@@ -255,6 +255,7 @@ export const scenarioPage: Record<string, string> = {
     "input-disabled": "tier-1b",
     "input-error": "tier-1b",
     "input-sizes": "tier-1b",
+    "input-nested-theme": "tier-1b",
     "kbd-basic": "tier-1a",
     "kbd-sizes": "tier-1a",
     "label-variants": "tier-1b",

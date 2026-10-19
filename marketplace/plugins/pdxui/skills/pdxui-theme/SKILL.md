@@ -175,9 +175,13 @@ a hardcoded `rgb(255,255,255)` expectation breaks in dark mode.
      density back. Do not write the factor as an inline style: it works, but it is the workaround for a
      layer order that is fixed.
 - **Behavior tokens** drive structural variants app-wide: `--pdx-button-radius`, `--pdx-input-style`
-  (`outlined|filled|underlined`), `--pdx-tab-indicator` (`underline|pill|filled`), `--pdx-card-style`,
-  `--pdx-accordion-glyph` + `--pdx-accordion-open-transform`, `--pdx-breadcrumb-separator`,
-  `--pdx-toggle-width/height`.
+  (`outlined|filled|underlined`), `--pdx-input-focus` (`bottom`), `--pdx-tab-indicator`
+  (`underline|pill|filled`), `--pdx-card-style`, `--pdx-accordion-glyph` +
+  `--pdx-accordion-open-transform`, `--pdx-breadcrumb-separator`, `--pdx-toggle-width/height`.
+  Declare them as tokens and set nothing else: under the default target the design CSS reads the
+  structural ones with style queries, so a `pdx-theme` subtree gets its own. Never write
+  `pdx-input-style`/`pdx-card-style`/`pdx-tab-style` attributes on `<html>` by hand — under
+  `baseline-2024` `setTheme` mirrors them.
 
 ## 7. Programmatic API (`@pdxui/design/engine`)
 

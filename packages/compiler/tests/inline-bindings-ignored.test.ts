@@ -23,7 +23,7 @@ afterAll(() => rmSync(root, { recursive: true, force: true }));
 const SFC = '<template>\n  <p :title="label">{{ label }}</p>\n</template>\n<script setup>\nlet label = $signal(\'x\');\n</script>\n';
 
 function start(options: Parameters<typeof pdx>[0], command: 'build' | 'serve') {
-    const plugin = pdx({ devtools: false, autoAlias: false, ...options }) as unknown as Hooks;
+    const plugin = pdx({ devtools: false, autoAlias: false, ...options })[0] as unknown as Hooks;
     plugin.config({}, { command });
     plugin.configResolved({ root, server: { fs: { allow: [] } } });
     const warnings: { code?: string; message?: string }[] = [];

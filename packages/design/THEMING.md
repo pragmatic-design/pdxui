@@ -32,11 +32,19 @@ A designer works at levels **1–2**. Level 3 is a *consumer*: when a component 
 |---|---|
 | `--pdx-button-radius` | `0` · `0.5rem` · `9999px` (pill) |
 | `--pdx-input-style` | `outlined` · `filled` · `underlined` |
+| `--pdx-input-focus` | `ring` · `bottom` (the bottom accent of a focused field) |
 | `--pdx-tab-indicator` | `underline` · `pill` |
 | `--pdx-card-style` | `bordered` · `elevated` · `flat` |
 | `--pdx-accordion-glyph` + `--pdx-accordion-transform-open` | the glyph, and how it rotates when open |
 | `--pdx-field-required-marker` | the `content` after a required field's label: `' *'` (unset) · any string · `none`. Inherited, so it can also be set on one form or one field; the control's `aria-required` is set whatever it is |
 | density | `compact` · `normal` · `comfort` — a theme may declare its own `--pdx-density-factor`; the reader's `pdx-density` attribute (on `<html>` or any element) overrides it, from the layer `pdx.preferences` after the themes |
+
+The CSS writes the four structural ones — input style and focus, tab indicator, card style — as
+rules on attributes, `[pdx-card-style="elevated"] .pdx-surface-card`. An app built with `pdx()` on the
+default target gets them rewritten into container style queries on the tokens (#156), so a
+`pdx-theme` subtree has its own behaviours; under `baseline-2024`, or with no `pdx()`, `setTheme`
+mirrors the tokens into those attributes on `<html>`. Write such a rule with the attribute in the
+selector's leading compound: anywhere else the rewrite refuses it.
 
 **C. Scales**: spacing, radii, **typography** (font plus a modular scale), **shadows** (5 levels), motion.
 
@@ -525,6 +533,7 @@ Extracted from hardcoded values.
 | Token | Default |
 |---|---|
 | `--pdx-input-style` | `outlined` |
+| `--pdx-input-focus` | `ring` |
 | `--pdx-input-min-height` | `2.5rem` |
 | `--pdx-input-border-width` | `var(--pdx-border-width)` |
 

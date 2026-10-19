@@ -40,7 +40,7 @@ describe('the Vite plugin', () => {
     function transformIn(command: 'serve' | 'build'): string {
         root = mkdtempSync(join(tmpdir(), 'pdx-file-'));
         mkdirSync(join(root, 'src', 'pages'), { recursive: true });
-        const plugin = pdx();
+        const [plugin] = pdx();
         (plugin.config as (c: object, e: { command: string }) => void)({}, { command });
         (plugin.configResolved as (c: { root: string; server: { fs: { allow: string[] } } }) => void)(
             { root, server: { fs: { allow: [] } } });

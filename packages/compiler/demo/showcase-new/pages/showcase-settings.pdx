@@ -46,6 +46,8 @@
 // The showcase's theme, density and colour scheme: the topbar's dropdowns and mode button
 // on a desktop, the settings drawer on a phone — two views of one state, which is why the drawer's
 // chips are rendered from it rather than built once and left behind when the dropdown changes it.
+import { setTheme as applyThemeName } from '@pdxui/core';
+
 const themeItems = [
   { key: 'neutral', label: 'Neutral' }, { key: 'material', label: 'Material' },
   { key: 'fluent', label: 'Fluent' }, { key: 'cupertino', label: 'Cupertino' },
@@ -60,12 +62,6 @@ const densityItems = [
   { key: 'compact', label: 'Compact' }, { key: 'normal', label: 'Normal' }, { key: 'comfort', label: 'Comfort' },
 ];
 
-// Behavior attributes derived from theme — drives structural CSS variants
-const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk: 'underlined' };
-const _inputFocusMap = { fluent: 'bottom' };
-const _tabStyleMap = { pragmatic: 'pill', 'pragmatic-gold': 'pill', cupertino: 'pill', playful: 'pill', neumorphic: 'pill' };
-const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
-
 // Restore theme/scheme/density from querystring or localStorage
 const _params = new URLSearchParams(location.search);
 let theme = $signal(_params.get('theme') || localStorage.getItem('pdx-theme') || 'neutral');
@@ -77,18 +73,10 @@ const themeLabel = $derived(themeItems.find(t => t.key === theme)?.label || them
 const densityLabel = $derived(densityItems.find(d => d.key === density)?.label || density);
 const modeIcon = $derived(dark ? 'sun' : 'moon');
 
-function _applyBehaviorAttrs(key) {
-    const root = document.documentElement;
-    const _set = (attr, map) => { const v = map[key]; if (v) root.setAttribute(attr, v); else root.removeAttribute(attr); };
-    _set('pdx-input-style', _inputStyleMap);
-    _set('pdx-input-focus', _inputFocusMap);
-    _set('pdx-tab-style', _tabStyleMap);
-    _set('pdx-card-style', _cardStyleMap);
-}
-
+// The attribute alone: a theme's behaviours (filled inputs, pill tabs, elevated cards) are its own
+// tokens, which the design CSS reads through style queries (#156).
 function _applyTheme(key) {
     document.documentElement.setAttribute('pdx-theme', key);
-    _applyBehaviorAttrs(key);
 }
 
 // The attribute alone: its rules are in the design system's `pdx.preferences` layer, after the
@@ -105,8 +93,7 @@ function _applyScheme(isDark) {
 
 function setTheme(key) {
     theme = key;
-    _applyTheme(key);
-    localStorage.setItem('pdx-theme', key);
+    applyThemeName(key);
 }
 
 function setDensity(key) {

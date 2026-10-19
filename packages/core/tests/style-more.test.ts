@@ -245,6 +245,34 @@ describe('the theme manager', () => {
         expect(root().getAttribute('pdx-input-style'),
             'the previous theme\'s behaviour attribute stayed on <html>').toBeNull();
     });
+
+    // Under baseline-2026 the pdx() plugin rewrites the design CSS into style queries on the tokens
+    // and defines __PDX_TARGET__ (#156): an attribute on <html> would select nothing, and mirroring it
+    // a frame late is the defect the queries remove.
+    it('does not mirror them under baseline-2026, where the CSS reads the tokens itself', async () => {
+        vi.stubGlobal('__PDX_TARGET__', 'baseline-2026');
+        try {
+            styleSheet(':root { --pdx-input-style: filled }');
+            setTheme('with-behaviour');
+            await new Promise((r) => requestAnimationFrame(() => r(null)));
+            expect(root().getAttribute('pdx-theme')).toBe('with-behaviour');
+            expect(root().getAttribute('pdx-input-style')).toBeNull();
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
+    it('mirrors them under baseline-2024, as without the plugin', async () => {
+        vi.stubGlobal('__PDX_TARGET__', 'baseline-2024');
+        try {
+            styleSheet(':root { --pdx-input-style: filled }');
+            setTheme('with-behaviour');
+            await new Promise((r) => requestAnimationFrame(() => r(null)));
+            expect(root().getAttribute('pdx-input-style')).toBe('filled');
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
 });
 
 describe('the observer on <html>', () => {

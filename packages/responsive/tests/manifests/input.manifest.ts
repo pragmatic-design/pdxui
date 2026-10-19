@@ -41,6 +41,20 @@ export const input: ComponentManifest = {
                     <pdx-input data-test="input-lg" size="lg" placeholder="Large"></pdx-input>
                 </div>`,
         },
+        {
+            // A subtree with a theme of its own takes that theme's input style (#156): material's
+            // filled field and fluent's outlined one, whatever the page's theme. The design CSS reads
+            // `--pdx-input-style` through a style query — the default target, baseline-2026. Under
+            // baseline-2024 the style is an attribute on <html>, the page's alone, and this scenario
+            // is the difference.
+            id: 'input-nested-theme',
+            title: 'Input — Nested themes',
+            html: `
+                <div style="display: flex; flex-direction: column; gap: 12px; max-width: 300px;">
+                    <div pdx-theme="material"><pdx-input data-test="material-input" placeholder="Material"></pdx-input></div>
+                    <div pdx-theme="fluent"><pdx-input data-test="fluent-input" placeholder="Fluent"></pdx-input></div>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (rules scoped to their scenario) ──
@@ -63,6 +77,27 @@ export const input: ComponentManifest = {
                             top: { style: { op: 'is', value: 'none' } },
                             left: { style: { op: 'is', value: 'none' } },
                             right: { style: { op: 'is', value: 'none' } },
+                        },
+                    },
+                ],
+            },
+            'input-nested-theme': {
+                standalone: [
+                    {
+                        // filled: `border: none` and a bottom border alone (inputs.css).
+                        selector: 'section:not([hidden]) [data-test="material-input"] .pdx-input-wrap',
+                        description: 'a material subtree has a filled input, on any page theme',
+                        border: {
+                            top: { style: { op: 'is', value: 'none' } },
+                            bottom: { style: { op: 'is', value: 'solid' } },
+                        },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="fluent-input"] .pdx-input-wrap',
+                        description: 'a fluent subtree has an outlined input, on any page theme',
+                        border: {
+                            top: { style: { op: 'is', value: 'solid' } },
+                            left: { style: { op: 'is', value: 'solid' } },
                         },
                     },
                 ],

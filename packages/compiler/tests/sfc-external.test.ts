@@ -123,7 +123,7 @@ describe('compile with external src=', () => {
 
 describe('vite plugin src= security guard', () => {
     it('rejects sibling paths that only share the project-root prefix', () => {
-        const plugin = pdx();
+        const [plugin] = pdx();
         const transform = plugin.transform as (this: { error(message: string): never }, code: string, id: string) => unknown;
         const source = '<template><div/></template>\n<script setup src="../../ui-framework-evil/secret.ts" />';
         const id = resolve(process.cwd(), 'src', 'guard-test.pdx');
@@ -138,7 +138,7 @@ describe('vite plugin src= security guard', () => {
 
 describe('vite plugin DevTools injection (dev only)', () => {
     it('does NOT inject DevTools in a production build', () => {
-        const plugin = pdx();
+        const [plugin] = pdx();
         (plugin.config as (c: object, e: { command: string }) => void)({}, { command: 'build' });
         const out = (plugin.transformIndexHtml as (h: string) => string)('<html><body></body></html>');
         expect(String(out)).not.toContain('initDevTools');
@@ -149,7 +149,7 @@ describe('vite plugin DevTools injection (dev only)', () => {
         // an inline script is not import-rewritten and its bare specifier would reach the browser
         // unresolved.
         // So: the page must reference the module, AND the module must be the devtools bootstrap.
-        const plugin = pdx();
+        const [plugin] = pdx();
         (plugin.config as (c: object, e: { command: string }) => void)({}, { command: 'serve' });
         const out = String((plugin.transformIndexHtml as (h: string) => string)('<html><body></body></html>'));
         expect(out).toContain('virtual:pdx-devtools');
@@ -181,7 +181,7 @@ describe('vite plugin src= symlink guard', () => {
                 // symlink creation not permitted on this platform → skip
                 return;
             }
-            const plugin = pdx();
+            const [plugin] = pdx();
             (plugin.configResolved as (c: { root: string; server: { fs: { allow: string[] } } }) => void)(
                 { root, server: { fs: { allow: [] } } });
             const transform = plugin.transform as (this: { error(m: string): never }, code: string, id: string) => unknown;

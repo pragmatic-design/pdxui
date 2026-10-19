@@ -396,6 +396,7 @@
 
     /* Input */
     --pdx-input-style:       outlined;     /* outlined | filled | underlined */
+    --pdx-input-focus:       ring;         /* ring | bottom */
     --pdx-input-min-height:  2.5rem;       /* 40px default */
     --pdx-input-border-width: var(--pdx-border-width);
 

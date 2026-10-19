@@ -110,7 +110,7 @@ is Baseline widely available (September 2028); #121 carries the details (decisio
 |---|---|---|
 | Scoped style | `@scope (…) to (…)` donut, slotted content marked `data-pdx-H-in` (#152 — landed) | ancestor selector `[data-pdx-H] …` (alpha) |
 | `:scope` in a scoped block (the host) | `:where(:scope)[data-pdx-H]`, inside `@scope` (#152 — landed) | rewritten to the host, `[data-pdx-H]` (#152 — landed; decisions.md 20) |
-| Theme behaviours | custom properties read with style queries (#156) | attributes on `<html>` synced by `setTheme` (alpha) |
+| Theme behaviours | custom properties read with style queries (#156 — landed) | attributes on `<html>` synced by `setTheme` (alpha) |
 | Custom states | `:state(name)` (#132) | `:state(name)` plus a mirrored `data-state-name` attribute |
 | Variants | `:scope[variant="x"]` inside the `@scope` block (#153) | `[data-pdx-H][variant="x"]` |
 

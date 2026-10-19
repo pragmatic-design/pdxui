@@ -35,10 +35,15 @@ Two attributes on `<html>`:
 `pdx-theme` picks the token set; `pdx-scheme` (`light`/`dark`) decides which branch of the
 `light-dark()` colors to use.
 
-Some themes also set **structural** attributes — `pdx-tab-style="pill"`,
-`pdx-card-style="elevated"`, `pdx-input-style="filled"`, `pdx-input-focus="bottom"` — for the
-variants that are a different shape rather than a different value. A generated theme hands them
-to you in `theme.attributes`.
+Some themes also have **structural** behaviours — pill tabs, elevated cards, filled inputs, a
+bottom focus accent — for the variants that are a different shape rather than a different value.
+They are tokens too (`--pdx-tab-indicator`, `--pdx-card-style`, `--pdx-input-style`,
+`--pdx-input-focus`), and under the default browser target the design CSS reads them with container
+style queries: a `pdx-theme` subtree gets its own, in the frame the theme changes, and there is
+nothing to set but `pdx-theme`. Under `pdx({ target: 'baseline-2024' })` the CSS selects on
+attributes on `<html>` instead (`pdx-tab-style="pill"`, `pdx-card-style="elevated"`, …), which
+`setTheme` writes for you — the page's behaviours only, one frame after the switch. A generated
+theme hands those attributes to you in `theme.attributes`.
 
 ## Letting a user pick one
 

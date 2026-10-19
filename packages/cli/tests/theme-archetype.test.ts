@@ -73,3 +73,22 @@ describe('archetype × any brand', () => {
         });
     }
 });
+
+// Under baseline-2026 the design CSS reads a theme's behaviours from its tokens, through style queries
+// (#156); the attributes on <html> are baseline-2024's. A behaviour the engine sets only as an
+// attribute is one a generated theme loses under the default target.
+const BEHAVIOUR_TOKEN: Record<string, string> = {
+    'pdx-input-style': '--pdx-input-style', 'pdx-input-focus': '--pdx-input-focus',
+    'pdx-tab-style': '--pdx-tab-indicator', 'pdx-card-style': '--pdx-card-style',
+};
+
+describe('behaviour tokens', () => {
+    for (const language of LANGUAGES) {
+        it(`${language} declares a token for every behaviour attribute it sets`, () => {
+            const theme = createTheme({ name: 'probe', brandColor: BRANDS[0], language });
+            for (const [attr, value] of Object.entries(theme.attributes)) {
+                expect(theme.tokens[BEHAVIOUR_TOKEN[attr]], `${attr}="${value}"`).toBe(value);
+            }
+        });
+    }
+});

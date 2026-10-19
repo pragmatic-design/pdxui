@@ -46,6 +46,7 @@ import type { MethodsLookup } from './compiler/validate-commands';
 import type { ModelsLookup } from './compiler/validate-two-way';
 import type { RequiredPropsLookup } from './compiler/validate-required-props';
 import { jsQuote } from './compiler/js-literal';
+import { designTargetPlugin } from './design-target';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
 /**
@@ -163,8 +164,11 @@ export interface PdxPluginOptions {
  * Usage in vite.config.ts:
  *   import { pdx } from '@pdxui/compiler';
  *   export default defineConfig({ plugins: [pdx()] });
+ *
+ * Two plugins, which Vite takes as one entry of `plugins`: the compiler, and the one that gives
+ * `@pdxui/design`'s stylesheets the form of the target (./design-target, #156).
  */
-export function pdx(options?: PdxPluginOptions): Plugin {
+export function pdx(options?: PdxPluginOptions): Plugin[] {
     const extensions = options?.extensions ?? ['.pdx', '.pdx.ts'];
     const compilerPlugins = options?.plugins ?? [];
     const shouldMinify = options?.minify; // undefined = auto (dev: false, build: true)
@@ -221,7 +225,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
         if (routes.length > 0) writeRouteTypes(root, routes.map((r) => r.path));
     }
 
-    return {
+    const main: Plugin = {
         name: 'pragmatic-pdx',
         enforce: 'pre',
 
@@ -250,6 +254,10 @@ export function pdx(options?: PdxPluginOptions): Plugin {
 
             // Build mode treeshake: handled per-module via transform() return value
             // (moduleSideEffects: 'no-treeshake') — no global treeshake override needed.
+
+            // The target, for core (#156): under baseline-2026 the design CSS reads the behaviour
+            // tokens through style queries, and setTheme stops mirroring them as attributes.
+            result.define = { __PDX_TARGET__: JSON.stringify(target) };
 
             // Exclude .pdx.ts from esbuild dep optimization (rune syntax breaks esbuild)
             result.optimizeDeps = {
@@ -632,6 +640,7 @@ export function pdx(options?: PdxPluginOptions): Plugin {
             }
         },
     };
+    return [main, designTargetPlugin(target)];
 }
 
 /** Result of compiling a .pdx file. */

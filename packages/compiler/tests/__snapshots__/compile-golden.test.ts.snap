@@ -48333,7 +48333,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/showcase-settings.p
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, delegate, eachRow, effect, safeHandler, selector, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, delegate, eachRow, effect, safeHandler, selector, setTheme as applyThemeName, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-mwg9c1");
@@ -48354,6 +48354,8 @@ component('app-showcase-settings', {
 // The showcase's theme, density and colour scheme: the topbar's dropdowns and mode button
     // on a desktop, the settings drawer on a phone — two views of one state, which is why the drawer's
     // chips are rendered from it rather than built once and left behind when the dropdown changes it.
+    
+    
     const themeItems = [
       { key: 'neutral', label: 'Neutral' }, { key: 'material', label: 'Material' },
       { key: 'fluent', label: 'Fluent' }, { key: 'cupertino', label: 'Cupertino' },
@@ -48368,16 +48370,6 @@ component('app-showcase-settings', {
     const densityItems = [
       { key: 'compact', label: 'Compact' }, { key: 'normal', label: 'Normal' }, { key: 'comfort', label: 'Comfort' },
     ];
-    
-    
-    // Behavior attributes derived from theme — drives structural CSS variants
-    const _inputStyleMap = { material: 'filled', editorial: 'underlined', cyberpunk: 'underlined' };
-    
-    const _inputFocusMap = { fluent: 'bottom' };
-    
-    const _tabStyleMap = { pragmatic: 'pill', 'pragmatic-gold': 'pill', cupertino: 'pill', playful: 'pill', neumorphic: 'pill' };
-    
-    const _cardStyleMap = { material: 'elevated', playful: 'elevated' };
     
     
     // Restore theme/scheme/density from querystring or localStorage
@@ -48398,18 +48390,10 @@ component('app-showcase-settings', {
     
     
     
-    function _applyBehaviorAttrs(key) {
-        const root = document.documentElement;
-        const _set = (attr, map) => { const v = map[key]; if (v) root.setAttribute(attr, v); else root.removeAttribute(attr); };
-        _set('pdx-input-style', _inputStyleMap);
-        _set('pdx-input-focus', _inputFocusMap);
-        _set('pdx-tab-style', _tabStyleMap);
-        _set('pdx-card-style', _cardStyleMap);
-    }
-    
+    // The attribute alone: a theme's behaviours (filled inputs, pill tabs, elevated cards) are its own
+    // tokens, which the design CSS reads through style queries (#156).
     function _applyTheme(key) {
         document.documentElement.setAttribute('pdx-theme', key);
-        _applyBehaviorAttrs(key);
     }
     
     // The attribute alone: its rules are in the design system's \`pdx.preferences\` layer, after the
@@ -48426,8 +48410,7 @@ component('app-showcase-settings', {
     
     function setTheme(key) {
         __theme.setRaw(key);
-        _applyTheme(key);
-        localStorage.setItem('pdx-theme', key);
+        applyThemeName(key);
     }
     
     function setDensity(key) {

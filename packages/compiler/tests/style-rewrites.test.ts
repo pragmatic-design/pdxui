@@ -72,7 +72,7 @@ describe('<style src> in a production build', () => {
     afterAll(() => rmSync(dir, { recursive: true, force: true }));
 
     it('the style module the bundler loads carries the file the block names', () => {
-        const plugin = pdx();
+        const [plugin] = pdx();
         (plugin.configResolved as unknown as (c: unknown) => void)({ root: dir, base: '/', server: { fs: { allow: [] } }, command: 'build', mode: 'production' });
         const load = plugin.load as unknown as (this: { warn(m: string): void }, id: string) => string | null;
         const css = load.call({ warn: () => {} }, '\0' + styleModuleId(file, 0));

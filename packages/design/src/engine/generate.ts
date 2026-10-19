@@ -175,6 +175,9 @@ export function generateTheme(input: ThemeInput): GeneratedTheme {
 
     // Behavior tokens (CSS custom properties for documentation/tooling)
     tokens['--pdx-input-style'] = behaviors.inputStyle;
+    // Read by the design CSS under baseline-2026, where the behaviours are style queries on these
+    // tokens and not attributes on <html> (#156).
+    if (behaviors.inputFocus) tokens['--pdx-input-focus'] = behaviors.inputFocus;
     tokens['--pdx-input-min-height'] = behaviors.inputMinHeight;
     // Button shape is its OWN behavior, not the global radius ramp: Material 3 has PILL
     // buttons on ROUNDED cards. So the language's buttonShape decides here — unless the
