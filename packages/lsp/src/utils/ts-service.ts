@@ -9,6 +9,7 @@ import { fileURLToPath } from 'url';
 import { GLOBALS_FILE, GLOBALS_DTS } from './pdx-globals';
 import { projectRuneModule } from './rune-module';
 import { findTsLibDir } from './ts-lib-dir';
+import { applyInsertions, runeTypeAnnotations } from './rune-annotations';
 
 // The projection lives in ./project-script; re-exported for the callers that read it here.
 export { projectScript } from './project-script';
@@ -20,7 +21,8 @@ export { projectScript } from './project-script';
  * Not its strictness. A .pdx script is checked with the runes declared as their VALUES, and under
  * `strict` that is wrong in ways the code is not: `$signal(null)` is typed `null` and every later
  * assignment is an error, a handler's `(e) =>` is an implicit any. Measured on the showcase, whose
- * tsconfig is strict: reading it whole takes the sweep from 0 lib errors to 499 false ones.
+ * tsconfig is strict: reading it whole takes the sweep from 0 lib errors to 499 false ones. The
+ * template projection, which holds none of that, is checked `strict` in a second program (#468).
  */
 function projectCompilerOptions(rootDir: string): ts.CompilerOptions | null {
     const configPath = ts.findConfigFile(rootDir, ts.sys.fileExists, 'tsconfig.json');
@@ -46,11 +48,25 @@ export interface TsDef {
 
 interface VFile { version: number; content: string; }
 
+/** A projected .pdx to check: its virtual file, and where its template projection starts (-1: none). */
+export interface PdxEntry { fileName: string; content: string; templateBase?: number; }
+
+/** A program's files: the projected .pdx it holds, and a version bumped when they change. */
+interface Program { files: Map<string, VFile>; version: number; }
+
 export class PdxTsService {
-    private files = new Map<string, VFile>();
+    /** The program that checks the scripts: the project's options, not `strict` (projectCompilerOptions). */
+    private lenient: Program = { files: new Map(), version: 0 };
     private service: ts.LanguageService;
     private options: ts.CompilerOptions;
-    private projectVersion = 0;
+    /**
+     * The second program, `strict`, that checks the template projections (#468). Its files are the
+     * lenient program's, with each untyped rune declaration typed as the lenient program reads it
+     * (./rune-annotations). Built on the first template it is asked about.
+     */
+    private strict: Program = { files: new Map(), version: 0 };
+    private strictService: ts.LanguageService | null = null;
+    private createService!: (program: Program, options: ts.CompilerOptions) => ts.LanguageService;
 
     /**
      * @param rootDir the project the service checks — its nearest tsconfig.json is read
@@ -89,29 +105,31 @@ export class PdxTsService {
             return stat ? String(stat.getTime()) : '0';
         };
 
-        const host: ts.LanguageServiceHost = {
+        // One registry for both programs: the libraries and the project's files are parsed once.
+        const registry = ts.createDocumentRegistry();
+        this.createService = (program, options) => ts.createLanguageService({
             // Bumped when the fileset or the content changes → the LS rebuilds the program
             // with the current file alone (nothing left over from earlier .pdx files).
-            getProjectVersion: () => `${this.projectVersion}:${routeTypesVersion()}`,
-            getScriptFileNames: () => [GLOBALS_FILE, ...(routeTypes && ts.sys.fileExists(routeTypes) ? [routeTypes] : []), ...this.files.keys()],
-            getScriptVersion: f => f === GLOBALS_FILE ? '1' : f === routeTypes ? routeTypesVersion() : String(this.files.get(f)?.version ?? 0),
+            getProjectVersion: () => `${program.version}:${routeTypesVersion()}`,
+            getScriptFileNames: () => [GLOBALS_FILE, ...(routeTypes && ts.sys.fileExists(routeTypes) ? [routeTypes] : []), ...program.files.keys()],
+            getScriptVersion: f => f === GLOBALS_FILE ? '1' : f === routeTypes ? routeTypesVersion() : String(program.files.get(f)?.version ?? 0),
             getScriptSnapshot: f => {
                 if (f === GLOBALS_FILE) return ts.ScriptSnapshot.fromString(GLOBALS_DTS);
-                const v = this.files.get(f);
+                const v = program.files.get(f);
                 if (v) return ts.ScriptSnapshot.fromString(v.content);
                 const c = ts.sys.readFile(f); // a .pdx.ts is a rune module: read as compiled (./rune-module)
                 return c !== undefined ? ts.ScriptSnapshot.fromString(f.endsWith('.pdx.ts') ? projectRuneModule(c, f) : c) : undefined;
             },
             getCurrentDirectory: () => rootDir || ts.sys.getCurrentDirectory(),
-            getCompilationSettings: () => this.options,
+            getCompilationSettings: () => options,
             getDefaultLibFileName: () => defaultLib,
             fileExists: ts.sys.fileExists,
             readFile: ts.sys.readFile,
             readDirectory: ts.sys.readDirectory,
             directoryExists: ts.sys.directoryExists,
             getDirectories: ts.sys.getDirectories,
-        };
-        this.service = ts.createLanguageService(host, ts.createDocumentRegistry());
+        }, registry);
+        this.service = this.createService(this.lenient, this.options);
     }
 
     /**
@@ -122,15 +140,15 @@ export class PdxTsService {
      * back to its own file.
      */
     renameLocations(entries: { fileName: string; content: string }[], target: string, offset: number): { fileName: string; start: number; length: number }[] {
-        this.files.clear();
-        for (const e of entries) this.files.set(e.fileName, { version: 1, content: e.content });
-        this.projectVersion++;
+        this.lenient.files.clear();
+        for (const e of entries) this.lenient.files.set(e.fileName, { version: 1, content: e.content });
+        this.lenient.version++;
         try {
             const locs = this.service.findRenameLocations(target, offset, false, false, { providePrefixAndSuffixTextForRename: false });
             return (locs ?? []).map(l => ({ fileName: l.fileName, start: l.textSpan.start, length: l.textSpan.length }));
         } finally {
-            this.files.clear();
-            this.projectVersion++;
+            this.lenient.files.clear();
+            this.lenient.version++;
         }
     }
 
@@ -139,30 +157,30 @@ export class PdxTsService {
      * `pdx check --types`. The editor builds a program per request for the file in
      * hand; a check of a whole project builds it once. The service syncs back on its next request.
      */
-    diagnoseAll(entries: { fileName: string; content: string }[]): Map<string, readonly ts.Diagnostic[]> {
-        this.files.clear();
-        for (const e of entries) this.files.set(e.fileName, { version: 1, content: e.content });
-        this.projectVersion++;
-        const out = new Map<string, readonly ts.Diagnostic[]>();
+    diagnoseAll(entries: PdxEntry[]): Map<string, readonly ts.Diagnostic[]> {
+        this.lenient.files.clear();
+        for (const e of entries) this.lenient.files.set(e.fileName, { version: 1, content: e.content });
+        this.lenient.version++;
         try {
-            for (const e of entries) out.set(e.fileName, this.diagnosticsOf(e.fileName));
+            return this.diagnoseEntries(entries);
         } finally {
-            this.files.clear();
-            this.projectVersion++;
+            for (const program of [this.lenient, this.strict]) {
+                program.files.clear();
+                program.version++;
+            }
         }
-        return out;
     }
 
     /** Whether TypeScript can rename what is at `offset` in the file `fileName` holding `content`. */
     canRename(fileName: string, content: string, offset: number): boolean {
-        this.files.clear();
-        this.files.set(fileName, { version: 1, content });
-        this.projectVersion++;
+        this.lenient.files.clear();
+        this.lenient.files.set(fileName, { version: 1, content });
+        this.lenient.version++;
         try {
             return this.service.getRenameInfo(fileName, offset).canRename;
         } finally {
-            this.files.clear();
-            this.projectVersion++;
+            this.lenient.files.clear();
+            this.lenient.version++;
         }
     }
 
@@ -185,14 +203,7 @@ export class PdxTsService {
      *  accumulates → nothing leaks. */
     private sync(uri: string, content: string): string {
         const name = this.vFileName(uri);
-        let changed = false;
-        for (const k of [...this.files.keys()]) if (k !== name) { this.files.delete(k); changed = true; }
-        const prev = this.files.get(name);
-        if (!prev || prev.content !== content) {
-            this.files.set(name, { version: (prev?.version ?? 0) + 1, content });
-            changed = true;
-        }
-        if (changed) this.projectVersion++;
+        syncFiles(this.lenient, [{ fileName: name, content }]);
         return name;
     }
 
@@ -231,21 +242,68 @@ export class PdxTsService {
     }
 
     /** The virtual file's diagnostics, syntax errors and type errors (#487); the offsets are relative
-     *  to the projected script (= the script content), to be mapped onto the .pdx after. */
-    getDiagnostics(uri: string, content: string): ts.Diagnostic[] {
+     *  to the projected script (= the script content), to be mapped onto the .pdx after. What lies
+     *  after `templateBase`, the template projection, is checked under `strict` (#468). */
+    getDiagnostics(uri: string, content: string, templateBase = -1): ts.Diagnostic[] {
         const name = this.sync(uri, content);
-        try { return this.diagnosticsOf(name); } catch { return []; }
+        try { return this.diagnoseEntries([{ fileName: name, content, templateBase }]).get(name) ?? []; } catch { return []; }
     }
 
     /**
-     * A file's syntactic diagnostics, then its semantic ones. The semantic list alone leaves a syntax
-     * error unreported — a script the user wrote wrong, or a projection that produced invalid
-     * TypeScript, would both look clean (#487).
+     * Each entry's diagnostics, offsets in its own content: its script's from the lenient program,
+     * its template's from the strict one (#468). The lenient program must already hold the entries.
      */
-    private diagnosticsOf(fileName: string): ts.Diagnostic[] {
-        return [...this.service.getSyntacticDiagnostics(fileName), ...this.service.getSemanticDiagnostics(fileName)];
+    private diagnoseEntries(entries: PdxEntry[]): Map<string, ts.Diagnostic[]> {
+        const out = new Map<string, ts.Diagnostic[]>();
+        for (const e of entries) {
+            const base = e.templateBase ?? -1;
+            out.set(e.fileName, diagnosticsOf(this.service, e.fileName).filter((d) => base < 0 || d.start == null || d.start < base));
+        }
+        const program = this.service.getProgram();
+        const templated = entries.filter((e) => (e.templateBase ?? -1) >= 0);
+        if (!program || templated.length === 0) return out;
+
+        // Each file with its rune declarations typed as the lenient program reads them. They are all
+        // in the script, before the template: the template's offsets move by `shift`, as one block.
+        const annotated = templated.map((e) => {
+            const base = e.templateBase ?? -1;
+            const { content, shift } = applyInsertions(e.content, runeTypeAnnotations(program, e.fileName, base));
+            return { fileName: e.fileName, content, from: base + shift, shift };
+        });
+        syncFiles(this.strict, annotated);
+        this.strictService ??= this.createService(this.strict, { ...this.options, strict: true });
+        for (const e of annotated) {
+            for (const d of diagnosticsOf(this.strictService, e.fileName)) {
+                if (d.start != null && d.start >= e.from) out.get(e.fileName)?.push({ ...d, start: d.start - e.shift });
+            }
+        }
+        return out;
     }
 
     /** Available only when the TS lib was found (full completion for the JS builtins). */
     get hasFullLib(): boolean { return !!findTsLibDir(this.rootDir, this.tsLibHint); }
+}
+
+/**
+ * A file's syntactic diagnostics, then its semantic ones. The semantic list alone leaves a syntax
+ * error unreported — a script the user wrote wrong, or a projection that produced invalid
+ * TypeScript, would both look clean (#487).
+ */
+function diagnosticsOf(service: ts.LanguageService, fileName: string): ts.Diagnostic[] {
+    return [...service.getSyntacticDiagnostics(fileName), ...service.getSemanticDiagnostics(fileName)];
+}
+
+/** Makes `files` the program's whole fileset, bumping a version only where the content changed. */
+function syncFiles(program: Program, files: { fileName: string; content: string }[]): void {
+    const names = new Set(files.map((f) => f.fileName));
+    let changed = false;
+    for (const k of [...program.files.keys()]) if (!names.has(k)) { program.files.delete(k); changed = true; }
+    for (const f of files) {
+        const prev = program.files.get(f.fileName);
+        if (!prev || prev.content !== f.content) {
+            program.files.set(f.fileName, { version: (prev?.version ?? 0) + 1, content: f.content });
+            changed = true;
+        }
+    }
+    if (changed) program.version++;
 }

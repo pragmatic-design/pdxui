@@ -227,6 +227,9 @@ no payload. The error of `@catch (e)` and `@await … @error (e)` is `unknown`: 
 `e instanceof Error ? e.message : String(e)`, since a template cannot write a cast. A scoped slot's
 `let:` names have the type its component declares with `@slot name: { … }`, `unknown` when it declares
 none. A library component's event details and slot contexts are not typed yet, so they are not checked.
+An arrow handler's parameter (`@input="e => …"`) is the event too. Template expressions are checked
+under `strict` (the script is not): a possibly-`null` read, `user.name` on a `$signal<User | null>`,
+is an error — write `user?.name` or guard it with `@if`.
 
 A component with no content may be written self-closing, `<pdx-autocomplete … />`: the compiler (and
 core's `html` tag) expands it to `<pdx-autocomplete …></pdx-autocomplete>`. The browser alone would not — it
