@@ -264,6 +264,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Set it, `:name="…"`, or declare it optional in the child: `@prop name?: T;` or a default.',
         reproducedIn: `${T}required-props.test.ts`,
     },
+    PDX_NAME_RESERVED: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@prop`, `@model` or typed `@slot` named after a member of the element (#542).',
+        explanation: 'Each becomes a property of the element, defined over the member of the same name: `@slot body: ();` replaced the method that renders the component, which then rendered nothing, with nothing said. The names are the element class\'s own members — `body`, `track`, `emit`, `frame`, `attr`, the lifecycle callbacks and the form-associated API — less `form`, which a form component replaces on purpose.',
+        fix: 'Rename the declaration.',
+        reproducedIn: `${T}reserved-element-names.test.ts`,
+    },
     PDX_SLOT_REQUIRED: {
         severity: 'error', category: 'defect',
         summary: 'A component used without a snippet it requires (#489).',

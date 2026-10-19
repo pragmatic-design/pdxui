@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 99 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 100 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -735,6 +735,14 @@ write:
 A state is a name and the condition it is on for. Without both, nothing is declared and nothing sets it.
 
 **Fix.** Write `@state name = condition;`, for example `@state expanded = open;`.
+
+### PDX_NAME_RESERVED
+
+*error* — A `@prop`, `@model` or typed `@slot` named after a member of the element (#542).
+
+Each becomes a property of the element, defined over the member of the same name: `@slot body: ();` replaced the method that renders the component, which then rendered nothing, with nothing said. The names are the element class's own members — `body`, `track`, `emit`, `frame`, `attr`, the lifecycle callbacks and the form-associated API — less `form`, which a form component replaces on purpose.
+
+**Fix.** Rename the declaration.
 
 ### PDX_NON_REACTIVE
 

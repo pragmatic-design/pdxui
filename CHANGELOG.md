@@ -297,6 +297,11 @@ semver.
 
 ### Fixes
 
+- A `@prop`, `@model` or typed `@slot` named after a member of the element (`body`, `track`, `emit`,
+  `frame`, `attr`, the lifecycle callbacks, the form-associated API) is `PDX_NAME_RESERVED`. It
+  replaced that member: a slot named `body` replaced the render method, and the component rendered
+  nothing. A TypeScript descriptor is warned in development. `form` stays allowed for form
+  components. (#542)
 - A component whose only declaration is a `@part` mounts: its part's ref is a signal, which the module
   called without importing, so the setup threw. (#153)
 - The child components of a kept-alive route page keep their state when the page is frozen: they

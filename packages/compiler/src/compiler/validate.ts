@@ -25,6 +25,7 @@ import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validat
 import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 import { checkRequiredSlots, type RequiredSlotsLookup } from './validate-required-slots';
+import { checkReservedNames } from './validate-reserved-names';
 import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubbles';
 import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
@@ -542,6 +543,7 @@ export function validate(
     warnings.push(...checkTwoWay(ast, options?.modelsOf));
     warnings.push(...checkRequiredProps(ast, options?.requiredPropsOf));
     warnings.push(...checkRequiredSlots(ast, options?.requiredSlotsOf));
+    warnings.push(...checkReservedNames(analysis));
     warnings.push(...checkBubblesUnused(analysis.events, options?.eventHeardAbove));
     warnings.push(...checkAttachments(ast, analysis));
     warnings.push(...checkBindingModifiers(ast));

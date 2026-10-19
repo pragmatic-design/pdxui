@@ -561,6 +561,19 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         }
     }
 
+    // A prop, model or typed snippet is defined on the instance, over the member of the same name (#542):
+    // one named after a member of this class or PdxElement replaces it. A `.pdx` is refused at compile
+    // time (PDX_NAME_RESERVED); a TypeScript descriptor is told here. `form` replaces the form getter
+    // on purpose, for a form component.
+    if (DEV) {
+        for (const name of propNames) {
+            if (name === 'form') continue;
+            const member = Object.prototype.hasOwnProperty.call(Comp.prototype, name)
+                || Object.prototype.hasOwnProperty.call(PdxElement.prototype, name);
+            if (member) console.warn(`[pdx] <${tag}> declares '${name}', which is a member of the element: the declaration replaces it, and the component may not render. Rename it.`);
+        }
+    }
+
     define(tag, Comp as unknown as new () => PdxElement);
 }
 

@@ -106,6 +106,10 @@ and the rewrite turns each read into `name()`; in a `$signal` or `$store` initia
 - Two `@prop` of one name raise `PDX_DUP_PROP`; a prop and another top-level declaration of the same
   name raise `PDX_DUP_DECLARATION`.
 - A component that assigns its own prop raises `PDX_PROP_WRITE`.
+- A prop is a property of the element: one named after a member of the element class (`body`,
+  `track`, `emit`, `frame`, `attr`, the lifecycle callbacks, the form-associated API) would replace
+  it, and raises `PDX_NAME_RESERVED` (#542). `form` is allowed, for a form component. Names of
+  `HTMLElement`'s own members (`id`, `style`, …) are not checked today (#545).
 - The declaration is one line: a type written across lines is not read — not checked today.
 
 #### Examples
@@ -276,8 +280,9 @@ The `.d.ts` gets a `Slots` interface with `name: ScopeType`, or `{}` without a t
   (error), at the tag.
 - A signature whose parentheses do not close (`@slot row: (item`) raises `PDX_UNKNOWN_DECLARATION`,
   and so does `@slot` with no name.
-- The name becomes a property of the element: a name the element already has (`body`, `track`,
-  `emit`, an `HTMLElement` member) replaces it — not checked today (#542).
+- The name becomes a property of the element: a member of the element class (`body`, `track`,
+  `emit`, …) is `PDX_NAME_RESERVED` (#542). An `HTMLElement` member replaces that member — not
+  checked today (#545).
 - The name is an `Identifier`; a hyphenated slot name cannot be declared — not checked today.
 
 #### Examples
