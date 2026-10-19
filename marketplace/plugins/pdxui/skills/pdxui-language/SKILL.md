@@ -253,7 +253,13 @@ and an imported signal is read with its parentheses, `{{ shared() }}`.
 @switch (status) { @case ('open') { … } @default { … } }
 @await (users as list) { … } @loading { … } @error (e, retry) { … }
 @defer (viewport) { … } @placeholder { … }
+@defer (when (tab === 'sales'); prefetch idle) { … } @error (err, retry) { … }
 ```
+
+`@defer` has two phases: the triggers before `;` render the block, the ones after `prefetch` only load
+its code ahead of time. Triggers: `viewport`, `idle`, `idle(ms)`, `interaction`, `timer(ms)`,
+`immediate`, `when (expr)` (fires once, the first time `expr` is true), joined with `|`. `hover` is
+removed — write `interaction`.
 
 The complete set the parser knows: `if · else · for · empty · switch · case · default · await ·
 loading · catch · try · error · defer · placeholder · show · require · portal · slot · let · raw`.

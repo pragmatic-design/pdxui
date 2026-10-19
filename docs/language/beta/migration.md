@@ -83,7 +83,7 @@ proposals the implementing issue may change.
 | `@head { title, meta: [...] }` | `@title` and `@meta` lines | mechanical — landed: `head-block` | #277 (decision 3) |
 | `@transition 'fade';` in the script | `@page '/x' { transition: 'fade' }` | mechanical — landed: `page-transition` | #277 (decision 7) |
 | `@meta { requiresAuth: true }` (route data) | `@page '/x' { meta: { requiresAuth: true } }` | mechanical — landed: `route-meta` | #277 (decision 8) |
-| `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical | † (decision 37) |
+| `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical — landed: `defer-hover` | #281 (decision 37) |
 | `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical — landed: `page-prefetch` | #277 (decision 19) |
 | a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged | † (decision 13) |
 | `x.isPending()` | `x.pending()` | mechanical — landed: `async-is-pending` | #141 |

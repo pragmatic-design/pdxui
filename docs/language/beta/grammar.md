@@ -276,11 +276,11 @@ CaseClause     ::= "@case" S? "(" ( StringLiteral | [^)]+ ) ")" Block
 RequireBlock   ::= "@require" S? "(" ( StringLiteral | [^)]+ ) ")" Block ( S? "@else" Block )?
 ShowBlock      ::= "@show" S? Paren Block
 PortalBlock    ::= "@portal" S? "(" ( StringLiteral | [^)]+ ) ")" Block
-DeferBlock     ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block                 (proposed: "; prefetch" — decisions.md 27)
-                   ( S? ( "@placeholder" Block | "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*     (proposed: ErrorNames — decisions.md 10)
+DeferBlock     ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block                 ("; prefetch" — decisions.md 27, landed #281)
+                   ( S? ( "@placeholder" Block | "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*     (ErrorNames — decisions.md 10, landed #281)
 Triggers       ::= Trigger ( S? "|" S? Trigger )*
-Trigger        ::= "viewport" | "idle" ( "(" Digits ")" )? | "interaction" | "timer(" Digits ")" | "immediate"   /* † `hover` removed — decisions.md 37 */
-                 | "when" S? "(" S? Expression S? ")"                                                      (proposed — decisions.md 27)
+Trigger        ::= "viewport" | "idle" ( "(" Digits ")" )? | "interaction" | "timer(" Digits ")" | "immediate"   /* † `hover` removed — decisions.md 37, landed #281 */
+                 | "when" S? "(" S? Expression S? ")"                                                      (decisions.md 27, landed #281)
 AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")" S? AwaitTiming? Block       (β #145: `as`; disambiguation proposed — decisions.md 18)
                    ( S? ( "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
 AwaitTiming    ::= "{" S? TimingOption ( S? "," S? TimingOption )? S? "}"

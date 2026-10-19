@@ -107,7 +107,7 @@ describe('the entries of #187, #107 and #260', () => {
     });
 
     it('flags an unknown @defer trigger, reading a trigger with its own parentheses', () => {
-        const source = page('@defer (viewprt) { <p>a</p> }\n  @defer (idle(500)) { <p>b</p> }\n  @defer (timer(200) | hover) { <p>c</p> }');
+        const source = page('@defer (viewprt) { <p>a</p> }\n  @defer (idle(500)) { <p>b</p> }\n  @defer (timer(200) | interaction) { <p>c</p> }');
         const found = entry('defer-unknown-trigger').detect(source);
         expect(found.map((f) => f.found)).toEqual(['@defer (viewprt)']);
         // Its compile error is PDX_DEFER_UNKNOWN_TRIGGER's, not a second one.

@@ -1297,32 +1297,52 @@ alpha
 #### Syntax
 
 ```ebnf
-DeferBlock     ::= "@defer" S? "(" Trigger ( S? "|" S? Trigger )* ")" Block ( S? ( "@placeholder" | "@loading" | "@error" ) Block )*
-Trigger        ::= "viewport" | "idle" ( "(" [0-9]+ ")" )? | "hover" | "interaction" | "timer(" [0-9]+ ")" | "immediate"
+DeferBlock     ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block
+                   ( S? ( "@placeholder" Block | "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
+Triggers       ::= Trigger ( S? "|" S? Trigger )*
+Trigger        ::= "viewport" | "idle" ( "(" [0-9]+ ")" )? | "interaction" | "timer(" [0-9]+ ")" | "immediate"
+                 | "when" S? "(" S? Expression S? ")"
+ErrorNames     ::= "(" S? Identifier ( S? "," S? Identifier )? S? ")"
 ```
 
 #### Semantics
 
-`defer({ trigger, placeholder, loading, error }, loadFn, () => html\`…\`)`. `@placeholder` shows
-until a trigger fires; `|` means any of them. `viewport` fires when the block is within 100px of the
-viewport, `idle` on an idle callback (`idle(ms)` times out after `ms`, 2000 by default), `hover` and
-`interaction` on the first `pointerenter` or `focusin` on the element the block sits in, `timer(ms)`
-after `ms`, `immediate` at once. Then
-the block loads the components its body uses — `loadFn` is `() => Promise.all([import(…)])` for every
-`<pdx-…>` tag in the body whose module the plugin resolves, so they leave the route's chunk — showing `@loading` (or the placeholder),
-and renders the body; if the load fails it shows `@error`.
+`defer({ trigger, when, prefetch, prefetchWhen, placeholder, loading, error }, loadFn, () => …)`.
+The block has two phases (#281). The triggers before `;` start the **render**: the body is mounted, and
+its code is loaded first if it has not been. The triggers after `prefetch` start only the **load**: the
+code is fetched and kept, and nothing is rendered. Without `; prefetch` the two start together.
+
+`@placeholder` shows until a render trigger fires; `|` means any of them. `viewport` fires when the
+block is within 100px of the viewport, `idle` on an idle callback (`idle(ms)` times out after `ms`,
+2000 by default), `interaction` on the first `pointerenter` or `focusin` on the element the block sits
+in, `timer(ms)` after `ms`, `immediate` at once. `when (expr)` fires the first time the expression is
+truthy and does not un-fire: a deferred block is never removed by its trigger, an `@if` around it does
+that. The expression is in its own parentheses, so a `|` or a `;` inside it is the expression's.
+
+The code is what the body's components need — `loadFn` is `() => Promise.all([import(…)])` for every
+custom-element tag in the body whose module the plugin resolves, so they leave the route's chunk. A
+render shows `@loading` (or the placeholder) while the code is in flight, reuses code a prefetch has
+loaded — at once when it has arrived, when it does when it is in flight — and renders the body. A
+prefetch goes through the prefetch queue, which waits for the browser to be idle; a render's load goes
+ahead of it. A prefetch that fails renders nothing; the render trigger loads the code again. A render
+whose load fails shows `@error (err, retry)`: `err` is the load's error, and `retry()` loads the code
+again. The names are the author's, `err` and `retry` when none are written.
 
 #### Rules
 
-- The trigger is not an expression and not quoted: `@defer ('viewport')` names the trigger
-  `'viewport'` with its quotes, which is unknown. An unknown trigger — misspelt, quoted, or from
-  another framework — is `PDX_DEFER_UNKNOWN_TRIGGER`, an error naming the part of a `|` combination
-  that is not a trigger (#260). The runtime still fires one at once when it reaches it through a
+- The trigger is not quoted: `@defer ('viewport')` names the trigger `'viewport'` with its quotes,
+  which is unknown. An unknown trigger — misspelt, quoted, or from another framework — an empty
+  `when ()`, or a `;` not followed by `prefetch`, is `PDX_DEFER_UNKNOWN_TRIGGER`, an error naming the
+  part that is not a trigger (#260). The runtime still fires one at once when it reaches it through a
   hand-written `defer()` call, and warns in development.
-- `@error` here takes no parameters: `@error (e)` stops the compile with `Expected '{'`. The error and
-  a retry are not available to its body.
+- `hover` is a removed form, `PDX_REMOVED_FORM`: it was `interaction` under another name, and
+  `pdx migrate` rewrites it (#281).
+- `@error` takes at most two names, the error and the retry function; a third, or the same name twice,
+  stops the compile.
 - Each sub-block may follow in any order; a second one of the same kind replaces the first.
 - `@placeholder`, `@loading` or `@error` with no `@defer` or `@await` before it stops the compile.
+- `retry` loads the code again: whether the browser fetches a module again after its first `import()`
+  failed is the browser's.
 
 #### Examples
 
@@ -1343,9 +1363,24 @@ and renders the body; if the load fails it shows `@error`.
 </script>
 ```
 
+```pdx
+<template>
+  <button @click="tab = 'sales'">Sales</button>
+  @defer (when (tab === 'sales'); prefetch idle) {
+    <pdx-chart></pdx-chart>
+  } @error (err, again) {
+    <button @click="again()">Load the chart again</button>
+  }
+</template>
+
+<script>
+let tab = $signal('overview');
+</script>
+```
+
 #### Since
 
-alpha
+alpha; `; prefetch`, `when (…)` and `@error (err, retry)`, beta (#281)
 
 ### `@await`, `@loading`, `@error`
 

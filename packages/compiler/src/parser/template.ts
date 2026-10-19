@@ -149,11 +149,14 @@ export interface PortalNode {
 
 export interface DeferNode {
     type: 'defer';
+    /** What the parentheses hold, as written: the render triggers, then `; prefetch` and its own. */
     trigger: string;
     body: TemplateNode[];
     placeholder?: TemplateNode[];
     loading?: TemplateNode[];
     error?: TemplateNode[];
+    errorVar?: string;        // the error's name (from @error (err)); `err` when omitted
+    retryVar?: string;        // the retry function's name (from @error (err, again)); `retry` when omitted
     loc?: SourceLoc;
 }
 
@@ -887,6 +890,8 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
     let placeholder: TemplateNode[] | undefined;
     let loading: TemplateNode[] | undefined;
     let error: TemplateNode[] | undefined;
+    let errorVar: string | undefined;
+    let retryVar: string | undefined;
 
     // Parse optional sub-blocks
     while (ctx.pos < ctx.source.length) {
@@ -902,13 +907,18 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
         } else if (lookAhead(ctx, '@error')) {
             advance(ctx, 6); // skip @error
             skipWhitespace(ctx);
+            // Optional names, as `@await`'s (#281): @error (err) / @error (err, again)
+            if (ctx.source[ctx.pos] === '(') {
+                ({ errorVar, retryVar } = parseBoundaryParams(parseParenthesized(ctx), '@error', ctx));
+                skipWhitespace(ctx);
+            }
             error = parseBlock(ctx);
         } else {
             break;
         }
     }
 
-    return { type: 'defer', trigger, body, placeholder, loading, error, loc };
+    return { type: 'defer', trigger, body, placeholder, loading, error, errorVar, retryVar, loc };
 }
 
 // ─── @await ───────────────────────────────────────────────────────

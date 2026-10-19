@@ -40,6 +40,9 @@ export { componentPackages } from './component-packages';
 export { RUNES, DECORATOR_RUNES } from './compiler/runes';
 /** The one reading of an `@fetch` line: the LSP types the resource from its `as Type`. */
 export { parseFetchDecl } from './compiler/script-analyzer-helpers';
+// The `@defer (…)` trigger grammar (#281): the editor's strict projection types its `when ( … )`.
+export { parseDeferTriggers } from './compiler/defer-triggers';
+export type { DeferTriggers, DeferPhase } from './compiler/defer-triggers';
 // The axes of `@variants` (#153), read by the language server as the analyzer reads them.
 export { parseVariantsBlock } from './compiler/variants';
 export type { VariantAxis } from './compiler/variants';

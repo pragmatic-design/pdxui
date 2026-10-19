@@ -20,6 +20,7 @@ import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-elemen
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
+import { deferTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
 import { specialisedClassBinding } from './inline-class-binding';
@@ -962,10 +963,16 @@ class InlineGen {
     deferN(node: DeferNode): void {
         this.imports.add('defer');
         const { code: body, tags: created } = this.block(node.body);
-        const opts: string[] = [`trigger:${jsQuote(node.trigger)}`];
+        const opts = deferTriggerOptions(node.trigger, (e) => callSignals(prefixCtx(e, this.ctx), this.ctx), true);
         if (node.placeholder) opts.push(`placeholder:()=>{${this.sub(node.placeholder)}}`);
         if (node.loading) opts.push(`loading:()=>{${this.sub(node.loading)}}`);
-        if (node.error) opts.push(`error:()=>{${this.sub(node.error)}}`);
+        if (node.error) {
+            // `@error (err, retry)`, as `@await`'s (#281).
+            const errVar = node.errorVar || 'err';
+            const retryVar = node.retryVar ?? 'retry';
+            const errorBody = node.error;
+            opts.push(`error:(${errVar},${retryVar})=>{${withBoundaryScope(errVar, retryVar, this.ctx, () => this.sub(errorBody))}}`);
+        }
         // The components the body creates, its own and those of the blocks inside it, as the template
         // path reads them off its markup: the block loads its components, or nothing does (#44).
         // Every custom element, the app's too (#136): `deferLoadFn` imports what `importPathOf` resolves.

@@ -233,7 +233,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // blocking 95 → 96: a button reads its own tokens (#154) — `--pdx-button-bg`, `-bg-hover` and `-color`,
 // a rule per variant in buttons.css, which the landing route's stylesheet carries. Measured locally on
 // the built dist: blocking 94.9 → 95.2, css 62.6 → 62.8; the JavaScript did not move.
-const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 96 };
+// blocking 96 → 97: `@defer` has two phases (#281) — `defer()` keeps the prefetched load and reuses it,
+// queues the prefetch, and arms `when (…)` triggers; the landing route's chunk carries `defer()`. From
+// the CI's own line, same shard: main blocking 95.8, js 465.5 → this branch 96.1, 465.8; entry 39.9.
+const BUDGET_KB = { entry: 40, js: 466, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

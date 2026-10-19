@@ -49,7 +49,10 @@ describe('@defer triggers', () => {
     }
 
     it('exports the list it checks against, for the migration registry to reuse (#121)', () => {
-        expect(DEFER_TRIGGERS).toEqual(expect.arrayContaining(['immediate', 'viewport', 'idle', 'interaction', 'hover']));
+        expect(DEFER_TRIGGERS).toEqual(expect.arrayContaining(['immediate', 'viewport', 'idle', 'interaction']));
+        // `hover` is a removed form (#281), not a trigger: PDX_REMOVED_FORM reports it, this list does not.
+        expect(DEFER_TRIGGERS).not.toContain('hover');
+        expect(unknownDeferTriggers('hover')).toEqual([]);
         expect(unknownDeferTriggers('viewport | idle(10) | nope')).toEqual(['nope']);
     });
 });

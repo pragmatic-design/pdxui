@@ -450,10 +450,10 @@ alpha → beta (#145 — landed)
 ### `@defer` — two phases, rules for removal
 
 ```ebnf
-DeferBlock ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block       /* "; prefetch" proposed */
+DeferBlock ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )? ")" Block       /* "; prefetch" landed, #281 */
                ( S? ( "@placeholder" Block | "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
 Triggers   ::= Trigger ( S? "|" S? Trigger )*
-Trigger    ::= /* the alpha triggers */ | "when" S? "(" S? Expression S? ")"                    /* "when" proposed */
+Trigger    ::= /* the alpha triggers */ | "when" S? "(" S? Expression S? ")"                    /* "when" landed, #281 */
 ```
 
 The components only its body uses are loaded lazily on every build (#98 — landed). What `@defer`
@@ -462,7 +462,7 @@ The scan that finds them takes every custom-element tag the body renders and imp
 project resolves, the library's and the application's `app-` ones alike (#136 — landed), so an
 application component in a `@defer` body stays lazy.
 
-**Two phases** (proposed, decisions.md point 27). *Prefetch* loads the code without rendering;
+**Two phases** (landed, #281; decisions.md point 27). *Prefetch* loads the code without rendering;
 *render* mounts the body. The triggers before `;` start the render — and the load, if it has not
 happened yet; the triggers after `prefetch` start only the load. `@defer (interaction; prefetch idle)`
 fetches the chart's code when the browser is idle and mounts it on the first pointer or focus entry
@@ -499,8 +499,7 @@ shows only if that load fails. A render trigger's load goes ahead of the prefetc
     `interaction`) cannot enable a fetch; that stays open (decisions.md, «Still open»);
   - **code then data** — a waterfall, acceptable only when the data is not needed without the code:
     the `@fetch` is declared inside the deferred component, and starts when it mounts.
-- `@error` takes `(err, retry)` like `@await`'s; `retry` loads the code again (proposed; alpha emits
-  no names, `codegen-template.ts:334`).
+- `@error` takes `(err, retry)` like `@await`'s; `retry` loads the code again (landed, #281).
 
 Acceptance cases: the block removed during its load → no mount, no error, no listener left; a body
 mounted after a load and then removed → its effects disposed (count observed); `prefetch idle` →
