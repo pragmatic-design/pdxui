@@ -1,7 +1,8 @@
 // PdxElement — base class for Pragmatic Web Components.
 // Light DOM rendering (no Shadow DOM) so CSS tokens pass through.
 
-import { signal, effect, collectDisposers, pushErrorOwner, popErrorOwner, getTopErrorHandler } from '../reactivity/signal';
+import { signal, effect, collectScope, suspendScope, resumeScope, runInScope, currentScope, pushErrorOwner, popErrorOwner, getTopErrorHandler } from '../reactivity/signal';
+import type { OwnerScope } from '../reactivity/signal';
 import type { Signal, Dispose } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
 import { registerComponent, unregisterComponent, emitDevTools } from '../debug/inspector';
@@ -129,6 +130,9 @@ export abstract class PdxElement extends HTMLElementBase {
     /** Whether the component has been connected and rendered. */
     private _mounted = false;
 
+    /** The scope its body rendered in: suspended while the component is frozen (#269). */
+    private _scope: OwnerScope | null = null;
+
     /** Keep-alive flag — when true, disconnectedCallback skips cleanup (freeze, not destroy). */
     _keepAlive = false;
 
@@ -248,7 +252,7 @@ export abstract class PdxElement extends HTMLElementBase {
                 // Collect the template's binding effects (html``, when/each/match)
                 // so they are disposed on disconnect — they are NOT created via
                 // this.track(), so without this they would leak on unmount.
-                const [rendered, disposeBody] = collectDisposers(() => {
+                const [rendered, disposeBody, scope] = collectScope(() => {
                     try {
                         return { content: this.body() };
                     } catch (error) {
@@ -272,6 +276,7 @@ export abstract class PdxElement extends HTMLElementBase {
                 }
                 const content = rendered.content;
                 this._disposers.push(disposeBody);
+                this._scope = scope;
                 // The slots this template rendered — taken NOW, while the content is detached and
                 // no child component has rendered its own <slot> into it.
                 this._ownSlots = slotsIn(content);
@@ -303,11 +308,17 @@ export abstract class PdxElement extends HTMLElementBase {
                 }) as EventListener);
             }
         } else if (this._keepAlive || this._frozenWithAncestor) {
-            // Resume from freeze: DOM is intact, effects will re-track on signal read.
-            // Signal reads in effects/computeds auto-reconcile with current store state.
+            // Resume from freeze: DOM is intact. Each effect a change came due for while frozen runs
+            // once, and the framework's polling and timers start again (#269).
             this._frozenWithAncestor = false;
+            if (this._scope) resumeScope(this._scope);
             emitDevTools('component:show', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             for (const fn of this._showCallbacks) fn();
+        } else if (this._scope) {
+            // Moved out with `_keepAlive` set only for the move — a parent taking its light-DOM children
+            // to project them marks them so — and the flag cleared before it came back: the move froze
+            // it, and this connect ends that.
+            resumeScope(this._scope);
         }
     }
 
@@ -324,6 +335,9 @@ export abstract class PdxElement extends HTMLElementBase {
         if (this._keepAlive || frozenWithAncestor) {
             if (frozenWithAncestor) this._frozenWithAncestor = true;
             for (const fn of this._hideCallbacks) fn();
+            // A frozen page costs no CPU (#269): its effects are parked, its polling and timers paused.
+            // After onHide, which may still write the state a resume reads.
+            if (this._scope) suspendScope(this._scope);
             emitDevTools('component:hide', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
             return;
         }
@@ -337,6 +351,7 @@ export abstract class PdxElement extends HTMLElementBase {
         emitDevTools('component:unmount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
         for (const d of this._disposers) d();
         this._disposers = [];
+        this._scope = null;
 
         // Reset so a re-append re-mounts (re-renders) instead of staying dead.
         // Lifecycle callback queues are repopulated by the next body()/setup run,
@@ -437,9 +452,11 @@ export abstract class PdxElement extends HTMLElementBase {
     /** Track an effect for auto-disposal on disconnect. */
     protected track(fn: () => void | (() => void), options?: EffectOptions): Dispose {
         // Also after mount (from onMount, a timer, a rAF): the effect is this component's.
+        // Outside any scope (onMount, a timer) it joins the component's own, and is frozen with it.
+        const scope = currentScope() === null ? this._scope : null;
         pushErrorOwner(this);
         let dispose: Dispose;
-        try { dispose = effect(fn, options); } finally { popErrorOwner(); }
+        try { dispose = scope ? runInScope(scope, () => effect(fn, options)) : effect(fn, options); } finally { popErrorOwner(); }
         this._disposers.push(dispose);
         return dispose;
     }

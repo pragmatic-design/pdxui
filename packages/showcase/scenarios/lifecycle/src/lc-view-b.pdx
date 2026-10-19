@@ -1,0 +1,3 @@
+<template>
+  <p data-test="view-b">b</p>
+</template>

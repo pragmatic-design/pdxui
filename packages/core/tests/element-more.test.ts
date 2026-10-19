@@ -172,6 +172,22 @@ describe('the mount cycle', () => {
 });
 
 describe('keepAlive — freeze and resume', () => {
+    // A parent takes its light-DOM children out to project them, marked `_keepAlive` only for the
+    // move. The move suspends a child that had mounted already (#269); the projection connects it
+    // again with the flag cleared, and that connect has to resume it — or its effects stay parked for
+    // good. 24 tests of @pdxui/ui were red that way before this one existed.
+    it('a child component projected into a parent\'s slot keeps following its state', () => {
+        const count = signal(0);
+        const child = defineEl(() => html`<b>${count}</b>`);
+        const parent = defineEl(() => html`<div><slot></slot></div>`);
+
+        const host = mountWith(parent, `<${child}></${child}>`);
+        expect(host.querySelector(`div ${child}`), 'the child was not projected').not.toBeNull();
+
+        count.set(5);
+        expect(host.querySelector(child)!.textContent, 'the projected child stopped following its state').toBe('5');
+    });
+
     it('a frozen element keeps its DOM and does not re-render on return', () => {
         let bodies = 0;
         const tag = defineEl(() => { bodies++; return html`<p>kept</p>`; });
@@ -188,7 +204,9 @@ describe('keepAlive — freeze and resume', () => {
         expect(bodies, 'a resumed element was rebuilt instead of resumed').toBe(1);
     });
 
-    it('a frozen element keeps its effects live', () => {
+    // A frozen page costs no CPU (#269; beta spec, lifecycle.md → «The matrix»): its effects are
+    // parked, and the change shows when it comes back. This test said the opposite until then.
+    it('a frozen element pauses its effects, and shows a change made meanwhile when it resumes', () => {
         const count = signal(0);
         const tag = defineEl(() => html`<p>${count}</p>`);
 
@@ -198,8 +216,10 @@ describe('keepAlive — freeze and resume', () => {
         document.createDocumentFragment().appendChild(el);
 
         count.set(5);
+        expect(el.textContent, 'a frozen component kept running its effects').toBe('0');
 
-        expect(el.textContent, 'a frozen component stopped following its state').toBe('5');
+        document.body.appendChild(el);
+        expect(el.textContent, 'a resumed component did not catch up with its state').toBe('5');
     });
 });
 

@@ -276,8 +276,9 @@ const ROWS: Row[] = [
     { name: 'an interpolated array', expected: '<div>ab</div>', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];" },
     { name: 'content inside a component tag', expected: '<x-probe><span>child</span></x-probe>', template: '<x-probe><span>child</span></x-probe>' },
     // The inline path emitted `batchHandler(() => )` for @keepAlive: a module that does not parse (#200).
+    // The instance switched away is frozen in a fragment, not hidden in the page (#269).
     {
-        name: '<component :is> with @keepAlive', expected: '<x-probe style="display: none;"></x-probe><x-field></x-field><button>swap</button>',
+        name: '<component :is> with @keepAlive', expected: '<x-field></x-field><button>swap</button>',
         template: '<component :is="tag" @keepAlive></component><button @click="tag = tag === \'x-probe\' ? \'x-field\' : \'x-probe\'">swap</button>',
         script: "let tag = $signal('x-probe');",
         act: click('button'),

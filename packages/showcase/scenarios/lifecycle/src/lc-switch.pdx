@@ -1,0 +1,10 @@
+<template>
+  <component :is="view" @keepAlive></component>
+</template>
+
+<script>
+// A kept `<component :is>` view switched away is frozen like a page, and told so (#269).
+@page '/switch';
+let view = $signal('app-lc-view-a');
+window.__lc_show = (tag) => { view = tag; };
+</script>

@@ -1,0 +1,29 @@
+<template>
+  <p data-test="tick">{{ lc.tick() }}</p>
+  <p data-test="item">{{ item.data() }}</p>
+  <p data-test="query">{{ queried.data() }}</p>
+  @await (lc.wait()) { maxMs: 1000 } {
+    <p data-test="done">done</p>
+  } @loading {
+    <p data-test="waiting">waiting</p>
+  } @error (e) {
+    <p data-test="timeout">{{ e.name }}</p>
+  }
+</template>
+
+<script>
+// What a frozen page must stop (#269; beta spec, lifecycle.md → «The matrix»): an effect, a polling
+// useQuery, a dynamic @title, an @fetch and a useQuery that go stale, an @await's maxMs timer.
+@page '/kept' { keepAlive };
+@title `Kept ${lc.tick()}`;
+import { effect, useQuery } from '@pdxui/core';
+import { lc } from './probe';
+
+@fetch item: 'GET /api/item' as string { staleTime: 1000, tags: ['item'] };
+
+const json = (path) => fetch(path).then((r) => r.json());
+useQuery(() => json('/api/poll'), { key: 'poll', refetchInterval: 100, staleTime: 60000, refetchOnFocus: false });
+const queried = useQuery(() => json('/api/query'), { key: 'query', staleTime: 1000, tags: ['query'], refetchOnFocus: false });
+
+effect(() => { lc.tick(); lc.effectRuns++; });
+</script>

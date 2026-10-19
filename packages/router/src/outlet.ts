@@ -1,9 +1,12 @@
 // <pdx-router-outlet> — production-grade router outlet.
 //
 // Keep-alive uses DocumentFragment freeze/resume pattern:
-//   - Freeze: move to DocumentFragment -> disconnectedCallback fires but _keepAlive skips cleanup
-//   - Resume: re-append to DOM -> connectedCallback fires -> effects re-track -> auto-reconcile
-//   - Zero CPU cost while frozen, burst reconciliation on resume
+//   - Freeze: move to DocumentFragment -> disconnectedCallback fires but _keepAlive skips cleanup;
+//     each component of the page suspends its scope (#269): its effects are parked, its polling and
+//     the framework's timers pause, and no request starts
+//   - Resume: re-append to DOM -> connectedCallback fires -> each parked effect runs once, timers go
+//     on with the time they had left, a source that went stale meanwhile is refreshed
+//   - Zero CPU cost while frozen, except a timer the developer started outside an effect
 //
 // Transitions: uses CSS enter/exit classes from @pdxui/core transitions API.
 // Layout: layout chain managed by _resolveLayoutStack() + _diffLayouts().

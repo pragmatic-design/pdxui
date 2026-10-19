@@ -20,19 +20,19 @@ marked *inference* are read from the code and still need the test that shows the
 
 | What | removed | hidden | frozen | resumed | destroyed |
 |---|---|---|---|---|---|
-| `$effect`, `$derived`, `$watch`, template bindings | disposed (**landed**, the branch's scope) | run | **paused**: a change marks them, nothing runs | each marked one runs **once** | disposed (**landed**) |
-| `@fetch`, `resource()` | disposed: request aborted, cache released (data.md E8) | run | no new request; one in flight completes and writes the cache | refreshes if `stale()` | disposed (E8) |
-| `useQuery` polling, refetch on focus / reconnect | stopped (**landed**) | run | **paused** | resumes; refreshes if `stale()` | stopped (**landed**) |
+| `$effect`, `$derived`, `$watch`, template bindings | disposed (**landed**, the branch's scope) | run | **paused**: a change marks them, nothing runs (**landed**, #269) | each marked one runs **once** (**landed**) | disposed (**landed**) |
+| `@fetch`, `resource()` | disposed: request aborted, cache released (data.md E8) | run | no new request; one in flight completes and writes the cache (**landed**, #269) | refreshes if `stale()` (**landed**) | disposed (E8) |
+| `useQuery` polling, refetch on focus / reconnect | stopped (**landed**) | run | **paused** (**landed**, #269) | resumes; refreshes if `stale()` (**landed**) | stopped (**landed**) |
 | `@action` call in flight or queued | runs to its end; only `cancel()` stops it | runs | runs | — | runs to its end: `invalidate` and `onSuccess` still run; writing a signal of the destroyed scope raises no error and is observed by nothing |
 | `$effect` cleanup (timers, listeners) | run | — | not run: the effect is paused, not disposed | — | run |
-| framework timers: `@await` `minMs`/`maxMs`, `@defer` `idle`/`timer` triggers | cleared | run | **suspended**: the remaining time is kept | resume with the remaining time | cleared |
+| framework timers: `@await` `minMs`/`maxMs`, `@defer` `idle`/`timer` triggers | cleared | run | **suspended**: the remaining time is kept (**landed**, #269) | resume with the remaining time (**landed**) | cleared |
 | timers the developer starts in `onMount` | cleared only through the cleanup the developer registers (`onDestroy`, an `$effect` return) | run | keep running — the framework cannot see them; the docs say to use `$effect` | — | as removed |
 | `attach:` | its cleanup runs | stays | stays | — | its cleanup runs |
 | `:ref` | set to `null` | unchanged | unchanged | unchanged | set to `null` |
 | a snippet rendered by `@render` | disposed with the block that renders it, not with the component that declared it | — | frozen with its renderer | resumed | disposed |
 | child components | destroyed (**landed**) | kept, no hook | **frozen with the page** | resumed, `onShow` | destroyed (**landed**) |
 | hooks | `onDestroy` of each child | none | `onHide` | `onShow` | `onDestroy` |
-| `@title` / document head | — | — | not written while frozen | written again | — |
+| `@title` / document head | — | — | not written while frozen (**landed**, #269: the dynamic `@title` is an effect, paused with the page) | written again when it changed | — |
 
 `@show` is CSS: hiding a block does not pause it. Code that must stop while hidden is an `@if`.
 
@@ -51,9 +51,15 @@ marked *inference* are read from the code and still need the test that shows the
 
 ## Today
 
-- *Effects keep running while frozen*: the router moves the page into a `DocumentFragment` and skips
-  its cleanup (`router/src/outlet.ts:714-719`, `core/src/component/element.ts:296-301`); nothing in
-  the reactive core pauses them. `outlet.ts:4-6` says «zero CPU cost while frozen».
+- Effects kept running while frozen: the router moved the page into a `DocumentFragment` and skipped
+  its cleanup, and nothing in the reactive core paused them. Since #269 an ownership scope is an object
+  that can be **suspended** (`core/src/reactivity/signal.ts`): each component of a frozen page suspends
+  its scope, the flush parks an effect whose scope or a scope above it is suspended, and the resume runs
+  each parked effect once. `useQuery`'s polling, focus and reconnect refetch, `@await`'s timers and
+  `@defer`'s `idle`/`timer` triggers pause through internal suspension hooks
+  (`core/src/reactivity/scope-timer.ts`), and a `resource()` / `@fetch` refreshes on resume when
+  `stale()`. Measured in Chromium: `packages/showcase/tests/scenario-lifecycle.spec.ts`; the core
+  half is `core/tests/scope-suspension.test.ts`.
 - Children of a frozen page were destroyed — measured in Chromium, then fixed by #268. Only the page
   element is marked `_keepAlive`, so each child's `disconnectedCallback` cleaned up and the child ran
   its setup again on resume, its state lost. A mounted component that is disconnected while a
@@ -61,14 +67,14 @@ marked *inference* are read from the code and still need the test that shows the
   and the outlet tears the children down, deepest first, when it destroys a frozen page for good
   (`core/src/component/element.ts`, `router/src/outlet.ts` `_destroyFrozen`;
   `responsive/tests/integration/ui-components/keepalive-children.spec.ts`).
-- `useQuery` pauses polling only while the **document** is hidden (`core/src/reactivity/use-query.ts:137`).
 - `@fetch` leaks its cache subscription when its component is destroyed (data.md E8).
 - `:ref` was never reset: `bindRef` only set the element. Since #262 both render paths reset it to
   `null` when the scope that rendered the element is disposed, unless another element has taken it
   (`core/src/renderer/template.ts`, `bindRef`; `compiler/src/compiler/codegen-template-inline.ts`,
   `refBind`); `core/tests/ref-reset.test.ts`.
 - `<component :is @keepAlive>` keeps at most 10 instances, LRU (`core/src/renderer/dynamic.ts:51,103`),
-  hidden with `display: none` and still connected, so they keep running and receive no `onHide`.
+  were hidden with `display: none` and still connected, so they kept running and received no `onHide`;
+  since #269 the instance switched away is frozen in a fragment, as a route page is.
   Since #270 `@keepAlive(n)` sets the maximum (`maxAlive: n`, both render paths), and a route
   outlet keeps at most `keep-alive-max` frozen pages (default 10), the least recently used
   destroyed past it; `@page { keepAlive: n }` stays a timeout (`core/tests/keepalive-max-dynamic.test.ts`,
@@ -83,7 +89,7 @@ One browser suite (Chromium: mount order and disconnection are not reliable in h
 
 1. A page with an effect, a `useQuery` with `refetchInterval` and a dynamic `@title` is frozen →
    during 1 s no effect run, no request, no title write; a signal it reads changes → on resume the
-   effect runs once.
+   effect runs once. **Landed** (#269), in Chromium: `packages/showcase/tests/scenario-lifecycle.spec.ts`.
 2. A frozen page's child component keeps its state (a counter) across freeze and resume, and its
    setup runs once.
 3. An `@if` removes a block with a `:ref`, an `attach:` and a child component that declares a
@@ -93,5 +99,5 @@ One browser suite (Chromium: mount order and disconnection are not reliable in h
    runs, no error is thrown for the gone component.
 5. Eleven `<component :is @keepAlive>` views visited with a maximum of ten → the first is destroyed.
 6. A page frozen 300 ms into an `@await { maxMs: 1000 }` and resumed 5 s later → the timeout fires
-   700 ms after the resume, not at once.
+   700 ms after the resume, not at once. **Landed** (#269), in the same suite.
 7. `@show` false over a text root → nothing visible.

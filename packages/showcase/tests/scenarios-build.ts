@@ -7,6 +7,8 @@
  *   - `hello`, under `scenarios/hello/`: one component, one signal, one button;
  *   - `memory`, under `scenarios/memory/`: a page with an @fetch, a @for of 200 rows, an attach: and
  *     a child component per row, mounted and destroyed by `scenario-memory.spec.ts` (#243);
+ *   - `lifecycle`, under `scenarios/lifecycle/`: a kept-alive route page and a kept `<component :is>`
+ *     view, frozen and resumed by `scenario-lifecycle.spec.ts` (#269);
  *   - `benchmark`, the js-framework-benchmark app, built from `scripts/bench-jfb/` with its own
  *     `vite.config.js`, so what is weighed here is the app `pnpm bench:jfb` measures. Its output goes
  *     under this package, not into `scripts/`.
@@ -29,6 +31,7 @@ export function scenarioDist(name: string): string {
 export const SCENARIOS: { name: string; root: string; config: string }[] = [
     { name: 'hello', root: join(packageDir, 'scenarios', 'hello'), config: 'vite.config.ts' },
     { name: 'memory', root: join(packageDir, 'scenarios', 'memory'), config: 'vite.config.ts' },
+    { name: 'lifecycle', root: join(packageDir, 'scenarios', 'lifecycle'), config: 'vite.config.ts' },
     { name: 'benchmark', root: join(repoDir, 'scripts', 'bench-jfb'), config: 'vite.config.js' },
 ];
 

@@ -77,8 +77,10 @@ component:
 onVisible(() => startCountUpAnimation());
 ```
 
-**Pause when frozen** — with `keepAlive` pages, `onHide`/`onShow` let you stop a poll while the page
-is frozen and resume on return, instead of keeping it running for nothing.
+**Pause when frozen** — a `keepAlive` page left by navigation, or a `<component :is @keepAlive>` view
+switched away, is frozen, and the framework pauses what it can see by itself: you do not stop a
+`useQuery` poll in `onHide`. `onHide`/`onShow` are for what it cannot see — a connection or a library
+you drive by hand.
 
 ## The rule
 
@@ -86,3 +88,17 @@ If you can get the result by **declaring** (a `$derived`, an `@show`, an `@if`),
 simpler and won't get cleanup wrong. Hooks are for what is **inherently imperative**: talking to the
 bare DOM, to external libraries, to timers and global listeners. And for everything you start in a
 hook, remember where you stop it.
+
+A frozen page costs no CPU. While it is frozen:
+
+- its effects and template bindings are **paused**: a change marks them, and each marked one runs
+  **once** when the page comes back;
+- `useQuery` polling stops, and so do the refetch on focus and on reconnect; no request starts — an
+  `@fetch` or a `useQuery` whose value went stale meanwhile is refreshed when the page comes back;
+- the framework's timers — `@await`'s `minMs`/`maxMs`, `@defer`'s `idle` and `timer(n)` — are
+  suspended, and go on with the time they had left;
+- the head is not written: a dynamic `@title` is an effect, paused with the page.
+
+A timer **you** start in `onMount` keeps running: the framework cannot see it. Start it in an
+`$effect` and clear it in the effect's cleanup instead — the effect is paused with the page, and the
+cleanup runs when the page is destroyed.

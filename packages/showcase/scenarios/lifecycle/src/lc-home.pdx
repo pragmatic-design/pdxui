@@ -1,0 +1,7 @@
+<template>
+  <h1 data-test="home">home</h1>
+</template>
+
+<script>
+@page '/';
+</script>
