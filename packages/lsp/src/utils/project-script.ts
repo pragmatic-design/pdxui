@@ -62,9 +62,9 @@ export function projectScript(scriptContent: string): string {
             const after = /^\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index + 1 + kw.length));
             if (after) names.set(after[1], 'any');
         }
-        if (kw === 'inject' || kw === 'mixin') {
-            // Match: @inject key;  @inject key as alias;  @mixin './use-thing.ts' as thing;
-            // Groups: [1]=key (absent for a quoted mixin path) [2]=alias
+        if (kw === 'inject') {
+            // Match: @inject key;  @inject key as alias;  @inject 'key' as alias;
+            // Groups: [1]=key (absent when it is quoted) [2]=alias
             const inj = /^\s+(?:'[^'\n]*'|"[^"\n]*"|([A-Za-z_$][\w$]*))(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
             const declared = inj && (inj[2] ?? inj[1]);
             if (declared) names.set(declared, 'any');

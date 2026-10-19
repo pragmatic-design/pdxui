@@ -15,7 +15,7 @@ let seq = 0;
 /** Compile `template` + `script` on one path, define it, mount it, and return the host. */
 function mount(template: string, script: string, build: boolean): HTMLElement {
     const name = `batchprobe${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');

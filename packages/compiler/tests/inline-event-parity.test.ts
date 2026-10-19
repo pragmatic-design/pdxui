@@ -41,7 +41,7 @@ const FORMS = [
 // The second form puts the button in a scoped slot's body, which the template generator wrote until
 // #364 and the inline path writes now: the same handler, at the top level and in a slot.
 const SOURCE = (handler: string, inline = true): string => `<template>${inline ? '' : '<pdx-list><slot name="item" let:row>'}<button @click="${handler}">x</button>${inline ? '' : '</slot></pdx-list>'}</template>
-<script setup>
+<script>
 let count = $signal(0); let open = $signal(false); let name = $signal('');
 const item = 1;
 function save(x) {} function a() {} function b() {} function onClick() {} function onFrameLoad(e) {}
@@ -98,7 +98,7 @@ describe('an event with modifiers and no handler', () => {
         ['a scoped slot body', '<pdx-list><slot name="item" let:row><a href="/x" @click.stop>x</a></slot></pdx-list>'],
     ] as const) {
         it(`${where}: the module parses, and the click still stops`, () => {
-            const { code } = compile(`<template>${template}</template>\n<script setup>\nlet n = $signal(0);\n</script>`, 'p.pdx', [], undefined, { production: true });
+            const { code } = compile(`<template>${template}</template>\n<script>\nlet n = $signal(0);\n</script>`, 'p.pdx', [], undefined, { production: true });
             expect(() => new Function(code.replace(/^\s*import\b.*$/gm, '')), 'the module does not parse').not.toThrow();
             expect(code).toContain('e.stopPropagation();');
             expect(code).toContain('batchHandler(() => {})');

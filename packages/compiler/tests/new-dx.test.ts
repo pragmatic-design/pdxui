@@ -8,21 +8,6 @@ import { generateDts } from '../src/compiler/dts-generator';
 // ─── Script Analyzer ───────────────────────────────────────────────
 
 describe('script analyzer', () => {
-    it('detects new mode from @prop', () => {
-        const analysis = analyzeScript(`
-            @prop label: string = 'Hello';
-            let count = $signal(0);
-        `, 'test.pdx');
-        expect(analysis.mode).toBe('new');
-    });
-
-    it('detects legacy mode without @prop/$signal', () => {
-        const analysis = analyzeScript(`
-            const props = defineProps({ label: { type: String } });
-            return { count };
-        `, 'test.pdx');
-        expect(analysis.mode).toBe('legacy');
-    });
 
     it('parses @prop with type and default', () => {
         const analysis = analyzeScript(`
@@ -133,7 +118,7 @@ describe('compile new mode', () => {
   <button @click="inc">+</button>
 </template>
 
-<script setup>
+<script>
   @prop label: string = 'Counter';
   @prop initial: number = 0;
 
@@ -176,7 +161,7 @@ describe('compile new mode', () => {
   }
 </template>
 
-<script setup>
+<script>
   @prop title: string = 'Todo';
 
   let items = $signal([{ id: 1, text: 'A' }]);
@@ -200,7 +185,7 @@ describe('compile new mode', () => {
         const { code } = compile(`
 <template><span>{{ doubled }}</span></template>
 
-<script setup>
+<script>
   @prop x: number = 0;
   let count = $signal(0);
   const doubled = $derived(count * 2);
@@ -215,7 +200,7 @@ describe('compile new mode', () => {
         const { code } = compile(`
 <template><button @click="changed(1)">x</button></template>
 
-<script setup>
+<script>
   @event changed: number;
   @event reset: void;
 </script>`, 'test.pdx');
@@ -227,7 +212,7 @@ describe('compile new mode', () => {
         const { code, warnings } = compile(`
 <template><button @click="$emit('pdx-change', 1)">x</button></template>
 
-<script setup>
+<script>
   @event changed: number;
 </script>`, 'test.pdx');
 
@@ -239,7 +224,7 @@ describe('compile new mode', () => {
         const { code } = compile(`
 <template><span>x</span></template>
 
-<script setup>
+<script>
   @prop x: number = 0;
 </script>`, 'test.pdx');
 
@@ -250,7 +235,7 @@ describe('compile new mode', () => {
         const { code } = compile(`
 <template><div>test</div></template>
 
-<script setup>
+<script>
   @prop x: number = 0;
   let count = $signal(0);
   onMount(() => console.log('ready'));
@@ -265,7 +250,7 @@ describe('compile new mode', () => {
         const { code } = compile(`
 <template><span>{{ name }}</span></template>
 
-<script setup>
+<script>
   import { signal } from '@pdxui/core';
   const props = defineProps({ name: { type: String, default: 'World' } });
   const count = signal(0);

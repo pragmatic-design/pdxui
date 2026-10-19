@@ -4,7 +4,7 @@ import type { DiagnosticEntry } from './catalog';
 
 /** A .pdx with this template and this setup script — the shape every example below uses. */
 const pdx = (template: string, script: string): string =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const T = 'packages/compiler/tests/';
 
@@ -86,7 +86,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_HAND_WRITTEN_SIGNAL: {
         severity: 'error', category: 'defect',
-        summary: 'A `signal()` or `computed()` written by hand in `<script setup>` and read bare by the template (`{{ name }}`, `:title="name"`).',
+        summary: 'A `signal()` or `computed()` written by hand in `<script>` and read bare by the template (`{{ name }}`, `:title="name"`).',
         explanation: 'The template reads the names the runes declare as values. A signal created by hand is a function, and the template shows the function itself — its source text in the page, or the function assigned to a property. Calling it in the template (`{{ name() }}`) shows the value, and a hand-written signal the template does not read is not reported.',
         fix: 'Declare it with the rune: `let name = $signal(\'World\');` for `signal()`, `const total = $derived(a + b);` for `computed()` — the expression, not a function.',
         reproducedIn: `${T}hand-written-signal.test.ts`,
@@ -103,7 +103,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_SCRIPT_SYNTAX_ERROR: {
         severity: 'error', category: 'defect',
-        summary: 'The `<script setup>` does not parse.',
+        summary: 'The `<script>` does not parse.',
         explanation: 'A syntax error in the setup would reach the generated module as broken code. It is reported with its position in the script.',
         fix: 'Fix the syntax at the reported line.',
         reproducedIn: `${T}validate.test.ts`,
@@ -126,7 +126,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         severity: 'error', category: 'defect',
         summary: 'A second `<script>` block in a `.pdx`.',
         explanation: 'A `.pdx` has one `<script>`. The parser reads the first; a second would be dropped without a word — its declarations surfacing only as undeclared names in the template, its statements (an `onMount(…)`) never running. So the compile stops at it, naming its line.',
-        fix: 'Move its code into the first `<script setup>`.',
+        fix: 'Move its code into the first `<script>`.',
         reproducedIn: `${T}duplicate-blocks.test.ts`,
     },
     PDX_DUPLICATE_TEMPLATE: {
@@ -253,6 +253,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         explanation: 'A `@prop name: T;` with no default and no `?` is required, TypeScript\'s rule: the component cannot render without it. A use that sets it with neither an attribute nor a binding would leave it `undefined` and fail later, far from the cause. Checked for project components and for library components whose manifest marks the prop required (`prop.required<T>()`).',
         fix: 'Set it, `:name="…"`, or declare it optional in the child: `@prop name?: T;` or a default.',
         reproducedIn: `${T}required-props.test.ts`,
+    },
+    PDX_SETUP_REDUNDANT: {
+        severity: 'info', category: 'defect',
+        summary: '`<script setup>`: `setup` has no meaning (#158).',
+        explanation: 'The script has one grammar: a `<script>` is read for declarations and runes whatever it contains, so `setup` changes nothing. It stays valid, and `pdx migrate` removes it.',
+        fix: 'Write `<script>`; `pdx migrate` does it in every file.',
+        reproducedIn: `${T}legacy-mode-removed.test.ts`,
     },
     PDX_PIPE_SINGLE: {
         severity: 'info', category: 'defect',
@@ -415,13 +422,6 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: "`@fetch users: 'GET /api/users' as User[];`",
         reproducedIn: `${T}fetch-directive-diagnostics.test.ts`,
     },
-    PDX_TEMPLATE_NAME_NOT_PROVIDED: {
-        severity: 'error', category: 'defect',
-        summary: 'A legacy-mode template reads a name its script does not provide.',
-        explanation: 'In the legacy mode the template sees what `defineProps` declares and what the top-level `return { … }` returns. A `const` the script declares and does not return reads as undefined — and a plain `<script>` with no rune is the legacy mode.',
-        fix: 'Write `<script setup>`, which hands the template every name it declares — or add the name to the returned object.',
-        reproducedIn: `${T}legacy-template-names.test.ts`,
-    },
     PDX_PREFETCH_POLICY: {
         severity: 'error', category: 'defect',
         summary: 'A route\'s `@prefetch` names a policy the router does not have.',
@@ -490,13 +490,6 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         explanation: 'No field is generated, so the control bound to it swallows what is typed.',
         fix: 'Write the field as `name: type { rules }`, `name: string[]`, `name: { sub: type }` or `name: [{ sub: type }]`.',
         reproducedIn: `${T}form-list-field.test.ts`,
-    },
-    PDX_LEGACY_IN_SETUP: {
-        severity: 'warn', category: 'defect',
-        summary: 'A legacy marker (`defineProps`, `defineEmits`, a top-level `return`) in `<script setup>`.',
-        explanation: 'With runes beside it, the marker does nothing; without runes, the file compiles in the legacy mode and any rune added later is inert.',
-        fix: 'Remove the marker — `<script setup>` returns what it declares — or write plain `<script>` for a deliberately legacy file.',
-        reproducedIn: `${T}validate.test.ts`,
     },
     PDX_PAGE_INVALID_PATH: {
         severity: 'error', category: 'defect',
@@ -663,7 +656,7 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     },
     PDX_UNDECLARED_REF: {
         severity: 'error', category: 'defect', fixable: true,
-        summary: 'A name the template reads that `<script setup>` does not declare.',
+        summary: 'A name the template reads that `<script>` does not declare.',
         explanation: 'At runtime the binding reads `undefined`, and a handler named this way does nothing when clicked; usually a misspelt signal, prop or function.',
         fix: 'Declare it, or fix the spelling — when one declared name is within 2 edits the message names it, and the fix renames the read.',
         example: { bad: pdx('<p>{{ coutn }}</p>', 'let count = $signal(0);'), good: pdx('<p>{{ count }}</p>', 'let count = $signal(0);') },

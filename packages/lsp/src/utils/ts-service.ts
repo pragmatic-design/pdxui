@@ -1,4 +1,4 @@
-// TS Language Service — IntelliSense (completion/hover) inside <script setup>.
+// TS Language Service — IntelliSense (completion/hover) inside <script>.
 // The .pdx script is projected into a VIRTUAL TS file next to the .pdx (so that
 // relative paths resolve), with the $… runes declared ambient and the @… runes blanked
 // out PRESERVING the offsets → the .pdx ↔ TS position mapping is 1:1 (offset-scriptStart).

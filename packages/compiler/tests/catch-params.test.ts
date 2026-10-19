@@ -23,7 +23,7 @@ const PATHS = {
 } as const;
 
 function compileTemplate(template: string, opts: object): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let ready = $signal(false);\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  let ready = $signal(false);\n</script>`;
     return compile(source, 'catch-params.pdx', [], undefined, opts).code;
 }
 
@@ -107,7 +107,7 @@ describe('the recipe an app copies', () => {
 
     for (const [name, opts] of Object.entries(PATHS)) {
         it(`compiles to valid JavaScript — ${name}`, () => {
-            const source = `<template>\n${block}\n</template>\n<script setup>\n  let agencies = $signal([]);\n</script>`;
+            const source = `<template>\n${block}\n</template>\n<script>\n  let agencies = $signal([]);\n</script>`;
             const code = compile(source, 'recipe.pdx', [], undefined, opts).code;
             parses(code);
             expect(fallbackParams(code)).toBe('err,retry');

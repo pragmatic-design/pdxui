@@ -12,7 +12,7 @@ import {
 } from '../src/language/changes';
 
 const page = (template: string, script = '') =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const removedFormsOf = (source: string) =>
     compile(source, 'x.pdx').warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');

@@ -49,7 +49,7 @@ const tagOf = (shape: string, path: number) => `app-ts-${shape.toLowerCase()}-${
 beforeAll(() => {
     for (const [shape, loop] of Object.entries(SHAPES)) {
         PATHS.forEach((p, i) => {
-            const source = `<template>\n<button class="swap" @click="swap()">swap</button>\n<ul>\n${loop}\n</ul>\n</template>\n<script setup>\n${SETUP}\n</script>`;
+            const source = `<template>\n<button class="swap" @click="swap()">swap</button>\n<ul>\n${loop}\n</ul>\n</template>\n<script>\n${SETUP}\n</script>`;
             load(fileOf(shape, i), source, p.opts);
         });
     }

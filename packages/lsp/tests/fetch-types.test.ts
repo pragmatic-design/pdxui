@@ -20,8 +20,8 @@ const svc = new PdxTsService(ROOT);
 
 /** The TS diagnostics of a .pdx made of `script` and `template`, as the server computes them. */
 function diagnose(script: string, template = ''): string[] {
-    const source = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const scriptStart = source.indexOf('<script setup>\n') + '<script setup>\n'.length;
+    const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+    const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const vf = buildVirtualFile(script, scriptStart, template ? parseTemplate(template, 1) : [], template || null, template ? '<template>'.length : -1);
     return getTsDiagnostics(svc, URI, vf, source).map(d => d.message.split('\n')[0]);
 }
@@ -82,7 +82,7 @@ describe('a typed @fetch in the template', () => {
 
 describe('pdx check --types', () => {
     it('reports the misspelt field on the .pdx line', () => {
-        const content = `<template><p>{{ user.data()?.nmae }}</p></template>\n<script setup>\n${USER}</script>\n`;
+        const content = `<template><p>{{ user.data()?.nmae }}</p></template>\n<script>\n${USER}</script>\n`;
         const path = join(ROOT, 'fetch-types-probe.pdx');
         const errors = typecheckPdx(ROOT, [{ path, content }]).get(path) ?? [];
         expect(errors.some(e => /nmae/.test(e.message) && e.line === 1), JSON.stringify(errors)).toBe(true);

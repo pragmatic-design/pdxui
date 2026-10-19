@@ -21,7 +21,7 @@ const MIRROR = `<template>
 <button class="bump" @click="count++">+</button>
 <p class="seen">{{ seen }}</p>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 let seen = $signal('');
 $effect(function() { seen = 'count is ' + count; });

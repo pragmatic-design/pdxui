@@ -58,7 +58,7 @@ export function checkUndeclaredRefs(analysis: ScriptAnalysis, templateIds: Reado
         warnings.push({
             code: 'PDX_UNDECLARED_REF',
             severity: 'error',
-            message: `'${id}' is used in the template but is not declared in <script setup>.${meant ? ` Did you mean '${meant}'?` : ''}`,
+            message: `'${id}' is used in the template but is not declared in <script>.${meant ? ` Did you mean '${meant}'?` : ''}`,
             hint: meant ? `Write ${meant}, or declare ${id}.` : `Declare it — a $signal, a @prop, a function — or fix the spelling.`,
             ...(meant ? { suggestion: meant } : {}),
         });

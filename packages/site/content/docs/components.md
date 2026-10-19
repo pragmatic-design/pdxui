@@ -16,7 +16,7 @@ A file has three blocks:
 
 ```pdx
 <template>  <!-- what you see -->        </template>
-<script setup>  // state and logic
+<script>  // state and logic
 </script>
 <style scoped>  /* isolated styles */ </style>
 ```
@@ -51,11 +51,11 @@ The trade is the one Shadow DOM always asks for, and it is worth saying out loud
 stylesheet does not reach in either. A shadow component styles itself, or imports what it needs inside
 its own block. Light DOM is the default because most components want the theme.
 
-### `<script setup>` — the logic
+### `<script>` — the logic
 
-`setup` is not a switch. What the compiler reads are the **runes** — `@prop`, `@event`, `$signal`,
-`$derived`, `@expose` — line by line, and a plain `<script>` containing them compiles to byte-identical
-output:
+The script has one grammar. What the compiler reads are the **runes** — `@prop`, `@event`, `$signal`,
+`$derived`, `@expose` — and every top-level name the script declares reaches the template, whatever
+else the script contains:
 
 ```pdx
 <script>
@@ -64,38 +64,23 @@ let count = $signal(start);
 </script>
 ```
 
-So `setup` is a statement of intent, and writing it is the convention here. There is one case where the
-word matters, and it is the opposite of what you'd guess: the old pre-rune syntax — `defineProps`,
-`defineEmits`, or a top-level `return { … }` — is still supported, and **one of those markers inside
-`<script setup>` changes what the file compiles to**. Which way depends on what else is in it, and
-both ways are surprising:
-
-- with **no rune**, the legacy mode wins: the file has no new-mode setup at all, so a rune added to it
-  later is inert;
-- with **a rune**, the new mode wins and the `defineProps` you wrote does nothing — the props come
-  from `@prop` only.
-
-The compiler says so, as `PDX_LEGACY_IN_SETUP`, naming the marker and which side won. If props you
-declared with `@prop` don't arrive, that warning is the first place to look — after a stray `return`
-at the top level of the script, which is the marker nobody recognises as one.
-
-The other side of «not a switch»: a plain `<script>` **with no rune** is the legacy mode too, and the
-legacy mode hands the template only what `defineProps` declares and what the top-level `return { … }`
-returns. `const title = 'Hi'` there, read as `{{ title }}`, is undefined — and the compiler reports it
-as `PDX_TEMPLATE_NAME_NOT_PROVIDED`. `<script setup>` returns what it declares, which is why writing
-it is the convention.
+`<script setup>` compiles the same: `setup` has no meaning, and the compiler says so as an info,
+`PDX_SETUP_REDUNDANT`. The pre-rune syntax — `defineProps`, `defineEmits`, a top-level
+`return { … }` — and `@mixin` are removed: each is `PDX_REMOVED_FORM`. `pdx migrate` rewrites
+`defineProps` to `@prop`, `defineEmits` and its calls to `@event`, drops the `return`, and lists what
+it cannot convert.
 
 The script is **TypeScript**: annotations, `as`, generics (`$signal<User | null>(null)`), `import type`,
 `interface` and `type` are checked by the editor and erased by the compiler, which replaces them with
 spaces so every line and column of the module stays where you wrote it. TypeScript that does something
 at runtime — an `enum`, a `namespace`, a constructor parameter property, `import x = require()` — has
 nothing to erase it to and stops the compile (`PDX_TS_UNSUPPORTED`): write it as JavaScript.
-`<script setup lang="js">` opts out, and the script is compiled as written.
+`<script lang="js">` opts out, and the script is compiled as written.
 
 A script can also live in its own file, which is useful when the logic outgrows the markup:
 
 ```pdx
-<script setup src="./user-card.logic.ts" />
+<script src="./user-card.logic.ts" />
 ```
 
 The other two blocks take one too: `<template src="./user-card.html" />` and
@@ -164,7 +149,7 @@ Two extras live in this block, both resolved at compile time with no runtime cos
 
 ```pdx
 <template><div class="bar"></div></template>
-<script setup>
+<script>
 let pct = $signal(42);
 </script>
 <style scoped>
@@ -243,7 +228,7 @@ A prop belongs to the parent: the component reads it and does not write it. When
   <button @click="clear()">Clear</button>
 </template>
 
-<script setup>
+<script>
 @model value: string = '';
 function clear() { value = ''; }
 </script>
@@ -259,7 +244,7 @@ Assigning it (here, the inner input through `::value`, and `clear()`) sets it an
   <p>Hello, {{ name }}</p>
 </template>
 
-<script setup>
+<script>
 let name = $signal('Ada');
 </script>
 ```
@@ -375,7 +360,7 @@ and `data-part="…"` marks each, on exactly one element:
   @if (open) { <div data-part="popup"><slot></slot></div> }
 </template>
 
-<script setup>
+<script>
 @part trigger, popup;
 let open = $signal(false);
 function close() { open = false; trigger?.focus(); }
@@ -448,7 +433,7 @@ is written from a theme or the page.
   </article>
 </template>
 
-<script setup>
+<script>
 @prop name: string = 'Anonymous';
 @prop verified: boolean = false;
 @prop id: string = '';

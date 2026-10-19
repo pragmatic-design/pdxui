@@ -126,7 +126,7 @@ async function buildStandalone(
 
             // Generate .d.ts
             const descriptor = parseSFC(source);
-            const analysis = analyzeScript(descriptor.script?.content ?? '', file, { setup: descriptor.script?.setup });
+            const analysis = analyzeScript(descriptor.script?.content ?? '', file);
             // The tag the compiled module registers: `@tag`, else the compiler's rule.
             const tag = analysis.customTag ?? deriveTag(file, resolved.prefix);
             const dts = generateDts({

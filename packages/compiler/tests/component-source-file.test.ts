@@ -7,7 +7,7 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import { compile, pdx } from '../src/plugin';
 
-const NEW_MODE = '<template><button @click="count++">{{ count }}</button></template>\n<script setup>\nlet count = $signal(0);\n</script>\n';
+const NEW_MODE = '<template><button @click="count++">{{ count }}</button></template>\n<script>\nlet count = $signal(0);\n</script>\n';
 const NO_SCRIPT = '<template><p>static</p></template>\n';
 const FILE = 'src/pages/login.pdx';
 

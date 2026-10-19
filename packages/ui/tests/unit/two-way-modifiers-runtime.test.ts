@@ -22,7 +22,7 @@ const page = (tag: string) => `<template>
 <p class="out">{{ query }}|{{ cents }}|{{ age }}</p>
 <button class="relabel" @click="label = 'second'">relabel</button>
 </template>
-<script setup>
+<script>
 @tag '${tag}';
 let query = $signal('');
 let cents = $signal(1250);

@@ -14,7 +14,7 @@ const codesOf = (source: string) =>
     compile(source, 'probe.pdx', [], undefined, {}).warnings.map((w) => w.code);
 
 const SCRIPT = `
-<script setup>
+<script>
 @form order: { sku: string { required } }
 function onSubmit(e) { console.log(e); }
 </script>`;
@@ -44,7 +44,7 @@ describe('PDX_FORM_NO_SUBMIT', () => {
   <pdx-form :form="order"><pdx-input name="sku" /></pdx-form>
   <form><input :value="draft.fields.note.value()" /></form>
 </template>
-<script setup>
+<script>
 @form order: { sku: string { required } }
 @form draft: { note: string }
 function onSubmit(e) { console.log(e); }

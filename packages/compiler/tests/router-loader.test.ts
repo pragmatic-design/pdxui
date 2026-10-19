@@ -138,20 +138,20 @@ describe('scanForRoutes reads @loader', () => {
     });
 
     it('picks the name up from a page that declares one', () => {
-        const [r] = scan("<script setup>\n@page '/data';\n@loader loadRows;\nasync function loadRows() { return 1; }\n</script>");
+        const [r] = scan("<script>\n@page '/data';\n@loader loadRows;\nasync function loadRows() { return 1; }\n</script>");
 
         expect(r.loader).toBe('loadRows');
     });
 
     it('leaves it undefined on a page that declares none', () => {
         // The control: a scanner that returned a name unconditionally would satisfy the case above.
-        const [r] = scan("<script setup>\n@page '/about';\n</script>");
+        const [r] = scan("<script>\n@page '/about';\n</script>");
 
         expect(r.loader).toBeUndefined();
     });
 
     it('does not read the word out of a sentence in a comment', () => {
-        const [r] = scan("<script setup>\n@page '/about';\n// the @loader loadRows story is told elsewhere\n</script>");
+        const [r] = scan("<script>\n@page '/about';\n// the @loader loadRows story is told elsewhere\n</script>");
 
         expect(r.loader).toBeUndefined();
     });

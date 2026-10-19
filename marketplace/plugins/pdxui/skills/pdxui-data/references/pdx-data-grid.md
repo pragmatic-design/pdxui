@@ -71,7 +71,7 @@ sanitised, warns once per column, and belongs in a builder. The grid applies `ce
   <pdx-data-grid :data="shipments" :columns="columns"></pdx-data-grid>
 </template>
 
-<script setup>
+<script>
 import { badge, booleanIcon, currency } from '@pdxui/core';
 
 let shipments = $signal([

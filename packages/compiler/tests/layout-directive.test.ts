@@ -22,7 +22,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { compile } from '../src/plugin';
 
 const PAGE = `<template><h1>Users</h1></template>
-<script setup>
+<script>
 @page '/admin/users';
 @layout 'admin';
 </script>`;

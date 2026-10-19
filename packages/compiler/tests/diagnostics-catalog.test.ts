@@ -100,7 +100,7 @@ function findingsOf(source: string): ValidationWarning[] {
     } catch {
         const d = parseSFC(source);
         const ast = parseTemplate(d.template!.content, source.slice(0, d.template!.start).split('\n').length);
-        const analysis = analyzeScript(d.script!.content, 'example.pdx', { setup: d.script!.setup });
+        const analysis = analyzeScript(d.script!.content, 'example.pdx');
         return positionWarnings(source, validate(analysis, ast, 'example.pdx'), analysis.body);
     }
 }

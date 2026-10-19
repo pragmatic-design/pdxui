@@ -10,7 +10,7 @@ import buildCmd from '../src/commands/build';
 import { removeTree } from './remove-tree';
 
 const COUNTER = '<template><button @click="count++">{{ count }}</button></template>\n' +
-    '<script setup>\nlet count = $signal(0);\n</script>\n';
+    '<script>\nlet count = $signal(0);\n</script>\n';
 
 function tmpRoot(name: string): string {
     return join(tmpdir(), `pdx-build-${name}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`);

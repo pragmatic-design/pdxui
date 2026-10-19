@@ -5,10 +5,10 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const filler = Array.from({ length: 9 }, (_v, k) => `const pad${k} = ${k};`).join('\n');
-// Line 1 template, line 2 <script setup>, lines 3-11 filler, line 12 the $effect, line 13 the $watch.
+// Line 1 template, line 2 <script>, lines 3-11 filler, line 12 the $effect, line 13 the $watch.
 const SOURCE = [
     '<template><p>{{ count }}</p></template>',
-    '<script setup>',
+    '<script>',
     filler,
     '$effect(() => { console.log(count); });',
     '$watch(count, (v) => console.log(v));',

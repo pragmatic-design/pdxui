@@ -11,7 +11,7 @@ import { parseVariantsBlock, expandVariantRules } from '../src/compiler/variants
 
 const VARIANTS = '@variants {\n  variant: { primary, ghost, danger } = primary;\n  size: { sm, md, lg } = md;\n}';
 const file = (script: string, css: string) =>
-    `<template><button data-part="root"><slot></slot></button></template>\n<script setup>\n${script}\n@part root;\n</script>\n<style scoped>\n${css}\n</style>\n`;
+    `<template><button data-part="root"><slot></slot></button></template>\n<script>\n${script}\n@part root;\n</script>\n<style scoped>\n${css}\n</style>\n`;
 const STYLED = [
     '[data-part="root"] { border-radius: 4px; }',
     '@variant variant(ghost) { [data-part="root"] { background: transparent; } }',
@@ -37,8 +37,7 @@ describe('@variants in the script', () => {
     });
 
     it('generates a prop per axis, typed with its values and defaulting to its default', () => {
-        const analysis = analyzeScript(VARIANTS, 'btn.pdx', { setup: true });
-        expect(analysis.mode).toBe('new');
+        const analysis = analyzeScript(VARIANTS, 'btn.pdx');
         expect(analysis.props).toEqual([
             { name: 'variant', tsType: "'primary' | 'ghost' | 'danger'", runtimeType: 'String', default: "'primary'" },
             { name: 'size', tsType: "'sm' | 'md' | 'lg'", runtimeType: 'String', default: "'md'" },

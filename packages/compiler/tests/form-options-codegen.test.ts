@@ -6,7 +6,7 @@ import { compile } from '../src/plugin';
 
 function compileForm(script: string) {
     return compile(
-        `<template><div>form</div></template>\n<script setup>\n${script}\n</script>`,
+        `<template><div>form</div></template>\n<script>\n${script}\n</script>`,
         'edit-user.pdx',
     );
 }

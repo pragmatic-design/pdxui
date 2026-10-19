@@ -175,7 +175,7 @@ single rune list the editor reads (#106 — landed).
 `@mixin './x.ts' as name` ran a module's `setup(ctx)`; an imported function called in the script does
 the same with no keyword (`const clock = useClock();`), and core's lifecycle functions (`onMount`,
 `onDestroy`, `effect`) work inside it. The beta removes `@mixin` (decisions.md 6 — proposed);
-no `.pdx` file in the repository uses it. It is `PDX_REMOVED_FORM`.
+no `.pdx` file in the repository uses it. It is `PDX_REMOVED_FORM` (#158 — landed: `mixin-removed`, flagged by `pdx migrate`).
 
 ### @snippet (in the script)
 

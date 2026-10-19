@@ -42,7 +42,7 @@ A ref is a **signal you declare**, and `:ref` fills it with the element when tha
   <pdx-button @click="dlg.open = true">Open</pdx-button>
 </template>
 
-<script setup>
+<script>
 let dlg = $signal(null);
 </script>
 ```
@@ -93,7 +93,7 @@ ctx.expose({ open, close, clear });
   <pdx-button @click="ac.clear()">Clear</pdx-button>
 </template>
 
-<script setup>
+<script>
 let ac = $signal(null);
 </script>
 ```
@@ -130,7 +130,7 @@ ships today:
 In a `.pdx` SFC, declare them with `@expose`:
 
 ```pdx
-<script setup>
+<script>
 let open = $signal(false);   // the component's own state: a @prop belongs to the parent
 
 function showModal() { open = true; }

@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { compile } from '../src/plugin';
 
 const page = (attrs: string, script = 'let a = $signal(1);\nfunction go() {}') =>
-    `<template>\n  <div ${attrs}></div>\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  <div ${attrs}></div>\n</template>\n<script>\n${script}\n</script>\n`;
 
 /** The module's syntax errors, as TypeScript's parser reports them. */
 function parseErrors(code: string): string[] {

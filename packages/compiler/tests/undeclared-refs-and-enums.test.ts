@@ -16,7 +16,7 @@ import { validate, type ValidationWarning } from '../src/compiler/validate';
 import { ComponentResolver } from '../src/component-resolver';
 
 const pdx = (template: string, script: string): string =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const BUTTON_ENUMS: Record<string, string[]> = { size: ['sm', 'md', 'lg'], variant: ['primary', 'secondary'] };
 const enumValues = (tag: string, prop: string) => (tag === 'pdx-button' ? BUTTON_ENUMS[prop] ?? null : null);
@@ -28,7 +28,7 @@ const refs = (src: string): ValidationWarning[] =>
 function validated(src: string): ValidationWarning[] {
     const d = parseSFC(src);
     const ast = parseTemplate(d.template!.content, src.slice(0, d.template!.start).split('\n').length);
-    return validate(analyzeScript(d.script!.content, 'x.pdx', { setup: d.script!.setup }), ast, 'x.pdx', { enumValues });
+    return validate(analyzeScript(d.script!.content, 'x.pdx'), ast, 'x.pdx', { enumValues });
 }
 
 const applied = (src: string, w: ValidationWarning): string =>
@@ -38,7 +38,7 @@ describe('PDX_UNDECLARED_REF', () => {
     it('{{ missingThing }} is an error, at its line', () => {
         const d = refs(pdx('<p>{{ missingThing }}</p>', 'let count = $signal(0);'));
         expect(d.map((w) => [w.message, w.severity, w.line])).toEqual([
-            ["'missingThing' is used in the template but is not declared in <script setup>.", 'error', 2],
+            ["'missingThing' is used in the template but is not declared in <script>.", 'error', 2],
         ]);
     });
 
@@ -79,7 +79,7 @@ describe('PDX_UNDECLARED_REF', () => {
 
     it('the control: an undeclared name in an arrow function body is still flagged', () => {
         const d = refs(pdx('<x-a @pdx-change="e => cuont = e.detail.value"></x-a>', 'let count = $signal(0);'));
-        expect(d.map((x) => x.message)).toEqual(["'cuont' is used in the template but is not declared in <script setup>. Did you mean 'count'?"]);
+        expect(d.map((x) => x.message)).toEqual(["'cuont' is used in the template but is not declared in <script>. Did you mean 'count'?"]);
     });
 
     it('an object key in a binding is not a read; a ternary branch is', () => {

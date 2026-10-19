@@ -22,7 +22,7 @@ describe('@fetch options', () => {
             core.setDefaultClient(core.createHttpClient());
             const name = `fetchopts${build ? 'b' : 'd'}`;
             const src = "<template><p>{{ users.data()?.length ?? 0 }}</p><button @click=\"ready = true\">go</button></template>\n"
-                + "<script setup>\nlet ready = $signal(false);\n@fetch users: 'GET /api/users-203-" + name + "' as string[] { enabled: () => ready };\n</script>\n";
+                + "<script>\nlet ready = $signal(false);\n@fetch users: 'GET /api/users-203-" + name + "' as string[] { enabled: () => ready };\n</script>\n";
             const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);
@@ -44,7 +44,7 @@ describe('@fetch options', () => {
             core.setDefaultClient(core.createHttpClient());
             const name = `fetchobjtype${build ? 'b' : 'd'}`;
             const src = "<template><p>{{ user.data()?.name ?? '' }}</p></template>\n"
-                + "<script setup>\n@fetch user: 'GET /api/user-312-" + name + "' as { name: string };\n</script>\n";
+                + "<script>\n@fetch user: 'GET /api/user-312-" + name + "' as { name: string };\n</script>\n";
             const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
             const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
             new Function('__core', body)(core);

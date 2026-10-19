@@ -50,7 +50,7 @@ A `.pdx` file is a Single File Component (like a `.vue` or a `.svelte`) with thr
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/demo/counter';
 @title 'Counter Example';
 

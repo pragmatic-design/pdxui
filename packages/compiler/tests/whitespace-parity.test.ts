@@ -91,7 +91,7 @@ describe('whitespace inside a table is not emitted', () => {
     });
 
     it('a @for row inside <tbody>: the block takes the table context of where it is placed', () => {
-        const src = '<template><table><tbody>\n  @for (rows as r; track r.id) {\n    <tr> <td>{{ r.id }}</td> </tr>\n  }\n</tbody></table></template>\n<script setup>\nlet rows = $signal([]);\n</script>\n';
+        const src = '<template><table><tbody>\n  @for (rows as r; track r.id) {\n    <tr> <td>{{ r.id }}</td> </tr>\n  }\n</tbody></table></template>\n<script>\nlet rows = $signal([]);\n</script>\n';
         const { code } = compile(src, 'rows.pdx', [], undefined, { production: true });
         // Every whitespace text node of the module is gone: the row's builder writes none either.
         expect(code).not.toContain('__d.createTextNode(" ")');

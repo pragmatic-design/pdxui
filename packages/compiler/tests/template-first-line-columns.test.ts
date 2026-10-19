@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const SCRIPT = '\n<script setup>\nlet tone = $signal(\'info\');\n</script>\n';
+const SCRIPT = '\n<script>\nlet tone = $signal(\'info\');\n</script>\n';
 
 function rawInterpolation(source: string) {
     return compile(source, 'one-line.pdx').warnings.find(w => w.code === 'PDX_RAW_INTERPOLATION');

@@ -27,7 +27,7 @@ import { validate } from '../src/compiler/validate';
 import { compile } from '../src/plugin';
 
 function analyse(template: string, script = 'let x = $signal(0);') {
-    const src = `<template>\n${template}\n</template>\n\n<script setup>\n${script}\n</script>`;
+    const src = `<template>\n${template}\n</template>\n\n<script>\n${script}\n</script>`;
     const d = parseSFC(src);
     return {
         analysis: analyzeScript(d.script?.content ?? '', 'probe.pdx'),
@@ -78,7 +78,7 @@ describe('PDX_REWRITE_FALLBACK reaches the structured channel', () => {
     // fragment untouched: `count` stays a bare read of a signal that has become `__count`.
     const BROKEN = [
         '<template><div>{{ count }}</div></template>',
-        '<script setup>',
+        '<script>',
         '  let count = $signal(0);',
         '  function bump() { count = ( }',
         '</script>',
@@ -101,7 +101,7 @@ describe('PDX_REWRITE_FALLBACK reaches the structured channel', () => {
         // The control: a diagnostic that fires on everything is a diagnostic nobody reads.
         const ok = [
             '<template><div>{{ count }}</div></template>',
-            '<script setup>',
+            '<script>',
             '  let count = $signal(0);',
             '  function bump() { count++; }',
             '</script>',

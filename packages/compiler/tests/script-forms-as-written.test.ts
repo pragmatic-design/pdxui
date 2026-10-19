@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { generateDerivedDeclarations } from '../src/compiler/signal-rewrite';
 
-const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+const pdx = (script: string, template = '<p>x</p>') => `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
 
 /** Does the emitted module parse? Imports stripped: illegal in a function body, and not the point. */
 function parses(code: string): boolean {

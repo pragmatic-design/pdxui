@@ -14,7 +14,7 @@ import { compile } from '../src/plugin';
 import { URL_BINDINGS } from '../src/compiler/codegen-template-inline';
 
 function inline(template: string, script = "let url = $signal('/');"): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
     return compile(source, 'inline-url.pdx', [], undefined, { production: true }).code;
 }
 
@@ -56,7 +56,7 @@ describe('the controls', () => {
 describe('a scoped slot body, built inline since #364', () => {
     it(':href goes through sanitizeBoundUrl there too', () => {
         // It was an html`` template, which core's bindProperty sanitised at runtime.
-        const source = "<template>\n<pdx-list><slot name=\"item\" let:row><a :href=\"url\">Go</a></slot></pdx-list>\n</template>\n<script setup>\nlet url = $signal('/');\n</script>";
+        const source = "<template>\n<pdx-list><slot name=\"item\" let:row><a :href=\"url\">Go</a></slot></pdx-list>\n</template>\n<script>\nlet url = $signal('/');\n</script>";
         const code = compile(source, 'slot-url.pdx', [], undefined, { production: true }).code;
         const slot = code.slice(code.indexOf('const __pdxSlot_item_0'));
         expect(slot).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);

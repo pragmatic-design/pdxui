@@ -16,7 +16,7 @@ import { DIAGNOSTICS } from '../src/diagnostics/catalog';
 import type { ValidationWarning } from '../src/compiler/validate';
 
 const pdx = (template: string, script: string, style = ''): string =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n${style ? `<style scoped>\n${style}\n</style>\n` : ''}`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n${style ? `<style scoped>\n${style}\n</style>\n` : ''}`;
 
 interface Row {
     src: string;
@@ -70,8 +70,9 @@ const ROWS: Record<string, Row> = {
     PDX_AWAIT_TIMING: { src: pdx('<p>{{ a }}</p>\n@await (ready) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <i>…</i> }', 'let a = $signal(1);\nlet ready = $signal(Promise.resolve());'), at: '@await (ready) { minMs' },
     PDX_FETCH_INVALID: { src: pdx('<p>x</p>', "let a = $signal(1);\n@fetch users: 'nomethod';"), at: '@fetch users' },
     PDX_FETCH_NO_ERROR_UI: { src: pdx('<p>{{ users.data() }}</p>', "@fetch users: 'GET /api/users' as string[];"), at: '@fetch users' },
-    PDX_TEMPLATE_NAME_NOT_PROVIDED: { src: '<template>\n  <h1>{{ title }}</h1>\n</template>\n<script>\nconst title = 1;\nreturn {};\n</script>\n', at: '{{ title }}' },
     PDX_PREFETCH_POLICY: { src: pdx('<p>x</p>', "@page '/x';\n@prefetch 'visible';"), at: "@prefetch 'visible'" },
+    PDX_SETUP_REDUNDANT: { src: '<template>\n  <p>{{ a }}</p>\n</template>\n<script setup>\nlet a = $signal(1);\n</script>\n', at: '<script setup>' },
+    PDX_REMOVED_FORM: { src: pdx('<p>{{ label }}</p>', "const props = defineProps({ label: { type: String, default: 'a' } });"), at: 'defineProps' },
     PDX_FETCH_METHOD: { src: pdx('<p>{{ hits }}</p>', "let a = $signal(1);\n@fetch hits: 'POST /api/search';"), at: '@fetch hits' },
     PDX_FETCH_TYPE_COLON: { src: pdx('<p>{{ user }}</p>', "let a = $signal(1);\n@fetch user: 'GET /api/user' : User;"), at: '@fetch user' },
     PDX_FETCH_UNKNOWN_OPTION: { src: pdx('<p>{{ users }}</p>', "let a = $signal(1);\n@fetch users: 'GET /api/users' { stalTime: 1 };"), at: '@fetch users' },
@@ -80,7 +81,6 @@ const ROWS: Record<string, Row> = {
     PDX_FORM_UNKNOWN_RULE: { src: pdx('<p>{{ f }}</p>', 'let a = $signal(1);\n@form f: { name: string { required, shout } };'), at: 'shout' },
     PDX_FORM_FIELD_UNPARSED: { src: pdx('<p>{{ x }}</p>', 'let a = $signal(1);\n@form x: {\n  a: string,\n  weird: <<nonsense>>\n};'), at: 'weird' },
     PDX_REWRITE_FALLBACK: { src: pdx('<div>{{ count }}</div>', 'let count = $signal(0);\nfunction bump() { count = ( }'), at: 'function bump()' },
-    PDX_LEGACY_IN_SETUP: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\nconst props = defineProps({});'), at: 'defineProps' },
     PDX_PAGE_INVALID_PATH: { src: pdx('<p>x</p>', "@page 'users';"), at: "@page 'users'" },
     PDX_PAGE_INVALID_CONSTRAINT: { src: pdx('<p>x</p>', "@page '/u/:id(foo)';"), at: "@page '/u/:id(foo)'" },
     PDX_PAGE_EMPTY_CONSTRAINT: { src: pdx('<p>x</p>', "@page '/u/:id()';"), at: "@page '/u/:id()'" },
@@ -129,7 +129,6 @@ const ELSEWHERE: Record<string, string> = {
     PDX_TAG_COLLISION_RESOLVER: 'about two files, not a line in one',
     PDX_TAG_COLLISION: 'about two files, not a line in one',
     PDX_INLINE_BINDINGS_IGNORED: 'about the vite.config.ts, not a .pdx — inline-bindings-ignored.test.ts',
-    PDX_REMOVED_FORM: 'no form is removed yet: its line is asserted with a test entry — language-changes.test.ts',
     PDX_EMPTY_SOURCE: 'an empty file has no line',
     PDX_I18N_MISSING_KEY: 'a key in a JSON locale file, not a .pdx',
     PDX_TS: 'TypeScript\'s position, mapped by the language server — packages/cli/tests/check-types.test.ts asserts the line',
@@ -138,7 +137,7 @@ const ELSEWHERE: Record<string, string> = {
 function produce(code: string, row: Row): ValidationWarning | undefined {
     if (row.via === 'validate-unknown-tags') {
         const d = parseSFC(row.src);
-        const analysis = analyzeScript(d.script!.content, 'x.pdx', { setup: d.script!.setup });
+        const analysis = analyzeScript(d.script!.content, 'x.pdx');
         const ws = validate(analysis, parseTemplate(d.template!.content), 'x.pdx', { isKnownTag: () => false });
         return positionWarnings(row.src, ws).find((w) => w.code === code);
     }
@@ -173,7 +172,7 @@ describe('every diagnostic from one file points at its line', () => {
 const SCRIPT_ROWS: Record<string, { file: string; src: string; at: string }> = {
     PDX_STORE_EXPORT: { file: 'menu.pdx.ts', src: "@store menu;\nlet s = $signal('a');\nexport const label = () => s;\n", at: 'export const label' },
     PDX_FETCH_INVALID: { file: 'api.pdx.ts', src: "let a = $signal(1);\n@fetch users: 'nomethod';\n", at: '@fetch users' },
-    PDX_PROP_NO_TYPE: { file: 'tagless.pdx', src: '<script setup>\nlet a = $signal(1);\n@prop label;\n</script>\n', at: '@prop label;' },
+    PDX_PROP_NO_TYPE: { file: 'tagless.pdx', src: '<script>\nlet a = $signal(1);\n@prop label;\n</script>\n', at: '@prop label;' },
 };
 
 describe('every diagnostic from a script-only file points at its line', () => {

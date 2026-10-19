@@ -19,7 +19,7 @@ function load(filename: string, source: string): void {
 const COMBO = `<template>
 <span class="label">{{ label }}</span>
 </template>
-<script setup>
+<script>
 @prop label: string = 'Choose';
 let open = $signal(false);
 @host {

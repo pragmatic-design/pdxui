@@ -30,7 +30,7 @@ describe('@raw keeps its text as written', () => {
     // A backslash went into the template literal unescaped: `\n` became a line break, `\d` a `d`,
     // and a backslash before the backtick the parser escaped ended the literal.
     const RAW = 'C:\\new \\d a`b ${x} \\`';
-    const src = `<template>\n<pre>@raw {${RAW}}</pre>\n</template>\n<script setup>\nlet a = $signal(0);\n</script>\n`;
+    const src = `<template>\n<pre>@raw {${RAW}}</pre>\n</template>\n<script>\nlet a = $signal(0);\n</script>\n`;
     it('the render', () => {
         expect(templateText(compile(src, 'raw.pdx', [], undefined, { production: true }).code)).toContain(RAW);
     });
@@ -42,7 +42,7 @@ describe('@raw keeps its text as written', () => {
 describe('@raw inside a loop binds nothing', () => {
     // The parser's `\${` used to hide an unquoted `attr=${…}` from both render paths. Kept as written,
     // the inline path read it as a value the compiler had pre-rewritten — a live binding to `item`.
-    const src = `<template>\n@for (items as item; track item) { @raw {<span title=\${item}>x</span>} }\n</template>\n<script setup>\nlet items = $signal([1]);\n</script>\n`;
+    const src = `<template>\n@for (items as item; track item) { @raw {<span title=\${item}>x</span>} }\n</template>\n<script>\nlet items = $signal([1]);\n</script>\n`;
 
     // The row's static markup is HTML (#369): the attribute value is in it, as text.
     it('the render: the attribute is the text', () => {

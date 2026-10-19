@@ -15,7 +15,7 @@ const warningsOf = (source: string, code: string) => compile(source, 'piece.pdx'
 
 describe('CD-A1 — PDX_DOCUMENT_QUERY', () => {
     const sfc = (script: string) => `<template><div class="list"><a class="first">x</a></div></template>
-<script setup>
+<script>
 let open = $signal(false);
 ${script}
 </script>
@@ -45,7 +45,7 @@ ${script}
 
 describe('CD-A2 — PDX_PROP_WRITE', () => {
     const sfc = (script: string) => `<template><span>{{ label }}</span></template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 @prop count: number = 0;
 ${script}
@@ -73,7 +73,7 @@ ${script}
 
 describe('CD-D3 — PDX_LISTENER_LEAK', () => {
     const sfc = (script: string) => `<template><div></div></template>
-<script setup>
+<script>
 let open = $signal(false);
 ${script}
 </script>
@@ -105,7 +105,7 @@ ${script}
 
 describe('CD-C2 — PDX_LIBRARY_INTERNALS', () => {
     const sfc = (style: string, template = '<div class="page pdx-txt-small"><pdx-data-grid></pdx-data-grid></div>') => `<template>${template}</template>
-<script setup>
+<script>
 let n = $signal(0);
 </script>
 <style scoped>

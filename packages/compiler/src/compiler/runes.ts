@@ -59,7 +59,6 @@ export const RUNES: readonly RuneInfo[] = [
     d('prefetch', 'When the page\'s chunk is fetched ahead of a click.', "@prefetch 'hover';", "@prefetch '${1|hover,eager,viewport,never|}';"),
     d('snippet', 'Declare a reusable template fragment.', '@snippet name(arg) { <div>…</div> }', '@snippet ${1:name}(${2:arg}) {\n  $3\n}'),
     d('i18n', 'Configure internationalization for the app.', "@i18n { locales: ['en', 'it'], default: 'en' }", "@i18n {\n  locales: ['${1:en}', '${2:it}'],\n  default: '${3:en}',\n  translations: '${4:./translations}',\n}"),
-    d('mixin', "Run a module's exported setup(ctx) here, under a name.", "@mixin './use-thing.ts' as thing;", "@mixin '${1:./use-thing.ts}' as ${2:thing};"),
     d('use', 'Use a Web Component from another package: imports the package that registers the tag.', "@use 'sl-button' from '@shoelace-style/shoelace';", "@use '${1:tag-name}' from '${2:package}';"),
     d('raw', 'Kept as written. In the script, no signal is rewritten inside the block; in the template, no binding, interpolation or directive is read inside it.', '@raw { … }', '@raw {\n  $1\n}'),
     d('transition', 'The page transition animation: a preset, `none`, or a class name used for both enter and exit.', "@transition 'fade';", "@transition '${1|fade,slide-left,slide-right,slide-up,slide-down,scale,collapse,none|}';"),

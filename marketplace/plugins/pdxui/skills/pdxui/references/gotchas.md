@@ -57,7 +57,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
 
 ## Routing / guard
 - No global `effect` that reads `currentPath()` and calls `navigate()` (it loops). Guard **per route** in the
-  `<script setup>` (a `requireAuth()` that calls `navigate('/login')` when not authenticated). Condition the **chrome** on the
+  `<script>` (a `requireAuth()` that calls `navigate('/login')` when not authenticated). Condition the **chrome** on the
   ROUTE (`currentPath() !== '/login'`), not on `authed()` (authentication resolves asynchronously).
 - "Leaving loses the unsaved work": that is not a per-route guard, it is `onBeforeNavigate` from
   `@pdxui/router`, asked before every navigation, Back included. The recipe "Do not leave with unsaved

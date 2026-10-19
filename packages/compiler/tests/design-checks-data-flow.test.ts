@@ -12,7 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const warningsOf = (source: string, code: string) => compile(source, 'piece.pdx').warnings.filter(w => w.code === code);
-const sfc = (script: string) => `<template><p>{{ label }}</p></template>\n<script setup>\n${script}\n</script>\n`;
+const sfc = (script: string) => `<template><p>{{ label }}</p></template>\n<script>\n${script}\n</script>\n`;
 
 describe('CD-S2 — PDX_DERIVED_WRITE', () => {
     it('the syncSettings shape: a member written through locals that came from a $derived', () => {
@@ -160,7 +160,7 @@ describe('CD-D2 — PDX_EFFECT_STATE', () => {
     it('control — the catalog: a watch resets to a constant what a template handler chose', () => {
         const source = [
             '<template><input :value="query" @input="e => query = e.target.value"><p>{{ query }}</p></template>',
-            '<script setup>',
+            '<script>',
             '@prop open: boolean = false;',
             "let query = $signal('');",
             "$watch(open, (isOpen) => { if (!isOpen) return; query = ''; });",

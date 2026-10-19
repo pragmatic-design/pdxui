@@ -16,7 +16,7 @@ import { join } from 'node:path';
 
 const page = (directives: string) => `
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/p';
 ${directives}
 </script>`;

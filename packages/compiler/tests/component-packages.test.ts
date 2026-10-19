@@ -102,7 +102,7 @@ describe('the resolver over component packages', () => {
         const r = new ComponentResolver();
         r.registerComponentPackages(root);
         r.registerProjectComponents(root);
-        const analysis = analyzeScript('', 'a.pdx', { setup: true });
+        const analysis = analyzeScript('', 'a.pdx');
         const [w] = validate(analysis, parseTemplate('<acme-nope></acme-nope>'), 'a.pdx', {
             isKnownTag: t => r.has(t),
             searched: () => r.searched,

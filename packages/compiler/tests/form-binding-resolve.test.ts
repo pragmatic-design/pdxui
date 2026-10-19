@@ -15,7 +15,7 @@ import { parseTemplate } from '../src/parser/template';
 import { findComponentTags, generateComponentImports } from '../src/compiler/resolve';
 import { FormControlRegistry } from '../src/compiler/codegen-form-binding';
 
-const SETUP = "<script setup>\n  let f = $form({ email: '' });\n</script>";
+const SETUP = "<script>\n  let f = $form({ email: '' });\n</script>";
 
 function tpl(inner: string): string {
     const { code } = compile(`<template>\n${inner}\n</template>\n${SETUP}`, 'form.pdx');

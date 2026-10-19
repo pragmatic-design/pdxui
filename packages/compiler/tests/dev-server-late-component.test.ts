@@ -19,7 +19,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pdx } from '../src/plugin';
 
-const V1 = (name: string) => `<template>\n  <em>${name} first version {{ label }}</em>\n</template>\n\n<script setup>\nlet label = $signal('one');\n</script>\n`;
+const V1 = (name: string) => `<template>\n  <em>${name} first version {{ label }}</em>\n</template>\n\n<script>\nlet label = $signal('one');\n</script>\n`;
 const V2 = (name: string) => V1(name).replace('first version', 'second version');
 // A stub, as a source: a template and nothing else.
 const STUB = '<template>\n  <div></div>\n</template>\n';
@@ -30,7 +30,7 @@ const APP = `<template>
   <app-late-stub></app-late-stub>
 </template>
 
-<script setup>
+<script>
 let n = $signal(1);
 </script>
 `;
@@ -127,12 +127,11 @@ describe('a .pdx created while the dev server runs', () => {
         await reported('add', 'late-stub.pdx');
         const stub = await served('late-stub.pdx');
         expect(stub).toContain("component('app-late-stub'");
-        expect(stub, 'control — the stub really is a stub').not.toContain('setup(ctx)');
+        expect(stub, 'control — the stub really is a stub').not.toContain('stub first version');
 
         writeFileSync(join(root, 'src', 'late-stub.pdx'), V1('stub'));
         await reported('change', 'late-stub.pdx');
         const real = await served('late-stub.pdx');
-        expect(real).toContain('setup(ctx)');
         expect(real).toContain('stub first version');
     }, 30_000);
 });

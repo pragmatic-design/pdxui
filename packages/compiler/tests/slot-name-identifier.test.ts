@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function compileTemplate(template: string): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let rows = $signal([]);\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  let rows = $signal([]);\n</script>`;
     return compile(source, 'slot-name.pdx').code;
 }
 

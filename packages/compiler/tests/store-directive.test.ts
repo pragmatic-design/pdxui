@@ -11,7 +11,7 @@ describe('@store — script analyzer', () => {
     it('parses @store name;', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart;
 let items = $signal([]);
 </script>
@@ -23,7 +23,7 @@ let items = $signal([]);
     it('parses @store name with persist option', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart { persist: 'local' };
 let items = $signal([]);
 </script>
@@ -36,7 +36,7 @@ let items = $signal([]);
     it('parses @store with session persist', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store auth { persist: 'session' };
 let token = $signal('');
 </script>
@@ -50,7 +50,7 @@ describe('@store — codegen', () => {
     it('generates createGlobalStore wrapping setup body', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart;
 let items = $signal([]);
 const total = $derived(items.length);
@@ -72,7 +72,7 @@ function addItem(item) { items = [...items, item]; }
     it('generates export function useXxx()', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store notifications;
 let list = $signal([]);
 </script>
@@ -84,7 +84,7 @@ let list = $signal([]);
     it('does NOT generate component() call', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart;
 let items = $signal([]);
 </script>
@@ -95,7 +95,7 @@ let items = $signal([]);
     it('imports createGlobalStore from @pdxui/core', () => {
         const { code } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart;
 let items = $signal([]);
 </script>
@@ -107,7 +107,7 @@ let items = $signal([]);
     it('produces no warnings', () => {
         const { warnings } = compileStore(`
 <template><div>Store</div></template>
-<script setup>
+<script>
 @store cart;
 let items = $signal([]);
 </script>

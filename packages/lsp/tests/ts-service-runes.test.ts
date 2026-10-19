@@ -18,8 +18,8 @@ const svc = new PdxTsService(ROOT);
 
 /** The TS diagnostics of a .pdx made of `script` and `template`, as the server computes them. */
 function diagnose(script: string, template = '', resolveType?: (tag: string, attr: string) => string | null, service = svc, uri = URI): string[] {
-    const source = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const scriptStart = source.indexOf('<script setup>\n') + '<script setup>\n'.length;
+    const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+    const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const tmplStart = '<template>'.length;
     const vf = buildVirtualFile(script, scriptStart, template ? parseTemplate(template, 1) : [], template || null, template ? tmplStart : -1, resolveType);
     return getTsDiagnostics(service, uri, vf, source).map(d => `${d.code} ${d.message.split('\n')[0]}`);

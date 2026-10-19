@@ -11,7 +11,7 @@ describe('@for with index variable', () => {
   <div>{{ i }}: {{ item.name }}</div>
 }
 </template>
-<script setup>
+<script>
 @prop items: { id: number; name: string }[] = [];
 </script>`;
         const { code } = compile(source, 'for-index.pdx');
@@ -27,7 +27,7 @@ describe('@for with index variable', () => {
   <span class="{{ idx % 2 === 0 ? 'even' : 'odd' }}">{{ item.name }}</span>
 }
 </template>
-<script setup>
+<script>
 @prop items: any[] = [];
 </script>`;
         const { code } = compile(source, 'for-idx.pdx');
@@ -44,7 +44,7 @@ describe('@for with index variable', () => {
   <div>{{ item.name }}</div>
 }
 </template>
-<script setup>
+<script>
 @prop items: any[] = [];
 </script>`;
         const { code } = compile(source, 'for-no-idx.pdx');
@@ -60,7 +60,7 @@ describe('@for with index variable', () => {
   <div>{{ i }}: {{ key }}={{ value }}</div>
 }
 </template>
-<script setup>
+<script>
 @prop entries: { key: string; value: string }[] = [];
 </script>`;
         const { code } = compile(source, 'for-destr-idx.pdx');

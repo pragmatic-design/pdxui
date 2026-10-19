@@ -10,7 +10,7 @@ const source = [
     '<template>',
     '  <span>{{ count }}</span>',   // line 1 — 'count' appears here first
     '</template>',
-    '<script setup>',               // line 3
+    '<script>',               // line 3
     "@prop title: string = 'x';",   // line 4
     'let count = 5;',               // line 5 — the declaration (not $signal)
     '</script>',
@@ -20,7 +20,7 @@ const source = [
 // content — counted from the content, the finding lands ten characters early and misses its `${`.
 describe('a finding on the <template> line', () => {
     it('PDX_RAW_INTERPOLATION_IN_BINDING points at the ${ in the file', () => {
-        const src = '<template><div :title="${tone}">x</div></template>\n<script setup>\nlet tone = $signal(\'a\');\n</script>\n';
+        const src = '<template><div :title="${tone}">x</div></template>\n<script>\nlet tone = $signal(\'a\');\n</script>\n';
         const w = analyzeDocument(src, 'one-line.pdx').warnings.find(x => x.code === 'PDX_RAW_INTERPOLATION_IN_BINDING');
         expect(w, 'no PDX_RAW_INTERPOLATION_IN_BINDING').toBeDefined();
         expect(w!.line).toBe(1);
@@ -47,13 +47,13 @@ describe('diagnostics positioning', () => {
             source,
             descriptor?.script ?? null,
         );
-        // Script content starts on line 4 (after `<script setup>` on line 3).
+        // Script content starts on line 4 (after `<script>` on line 3).
         expect(diags[0].range.start.line).toBeGreaterThanOrEqual(3);
     });
 
     it('uses word boundaries (no substring false match)', () => {
         const src = [
-            '<script setup>',
+            '<script>',
             'let username = 1;',   // contains "name" as a substring
             'let count = 2;',
             '</script>',
@@ -75,7 +75,7 @@ describe('diagnostics positioning', () => {
             '  <!-- pdx-ignore PDX_RAW_INTERPOLATION: shown as written -->',
             '  <p title="${a}">x</p>',
             '</template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             '</script>',
         ].join('\n');
@@ -99,7 +99,7 @@ describe('diagnostics positioning', () => {
             '  </div>',
             '  <pdx-second></pdx-second>',
             '</template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             '</script>',
         ].join('\n');

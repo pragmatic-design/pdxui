@@ -96,7 +96,7 @@ compile-time pass over the HTML of one `.pdx`, and it runs in two places:
   <pdx-form-field name="firstName" label="First name"><pdx-input name="firstName" /></pdx-form-field>
   <pdx-form-field name="lastName" label="Last name"><pdx-input name="lastName" /></pdx-form-field>
 </template>
-<script setup>
+<script>
 import { tryUseForm } from '@pdxui/core';
 const form = tryUseForm();   // the declaration; the bindings find the form themselves
 </script>
@@ -187,7 +187,7 @@ A shipment form whose draft survives closing the tab:
   <span class="draft-state pdx-txt-small pdx-ink-muted">{{ savedAt }}</span>
 </template>
 
-<script setup>
+<script>
 import { createForm, required, minLength, min } from '@pdxui/core';
 
 const DRAFT_KEY = 'shipment-draft';
@@ -216,7 +216,7 @@ function send(e) { localStorage.removeItem(DRAFT_KEY); console.log('sent', e.det
 </script>
 ```
 
-A `<script setup>` needs no rune to work: one with none is compiled like any other.
+A `<script>` needs no rune to work: one with none is compiled like any other.
 
 What that gives you (`packages/ui/tests/unit/recipe-long-form.test.ts` runs this block):
 - **`form.setValues(draft)` reaches controls already on screen**, the `pdx-select` included — `pdx-form`
@@ -250,7 +250,7 @@ expression you need not write one: `pattern(regex, msg)`.
     </pdx-form-field>
   </pdx-form>
 </template>
-<script setup>
+<script>
 import { createForm, required, pattern } from '@pdxui/core';
 
 const notSunday = (v) => (v && new Date(v).getDay() === 0 ? 'The clinic is closed on Sunday' : undefined);
@@ -283,7 +283,7 @@ in the browser's own words.
   </pdx-form>
 </template>
 
-<script setup>
+<script>
 import { createForm, required } from '@pdxui/core';
 import { navigate } from '@pdxui/router';
 import { saveOwner } from './lib/owners';
@@ -369,7 +369,7 @@ lines stacked in a 32px block under `overflow: hidden` cut the name.
   </div>
 </template>
 
-<script setup>
+<script>
 const resources = [{ id: 'rossi', name: 'Dr. Rossi' }, { id: 'bianchi', name: 'Dr. Bianchi' }];
 const hours = ['08:00', '09:00', '10:00', '11:00'];
 const DAY_START = 8 * 60;
@@ -681,7 +681,7 @@ Then, in a page:
   <pdx-pagination :source="rows"></pdx-pagination>
 </template>
 
-<script setup>
+<script>
 import { makeSource } from './lib/mock-backend';
 const rows = makeSource({ pageSize: 10 });
 const columns = [
@@ -768,7 +768,7 @@ template is not on `ctx`:
   <label><input type="checkbox" @change="e => setFailing(e.target.checked)"> Simulate failure</label>
   <pdx-data-grid :source="records" :columns="columns"></pdx-data-grid>
 </template>
-<script setup>
+<script>
 import { service, makeRecords } from './lib/records-service';
 const records = makeRecords([{ id: 1, name: 'Fido' }, { id: 2, name: 'Birba' }]);
 const columns = [{ field: 'name', header: 'Name' }];

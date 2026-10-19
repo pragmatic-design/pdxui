@@ -20,7 +20,7 @@ const expand = (snippet: string): string => snippet
 /** The codes a script of just `line` produces, in a component with an empty template. */
 function codesOf(line: string): string[] {
     try {
-        const r = compile(`<template><p></p></template>\n<script setup>\n${line}\n</script>\n`, 'rune-shape.pdx');
+        const r = compile(`<template><p></p></template>\n<script>\n${line}\n</script>\n`, 'rune-shape.pdx');
         return (r.warnings ?? []).map((w) => w.code);
     } catch (e) {
         return [`THREW ${String(e)}`];

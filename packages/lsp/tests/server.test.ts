@@ -250,7 +250,7 @@ describe('diagnostics on change', () => {
     });
 
     it('pdx.typeCheck turns the type errors off and on again, on the open documents', () => {
-        const doc = open('src/typed.pdx', "<template><p>x</p></template>\n<script setup>\nconst n: string = 42;\n</script>\n");
+        const doc = open('src/typed.pdx', "<template><p>x</p></template>\n<script>\nconst n: string = 42;\n</script>\n");
         const tsCodes = () => {
             const sent = stub.sent.filter((s) => s.uri === doc.uri).at(-1);
             return (sent?.diagnostics as { source?: string }[] ?? []).filter((d) => d.source === 'pdx-ts').length;
@@ -601,7 +601,7 @@ describe('rename scope', () => {
     ].map(fileOf);
 
     it('refuses to rename a tag a component package defines, and says which', () => {
-        const text = '<template>\n<pdx-card></pdx-card>\n</template>\n<script setup>\nlet a = $signal(1);\n</script>\n';
+        const text = '<template>\n<pdx-card></pdx-card>\n</template>\n<script>\nlet a = $signal(1);\n</script>\n';
         const doc = open('src/lib-tag.pdx', text);
         const r = stub.on.prepareRename(at(doc.uri, positionOf(text, '<pdx-card', 3))) as { message?: string } | null;
         expect(r?.message, 'a library tag was offered for renaming').toContain('@acme/cards');
@@ -621,7 +621,7 @@ describe('rename scope', () => {
 
     it('renaming a function a .pdx.ts exports updates the .pdx that imports it', () => {
         const STATE = 'export function bump(n: number) { return n + 1; }\n';
-        const USER = "<template><p>{{ bump(1) }}</p></template>\n<script setup>\nimport { bump } from './state.pdx';\nconst two = bump(1);\n</script>\n";
+        const USER = "<template><p>{{ bump(1) }}</p></template>\n<script>\nimport { bump } from './state.pdx';\nconst two = bump(1);\n</script>\n";
         writeFileSync(join(root, 'src', 'state.pdx.ts'), STATE);
         writeFileSync(join(root, 'src', 'user.pdx'), USER);
         stub.on.watchedFiles({ changes: [] });

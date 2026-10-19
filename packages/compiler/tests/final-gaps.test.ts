@@ -9,7 +9,7 @@ describe('gap 4: @for with destructuring', () => {
 @for (entries as { key, value }; track key) {
   <div>{{ key }}: {{ value }}</div>
 }
-</template><script setup>
+</template><script>
 @prop entries: { key: string; value: string }[] = [];
 </script>`;
         const { code } = compile(source, 'destr-for.pdx');
@@ -22,7 +22,7 @@ describe('gap 4: @for with destructuring', () => {
 @for (pairs as [k, v]; track k) {
   <div>{{ k }}={{ v }}</div>
 }
-</template><script setup>
+</template><script>
 @prop pairs: [string, number][] = [];
 </script>`;
         const { code } = compile(source, 'arr-destr.pdx');
@@ -35,7 +35,7 @@ describe('gap 7: @raw inside function body', () => {
     it('@raw inside function body skips signal rewriting', () => {
         const source = `
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   function debug() {
     @raw {
@@ -62,7 +62,7 @@ describe('gap 8: custom plugin directives in parser + codegen', () => {
     <div>Animated!</div>
   }
 </template>
-<script setup>
+<script>
   @prop label: string = 'test';
 </script>`;
 
@@ -88,7 +88,7 @@ describe('gap 8: custom plugin directives in parser + codegen', () => {
     it('cleans up custom directives between compilations', () => {
         // First compile with plugin
         const { code: first } = compile(
-            `<template>@animate (x) { <p>hi</p> }</template><script setup>@prop a: string = '';</script>`,
+            `<template>@animate (x) { <p>hi</p> }</template><script>@prop a: string = '';</script>`,
             'a.pdx',
             [{ name: 'test', templateDirectives: { animate: { generate: () => `test()` } } }]
         );
@@ -96,7 +96,7 @@ describe('gap 8: custom plugin directives in parser + codegen', () => {
 
         // Second compile WITHOUT plugin — @animate treated as plain text (not recognized)
         const { code: second } = compile(
-            `<template><div>@animate ignored</div></template><script setup>@prop b: string = '';</script>`,
+            `<template><div>@animate ignored</div></template><script>@prop b: string = '';</script>`,
             'b.pdx'
         );
         expect(second).not.toContain('test()');

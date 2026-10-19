@@ -20,7 +20,7 @@ const source = [
     '<template>',                                            // line 0 (LSP positions are 0-based)
     '  <pdx-app-layout :withBordr="on"></pdx-app-layout>',   // line 1, `:withBordr` at character 18
     '</template>',
-    '<script setup>',
+    '<script>',
     'let on = $signal(false);',
     '</script>',
 ].join('\n');
@@ -40,7 +40,7 @@ describe('analyzeDocument with the components\' props', () => {
     });
 
     it('a warning validate() already gave is not listed twice', () => {
-        const counter = '<template><span>{{ count }}</span></template>\n<script setup>\nlet count = 5;\n</script>';
+        const counter = '<template><span>{{ count }}</span></template>\n<script>\nlet count = 5;\n</script>';
         const keys = analyzeDocument(counter, 'counter.pdx', { propsOf }).warnings.map((w) => `${w.code}: ${w.message}`);
         expect(keys).toContain(keys.find((k) => k.startsWith('PDX_NON_REACTIVE')));
         expect(new Set(keys).size).toBe(keys.length);
@@ -56,7 +56,7 @@ describe('analyzeDocument with the components\' props', () => {
     });
 
     it('a document the compiler cannot compile still gets its validate() warnings, and no crash', () => {
-        const broken = '<template><span>{{ count }}</span></template>\n<script setup>\nlet count = 5;\n</script>\n<style src="./missing.css"></style>';
+        const broken = '<template><span>{{ count }}</span></template>\n<script>\nlet count = 5;\n</script>\n<style src="./missing.css"></style>';
         const { warnings } = analyzeDocument(broken, 'broken.pdx', { propsOf });
         expect(warnings.map((w) => w.code)).toContain('PDX_NON_REACTIVE');
     });

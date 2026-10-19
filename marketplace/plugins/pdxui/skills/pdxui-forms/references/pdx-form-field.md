@@ -18,7 +18,7 @@ on save), goes with `show-error`:
 <template>
   <pdx-form-field label="PIN" :error="pinError" show-error><pdx-input type="password" /></pdx-form-field>
 </template>
-<script setup>
+<script>
 let pinError = $signal(''); // set when the server refuses the PIN: pinError = 'Wrong PIN'
 </script>
 ```

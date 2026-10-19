@@ -25,7 +25,7 @@ const COUNTER = `<template>
 <button class="reset" @click="clear()">0</button>
 <p class="count">{{ n }}</p>
 </template>
-<script setup>
+<script>
 let n = $signal(0);
 function makeCounter() {
   return { bump: () => n++, reset: () => n = 0 };

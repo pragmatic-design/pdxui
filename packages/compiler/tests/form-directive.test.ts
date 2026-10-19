@@ -88,15 +88,7 @@ describe('@form parsing — external schema', () => {
     });
 });
 
-describe('@form — mode and exports', () => {
-    it('@form activates new mode', () => {
-        const a = analyzeScript(`
-            @form user: {
-                name: string { required },
-            }
-        `, 'user.pdx');
-        expect(a.mode).toBe('new');
-    });
+describe('@form — exports', () => {
 
     it('@form name is auto-exported', () => {
         const a = analyzeScript(`
@@ -144,7 +136,7 @@ describe('@form — mode and exports', () => {
 // acceptable — so the compiler says so, and points at the mechanism that does enforce it.
 describe('@form — a rule inside an array field', () => {
     const analyse = (decl: string) =>
-        analyzeScript(`${decl}\nfunction save() {}`, 'order.pdx', { setup: true });
+        analyzeScript(`${decl}\nfunction save() {}`, 'order.pdx');
 
     it('does not drop the declaration', () => {
         const a = analyse('@form order: { lines: [{ product: string { required }, qty: number }] }');

@@ -414,7 +414,7 @@ describe('integration — @page options', () => {
     it('parses @page with keepAlive option', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/dashboard' { keepAlive };
 </script>`, 'dashboard.pdx');
         expect(code).toContain("keepAlive:true");
@@ -423,7 +423,7 @@ describe('integration — @page options', () => {
     it('parses @page with keepAlive timeout', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/dashboard' { keepAlive: 300000 };
 </script>`, 'dashboard.pdx');
         expect(code).toContain("keepAlive:300000");
@@ -432,7 +432,7 @@ describe('integration — @page options', () => {
     it('parses @page with preload', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/dashboard' { preload };
 </script>`, 'dashboard.pdx');
         expect(code).toContain("preload:true");
@@ -442,7 +442,7 @@ describe('integration — @page options', () => {
     it('parses @page with prefetch option', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products' { prefetch: 'hover' };
 </script>`, 'products.pdx');
         expect(code).toContain('prefetch:"hover"');
@@ -451,7 +451,7 @@ describe('integration — @page options', () => {
     it('parses @page with multiple options', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/admin' { keepAlive, prefetch: 'eager' };
 </script>`, 'admin.pdx');
         expect(code).toContain("keepAlive:true");
@@ -461,7 +461,7 @@ describe('integration — @page options', () => {
     it('default @page has lazy:true, no keepAlive', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/products';
 </script>`, 'products.pdx');
         expect(code).toContain("lazy:true");

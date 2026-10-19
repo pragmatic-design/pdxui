@@ -1,4 +1,4 @@
-// A <script setup> function named like a browser global, called from a template handler, is the
+// A <script> function named like a browser global, called from a template handler, is the
 // component's function, not the global. Compiled to the bare global, `confirm` makes a click open
 // the browser's own modal dialog, blocking the page, and the component's function never runs. The
 // global list yields to a declared name, as the neighbouring LOOP_VAR_FALLBACK list does.
@@ -21,7 +21,7 @@ function handlerOf(code: string, event: string): string {
 
 function componentWith(fnName: string): string {
     return `<template><button @click="${fnName}()">x</button></template>
-<script setup>
+<script>
 let n = $signal(0);
 function ${fnName}() { n = n + 1; }
 </script>`;
@@ -38,7 +38,7 @@ describe('a setup function named like a global', () => {
 
     it('the control: a global the component does not declare stays the global', () => {
         const { code } = compile(`<template><button @click="alert('x')">x</button></template>
-<script setup>
+<script>
 let n = $signal(0);
 </script>`, 'global.pdx');
         const handler = handlerOf(code, 'click');

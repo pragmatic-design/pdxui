@@ -17,7 +17,7 @@ let seq = 0;
 /** The component compiled on one path, defined, and mounted in the document. */
 function mount(template: string, script: string, build: boolean): HTMLElement {
     const name = `refreset${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');

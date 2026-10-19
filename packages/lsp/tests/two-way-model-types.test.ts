@@ -23,8 +23,8 @@ const svc = new PdxTsService(ROOT);
 const resolveType = (tag: string, attr: string) => (tag === 'app-field' && attr === '::value' ? 'string' : null);
 
 function diagnose(script: string, template: string): string[] {
-    const source = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const scriptStart = source.indexOf('<script setup>\n') + '<script setup>\n'.length;
+    const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+    const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length, resolveType);
     return getTsDiagnostics(svc, URI, vf, source).map(d => `${d.code} ${d.message.split('\n')[0]}`);
 }
@@ -69,7 +69,7 @@ describe('the workspace answers a model\'s type', () => {
         const dir = mkdtempSync(join(tmpdir(), 'pdx-model-describe-'));
         try {
             const file = join(dir, 'app-field.pdx');
-            writeFileSync(file, "<template><p/></template>\n<script setup>\n@model selectedId: string = '';\n</script>\n");
+            writeFileSync(file, "<template><p/></template>\n<script>\n@model selectedId: string = '';\n</script>\n");
             expect(describeProjectComponent('app-field', file)?.events).toEqual([
                 { name: 'selected-id-change', type: '{ value: string }', description: 'Fired when the component writes `selectedId`. Does not bubble.' },
             ]);

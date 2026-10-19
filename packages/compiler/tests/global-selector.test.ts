@@ -6,7 +6,7 @@ import { compile } from '../src/plugin';
 
 const sfc = (style: string, attrs = 'scoped') => `
 <template><div class="list"></div></template>
-<script setup>
+<script>
 let n = $signal(0);
 </script>
 <style ${attrs}>

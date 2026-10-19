@@ -9,7 +9,7 @@ describe('@snippet — reusable template blocks', () => {
 <template>
   <div>{{ userCell({ name: 'Alice' }) }}</div>
 </template>
-<script setup>
+<script>
   @snippet userCell(user) {
     <span class="cell">{{ user.name }}</span>
   }
@@ -25,7 +25,7 @@ describe('@snippet — reusable template blocks', () => {
 <template>
   <div>{{ renderItem({ id: 1, label: 'Test' }) }}</div>
 </template>
-<script setup>
+<script>
   @snippet renderItem(item) {
     <li data-id="{{ item.id }}">{{ item.label }}</li>
   }
@@ -39,7 +39,7 @@ describe('@snippet — reusable template blocks', () => {
     it('multiple snippets in same component', () => {
         const source = `
 <template><div>test</div></template>
-<script setup>
+<script>
   @snippet headerCell(col) {
     <th>{{ col.label }}</th>
   }

@@ -185,7 +185,7 @@ export function designHeuristics(source: string, file = 'component.pdx'): Valida
     const warnings: ValidationWarning[] = [];
     let groups: SignalGroup[] = [];
     if (script && script.content.trim()) {
-        const analysis = analyzeScript(script.content, file, { setup: script.setup });
+        const analysis = analyzeScript(script.content, file);
         const signals = new Set(analysis.signals.map(s => s.name));
         const deriveds = new Set(analysis.deriveds.map(d => d.name));
         const sf = parseableScript(script.content);

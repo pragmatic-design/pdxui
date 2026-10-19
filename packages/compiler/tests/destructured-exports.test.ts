@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const sfc = (script: string) => `<template><div></div></template>\n<script setup>\n${script}\n</script>`;
+const sfc = (script: string) => `<template><div></div></template>\n<script>\n${script}\n</script>`;
 
 /** The names in the setup's `return { … }`, as emitted. */
 function returned(script: string): string[] {

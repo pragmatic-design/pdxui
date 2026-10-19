@@ -38,7 +38,7 @@ describe('@await (x as name) in a compiled template', () => {
         define('awaitnull', `<template>
 @await (p as value) { <p class="body">{{ String(value) }}</p> } @loading { <p class="loading">…</p> }
 </template>
-<script setup>
+<script>
 const p = globalThis.__awaitNull;
 </script>`);
         const el = mount('app-awaitnull');
@@ -54,7 +54,7 @@ const p = globalThis.__awaitNull;
         define('awaitclick', `<template>
 @await (p as user) { <button @click="picked = user.name">{{ user.name }}</button><i>{{ picked }}</i> }
 </template>
-<script setup>
+<script>
 const p = globalThis.__awaitClick;
 let picked = $signal('');
 </script>`);
@@ -71,7 +71,7 @@ let picked = $signal('');
         define('awaitcast', `<template>
 @await ((p as Promise<string[]>) as list) { <p>{{ list.join(',') }}</p> }
 </template>
-<script setup lang="ts">
+<script lang="ts">
 const p: unknown = globalThis.__awaitCast;
 </script>`);
         const el = mount('app-awaitcast');
@@ -87,7 +87,7 @@ describe('@await (x) on a plain value (E5)', () => {
 <button class="set" @click="step()">next</button>
 @await (v) { <p class="body">body</p> } @loading { <p class="loading">loading</p> }
 </template>
-<script setup>
+<script>
 let v = $signal(0);
 const values = [undefined, false, true];
 let i = 0;
@@ -112,7 +112,7 @@ describe('@await (x) { maxMs } in a compiled template', () => {
         define('awaitslow', `<template>
 @await (p as v) { maxMs: 300 } { <p class="body">{{ v }}</p> } @loading { <p class="loading">…</p> } @error (e) { <p class="error">{{ e.name }}</p> }
 </template>
-<script setup>
+<script>
 const p = globalThis.__awaitSlow;
 </script>`);
         const el = mount('app-awaitslow');
@@ -131,7 +131,7 @@ describe('@await in a scoped slot body (the template path)', () => {
     it('binds the value there too', async () => {
         const p = held('__awaitSlot');
         define('awaitslothost', `<template><div class="host"><slot name="row" :item="item"></slot></div></template>
-<script setup>
+<script>
 let item = $signal(1);
 </script>`);
         define('awaitslotuser', `<template>
@@ -139,7 +139,7 @@ let item = $signal(1);
   @slot(row, { item }) { @await (p as v) { <b>{{ v }}-{{ item }}</b> } }
 </app-awaitslothost>
 </template>
-<script setup>
+<script>
 const p = globalThis.__awaitSlot;
 </script>`);
         const el = mount('app-awaitslotuser');

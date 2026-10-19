@@ -42,7 +42,7 @@ describe('in Node, without a DOM', () => {
 
     it('a compiled .pdx module evaluates', () => {
         const src = '<template><button @click="count++">{{ count }}</button></template>\n'
-            + '<script setup>\nlet count = $signal(0);\n</script>\n';
+            + '<script>\nlet count = $signal(0);\n</script>\n';
         const { code } = compile(src, 'node-counter.pdx', [], undefined, {});
         expect(code).toMatch(/from '@pdxui\/core'/);
         const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');

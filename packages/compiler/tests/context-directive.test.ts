@@ -11,7 +11,7 @@ describe('@provide — declarative context provider', () => {
     it('generates provide() call with signal expression', () => {
         const { code } = compileCtx(`
 <template><div>Provider</div></template>
-<script setup>
+<script>
 @provide theme = $signal({ mode: 'dark', accent: 'blue' });
 </script>
         `);
@@ -22,7 +22,7 @@ describe('@provide — declarative context provider', () => {
     it('generates provide() with plain value', () => {
         const { code } = compileCtx(`
 <template><div>Provider</div></template>
-<script setup>
+<script>
 let x = $signal(0);
 @provide apiUrl = 'https://api.example.com';
 </script>
@@ -34,7 +34,7 @@ let x = $signal(0);
     it('supports multiple @provide declarations', () => {
         const { code } = compileCtx(`
 <template><div>Multi</div></template>
-<script setup>
+<script>
 @provide theme = $signal('dark');
 @provide locale = $signal('en');
 </script>
@@ -48,7 +48,7 @@ describe('@inject — declarative context consumer', () => {
     it('generates inject() call', () => {
         const { code } = compileCtx(`
 <template><div>{{ theme() }}</div></template>
-<script setup>
+<script>
 @inject theme;
 </script>
         `);
@@ -59,7 +59,7 @@ describe('@inject — declarative context consumer', () => {
     it('supports alias with "as"', () => {
         const { code } = compileCtx(`
 <template><div>{{ appTheme }}</div></template>
-<script setup>
+<script>
 @inject theme as appTheme;
 </script>
         `);
@@ -69,7 +69,7 @@ describe('@inject — declarative context consumer', () => {
     it('auto-exports injected value', () => {
         const { code } = compileCtx(`
 <template><div>{{ theme }}</div></template>
-<script setup>
+<script>
 @inject theme;
 </script>
         `);
@@ -83,7 +83,7 @@ describe('@inject — declarative context consumer', () => {
         // something lazy — a `$derived`, a function.
         const { code } = compileCtx(`
 <template><p>{{ label }}</p></template>
-<script setup>
+<script>
 @inject theme;
 const label = theme.name;
 </script>
@@ -98,7 +98,7 @@ const label = theme.name;
     it('control — @provide stays after the body, where the value it provides is defined', () => {
         const { code } = compileCtx(`
 <template><div><slot /></div></template>
-<script setup>
+<script>
 const store = { name: 'dark' };
 @provide theme = store;
 </script>
@@ -109,7 +109,7 @@ const store = { name: 'dark' };
     it('supports multiple @inject declarations', () => {
         const { code } = compileCtx(`
 <template><div>Multi</div></template>
-<script setup>
+<script>
 @inject theme;
 @inject locale;
 let x = $signal(0);
@@ -124,7 +124,7 @@ describe('@provide + @inject combined', () => {
     it('compiles without errors or warnings', () => {
         const provider = compileCtx(`
 <template><div><slot /></div></template>
-<script setup>
+<script>
 @provide theme = $signal({ mode: 'dark' });
 </script>
         `);
@@ -132,7 +132,7 @@ describe('@provide + @inject combined', () => {
 
         const consumer = compileCtx(`
 <template><div>{{ theme }}</div></template>
-<script setup>
+<script>
 @inject theme;
 </script>
         `);

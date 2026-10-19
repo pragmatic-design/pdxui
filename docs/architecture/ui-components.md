@@ -147,7 +147,7 @@ The base structure:
   </div>
 </template>
 
-<script setup>
+<script>
 @page '/components/{name}';
 @title 'Component Name';
 </script>

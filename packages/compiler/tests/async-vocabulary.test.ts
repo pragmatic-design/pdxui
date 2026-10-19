@@ -15,11 +15,11 @@ import {
 const fix = (c: { fix: unknown }, text: string) => (c.fix as (t: string) => string)(text);
 
 describe('x.isPending() → x.pending()', () => {
-    const pdx = "<template>@if (users.isPending()) { <i>…</i> }</template>\n<script setup>\n@fetch users: 'GET /api/u' as string[];\nconst busy = $derived(users.isPending());\n</script>\n";
+    const pdx = "<template>@if (users.isPending()) { <i>…</i> }</template>\n<script>\n@fetch users: 'GET /api/u' as string[];\nconst busy = $derived(users.isPending());\n</script>\n";
 
     it('the template is the pdx entry\'s, the script the script entry\'s: each place once', () => {
         expect(asyncIsPending.detect(pdx).map((f) => f.found)).toEqual(['users.isPending()']);
-        const script = pdx.slice(pdx.indexOf('<script setup>') + 14, pdx.indexOf('</script>'));
+        const script = pdx.slice(pdx.indexOf('<script>') + '<script>'.length, pdx.indexOf('</script>'));
         expect(asyncIsPendingScript.detect(script).map((f) => f.found)).toEqual(['users.isPending()']);
     });
 
@@ -51,7 +51,7 @@ describe('the alpha names with no one-word replacement are flagged', () => {
     });
 
     it('in a template, against an @fetch', () => {
-        const pdx = "<template>@if (users.loading()) { <i>…</i> }</template>\n<script setup>\n@fetch users: 'GET /api/u' as string[];\n</script>\n";
+        const pdx = "<template>@if (users.loading()) { <i>…</i> }</template>\n<script>\n@fetch users: 'GET /api/u' as string[];\n</script>\n";
         expect(asyncAlphaNames.detect(pdx).map((f) => f.found)).toEqual(['users.loading()']);
     });
 });
@@ -68,7 +68,7 @@ describe('a route loader\'s state words', () => {
     });
 
     it('in a template', () => {
-        const pdx = "<template>@if (currentLoaderState() === 'done') { <p>ok</p> }</template>\n<script setup>\nlet a = $signal(1);\n</script>\n";
+        const pdx = "<template>@if (currentLoaderState() === 'done') { <p>ok</p> }</template>\n<script>\nlet a = $signal(1);\n</script>\n";
         expect(fix(loaderStateWords, pdx)).toContain("currentLoaderState() === 'success'");
     });
 });

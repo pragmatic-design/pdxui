@@ -26,7 +26,7 @@ const PAGE = `
   <pdx-router-outlet />
 </template>
 
-<script setup>
+<script>
 @page '/tickets/:id';
 @alias '/cases/:id';
 @guard 'tickets.read';
@@ -39,7 +39,7 @@ const PAGE = `
 const EAGER = `
 <template><section>Home</section></template>
 
-<script setup>
+<script>
 @page '/' { preload: true };
 </script>`;
 

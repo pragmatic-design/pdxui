@@ -5,7 +5,6 @@
 import { describe, it, expect } from 'vitest';
 import { openTags, findOpenTag, elementContent, removeHtmlComments, routeParams, openingTagTexts, removeElements, elementBodies } from '../src/text-scan';
 import { isRouterSeam, injectAfterHeadOpen, shortPath, stripHtmlComments } from '../src/plugin-utils';
-import { extractLegacyScript } from '../src/compiler/codegen-legacy';
 import { coreRuntimeNames } from '../src/compiler/core-import-names';
 import { parseIgnores } from '../src/compiler/ignores';
 import { minifyHTML } from '../src/compiler/minify';
@@ -91,20 +90,6 @@ describe('the compiler passes built on them', () => {
         expect(shortPath('/w/packages/a/packages/ui/src/x/y.pdx')).toBe('src/x/y.pdx');
         expect(shortPath('C:\\w\\packages\\ui\\lib\\y.pdx')).toBe('ui\\lib\\y.pdx');
         expect(shortPath('/w/app/y.pdx')).toBe('/w/app/y.pdx');
-    });
-
-    it('extractLegacyScript: defineProps with its const, defineEmits with a type and a name', () => {
-        const parts = extractLegacyScript('const props = defineProps({ a: { type: String } });\nconst fire = defineEmits<{ x: [] }>();\nconst b = 1;');
-        expect(parts.props).toBe('{ a: { type: String } }');
-        expect(parts.body).toContain('const fire = (event, detail) => ctx.emit(event, detail);');
-        expect(parts.body).not.toContain('defineEmits');
-        expect(parts.body).not.toContain('defineProps');
-        expect(parts.body).toContain('const b = 1;');
-    });
-
-    it('extractLegacyScript: a defineEmits< that never closes does not hide a later defineEmits()', () => {
-        const parts = extractLegacyScript('// defineEmits<\nconst e = defineEmits();');
-        expect(parts.body).toContain('const e = (event, detail) => ctx.emit(event, detail);');
     });
 
     it('coreRuntimeNames: the names in the first non-empty braces, without types', () => {

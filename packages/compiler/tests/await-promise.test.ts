@@ -17,7 +17,7 @@ const PATHS = {
 } as const;
 
 function compileTemplate(template: string, opts: object): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n  let job = $signal(null);\n  let ready = $signal(false);\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n  let job = $signal(null);\n  let ready = $signal(false);\n</script>`;
     return compile(source, 'await.pdx', [], undefined, opts).code;
 }
 

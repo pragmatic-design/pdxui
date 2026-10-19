@@ -16,7 +16,7 @@ let seq = 0;
 
 /** Compile one .pdx on one path and register it against core. */
 function define(name: string, template: string, script: string, build: boolean): void {
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);

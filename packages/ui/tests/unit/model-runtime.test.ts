@@ -21,7 +21,7 @@ const child = (tag: string) => `<template>
 <input class="inp" ::value="value" />
 <button class="clear" @click="clear()">clear</button>
 </template>
-<script setup>
+<script>
 @tag '${tag}';
 @model value: string = '';
 function clear() { value = ''; }
@@ -32,7 +32,7 @@ const parent = (tag: string, childTag: string) => `<template>
 <p class="out">{{ name }}</p>
 <button class="rename" @click="name = 'Grace'">rename</button>
 </template>
-<script setup>
+<script>
 @tag '${tag}';
 let name = $signal('Ada');
 </script>`;

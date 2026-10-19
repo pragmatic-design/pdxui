@@ -13,7 +13,7 @@ import { join } from 'node:path';
 import { compile, pdx } from '../src/plugin';
 import { hash, styleModuleId } from '../src/compiler/codegen-styles';
 
-const sfc = (style: string, script = 'let a = $signal(1);') => `<template><p>{{ a }}</p></template>\n<script setup>\n${script}\n</script>\n${style}\n`;
+const sfc = (style: string, script = 'let a = $signal(1);') => `<template><p>{{ a }}</p></template>\n<script>\n${script}\n</script>\n${style}\n`;
 /** The CSS a dev compile injects into the head, read back out of the module. */
 const injected = (code: string): string => {
     const m = /__pdx_style\.textContent = ("(?:[^"\\]|\\.)*");/.exec(code);
@@ -67,7 +67,7 @@ describe('<style src> in a production build', () => {
     beforeAll(() => {
         mkdirSync(dir, { recursive: true });
         writeFileSync(join(dir, 'card.css'), '.card { color: rebeccapurple; }\n');
-        writeFileSync(file, '<template><div class="card">x</div></template>\n<script setup>\nlet a = $signal(1);\n</script>\n<style scoped src="./card.css" />\n');
+        writeFileSync(file, '<template><div class="card">x</div></template>\n<script>\nlet a = $signal(1);\n</script>\n<style scoped src="./card.css" />\n');
     });
     afterAll(() => rmSync(dir, { recursive: true, force: true }));
 

@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const sfc = (script: string) => `<template><p>{{ label }}</p></template>\n<script setup>\n${script}\n</script>\n`;
+const sfc = (script: string) => `<template><p>{{ label }}</p></template>\n<script>\n${script}\n</script>\n`;
 const fallbacks = (code: ReturnType<typeof compile>) => code.warnings.filter(w => w.code === 'PDX_REWRITE_FALLBACK');
 
 describe('a function-expression callback reads its signals like an arrow does', () => {

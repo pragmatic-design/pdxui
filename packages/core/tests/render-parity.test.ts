@@ -63,7 +63,7 @@ let seq = 0;
 /** The component compiled as a production build compiles it, defined, and mounted in the document. */
 function mount(row: Row): HTMLElement {
     const name = `parity${++seq}`;
-    const src = `<template>${row.template}</template>\n<script setup>\n${row.script ?? ''}\n</script>\n`;
+    const src = `<template>${row.template}</template>\n<script>\n${row.script ?? ''}\n</script>\n`;
     // The one component a row may load lazily resolves to a specifier naming this mount.
     const importPathOf = (tag: string) => (tag === 'pdx-deferred-probe' ? `${DEFERRED_MODULE}?for=${name}` : null);
     const { code } = compile(src, `${name}.pdx`, [], undefined, { production: true, importPathOf });

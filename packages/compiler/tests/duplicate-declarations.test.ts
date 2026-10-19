@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const sfc = (script: string) => `<template><p>{{ icon }}</p></template>\n<script setup>\n${script}\n</script>\n`;
+const sfc = (script: string) => `<template><p>{{ icon }}</p></template>\n<script>\n${script}\n</script>\n`;
 const dups = (script: string) => compile(sfc(script), 'piece.pdx').warnings.filter(w => w.code === 'PDX_DUP_DECLARATION');
 
 describe('PDX_DUP_DECLARATION', () => {

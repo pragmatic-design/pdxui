@@ -8,7 +8,7 @@ import { join } from 'node:path';
 import { compile } from '../src/plugin';
 import { builds } from './static-markup-of';
 
-const SRC = '<template><p :title="t">{{ t }}</p></template>\n<script setup>\nlet t = $signal(\'x\');\n</script>\n';
+const SRC = '<template><p :title="t">{{ t }}</p></template>\n<script>\nlet t = $signal(\'x\');\n</script>\n';
 
 describe('the template path is removed from new-mode compilation', () => {
     it('no compile option selects it any more', () => {

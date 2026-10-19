@@ -17,7 +17,7 @@ const settle = async () => {
 
 /** Compile a .pdx as a production build does and define its component on this core. */
 function define(name: string, template: string, script = ''): string {
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, { production: true });
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);

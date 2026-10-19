@@ -17,7 +17,7 @@ const SOURCE = `<template>
   <div class="row" :title="label">{{ label }}</div>
 </template>
 
-<script setup>
+<script>
 @prop label: string = 'Hello';
 </script>`;
 

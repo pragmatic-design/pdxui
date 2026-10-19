@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 97 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 96 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -24,7 +24,7 @@ Instead of:
 <template>
   <input attach:toltip="'Search'" />
 </template>
-<script setup>
+<script>
 import { tooltip } from './tooltip';
 </script>
 ```
@@ -35,7 +35,7 @@ write:
 <template>
   <input attach:tooltip="'Search'" />
 </template>
-<script setup>
+<script>
 import { tooltip } from './tooltip';
 </script>
 ```
@@ -62,7 +62,7 @@ Instead of:
 <template>
   @await (users) { minMs: 500, maxMs: 300 } { <p>ok</p> } @loading { <p>…</p> }
 </template>
-<script setup>
+<script>
 @fetch users: 'GET /api/users' as string[];
 </script>
 ```
@@ -73,7 +73,7 @@ write:
 <template>
   @await (users) { minMs: 300, maxMs: 5000 } { <p>ok</p> } @loading { <p>…</p> }
 </template>
-<script setup>
+<script>
 @fetch users: 'GET /api/users' as string[];
 </script>
 ```
@@ -92,7 +92,7 @@ Instead of:
 <template>
   <input ::value.lazzy="name" />
 </template>
-<script setup>
+<script>
 let name = $signal('');
 </script>
 ```
@@ -103,7 +103,7 @@ write:
 <template>
   <input ::value.lazy="name" />
 </template>
-<script setup>
+<script>
 let name = $signal('');
 </script>
 ```
@@ -130,7 +130,7 @@ Instead of:
 <template>
   <button commandfor="d" command="--show">Open</button><pdx-dialog title="T">x</pdx-dialog>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -141,7 +141,7 @@ write:
 <template>
   <button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -160,7 +160,7 @@ Instead of:
 <template>
   <button commandfor="d" command="show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -171,7 +171,7 @@ write:
 <template>
   <button commandfor="d" command="--show">Open</button><pdx-dialog id="d" title="T">x</pdx-dialog>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -190,7 +190,7 @@ Instead of:
 <template>
   @defer (viewprt) { <p>chart</p> }
 </template>
-<script setup>
+<script>
 
 </script>
 ```
@@ -201,7 +201,7 @@ write:
 <template>
   @defer (viewport) { <p>chart</p> }
 </template>
-<script setup>
+<script>
 
 </script>
 ```
@@ -244,7 +244,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @event changed: number;
 @event changed: number;
 </script>
@@ -256,7 +256,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @event changed: number;
 </script>
 ```
@@ -275,7 +275,7 @@ Instead of:
 <template>
   <p>{{ a }}</p>
 </template>
-<script setup>
+<script>
 @prop a: string = 'x';
 @prop a: string = 'y';
 </script>
@@ -287,7 +287,7 @@ write:
 <template>
   <p>{{ a }}</p>
 </template>
-<script setup>
+<script>
 @prop a: string = 'x';
 </script>
 ```
@@ -298,7 +298,7 @@ write:
 
 A `.pdx` has one `<script>`. The parser reads the first; a second would be dropped without a word — its declarations surfacing only as undeclared names in the template, its statements (an `onMount(…)`) never running. So the compile stops at it, naming its line.
 
-**Fix.** Move its code into the first `<script setup>`.
+**Fix.** Move its code into the first `<script>`.
 
 ### PDX_DUPLICATE_TEMPLATE
 
@@ -322,7 +322,7 @@ Instead of:
 <template>
   <component :is="view"><p>Welcome</p></component>
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-home');
 </script>
 ```
@@ -334,7 +334,7 @@ write:
   <p>Welcome</p>
   <component :is="view" />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-home');
 </script>
 ```
@@ -353,7 +353,7 @@ Instead of:
 <template>
   @for (items as item; track item) {}
 </template>
-<script setup>
+<script>
 let items = $signal([1, 2]);
 </script>
 ```
@@ -364,7 +364,7 @@ write:
 <template>
   @for (items as item; track item) { <p>{{ item }}</p> }
 </template>
-<script setup>
+<script>
 let items = $signal([1, 2]);
 </script>
 ```
@@ -431,7 +431,7 @@ Instead of:
 <template>
   <p>{{ users.data() }}</p>
 </template>
-<script setup>
+<script>
 @fetch users: 'GET /api/users' as string[];
 </script>
 ```
@@ -442,7 +442,7 @@ write:
 <template>
   @if (users.state() === 'error') { <p role="alert">{{ users.error()?.message }}</p> } <p>{{ users.data() }}</p>
 </template>
-<script setup>
+<script>
 @fetch users: 'GET /api/users' as string[];
 </script>
 ```
@@ -501,7 +501,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @form f: { name: string { shout } };
 </script>
 ```
@@ -512,7 +512,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @form f: { name: string { shout } };
 function shout() { return (v) => (v === String(v).toUpperCase() ? null : 'Shout it'); }
 </script>
@@ -528,7 +528,7 @@ function shout() { return (v) => (v === String(v).toUpperCase() ? null : 'Shout 
 
 ### PDX_HAND_WRITTEN_SIGNAL
 
-*error* — A `signal()` or `computed()` written by hand in `<script setup>` and read bare by the template (`{{ name }}`, `:title="name"`).
+*error* — A `signal()` or `computed()` written by hand in `<script>` and read bare by the template (`{{ name }}`, `:title="name"`).
 
 The template reads the names the runes declare as values. A signal created by hand is a function, and the template shows the function itself — its source text in the page, or the function assigned to a property. Calling it in the template (`{{ name() }}`) shows the value, and a hand-written signal the template does not read is not reported.
 
@@ -548,7 +548,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @host { role="button" data-part="root" }
 </script>
 ```
@@ -559,7 +559,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @host { role="button" }
 </script>
 ```
@@ -595,7 +595,7 @@ Instead of:
   <!-- pdx-ignore PDX_RAW_INTERPOLATION -->
   <p>x</p>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -607,7 +607,7 @@ write:
   <!-- pdx-ignore PDX_RAW_INTERPOLATION: shown as written -->
   <p>x</p>
 </template>
-<script setup>
+<script>
 let a = $signal(1);
 </script>
 ```
@@ -650,7 +650,7 @@ Instead of:
 <template>
   <component :is="view" @keepAlive(0)></component>
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-a');
 </script>
 ```
@@ -661,7 +661,7 @@ write:
 <template>
   <component :is="view" @keepAlive(3)></component>
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-a');
 </script>
 ```
@@ -673,14 +673,6 @@ let view = $signal('pdx-a');
 The route contributes no crumb to the breadcrumb.
 
 **Fix.** Declare it: `function crumb(params) { … }`, or write the crumb as a string.
-
-### PDX_LEGACY_IN_SETUP
-
-*warn* — A legacy marker (`defineProps`, `defineEmits`, a top-level `return`) in `<script setup>`.
-
-With runes beside it, the marker does nothing; without runes, the file compiles in the legacy mode and any rune added later is inert.
-
-**Fix.** Remove the marker — `<script setup>` returns what it declares — or write plain `<script>` for a deliberately legacy file.
 
 ### PDX_LIBRARY_INTERNALS
 
@@ -720,7 +712,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @event (saved): number;
 </script>
 ```
@@ -731,7 +723,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @event saved: number;
 </script>
 ```
@@ -782,7 +774,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @page 'users';
 </script>
 ```
@@ -793,7 +785,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @page '/users';
 </script>
 ```
@@ -812,7 +804,7 @@ Instead of:
 <template>
   <button data-part="action">A</button><button data-part="action">B</button>
 </template>
-<script setup>
+<script>
 @part action;
 </script>
 ```
@@ -823,7 +815,7 @@ write:
 <template>
   <button data-part="ok">A</button><button data-part="cancel">B</button>
 </template>
-<script setup>
+<script>
 @part ok, cancel;
 </script>
 ```
@@ -842,7 +834,7 @@ Instead of:
 <template>
   <button>Menu</button>
 </template>
-<script setup>
+<script>
 @part trigger;
 </script>
 ```
@@ -853,7 +845,7 @@ write:
 <template>
   <button data-part="trigger">Menu</button>
 </template>
-<script setup>
+<script>
 @part trigger;
 </script>
 ```
@@ -872,7 +864,7 @@ Instead of:
 <template>
   <div data-part="popup">x</div>
 </template>
-<script setup>
+<script>
 let open = $signal(false);
 </script>
 ```
@@ -883,7 +875,7 @@ write:
 <template>
   <div data-part="popup">x</div>
 </template>
-<script setup>
+<script>
 @part popup;
 </script>
 ```
@@ -902,7 +894,7 @@ Instead of:
 <template>
   <p>{{ n | upper }}</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 function upper(v) { return String(v).toUpperCase(); }
 </script>
@@ -914,7 +906,7 @@ write:
 <template>
   <p>{{ upper(n) }}</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 function upper(v) { return String(v).toUpperCase(); }
 </script>
@@ -958,7 +950,7 @@ Instead of:
 <template>
   <p>{{ label }}</p>
 </template>
-<script setup>
+<script>
 @prop label;
 </script>
 ```
@@ -969,7 +961,7 @@ write:
 <template>
   <p>{{ label }}</p>
 </template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 </script>
 ```
@@ -1012,7 +1004,7 @@ Instead of:
 <template>
   <p title="${n}">x</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 </script>
 ```
@@ -1023,7 +1015,7 @@ write:
 <template>
   <p :title="n">x</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 </script>
 ```
@@ -1042,7 +1034,7 @@ Instead of:
 <template>
   <p :title="${n}">x</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 </script>
 ```
@@ -1053,7 +1045,7 @@ write:
 <template>
   <p :title="n">x</p>
 </template>
-<script setup>
+<script>
 let n = $signal(1);
 </script>
 ```
@@ -1088,7 +1080,7 @@ Instead of:
 <template>
   <p>{{ id }}</p>
 </template>
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: 'number' };
 </script>
@@ -1100,7 +1092,7 @@ write:
 <template>
   <p>{{ id }}</p>
 </template>
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: number };
 </script>
@@ -1108,11 +1100,19 @@ write:
 
 ### PDX_SCRIPT_SYNTAX_ERROR
 
-*error* — The `<script setup>` does not parse.
+*error* — The `<script>` does not parse.
 
 A syntax error in the setup would reach the generated module as broken code. It is reported with its position in the script.
 
 **Fix.** Fix the syntax at the reported line.
+
+### PDX_SETUP_REDUNDANT
+
+*info* — `<script setup>`: `setup` has no meaning (#158).
+
+The script has one grammar: a `<script>` is read for declarations and runes whatever it contains, so `setup` changes nothing. It stays valid, and `pdx migrate` removes it.
+
+**Fix.** Write `<script>`; `pdx migrate` does it in every file.
 
 ### PDX_SIGNAL_MUTATED_IN_PLACE
 
@@ -1128,7 +1128,7 @@ Instead of:
 <template>
   <p>{{ items.length }}</p>
 </template>
-<script setup>
+<script>
 let items = $signal<number[]>([]);
 function add(x: number) {
   items.push(x);
@@ -1142,7 +1142,7 @@ write:
 <template>
   <p>{{ items.length }}</p>
 </template>
-<script setup>
+<script>
 let items = $signal<number[]>([]);
 function add(x: number) {
   items = [...items, x];
@@ -1164,7 +1164,7 @@ Instead of:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 @state count = 0;
 </script>
 ```
@@ -1175,7 +1175,7 @@ write:
 <template>
   <p>x</p>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 @state busy = count > 0;
 </script>
@@ -1219,7 +1219,7 @@ Instead of:
 <template>
   <p>{{ a }}</p>
 </template>
-<script setup>
+<script>
 @tag 'pdx-badge';
 let a = $signal(1);
 </script>
@@ -1231,19 +1231,11 @@ write:
 <template>
   <p>{{ a }}</p>
 </template>
-<script setup>
+<script>
 @tag 'app-badge';
 let a = $signal(1);
 </script>
 ```
-
-### PDX_TEMPLATE_NAME_NOT_PROVIDED
-
-*error* — A legacy-mode template reads a name its script does not provide.
-
-In the legacy mode the template sees what `defineProps` declares and what the top-level `return { … }` returns. A `const` the script declares and does not return reads as undefined — and a plain `<script>` with no rune is the legacy mode.
-
-**Fix.** Write `<script setup>`, which hands the template every name it declares — or add the name to the returned object.
 
 ### PDX_TS
 
@@ -1271,7 +1263,7 @@ Two-way binding is a contract: the child declares which of its props it writes b
 
 ### PDX_UNDECLARED_REF
 
-*error* — A name the template reads that `<script setup>` does not declare.
+*error* — A name the template reads that `<script>` does not declare.
 
 At runtime the binding reads `undefined`, and a handler named this way does nothing when clicked; usually a misspelt signal, prop or function.
 
@@ -1283,7 +1275,7 @@ Instead of:
 <template>
   <p>{{ coutn }}</p>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>
 ```
@@ -1294,7 +1286,7 @@ write:
 <template>
   <p>{{ count }}</p>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>
 ```
@@ -1321,7 +1313,7 @@ Instead of:
 <template>
   <p>@media (pointer: coarse) is CSS</p>
 </template>
-<script setup>
+<script>
 
 </script>
 ```
@@ -1332,7 +1324,7 @@ write:
 <template>
   <p>@@media (pointer: coarse) is CSS</p>
 </template>
-<script setup>
+<script>
 
 </script>
 ```
@@ -1399,7 +1391,7 @@ Instead of:
 <template>
   <ul><li>Header</li>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
 </template>
-<script setup>
+<script>
 let rows = $signal([]);
 </script>
 ```
@@ -1410,7 +1402,7 @@ write:
 <template>
   <ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
 </template>
-<script setup>
+<script>
 let rows = $signal([]);
 </script>
 ```
@@ -1429,7 +1421,7 @@ Instead of:
 <template>
   <ul>@for (rows as r; track r.id) @transition('fade') @virtual { <li>{{ r.name }}</li> }</ul>
 </template>
-<script setup>
+<script>
 let rows = $signal([]);
 </script>
 ```
@@ -1440,7 +1432,7 @@ write:
 <template>
   <ul>@for (rows as r; track r.id) @virtual { <li>{{ r.name }}</li> }</ul>
 </template>
-<script setup>
+<script>
 let rows = $signal([]);
 </script>
 ```

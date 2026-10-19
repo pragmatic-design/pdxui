@@ -55,7 +55,7 @@ describe('production mode compilation', () => {
     it('minifies CSS in production mode', () => {
         const source = `
 <template><div class="box">Hello</div></template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>
 <style scoped>
@@ -97,7 +97,7 @@ let x = $signal(0);
 
     it('production strips signal debug names', () => {
         const source = `<template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const descriptor = parseSFC(source);
@@ -117,7 +117,7 @@ let count = $signal(0);
   <div>{{ item.name }} - {{ count }}</div>
 }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 let count = $signal(0);
 </script>`;
@@ -135,7 +135,7 @@ let count = $signal(0);
 
     it('a static component renders with nothing reactive: no effect, no binding helper', () => {
         const source = `<template><div>About Page</div></template>
-<script setup>
+<script>
 @page '/about';
 </script>`;
         const descriptor = parseSFC(source);
@@ -156,7 +156,7 @@ let count = $signal(0);
 describe('dead signal elimination', () => {
     it('production eliminates signals with zero references', () => {
         const source = `<template><div>Hello</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 let name = $signal('world');
 </script>`;
@@ -167,7 +167,7 @@ let name = $signal('world');
 
     it('production keeps signals used in template', () => {
         const source = `<template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 let unused = $signal(99);
 </script>`;
@@ -178,7 +178,7 @@ let unused = $signal(99);
 
     it('production keeps signals used in effects', () => {
         const source = `<template><div>Test</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 $effect(() => console.log(count));
 </script>`;
@@ -188,7 +188,7 @@ $effect(() => console.log(count));
 
     it('production keeps signals used in derived', () => {
         const source = `<template><div>{{ doubled }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const doubled = $derived(count * 2);
 </script>`;
@@ -198,7 +198,7 @@ const doubled = $derived(count * 2);
 
     it('production keeps signals used in body', () => {
         const source = `<template><div>Test</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 function increment() { count++; }
 </script>`;
@@ -208,7 +208,7 @@ function increment() { count++; }
 
     it('production keeps signals used by other signals', () => {
         const source = `<template><div>{{ b }}</div></template>
-<script setup>
+<script>
 let a = $signal(1);
 let b = $signal(a);
 </script>`;
@@ -219,7 +219,7 @@ let b = $signal(a);
 
     it('dev mode does not eliminate dead signals', () => {
         const source = `<template><div>Hello</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'dev-dead.pdx', [], undefined, { production: false });
@@ -229,7 +229,7 @@ let count = $signal(0);
 
     it('dead signal is also removed from auto-return', () => {
         const source = `<template><div>{{ kept }}</div></template>
-<script setup>
+<script>
 let kept = $signal('yes');
 let dead = $signal('no');
 </script>`;
@@ -246,7 +246,7 @@ describe('constant condition elimination', () => {
   <div>Always visible</div>
 }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'const-if.pdx', [], undefined, { production: true });
@@ -262,7 +262,7 @@ describe('constant condition elimination', () => {
 }
 <p>After</p>
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'const-if-false.pdx', [], undefined, { production: true });
@@ -280,7 +280,7 @@ describe('constant condition elimination', () => {
   <div>Fallback</div>
 }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'const-else.pdx', [], undefined, { production: true });
@@ -295,7 +295,7 @@ describe('constant condition elimination', () => {
   <div>Visible</div>
 }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'const-show-true.pdx', [], undefined, { production: true });
@@ -309,7 +309,7 @@ describe('constant condition elimination', () => {
   <div>Hidden</div>
 }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'const-show-false.pdx', [], undefined, { production: true });
@@ -323,7 +323,7 @@ describe('constant condition elimination', () => {
   <div>Always</div>
 }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'dev-const.pdx', [], undefined, { production: false });
@@ -336,7 +336,7 @@ describe('constant condition elimination', () => {
   <div>Dynamic</div>
 }
 </template>
-<script setup>
+<script>
 let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'dyn-if.pdx', [], undefined, { production: true });
@@ -349,7 +349,7 @@ describe('binding deduplication', () => {
         const source = `<template>
 <button :disabled="count > 0" :hidden="count > 0">Save</button>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'dedup.pdx', [], undefined, { production: true });
@@ -362,7 +362,7 @@ let count = $signal(0);
         const source = `<template>
 <button :disabled="loading" :class="{ active: active }">Save</button>
 </template>
-<script setup>
+<script>
 let loading = $signal(false);
 let active = $signal(true);
 </script>`;
@@ -374,7 +374,7 @@ let active = $signal(true);
         const source = `<template>
 <button :disabled="count > 0" :aria-busy="count > 0">Save</button>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'dev-dedup.pdx', [], undefined, { production: false });
@@ -385,7 +385,7 @@ let count = $signal(0);
         const source = `<template>
 <div :disabled="items.length === 0" :hidden="items.length === 0">Empty</div>
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'dedup-iife.pdx', [], undefined, { production: true });
@@ -398,7 +398,7 @@ let items = $signal([]);
         const source = `<template>
 <div :class="{ a: x > 0, b: x > 0, c: y > 0, d: y > 0 }">Test</div>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 let y = $signal(0);
 </script>`;
@@ -415,7 +415,7 @@ let y = $signal(0);
 describe('prop narrowing — _skipAttrSync removed (dev/prod parity)', () => {
     it('production does NOT emit _skipAttrSync (removed for dev/prod parity)', () => {
         const source = `<template><div>{{ label }}</div></template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 </script>`;
         const { code } = compile(source, 'prop-narrow.pdx', [], undefined, { production: true });
@@ -424,7 +424,7 @@ describe('prop narrowing — _skipAttrSync removed (dev/prod parity)', () => {
 
     it('dev mode does NOT emit _skipAttrSync', () => {
         const source = `<template><div>{{ label }}</div></template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 </script>`;
         const { code } = compile(source, 'dev-prop.pdx', [], undefined, { production: false });
@@ -437,7 +437,7 @@ describe('prop narrowing — _skipAttrSync removed (dev/prod parity)', () => {
 describe('static templates', () => {
     it('a build renders a static component inline: no __staticHTML, no html``', () => {
         const source = `<template><div>Static</div></template>
-<script setup>
+<script>
 @page '/static';
 </script>`;
         const { code } = compile(source, 'static.pdx', [], undefined, { production: true });
@@ -448,7 +448,7 @@ describe('static templates', () => {
 
     it('dev mode renders a static component inline, as a build does (#107)', () => {
         const source = `<template><div>About Page</div></template>
-<script setup>
+<script>
 @page '/about';
 </script>`;
         const { code } = compile(source, 'dev-about.pdx', [], undefined, { production: false });
@@ -465,7 +465,7 @@ describe('static templates', () => {
 describe('inline bindings (Phase 3)', () => {
     it('builds its static markup instead of html``', () => {
         const source = `<template><div class="card">Hello</div></template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline.pdx', [], undefined, { production: true });
@@ -479,7 +479,7 @@ describe('inline bindings (Phase 3)', () => {
         const source = `<template>
 <button :disabled="loading">Save</button>
 </template>
-<script setup>
+<script>
 let loading = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-prop.pdx', [], undefined, { production: true });
@@ -492,7 +492,7 @@ let loading = $signal(false);
         const source = `<template>
 <button @click="save">Save</button>
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 function save() {}
 </script>`;
@@ -504,7 +504,7 @@ function save() {}
         const source = `<template>
 <button @click.prevent.stop="save">Save</button>
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 function save() {}
 </script>`;
@@ -517,7 +517,7 @@ function save() {}
         const source = `<template>
 <span>{{ count }}</span>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
         const { code } = compile(source, 'inline-text.pdx', [], undefined, { production: true });
@@ -534,7 +534,7 @@ let count = $signal(0);
   <div>Shown</div>
 }
 </template>
-<script setup>
+<script>
 let visible = $signal(true);
 </script>`;
         const { code } = compile(source, 'inline-if.pdx', [], undefined, { production: true });
@@ -548,7 +548,7 @@ let visible = $signal(true);
   <div>{{ item.name }}</div>
 }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'inline-for.pdx', [], undefined, { production: true });
@@ -562,7 +562,7 @@ let items = $signal([]);
   <div>{{ item.name }}</div>
 }
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`;
         const { code } = compile(source, 'inline-for-scope.pdx', [], undefined, { production: true });
@@ -577,7 +577,7 @@ let items = $signal([]);
         const source = `<template>
 <div :title="helper">{{ helper }}</div>
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 const helper = 'ok';
 </script>`;
@@ -590,7 +590,7 @@ const helper = 'ok';
         const source = `<template>
 <div class="outer"><span class="inner">Text</span></div>
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-nest.pdx', [], undefined, { production: true });
@@ -602,7 +602,7 @@ const helper = 'ok';
         const source = `<template>
 <input ::value="name" />
 </template>
-<script setup>
+<script>
 let name = $signal('');
 </script>`;
         const { code } = compile(source, 'inline-twoway.pdx', [], undefined, { production: true });
@@ -616,7 +616,7 @@ let name = $signal('');
         const source = `<template>
 <div :class="{ active: isActive }">Card</div>
 </template>
-<script setup>
+<script>
 let isActive = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-class.pdx', [], undefined, { production: true });
@@ -626,7 +626,7 @@ let isActive = $signal(false);
 
     it('dead signal elimination still works with inline bindings', () => {
         const source = `<template><div>Hello</div></template>
-<script setup>
+<script>
 let unused = $signal(0);
 </script>`;
         const { code } = compile(source, 'inline-dead.pdx', [], undefined, { production: true });
@@ -639,7 +639,7 @@ let unused = $signal(0);
 <br>
 <img src="logo.png" />
 </template>
-<script setup>
+<script>
 let off = $signal(false);
 </script>`;
         const { code } = compile(source, 'inline-void.pdx', [], undefined, { production: true });
@@ -654,7 +654,7 @@ let off = $signal(false);
         const source = `<template>
 @show (visible) { <div :style="{ color: textColor }">Styled</div> }
 </template>
-<script setup>
+<script>
 let textColor = $signal('red');
 let visible = $signal(true);
 </script>`;
@@ -667,7 +667,7 @@ let visible = $signal(true);
         const source = `<template>
 <input :ref="inputRef" />
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-ref.pdx', [], undefined, { production: true });
@@ -680,7 +680,7 @@ let visible = $signal(true);
         const source = `<template>
 <div class="l1"><div class="l2"><div class="l3"><span>Deep</span></div></div></div>
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code } = compile(source, 'inline-deep.pdx', [], undefined, { production: true });
@@ -693,7 +693,7 @@ let visible = $signal(true);
         const source = `<template>
 <span>{{ first }} {{ last }}</span>
 </template>
-<script setup>
+<script>
 let first = $signal('John');
 let last = $signal('Doe');
 </script>`;
@@ -712,7 +712,7 @@ let last = $signal('Doe');
   @default { <span>Unknown</span> }
 }
 </template>
-<script setup>
+<script>
 let status = $signal('active');
 </script>`;
         const { code } = compile(source, 'inline-switch.pdx', [], undefined, { production: true });
@@ -735,7 +735,7 @@ describe('production output size benchmarks', () => {
     @if (count > 10) { <div class="alert">High!</div> }
   </div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'Counter';
   @prop initial: number = 0;
   let count = $signal(initial);
@@ -752,7 +752,7 @@ describe('production output size benchmarks', () => {
 <template>
   <div class="about"><h1>About Us</h1><p>Static content here.</p></div>
 </template>
-<script setup>
+<script>
   @page '/about';
 </script>`;
 
@@ -778,7 +778,7 @@ describe('production output size benchmarks', () => {
 
     it('dead signal elimination reduces output size', () => {
         const srcWithDead = `<template><div>{{ used }}</div></template>
-<script setup>
+<script>
 let used = $signal('yes');
 let dead1 = $signal(0);
 let dead2 = $signal('nope');
@@ -803,7 +803,7 @@ let dead3 = $signal([]);
 @show (true) { <div>Shown</div> }
 @show (false) { <div>Hidden</div> }
 </template>
-<script setup>
+<script>
 @prop label: string = '';
 </script>`;
         const { code: devCode } = compile(srcWithConst, 'const.pdx', [], undefined, { production: false });

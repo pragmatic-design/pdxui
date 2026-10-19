@@ -11,7 +11,7 @@ const SFC = `<template>
   @if (on) { <span>on</span> }
   @for (items as item; track item) { <i>{{ item }}</i> }
 </template>
-<script setup>
+<script>
 let count = $signal(0);
 let on = $signal(true);
 const label = $derived('n' + count);

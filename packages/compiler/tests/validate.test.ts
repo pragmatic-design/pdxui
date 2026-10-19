@@ -169,19 +169,6 @@ describe('validation: non-reactive template variables', () => {
         expect(warnings).toHaveLength(0);
     });
 
-    it('does not warn in legacy mode', () => {
-        const analysis = analyzeScript(`
-            const props = defineProps({ label: { type: String } });
-            let x = 42;
-            return { x };
-        `, 'test.pdx');
-
-        const ast = parseTemplate('{{ x }}');
-        const warnings = warnAndErrors(validate(analysis, ast, 'test.pdx'));
-
-        expect(warnings).toHaveLength(0);
-    });
-
     it('warns for plain let in @show condition', () => {
         const analysis = analyzeScript(`
             let visible = $signal(true);
@@ -205,7 +192,7 @@ describe('validation: compile() integration', () => {
 <template>
   <div>{{ label }}</div>
 </template>
-<script setup>
+<script>
 @prop label = 'Hello';
 let count = $signal(0);
 </script>`;
@@ -220,7 +207,7 @@ let count = $signal(0);
 <template>
   <div>{{ maxItems }}</div>
 </template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 let count = $signal(0);
 let maxItems = 100;
@@ -235,7 +222,7 @@ let maxItems = 100;
 <template>
   <div>{{ count }}</div>
 </template>
-<script setup>
+<script>
 @prop label: string = 'Hello';
 let count = $signal(0);
 const doubled = $derived(count * 2);
@@ -244,25 +231,6 @@ const doubled = $derived(count * 2);
         const result = compile(source, 'test.pdx');
         const warns = result.warnings.filter(w => w.severity !== 'info');
         expect(warns).toHaveLength(0);
-    });
-
-    it('compile returns no warnings for legacy mode', () => {
-        // The block is a plain `<script>`, and that is the point of the fixture rather than an
-        // incidental detail: this file IS legacy, and says so. `<script setup>` around the same body
-        // would be a disagreement — the author claims the new mode and the compiler builds the legacy
-        // one. That warns (PDX_LEGACY_IN_SETUP), and asserting silence on it here would be asserting
-        // the defect.
-        const source = `
-<template>
-  <div>{{ count }}</div>
-</template>
-<script>
-let count = 0;
-return { count };
-</script>`;
-
-        const result = compile(source, 'test.pdx');
-        expect(result.warnings).toHaveLength(0);
     });
 });
 
@@ -489,95 +457,22 @@ describe('validation: unused reactive (AST reference check)', () => {
     });
 });
 
-// ─── A legacy marker inside <script setup> ────────────────────────
+// ─── A legacy marker inside <script> ────────────────────────
 //
-// `<script setup>` states an intent, and this checks it against what the compiler produces:
-// `<script setup>` carrying `defineProps` and no rune compiles as a LEGACY component — no new-mode
-// setup, so every rune-shaped thing in it would be inert — and carrying both compiles as NEW, where
-// the `defineProps` the author wrote does nothing.
-//
-// The diagnostic does not make either an error: a legacy component is still valid, and making
-// `setup` FORCE the new mode would break any file that carries both. It must simply not be silent.
-describe('a legacy marker inside <script setup>', () => {
-    const analyse = (body: string): ValidationWarning[] =>
-        analyzeScript(body, 'test.pdx', { setup: true }).warnings.filter(w => w.code === 'PDX_LEGACY_IN_SETUP');
-
-    it('warns when defineProps takes the file to the legacy mode', () => {
-        const analysis = analyzeScript(
-            "const props = defineProps({ label: { type: String } });\nconst n = signal(0);\nreturn { n };",
-            'test.pdx', { setup: true });
-
-        expect(analysis.mode, 'the premise: this is the legacy mode').toBe('legacy');
-        const found = analysis.warnings.filter(w => w.code === 'PDX_LEGACY_IN_SETUP');
-        expect(found).toHaveLength(1);
-        expect(found[0].severity).toBe('warn');
-        expect(found[0].message, 'the message must name the marker').toContain('defineProps');
-        expect(found[0].message, 'and say which mode won, which is the actionable part')
-            .toContain('legacy');
-    });
-
-    it('warns when the runes win and the defineProps is the dead half', () => {
-        const analysis = analyzeScript(
-            "const props = defineProps({ label: { type: String } });\nlet count = $signal(0);",
-            'test.pdx', { setup: true });
-
-        expect(analysis.mode, 'the premise: a rune takes it to the new mode').toBe('new');
-        const found = analysis.warnings.filter(w => w.code === 'PDX_LEGACY_IN_SETUP');
-        expect(found).toHaveLength(1);
-        expect(found[0].message).toContain('defineProps');
-        expect(found[0].hint, 'the fix is to drop the marker, not the setup').toContain('@prop');
-    });
-
-    it('names defineEmits when that is the marker', () => {
-        const found = analyse("const emit = defineEmits(['changed']);\nlet count = $signal(0);");
-        expect(found).toHaveLength(1);
-        expect(found[0].message).toContain('defineEmits');
-    });
-
-    it('names a top-level return, which is the marker nobody recognises as one', () => {
-        const found = analyse("const n = 1;\nreturn { n };");
-        expect(found).toHaveLength(1);
-        expect(found[0].message).toContain('return');
-    });
-
-    it('says nothing for a plain <script>, which claimed nothing', () => {
-        const analysis = analyzeScript(
-            "const props = defineProps({ label: { type: String } });\nconst n = signal(0);\nreturn { n };",
-            'test.pdx', { setup: false });
-
-        expect(analysis.mode).toBe('legacy');
-        expect(analysis.warnings.filter(w => w.code === 'PDX_LEGACY_IN_SETUP')).toEqual([]);
-    });
-
-    it('says nothing for a <script setup> with no legacy marker', () => {
-        expect(analyse("let count = $signal(0);\nfunction inc() { count++; }")).toEqual([]);
-    });
-
-    it('does not read a marker out of a comment or a string', () => {
-        expect(analyse("// defineProps is the old way\nconst s = 'defineEmits(...)';\nlet n = $signal(0);"))
-            .toEqual([]);
-    });
-
-    it('reaches compile(), which is where a developer would see it', () => {
-        const out = compile(
-            '<template><div>x</div></template>\n<script setup>\nconst props = defineProps({ label: { type: String } });\nconst n = signal(0);\nreturn { n };\n</script>',
-            'legacy-in-setup.pdx');
-        expect(out.warnings.map(w => w.code)).toContain('PDX_LEGACY_IN_SETUP');
-    });
-});
+// `<script>` states an intent, and this checks it against what the compiler produces:
 
 // ─── A declaration no rule understood ─────────────────────────────
 //
 // A line like `@form f { … }` (the colon is missing), pushed into the setup body as if it were
 // code, fails to parse — `@` opens nothing valid in JavaScript — and validate's own syntax check
-// reports `Syntax error in <script setup>: Declaration expected.`: a TypeScript parser's opinion of a
+// reports `Syntax error in <script>: Declaration expected.`: a TypeScript parser's opinion of a
 // line the author wrote as a framework declaration. It names neither the keyword nor the shape
 // expected, and the generated module still carries the line.
 //
 // `@fetch` has its own diagnostic, PDX_FETCH_INVALID, and keeps it.
 describe('a declaration no rule understood', () => {
     const file = (body: string): string =>
-        `<template><div>x</div></template>\n<script setup>\n${body}\nlet n = $signal(0);\n</script>`;
+        `<template><div>x</div></template>\n<script>\n${body}\nlet n = $signal(0);\n</script>`;
 
     const codesOf = (body: string): string[] => compile(file(body), 'unknown-decl.pdx').warnings.map(w => w.code);
 

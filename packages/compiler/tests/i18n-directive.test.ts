@@ -88,7 +88,7 @@ describe('@i18n — codegen', () => {
     it('generates initI18n + createI18nLoader for @i18n block', () => {
         const { code } = compileI18n(`
 <template><div>{{ $t('hello') }}</div></template>
-<script setup>
+<script>
 @i18n {
   locales: ['en', 'it'],
   default: 'en',
@@ -111,7 +111,7 @@ describe('@i18n — codegen', () => {
     it('auto-imports $t when used in template expressions', () => {
         const { code } = compileI18n(`
 <template><div>{{ $t('welcome') }}</div></template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>
         `);
@@ -123,7 +123,7 @@ let x = $signal(0);
     it('auto-imports $n when used', () => {
         const { code } = compileI18n(`
 <template><div>{{ $n(1234) }}</div></template>
-<script setup>
+<script>
 let price = $signal(0);
 const formatted = $derived($n(price));
 </script>
@@ -135,7 +135,7 @@ const formatted = $derived($n(price));
     it('does not import i18n helpers when not used', () => {
         const { code } = compileI18n(`
 <template><div>Hello</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 </script>
         `);
@@ -149,7 +149,7 @@ describe('@transition / @layout — codegen manifest', () => {
     it('emits transition in route manifest', () => {
         const { code } = compileI18n(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/dashboard';
 @transition 'slide-left';
 </script>
@@ -164,7 +164,7 @@ describe('@transition / @layout — codegen manifest', () => {
     it('emits the layout chain in route manifest', () => {
         const { code } = compileI18n(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/admin/users';
 @layout 'admin';
 </script>
@@ -176,7 +176,7 @@ describe('@transition / @layout — codegen manifest', () => {
     it('emits both transition and layout together', () => {
         const { code } = compileI18n(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/settings';
 @transition 'fade';
 @layout 'dashboard';

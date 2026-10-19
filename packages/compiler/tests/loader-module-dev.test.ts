@@ -17,7 +17,7 @@ beforeAll(async () => {
     mkdirSync(join(root, 'src'), { recursive: true });
     writeFileSync(join(root, 'src', 'rows.pdx'), [
         '<template><p>{{ title }}</p></template>',
-        '<script setup>',
+        '<script>',
         "@page '/rows';",
         '@loader loadRows;',
         "import { rowsFrom } from './api';",

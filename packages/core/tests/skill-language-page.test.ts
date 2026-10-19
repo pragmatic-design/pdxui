@@ -1,7 +1,7 @@
 // The skill's language page has to describe the language the compiler actually implements.
 //
 // Without it nothing describes the `.pdx` file format. An agent that writes `<template>` /
-// `<script setup>`, `:prop`, `@event`, `{{ }}`, `@if` from memory can get it right by luck, and
+// `<script>`, `:prop`, `@event`, `{{ }}`, `@if` from memory can get it right by luck, and
 // leaves no trace of the gap — and anyone without Vue's SFC shape already in their head cannot begin.
 //
 // A page written from memory drifts from the language, so this

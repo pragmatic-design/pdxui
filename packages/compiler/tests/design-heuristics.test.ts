@@ -19,7 +19,7 @@ describe('CD-B1 — PDX_SEVERAL_PIECES', () => {
     // favourites + recents joined by `pins`.
     const SHELL = [
         '<template><div></div></template>',
-        '<script setup>',
+        '<script>',
         "let side = $signal('expanded');",
         'let menuOpen = $signal(false);',
         'let catalogOpen = $signal(false);',
@@ -48,7 +48,7 @@ describe('CD-B1 — PDX_SEVERAL_PIECES', () => {
 
     it('control — one piece, whatever its size', () => {
         expect(codes([
-            '<template><div></div></template>', '<script setup>',
+            '<template><div></div></template>', '<script>',
             'let a = $signal(0);', 'let b = $signal(0);', 'let c = $signal(0);',
             'function f() { a = b + 1; }', 'const d = $derived(b * c);',
             '</script>',
@@ -57,7 +57,7 @@ describe('CD-B1 — PDX_SEVERAL_PIECES', () => {
 
     it('control — a lone signal beside a piece is not a second piece', () => {
         expect(codes([
-            '<template><div></div></template>', '<script setup>',
+            '<template><div></div></template>', '<script>',
             'let a = $signal(0);', 'let b = $signal(0);', 'let flag = $signal(false);',
             'function f() { a = b + 1; }',
             '</script>',
@@ -68,7 +68,7 @@ describe('CD-B1 — PDX_SEVERAL_PIECES', () => {
 describe('CD-S3 — PDX_VERSION_COUNTER', () => {
     it('the recents counter: bumped, and read only as `void version`', () => {
         const ws = codes([
-            '<template><p>{{ recents.length }}</p></template>', '<script setup>',
+            '<template><p>{{ recents.length }}</p></template>', '<script>',
             "let path = $signal('/');",
             'let recentsVersion = $signal(0);',
             'function readRecents(version) {',
@@ -87,7 +87,7 @@ describe('CD-S3 — PDX_VERSION_COUNTER', () => {
 
     it('control — a counter someone reads for its value', () => {
         expect(codes([
-            '<template><p>{{ count }}</p></template>', '<script setup>',
+            '<template><p>{{ count }}</p></template>', '<script>',
             'let count = $signal(0);',
             'function bump() { count++; }',
             'const label = $derived(`clicked ${count} times`);',
@@ -98,7 +98,7 @@ describe('CD-S3 — PDX_VERSION_COUNTER', () => {
 
 describe('CD-B2 — PDX_ROUTE_RENDERS', () => {
     const route = (body: string, page = "@page '/intake';") =>
-        `<template>\n<pdx-wizard>\n${body}\n</pdx-wizard>\n</template>\n<script setup>\n${page}\nlet step = $signal(0);\n</script>\n`;
+        `<template>\n<pdx-wizard>\n${body}\n</pdx-wizard>\n</template>\n<script>\n${page}\nlet step = $signal(0);\n</script>\n`;
     const step = (n: number) => `  <div data-wizard-step="${n}"><pdx-form-field name="f${n}"><pdx-input></pdx-input></pdx-form-field></div>`;
 
     it('intake: four wizard steps inline in the route', () => {
@@ -132,7 +132,7 @@ describe('CD-C1 — PDX_SHARED_STYLES', () => {
         '  <nav class="rail" :data-side="side"><button class="rail-toggle" @click="toggle">≡</button></nav>',
         '  @show (profileOpen) { <div class="profile"><p class="profile-name">me</p></div> }',
         '</template>',
-        '<script setup>',
+        '<script>',
         "let side = $signal('expanded');", 'let collapsed = $signal(false);',
         'let profileOpen = $signal(false);', "let profileTab = $signal('me');",
         "function toggle() { side = side === 'expanded' ? 'collapsed' : 'expanded'; collapsed = !collapsed; }",
@@ -155,7 +155,7 @@ describe('CD-C1 — PDX_SHARED_STYLES', () => {
 });
 
 describe('CD-C3 — PDX_COLOUR_LITERAL', () => {
-    const styled = (css: string) => `<template><p class="x">x</p></template>\n<script setup>\nlet a = $signal(0);\n</script>\n<style scoped>\n${css}\n</style>\n`;
+    const styled = (css: string) => `<template><p class="x">x</p></template>\n<script>\nlet a = $signal(0);\n</script>\n<style scoped>\n${css}\n</style>\n`;
 
     it('a hex, an rgb() and a `white` as values', () => {
         const ws = codes(styled('.x { color: #3366ff; }\n.x:hover { background: rgb(0 0 0 / 10%); }\n.y { border-color: white; }'), 'PDX_COLOUR_LITERAL');

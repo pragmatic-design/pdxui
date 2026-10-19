@@ -18,7 +18,7 @@ function genComponent(n: number): string {
         sigs.push(`  function inc${i}() { s${i}++; }`);
         tpl.push(`    <span class="v${i}">{{ s${i} }} {{ d${i} }}</span>`);
     }
-    return `<template>\n  <div>\n${tpl.join('\n')}\n  </div>\n</template>\n<script setup>\n@prop title: string = 'x';\n${sigs.join('\n')}\n</script>`;
+    return `<template>\n  <div>\n${tpl.join('\n')}\n  </div>\n</template>\n<script>\n@prop title: string = 'x';\n${sigs.join('\n')}\n</script>`;
 }
 
 function timeCompile(src: string, iterations = 5): number {

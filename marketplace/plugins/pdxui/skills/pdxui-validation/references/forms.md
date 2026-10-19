@@ -67,7 +67,7 @@ touched and warning from the same place — you write no `:value`, no `@input`:
   <pdx-button type="submit" :disabled="!user.valid()">Save</pdx-button>
 </pdx-form>
 
-<script setup>
+<script>
 @form user: {
   name: string { required, minLength: 3 },
   email: string { required, email },
@@ -153,7 +153,7 @@ wired.
 <template>
   <pdx-form-field name="phone" label="Phone"><pdx-input name="phone" /></pdx-form-field>
 </template>
-<script setup>
+<script>
 import { tryUseForm } from '@pdxui/core';
 const form = tryUseForm();   // declares the section; answers undefined if the form is not there yet
 </script>
@@ -296,7 +296,7 @@ the compiler to wire its named controls to that form (see *Binding the fields*):
   <pdx-form-field name="iban" label="IBAN"><pdx-input name="iban" /></pdx-form-field>
 </template>
 
-<script setup>
+<script>
 import { tryUseForm } from '@pdxui/core';
 
 const form = tryUseForm();   // the nearest <pdx-form>, or undefined if it is not there yet

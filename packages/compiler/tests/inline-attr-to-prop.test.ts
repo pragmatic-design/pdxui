@@ -21,7 +21,7 @@ import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
 import { clearBoundProperty, assignBoundProperty, interpolationText } from '../../core/src/renderer/template';
 
 function inline(template: string, script = "let label = $signal('x');\nlet id = $signal(1);"): string {
-    const source = `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    const source = `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
     return compile(source, 'inline-attr.pdx', [], undefined, { production: true }).code;
 }
 

@@ -12,7 +12,7 @@ describe('layout codegen', () => {
     <slot />
 </template>
 
-<script setup>
+<script>
 let title = $signal('App');
 </script>`;
 
@@ -28,7 +28,7 @@ let title = $signal('App');
     <slot />
 </template>
 
-<script setup>
+<script>
 let expanded = $signal(true);
 </script>`;
 
@@ -40,7 +40,7 @@ let expanded = $signal(true);
         const source = `
 <template><div>Regular</div></template>
 
-<script setup>
+<script>
 let count = $signal(0);
 </script>`;
 
@@ -52,7 +52,7 @@ let count = $signal(0);
         const source = `
 <template><div>Error</div></template>
 
-<script setup>
+<script>
 @prop code: string = '500';
 </script>`;
 
@@ -64,7 +64,7 @@ let count = $signal(0);
         const source = `
 <template><div>Dashboard</div></template>
 
-<script setup>
+<script>
 @page '/dashboard';
 </script>`;
 
@@ -83,7 +83,7 @@ describe('error page codegen', () => {
     <p>Page not found</p>
 </template>
 
-<script setup>
+<script>
 @prop code: string = '404';
 @prop path: string = '';
 </script>`;
@@ -100,7 +100,7 @@ describe('error page codegen', () => {
     <h1>Forbidden</h1>
 </template>
 
-<script setup>
+<script>
 @prop code: string = '403';
 </script>`;
 
@@ -113,7 +113,7 @@ describe('error page codegen', () => {
         const source = `
 <template><div>Regular</div></template>
 
-<script setup>
+<script>
 let x = $signal(0);
 </script>`;
 

@@ -1,4 +1,4 @@
-// A signal() or computed() written by hand in <script setup> and read bare by the template (#362).
+// A signal() or computed() written by hand in <script> and read bare by the template (#362).
 //
 // The inline path compiles `{{ name }}` to `bindInterpolation(t, () => ctx.name)` and `:title="name"`
 // to an assignment of `ctx.name`: for a name declared with `$signal` / `$derived` that is the value,
@@ -39,7 +39,7 @@ export function validateHandWrittenSignals(
 ): ValidationWarning[] {
     const script = descriptor.script;
     const template = descriptor.template;
-    if (!analysis || analysis.mode !== 'new' || !script || script.src || !template || template.src) return [];
+    if (!analysis || !script || script.src || !template || template.src) return [];
     const expressions = valueExpressions(template.content);
     if (expressions.length === 0) return [];
 

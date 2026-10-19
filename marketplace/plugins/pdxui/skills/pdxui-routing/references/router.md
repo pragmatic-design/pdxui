@@ -188,7 +188,7 @@ without those pages knowing about each other:
 
 ```pdx
 <!-- users.pdx -->
-<script setup>
+<script>
 @page '/admin/users';
 @layout 'admin';
 </script>
@@ -227,7 +227,7 @@ Put a `<pdx-router-outlet>` in a page and every route below its path renders **i
   <pdx-router-outlet />          <!-- the child renders here -->
 </template>
 
-<script setup>
+<script>
 @page '/tickets/:id';
 import { currentParams } from '@pdxui/router';
 const id = $derived(currentParams().id);
@@ -236,7 +236,7 @@ const id = $derived(currentParams().id);
 
 ```pdx
 <!-- intervention.pdx -->
-<script setup>
+<script>
 @page '/tickets/:id/interventions/:n';
 </script>
 ```

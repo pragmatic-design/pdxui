@@ -29,6 +29,7 @@ import { awaitAsAssertion, awaitPlainValue, awaitMaxMs } from './await-forms';
 import { navigateUrl, navigateUrlManual } from './navigate-url';
 import { scopedReachesChild } from './scoped-reach';
 import { scriptSetup } from './script-setup';
+import { legacyScript, mixinRemoved } from './legacy-script';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -308,8 +309,11 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     navigateUrlManual,
     // #152: a scoped style stops at nested components (./scoped-reach).
     scopedReachesChild,
-    // #158: the script has one grammar, `<script setup>` is `<script>` (./script-setup).
+    // #158: the script has one grammar, `<script setup>` is `<script>` (./script-setup); the legacy
+    // mode and `@mixin` are removed (./legacy-script).
     scriptSetup,
+    legacyScript,
+    mixinRemoved,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

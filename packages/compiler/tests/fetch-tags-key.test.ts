@@ -8,7 +8,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const fetchLine = (decl: string): string => {
-    const { code } = compile(`<template><p></p></template>\n<script setup>\n${decl}\n</script>\n`, 'f.pdx');
+    const { code } = compile(`<template><p></p></template>\n<script>\n${decl}\n</script>\n`, 'f.pdx');
     return code.split('\n').filter((l) => l.includes('resource(') || l.includes('_opts =')).join('\n');
 };
 

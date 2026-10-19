@@ -4,6 +4,7 @@
 
 import { findOpenTag } from '../text-scan';
 import type { LanguageChange, LanguageChangeFinding } from './changes';
+import type { ValidationWarning } from '../compiler/validate';
 
 // Match: the `setup` attribute in a tag's attributes, with the space before it. Groups: none
 const SETUP_ATTR = /\s+setup\b(?!\s*=)/;
@@ -18,6 +19,18 @@ function setupTag(text: string): { start: number; text: string } | null {
 /** The line (1-based) of `index` in `text`. */
 function lineAt(text: string, index: number): number {
     return text.slice(0, index).split('\n').length;
+}
+
+/** PDX_SETUP_REDUNDANT for a .pdx whose script tag carries `setup`, at the tag's line. */
+export function setupRedundant(source: string): ValidationWarning {
+    const tag = setupTag(source);
+    return {
+        code: 'PDX_SETUP_REDUNDANT',
+        severity: 'info',
+        message: '`<script setup>`: `setup` has no meaning — the script has one grammar, and reads the same as `<script>`.',
+        hint: 'Write `<script>`; `pdx migrate` removes `setup` in every file.',
+        ...(tag ? { line: lineAt(source, tag.start) } : {}),
+    };
 }
 
 export const scriptSetup: LanguageChange = {

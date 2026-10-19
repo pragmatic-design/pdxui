@@ -60,7 +60,7 @@ describe('compile() source map integration', () => {
   <div>{{ name }}</div>
 </template>
 
-<script setup>
+<script>
   @prop name: string = 'World';
 </script>`, 'test.pdx');
 
@@ -88,7 +88,7 @@ describe('compile() source map integration', () => {
   }
 </template>
 
-<script setup>
+<script>
   @prop title: string = 'Hello';
   @prop show: boolean = true;
 </script>`;

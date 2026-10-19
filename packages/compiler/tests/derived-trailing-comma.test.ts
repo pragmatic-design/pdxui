@@ -15,7 +15,7 @@ function parseErrors(code: string): string[] {
 }
 
 describe('a trailing comma inside $derived', () => {
-    const src = (body: string) => `<template><p>{{ total }}</p></template>\n<script setup>\nlet a = $signal(1);\n${body}\n</script>\n`;
+    const src = (body: string) => `<template><p>{{ total }}</p></template>\n<script>\nlet a = $signal(1);\n${body}\n</script>\n`;
 
     it('compiles to the computed it would without the comma, with no fallback', () => {
         const withComma = compile(src('const total = $derived(\n  a * 2,\n);'), 'd.pdx');

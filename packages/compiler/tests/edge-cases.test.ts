@@ -13,7 +13,7 @@ describe('Signal rewriter — string safety', () => {
     it('does NOT rewrite signal name inside string literal', () => {
         const { code } = compile(`
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const label = "count++";
 </script>`, 'test.pdx');
@@ -25,7 +25,7 @@ const label = "count++";
     it('does NOT rewrite signal name inside template literal', () => {
         const { code } = compile(`
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const msg = \`The count is \${count}\`;
 </script>`, 'test.pdx');
@@ -37,7 +37,7 @@ const msg = \`The count is \${count}\`;
     it('handles multi-line array assignment correctly', () => {
         const { code } = compile(`
 <template><div>{{ items }}</div></template>
-<script setup>
+<script>
 let items = $signal([1, 2, 3]);
 
 function reset() {
@@ -60,7 +60,7 @@ function reset() {
     it('handles compound assignment with multi-line expression', () => {
         const { code } = compile(`
 <template><div>{{ total }}</div></template>
-<script setup>
+<script>
 let total = $signal(0);
 total += 5;
 </script>`, 'test.pdx');
@@ -129,7 +129,7 @@ describe('Compiler — edge cases', () => {
     it('object literal with signal values in script body', () => {
         const { code } = compile(`
 <template><div>{{ data }}</div></template>
-<script setup>
+<script>
 let count = $signal(0);
 const data = { total: count, label: 'test' };
 </script>`, 'test.pdx');
@@ -154,7 +154,7 @@ let x = $signal($t('hello'));
     it('@transition and @layout appear in route manifest', () => {
         const { code } = compile(`
 <template><div>Page</div></template>
-<script setup>
+<script>
 @page '/test' { preload };
 @transition 'fade';
 @layout 'admin';

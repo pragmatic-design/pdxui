@@ -15,7 +15,7 @@ A file with `@store` becomes a store module. Inside, `$store({...})` creates the
 
 ```pdx
 <!-- cart.pdx -->
-<script setup>
+<script>
 @store cart;
 
 let items = $store({ products: [], total: 0 });
@@ -52,7 +52,7 @@ consumers, wherever they are in the tree.
   <pdx-button @click="cart.clear()">Empty</pdx-button>
 </template>
 
-<script setup>
+<script>
 import { useCart } from './cart.pdx';
 
 const cart = useCart();   // the same instance in every component
@@ -69,7 +69,7 @@ Often you want state to survive a refresh. `persist` on the declaration keeps th
 
 ```pdx
 <!-- cart.pdx -->
-<script setup>
+<script>
 @store cart { persist: 'local' };
 
 let count = $signal(0);   // persisted

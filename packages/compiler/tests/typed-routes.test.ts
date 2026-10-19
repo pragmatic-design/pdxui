@@ -52,7 +52,7 @@ describe('the route types', () => {
 });
 
 describe('the plugin writes it', () => {
-    const page = (path: string) => `<template><p>x</p></template>\n<script setup>\n@page '${path}';\n</script>\n`;
+    const page = (path: string) => `<template><p>x</p></template>\n<script>\n@page '${path}';\n</script>\n`;
 
     it('at build start, from the pages it scans', () => {
         const root = tmp();

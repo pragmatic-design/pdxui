@@ -12,7 +12,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function render(template: string): string {
-    const src = `<template>${template}</template>\n<script setup>\nlet rows = $signal([]);\nlet n = $signal(0);\nlet text = $signal('');\nfunction pick(id) {}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\nlet rows = $signal([]);\nlet n = $signal(0);\nlet text = $signal('');\nfunction pick(id) {}\n</script>\n`;
     const { code } = compile(src, 'delegation.pdx', [], undefined, { production: true });
     return code.slice(code.indexOf('render:'));
 }

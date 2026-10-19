@@ -25,7 +25,7 @@ import { templateGenerator } from './template-generator';
  * static-markup-parse.spec.ts the parse, in Chromium.
  */
 const emitted = (template: string, inSlot = false): string =>
-    compile(`<template>${inSlot ? `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>` : template}</template>\n<script setup>\nlet _x = $signal(0);\n</script>`,
+    compile(`<template>${inSlot ? `<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>` : template}</template>\n<script>\nlet _x = $signal(0);\n</script>`,
         'e.pdx', [], undefined, { production: true, staticMarkup: false }).code;
 
 describe('text a reader sees', () => {

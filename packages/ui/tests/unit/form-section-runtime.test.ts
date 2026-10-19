@@ -26,7 +26,7 @@ function load(filename: string, source: string): void {
 const SECTION = `<template>
 <pdx-input class="deep" name="deep"></pdx-input>
 </template>
-<script setup>
+<script>
 import { tryUseForm } from '@pdxui/core';
 const form = tryUseForm();
 </script>`;
@@ -37,7 +37,7 @@ const PROBE = `<template>
   <app-probe-section></app-probe-section>
 </pdx-form>
 </template>
-<script setup>
+<script>
 import { createForm } from '@pdxui/core';
 const f = createForm({ initialValues: { here: '', deep: '' } });
 window.__probeForm = f;

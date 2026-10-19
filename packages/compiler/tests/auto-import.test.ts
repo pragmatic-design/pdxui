@@ -9,7 +9,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports pipe + debounce + map', () => {
         const source = `
 <template><div>{{ search }}</div></template>
-<script setup>
+<script>
   @prop query: string = '';
   const search = pipe(() => query(), debounce(300), map(q => q.trim()));
 </script>`;
@@ -24,7 +24,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports switchSignal', () => {
         const source = `
 <template><div>{{ results }}</div></template>
-<script setup>
+<script>
   @prop query: string = '';
   let q = $signal('');
   const results = switchSignal(() => q, (v) => fetch('/api?q=' + v));
@@ -36,7 +36,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports exhaustSignal', () => {
         const source = `
 <template><div>{{ result }}</div></template>
-<script setup>
+<script>
   let trigger = $signal(0);
   const result = exhaustSignal(() => trigger, () => fetch('/api/submit'));
 </script>`;
@@ -47,7 +47,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports distinct + previous + scan', () => {
         const source = `
 <template><div>{{ total }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   const d = distinct(() => count);
   const prev = previous(() => count);
@@ -62,7 +62,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports fromEvent + fromResize', () => {
         const source = `
 <template><div>{{ clicks }}</div></template>
-<script setup>
+<script>
   let clicks = $signal(0);
   const evts = fromEvent(document, 'click');
   const size = fromResize(document.body);
@@ -75,7 +75,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports fromPromise + toPromise', () => {
         const source = `
 <template><div>{{ data }}</div></template>
-<script setup>
+<script>
   const data = fromPromise(fetch('/api/data'));
   const ready = toPromise(() => data());
 </script>`;
@@ -87,7 +87,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports tween + easings', () => {
         const source = `
 <template><div>{{ smooth }}</div></template>
-<script setup>
+<script>
   let target = $signal(0);
   const smooth = tween(() => target, { easing: easings.easeOutCubic });
 </script>`;
@@ -99,7 +99,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports untracked', () => {
         const source = `
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   let other = $signal(10);
   $effect(() => {
@@ -114,7 +114,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports useQuery', () => {
         const source = `
 <template><div>{{ users }}</div></template>
-<script setup>
+<script>
   const { data: users } = useQuery(() => fetch('/api/users'), { key: 'users' });
 </script>`;
         const { code: output } = compile(source, 'query.pdx');
@@ -124,7 +124,7 @@ describe('auto-import: signal operators', () => {
     it('auto-imports tap + catchError', () => {
         const source = `
 <template><div>{{ safe }}</div></template>
-<script setup>
+<script>
   let x = $signal(0);
   const safe = pipe(() => x, tap(v => console.log(v)), catchError(() => 0));
 </script>`;
@@ -136,7 +136,7 @@ describe('auto-import: signal operators', () => {
     it('does NOT import map when used as array method', () => {
         const source = `
 <template><div>{{ items }}</div></template>
-<script setup>
+<script>
   let items = $signal([1, 2, 3]);
   const doubled = items.map(x => x * 2);
 </script>`;
@@ -148,7 +148,7 @@ describe('auto-import: signal operators', () => {
     it('does NOT import operators mentioned only in comments', () => {
         const source = `
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   // TODO: use pipe() and map() later
   // switchSignal is great for search
@@ -165,7 +165,7 @@ describe('auto-import: signal operators', () => {
     it('does NOT import operators in string literals', () => {
         const source = `
 <template><div>{{ label }}</div></template>
-<script setup>
+<script>
   @prop label: string = 'use pipe() here';
   const msg = "call switchSignal() for search";
 </script>`;
@@ -187,7 +187,7 @@ describe('auto-import: signal operators', () => {
 // upload throws.
 describe('auto-import: the reactivity primitives', () => {
     const importsOf = (script: string): string => {
-        const source = `<template><div>{{ ready }}</div></template>\n<script setup>\n${script}\n</script>`;
+        const source = `<template><div>{{ ready }}</div></template>\n<script>\n${script}\n</script>`;
         const { code } = compile(source, 'panel.pdx');
         return code.match(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core'/)?.[1] ?? '';
     };
@@ -266,7 +266,7 @@ describe('auto-import: the reactivity primitives', () => {
         // Two `import { effect }` in one module is a SyntaxError. A core import is absorbed into
         // the generated one, so this is the assertion that it stays absorbed.
         const source = `<template><div>{{ ready }}</div></template>
-<script setup>
+<script>
 import { effect, uploadFile } from '@pdxui/core';
 let ready = $signal(false);
 function go(file) { const h = uploadFile('/u', file); effect(() => { ready = h.progress() === 100; }); }
@@ -287,7 +287,7 @@ function go(file) { const h = uploadFile('/u', file); effect(() => { ready = h.p
 describe('a component only used inside @defer', () => {
     // `production` or dev: one render path either way since #107.
     const compileDeferred = (template: string, production = false): string => {
-        const source = `<template>${template}</template>\n<script setup>\nlet ready = $signal(true);\n</script>`;
+        const source = `<template>${template}</template>\n<script>\nlet ready = $signal(true);\n</script>`;
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
         const { code } = compile(source, 'page.pdx', undefined, undefined, {

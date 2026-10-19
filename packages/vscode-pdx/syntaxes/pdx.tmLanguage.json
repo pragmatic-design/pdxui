@@ -316,7 +316,7 @@
     "pdx-decorators": {
       "patterns": [
         {
-          "match": "^\\s*@(prop|model|event|slot|expose|part|host|variants|state|form|fetch|store|page|guard|loader|layout|title|meta|scroll|head|provide|inject|tag|route|params|redirect|alias|outlet|search|prefetch|snippet|i18n|mixin|use|raw|transition)\\b",
+          "match": "^\\s*@(prop|model|event|slot|expose|part|host|variants|state|form|fetch|store|page|guard|loader|layout|title|meta|scroll|head|provide|inject|tag|route|params|redirect|alias|outlet|search|prefetch|snippet|i18n|use|raw|transition)\\b",
           "name": "keyword.other.decorator.pdx"
         }
       ]

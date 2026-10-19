@@ -16,10 +16,9 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_EMPTY_SOURCE` | error | An empty `.pdx` file (build error). | [The file](overview.md#the-file) |
 | `PDX_DUPLICATE_TEMPLATE` | error | A second `<template>` block in a `.pdx`. | [The file](overview.md#the-file) |
 | `PDX_DUPLICATE_SCRIPT` | error | A second `<script>` block in a `.pdx`. | [The file](overview.md#the-file) |
-| `PDX_SCRIPT_SYNTAX_ERROR` | error | The `<script setup>` does not parse. | [The file](overview.md#the-file) |
+| `PDX_SCRIPT_SYNTAX_ERROR` | error | The `<script>` does not parse. | [The file](overview.md#the-file) |
+| `PDX_SETUP_REDUNDANT` | info | `<script setup>`: `setup` has no meaning (#158). | [The file](overview.md#the-file) |
 | `PDX_TS_UNSUPPORTED` | error | TypeScript in a `.pdx` script that has a runtime of its own: an enum, a namespace, a parameter property, `import = require()`. | [The file](overview.md#the-file) |
-| `PDX_LEGACY_IN_SETUP` | warn | A legacy marker (`defineProps`, `defineEmits`, a top-level `return`) in `<script setup>`. | [The two script modes](overview.md#the-two-script-modes) |
-| `PDX_TEMPLATE_NAME_NOT_PROVIDED` | error | A legacy-mode template reads a name its script does not provide. | [The two script modes](overview.md#the-two-script-modes) |
 | `PDX_TAG_COLLISION` | error | Two compiled `.pdx` files register the same tag (build error). | [The tag](overview.md#the-tag) |
 | `PDX_TAG_RESERVED` | error | An application component's tag starts with `pdx-`, the @pdxui packages' prefix (#136). | [The tag](overview.md#the-tag) |
 | `PDX_TAG_COLLISION_RESOLVER` | warn | Two component files derive the same tag; the second is not auto-importable. | [The tag](overview.md#the-tag) |
@@ -73,7 +72,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 |---|---|---|---|
 | `PDX_RAW_INTERPOLATION` | warn | A `${…}` in the template markup. | interpolation, [template.md](template.md) |
 | `PDX_RAW_INTERPOLATION_IN_BINDING` | error | A `${…}` inside the value of a bound attribute (`:x`, `::x`, `@x`). | bindings, [template.md](template.md) |
-| `PDX_UNDECLARED_REF` | error | A name the template reads that `<script setup>` does not declare. | expressions, [template.md](template.md) |
+| `PDX_UNDECLARED_REF` | error | A name the template reads that `<script>` does not declare. | expressions, [template.md](template.md) |
 | `PDX_UNRESOLVED_COMPONENT` | warn | A custom-element tag that no component package and no project component defines. | component tags, [template.md](template.md) |
 | `PDX_UNKNOWN_PROP` | warn | A bound name the component does not declare as a prop. | `:prop` bindings, [template.md](template.md) |
 | `PDX_PROP_NAME_CASE` | warn | A bound prop written in lowercase that matches a camelCase prop. | `:prop` bindings, [template.md](template.md) |

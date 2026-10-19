@@ -78,7 +78,7 @@ describe('a type written after a colon', () => {
     });
 
     it('carries a fix that rewrites it to `as`', () => {
-        const source = `<template>\n  <p>{{ user }}</p>\n</template>\n<script setup>\n@fetch user: 'GET /api/user' : User;\n</script>\n`;
+        const source = `<template>\n  <p>{{ user }}</p>\n</template>\n<script>\n@fetch user: 'GET /api/user' : User;\n</script>\n`;
         const w = compile(source, 'user.pdx').warnings.find((x) => x.code === 'PDX_FETCH_TYPE_COLON');
         expect(w?.fix, 'no fix proposal').toBeDefined();
         let fixed = source;

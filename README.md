@@ -67,7 +67,7 @@ measure the framework against real screens (abridged, imports left out; the comm
   </section>
 </template>
 
-<script setup>
+<script>
 @page '/employees' { label: $t('employees.title') };   // a route, lazy-loaded, with its label
 @title $t('employees.title');                         // the document title, kept in step with the language
 @scroll 'preserve';                                   // back from a record, the list is where you left it
@@ -175,7 +175,7 @@ component with two mistakes in it:
   </article>
 </template>
 
-<script setup>
+<script>
 @prop id: string = '';
 @prop title: string = '';
 const total = $derived(0);
@@ -247,7 +247,7 @@ You still read what the agent wrote. There is less of it, and none of it is plum
   React tree. A PDX component is a custom element: no virtual DOM, and it runs in any page or
   framework. Where React leaves registration, routing and data wiring to libraries you assemble, here
   they are declarations in the file.
-- **…Vue?** The single-file components will look familiar, `<script setup>` included. The difference
+- **…Vue?** The single-file components will look familiar, `<script>` included. The difference
   is the output: standard custom elements by default rather than Vue components. The route and the
   title are declared in the file rather than configured in the router, and the components a template
   uses need no import. And the component library and the design system are designed with the compiler.

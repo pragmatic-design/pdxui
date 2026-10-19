@@ -2,7 +2,7 @@
 //
 // Compiled to `ctx.send({ ctx.productId(), ctx.n() })`, `@click="send({ productId, n })"` is a syntax
 // error — `{ ctx.x }` — the module fails to load, and every component in it goes unregistered. The
-// template twin of the same shorthand in <script setup>.
+// template twin of the same shorthand in <script>.
 
 import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
@@ -15,7 +15,7 @@ function parseErrors(code: string): string[] {
 }
 
 const SCRIPT = [
-    '<script setup>',
+    '<script>',
     '@prop productId: string = "p1";',
     'let n = $signal(1);',
     'function send(o) { console.log(o); }',

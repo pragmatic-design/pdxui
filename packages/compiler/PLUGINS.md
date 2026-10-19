@@ -180,7 +180,7 @@ import { analyticsPlugin } from './analytics';
 it('injects page tracking', () => {
     const source = `
 <template><div>Dashboard</div></template>
-<script setup>
+<script>
 @page '/dashboard';
 </script>`;
 

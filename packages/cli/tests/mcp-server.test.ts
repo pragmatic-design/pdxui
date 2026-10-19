@@ -26,9 +26,9 @@ beforeAll(async () => {
     // A raw interpolation in an attribute: PDX_RAW_INTERPOLATION, with a fix.
     // Named so it collides with no library tag: `card.pdx` would be pdx-card, which @pdxui/ui ships.
     writeFileSync(join(project, 'src', 'profile-card.pdx'),
-        '<template>\n  <p title="${tone}">x</p>\n</template>\n<script setup>\nlet tone = $signal(\'a\');\n</script>\n');
+        '<template>\n  <p title="${tone}">x</p>\n</template>\n<script>\nlet tone = $signal(\'a\');\n</script>\n');
     writeFileSync(join(project, 'src', 'pages', 'home.pdx'),
-        '<template><p>home</p></template>\n<script setup>\n@page \'/\';\n</script>\n');
+        '<template><p>home</p></template>\n<script>\n@page \'/\';\n</script>\n');
 
     // The docs the tool searches, in the shape gen-llms.mjs writes: an index of links, then sections.
     // A fixture rather than the site's output, which is generated, git-ignored, and rewritten by

@@ -29,7 +29,7 @@ describe('rewriteAst — shorthand of a callable', () => {
 describe('compile — shorthand of a prop, a derived and a route param', () => {
     it('every shorthand in a setup function passes the value', () => {
         const { code } = compile(`<template><button @click="send()">{{ n }}</button></template>
-<script setup>
+<script>
 @page '/orders/:orderId';
 @params { orderId: string };
 @prop productId: string = '';

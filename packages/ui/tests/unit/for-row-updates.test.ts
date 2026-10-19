@@ -21,7 +21,7 @@ function load(filename: string, source: string, opts: object = {}): void {
 const BAR = `<template>
 <b class="bar">{{ value }}</b>
 </template>
-<script setup>
+<script>
 @prop value: number = 0;
 </script>`;
 
@@ -34,7 +34,7 @@ const LIST = (tag: string) => `<template>
 }
 </ul>
 </template>
-<script setup>
+<script>
 let docs = $signal([{ id: 1, name: 'a', progress: 10 }, { id: 2, name: 'b', progress: 20 }]);
 function finish() { docs = docs.map(d => ({ ...d, progress: 100 })); }
 function swap() { docs = [docs[1], docs[0]]; }

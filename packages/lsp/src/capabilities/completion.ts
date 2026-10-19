@@ -22,7 +22,7 @@ const RUNE_COMPLETIONS: CompletionItem[] = RUNES.map(r => ({
     insertTextFormat: InsertTextFormat.Snippet,
 }));
 
-/** Get rune completion items (always available in <script setup>). */
+/** Get rune completion items (always available in <script>). */
 export function getRuneCompletions(): CompletionItem[] {
     return RUNE_COMPLETIONS;
 }

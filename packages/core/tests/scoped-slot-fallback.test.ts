@@ -17,7 +17,7 @@ let seq = 0;
 
 /** Compile `src` as `app-<name>` on one path and define it. */
 function define(name: string, template: string, script: string, build: boolean): void {
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const options = build ? { production: true } : {};
     const { code } = compile(src, `${name}.pdx`, [], undefined, options);
     const body = code

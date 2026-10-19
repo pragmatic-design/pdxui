@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 const out = (script: string, template = '<div>{{ n }}</div>') => {
-    const r = compile(`<template>${template}</template>\n<script setup>\n${script}\n</script>`,
+    const r = compile(`<template>${template}</template>\n<script>\n${script}\n</script>`,
         'semi.pdx', [], undefined, { production: false });
     return typeof r === 'string' ? { code: r, warnings: [] as { code: string }[] } : r;
 };

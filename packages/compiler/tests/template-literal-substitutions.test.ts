@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const SCRIPT = "<script setup>\nlet label = $signal('en');\nlet note = $signal('');\nconst rows = [{ id: 1 }];\nconst items = ['a'];\n</script>\n";
+const SCRIPT = "<script>\nlet label = $signal('en');\nlet note = $signal('');\nconst rows = [{ id: 1 }];\nconst items = ['a'];\n</script>\n";
 const build = (template: string) => compile(`<template>${template}</template>\n${SCRIPT}`, 'tl.pdx', [], undefined, { production: true });
 
 describe('a template literal in a template expression', () => {

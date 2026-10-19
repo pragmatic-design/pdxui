@@ -46,7 +46,7 @@ describe('pdx check reports defects; --design adds the review', () => {
     // One colour literal (a design heuristic) and one raw interpolation (a defect).
     const FIXTURE = [
         '<template><p class="b" title="${n}">x</p></template>',
-        '<script setup>',
+        '<script>',
         'let n = $signal(1);',
         '</script>',
         '<style scoped>',

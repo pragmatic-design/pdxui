@@ -28,8 +28,8 @@ type Resolve = (tag: string, attr: string) => string | null;
 
 /** The TS diagnostics of a .pdx, each with the text of the .pdx it points at. */
 function diagnose(script: string, template: string, resolveType?: Resolve): { code: string; message: string; at: string }[] {
-    const source = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
-    const scriptStart = source.indexOf('<script setup>\n') + '<script setup>\n'.length;
+    const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+    const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length, resolveType);
     const lines = source.split('\n');
     return getTsDiagnostics(svc, URI, vf, source).map((d) => {

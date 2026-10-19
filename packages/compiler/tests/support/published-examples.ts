@@ -50,7 +50,7 @@ function docsFile(body: string): string {
     // A leading <!-- file name --> caption is not markup the fragment opens with, nor script.
     const uncaptioned = body.replace(/^\s*<!--[\s\S]*?-->[ \t]*\n?/, '');
     const opensWithMarkup = /^\s*(?:<|\{\{)/.test(uncaptioned);
-    if (!opensWithMarkup && SCRIPT_LINE.test(uncaptioned)) return `<template><div></div></template>\n<script setup>\n${uncaptioned}\n</script>`;
+    if (!opensWithMarkup && SCRIPT_LINE.test(uncaptioned)) return `<template><div></div></template>\n<script>\n${uncaptioned}\n</script>`;
     return `<template>\n${body}\n</template>`;
 }
 
@@ -75,8 +75,16 @@ export function docsExamples(): PublishedExample[] {
     return out;
 }
 
-/** A .pdx construct: a block directive, or an SFC block. */
-const PDX_CONSTRUCT = /@for\b|@if\b|@try\b|@await\b|@switch\b|@defer\b|<script setup>|<template[\s>]/;
+/** A .pdx construct: a block directive, or a template block. The script block is `sfcScript`. */
+const PDX_CONSTRUCT = /@for\b|@if\b|@try\b|@await\b|@switch\b|@defer\b|<template[\s>]/;
+
+// Match: any opening script tag, whatever its case and spacing. Groups: [1]=its attributes
+const SCRIPT_TAG = /<script\b([^>]*)>/gi;
+
+/** Does `text` hold a .pdx script block — a `<script>` without `type`, unlike an HTML page's? */
+function sfcScript(text: string): boolean {
+    return [...text.matchAll(SCRIPT_TAG)].some((m) => !/\btype\s*=/i.test(m[1]));
+}
 
 function skillFiles(dir: string, out: string[] = []): string[] {
     for (const name of readdirSync(dir)) {
@@ -108,7 +116,7 @@ export function skillExamples(): PublishedExample[] {
         for (const m of text.matchAll(FENCE)) {
             const [lang = '', ...meta] = m[1].trim().split(/\s+/);
             if (lang !== 'html' && lang !== 'pdx') continue;
-            if (!PDX_CONSTRUCT.test(m[2])) continue;
+            if (!PDX_CONSTRUCT.test(m[2]) && !sfcScript(m[2])) continue;
             const line = text.slice(0, m.index).split('\n').length;
             found.push({
                 where: `${relative(PLUGINS, file).replace(/\\/g, '/')}:${line}`,

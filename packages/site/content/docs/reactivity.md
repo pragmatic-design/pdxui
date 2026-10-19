@@ -40,7 +40,7 @@ and calling it calls the function it holds:
   <button @click="onSave()">Save</button>
 </template>
 
-<script setup>
+<script>
 let saved = $signal(0);
 let onSave = $signal(null);
 
@@ -216,7 +216,7 @@ The component creates it, posts the work, and writes what comes back into signal
   @if (summary) { <p>{{ summary?.rows }} rows, {{ summary?.total }} in all</p> }
 </template>
 
-<script setup>
+<script>
 import { onDestroy } from '@pdxui/core';
 
 let summary = $signal<{ rows: number; total: number } | null>(null);

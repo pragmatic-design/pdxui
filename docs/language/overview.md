@@ -69,9 +69,10 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
   form wiring and scoping work unchanged, in development and in a production build.
 - **`<template shadow>`** renders into a shadow root instead of light DOM; the component's CSS is
   adopted into the root, unrewritten, and `scoped` makes no difference there. Light DOM is the default.
-- **`<script setup>`** is the convention. What the compiler reads are the runes, line by line; `setup`
-  states the intent.
-- **`<script setup lang="js">`** compiles the script as written. Without it the script is TypeScript:
+- **`<script>`** has one grammar (#158): it is read for its declarations and runes whatever it
+  contains. `setup` is accepted and means nothing — `PDX_SETUP_REDUNDANT`, an info — and `pdx migrate`
+  removes it. A file without a `<script>` compiles like one with an empty one.
+- **`<script lang="js">`** compiles the script as written. Without it the script is TypeScript:
   annotations, `as`, generics, `import type`, `interface` and `type` are erased (replaced by spaces, so
   lines and columns stay where they were). TypeScript with a runtime meaning — `enum`, `namespace`, a
   constructor parameter property, `import x = require()` — stops the compile with
@@ -89,19 +90,19 @@ A file whose name starts with `_` keeps its parent folder for uniqueness: `admin
 derive the same tag raise `PDX_TAG_COLLISION`. `pdx migrate` renames an application's alpha `pdx-`
 tags in its templates, its style selectors and its `@tag` lines, and flags one written in a string.
 
-### The two script modes
+### One script grammar
 
-The runes are the **new mode**. The pre-rune syntax — `defineProps`, `defineEmits`, a top-level
-`return { … }` — is the **legacy mode**, still compiled, and not described further in this
-reference. A `<script>` with no rune and no legacy marker is legacy; `<script setup>` without either
-is the new mode. A legacy marker inside `<script setup>` raises `PDX_LEGACY_IN_SETUP`, naming the
-marker and which mode won. In the legacy mode a name the template reads that the script does not
-return raises `PDX_TEMPLATE_NAME_NOT_PROVIDED`.
+There is one way to write a script (#158): props are `@prop`, events are `@event`, and every
+top-level name reaches the template. The pre-rune syntax — `defineProps`, `defineEmits`, a top-level
+`return { … }` — and `@mixin` are removed: each is `PDX_REMOVED_FORM`. `pdx migrate` converts
+`defineProps({ x: { type: String, default: 'a' } })` to `@prop x: string = 'a';`, a `defineEmits` and
+the calls of its function to `@event` declarations and their functions, and drops a `return { … }` of
+plain names; what it cannot read, and every `@mixin`, it lists for a person.
 
 ### Script-only files
 
 A `.pdx.ts` file is a script with no template: a store (`@store`, [data.md](data.md)) or a module of
-functions that uses runes. It is compiled with the same rewrites as a `<script setup>` and exports
+functions that uses runes. It is compiled with the same rewrites as a `<script>` and exports
 what it declares.
 
 ```pdx
@@ -109,7 +110,7 @@ what it declares.
   <p>{{ count }} of {{ total }}</p>
 </template>
 
-<script setup>
+<script>
 @prop total: number = 10;
 let count = $signal(0);
 </script>

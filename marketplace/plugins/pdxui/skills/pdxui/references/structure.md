@@ -50,7 +50,7 @@ keep the state in the route. This is what you want most of the time.
   </div>
 </template>
 
-<script setup>
+<script>
 @prop customer: string = '';
 @prop status: string = 'aperto';
 @event selected: string;

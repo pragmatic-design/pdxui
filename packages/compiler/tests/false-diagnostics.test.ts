@@ -25,7 +25,7 @@ const unused = (src: string) => compile(src, 'probe.pdx').warnings
 describe('PDX_UNUSED_REACTIVE sees every read in the template', () => {
     it('a signal read only in a hyphenated binding is used', () => {
         const warnings = unused(`<template><nav :active-key="section()"></nav></template>
-<script setup>
+<script>
 const section = $signal('home');
 </script>`);
         expect(warnings, 'the read in :active-key was not seen').toEqual([]);
@@ -35,7 +35,7 @@ const section = $signal('home');
         const warnings = unused(`<template>
 @try { <p>{{ label }}</p> } @catch (err) { <p>{{ fallback }}</p> }
 </template>
-<script setup>
+<script>
 let label = $signal('ok');
 let fallback = $signal('failed');
 </script>`);
@@ -44,7 +44,7 @@ let fallback = $signal('failed');
 
     it('control — a signal nothing reads still warns', () => {
         const warnings = unused(`<template><nav :active-key="section()"></nav></template>
-<script setup>
+<script>
 const section = $signal('home');
 let forgotten = $signal(0);
 </script>`);

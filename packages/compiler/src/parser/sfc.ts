@@ -4,8 +4,8 @@
 //
 // Format:
 //   <template> ... </template>
-//   <script setup lang="ts" src="./counter.ts" />  ← external
-//   <script setup> ... </script>                    ← inline
+//   <script lang="ts" src="./counter.ts" />  ← external
+//   <script> ... </script>                    ← inline
 //   <style scoped src="./counter.css" />            ← external
 //   <style scoped> ... </style>                     ← inline
 
@@ -61,7 +61,7 @@ export function parseSFC(source: string): SFCDescriptor {
     const styles = extractStyleBlocks(source, errors);
     const script = extractScriptBlock(source, errors);
     // One <script> and one <template> per file. The extractors take the first and stop, so a second
-    // would be dropped in silence — a second <script setup> would compile to a module without it, and
+    // would be dropped in silence — a second <script> would compile to a module without it, and
     // when it holds only statements nothing would be reported at all. Reported like an unclosed block.
     const taken = [tpl, script, ...styles].filter((b): b is SFCBlock => b !== null);
     if (script) reportSecond(source, 'script', 'PDX_DUPLICATE_SCRIPT', script, taken, errors);
@@ -197,7 +197,7 @@ function extractScriptBlock(source: string, errors?: string[]): SFCScript | null
     const lang = extractLang(attrs) ?? 'ts'; // Default: TypeScript
     const src = extractSrc(attrs);
 
-    // Self-closing: <script setup src="./counter.ts" />
+    // Self-closing: <script src="./counter.ts" />
     if (isSelfClosing(openMatch.text)) {
         if (src) return { content: '', setup, lang, start: openMatch.index, end: openMatch.index + openMatch.text.length, src };
         // Self-closing <script /> with no src carries no code — nothing to extract.

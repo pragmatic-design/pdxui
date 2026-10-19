@@ -126,7 +126,7 @@ export function createRecents(key: string) {
 
 ### CD-L1 — Logic repeated across pages is a composable; logic *with its markup* is a component
 
-A composable is a plain `.ts` function called in `<script setup>`. It returns signals, or an object of
+A composable is a plain `.ts` function called in `<script>`. It returns signals, or an object of
 signals and methods: `use*` when it attaches to something that exists, `create*` when it makes a thing
 the caller owns. Lifecycle hooks inside it (`onMount`, `onDestroy`, `onBeforeLeave`) bind to the
 calling component, and they must run synchronously during setup: outside setup they throw. In a

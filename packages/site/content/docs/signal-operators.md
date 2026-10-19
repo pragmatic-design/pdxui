@@ -45,7 +45,7 @@ The commonest problem on the page, and the one the live-search example in [React
 solves by hand:
 
 ```pdx
-<script setup>
+<script>
 import { pipe, debounce, distinctOp, map } from '@pdxui/core';
 
 let query = $signal('');
@@ -104,7 +104,7 @@ The bridges turn the browser into signals. They take **the element or a getter f
 ```pdx
 <template><div class="card" :ref="card">…</div></template>
 
-<script setup>
+<script>
 import { fromResize, fromIntersection } from '@pdxui/core';
 
 let card = $signal(null);

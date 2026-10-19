@@ -38,7 +38,7 @@ a component, or when you tear a feature down while the page stays.
 ## Browser and environment
 
 ```pdx
-<script setup>
+<script>
 import { useMediaQuery, useOnline, useStorage, useClipboard } from '@pdxui/core';
 
 const isWide = useMediaQuery('(min-width: 1200px)');
@@ -69,7 +69,7 @@ left open on a shared desk. Any application handling personal, financial or clin
 for an inactivity timeout in its first review.
 
 ```pdx
-<script setup>
+<script>
 import { useIdle, createAuthStore } from '@pdxui/core';
 
 const auth = createAuthStore();
@@ -114,7 +114,7 @@ removes every listener.
 `mutate()` for an optimistic write.
 
 ```pdx
-<script setup>
+<script>
 import { useQuery } from '@pdxui/core';
 
 let page = $signal(1);
@@ -208,7 +208,7 @@ Four composables that compose into a drag-and-drop feature, each usable alone:
   </ul>
 </template>
 
-<script setup>
+<script>
 import { useSortable } from '@pdxui/core';
 
 let items = $signal([{ id: 1, label: 'One' }, { id: 2, label: 'Two' }]);

@@ -19,7 +19,7 @@ describe('a $derived that reads a script local', () => {
     it('is declared after the local and before the top-level effect() that reads it', () => {
         const { code } = compile(`
 <template><p>{{ key }}</p></template>
-<script setup>
+<script>
 @prop name: string = 'button';
 const _PFX = '../demos/comp-';
 const key = $derived(_PFX + name + '.pdx');
@@ -36,7 +36,7 @@ effect(() => { const k = key; console.log(k); });
     it('a later $derived that reads no local is not dragged after the body with it', () => {
         const { code } = compile(`
 <template><p>{{ key }} {{ twice }}</p></template>
-<script setup>
+<script>
 let n = $signal(1);
 const _PFX = 'comp-';
 const key = $derived(_PFX + n);
@@ -52,7 +52,7 @@ effect(() => { console.log(twice); });
     it('a derived reading a late signal comes after that signal', () => {
         const { code } = compile(`
 <template><p>{{ label }}</p></template>
-<script setup>
+<script>
 const base = 10;
 let count = $signal(base);
 const label = $derived('n=' + count);
@@ -69,7 +69,7 @@ effect(() => console.log(label));
     it('the module runs: the effect reads the derived without a TDZ error', async () => {
         const { code } = compile(`
 <template><p>{{ key }}</p></template>
-<script setup>
+<script>
 const _PFX = 'comp-';
 let n = $signal(1);
 const key = $derived(_PFX + n);
@@ -90,7 +90,7 @@ effect(() => { window.__pdx828 = key; });
     it('control — a derived that reads no local stays before the body', () => {
         const { code } = compile(`
 <template><p>{{ twice }}</p></template>
-<script setup>
+<script>
 let n = $signal(1);
 const twice = $derived(n * 2);
 const _local = 3;

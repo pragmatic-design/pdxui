@@ -90,7 +90,7 @@ gets `hasOutlet:true`: the routes below its path render inside it. The options b
   <h1>Ticket {{ id }}</h1>
 </template>
 
-<script setup>
+<script>
 @page '/tickets/:id(number)', '/t/:id' { keepAlive: 60000, label: crumb };
 import { currentParams } from '@pdxui/router';
 
@@ -107,7 +107,7 @@ function crumb(params) {
   <p>Reports</p>
 </template>
 
-<script setup>
+<script>
 @page '/reports' { label: 'Reports', preload };
 </script>
 ```
@@ -157,7 +157,7 @@ registration is the one `@page` emits.
   <p>Users</p>
 </template>
 
-<script setup>
+<script>
 @route { path: '/users', keepAlive: true }
 </script>
 ```
@@ -167,7 +167,7 @@ registration is the one `@page` emits.
   <p>{{ count }} users</p>
 </template>
 
-<script setup>
+<script>
 @route {
   path: '/admin/users',
   guard: 'users.read',
@@ -223,7 +223,7 @@ registered denies.
   <p>Administration</p>
 </template>
 
-<script setup>
+<script>
 @page '/admin';
 @guard 'admin.users';
 </script>
@@ -278,7 +278,7 @@ the same key takes it instead of calling the loader.
   <p>{{ user?.name }}</p>
 </template>
 
-<script setup>
+<script>
 @page '/users/:id';
 @loader loadUser;
 import { currentLoaderData, currentParams } from '@pdxui/router';
@@ -329,7 +329,7 @@ next route shares it. A page that declares no layout renders in the app's defaul
   <p>Roles</p>
 </template>
 
-<script setup>
+<script>
 @page '/admin/roles';
 @layout 'admin';
 </script>
@@ -340,7 +340,7 @@ next route shares it. A page that declares no layout renders in the app's defaul
   <p>Sign in</p>
 </template>
 
-<script setup>
+<script>
 @page '/login';
 @layout 'none';
 </script>
@@ -380,7 +380,7 @@ creates a `pdx-nav` element in itself; on a route that assigns it nothing, it em
   <p>Inbox</p>
 </template>
 
-<script setup>
+<script>
 @page '/inbox';
 @outlet 'sidebar' -> 'pdx-inbox-filters';
 @outlet 'toolbar' -> 'pdx-inbox-actions';
@@ -421,7 +421,7 @@ the enter and the exit class.
   <p>Details</p>
 </template>
 
-<script setup>
+<script>
 @page '/details';
 @transition 'slide-left';
 </script>
@@ -461,7 +461,7 @@ wins over both.
   <p>Checkout</p>
 </template>
 
-<script setup>
+<script>
 @page '/checkout';
 @scroll 'top';
 </script>
@@ -500,7 +500,7 @@ to it; `eager` as soon as a link to it is on the page; `viewport` once a link to
   <p>Reports</p>
 </template>
 
-<script setup>
+<script>
 @page '/reports';
 @prefetch 'eager';
 </script>
@@ -539,7 +539,7 @@ entry for it with the page's other fields.
   <p>People</p>
 </template>
 
-<script setup>
+<script>
 @page '/users';
 @alias '/people';
 </script>
@@ -578,7 +578,7 @@ instead of rendering the page. A redirect to a target outside the origin is refu
   <p>Account</p>
 </template>
 
-<script setup>
+<script>
 @page '/account';
 @redirect '/profile' -> '/account';
 @redirect '/settings' -> '/account';
@@ -590,7 +590,7 @@ instead of rendering the page. A redirect to a target outside the origin is refu
   <p>Moved</p>
 </template>
 
-<script setup>
+<script>
 @page '/old-home';
 @redirect '/new-path';
 </script>
@@ -638,7 +638,7 @@ navigation that changes the param while the page stays mounted.
   <p>User {{ id }}, next {{ next }}</p>
 </template>
 
-<script setup>
+<script>
 @page '/users/:id';
 @params { id: number };
 
@@ -687,7 +687,7 @@ as the object of the fields.
   <a :href="'?page=' + next">Next page</a>
 </template>
 
-<script setup>
+<script>
 @page '/search';
 @search { q?: string, page: number = 1, archived: boolean };
 const next = $derived(searchParams.page + 1);
@@ -737,7 +737,7 @@ Both are signals: a template or a `$derived` that reads them updates with them.
   <pdx-router-outlet></pdx-router-outlet>
 </template>
 
-<script setup>
+<script>
 </script>
 ```
 
@@ -796,7 +796,7 @@ state.
   <button @click="openNext()">Next</button>
 </template>
 
-<script setup>
+<script>
 import { navigate } from '@pdxui/router';
 const user = { id: 41, name: 'Ada' };
 function openNext() { navigate('/users/:id', { id: user.id + 1 }); }
@@ -840,7 +840,7 @@ title follows them. On a page with `keepAlive` the title is written again in `on
   <p>Dashboard</p>
 </template>
 
-<script setup>
+<script>
 @title 'Dashboard';
 </script>
 ```
@@ -850,7 +850,7 @@ title follows them. On a page with `keepAlive` the title is written again in `on
   <input :value="person" @input="e => person = e.target.value" />
 </template>
 
-<script setup>
+<script>
 let person = $signal('Ada');
 @title `Profile of ${person}`;
 </script>
@@ -899,7 +899,7 @@ document.
   <p>Account</p>
 </template>
 
-<script setup>
+<script>
 @meta description: 'Control panel for your account.';
 @meta property og:title: 'Account';
 </script>
@@ -910,7 +910,7 @@ document.
   <p>Billing</p>
 </template>
 
-<script setup>
+<script>
 @page '/billing';
 @meta { requiresAuth: true, section: 'account' };
 </script>
@@ -953,7 +953,7 @@ and the named `@meta` lines produce: `useHead({ title: 'Products' })` and
   <p>Products</p>
 </template>
 
-<script setup>
+<script>
 @head {
   title: 'Products',
   meta: [{ name: 'description', content: 'Everything we sell' }, { property: 'og:title', content: 'Products' }]

@@ -18,7 +18,7 @@ import { validate } from '../src/compiler/validate';
 function unresolved(template: string, script: string): string[] {
     // A rune keeps the script in the new mode: analyzeScript alone reads a rune-less script as legacy,
     // and validate() then checks nothing — every case below would pass for no reason.
-    const src = `<template>\n${template}\n</template>\n\n<script setup>\nlet probe = $signal(0);\n${script}\n</script>`;
+    const src = `<template>\n${template}\n</template>\n\n<script>\nlet probe = $signal(0);\n${script}\n</script>`;
     const d = parseSFC(src);
     const warnings = validate(analyzeScript(d.script?.content ?? '', 'probe.pdx'), parseTemplate(d.template?.content ?? ''), 'probe.pdx', { isKnownTag: () => false });
     return warnings.filter((w) => w.code === 'PDX_UNRESOLVED_COMPONENT').map((w) => /<([\w-]+)>/.exec(w.message)![1]);

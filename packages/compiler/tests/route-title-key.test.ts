@@ -16,9 +16,9 @@ import { generateRouteTable, devSpecifier } from '../src/route-table';
 import { scanForRoutes, type ScannedRoute } from '../src/plugin-utils';
 
 const src = (script: string) =>
-    `<template>\n<div>x</div>\n</template>\n<script setup>\n${script}\n</script>`;
+    `<template>\n<div>x</div>\n</template>\n<script>\n${script}\n</script>`;
 
-const routeOf = (script: string) => analyzeScript(script, 'page.pdx', { setup: true }).route;
+const routeOf = (script: string) => analyzeScript(script, 'page.pdx').route;
 
 const KEY_TITLE = "@page '/intake';\n@title $t('intake.title');\nlet n = $signal(0);";
 

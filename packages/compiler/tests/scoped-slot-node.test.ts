@@ -30,13 +30,13 @@ describe('the scoped slot outlet node', () => {
 
     it('a signal read only by the outlet\'s binding is not reported unused', () => {
         const codes = codesOf('<template><div><slot name="row" :item="first">none</slot></div></template>\n'
-            + "<script setup>\nlet first = $signal('Ada');\n</script>");
+            + "<script>\nlet first = $signal('Ada');\n</script>");
         expect(codes).not.toContain('PDX_UNUSED_REACTIVE');
     });
 
     it('a name the fallback reads and nobody declares is reported', () => {
         const codes = codesOf('<template><div><slot name="row" :item="first">{{ missing }}</slot></div></template>\n'
-            + "<script setup>\nlet first = $signal('Ada');\n</script>");
+            + "<script>\nlet first = $signal('Ada');\n</script>");
         expect(codes).toContain('PDX_UNDECLARED_REF');
     });
 });

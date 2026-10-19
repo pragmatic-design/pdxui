@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const sfc = (template: string, script = 'let n = $signal(0);') => `<template>${template}</template>\n<script setup>\n${script}\n</script>`;
+const sfc = (template: string, script = 'let n = $signal(0);') => `<template>${template}</template>\n<script>\n${script}\n</script>`;
 const codes = (r: { warnings: { code: string }[] }) => r.warnings.map((w) => w.code);
 
 describe('attach: — codegen', () => {

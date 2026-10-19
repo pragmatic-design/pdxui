@@ -19,6 +19,7 @@ import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { checkRemovedForms } from './language/removed-forms';
+import { setupRedundant } from './language/script-setup';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
 import { minifyHTML } from './compiler/minify';
@@ -873,7 +874,7 @@ export function compile(
             ? descriptor.script.start : undefined;
         // And on which line, so a development build can name an effect `file.pdx:line`.
         const lineBase = originBase === undefined ? undefined : countLines(source, 0, originBase) + 1;
-        cachedAnalysis = analyzeScript(scriptContent, filename, { setup: descriptor.script?.setup, originBase, lineBase });
+        cachedAnalysis = analyzeScript(scriptContent, filename, { originBase, lineBase });
         // Collect structural warnings from analyzer (@prop without type, etc.)
         allWarnings.push(...cachedAnalysis.warnings);
         // Cross-check template identifiers against script declarations
@@ -905,6 +906,8 @@ export function compile(
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
     // A form the beta removed, from the registry of language changes (#121).
     allWarnings.push(...checkRemovedForms(descriptor, source));
+    // `<script setup>`: one script grammar (#158), so `setup` changes nothing. Said once, at the tag.
+    if (descriptor.script?.setup) allWarnings.push(setupRedundant(source));
 
     // A `${` inside a bound value would be written into the module as it is, and the module would not
     // parse: the build would die in rollup, far from the line at fault. Stop here, at the line.
@@ -1018,17 +1021,15 @@ function compileScriptOnly(
     const originBase = scriptContent === writtenScript ? (sfcScript ? sfcScript.start : 0) : undefined;
     // The analysis the code generator reads, with origins. compileSFC runs the plugins'
     // analyzeScript hook on it, once.
-    // Read as the `<script setup>` it is wrapped in below, as compileSFC reads it: a .pdx.ts with no
-    // rune is still the new mode, and read as a plain script it would fall into the legacy one.
     const lineBase = originBase === undefined ? undefined : countLines(source, 0, originBase) + 1;
-    const codegenAnalysis = () => analyzeScript(scriptContent, filename, { setup: true, originBase, lineBase });
+    const codegenAnalysis = () => analyzeScript(scriptContent, filename, { originBase, lineBase });
     /** The module without its origin marks, and the map they make. */
     const mapped = (code: string) => {
         const origins = collectOrigins(code);
         return { code: origins.code, map: mapFromOrigins(extractFilename(filename), source, origins.marks) };
     };
 
-    const analysis = analyzeScript(scriptContent, filename, { setup: sfcScript?.setup });
+    const analysis = analyzeScript(scriptContent, filename);
     if (runner) runner.runAnalyzeScript(analysis);
     // Positioned in the file, as compile() does for a .pdx: returned as they come, every finding of a
     // script-only file would have no line. Not when a plugin rewrote the script: its text is no
@@ -1039,7 +1040,7 @@ function compileScriptOnly(
 
     // @store files: use the full SFC pipeline (compileStoreMode in codegen)
     if (analysis.globalStore) {
-        const wrappedSource = `<template><div></div></template>\n<script setup>\n${scriptContent}\n</script>`;
+        const wrappedSource = `<template><div></div></template>\n<script>\n${scriptContent}\n</script>`;
         const descriptor = parseSFC(wrappedSource);
         descriptor.script!.content = scriptContent;
         const ast = parseTemplate(descriptor.template!.content, 1);
@@ -1053,7 +1054,7 @@ function compileScriptOnly(
 
     // Pure script modules (utilities, composables): full rune lowering via SFC pipeline,
     // then strip the component() wrapper to produce a plain ES module.
-    const wrappedSource = `<template><div></div></template>\n<script setup>\n${scriptContent}\n</script>`;
+    const wrappedSource = `<template><div></div></template>\n<script>\n${scriptContent}\n</script>`;
     const sfcDesc = parseSFC(wrappedSource);
     sfcDesc.script!.content = scriptContent;
     const ast = parseTemplate(sfcDesc.template!.content, 1);

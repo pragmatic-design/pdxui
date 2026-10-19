@@ -24,7 +24,7 @@ const ROW = `<template>
     }
   </tbody></table>
 </template>
-<script setup>
+<script>
 let rows = $signal([]);
 function pick(id) {}
 </script>

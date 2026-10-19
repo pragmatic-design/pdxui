@@ -8,7 +8,7 @@ import { compile } from '../src/plugin';
 import { LANGUAGE_CHANGES } from '../src/language/changes';
 
 function sfc(template: string, script = "let on = $signal(true);\nlet c = $signal('red');\nlet a = $signal('blue');\nlet box = $signal(null);\nlet n = $signal(1);\nfunction money(v, cur) { return cur + v; }\nfunction upper(v) { return String(v).toUpperCase(); }\nfunction trim(v) { return String(v).trim(); }"): string {
-    return `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    return `<template>\n${template}\n</template>\n<script>\n${script}\n</script>\n`;
 }
 const warnings = (source: string) => compile(source, 'one.pdx', [], undefined, {}).warnings;
 const removed = (source: string) => warnings(source).filter(w => w.code === 'PDX_REMOVED_FORM').map(w => w.message);

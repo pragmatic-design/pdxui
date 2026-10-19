@@ -15,7 +15,7 @@ let seq = 0;
 
 function mount(template: string, script: string, build: boolean): HTMLElement {
     const name = `bound${++seq}${build ? 'b' : 'd'}`;
-    const src = `<template>${template}</template>\n<script setup>\n${script}\n</script>\n`;
+    const src = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const { code } = compile(src, `${name}.pdx`, [], undefined, build ? { production: true } : {});
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
@@ -57,7 +57,7 @@ describe('names a block binds', () => {
 
 describe('a destructured @for', () => {
     it('binds every name in its pattern, not the pattern as one name', () => {
-        const src = "<template><ul>@for (pairs as { key, value }; track key) { <li>{{ key }}={{ value }}</li> }</ul></template>\n<script setup>\nlet pairs = $signal([{ key: 'a', value: 1 }]);\n</script>\n";
+        const src = "<template><ul>@for (pairs as { key, value }; track key) { <li>{{ key }}={{ value }}</li> }</ul></template>\n<script>\nlet pairs = $signal([{ key: 'a', value: 1 }]);\n</script>\n";
         const { errors, warnings } = compile(src, 'pairs.pdx') as { errors?: { code?: string }[]; warnings?: { code?: string }[] };
         const codes = [...(errors ?? []), ...(warnings ?? [])].map((d) => d.code);
         expect(codes).not.toContain('PDX_UNDECLARED_REF');

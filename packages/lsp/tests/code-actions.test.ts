@@ -10,7 +10,7 @@ const URI = 'file:///comp.pdx';
 // `msg` is a plain let used in the template → PDX_NON_REACTIVE, which carries a fix.
 const source = [
     '<template><p>{{ msg }}</p></template>',
-    '<script setup>',
+    '<script>',
     'let count = $signal(0);',
     "let msg = 'hello';",
     '</script>',

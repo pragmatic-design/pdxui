@@ -9,7 +9,7 @@ describe('dynamic <component> compilation', () => {
 <template>
   <component :is="currentView" />
 </template>
-<script setup>
+<script>
 let currentView = $signal('pdx-home');
 </script>`;
         const result = compile(source, 'app.pdx');
@@ -22,7 +22,7 @@ let currentView = $signal('pdx-home');
 <template>
   <component :is="view" :items="data" :title="heading" />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-list');
 let data = $signal([]);
 let heading = $signal('Items');
@@ -37,7 +37,7 @@ let heading = $signal('Items');
 <template>
   <component :is="view" @keepAlive />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-home');
 </script>`;
         const result = compile(source, 'app.pdx');
@@ -49,7 +49,7 @@ let view = $signal('pdx-home');
 <template>
   <component :is="view" @transition('slide-right', 'slide-left') />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-home');
 </script>`;
         const result = compile(source, 'app.pdx');
@@ -62,7 +62,7 @@ let view = $signal('pdx-home');
 <template>
   <component :is="view" @transition('fade-in', 'fade-out') @mode('out-in') />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-home');
 </script>`;
         const result = compile(source, 'app.pdx');
@@ -74,7 +74,7 @@ let view = $signal('pdx-home');
 <template>
   <component :is="view" :data="items" @transition('slide-right', 'slide-left') @mode('out-in') @keepAlive />
 </template>
-<script setup>
+<script>
 let view = $signal('pdx-list');
 let items = $signal([]);
 </script>`;

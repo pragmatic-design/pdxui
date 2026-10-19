@@ -50,8 +50,8 @@ describe('getScriptDiagnostics', () => {
 
     it('reports a real type error in the script', () => {
         const sc = '\nlet n: number = 0;\nn = "a string";\n';
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         const vf = buildVirtualFile(sc, start, [], '', -1);
         const d = getTsDiagnostics(svc, URI, vf, src);
         expect(d.length).toBeGreaterThan(0);
@@ -62,15 +62,15 @@ describe('getScriptDiagnostics', () => {
     // declare it, typed by its payload, or every call is "Cannot find name".
     const withEvent = (body: string) => {
         const sc = `\n@event changed: number;\n${body}\n`;
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         return getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src);
     };
 
     it('an optional @prop (#130), `@prop hint?: string;`, is valid TypeScript in the projection', () => {
         const sc = "\n@prop hint?: string;\n@prop id: string;\nfunction f() { return (hint ?? '') + id; }\n";
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         expect(projectScript(sc)).toHaveLength(sc.length);
         const syntax = ts.transpileModule(projectScript(sc), { reportDiagnostics: true }).diagnostics ?? [];
         expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
@@ -79,8 +79,8 @@ describe('getScriptDiagnostics', () => {
 
     it('a syntax error in the projected script is reported, not only the type errors (#487)', () => {
         const sc = '\nlet n = ;\n';
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         const d = getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src);
         expect(d.map((x: { message: string }) => x.message)).toContain('Expression expected.');
         const at = d.find((x: { message: string }) => x.message === 'Expression expected.')!;
@@ -93,8 +93,8 @@ describe('getScriptDiagnostics', () => {
 
     it('@event(bubbles) (#138) declares its function as @event does: blanked, typed by its payload', () => {
         const sc = "\n@event(bubbles) saved: number;\nfunction f() { saved('one'); saved(2); }\n";
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         expect(projectScript(sc).slice(0, sc.length)).not.toContain('bubbles');
         const d = getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src) as { message: string }[];
         expect(d.map((x) => x.message).filter((m) => /Cannot find name/.test(m)), 'saved() was not declared').toEqual([]);
@@ -108,8 +108,8 @@ describe('getScriptDiagnostics', () => {
 
     it('zero diagnostica su script valido con rune/prop/$signal/html', () => {
         const sc = "\n@prop title: string = 'x';\nlet count = $signal(0);\nfunction inc() { count = count + 1; }\nconst tpl = html`<b>${title}</b>`;\n";
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         const vf = buildVirtualFile(sc, start, [], '', -1);
         expect(getTsDiagnostics(svc, URI, vf, src)).toHaveLength(0);
     });
@@ -117,8 +117,8 @@ describe('getScriptDiagnostics', () => {
     // The compiler imports the router's `navigation` where a .pdx reads it (#149), so the editor
     // must know the name and its type with no import written.
     const script = (sc: string) => {
-        const src = '<template></template>\n<script setup>' + sc + '</script>';
-        const start = src.indexOf('<script setup>') + '<script setup>'.length;
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
         return getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src)
             .map((d: { message: string }) => d.message);
     };

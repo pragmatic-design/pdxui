@@ -29,8 +29,8 @@ const errorsOf = (warnings: { code: string; severity?: string }[]) => warnings.f
 
 describe('a rune with a type argument that has a comma, parentheses or an arrow', () => {
     for (const row of ROWS) {
-        it(`<script setup>: ${row.decl}`, () => {
-            const src = `<template><p>{{ ${row.name} }}</p></template>\n<script setup lang="ts">\n${TYPES}\n${row.decl}\n</script>`;
+        it(`<script>: ${row.decl}`, () => {
+            const src = `<template><p>{{ ${row.name} }}</p></template>\n<script lang="ts">\n${TYPES}\n${row.decl}\n</script>`;
             const { code, warnings } = compile(src, 'rune.pdx');
             noRuneLeft(code);
             expect(code).toMatch(row.call);
@@ -57,7 +57,7 @@ describe('a rune with a type argument that has a comma, parentheses or an arrow'
     });
 
     it('$store with a type argument that has a comma', () => {
-        const src = '<template><p>{{ st.a }}</p></template>\n<script setup lang="ts">\nlet st = $store<Record<string, number>>({ a: 1 });\n</script>';
+        const src = '<template><p>{{ st.a }}</p></template>\n<script lang="ts">\nlet st = $store<Record<string, number>>({ a: 1 });\n</script>';
         const { code, warnings } = compile(src, 'store-rune.pdx');
         noRuneLeft(code);
         expect(code).toMatch(/\bstore\(\{ a: 1 \}/);
@@ -65,7 +65,7 @@ describe('a rune with a type argument that has a comma, parentheses or an arrow'
     });
 
     it('a rune declaration that cannot be read is an error that quotes it, and no rune is emitted', () => {
-        const src = '<template><p>x</p></template>\n<script setup lang="ts">\nlet x = $signal<Record<string, number>(1);\n</script>';
+        const src = '<template><p>x</p></template>\n<script lang="ts">\nlet x = $signal<Record<string, number>(1);\n</script>';
         const { code, warnings } = compile(src, 'broken.pdx');
         const err = warnings.find(w => w.code === 'PDX_UNKNOWN_DECLARATION');
         expect(err, `no PDX_UNKNOWN_DECLARATION; got ${warnings.map(w => w.code).join(', ')}`).toBeDefined();
@@ -81,7 +81,7 @@ describe('a rune with a type argument that has a comma, parentheses or an arrow'
     });
 
     it('control — a simple type argument, as it always compiled', () => {
-        const src = '<template><p>{{ n }}</p></template>\n<script setup lang="ts">\nlet n = $signal<number>(0), m = $signal(1);\nlet plain = 2;\n</script>';
+        const src = '<template><p>{{ n }}</p></template>\n<script lang="ts">\nlet n = $signal<number>(0), m = $signal(1);\nlet plain = 2;\n</script>';
         const { code, warnings } = compile(src, 'simple.pdx');
         noRuneLeft(code);
         expect(code).toMatch(/\bsignal\(0/);

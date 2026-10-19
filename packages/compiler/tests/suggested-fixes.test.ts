@@ -12,7 +12,7 @@ import { validate, type ValidationWarning, type ValidateOptions } from '../src/c
 import { positionWarnings } from '../src/compiler/position-warnings';
 
 const pdx = (template: string, script: string): string =>
-    `<template>\n  ${template}\n</template>\n<script setup>\n${script}\n</script>\n`;
+    `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 
 const BUTTON_PROPS = new Set(['variant', 'size', 'disabled', 'maxItems']);
 const propsOf = (tag: string) => (tag === 'pdx-button' ? BUTTON_PROPS : tag === 'pdx-tie' ? new Set(['size', 'side']) : null);
@@ -23,7 +23,7 @@ const compiled = (source: string): ValidationWarning[] => compile(source, 'x.pdx
 function validated(source: string, options: ValidateOptions): ValidationWarning[] {
     const d = parseSFC(source);
     const ast = parseTemplate(d.template!.content, source.slice(0, d.template!.start).split('\n').length);
-    const analysis = analyzeScript(d.script!.content, 'x.pdx', { setup: d.script!.setup });
+    const analysis = analyzeScript(d.script!.content, 'x.pdx');
     return positionWarnings(source, validate(analysis, ast, 'x.pdx', options), analysis.body);
 }
 

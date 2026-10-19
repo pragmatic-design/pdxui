@@ -21,7 +21,7 @@ const counterPdx = `
     @if (count > 10) { <div class="alert">High!</div> }
   </div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'Counter';
   @prop initial: number = 0;
   let count = $signal(initial);
@@ -49,7 +49,7 @@ const todoPdx = `
     @if (items.length === 0) { <div>Empty</div> }
   </div>
 </template>
-<script setup>
+<script>
   @prop title: string = 'Todo';
   let items = $signal([{ id: 1, text: 'Task 1' }, { id: 2, text: 'Task 2' }]);
   let newItem = $signal('');
@@ -146,7 +146,7 @@ describe('compiler benchmarks', () => {
     </form>
   </div>
 </template>
-<script setup>
+<script>
   @page '/users';
   @guard 'users.view';
   @fetch users: 'GET /api/users' as User[];

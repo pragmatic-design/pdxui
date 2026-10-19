@@ -253,7 +253,7 @@ describe('a compiled @fetch', () => {
     it('case 1 — latest wins on a reactive URL', async () => {
         const t = stubFetch();
         defineCompiled('acfetchlatest', "<template><p>{{ user.data()?.name ?? '' }}</p><button @click=\"id = 2\">2</button></template>\n"
-            + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-latest/${id}' as User;\n</script>\n");
+            + "<script>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-latest/${id}' as User;\n</script>\n");
         const el = document.createElement('app-acfetchlatest');
         document.body.appendChild(el);
         await settle();
@@ -276,7 +276,7 @@ describe('a compiled @fetch', () => {
         }));
         core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
         defineCompiled('acfetchsignal', "<template><p></p><button @click=\"id = 2\">2</button></template>\n"
-            + "<script setup>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-signal/${id}' as User;\n</script>\n");
+            + "<script>\nlet id = $signal(1);\n@fetch user: 'GET /api/ac-signal/${id}' as User;\n</script>\n");
         const el = document.createElement('app-acfetchsignal');
         document.body.appendChild(el);
         await settle();
@@ -293,7 +293,7 @@ describe('a compiled @fetch', () => {
     it('case 8 — the component going releases the @fetch cache subscription', async () => {
         const t = stubFetch();
         defineCompiled('acfetchdispose', "<template><p>{{ users.data()?.length ?? 0 }}</p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/ac-dispose' as string[];\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/ac-dispose' as string[];\n</script>\n");
         const el = document.createElement('app-acfetchdispose');
         document.body.appendChild(el);
         await settle();
@@ -310,7 +310,7 @@ describe('a compiled @fetch', () => {
     it('case 8 — a @fetch retry waiting in its backoff does not fire after the component goes', async () => {
         const t = stubFetch();
         defineCompiled('acfetchretry', "<template><p></p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/ac-retry' as string[] { retry: 1 };\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/ac-retry' as string[] { retry: 1 };\n</script>\n");
         vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
         const el = document.createElement('app-acfetchretry');
         document.body.appendChild(el);
@@ -480,7 +480,7 @@ describe('case 6 — one layer retries, and only reads', () => {
         const seen = scriptedFetch(always503());
         core.setDefaultClient(core.createHttpClient({ timeout: 0 })); // its own retry on, as by default
         defineCompiled('acretryfetch', "<template><p></p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/ac-retry-fetch' as string[] { retry: 2 };\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/ac-retry-fetch' as string[] { retry: 2 };\n</script>\n");
         document.body.appendChild(document.createElement('app-acretryfetch'));
         await vi.advanceTimersByTimeAsync(60_000);
         expect(seen.calls, 'the transport retried under the source\'s retries').toBe(3);
@@ -491,7 +491,7 @@ describe('case 6 — one layer retries, and only reads', () => {
         const seen = scriptedFetch([503, 503]);
         core.setDefaultClient(core.createHttpClient({ timeout: 0 }));
         defineCompiled('acretryfetchok', "<template><p></p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/ac-retry-ok' as string[] { retry: 2 };\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/ac-retry-ok' as string[] { retry: 2 };\n</script>\n");
         document.body.appendChild(document.createElement('app-acretryfetchok'));
         await vi.advanceTimersByTimeAsync(60_000);
         expect(seen.calls).toBe(3);
@@ -745,7 +745,7 @@ describe('the async vocabulary — a compiled @fetch', () => {
         core.setDefaultClient(core.createHttpClient({ retry: false, timeout: 0 }));
         // String(): an interpolation renders false and null as nothing.
         defineCompiled('acvocabfetch', "<template><p>{{ users.state() }}|{{ String(users.pending()) }}|{{ String(users.stale()) }}|{{ String(users.error()) }}</p></template>\n"
-            + "<script setup>\n@fetch users: 'GET /api/ac-vocab' as string[];\n</script>\n");
+            + "<script>\n@fetch users: 'GET /api/ac-vocab' as string[];\n</script>\n");
         const el = document.createElement('app-acvocabfetch');
         document.body.appendChild(el);
         await settle();
@@ -765,7 +765,7 @@ describe('case 4 (E4), the template leg — @await over a compiled @fetch (#145)
         + "} @loading { <p class=\"loading\">loading</p> } @error (err, retry) {\n"
         + "  <p class=\"error\">{{ err.message }}</p><button class=\"retry\" @click=\"retry()\">retry</button>\n"
         + "}\n</template>\n"
-        + `<script setup>\n@fetch users: 'GET /api/ac-await-${name}' as string[];\n</script>\n`;
+        + `<script>\n@fetch users: 'GET /api/ac-await-${name}' as string[];\n</script>\n`;
 
     it('@loading, then the body with the bound list; a refresh and a failed refresh keep the body', async () => {
         const t = heldTransport<Response>();

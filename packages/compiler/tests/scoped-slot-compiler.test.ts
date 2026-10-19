@@ -12,7 +12,7 @@ describe('scoped slot compilation', () => {
     <slot name="cell" :row="currentRow" :col="currentCol" />
   </div>
 </template>
-<script setup>
+<script>
 @slot cell: { row: object, col: string };
 let currentRow = $signal({});
 let currentCol = $signal('name');
@@ -32,7 +32,7 @@ let currentCol = $signal('name');
     <slot name="header">Default Header</slot>
   </div>
 </template>
-<script setup>
+<script>
 @slot header;
 let x = $signal(0);
 </script>`;
@@ -49,7 +49,7 @@ let x = $signal(0);
 <template>
   <slot name="item" :data="itemData" />
 </template>
-<script setup>
+<script>
 @slot item: { data: object };
 let itemData = $signal({});
 </script>`;
@@ -65,7 +65,7 @@ let itemData = $signal({});
 <template>
   <slot name="action" :item="current" />
 </template>
-<script setup>
+<script>
 @slot action: { item: object };
 let current = $signal({});
 </script>`;
@@ -86,7 +86,7 @@ describe('parent-side @slot directive', () => {
     }
   </pdx-select>
 </template>
-<script setup>
+<script>
 let items = $signal(['a', 'b']);
 </script>`, 'parent.pdx');
 
@@ -107,7 +107,7 @@ let items = $signal(['a', 'b']);
     }
   </pdx-select>
 </template>
-<script setup>
+<script>
 let items = $signal([]);
 </script>`, 'parent.pdx');
 
@@ -124,7 +124,7 @@ let items = $signal([]);
     }
   </pdx-list>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'parent.pdx');
 
@@ -140,7 +140,7 @@ let x = $signal(0);
     }
   </pdx-list>
 </template>
-<script setup>
+<script>
 let title = $signal('Items');
 function handleClick(d) { console.log(d); }
 </script>`, 'parent.pdx');
@@ -165,7 +165,7 @@ function handleClick(d) { console.log(d); }
     }
   </pdx-select>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'parent.pdx');
 
@@ -184,7 +184,7 @@ describe('<slot let:> parent-side syntax', () => {
     </slot>
   </pdx-list>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'parent.pdx');
 
@@ -204,7 +204,7 @@ let x = $signal(0);
     </slot>
   </pdx-widget>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'parent.pdx');
 
@@ -218,7 +218,7 @@ let x = $signal(0);
     <slot name="empty" let:message />
   </pdx-widget>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'parent.pdx');
 
@@ -230,7 +230,7 @@ let x = $signal(0);
 <template>
   <slot name="cell" :row="currentRow">default</slot>
 </template>
-<script setup>
+<script>
 @slot cell: { row: object };
 let currentRow = $signal({});
 </script>`, 'child.pdx');
@@ -246,7 +246,7 @@ describe('@@ escape', () => {
 <template>
   <pre>Use @@slot(name) to escape</pre>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -259,7 +259,7 @@ let x = $signal(0);
 <template>
   <code>@@if (cond) { ... }</code>
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -274,7 +274,7 @@ describe('@raw block', () => {
 <template>
   @raw {<pre>{{ not.interpolated }}</pre>}
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -287,7 +287,7 @@ let x = $signal(0);
 <template>
   @raw {<code>@if (cond) { @for (items as item) { } }</code>}
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -302,7 +302,7 @@ let x = $signal(0);
 <template>
   @raw {<pre>return html\`<span>\${data}</span>\`;</pre>}
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 
@@ -315,7 +315,7 @@ let x = $signal(0);
 <template>
   @raw {<code>function foo() { if (x) { bar(); } }</code>}
 </template>
-<script setup>
+<script>
 let x = $signal(0);
 </script>`, 'test.pdx');
 

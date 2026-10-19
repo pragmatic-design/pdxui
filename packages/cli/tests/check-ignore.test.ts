@@ -43,7 +43,7 @@ describe('pdx check honours pdx-ignore', () => {
 
     const swatch = (comment: string) => [
         '<template><div class="swatch">red</div></template>',
-        '<script setup>',
+        '<script>',
         'let a = $signal(1);',
         '</script>',
         '<style scoped>',
@@ -77,7 +77,7 @@ describe('pdx check honours pdx-ignore', () => {
             '  <!-- pdx-ignore PDX_RAW_INTERPOLATION: was needed once -->',
             '  <p>x</p>',
             '</template>',
-            '<script setup>',
+            '<script>',
             'let a = $signal(1);',
             '</script>',
             '',

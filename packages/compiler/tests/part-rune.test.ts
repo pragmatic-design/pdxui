@@ -9,7 +9,7 @@ import { analyzeScript } from '../src/compiler/script-analyzer';
 import { validate } from '../src/compiler/validate';
 import { parseTemplate } from '../src/parser/template';
 
-const pdx = (template: string, script: string) => `<template>${template}</template>\n<script setup>\n${script}\n</script>`;
+const pdx = (template: string, script: string) => `<template>${template}</template>\n<script>\n${script}\n</script>`;
 
 function codes(template: string, script: string, code: string) {
     const analysis = analyzeScript(script, 'test.pdx');
@@ -52,10 +52,6 @@ describe('@part compiles into a ref and the descriptor', () => {
 
     it('a part is not PDX_UNUSED_REACTIVE: its element is the use', () => {
         expect(codes('<div data-part="popup">x</div>', '@part popup;', 'PDX_UNUSED_REACTIVE')).toHaveLength(0);
-    });
-
-    it('@part alone marks the script as the new mode', () => {
-        expect(analyzeScript('@part popup;', 'test.pdx').mode).toBe('new');
     });
 });
 

@@ -13,7 +13,7 @@ import checkCmd from '../src/commands/check';
 
 const WIDGET = [
     '<template><button @click="fire()">{{ label }}</button></template>',
-    '<script setup>',
+    '<script>',
     "@prop label: string = 'Save';",
     '@event saved: number;',
     "function fire() { saved('no'); }",

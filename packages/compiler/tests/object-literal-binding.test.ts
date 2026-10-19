@@ -16,7 +16,7 @@ import { templateGenerator } from './template-generator';
 /** Compile a template on both generators: the template generator, called directly — no .pdx in the
  *  new mode reaches it since #364 — and the inline one, every render's. */
 function both(template: string): { template: string; inline: string } {
-    const source = (body: string) => `<template>\n${body}\n</template>\n<script setup>\n  let on = $signal(1);\n</script>`;
+    const source = (body: string) => `<template>\n${body}\n</template>\n<script>\n  let on = $signal(1);\n</script>`;
     return {
         template: templateGenerator(template, ['on']),
         inline: compile(source(template), 'obj.pdx').code,

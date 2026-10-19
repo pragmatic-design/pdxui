@@ -234,7 +234,7 @@ describe('HMR of a .pdx the dev server compiled (the inline path, #107)', () => 
 
     /** Compile as the dev server does, and evaluate the module the way a re-import would. */
     function load(template: string): string {
-        const src = `<template>${template}</template>\n<script setup>\nlet count = $signal(0);\n</script>\n`;
+        const src = `<template>${template}</template>\n<script>\nlet count = $signal(0);\n</script>\n`;
         const { code } = compile(src, 'hmr-inline.pdx');
         new Function('__core', code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;'))(core);
         return code;

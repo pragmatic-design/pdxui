@@ -23,7 +23,7 @@ reasonably hold:
 ```pdx
 <template><div>{{ label }} {{ count }} {{ doubled }}</div></template>
 
-<script setup>
+<script>
 @prop label: string = 'Hello';
 @event changed: number;
 

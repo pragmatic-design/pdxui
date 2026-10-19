@@ -2,7 +2,7 @@
 
 The declarations that bring data into a component or share it between components: `@fetch` reads
 from a server, `@form` holds what a user enters, `@store` makes a file a store shared by the whole
-app, and `$store` is a deep reactive object. Each one is a statement of a `<script setup>`
+app, and `$store` is a deep reactive object. Each one is a statement of a `<script>`
 ([script.md](script.md)) that the analyzer reads line by line, starting at the beginning of the line.
 
 ## Fetching
@@ -93,7 +93,7 @@ read as in the rest of the script. The type after `as` is read by the editor and
   }
 </template>
 
-<script setup>
+<script>
 interface User { id: number; name: string }
 
 @fetch users: 'GET /api/users' as User[];
@@ -111,7 +111,7 @@ The URL reads a prop and a signal; changing either fetches again.
   <button @click="page++">Next page</button>
 </template>
 
-<script setup>
+<script>
 interface Order { id: number; total: number }
 
 @prop customer: number = 1;
@@ -217,7 +217,7 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   </form>
 </template>
 
-<script setup>
+<script>
 @form signup: {
   name: string { required, minLength: 3 },
   email: string { required, email },
@@ -252,7 +252,7 @@ An external schema, with its options in the one pair of braces it has:
   </form>
 </template>
 
-<script setup>
+<script>
 import { ContactSchema } from './contact-schema';
 
 @form contact: ContactSchema { save: 'onBlur'; warnUnsaved };
@@ -284,7 +284,7 @@ StoreDecl ::= "@store" S Word ( S? "{" S? "persist" S? ":" S? ( "'" Word "'" | '
 The file **is** the store: a `.pdx` or a `.pdx.ts` whose script declares `@store name` compiles to a
 module, not a component. Its script becomes the factory of
 `const __store_name = createGlobalStore('name', () => { …; return { …every name it declares… }; }, { persist })`,
-with the same rewrites a `<script setup>` gets, and the module exports one hook,
+with the same rewrites a `<script>` gets, and the module exports one hook,
 `export function useName() { return __store_name; }` (the name capitalised after `use`). The factory
 runs once per name for the whole app; every caller of the hook gets the same object, in which a
 `$signal` is the signal itself (`cart.count()` to read, `cart.count.set(…)` to write), a `$store` is
@@ -310,7 +310,7 @@ store's top-level `$signal`s are restored when it is created and written 100 ms 
 A store file, `cart.pdx`:
 
 ```pdx
-<script setup>
+<script>
 @store cart { persist: 'local' };
 
 interface Product { id: number; price: number }
@@ -335,7 +335,7 @@ A component that uses it:
   <button @click="cart.add({ id: 1, price: 10 })">Add</button>
 </template>
 
-<script setup>
+<script>
 import { useCart } from './cart.pdx';
 
 const cart = useCart();
@@ -388,7 +388,7 @@ not follow the prop afterwards.
   <button @click="add">Add</button>
 </template>
 
-<script setup>
+<script>
 @prop start: number = 0;
 let state = $store({ count: start, items: [] as string[] });
 

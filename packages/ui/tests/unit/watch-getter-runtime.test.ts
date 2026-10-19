@@ -20,7 +20,7 @@ function load(filename: string, source: string): void {
 const panel = (source: string) => `<template>
 <p class="seen">{{ seen }}</p>
 </template>
-<script setup>
+<script>
 @prop open: boolean = false;
 let seen = $signal('closed');
 $watch(${source}, (isOpen) => { seen = isOpen ? 'opened' : 'closed'; });

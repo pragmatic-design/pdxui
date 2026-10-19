@@ -1,7 +1,6 @@
 // Code Generator — orchestrates SFC compilation into JavaScript modules.
-// Detects the compilation mode and delegates:
-//   codegen-new.ts      — new mode (@prop + $signal) and @store mode
-//   codegen-legacy.ts   — legacy mode (defineProps + return)
+// One script grammar (#158), so one code generator:
+//   codegen-new.ts      — a component (@prop + $signal), and the @store module
 //   codegen-shared.ts   — module assembly, tag derivation, production optimizations
 // Lower-level helpers:
 //   codegen-setup.ts    — setup() body generation
@@ -14,7 +13,6 @@ import { analyzeScript } from './script-analyzer';
 import type { PluginRunner } from '../plugin-system';
 import { createCompileContext } from './compile-context';
 import { compileNewMode, compileStoreMode } from './codegen-new';
-import { compileLegacyMode } from './codegen-legacy';
 import { eraseTypes } from './erase-types';
 import { insertModuleHoists } from './codegen-shared';
 import { styleBlocks, hash } from './codegen-styles';
@@ -27,9 +25,7 @@ export { extractTag, deriveTag } from './codegen-shared';
 
 /**
  * Compile a parsed SFC into a JavaScript module string.
- * Detects mode from script content:
- * - **new mode**: @prop / $signal decorators+runes → auto-expose, auto-import
- * - **legacy mode**: defineProps / explicit return → backward compatible
+ * A file without a script is compiled as one with an empty script: there is one code generator.
  *
  * @param runner - Optional PluginRunner for compiler plugin hooks
  */
@@ -86,25 +82,23 @@ export function compileSFC(
         ast = markSlotted(ast, `data-pdx-${hash(filename)}-in`);
     }
 
-    if (descriptor.script) {
-        // Reuse pre-computed analysis from compile() validation pass if available
-        const analysis = precomputedAnalysis ?? analyzeScript(descriptor.script.content, filename, { setup: descriptor.script.setup });
+    // A file without a script compiles as one with an empty `<script>` (#158): one code generator.
+    const withScript: SFCDescriptor = descriptor.script ? descriptor
+        : { ...descriptor, script: { content: '', start: 0, end: 0, src: null, setup: false, lang: 'ts' } };
+    const script = withScript.script!;
+    // Reuse pre-computed analysis from compile() validation pass if available
+    const analysis = precomputedAnalysis ?? analyzeScript(script.content, filename);
 
-        // Run plugin analyzeScript hooks
-        if (runner) runner.runAnalyzeScript(analysis);
+    // Run plugin analyzeScript hooks
+    if (runner) runner.runAnalyzeScript(analysis);
 
-        // The script is TypeScript unless it says otherwise: its types are erased from the module the
-        // runes were lowered into, positions kept. A `lang="js"` script is left as written.
-        const erase = (code: string) => descriptor.script!.lang === 'js' ? code : eraseTypes(code, filename);
-        if (analysis.mode === 'new') {
-            // @store rune: compile as store module (not component)
-            if (analysis.globalStore) {
-                return erase(compileStoreMode(descriptor, filename, analysis, runner));
-            }
-            // The render's block declarations go in after the erasure: generated, with no types (#109).
-            return insertModuleHoists(erase(compileNewMode(descriptor, ast, filename, analysis, runner, ctx, options?.scriptOnly)), ctx.moduleHoists);
-        }
-        return erase(compileLegacyMode(descriptor, ast, filename, runner, ctx));
+    // The script is TypeScript unless it says otherwise: its types are erased from the module the
+    // runes were lowered into, positions kept. A `lang="js"` script is left as written.
+    const erase = (code: string) => script.lang === 'js' ? code : eraseTypes(code, filename);
+    // @store rune: compile as store module (not component)
+    if (analysis.globalStore) {
+        return erase(compileStoreMode(withScript, filename, analysis, runner));
     }
-    return compileLegacyMode(descriptor, ast, filename, runner, ctx);
+    // The render's block declarations go in after the erasure: generated, with no types (#109).
+    return insertModuleHoists(erase(compileNewMode(withScript, ast, filename, analysis, runner, ctx, options?.scriptOnly)), ctx.moduleHoists);
 }

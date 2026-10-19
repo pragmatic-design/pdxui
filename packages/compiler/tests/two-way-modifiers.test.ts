@@ -7,7 +7,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
 function sfc(template: string, script = "let name = $signal('');\nlet cents = $signal(1250);"): string {
-    return `<template>\n${template}\n</template>\n<script setup>\n${script}\n</script>`;
+    return `<template>\n${template}\n</template>\n<script>\n${script}\n</script>`;
 }
 const codes = (template: string) => compile(sfc(template), 'm.pdx', [], undefined, {}).warnings
     .filter(w => w.code === 'PDX_BINDING_MODIFIER').map(w => `${w.severity}: ${w.message}`);

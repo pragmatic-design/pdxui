@@ -19,7 +19,7 @@ describe('bind() in a style', () => {
         it(`follows a $signal, a $derived and a @prop (${build ? 'build' : 'dev'})`, async () => {
             const name = `cssbind${build ? 'b' : 'd'}`;
             const src = '<template><button @click="w = w + 10">+</button></template>\n'
-                + "<script setup>\n@prop tone: string = 'red';\nlet w = $signal(40);\nconst half = $derived(w / 2 + 'px');\n</script>\n"
+                + "<script>\n@prop tone: string = 'red';\nlet w = $signal(40);\nconst half = $derived(w / 2 + 'px');\n</script>\n"
                 + '<style scoped>button { width: calc(bind(w) * 1px); height: bind(half); color: bind(tone); }</style>\n';
             const file = `${name}.pdx`;
             const { code } = compile(src, file, [], undefined, build ? { production: true } : {});

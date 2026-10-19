@@ -16,7 +16,7 @@ describe('@page with param constraints', () => {
     it('emits paramConstraints in route manifest', () => {
         const { code } = compile(`
 <template><div>User</div></template>
-<script setup>
+<script>
 @page '/users/:id(number)';
 </script>`, 'user.pdx');
         expect(code).toContain('paramConstraints:{id:"number"}');
@@ -25,7 +25,7 @@ describe('@page with param constraints', () => {
     it('emits multiple constraints', () => {
         const { code } = compile(`
 <template><div>Order</div></template>
-<script setup>
+<script>
 @page '/orders/:year(number)/:month(number)';
 </script>`, 'order.pdx');
         expect(code).toContain('year:"number"');
@@ -47,7 +47,7 @@ describe('@redirect rune', () => {
     it('emits __pdx_redirects', () => {
         const { code } = compile(`
 <template><div>App</div></template>
-<script setup>
+<script>
 @page '/app';
 @redirect '/' -> '/app';
 </script>`, 'app.pdx');
@@ -72,7 +72,7 @@ describe('@alias rune', () => {
     it('emits alias route entries', () => {
         const { code } = compile(`
 <template><div>Users</div></template>
-<script setup>
+<script>
 @page '/users';
 @alias '/people';
 </script>`, 'users.pdx');
@@ -100,7 +100,7 @@ describe('@outlet rune', () => {
     it('emits outlets in route manifest', () => {
         const { code } = compile(`
 <template><div>Dashboard</div></template>
-<script setup>
+<script>
 @page '/dashboard';
 @outlet 'sidebar' -> 'pdx-sidebar-nav';
 </script>`, 'dashboard.pdx');
@@ -124,7 +124,7 @@ describe('route @meta (block form)', () => {
     it('emits meta in route manifest', () => {
         const { code } = compile(`
 <template><div>Admin</div></template>
-<script setup>
+<script>
 @page '/admin';
 @meta { permissions: ['admin.view'] };
 </script>`, 'admin.pdx');

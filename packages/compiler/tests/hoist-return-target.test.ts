@@ -33,7 +33,7 @@ const SOURCE = `
 // }</code></pre>
   </div>
 </template>
-<script setup>
+<script>
 let keep = $signal(0);
 let rows = $signal([1, 2]);
 </script>`;

@@ -11,7 +11,7 @@ import { join } from 'path';
 import buildCmd from '../src/commands/build';
 import { removeTree } from './remove-tree';
 
-const APP = '<template><p>{{ title }}</p></template>\n<script setup>\nlet title = $signal("hi");\n</script>\n';
+const APP = '<template><p>{{ title }}</p></template>\n<script>\nlet title = $signal("hi");\n</script>\n';
 
 // Inside packages/cli, so the project resolves @pdxui/compiler and @pdxui/core the way an installed
 // one does, through node_modules: a project under the system temp directory resolves neither.

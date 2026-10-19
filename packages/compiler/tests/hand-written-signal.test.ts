@@ -15,7 +15,7 @@ const reported = (source: string) =>
 describe('a hand-written signal read by the template', () => {
     it('signal() read bare in an interpolation is reported, with $signal', () => {
         const found = reported(`<template><span>{{ name }}</span></template>
-<script setup>
+<script>
   const name = signal('World');
 </script>`);
         expect(found, 'no diagnostic for a hand-written signal read in {{ }}').toHaveLength(1);
@@ -26,7 +26,7 @@ describe('a hand-written signal read by the template', () => {
 
     it('computed() read bare in a bound attribute is reported, with $derived', () => {
         const found = reported(`<template><span :title="label">x</span></template>
-<script setup>
+<script>
   let count = $signal(1);
   const label = computed(() => 'n' + count);
 </script>`);
@@ -36,14 +36,14 @@ describe('a hand-written signal read by the template', () => {
 
     it('control — one the template calls renders its value, and is not reported', () => {
         expect(reported(`<template><span>{{ name() }}</span><button @click="name.set('x')">x</button></template>
-<script setup>
+<script>
   const name = signal('World');
 </script>`)).toEqual([]);
     });
 
     it('control — one the template does not read is not reported', () => {
         expect(reported(`<template><span>{{ shown }}</span></template>
-<script setup>
+<script>
   const cache = signal(0);
   let shown = $signal(1);
 </script>`)).toEqual([]);
@@ -51,7 +51,7 @@ describe('a hand-written signal read by the template', () => {
 
     it('control — a $signal is not reported', () => {
         expect(reported(`<template><span>{{ name }}</span></template>
-<script setup>
+<script>
   let name = $signal('World');
 </script>`)).toEqual([]);
     });

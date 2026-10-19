@@ -11,7 +11,7 @@ const source = [
     '  <div>{{ count }}</div>',                     // 1
     '  <pdx-button :label="count">x</pdx-button>', // 2
     '</template>',                                 // 3
-    '<script setup>',                              // 4
+    '<script>',                              // 4
     'let count = $signal(0);',                     // 5
     'function inc() { count++; }',                 // 6
     '</script>',                                   // 7
@@ -77,7 +77,7 @@ describe('tag occurrences — robustness', () => {
 describe('find references — @prop / @event cross-file', () => {
     const counter = [
         '<template><button>{{ label }}</button></template>',
-        '<script setup>',
+        '<script>',
         "@prop label: string = 'Hi';",
         '@event changed: number;',
         '</script>',

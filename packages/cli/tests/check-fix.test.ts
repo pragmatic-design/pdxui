@@ -29,7 +29,7 @@ interface JsonReport {
 // the top, the component's own. The fix is for the top one.
 const TWO_COUNTS = [
     '<template><p>{{ count }}</p></template>',
-    '<script setup>',
+    '<script>',
     'function reset() {',
     '  let count = 0;',
     '  return count;',
@@ -92,7 +92,7 @@ describe('pdx check --fix and --json', () => {
     // that reads the text at it applies. Counted from the template's start, it would be ten
     // characters early, and the fix absent.
     it('--json carries the fix for a finding on the <template> line', async () => {
-        writeFileSync(join(root, 'badge.pdx'), '<template><div class="${tone}">x</div></template>\n<script setup>\nlet tone = $signal(\'info\');\n</script>\n');
+        writeFileSync(join(root, 'badge.pdx'), '<template><div class="${tone}">x</div></template>\n<script>\nlet tone = $signal(\'info\');\n</script>\n');
         const report = await check();
         const w = report.files.flatMap((f) => f.warnings).find((x) => x.code === 'PDX_RAW_INTERPOLATION');
         expect(w?.fix?.edits.map((e) => e.newText).join(''), 'no fix for the one-line template').toContain(':class="tone"');
@@ -108,7 +108,7 @@ describe('pdx check --fix and --json', () => {
     });
 
     it('--fix applies an info-level fix too, at the default --severity warn: a single pipe becomes the call (#129)', async () => {
-        writeFileSync(join(root, 'pipe.pdx'), '<template><p>{{ n | upper }}</p></template>\n<script setup>\nlet n = $signal(1);\nfunction upper(v) { return String(v).toUpperCase(); }\n</script>\n');
+        writeFileSync(join(root, 'pipe.pdx'), '<template><p>{{ n | upper }}</p></template>\n<script>\nlet n = $signal(1);\nfunction upper(v) { return String(v).toUpperCase(); }\n</script>\n');
         const report = await check({ fix: true });
         expect(readFileSync(join(root, 'pipe.pdx'), 'utf-8')).toContain('<p>{{ upper(n) }}</p>');
         expect(report.files[0].fixed.map((f) => f.code)).toEqual(['PDX_PIPE_SINGLE']);
@@ -175,7 +175,7 @@ describe('the agent loop: check --json --fix, then check --json', () => {
             '  <button @click="incremnt">+</button>',
             `  <pdx-button :size="'huge'">b</pdx-button>`,
             '</template>',
-            '<script setup>',
+            '<script>',
             'let count = $signal(0);',
             'function increment() { count++; }',
             '</script>',
@@ -188,8 +188,8 @@ describe('the agent loop: check --json --fix, then check --json', () => {
             JSON.parse(logSpy.mock.calls.map((c) => String(c[0])).find((s) => s.trimStart().startsWith('{'))!);
         const found = report.files.flatMap((f) => f.warnings).map((w) => `${w.code} ${w.line} ${w.message.split('.')[0]}`);
         expect(found).toEqual(expect.arrayContaining([
-            "PDX_UNDECLARED_REF 2 'missingThing' is used in the template but is not declared in <script setup>",
-            "PDX_UNDECLARED_REF 3 'incremnt' is used in the template but is not declared in <script setup>",
+            "PDX_UNDECLARED_REF 2 'missingThing' is used in the template but is not declared in <script>",
+            "PDX_UNDECLARED_REF 3 'incremnt' is used in the template but is not declared in <script>",
             'PDX_INVALID_ENUM_VALUE 4 <pdx-button> size="huge" is not a declared value for "size"',
         ]));
         expect(exitSpy, 'an undeclared name is an error: check fails').toHaveBeenCalledWith(1);
@@ -206,7 +206,7 @@ describe('the agent loop: check --json --fix, then check --json', () => {
             '  <pdx-buton>z</pdx-buton>',
             '  <button @click="save">{{ total }}</button>',
             '</template>',
-            '<script setup>',
+            '<script>',
             "let a = $signal('primary');",
             'let b = $signal(1);',
             'let c = $signal(2);',

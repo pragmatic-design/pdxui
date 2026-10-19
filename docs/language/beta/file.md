@@ -14,7 +14,7 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
 ### Semantics
 
 A `.pdx` file is a single-file component: at most one template, at most one script, any number of
-style blocks. **The script has one grammar** (#158): there is no `setup` attribute that changes the
+style blocks. **The script has one grammar** (#158 — landed): there is no `setup` attribute that changes the
 meaning, and no legacy mode. A `<script>` is always read for declarations and runes, whatever it
 contains; a script with none of them is a component that returns every top-level name to its
 template. `src=`, `<template shadow>`, `lang="js"` and type erasure are unchanged from alpha
@@ -23,13 +23,14 @@ use runes), unchanged.
 
 ### Rules
 
-- `<script setup>` is accepted and `setup` ignored: `PDX_SETUP_REDUNDANT` (info).
+- `<script setup>` is accepted and `setup` ignored: `PDX_SETUP_REDUNDANT` (info). Landed (#158).
 - A legacy marker — `defineProps`, `defineEmits`, a top-level `return { … }` — is `PDX_REMOVED_FORM`;
-  `pdx migrate` converts it (migration.md).
+  `pdx migrate` converts it (migration.md). Landed (#158): the registry entry `legacy-script`, and the
+  legacy code generator is removed — a file without a script compiles like one with an empty script.
 - A second `<template>` or `<script>` is `PDX_DUPLICATE_TEMPLATE` / `PDX_DUPLICATE_SCRIPT`, as in alpha.
 - **One reading rule for declarations** (decisions.md 11 — proposed): any declaration may span lines
   when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end of
-  that block. Alpha allowed it declaration by declaration.
+  that block. Alpha allowed it declaration by declaration. Not landed: #524, which waits for `@action` (#142).
 
 ### Since
 

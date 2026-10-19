@@ -105,7 +105,7 @@ describe('signal spread rewrite', () => {
     it('rewrites object spread with signal', () => {
         const { code } = compile(`
 <template><div>{{ state }}</div></template>
-<script setup>
+<script>
   @prop x: number = 0;
   let state = $signal({ a: 1, b: 2 });
   function update() {
@@ -121,7 +121,7 @@ describe('signal spread rewrite', () => {
     it('rewrites array spread with signal', () => {
         const { code } = compile(`
 <template><div>{{ items }}</div></template>
-<script setup>
+<script>
   @prop x: number = 0;
   let items = $signal([1, 2, 3]);
   function add() {

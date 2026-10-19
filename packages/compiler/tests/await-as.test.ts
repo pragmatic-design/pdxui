@@ -33,7 +33,7 @@ describe('the binding is the last top-level `as` followed by a name', () => {
 });
 
 describe('the emitted code', () => {
-    const src = (template: string) => `<template>${template}</template>\n<script setup>\n@fetch users: 'GET /api/u' as string[];\n</script>\n`;
+    const src = (template: string) => `<template>${template}</template>\n<script>\n@fetch users: 'GET /api/u' as string[];\n</script>\n`;
 
     it('calls awaitBlock with the bound name as the body\'s parameter, read as a getter', () => {
         const { code } = compile(src('@await (users as list) { <p>{{ list.length }}</p> } @loading { <i>…</i> }'), 'a.pdx', [], undefined, {});
@@ -50,7 +50,7 @@ describe('the emitted code', () => {
 
 describe('PDX_AWAIT_TIMING', () => {
     const timing = (opts: string) => compile(
-        `<template>@await (users) { ${opts} } { <p>ok</p> } @loading { <i>…</i> }</template>\n<script setup>\n@fetch users: 'GET /api/u' as string[];\n</script>\n`,
+        `<template>@await (users) { ${opts} } { <p>ok</p> } @loading { <i>…</i> }</template>\n<script>\n@fetch users: 'GET /api/u' as string[];\n</script>\n`,
         't.pdx', [], undefined, {},
     ).warnings.filter((w) => w.code === 'PDX_AWAIT_TIMING');
 
@@ -66,13 +66,13 @@ describe('PDX_AWAIT_TIMING', () => {
     });
 
     it('is found inside another block', () => {
-        const r = compile("<template>@if (on) { @await (users) { minMs: 9, maxMs: 1 } { <p>ok</p> } @loading { <i>…</i> } }</template>\n<script setup>\nlet on = $signal(true);\n@fetch users: 'GET /api/u' as string[];\n</script>\n", 'n.pdx', [], undefined, {});
+        const r = compile("<template>@if (on) { @await (users) { minMs: 9, maxMs: 1 } { <p>ok</p> } @loading { <i>…</i> } }</template>\n<script>\nlet on = $signal(true);\n@fetch users: 'GET /api/u' as string[];\n</script>\n", 'n.pdx', [], undefined, {});
         expect(r.warnings.filter((w) => w.code === 'PDX_AWAIT_TIMING')).toHaveLength(1);
     });
 });
 
 describe('pdx migrate: @await (x as T)', () => {
-    const pdx = (template: string, script = '') => `<template>${template}</template>\n<script setup lang="ts">\n${script}\n</script>\n`;
+    const pdx = (template: string, script = '') => `<template>${template}</template>\n<script lang="ts">\n${script}\n</script>\n`;
 
     it('parenthesises an alpha assertion to a type, and leaves the beta binding alone', () => {
         const text = pdx(

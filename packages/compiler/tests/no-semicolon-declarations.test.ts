@@ -9,7 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 
-const setup = (script: string) => compile(`<template><p>x</p></template>\n<script setup>\n${script}\n</script>\n`, 'nosemi.pdx').code;
+const setup = (script: string) => compile(`<template><p>x</p></template>\n<script>\n${script}\n</script>\n`, 'nosemi.pdx').code;
 
 function before(code: string, a: string, b: string): void {
     const i = code.indexOf(a), j = code.indexOf(b);

@@ -106,7 +106,7 @@ describe('signal rewriter edge cases', () => {
     it('does NOT rewrite function parameters that shadow signal names', () => {
         const source = `
 <template><div>{{ result }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   function process(count) { return count * 2; }
   const result = process(5);
@@ -120,7 +120,7 @@ describe('signal rewriter edge cases', () => {
     it('does NOT rewrite arrow params that shadow signals (braced body)', () => {
         const source = `
 <template><div>{{ doubled }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   const doubler = (count) => { return count * 2; };
   const doubled = doubler(5);
@@ -132,7 +132,7 @@ describe('signal rewriter edge cases', () => {
     it('does NOT rewrite arrow params inside .map() (concise body)', () => {
         const source = `
 <template><div>{{ result }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   const result = [1,2,3].map((count) => count * 2);
 </script>`;
@@ -144,7 +144,7 @@ describe('signal rewriter edge cases', () => {
     it('does NOT rewrite single-param arrow without parens', () => {
         const source = `
 <template><div>{{ result }}</div></template>
-<script setup>
+<script>
   let items = $signal([]);
   const result = [1,2].map(items => items + 1);
 </script>`;
@@ -155,7 +155,7 @@ describe('signal rewriter edge cases', () => {
     it('rewrites signals in object shorthand correctly', () => {
         const source = `
 <template><div>{{ data }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   let name = $signal('test');
   const data = { count, name };
@@ -180,7 +180,7 @@ describe('integration: @fetch + @form', () => {
     <input ::value="contact.fields.name.value">
   </form>
 </template>
-<script setup>
+<script>
   @fetch users: 'GET /api/users' as User[];
   @form contact: { name: string { required } };
 </script>`;
@@ -201,7 +201,7 @@ describe('@raw block — scope-aware', () => {
     it('top-level @raw block skips rewriting', () => {
         const source = `
 <template><div>{{ count }}</div></template>
-<script setup>
+<script>
   let count = $signal(0);
   count++;
   @raw {
@@ -225,7 +225,7 @@ describe('integration: shadow DOM + CSS', () => {
 <template shadow>
   <div class="widget">Hello</div>
 </template>
-<script setup>
+<script>
   @prop label: string = 'test';
 </script>
 <style scoped>

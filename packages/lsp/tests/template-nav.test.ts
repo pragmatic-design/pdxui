@@ -17,7 +17,7 @@ const SRC = [
     '  @for (rows as row; track row.id) { <span>{{ row.label }}</span> }',
     '  <button @click="ctrl.del()">x</button>',
     '</template>',
-    '<script setup>',
+    '<script>',
     "@prop user: { name: string } = { name: '' };",
     'let rows = $signal<{ id: number; label: string }[]>([]);',
     'const ctrl = { del() { return 1; } };',

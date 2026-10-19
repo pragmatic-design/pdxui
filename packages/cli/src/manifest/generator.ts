@@ -14,7 +14,7 @@ export function analyzeComponent(filePath: string, rootDir: string, prefix: stri
     const descriptor = parseSFC(source);
 
     const scriptContent = descriptor.script?.content ?? '';
-    const analysis = analyzeScript(scriptContent, filePath, { setup: descriptor.script?.setup });
+    const analysis = analyzeScript(scriptContent, filePath);
     // The tag the compiler registers: `@tag`, else its filename rule with the app's prefix — not a copy of it.
     const tag = analysis.customTag ?? deriveTag(filePath, prefix);
 

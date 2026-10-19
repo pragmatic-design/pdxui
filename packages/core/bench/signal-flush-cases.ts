@@ -149,7 +149,7 @@ let compiledSeq = 0;
 export function compiledHandler(strategy: Strategy): FlushCase {
     const name = `flushprobe${++compiledSeq}`;
     const src = `<template><button @click="tick = tick + 1; a = tick; b = tick; c = tick">go</button></template>
-<script setup>
+<script>
 let tick = $signal(0); let a = $signal(0); let b = $signal(0); let c = $signal(0);
 $effect(() => { a; b; c; globalThis.__flushProbeRuns = (globalThis.__flushProbeRuns ?? 0) + 1; });
 </script>`;

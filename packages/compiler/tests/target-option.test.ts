@@ -23,7 +23,7 @@ vi.mock('../src/compiler/compile-context', async () => {
 const { compile, pdx } = await import('../src/plugin');
 type PdxPluginOptions = import('../src/plugin').PdxPluginOptions;
 
-const SOURCE = '<template><p>{{ n }}</p></template>\n<script setup>\nlet n = $signal(1);\n</script>\n';
+const SOURCE = '<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(1);\n</script>\n';
 
 beforeEach(() => { seen.length = 0; });
 
