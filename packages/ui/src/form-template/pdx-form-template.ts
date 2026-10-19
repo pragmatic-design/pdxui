@@ -44,6 +44,7 @@ import '../tag-input/pdx-tag-input';
 import '../otp-input/pdx-otp-input';
 import '../pin-input/pdx-pin-input';
 import { uiString, format, uiAttr} from '../shared/i18n';
+import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';
@@ -565,20 +566,17 @@ function createFieldElement(field: FormFieldSchema, form: Form<Record<string, un
             (control as any).value = val;
         }
 
-        // Listen for changes from control → form
-        // Text inputs fire pdx-input (per keystroke), others fire pdx-change (on commit)
+        // Listen for changes from control → form: the control's model event, whose detail is the
+        // value (#125), or, for a control with no model yet, its alpha event — text inputs fire
+        // pdx-input (per keystroke), others pdx-change (on commit).
         const isText = tag === 'pdx-input' || tag === 'pdx-textarea' || tag === 'pdx-password-input'
             || tag === 'pdx-search-input' || tag === 'pdx-masked-input';
         const changeEvent = isText ? 'pdx-input' : 'pdx-change';
-        control.addEventListener(changeEvent, ((e: CustomEvent) => {
-            if (isChecked) {
-                formField.onChange(e.detail?.checked ?? false);
-            } else if (isMulti) {
-                formField.onChange(e.detail?.values ?? []);
-            } else {
-                formField.onChange(e.detail?.value ?? (e.target as any)?.value);
-            }
-        }) as EventListener);
+        onControlValue(control, changeEvent, (e) => {
+            if (isChecked) return e.detail?.checked ?? false;
+            if (isMulti) return e.detail?.values ?? [];
+            return e.detail?.value ?? (e.target as any)?.value;
+        }, (value) => formField.onChange(value));
 
         control.addEventListener('pdx-blur', () => {
             formField.onBlur();
@@ -777,11 +775,10 @@ function createListElement(
                     if (val !== undefined && val !== null && val !== '') {
                         (input as any).value = val;
                     }
+                    // Its model's event, or the alpha one of a control that has no model yet (#125).
                     const isText = tag === 'pdx-input' || tag === 'pdx-textarea';
                     const evt = isText ? 'pdx-input' : 'pdx-change';
-                    input.addEventListener(evt, ((e: CustomEvent) => {
-                        formField.onChange(e.detail?.value ?? (e.target as any)?.value);
-                    }) as EventListener);
+                    onControlValue(input, evt, (e) => e.detail?.value ?? (e.target as any)?.value, (value) => formField.onChange(value));
                     input.addEventListener('pdx-blur', () => formField.onBlur());
 
                     // Manual error wiring for list items (same reason as regular fields)

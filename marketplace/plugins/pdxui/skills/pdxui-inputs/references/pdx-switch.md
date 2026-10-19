@@ -4,7 +4,6 @@ Toggle a setting on or off.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `label` | `label` | string | `''` | Visible label text. |
@@ -15,6 +14,7 @@ Toggle a setting on or off.
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `value` | `value` | string | `''` | The current value. |
+| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 
 **API (via `:ref`)**
 
@@ -24,7 +24,7 @@ Toggle a setting on or off.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { checked, value }` — Fired when the value changes.
+**Events:** `checked-change` → `detail: { value: boolean }` — Fired when the component writes `checked`. Does not bubble.
 
 **Renders:** roles `switch`
 

@@ -36,7 +36,10 @@ export class FormControlRegistry {
             'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete',
             'pdx-toggle', 'pdx-date-picker', 'pdx-time-picker',
         ]);
-        this.checked = new Set(['pdx-checkbox', 'pdx-switch']);
+        // The controls that declare a model (#125) are not here: the binding reads their model, its
+        // event and its prop from the manifest (`modelEventOf`). What is left is the alpha table of
+        // the controls whose batch has not landed yet.
+        this.checked = new Set();
         this.textInput = new Set([
             'pdx-input', 'pdx-textarea', 'pdx-password-input',
             'pdx-search-input', 'pdx-masked-input',
@@ -45,13 +48,8 @@ export class FormControlRegistry {
             'pdx-input': 'pdx-input', 'pdx-textarea': 'pdx-input',
             'pdx-password-input': 'pdx-input', 'pdx-search-input': 'pdx-input',
             'pdx-masked-input': 'pdx-input', 'pdx-number-input': 'pdx-change',
-            'pdx-segmented': 'change', 'pdx-toggle': 'pressedchange',
         };
-        this.valueExpr = {
-            'pdx-checkbox': 'e.detail?.checked', 'pdx-switch': 'e.detail?.checked',
-            'pdx-toggle': 'e.detail?.pressed', 'pdx-slider': 'e.detail?.value',
-            'pdx-rating': 'e.detail?.value', 'pdx-segmented': 'e.detail?.value',
-        };
+        this.valueExpr = {};
     }
 
     register(tagName: string, config?: { valueEvent?: string; valueExpr?: string; checked?: boolean; textInput?: boolean }): void {
@@ -381,7 +379,7 @@ function injectFormFieldBindings(tagStr: string, formVar: string, fieldPath: str
  * Inject :value (or :checked), @pdx-change, @pdx-blur on form controls.
  * Uses .pdx binding syntax — rewriteHtmlBindings converts to interpolations.
  */
-function injectControlBindings(tagStr: string, tagName: string, formVar: string, fieldPath: string, model: { event: string } | null): string {
+function injectControlBindings(tagStr: string, tagName: string, formVar: string, fieldPath: string, model: { model: string; event: string } | null): string {
     let injected = '';
     const f = fieldRef(formVar, fieldPath);
 
@@ -390,7 +388,8 @@ function injectControlBindings(tagStr: string, tagName: string, formVar: string,
     const isTextInput = TEXT_INPUT_CONTROLS.has(tagName);
 
     if (!isTextInput) {
-        const valueProp = isChecked ? ':checked' : ':value';
+        // The model is the prop the field's value goes to: `checked` on a checkbox, `pressed` on a toggle.
+        const valueProp = model ? `:${model.model}` : (isChecked ? ':checked' : ':value');
         if (!tagStr.includes(valueProp + '=')) {
             injected += ` ${valueProp}=$` + `{() => ${f}?.value()}`;
         }

@@ -134,6 +134,20 @@ semver.
 
 ### Changed
 
+- The choice controls declare their value as a model and announce it with the model's event, whose
+  detail is `{ value }`: `checked-change` on `pdx-checkbox`, `pdx-switch` and `pdx-radio`,
+  `pressed-change` on `pdx-toggle`, `value-change` on `pdx-radio-group`, `pdx-checkbox-group`,
+  `pdx-segmented`, `pdx-rating` and `pdx-slider`. `::checked`, `::pressed` and `::value` bind them both
+  ways, and a form binds each to its model.
+  - They no longer emit `pdx-change`, `change`, `pdx-pressed-change` or `pressedchange`. A listener on
+    one is `PDX_REMOVED_FORM`, and `pdx migrate` rewrites an inline handler — `e.detail.checked` on a
+    checkbox becomes `e.detail.value`, its `value` and `indeterminate` the element's — and lists a
+    handler it cannot. `@change` is flagged, not rewritten: a native `change` from the inner input
+    still reaches the host.
+  - `pdx-checkbox` also has `indeterminate` as a model, `indeterminate-change`, so a tristate's step
+    from indeterminate to unchecked is announced.
+  - `pdx-checkbox-group`'s value is the comma-separated selection; `values` is `value.split(',')`.
+  - `pdx-slider` keeps `pdx-change-end` at the end of a drag. (#480)
 - `@defer` has two phases. `@defer (interaction; prefetch idle)` fetches the block's code when the
   browser is idle and mounts it on the first pointer or focus entry; without `; prefetch` both start
   together, as before. A prefetch goes through the prefetch queue, the render's load ahead of it, and a

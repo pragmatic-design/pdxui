@@ -4855,7 +4855,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-u4h3nn], [data-pdx-u4h3nn-in]) to ([data-pdx-root] \\u003E *) {:scope .page, :where(:not([data-pdx-u4h3nn])):scope:is(.page) { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Checkbox</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-checkbox&gt;</code> — custom checkbox with label, description, indeterminate, tristate, sizes.\\n      Tristate cycles: unchecked → checked → indeterminate.\\n    </p>  <app-demo-comp-checkbox-basic class="demo-section"></app-demo-comp-checkbox-basic>  <app-demo-comp-checkbox-description class="demo-section"></app-demo-comp-checkbox-description>  <app-demo-comp-checkbox-indeterminate class="demo-section"></app-demo-comp-checkbox-indeterminate>  <app-demo-comp-checkbox-tristate class="demo-section"></app-demo-comp-checkbox-tristate>  <app-demo-comp-checkbox-sizes class="demo-section"></app-demo-comp-checkbox-sizes>  <app-demo-comp-checkbox-label-position class="demo-section"></app-demo-comp-checkbox-label-position>  <app-demo-comp-checkbox-error class="demo-section"></app-demo-comp-checkbox-error>  <app-demo-comp-checkbox-composition class="demo-section"></app-demo-comp-checkbox-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>checked</code><span>boolean</span><span>Checked state</span></div> <div class="opt-row"><code>indeterminate</code><span>boolean</span><span>Visual "—" state, announced as mixed; a click settles it</span></div> <div class="opt-row"><code>tristate</code><span>boolean</span><span>Enable 3-state cycle on click</span></div> <div class="opt-row"><code>label</code><span>string</span><span>Label text (or use default slot)</span></div> <div class="opt-row"><code>description</code><span>string</span><span>Help text below label</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>labelPosition</code><span>string</span><span>right (default), left</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red border for validation</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div> <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div> <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>pdx-change</code><span>{ checked, value }</span><span>Normal mode: toggled</span></div> <div class="opt-row"><code>pdx-change</code><span>{ checked, indeterminate, value, state }</span><span>Tristate: state = true/false/null</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Checkbox</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-checkbox&gt;</code> — custom checkbox with label, description, indeterminate, tristate, sizes.\\n      Tristate cycles: unchecked → checked → indeterminate.\\n    </p>  <app-demo-comp-checkbox-basic class="demo-section"></app-demo-comp-checkbox-basic>  <app-demo-comp-checkbox-description class="demo-section"></app-demo-comp-checkbox-description>  <app-demo-comp-checkbox-indeterminate class="demo-section"></app-demo-comp-checkbox-indeterminate>  <app-demo-comp-checkbox-tristate class="demo-section"></app-demo-comp-checkbox-tristate>  <app-demo-comp-checkbox-sizes class="demo-section"></app-demo-comp-checkbox-sizes>  <app-demo-comp-checkbox-label-position class="demo-section"></app-demo-comp-checkbox-label-position>  <app-demo-comp-checkbox-error class="demo-section"></app-demo-comp-checkbox-error>  <app-demo-comp-checkbox-composition class="demo-section"></app-demo-comp-checkbox-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>checked</code><span>boolean</span><span>Checked state</span></div> <div class="opt-row"><code>indeterminate</code><span>boolean</span><span>Visual "—" state, announced as mixed; a click settles it</span></div> <div class="opt-row"><code>tristate</code><span>boolean</span><span>Enable 3-state cycle on click</span></div> <div class="opt-row"><code>label</code><span>string</span><span>Label text (or use default slot)</span></div> <div class="opt-row"><code>description</code><span>string</span><span>Help text below label</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>labelPosition</code><span>string</span><span>right (default), left</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red border for validation</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div> <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div> <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>checked-change</code><span>{ value: boolean }</span><span>A click wrote <code>checked</code>; <code>::checked</code> binds it both ways</span></div> <div class="opt-row"><code>indeterminate-change</code><span>{ value: boolean }</span><span>A click wrote <code>indeterminate</code> (a tristate cycle, or settling a mixed box)</span></div> </div> </section> </div> '));
 component('app-comp-checkbox', {
   props: {},
   setup(ctx) {
@@ -4888,7 +4888,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-x56sup], [data-pdx-x56sup-in]) to ([data-pdx-root] \\u003E *) {:scope .page, :where(:not([data-pdx-x56sup])):scope:is(.page) { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Checkbox Group</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-checkbox-group&gt;</code> — multi-selection across <code>&lt;pdx-checkbox&gt;</code> children,\\n      with one value for the form. Propagates size, disabled and error.\\n    </p>  <app-demo-comp-checkbox-group-basic class="demo-section"></app-demo-comp-checkbox-group-basic>  <app-demo-comp-checkbox-group-horizontal class="demo-section"></app-demo-comp-checkbox-group-horizontal>  <app-demo-comp-checkbox-group-size-disabled-error class="demo-section"></app-demo-comp-checkbox-group-size-disabled-error>  <app-demo-comp-checkbox-group-composition class="demo-section"></app-demo-comp-checkbox-group-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>string</span><span>Comma-separated selected values</span></div> <div class="opt-row"><code>label</code><span>string</span><span>Accessible name; without it, a pdx-label right before the group names it</span></div> <div class="opt-row"><code>orientation</code><span>string</span><span>vertical (default), horizontal</span></div> <div class="opt-row"><code>size</code><span>string</span><span>Propagated to children</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagated to children</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>pdx-change</code><span>{ value, values }</span><span>Once per change; the children\\'s own events stop at them</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Checkbox Group</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-checkbox-group&gt;</code> — multi-selection across <code>&lt;pdx-checkbox&gt;</code> children,\\n      with one value for the form. Propagates size, disabled and error.\\n    </p>  <app-demo-comp-checkbox-group-basic class="demo-section"></app-demo-comp-checkbox-group-basic>  <app-demo-comp-checkbox-group-horizontal class="demo-section"></app-demo-comp-checkbox-group-horizontal>  <app-demo-comp-checkbox-group-size-disabled-error class="demo-section"></app-demo-comp-checkbox-group-size-disabled-error>  <app-demo-comp-checkbox-group-composition class="demo-section"></app-demo-comp-checkbox-group-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>string</span><span>Comma-separated selected values</span></div> <div class="opt-row"><code>label</code><span>string</span><span>Accessible name; without it, a pdx-label right before the group names it</span></div> <div class="opt-row"><code>orientation</code><span>string</span><span>vertical (default), horizontal</span></div> <div class="opt-row"><code>size</code><span>string</span><span>Propagated to children</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagated to children</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Once per change, the comma-separated selection; the children\\'s own events stop at them</span></div> </div> </section> </div> '));
 component('app-comp-checkbox-group', {
   props: {},
   setup(ctx) {
@@ -13704,8 +13704,8 @@ component('app-demo-comp-checkbox-composition', {
     const [__el14,__m18]=__walk1(__frag);
     let __el14w_checked = {}; effect(() => { const __b = allOn(ctx.perms()); if (Object.is(__b, __el14w_checked)) return; __el14w_checked = __b; assignBoundProperty(__el14, "checked", __b); });
     let __el14w_indeterminate = {}; effect(() => { const __b = someOn(ctx.perms()); if (Object.is(__b, __el14w_indeterminate)) return; __el14w_indeterminate = __b; assignBoundProperty(__el14, "indeterminate", __b); });
-    __el14.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setAll(ctx.perms(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    const __cf17=eachRow(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);{ assignBoundProperty(__el16, "label", perm().label); }let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });{ assignBoundProperty(__el16, "value", perm().label); }let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
+    __el14.addEventListener('checked-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setAll(ctx.perms(), e.detail.value))), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
+    const __cf17=eachRow(()=>ctx.perms(),'label',(perm)=>{const __frag=__blk0();const [__el16]=__walk0(__frag);{ assignBoundProperty(__el16, "label", perm().label); }let __el16w_description = {}; effect(() => { const __b = perm().description; if (Object.is(__b, __el16w_description)) return; __el16w_description = __b; assignBoundProperty(__el16, "description", __b); });{ assignBoundProperty(__el16, "value", perm().label); }let __el16w_checked = {}; effect(() => { const __b = perm().on; if (Object.is(__b, __el16w_checked)) return; __el16w_checked = __b; assignBoundProperty(__el16, "checked", __b); });__el16.addEventListener('checked-change', safeHandler(batchHandler(e => ctx.perms.setRaw(setOne(ctx.perms(), perm().label, e.detail.value))), ctx.el?.tagName?.toLowerCase(), 'checked-change'));return __frag;});
     __m18.replaceWith(__cf17);
     return __frag;
   })(),
@@ -13762,7 +13762,7 @@ import { allOn, someOn, setAll, setOne } from './state.pdx';
 
 const __blk0=staticBlock(staticMarkup(' <div style="padding-left:var(--pdx-space-xl)"> <pdx-checkbox></pdx-checkbox> </div> '));
 const __walk0=(r)=>{const __el6=r.firstChild.nextSibling;const __el7=__el6.firstChild.nextSibling;return [__el7];};
-const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Indeterminate State</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Visual "—" state for a parent checkbox when only some children are selected. The native input\\n      has <code>indeterminate</code> only as a property; the component takes it as a prop or an attribute\\n      and sets it for you. A click settles it. Here the parent follows its children — all, none or some —\\n      and clicking it sets them all.\\n    </p> <div class="demo-stack"> <pdx-checkbox label="Select all items"></pdx-checkbox> <!----></div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-checkbox label="Select all items"\\n  :checked="allOn(items)" :indeterminate="someOn(items)"\\n  @pdx-change="e =&gt; items = setAll(items, e.detail.checked)"&gt;&lt;/pdx-checkbox&gt;\\n@for (items as item; track item.label) {\\n  &lt;pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"\\n    @pdx-change="e =&gt; items = setOne(items, e.detail)"&gt;&lt;/pdx-checkbox&gt;\\n}</code></pre> </details> </section> '));
+const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Indeterminate State</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Visual "—" state for a parent checkbox when only some children are selected. The native input\\n      has <code>indeterminate</code> only as a property; the component takes it as a prop or an attribute\\n      and sets it for you. A click settles it. Here the parent follows its children — all, none or some —\\n      and clicking it sets them all.\\n    </p> <div class="demo-stack"> <pdx-checkbox label="Select all items"></pdx-checkbox> <!----></div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-checkbox label="Select all items"\\n  :checked="allOn(items)" :indeterminate="someOn(items)"\\n  @checked-change="e =&gt; items = setAll(items, e.detail.value)"&gt;&lt;/pdx-checkbox&gt;\\n@for (items as item; track item.label) {\\n  &lt;pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"\\n    @checked-change="e =&gt; items = setOne(items, item.label, e.detail.value)"&gt;&lt;/pdx-checkbox&gt;\\n}</code></pre> </details> </section> '));
 const __walk1=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __m9=__el5.nextSibling.nextSibling;return [__el5,__m9];};
 component('app-demo-comp-checkbox-indeterminate', {
   props: {},
@@ -13780,8 +13780,8 @@ component('app-demo-comp-checkbox-indeterminate', {
     const [__el5,__m9]=__walk1(__frag);
     let __el5w_checked = {}; effect(() => { const __b = allOn(ctx.items()); if (Object.is(__b, __el5w_checked)) return; __el5w_checked = __b; assignBoundProperty(__el5, "checked", __b); });
     let __el5w_indeterminate = {}; effect(() => { const __b = someOn(ctx.items()); if (Object.is(__b, __el5w_indeterminate)) return; __el5w_indeterminate = __b; assignBoundProperty(__el5, "indeterminate", __b); });
-    __el5.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.items.setRaw(setAll(ctx.items(), e.detail.checked))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    const __cf8=eachRow(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);{ assignBoundProperty(__el7, "label", item().label); }{ assignBoundProperty(__el7, "value", item().label); }let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.items.setRaw(setOne(ctx.items(), e.detail))), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));return __frag;});
+    __el5.addEventListener('checked-change', safeHandler(batchHandler(e => ctx.items.setRaw(setAll(ctx.items(), e.detail.value))), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
+    const __cf8=eachRow(()=>ctx.items(),'label',(item)=>{const __frag=__blk0();const [__el7]=__walk0(__frag);{ assignBoundProperty(__el7, "label", item().label); }{ assignBoundProperty(__el7, "value", item().label); }let __el7w_checked = {}; effect(() => { const __b = item().on; if (Object.is(__b, __el7w_checked)) return; __el7w_checked = __b; assignBoundProperty(__el7, "checked", __b); });__el7.addEventListener('checked-change', safeHandler(batchHandler(e => ctx.items.setRaw(setOne(ctx.items(), item().label, e.detail.value))), ctx.el?.tagName?.toLowerCase(), 'checked-change'));return __frag;});
     __m9.replaceWith(__cf8);
     return __frag;
   })(),
@@ -13855,7 +13855,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-check
 ============================================================
 import { batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic Group</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Value is comma-separated. A <code>&lt;pdx-label&gt;</code> right before the group names it; or give the group a <code>label</code>.\\n    </p> <div class="demo-stack"> <div class="pdx-field"> <pdx-label text="Interests" description="Select all that apply"></pdx-label> <pdx-checkbox-group value="code,design"> <pdx-checkbox label="Coding" value="code"></pdx-checkbox> <pdx-checkbox label="Design" value="design"></pdx-checkbox> <pdx-checkbox label="Marketing" value="marketing"></pdx-checkbox> <pdx-checkbox label="Sales" value="sales"></pdx-checkbox> </pdx-checkbox-group> </div> <p class="pdx-txt-small pdx-ink-muted" data-test="interests-out">Selected: <!----></p> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-label text="Interests"&gt;&lt;/pdx-label&gt;\\n&lt;pdx-checkbox-group value="code,design"\\n  @pdx-change="e =&gt; interests = e.detail.values.join(\\', \\')"&gt;\\n  &lt;pdx-checkbox label="Coding" value="code"&gt;&lt;/pdx-checkbox&gt;\\n  &lt;pdx-checkbox label="Design" value="design"&gt;&lt;/pdx-checkbox&gt;\\n&lt;/pdx-checkbox-group&gt;\\n// one pdx-change per click: { value: "code,design", values: ["code", "design"] }</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic Group</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Value is comma-separated. A <code>&lt;pdx-label&gt;</code> right before the group names it; or give the group a <code>label</code>.\\n    </p> <div class="demo-stack"> <div class="pdx-field"> <pdx-label text="Interests" description="Select all that apply"></pdx-label> <pdx-checkbox-group value="code,design"> <pdx-checkbox label="Coding" value="code"></pdx-checkbox> <pdx-checkbox label="Design" value="design"></pdx-checkbox> <pdx-checkbox label="Marketing" value="marketing"></pdx-checkbox> <pdx-checkbox label="Sales" value="sales"></pdx-checkbox> </pdx-checkbox-group> </div> <p class="pdx-txt-small pdx-ink-muted" data-test="interests-out">Selected: <!----></p> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-label text="Interests"&gt;&lt;/pdx-label&gt;\\n&lt;pdx-checkbox-group value="code,design"\\n  @value-change="e =&gt; interests = e.detail.value.split(\\',\\').join(\\', \\')"&gt;\\n  &lt;pdx-checkbox label="Coding" value="code"&gt;&lt;/pdx-checkbox&gt;\\n  &lt;pdx-checkbox label="Design" value="design"&gt;&lt;/pdx-checkbox&gt;\\n&lt;/pdx-checkbox-group&gt;\\n// one value-change per click: { value: "code,design" }</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el8=__el6.firstChild.nextSibling.nextSibling.nextSibling;const __el13=__el6.nextSibling.nextSibling;const __t14=__el13.firstChild.nextSibling;return [__el8,__t14];};
 component('app-demo-comp-checkbox-group-basic', {
   props: {},
@@ -13866,7 +13866,7 @@ component('app-demo-comp-checkbox-group-basic', {
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el8,__t14]=__walk0(__frag);
-    __el8.addEventListener('pdx-change', safeHandler(batchHandler(e => ctx.interests.setRaw(e.detail.values.join(', ') || 'none')), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el8.addEventListener('value-change', safeHandler(batchHandler(e => ctx.interests.setRaw(e.detail.value.split(',').join(', ') || 'none')), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     bindInterpolation(__t14,()=>ctx.interests());
     return __frag;
   })(),
@@ -19748,13 +19748,13 @@ component('app-demo-comp-form-all-controls', {
     { assignBoundProperty(__el13, "min", 0); }
     { assignBoundProperty(__el13, "max", 100); }
     let __el13w_value = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.slider?.value())(); if (Object.is(__b, __el13w_value)) return; __el13w_value = __b; assignBoundProperty(__el13, "value", __b); });
-    __el13.addEventListener('pdx-change', safeHandler((e) => ctx.allTypesForm.fields.slider?.onChange(e.detail?.value), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el13.addEventListener('value-change', safeHandler((e) => ctx.allTypesForm.fields.slider?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     __el13.addEventListener('pdx-blur', safeHandler(() => ctx.allTypesForm.fields.slider?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     let __el14w_error = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.rating?.error())(); if (Object.is(__b, __el14w_error)) return; __el14w_error = __b; assignBoundProperty(__el14, "error", __b); });
     let __el14w_touched = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.rating?.touched())(); if (Object.is(__b, __el14w_touched)) return; __el14w_touched = __b; assignBoundProperty(__el14, "touched", __b); });
     let __el14w_warning = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.rating?.warning())(); if (Object.is(__b, __el14w_warning)) return; __el14w_warning = __b; assignBoundProperty(__el14, "warning", __b); });
     let __el15w_value = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.rating?.value())(); if (Object.is(__b, __el15w_value)) return; __el15w_value = __b; assignBoundProperty(__el15, "value", __b); });
-    __el15.addEventListener('pdx-change', safeHandler((e) => ctx.allTypesForm.fields.rating?.onChange(e.detail?.value), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el15.addEventListener('value-change', safeHandler((e) => ctx.allTypesForm.fields.rating?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     __el15.addEventListener('pdx-blur', safeHandler(() => ctx.allTypesForm.fields.rating?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     let __el16w_error = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.color?.error())(); if (Object.is(__b, __el16w_error)) return; __el16w_error = __b; assignBoundProperty(__el16, "error", __b); });
     let __el16w_touched = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.color?.touched())(); if (Object.is(__b, __el16w_touched)) return; __el16w_touched = __b; assignBoundProperty(__el16, "touched", __b); });
@@ -19771,13 +19771,13 @@ component('app-demo-comp-form-all-controls', {
     let __el21w_touched = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.checkbox?.touched())(); if (Object.is(__b, __el21w_touched)) return; __el21w_touched = __b; assignBoundProperty(__el21, "touched", __b); });
     let __el21w_warning = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.checkbox?.warning())(); if (Object.is(__b, __el21w_warning)) return; __el21w_warning = __b; assignBoundProperty(__el21, "warning", __b); });
     let __el22w_checked = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.checkbox?.value())(); if (Object.is(__b, __el22w_checked)) return; __el22w_checked = __b; assignBoundProperty(__el22, "checked", __b); });
-    __el22.addEventListener('pdx-change', safeHandler((e) => ctx.allTypesForm.fields.checkbox?.onChange(e.detail?.checked), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el22.addEventListener('checked-change', safeHandler((e) => ctx.allTypesForm.fields.checkbox?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
     __el22.addEventListener('pdx-blur', safeHandler(() => ctx.allTypesForm.fields.checkbox?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     let __el23w_error = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.switch?.error())(); if (Object.is(__b, __el23w_error)) return; __el23w_error = __b; assignBoundProperty(__el23, "error", __b); });
     let __el23w_touched = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.switch?.touched())(); if (Object.is(__b, __el23w_touched)) return; __el23w_touched = __b; assignBoundProperty(__el23, "touched", __b); });
     let __el23w_warning = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.switch?.warning())(); if (Object.is(__b, __el23w_warning)) return; __el23w_warning = __b; assignBoundProperty(__el23, "warning", __b); });
     let __el24w_checked = {}; effect(() => { const __b = (() => ctx.allTypesForm.fields.switch?.value())(); if (Object.is(__b, __el24w_checked)) return; __el24w_checked = __b; assignBoundProperty(__el24, "checked", __b); });
-    __el24.addEventListener('pdx-change', safeHandler((e) => ctx.allTypesForm.fields.switch?.onChange(e.detail?.checked), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el24.addEventListener('checked-change', safeHandler((e) => ctx.allTypesForm.fields.switch?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
     __el24.addEventListener('pdx-blur', safeHandler(() => ctx.allTypesForm.fields.switch?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     return __frag;
   })(),
@@ -19846,7 +19846,7 @@ component('app-demo-comp-form-basic', {
     let __el13w_touched = {}; effect(() => { const __b = (() => ctx.basicForm.fields.notifications?.touched())(); if (Object.is(__b, __el13w_touched)) return; __el13w_touched = __b; assignBoundProperty(__el13, "touched", __b); });
     let __el13w_warning = {}; effect(() => { const __b = (() => ctx.basicForm.fields.notifications?.warning())(); if (Object.is(__b, __el13w_warning)) return; __el13w_warning = __b; assignBoundProperty(__el13, "warning", __b); });
     let __el14w_checked = {}; effect(() => { const __b = (() => ctx.basicForm.fields.notifications?.value())(); if (Object.is(__b, __el14w_checked)) return; __el14w_checked = __b; assignBoundProperty(__el14, "checked", __b); });
-    __el14.addEventListener('pdx-change', safeHandler((e) => ctx.basicForm.fields.notifications?.onChange(e.detail?.checked), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el14.addEventListener('checked-change', safeHandler((e) => ctx.basicForm.fields.notifications?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
     __el14.addEventListener('pdx-blur', safeHandler(() => ctx.basicForm.fields.notifications?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     effect(()=>{__el17.className=interpolationText(ctx.basicDirtyClass());});
     let __el17w_textContent = {}; effect(() => { const __b = ctx.basicDirtyText(); if (Object.is(__b, __el17w_textContent)) return; __el17w_textContent = __b; if ("textContent" in __el17) { const __v = __b; if (__v == null) clearBoundProperty(__el17, "textContent", "textContent"); else __el17["textContent"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el17.removeAttribute("textContent"); else { __el17.setAttribute("textContent", __v === true ? '' : String(__v)); } } });
@@ -19939,7 +19939,7 @@ component('app-demo-comp-form-data-source', {
     let __el12w_touched = {}; effect(() => { const __b = (() => ctx.dsForm.fields.active?.touched())(); if (Object.is(__b, __el12w_touched)) return; __el12w_touched = __b; assignBoundProperty(__el12, "touched", __b); });
     let __el12w_warning = {}; effect(() => { const __b = (() => ctx.dsForm.fields.active?.warning())(); if (Object.is(__b, __el12w_warning)) return; __el12w_warning = __b; assignBoundProperty(__el12, "warning", __b); });
     let __el13w_checked = {}; effect(() => { const __b = (() => ctx.dsForm.fields.active?.value())(); if (Object.is(__b, __el13w_checked)) return; __el13w_checked = __b; assignBoundProperty(__el13, "checked", __b); });
-    __el13.addEventListener('pdx-change', safeHandler((e) => ctx.dsForm.fields.active?.onChange(e.detail?.checked), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el13.addEventListener('checked-change', safeHandler((e) => ctx.dsForm.fields.active?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
     __el13.addEventListener('pdx-blur', safeHandler(() => ctx.dsForm.fields.active?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     effect(()=>{__el17.className=interpolationText(ctx.dsDirtyClass());});
     let __el17w_textContent = {}; effect(() => { const __b = ctx.dsDirtyText(); if (Object.is(__b, __el17w_textContent)) return; __el17w_textContent = __b; if ("textContent" in __el17) { const __v = __b; if (__v == null) clearBoundProperty(__el17, "textContent", "textContent"); else __el17["textContent"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el17.removeAttribute("textContent"); else { __el17.setAttribute("textContent", __v === true ? '' : String(__v)); } } });
@@ -20155,7 +20155,7 @@ component('app-demo-comp-form-programmatic', {
     let __el12w_touched = {}; effect(() => { const __b = (() => ctx.codeForm.fields.agree?.touched())(); if (Object.is(__b, __el12w_touched)) return; __el12w_touched = __b; assignBoundProperty(__el12, "touched", __b); });
     let __el12w_warning = {}; effect(() => { const __b = (() => ctx.codeForm.fields.agree?.warning())(); if (Object.is(__b, __el12w_warning)) return; __el12w_warning = __b; assignBoundProperty(__el12, "warning", __b); });
     let __el13w_checked = {}; effect(() => { const __b = (() => ctx.codeForm.fields.agree?.value())(); if (Object.is(__b, __el13w_checked)) return; __el13w_checked = __b; assignBoundProperty(__el13, "checked", __b); });
-    __el13.addEventListener('pdx-change', safeHandler((e) => ctx.codeForm.fields.agree?.onChange(e.detail?.checked), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el13.addEventListener('checked-change', safeHandler((e) => ctx.codeForm.fields.agree?.onChange(e.detail.value), ctx.el?.tagName?.toLowerCase(), 'checked-change'));
     __el13.addEventListener('pdx-blur', safeHandler(() => ctx.codeForm.fields.agree?.onBlur(), ctx.el?.tagName?.toLowerCase(), 'pdx-blur'));
     let __el17w_textContent = {}; effect(() => { const __b = ctx.codeFormValuesText(); if (Object.is(__b, __el17w_textContent)) return; __el17w_textContent = __b; if ("textContent" in __el17) { const __v = __b; if (__v == null) clearBoundProperty(__el17, "textContent", "textContent"); else __el17["textContent"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el17.removeAttribute("textContent"); else { __el17.setAttribute("textContent", __v === true ? '' : String(__v)); } } });
     return __frag;
@@ -26836,7 +26836,7 @@ import { useRatingDemo } from './state.pdx';
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-hnllkz], [data-pdx-hnllkz-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack \\u003E div, :where(:not([data-pdx-hnllkz])):scope:is(.demo-stack \\u003E div) { display: flex; align-items: center; gap: var(--pdx-space-sm); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click to rate. Arrow keys to adjust.</p> <div class="demo-row"> <pdx-rating></pdx-rating> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-rating :value="rating1" @pdx-change="onRating1"&gt;&lt;/pdx-rating&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click to rate. Arrow keys to adjust.</p> <div class="demo-row"> <pdx-rating></pdx-rating> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-rating :value="rating1" @value-change="onRating1"&gt;&lt;/pdx-rating&gt;</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;return [__el4];};
 component('app-demo-comp-rating-basic', {
   props: {},
@@ -26854,7 +26854,7 @@ component('app-demo-comp-rating-basic', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.rating1(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onRating1), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el4.addEventListener('value-change', safeHandler(batchHandler(ctx.onRating1), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -26900,7 +26900,7 @@ component('app-demo-comp-rating-form', {
     const [__el5,__el7]=__walk0(__frag);
     __el5.addEventListener('submit', safeHandler(batchHandler(ctx.onSubmit), ctx.el?.tagName?.toLowerCase(), 'submit'));
     let __el7w_value = {}; effect(() => { const __b = ctx.rating1(); if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });
-    __el7.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onRating1), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el7.addEventListener('value-change', safeHandler(batchHandler(ctx.onRating1), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -26935,7 +26935,7 @@ function onRating2(e) {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.rating2(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onRating2), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el4.addEventListener('value-change', safeHandler(batchHandler(ctx.onRating2), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -27024,7 +27024,7 @@ function onRating4(e) {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.rating4(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onRating4), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el4.addEventListener('value-change', safeHandler(batchHandler(ctx.onRating4), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -27872,7 +27872,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-segme
 ============================================================
 import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Select a time period.</p> <div class="demo-row"> <pdx-segmented label="Calendar view" options="[&quot;day&quot;,&quot;week&quot;,&quot;month&quot;,&quot;year&quot;]"></pdx-segmented> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-segmented :value="view" options=\\'["day","week","month","year"]\\' @change="onView"&gt;&lt;/pdx-segmented&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Select a time period.</p> <div class="demo-row"> <pdx-segmented label="Calendar view" options="[&quot;day&quot;,&quot;week&quot;,&quot;month&quot;,&quot;year&quot;]"></pdx-segmented> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-segmented :value="view" options=\\'["day","week","month","year"]\\' @value-change="onView"&gt;&lt;/pdx-segmented&gt;</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;return [__el4];};
 component('app-demo-comp-segmented-basic', {
   props: {},
@@ -27887,7 +27887,7 @@ function onView(e) {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.view(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    __el4.addEventListener('change', safeHandler(batchHandler(ctx.onView), ctx.el?.tagName?.toLowerCase(), 'change'));
+    __el4.addEventListener('value-change', safeHandler(batchHandler(ctx.onView), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -27946,7 +27946,7 @@ component('app-demo-comp-segmented-form', {
     const [__el3,__el5]=__walk0(__frag);
     __el3.addEventListener('submit', safeHandler(batchHandler(ctx.onSubmit), ctx.el?.tagName?.toLowerCase(), 'submit'));
     let __el5w_value = {}; effect(() => { const __b = ctx.period(); if (Object.is(__b, __el5w_value)) return; __el5w_value = __b; assignBoundProperty(__el5, "value", __b); });
-    __el5.addEventListener('change', safeHandler(batchHandler(ctx.onPeriod), ctx.el?.tagName?.toLowerCase(), 'change'));
+    __el5.addEventListener('value-change', safeHandler(batchHandler(ctx.onPeriod), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -27974,7 +27974,7 @@ function onLayout(e) {
     const __frag=__blk0();
     const [__el3]=__walk0(__frag);
     let __el3w_value = {}; effect(() => { const __b = ctx.layout(); if (Object.is(__b, __el3w_value)) return; __el3w_value = __b; assignBoundProperty(__el3, "value", __b); });
-    __el3.addEventListener('change', safeHandler(batchHandler(ctx.onLayout), ctx.el?.tagName?.toLowerCase(), 'change'));
+    __el3.addEventListener('value-change', safeHandler(batchHandler(ctx.onLayout), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -28005,7 +28005,7 @@ component('app-demo-comp-segmented-object-options', {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     let __el4w_value = {}; effect(() => { const __b = ctx.period(); if (Object.is(__b, __el4w_value)) return; __el4w_value = __b; assignBoundProperty(__el4, "value", __b); });
-    __el4.addEventListener('change', safeHandler(batchHandler(ctx.onPeriod), ctx.el?.tagName?.toLowerCase(), 'change'));
+    __el4.addEventListener('value-change', safeHandler(batchHandler(ctx.onPeriod), ctx.el?.tagName?.toLowerCase(), 'value-change'));
     return __frag;
   })(),
 });
@@ -31667,7 +31667,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-toggl
 ============================================================
 import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Standalone Toggle</h2> <p class="pdx-txt-small pdx-ink-muted">Click to toggle on/off.</p> <div class="demo-row"> <pdx-toggle aria-label="Bold"><strong>B</strong></pdx-toggle> <pdx-toggle aria-label="Italic"><em>I</em></pdx-toggle> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;!-- aria-label names it by what it does: "B" alone is read as the letter --&gt;\\n&lt;pdx-toggle :pressed="bold" @pressedchange="onBold" aria-label="Bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-toggle&gt;\\n&lt;pdx-toggle :pressed="italic" @pressedchange="onItalic" aria-label="Italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-toggle&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Standalone Toggle</h2> <p class="pdx-txt-small pdx-ink-muted">Click to toggle on/off.</p> <div class="demo-row"> <pdx-toggle aria-label="Bold"><strong>B</strong></pdx-toggle> <pdx-toggle aria-label="Italic"><em>I</em></pdx-toggle> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;!-- aria-label names it by what it does: "B" alone is read as the letter --&gt;\\n&lt;pdx-toggle :pressed="bold" @pressed-change="onBold" aria-label="Bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-toggle&gt;\\n&lt;pdx-toggle :pressed="italic" @pressed-change="onItalic" aria-label="Italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-toggle&gt;</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el6=__el4.nextSibling.nextSibling;return [__el4,__el6];};
 component('app-demo-comp-toggle-standalone', {
   props: {},
@@ -31675,11 +31675,11 @@ component('app-demo-comp-toggle-standalone', {
     const __bold = signal(false, { name: 'demo-comp-toggle-standalone:bold' });
     const __italic = signal(false, { name: 'demo-comp-toggle-standalone:italic' });
 function onBold(e) {
-      __bold.setRaw(e.detail.pressed);
+      __bold.setRaw(e.detail.value);
     }
     
     function onItalic(e) {
-      __italic.setRaw(e.detail.pressed);
+      __italic.setRaw(e.detail.value);
     }
     return { bold: __bold, italic: __italic, onBold, onItalic };
   },
@@ -31687,9 +31687,9 @@ function onBold(e) {
     const __frag=__blk0();
     const [__el4,__el6]=__walk0(__frag);
     let __el4w_pressed = {}; effect(() => { const __b = ctx.bold(); if (Object.is(__b, __el4w_pressed)) return; __el4w_pressed = __b; assignBoundProperty(__el4, "pressed", __b); });
-    __el4.addEventListener('pressedchange', safeHandler(batchHandler(ctx.onBold), ctx.el?.tagName?.toLowerCase(), 'pressedchange'));
+    __el4.addEventListener('pressed-change', safeHandler(batchHandler(ctx.onBold), ctx.el?.tagName?.toLowerCase(), 'pressed-change'));
     let __el6w_pressed = {}; effect(() => { const __b = ctx.italic(); if (Object.is(__b, __el6w_pressed)) return; __el6w_pressed = __b; assignBoundProperty(__el6, "pressed", __b); });
-    __el6.addEventListener('pressedchange', safeHandler(batchHandler(ctx.onItalic), ctx.el?.tagName?.toLowerCase(), 'pressedchange'));
+    __el6.addEventListener('pressed-change', safeHandler(batchHandler(ctx.onItalic), ctx.el?.tagName?.toLowerCase(), 'pressed-change'));
     return __frag;
   })(),
 });

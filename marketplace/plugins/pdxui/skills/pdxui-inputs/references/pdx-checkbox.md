@@ -4,8 +4,6 @@ On/off box with an indeterminate state.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
-| `indeterminate` | `indeterminate` | boolean | `false` | Shows the mixed/indeterminate state. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `tristate` | `tristate` | boolean | `false` | Enable 3-state cycle: unchecked → checked → indeterminate → unchecked |
 | `label` | `label` | string | `''` | Visible label text. |
@@ -16,8 +14,10 @@ On/off box with an indeterminate state.
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `required` | `required` | boolean | `false` | Marks the field as required. |
 | `labelPosition` | `labelposition` | string | `'right'` | Where the label sits relative to the control. |
+| `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
+| `indeterminate` | `indeterminate` | boolean | `false` |  |
 
-**Events:** `pdx-change` → `detail: { checked, indeterminate, value, state } | { checked, value }` — Fired when the value changes.
+**Events:** `checked-change` → `detail: { value: boolean }` — Fired when the component writes `checked`. Does not bubble.; `indeterminate-change` → `detail: { value: boolean }` — Fired when the component writes `indeterminate`. Does not bubble.
 
 
 #### Examples
@@ -49,10 +49,10 @@ are checked against the manifest above._
 ```html
 <pdx-checkbox label="Select all items"
   :checked="allOn(items)" :indeterminate="someOn(items)"
-  @pdx-change="e => items = setAll(items, e.detail.checked)"></pdx-checkbox>
+  @checked-change="e => items = setAll(items, e.detail.value)"></pdx-checkbox>
 &#64;for (items as item; track item.label) {
   <pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"
-    @pdx-change="e => items = setOne(items, e.detail)"></pdx-checkbox>
+    @checked-change="e => items = setOne(items, item.label, e.detail.value)"></pdx-checkbox>
 }
 ```
 
@@ -112,10 +112,10 @@ are checked against the manifest above._
 <div class="comp-card">
   <h3 class="pdx-txt-subheading">Permissions</h3>
   <div class="comp-form-single">
-    <pdx-checkbox label="Select all" :checked="allOn(perms)" :indeterminate="someOn(perms)" @pdx-change="e => perms = setAll(perms, e.detail.checked)"></pdx-checkbox>
+    <pdx-checkbox label="Select all" :checked="allOn(perms)" :indeterminate="someOn(perms)" @checked-change="e => perms = setAll(perms, e.detail.value)"></pdx-checkbox>
     <div style="padding-left:var(--pdx-space-lg);display:flex;flex-direction:column;gap:var(--pdx-space-sm)">
       @for (perms as perm; track perm.label) {
-        <pdx-checkbox :label="perm.label" :description="perm.description" :value="perm.label" :checked="perm.on" @pdx-change="e => perms = setOne(perms, e.detail)"></pdx-checkbox>
+        <pdx-checkbox :label="perm.label" :description="perm.description" :value="perm.label" :checked="perm.on" @checked-change="e => perms = setOne(perms, perm.label, e.detail.value)"></pdx-checkbox>
       }
     </div>
   </div>

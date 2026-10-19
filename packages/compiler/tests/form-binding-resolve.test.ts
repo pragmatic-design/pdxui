@@ -51,9 +51,13 @@ describe('the form auto-wire', () => {
     });
 
     it('binds a checkbox by its checked state, not by a value string', () => {
-        const code = tpl('<pdx-form :form="f"><pdx-checkbox name="agree" /></pdx-form>');
+        // Its model, as the plugin reads it from the manifest (#480).
+        const { code } = compile(`<template>\n<pdx-form :form="f"><pdx-checkbox name="agree" /></pdx-form>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, {
+            modelEventOf: (tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null),
+        });
         expect(code).toContain('agree');
-        expect(code).toMatch(/checked/i);
+        expect(code).toContain('"checked"');
+        expect(code).toContain('checked-change');
     });
 
     it('wires a pdx-form-field wrapper to the field it names', () => {
@@ -69,11 +73,11 @@ describe('the form auto-wire', () => {
 });
 
 describe('the form control registry', () => {
-    it('knows the shipped controls, and which of them are checkboxes', () => {
+    it('knows the shipped controls; a checkbox\'s checked state comes from its model, not from here (#480)', () => {
         const r = new FormControlRegistry();
         expect(r.tags.has('pdx-input')).toBe(true);
-        expect(r.checked.has('pdx-checkbox')).toBe(true);
-        expect(r.checked.has('pdx-input')).toBe(false);
+        expect(r.tags.has('pdx-checkbox')).toBe(true);
+        expect(r.checked.has('pdx-checkbox')).toBe(false);
         expect(r.textInput.has('pdx-textarea')).toBe(true);
     });
 

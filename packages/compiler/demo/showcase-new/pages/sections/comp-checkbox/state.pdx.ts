@@ -5,4 +5,4 @@ export function someOn(list) { return list.some(i => i.on) && !list.every(i => i
 
 export function setAll(list, on) { return list.map(i => Object.assign({}, i, { on })); }
 
-export function setOne(list, detail) { return list.map(i => i.label === detail.value ? Object.assign({}, i, { on: detail.checked }) : i); }
+export function setOne(list, label, on) { return list.map(i => i.label === label ? Object.assign({}, i, { on }) : i); }

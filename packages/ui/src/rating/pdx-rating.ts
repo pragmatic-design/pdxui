@@ -3,9 +3,9 @@
 // threshold colors (Element+), hover preview, readonly vs disabled.
 // Uses aria-valuenow/min/max on role="slider" (WAI pattern).
 
-import { component, html, signal, effect, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, effect, useFormAssociated, model } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/rating';
@@ -13,11 +13,16 @@ import '@pdxui/design/components/rating';
 /**
  * A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value
  * takes part in a form.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-rating', {
     formAssociated: true,
+    // A click or a key writes it (#480), and the write dispatches `value-change`.
+    models: { value: model(0) },
     props: {
-        value: { type: Number, default: 0 },
         count: { type: Number, default: 5 },
         precision: { type: Number, default: 1 },
         size: { type: String, default: '' },
@@ -37,18 +42,16 @@ component('pdx-rating', {
     setup(ctx) {
         const hoverValue = signal(-1);
         const isFocused = signal(false);
-        // Uncontrolled-friendly value: click/keyboard update the internal state (and still emit
-        // 'change'); the `value` prop seeds it and overrides whenever the host updates it. Without
-        // this the rating was purely controlled → clicking emitted but the stars never changed.
+        // Uncontrolled-friendly value: click/keyboard update the internal state and the model; the
+        // `value` prop seeds it and overrides whenever the host updates it. Without this the rating
+        // was purely controlled → clicking emitted but the stars never changed.
         const _value = signal((ctx.value() as number) || 0);
         effect(() => { _value.set((ctx.value() as number) || 0); });
 
-        /** The new value, announced twice: `pdx-change`, which is this library's value event and the
-         *  one a form binding listens to, and `change` after it, a deprecated alias (as
-         *  pdx-segmented does). */
-        function emitValue(value: number): void {
-            ctx.emit('pdx-change', { value });
-            ctx.emit('change', { value });
+        /** A new value from the user: the shown one and the model, whose write dispatches `value-change` (#480). */
+        function writeValue(value: number): void {
+            _value.set(value);
+            ctx.value.set(value);
         }
 
         function isInteractive(): boolean {
@@ -119,9 +122,7 @@ component('pdx-rating', {
             if (ctx.clearable() && newVal === _value()) {
                 newVal = 0;
             }
-            _value.set(newVal);
-            setOwnProp(ctx.el, 'value', newVal);
-            emitValue(newVal);
+            writeValue(newVal);
         }
 
         function onStarHover(index: number, e: MouseEvent) {
@@ -170,11 +171,7 @@ component('pdx-rating', {
                 default: return;
             }
             next = snapToPrec(next);
-            if (next !== current) {
-                _value.set(next);
-                setOwnProp(ctx.el, 'value', next);
-                emitValue(next);
-            }
+            if (next !== current) writeValue(next);
         }
 
         function rootClass(): string {
@@ -229,9 +226,7 @@ component('pdx-rating', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() {
-                _value.set(0);
-                (ctx.el as any).value = 0;
-                emitValue(0);
+                writeValue(0);
             },
         });
 

@@ -10,7 +10,7 @@
  *      Note: it does NOT set aria-orientation on role="group" → which is right (no aria-allowed-attr bug).
  *      State (selection) through createSelection({mode:'multiple'}); it passes size/disabled/error
  *      to the <pdx-checkbox> children in rAF. NO focusGroup → every checkbox is tabbable
- *      independently (NOT roving). It emits pdx-change with the selected values. formAssociated.
+ *      independently (NOT roving). It announces the selection with its model's value-change (#480). formAssociated.
  *  - source: packages/ui/src/checkbox/pdx-checkbox.ts
  *      render → <label class="pdx-checkbox-wrap [.disabled]"> holding:
  *        - <input type="checkbox" class="pdx-checkbox [.pdx-checkbox-{size}] [.pdx-checkbox-error]">

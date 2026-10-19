@@ -27,7 +27,7 @@
           <span class="demo-label">Live · drag the slider</span>
           <div class="demo-stage">
             <div class="demo-row">
-              <pdx-slider class="demo-slider" :value="level" min="0" max="100" @pdx-change="setLevel"></pdx-slider>
+              <pdx-slider class="demo-slider" :value="level" min="0" max="100" @value-change="setLevel"></pdx-slider>
               <pdx-badge :value="level" variant="primary"></pdx-badge>
             </div>
             <pdx-progress :value="level" max="100" striped></pdx-progress>
@@ -80,7 +80,7 @@ const mood = $derived(level >= 80 ? 'Awesome 🚀' : level >= 50 ? 'Pretty good 
 
 function setLevel(e) { const v = e.detail && e.detail.value; if (v != null) level = Number(v); }
 
-let demoCode = $signal('<pdx-slider :value="level" @pdx-change="set" />\n<pdx-progress :value="level" striped />\n<p>{{ mood }} — {{ level }}%</p>\n\nlet level = $signal(64);\nconst mood = $derived(\n  level >= 80 ? \'Awesome 🚀\'\n  : level >= 50 ? \'Pretty good 👍\'\n  : \'Getting there 🙂\'\n);');
+let demoCode = $signal('<pdx-slider :value="level" @value-change="set" />\n<pdx-progress :value="level" striped />\n<p>{{ mood }} — {{ level }}%</p>\n\nlet level = $signal(64);\nconst mood = $derived(\n  level >= 80 ? \'Awesome 🚀\'\n  : level >= 50 ? \'Pretty good 👍\'\n  : \'Getting there 🙂\'\n);');
 let srcCode = $signal('@prop label: string = "Hello";\nlet count = $signal(0);\ncount++;');
 let genCode = $signal('// prop signal + attribute sync + type\n// __count.set(v => v + 1)\n// computed debug name, mutation rewriting');
 let installCode = $signal('pnpm add @pdxui/core @pdxui/compiler\npnpm add -D @pdxui/cli');

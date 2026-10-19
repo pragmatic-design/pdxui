@@ -4,7 +4,7 @@
     <div class="demo-row">
       <form @submit="onSubmit">
         <pdx-form-field label="Billing period">
-          <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Yearly","value":"yearly"}]' name="period" @change="onPeriod"></pdx-segmented>
+          <pdx-segmented label="Billing period" :value="period" options='[{"label":"Monthly","value":"monthly"},{"label":"Yearly","value":"yearly"}]' name="period" @value-change="onPeriod"></pdx-segmented>
         </pdx-form-field>
         <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
       </form>

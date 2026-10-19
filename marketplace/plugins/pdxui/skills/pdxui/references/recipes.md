@@ -348,7 +348,7 @@ lines stacked in a 32px block under `overflow: hidden` cut the name.
 
 ```html
 <template>
-  <pdx-segmented class="agenda-pick" :options="resourceOptions" :value="shown" @pdx-change="e => shown = e.detail.value"></pdx-segmented>
+  <pdx-segmented class="agenda-pick" :options="resourceOptions" ::value="shown"></pdx-segmented>
   <div class="agenda" :style="{ '--agenda-cols': String(resources.length) }">
     <div class="agenda-corner"></div>
     @for (resources as r; track r.id) {

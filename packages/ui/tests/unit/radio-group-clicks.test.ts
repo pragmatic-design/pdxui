@@ -1,7 +1,7 @@
-// pdx-radio-group must follow what the user clicks. A group that listens for pdx-change on its own
-// host and re-emits pdx-change from that same host catches its own event and emits again: one click
-// on a radio overflows the stack ("Maximum call stack size exceeded"), a listener on the group sees
-// dozens of events, and the group's value never changes. pdx-checkbox-group has the same shape.
+// pdx-radio-group must follow what the user clicks. It listens to its radios and announces its own
+// value, `value-change` (#480). A group that caught its own event for a child's emitted again: one
+// click on a radio overflowed the stack ("Maximum call stack size exceeded"), a listener on the group
+// saw dozens of events, and the group's value never changed. pdx-checkbox-group has the same shape.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/radio/pdx-radio';
@@ -38,10 +38,10 @@ async function createGroup(attrs: Record<string, string> = {}): Promise<{ group:
 beforeEach(() => { document.body.innerHTML = ''; });
 
 describe('pdx-radio-group follows its children', () => {
-    it('a click sets the group value, and a listener on the group gets exactly one pdx-change', async () => {
+    it('a click sets the group value, and a listener on the group gets exactly one value-change', async () => {
         const { group, inputs } = await createGroup({ value: 'x' });
         const seen: unknown[] = [];
-        group.addEventListener('pdx-change', (e) => seen.push((e as CustomEvent).detail));
+        group.addEventListener('value-change', (e) => seen.push((e as CustomEvent).detail));
         inputs[1].click();
         expect(group.value).toBe('y');
         expect(seen).toEqual([{ value: 'y' }]);
@@ -50,10 +50,10 @@ describe('pdx-radio-group follows its children', () => {
     it('a parent that binds the value back does not start a loop', async () => {
         const { group, inputs } = await createGroup({ value: 'x' });
         let count = 0;
-        group.addEventListener('pdx-change', (e) => {
+        group.addEventListener('value-change', (e) => {
             count++;
             if (count > 50) return; // circuit breaker: the defect looped
-            group.value = (e as CustomEvent).detail.value; // what `:value` + `@pdx-change` does
+            group.value = (e as CustomEvent).detail.value; // what `::value` does
         });
         inputs[2].click();
         await new Promise(r => requestAnimationFrame(r));
@@ -82,7 +82,7 @@ describe('pdx-radio-group follows its children', () => {
     it('the control: setting value from outside checks the radio and emits nothing', async () => {
         const { group, inputs } = await createGroup({ value: 'x' });
         let count = 0;
-        group.addEventListener('pdx-change', () => { count++; });
+        group.addEventListener('value-change', () => { count++; });
         group.value = 'z';
         await until(() => (inputs[2].checked ? true : null), 'z checked');
         expect(count).toBe(0);

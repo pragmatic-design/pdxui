@@ -45,7 +45,7 @@
               :aria-label="canEdit() ? null : (granted(role, p) ? $t('settings.permissions.granted') : $t('settings.permissions.denied'))">
               @if (canEdit()) {
                 <pdx-checkbox :checked="granted(role, p)" :disabled="!role.active"
-                  @pdx-change="e => toggle(role, p, e.detail.checked, e.currentTarget)"><span class="pdx-sr-only">{{ $t('settings.permissions.grant', { permission: p, role: roleName(role.key) }) }}</span></pdx-checkbox>
+                  @checked-change="e => toggle(role, p, e.detail.value, e.currentTarget)"><span class="pdx-sr-only">{{ $t('settings.permissions.grant', { permission: p, role: roleName(role.key) }) }}</span></pdx-checkbox>
               } @else {
                 {{ granted(role, p) ? '✓' : '—' }}
               }

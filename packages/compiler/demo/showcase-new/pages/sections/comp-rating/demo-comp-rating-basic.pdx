@@ -4,12 +4,12 @@
     <p class="pdx-txt-small pdx-ink-muted">Click to rate. Arrow keys to adjust.</p>
 
     <div class="demo-row">
-      <pdx-rating :value="rating1" @pdx-change="onRating1"></pdx-rating>
+      <pdx-rating :value="rating1" @value-change="onRating1"></pdx-rating>
     </div>
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-rating :value="rating1" @pdx-change="onRating1"&gt;&lt;/pdx-rating&gt;</code></pre>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-rating :value="rating1" @value-change="onRating1"&gt;&lt;/pdx-rating&gt;</code></pre>
     </details>
   </section>
 </template>

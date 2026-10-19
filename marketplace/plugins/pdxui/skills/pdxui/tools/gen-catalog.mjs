@@ -114,6 +114,9 @@ function emitsFor(tag) {
   for (const f of readdirSync(dir)) {
     if (!f.endsWith('.ts')) continue;
     const txt = readFileSync(join(dir, f), 'utf8');
+    // A file that declares two components (pdx-toggle beside pdx-toggle-group) cannot say from a grep
+    // whose emit is whose: the manifest reads each component's own statement, and is the one source.
+    if ((txt.match(/\bcomponent\(\s*'/g) || []).length > 1) continue;
     const re = /emit\(\s*'(pdx-[\w-]+)'/g; let m; while ((m = re.exec(txt))) found.add(m[1]);
   }
   return [...found].sort();

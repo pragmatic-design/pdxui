@@ -10,7 +10,7 @@
  *        aria-disabled='true' only when disabled.
  *      No focusGroup: the radios share one `name`, and the browser's native radio group
  *      gives the tab stop and the arrows. It passes name/size/disabled/error/
- *      checked to the children in an rAF. It emits pdx-change once per choice. formAssociated.
+ *      checked to the children in an rAF. It announces each choice once, with its model's value-change (#480). formAssociated.
  *  - source: packages/ui/src/radio/pdx-radio.ts
  *      render → <label class="pdx-radio-wrap [.disabled]"> holding:
  *        - <input type="radio" class="pdx-radio [.pdx-radio-{size}] [.pdx-radio-error]">

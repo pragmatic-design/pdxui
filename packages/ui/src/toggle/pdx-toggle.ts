@@ -3,7 +3,7 @@
 // Uses focusGroup from core for roving tabindex in group mode.
 // Distinct from Segmented: toggle = action state (0..N), segmented = exclusive selection (1).
 
-import { component, html, useFormAssociated, prop, event } from '@pdxui/core';
+import { component, html, useFormAssociated, prop, event, model } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -14,11 +14,16 @@ import '@pdxui/design/components/toggle';
 
 /**
  * A button the user presses on and off, its state exposed with `aria-pressed`.
+ *
+ * @alphaevent pdx-pressed-change
+ * @alphaevent pressedchange
+ * @alphadetail pressed $event.detail.value
  */
 component('pdx-toggle', {
     formAssociated: true,
+    // A click writes it (#480), and the write dispatches `pressed-change`.
+    models: { pressed: model(false) },
     props: {
-        pressed: prop(false),
         disabled: prop(false),
         value: prop(''),
         variant: prop('outline'),
@@ -26,26 +31,16 @@ component('pdx-toggle', {
         /** The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
         ariaLabel: prop(''),
     },
-    events: {
-        /** Fired when the toggle is pressed or released. */
-        'pdx-pressed-change': event<{ pressed: boolean }>(),
-        /** The legacy name of `pdx-pressed-change`, kept as an alias. */
-        'pressedchange': event<{ pressed: boolean }>(),
-    },
     setup(ctx) {
         // Disabled: the click stops at the host, before the app's @click.
         ctx.track(() => guardDisabledClicks(ctx.el, () => !!ctx.disabled()));
 
         function toggle() {
             if (ctx.disabled()) return;
-            const next = !ctx.pressed();
-            // `pressed` is the live state: a click writes it, so the button does not depend on a
-            // parent binding the event back. In a group, the group's value then rewrites every
-            // child's `pressed`.
-            setOwnProp(ctx.el, 'pressed', next);
-            // The event contract: the pdx- prefix. The legacy event stays as an alias.
-            ctx.emit('pdx-pressed-change', { pressed: next });
-            ctx.emit('pressedchange', { pressed: next });
+            // `pressed` is the live state and the model: a click writes it, so the button does not
+            // depend on a parent binding the event back. In a group, the group's value then rewrites
+            // every child's `pressed`.
+            ctx.pressed.set(!ctx.pressed());
         }
 
         function btnClass(): string {
@@ -62,9 +57,7 @@ component('pdx-toggle', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() {
-                (ctx.el as any).pressed = false;
-                ctx.emit('pdx-pressed-change', { pressed: false });
-                ctx.emit('pressedchange', { pressed: false });
+                ctx.pressed.set(false);
             },
         });
 
@@ -169,8 +162,9 @@ component('pdx-toggle-group', {
             });
         });
 
-        // Listen for child toggle events. A toggle's event stays on it (#138), so the group hears it on
-        // the way down, in the capture phase, which passes through the host whether or not it bubbles.
+        // Listen for child toggle events: their model's, `pressed-change` (#480). A toggle's event stays
+        // on it (#138), so the group hears it on the way down, in the capture phase, which passes
+        // through the host whether or not it bubbles.
         ctx.track(() => {
             const el = ctx.el;
             function onChildToggle(e: Event) {
@@ -179,8 +173,8 @@ component('pdx-toggle-group', {
                 const val = toggle.getAttribute('value') || '';
                 if (val) handleToggle(val);
             }
-            el.addEventListener('pressedchange', onChildToggle, true);
-            return () => el.removeEventListener('pressedchange', onChildToggle, true);
+            el.addEventListener('pressed-change', onChildToggle, true);
+            return () => el.removeEventListener('pressed-change', onChildToggle, true);
         });
 
         // Keyboard navigation (roving tabindex)

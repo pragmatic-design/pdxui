@@ -6,7 +6,7 @@
     <div class="demo-row">
       <form @submit="onSubmit">
         <pdx-form-field label="Your rating" required>
-          <pdx-rating :value="rating1" name="score" @pdx-change="onRating1"></pdx-rating>
+          <pdx-rating :value="rating1" name="score" @value-change="onRating1"></pdx-rating>
         </pdx-form-field>
         <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
       </form>

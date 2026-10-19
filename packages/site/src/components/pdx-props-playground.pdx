@@ -14,7 +14,7 @@
           <span class="pp-label" :title="c.description">{{ c.name }}</span>
           <span class="pp-slot">
             @if (c.kind === 'boolean') {
-              <pdx-switch :checked="ctlBool(c)" @pdx-change="apply($event, c)"></pdx-switch>
+              <pdx-switch :checked="ctlBool(c)" @checked-change="apply($event, c)"></pdx-switch>
             }
             @if (c.kind === 'select') {
               <pdx-select size="sm" placeholder="—" :label="c.name" :options="optionsFor(c)" :value="ctlVal(c)" @pdx-change="apply($event, c)"></pdx-select>
@@ -135,7 +135,8 @@ onDestroy(() => { if (liveEl) { liveEl.remove(); liveEl = null; } });
 // '' / null value = the user cleared it → record as an explicit unset (falls back to the default).
 function apply(e, c) {
   const _d = (e && e.detail) || {};
-  if (c.kind === 'boolean') applied[c.name] = !!_d.checked;
+  // The switch announces its model, `checked-change` with `{ value }` (#480); the others their value.
+  if (c.kind === 'boolean') applied[c.name] = !!_d.value;
   else applied[c.name] = (_d.value === '' || _d.value == null) ? '' : String(_d.value);
   dirty = true;
   buildLive();

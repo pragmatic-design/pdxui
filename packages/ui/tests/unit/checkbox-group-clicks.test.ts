@@ -1,8 +1,8 @@
-// pdx-checkbox-group must track what the user clicks. It emits pdx-change on the same host it
-// listens on, so its handler must not take its OWN event for a child's: it would toggle the joined
-// string ("a,b") as a value and emit again — 41 events for one click with `:value` bound. The
-// group's value reflects the children, and the group does not write `el.className = …`, which
-// would wipe every class the author put on the element.
+// pdx-checkbox-group must track what the user clicks. It listens to its children and announces
+// its own value, `value-change` (#480), on the same host: its handler must not take its own event
+// for a child's — it toggled the joined string ("a,b") as a value and emitted again, 41 events for one
+// click with `:value` bound. The group's value reflects the children, and the group does not write
+// `el.className = …`, which would wipe every class the author put on the element.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import '../../src/checkbox/pdx-checkbox';
@@ -42,25 +42,24 @@ beforeEach(() => { document.body.innerHTML = ''; });
 describe('pdx-checkbox-group follows its children', () => {
     it('clicking a and c gives value "a,c", with one event per click on the group', async () => {
         const { group, inputs } = await createGroup();
-        const seen: Array<{ value: string; values: string[] }> = [];
-        group.addEventListener('pdx-change', (e) => {
+        const seen: Array<{ value: string }> = [];
+        group.addEventListener('value-change', (e) => {
             if (e.target === group) seen.push((e as CustomEvent).detail);
         });
         inputs[0].click();
         inputs[2].click();
         expect(group.value).toBe('a,c');
-        expect(seen.length).toBe(2);
-        expect(seen.at(-1)?.values).toEqual(['a', 'c']);
+        expect(seen).toEqual([{ value: 'a' }, { value: 'a,c' }]);
     });
 
     it('a parent that binds the value back does not start a loop', async () => {
         const { group, inputs } = await createGroup();
         let count = 0;
-        group.addEventListener('pdx-change', (e) => {
+        group.addEventListener('value-change', (e) => {
             if (e.target !== group) return;
             count++;
             if (count > 50) return; // circuit breaker: the defect looped
-            group.value = (e as CustomEvent).detail.value; // what `:value` + `@pdx-change` does
+            group.value = (e as CustomEvent).detail.value; // what `::value` does
         });
         inputs[1].click();
         await new Promise(r => requestAnimationFrame(r));
@@ -89,7 +88,7 @@ describe('pdx-checkbox-group follows its children', () => {
     it('the control: setting value from outside checks the children and emits nothing', async () => {
         const { group, inputs } = await createGroup();
         let count = 0;
-        group.addEventListener('pdx-change', (e) => { if (e.target === group) count++; });
+        group.addEventListener('value-change', (e) => { if (e.target === group) count++; });
         group.value = 'b';
         await until(() => (inputs[1].closest('pdx-checkbox')!.hasAttribute('checked') ? true : null), 'b checked');
         expect(count).toBe(0);

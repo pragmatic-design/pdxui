@@ -51,8 +51,8 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ checked, value }</span><span>Normal mode: toggled</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ checked, indeterminate, value, state }</span><span>Tristate: state = true/false/null</span></div>
+        <div class="opt-row"><code>checked-change</code><span>{ value: boolean }</span><span>A click wrote <code>checked</code>; <code>::checked</code> binds it both ways</span></div>
+        <div class="opt-row"><code>indeterminate-change</code><span>{ value: boolean }</span><span>A click wrote <code>indeterminate</code> (a tristate cycle, or settling a mixed box)</span></div>
       </div>
     </section>
   </div>

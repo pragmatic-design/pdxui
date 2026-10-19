@@ -104,7 +104,9 @@ function rewriteHandler(value: string, detail: Record<string, string>): string |
         const field = members[1]?.[2];
         if (!field || !(field in detail)) { failed = true; return whole; } // `detail` on whole, or unmapped
         const rest = members.slice(2).map((m) => m[0]).join('');
-        return detail[field].replace(/^\$event(?![\w$])/, event) + rest;
+        // Every `$event` of the mapping is the handler's event: `($event.currentTarget.indeterminate ? null
+        // : $event.detail.value)` holds two. A function, so a `$` in the name is not a pattern.
+        return detail[field].replace(/\$event(?![\w$])/g, () => event) + rest;
     });
     return failed ? null : head + next;
 }

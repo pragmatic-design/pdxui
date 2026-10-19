@@ -5525,16 +5525,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Comma-separated selected values",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "orientation",
               "description": "Layout orientation — horizontal or vertical.",
               "type": {
@@ -5582,31 +5572,42 @@
               },
               "default": "''",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "description": "Comma-separated selected values",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "values": "$event.detail.value.split(',').filter(Boolean)"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, values }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
             "group"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Comma-separated selected values",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "orientation",
               "fieldName": "orientation",
@@ -5651,6 +5652,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "Comma-separated selected values",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ],
           "slots": [
@@ -5685,26 +5695,6 @@
           "order": 13,
           "description": "A checkbox with a label and a description, which can be indeterminate or, as a tristate, cycle\nthrough unchecked, checked and indeterminate.",
           "members": [
-            {
-              "kind": "field",
-              "name": "checked",
-              "description": "Whether it is checked / on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "checked"
-            },
-            {
-              "kind": "field",
-              "name": "indeterminate",
-              "description": "Shows the mixed/indeterminate state.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "indeterminate"
-            },
             {
               "kind": "field",
               "name": "disabled",
@@ -5804,37 +5794,59 @@
               },
               "default": "'right'",
               "attribute": "labelposition"
-            }
-          ],
-          "events": [
+            },
             {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ checked, indeterminate, value, state } | { checked, value }"
-            }
-          ],
-          "attributes": [
-            {
+              "kind": "field",
               "name": "checked",
-              "fieldName": "checked",
               "description": "Whether it is checked / on.",
               "type": {
                 "text": "boolean"
               },
-              "default": "false"
+              "default": "false",
+              "attribute": "checked"
             },
             {
+              "kind": "field",
               "name": "indeterminate",
-              "fieldName": "indeterminate",
-              "description": "Shows the mixed/indeterminate state.",
               "type": {
                 "text": "boolean"
               },
-              "default": "false"
+              "default": "false",
+              "attribute": "indeterminate"
+            }
+          ],
+          "models": [
+            "checked",
+            "indeterminate"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "checked": "$event.detail.value",
+            "value": "$event.currentTarget.value",
+            "indeterminate": "$event.currentTarget.indeterminate",
+            "state": "($event.currentTarget.indeterminate ? null : $event.detail.value)"
+          },
+          "events": [
+            {
+              "name": "checked-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `checked`. Does not bubble.",
+              "detail": "{ value: boolean }"
             },
+            {
+              "name": "indeterminate-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `indeterminate`. Does not bubble.",
+              "detail": "{ value: boolean }"
+            }
+          ],
+          "attributes": [
             {
               "name": "disabled",
               "fieldName": "disabled",
@@ -5924,6 +5936,23 @@
                 "text": "string"
               },
               "default": "'right'"
+            },
+            {
+              "name": "checked",
+              "fieldName": "checked",
+              "description": "Whether it is checked / on.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "name": "indeterminate",
+              "fieldName": "indeterminate",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -18566,16 +18595,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "name",
               "description": "Form field name, submitted with the form.",
               "type": {
@@ -18633,31 +18652,41 @@
               },
               "default": "''",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
             "radiogroup"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "name",
               "fieldName": "name",
@@ -18711,6 +18740,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ],
           "slots": [
@@ -18745,16 +18783,6 @@
           "order": 14,
           "description": "A radio button: one option of a single selection, grouped by `<pdx-radio-group>` and navigated\nwith the arrow keys.",
           "members": [
-            {
-              "kind": "field",
-              "name": "checked",
-              "description": "Whether it is checked / on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "checked"
-            },
             {
               "kind": "field",
               "name": "disabled",
@@ -18834,28 +18862,38 @@
               },
               "default": "'right'",
               "attribute": "labelposition"
-            }
-          ],
-          "events": [
+            },
             {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
-            }
-          ],
-          "attributes": [
-            {
+              "kind": "field",
               "name": "checked",
-              "fieldName": "checked",
               "description": "Whether it is checked / on.",
               "type": {
                 "text": "boolean"
               },
-              "default": "false"
-            },
+              "default": "false",
+              "attribute": "checked"
+            }
+          ],
+          "models": [
+            "checked"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
+          "events": [
+            {
+              "name": "checked-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `checked`. Does not bubble.",
+              "detail": "{ value: boolean }"
+            }
+          ],
+          "attributes": [
             {
               "name": "disabled",
               "fieldName": "disabled",
@@ -18927,6 +18965,15 @@
                 "text": "string"
               },
               "default": "'right'"
+            },
+            {
+              "name": "checked",
+              "fieldName": "checked",
+              "description": "Whether it is checked / on.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -18961,16 +19008,6 @@
           "order": 30,
           "description": "A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value\ntakes part in a form.",
           "members": [
-            {
-              "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "attribute": "value"
-            },
             {
               "kind": "field",
               "name": "count",
@@ -19082,6 +19119,16 @@
               "attribute": "label"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -19100,22 +19147,24 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change",
+            "change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: number }"
             },
             {
               "name": "hover",
@@ -19130,15 +19179,6 @@
             "slider"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "number"
-              },
-              "default": "0"
-            },
             {
               "name": "count",
               "fieldName": "count",
@@ -19237,6 +19277,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
             }
           ]
         }
@@ -20672,16 +20721,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "options",
               "description": "Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute.",
               "type": {
@@ -20750,6 +20789,16 @@
               "attribute": "label"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -20768,22 +20817,24 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change",
+            "change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, previousValue }"
-            },
-            {
-              "name": "change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, previousValue }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
@@ -20791,15 +20842,6 @@
             "radiogroup"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "size",
               "fieldName": "size",
@@ -20849,6 +20891,15 @@
               "name": "label",
               "fieldName": "label",
               "description": "Visible label text.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },
@@ -21618,16 +21669,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "min",
               "description": "Minimum allowed value.",
               "type": {
@@ -21787,6 +21828,16 @@
               "attribute": "color"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "number | number[]"
+              },
+              "default": "0",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -21805,14 +21856,25 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "min": "$event.detail.value[0]",
+            "max": "$event.detail.value[1]"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, min, max } | { value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: number | number[] }"
             },
             {
               "name": "pdx-change-end",
@@ -21827,15 +21889,6 @@
             "slider"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "number"
-              },
-              "default": "0"
-            },
             {
               "name": "min",
               "fieldName": "min",
@@ -21979,6 +22032,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "number | number[]"
+              },
+              "default": "0"
             }
           ]
         }
@@ -22970,16 +23032,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "checked",
-              "description": "Whether it is checked / on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "checked"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -23079,6 +23131,16 @@
               "attribute": "value"
             },
             {
+              "kind": "field",
+              "name": "checked",
+              "description": "Whether it is checked / on.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "checked"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -23097,29 +23159,30 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "checked"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "checked": "$event.detail.value",
+            "value": "$event.currentTarget.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "checked-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ checked, value }"
+              "description": "Fired when the component writes `checked`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
             "switch"
           ],
           "attributes": [
-            {
-              "name": "checked",
-              "fieldName": "checked",
-              "description": "Whether it is checked / on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "disabled",
               "fieldName": "disabled",
@@ -23209,6 +23272,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "checked",
+              "fieldName": "checked",
+              "description": "Whether it is checked / on.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -24868,16 +24940,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "pressed",
-              "description": "Whether the toggle is pressed/on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "pressed"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -24927,6 +24989,15 @@
               "attribute": "arialabel"
             },
             {
+              "kind": "field",
+              "name": "pressed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "pressed"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -24945,34 +25016,27 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "pressed"
+          ],
+          "alphaEvents": [
+            "pdx-pressed-change",
+            "pressedchange"
+          ],
+          "alphaDetail": {
+            "pressed": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-pressed-change",
+              "name": "pressed-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the toggle is pressed or released.",
-              "detail": "{ pressed: boolean }"
-            },
-            {
-              "name": "pressedchange",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "The legacy name of `pdx-pressed-change`, kept as an alias.",
-              "detail": "{ pressed: boolean }"
+              "description": "Fired when the component writes `pressed`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "attributes": [
-            {
-              "name": "pressed",
-              "fieldName": "pressed",
-              "description": "Whether the toggle is pressed/on.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "disabled",
               "fieldName": "disabled",
@@ -25017,6 +25081,14 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "pressed",
+              "fieldName": "pressed",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [

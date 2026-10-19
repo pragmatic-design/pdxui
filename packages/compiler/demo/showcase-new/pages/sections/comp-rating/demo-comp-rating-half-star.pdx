@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">precision=0.5 enables half-star selection.</p>
 
     <div class="demo-row">
-      <pdx-rating :value="rating2" precision="0.5" @pdx-change="onRating2"></pdx-rating>
+      <pdx-rating :value="rating2" precision="0.5" @value-change="onRating2"></pdx-rating>
     </div>
   </section>
 </template>

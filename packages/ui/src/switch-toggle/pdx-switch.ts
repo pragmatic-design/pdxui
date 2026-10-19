@@ -2,18 +2,23 @@
 // Maps to .pdx-toggle CSS class from design system (forms.css).
 // Uses role="switch" for proper a11y semantics.
 
-import { component, html, useFormAssociated } from '@pdxui/core';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { component, html, useFormAssociated, model } from '@pdxui/core';
+import { reflectNameToHost } from '../shared/own-prop';
 import { uiString } from '../shared/i18n';
 
 /**
  * A toggle switch (role="switch") the user turns on and off, with a label, a description and a
  * loading state.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail checked $event.detail.value
+ * @alphadetail value $event.currentTarget.value
  */
 component('pdx-switch', {
     formAssociated: true,
+    // A toggle writes it (#480), and the write dispatches `checked-change`.
+    models: { checked: model(false) },
     props: {
-        checked: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
         loading: { type: Boolean, default: false },
         label: { type: String, default: '' },
@@ -27,16 +32,11 @@ component('pdx-switch', {
         value: { type: String, default: '' },
     },
     setup(ctx) {
-        // `checked` is the live state: a toggle writes it.
+        // `checked` is the live state and the model: a toggle writes it, and the write dispatches its event.
 
         function onChange(e: Event) {
             if (ctx.disabled() || ctx.loading()) return;
-            const input = e.target as HTMLInputElement;
-            setOwnProp(ctx.el, 'checked', input.checked);
-            ctx.emit('pdx-change', {
-                checked: input.checked,
-                value: ctx.value() || ctx.label(),
-            });
+            ctx.checked.set((e.target as HTMLInputElement).checked);
         }
 
         function toggleClass(): string {
@@ -67,8 +67,7 @@ component('pdx-switch', {
             clear() {
                 const inp = ctx.el.querySelector('input') as HTMLInputElement | null;
                 if (inp) inp.checked = false;
-                setOwnProp(ctx.el, 'checked', false);
-                ctx.emit('pdx-change', { checked: false, value: (ctx.value() as string) || (ctx.label() as string) });
+                ctx.checked.set(false);
             },
         });
 

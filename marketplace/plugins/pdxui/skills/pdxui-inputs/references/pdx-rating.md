@@ -4,7 +4,6 @@ Star rating with halves and tooltips.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | number | `0` | The current value. |
 | `count` | `count` | number | `5` | Number of rating symbols. |
 | `precision` | `precision` | number | `1` | Smallest selectable step (e.g. 0.5 for half stars). |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
@@ -16,6 +15,7 @@ Star rating with halves and tooltips.
 | `colors` | `colors` | string | `''` | Comma-separated threshold:color pairs, e.g. "2:red,3:orange,5:green" |
 | `clearable` | `clearable` | boolean | `false` | Allow clearing to 0 by clicking current value |
 | `label` | `label` | string | `''` | Accessible name. Empty: the rating.label component string, «Rating» in English. |
+| `value` | `value` | number | `0` | The current value. |
 
 **API (via `:ref`)**
 
@@ -25,7 +25,7 @@ Star rating with halves and tooltips.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `change` → `detail: { value }` — Fired when the value changes.; `hover` → `detail: { value }` — Fired on `hover`.; `pdx-change` → `detail: { value }` — Fired when the value changes.
+**Events:** `hover` → `detail: { value }` — Fired on `hover`.; `value-change` → `detail: { value: number }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `slider`
 
@@ -39,14 +39,14 @@ are checked against the manifest above._
 **Basic** — Click to rate. Arrow keys to adjust.
 
 ```html
-<pdx-rating :value="rating1" @pdx-change="onRating1"></pdx-rating>
+<pdx-rating :value="rating1" @value-change="onRating1"></pdx-rating>
 ```
 
 **Half-Star Precision** — precision=0.5 enables half-star selection. _(from the live demo)_
 
 ```html
 <div class="demo-row">
-  <pdx-rating :value="rating2" precision="0.5" @pdx-change="onRating2"></pdx-rating>
+  <pdx-rating :value="rating2" precision="0.5" @value-change="onRating2"></pdx-rating>
 </div>
 ```
 
@@ -81,7 +81,7 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-row">
-  <pdx-rating :value="rating4" colors="2:red,3:orange,5:green" @pdx-change="onRating4" clearable></pdx-rating>
+  <pdx-rating :value="rating4" colors="2:red,3:orange,5:green" @value-change="onRating4" clearable></pdx-rating>
 </div>
 ```
 
@@ -110,7 +110,7 @@ are checked against the manifest above._
 <div class="demo-row">
   <form @submit="onSubmit">
     <pdx-form-field label="Your rating" required>
-      <pdx-rating :value="rating1" name="score" @pdx-change="onRating1"></pdx-rating>
+      <pdx-rating :value="rating1" name="score" @value-change="onRating1"></pdx-rating>
     </pdx-form-field>
     <button type="submit" class="pdx-primary" style="margin-top:var(--pdx-space-sm)">Submit</button>
   </form>

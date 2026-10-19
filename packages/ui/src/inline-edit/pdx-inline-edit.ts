@@ -7,6 +7,7 @@ import { component, html, signal, untracked } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 import { setOwnProp } from '../shared/own-prop';
+import { onControlValue } from '../shared/model-event';
 import { onPressOutside } from '../shared/press-outside';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -343,8 +344,8 @@ component('pdx-inline-edit', {
                 case 'boolean': {
                     const sw = document.createElement('pdx-switch') as any;
                     sw.checked = !!val;
-                    sw.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.checked ?? sw.checked;
+                    onControlValue(sw, 'pdx-change', (e) => e.detail?.checked ?? sw.checked, (v) => {
+                        _editValue = v;
                         // Boolean auto-confirms immediately
                         confirmEdit();
                     });
@@ -388,8 +389,8 @@ component('pdx-inline-edit', {
                 case 'rating': {
                     const rt = document.createElement('pdx-rating') as any;
                     rt.value = val ?? 0;
-                    rt.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.value ?? rt.value;
+                    onControlValue(rt, 'pdx-change', (e) => e.detail?.value ?? rt.value, (v) => {
+                        _editValue = v;
                         confirmEdit();
                     });
                     container.appendChild(rt);
