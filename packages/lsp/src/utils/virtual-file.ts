@@ -16,6 +16,9 @@ export interface VirtualFile {
     scriptStart: number;     // the offset in the .pdx where the <script> content starts
     scriptLen: number;       // the length of the <script> content (the 1:1 region at the head of the virtual file)
     templateMap: SegmentMap | null;
+    /** Where the template projection starts in `content`; -1 when there is none. What comes after it
+     *  is checked under `strict`, what comes before it is not (#468). */
+    templateBase: number;
 }
 
 export function buildVirtualFile(
@@ -28,14 +31,16 @@ export function buildVirtualFile(
     const { script, declarations } = typeRefs(projectScript(scriptContent), refTargets(ast, resolveExposed));
     let content = script + EPILOGUE + (declarations ? declarations + '\n' : '');
     let templateMap: SegmentMap | null = null;
+    let templateBase = -1;
 
     if (ast && ast.length > 0 && templateContent != null && templateStart >= 0) {
+        templateBase = content.length;
         const proj = projectTemplate(ast, templateContent, templateStart, content.length, resolveType);
         content += proj.code;
         templateMap = proj.map;
     }
 
-    return { content, scriptStart, scriptLen: scriptContent.length, templateMap };
+    return { content, scriptStart, scriptLen: scriptContent.length, templateMap, templateBase };
 }
 
 /** A .pdx offset → the virtual file's offset, or -1 when it is outside a projected region. */

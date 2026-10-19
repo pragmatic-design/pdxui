@@ -491,7 +491,14 @@ declares (`CustomEvent<Payload>`, `CustomEvent<unknown>` for an `@event` with no
 event by its name otherwise (`MouseEvent` for `click`), whose `target` and `currentTarget` are the
 element the handler is written on, so `$event.target.value` on an `<input>` reads as it runs. The event
 of a library component, whose manifest does not type its detail, and of an unknown tag is a
-`CustomEvent` whose detail is not checked.
+`CustomEvent` whose detail is not checked. A handler that is an arrow, `e => …`, is given the same
+event as its parameter.
+
+The template is checked under TypeScript's `strict` mode, the script is not (#468): a read of a value
+that may be `null` (`user.name` on a `$signal<User | null>(null)`) and an untyped parameter nothing
+gives a type are errors in a template expression. The script's names reach the template with the
+types the script gives them: `$signal(null)`, `$signal([])`, `const rows = []` and a `@prop` with no
+type are `any` there as in the script.
 
 #### Rules
 

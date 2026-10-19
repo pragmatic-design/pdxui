@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- The editor and `pdx check --types` check template expressions under TypeScript's `strict` mode.
+  `{{ user.name }}` on a `$signal<User | null>(null)` is an error until it is guarded, and an arrow
+  handler's parameter (`@input="e => …"`) is typed as the event, so `e.taget` is an error too.
+  - The script is still checked leniently. Its names reach the template with the types the script
+    gives them: `$signal(null)`, `$signal([])`, `const rows = []` and an untyped `@prop` stay `any`.
+  - A project that type-checks today may see new errors where a template reads a nullable value
+    unguarded. (#468)
 - A component's own values are tokens, `--pdx-<component>-<property>[-<state>]`, overridable at
   `:root`, on a subtree or on one element. `<pdx-button style="--pdx-button-bg: …">` restyles one
   button, in every theme, on every variant; `--pdx-button-bg-hover` and `--pdx-button-color` likewise.

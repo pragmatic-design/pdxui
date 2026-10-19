@@ -37,7 +37,7 @@ export function typecheckPdx(rootDir: string, files: { path: string; content: st
         return [{ file: f, vf, fileName: svc.virtualName(uri) }];
     });
 
-    const diagnostics = svc.diagnoseAll(projected.map((p) => ({ fileName: p.fileName, content: p.vf.content })));
+    const diagnostics = svc.diagnoseAll(projected.map((p) => ({ fileName: p.fileName, content: p.vf.content, templateBase: p.vf.templateBase })));
     const out = new Map<string, PdxTypeError[]>();
     for (const p of projected) {
         const found = mapTsDiagnostics(diagnostics.get(p.fileName) ?? [], p.vf, p.file.content).map((d) => ({

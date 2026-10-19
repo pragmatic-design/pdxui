@@ -50,10 +50,10 @@
               <button
                 class="rail-tool"
                 type="button"
-                :aria-pressed="favourites.isPinned(item.pin) ? 'true' : 'false'"
+                :aria-pressed="favourites?.isPinned(item.pin) ? 'true' : 'false'"
                 :aria-label="$t('app.rail.pin', { name: item.label })"
                 :data-test="item.data.test + '-pin'"
-                @click.prevent.stop="favourites.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+                @click.prevent.stop="favourites?.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
             </span>
           }
         </slot>

@@ -2,16 +2,15 @@
 // the error of `@catch` and `@await … @error`, and a scoped slot's context. Each is typed now, so a
 // misspelt member is an error where it is written — in the editor and in `pdx check --types`.
 //
-// The projection is not compiled under `strict`: the script and the template share one program, and
-// strict mode on the showcase's scripts raised 398 errors that were none (a `$signal(null)` typed
-// `null`, an untyped parameter). What the beta asks of the projection is the three typings; they
-// report a misspelling without strict mode.
+// The projection is checked under `strict`, in a program of its own (#468; template-strict.test.ts):
+// on `unknown`, TypeScript then reports the value read (`'err' is of type 'unknown'`, 18046), where
+// without strict mode it named the member (2339). Either way the read is an error where it is written.
 //
 // `unknown` where the declaring component could have said and did not — a .pdx's `@event x;`, its
 // slot with no context. A library component's manifest types neither, and an unknown tag says
 // nothing: those stay unchecked, because a template has no cast to answer a false error with.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -37,6 +36,10 @@ function diagnose(script: string, template: string, resolveType?: Resolve): { co
         return { code: String(d.code), message: d.message.split('\n')[0], at: line.slice(d.range.start.character, d.range.end.character) };
     });
 }
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('what the workspace answers for an event and a slot', () => {
     const registry = {
@@ -84,9 +87,9 @@ describe("a handler's $event", () => {
     it('of an event a .pdx component declares with no payload is CustomEvent<unknown>, not any', () => {
         // What the workspace answers for `@event changed;` in a project component.
         const bare: Resolve = (tag, attr) => (tag === 'app-other' && attr === '@changed' ? 'CustomEvent<unknown>' : null);
-        // Without strict mode TypeScript names the member it cannot read on `unknown`.
+        // Under strict mode TypeScript names the `unknown` value read, not the member.
         const found = diagnose('let v = $signal(0);', '<app-other @changed="v = $event.detail.value"></app-other>', bare);
-        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(2339)', 'value']]);
+        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(18046)', '$event.detail']]);
     });
 
     it('control — the event of a component nothing types (a library one) is left unchecked', () => {
@@ -106,7 +109,7 @@ describe("a handler's $event", () => {
 describe('the error of @catch and @await … @error', () => {
     it('is unknown: reading a member of it unchecked is an error', () => {
         const found = diagnose('let x = $signal(1);', '@try { <p>{{ x }}</p> } @catch (err) { <p>{{ err.mesage }}</p> }');
-        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(2339)', 'mesage']]);
+        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(18046)', 'err']]);
     });
 
     it('narrowed, it reads as what it was narrowed to', () => {
@@ -116,7 +119,7 @@ describe('the error of @catch and @await … @error', () => {
 
     it('of @await … @error too', () => {
         const found = diagnose('let ready = $signal(false);', '@await (ready) { <p>ok</p> } @error (e) { <p>{{ e.mesage }}</p> }');
-        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(2339)', 'mesage']]);
+        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(18046)', 'e']]);
     });
 });
 
@@ -136,7 +139,7 @@ describe("a scoped slot's context", () => {
         // What the workspace answers for a project component's slot with no `@slot name: { … }`.
         const bare: Resolve = (tag, attr) => (tag === 'app-bare' && attr === '#item' ? 'unknown' : null);
         const found = diagnose('let x = $signal(1);', '<app-bare>@slot (item, { row }) { <p>{{ row.name }}</p> }</app-bare>', bare);
-        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(2339)', 'name']]);
+        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(18046)', 'row']]);
     });
 
     it('control — the slot of a component that cannot type it (a library one) is left unchecked', () => {

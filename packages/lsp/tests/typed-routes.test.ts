@@ -16,7 +16,11 @@ let APP = '';
 beforeAll(() => {
     APP = mkdtempSync(join(SITE, '.tmp-typed-routes-'));
     writeRouteTypes(APP, ['/', '/users/:id(number)', '/tickets', '/docs/:section/:page']);
-});
+    // TypeScript's cold start — the libraries read, the checker compiled — paid here with a timeout
+    // of its own, not by the first `it` against vitest's 5s: since the template is checked in a
+    // second, strict program (#468), under coverage that test overran.
+    errors('');
+}, 60_000);
 afterAll(() => { rmSync(APP, { recursive: true, force: true }); });
 
 /**
@@ -36,7 +40,14 @@ function errors(script: string, template = '<p></p>', options?: { routeTypes?: b
     return errorsOf([{ script, template }], options)[0];
 }
 
-describe('navigate() against the generated routes', () => {
+/**
+ * Each test is a `pdx check --types` of its own, and each builds its programs from cold: the lenient
+ * one and, since #468, the strict one for the template. That costs 2-4.5 s locally, more under
+ * coverage, so a test here has 30 s rather than vitest's 5.
+ */
+const COLD_PROGRAM = { timeout: 30_000 };
+
+describe('navigate() against the generated routes', COLD_PROGRAM, () => {
     it('a declared pattern with its typed params, and one with none, check', () => {
         expect(errors("navigate('/users/:id', { id: 42 });\nnavigate('/tickets');\nnavigate('/docs/:section/:page', { section: 'a', page: 'b' }, { from: 'x' });")).toEqual([]);
     });
@@ -69,7 +80,7 @@ describe('navigate() against the generated routes', () => {
     });
 });
 
-describe('<pdx-link> against the generated routes', () => {
+describe('<pdx-link> against the generated routes', COLD_PROGRAM, () => {
     const page = (template: string) => errors('const u = { id: 3 };', template);
 
     it('a declared pattern with its params checks', () => {

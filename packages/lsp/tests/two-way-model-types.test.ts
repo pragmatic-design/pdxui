@@ -3,7 +3,7 @@
 // signal is an error; the same binding of a string signal is fine. What is not a model — a plain prop,
 // a native element, a library component that lists no model — is projected as before.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { mkdtempSync, writeFileSync, rmSync } from 'fs';
@@ -28,6 +28,10 @@ function diagnose(script: string, template: string): string[] {
     const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length, resolveType);
     return getTsDiagnostics(svc, URI, vf, source).map(d => `${d.code} ${d.message.split('\n')[0]}`);
 }
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('::name on a model is type-checked', () => {
     it('a value of another type is an error, at the binding', () => {

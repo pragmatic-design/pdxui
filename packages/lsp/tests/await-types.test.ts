@@ -1,7 +1,7 @@
 // `@await (x as name)` in the editor (#145): the body sees the result, typed — `T` for a
 // `Promise<T>`, a source's `data()` without `undefined`. A read the type does not have is an error.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { pathToFileURL } from 'url';
 import { parseTemplate } from '@pdxui/compiler';
@@ -27,6 +27,10 @@ function diagnose(script: string, template: string): { message: string; at: stri
 const SOURCE = 'interface User { id: number; name: string }\n'
     + 'const users = null as unknown as { data(): User[] | undefined; state(): string };\n'
     + 'const one = null as unknown as Promise<User>;';
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
 describe('@await (x as name) in the editor', () => {
     it('a source binds its data, without undefined', () => {

@@ -7,7 +7,7 @@
 // unchanged, the grid emits pdx-cell-edit-cancel and the cell shows the old name again. Tab and a
 // click outside behave the same way, and in batch mode "Save All" would have nothing to save.
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { createDataSource } from '@pdxui/core';
 import '../../src/data-grid/pdx-data-grid';
@@ -45,13 +45,17 @@ async function mountGrid(editMode: 'cell' | 'batch') {
 const cell = (el: HTMLElement, id: number, field: string) =>
     el.querySelector<HTMLElement>(`.pdx-dg-row[data-row-id="${id}"] .pdx-dg-td[data-field="${field}"]`)!;
 
-/** Double-click a cell and wait for its editor to take the value. */
+/**
+ * Double-click a cell and wait for its editor's input. The editors load on first use (#447): the
+ * input exists once their module has arrived, which a fixed delay did not wait for under load (#534).
+ */
 async function openEditor(el: HTMLElement, id: number, field: string): Promise<HTMLInputElement> {
     cell(el, id, field).dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
-    await tick(30);
-    const field$ = el.querySelector<HTMLInputElement>('.pdx-dg-cell-editing input');
-    expect(field$, `no editor opened on ${id}.${field}: ${cell(el, id, field)?.outerHTML.slice(0, 300)}`).toBeTruthy();
-    return field$!;
+    const input = () => el.querySelector<HTMLInputElement>('.pdx-dg-cell-editing input');
+    await vi.waitFor(() => {
+        expect(input(), `no editor opened on ${id}.${field}: ${cell(el, id, field)?.outerHTML.slice(0, 300)}`).toBeTruthy();
+    }, { timeout: 5000 });
+    return input()!;
 }
 
 function type(input: HTMLInputElement, text: string): void {

@@ -128,7 +128,11 @@ The editor and `pdx check --types` know what `$event` is. On a DOM event it is t
 `$event.target.value` on an `<input>` is a string, and `$event.target.vlaue` is an error. On a
 component's event it is the `CustomEvent` that component declares with `@event`: `$event.detail` has
 the payload's type, or `unknown` when the `@event` gives none. A library component's events are not
-typed yet: their `$event.detail` is not checked.
+typed yet: their `$event.detail` is not checked. In `@input="e => …"`, `e` is that same event.
+
+Template expressions are checked under TypeScript's `strict` mode, the script is not: `{{ user.name }}`
+on a `$signal<User | null>(null)` is an error until you write `user?.name` or guard it with `@if`.
+A `$signal(null)` or a `$signal([])` keeps the loose type it has in the script.
 
 ### Event modifiers
 

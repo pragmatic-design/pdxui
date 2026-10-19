@@ -18,7 +18,7 @@ const IGNORED_CODES = new Set<number>([
 export function getTsDiagnostics(
     svc: PdxTsService, uri: string, vf: VirtualFile, source: string,
 ): Diagnostic[] {
-    return mapTsDiagnostics(svc.getDiagnostics(uri, vf.content), vf, source);
+    return mapTsDiagnostics(svc.getDiagnostics(uri, vf.content, vf.templateBase), vf, source);
 }
 
 /**

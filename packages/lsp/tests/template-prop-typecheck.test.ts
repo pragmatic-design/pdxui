@@ -2,7 +2,7 @@
 // `:count="'x'"` on a number prop → an error; `:count="5"` is fine; identifiers
 // (loosely-typed signals) are NOT checked → no false positives.
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
 import { analyzeDocument } from '../src/utils/compiler-bridge';
 import { PdxTsService } from '../src/utils/ts-service';
@@ -35,6 +35,10 @@ function diagsFor(src: string) {
 const wrap = (tmplBody: string) =>
     ['<template>', tmplBody, '</template>',
      '<script>', 'let n = $signal(0);', '</script>'].join('\n');
+
+// The language service's cold start — the lenient program and the strict one that checks the template
+// (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
+beforeAll(() => { diagsFor(wrap('<p>{{ n }}</p>')); }, 60_000);
 
 describe('type-checking literal bindings against the props of a component', () => {
     it('reports a string literal on a number prop', () => {

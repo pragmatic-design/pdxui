@@ -5,9 +5,9 @@
 // Signals are already typed as their value ($signal<T>:T) → no unwrapping needed.
 //
 // The names a template introduces are typed, not `any` (#122): a handler's `$event`, the error of
-// `@catch` / `@await … @error` (`unknown`), a scoped slot's context. The projection shares the
-// script's program, so it is not compiled `strict`: forcing it raised 398 errors on the showcase,
-// nearly all in the scripts (./ts-service). The typed names report a misspelt member without it.
+// `@catch` / `@await … @error` (`unknown`), a scoped slot's context. The projection is checked
+// `strict`, in a program of its own (#468): forcing `strict` on the script raised 398 errors on the
+// showcase that are not errors, so the script stays in the lenient program (./ts-service).
 
 import type { TemplateNode } from '@pdxui/compiler';
 import { parseDeferTriggers } from '@pdxui/compiler';
@@ -28,6 +28,12 @@ export type ResolveType = (tag: string, attr: string) => string | null;
 // Boolean/number literals are NOT checked: auto-generated manifests often type as
 // `string` props that accept a boolean (attribute reflection) → false positives.
 const STRING_LITERAL = /^\s*('[^']*'|"[^"]*")\s*$/;
+
+// Match: a handler that is one arrow function — `e => …`, `(a, b) => …`, `e => { …; … }` — as the
+// compiler's ARROW in codegen-template-rewrite.ts reads it. A body with a `;` outside braces is not
+// one TypeScript expression, so it stays a block (`e => a(e); b()`). The body starts at a non-space,
+// so it shares no spaces with the `\s*` before it (CodeQL js/polynomial-redos, as in the compiler).
+const ARROW_HANDLER = /^(?:\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*(?:\{[\s\S]*\}|[^\s;{][^;]*)$/;
 
 interface Range { start: number; end: number; }
 
@@ -141,7 +147,13 @@ export function projectTemplate(
                     ? (resolveType?.(tag, '@' + event) ?? `PdxEvent<${JSON.stringify(event)}, ${JSON.stringify(tag.toLowerCase())}>`)
                     : null;
                 emit(';');
-                if (eventType) {
+                if (eventType && ARROW_HANDLER.test(expr.trim())) {
+                    // A handler that IS an arrow is called with the event (the compiler's ARROW): its
+                    // parameter is the event, typed as `$event` is, and not an implicit any (#468).
+                    emit(`((__h: ($event: ${eventType}) => unknown) => {})(`);
+                    map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
+                    emit(');\n');
+                } else if (eventType) {
                     // A block body: a handler may be several statements, `save(); count += 2`, which
                     // a parenthesised expression cannot hold (#487). A reference, a call, a lambda and
                     // a mutation are each a statement as well.
