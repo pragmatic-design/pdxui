@@ -9,7 +9,7 @@ import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
 import { checkFormRules } from './form-rules';
-import { DEFER_TRIGGERS, unknownDeferTriggers } from './defer-triggers';
+import { DEFER_TRIGGERS, unknownDeferTriggers, parseDeferTriggers } from './defer-triggers';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
@@ -833,7 +833,8 @@ function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]
                             code: 'PDX_DEFER_UNKNOWN_TRIGGER',
                             severity: 'error',
                             message: `@defer (${node.trigger}): '${part}' is not a trigger. The runtime would load the block at once — the opposite of deferring it.`,
-                            hint: `The triggers are ${DEFER_TRIGGERS.join(', ')}, combined with |. Write immediate to load at once.`,
+                            hint: `The triggers are ${DEFER_TRIGGERS.join(', ')} and when (<expression>), combined with |; `
+                                + 'the triggers after `; prefetch` only load the code. Write immediate to load at once.',
                             ...(node.loc ? { line: node.loc.line, column: node.loc.column } : {}),
                         });
                     }
@@ -983,12 +984,21 @@ function walkNodes(
             case 'portal':
                 walkNodes(node.body, ids, loopVars);
                 break;
-            case 'defer':
+            case 'defer': {
+                // `when ( … )` reads the script's names, in either phase (#281).
+                const triggers = parseDeferTriggers(node.trigger);
+                for (const e of [...triggers.render.when, ...(triggers.prefetch?.when ?? [])]) extractIdentifiers(e, ids);
                 walkNodes(node.body, ids, loopVars);
                 if (node.placeholder) walkNodes(node.placeholder, ids, loopVars);
                 if (node.loading) walkNodes(node.loading, ids, loopVars);
-                if (node.error) walkNodes(node.error, ids, loopVars);
+                if (node.error) {
+                    // `@error (err, retry)`: the branch's names, `err` and `retry` by default (#281).
+                    loopVars.add(node.errorVar || 'err');
+                    loopVars.add(node.retryVar ?? 'retry');
+                    walkNodes(node.error, ids, loopVars);
+                }
                 break;
+            }
             case 'await':
                 extractIdentifiers(node.condition, ids);
                 // `@await (x as name)`: the result's name is the block's, like a @for item.

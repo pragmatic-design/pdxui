@@ -103,7 +103,10 @@ function templateHandlers(ast: TemplateNode[]): TemplateHandler[] {
                 case 'if': case 'require': walk(node.body, bound); walk(node.elseBody, bound); break;
                 case 'switch': for (const c of node.cases) walk(c.body, bound); walk(node.defaultBody, bound); break;
                 case 'show': case 'portal': case 'scoped-slot': case 'custom-directive': walk(node.body, bound); break;
-                case 'defer': walk(node.body, bound); walk(node.placeholder, bound); walk(node.loading, bound); walk(node.error, bound); break;
+                case 'defer':
+                    walk(node.body, bound); walk(node.placeholder, bound); walk(node.loading, bound);
+                    walk(node.error, plus(node.errorVar || 'err', node.retryVar ?? 'retry'));
+                    break;
             }
         }
     };

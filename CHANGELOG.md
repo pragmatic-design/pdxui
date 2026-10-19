@@ -127,6 +127,16 @@ semver.
 
 ### Changed
 
+- `@defer` has two phases. `@defer (interaction; prefetch idle)` fetches the block's code when the
+  browser is idle and mounts it on the first pointer or focus entry; without `; prefetch` both start
+  together, as before. A prefetch goes through the prefetch queue, the render's load ahead of it, and a
+  prefetch that fails shows nothing: the render loads again.
+  - `when (expr)` is a trigger in either phase: it fires the first time the expression is true, and
+    does not un-fire.
+  - `@error (err, retry)` names the load's error and a `retry` that loads the code again, as
+    `@await`'s `@error` does.
+  - `@defer (hover)` is `PDX_REMOVED_FORM`: it was `interaction` under another name, and `pdx migrate`
+    rewrites it. (#281)
 - Two script forms the compiler read wrongly, in silence, are errors. A `$` rune outside its place —
   `$signal`, `$derived`, `$store` that are not the whole initialiser of a top-level declaration,
   `$effect`, `$watch` that are not a top-level statement — is `PDX_RUNE_POSITION`, its hint naming the

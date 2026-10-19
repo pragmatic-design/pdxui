@@ -376,9 +376,25 @@ placeholder meanwhile:
 }
 ```
 
-The trigger (`viewport`, `idle`, `interaction`…) decides *when*. The compiler generates the dynamic
-import and the boundary: you don't write `import()`, `Suspense` or error boundaries by hand. It's the
-right way to keep a chart you only see on scroll out of the home bundle.
+The trigger (`viewport`, `idle`, `interaction`, `timer(ms)`, `immediate`…) decides *when*. The compiler
+generates the dynamic import and the boundary: you don't write `import()`, `Suspense` or error
+boundaries by hand. It's the right way to keep a chart you only see on scroll out of the home bundle.
+
+Loading the code and showing it can happen at different moments. The triggers after `; prefetch` only
+fetch the code, so it is already there when the block is shown; `when (…)` waits for a condition of
+the app, the first time it is true; and `@error` hands its branch the error and a `retry` that loads
+the code again:
+
+```pdx
+@defer (when (tab === 'sales'); prefetch idle) {
+  <app-sales-chart />
+} @error (err, retry) {
+  <button @click="retry()">Load the chart again</button>
+}
+```
+
+The chart's code arrives while the browser is idle, and the chart mounts when the Sales tab is
+opened — without a wait. A failed prefetch shows nothing; opening the tab simply loads again.
 
 ## Waiting for data: `@await`
 

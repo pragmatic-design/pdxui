@@ -14,6 +14,7 @@ import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope,
 import { rewriteHtmlBindings, isSimpleAccess, scopedSlotCall } from './codegen-template-rewrite';
 import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
+import { deferTriggerOptions } from './defer-triggers';
 import { escapeForTemplateLiteral } from './codegen-shared';
 import { virtualRowTag } from './validate-virtual';
 import { dropDynamicContent } from './dynamic-content';
@@ -369,10 +370,16 @@ function deferredTags(bodyCode: string): string[] {
 function generateDefer(node: DeferNode, imports: Set<string>, ctx: CompileContext): string {
     imports.add('defer');
     const bodyCode = generateNodes(node.body, imports, ctx);
-    const optionParts: string[] = [`trigger: ${jsQuote(node.trigger)}`];
+    const optionParts = deferTriggerOptions(node.trigger, (e) => callSignals(prefixCtx(e, ctx), ctx));
     if (node.placeholder) optionParts.push(`placeholder: () => ${generateNodes(node.placeholder, imports, ctx)}`);
     if (node.loading) optionParts.push(`loading: () => ${generateNodes(node.loading, imports, ctx)}`);
-    if (node.error) optionParts.push(`error: () => ${generateNodes(node.error, imports, ctx)}`);
+    if (node.error) {
+        // `@error (err, retry)`, as `@await`'s (#281): the names reach the branch, `err` and `retry` by default.
+        const errorVar = node.errorVar || 'err';
+        const retryVar = node.retryVar ?? 'retry';
+        const errorBody = node.error;
+        optionParts.push(`error: (${errorVar}, ${retryVar}) => ${withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx))}`);
+    }
 
     return `\${defer({ ${optionParts.join(', ')} }, ${deferLoadFn(deferredTags(bodyCode), ctx)}, () => ${bodyCode})}`;
 }

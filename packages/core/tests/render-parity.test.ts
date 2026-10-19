@@ -245,6 +245,12 @@ const ROWS: Row[] = [
     // The body, once the promise has settled. (The body reads the promise itself, not its value, on
     // both paths: binding the value is #145.)
     { name: '@await', expected: '<p>ready</p>', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
+    // Two phases (#281): the render waits for `when ( … )`, whatever the prefetch phase does.
+    {
+        name: '@defer (when (…); prefetch idle), after the condition turns true', expected: '<p>in</p><button>go</button>',
+        template: '@defer (when (on); prefetch idle) { <p>in</p> } @placeholder { <p>wait</p> }<button @click="on = true">go</button>',
+        script: 'let on = $signal(false);', act: click('button'),
+    },
     {
         name: '@defer loads a component used only inside it', expected: '<pdx-deferred-probe></pdx-deferred-probe>', expectedRead: true,
         template: '@defer (immediate) { <pdx-deferred-probe></pdx-deferred-probe> }',

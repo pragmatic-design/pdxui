@@ -6,7 +6,7 @@ import type { OwnerScope } from '../reactivity/signal';
 import { pausableTimeout } from '../reactivity/scope-timer';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
-import { trackUrgentLoad } from './load-queue';
+import { trackUrgentLoad, queuePrefetch } from './load-queue';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -14,18 +14,28 @@ const isBrowser = typeof window !== 'undefined';
 // ─── Types ─────────────────────────────────────────────────────────
 
 export interface DeferOptions {
-    /** Trigger expression: 'viewport', 'idle', 'idle(2000)', 'hover', 'timer(1000)', 'immediate'.
-     *  Composite: 'viewport | idle(2000)' (OR — any trigger fires). */
-    trigger: string;
+    /** The render triggers: 'viewport', 'idle', 'idle(2000)', 'interaction', 'timer(1000)', 'immediate'.
+     *  Composite: 'viewport | idle(2000)' (OR — any trigger fires). They render the body, and load its
+     *  code if it has not been loaded yet. */
+    trigger?: string;
+    /** A render trigger too (`when (expr)`): fires the first time it is truthy, and does not un-fire. */
+    when?: () => unknown;
+    /** The prefetch triggers (`; prefetch …`): they load the code without rendering (#281). */
+    prefetch?: string;
+    /** A prefetch trigger too (`; prefetch when (expr)`). */
+    prefetchWhen?: () => unknown;
     /** Permission required before loading. */
     permission?: string;
     /** Placeholder shown before trigger fires. */
     placeholder?: () => Node | DocumentFragment;
     /** Loading state after trigger, before load completes. */
     loading?: () => Node | DocumentFragment;
-    /** Error state if load fails. */
+    /** Error state if the render's load fails; `retry` loads the code again. */
     error?: (err: Error, retry: () => void) => Node | DocumentFragment;
 }
+
+/** Each block's key in the prefetch queue: its own, so two blocks never share a queued load. */
+let prefetchKeys = 0;
 
 export type DeferState = 'placeholder' | 'triggered' | 'loading' | 'loaded' | 'error';
 
@@ -64,15 +74,41 @@ export function defer(
     let cleanups: (() => void)[] = [];
     // The idle and timer triggers pause with the page that holds the block (#269).
     const scope = currentScope();
+    const prefetchKey = `defer:${++prefetchKeys}`;
 
+    // ─── Two phases (#281) ──────────────────────────────────────────
+    // The code is loaded once: the prefetch keeps the promise and the render reuses it — at once if the
+    // code has arrived, when it does if it is in flight. A load that fails is forgotten, so the next
+    // one, the render's or a retry's, calls `loadFn` again; a failed prefetch renders nothing.
+    let code: Promise<unknown> | null = null;
+
+    function load(): Promise<unknown> {
+        if (!loadFn) return Promise.resolve(undefined);
+        if (code) return code;
+        const pending = loadFn();
+        code = pending;
+        pending.catch(() => { if (code === pending) code = null; });
+        return pending;
+    }
+
+    /** The prefetch phase: the code, through the prefetch queue, and nothing rendered. */
+    function prefetch() {
+        if (!loadFn || code || state.peek() !== 'placeholder') return;
+        // Started later, by the queue: by then the render may have loaded it, or failed to — a failed
+        // render's load is not tried again behind its back.
+        queuePrefetch(prefetchKey, () => (state.peek() === 'placeholder' ? load() : code ?? Promise.resolve()));
+    }
+
+    /** The render phase: the body, once its code is there. */
     function doLoad() {
         if (state.peek() !== 'placeholder' && state.peek() !== 'triggered') return;
         state.set('loading');
         cleanupTriggers();
 
         if (loadFn) {
-            // The block is on screen and waiting: queued prefetches hold back until it has loaded.
-            trackUrgentLoad(loadFn())
+            // The block is on screen and waiting: it goes ahead of the queue, and queued prefetches
+            // hold back until it has loaded.
+            trackUrgentLoad(load())
                 .then(mod => {
                     loadedModule.set(mod);
                     state.set('loaded');
@@ -87,6 +123,7 @@ export function defer(
         }
     }
 
+    /** `@error`'s retry: the code is loaded again, and the body rendered when it arrives. */
     function retry() {
         loadError.set(null);
         state.set('placeholder');
@@ -105,16 +142,19 @@ export function defer(
         const parent = end.parentNode;
         if (!parent || state() !== 'placeholder') return;
 
-        // Parse and activate triggers
-        const triggers = options.trigger.split('|').map(t => t.trim());
-
-        for (const trigger of triggers) {
-            const cleanup = activateTrigger(trigger, parent, end, scope, () => {
-                state.set('triggered');
-                doLoad();
-            });
-            if (cleanup) cleanups.push(cleanup);
-        }
+        // The prefetch triggers first: an `immediate` render must not leave a prefetch armed after it.
+        const arm = (triggers: string | undefined, when: (() => unknown) | undefined, fire: () => void): void => {
+            for (const trigger of (triggers ?? '').split('|').map(t => t.trim()).filter(Boolean)) {
+                const cleanup = activateTrigger(trigger, parent, end, scope, fire);
+                if (cleanup) cleanups.push(cleanup);
+            }
+            if (when) cleanups.push(activateWhen(when, fire));
+        };
+        arm(options.prefetch, options.prefetchWhen, prefetch);
+        arm(options.trigger, options.when, () => {
+            state.set('triggered');
+            doLoad();
+        });
 
         return cleanupTriggers;
     });
@@ -198,7 +238,9 @@ function activateTrigger(
         return setupIdleTrigger(timeout, scope, onTrigger);
     }
 
-    if (trigger === 'hover' || trigger === 'interaction') {
+    // `hover` was the same trigger under another name; the beta removed it (#281, decision 37), and a
+    // hand-written `defer()` that still says it gets the unknown-trigger warning below.
+    if (trigger === 'interaction') {
         return setupInteractionTrigger(before, onTrigger);
     }
 
@@ -212,10 +254,26 @@ function activateTrigger(
     // In development it says so, once per trigger: loading at once is the opposite of what was asked.
     if (DEV && !warnedTriggers.has(trigger)) {
         warnedTriggers.add(trigger);
-        console.warn(`[pdx] defer: '${trigger}' is not a trigger, so the block loads at once. The triggers are immediate, viewport, idle, idle(<n>), interaction, hover, timer(<n>), combined with |.`);
+        console.warn(`[pdx] defer: '${trigger}' is not a trigger, so the block loads at once. The triggers are immediate, viewport, idle, idle(<n>), interaction, timer(<n>), combined with |.`);
     }
     onTrigger();
     return null;
+}
+
+/**
+ * `when (expr)`: fires the first time the expression is truthy, and does not un-fire — a deferred block
+ * is never removed by its trigger. Once fired, the next run reads nothing, and the effect is subscribed
+ * to nothing.
+ */
+function activateWhen(condition: () => unknown, onTrigger: () => void): () => void {
+    let fired = false;
+    return effect(() => {
+        if (fired) return;
+        if (condition()) {
+            fired = true;
+            untracked(onTrigger);
+        }
+    });
 }
 
 /** The unknown triggers already warned about, so a list of deferred rows warns once. */

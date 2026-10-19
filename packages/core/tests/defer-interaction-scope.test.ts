@@ -84,16 +84,6 @@ describe('@defer (interaction)', () => {
         expect(load).toHaveBeenCalledOnce();
     });
 
-    it('and `hover` is scoped the same way', async () => {
-        // Same code path, same defect, and the issue asked for both to be decided together.
-        const load = vi.fn(() => Promise.resolve({}));
-        const { box } = mount('hover', load);
-        await armed();
-        enter(document.body);
-        expect(load, 'hover fired on the page').not.toHaveBeenCalled();
-
-        enter(box);
-        await waitUntil(() => load.mock.calls.length > 0, 'hover to fire on its own block');
-        expect(load).toHaveBeenCalledOnce();
-    });
+    // `hover`, the same trigger under another name, is removed (#281): `defer-two-phases.test.ts` has
+    // it, and the compiler reports it as PDX_REMOVED_FORM naming `interaction`.
 });

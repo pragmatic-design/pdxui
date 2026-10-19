@@ -10,6 +10,7 @@
 // nearly all in the scripts (./ts-service). The typed names report a misspelt member without it.
 
 import type { TemplateNode } from '@pdxui/compiler';
+import { parseDeferTriggers } from '@pdxui/compiler';
 import { SegmentMap } from './segment-map';
 
 export interface TemplateProjection { code: string; map: SegmentMap; }
@@ -266,10 +267,17 @@ export function projectTemplate(
                 case 'let':
                     emit('let '); verbatim(node.name.trim()); emit(' = ('); verbatim(node.expr.trim()); emit(');\n');
                     break;
-                case 'defer':
+                case 'defer': {
+                    // `when ( … )` is an expression of the script's names, in either phase (#281).
+                    const triggers = parseDeferTriggers(node.trigger);
+                    for (const e of [...triggers.render.when, ...(triggers.prefetch?.when ?? [])]) { emit('if ('); verbatim(e.trim()); emit(') {}\n'); }
                     if (node.body) walk(node.body);
                     if (node.placeholder) walk(node.placeholder);
+                    if (node.loading) walk(node.loading);
+                    // `@error (err, retry)`, as `@await`'s: the error is `unknown`, `retry` a function.
+                    if (node.error) { emit('{ const ' + (node.errorVar || 'err') + ': unknown = 0; const ' + (node.retryVar || 'retry') + ' = (): void => {};\n'); walk(node.error); emit('}\n'); }
                     break;
+                }
                 case 'require': case 'portal':
                     walk(node.body ?? []);
                     if ('elseBody' in node && node.elseBody) walk(node.elseBody);

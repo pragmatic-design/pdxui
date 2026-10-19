@@ -32,6 +32,7 @@ import { scriptSetup } from './script-setup';
 import { legacyScript, mixinRemoved } from './legacy-script';
 import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlock } from './route-fields';
 import { runePosition, storePersist } from './script-misreadings';
+import { deferHover } from './defer-hover';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -327,6 +328,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #278: silent misreadings of the script are errors (./script-misreadings).
     runePosition,
     storePersist,
+    // #281: `@defer (hover)` is `interaction` (./defer-hover).
+    deferHover,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
