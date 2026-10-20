@@ -496,6 +496,17 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         },
         reproducedIn: `${T}action-rune.test.ts`,
     },
+    PDX_LOADER_UNKNOWN_OPTION: {
+        severity: 'error', category: 'defect',
+        summary: '`@loader … { … }` with an option other than `staleTime`, or a `staleTime` the compiler cannot read as milliseconds.',
+        explanation: 'The router takes one option for a loader, `staleTime`, and it is written into the route table, which is read before any page runs: a misspelled `stale` would keep nothing, and a `staleTime` that names a variable of the script cannot reach the table.',
+        fix: '`{ staleTime: 30_000 }` — a number of milliseconds: a literal, or a product of literals such as `5 * 60_000`.',
+        example: {
+            bad: pdx('<p>{{ user.data()?.name }}</p>', "@page '/users/:id';\n@loader user: loadUser { stale: 30_000 };\nasync function loadUser() { return { name: 'Ada' }; }"),
+            good: pdx('<p>{{ user.data()?.name }}</p>', "@page '/users/:id';\n@loader user: loadUser { staleTime: 30_000 };\nasync function loadUser() { return { name: 'Ada' }; }"),
+        },
+        reproducedIn: `${T}loader-options.test.ts`,
+    },
     PDX_AGENT_ACTION_UNBOUND: {
         severity: 'error', category: 'defect',
         summary: 'An `@action` offered to agents (`with { agent }`) that no control of the template runs.',

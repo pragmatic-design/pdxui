@@ -46,7 +46,7 @@ export const RUNES: readonly RuneInfo[] = [
     // and `@head` are removed forms, and not offered.
     d('page', 'Register the component as a route page, lazy-loaded: further paths are aliases, and the options carry every route field.', "@page '/users', '/people' { prefetch: 'hover', transition: 'fade', meta: { requiresAuth: true } };", "@page '${1:/path}';"),
     d('guard', 'Require a permission for the route.', "@guard 'users.read';", "@guard '${1:permission}';"),
-    d('loader', 'Name a route loader; the page reads `user.data()`, `user.state()`.', '@loader user: loadUser;', '@loader ${1:user}: ${2:loadUser};'),
+    d('loader', 'Name a route loader; the page reads `user.data()`, `user.state()`. `{ staleTime }` keeps its result for a level entered again.', '@loader user: loadUser { staleTime: 30_000 };', '@loader ${1:user}: ${2:loadUser};'),
     d('layout', 'Render the page inside a layout; \'none\' opts out.', "@layout 'admin';", "@layout '${1:name}';"),
     d('title', 'Set document.title, static or reactive.', "@title 'Dashboard';   // or a backtick template for a reactive one", "@title '${1:Page Title}';"),
     d('meta', 'Add a meta tag to the document head.', "@meta description: 'text';   // or @meta property og:title: 'text';", "@meta ${1:description}: '${2:content}';"),

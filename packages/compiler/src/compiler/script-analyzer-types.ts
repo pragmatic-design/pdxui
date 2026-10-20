@@ -235,6 +235,8 @@ export interface RouteInfo {
     loader?: string;      // function name
     /** The name a named `@loader user: loadUser;` declares (#506); absent for the alpha's anonymous form. */
     loaderName?: string;
+    /** `@loader user: loadUser { staleTime: 30_000 };` — the loader's staleTime in ms (#148). */
+    loaderStaleTime?: number;
     search?: string;      // raw string (backward compat)
     searchParams?: SearchParamDecl[];  // parsed schema
     prefetch?: string;    // 'hover', 'viewport', 'eager'

@@ -149,6 +149,8 @@ export interface ScannedRoute {
      * HAS a loader; the function arrives from the page module's own registration.
      */
     loader?: string;
+    /** `@loader user: loadUser { staleTime: 30_000 };` — how long its result is used again, in ms (#148). */
+    loaderStaleTime?: number;
     /**
      * The page renders a `<pdx-router-outlet>`, so routes below its path nest inside it.
      *
@@ -257,6 +259,7 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                             redirects: route.redirects,
                             meta: route.meta,
                             loader: route.loader,
+                            loaderStaleTime: route.loaderStaleTime,
                             // The outlet reads these to activate a page. Taken only from
                             // `globalThis.__pdx_routes`, which a page module fills WHEN IT IS
                             // IMPORTED, every page would have to be imported for the router to know

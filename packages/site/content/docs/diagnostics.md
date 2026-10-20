@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 103 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 104 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -769,6 +769,40 @@ The listener outlives the component and keeps acting on a screen that is gone.
 The route is registered without a loader, so the page renders with no data.
 
 **Fix.** Declare it: `async function loadUser() { … }`.
+
+### PDX_LOADER_UNKNOWN_OPTION
+
+*error* — `@loader … { … }` with an option other than `staleTime`, or a `staleTime` the compiler cannot read as milliseconds.
+
+The router takes one option for a loader, `staleTime`, and it is written into the route table, which is read before any page runs: a misspelled `stale` would keep nothing, and a `staleTime` that names a variable of the script cannot reach the table.
+
+**Fix.** `{ staleTime: 30_000 }` — a number of milliseconds: a literal, or a product of literals such as `5 * 60_000`.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ user.data()?.name }}</p>
+</template>
+<script>
+@page '/users/:id';
+@loader user: loadUser { stale: 30_000 };
+async function loadUser() { return { name: 'Ada' }; }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ user.data()?.name }}</p>
+</template>
+<script>
+@page '/users/:id';
+@loader user: loadUser { staleTime: 30_000 };
+async function loadUser() { return { name: 'Ada' }; }
+</script>
+```
 
 ### PDX_MALFORMED_EVENT
 

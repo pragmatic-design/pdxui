@@ -267,7 +267,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // `notFound()` themselves are not: the router recognises them by a marker, and only the loaders that
 // throw them import them. Same machine, same day, the built dist: main entry 40.8 → this branch
 // 41.1 KB, blocking 97.0 → 97.4 KB, js 470.1 → 470.4 KB.
-const BUDGET_KB = { entry: 42, js: 471, css: 63, blocking: 98 };
+// entry 42 → 43, js 471 → 472, blocking 98 → 99: a loader's results are kept in core's cache (#148),
+// and the router imports the cache statically, so every routed app carries it in its entry. Loading
+// it on demand kept the entry at 41.7 KB but put the module between a navigation and its loader's
+// data — three waves where `first-paint-waves.spec.ts` (L4) holds two. Same machine, same day, the
+// built dist: main entry 41.1 → this branch 42.6 KB, blocking 97.4 → 98.9 KB, js 470.4 → 472.0 KB.
+const BUDGET_KB = { entry: 43, js: 472, css: 63, blocking: 99 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

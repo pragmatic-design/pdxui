@@ -32,6 +32,11 @@ export const _loaderData = signal<Record<string, unknown>>({});
 export const _loaderState = signal<Record<string, LoaderState>>({});
 /** Each level's last failure, by its pattern: set on failure, cleared on success and by clearLoaders (#505). */
 export const _loaderError = signal<Record<string, Error>>({});
+/**
+ * The levels showing a kept result while their loader runs again (#148): entered again after their
+ * `staleTime`, or invalidated while mounted. Cleared when the run settles with a new result.
+ */
+export const _loaderStale = signal<Record<string, boolean>>({});
 /** Which level `currentLoaderData()` resolves against: the matched route, set before its loader runs. */
 export const _loaderFocus = signal<string | null>(null);
 export const _route = signal<ResolvedRoute | null>(null);
@@ -90,8 +95,9 @@ export function loaderState(routePath: string): LoaderState {
 /**
  * A route's loader as a source with the async vocabulary (#141, #506): what a named
  * `@loader user: loadUser;` declares `user` as. `data()` is what the loader returned, `state()` its
- * state, `error()` why it last failed, `pending()` while a navigation runs it. `stale()` is false: the
- * router keeps no cache of loader results yet (#148). `@await (user as u)` reads it like any source.
+ * state, `error()` why it last failed, `pending()` while a navigation runs it, and `stale()` while
+ * the result shown is a kept one its loader is running again for (#148). `@await (user as u)` reads
+ * it like any source.
  */
 export interface LoaderSource<T = unknown> {
     readonly data: ReadonlySignal<T | undefined>;
@@ -109,7 +115,7 @@ export function loaderSource<T = unknown>(routePath: string): LoaderSource<T> {
         state,
         error: computed(() => _loaderError()[routePath] ?? null),
         pending: computed(() => state() === 'pending'),
-        stale: computed(() => false),
+        stale: computed(() => _loaderStale()[routePath] ?? false),
     };
 }
 

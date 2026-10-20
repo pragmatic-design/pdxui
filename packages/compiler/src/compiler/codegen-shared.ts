@@ -224,6 +224,7 @@ export function assembleModule(
         title?: string;
         titleKey?: string;
         loader?: string;
+        loaderStaleTime?: number;
         redirectTo?: string; redirects?: { from: string; to: string }[];
         meta?: Record<string, unknown>; aliases?: string[];
         outlets?: { name: string; tag: string }[];
@@ -372,6 +373,8 @@ export function assembleModule(
         // The REFERENCE, not the name: the router calls this. The string would make
         // `config.loader()` a call on a string and the whole feature unreachable.
         if (loaderRef) routeParts.push(`loader:${loaderRef}`);
+        // `@loader user: loadUser { staleTime: 30_000 };` (#148): how long the result is used again.
+        if (loaderRef && route.loaderStaleTime !== undefined) routeParts.push(`loaderStaleTime:${route.loaderStaleTime}`);
         if (route.prefetch) routeParts.push(`prefetch:${jsString(route.prefetch)}`);
         if (route.transition) routeParts.push(`transition:${jsString(route.transition)}`);
         // The RESOLVED chain, not the name: the outlet diffs the chain, and nothing reads the

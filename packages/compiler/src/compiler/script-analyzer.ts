@@ -20,6 +20,7 @@ import {
     parseRouteParams, splitAtTopLevelCommas, invalidRouteFields, PAGE_OPTIONS,
     routeTitleOf,
 } from './script-analyzer-helpers';
+import { readLoaderOptions } from './loader-options';
 import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
@@ -812,9 +813,26 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         const guardMatch = trimmed.match(/^@guard\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
         if (guardMatch) { route.guard = guardMatch[1] ?? guardMatch[2]; continue; }
 
-        // Match: @loader user: loadUser; — the named form (#506). Groups: [1]=the name [2]=the function
-        const namedLoader = trimmed.match(/^@loader\s+(\w+)\s*:\s*(\w+)\s*;?\s*$/);
-        if (namedLoader) { route.loaderName = namedLoader[1]; route.loader = namedLoader[2]; continue; }
+        // Match: @loader user: loadUser; — the named form (#506), with its options block (#148).
+        // Groups: [1]=the name [2]=the function [3]=the options block, braces included
+        const namedLoader = trimmed.match(/^@loader\s+(\w+)\s*:\s*(\w+)\s*(\{[^{}]*\})?\s*;?\s*$/);
+        if (namedLoader) {
+            route.loaderName = namedLoader[1];
+            route.loader = namedLoader[2];
+            if (namedLoader[3]) {
+                const read = readLoaderOptions(namedLoader[3]);
+                if (read.staleTime !== undefined) route.loaderStaleTime = read.staleTime;
+                if (read.problem) {
+                    warnings.push({
+                        code: 'PDX_LOADER_UNKNOWN_OPTION',
+                        severity: 'error' as const,
+                        message: `\`@loader ${namedLoader[1]}\` ${read.problem}`,
+                        hint: '`@loader user: loadUser { staleTime: 30_000 };` — staleTime is the one option, a number of milliseconds: a literal, or a product of literals such as 5 * 60_000.',
+                    });
+                }
+            }
+            continue;
+        }
         // Match: @loader functionName; — the alpha's anonymous form, a removed form (#506) that still
         // registers the loader. Groups: [1]=the function
         const loaderMatch = trimmed.match(/^@loader\s+(\w+)\s*;?\s*$/);

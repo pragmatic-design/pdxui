@@ -83,7 +83,7 @@ context, its coercion and signal, the prefetched call's own signal, and `loaderE
 `router/tests/loader-context.test.ts`. The named loader is the compiler's half: **landed**, #506 —
 `router/tests/outlet-named-loader.test.ts`, `lsp/tests/loader-types.test.ts`. The editor types `user`
 from the function's return type, and `params` where the parameter is annotated `LoaderContext<P>`; an
-unannotated parameter is not yet typed from the pattern. `{ staleTime }` and `stale()` are #148.)
+unannotated parameter is not yet typed from the pattern. `{ staleTime }` and `stale()`: **landed**, #148.)
 
 **Outcomes** (#147). `redirect(to, { replace? })` and `notFound()` from `@pdxui/router` are thrown by a
 loader: a redirect navigates to `to` before the current navigation commits (no history entry for the
@@ -120,7 +120,11 @@ replaces it when the run settles. The default `staleTime` is `0`: a level entere
 its loader, and shows the kept result as stale meanwhile. A prefetched result enters the cache under
 the same key. An `@action`'s `invalidate: ['loader:/users/:id']` marks **every** key of that pattern
 stale (any params, any query); the next entry runs the loader, and a mounted level whose key was
-invalidated runs again at once.
+invalidated runs again at once. (**Landed**, #148 — `router/tests/loader-cache.test.ts`,
+`compiler/tests/loader-options.test.ts`. Two readings of this text: invalidation is core's cache's,
+which drops the entries rather than keeping them stale, so the next entry of a dropped key runs the
+loader with nothing shown — a level on screen keeps its result while it runs again; and `staleTime`
+is a number the compiler reads, a literal or a product of literals, because the route table holds it.)
 
 #### Rules
 

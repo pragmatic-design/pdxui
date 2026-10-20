@@ -92,6 +92,7 @@ const ROWS: Record<string, Row> = {
     PDX_PAGE_EMPTY_CONSTRAINT: { src: pdx('<p>x</p>', "@page '/u/:id()';"), at: "@page '/u/:id()'" },
     PDX_ROUTE_FIELD_INVALID: { src: pdx('<p>x</p>', "@page '/u';\n@search {\n  page: number = 1,\n  q: 'string'\n};"), at: "q: 'string'" },
     PDX_LOADER_NOT_FOUND: { src: pdx('<p>x</p>', "@page '/u';\n@loader gone: loadMissing;"), at: '@loader gone: loadMissing' },
+    PDX_LOADER_UNKNOWN_OPTION: { src: pdx('<p>{{ user.data() }}</p>', "@page '/u';\n@loader user: loadUser { stale: 1 };\nasync function loadUser() { return 1; }"), at: '@loader user' },
     PDX_LABEL_NOT_FOUND: { src: pdx('<p>x</p>', "@page '/u/:id' { label: missingLabel };"), at: 'missingLabel' },
     PDX_GLOBAL_SELECTOR: { src: pdx('<p class="y">x</p>', 'let a = $signal(1);', ':global(.x) .y { margin: 0; }'), at: ':global(.x)' },
     PDX_VARIANTS_MALFORMED: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@variants { size: { sm, md } = xl; }'), at: '@variants' },

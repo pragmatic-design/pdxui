@@ -189,6 +189,27 @@ What the loader throws decides where the navigation ends:
   runs the loader again. Its reason is still in `user.error()`. An app with its own error page calls
   `retryNavigation()` from `@pdxui/router` for the same retry.
 
+Coming back to a page it has already loaded, the router has its result kept, so going list →
+detail → back does not leave the list blank while it reloads. By default the kept result is shown at
+once, with `user.stale()` true, while the loader runs again and replaces it. Give the loader a
+`staleTime` and, within it, the kept result is used as it is, with no request:
+
+```pdx
+@page '/users';
+@loader users: loadUsers { staleTime: 30_000 };
+
+async function loadUsers({ signal }) {
+    return (await fetch('/api/users', { signal })).json();
+}
+```
+
+The result is kept per address — `/search?q=alice` and `/search?q=bob` are two — and a level that
+stays on screen, a parent around the children you move between, does not reload at all. An
+`@action` that changes the data says so with `invalidate: ['loader:/users/:id']`: every kept result of
+that route is dropped, and if it is on screen it reloads at once. `staleTime` is a number of
+milliseconds the compiler reads (`30_000`, `5 * 60_000`): anything else is
+`PDX_LOADER_UNKNOWN_OPTION`.
+
 Coming from the alpha: `@loader loadUser;` and `currentLoaderData()` are gone. `pdx migrate` names
 the loader after its function, `@loader loadUser: loadUser;`, and turns the page's
 `currentLoaderData()` into `loadUser.data()`.
