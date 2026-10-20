@@ -48,9 +48,23 @@ const CERT_DIR = join(PACKAGE, 'test-results', '.h2-cert');
  * Judged since #464 on the median of three cold loads: one load on a shared CI runner measured `/` at
  * 1128 ms where the same code measured 948 and 1000. The budgets stay: the median takes the outliers
  * out, it does not move the usual value.
+ *
+ * `/` 1050 → 1200 (#574): its budget came from the local highest, and CI runners are slower — the
+ * same code spreads 164 ms across them, more than any honest headroom over a local number. The same
+ * rule applied to the medians this spec logged in 59 CI runs (main and pull requests, 2026-10-19/20):
+ *
+ *                 min     p50     p90     max      max + 10%    budget
+ *   /             908     980     1024    1072     1200         1200   (was 1050: 2 of 59 failed it)
+ *   /tickets      1928    2004    2032    2128     2350         2450
+ *   /tickets/1    1304    1376    1564    1584     1750         1850
+ *
+ * What 1200 still catches, measured locally on `/` (976 ms): an incompressible 50 KB gzip module
+ * imported by the dashboard paints at 1220 ms and fails; 20 KB paints at 1060 ms and does not —
+ * a difference of that size is the bundle budgets' (`bundle-budget.spec.ts`), held to the KB, and
+ * an extra wave is `first-paint-waves.spec.ts`'s.
  */
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
-    { route: '/', root: 'dashboard', budgetMs: 1050 },
+    { route: '/', root: 'dashboard', budgetMs: 1200 },
     { route: '/tickets', root: 'tickets', budgetMs: 2450 },
     { route: '/tickets/1', root: 'ticket', budgetMs: 1850 },
 ];
