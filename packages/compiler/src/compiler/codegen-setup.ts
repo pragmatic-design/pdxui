@@ -140,7 +140,9 @@ export function buildSetupBody(
     // and the auto-return hands it to the template. Declared before the deriveds and the body that
     // read them (#185).
     if (analysis.route.params && analysis.route.params.length > 0) {
-        parts.push(`    const __routeParams = inject('routeParams', ctx.el) ?? (() => ({}));`);
+        // The outlet provides them under the router's `RouteParams` token (#495), imported in
+        // codegen-new; outside an outlet the fallback makes them empty rather than a throw.
+        parts.push(`    const __routeParams = inject(RouteParams, ctx.el, null) ?? (() => ({}));`);
         for (const p of analysis.route.params) {
             const coerce = p.type === 'number' ? `Number(__routeParams()?.${p.name} ?? 0)`
                 : p.type === 'boolean' ? `__routeParams()?.${p.name} === 'true'`

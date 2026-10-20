@@ -2,7 +2,8 @@
 export { PdxElement } from './element';
 export { define } from './define';
 export { component } from './component';
-export { provide, inject, tryInject } from './context';
+export { context, provide, inject } from './context';
+export type { Context, ContextValue } from './context';
 export { setPermissions, hasPermission, requirePermission } from './permissions';
 export { responsive } from './responsive';
 export { device } from './device';

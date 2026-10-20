@@ -15,7 +15,8 @@
 // Callback (backward compat):
 //   <pdx-list :items="${users}" :render-item="${renderUser}">
 
-import { component, html, tryInject, repeatWithSlot } from '@pdxui/core';
+import { component, html, inject, repeatWithSlot } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString } from '../shared/i18n';
@@ -101,7 +102,7 @@ component('pdx-list', {
             const explicitSource = ctx.source() as DataSource<unknown> | null;
             if (explicitSource) return explicitSource;
             if (!injectedDS) {
-                try { injectedDS = tryInject('dataSource', ctx.el) as DataSource<unknown> | null; } catch { injectedDS = null; }
+                injectedDS = inject(DataSourceContext, ctx.el, null) as DataSource<unknown> | null;
             }
             return injectedDS;
         }

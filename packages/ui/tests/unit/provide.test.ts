@@ -1,7 +1,7 @@
 // Tests for pdx-provide non-rendering cascading value component.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { inject, clearProviders } from '@pdxui/core';
+import { context, inject, clearProviders } from '@pdxui/core';
 import '../../src/provide/pdx-provide';
 
 describe('pdx-provide', () => {
@@ -28,37 +28,41 @@ describe('pdx-provide', () => {
         expect(el.querySelector('span')?.textContent).toBe('hello');
     });
 
-    it('provides single named value to descendants', async () => {
+    it('provides a single value under its token to descendants', async () => {
+        const Color = context<string>('color');
         const provider = document.createElement('pdx-provide') as any;
-        provider.name = 'color';
+        provider.token = Color;
         provider.value = 'red';
         const child = document.createElement('div');
         provider.appendChild(child);
         document.body.appendChild(provider);
         await new Promise(r => setTimeout(r, 50));
 
-        expect(inject('color', child)).toBe('red');
+        expect(inject(Color, child)).toBe('red');
     });
 
-    it('provides multiple values via :values prop', async () => {
+    it('provides multiple values via a :values Map of token to value', async () => {
+        const Theme = context<string>('theme');
+        const Locale = context<string>('locale');
         const provider = document.createElement('pdx-provide') as any;
-        provider.values = { theme: 'dark', locale: 'en' };
+        provider.values = new Map<unknown, unknown>([[Theme, 'dark'], [Locale, 'en']]);
         const child = document.createElement('div');
         provider.appendChild(child);
         document.body.appendChild(provider);
         await new Promise(r => setTimeout(r, 50));
 
-        expect(inject('theme', child)).toBe('dark');
-        expect(inject('locale', child)).toBe('en');
+        expect(inject(Theme, child)).toBe('dark');
+        expect(inject(Locale, child)).toBe('en');
     });
 
     it('scoped override: nested provider shadows outer', async () => {
+        const Theme = context<string>('theme');
         const outer = document.createElement('pdx-provide') as any;
-        outer.name = 'theme';
+        outer.token = Theme;
         outer.value = 'light';
 
         const inner = document.createElement('pdx-provide') as any;
-        inner.name = 'theme';
+        inner.token = Theme;
         inner.value = 'dark';
 
         const leaf = document.createElement('div');
@@ -67,6 +71,6 @@ describe('pdx-provide', () => {
         document.body.appendChild(outer);
         await new Promise(r => setTimeout(r, 50));
 
-        expect(inject('theme', leaf)).toBe('dark');
+        expect(inject(Theme, leaf)).toBe('dark');
     });
 });

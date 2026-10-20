@@ -27,9 +27,9 @@
         <table>
           <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>name</code></td><td>String</td><td>''</td><td>Context key (single value mode).</td></tr>
+            <tr><td><code>:token</code></td><td>Context</td><td>null</td><td>Context token, <code>context&lt;T&gt;('name')</code> (single value mode).</td></tr>
             <tr><td><code>:value</code></td><td>any</td><td>null</td><td>Value to provide (single value mode).</td></tr>
-            <tr><td><code>:values</code></td><td>Object</td><td>null</td><td>Multiple key→value pairs (takes priority).</td></tr>
+            <tr><td><code>:values</code></td><td>Map</td><td>null</td><td>A Map of token → value (takes priority).</td></tr>
           </tbody>
         </table>
       </div>
@@ -38,9 +38,8 @@
         <table>
           <thead><tr><th>API</th><th>Usage</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>@inject key;</code></td><td>.pdx files</td><td>Compiler rune — generates inject() call.</td></tr>
-            <tr><td><code>useProvided(key)</code></td><td>setup()</td><td>Composable — injects from current element's ancestors.</td></tr>
-            <tr><td><code>inject(key, el)</code></td><td>anywhere</td><td>Manual — walks DOM from el upward.</td></tr>
+            <tr><td><code>inject(token, el)</code></td><td>anywhere</td><td>Walks the DOM from el upward; throws, naming the token, when nothing provides it.</td></tr>
+            <tr><td><code>inject(token, el, fallback)</code></td><td>anywhere</td><td>The same, and returns <code>fallback</code> when nothing provides it.</td></tr>
           </tbody>
         </table>
       </div>

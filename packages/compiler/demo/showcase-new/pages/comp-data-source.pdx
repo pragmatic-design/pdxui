@@ -34,7 +34,7 @@
             <tr><td><code>id-field</code></td><td>String</td><td>'id'</td><td>Unique ID field.</td></tr>
             <tr><td><code>:page-size</code></td><td>Number</td><td>0</td><td>Pagination. 0 = none.</td></tr>
             <tr><td><code>auto-load</code></td><td>Boolean</td><td>true</td><td>Load on creation.</td></tr>
-            <tr><td><code>name</code></td><td>String</td><td>''</td><td>Context key for provide (ds:{name}).</td></tr>
+            <tr><td><code>:token</code></td><td>Context</td><td>null</td><td>A token of your own the source is provided under too; it is always provided under <code>DataSourceContext</code>.</td></tr>
           </tbody>
         </table>
       </div>

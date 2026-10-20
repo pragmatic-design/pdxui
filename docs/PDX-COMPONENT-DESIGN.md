@@ -118,8 +118,8 @@ file does*, and *how many files do the same thing*.
 
 - **Mechanism, by reach:**
   - local to one component → `$signal`;
-  - shared by a subtree → `provide` a *read* value; `provideWritable` only when a descendant must
-    write, and `createCommands` / `createChannel` when the parent gives orders (`provide-inject.md`);
+  - shared by a subtree → `provide` a *read* value under a `context<T>()` token; a signal only when a
+    descendant must write, and `createCommands` / `createChannel` when the parent gives orders (`provide-inject.md`);
   - shared across unrelated components, or kept across navigation → `@store`; an *event* between
     unrelated components (not state) → `createBus`;
   - part of what the screen *is* (a filter, a tab, a record id) → the URL.

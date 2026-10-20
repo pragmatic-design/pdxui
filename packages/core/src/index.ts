@@ -196,7 +196,8 @@ export { prop, event, model, slot } from './component/component-descriptor';
 export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, SlotSpec, EventDetail, EmitOf } from './component/component-descriptor';
 
 // Services (provide/inject)
-export { provide, inject, tryInject, useProvided, tryUseProvided, provideWritable, useWritable, tryUseWritable, clearProviders, requestContext, installContextProtocol } from './component/context';
+export { context, provide, inject, clearProviders, installContextProtocol } from './component/context';
+export type { Context, ContextValue } from './component/context';
 
 // Global Error Interceptor
 export { onGlobalError, dispatchGlobalError, safeHandler, clearGlobalErrorHandlers } from './component/global-error';

@@ -42,12 +42,12 @@ describe('the DataSource and the components that read one', () => {
     });
 
     it('a consumer that injects one says it can sit inside a <pdx-data-source>', () => {
-        // pdx-select injects with a type argument, `tryInject<DataSource<any>>('dataSource', …)`: a
-        // reader that stops at the first `>` misses it, and the page then hides the provider pattern.
+        // A consumer injects the token a <pdx-data-source> provides under, `inject(DataSourceContext, …)`
+        // (#495), the same reading the generator does.
         const injectors = found.filter(t => {
             const dir = join(UI_SRC, t.slice(4));
             return readdirSync(dir).filter(f => f.endsWith('.ts'))
-                .some(f => /tryInject\b[^(]*\(\s*'dataSource'/.test(readFileSync(join(dir, f), 'utf-8')));
+                .some(f => /\binject\s*\(\s*DataSourceContext\b/.test(readFileSync(join(dir, f), 'utf-8')));
         });
         expect(injectors).toContain('pdx-select');
         const silent = injectors.filter(t => !/^\*\*Takes a DataSource:\*\*.*inside a \[`<pdx-data-source>`\]/m.test(pages.get(t) ?? ''));

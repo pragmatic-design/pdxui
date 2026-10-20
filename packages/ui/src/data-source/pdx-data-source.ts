@@ -12,7 +12,10 @@
 
 import { component, html, signal, computed, provide } from '@pdxui/core';
 import { createDataSource, restTransport, arrayTransport } from '@pdxui/core';
-import type { DataSource } from '@pdxui/core';
+import type { Context, DataSource } from '@pdxui/core';
+import { DataSourceContext } from './data-source-context';
+
+export { DataSourceContext };
 
 /**
  * A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,
@@ -38,8 +41,11 @@ component('pdx-data-source', {
         filter: { type: Array, default: null },
         /** Additional params passed to transport.read(). */
         params: { type: Object, default: null },
-        /** Name for Context Protocol provide. Descendants can inject('ds:{name}'). */
-        name: { type: String, default: '' },
+        /**
+         * A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided
+         * under too: a component below injects that one by it, past a nearer `<pdx-data-source>`.
+         */
+        token: { type: Object, default: null },
     },
     setup(ctx) {
         const _ds = signal<DataSource<Record<string, unknown>> | null>(null);
@@ -81,13 +87,11 @@ component('pdx-data-source', {
 
             _ds.set(ds);
 
-            // Auto-provide via Context Protocol if named
-            const dsName = ctx.name() as string;
-            if (dsName) {
-                provide(`ds:${dsName}`, ds, ctx.el);
-            }
-            // Always provide as 'dataSource' for unnamed (nearest ancestor pattern)
-            provide('dataSource', ds, ctx.el);
+            // Under the token it is given, for a component that wants this source by name (#495)…
+            const token = ctx.token() as Context<DataSource<Record<string, unknown>>> | null;
+            if (token) provide(token, ds, ctx.el);
+            // …and always under DataSourceContext: the nearest source, for the library's consumers.
+            provide(DataSourceContext, ds, ctx.el);
         });
 
         // Expose the DataSource for parent access via :ref or slot scope

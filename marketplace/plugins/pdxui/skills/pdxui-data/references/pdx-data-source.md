@@ -64,7 +64,7 @@ and `sync()` sends it to the transport.
 | `sort` | — | array | `null` | Initial sort. Array of { field, dir } objects. |
 | `filter` | — | array | `null` | Initial filter. Array of filter descriptors. |
 | `params` | — | object | `null` | Additional params passed to transport.read(). |
-| `name` | `name` | string | `''` | Name for Context Protocol provide. Descendants can inject('ds:{name}'). |
+| `token` | — | object | `null` | A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided under too: a component below injects that one by it, past a nearer `<pdx-data-source>`. |
 
 **API (via `:ref`)**
 

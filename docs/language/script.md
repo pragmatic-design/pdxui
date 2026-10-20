@@ -574,8 +574,10 @@ to the template like any other.
 #### Rules
 
 - `@provide` without `=` and `@inject` with a quoted key raise `PDX_UNKNOWN_DECLARATION`.
-- An `@inject` with no provider above throws `No provider found for "key"` when the component is set
-  up — not checked at compile time. `tryInject` from `@pdxui/core` is the optional form.
+- An `@inject` with no provider above throws `No provider for context "key" above <tag>` when the
+  component is set up — not checked at compile time. In TypeScript the context API takes a
+  `context<T>()` token: `inject(token, el, fallback)` is the optional form (#495); the runes take one
+  with #496.
 - The `@provide` value is one line.
 
 #### Examples

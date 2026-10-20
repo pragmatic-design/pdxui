@@ -3,127 +3,93 @@
 // that bubbles up the DOM. Nearest ancestor provider wins (scoped override).
 // Falls back to global registry for app-wide singletons (theme, auth, router).
 //
+// A value is keyed by a token, `context<T>(name)` (#495): the token IS the key, compared by identity
+// here and by the context protocol, and it carries the value's type. Two calls with one name are two
+// tokens. The runtime API is `provide(token, value, host)` and `inject(token, host, fallback?)`.
+//
 // Reference: https://github.com/webcomponents-cg/community-protocols/blob/main/proposals/context.md
 
 import type { Signal } from '../utils/types';
-import { getCurrentScope } from './lifecycle';
 import { effect, untracked } from '../reactivity/signal';
+
+/**
+ * A context token: the key a value of type `T` is provided and injected by. `T` is in the type only;
+ * at runtime it is a frozen `{ name }`, compared by identity.
+ */
+export interface Context<T> {
+    readonly name: string;
+    /** The value's type, for TypeScript only: never set. */
+    readonly __value?: T;
+}
+
+/** The value type of a token: `ContextValue<typeof CurrentUser>` is `User`. */
+export type ContextValue<C> = C extends Context<infer T> ? T : never;
+
+/**
+ * A context token named `name`, for a value of type `T`. Declare it once, in a module, and import it
+ * where the value is provided and where it is injected: `export const CurrentUser = context<User>('current-user');`.
+ */
+export function context<T>(name: string): Context<T> {
+    return Object.freeze({ name }) as Context<T>;
+}
+
+/**
+ * What a value is keyed by at runtime. A token everywhere the API is typed; the string a `.pdx`'s
+ * `@provide key` / `@inject key` still compiles to, until those runes take a token too (#496).
+ */
+type ContextKey = Context<unknown> | string | symbol;
+
+/** A key as a message names it: a token's name, or the string. */
+const keyName = (key: ContextKey): string => (typeof key === 'object' ? key.name : String(key));
 
 // ─── Global Registry (fallback for app-wide providers) ──────────
 
-const globalRegistry = new Map<string | symbol, unknown>();
+const globalRegistry = new Map<ContextKey, unknown>();
 
 // ─── Element-Scoped Providers ───────────────────────────────────
 
 /** Map of element → map of key → value. Providers register here. */
-const elementProviders = new WeakMap<HTMLElement, Map<string | symbol, unknown>>();
+const elementProviders = new WeakMap<HTMLElement, Map<ContextKey, unknown>>();
 
 /**
- * Provide a value on a specific element (DOM-scoped).
- * Descendants can inject it via context-request event.
- * If no element is specified, provides globally (app-wide).
+ * Provide a value under `token` on an element (DOM-scoped): descendants inject it. Without an
+ * element it is provided globally (app-wide).
  *
  * It answers the Web Components context protocol's `context-request`, from any library: the
- * request's `context` is compared with `key` by identity. A request with `subscribe: true` is
+ * request's `context` is compared with the token by identity. A request with `subscribe: true` is
  * answered with the current value of a provided signal, and again on each change until it calls
  * the `unsubscribe` it was given, or the host component is destroyed; a plain value is answered
- * once, which the protocol allows. A request without `subscribe` gets the value as provided.
+ * once, which the protocol allows. A request without `subscribe` gets the value as provided. A
+ * provided signal is writable by whoever injects it.
  */
-export function provide<T>(key: string | symbol, value: T, element?: HTMLElement): void {
-    if (element) {
-        let map = elementProviders.get(element);
-        if (!map) { map = new Map(); elementProviders.set(element, map); }
+export function provide<T>(token: Context<T>, value: T, host?: HTMLElement): void {
+    // The key may also be a `.pdx`'s string key at runtime (see ContextKey).
+    const key: ContextKey = token;
+    if (host) {
+        let map = elementProviders.get(host);
+        if (!map) { map = new Map(); elementProviders.set(host, map); }
         map.set(key, value);
         // Listen for context-request from descendants
-        _ensureContextListener(element);
+        _ensureContextListener(host);
     } else {
         globalRegistry.set(key, value);
     }
 }
 
 /**
- * Inject a value by walking up the DOM tree (nearest provider wins).
- * Falls back to global registry. Throws if not found.
+ * The value the nearest provider above `host` provides under `token`: a PDX provider, then any
+ * provider that speaks the context protocol (a Lit one answers a request carrying the same token),
+ * then the global one. With no provider it throws, naming the token and the component — unless a
+ * `fallback` is passed, `undefined` included, which is returned instead.
  */
-export function inject<T>(key: string | symbol, from?: HTMLElement): T {
-    const value = _resolve(key, from);
-    if (value === undefined) {
-        throw new Error(`No provider found for "${String(key)}"`);
-    }
-    return value as T;
-}
-
-/**
- * Try to inject a value. Returns undefined if not found.
- */
-export function tryInject<T>(key: string | symbol, from?: HTMLElement): T | undefined {
-    return _resolve(key, from) as T | undefined;
-}
-
-/**
- * Composable: inject a provided value using the current component's element.
- * Must be called during setup(). Throws if not found.
- *
- * Usage in setup():
- *   const theme = useProvided<ThemeSignal>('theme');
- */
-export function useProvided<T>(key: string | symbol): T {
-    const scope = getCurrentScope();
-    if (!scope) throw new Error('useProvided() must be called during component setup()');
-    return inject<T>(key, scope.element);
-}
-
-/**
- * Composable: try to inject a provided value. Returns undefined if not found.
- * Must be called during setup().
- */
-export function tryUseProvided<T>(key: string | symbol): T | undefined {
-    const scope = getCurrentScope();
-    if (!scope) return undefined;
-    return tryInject<T>(key, scope.element);
-}
-
-/**
- * Provide a writable signal for bidirectional context.
- * Children can read AND write the value via useWritable().
- * Semantic sugar over provide() — clarifies bidirectional intent.
- */
-export function provideWritable<T>(key: string | symbol, value: Signal<T>, element?: HTMLElement): void {
-    provide(key, value, element);
-}
-
-/**
- * Composable: inject a writable signal from an ancestor.
- * Returns the full signal object (read + write), not just the value.
- * Must be called during setup().
- *
- * Usage: const theme = useWritable<string>('theme');
- *        theme()      // read
- *        theme.set()  // write — propagates to provider
- */
-export function useWritable<T>(key: string | symbol): Signal<T> {
-    const scope = getCurrentScope();
-    if (!scope) throw new Error('useWritable() must be called during component setup()');
-    const value = _resolve(key, scope.element);
-    if (value === undefined) throw new Error(`No writable provider found for "${String(key)}"`);
-    // Verify it's a signal (has .set method)
-    if (typeof (value as { set?: unknown }).set !== 'function') {
-        throw new Error(`Provider for "${String(key)}" is not a writable signal. Use provideWritable() on the parent.`);
-    }
-    return value as Signal<T>;
-}
-
-/**
- * Composable: try to inject a writable signal. Returns undefined if not found.
- * Must be called during setup().
- */
-export function tryUseWritable<T>(key: string | symbol): Signal<T> | undefined {
-    const scope = getCurrentScope();
-    if (!scope) return undefined;
-    const value = _resolve(key, scope.element);
-    if (value === undefined) return undefined;
-    if (typeof (value as { set?: unknown }).set !== 'function') return undefined;
-    return value as Signal<T>;
+export function inject<T, F = never>(token: Context<T>, host?: HTMLElement, ...fallback: [F] | []): T | F {
+    // The key may also be a `.pdx`'s string key at runtime (see ContextKey).
+    const key: ContextKey = token;
+    const value = _resolve(key, host);
+    if (value !== undefined) return value as T;
+    if (fallback.length > 0) return fallback[0] as F;
+    const above = host ? ` above <${host.localName}>` : '';
+    throw new Error(`No provider for context "${keyName(key)}"${above}.`);
 }
 
 /** Clear all global providers (for testing). */
@@ -140,18 +106,31 @@ function _parentOrHost(el: Element): HTMLElement | null {
     return root instanceof ShadowRoot ? (root.host as HTMLElement) : null;
 }
 
-/** Walk up the DOM tree looking for a provider, then fall back to global. */
-function _resolve(key: string | symbol, from?: HTMLElement): unknown {
-    // 1. Walk ancestors (DOM-scoped, nearest wins) — shadow-crossing
+/**
+ * Walk up the DOM tree looking for a provider, ask the context protocol from `from`, then fall back
+ * to global.
+ */
+function _resolve(key: ContextKey, from?: HTMLElement): unknown {
     if (from) {
+        // 1. PDX providers on the ancestors (DOM-scoped, nearest wins) — shadow-crossing
         let el: HTMLElement | null = _parentOrHost(from);
         while (el) {
             const map = elementProviders.get(el);
             if (map?.has(key)) return map.get(key);
             el = _parentOrHost(el);
         }
+        // 2. A provider of another library, through the protocol: a one-time request (no `subscribe`)
+        // carrying the key itself. The global listener answers it too, from the registry below.
+        let answer: unknown;
+        const request = new Event('context-request', { bubbles: true, composed: true }) as ContextRequestEvent;
+        request.context = key;
+        request.contextTarget = from;
+        request.callback = (value: unknown) => { answer = value; };
+        request.subscribe = false;
+        from.dispatchEvent(request);
+        if (answer !== undefined) return answer;
     }
-    // 2. Global fallback
+    // 3. Global fallback
     if (globalRegistry.has(key)) return globalRegistry.get(key);
     return undefined;
 }
@@ -165,10 +144,15 @@ function _ensureContextListener(element: HTMLElement): void {
     _listenersInstalled.add(element);
 
     element.addEventListener('context-request', ((e: Event) => {
+        // A provider answers the elements below it, never a request its own host sent: a component
+        // that provides a value and reads its parent's under the same token (a nested field group's
+        // path) would otherwise read its own. PDX's walk starts at the parent, and Lit's provider
+        // ignores its host's requests the same way.
+        if (e.composedPath()[0] === element) return;
         const req = e as ContextRequestEvent;
-        // The protocol allows any value as a key; PDX's are strings and symbols. A lookup by
-        // identity simply does not find a key of another kind.
-        const key = req.context as string | symbol;
+        // The protocol allows any value as a key; PDX's are tokens (and the strings a `.pdx` still
+        // compiles to). A lookup by identity simply does not find a key of another kind.
+        const key = req.context as ContextKey;
         const map = elementProviders.get(element);
         if (!map?.has(key)) return;
         e.stopPropagation();
@@ -215,29 +199,6 @@ interface ContextRequestEvent extends Event {
     subscribe?: boolean;
 }
 
-// ─── W3C Context Protocol: Request ──────────────────────────────
-
-/**
- * Request a context value via W3C Context Protocol.
- * Dispatches a context-request event and returns the value from the nearest provider.
- * Works with any Web Component (including non-Pragmatic ones like Lit).
- */
-export function requestContext<T>(element: HTMLElement, key: string | symbol): T | undefined {
-    let value: T | undefined;
-    // The protocol's request: the key itself as `context`, a one-time answer (no `subscribe`).
-    const event = new Event('context-request', { bubbles: true, composed: true }) as ContextRequestEvent;
-    event.context = key;
-    event.contextTarget = element;
-    event.callback = (v: unknown) => { value = v as T; };
-    event.subscribe = false;
-    element.dispatchEvent(event);
-    // If no W3C provider answered, fall back to our resolution
-    if (value === undefined) {
-        value = _resolve(key, element) as T | undefined;
-    }
-    return value;
-}
-
 /**
  * Install global Context Protocol listener (for global providers).
  * Responds to context-request events with values from the global registry.
@@ -248,9 +209,9 @@ export function installContextProtocol(): void {
 
     document.addEventListener('context-request', ((e: Event) => {
         const req = e as ContextRequestEvent;
-        if (!globalRegistry.has(req.context as string | symbol)) return;
+        if (!globalRegistry.has(req.context as ContextKey)) return;
         e.stopPropagation();
-        _answer(req, globalRegistry.get(req.context as string | symbol));
+        _answer(req, globalRegistry.get(req.context as ContextKey));
     }) as EventListener);
 }
 

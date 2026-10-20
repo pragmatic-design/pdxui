@@ -4,7 +4,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { signal, computed } from '../src/reactivity/signal';
 import { httpResource } from '../src/reactivity/http-resource';
 import { toTC39State, toTC39Computed, fromTC39State } from '../src/reactivity/tc39-compat';
-import { provide, inject, tryInject, requestContext, clearProviders, installContextProtocol } from '../src/component/context';
+import { context, provide, inject, clearProviders, installContextProtocol } from '../src/component/context';
 
 // ═══════════════════════════════════════════════════════════════
 // httpResource()
@@ -116,28 +116,29 @@ describe('TC39 Signals compat', () => {
 // ═══════════════════════════════════════════════════════════════
 
 describe('W3C Context Protocol', () => {
-    it('provide + inject still work (backward compat)', () => {
-        provide('test-service', { name: 'TestService' });
-        const svc = inject<{ name: string }>('test-service');
+    it('provide + inject work by token', () => {
+        const Service = context<{ name: string }>('test-service');
+        provide(Service, { name: 'TestService' });
+        const svc = inject(Service);
         expect(svc.name).toBe('TestService');
         clearProviders();
     });
 
-    it('tryInject returns undefined for missing key', () => {
+    it('inject with a fallback returns it for a missing token', () => {
         clearProviders();
-        expect(tryInject('nonexistent')).toBeUndefined();
+        expect(inject(context('nonexistent'), undefined, undefined)).toBeUndefined();
     });
 
-    it('requestContext dispatches context-request event', () => {
+    it('inject from an element finds a global provider, through the protocol or the registry', () => {
         installContextProtocol();
-        provide('w3c-test', { value: 42 });
+        const W3c = context<{ value: number }>('w3c-test');
+        provide(W3c, { value: 42 });
 
         const el = document.createElement('div');
         document.body.appendChild(el);
 
-        const result = requestContext<{ value: number }>(el, 'w3c-test');
-        expect(result).toBeDefined();
-        expect(result!.value).toBe(42);
+        const result = inject(W3c, el);
+        expect(result.value).toBe(42);
 
         el.remove();
         clearProviders();
@@ -145,7 +146,8 @@ describe('W3C Context Protocol', () => {
 
     it('context-request from non-Pragmatic element works', () => {
         installContextProtocol();
-        provide('shared-theme', { dark: true });
+        const SharedTheme = context<{ dark: boolean }>('shared-theme');
+        provide(SharedTheme, { dark: true });
 
         // Simulate a Lit element requesting context: the protocol's `context` is the key itself (#103).
         const litEl = document.createElement('lit-element');
@@ -153,7 +155,7 @@ describe('W3C Context Protocol', () => {
 
         let received: unknown = null;
         const event = new Event('context-request', { bubbles: true, composed: true });
-        Object.assign(event, { context: 'shared-theme', callback: (v: unknown) => { received = v; } });
+        Object.assign(event, { context: SharedTheme, callback: (v: unknown) => { received = v; } });
         litEl.dispatchEvent(event);
 
         expect(received).toEqual({ dark: true });

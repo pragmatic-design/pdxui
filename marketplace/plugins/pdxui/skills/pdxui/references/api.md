@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-465 value exports.
+459 value exports.
 
 ### `__adoptStyles`
 
@@ -999,6 +999,17 @@ function configureClient(config: HttpClientConfig): HttpClient
 
 Configure and set the default HTTP client from config.
 
+### `context`
+
+```ts
+import { context } from '@pdxui/core';
+
+function context(name: string): Context<T>
+```
+
+A context token named `name`, for a value of type `T`. Declare it once, in a module, and import it
+where the value is provided and where it is injected: `export const CurrentUser = context<User>('current-user');`.
+
 ### `createAuthStore`
 
 ```ts
@@ -1121,15 +1132,16 @@ Create a compound parent context.
 The parent creates this and provides it to children via provide/inject.
 
 @example
+// A token, declared once: export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
 // In parent component (e.g. pdx-tabs):
 const compound = createCompoundParent<TabChild>({
     onChildAdded: (child, i) => { ... },
     onNotify: (event, payload) => { ... },
 });
-provide('pdx-tabs', compound);
+provide(Tabs, compound, ctx.el);
 
 // In child component (e.g. pdx-tab):
-const parent = inject<CompoundParentContext<TabChild>>('pdx-tabs');
+const parent = inject(Tabs, ctx.el);
 const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
 onDestroy(() => dispose());
 
@@ -2920,11 +2932,13 @@ Initialize i18n with configuration. Called once (typically from app root).
 ```ts
 import { inject } from '@pdxui/core';
 
-function inject(key: string | symbol, from?: HTMLElement): T
+function inject(token: Context<T>, host?: HTMLElement, ...fallback: [F] | []): T | F
 ```
 
-Inject a value by walking up the DOM tree (nearest provider wins).
-Falls back to global registry. Throws if not found.
+The value the nearest provider above `host` provides under `token`: a PDX provider, then any
+provider that speaks the context protocol (a Lit one answers a request carrying the same token),
+then the global one. With no provider it throws, naming the token and the component — unless a
+`fallback` is passed, `undefined` included, which is returned instead.
 
 ### `injectSafeAreaCSS`
 
@@ -3957,18 +3971,18 @@ Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or 
 ```ts
 import { provide } from '@pdxui/core';
 
-function provide(key: string | symbol, value: T, element?: HTMLElement): void
+function provide(token: Context<T>, value: T, host?: HTMLElement): void
 ```
 
-Provide a value on a specific element (DOM-scoped).
-Descendants can inject it via context-request event.
-If no element is specified, provides globally (app-wide).
+Provide a value under `token` on an element (DOM-scoped): descendants inject it. Without an
+element it is provided globally (app-wide).
 
 It answers the Web Components context protocol's `context-request`, from any library: the
-request's `context` is compared with `key` by identity. A request with `subscribe: true` is
+request's `context` is compared with the token by identity. A request with `subscribe: true` is
 answered with the current value of a provided signal, and again on each change until it calls
 the `unsubscribe` it was given, or the host component is destroyed; a plain value is answered
-once, which the protocol allows. A request without `subscribe` gets the value as provided.
+once, which the protocol allows. A request without `subscribe` gets the value as provided. A
+provided signal is writable by whoever injects it.
 
 ### `provideFieldGroupPath`
 
@@ -4001,18 +4015,6 @@ function provideFormCoordinator(coordinator: FormCoordinator, element?: HTMLElem
 ```
 
 Provide a FormCoordinator for nested form orchestration.
-
-### `provideWritable`
-
-```ts
-import { provideWritable } from '@pdxui/core';
-
-function provideWritable(key: string | symbol, value: Signal<T>, element?: HTMLElement): void
-```
-
-Provide a writable signal for bidirectional context.
-Children can read AND write the value via useWritable().
-Semantic sugar over provide() — clarifies bidirectional intent.
 
 ### `pushErrorHandler`
 
@@ -4247,18 +4249,6 @@ it does NOT create a separate effect per item.
 @param defaultFn - Built-in default renderer
 @param scopeMapper - Converts (item, index) to the slot scope object
 @param options - Transition options for enter/exit/move animations
-
-### `requestContext`
-
-```ts
-import { requestContext } from '@pdxui/core';
-
-function requestContext(element: HTMLElement, key: string | symbol): T | undefined
-```
-
-Request a context value via W3C Context Protocol.
-Dispatches a context-request event and returns the value from the nearest provider.
-Works with any Web Component (including non-Pragmatic ones like Lit).
 
 ### `required`
 
@@ -5506,16 +5496,6 @@ const trapFocus: Attachment
 (core's `focusTrap`), from the moment it is in the document until its scope is disposed, which
 gives focus back to where it was.
 
-### `tryInject`
-
-```ts
-import { tryInject } from '@pdxui/core';
-
-function tryInject(key: string | symbol, from?: HTMLElement): T | undefined
-```
-
-Try to inject a value. Returns undefined if not found.
-
 ### `tryUseForm`
 
 ```ts
@@ -5532,28 +5512,6 @@ With `from`, it looks up from that element whenever it is called, in setup or no
 nothing, an effect that called it runs again as soon as a form is provided — so a component that
 may be set up before its form reads it through `tryUseForm(ctx.el)` inside the code that uses it,
 and keeps it once found.
-
-### `tryUseProvided`
-
-```ts
-import { tryUseProvided } from '@pdxui/core';
-
-function tryUseProvided(key: string | symbol): T | undefined
-```
-
-Composable: try to inject a provided value. Returns undefined if not found.
-Must be called during setup().
-
-### `tryUseWritable`
-
-```ts
-import { tryUseWritable } from '@pdxui/core';
-
-function tryUseWritable(key: string | symbol): Signal<T> | undefined
-```
-
-Composable: try to inject a writable signal. Returns undefined if not found.
-Must be called during setup().
 
 ### `tween`
 
@@ -5943,20 +5901,6 @@ Usage:
     </div>
   }
 
-### `useProvided`
-
-```ts
-import { useProvided } from '@pdxui/core';
-
-function useProvided(key: string | symbol): T
-```
-
-Composable: inject a provided value using the current component's element.
-Must be called during setup(). Throws if not found.
-
-Usage in setup():
-  const theme = useProvided<ThemeSignal>('theme');
-
 ### `usePullToRefresh`
 
 ```ts
@@ -6140,22 +6084,6 @@ Reactively set document.title. Updates whenever signal dependencies change.
 Usage:
   useTitle(() => `${count()} items — My App`);
 
-### `useWritable`
-
-```ts
-import { useWritable } from '@pdxui/core';
-
-function useWritable(key: string | symbol): Signal<T>
-```
-
-Composable: inject a writable signal from an ancestor.
-Returns the full signal object (read + write), not just the value.
-Must be called during setup().
-
-Usage: const theme = useWritable<string>('theme');
-       theme()      // read
-       theme.set()  // write — propagates to provider
-
 ### `validateIcu`
 
 ```ts
@@ -6260,7 +6188,7 @@ Usage:
 
 ## @pdxui/router
 
-27 value exports.
+28 value exports.
 
 ### `configureRouter`
 
@@ -6533,6 +6461,18 @@ const routeParams
 ```
 
 Signal for current route params — provided to descendants via Context Protocol.
+
+### `RouteParams`
+
+```ts
+import { RouteParams } from '@pdxui/router';
+
+const RouteParams: Context<Signal<Record<string, string>>>
+```
+
+The context token the router outlet provides the current route's params under (#495): a signal of
+the raw params, read below the outlet with `inject(RouteParams, el, null)`. The same name as the type
+above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `RouteParams` the token.
 
 ### `setQuery`
 

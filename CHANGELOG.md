@@ -11,6 +11,29 @@ semver.
 
 ### Features
 
+- Context values are keyed by typed tokens. `context<T>(name)` returns one; declare it once, in a
+  module: `export const CurrentUser = context<User>('current-user');`. The token is the key, compared
+  by identity, and carries the value's type (`ContextValue<typeof CurrentUser>` is `User`).
+  - The API is `provide(token, value, host)` and `inject(token, host, fallback?)`. `inject` with no
+    provider throws, naming the token and the component; with a third argument, `undefined`
+    included, it returns that instead. It asks the context protocol too, so a Lit provider of the
+    same token answers.
+  - **Breaking:** seven functions leave `@pdxui/core`. An import of one in a `.pdx` is
+    `PDX_REMOVED_FORM`, and `pdx migrate` flags it:
+    - `tryInject(k, el)` and `tryUseProvided(k)` → `inject(token, el, undefined)`;
+    - `useProvided(k)` → `inject(token, el)`, or `@inject`;
+    - `requestContext(el, k)` → `inject(token, el)`;
+    - `provideWritable(k, s)` → `provide(token, s, el)`, since a provided signal is writable;
+    - `useWritable(k)` / `tryUseWritable(k)` → `inject(token, el)` / `inject(token, el, undefined)`.
+  - **Breaking:** the library's and router's contexts are exported tokens:
+    - `DataSourceContext` (`@pdxui/ui/data-source`) replaces `'dataSource'`;
+    - `<pdx-data-source :token="Orders">` replaces `name` and its `ds:` key;
+    - `ErrorContext` (`@pdxui/ui/error-boundary`) replaces `'errorContext'`;
+    - `RouteParams` (`@pdxui/router`) replaces `'routeParams'`;
+    - `<pdx-provide :token :value>` replaces `name`, and `:values` takes a `Map` of token to value.
+  - A page's `@params` reads `RouteParams` with a fallback, so outside an outlet its params are
+    empty instead of a throw.
+  - The `.pdx` runes `@provide` / `@inject` still take a string key until #496. (#495)
 - The editor types a `@snippet`'s parameters from the child's `@slot` signature, so `u.nmae` on a
   `User` is an error where it is written.
   - `@generic T extends { id: string };` declares a type parameter. The editor infers it from the

@@ -4,16 +4,16 @@
 // Parent <pdx-form> calls provideForm() to make its Form available.
 // Children (<pdx-form-field>, custom inputs) call useForm() to access it.
 
-import { provide, tryInject, inject } from '../component/context';
+import { context, provide, inject } from '../component/context';
 import { getCurrentScope } from '../component/lifecycle';
 import { signal } from '../reactivity/signal';
 import type { Form } from './form';
 import type { FormCoordinator } from './form-coordinator';
 import type { Signal } from '../utils/types';
 
-// ─── Context Keys ─────────────────────────────────────────────
+// ─── Context Tokens ───────────────────────────────────────────
 
-// These three are not exported.
+// These three are not exported. Each is a context token (#495), keyed by identity.
 //
 // They are the token a provide/inject pair talks over, and BOTH SIDES of that pair are already
 // public and documented — `provideForm`/`useForm`, `provideFormCoordinator`/`useFormCoordinator`,
@@ -24,13 +24,15 @@ import type { Signal } from '../utils/types';
 // reads them as an invitation to wire the context by hand instead of calling the function written
 // for it. `VALIDATION_KEYS` is exported — an app adding a locale needs the key names, so it has a
 // reader.
-const FORM_KEY = Symbol('pragmatic:form');
+// One token for a form of any record shape: a `Form<T>` is invariant in `T`, so the token holds
+// `unknown`, and `useForm<T>()` says which shape it expects.
+const FORM_KEY = context<unknown>('pragmatic:form');
 
-const FORM_COORDINATOR_KEY = Symbol('pragmatic:form-coordinator');
+const FORM_COORDINATOR_KEY = context<FormCoordinator>('pragmatic:form-coordinator');
 
 /** Carries the dotted path of the enclosing field group, so a control inside
  *  `<pdx-field-group name="address">` reports itself as `address.city` rather than `city`. */
-const FIELD_GROUP_PATH_KEY = Symbol('pragmatic:field-group-path');
+const FIELD_GROUP_PATH_KEY = context<string>('pragmatic:field-group-path');
 
 // ─── Form Context ─────────────────────────────────────────────
 
@@ -71,7 +73,7 @@ export function provideForm<T extends Record<string, unknown>>(
 export function useForm<T extends Record<string, unknown>>(): Form<T> {
     const scope = getCurrentScope();
     if (!scope) throw new Error('useForm() must be called during component setup()');
-    return inject<Form<T>>(FORM_KEY, scope.element);
+    return inject(FORM_KEY, scope.element) as Form<T>;
 }
 
 /**
@@ -89,13 +91,13 @@ export function tryUseForm<T extends Record<string, unknown>>(from?: HTMLElement
     // a browser does too when pdx-form's module loads after its fields'. A one-time lookup at setup
     // would then never find the form.
     if (from) {
-        const found = tryInject<Form<T>>(FORM_KEY, from);
+        const found = inject(FORM_KEY, from, undefined) as Form<T> | undefined;
         if (!found) _formsProvided();
         return found;
     }
     const scope = getCurrentScope();
     if (!scope) return undefined;
-    return tryInject<Form<T>>(FORM_KEY, scope.element);
+    return inject(FORM_KEY, scope.element, undefined) as Form<T> | undefined;
 }
 
 // ─── Coordinator Context ──────────────────────────────────────
@@ -123,13 +125,13 @@ const _coordinatorsProvided = signal(0);
  */
 export function useFormCoordinator(from?: HTMLElement): FormCoordinator | undefined {
     if (from) {
-        const found = tryInject<FormCoordinator>(FORM_COORDINATOR_KEY, from);
+        const found = inject(FORM_COORDINATOR_KEY, from, undefined);
         if (!found) _coordinatorsProvided();
         return found;
     }
     const scope = getCurrentScope();
     if (!scope) return undefined;
-    return tryInject<FormCoordinator>(FORM_COORDINATOR_KEY, scope.element);
+    return inject(FORM_COORDINATOR_KEY, scope.element, undefined);
 }
 
 // ─── Field Group Path Context ────────────────────────────────
@@ -159,9 +161,9 @@ const _groupPathsProvided = signal(0);
 export function useFieldGroupPath(from?: HTMLElement): string | undefined {
     if (from) {
         _groupPathsProvided();
-        return tryInject<string>(FIELD_GROUP_PATH_KEY, from);
+        return inject(FIELD_GROUP_PATH_KEY, from, undefined);
     }
     const scope = getCurrentScope();
     if (!scope) return undefined;
-    return tryInject<string>(FIELD_GROUP_PATH_KEY, scope.element);
+    return inject(FIELD_GROUP_PATH_KEY, scope.element, undefined);
 }

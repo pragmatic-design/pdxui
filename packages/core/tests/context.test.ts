@@ -1,45 +1,51 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { provide, inject, tryInject, clearProviders } from '../src/component/context';
+import { context, provide, inject, clearProviders } from '../src/component/context';
 
 describe('provide/inject', () => {
     beforeEach(() => { clearProviders(); });
 
     it('provides and injects a value', () => {
-        provide('auth', { user: 'admin' });
-        expect(inject<{ user: string }>('auth')).toEqual({ user: 'admin' });
+        const Auth = context<{ user: string }>('auth');
+        provide(Auth, { user: 'admin' });
+        expect(inject(Auth)).toEqual({ user: 'admin' });
     });
 
-    it('throws when key not found', () => {
-        expect(() => inject('nonexistent')).toThrow('No provider found');
+    it('throws when no provider has the token', () => {
+        expect(() => inject(context('nonexistent'))).toThrow('No provider for context "nonexistent"');
     });
 
-    it('tryInject returns undefined when not found', () => {
-        expect(tryInject('missing')).toBeUndefined();
+    it('with a fallback, returns it when no provider has the token', () => {
+        expect(inject(context('missing'), undefined, undefined)).toBeUndefined();
     });
 
-    it('tryInject returns value when found', () => {
-        provide('router', { path: '/' });
-        expect(tryInject<{ path: string }>('router')).toEqual({ path: '/' });
+    it('with a fallback, returns the provided value when there is one', () => {
+        const Router = context<{ path: string }>('router');
+        provide(Router, { path: '/' });
+        expect(inject(Router, undefined, undefined)).toEqual({ path: '/' });
     });
 
-    it('supports symbol keys', () => {
-        const AUTH_KEY = Symbol('auth');
-        provide(AUTH_KEY, { token: 'abc' });
-        expect(inject<{ token: string }>(AUTH_KEY)).toEqual({ token: 'abc' });
+    it('a token is its own key: another token of the same name finds nothing', () => {
+        const Auth = context<{ token: string }>('auth');
+        provide(Auth, { token: 'abc' });
+        expect(inject(Auth)).toEqual({ token: 'abc' });
+        expect(inject(context('auth'), undefined, null)).toBeNull();
     });
 
     it('overwrites on re-provide', () => {
-        provide('service', 'v1');
-        provide('service', 'v2');
-        expect(inject('service')).toBe('v2');
+        const Service = context<string>('service');
+        provide(Service, 'v1');
+        provide(Service, 'v2');
+        expect(inject(Service)).toBe('v2');
     });
 
     it('clearProviders resets all', () => {
-        provide('a', 1);
-        provide('b', 2);
+        const A = context<number>('a');
+        const B = context<number>('b');
+        provide(A, 1);
+        provide(B, 2);
         clearProviders();
-        expect(tryInject('a')).toBeUndefined();
-        expect(tryInject('b')).toBeUndefined();
+        expect(inject(A, undefined, undefined)).toBeUndefined();
+        expect(inject(B, undefined, undefined)).toBeUndefined();
     });
 });
 
@@ -47,9 +53,10 @@ describe('provide/inject', () => {
 
 describe('inject through the Shadow DOM', () => {
     it('finds a provider outside the shadow tree', () => {
+        const Svc = context<number>('shadow-svc');
         const outer = document.createElement('div');
         document.body.appendChild(outer);
-        provide('shadow-svc', 42, outer);
+        provide(Svc, 42, outer);
 
         const host = document.createElement('div');
         outer.appendChild(host);
@@ -57,6 +64,6 @@ describe('inject through the Shadow DOM', () => {
         const inner = document.createElement('span');
         root.appendChild(inner);
 
-        expect(tryInject('shadow-svc', inner as HTMLElement)).toBe(42);
+        expect(inject(Svc, inner as HTMLElement, undefined)).toBe(42);
     });
 });

@@ -4,7 +4,8 @@
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
 import { component, html, signal, computed, effect, prop, event, generatedId } from '@pdxui/core';
-import { createDataSource, isDataSource, tryInject } from '@pdxui/core';
+import { createDataSource, isDataSource, inject } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { createVirtualizer } from '@pdxui/core';
 import type { DataSource, PopoverPlacement } from '@pdxui/core';
@@ -150,7 +151,7 @@ component('pdx-select', {
             }
 
             // Fallback: Context Protocol from ancestor <pdx-data-source>
-            const injected = tryInject<DataSource<any>>('dataSource', ctx.el);
+            const injected = inject(DataSourceContext, ctx.el, null);
             if (injected && isDataSource(injected)) {
                 _isExternalDS.set(true);
                 _dsRef.set(injected as DataSource<Record<string, unknown>>);

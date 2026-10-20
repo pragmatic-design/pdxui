@@ -63,8 +63,8 @@ belong to the form's validator.
 | reach | put it in |
 |---|---|
 | one component | `$signal` |
-| a subtree reads it | `provide` a read value (`provide-inject` docs) |
-| a descendant must write it | `provideWritable` |
+| a subtree reads it | `provide` a read value under a `context<T>()` token (`provide-inject` docs) |
+| a descendant must write it | `provide` a signal |
 | the parent gives orders | `createCommands` / `createChannel` |
 | unrelated components, or kept across navigation | `@store` |
 | an *event* between unrelated components | `createBus` |

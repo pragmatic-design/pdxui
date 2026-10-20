@@ -1,6 +1,6 @@
 ---
 title: Component Communication
-description: "How two components reach each other: provide/inject, writable context, commands, channels, an event bus, and compound parents."
+description: "How two components reach each other: provide/inject by context token, writable context, commands, channels, an event bus, and compound parents."
 order: 18
 ---
 
@@ -16,27 +16,42 @@ Who should own a piece of state in the first place is on [Component Design](/doc
 
 | what you have | reach for |
 | --- | --- |
-| an ancestor and a descendant, one value | `provide` / `inject` |
-| the same, but the descendant must **write** it too | `provideWritable` / `useWritable` |
+| an ancestor and a descendant, one value | `provide` / `inject`, by a `context<T>()` token |
+| the same, but the descendant must **write** it too | `provide` a signal; `inject` returns it |
 | a parent that must **order** a child to do something | `createCommands` |
 | both directions, typed, between two known components | `createChannel` |
 | components with no relationship at all | `createBus` |
 | a parent that must **discover** its children (`<pdx-tabs>` and its `<pdx-tab>`s) | `createCompoundParent` |
 
 Everything below except the bus resolves through the **DOM tree**: a consumer finds the nearest
-provider *above it*, so two branches can carry different values under the same key.
+provider *above it*, so two branches can carry different values under the same token.
 
 ## provide / inject
 
-An ancestor publishes a value under a key; any descendant pulls it out, no matter how deep.
+An ancestor publishes a value under a **token**; any descendant pulls it out, no matter how deep.
+A token is declared once, in a module of its own, and carries the value's type:
+
+```ts
+// cart-context.ts
+import { context } from '@pdxui/core';
+import type { CartStore } from './cart';
+
+export const Cart = context<CartStore>('cart');
+```
 
 ```ts
 import { provide } from '@pdxui/core';
+import { Cart } from './cart-context';
 
-provide('cart', cartStore);          // key, value
+provide(Cart, cartStore, ctx.el);    // token, value, the host element
 ```
 
-Or declaratively in a `.pdx` component — note the `=`, the rune always takes a value:
+The token **is** the key, compared by identity: two `context('cart')` calls are two tokens, and a
+typo is a missing import instead of a value that silently never arrives. A provider of the Web
+Components context protocol from another library (Lit) answers the same token.
+
+In a `.pdx` component the runes still name a string key — note the `=`, the rune always takes a
+value; their token form is coming with #496:
 
 ```pdx
 <script>
@@ -50,10 +65,11 @@ let cartStore = $store({ items: [] });
 On the other side:
 
 ```ts
-import { inject, tryInject } from '@pdxui/core';
+import { inject } from '@pdxui/core';
+import { Cart, Theme } from './contexts';
 
-const cart = inject('cart');         // throws if no provider above
-const theme = tryInject('theme');    // returns undefined if absent
+const cart = inject(Cart, ctx.el);                // CartStore — throws if no provider above
+const theme = inject(Theme, ctx.el, 'default');   // the fallback when nothing provides it
 ```
 
 ```pdx
@@ -67,32 +83,32 @@ Now `cart` and `theme` are available in the component as if they were local.
 
 | | Missing provider |
 | --- | --- |
-| `inject(key)` | **throws** — use when the value is required |
-| `tryInject(key)` | returns **`undefined`** — use for optional context (provide a default) |
+| `inject(token, el)` | **throws**, naming the token and the component — use when the value is required |
+| `inject(token, el, fallback)` | returns **`fallback`** (`undefined` included) — use for optional context |
 
-Outside a `.pdx` setup — in a composable of your own — the same lookup is `useProvided(key)` and
-`tryUseProvided(key)`: they read the component scope that is current, so you don't have to pass an
-element around.
+A composable of your own takes the host element as an argument and injects from it —
+`useCart(el)` calls `inject(Cart, el)` — and a `.pdx` uses `@inject`.
 
 ## A value the descendant can write back
 
-`provide` hands down a value. When the child has to change it, hand down the **signal** instead:
+`provide` hands down a value. When the child has to change it, hand down the **signal** instead —
+`inject` returns the signal, which the child reads and writes:
 
 ```ts
-import { provideWritable, useWritable } from '@pdxui/core';
+import { context, provide, inject, signal } from '@pdxui/core';
+import type { Signal } from '@pdxui/core';
+
+export const Density = context<Signal<'compact' | 'comfortable'>>('density');
 
 // ancestor
 const density = signal<'compact' | 'comfortable'>('comfortable');
-provideWritable('density', density);
+provide(Density, density, ctx.el);
 
 // descendant
-const density = useWritable<'compact' | 'comfortable'>('density');
+const density = inject(Density, ctx.el);
 density();                    // read
 density.set('compact');       // write — the ancestor sees it
 ```
-
-`useWritable` throws if the provider gave a plain value rather than a signal, which is the mistake
-this pair exists to catch. `tryUseWritable` is the non-throwing version.
 
 ## A parent that gives orders: `createCommands`
 
@@ -168,17 +184,20 @@ The `<pdx-tabs>` / `<pdx-tab>` shape — a parent that has to know which childre
 be told when one of them does something:
 
 ```ts
-import { createCompoundParent, provide, inject } from '@pdxui/core';
+import { createCompoundParent, context, provide, inject } from '@pdxui/core';
+import type { CompoundParentContext } from '@pdxui/core';
+
+export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
 
 // parent
 const compound = createCompoundParent<TabChild>({
     onChildAdded: (child, i) => { /* … */ },
     onNotify: (event, payload) => { /* … */ },
 });
-provide('pdx-tabs', compound);
+provide(Tabs, compound, ctx.el);
 
 // child
-const parent = inject<CompoundParentContext<TabChild>>('pdx-tabs');
+const parent = inject(Tabs, ctx.el);
 const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
 onDestroy(() => dispose());
 ```
@@ -238,5 +257,8 @@ Several forms that must be saved together — a wizard, a master-detail screen �
   re-run, which is what the form context does with its version signal.
 - **A portal breaks the line.** Content moved by [`@portal`](/docs/portal) resolves provide/inject
   against where it *lands*, not where it was written.
-- Keys are plain strings or symbols. Namespace them (`'cart'`, `'form:ctx'`) — a collision resolves
-  silently to whichever provider is nearer.
+- **A token, not a name.** Two `context('cart')` calls are two tokens that never meet, so declare
+  each token once, in a module, and import it on both sides. The name is for messages and devtools.
+- The library's own contexts are tokens too: `DataSourceContext` (`@pdxui/ui/data-source`; a
+  `<pdx-data-source :token="Orders">` provides under yours as well), `ErrorContext`
+  (`@pdxui/ui/error-boundary`), `RouteParams` (`@pdxui/router`), and `<pdx-provide :token :value>`.
