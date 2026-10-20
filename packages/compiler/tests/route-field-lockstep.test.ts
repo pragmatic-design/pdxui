@@ -10,7 +10,7 @@
 //   3. `router/src/outlet.ts`, which reads the registration, and `router/src/route-table.ts` →
 //      `toRouteConfig`, which turns it into what the router reads. Missed: the router never sees it.
 //
-// A missed field fails silently: a missing `loader` makes `currentLoaderData()` undefined forever;
+// A missed field fails silently: a missing `loader` makes the page's `user.data()` undefined forever;
 // `scroll`, `@scroll 'top'` do nothing; `hasOutlet`, every nested route render flat; `label`, the
 // breadcrumb empty in production while the route table carries the labels. A rule that every
 // field must be copied, repeated in comments, is a design asking for a test.

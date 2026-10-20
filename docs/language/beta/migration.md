@@ -92,9 +92,9 @@ proposals the implementing issue may change.
 | `<pdx-form-field name="email">` | `<pdx-form-field :field="f.email">` | mechanical | #128 |
 | `f.fields.email` | `f.email` | mechanical | #128 (rewrite †; see decision 13) |
 | `required` on a bound control | a rule in the schema | `PDX_FORM_REQUIRED_IN_MARKUP`; flagged | #128 |
-| `@loader loadUser;` + `currentLoaderData()` | `@loader loadUser: loadUser;` + `loadUser.data()` | mechanical; reports the rename | #146 |
-| `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise | #141, #146 (†) |
-| a loader reading params from `location` or `currentParams()` | `({ params, signal })` | flagged | #146 (†) |
+| `@loader loadUser;` + `currentLoaderData()` | `@loader loadUser: loadUser;` + `loadUser.data()` | mechanical; reports the rename — landed: `loader-anonymous`, `loader-readers`; an import of `currentLoaderData` flagged (`export:@pdxui/router:currentLoaderData`) | #146, #506 |
+| `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise — landed: `loader-readers` | #141, #146, #506 |
+| a loader reading params from `location` or `currentParams()` | `({ params, signal })` | flagged — landed: `loader-reads-address` | #146, #506 |
 | `navigate('/users/42')` | `navigate.url('/users/42')`, or `navigate('/users/:id', { id: 42 })` | mechanical to `navigate.url` when the literal is not one of the project's patterns; a computed path, or a URL with more arguments, flagged — landed: `navigate-url`, `navigate-url-manual` | #150 |
 | `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged — landed: `store-persist` | #278 (decision 14) |
 

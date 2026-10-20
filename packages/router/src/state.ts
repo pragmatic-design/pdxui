@@ -88,6 +88,32 @@ export function loaderState(routePath: string): LoaderState {
 }
 
 /**
+ * A route's loader as a source with the async vocabulary (#141, #506): what a named
+ * `@loader user: loadUser;` declares `user` as. `data()` is what the loader returned, `state()` its
+ * state, `error()` why it last failed, `pending()` while a navigation runs it. `stale()` is false: the
+ * router keeps no cache of loader results yet (#148). `@await (user as u)` reads it like any source.
+ */
+export interface LoaderSource<T = unknown> {
+    readonly data: ReadonlySignal<T | undefined>;
+    readonly state: ReadonlySignal<LoaderState>;
+    readonly error: ReadonlySignal<Error | null>;
+    readonly pending: ReadonlySignal<boolean>;
+    readonly stale: ReadonlySignal<boolean>;
+}
+
+/** The loader of the route `routePath` (its pattern) as a source: the router's per-level state, read. */
+export function loaderSource<T = unknown>(routePath: string): LoaderSource<T> {
+    const state = computed(() => _loaderState()[routePath] ?? 'idle');
+    return {
+        data: computed(() => _loaderData()[routePath] as T | undefined),
+        state,
+        error: computed(() => _loaderError()[routePath] ?? null),
+        pending: computed(() => state() === 'pending'),
+        stale: computed(() => false),
+    };
+}
+
+/**
  * Why a level's @loader last failed, by its route pattern — `loaderError('/tickets/:id')` (#505).
  * Null when it has not failed, after it succeeds again, and once the router clears its loaders.
  * A rejection that is not an Error is wrapped in one, so the reason is always an Error.

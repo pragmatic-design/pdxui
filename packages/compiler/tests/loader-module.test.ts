@@ -16,7 +16,7 @@ describe('the module of a @loader', () => {
     it('holds the loader, the imports it reads, and a default export', () => {
         const code = generateLoaderModule(page([
             "@page '/tickets';",
-            '@loader loadTickets;',
+            '@loader ticketList: loadTickets;',
             "import { listTickets } from '../data/tickets';",
             "import { formatDate } from '../data/format';",
             "import { http } from '@pdxui/core';",
@@ -42,7 +42,7 @@ describe('the module of a @loader', () => {
     it('erases its TypeScript', () => {
         const code = generateLoaderModule(page([
             "@page '/t';",
-            '@loader load;',
+            '@loader loaded: load;',
             "import type { Row } from './types';",
             'async function load(): Promise<Row[]> {',
             "  const rows = (await fetch('/api').then(r => r.json())) as Row[];",
@@ -58,7 +58,7 @@ describe('the module of a @loader', () => {
         // Moved alone, `base` would be a ReferenceError the first time the route is visited.
         const code = generateLoaderModule(page([
             "@page '/t';",
-            '@loader load;',
+            '@loader loaded: load;',
             "const base = '/api/v2';",
             'async function load() { return fetch(base + "/t"); }',
         ].join('\n')), 't.pdx', 'load');
@@ -69,14 +69,14 @@ describe('the module of a @loader', () => {
 
     it('exports null when the script has no function by that name', () => {
         // PDX_LOADER_NOT_FOUND is the page module's to report; this module only declines.
-        expect(generateLoaderModule(page("@page '/t';\n@loader missing;"), 't.pdx', 'missing'))
+        expect(generateLoaderModule(page("@page '/t';\n@loader gone: missing;"), 't.pdx', 'missing'))
             .toMatch(/export default null;/);
     });
 
     it('control — a loader that reads only its imports and globals is not declined', () => {
         const code = generateLoaderModule(page([
             "@page '/t';",
-            '@loader load;',
+            '@loader loaded: load;',
             "const unrelated = 1;",
             'async function load() { const r = await fetch("/api"); return r.json(); }',
         ].join('\n')), 't.pdx', 'load');

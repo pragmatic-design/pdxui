@@ -238,6 +238,16 @@ semver.
 
 ### Changed
 
+- `@loader` names what it loads: `@loader user: loadUser;` declares `user`, a source with the async
+  vocabulary read from the router's state of the page's pattern — `user.data()`, `user.state()`,
+  `user.error()`, `user.pending()`, and `@await (user as u)` reads it. In the editor `user.data()` is
+  typed by what the function returns. `loaderSource(pattern)` and the `LoaderSource` type are exported
+  from `@pdxui/router`.
+  - The anonymous `@loader loadUser;` is `PDX_REMOVED_FORM`, and so are `currentLoaderData()` and
+    `currentLoaderState()`, which leave `@pdxui/router`. `pdx migrate` names the loader after its
+    function, `@loader loadUser: loadUser;`, rewrites the page's readers to `loadUser.data()` and
+    `loadUser.state()`, and flags them on a page with no loader. It flags a loader that reads
+    `location` or `currentParams()`: the router hands it its params. (#506)
 - The editors and the upload declare their value as a model, announced with `value-change` and
   `{ value }`: `pdx-rich-text`, `pdx-json-editor`, `pdx-inline-edit`, and `pdx-file-upload`, whose
   value is the `File[]` it holds. `::value` binds each both ways — on `pdx-file-upload` for the first

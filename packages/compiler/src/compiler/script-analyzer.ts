@@ -812,7 +812,11 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         const guardMatch = trimmed.match(/^@guard\s+(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*;?\s*$/);
         if (guardMatch) { route.guard = guardMatch[1] ?? guardMatch[2]; continue; }
 
-        // Match: @loader functionName;
+        // Match: @loader user: loadUser; — the named form (#506). Groups: [1]=the name [2]=the function
+        const namedLoader = trimmed.match(/^@loader\s+(\w+)\s*:\s*(\w+)\s*;?\s*$/);
+        if (namedLoader) { route.loaderName = namedLoader[1]; route.loader = namedLoader[2]; continue; }
+        // Match: @loader functionName; — the alpha's anonymous form, a removed form (#506) that still
+        // registers the loader. Groups: [1]=the function
         const loaderMatch = trimmed.match(/^@loader\s+(\w+)\s*;?\s*$/);
         if (loaderMatch) { route.loader = loaderMatch[1]; continue; }
 
@@ -1138,6 +1142,18 @@ export function analyzeScript(script: string, _filename: string, options: { orig
 
         // ─── Everything else → body ───
         pushBody(line, i);
+    }
+
+    // A named `@loader user: loadUser;` (#506): `user` is the route's loader as a source, read from the
+    // router's state of this page's pattern. First in the setup, so every line below can read it, and
+    // after the loop, which is when the pattern of `@page` is known wherever it was written.
+    if (route.loaderName) {
+        bodyLines.unshift(`    const ${route.loaderName} = loaderSource(${JSON.stringify(route.page ?? '')});`);
+        bodyLineOrigins.unshift(null);
+        // Named after its own function, the name is exported already — and now reads the source.
+        if (!route.loaderName.startsWith('_') && !exports.some((e) => e.name === route.loaderName)) {
+            exports.push({ name: route.loaderName, kind: 'const' });
+        }
     }
 
     // A context token is a module-level `context<T>()` the script imports (#496). Anything else — the

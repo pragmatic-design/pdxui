@@ -80,7 +80,10 @@ unconstrained → `string`); `signal` aborts when a newer navigation supersedes 
 computes the new params before running loaders. Levels run outermost first, since a child's loader may
 read its parent's data (`loaderData(parentPath)`). (**Landed**, #505 — the router's half of #146: the
 context, its coercion and signal, the prefetched call's own signal, and `loaderError(path)`;
-`router/tests/loader-context.test.ts`. The named loader is the compiler's half.)
+`router/tests/loader-context.test.ts`. The named loader is the compiler's half: **landed**, #506 —
+`router/tests/outlet-named-loader.test.ts`, `lsp/tests/loader-types.test.ts`. The editor types `user`
+from the function's return type, and `params` where the parameter is annotated `LoaderContext<P>`; an
+unannotated parameter is not yet typed from the pattern. `{ staleTime }` and `stale()` are #148.)
 
 **Outcomes** (#147). `redirect(to, { replace? })` and `notFound()` from `@pdxui/router` are thrown by a
 loader: a redirect navigates to `to` before the current navigation commits (no history entry for the
@@ -124,7 +127,9 @@ invalidated runs again at once.
   name `PDX_LOADER_UNKNOWN_OPTION` is this specification's.
 - The anonymous form `@loader fn;` and `currentLoaderData()` / `currentLoaderState()` are language
   changes: `pdx migrate` names the loader after its function, `@loader loadUser;` →
-  `@loader loadUser: loadUser;`, and reports the rename (#146).
+  `@loader loadUser: loadUser;`, and reports the rename (#146). (**Landed**, #506: the readers are
+  rewritten on the page that declares the loader and flagged elsewhere; a loader reading `location` or
+  `currentParams()` is flagged.)
 
 #### Examples
 

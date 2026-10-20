@@ -7,7 +7,7 @@ parent: api
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 29 exports, from `@pdxui/router`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 28 exports, from `@pdxui/router`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -52,26 +52,6 @@ function createRouterFromTable(table: RouteTable, options?: RouterOptions): void
 
 Install a build's route table and start the router on it — what an app with no
 `<pdx-router-outlet>` calls. The outlet does the same from `routeTable()`.
-
-## `currentLoaderData`
-
-```ts
-import { currentLoaderData } from '@pdxui/router';
-
-const currentLoaderData: ReadonlySignal<unknown>
-```
-
-Data returned by the MATCHED route's @loader function. For a parent's, see {@link loaderData}.
-
-## `currentLoaderState`
-
-```ts
-import { currentLoaderState } from '@pdxui/router';
-
-const currentLoaderState: ReadonlySignal<LoaderState>
-```
-
-Loader execution state of the matched route: idle → pending → success/error.
 
 ## `currentMeta`
 
@@ -184,6 +164,16 @@ function loaderError(routePath: string): Error | null
 Why a level's @loader last failed, by its route pattern — `loaderError('/tickets/:id')` (#505).
 Null when it has not failed, after it succeeds again, and once the router clears its loaders.
 A rejection that is not an Error is wrapped in one, so the reason is always an Error.
+
+## `loaderSource`
+
+```ts
+import { loaderSource } from '@pdxui/router';
+
+function loaderSource(routePath: string): LoaderSource<T>
+```
+
+The loader of the route `routePath` (its pattern) as a source: the router's per-level state, read.
 
 ## `loaderState`
 

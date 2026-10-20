@@ -112,7 +112,8 @@ interface Conversion { paths: string[]; options: { key: string; value: string }[
 /** The keys of `@route { … }` that are a declaration of their own, and how each is written. */
 const ROUTE_DECLARATIONS: Record<string, (value: string) => string> = {
     guard: (v) => `@guard ${v};`,
-    loader: (v) => `@loader ${v};`,
+    // Named after its function (#506): the anonymous `@loader fn;` is a removed form too.
+    loader: (v) => `@loader ${v}: ${v};`,
     layout: (v) => `@layout ${v};`,
     scroll: (v) => `@scroll ${v};`,
     search: (v) => `@search ${v};`,

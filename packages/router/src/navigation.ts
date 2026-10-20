@@ -342,7 +342,7 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
 
     // Every level's chunk starts now, all at once, and beside it every level's loader, outermost
     // first — the same rule as the guards above (#119). The focus is set first so
-    // `currentLoaderState()` reads 'pending' for the page that is about to render. The planning is
+    // the page that is about to render reads its loader's `state()` as 'pending'. The planning is
     // synchronous and the await happens only when something actually has to load.
     const chunks = startChunks(chain);
     _loaderFocus.set(route.path);

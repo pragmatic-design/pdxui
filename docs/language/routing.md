@@ -198,27 +198,35 @@ alpha
 #### Syntax
 
 ```ebnf
-LoaderDecl ::= "@loader" S Identifier S? ";"?
+LoaderDecl ::= "@loader" S Identifier S? ":" S? Identifier S? ";"?
 ```
 
-The analyzer's form: `@loader loadUsers;`.
+The analyzer's form: `@loader user: loadUser;`.
 
 #### Semantics
 
-`@loader` names a function of the script that loads the route's data before the page renders. The
-compiler moves its declaration — `function`, `async function`, or a `const`/`let`/`var` assigned to
-it — out of `setup(ctx)` to module scope, and registers the function itself, `loader:loadUsers`. The
-router calls it before mounting the page, outermost level first, and does not call it again while
-the level's own params are unchanged. It receives a `LoaderContext` (#505): `params`, the level's
-params coerced by the pattern's constraints (`:id(number)` gives a number, any other param a
-string); `query`, the query with a repeated key as an array; and `signal`, aborted when a newer
-navigation supersedes this one. A loader that ignores its argument keeps working. The result is
-`currentLoaderData()` and the state (`'idle'`, `'pending'`, `'success'`, `'error'`) is
-`currentLoaderState()`; the compiler imports both from `@pdxui/router` into the module. A level's
-own are `loaderData(pattern)`, `loaderState(pattern)` and `loaderError(pattern)`, the last failure's
-reason. Because it runs before the component exists, a loader cannot read the page's props or
-signals; a child level's loader reads its parent's `loaderData(parentPattern)`, which is published
-before it runs.
+`@loader user: loadUser;` names a route loader (#506): `loadUser` is a function of the script that
+loads the route's data before the page renders, and `user` is declared in the setup and the
+template, the way `@fetch` declares its name. The compiler moves the function's declaration —
+`function`, `async function`, or a `const`/`let`/`var` assigned to it — out of `setup(ctx)` to
+module scope, and registers the function itself, `loader:loadUser`. The router calls it before
+mounting the page, outermost level first, and does not call it again while the level's own params
+are unchanged. It receives a `LoaderContext` (#505): `params`, the level's params coerced by the
+pattern's constraints (`:id(number)` gives a number, any other param a string); `query`, the query
+with a repeated key as an array; and `signal`, aborted when a newer navigation supersedes this one.
+
+`user` is a source with the async vocabulary, read from the router's state of the page's pattern:
+`user.data()` is what the loader returned, `user.state()` is `'idle'`, `'pending'`, `'success'` or
+`'error'`, `user.error()` the last failure's reason, `user.pending()` is true while a navigation runs
+it, and `user.stale()` is false (the router keeps no cache of loader results). `@await (user as u)`
+renders its body with the data. The compiler imports `loaderSource` from `@pdxui/router` into the
+module. In the editor `user.data()` is typed by what the function resolves to,
+`Awaited<ReturnType<typeof loadUser>>`; the function's own parameter is typed where it is annotated,
+`LoaderContext<{ id: number }>`. Another level's are `loaderData(pattern)`, `loaderState(pattern)` and
+`loaderError(pattern)`. Because it runs before the component exists, a loader cannot read the page's
+props or signals; a child level's loader reads its parent's `loaderData(parentPattern)`, which is
+published before it runs. The name may be the function's own, `@loader loadUser: loadUser;`: in the
+page the name is then the source, and the route still registers the function.
 
 The loader also gets a module of its own, `virtual:pdx-loader/<tag>`: its declaration, the script
 imports it reads, its types erased. The route table imports that module, and a navigation starts it
@@ -236,25 +244,35 @@ unused is aborted as it is dropped.
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is
   registered without a loader.
-- A loader that throws sets the state to `'error'`, keeps the reason in `loaderError(pattern)` until
-  it succeeds again, and logs it at run time; nothing is checked at compile time.
+- A loader that throws sets the state to `'error'`, keeps the reason in `user.error()` until it
+  succeeds again, and logs it at run time; nothing is checked at compile time.
+- The alpha's anonymous `@loader loadUser;` and its readers `currentLoaderData()` /
+  `currentLoaderState()` are `PDX_REMOVED_FORM`. `pdx migrate` names the loader after its function,
+  `@loader loadUser: loadUser;`, and rewrites the readers to `loadUser.data()` / `loadUser.state()` on
+  the page that declares it; elsewhere it flags them. It flags a loader that reads `location` or
+  `currentParams()`: the router hands it its params.
 
 #### Examples
 
 ```pdx
 <template>
-  <p>{{ user?.name }}</p>
+  @await (user as u) {
+    <h1>{{ u.name }}</h1>
+  }
+  @if (user.state() === 'error') {
+    <p>Could not load the user: {{ user.error()?.message }}</p>
+  }
 </template>
 
 <script>
-@page '/users/:id';
-@loader loadUser;
-import { currentLoaderData, currentParams } from '@pdxui/router';
+import type { LoaderContext } from '@pdxui/router';
+interface User { id: number; name: string }
 
-const user = $derived(currentLoaderData() as { name: string } | undefined);
+@page '/users/:id(number)';
+@loader user: loadUser;
 
-async function loadUser() {
-  const res = await fetch('/api/users/' + currentParams().id);
+async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Promise<User> {
+  const res = await fetch('/api/users/' + params.id, { signal });
   return res.json();
 }
 </script>
@@ -262,7 +280,7 @@ async function loadUser() {
 
 #### Since
 
-alpha
+alpha; the named form, beta (#506)
 
 ## How the page renders
 

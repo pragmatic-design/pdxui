@@ -140,16 +140,30 @@ app knows whether there is a session, say. A target outside the origin is refuse
 ## Data before the page: @loader
 
 Often you want data *ready* when the page appears, not a "loading" flash. `@loader` runs a function
-before entering:
+before entering, and names what it loads:
 
 ```pdx
-@page '/users/:id(number)';
-@loader loadUser;
+<template>
+  @await (user as u) {
+    <h1>{{ u.name }}</h1>
+  }
+  @if (user.state() === 'error') {
+    <p>Could not load the user: {{ user.error()?.message }}</p>
+  }
+</template>
 
-async function loadUser({ params, signal }) {
+<script>
+import type { LoaderContext } from '@pdxui/router';
+interface User { id: number; name: string }
+
+@page '/users/:id(number)';
+@loader user: loadUser;
+
+async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Promise<User> {
     const res = await fetch(`/api/users/${params.id}`, { signal });
     return res.json();
 }
+</script>
 ```
 
 The loader receives a context: `params`, the route's params coerced by their constraints —
@@ -158,10 +172,17 @@ repeated key as an array (`?tab=a&tab=b` → `{ tab: ['a', 'b'] }`); and `signal
 aborts when a newer navigation starts before this one finished. Hand it to `fetch` and a superseded
 request stops. A loader that takes no argument is fine too.
 
-The resolved data is in `currentLoaderData()`, and `currentLoaderState()` reports
-`idle → pending → success` (or `error`), the words of the async vocabulary ([data](../../pdxui-data-layer/references/data.md)). The page mounts only once the loader has settled, which is
-what makes it *blocking* data — for declarative fetching inside the page see
-[Data layer](../../pdxui-data-layer/references/data.md).
+`user` is the loader as a source, in the async vocabulary ([data](../../pdxui-data-layer/references/data.md)): `user.data()` is
+what it resolved to, `user.state()` reports `idle → pending → success` (or `error`), `user.error()`
+is why it last failed, and `user.pending()` is true while a navigation runs it. `@await (user as u)`
+reads it like any source. In the editor `user.data()` is typed by what the function returns, so a
+misspelt field is an error; annotate the context, `LoaderContext<{ id: number }>`, and `params` is
+typed too. The page mounts only once the loader has settled, which is what makes it *blocking* data
+— for declarative fetching inside the page see [Data layer](../../pdxui-data-layer/references/data.md).
+
+Coming from the alpha: `@loader loadUser;` and `currentLoaderData()` are gone. `pdx migrate` names
+the loader after its function, `@loader loadUser: loadUser;`, and turns the page's
+`currentLoaderData()` into `loadUser.data()`.
 
 The function is declared in the same `<script>`, and the compiler lifts it to module scope so the
 route can call it. It therefore runs **before the component exists**: it cannot read props or
@@ -279,39 +300,37 @@ the child loads one intervention, and moving between interventions refetches the
 ```pdx
 <!-- ticket.pdx -->
 @page '/tickets/:id';
-@loader loadTicket;
+@loader ticket: loadTicket;
 
-async function loadTicket() {
-    return (await fetch('/api/tickets/7')).json();
+async function loadTicket({ params }) {
+    return (await fetch(`/api/tickets/${params.id}`)).json();
 }
 ```
 
 ```pdx
 <!-- intervention.pdx -->
 @page '/tickets/:id/interventions/:n';
-@loader loadIntervention;
+@loader intervention: loadIntervention;
 
-import { currentLoaderData, loaderData } from '@pdxui/router';
+import { loaderData } from '@pdxui/router';
 
-async function loadIntervention() {
-    return (await fetch('/api/tickets/7/interventions/2')).json();
+async function loadIntervention({ params }) {
+    return (await fetch(`/api/tickets/${params.id}/interventions/${params.n}`)).json();
 }
 
-const intervention = $derived(currentLoaderData());        // this level's
-const ticket = $derived(loaderData('/tickets/:id'));       // the parent's, by its pattern
+const parentTicket = $derived(loaderData('/tickets/:id'));   // the parent's, by its pattern
 ```
 
-`currentLoaderData()` still means **the matched route's** data, which is what it has always meant
-and what a flat route still gets. `loaderData(pattern)` reads a named level — that is how a child
-reads its parent's record, and it is reactive, so it updates when that level reloads.
+`intervention` is this level's loader. `loaderData(pattern)` reads another level by its pattern —
+that is how a child reads its parent's record, and it is reactive, so it updates when that level
+reloads.
 
 What decides a refetch is the level's **own** params. `/tickets/7/interventions/1` →
 `…/interventions/2` leaves `:id` alone, so `loadTicket` does not run and the header does not
 flicker; `/tickets/9/interventions/1` changes it, so it does. Leaving the branch entirely forgets
 it: `loaderData('/tickets/:id')` from a page outside is `undefined`, never a stale ticket.
 
-`loaderState(pattern)` is the same for the state, and `currentLoaderState()` remains the matched
-route's. `loaderError(pattern)` is why a level last failed — an `Error`, or `null` once it loads
+`loaderState(pattern)` is the same for the state. `loaderError(pattern)` is why a level last failed — an `Error`, or `null` once it loads
 again.
 
 > **Not named outlets.** `@outlet 'sidebar'` fills a *parallel* region at the same URL — a sidebar
@@ -652,7 +671,7 @@ reads while it is matched; `@params { id: number }` types the params (see the to
 | a page | `@page '/path'` |
 | a variable segment | `@page '/x/:id'` + `@params { id: number }` |
 | to protect it | `@guard 'permission'` |
-| data ready on entry | `@loader fn` |
+| data ready on entry | `@loader user: loadUser` |
 | a shared frame | `@layout 'admin'` — or, for a frame inside a frame, a parent page with a `<pdx-router-outlet>` |
 | to keep state | `@page '/x' { keepAlive }` |
 | to navigate from code | `navigate('/users/:id', { id })`, or `navigate.url(url)` for a built URL |

@@ -183,6 +183,13 @@ export function projectScript(scriptContent: string): string {
             const decl = parseFetchDecl(s.slice(m.index, j).replace(/\s+/g, ' ').trim());
             if (decl) names.set(decl.name, `PdxResource<${decl.type || 'unknown'}>`);
         }
+        if (kw === 'loader') {
+            // `@loader user: loadUser;` (#506): `user` reads what the function resolves to. The alpha's
+            // anonymous `@loader fn;` declares nothing, and the compiler reports it.
+            // Match: the name and the function. Groups: [1]=the name [2]=the function
+            const named = /^@loader\s+([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)/.exec(s.slice(m.index, j));
+            if (named) names.set(named[1], `PdxLoaderSource<Awaited<ReturnType<typeof ${named[2]}>>>`);
+        }
         if (kw === 'params' || kw === 'search') {
             // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
             for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);

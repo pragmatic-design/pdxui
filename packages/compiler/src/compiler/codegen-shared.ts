@@ -167,10 +167,14 @@ export function hoistLoader(setupBody: string, name: string):
     // A line may open with its origin mark: the declaration moves with it.
     const fnDecl = new RegExp(`^\\s*(?:\\/\\*@pdx-at:\\d+\\*\\/)?(?:async\\s+)?function\\s+${esc}\\s*\\(`);
     const varDecl = new RegExp(`^\\s*(?:\\/\\*@pdx-at:\\d+\\*\\/)?(?:const|let|var)\\s+${esc}\\s*=`);
+    // Match: the source a named `@loader loadUser: loadUser;` declares (#506), which the analyzer puts
+    // first in the setup. It shares the function's name and is not the function: it stays in the setup,
+    // where it shadows the function the route registers.
+    const loaderSourceDecl = new RegExp(`^\\s*const\\s+${esc}\\s*=\\s*loaderSource\\(`);
 
     for (let i = 0; i < lines.length; i++) {
         const isFn = fnDecl.test(lines[i]);
-        const isVar = varDecl.test(lines[i]);
+        const isVar = varDecl.test(lines[i]) && !loaderSourceDecl.test(lines[i]);
         if (!isFn && !isVar) continue;
 
         // A block-bodied declaration ends at its matching brace; a one-line arrow ends at its own

@@ -209,12 +209,12 @@ export function compileNewMode(
     if (analysis.route.searchParams && analysis.route.searchParams.length > 0) {
         autoImportRouter(allUserImports, ['currentSearch']);
     }
-    // @loader: the same, for the same reason. The page DECLARES the loader, the router runs it, and
-    // the data lands in currentLoaderData() — so the component that owns the declaration could not
-    // reach its own data without writing the import by hand. That is the framework's first rule
-    // broken: if the dev writes wiring, it is a bug of the framework.
-    if (analysis.route.loader) {
-        autoImportRouter(allUserImports, ['currentLoaderData', 'currentLoaderState']);
+    // A named @loader: the same, for the same reason. The page DECLARES the loader, the router runs it,
+    // and `user` reads it through `loaderSource` (#506) — so the component that owns the declaration
+    // could not reach its own data without writing the import by hand. That is the framework's first
+    // rule broken: if the dev writes wiring, it is a bug of the framework.
+    if (analysis.route.loaderName) {
+        autoImportRouter(allUserImports, ['loaderSource']);
     }
     // @params: the outlet provides the params under the router's `RouteParams` token (#495).
     if (analysis.route.params && analysis.route.params.length > 0) {
@@ -320,7 +320,7 @@ export function compileStoreMode(
 /**
  * Import router signals a page's own declarations imply — unless the author already imported them.
  *
- * The guard is not defensive tidiness: two `import { currentLoaderData }` statements in one module
+ * The guard is not defensive tidiness: two `import { loaderSource }` statements in one module
  * is a duplicate binding and a SyntaxError, and it would appear only for the author who reached for
  * the import before the compiler offered it — the one person who cannot be blamed for it.
  *
