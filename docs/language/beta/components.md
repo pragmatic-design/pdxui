@@ -515,8 +515,9 @@ component provides and injects.
 
 - No provider and no default: a run-time error naming the token and the component.
 - String keys (`@provide user = …`, `@inject user;`, `@inject user as me;`) are a language change:
-  `PDX_UNKNOWN_DECLARATION` and listed by `pdx migrate` (#496 — landed); `pdx migrate` generates a
-  `contexts.ts` with one token per key and rewrites both sides (`@inject me from User`) with #497.
+  `PDX_UNKNOWN_DECLARATION` (#496 — landed); `pdx migrate` generates a `contexts.ts` with one token
+  per key and rewrites both sides (`@inject me from User`) (#497 — landed). A token it writes is
+  `context<unknown>`: give it its type.
 - `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`,
   `tryUseWritable` leave the public exports (#495 — landed; an import of one is `PDX_REMOVED_FORM`;
   the bus and channel APIs leave with #144).

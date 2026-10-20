@@ -16,6 +16,7 @@ import { readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, relative, resolve } from 'node:path';
 import { ComponentResolver, DEFAULT_TAG_PREFIX, languageChanges, parseSFC, projectRoutePatterns, projectTagRenames, type LanguageChange, type LanguageChangeContext } from '@pdxui/compiler';
 import { findFiles } from '../find-files';
+import { planContextTokens, writeContextModule } from './migrate-contexts';
 
 /** One rewrite: a file, the change applied, and how many places it rewrote. */
 export interface MigrateChange { file: string; id: string; count: number }
@@ -115,10 +116,25 @@ function projectContext(cwd: string, prefix: string, paths: string[]): LanguageC
 export async function migrate(paths: string[], { cwd, dry = false, prefix = DEFAULT_TAG_PREFIX, context: given }: { cwd: string; dry?: boolean; prefix?: string; context?: LanguageChangeContext }): Promise<MigrateReport> {
     const report: MigrateReport = { changed: [], flagged: [] };
     const targets = paths.length > 0 ? paths : ['.'];
-    const context = { ...projectContext(cwd, prefix, targets.filter((p) => statSync(resolve(cwd, p), { throwIfNoEntry: false })?.isDirectory())), ...given };
-    for (const path of await filesOf(targets, cwd)) {
+    const files = await filesOf(targets, cwd);
+    // The string context keys the .pdx files use, each mapped to a token, and the contexts.ts that
+    // declares the new ones (#497). Written first: the rewritten files import from it.
+    const contexts = planContextTokens(files, cwd);
+    if (contexts.module) {
+        const rel = relative(cwd, contexts.module.path).replace(/\\/g, '/');
+        if (!dry) writeContextModule(contexts, cwd);
+        report.changed.push({ file: rel, id: 'context-tokens', count: contexts.module.added });
+    }
+    const projectWide: LanguageChangeContext = {
+        ...projectContext(cwd, prefix, targets.filter((p) => statSync(resolve(cwd, p), { throwIfNoEntry: false })?.isDirectory())),
+        contextTokens: contexts.tokens,
+        ...given,
+    };
+    for (const path of files) {
         const kind = kindOf(path)!;
         const rel = relative(cwd, path).replace(/\\/g, '/');
+        // The file itself, for a change that imports a module relative to it.
+        const context: LanguageChangeContext = { ...projectWide, file: path };
         const original = readFileSync(path, 'utf-8');
         let text = original;
         for (const change of languageChanges()) {

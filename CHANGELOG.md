@@ -16,11 +16,18 @@ semver.
   nothing above provides one. The token is a `context<T>()` the script imports, and the editor types
   the injected name by it.
   - A string key — `@provide user = …`, `@inject user;`, `@inject user as me;` — is
-    `PDX_UNKNOWN_DECLARATION` with the token form as its hint, and `pdx migrate` lists it. So is a
-    token the script declares itself: the script runs once per component, so the token would be a
-    new one each time and nothing else could reach it.
+    `PDX_UNKNOWN_DECLARATION` with the token form as its hint. So is a token the script declares
+    itself: the script runs once per component, so the token would be a new one each time and
+    nothing else could reach it.
   - The default is emitted as written, before the rest of the script: a literal or an imported
     name. (#496)
+  - `pdx migrate` rewrites the string keys. It writes one token per key into `src/contexts.ts`
+    (`contexts.ts` at the root without `src/`), keeping the tokens the module already declares, and
+    rewrites both sides with an import of the token: `@provide user = v;` → `@provide User = v;`,
+    `@inject user as me;` → `@inject me from User;`. The library's keys take the library's tokens
+    (`errorContext` → `ErrorContext`, `dataSource` → `DataSourceContext`, `routeParams` →
+    `RouteParams`). **A token it writes is `context<unknown>`: give each one its value's type.**
+    (#497)
 - Context values are keyed by typed tokens. `context<T>(name)` returns one; declare it once, in a
   module: `export const CurrentUser = context<User>('current-user');`. The token is the key, compared
   by identity, and carries the value's type (`ContextValue<typeof CurrentUser>` is `User`).
