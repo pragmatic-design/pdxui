@@ -45,7 +45,7 @@ component('pdx-button', {
         ariaLabel: { type: String, default: '' },
         /** The id of an element whose text names the button, forwarded to the inner `<button>`. */
         ariaLabelledby: { type: String, default: '' },
-        /** A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button is busy and refuses clicks, so a double click sends one write. */
+        /** A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. */
         action: { type: Object, default: null },
         /** The value a click passes to `action.execute`. */
         actionArg: { type: Object, default: null },
@@ -53,17 +53,30 @@ component('pdx-button', {
     setup(ctx) {
         let _pressed = false;
 
+        type Action = { execute: (arg?: unknown) => unknown; pending: () => boolean; concurrency?: string };
+
         /** The `action`, if it has the shape: an `execute` to call and a `pending` to read. */
-        function action(): { execute: (arg?: unknown) => unknown; pending: () => boolean } | null {
+        function action(): Action | null {
             const a = ctx.action() as { execute?: unknown; pending?: unknown } | null;
             return a && typeof a.execute === 'function' && typeof a.pending === 'function'
-                ? a as { execute: (arg?: unknown) => unknown; pending: () => boolean }
+                ? a as Action
                 : null;
         }
 
         /** Busy: `loading` set, or the action's write in flight. */
         function isBusy(): boolean {
             return !!(ctx.loading() || action()?.pending());
+        }
+
+        /**
+         * Whether the pending action refuses another click (#500): under `'queue'` and `'drop'` a click
+         * while it is pending would wait or be dropped, so the button refuses it; under `'coalesce'`
+         * and `'parallel'` the action takes it, and the button stays clickable while it shows loading.
+         */
+        function refusesWhilePending(): boolean {
+            const a = action();
+            if (!a?.pending()) return false;
+            return a.concurrency !== 'coalesce' && a.concurrency !== 'parallel';
         }
 
         function getClass(): string {
@@ -74,7 +87,7 @@ component('pdx-button', {
         }
 
         function isDisabled(): boolean {
-            return !!(ctx.disabled() || isBusy());
+            return !!(ctx.disabled() || ctx.loading() || refusesWhilePending());
         }
 
         /**

@@ -164,12 +164,12 @@ leaving `command` to the native attribute). It compiles to `mutation()`:
 - `with { … }` passes `invalidate`, `optimistic`, `onSuccess`, `onError` to `mutation()`;
 - a call while another is pending is **queued** and runs after it (#50 — landed).
 
-**Concurrency** (proposed, decisions.md point 24). What a call does while another is pending is one
+**Concurrency** (decisions.md point 24; **landed** in `mutation()`, #500 — the `@action` rune is #501). What a call does while another is pending is one
 option, `concurrency`, because the right answer depends on what the write is:
 
 | `concurrency` | A call while one is pending | For |
 |---|---|---|
-| `'queue'` (default) | runs after it, in call order; a rejection does not stop the next (**landed**, `core/src/reactivity/mutation.ts:85-101`) | ordered writes: a list of edits |
+| `'queue'` (default) | runs after it, in call order; a rejection does not stop the next | ordered writes: a list of edits |
 | `'drop'` | is ignored; `execute()` returns the pending call's promise | a submit: a second click must not send twice |
 | `'coalesce'` | replaces any call **waiting** behind the running one; the running one is not touched | autosave: only the latest draft needs to reach the server |
 | `'parallel'` | runs at once; `data()` and `error()` are those of the last call **to settle** | independent writes: toggling several rows |
@@ -182,16 +182,15 @@ fails, and `invalidate` runs after each success. A coalesced call settles with t
 replaced it.
 
 - **Rollback under `'parallel'`** restores only what the failing call changed: each call's optimistic
-  value is an overlay, and removing one leaves later overlays in place. (Today rollback restores a
-  whole snapshot, `core/src/reactivity/mutation.ts:153-155`, which under parallel calls would
-  overwrite a later optimistic value.)
+  value is an overlay, and removing one leaves later overlays in place (**landed**, #500).
 - **`cancel()`** aborts the running call's `signal` and removes every call waiting behind it; their
-  promises reject with an `AbortError`, and none of them becomes `error()` (E3).
+  promises reject with an `AbortError`, and none of them becomes `error()` (E3 — **landed**, #500).
 - A waiting call whose `when` has become false when its turn comes **is not run**; its promise rejects
-  with an `ActionDisabledError`.
+  with an `ActionDisabledError` (**landed** as `mutation({ enabled })`, #500; `when` is its `@action`
+  spelling, #501).
 - `<pdx-button :action>` follows the policy: under `'drop'` and `'queue'` it is `loading` and refuses
   clicks while the action is pending (the landed behaviour, #49); under `'coalesce'` and `'parallel'`
-  it stays clickable and shows `loading` while any call runs.
+  it stays clickable and shows `loading` while any call runs (**landed**, #500).
 
 The result is an **action**: `execute(arg?)`, `pending()`, `enabled()`, `cancel()`, plus the async
 vocabulary. `<pdx-button :action="save" :action-arg="dto">` runs it on click, is `loading` and refuses

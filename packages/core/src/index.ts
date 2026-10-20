@@ -62,8 +62,8 @@ export { resource, resourceWhen } from './reactivity/resource';
 export type { Resource, ResourceOptions, ResourceState, AsyncState, ResourceHandlers, ResourceFetcher } from './reactivity/resource';
 
 // Mutation
-export { mutation } from './reactivity/mutation';
-export type { Mutation, MutationOptions } from './reactivity/mutation';
+export { mutation, ActionDisabledError } from './reactivity/mutation';
+export type { Mutation, MutationOptions, MutationConcurrency } from './reactivity/mutation';
 
 // Linked Signal (writable derived)
 export { linkedSignal } from './reactivity/linked-signal';

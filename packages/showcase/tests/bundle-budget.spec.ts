@@ -253,7 +253,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // tokens at start — all in the entry, which every page reaches through the outlet. Same machine, same
 // day, the built dist: main entry 40.0 → this branch 40.2 KB (+172 B in the entry chunk), js 467.2 →
 // 468.0 KB; main sat on the entry's ceiling already.
-const BUDGET_KB = { entry: 41, js: 468, css: 63, blocking: 97 };
+// js 468 → 469: mutation() takes a concurrency policy, a signal per call, cancel(), enabled() and
+// keeps optimistic values as overlays (#500), and pdx-button reads the policy. Same machine, same
+// day, the built dist: main js 467.8 → this branch 468.1 KB, entry 40.1 → 40.2 KB; blocking did not
+// move.
+const BUDGET_KB = { entry: 41, js: 469, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -22,10 +22,11 @@ async function mount(attrs = ''): Promise<ButtonHost> {
 const inner = (el: HTMLElement): HTMLButtonElement => el.querySelector('button')!;
 
 /** A write that resolves when `release()` is called, counting its calls and the inputs they got. */
-function slowWrite(fail = false) {
+function slowWrite(fail = false, concurrency?: 'queue' | 'drop' | 'coalesce' | 'parallel') {
     const calls: unknown[] = [];
     let release!: () => void;
     const save = mutation<string, unknown>({
+        concurrency,
         fn: (input) => {
             calls.push(input);
             return new Promise<string>((resolve, reject) => {
@@ -70,6 +71,39 @@ describe('pdx-button action', () => {
         await tick(20);
         expect(inner(el).getAttribute('aria-busy'), 'still busy after the write settled').toBeNull();
         expect(inner(el).disabled).toBe(false);
+    });
+
+    it("under 'drop' a second click is refused, as under 'queue' (#500)", async () => {
+        const { save, calls, release } = slowWrite(false, 'drop');
+        const el = await mount();
+        el.action = save;
+        await tick(20);
+        inner(el).click();
+        await tick(20);
+        expect(inner(el).disabled).toBe(true);
+        inner(el).click();
+        await tick(20);
+        release();
+        await tick(20);
+        expect(calls).toHaveLength(1);
+    });
+
+    it("under 'coalesce' the button stays clickable and shows loading: a second click is accepted (#500)", async () => {
+        const { save, calls, release } = slowWrite(false, 'coalesce');
+        const el = await mount();
+        el.action = save;
+        await tick(20);
+        inner(el).click();
+        await tick(20);
+        expect(inner(el).getAttribute('aria-busy'), 'loading while the call runs').toBe('true');
+        expect(inner(el).disabled, 'refuses clicks under coalesce').toBe(false);
+        inner(el).click();
+        await tick(20);
+        release();
+        await tick(20);
+        expect(calls, 'the second click waited behind the first, and ran').toHaveLength(2);
+        release();
+        await tick(20);
     });
 
     it('explicit disabled wins: no call', async () => {
