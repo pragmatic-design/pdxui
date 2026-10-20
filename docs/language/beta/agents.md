@@ -1,7 +1,9 @@
 # Agents
 
 How a PDX application is read and operated by an agent — a browser agent, a test agent, a model
-judging a page. Everything on this page is **proposed** (decisions.md, points 30–32). The
+judging a page. Everything on this page is **proposed** (decisions.md, points 30–32), except what
+says **landed**: the `@action` agent options and their build check (#502, «Capabilities in
+production»); the WebMCP adapter stays proposed. The
 baselines below come from a prototype run on four pages of the showcase application on 2026-10-11.
 
 ## Principles
