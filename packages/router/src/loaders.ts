@@ -5,6 +5,7 @@ import { _loaderData, _loaderState, _loaderError, _loaderFocus, type LoaderState
 import { pageModule } from './route-table';
 import { loaderIdentity, ownParamNames, parseLoaderQuery, takePrefetchedLoaderCall } from './loader-prefetch';
 import { coerceParams } from './matcher';
+import { outcomeOf } from './outcomes';
 import type { LoaderContext, RouteConfig } from './types';
 
 /**
@@ -128,12 +129,15 @@ export function startChunks(chain: RouteConfig[]): Map<string, Promise<unknown>>
  *
  * Each loader receives its level's context (#505): the params coerced by the level's constraints,
  * the parsed query, and the navigation's signal. A failure is kept in `loaderError(path)`.
- * Returns false when a newer navigation superseded this one, which `isCurrent` answers.
+ *
+ * The first loader that throws ends the run with its outcome (#147): `redirect(to)` sends the
+ * navigation on, `notFound()` and any other error stop it at that level — the levels below it would
+ * render under a parent that has nothing to show, so they are not run.
  */
 export async function runLoaders(
     pending: RouteConfig[], isCurrent: () => boolean,
     { chunks, params = {}, search = '' }: { chunks?: Map<string, Promise<unknown>>; params?: Record<string, string>; search?: string } = {},
-): Promise<boolean> {
+): Promise<LoaderOutcome> {
     const signal = currentSignal();
     const query = parseLoaderQuery(search);
     for (const level of pending) {
@@ -146,28 +150,43 @@ export async function runLoaders(
             const [data] = await Promise.allSettled([call, chunks?.get(level.path)]);
             if (data.status === 'rejected') throw data.reason;
             const result = data.value;
-            if (!isCurrent()) return false; // a newer navigation won — drop this stale result
+            if (!isCurrent()) return { kind: 'superseded' }; // a newer navigation won — drop this stale result
             const errors = { ..._loaderError.peek() };
             delete errors[level.path];
             _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
             _loaderState.set({ ..._loaderState.peek(), [level.path]: 'success' });
             _loaderError.set(errors);
         } catch (err) {
-            if (!isCurrent()) return false;
+            if (!isCurrent()) return { kind: 'superseded' };
+            // A redirect is not a failure of this level: it is where the navigation goes instead.
+            const outcome = outcomeOf(err);
+            if (outcome?.pdxOutcome === 'redirect') return { kind: 'redirect', to: outcome.to, replace: outcome.replace };
             const nextData = { ..._loaderData.peek() };
             delete nextData[level.path];
             _loaderData.set(nextData);
             _loaderState.set({ ..._loaderState.peek(), [level.path]: 'error' });
             _loaderError.set({ ..._loaderError.peek(), [level.path]: asError(err) });
+            if (outcome?.pdxOutcome === 'notFound') return { kind: 'notFound', level };
             console.error(`[pdx-router] Loader failed for ${level.path}:`, err);
+            return { kind: 'error', level };
         }
     }
     // Checked on the way out even when nothing ran. This function is async whatever the chain
     // holds, so every navigation yields a microtask here — and a navigation that started BEFORE a
     // newer one would otherwise resume and publish its route over it: the initial navigation to
     // `/` would overwrite a 404 that had already been reported.
-    return isCurrent();
+    return isCurrent() ? { kind: 'loaded' } : { kind: 'superseded' };
 }
+
+/**
+ * How the loaders of a navigation ended: all of them loaded; a newer navigation superseded this one;
+ * a loader redirected; or a loader reported not found, or failed, at `level`.
+ */
+export type LoaderOutcome =
+    | { kind: 'loaded' }
+    | { kind: 'superseded' }
+    | { kind: 'redirect'; to: string; replace: boolean }
+    | { kind: 'notFound' | 'error'; level: RouteConfig };
 
 /** Nothing matched, or a guard denied: no level has data any more. */
 export function clearLoaders(): void {

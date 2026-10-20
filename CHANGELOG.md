@@ -11,6 +11,11 @@ semver.
 
 ### Features
 
+- A route loader decides where a navigation ends: `throw redirect(to, { replace? })` from
+  `@pdxui/router` goes to `to` before the route is shown (replacing the abandoned address by default),
+  and `throw notFound()` renders the not-found page of that level, with the levels above it kept and
+  the address unchanged. `retryNavigation()` runs the navigation on screen again, for an app's own
+  error page. (#147)
 - A route loader receives a `LoaderContext` (exported from `@pdxui/router`): `params`, coerced by the
   pattern's constraints (`:id(number)` gives a number, every other param a string); `query`, with a
   repeated key as an array; and `signal`, aborted when a newer navigation starts, or the router
@@ -238,6 +243,10 @@ semver.
 
 ### Changed
 
+- A route loader that fails no longer mounts its page as if nothing had happened: the level renders
+  its error page, with a **Try again** button that runs the loader again, and the levels above it stay.
+  `currentNavError()` is `'500'` there, at `currentNavErrorDepth()`; a registered error page for
+  `'500'` replaces the default one. The router's strings gain `loaderFailed` and `retry`. (#147)
 - `@loader` names what it loads: `@loader user: loadUser;` declares `user`, a source with the async
   vocabulary read from the router's state of the page's pattern — `user.data()`, `user.state()`,
   `user.error()`, `user.pending()`, and `@await (user as u)` reads it. In the editor `user.data()` is

@@ -19,7 +19,7 @@ export {
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     loaderData, loaderState, loaderError, loaderSource, currentRoute, currentNavError,
     currentNavErrorDepth, navigation,
-    onBeforeNavigate, onAfterNavigate,
+    onBeforeNavigate, onAfterNavigate, retryNavigation, redirect, notFound,
     registerGuardChecker, setQuery, setQueryParam,
     installRouteTable, routeTable, pageModule, toRouteConfig,
 } from './runtime';

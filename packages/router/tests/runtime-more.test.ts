@@ -42,7 +42,7 @@ describe('route loaders', () => {
         expect(currentRoute()?.path, 'the route resolved only after the loader').toBe('/data');
     });
 
-    it('a loader that throws leaves the route usable and says so', async () => {
+    it("a loader that throws ends on the level's error page and says so (#147)", async () => {
         const err = vi.spyOn(console, 'error').mockImplementation(() => {});
         createRouter([
             { path: '/', component: page('home') },
@@ -54,7 +54,8 @@ describe('route loaders', () => {
 
         expect(currentLoaderState()).toBe('error');
         expect(currentLoaderData(), 'a failed loader left stale data behind').toBeUndefined();
-        expect(currentRoute()?.path, 'a failed loader took the whole page down').toBe('/bad');
+        expect(currentRoute(), 'the page was published as if its loader had not failed').toBeNull();
+        expect(currentNavError()).toBe('500');
         expect(err, 'the failure never reached the console').toHaveBeenCalled();
         err.mockRestore();
     });

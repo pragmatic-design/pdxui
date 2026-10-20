@@ -7,7 +7,7 @@ parent: api
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 28 exports, from `@pdxui/router`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 31 exports, from `@pdxui/router`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -66,12 +66,12 @@ const currentMeta: ReadonlySignal<Record<string, unknown> | undefined>
 ```ts
 import { currentNavError } from '@pdxui/router';
 
-const currentNavError: ReadonlySignal<'403' | '404' | null>
+const currentNavError: ReadonlySignal<'403' | '404' | '500' | null>
 ```
 
-Last navigation error kind: '403' (guard denied, no redirect), '404' (no match),
-or null (last navigation resolved a route). The outlet reads this to pick which
-error page to render when currentRoute() is null.
+Last navigation error kind: '403' (guard denied, no redirect), '404' (no match, or a loader threw
+`notFound()`), '500' (a loader failed, #147), or null (last navigation resolved a route). The
+outlet at `currentNavErrorDepth()` reads this to pick which error page to render.
 
 ## `currentParams`
 
@@ -218,6 +218,17 @@ The navigation in progress, for a progress bar or a dimmed page while chunks and
 is still asking "leave this page?" — until its route is published, or it is refused, denied or
 abandoned. `to()` is its target, query included, while pending; a newer navigation replaces it.
 
+## `notFound`
+
+```ts
+import { notFound } from '@pdxui/router';
+
+function notFound(): LoaderNotFound
+```
+
+`throw notFound()` in a route loader: the level renders its not-found page — the levels above it
+stay — and the address is unchanged.
+
 ## `onAfterNavigate`
 
 ```ts
@@ -265,6 +276,18 @@ do with the answer. Failure is swallowed on purpose: a prefetch that cannot reac
 a click that will load normally, not an error the visitor should be shown — the outlet reports
 the real one when the navigation happens.
 
+## `redirect`
+
+```ts
+import { redirect } from '@pdxui/router';
+
+function redirect(to: string, options: { replace?: boolean } = {}): LoaderRedirect
+```
+
+`throw redirect('/login')` in a route loader: the router navigates to `to` before the current
+navigation is published, and the route that redirected never renders. With `replace` (the default)
+the abandoned target leaves no history entry; `{ replace: false }` keeps it.
+
 ## `registerGuardChecker`
 
 ```ts
@@ -274,6 +297,18 @@ function registerGuardChecker(checker: GuardChecker): void
 ```
 
 Register a guard checker. Called with the guard name from @guard declarations.
+
+## `retryNavigation`
+
+```ts
+import { retryNavigation } from '@pdxui/router';
+
+function retryNavigation(): void
+```
+
+Resolve the address on screen again: the retry of a level's error page (#147). A level whose loader
+failed holds no data, so its loader runs again; a level above it that loaded is kept, as on any
+navigation that leaves its own params alone. No history entry is written: the address is the same.
 
 ## `routeParams`
 

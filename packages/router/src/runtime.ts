@@ -26,7 +26,8 @@ export {
     currentNavErrorDepth, navigation,
 } from './state';
 export { setQuery, setQueryParam } from './address';
-export { navigate, registerGuardChecker, onBeforeNavigate, onAfterNavigate } from './navigation';
+export { navigate, registerGuardChecker, onBeforeNavigate, onAfterNavigate, retryNavigation } from './navigation';
+export { redirect, notFound } from './outcomes';
 export { installRouteTable, routeTable, pageModule, toRouteConfig } from './route-table';
 
 /** Listener cleanup for the active router instance (set by createRouter). */

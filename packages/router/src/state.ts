@@ -35,9 +35,9 @@ export const _loaderError = signal<Record<string, Error>>({});
 /** Which level `currentLoaderData()` resolves against: the matched route, set before its loader runs. */
 export const _loaderFocus = signal<string | null>(null);
 export const _route = signal<ResolvedRoute | null>(null);
-// Distinguish a guard denial (403) from a no-match (404): both set _route to null,
-// but the outlet needs to know WHICH error page to render.
-export const _navError = signal<'403' | '404' | null>(null);
+// Distinguish a guard denial (403) from a no-match or a loader's notFound() (404) and a loader that
+// failed (500, #147): the outlet needs to know WHICH error page to render.
+export const _navError = signal<'403' | '404' | '500' | null>(null);
 /**
  * The level of the chain the last 403 was raised at — 0 for a flat route or a denial at the top.
  *
@@ -123,11 +123,11 @@ export function loaderError(routePath: string): Error | null {
 }
 export const currentRoute: ReadonlySignal<ResolvedRoute | null> = computed(() => _route());
 /**
- * Last navigation error kind: '403' (guard denied, no redirect), '404' (no match),
- * or null (last navigation resolved a route). The outlet reads this to pick which
- * error page to render when currentRoute() is null.
+ * Last navigation error kind: '403' (guard denied, no redirect), '404' (no match, or a loader threw
+ * `notFound()`), '500' (a loader failed, #147), or null (last navigation resolved a route). The
+ * outlet at `currentNavErrorDepth()` reads this to pick which error page to render.
  */
-export const currentNavError: ReadonlySignal<'403' | '404' | null> = computed(() => _navError());
+export const currentNavError: ReadonlySignal<'403' | '404' | '500' | null> = computed(() => _navError());
 
 /**
  * The nesting depth that the current navigation error belongs to.
