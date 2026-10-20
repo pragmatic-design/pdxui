@@ -9,9 +9,14 @@ import type { RouteCrumb } from '@pdxui/core';
 import { isSegmentPrefix } from './matcher';
 import type { RouteConfig } from './types';
 
-/** `/tickets/:id` + `{ id: '42' }` → `/tickets/42`. A crumb has to be somewhere you can go. */
+/**
+ * `/tickets/:id` + `{ id: '42' }` → `/tickets/42`. A crumb has to be somewhere you can go. The
+ * constraint goes with the placeholder, as in navigation's `fillParams`: `/tickets/:id(number)` →
+ * `/tickets/42`, never `/tickets/42(number)` (#566). A param the route did not match stays as written.
+ */
 function fillParams(pattern: string, params: Record<string, string>): string {
-    return pattern.replace(/:([A-Za-z0-9_]+)\??/g, (whole, name: string) => {
+    // Match: `:id`, `:id(number)`, `:id?`. Groups: [1]=the name
+    return pattern.replace(/:([A-Za-z0-9_]+)(?:\([^)]*\))?\??/g, (whole, name: string) => {
         const value = params[name];
         return value === undefined ? whole : encodeURIComponent(value);
     });
