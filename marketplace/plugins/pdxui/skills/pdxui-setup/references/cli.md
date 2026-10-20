@@ -156,6 +156,12 @@ assigned to a `$signal` is now stored, not called with the previous value). It r
 scripts and `vite.config.*`, where the plugin's options are, and leaves `node_modules` and `dist`
 alone. A second run changes nothing.
 
+One rewrite creates a file. The alpha's string context keys (`@provide user = …`, `@inject user;`)
+become tokens: `pdx migrate` writes one per key into `src/contexts.ts` (`contexts.ts` at the root
+without `src/`), adds to that module when it exists, and imports the token on both sides. A token it
+writes is `context<unknown>`; give it its type. The library's keys take the library's tokens, as
+`errorContext` takes `ErrorContext` from `@pdxui/ui/error-boundary`.
+
 ## pdx new — start fast
 
 ```bash

@@ -34,7 +34,7 @@ import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlo
 import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
-import { contextStringProvide, contextStringInject } from './context-keys';
+import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -66,6 +66,10 @@ export interface LanguageChangeContext {
     routePatterns?: ReadonlySet<string>;
     /** The alpha events a library component no longer emits, from its manifest (#478). */
     alphaOf?: AlphaLookup;
+    /** The file being migrated, absolute: a change that adds an import names a module relative to it (#497). */
+    file?: string;
+    /** The project's string context keys, each with the token it is migrated to (#497). */
+    contextTokens?: ReadonlyMap<string, ContextTokenRef>;
 }
 
 /** A registered change. */

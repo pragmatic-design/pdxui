@@ -248,3 +248,66 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
         expect(report).toEqual({ changed: [], flagged: [] });
     });
 });
+
+describe('pdx migrate — string context keys become tokens in contexts.ts (#497)', () => {
+    const script = (body: string) => `<template><p>x</p></template>\n<script>\n${body}\n</script>\n`;
+    const contextIds = (report: { changed: { id: string }[]; flagged: { id: string }[] }) => ({
+        changed: report.changed.filter((c) => c.id.startsWith('context-string-')).length,
+        flagged: report.flagged.filter((f) => f.id.startsWith('context-string-')),
+    });
+
+    it('writes one token per key, rewrites both sides with relative imports, maps a library key, and is idempotent', async () => {
+        file('src/app-shell.pdx', script("const me = { name: 'Ada' };\n@provide user = me;"));
+        file('src/pages/profile.pdx', script('@inject user;'));
+        file('src/widgets/deep/badge.pdx', script('@inject user as me;'));
+        file('src/retry.pdx', script('@inject errorContext;'));
+
+        const first = contextIds(await migrate(['.'], { cwd: root }));
+        expect(first.flagged).toEqual([]);
+        expect(first.changed).toBeGreaterThan(0);
+
+        expect(read('src/contexts.ts')).toBe("import { context } from '@pdxui/core';\n\n// Give each token its value's type: context<User>('user').\nexport const User = context<unknown>('user');\n");
+        expect(read('src/app-shell.pdx')).toBe(script("import { User } from './contexts';\nconst me = { name: 'Ada' };\n@provide User = me;"));
+        expect(read('src/pages/profile.pdx')).toBe(script("import { User } from '../contexts';\n@inject user from User;"));
+        expect(read('src/widgets/deep/badge.pdx')).toBe(script("import { User } from '../../contexts';\n@inject me from User;"));
+        expect(read('src/retry.pdx')).toBe(script("import { ErrorContext } from '@pdxui/ui/error-boundary';\n@inject errorContext from ErrorContext;"));
+
+        const before = ['src/contexts.ts', 'src/app-shell.pdx', 'src/pages/profile.pdx', 'src/widgets/deep/badge.pdx', 'src/retry.pdx'].map(read);
+        expect(await migrate(['.'], { cwd: root }), 'not idempotent').toEqual({ changed: [], flagged: [] });
+        expect(['src/contexts.ts', 'src/app-shell.pdx', 'src/pages/profile.pdx', 'src/widgets/deep/badge.pdx', 'src/retry.pdx'].map(read)).toEqual(before);
+    });
+
+    it('keeps the tokens a contexts.ts has, adds the missing ones, merges the import, and suffixes a colliding name', async () => {
+        file('src/contexts.ts', "import { context } from '@pdxui/core';\nimport type { Account } from './account';\n\nexport const Account = context<Account>('user');\nexport const Theme = context<string>('theme');\n");
+        file('src/a.pdx', script("import { Theme } from './contexts';\n@inject user;\n@inject theme;\n@inject locale;"));
+        file('src/b.pdx', script("@provide Locale = 'en';"));
+
+        await migrate(['.'], { cwd: root });
+
+        // 'user' and 'theme' are keys the module already has a token for. 'locale' and 'Locale' are two
+        // keys whose name is the same: the second, in file order, takes a suffix.
+        expect(read('src/contexts.ts')).toBe("import { context } from '@pdxui/core';\nimport type { Account } from './account';\n\nexport const Account = context<Account>('user');\nexport const Theme = context<string>('theme');\n\n// Give each token its value's type: context<User>('user').\nexport const Locale = context<unknown>('locale');\nexport const Locale2 = context<unknown>('Locale');\n");
+        expect(read('src/a.pdx')).toBe(script("import { Theme, Account, Locale } from './contexts';\n@inject user from Account;\n@inject theme from Theme;\n@inject locale from Locale;"));
+        expect(read('src/b.pdx')).toBe(script("import { Locale2 } from './contexts';\n@provide Locale2 = 'en';"));
+    });
+
+    it('control — with no string key, no contexts.ts is written', async () => {
+        file('src/a.pdx', script('let n = $signal(0);'));
+        await migrate(['.'], { cwd: root });
+        expect(() => read('src/contexts.ts')).toThrow();
+    });
+
+    it('--dry writes no contexts.ts and no file', async () => {
+        file('src/p.pdx', script('@inject user;'));
+        await migrate(['.'], { cwd: root, dry: true });
+        expect(() => read('src/contexts.ts')).toThrow();
+        expect(read('src/p.pdx')).toBe(script('@inject user;'));
+    });
+
+    it('without src/, contexts.ts is written at the root', async () => {
+        file('p.pdx', script('@inject user;'));
+        await migrate(['.'], { cwd: root });
+        expect(read('contexts.ts')).toContain("export const User = context<unknown>('user');");
+        expect(read('p.pdx')).toBe(script("import { User } from './contexts';\n@inject user from User;"));
+    });
+});
