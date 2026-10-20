@@ -507,15 +507,16 @@ called again on each change, and a plain value is delivered once (#103 — lande
 `inject(token, host, default?)` (#495 — landed: `context<T>()`, `ContextValue<C>`, the two functions,
 `inject` asking the protocol when no PDX provider has the token, and the library's and router's
 contexts as exported tokens — `DataSourceContext`, `ErrorContext`, `RouteParams`, `<pdx-provide
-:token>`, `<pdx-data-source :token>`). The runes' token form is #496; the manifest records which
-tokens each component provides and injects.
+:token>`, `<pdx-data-source :token>`). The runes' token form is #496 — landed: the token must be
+imported, and the default is a literal or an imported name. The manifest records which tokens each
+component provides and injects.
 
 ### Rules
 
 - No provider and no default: a run-time error naming the token and the component.
 - String keys (`@provide user = …`, `@inject user;`, `@inject user as me;`) are a language change:
-  `pdx migrate` generates a `contexts.ts` with one token per key and rewrites both sides
-  (`@inject me from User`).
+  `PDX_UNKNOWN_DECLARATION` and listed by `pdx migrate` (#496 — landed); `pdx migrate` generates a
+  `contexts.ts` with one token per key and rewrites both sides (`@inject me from User`) with #497.
 - `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`,
   `tryUseWritable` leave the public exports (#495 — landed; an import of one is `PDX_REMOVED_FORM`;
   the bus and channel APIs leave with #144).

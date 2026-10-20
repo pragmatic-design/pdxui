@@ -190,6 +190,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const head: HeadInfo = { meta: [] };
     const provides: ProvideDecl[] = [];
     const injects: InjectDecl[] = [];
+    // Each @provide / @inject as written, with its token: checked against the imports after the loop.
+    const contextLines: { token: string; text: string; rune: 'provide' | 'inject' }[] = [];
     const bodyLines: string[] = [];
     // One origin per LINE of the body, in order: a pushed entry may hold several lines.
     const bodyLineOrigins: (number | null)[] = [];
@@ -666,26 +668,45 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
-        // ─── @provide key = expression; — declarative context provider ───
-        // Match: @provide theme = $signal({ mode: 'dark' });
-        // Match: @provide authService = new AuthService();
+        // ─── @provide Token = expression; — declarative context provider (#496) ───
+        // Match: @provide Theme = theme;  @provide Auth = new AuthService();
+        // Groups: [1]=the token [2]=the value. That the token is imported is checked after the loop.
         const provideMatch = trimmed.match(/^@provide\s+(\w+)\s*=\s*(.+?)\s*;?\s*$/);
         if (provideMatch) {
-            provides.push({ key: provideMatch[1], expr: provideMatch[2] });
+            provides.push({ token: provideMatch[1], expr: provideMatch[2] });
+            contextLines.push({ token: provideMatch[1], text: trimmed, rune: 'provide' });
             usedFeatures.add('provide');
             continue;
         }
 
-        // ─── @inject key; or @inject key as alias; — declarative context consumer ───
-        // Match: @inject theme;
-        // Match: @inject theme as appTheme;
-        const injectMatch = trimmed.match(/^@inject\s+(\w+)(?:\s+as\s+(\w+))?\s*;?\s*$/);
-        if (injectMatch) {
-            injects.push({ key: injectMatch[1], alias: injectMatch[2] });
-            usedFeatures.add('inject');
-            // Auto-export the injected value
-            const localName = injectMatch[2] ?? injectMatch[1];
-            if (!localName.startsWith('_')) exports.push({ name: localName, kind: 'const' });
+        // ─── @inject name from Token; / @inject name from Token = fallback; (#496) ───
+        // Match: the name and the token. Groups: [1]=the name [2]=the token. The rest is read by
+        // hand: an optional `= fallback` and the `;`.
+        const injectHead = trimmed.match(/^@inject\s+(\w+)\s+from\s+(\w+)/);
+        const injectRest = injectHead ? trimmed.slice(injectHead[0].length).trim().replace(/;$/, '').trim() : null;
+        if (injectHead && injectRest !== null && (injectRest === '' || injectRest.startsWith('='))) {
+            const fallback = injectRest.startsWith('=') ? injectRest.slice(1).trim() : undefined;
+            if (fallback !== '') {
+                injects.push({ name: injectHead[1], token: injectHead[2], ...(fallback ? { fallback } : {}) });
+                contextLines.push({ token: injectHead[2], text: trimmed, rune: 'inject' });
+                usedFeatures.add('inject');
+                // Auto-export the injected value
+                if (!injectHead[1].startsWith('_')) exports.push({ name: injectHead[1], kind: 'const' });
+                continue;
+            }
+        }
+
+        // ─── @inject key; / @inject key as alias; — the alpha's string key (#496) ───
+        // Match: the alpha form. Groups: [1]=the key [2]=the alias
+        const alphaInject = trimmed.match(/^@inject\s+(\w+)(?:\s+as\s+(\w+))?\s*;?\s*$/);
+        if (alphaInject) {
+            const name = alphaInject[2] ?? alphaInject[1];
+            warnings.push({
+                code: 'PDX_UNKNOWN_DECLARATION',
+                severity: 'error' as const,
+                message: `"${trimmed}" names no context token: @inject reads a value by a token, \`from\` it. It was dropped — nothing is generated for it.`,
+                hint: `Use: @inject ${name} from Token; — with Token = context<T>('${alphaInject[1]}') declared in a module and imported.`,
+            });
             continue;
         }
 
@@ -1085,6 +1106,25 @@ export function analyzeScript(script: string, _filename: string, options: { orig
 
         // ─── Everything else → body ───
         pushBody(line, i);
+    }
+
+    // A context token is a module-level `context<T>()` the script imports (#496). Anything else — the
+    // alpha's string key, or a token declared in the script, which would be a new token per component
+    // (the script is the setup), shared with nobody — is refused and generates nothing.
+    const imported = new Set(importedNames);
+    for (const line of contextLines) {
+        if (imported.has(line.token)) continue;
+        const declaredHere = exports.some(e => e.name === line.token);
+        warnings.push({
+            code: 'PDX_UNKNOWN_DECLARATION',
+            severity: 'error' as const,
+            message: `"${line.text}": '${line.token}' is not an imported context token. It was dropped — nothing is generated for it.`,
+            hint: line.rune === 'provide'
+                ? `Use: @provide Token = …;, with Token = context<T>('${line.token}') imported${declaredHere ? ' — a token declared in the script is a new one for each component, so nothing else can reach it' : ''}.`
+                : `Use: @inject name from Token;, with Token = context<T>('…') declared in a module and imported.`,
+        });
+        if (line.rune === 'provide') provides.splice(provides.findIndex(p => p.token === line.token), 1);
+        else injects.splice(injects.findIndex(i => i.token === line.token), 1);
     }
 
     // Each @part is the ref of its element (#134): a signal holding it, null until the element is

@@ -3,7 +3,7 @@
     <h1 class="pdx-txt-title">ErrorBoundary</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
       Catches render errors and effect failures from children. Shows fallback UI with retry.
-      Provides <code>errorContext</code> to descendants via Context Protocol.
+      Provides <code>ErrorContext</code> to descendants via Context Protocol.
     </p>
 
     <!-- ═══ Render Error Caught ═══ -->
@@ -58,18 +58,18 @@
 
     <!-- ═══ Context Protocol ═══ -->
     <section>
-      <h2 class="pdx-txt-heading">Context Protocol — errorContext</h2>
+      <h2 class="pdx-txt-heading">Context Protocol — ErrorContext</h2>
       <p class="pdx-txt-small pdx-ink-muted">
-        Provides <code>errorContext</code> to all descendants via hierarchical provide/inject.
-        Children can <code>@inject errorContext;</code> to read error state, retry count, and trigger retries.
+        Provides its state to all descendants under the <code>ErrorContext</code> token.
+        Children can <code>@inject boundary from ErrorContext;</code> to read error state, retry count, and trigger retries.
       </p>
-      @raw {<details class="source"><summary>Source</summary><pre><code>// In a child component:
-@inject errorContext;
+      @raw {<details class="source"><summary>Source</summary><pre><code>// In a child component (ErrorContext comes from '@pdxui/ui/error-boundary'):
+@inject boundary from ErrorContext;
 
-// errorContext.error()    → Error | null
-// errorContext.retryCount() → number
-// errorContext.canRetry()  → boolean
-// errorContext.retry()     → trigger retry</code></pre></details>}
+// boundary.error()      → Error | null
+// boundary.retryCount() → number
+// boundary.canRetry()   → boolean
+// boundary.retry()      → trigger retry</code></pre></details>}
     </section>
 
   </div>

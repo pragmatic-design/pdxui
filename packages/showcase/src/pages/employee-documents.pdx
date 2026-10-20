@@ -82,12 +82,13 @@ function documentsLabel() {
 import { downloadFile, saveBlob } from '@pdxui/core';
 // Created from JS, so the compiler cannot auto-import it from a tag.
 import { toast } from '@pdxui/ui/toast';
+import { EmployeeDocumentsContext } from '../data/employee-documents-context';
 
 @prop id: string = '';
 
 // The list is the employee route's, loaded there once (CD-D1): this section reads it and
 // asks the owner to read it again after a change, so the count on the route's menu moves with it.
-@inject employeeDocuments;
+@inject employeeDocuments from EmployeeDocumentsContext;
 const documents = $derived(employeeDocuments.documents());
 /** False until the first list arrives: the void state is an answer, not the wait for one. */
 const loaded = $derived(employeeDocuments.loaded());

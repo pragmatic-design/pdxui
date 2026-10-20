@@ -88,10 +88,12 @@ export function buildSetupBody(
 
     // @inject — declarative context consumer (walks up DOM tree). BEFORE the body, with the props: the
     // body reads what it injects, and emitted after it a top-level read would be in the name's TDZ.
-    // The lookup needs nothing the body declares — a key and the host element.
+    // The lookup needs nothing the body declares — an imported token and the host element (#496). A
+    // fallback is the third argument, as written: read before the body, it is a literal or an import,
+    // since a name the script declares would still be in its temporal dead zone.
     for (const inj of analysis.injects) {
-        const localName = inj.alias ?? inj.key;
-        parts.push(`    const ${localName} = inject(${jsQuote(inj.key)}, ctx.el);`);
+        const fallback = inj.fallback !== undefined ? `, ${inj.fallback}` : '';
+        parts.push(`    const ${inj.name} = inject(${inj.token}, ctx.el${fallback});`);
     }
 
     // TDZ-safe ordering. Signals normally emit BEFORE the body, but a signal may
@@ -542,7 +544,7 @@ export function buildSetupBody(
 
     // @provide — declarative context provider (DOM-scoped on host element)
     for (const p of analysis.provides) {
-        parts.push(`    provide(${jsQuote(p.key)}, ${rewriteAll(p.expr)}, ctx.el);`);
+        parts.push(`    provide(${p.token}, ${rewriteAll(p.expr)}, ctx.el);`);
     }
 
     // @state — a custom state of the host, kept in sync with its expression (#132). After the body

@@ -94,6 +94,7 @@
 import { navigate, currentPath } from '@pdxui/router';
 import { employeeById, employeeTransport, employeeWalk, employmentStatus, contractEndingSoon } from '../data/employees';
 import { createEmployeeDocuments } from '../data/employee-documents';
+import { EmployeeDocumentsContext } from '../data/employee-documents-context';
 
 // The param arrives as a PROP, as on the ticket's and the customer's detail.
 @prop id: string = '';
@@ -142,7 +143,7 @@ const contractsAttention = $derived(!!record && contractEndingSoon(record));
 // The documents are loaded HERE, once, and handed to the documents section, which asks for them
 // again after a change — so the count on the menu is the section's list (CD-D1).
 const employeeDocs = createEmployeeDocuments(() => id);
-@provide employeeDocuments = employeeDocs;
+@provide EmployeeDocumentsContext = employeeDocs;
 // An effect: `id` is read inside it, so the list follows the route.
 $effect(() => { void employeeDocs.reload(); });
 const documentCount = $derived(employeeDocs.documents().length);

@@ -50,15 +50,17 @@ The token **is** the key, compared by identity: two `context('cart')` calls are 
 typo is a missing import instead of a value that silently never arrives. A provider of the Web
 Components context protocol from another library (Lit) answers the same token.
 
-In a `.pdx` component the runes still name a string key — note the `=`, the rune always takes a
-value; their token form is coming with #496:
+In a `.pdx` component the `@provide` rune takes the same imported token — note the `=`, the rune
+always takes a value:
 
 ```pdx
 <script>
+import { Cart, Theme } from './contexts';
+
 let cartStore = $store({ items: [] });
 
-@provide cart = cartStore;
-@provide theme = 'invoice';
+@provide Cart = cartStore;
+@provide Theme = 'invoice';
 </script>
 ```
 
@@ -74,12 +76,17 @@ const theme = inject(Theme, ctx.el, 'default');   // the fallback when nothing p
 
 ```pdx
 <script>
-@inject cart;
-@inject theme;
+import { Cart, Theme } from './contexts';
+
+@inject cart from Cart;                   // CartStore — throws if no provider above
+@inject theme from Theme = 'default';     // the fallback when nothing provides it
 </script>
 ```
 
-Now `cart` and `theme` are available in the component as if they were local.
+Now `cart` and `theme` are available in the component as if they were local, typed by their tokens
+in the editor. The token must be imported: a string key (`@inject cart;`), or a token declared in
+the component itself, is `PDX_UNKNOWN_DECLARATION`. The fallback is a literal or an imported name —
+it is read before the rest of the script runs.
 
 | | Missing provider |
 | --- | --- |
@@ -87,7 +94,7 @@ Now `cart` and `theme` are available in the component as if they were local.
 | `inject(token, el, fallback)` | returns **`fallback`** (`undefined` included) — use for optional context |
 
 A composable of your own takes the host element as an argument and injects from it —
-`useCart(el)` calls `inject(Cart, el)` — and a `.pdx` uses `@inject`.
+`useCart(el)` calls `inject(Cart, el)` — and a `.pdx` uses `@inject cart from Cart;`.
 
 ## A value the descendant can write back
 

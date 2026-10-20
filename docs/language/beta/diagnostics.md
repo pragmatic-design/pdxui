@@ -45,7 +45,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 
 | Code | Change | Issue |
 |---|---|---|
-| `PDX_UNKNOWN_DECLARATION` | Also raised by a malformed beta form of `@slot` (a signature), `@inject` (`from` is required), `@event` (`(bubbles)` — landed with #138), and by `@store` with an unknown `persist` value (landed, #278). | this specification, following the alpha rule «a known keyword in an unknown shape» (#138 says it for `@event`) |
+| `PDX_UNKNOWN_DECLARATION` | Also raised by a malformed beta form of `@slot` (a signature), `@inject` (`from` is required — landed with #496), `@event` (`(bubbles)` — landed with #138), and by `@store` with an unknown `persist` value (landed, #278). | this specification, following the alpha rule «a known keyword in an unknown shape» (#138 says it for `@event`) |
 | `PDX_FETCH_NO_ERROR_UI` | Its example and fix use the async vocabulary (`users.state() === 'error'`, `users.error()`). | #141 |
 | `PDX_TS` | Raised by the strict template projection: slot contexts, `@catch`/`@error` names and `$event` are typed, not `any`. | #122 — **landed** for the three typings; #468 — **landed**, the template under TypeScript's `strict` mode, in a program of its own: `strict` on the showcase's scripts raised 398 errors that were none, so the script stays in the lenient program and its names reach the template with the types it gives them. A library component's event details and slot contexts stay unchecked until its manifest types them (#131) |
 

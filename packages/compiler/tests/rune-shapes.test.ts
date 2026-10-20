@@ -29,6 +29,13 @@ function codesOf(line: string): string[] {
 
 const decorators = RUNES.filter((r) => r.kind === 'decorator');
 
+/** What a shape takes for granted around it: `@provide Token` and `@inject … from Token` name a token the script imports (#496). */
+const CONTEXT: Record<string, string> = {
+    provide: "import { Token } from './contexts';",
+    inject: "import { Token } from './contexts';",
+};
+const inContext = (name: string, line: string): string => (CONTEXT[name] ? `${CONTEXT[name]}\n${line}` : line);
+
 describe('the declaration forms the editor teaches', () => {
     it('there are declarations to check', () => {
         expect(decorators.length).toBeGreaterThan(20);
@@ -36,11 +43,11 @@ describe('the declaration forms the editor teaches', () => {
 
     for (const r of decorators) {
         it(`@${r.name}: its shape is a declaration the compiler reads`, () => {
-            expect(codesOf(code(r.shape)), code(r.shape)).not.toContain('PDX_UNKNOWN_DECLARATION');
+            expect(codesOf(inContext(r.name, code(r.shape))), code(r.shape)).not.toContain('PDX_UNKNOWN_DECLARATION');
         });
 
         it(`@${r.name}: so is what its completion writes`, () => {
-            expect(codesOf(expand(r.snippet)), expand(r.snippet)).not.toContain('PDX_UNKNOWN_DECLARATION');
+            expect(codesOf(inContext(r.name, expand(r.snippet))), expand(r.snippet)).not.toContain('PDX_UNKNOWN_DECLARATION');
         });
     }
 

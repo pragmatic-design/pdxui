@@ -11,6 +11,16 @@ semver.
 
 ### Features
 
+- **Breaking:** the `.pdx` context runes take a token: `@provide CurrentUser = me;`,
+  `@inject user from CurrentUser;`, and `@inject theme from Theme = 'light';` for a default when
+  nothing above provides one. The token is a `context<T>()` the script imports, and the editor types
+  the injected name by it.
+  - A string key — `@provide user = …`, `@inject user;`, `@inject user as me;` — is
+    `PDX_UNKNOWN_DECLARATION` with the token form as its hint, and `pdx migrate` lists it. So is a
+    token the script declares itself: the script runs once per component, so the token would be a
+    new one each time and nothing else could reach it.
+  - The default is emitted as written, before the rest of the script: a literal or an imported
+    name. (#496)
 - Context values are keyed by typed tokens. `context<T>(name)` returns one; declare it once, in a
   module: `export const CurrentUser = context<User>('current-user');`. The token is the key, compared
   by identity, and carries the value's type (`ContextValue<typeof CurrentUser>` is `User`).
@@ -33,7 +43,7 @@ semver.
     - `<pdx-provide :token :value>` replaces `name`, and `:values` takes a `Map` of token to value.
   - A page's `@params` reads `RouteParams` with a fallback, so outside an outlet its params are
     empty instead of a throw.
-  - The `.pdx` runes `@provide` / `@inject` still take a string key until #496. (#495)
+  - The `.pdx` runes `@provide` / `@inject` take a token since #496. (#495)
 - The editor types a `@snippet`'s parameters from the child's `@slot` signature, so `u.nmae` on a
   `User` is an error where it is written.
   - `@generic T extends { id: string };` declares a type parameter. The editor infers it from the

@@ -77,11 +77,19 @@ export function projectScript(scriptContent: string): string {
             if (after) names.set(after[1], 'any');
         }
         if (kw === 'inject') {
-            // Match: @inject key;  @inject key as alias;  @inject 'key' as alias;
-            // Groups: [1]=key (absent when it is quoted) [2]=alias
-            const inj = /^\s+(?:'[^'\n]*'|"[^"\n]*"|([A-Za-z_$][\w$]*))(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
-            const declared = inj && (inj[2] ?? inj[1]);
-            if (declared) names.set(declared, 'any');
+            // Match: @inject name from Token — typed by the token's value (#496), with a fallback or not.
+            // Groups: [1]=the name [2]=the token
+            const byToken = /^\s+([A-Za-z_$][\w$]*)\s+from\s+([A-Za-z_$][\w$]*)/.exec(s.slice(m.index + 1 + kw.length));
+            if (byToken) {
+                names.set(byToken[1], `import('@pdxui/core').ContextValue<typeof ${byToken[2]}>`);
+            } else {
+                // The alpha's string key, `@inject key;` / `@inject key as alias;` — an error the compiler
+                // reports; the name stays `any` so it is not reported twice.
+                // Groups: [1]=key (absent when it is quoted) [2]=alias
+                const inj = /^\s+(?:'[^'\n]*'|"[^"\n]*"|([A-Za-z_$][\w$]*))(?:\s+as\s+([A-Za-z_$][\w$]*))?/.exec(s.slice(m.index + 1 + kw.length));
+                const declared = inj && (inj[2] ?? inj[1]);
+                if (declared) names.set(declared, 'any');
+            }
         }
         if (kw === 'event') {
             // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138)

@@ -521,7 +521,7 @@ describe('a declaration no rule understood', () => {
             "@title 'Dashboard';",
             "@page '/users/:id';",
             "@prop label: string = 'Hello';",
-            "@provide cart = 1;",
+            "import { Cart } from './cart';\n@provide Cart = 1;",
         ]) {
             expect(codesOf(decl), `${decl} was reported as unrecognised`)
                 .not.toContain('PDX_UNKNOWN_DECLARATION');
