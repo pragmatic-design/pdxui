@@ -337,6 +337,9 @@ semver.
 
 ### Fixes
 
+- A `$` rune as the value of `@provide` (`@provide Theme = $signal('dark');`) is
+  `PDX_RUNE_POSITION`. It was emitted as written, and `$signal` was not defined when the setup ran.
+  (#550)
 - A `@prop`, `@model` or typed `@slot` named after a member of the element (`body`, `track`, `emit`,
   `frame`, `attr`, the lifecycle callbacks, the form-associated API) is `PDX_NAME_RESERVED`. It
   replaced that member: a slot named `body` replaced the render method, and the component rendered

@@ -63,6 +63,24 @@ const store = { name: 'dark' };
         expect(w.hint).toContain("@provide Token = …;, with Token = context<T>('user') imported");
     });
 
+    // The value is emitted as an argument of provide(), where no rune is read (#550).
+    const runePosition = (source: string) => compileCtx(source).warnings.filter((w) => w.code === 'PDX_RUNE_POSITION');
+
+    it('with a rune as its value is PDX_RUNE_POSITION on its line, not provide(Token, $signal(…))', () => {
+        const [w, ...rest] = runePosition(`<template><p>x</p></template>\n<script>\n${IMPORTS}\n@provide Theme = $signal('dark');\n</script>\n`);
+        expect(rest).toEqual([]);
+        expect(w).toMatchObject({ severity: 'error', line: 4 });
+        expect(w.hint).toContain('signal(');
+    });
+
+    it('so is an $effect as its value, which is not a statement there', () => {
+        expect(runePosition(`<template><p>x</p></template>\n<script>\n${IMPORTS}\n@provide Theme = $effect(() => {});\n</script>\n`)).toHaveLength(1);
+    });
+
+    it('control — the signal declared first and provided by name raises nothing', () => {
+        expect(runePosition(`<template><p>x</p></template>\n<script>\n${IMPORTS}\nlet theme = $signal('dark');\n@provide Theme = theme;\n</script>\n`)).toEqual([]);
+    });
+
     it('with a token declared in the script, not imported, is PDX_UNKNOWN_DECLARATION too: it would be a new token per component', () => {
         const [w] = unknown(`<template><p>x</p></template>\n<script>\nimport { context } from '@pdxui/core';\nconst Theme = context('theme');\n@provide Theme = 'dark';\n</script>\n`);
         expect(w, 'a script-declared token was accepted').toBeDefined();
