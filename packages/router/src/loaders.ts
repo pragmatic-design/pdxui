@@ -1,10 +1,33 @@
 // Loaders, one per level of the matched chain, each beside its level's chunk (#119).
 
 import { queuePrefetch, takePrefetch } from '@pdxui/core';
-import { _loaderData, _loaderState, _loaderFocus, type LoaderState } from './state';
+import { _loaderData, _loaderState, _loaderError, _loaderFocus, type LoaderState } from './state';
 import { pageModule } from './route-table';
-import { loaderIdentity, ownParamNames, takePrefetchedLoaderCall } from './loader-prefetch';
-import type { RouteConfig } from './types';
+import { loaderIdentity, ownParamNames, parseLoaderQuery, takePrefetchedLoaderCall } from './loader-prefetch';
+import { coerceParams } from './matcher';
+import type { LoaderContext, RouteConfig } from './types';
+
+/**
+ * The controller of the navigation in progress (#505): its signal is every loader's `ctx.signal`.
+ * A newer navigation aborts it as it starts — which is when `isCurrent()` turns false — and so does
+ * `clearLoaders()`.
+ */
+let _navController: AbortController | null = null;
+
+/** A navigation starts: the previous one's loaders are told they are superseded. Returns the new signal. */
+export function supersedeLoaders(): AbortSignal {
+    _navController?.abort();
+    _navController = new AbortController();
+    return _navController.signal;
+}
+
+/** The signal of the navigation in progress, or one that is never aborted when none has started. */
+function currentSignal(): AbortSignal {
+    return (_navController ??= new AbortController()).signal;
+}
+
+/** A rejection as an Error: what `loaderError(path)` holds. */
+const asError = (reason: unknown): Error => (reason instanceof Error ? reason : new Error(String(reason)));
 
 /**
  * The params each level's loader last ran with — ITS OWN, not the whole match.
@@ -37,12 +60,14 @@ export function planLoaders(
 ): RouteConfig[] {
     const prevData = _loaderData.peek();
     const prevState = _loaderState.peek();
+    const prevErrors = _loaderError.peek();
     const prevKeys = _loaderKeys;
 
     // Built from the CHAIN, so a level that is not in it is simply not carried over: leaving
     // a branch forgets its data rather than leaving it readable from somewhere it does not belong.
     const data: Record<string, unknown> = {};
     const state: Record<string, LoaderState> = {};
+    const errors: Record<string, Error> = {};
     const keys: Record<string, string> = {};
 
     const pending: RouteConfig[] = [];
@@ -51,6 +76,8 @@ export function planLoaders(
         const key = loaderKey(level.path, params);
         keys[level.path] = key;
         if (!level.loader) continue;
+        // A level's last failure stays readable until it succeeds again (#505).
+        if (level.path in prevErrors) errors[level.path] = prevErrors[level.path];
 
         // Unchanged since the last navigation: keep it. This is the sibling move — the parent's
         // data stays on screen and no request is made for something already held.
@@ -65,6 +92,7 @@ export function planLoaders(
 
     _loaderData.set(data);
     _loaderState.set(state);
+    _loaderError.set(errors);
     _loaderKeys = keys;
     return pending;
 }
@@ -95,29 +123,42 @@ export function startChunks(chain: RouteConfig[]): Map<string, Promise<unknown>>
  * Run the planned loaders in order, outermost first — the order the data depends in, and the order
  * the guards already run in. Each level settles when its loader AND its chunk have: the chunk is
  * already on its way (`startChunks`), and a failure of the chunk is the outlet's to report, not the
- * loader's. A call a prefetch started for the same identity is taken instead of calling the loader.
+ * loader's. A call a prefetch started for the same identity is taken instead of calling the loader,
+ * with its controller: this navigation's supersede aborts it too.
+ *
+ * Each loader receives its level's context (#505): the params coerced by the level's constraints,
+ * the parsed query, and the navigation's signal. A failure is kept in `loaderError(path)`.
  * Returns false when a newer navigation superseded this one, which `isCurrent` answers.
  */
 export async function runLoaders(
     pending: RouteConfig[], isCurrent: () => boolean,
     { chunks, params = {}, search = '' }: { chunks?: Map<string, Promise<unknown>>; params?: Record<string, string>; search?: string } = {},
 ): Promise<boolean> {
+    const signal = currentSignal();
+    const query = parseLoaderQuery(search);
     for (const level of pending) {
         if (!level.loader) continue;
         try {
-            const call = takePrefetchedLoaderCall(loaderIdentity(level.path, params, search)) ?? level.loader();
+            const ctx: LoaderContext = { params: coerceParams(level.path, params), query, signal };
+            const prefetched = takePrefetchedLoaderCall(loaderIdentity(level.path, params, search));
+            if (prefetched) signal.addEventListener('abort', () => prefetched.controller.abort(), { once: true });
+            const call = prefetched ? prefetched.promise : level.loader(ctx);
             const [data] = await Promise.allSettled([call, chunks?.get(level.path)]);
             if (data.status === 'rejected') throw data.reason;
             const result = data.value;
             if (!isCurrent()) return false; // a newer navigation won — drop this stale result
+            const errors = { ..._loaderError.peek() };
+            delete errors[level.path];
             _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
             _loaderState.set({ ..._loaderState.peek(), [level.path]: 'success' });
+            _loaderError.set(errors);
         } catch (err) {
             if (!isCurrent()) return false;
             const nextData = { ..._loaderData.peek() };
             delete nextData[level.path];
             _loaderData.set(nextData);
             _loaderState.set({ ..._loaderState.peek(), [level.path]: 'error' });
+            _loaderError.set({ ..._loaderError.peek(), [level.path]: asError(err) });
             console.error(`[pdx-router] Loader failed for ${level.path}:`, err);
         }
     }
@@ -130,8 +171,12 @@ export async function runLoaders(
 
 /** Nothing matched, or a guard denied: no level has data any more. */
 export function clearLoaders(): void {
+    // A loader still running has nothing left to publish to: it is told.
+    _navController?.abort();
+    _navController = null;
     _loaderData.set({});
     _loaderState.set({});
+    _loaderError.set({});
     _loaderKeys = {};
     _loaderFocus.set(null);
 }

@@ -208,11 +208,17 @@ The analyzer's form: `@loader loadUsers;`.
 `@loader` names a function of the script that loads the route's data before the page renders. The
 compiler moves its declaration — `function`, `async function`, or a `const`/`let`/`var` assigned to
 it — out of `setup(ctx)` to module scope, and registers the function itself, `loader:loadUsers`. The
-router calls it with no argument before mounting the page, outermost level first, and does not call
-it again while the level's own params are unchanged. The result is `currentLoaderData()` and the
-state (`'loading'`, `'done'`, `'error'`) is `currentLoaderState()`; the compiler imports both from
-`@pdxui/router` into the module. Because it runs before the component exists, a loader cannot read
-the page's props or signals.
+router calls it before mounting the page, outermost level first, and does not call it again while
+the level's own params are unchanged. It receives a `LoaderContext` (#505): `params`, the level's
+params coerced by the pattern's constraints (`:id(number)` gives a number, any other param a
+string); `query`, the query with a repeated key as an array; and `signal`, aborted when a newer
+navigation supersedes this one. A loader that ignores its argument keeps working. The result is
+`currentLoaderData()` and the state (`'idle'`, `'pending'`, `'success'`, `'error'`) is
+`currentLoaderState()`; the compiler imports both from `@pdxui/router` into the module. A level's
+own are `loaderData(pattern)`, `loaderState(pattern)` and `loaderError(pattern)`, the last failure's
+reason. Because it runs before the component exists, a loader cannot read the page's props or
+signals; a child level's loader reads its parent's `loaderData(parentPattern)`, which is published
+before it runs.
 
 The loader also gets a module of its own, `virtual:pdx-loader/<tag>`: its declaration, the script
 imports it reads, its types erased. The route table imports that module, and a navigation starts it
@@ -222,14 +228,16 @@ helper, a rune — is not moved: its module exports `null`, and the route table 
 reach it, as before. A link that prefetches its route under the `hover` or `viewport` policy starts
 the loader too, once every guard of the route has allowed it; the result is kept for ten seconds
 under the route's pattern, its own params and its query in a canonical order, and a navigation with
-the same key takes it instead of calling the loader.
+the same key takes it instead of calling the loader. The prefetched call gets the same context, with
+a signal of its own: the navigation that takes it aborts it when superseded, and a call that expires
+unused is aborted as it is dropped.
 
 #### Rules
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is
   registered without a loader.
-- A loader that throws sets the state to `'error'` and logs it at run time; nothing is checked at
-  compile time.
+- A loader that throws sets the state to `'error'`, keeps the reason in `loaderError(pattern)` until
+  it succeeds again, and logs it at run time; nothing is checked at compile time.
 
 #### Examples
 

@@ -2,7 +2,7 @@
 
 import { saveScrollPosition as saveScroll, restoreScrollPosition as restoreScroll } from '@pdxui/core';
 import { compileMatcher, type Matcher } from './matcher';
-import { clearLoaders, planLoaders, runLoaders, startChunks } from './loaders';
+import { clearLoaders, planLoaders, runLoaders, startChunks, supersedeLoaders } from './loaders';
 import { publishTrail } from './trail';
 import { tableRedirect } from './route-table';
 import {
@@ -213,6 +213,8 @@ function refuse(source: string, target: string): void {
  */
 export async function handleNavigation(fullPath: string, isBack = false, depth = 0, commit?: (target: string) => void): Promise<void> {
     const navId = ++_navSeq;
+    // The previous navigation is superseded now, and its loaders' signal says so (#505).
+    supersedeLoaders();
     try {
         await resolveNavigation(navId, fullPath, isBack, depth, commit);
     } finally {

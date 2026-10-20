@@ -96,7 +96,7 @@ export function generateRouteTable(
             // (#119), so the data does not wait for the page's chunk, and the page's when the
             // loader cannot stand alone.
             r.loader
-                ? `loader: () => __load(${jsString(r.path)}, ${imp(r.file)}, ${jsString(r.loader)}, () => import(${jsString(loaderModuleId(r.tag))}))`
+                ? `loader: (ctx) => __load(${jsString(r.path)}, ${imp(r.file)}, ${jsString(r.loader)}, () => import(${jsString(loaderModuleId(r.tag))}), ctx)`
                 : '',
         ].filter(Boolean).join(', ')
         + ' }',
@@ -125,9 +125,9 @@ function __registered(path) {
 
 /**
  * The loader: as its page registered it, or from its own module, or — when it cannot stand alone —
- * from the page, imported first. Then call it.
+ * from the page, imported first. Then call it with the router's context (#505).
  */
-async function __load(path, page, name, own) {
+async function __load(path, page, name, own, ctx) {
   let fn = __registered(path);
   if (!fn) fn = (await own()).default;
   if (!fn) { await page(); fn = __registered(path); }
@@ -135,7 +135,7 @@ async function __load(path, page, name, own) {
     throw new Error('@loader "' + name + '" is declared on ' + path + ' but the page module '
       + 'registered none. Declare it in <script>: async function ' + name + '() { … }');
   }
-  return fn();
+  return fn(ctx);
 }
 
 export const routes = [\n${routeEntries}\n];

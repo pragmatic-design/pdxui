@@ -19,7 +19,8 @@
 import { queuePrefetch, takePrefetch, cancelPrefetches } from '@pdxui/core';
 import { routeTable, pageModule } from './active';
 import { config, chainAllowed } from './navigation';
-import { loaderIdentity, prefetchLoaderCall } from './loader-prefetch';
+import { loaderIdentity, parseLoaderQuery, prefetchLoaderCall } from './loader-prefetch';
+import { coerceParams } from './matcher';
 
 /**
  * What a route says about being fetched ahead of time: on a hover, focus or press of a link to it
@@ -197,5 +198,8 @@ async function prefetchData(url: string): Promise<boolean> {
     if (!match?.route.loader || match.route.redirect) return false;
     const loader = match.route.loader;
     if (!await chainAllowed(config.matcher.chain(match.route))) return false;
-    return prefetchLoaderCall(loaderIdentity(match.route.path, match.params, search), loader);
+    // The same context a navigation gives the loader (#505), with the prefetch's own signal.
+    const params = coerceParams(match.route.path, match.params);
+    const query = parseLoaderQuery(search);
+    return prefetchLoaderCall(loaderIdentity(match.route.path, match.params, search), (signal) => loader({ params, query, signal }));
 }

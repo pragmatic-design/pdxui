@@ -30,6 +30,8 @@ export const _state = signal<Record<string, unknown> | undefined>(undefined);
 export type LoaderState = 'idle' | 'pending' | 'success' | 'error';
 export const _loaderData = signal<Record<string, unknown>>({});
 export const _loaderState = signal<Record<string, LoaderState>>({});
+/** Each level's last failure, by its pattern: set on failure, cleared on success and by clearLoaders (#505). */
+export const _loaderError = signal<Record<string, Error>>({});
 /** Which level `currentLoaderData()` resolves against: the matched route, set before its loader runs. */
 export const _loaderFocus = signal<string | null>(null);
 export const _route = signal<ResolvedRoute | null>(null);
@@ -83,6 +85,15 @@ export function loaderData(routePath: string): unknown {
 /** The same, for the state. 'idle' for a level that is not loading and has nothing. */
 export function loaderState(routePath: string): LoaderState {
     return _loaderState()[routePath] ?? 'idle';
+}
+
+/**
+ * Why a level's @loader last failed, by its route pattern — `loaderError('/tickets/:id')` (#505).
+ * Null when it has not failed, after it succeeds again, and once the router clears its loaders.
+ * A rejection that is not an Error is wrapped in one, so the reason is always an Error.
+ */
+export function loaderError(routePath: string): Error | null {
+    return _loaderError()[routePath] ?? null;
 }
 export const currentRoute: ReadonlySignal<ResolvedRoute | null> = computed(() => _route());
 /**

@@ -2,11 +2,23 @@
 
 import type { ScrollRestoration } from '@pdxui/core';
 
+/**
+ * What a route loader receives (#505): the level's params coerced by the pattern's constraints
+ * (`:id(number)` → a number, any other param a string), the query with a repeated key as an array,
+ * and a signal aborted when a newer navigation supersedes this one, or the router clears its loaders.
+ */
+export interface LoaderContext<P = Record<string, string | number>> {
+    params: P;
+    query: Record<string, string | string[]>;
+    signal: AbortSignal;
+}
+
 export interface RouteConfig {
     path: string;
     component: () => Node | DocumentFragment | Promise<unknown>;
     guard?: string;
-    loader?: () => Promise<unknown>;
+    /** Called with the level's context; an anonymous `@loader fn;` may ignore it. */
+    loader?: (ctx: LoaderContext) => unknown;
     redirect?: string;
     meta?: Record<string, unknown>;
     /** `@scroll` on the page: what happens to the scroll position when this route is entered. */
@@ -103,9 +115,9 @@ export interface TableRoute {
     meta?: Record<string, unknown>;
     /**
      * A bridge to the page's `@loader`: the function the page registered, else the loader's own
-     * module (#119), else the page imported for it — then called.
+     * module (#119), else the page imported for it — then called, with the context (#505).
      */
-    loader?: () => Promise<unknown>;
+    loader?: (ctx: LoaderContext) => unknown;
     scroll?: ScrollRestoration;
     hasOutlet?: boolean;
     /** A string in a table the compiler wrote; a page module's own registration may carry a function. */

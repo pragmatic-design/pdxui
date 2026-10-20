@@ -6122,7 +6122,7 @@ Usage:
 
 ## @pdxui/router
 
-28 value exports.
+29 value exports.
 
 ### `configureRouter`
 
@@ -6285,6 +6285,18 @@ computed or a template and it updates when that level reloads.
 
 `undefined` when the level declared no loader, has not loaded yet, failed, or is not in the
 current chain at all — a page cannot read the data of a branch it has left.
+
+### `loaderError`
+
+```ts
+import { loaderError } from '@pdxui/router';
+
+function loaderError(routePath: string): Error | null
+```
+
+Why a level's @loader last failed, by its route pattern — `loaderError('/tickets/:id')` (#505).
+Null when it has not failed, after it succeeds again, and once the router clears its loaders.
+A rejection that is not an Error is wrapped in one, so the reason is always an Error.
 
 ### `loaderState`
 
