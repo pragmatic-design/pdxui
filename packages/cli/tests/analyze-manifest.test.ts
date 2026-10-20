@@ -69,6 +69,21 @@ describe('pdx analyze', () => {
         expect(field.events).toEqual([{ name: 'selected-id-change', payloadType: '{ value: string }' }]);
     });
 
+    it('lists the context tokens each component provides and injects, with their module; a fallback makes an inject optional (#498)', async () => {
+        write('src/shell.pdx', "<template><slot></slot></template>\n<script>\nimport { CurrentUser } from './contexts';\nconst me = { name: 'Ada' };\n@provide CurrentUser = me;\n</script>\n");
+        write('src/user-badge.pdx', "<template><p>{{ user.name }}</p></template>\n<script>\nimport { CurrentUser, Theme } from './contexts';\nimport { RouteParams } from '@pdxui/router';\n@inject user from CurrentUser;\n@inject theme from Theme = 'light';\n@inject params from RouteParams;\n</script>\n");
+        const components = (await json()).components as (Manifest['components'][number] & { provides: unknown; injects: unknown })[];
+        const byTag = Object.fromEntries(components.map((c) => [c.tag, c]));
+        expect(byTag['app-shell'].provides).toEqual([{ token: 'CurrentUser', from: './contexts' }]);
+        expect(byTag['app-shell'].injects).toEqual([]);
+        expect(byTag['app-user-badge'].provides).toEqual([]);
+        expect(byTag['app-user-badge'].injects).toEqual([
+            { token: 'CurrentUser', from: './contexts', optional: false },
+            { token: 'Theme', from: './contexts', optional: true },
+            { token: 'RouteParams', from: '@pdxui/router', optional: false },
+        ]);
+    });
+
     it('--json prints the manifest and writes no file', async () => {
         write('src/hello.pdx', '<template><p>hi</p></template>\n');
         const manifest = await json();

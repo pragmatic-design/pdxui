@@ -918,6 +918,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     // sourceFile, not scanNode: interfaces are module-level, and a file declaring two components
     // shares them. scanNode narrows to one component() statement for those files.
     const shapes = scanExportedShapes(sourceFile, file);
+    // The contexts it provides and reads (#498), in its own statement or file and its helpers.
+    const contexts = scanContexts([scanNode, ...helpers.map(h => h.sourceFile)], new Set(props.map(p => p.name)));
     for (const mm of methods) members.push(mm);
     const attributes = props.filter(p => !PROP_ONLY.has(p.runtime)).map(p => ({
         name: p.name.toLowerCase(), fieldName: p.name,
@@ -945,6 +947,12 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             ...(cssParts.length ? { cssParts } : {}),
             ...(cssProperties.length ? { cssProperties } : {}),
             ...(cssStates.length ? { cssStates } : {}),
+            ...(contexts.provides.length || contexts.injects.length ? {
+                'x-pdx-context': {
+                    ...(contexts.provides.length ? { provides: contexts.provides } : {}),
+                    ...(contexts.injects.length ? { injects: contexts.injects } : {}),
+                },
+            } : {}),
         }],
         exports: [{
             kind: 'custom-element-definition', name: tag,
@@ -954,6 +962,30 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
 }
 
 // ─── Main ───────────────────────────────────────────────────────────
+
+/**
+ * The context tokens a component provides and injects (#498), read off its `provide(token, …)` and
+ * `inject(token, …)` calls. A token is an identifier that starts upper-case (`DataSourceContext`); a
+ * lower-case identifier named like one of the props is the token that prop carries, listed as `:prop`
+ * (`<pdx-provide :token>`); anything else (a key taken from a map) is not knowable here, and is left
+ * out. An inject is optional when it passes a fallback, its third argument.
+ */
+function scanContexts(nodes, propNames) {
+    const provides = [];
+    const injects = [];
+    const visit = (n) => {
+        if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.arguments.length > 0 && ts.isIdentifier(n.arguments[0])) {
+            const fn = n.expression.text;
+            const arg = n.arguments[0].text;
+            const token = /^[A-Z]/.test(arg) ? arg : propNames.has(arg) ? `:${arg}` : null;
+            if (token && fn === 'provide' && !provides.includes(token)) provides.push(token);
+            if (token && fn === 'inject' && !injects.some(i => i.token === token)) injects.push({ token, optional: n.arguments.length >= 3 });
+        }
+        ts.forEachChild(n, visit);
+    };
+    for (const node of nodes) visit(node);
+    return { provides, injects };
+}
 
 /**
  * The whole manifest, built from the sources, without writing anything.

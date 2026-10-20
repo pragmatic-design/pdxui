@@ -56,6 +56,8 @@ on blur.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
+**Injects:** `DataSourceContext` (optional)
+
 **Slot:** `option` — Scoped — renders one option. Receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
 
 

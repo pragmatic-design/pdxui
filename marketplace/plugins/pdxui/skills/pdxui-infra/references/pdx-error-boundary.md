@@ -13,6 +13,8 @@ Catch and recover from render errors.
 
 **Renders:** roles `alert`
 
+**Provides:** `ErrorContext`
+
 **Shapes:** `ErrorContext { error: Signal<Error | null>; retryCount: Signal<number>; canRetry: ReadonlySignal<boolean>; retry: () => void }`
 
 

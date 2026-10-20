@@ -72,6 +72,8 @@ and `sync()` sends it to the transport.
 |---|---|
 | `source` | The DataSource itself, as a computed: call it — `el.source()` — and it re-reads when the source is replaced. |
 
+**Provides:** the token in `:token` · `DataSourceContext`
+
 
 #### Examples
 

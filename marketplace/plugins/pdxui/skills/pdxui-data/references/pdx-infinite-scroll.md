@@ -18,6 +18,8 @@ Load more as you scroll.
 
 **Renders:** roles `status`
 
+**Injects:** `DataSourceContext` (optional)
+
 
 #### Examples
 

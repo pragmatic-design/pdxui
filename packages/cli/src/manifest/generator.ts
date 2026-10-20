@@ -2,8 +2,19 @@
 
 import { readFileSync } from 'fs';
 import { relative } from 'pathe';
-import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, modelEventName, DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
+import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, importedLocalNames, modelEventName, DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
 import type { ComponentManifest, RouteManifest, FetchManifest, FormManifest, ComponentMetadata } from './schema';
+
+/** The specifier of the import that binds `name`, among the script's import statements; '' when none does. */
+function importedFrom(imports: string[], name: string): string {
+    for (const stmt of imports) {
+        if (!importedLocalNames(stmt).includes(name)) continue;
+        // Groups: [1]=the specifier
+        const m = /\bfrom\s*['"]([^'"]+)['"]/.exec(stmt);
+        if (m) return m[1];
+    }
+    return '';
+}
 
 /**
  * Analyze a single .pdx file and produce its component manifest.
@@ -86,6 +97,9 @@ export function analyzeComponent(filePath: string, rootDir: string, prefix: stri
             scopeType: s.scopeType,
         })),
         exposes: analysis.exposes,
+        // The tokens of @provide / @inject, which the compiler accepts only when imported (#496).
+        provides: analysis.provides.map(p => ({ token: p.token, from: importedFrom(analysis.userImports, p.token) })),
+        injects: analysis.injects.map(i => ({ token: i.token, from: importedFrom(analysis.userImports, i.token), optional: i.fallback !== undefined })),
         signals: analysis.signals.map(s => s.name),
         stores: analysis.stores.map(s => s.name),
         dependencies: deps,
