@@ -143,14 +143,20 @@ Often you want data *ready* when the page appears, not a "loading" flash. `@load
 before entering:
 
 ```pdx
-@page '/users/:id';
+@page '/users/:id(number)';
 @loader loadUser;
 
-async function loadUser() {
-    const res = await fetch('/api/users/1');
+async function loadUser({ params, signal }) {
+    const res = await fetch(`/api/users/${params.id}`, { signal });
     return res.json();
 }
 ```
+
+The loader receives a context: `params`, the route's params coerced by their constraints —
+`:id(number)` gives the number `42`, any other param a string; `query`, the query string with a
+repeated key as an array (`?tab=a&tab=b` → `{ tab: ['a', 'b'] }`); and `signal`, which the router
+aborts when a newer navigation starts before this one finished. Hand it to `fetch` and a superseded
+request stops. A loader that takes no argument is fine too.
 
 The resolved data is in `currentLoaderData()`, and `currentLoaderState()` reports
 `idle → pending → success` (or `error`), the words of the async vocabulary ([data](../../pdxui-data-layer/references/data.md)). The page mounts only once the loader has settled, which is
@@ -305,7 +311,8 @@ flicker; `/tickets/9/interventions/1` changes it, so it does. Leaving the branch
 it: `loaderData('/tickets/:id')` from a page outside is `undefined`, never a stale ticket.
 
 `loaderState(pattern)` is the same for the state, and `currentLoaderState()` remains the matched
-route's.
+route's. `loaderError(pattern)` is why a level last failed — an `Error`, or `null` once it loads
+again.
 
 > **Not named outlets.** `@outlet 'sidebar'` fills a *parallel* region at the same URL — a sidebar
 > and a main area showing different things at once. Nesting is about the path.

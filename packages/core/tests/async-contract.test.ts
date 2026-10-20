@@ -18,7 +18,9 @@
 //     cache subscription when the component goes, so the entry is collected, and a retry waiting in
 //     its backoff does not fire (#254).
 //
-// The issue for E7 adds its case here; the route-loader rows come with the loaders.
+// The issue for E7 adds its case here. The route-loader leg — E1 latest wins, E2 a signal per call,
+// and why E4 does not apply to a loader — is packages/router/tests/loader-context.test.ts, beside the
+// router: core does not import it (#505).
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import * as core from '../src/index';

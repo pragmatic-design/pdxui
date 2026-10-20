@@ -78,7 +78,9 @@ type LoaderContext<P> = { params: P; query: Record<string, string | string[]>; s
 `params` is typed and coerced from the path's constraints (`:id(number)` → `{ id: number }`;
 unconstrained → `string`); `signal` aborts when a newer navigation supersedes this one. The router
 computes the new params before running loaders. Levels run outermost first, since a child's loader may
-read its parent's data (`loaderData(parentPath)`).
+read its parent's data (`loaderData(parentPath)`). (**Landed**, #505 — the router's half of #146: the
+context, its coercion and signal, the prefetched call's own signal, and `loaderError(path)`;
+`router/tests/loader-context.test.ts`. The named loader is the compiler's half.)
 
 **Outcomes** (#147). `redirect(to, { replace? })` and `notFound()` from `@pdxui/router` are thrown by a
 loader: a redirect navigates to `to` before the current navigation commits (no history entry for the

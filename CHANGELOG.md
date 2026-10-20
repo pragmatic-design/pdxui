@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- A route loader receives a `LoaderContext` (exported from `@pdxui/router`): `params`, coerced by the
+  pattern's constraints (`:id(number)` gives a number, every other param a string); `query`, with a
+  repeated key as an array; and `signal`, aborted when a newer navigation starts, or the router
+  clears its loaders. A prefetched call gets the same context with a signal of its own: the
+  navigation that takes it over aborts it when superseded, and one that expires unused is aborted as
+  it is dropped. `loaderError(pattern)` keeps a level's last failure until it loads again. A loader
+  that takes no argument keeps working. (#505)
 - An `@action … with { agent: '…', consequential: true }` is an action an agent may call. `pdx analyze`
   records it under `actions`, with `agent`, `consequential` and `input`, the JSON schema of its
   parameter's type read from the type's text (`{}` for a type it cannot read, such as an interface).

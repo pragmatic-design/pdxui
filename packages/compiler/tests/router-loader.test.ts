@@ -54,7 +54,7 @@ describe('what the table carries', () => {
         const code = generateRouteTable([DATA]);
 
         expect(code, 'the bridge did not reach the route entry').toContain(
-            'loader: () => __load("/data", () => import("/app/pages/data.pdx"), "loadRows", () => import("virtual:pdx-loader/pdx-data"))');
+            'loader: (ctx) => __load("/data", () => import("/app/pages/data.pdx"), "loadRows", () => import("virtual:pdx-loader/pdx-data"), ctx)');
         // A string where the router expects a function is a call on a string.
         expect(code).not.toContain('loader: "loadRows"');
     });
@@ -104,6 +104,16 @@ describe('how the function is found', () => {
 
         expect(await route.loader!()).toBe('fresh');
         expect(imported).toEqual(['/app/pages/data.pdx']);
+    });
+
+    it('hands the router\'s context to the loader it finds (#505)', async () => {
+        const seen: unknown[] = [];
+        const [route] = evaluate([DATA], neverImported);
+        (globalThis as { __pdx_routes?: unknown[] }).__pdx_routes = [{ path: '/data', loader: async (ctx: unknown) => { seen.push(ctx); return 1; } }];
+        const ctx = { params: { id: 1 }, query: {}, signal: new AbortController().signal };
+
+        await (route.loader as unknown as (c: unknown) => Promise<unknown>)(ctx);
+        expect(seen, 'the bridge dropped the context').toEqual([ctx]);
     });
 
     it('ignores a registration whose loader is not callable', async () => {

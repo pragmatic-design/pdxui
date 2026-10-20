@@ -35,24 +35,45 @@ export function loaderIdentity(pattern: string, params: Record<string, string>, 
     return `${pattern}|${own}|${canonicalQuery(search)}`;
 }
 
-interface Prefetched { promise: Promise<unknown>; at: number }
+/** The query a loader receives (#505): each key once, a repeated key as an array in URL order. */
+export function parseLoaderQuery(search: string): Record<string, string | string[]> {
+    const raw = search.split('#')[0].replace(/^\?/, '');
+    const out: Record<string, string | string[]> = {};
+    if (raw === '') return out;
+    for (const [k, v] of new URLSearchParams(raw)) {
+        const held = out[k];
+        out[k] = held === undefined ? v : Array.isArray(held) ? [...held, v] : [held, v];
+    }
+    return out;
+}
 
-const prefetched = new Map<string, Prefetched>();
+/** A held call: its promise, when it started, and its own controller, which aborts it if it goes unused. */
+export interface PrefetchedCall { promise: Promise<unknown>; at: number; controller: AbortController }
 
-/** Whether a call with this identity is already held, and young enough to be taken. */
-function fresh(entry: Prefetched | undefined): entry is Prefetched {
-    return !!entry && Date.now() - entry.at <= PREFETCH_TTL_MS;
+const prefetched = new Map<string, PrefetchedCall>();
+
+/**
+ * Whether a held call is young enough to be taken. Not a type guard: a call that fails it is still a
+ * call — an expired one, which is aborted as it is dropped.
+ */
+function fresh(entry: PrefetchedCall): boolean {
+    return Date.now() - entry.at <= PREFETCH_TTL_MS;
 }
 
 /**
- * Start `loader` for `key` unless a fresh call is already held. Returns whether it started one.
+ * Start `loader` for `key` unless a fresh call is already held, giving it the signal of a controller
+ * of its own (#505). Returns whether it started one. A held call that expired is aborted as it is
+ * replaced.
  *
  * A call that fails is forgotten: the navigation then calls the loader itself, and its failure is
  * the one the page reports.
  */
-export function prefetchLoaderCall(key: string, loader: () => unknown): boolean {
-    if (fresh(prefetched.get(key))) return false;
-    const entry: Prefetched = { promise: Promise.resolve().then(loader), at: Date.now() };
+export function prefetchLoaderCall(key: string, loader: (signal: AbortSignal) => unknown): boolean {
+    const held = prefetched.get(key);
+    if (held && fresh(held)) return false;
+    held?.controller.abort();
+    const controller = new AbortController();
+    const entry: PrefetchedCall = { promise: Promise.resolve().then(() => loader(controller.signal)), at: Date.now(), controller };
     prefetched.set(key, entry);
     entry.promise.then(undefined, () => {
         if (prefetched.get(key) === entry) prefetched.delete(key);
@@ -60,14 +81,22 @@ export function prefetchLoaderCall(key: string, loader: () => unknown): boolean 
     return true;
 }
 
-/** The prefetched call for `key`, handed to the navigation once; undefined when none is fresh. */
-export function takePrefetchedLoaderCall(key: string): Promise<unknown> | undefined {
+/**
+ * The prefetched call for `key`, handed to the navigation once; undefined when none is fresh. The
+ * navigation takes its controller too, and aborts it when a newer navigation supersedes it. A call
+ * that expired unused is aborted as it is dropped.
+ */
+export function takePrefetchedLoaderCall(key: string): PrefetchedCall | undefined {
     const entry = prefetched.get(key);
     prefetched.delete(key);
-    return fresh(entry) ? entry.promise : undefined;
+    if (!entry) return undefined;
+    if (fresh(entry)) return entry;
+    entry.controller.abort();
+    return undefined;
 }
 
-/** Test seam: the held calls are module state. */
+/** Test seam: the held calls are module state. Each is aborted as it goes. */
 export function resetLoaderPrefetch(): void {
+    for (const entry of prefetched.values()) entry.controller.abort();
     prefetched.clear();
 }

@@ -221,6 +221,22 @@ function constraintSource(constraint: string): string {
 }
 
 /**
+ * A level's params as its loader receives them (#505): coerced by the pattern's constraints, read
+ * beside the constraint table above so the two cannot drift. `:id(number)` gives a number — its
+ * value matched `[0-9]+`, so the conversion cannot fail — and every other constraint, and an
+ * unconstrained param, keeps the string.
+ */
+export function coerceParams(pattern: string, params: Record<string, string>): Record<string, string | number> {
+    const out: Record<string, string | number> = { ...params };
+    // Match: `:name(constraint)`, the constraint ending at the first `)` as the scanner reads it.
+    // Groups: [1]=the name [2]=the constraint
+    for (const m of pattern.matchAll(/:([A-Za-z0-9_]+)\(([^)]*)\)/g)) {
+        if (m[2] === 'number' && typeof params[m[1]] === 'string') out[m[1]] = Number(params[m[1]]);
+    }
+    return out;
+}
+
+/**
  * A pattern that is not made of whole segments, as one regex with named param extraction:
  *   /files/:name.:ext   → /^\/files\/([^/]+)\.([^/]+)$/
  *   /a/*\/b             → /^\/a\/(.+)\/b$/
