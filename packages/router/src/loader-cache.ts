@@ -34,13 +34,13 @@ export function watchKept(identity: string, onDropped: () => void): () => void {
     const cache = getDefaultCache();
     const key = cacheKey(identity);
     const version = cache.keyVersion(key);
-    // The key comes from the address, and `keyVersion` looks it up in a Map: CodeQL takes calling
-    // what that lookup returned as a call through a name the visitor chose. The check is the guard it
-    // recognises; `keyVersion` always returns a signal, so it never fails.
-    if (typeof version !== 'function') return () => {};
     let first = true;
     return effect(() => {
-        version();
+        // The key comes from the address, and `keyVersion` looks it up in a Map: CodeQL takes calling
+        // what that lookup returned as a call through a name the visitor chose. The check is the guard
+        // it recognises, and it has to sit beside the call — a guard outside this closure does not
+        // reach into it. `keyVersion` always returns a signal, so it always holds.
+        if (typeof version === 'function') version();
         if (first) { first = false; return; }
         if (!cache.get(key)) onDropped();
     });
