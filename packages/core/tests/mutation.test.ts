@@ -11,7 +11,8 @@ describe('mutation — basic', () => {
 
         const result = await m.execute({ name: 'Alice' });
 
-        expect(fn).toHaveBeenCalledWith({ name: 'Alice' });
+        // The input, and the call's own signal (#500).
+        expect(fn).toHaveBeenCalledWith({ name: 'Alice' }, { signal: expect.any(AbortSignal) });
         expect(result).toEqual({ id: 1, name: 'Alice' });
     });
 

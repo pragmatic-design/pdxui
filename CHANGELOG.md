@@ -11,6 +11,17 @@ semver.
 
 ### Features
 
+- `mutation()` takes a `concurrency` policy for a call made while another is pending: `'queue'`
+  (the default, as before), `'drop'`, `'coalesce'` or `'parallel'`. No policy aborts the running
+  write.
+  - `fn` receives `(input, { signal })`, the call's own; `m.cancel()` aborts the running call's
+    signal and drops the waiting ones, which reject with an `AbortError` and never become `error()`.
+  - `enabled: () => boolean`, read as `m.enabled()`: a call whose turn comes while it is false does
+    not run, and rejects with `ActionDisabledError`, exported from `@pdxui/core`.
+  - The optimistic value is applied when a call starts and kept as one overlay per running call: a
+    failing call removes its own, and a parallel call's value stays.
+  - `<pdx-button :action>` stays clickable, showing loading, under `'coalesce'` and `'parallel'`;
+    under `'queue'` and `'drop'` it refuses clicks while pending, as before. (#500)
 - **Breaking:** one mechanism per direction. Four untyped messaging APIs leave `@pdxui/core`; an
   import of one in a `.pdx` is `PDX_REMOVED_FORM`, and `pdx migrate` flags it:
   - `createBus` → a `@store` for state the app shares, or an `@event` for a message;

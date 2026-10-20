@@ -3312,7 +3312,7 @@
             {
               "kind": "field",
               "name": "action",
-              "description": "A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button is busy and refuses clicks, so a double click sends one write.",
+              "description": "A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write.",
               "type": {
                 "text": "object"
               },

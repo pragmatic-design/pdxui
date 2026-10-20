@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-455 value exports.
+456 value exports.
 
 ### `__adoptStyles`
 
@@ -175,6 +175,16 @@ class AbortError
 ```
 
 Error thrown when the caller aborts a request — a cancellation, not a failure. A timeout is {@link HttpTimeoutError}.
+
+### `ActionDisabledError`
+
+```ts
+import { ActionDisabledError } from '@pdxui/core';
+
+class ActionDisabledError
+```
+
+The rejection of a call whose `enabled()` was false when its turn came: it did not run.
 
 ### `actions`
 
@@ -3416,10 +3426,11 @@ function mutation(options: MutationOptions<TData, TInput>): Mutation<TData, TInp
 A write as reactive state: `execute(input)` plus the `pending`, `data` and `error` a form needs to
 disable its submit button and show what happened.
 
-Calls are queued, not run at once: `execute` while one is in flight waits for it, so two writes
-of the same record never race, and an autosave and a save both land, in order. A user
-double-clicking Save must still not create two records — that guard is the button's:
-`<pdx-button :action="save">` is busy and refuses clicks while `pending()`.
+By default calls are queued, not run at once: `execute` while one is in flight waits for it, so two
+writes of the same record never race, and an autosave and a save both land, in order. `concurrency`
+chooses otherwise — drop, coalesce, or run in parallel. A user double-clicking Save must still not
+create two records — that guard is the button's: `<pdx-button :action="save">` is busy and refuses
+clicks while `pending()`, under the policies that wait.
 
 `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
 an item is created without the caller wiring the two together.

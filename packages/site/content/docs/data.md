@@ -191,9 +191,12 @@ const rename = mutation({
 await rename.execute({ id: 7, name: 'Ada' });   // the list shows Ada before the request lands
 ```
 
-What happens, in order: the cache entry is **snapshotted**, the optimistic value is written, the
-request goes out. On success the cache is invalidated by tag and the real data arrives. On failure
-the snapshot goes back — and `execute` rejects, so the `catch` is yours to write.
+What happens, in order: when the call **starts** (not when it is queued), the cache entry's value is
+kept as the **base**, the optimistic value is written, the request goes out. On success the cache is
+invalidated by tag and the real data arrives. On failure that call's optimistic value is removed —
+and `execute` rejects, so the `catch` is yours to write. Each running call's value is an overlay on
+the base: when one of two parallel calls fails, the key goes back to the base with the other call's
+value still applied.
 
 **The rollback is the half that makes this safe**, and it has one behaviour worth knowing: if the
 key had **no entry** before the write, the rollback **removes** it rather than restoring
@@ -204,11 +207,24 @@ Three more things the type does not say:
 
 - **`update` throwing is not fatal.** If your update function raises, the optimistic step is
   skipped and the mutation proceeds as a normal write — you do not get a half-applied cache.
-- **`execute()` calls queue.** A call made while another is pending waits its turn: one runs at a
-  time, in call order, each promise gets its own result, and a failed call does not stop the ones
-  behind it. `pending()` stays true until the queue is empty; `data()` and `error()` are the last call
-  that finished. The double-submit guard is the button's — `<pdx-button :action="save">` refuses
-  clicks while `save.pending()` — so a double click still sends one request.
+- **`execute()` calls queue, unless you choose otherwise.** `concurrency` says what a call made
+  while another is pending does, and no policy aborts the running write:
+
+  | `concurrency` | a call while one is pending |
+  | --- | --- |
+  | `'queue'` (default) | runs after it, in call order; a failed call does not stop the next |
+  | `'drop'` | is ignored: `execute()` returns the pending call's promise |
+  | `'coalesce'` | replaces the call *waiting* behind the running one; the replaced call's promise settles with its replacement |
+  | `'parallel'` | runs at once; `data()` and `error()` are the last call to settle |
+
+  `pending()` stays true while a call runs or waits. The double-submit guard is the button's —
+  `<pdx-button :action="save">` refuses clicks while `save.pending()` under `'queue'` and `'drop'`,
+  and stays clickable (showing loading) under `'coalesce'` and `'parallel'`.
+- **A call has its own `signal`.** `fn(input, { signal })`: pass it to `fetch`. `save.cancel()`
+  aborts the running call's signal and drops every waiting call; their promises reject with an
+  `AbortError`, and none of them becomes `error()`.
+- **`enabled: () => boolean`** (read as `save.enabled()`) guards a waiting call: if it is false when
+  the call's turn comes, the call does not run and rejects with `ActionDisabledError`.
 - **`state()` is `idle | pending | success | error`**, and `pending()` is the one to disable a
   button with.
 
