@@ -648,10 +648,12 @@ describe('a document resolves from its own project, not from the editor folder',
     // The editor opens a monorepo root; the app is apps/web, and pnpm put @pdxui/ui in
     // apps/web/node_modules only. A server that loaded the manifest from the folder it was
     // opened on would find none, and every library tag in the app would be unresolved.
+    // The tag is one only this manifest declares: a tag the design system styles (`pdx-button`) is
+    // known without any manifest, and the test would pass whatever the server read.
     const mono = join(tmpdir(), `pdx-lsp-mono-${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
     const web = join(mono, 'apps', 'web');
     const ui = join(web, 'node_modules', '@pdxui', 'ui');
-    const TEXT = '<template>\n<pdx-button ></pdx-button>\n</template>\n<script>\nlet a = $signal(1);\n</script>\n';
+    const TEXT = '<template>\n<pdx-app-local ></pdx-app-local>\n</template>\n<script>\nlet a = $signal(1);\n</script>\n';
 
     beforeAll(() => {
         mkdirSync(join(ui, 'src'), { recursive: true });
@@ -662,23 +664,33 @@ describe('a document resolves from its own project, not from the editor folder',
         }));
         writeFileSync(join(ui, 'custom-elements.json'), JSON.stringify({
             modules: [{ path: 'src/button.js', declarations: [{
-                kind: 'class', customElement: true, tagName: 'pdx-button', description: 'The app-local button',
+                kind: 'class', customElement: true, tagName: 'pdx-app-local', description: 'The app-local button',
                 attributes: [{ name: 'variant', type: { text: "'solid' | 'ghost'" }, description: 'Look' }],
             }] }],
         }));
         writeFileSync(join(web, 'src', 'page.pdx'), TEXT);
         stub.on.initialize({ rootUri: pathToFileURL(mono).href });
+        // What is under test is where the manifest is read from — a compiler diagnostic. The type
+        // check would build a TypeScript program for a project no other test has opened: 0.3 s
+        // cold, 1.8 s under coverage locally and over 5 s on a CI runner (#575), all for diagnostics
+        // nothing here reads.
+        stub.on.configuration({ settings: { pdx: { typeCheck: false } } });
     });
 
     afterAll(() => {
+        // This project's document is closed BEFORE the check is turned back on: turning it on
+        // re-checks every open document, and with this one open it builds the cold program the
+        // describe was spared — 3.6 s under coverage locally, over 10 s on a CI runner (#575).
+        stub.open.delete(pathToFileURL(join(web, 'src', 'page.pdx')).href);
         rmSync(mono, { recursive: true, force: true });
         stub.on.initialize({ rootUri: pathToFileURL(root).href });
+        stub.on.configuration({ settings: { pdx: { typeCheck: true } } });
     });
 
     it('offers the props of a library tag inside it', () => {
         const uri = pathToFileURL(join(web, 'src', 'page.pdx')).href;
         stub.open.set(uri, TextDocument.create(uri, 'pdx', 1, TEXT));
-        const items = stub.on.completion(at(uri, positionOf(TEXT, '<pdx-button ', 12))) as { label: string }[];
+        const items = stub.on.completion(at(uri, positionOf(TEXT, '<pdx-app-local ', 15))) as { label: string }[];
 
         expect(items.map((i) => i.label)).toEqual(expect.arrayContaining([expect.stringContaining('variant')]));
     });
