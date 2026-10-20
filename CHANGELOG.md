@@ -337,6 +337,10 @@ semver.
 
 ### Fixes
 
+- An `export` of a value in a component's script is `PDX_SCRIPT_EXPORT`, and the declaration is
+  compiled without it. It landed inside `setup()`, where it is a syntax error, and the module failed
+  to load with no word from the compiler. A type export, a `@store` module and a `.pdx.ts` module
+  are unchanged. (#551)
 - A `$` rune as the value of `@provide` (`@provide Theme = $signal('dark');`) is
   `PDX_RUNE_POSITION`. It was emitted as written, and `$signal` was not defined when the setup ran.
   (#550)

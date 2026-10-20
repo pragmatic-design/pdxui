@@ -153,6 +153,17 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Read the store through its hook (`useMenu().selected`), or move the export to its own module.',
         reproducedIn: `${T}store-module-exports.test.ts`,
     },
+    PDX_SCRIPT_EXPORT: {
+        severity: 'error', category: 'defect',
+        summary: 'An `export` of a value in a component script.',
+        explanation: "A component's script is the body of its setup, run once per instance; an `export` inside a function is a syntax error, and the module failed to load in the browser with no word from the compiler. There is nothing a component could export, so the declaration is compiled without its `export` and the line is reported. A type export (`export interface`, `export type`) is erased like any type; a `@store` module and a `.pdx.ts` module keep their exports.",
+        fix: 'Move what you meant to share into a `.ts` module and import it from there; inside the component, drop the `export`.',
+        example: {
+            bad: pdx('<p>{{ total }}</p>', 'export const TAX = 0.22;\nconst total = 100 * (1 + TAX);'),
+            good: pdx('<p>{{ total }}</p>', "import { TAX } from './tax';\nconst total = 100 * (1 + TAX);"),
+        },
+        reproducedIn: `${T}script-export.test.ts`,
+    },
     PDX_DUP_DECLARATION: {
         severity: 'error', category: 'defect',
         summary: 'The same name declared twice at the top of the script: runes, `@prop`, functions, classes, plain variables.',

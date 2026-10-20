@@ -33,7 +33,7 @@ const blank = (code: string, at: number, end: number): string =>
  * of `@provide`, which is emitted as an argument of `provide()`: that value stays, and its range is
  * returned, since no rune is in its position there.
  */
-function withoutDeclarations(code: string): { code: string; values: [number, number][] } {
+export function withoutDeclarations(code: string): { code: string; values: [number, number][] } {
     const masked = maskNonCode(code);
     let out = code;
     const values: [number, number][] = [];

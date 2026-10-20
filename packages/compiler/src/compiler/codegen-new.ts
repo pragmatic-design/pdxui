@@ -9,6 +9,7 @@ import type { PluginRunner } from '../plugin-system';
 import { buildSetupBody, buildPropsObject } from './codegen-setup';
 import { hostDescriptor } from './codegen-host';
 import { liftStoreExports } from './store-exports';
+import { dropScriptExports } from './script-exports';
 import type { CompileContext } from './compile-context';
 import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
 import { maskNonCode } from './tokenizer';
@@ -184,7 +185,10 @@ export function compileNewMode(
     const propsCode = buildPropsObject(analysis.props.filter(p => !p.model));
     const models = analysis.props.filter(p => p.model);
     const modelsCode = models.length > 0 ? buildPropsObject(models) : '';
-    let setupParts = buildSetupBody(analysis, filename, descriptor, production, scriptOnly, ctx.warnings);
+    // An `export` inside setup() is a syntax error at load: reported as PDX_SCRIPT_EXPORT, emitted without it (#551).
+    // A .pdx.ts module (scriptOnly) unwraps the setup into the module itself, where its exports belong.
+    const body = scriptOnly ? analysis.body : dropScriptExports(analysis.body);
+    let setupParts = buildSetupBody(body === analysis.body ? analysis : { ...analysis, body }, filename, descriptor, production, scriptOnly, ctx.warnings);
 
     // Post-setup: detect i18n helpers used in setup body (functions with _ prefix skip feature detection)
     if (setupParts.includes('$t(')) imports.add('$t');

@@ -20,6 +20,7 @@ import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { checkRemovedForms } from './language/removed-forms';
 import { validateRunePosition } from './compiler/validate-rune-position';
+import { validateScriptExports } from './compiler/script-exports';
 import { setupRedundant } from './language/script-setup';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
@@ -932,6 +933,8 @@ export function compile(
     allWarnings.push(...checkRemovedForms(descriptor, source, { alphaOf: options?.alphaOf }));
     // A `$` rune where the compiler does not read it: left as written, undefined at run time (#278).
     allWarnings.push(...validateRunePosition(descriptor, source));
+    // An `export` in a component script: inside setup() it is a syntax error at load (#551).
+    allWarnings.push(...validateScriptExports(descriptor, source, !!cachedAnalysis?.globalStore));
     // `<script setup>`: one script grammar (#158), so `setup` changes nothing. Said once, at the tag.
     if (descriptor.script?.setup) allWarnings.push(setupRedundant(source));
 
