@@ -419,6 +419,9 @@ semver.
 
 ### Fixes
 
+- A `@defer` whose trigger has parentheses of its own — `when (…)`, `idle(ms)`, `timer(ms)` — keeps
+  the components it renders out of the route's chunk. The compiler did not recognise the block, gave
+  them a static import too, and the bundler put them back where the page loads. (#245)
 - A page that stays mounted while its route loader runs again — the same route, another id — no
   longer renders its `@await` body with the alias undefined, which threw in a binding and logged an
   unhandled effect error. The router wrote a level's data, state and error one by one, and a reader

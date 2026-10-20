@@ -1,0 +1,13 @@
+<template>
+  <h2>Sales</h2>
+  <ol data-test="sales">
+    @for (months as month; track month.name) {
+      <li>{{ month.name }}: {{ month.total }}</li>
+    }
+  </ol>
+</template>
+
+<script>
+// A deferred panel (#245): its code is in its own chunk, not the board's.
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'].map((name, i) => ({ name, total: (i + 1) * 1200 }));
+</script>

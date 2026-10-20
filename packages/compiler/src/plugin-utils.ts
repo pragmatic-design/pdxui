@@ -531,27 +531,52 @@ export function stripHtmlComments(template: string): string {
  *
  * Brace-counted rather than regex-matched: a defer body contains braces of its own —
  * interpolations, a nested `@if`, an inline object — and `@defer \(…\) \{[^}]*\}` stops at the
- * first of them. The `@placeholder` / `@loading` / `@error` blocks that follow are NOT removed:
- * they render immediately, so what they name belongs in the payload.
+ * first of them. The trigger list is walked the same way, by parentheses: `when (…)`, `idle(ms)` and
+ * `timer(ms)` have parentheses of their own, and a pattern that stopped at the first `)` did not
+ * recognise the block at all (#245). The `@placeholder` / `@loading` / `@error` blocks that follow
+ * are NOT removed: they render immediately, so what they name belongs in the payload.
  */
 export function stripDeferBlocks(template: string): string {
     let out = '';
     let i = 0;
-    const re = /@defer\s*(?:\([^)]*\))?\s*\{/gi;
+    // Match: `@defer` and the space after it; the trigger list and the `{` are walked below.
+    const re = /@defer\b\s*/gi;
     for (;;) {
         re.lastIndex = i;
         const m = re.exec(template);
         if (!m) { out += template.slice(i); return out; }
-        out += template.slice(i, m.index);
-        // Walk to the matching close brace, counting nesting.
-        let depth = 1;
         let j = m.index + m[0].length;
-        for (; j < template.length && depth > 0; j++) {
-            if (template[j] === '{') depth++;
-            else if (template[j] === '}') depth--;
+        if (template[j] === '(') j = skipBalanced(template, j, '(', ')', true);
+        while (j < template.length && /\s/.test(template[j])) j++;
+        if (template[j] !== '{') {
+            // Not a block (`@defer` in text, or malformed): keep it, and look further on.
+            out += template.slice(i, j);
+            i = j;
+            continue;
         }
-        i = j;
+        out += template.slice(i, m.index);
+        i = skipBalanced(template, j, '{', '}', false);
     }
+}
+
+/**
+ * The index just past the `close` that balances the `open` at `start`, counting nesting; the end of
+ * the text when it never balances. With `quotes`, quoted strings are stepped over, so a `)` inside
+ * `when (s === ')')` does not end the trigger list — only there: a defer's body is markup, where an
+ * apostrophe in a sentence opens nothing.
+ */
+function skipBalanced(text: string, start: number, open: string, close: string, quotes: boolean): number {
+    let depth = 0;
+    for (let j = start; j < text.length; j++) {
+        const c = text[j];
+        if (quotes && (c === '"' || c === "'" || c === '`')) {
+            const end = text.indexOf(c, j + 1);
+            if (end === -1) return text.length;
+            j = end;
+        } else if (c === open) depth++;
+        else if (c === close && --depth === 0) return j + 1;
+    }
+    return text.length;
 }
 
 /**

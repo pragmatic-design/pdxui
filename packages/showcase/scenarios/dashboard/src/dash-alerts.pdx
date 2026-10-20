@@ -1,0 +1,21 @@
+<template>
+  <h2>Alerts</h2>
+  <ul data-test="alerts">
+    @for (alerts as alert; track alert.id) {
+      <li :class="{ open: alert.open }">{{ alert.text }}</li>
+    }
+  </ul>
+  <button @click="dismiss()" data-test="dismiss">Dismiss the first</button>
+</template>
+
+<script>
+// A deferred panel rendered on the first interaction with it (#245).
+let alerts = $signal([
+  { id: 1, text: 'Disk at 91%', open: true },
+  { id: 2, text: 'Backup late', open: true },
+]);
+
+function dismiss() {
+  alerts = alerts.slice(1);
+}
+</script>

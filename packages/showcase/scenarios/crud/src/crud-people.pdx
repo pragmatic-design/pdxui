@@ -1,0 +1,54 @@
+<template>
+  <section data-test="crud">
+    <h1>People</h1>
+
+    <pdx-form :form="person" @pdx-submit="save.execute($event.detail.values)" data-test="crud-form">
+      <pdx-form-field name="name" label="Name">
+        <pdx-input name="name" data-test="name"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="email" label="Email">
+        <pdx-input name="email" type="email" data-test="email"></pdx-input>
+      </pdx-form-field>
+      <pdx-form-field name="role" label="Role">
+        <pdx-input name="role" data-test="role"></pdx-input>
+      </pdx-form-field>
+      <pdx-button type="submit" variant="primary" :disabled="save.pending()" data-test="save">Save</pdx-button>
+    </pdx-form>
+
+    @if (save.error()) { <p role="alert" data-test="save-error">{{ save.error()?.message }}</p> }
+
+    <ul data-test="rows">
+      @for ((rows.data() ?? []) as row; track row.id) {
+        <li>{{ row.name }} — {{ row.email }} ({{ row.role }})</li>
+      } @empty {
+        <li>No one yet.</li>
+      }
+    </ul>
+  </section>
+</template>
+
+<script>
+// The page a team evaluating PDX for an application builds first (#245): a list read before the page
+// is shown, a form that validates, and a save that reloads the list.
+@page '/';
+@loader rows: loadRows;
+
+interface PersonDraft { name: string; email: string; role: string }
+interface Person extends PersonDraft { id: number }
+
+async function loadRows({ signal }) {
+  const res = await fetch('/api/people', { signal });
+  return (await res.json()) as Person[];
+}
+
+@form person: {
+  name: string { required },
+  email: string { required, email },
+  role: string { required }
+};
+
+// Saving drops the loader's kept result, and the list on screen runs its loader again (#148).
+@action save(dto: PersonDraft, { signal }) with { invalidate: ['loader:/'] } {
+  await fetch('/api/people', { method: 'POST', body: JSON.stringify(dto), signal });
+}
+</script>

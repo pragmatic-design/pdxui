@@ -16,6 +16,11 @@
  * And for `hello`, what is in it: the build writes `modules.json`, and no module of the router, the
  * forms or the async data layer may be there. A size that stays under its budget can still hide a
  * module that has no business in a counter.
+ *
+ * Two more (#245): `crud`, one routed page with a named `@loader`, a `@form`, an `@action` and a
+ * `@for` of 100 rows; `dashboard`, four `@defer` panels, a `@virtual` list of 10,000 rows and one
+ * theme. Their `modules.json` says that the crud page carries what it is there to weigh, and that
+ * each deferred panel is out of the dashboard's entry (L5).
  */
 import { test, expect } from './fixture';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -31,6 +36,13 @@ import { scenarioDist } from './scenarios-build';
  *
  * A CSS budget of 0 is a budget: the first stylesheet either app ships is a change to argue for.
  *
+ * The two scenarios a team evaluating PDX for an application builds (#245), measured 2026-10-21:
+ *
+ *   crud        js 47.3 KB   css 1.4 KB  — a routed page: the router, a named @loader and its cache,
+ *                                          a @form in <pdx-form> with three <pdx-input>, an @action
+ *   dashboard   js 23.4 KB   css 19.9 KB — four @defer panels, a @virtual list, the design system's
+ *                                          base and one theme, which is all of its CSS
+ *
  * hello measured 4.0 KB before this file existed: core's form registry registered its built-in
  * controls at load, so every app carried it whether or not it had a form. Its controls are the
  * registry's initial value now, and a bundler drops it from an app that never asks (#244).
@@ -38,6 +50,8 @@ import { scenarioDist } from './scenarios-build';
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 4.2, css: 0 },
     benchmark: { js: 18.2, css: 0 },
+    crud: { js: 52.1, css: 1.6 },
+    dashboard: { js: 25.8, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the
@@ -69,7 +83,8 @@ for (const name of Object.keys(BUDGET_KB)) {
                 console.log(`[scenario] ${name} ${key} ${kb} KB gzipped (budget ${budget})`);
                 expect(kb, `the ${name} ${key} is ${kb} KB gzipped, the budget is ${budget} KB — say in the commit why it grew`)
                     .toBeLessThanOrEqual(budget);
-                expect(budget - kb, `the ${name} ${key} budget is ${budget} KB and the build is ${kb} KB — lower the budget`)
+                // To a tenth, as the measurement is: 1.6 - 1.4 is 0.20000000000000018 in floating point.
+                expect(Math.round((budget - kb) * 10) / 10, `the ${name} ${key} budget is ${budget} KB and the build is ${kb} KB — lower the budget`)
                     .toBeLessThanOrEqual(Math.round(kb * SLACK_SHARE * 10) / 10);
             });
         }
@@ -94,4 +109,45 @@ test('the hello bundle carries no router, no forms and no resource code', () => 
         .toBe(true);
     const found = modules.filter((m) => NOT_IN_HELLO.some((p) => m.includes(p)));
     expect(found, 'modules a one-signal counter should not carry').toEqual([]);
+});
+
+/** A scenario's chunks, by file name, each with the modules in it, separators normalised. */
+function chunksOf(name: string): Record<string, string[]> {
+    const chunks = JSON.parse(readFileSync(join(scenarioDist(name), 'modules.json'), 'utf8')) as Record<string, string[]>;
+    return Object.fromEntries(Object.entries(chunks).map(([file, mods]) => [file, mods.map((m) => m.replaceAll('\\', '/'))]));
+}
+
+/**
+ * What the crud budget weighs (#245): the constructs the page is made of. A build that lost one of
+ * them — a scenario that stopped declaring its loader, say — would weigh less and pass its budget
+ * while no longer measuring what it says.
+ */
+const IN_CRUD = [
+    'packages/router/src/loaders.ts',
+    'packages/router/src/loader-cache.ts',
+    'packages/core/src/form/',
+    'packages/core/src/reactivity/mutation.ts',
+    'scenarios/crud/src/crud-people.pdx',
+];
+
+test('the crud bundle carries the loader, the form and the action it is there to weigh', () => {
+    const modules = Object.values(chunksOf('crud')).flat();
+    const missing = IN_CRUD.filter((p) => !modules.some((m) => m.includes(p)));
+    expect(missing, 'constructs the crud page is made of, absent from its build').toEqual([]);
+});
+
+/** Each deferred panel of the dashboard, by the module of its component. */
+const DEFERRED_PANELS = ['dash-sales.pdx', 'dash-traffic.pdx', 'dash-alerts.pdx', 'dash-team.pdx'];
+
+test('each @defer panel of the dashboard is in a chunk of its own, not in the entry (L5)', () => {
+    const chunks = chunksOf('dashboard');
+    const entry = Object.entries(chunks).filter(([, mods]) => mods.some((m) => m.endsWith('scenarios/dashboard/src/dash-board.pdx')));
+    // The control: the board is found, in one chunk. Without it every panel would be "not in the entry".
+    expect(entry.map(([file]) => file), 'no single chunk holds the board').toHaveLength(1);
+    const [entryFile, entryModules] = entry[0];
+    for (const panel of DEFERRED_PANELS) {
+        const holders = Object.entries(chunks).filter(([, mods]) => mods.some((m) => m.endsWith(`scenarios/dashboard/src/${panel}`)));
+        expect(holders.length, `${panel} is in no chunk at all`).toBeGreaterThan(0);
+        expect(entryModules.some((m) => m.endsWith(panel)), `${panel} is in the entry, ${entryFile}`).toBe(false);
+    }
 });

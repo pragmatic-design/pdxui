@@ -9,6 +9,10 @@
  *     a child component per row, mounted and destroyed by `scenario-memory.spec.ts` (#243);
  *   - `lifecycle`, under `scenarios/lifecycle/`: a kept-alive route page and a kept `<component :is>`
  *     view, frozen and resumed by `scenario-lifecycle.spec.ts` (#269);
+ *   - `crud`, under `scenarios/crud/`: one routed page with a named @loader, a @form of three fields,
+ *     an @action that saves and invalidates the loader, and a @for of 100 rows (#245);
+ *   - `dashboard`, under `scenarios/dashboard/`: four @defer panels (one prefetched), a virtual list of
+ *     10,000 rows and one theme of @pdxui/design (#245);
  *   - `benchmark`, the js-framework-benchmark app, built from `scripts/bench-jfb/` with its own
  *     `vite.config.js`, so what is weighed here is the app `pnpm bench:jfb` measures. Its output goes
  *     under this package, not into `scripts/`.
@@ -32,6 +36,8 @@ export const SCENARIOS: { name: string; root: string; config: string }[] = [
     { name: 'hello', root: join(packageDir, 'scenarios', 'hello'), config: 'vite.config.ts' },
     { name: 'memory', root: join(packageDir, 'scenarios', 'memory'), config: 'vite.config.ts' },
     { name: 'lifecycle', root: join(packageDir, 'scenarios', 'lifecycle'), config: 'vite.config.ts' },
+    { name: 'crud', root: join(packageDir, 'scenarios', 'crud'), config: 'vite.config.ts' },
+    { name: 'dashboard', root: join(packageDir, 'scenarios', 'dashboard'), config: 'vite.config.ts' },
     { name: 'benchmark', root: join(repoDir, 'scripts', 'bench-jfb'), config: 'vite.config.js' },
 ];
 
