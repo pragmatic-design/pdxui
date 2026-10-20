@@ -75,7 +75,9 @@ export function parseActionDecl(text: string): ActionDecl | null {
     const blocks = topLevelBlocks(masked, close + 1);
     if (blocks.length === 0) return null;
     const [bodyStart, end] = blocks[blocks.length - 1];
-    if (!/^\s*;?\s*$/.test(text.slice(end))) return null;
+    // Only whitespace, or a `;`, may follow the body (trimmed, not a regex: no backtracking on spaces).
+    const tail = text.slice(end).trim();
+    if (tail !== '' && tail !== ';') return null;
 
     // Between the parameters and the body: `when expr`, `with { … }`, both, or nothing.
     const between = text.slice(close + 1, bodyStart);
@@ -88,15 +90,15 @@ export function parseActionDecl(text: string): ActionDecl | null {
     if (withAt >= 0) {
         const brace = close + 1 + betweenMasked.indexOf('{', withAt);
         const braceEnd = closing(masked, brace);
-        if (braceEnd < 0 || !/^\s*$/.test(text.slice(braceEnd + 1, bodyStart))) return null;
+        if (braceEnd < 0 || text.slice(braceEnd + 1, bodyStart).trim() !== '') return null;
         options = text.slice(brace, braceEnd + 1);
     }
     const whenText = beforeWith.trim();
     if (whenText) {
-        // Match: `when <expression>`. Groups: [1]=the expression
-        const w = /^when\s+([\s\S]+)$/.exec(whenText);
-        if (!w) return null;
-        when = w[1].trim();
+        // `when <expression>`: the keyword, then whitespace, then the expression.
+        if (!/^when\s/.test(whenText)) return null;
+        when = whenText.slice('when'.length).trim();
+        if (!when) return null;
     }
 
     const params = text.slice(open + 1, close).trim();
@@ -113,13 +115,14 @@ export function actionOptionProblems(options: string): string[] {
     const inner = options.trim().replace(/^\{/, '').replace(/\}$/, '');
     const problems: string[] = [];
     for (const entry of splitAtTopLevelCommas(inner).map((e) => e.trim()).filter(Boolean)) {
-        // Match: `key: value`, or a shorthand `key`. Groups: [1]=the key [2]=the value
-        const m = /^([A-Za-z_$][\w$]*)\s*(?::\s*([\s\S]+))?$/.exec(entry);
-        const key = m?.[1] ?? entry;
+        // `key: value`, or a shorthand `key`: split at the first colon (no regex over the value).
+        const colon = entry.indexOf(':');
+        const key = (colon < 0 ? entry : entry.slice(0, colon)).trim();
+        const value = colon < 0 ? '' : entry.slice(colon + 1).trim();
         if (!(ACTION_OPTIONS as readonly string[]).includes(key)) { problems.push(`\`${key}\` is not an option`); continue; }
-        if (key === 'concurrency' && m?.[2]) {
+        if (key === 'concurrency' && value) {
             // Match: a quoted literal. Groups: [2]=its text
-            const literal = /^(['"])(.*)\1$/.exec(m[2].trim());
+            const literal = /^(['"])(.*)\1$/.exec(value);
             if (literal && !(ACTION_CONCURRENCY as readonly string[]).includes(literal[2])) problems.push(`\`concurrency: '${literal[2]}'\` is not a policy`);
         }
     }
