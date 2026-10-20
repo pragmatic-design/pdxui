@@ -119,9 +119,8 @@ file does*, and *how many files do the same thing*.
 - **Mechanism, by reach:**
   - local to one component → `$signal`;
   - shared by a subtree → `provide` a *read* value under a `context<T>()` token; a signal only when a
-    descendant must write, and `createCommands` / `createChannel` when the parent gives orders (`provide-inject.md`);
-  - shared across unrelated components, or kept across navigation → `@store`; an *event* between
-    unrelated components (not state) → `createBus`;
+    descendant must write; an order from the parent → `@expose` + a typed ref (`provide-inject.md`);
+  - shared across unrelated components, or kept across navigation → `@store`;
   - part of what the screen *is* (a filter, a tab, a record id) → the URL.
 - **Why:** React's "for each unique piece of state, choose the component that owns it" and Vue's
   "keep mutations in the provider" are the same rule. Two copies of one fact disagree sooner or
@@ -214,7 +213,7 @@ file does*, and *how many files do the same thing*.
   - it returns signals, or an object of signals and methods. Name it `use*` when it attaches to
     something that already exists (an element, the route, the browser) and `create*` when it makes
     a new thing the caller owns. That is the tendency of core's names (`useDrag`, `useScroll`;
-    `createForm`, `createCommands`), not a rule core keeps: `useDrag` returns an object too;
+    `createForm`, `createCache`), not a rule core keeps: `useDrag` returns an object too;
   - lifecycle hooks (`onMount`, `onDestroy`, `onBeforeLeave`, …) inside it bind to the calling
     component. They must run synchronously during setup; outside setup they throw
     (`core/src/component/lifecycle.ts`), which is the check;

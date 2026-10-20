@@ -298,7 +298,7 @@ export function validate(
     for (const e of analysis.exports) allDeclaredNames.add(e.name);
 
     // Known reactive API calls in body
-    const reactiveApis = ['resource(', 'linkedSignal(', 'mutation(', 'createForm(', 'createBus('];
+    const reactiveApis = ['resource(', 'linkedSignal(', 'mutation(', 'createForm('];
     const functionApis = ['.handleSubmit(', '.handleChange(', '.handleBlur('];
     // Composable hook pattern: use*() returns reactive state (e.g. useTasks(), useCart())
     const composablePattern = /\buse[A-Z]\w*\(/;
@@ -1178,7 +1178,7 @@ const GLOBALS = new Set([
     'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval', 'fetch',
     'signal', 'computed', 'effect', 'batch', 'ref', 'html', 'component',
     'when', 'each', 'match', 'pipe', 'show', 'portal', 'defer', 'dynamic',
-    'resource', 'mutation', 'linkedSignal', 'createForm', 'createBus',
+    'resource', 'mutation', 'linkedSignal', 'createForm',
     'required', 'minLength', 'maxLength', 'email', 'pattern', 'url', 'min', 'max',
     '$t', '$n', '$d', '$r',
     'ctx',

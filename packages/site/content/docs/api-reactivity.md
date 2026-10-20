@@ -7,7 +7,7 @@ parent: api
 
 # Reactivity API
 
-Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 71 exports, from `@pdxui/core`.
+Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache. 70 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -104,31 +104,6 @@ Usage:
     () => saveTriggered(),
     (data) => fetch('/api/save', { method: 'POST', body: JSON.stringify(data) })
   );
-
-## `createBus`
-
-```ts
-import { createBus } from '@pdxui/core';
-
-function createBus(options?: BusOptions): EventBus<T>
-```
-
-Creates a typed event bus for inter-component communication.
-
-Usage:
-  interface AppEvents {
-      'cart:add': { productId: number; qty: number };
-      'cart:remove': { productId: number };
-      'auth:logout': void;
-  }
-  const bus = createBus<AppEvents>();
-  bus.emit('cart:add', { productId: 123, qty: 1 });
-  const unsub = bus.on('cart:add', (item) => console.log(item));
-
-With store (for debugging/replay):
-  const bus = createBus<AppEvents>({ store: true });
-  bus.history();   // → all emitted events
-  bus.replay();    // → re-emits to current handlers
 
 ## `createCache`
 

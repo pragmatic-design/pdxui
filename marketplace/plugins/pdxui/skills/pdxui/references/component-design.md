@@ -65,9 +65,8 @@ belong to the form's validator.
 | one component | `$signal` |
 | a subtree reads it | `provide` a read value under a `context<T>()` token (`provide-inject` docs) |
 | a descendant must write it | `provide` a signal |
-| the parent gives orders | `createCommands` / `createChannel` |
+| the parent gives orders | `@expose` + a typed ref |
 | unrelated components, or kept across navigation | `@store` |
-| an *event* between unrelated components | `createBus` |
 | part of what the screen is (a filter, a tab, an id) | the URL |
 
 A page may keep a **mirror** of a child's state to render from it: the grid's selection as

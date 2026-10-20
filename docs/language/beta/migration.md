@@ -37,7 +37,7 @@ proposals the implementing issue may change.
 | a listener above a `@pdxui/ui` component (`<section @pdx-change>`) | the listener on the component itself | not detected: library events no longer bubble (#138), listed in the release notes | #138 |
 | `@provide user = v;` / `@inject user;` / `@inject user as me;` | `@provide User = v;` / `@inject user from User;` / `@inject me from User;` | mechanical: generates `contexts.ts`, one token per key, and maps the library's keys to its tokens (`errorContext` → `ErrorContext`) — landed: `context-string-provide`, `context-string-inject`, `context-tokens` | #139 (landed, #497) |
 | `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`, `tryUseWritable` | `inject(token, host, default?)`, `@inject` | flagged | #139 (landed, #495) |
-| `createBus`, `createChannel`, `createCommands` | `@store`, `@provide`/`@inject`, `@expose` + refs | flagged | #144 |
+| `createBus`, `createChannel`, `createCommands`, `createCompoundParent` | `@store`, `@provide`/`@inject`, `@expose` + refs | flagged | #144 (landed) |
 | `x = (v) => …` on a `$signal`, meaning «update from the previous value» | `x = …` stores the function; write the update (`x = x + 1`, `x++`) | **fix**, behaviour: flagged where an arrow function is assigned to a `$signal` not typed as a function | #187 (flagging †) |
 | `count.peek()` read the value's `peek` | the signal's own `peek` | fix (the alpha form was broken) | #187 |
 | `handler ??= fn` (and `\|\|=`, `&&=`) on a `$signal`, which called `fn` as an updater | stores `fn`, short circuit kept | **fix**, behaviour: flagged where the right side is a function | #187 (logical assignment †) |

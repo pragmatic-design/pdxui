@@ -105,4 +105,11 @@ describe("@pdxui/core's exports", () => {
         // The control: the two that stay, and the token builder, are there.
         expect(['provide', 'inject', 'context'].filter((name) => !(name in core))).toEqual([]);
     });
+
+    it('no longer hold the untyped messaging APIs (#144)', () => {
+        const gone = ['createBus', 'createChannel', 'createCommands', 'createCompoundParent'];
+        expect(gone.filter((name) => name in core)).toEqual([]);
+        // The control: what the channel and compound modules keep for the library stays exported.
+        expect(['exposeOnElement', 'discoverChildren'].filter((name) => !(name in core))).toEqual([]);
+    });
 });

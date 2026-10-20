@@ -21,8 +21,8 @@ read is `pdx-data-source`'s page in `pdxui-data`, which lists every component th
 | rows for a grid, a list or a select | `createDataSource(rows)` or `createDataSource({ transport })` | [data](references/data.md) § In practice |
 | a socket message to update a row | `applyServerChange`, not `refresh()` | [data](references/data.md) § Live data |
 | state shared by many components, or kept across navigation | `@store` | [store](references/store.md) |
-| state that depends on where you are in the tree | `provide` / `inject` | [provide-inject](references/provide-inject.md) |
-| a parent that gives orders, or two-way talk | `createCommands` · `createChannel` | [provide-inject](references/provide-inject.md) |
+| state that depends on where you are in the tree | `@provide` / `@inject`, by token | [provide-inject](references/provide-inject.md) |
+| a parent that gives orders | `@expose` + a typed ref | [provide-inject](references/provide-inject.md) § the table |
 
 ## Traps
 

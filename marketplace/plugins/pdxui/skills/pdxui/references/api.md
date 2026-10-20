@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-459 value exports.
+455 value exports.
 
 ### `__adoptStyles`
 
@@ -1050,31 +1050,6 @@ function createBottomSheet(content: Node, options?: BottomSheetOptions): BottomS
 Create a bottom sheet (mobile-optimized overlay).
 Fixed to bottom, draggable between detent points, swipe-down to dismiss.
 
-### `createBus`
-
-```ts
-import { createBus } from '@pdxui/core';
-
-function createBus(options?: BusOptions): EventBus<T>
-```
-
-Creates a typed event bus for inter-component communication.
-
-Usage:
-  interface AppEvents {
-      'cart:add': { productId: number; qty: number };
-      'cart:remove': { productId: number };
-      'auth:logout': void;
-  }
-  const bus = createBus<AppEvents>();
-  bus.emit('cart:add', { productId: 123, qty: 1 });
-  const unsub = bus.on('cart:add', (item) => console.log(item));
-
-With store (for debugging/replay):
-  const bus = createBus<AppEvents>({ store: true });
-  bus.history();   // → all emitted events
-  bus.replay();    // → re-emits to current handlers
-
 ### `createCache`
 
 ```ts
@@ -1092,58 +1067,6 @@ cached value is still returned immediately and refreshed in the background.
 
 Most apps never call this — {@link getDefaultCache} is created on first use. Make your own to
 isolate a subsystem, or in a test that must not share state with another.
-
-### `createChannel`
-
-```ts
-import { createChannel } from '@pdxui/core';
-
-function createChannel(): Channel<T>
-```
-
-Create a typed bidirectional channel.
-Messages are validated by TypeScript at compile time.
-At runtime, listeners are stored per-event, frozen for security.
-
-CONSTRAINT: send (down) and emit (up) share one listener map, keyed by event
-NAME — give `down` and `up` distinct names in the contract ('refresh' vs 'refreshed', say), or
-the listeners receive the messages of both directions.
-
-### `createCommands`
-
-```ts
-import { createCommands } from '@pdxui/core';
-
-function createCommands(): Commands<T>
-```
-
-Create a typed command dispatcher (parent→child direction only).
-Simpler than a full channel when bidirectional is not needed.
-
-### `createCompoundParent`
-
-```ts
-import { createCompoundParent } from '@pdxui/core';
-
-function createCompoundParent(options?: CompoundOptions<TChild>): CompoundParentContext<TChild>
-```
-
-Create a compound parent context.
-The parent creates this and provides it to children via provide/inject.
-
-@example
-// A token, declared once: export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
-// In parent component (e.g. pdx-tabs):
-const compound = createCompoundParent<TabChild>({
-    onChildAdded: (child, i) => { ... },
-    onNotify: (event, payload) => { ... },
-});
-provide(Tabs, compound, ctx.el);
-
-// In child component (e.g. pdx-tab):
-const parent = inject(Tabs, ctx.el);
-const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
-onDestroy(() => dispose());
 
 ### `createDataSource`
 
