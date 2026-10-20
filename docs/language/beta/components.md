@@ -496,7 +496,7 @@ InjectDecl  ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Express
 
 ### Semantics
 
-A context is identified by a **token**, not a string (#139): `context<T>(name)` from `@pdxui/core`
+A context is identified by a **token**, not a string (#139 — landed, split into #495–#498): `context<T>(name)` from `@pdxui/core`
 returns one, declared in a module and imported
 (`export const CurrentUser = context<User>('current-user');`). `@provide CurrentUser = me;` publishes
 a value to the elements below; `@inject user from CurrentUser;` reads the nearest one, typed `User`;
@@ -552,7 +552,7 @@ import { CurrentUser } from './contexts';
 
 ### Since
 
-alpha → beta (#139)
+alpha → beta (#139 — landed)
 
 ## The TypeScript descriptor
 
