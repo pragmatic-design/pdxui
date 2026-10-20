@@ -4,11 +4,12 @@
 // notified on its own, and a reader saw the level half-way — its data dropped while its state still
 // said 'success', which `@await` takes for a loader that returned undefined.
 import { batch, queuePrefetch, takePrefetch } from '@pdxui/core';
-import { _loaderData, _loaderState, _loaderError, _loaderFocus, type LoaderState } from './state';
+import { _loaderData, _loaderState, _loaderError, _loaderStale, _loaderFocus, type LoaderState } from './state';
 import { pageModule } from './route-table';
-import { loaderIdentity, ownParamNames, parseLoaderQuery, takePrefetchedLoaderCall } from './loader-prefetch';
+import { loaderIdentity, parseLoaderQuery, takePrefetchedLoaderCall } from './loader-prefetch';
 import { coerceParams } from './matcher';
 import { outcomeOf } from './outcomes';
+import { keptResult, keepResult, watchKept } from './loader-cache';
 import type { LoaderContext, RouteConfig } from './types';
 
 /**
@@ -22,6 +23,7 @@ let _navController: AbortController | null = null;
 export function supersedeLoaders(): AbortSignal {
     _navController?.abort();
     _navController = new AbortController();
+    _generation++;
     return _navController.signal;
 }
 
@@ -34,17 +36,21 @@ function currentSignal(): AbortSignal {
 const asError = (reason: unknown): Error => (reason instanceof Error ? reason : new Error(String(reason)));
 
 /**
- * The params each level's loader last ran with — ITS OWN, not the whole match.
+ * The identity each level's loader last ran with: `pattern | own params | canonical query`, the key
+ * `docs/language/beta/routing.md` defines in «The identity of a loader call».
  *
  * This is what makes a sibling move cheap: `/tickets/7/notes/1` → `/tickets/7/notes/2` leaves the
  * ticket's own `:id` untouched, so its loader does not run again and the page it feeds does not
- * flicker. Change `:id` and it does.
+ * flicker. Change `:id`, or the query, and it does.
  */
 let _loaderKeys: Record<string, string> = {};
 
-/** A level's identity for this navigation: its own params, with their values. */
-function loaderKey(pattern: string, params: Record<string, string>): string {
-    return ownParamNames(pattern).map(n => `${n}=${params[n] ?? ''}`).join('&');
+/** What a navigation's loaders have to do: run before the page is shown, or again behind a kept result. */
+export interface LoaderPlan {
+    /** No result to show: run, outermost first, and the navigation waits for them. */
+    pending: RouteConfig[];
+    /** A kept result is shown, `stale()`, while the loader runs again — the navigation does not wait. */
+    revalidate: RouteConfig[];
 }
 
 /**
@@ -56,15 +62,22 @@ function loaderKey(pattern: string, params: Record<string, string>): string {
  * initial navigation to `/` lands on top of a 404 that has already been reported. The same holds
  * for `await`ing a boolean before-hook.
  *
- * Returns the levels that still have to run, outermost first. Empty means nothing to await.
+ * Each level, outermost first (#148):
+ *   - mounted, with its key unchanged: kept, whatever its `staleTime` — `staleTime` governs a level
+ *     that is entered again, not one that never left;
+ *   - a kept result younger than its `staleTime`: taken, the loader is not run;
+ *   - an older one: shown with `stale()` true, the loader runs again behind it (`revalidate`);
+ *   - none: the loader runs before the page is shown (`pending`).
  */
 export function planLoaders(
     chain: RouteConfig[],
     params: Record<string, string>,
-): RouteConfig[] {
+    search = '',
+): LoaderPlan {
     const prevData = _loaderData.peek();
     const prevState = _loaderState.peek();
     const prevErrors = _loaderError.peek();
+    const prevStale = _loaderStale.peek();
     const prevKeys = _loaderKeys;
 
     // Built from the CHAIN, so a level that is not in it is simply not carried over: leaving
@@ -72,12 +85,13 @@ export function planLoaders(
     const data: Record<string, unknown> = {};
     const state: Record<string, LoaderState> = {};
     const errors: Record<string, Error> = {};
+    const stale: Record<string, boolean> = {};
     const keys: Record<string, string> = {};
 
-    const pending: RouteConfig[] = [];
+    const plan: LoaderPlan = { pending: [], revalidate: [] };
 
     for (const level of chain) {
-        const key = loaderKey(level.path, params);
+        const key = loaderIdentity(level.path, params, search);
         keys[level.path] = key;
         if (!level.loader) continue;
         // A level's last failure stays readable until it succeeds again (#505).
@@ -88,19 +102,33 @@ export function planLoaders(
         if (prevKeys[level.path] === key && level.path in prevData) {
             data[level.path] = prevData[level.path];
             state[level.path] = prevState[level.path] ?? 'success';
+            if (prevStale[level.path]) stale[level.path] = true;
+            continue;
+        }
+        const kept = keptResult(key);
+        if (kept?.fresh) {
+            data[level.path] = kept.data;
+            state[level.path] = 'success';
             continue;
         }
         state[level.path] = 'pending';
-        pending.push(level);
+        if (kept) {
+            data[level.path] = kept.data;
+            stale[level.path] = true;
+            plan.revalidate.push(level);
+        } else {
+            plan.pending.push(level);
+        }
     }
 
     batch(() => {
         _loaderData.set(data);
         _loaderState.set(state);
         _loaderError.set(errors);
+        _loaderStale.set(stale);
     });
     _loaderKeys = keys;
-    return pending;
+    return plan;
 }
 
 /**
@@ -144,25 +172,14 @@ export async function runLoaders(
     { chunks, params = {}, search = '' }: { chunks?: Map<string, Promise<unknown>>; params?: Record<string, string>; search?: string } = {},
 ): Promise<LoaderOutcome> {
     const signal = currentSignal();
-    const query = parseLoaderQuery(search);
     for (const level of pending) {
         if (!level.loader) continue;
         try {
-            const ctx: LoaderContext = { params: coerceParams(level.path, params), query, signal };
-            const prefetched = takePrefetchedLoaderCall(loaderIdentity(level.path, params, search));
-            if (prefetched) signal.addEventListener('abort', () => prefetched.controller.abort(), { once: true });
-            const call = prefetched ? prefetched.promise : level.loader(ctx);
-            const [data] = await Promise.allSettled([call, chunks?.get(level.path)]);
+            const [data] = await Promise.allSettled([callLoader(level, params, search, signal), chunks?.get(level.path)]);
             if (data.status === 'rejected') throw data.reason;
             const result = data.value;
             if (!isCurrent()) return { kind: 'superseded' }; // a newer navigation won — drop this stale result
-            const errors = { ..._loaderError.peek() };
-            delete errors[level.path];
-            batch(() => {
-                _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
-                _loaderState.set({ ..._loaderState.peek(), [level.path]: 'success' });
-                _loaderError.set(errors);
-            });
+            publishResult(level, loaderIdentity(level.path, params, search), result);
         } catch (err) {
             if (!isCurrent()) return { kind: 'superseded' };
             // A redirect is not a failure of this level: it is where the navigation goes instead.
@@ -188,6 +205,99 @@ export async function runLoaders(
 }
 
 /**
+ * Call a level's loader with its context (#505), or take the call a prefetch started for the same
+ * identity — with its controller, which this navigation's supersede aborts too.
+ */
+function callLoader(level: RouteConfig, params: Record<string, string>, search: string, signal: AbortSignal): unknown {
+    const prefetched = takePrefetchedLoaderCall(loaderIdentity(level.path, params, search));
+    if (prefetched) signal.addEventListener('abort', () => prefetched.controller.abort(), { once: true });
+    if (prefetched) return prefetched.promise;
+    const ctx: LoaderContext = { params: coerceParams(level.path, params), query: parseLoaderQuery(search), signal };
+    return level.loader!(ctx);
+}
+
+/** A level's new result: published as one write (#569), no longer stale, and kept in the cache (#148). */
+function publishResult(level: RouteConfig, identity: string, result: unknown): void {
+    const errors = { ..._loaderError.peek() };
+    delete errors[level.path];
+    const stale = { ..._loaderStale.peek() };
+    delete stale[level.path];
+    batch(() => {
+        _loaderData.set({ ..._loaderData.peek(), [level.path]: result });
+        _loaderState.set({ ..._loaderState.peek(), [level.path]: 'success' });
+        _loaderError.set(errors);
+        _loaderStale.set(stale);
+    });
+    keepResult(level, identity, result);
+}
+
+/**
+ * Bumped when a navigation starts or the loaders are cleared: a run behind a kept result belongs to
+ * the generation it started in, and publishes nothing once that has passed.
+ */
+let _generation = 0;
+
+/**
+ * Run `levels` again behind the kept result each is showing, `stale()` (#148), without the navigation
+ * waiting for them. Outermost first, as a navigation's loaders run. A new result replaces the kept
+ * one; a failure keeps it on screen and says so in `state()` and `error()` (the async vocabulary's
+ * refresh that failed, data.md); a `redirect()` sends the visitor there, as from a navigation's
+ * loader. `notFound()` from a level whose result is on screen is a failure like any other.
+ */
+export async function revalidateLoaders(
+    levels: RouteConfig[], params: Record<string, string>, search: string,
+    redirectTo: (to: string, replace: boolean) => void,
+): Promise<void> {
+    const generation = _generation;
+    const signal = currentSignal();
+    for (const level of levels) {
+        if (!level.loader) continue;
+        const identity = loaderIdentity(level.path, params, search);
+        try {
+            const result = await callLoader(level, params, search, signal);
+            if (generation !== _generation) return;
+            publishResult(level, identity, result);
+        } catch (err) {
+            if (generation !== _generation) return;
+            const outcome = outcomeOf(err);
+            if (outcome?.pdxOutcome === 'redirect') { redirectTo(outcome.to, outcome.replace); return; }
+            batch(() => {
+                _loaderState.set({ ..._loaderState.peek(), [level.path]: 'error' });
+                _loaderError.set({ ..._loaderError.peek(), [level.path]: asError(err) });
+            });
+            console.error(`[pdx-router] Loader failed for ${level.path}:`, err);
+        }
+    }
+}
+
+/** What watches the mounted levels' kept results, disposed at the next navigation. */
+let _watchDispose: (() => void) | null = null;
+
+/**
+ * Watch the kept result of every loader level on screen (#148): when `invalidate(['loader:<pattern>'])`
+ * — an `@action`'s `invalidate`, or any call — drops it, the level runs again at once, its result
+ * still shown and `stale()` true meanwhile.
+ */
+export function watchMountedLoaders(
+    chain: RouteConfig[], params: Record<string, string>, search: string,
+    redirectTo: (to: string, replace: boolean) => void,
+): void {
+    _watchDispose?.();
+    _watchDispose = null;
+    const levels = chain.filter((level) => level.loader);
+    if (levels.length === 0) return;
+    const disposers = levels.map((level) => watchKept(loaderIdentity(level.path, params, search), () => {
+        if (!(level.path in _loaderData.peek())) return;
+        batch(() => {
+            _loaderState.set({ ..._loaderState.peek(), [level.path]: 'pending' });
+            _loaderStale.set({ ..._loaderStale.peek(), [level.path]: true });
+        });
+        void revalidateLoaders([level], params, search, redirectTo);
+    }));
+    _watchDispose = () => { for (const dispose of disposers) dispose(); };
+}
+
+/**
  * How the loaders of a navigation ended: all of them loaded; a newer navigation superseded this one;
  * a loader redirected; or a loader reported not found, or failed, at `level`.
  */
@@ -202,10 +312,14 @@ export function clearLoaders(): void {
     // A loader still running has nothing left to publish to: it is told.
     _navController?.abort();
     _navController = null;
+    _generation++;
+    _watchDispose?.();
+    _watchDispose = null;
     batch(() => {
         _loaderData.set({});
         _loaderState.set({});
         _loaderError.set({});
+        _loaderStale.set({});
         _loaderFocus.set(null);
     });
     _loaderKeys = {};

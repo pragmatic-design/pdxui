@@ -20,6 +20,7 @@ import { queuePrefetch, takePrefetch, cancelPrefetches } from '@pdxui/core';
 import { routeTable, pageModule } from './active';
 import { config, chainAllowed } from './navigation';
 import { loaderIdentity, parseLoaderQuery, prefetchLoaderCall } from './loader-prefetch';
+import { keepResult } from './loader-cache';
 import { coerceParams } from './matcher';
 
 /**
@@ -201,5 +202,8 @@ async function prefetchData(url: string): Promise<boolean> {
     // The same context a navigation gives the loader (#505), with the prefetch's own signal.
     const params = coerceParams(match.route.path, match.params);
     const query = parseLoaderQuery(search);
-    return prefetchLoaderCall(loaderIdentity(match.route.path, match.params, search), (signal) => loader({ params, query, signal }));
+    const identity = loaderIdentity(match.route.path, match.params, search);
+    // The result enters the router's cache under the same key (#148), as a navigation's would.
+    return prefetchLoaderCall(identity, (signal) => loader({ params, query, signal }),
+        (result) => keepResult(match.route, identity, result));
 }

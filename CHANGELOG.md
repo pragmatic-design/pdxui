@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- A route loader's results are kept in core's cache, per route, params and query. A page entered
+  again shows its kept result at once, `user.stale()` true, while the loader runs again; with
+  `@loader user: loadUser { staleTime: 30_000 };` a result younger than that is used with no request.
+  A level that stays on screen is not reloaded. `invalidate(['loader:/users/:id'])` — from an
+  `@action` or anywhere — drops every result of the route and reloads it if it is on screen; a
+  prefetched result enters the cache too. Any other option, or a `staleTime` the compiler cannot read
+  as milliseconds, is `PDX_LOADER_UNKNOWN_OPTION`. (#148)
 - A route loader decides where a navigation ends: `throw redirect(to, { replace? })` from
   `@pdxui/router` goes to `to` before the route is shown (replacing the abandoned address by default),
   and `throw notFound()` renders the not-found page of that level, with the levels above it kept and
@@ -243,6 +250,10 @@ semver.
 
 ### Changed
 
+- A level whose own params are unchanged but whose query changed runs its loader again: the query is
+  part of what a loader is called with, and two queries are two results. (#148)
+- The router keeps loader results in core's cache, which is now part of every routed app's entry:
+  about 1.5 KB gzip, measured on the showcase (41.1 → 42.6 KB). (#148)
 - A route loader that fails no longer mounts its page as if nothing had happened: the level renders
   its error page, with a **Try again** button that runs the loader again, and the levels above it stay.
   `currentNavError()` is `'500'` there, at `currentNavErrorDepth()`; a registered error page for

@@ -98,6 +98,8 @@ export function generateRouteTable(
             r.loader
                 ? `loader: (ctx) => __load(${jsString(r.path)}, ${imp(r.file)}, ${jsString(r.loader)}, () => import(${jsString(loaderModuleId(r.tag))}), ctx)`
                 : '',
+            // How long the loader's result is used again (#148): data, read before the page loads.
+            r.loader && r.loaderStaleTime !== undefined ? `loaderStaleTime: ${r.loaderStaleTime}` : '',
         ].filter(Boolean).join(', ')
         + ' }',
     ).join(',\n');

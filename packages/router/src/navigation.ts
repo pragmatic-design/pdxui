@@ -2,7 +2,10 @@
 
 import { saveScrollPosition as saveScroll, restoreScrollPosition as restoreScroll } from '@pdxui/core';
 import { compileMatcher, type Matcher } from './matcher';
-import { clearLoaders, planLoaders, runLoaders, startChunks, supersedeLoaders } from './loaders';
+import {
+    clearLoaders, planLoaders, revalidateLoaders, runLoaders, startChunks,
+    supersedeLoaders, watchMountedLoaders,
+} from './loaders';
 import { publishTrail } from './trail';
 import { tableRedirect } from './route-table';
 import {
@@ -356,9 +359,10 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
     // synchronous and the await happens only when something actually has to load.
     const chunks = startChunks(chain);
     _loaderFocus.set(route.path);
-    const pendingLoaders = planLoaders(chain, params);
-    if (pendingLoaders.length > 0) {
-        const outcome = await runLoaders(pendingLoaders, isCurrent, { chunks, params, search: _search.peek() });
+    const search = _search.peek();
+    const plan = planLoaders(chain, params, search);
+    if (plan.pending.length > 0) {
+        const outcome = await runLoaders(plan.pending, isCurrent, { chunks, params, search });
         if (outcome.kind === 'superseded') return;
         // A loader's outcome (#147). The address already says `path` — the commit ran when the
         // hooks accepted — so a redirect replaces that entry, unless the loader asked to keep it.
@@ -384,6 +388,16 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
     markShown();
     restoreScroll(path, isBack, primaryOutlet(), route.scroll);
     for (const hook of afterHooks) hook(prevPath, path);
+
+    // The levels shown with a kept result run their loaders again now, behind it (#148), and every
+    // loader level on screen is watched for an invalidation of its result.
+    const redirectTo = (to: string, replace: boolean) => {
+        if (!isRouterTarget(to)) { refuse(`a loader's redirect from "${path}"`, to); return; }
+        if (isBrowser) writeUrl(replace ? 'replace' : 'push', null, config.basePath + to);
+        void handleNavigation(to, false, depth + 1);
+    };
+    if (plan.revalidate.length > 0) void revalidateLoaders(plan.revalidate, params, search, redirectTo);
+    watchMountedLoaders(chain, params, search, redirectTo);
 }
 
 /**

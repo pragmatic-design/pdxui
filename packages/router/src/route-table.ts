@@ -60,6 +60,7 @@ export function toRouteConfig(r: TableRoute): RouteConfig {
         redirect: r.redirect,
         meta: r.meta,
         loader: r.loader,
+        loaderStaleTime: r.loaderStaleTime,
         scroll: r.scroll,
         hasOutlet: r.hasOutlet,
         label: r.label,

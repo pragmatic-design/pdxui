@@ -117,6 +117,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_PREFETCH_POLICY` | error | A route's `prefetch` names a policy the router does not have. | `@page`, [routing.md](routing.md) |
 | `PDX_PAGE_UNKNOWN_OPTION` | error | An `@page` option the router does not have. | `@page`, [routing.md](routing.md) |
 | `PDX_LOADER_NOT_FOUND` | warn | `@loader` names a function the script does not declare. | `@loader`, [routing.md](routing.md) |
+| `PDX_LOADER_UNKNOWN_OPTION` | error | `@loader … { … }` with an option other than `staleTime`, or a `staleTime` the compiler cannot read as milliseconds. | `@loader`, [routing.md](routing.md) |
 | `PDX_ROUTE_RENDERS` | warn | A route that renders many structural blocks inline, none a component (CD-B2, a heuristic). *(design)* | `@page`, [routing.md](routing.md) |
 
 ## Data

@@ -90,6 +90,8 @@ interface RegisteredRoute {
      * it can actually call.
      */
     loader?: () => Promise<unknown>;
+    /** `@loader user: loadUser { staleTime: 30_000 };` — how long its result is used again, in ms (#148). */
+    loaderStaleTime?: number;
     outlets?: { name: string; tag: string }[];  // named outlet mappings
 }
 

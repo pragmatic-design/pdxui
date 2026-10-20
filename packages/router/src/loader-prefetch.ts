@@ -66,16 +66,17 @@ function fresh(entry: PrefetchedCall): boolean {
  * replaced.
  *
  * A call that fails is forgotten: the navigation then calls the loader itself, and its failure is
- * the one the page reports.
+ * the one the page reports. A call that succeeds hands its result to `keep` — the router's cache
+ * (#148), where a navigation within the loader's `staleTime` finds it after this hold has expired.
  */
-export function prefetchLoaderCall(key: string, loader: (signal: AbortSignal) => unknown): boolean {
+export function prefetchLoaderCall(key: string, loader: (signal: AbortSignal) => unknown, keep?: (result: unknown) => void): boolean {
     const held = prefetched.get(key);
     if (held && fresh(held)) return false;
     held?.controller.abort();
     const controller = new AbortController();
     const entry: PrefetchedCall = { promise: Promise.resolve().then(() => loader(controller.signal)), at: Date.now(), controller };
     prefetched.set(key, entry);
-    entry.promise.then(undefined, () => {
+    entry.promise.then((result) => keep?.(result), () => {
         if (prefetched.get(key) === entry) prefetched.delete(key);
     });
     return true;

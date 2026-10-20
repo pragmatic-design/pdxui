@@ -11,6 +11,7 @@ import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSo
 import { saveScrollPosition as saveScroll } from '@pdxui/core';
 import { compileMatcher } from './matcher';
 import { clearLoaders } from './loaders';
+import { forgetKeptResults } from './loader-cache';
 import { installRouteTable, toRouteConfig } from './route-table';
 import { isBrowser, _path, _params, _query, _route, _navError, _state } from './state';
 import { isWritingUrl, writeUrl, primaryOutlet } from './address';
@@ -107,6 +108,8 @@ export function destroyRouter(): void {
     // A destroyed router holds no page, so it holds no page's data. Without this the loader map
     // outlives the router that filled it and the next one starts with somebody else's records.
     clearLoaders();
+    // The same for the results its loaders kept for the next visit (#148).
+    forgetKeptResults();
 }
 
 /** Register the navigation listener — the Navigation API's when there is one — and return its removal. */

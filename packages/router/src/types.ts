@@ -19,6 +19,12 @@ export interface RouteConfig {
     guard?: string;
     /** Called with the level's context; an anonymous `@loader fn;` may ignore it. */
     loader?: (ctx: LoaderContext) => unknown;
+    /**
+     * How long, in ms, the loader's result is used again without running it when the level is entered
+     * again — `@loader user: loadUser { staleTime: 30_000 };` (#148). 0, the default: a level entered
+     * again runs its loader, showing the kept result as stale meanwhile.
+     */
+    loaderStaleTime?: number;
     redirect?: string;
     meta?: Record<string, unknown>;
     /** `@scroll` on the page: what happens to the scroll position when this route is entered. */
@@ -118,6 +124,8 @@ export interface TableRoute {
      * module (#119), else the page imported for it — then called, with the context (#505).
      */
     loader?: (ctx: LoaderContext) => unknown;
+    /** The loader's `staleTime`, in ms (#148). */
+    loaderStaleTime?: number;
     scroll?: ScrollRestoration;
     hasOutlet?: boolean;
     /** A string in a table the compiler wrote; a page module's own registration may carry a function. */

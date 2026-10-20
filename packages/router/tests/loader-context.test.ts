@@ -211,10 +211,10 @@ describe('the execution contract — the route-loader leg', () => {
         expect(signals.map((s) => s.aborted)).toEqual([true, false]);
     });
 
-    it('E4 does not apply: the router has no refresh that keeps the data — a navigation with new params starts the level empty', async () => {
-        // The case «a failed refresh keeps the data» needs a refresh: the router has none (no
-        // loaderRevalidate), and a navigation to the same route with new params is a new call whose
-        // level starts without data. Pinned here, so a refresh added later has to take this case up.
+    it('a navigation with new params is a new call: the level starts empty, not with the other id\'s data', async () => {
+        // «A failed refresh keeps the data» (E4) is about a refresh of the SAME call: the router's is
+        // the run behind a kept result (#148), held in loader-cache.test.ts. A navigation to the same
+        // route with new params is a new call, whose level has no kept result of its own.
         const second = deferred();
         let calls = 0;
         createRouter([

@@ -198,10 +198,13 @@ alpha
 #### Syntax
 
 ```ebnf
-LoaderDecl ::= "@loader" S Identifier S? ":" S? Identifier S? ";"?
+LoaderDecl    ::= "@loader" S Identifier S? ":" S? Identifier ( S? LoaderOptions )? S? ";"?
+LoaderOptions ::= "{" S? "staleTime" S? ":" S? Milliseconds S? "}"
+Milliseconds  ::= Integer ( S? "*" S? Integer )*
 ```
 
-The analyzer's form: `@loader user: loadUser;`.
+The analyzer's form: `@loader user: loadUser { staleTime: 30_000 };`. An `Integer` may separate its
+digits with `_`.
 
 #### Semantics
 
@@ -210,15 +213,15 @@ loads the route's data before the page renders, and `user` is declared in the se
 template, the way `@fetch` declares its name. The compiler moves the function's declaration —
 `function`, `async function`, or a `const`/`let`/`var` assigned to it — out of `setup(ctx)` to
 module scope, and registers the function itself, `loader:loadUser`. The router calls it before
-mounting the page, outermost level first, and does not call it again while the level's own params
-are unchanged. It receives a `LoaderContext` (#505): `params`, the level's params coerced by the
+mounting the page, outermost level first, and does not call it again while the level stays mounted
+with the same params and query. It receives a `LoaderContext` (#505): `params`, the level's params coerced by the
 pattern's constraints (`:id(number)` gives a number, any other param a string); `query`, the query
 with a repeated key as an array; and `signal`, aborted when a newer navigation supersedes this one.
 
 `user` is a source with the async vocabulary, read from the router's state of the page's pattern:
 `user.data()` is what the loader returned, `user.state()` is `'idle'`, `'pending'`, `'success'` or
 `'error'`, `user.error()` the last failure's reason, `user.pending()` is true while a navigation runs
-it, and `user.stale()` is false (the router keeps no cache of loader results). `@await (user as u)`
+it, and `user.stale()` is true while the result shown is a kept one its loader runs again for (below). `@await (user as u)`
 renders its body with the data. The compiler imports `loaderSource` from `@pdxui/router` into the
 module. In the editor `user.data()` is typed by what the function resolves to,
 `Awaited<ReturnType<typeof loadUser>>`; the function's own parameter is typed where it is annotated,
@@ -250,10 +253,28 @@ page); the page is not mounted. Loaders run outermost first, and the first outco
 level below it does not load. The error page is the outlet's, or the app's own registered for the
 code: `'404'` for not found, `'500'` for a failure (`currentNavError()`, at `currentNavErrorDepth()`).
 
+**Cache** (#148). A loader's result is kept in core's cache (`getDefaultCache()`, the one `@fetch`
+uses) under the identity of its call — the level's pattern, its own params after coercion, keys
+sorted, and the query's pairs sorted by key — tagged `loader:<pattern>`. A level entered again whose
+key has a result younger than `staleTime` takes it, and its loader does not run. An older one is
+shown at once, `user.stale()` true and `user.state()` `'pending'`, while the loader runs again; the
+navigation does not wait for it, and its result replaces the kept one. If that run fails, the kept
+result stays on screen, `user.state()` `'error'` and the reason in `user.error()`. `staleTime`
+defaults to `0`: a level entered again always runs its loader, showing the kept result meanwhile.
+`staleTime` governs a level that is entered again: a level that stays mounted with the same key is
+not run again, whatever its `staleTime`. A prefetched result enters the cache under the same key.
+`invalidate(['loader:/users/:id'])` — an `@action`'s `invalidate`, or a call — drops every key of the
+pattern, any params and any query; the next entry runs the loader, and a level on screen whose
+result it dropped runs again at once, its result shown, stale, meanwhile. Destroying the router drops
+its loaders' results.
+
 #### Rules
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is
   registered without a loader.
+- An option other than `staleTime`, or a `staleTime` that is not a number of milliseconds the compiler
+  reads, raises `PDX_LOADER_UNKNOWN_OPTION` (an error). The value goes into the route table, read
+  before any page runs, so a name of the script cannot stand for it.
 - A loader that throws anything but a redirect sets the state to `'error'` and keeps the reason in
   `user.error()` until it succeeds again; a failure other than `notFound()` is logged at run time.
   Nothing is checked at compile time.
@@ -277,7 +298,7 @@ import { notFound, redirect, type LoaderContext } from '@pdxui/router';
 interface User { id: number; name: string }
 
 @page '/users/:id(number)';
-@loader user: loadUser;
+@loader user: loadUser { staleTime: 30_000 };
 
 async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Promise<User> {
   const res = await fetch('/api/users/' + params.id, { signal });
@@ -290,7 +311,7 @@ async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Prom
 
 #### Since
 
-alpha; the named form, beta (#506); outcomes, beta (#147)
+alpha; the named form, beta (#506); outcomes, beta (#147); the cache, beta (#148)
 
 ## How the page renders
 
