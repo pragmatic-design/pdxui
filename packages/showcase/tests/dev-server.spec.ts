@@ -25,7 +25,11 @@ test('the landing route renders its page, not the 404', async ({ page }) => {
 
 test('and so does a route the visitor navigates to', async ({ page }) => {
     await page.goto('/tickets');
-    await expect(page.locator('[data-test="tickets"]')).toBeVisible();
+    // The first visit is also the dev server compiling the page and what it imports (the data grid
+    // among them), on demand. Measured on a cold server (#579): 1.1 s alone, 4.5 s with the compiler
+    // and core suites running beside it, against the 5 s default — the pre-push gate's load went
+    // over it. What is asserted is that the route is served, not how fast a cold compile is.
+    await expect(page.locator('[data-test="tickets"]')).toBeVisible({ timeout: 20_000 });
     await expect(notFound(page)).toHaveCount(0);
 });
 
