@@ -496,6 +496,17 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         },
         reproducedIn: `${T}action-rune.test.ts`,
     },
+    PDX_AGENT_ACTION_UNBOUND: {
+        severity: 'error', category: 'defect',
+        summary: 'An `@action` offered to agents (`with { agent }`) that no control of the template runs.',
+        explanation: 'An agent has no capability a person does not (decision 31): an action an agent may call must be one a person can call from the page too. With no `:action="name"` and no handler that calls `name.execute(…)` or `name(…)`, the agent could do what the user cannot.',
+        fix: 'Give a person the same control — `<pdx-button :action="save">`, or a handler that calls `save.execute(…)` — or remove `agent`.',
+        example: {
+            bad: pdx('<p>Draft</p>', "@action save() with { agent: 'Save the draft' } {\n  await fetch('/api/save', { method: 'POST' });\n}"),
+            good: pdx('<pdx-button :action="save">Save</pdx-button>', "@action save() with { agent: 'Save the draft' } {\n  await fetch('/api/save', { method: 'POST' });\n}"),
+        },
+        reproducedIn: `${T}action-agent.test.ts`,
+    },
     PDX_FETCH_NO_ERROR_UI: {
         severity: 'info', category: 'defect',
         summary: 'An `@fetch` whose error state the template never shows.',

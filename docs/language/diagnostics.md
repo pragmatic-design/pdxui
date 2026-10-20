@@ -127,6 +127,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_FETCH_METHOD` | error | `@fetch` with a method other than GET. | `@fetch`, [data.md](data.md) |
 | `PDX_FETCH_TYPE_COLON` | error | `@fetch` with its type written after `:`. | `@fetch`, [data.md](data.md) |
 | `PDX_FETCH_UNKNOWN_OPTION` | error | `@fetch` with an option `resource()` does not take. | `@fetch`, [data.md](data.md) |
+| `PDX_AGENT_ACTION_UNBOUND` | error | An `@action` offered to agents (`with { agent }`) that no control of the template runs. | `@action`, [data.md](data.md) |
 | `PDX_ACTION_UNKNOWN_OPTION` | error | `@action … with { … }` holding an option `mutation()` does not take, or a `concurrency` that is not a policy. | `@action`, [data.md](data.md) |
 | `PDX_FETCH_NO_ERROR_UI` | info | An `@fetch` whose error state the template never shows. | `@fetch`, [data.md](data.md) |
 | `PDX_FORM_NO_SUBMIT` | info | A `@form` that nothing submits. | `@form`, [data.md](data.md) |

@@ -110,6 +110,29 @@ export function parseActionDecl(text: string): ActionDecl | null {
     return { name: head[1], params, inputType, hasInput, when, options, body: text.slice(bodyStart + 1, end - 1), bodyStart, end };
 }
 
+/** Each `key: value` of the `with` options as written, a shorthand `key` with an empty value. */
+export function actionOptionValues(options: string): Map<string, string> {
+    const inner = options.trim().replace(/^\{/, '').replace(/\}$/, '');
+    const out = new Map<string, string>();
+    for (const entry of splitAtTopLevelCommas(inner).map((e) => e.trim()).filter(Boolean)) {
+        const colon = entry.indexOf(':');
+        out.set((colon < 0 ? entry : entry.slice(0, colon)).trim(), colon < 0 ? '' : entry.slice(colon + 1).trim());
+    }
+    return out;
+}
+
+/**
+ * The agent options of an action (#502, decision 31): `agent`, the description a tool is offered
+ * under, read when it is a string literal; `consequential`, true only when written `true`.
+ */
+export function actionAgentOptions(options: string | undefined): { agent?: string; consequential: boolean } {
+    if (!options) return { consequential: false };
+    const values = actionOptionValues(options);
+    // Match: a quoted literal. Groups: [2]=its text
+    const agent = /^(['"`])(.*)\1$/.exec(values.get('agent') ?? '')?.[2];
+    return { ...(agent !== undefined ? { agent } : {}), consequential: values.get('consequential') === 'true' };
+}
+
 /** What is wrong with the `with` options: each unknown key, and a `concurrency` value outside the four. */
 export function actionOptionProblems(options: string): string[] {
     const inner = options.trim().replace(/^\{/, '').replace(/\}$/, '');

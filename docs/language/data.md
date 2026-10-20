@@ -158,8 +158,10 @@ The options are `mutation()`'s: `invalidate` (passed unchanged: an array names c
 `@fetch` is tagged with its own key, so `['GET:/api/users']` reaches it), `optimistic`,
 `onSuccess`, `onError`, and `concurrency` — what a call made while another is pending does:
 `'queue'` (the default) runs it after, `'drop'` ignores it, `'coalesce'` replaces the call waiting
-behind the running one, `'parallel'` runs it at once. `agent` and `consequential` are carried for the
-agent adapter (#502).
+behind the running one, `'parallel'` runs it at once. `agent` (a string, the description an agent is
+offered the action under) and `consequential` (`true` for a write an agent should confirm) are
+recorded in the `pdx analyze` manifest; registering the tool is the WebMCP adapter's, which is not
+built yet.
 
 #### Rules
 
@@ -168,6 +170,10 @@ agent adapter (#502).
 - An option not in the list, or a `concurrency` value that is not one of the four, raises
   `PDX_ACTION_UNKNOWN_OPTION` on the declaration.
 - A declaration in no form of `@action` raises `PDX_UNKNOWN_DECLARATION`, and nothing is generated.
+- An action with `agent` is offered to agents, and an agent has no capability a person does not: some
+  control of the template must run it — a `:action="name"` binding, or a handler that calls
+  `name.execute(…)` or `name(…)` — or it raises `PDX_AGENT_ACTION_UNBOUND`. `pdx analyze` records
+  each such action with its `agent`, `consequential` and the JSON schema of its input.
 - In the editor `save` is core's `Mutation`, typed by the first parameter and by what the body
   returns: `save.execute(1)` on an action that takes a `Dto` is a type error.
 

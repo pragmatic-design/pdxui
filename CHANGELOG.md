@@ -11,6 +11,12 @@ semver.
 
 ### Features
 
+- An `@action … with { agent: '…', consequential: true }` is an action an agent may call. `pdx analyze`
+  records it under `actions`, with `agent`, `consequential` and `input`, the JSON schema of its
+  parameter's type read from the type's text (`{}` for a type it cannot read, such as an interface).
+  Since an agent has no capability a person does not, such an action that no control of the template
+  runs — no `:action="name"`, no handler calling `name.execute(…)` or `name(…)` — is
+  `PDX_AGENT_ACTION_UNBOUND`. Registering the tool waits for the WebMCP adapter. (#502)
 - `@action` declares a write in a `.pdx`, as `@fetch` declares a read:
   `@action save(dto: Dto, { signal }) when canSave with { invalidate: [...] } { … }` compiles to a
   `mutation()` whose `fn` runs the body, `when` is `save.enabled()`, and `with` passes

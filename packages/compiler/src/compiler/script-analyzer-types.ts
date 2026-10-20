@@ -54,6 +54,15 @@ export interface SlotInfo {
  * A script `@snippet name(params) { … }` whose body is a template (#489, decision 9): compiled like
  * the component's template, and rendered with `@render name(args)`.
  */
+/** An `@action`: its name, the first parameter's type as written, and its agent options (#502). */
+export interface ActionInfo {
+    name: string;
+    inputType: string | null;
+    /** The description an agent is offered the action under, when `with { agent: '…' }` says one. */
+    agent?: string;
+    consequential: boolean;
+}
+
 export interface ScriptSnippet {
     name: string;
     /** The parameters' names, without their types. */
@@ -253,6 +262,8 @@ export interface ScriptAnalysis {
     slots: SlotInfo[];
     /** The script's `@snippet`s whose body is a template (#489): the render compiles them. */
     snippets: ScriptSnippet[];
+    /** Each `@action` (#501), with the agent options it carries (#502). */
+    actions?: ActionInfo[];
     /** The type parameters `@generic` declares, each as written: `T extends { id: string }` (#490). */
     generics: string[];
     signals: SignalDecl[];

@@ -21,6 +21,7 @@ import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { checkRemovedForms } from './language/removed-forms';
 import { validateRunePosition } from './compiler/validate-rune-position';
 import { validateScriptExports } from './compiler/script-exports';
+import { validateAgentActions } from './compiler/validate-agent-actions';
 import { setupRedundant } from './language/script-setup';
 import { validateDynamicContent } from './compiler/dynamic-content';
 import { routeLayout } from './compiler/codegen-shared';
@@ -910,6 +911,8 @@ export function compile(
             requiredSlotsOf: options?.requiredSlotsOf,
             eventHeardAbove: heard ? (event) => heard(event, ownTag) : undefined,
         }));
+        // An @action offered to agents that no control of the template runs (#502, decision 31).
+        allWarnings.push(...validateAgentActions(cachedAnalysis, ast));
         // The app's default layout, or none for `@layout 'none'`.
         if (cachedAnalysis.route?.page) {
             cachedAnalysis.route.layout = routeLayout(cachedAnalysis.route.layout, options?.defaultLayout);
