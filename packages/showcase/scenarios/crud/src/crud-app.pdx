@@ -1,0 +1,8 @@
+<template>
+  <pdx-router-outlet></pdx-router-outlet>
+</template>
+
+<script>
+// Registers `<pdx-router-outlet>`: the compiler's tag scan maps `pdx-*` tags to @pdxui/ui.
+import '@pdxui/router';
+</script>

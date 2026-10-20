@@ -23,6 +23,9 @@ test.describe('A3 — a list says how much of its source it shows', () => {
         await page.goto('/customers');
         await expect(page.locator('[data-test="total"]')).toHaveText(`${CUSTOMERS} matching`);
         const grid = page.getByRole('grid').first();
+        // The total is the toolbar's, and can be on screen before the grid has drawn its header:
+        // `count()` does not wait, and read 0 under the pre-push gate's load.
+        await expect(grid.locator('[role="row"]:has([role="columnheader"])').first()).toBeVisible();
         const headerRows = await grid.locator('[role="row"]:has([role="columnheader"])').count();
         expect(headerRows, 'no header row: the count below measures nothing').toBeGreaterThan(0);
         const shown = await grid.locator('[role="row"]:not(:has([role="columnheader"]))').count();

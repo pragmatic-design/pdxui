@@ -1,0 +1,11 @@
+<template>
+  <h2>Traffic</h2>
+  <p data-test="traffic">{{ visits }} visits, {{ share }}% from search</p>
+</template>
+
+<script>
+// A deferred panel loaded ahead of its render, while the browser is idle (#245).
+let visits = $signal(48_210);
+let fromSearch = $signal(19_766);
+const share = $derived(Math.round((fromSearch / visits) * 100));
+</script>

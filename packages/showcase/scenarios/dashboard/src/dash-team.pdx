@@ -1,0 +1,10 @@
+<template>
+  <h2>Team</h2>
+  <p data-test="team">{{ online }} of {{ people.length }} online</p>
+</template>
+
+<script>
+// A deferred panel rendered when the browser is idle (#245).
+const people = ['Ada', 'Grace', 'Linus', 'Margaret'];
+let online = $signal(3);
+</script>

@@ -157,8 +157,8 @@ when crossed and a slack that fails when it is stale (the showcase's pattern):
 |---|---|
 | hello | one component, one `$signal` (**landed**: JS 3.8 KB, no CSS; budget 4.2 KB) |
 | benchmark | the js-framework-benchmark app (**landed**: JS 16.5 KB, no CSS; budget 18.2 KB — built here with its own config against the workspace's sources; 13 KB was measured on 2026-10-10 inside the benchmark's clone) |
-| crud | one routed page with `@loader`, `@form`, `@action`, a `@for` of 100 rows |
-| dashboard | four `@defer` panels, a virtual list, a theme |
+| crud | one routed page with `@loader`, `@form`, `@action`, a `@for` of 100 rows (**landed**: JS 47.3 KB, CSS 1.4 KB; budgets 52.1 and 1.6 KB) |
+| dashboard | four `@defer` panels, a virtual list, a theme (**landed**: JS 23.4 KB, CSS 19.9 KB — the design system's base and one theme; budgets 25.8 and 21.9 KB) |
 
 Each budget is set at the scenario's first measurement plus 10%, and lowered by a stale-number
 check like the showcase's, so it is a number from the first day. The landed scenarios live under
@@ -166,7 +166,10 @@ check like the showcase's, so it is a number from the first day. The landed scen
 their slack is a share of the measurement (`SLACK_SHARE`), because the showcase's fixed 4 KB is the
 whole size of hello. That spec also holds O9 for hello, on the list of modules the build writes —
 and found it false: core's form registry ran its built-in registrations at load and was in every
-bundle until it was made pure (#244).
+bundle until it was made pure (#244). For dashboard it holds L5 — each `@defer` panel's component in
+a chunk of its own, not in the entry — and found it false too: a trigger with parentheses of its own
+(`when (…)`, `idle(ms)`, `timer(ms)`) was not recognised, and the panel was imported statically as
+well (#245).
 
 ## Out of scope for the beta
 

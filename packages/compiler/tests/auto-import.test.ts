@@ -325,6 +325,35 @@ describe('a component only used inside @defer', () => {
             .toMatch(/import\(\s*['"]@pdxui\/ui\/chart['"]\s*\)/);
     });
 
+    // The block was found by a pattern that stopped at the first `)`: a trigger with parentheses of
+    // its own — `when (…)`, `idle(ms)`, `timer(ms)` — was not recognised, its body counted as outside
+    // the defer, and the component went back into the route's chunk (#245, measured on a scenario).
+    for (const triggers of ["when (tab === 'sales'); prefetch idle", 'viewport | idle(3000)', 'timer(500)']) {
+        it(`with a trigger that has parentheses of its own — @defer (${triggers})`, () => {
+            const out = compileDeferred(`
+  @defer (${triggers}) {
+    <pdx-chart type="line"></pdx-chart>
+  }
+`);
+            const staticImports = out.split('\n').filter(l => l.trimStart().startsWith('import '));
+            expect(staticImports.join('\n'), 'the chart is in the route payload — @defer postponed only the render')
+                .not.toMatch(/@pdxui\/ui\/chart/);
+            expect(out).toMatch(/import\(\s*['"]@pdxui\/ui\/chart['"]\s*\)/);
+        });
+    }
+
+    it("with a `)` inside a string of its trigger, and an apostrophe in its body", () => {
+        const out = compileDeferred(`
+  @defer (when (mark === ')')) {
+    <p>Don't wait for {{ mark }}</p>
+    <pdx-chart type="line"></pdx-chart>
+  }
+  <p>after</p>
+`);
+        const staticImports = out.split('\n').filter(l => l.trimStart().startsWith('import '));
+        expect(staticImports.join('\n')).not.toMatch(/@pdxui\/ui\/chart/);
+    });
+
     it('control — the same component OUTSIDE a defer keeps its static import', () => {
         const out = compileDeferred('<pdx-chart type="line"></pdx-chart>');
         const staticImports = out.split('\n').filter(l => l.trimStart().startsWith('import '));

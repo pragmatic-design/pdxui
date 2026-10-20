@@ -1,0 +1,54 @@
+<template>
+  <main class="board" data-test="board">
+    <section class="panel">
+      @defer (viewport) {
+        <app-dash-sales></app-dash-sales>
+      } @placeholder {
+        <div class="skeleton"></div>
+      }
+    </section>
+    <section class="panel">
+      @defer (when (tab === 'traffic'); prefetch idle) {
+        <app-dash-traffic></app-dash-traffic>
+      } @placeholder {
+        <button @click="tab = 'traffic'" data-test="show-traffic">Traffic</button>
+      }
+    </section>
+    <section class="panel">
+      @defer (interaction) {
+        <app-dash-alerts></app-dash-alerts>
+      } @placeholder {
+        <div class="skeleton"></div>
+      }
+    </section>
+    <section class="panel">
+      @defer (idle) {
+        <app-dash-team></app-dash-team>
+      } @placeholder {
+        <div class="skeleton"></div>
+      }
+    </section>
+
+    <ul class="events" data-test="events">
+      @for (events as event; track event.id) @virtual(32) {
+        <li>{{ event.at }} — {{ event.text }}</li>
+      }
+    </ul>
+  </main>
+</template>
+
+<script>
+// The dashboard a team evaluating PDX for an application builds (#245): four panels whose code leaves
+// the entry (`@defer`, one prefetched while the browser is idle), a virtual list of 10,000 events,
+// and one theme of the design system.
+let tab = $signal('overview');
+
+const events = Array.from({ length: 10_000 }, (_, i) => ({ id: i, at: `${String(i % 24).padStart(2, '0')}:00`, text: `Event ${i}` }));
+</script>
+
+<style scoped>
+  .board { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--pdx-space-md); padding: var(--pdx-space-md); }
+  .panel { min-height: 160px; border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); padding: var(--pdx-space-md); }
+  .skeleton { height: 120px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }
+  .events { grid-column: 1 / -1; height: 320px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+</style>
