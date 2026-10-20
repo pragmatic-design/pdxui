@@ -9,7 +9,7 @@
 // A child route the current role may not open. The parent — the ticket, its tabs, its attachments
 // — has to stay on screen behind the refusal: a permission on one tab is not a reason to lose the
 // page the tab belongs to.
-@page '/tickets/:id/billing';
+@page '/tickets/:id(number)/billing';
 @title $t('billing.title', { id: id });
 @guard 'tickets.billing';
 

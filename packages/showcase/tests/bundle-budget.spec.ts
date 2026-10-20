@@ -257,7 +257,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // keeps optimistic values as overlays (#500), and pdx-button reads the policy. Same machine, same
 // day, the built dist: main js 467.8 → this branch 468.1 KB, entry 40.1 → 40.2 KB; blocking did not
 // move.
-const BUDGET_KB = { entry: 41, js: 469, css: 63, blocking: 97 };
+// js 469 → 471: the ticket page reads its record through `@loader ticket: loadTicket;` (#507) — the
+// loader's own module, the `@await` block that renders the record, and the router's `loaderSource`
+// (#506) now reached by a page. Same machine, same day, the built dist: main js 468.4 → this branch
+// 470.1 KB, entry 40.5 → 40.8 KB, blocking 96.8 → 97.0 KB, both still within theirs.
+const BUDGET_KB = { entry: 41, js: 471, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
