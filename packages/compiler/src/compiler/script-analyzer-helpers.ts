@@ -422,8 +422,12 @@ export function parseFieldDecl(decl: string): FormFieldDecl | null {
     return { name, type: type.trim(), required: isRequired, isArray: false, rules };
 }
 
-/** Split a string by commas at depth 0 (respecting braces, brackets, parens). */
-export function splitAtTopLevelCommas(content: string): string[] {
+/**
+ * Split a string by commas at depth 0 (respecting braces, brackets, parens). With `typeArguments`,
+ * `<…>` is a level too — for a list of typed parameters, where `Omit<T, 'id'>` is one type (#578);
+ * the `>` of an arrow `=>` closes nothing. Not by default: in an expression `<` is a comparison.
+ */
+export function splitAtTopLevelCommas(content: string, { typeArguments = false } = {}): string[] {
     const result: string[] = [];
     let depth = 0;
     let start = 0;
@@ -434,6 +438,8 @@ export function splitAtTopLevelCommas(content: string): string[] {
         const ch = content[i];
         if (ch === '{' || ch === '[' || ch === '(') depth++;
         if (ch === '}' || ch === ']' || ch === ')') depth--;
+        if (typeArguments && ch === '<') depth++;
+        if (typeArguments && ch === '>' && content[i - 1] !== '=') depth--;
         if (ch === ',' && depth === 0) {
             result.push(content.slice(start, i));
             start = i + 1;
