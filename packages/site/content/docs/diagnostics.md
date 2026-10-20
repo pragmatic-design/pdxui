@@ -8,11 +8,45 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 101 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 102 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
 Something is wrong: the output differs from what was written, or nothing is generated for it.
+
+### PDX_ACTION_UNKNOWN_OPTION
+
+*error* — `@action … with { … }` holding an option `mutation()` does not take, or a `concurrency` that is not a policy.
+
+The options are handed to `mutation()`, which ignores a key it does not know: a misspelled `invalidte` would leave the lists stale after every save, and `concurrency: 'later'` would quietly queue.
+
+**Fix.** Use one of the options — invalidate, optimistic, onSuccess, onError, concurrency, agent, consequential — and for `concurrency` one of 'queue', 'drop', 'coalesce', 'parallel'.
+
+Instead of:
+
+```html
+<template>
+  <pdx-button :action="save">Save</pdx-button>
+</template>
+<script>
+@action save() with { retries: 2 } {
+  await fetch('/api/save', { method: 'POST' });
+}
+</script>
+```
+
+write:
+
+```html
+<template>
+  <pdx-button :action="save">Save</pdx-button>
+</template>
+<script>
+@action save() with { concurrency: 'drop' } {
+  await fetch('/api/save', { method: 'POST' });
+}
+</script>
+```
 
 ### PDX_ATTACH_UNKNOWN
 

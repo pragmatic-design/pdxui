@@ -28,6 +28,7 @@ import { RUNE_CALL, readDeclarators } from './rune-declarations';
 import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
+import { readActionDecl, actionOptionProblems, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -315,6 +316,35 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             pushBody(`    function ${snippetName}(${params}) { return html\`${snippetBody}\`; }`, snippetAt);
             exports.push({ name: snippetName, kind: 'function' as const });
             usedFeatures.add('html');
+            continue;
+        }
+
+        // ─── @action name(param) [when expr] [with { … }] { body } — a declared write (#501) ───
+        if (/^@action\b/.test(trimmed)) {
+            const actionAt = i;
+            const action = readActionDecl(lines, codeLines, i);
+            i = action.lastLine;
+            if (!action.decl) {
+                warnings.push({
+                    code: 'PDX_UNKNOWN_DECLARATION',
+                    severity: 'error' as const,
+                    message: `"${trimmed}" is not a form of @action. It was dropped — nothing is generated for it.`,
+                    hint: 'Use: @action name(param: Type) when condition with { invalidate: [...] } { … } — `when` and `with` are optional, and so is a last `{ signal }` parameter.',
+                });
+                continue;
+            }
+            const problems = action.decl.options ? actionOptionProblems(action.decl.options) : [];
+            if (problems.length > 0) {
+                warnings.push({
+                    code: 'PDX_ACTION_UNKNOWN_OPTION',
+                    severity: 'error' as const,
+                    message: `\`@action ${action.decl.name}\`: ${problems.join('; ')}.`,
+                    hint: `The options are ${ACTION_OPTIONS.join(', ')}; \`concurrency\` is ${ACTION_CONCURRENCY.map((c) => `'${c}'`).join(' | ')}.`,
+                });
+            }
+            pushBody(`    ${compileAction(action.decl)}`, actionAt);
+            if (!action.decl.name.startsWith('_')) exports.push({ name: action.decl.name, kind: 'const' });
+            usedFeatures.add('mutation');
             continue;
         }
 

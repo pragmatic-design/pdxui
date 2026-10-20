@@ -168,6 +168,32 @@ clicks, so a double click sends one write. A refused write stays on `addUser.err
 where the form reads it, and the button is idle again. You write no `:loading`, no `:disabled` and
 no `@click` for it.
 
+**In a `.pdx`, declare it.** `@action` is the write's declaration, as `@fetch` is the read's: the
+compiler writes the `mutation()`.
+
+```pdx
+<template>
+  <pdx-button :action="addUser" :action-arg="draft">Add</pdx-button>
+</template>
+
+<script>
+interface UserDto { name: string }
+
+let draft = $signal<UserDto>({ name: '' });
+const canAdd = $derived(draft.name.length > 0);
+
+@action addUser(dto: UserDto, { signal }) when canAdd with { invalidate: ['GET:/api/users'], concurrency: 'drop' } {
+  await fetch('/api/users', { method: 'POST', body: JSON.stringify(dto), signal });
+}
+</script>
+```
+
+The first parameter is what `execute(arg)` passes; `{ signal }`, when you write it, is the call's
+own, aborted by `addUser.cancel()`. `when` is `addUser.enabled()`, and `with` takes `mutation()`'s
+options — `invalidate`, `optimistic`, `onSuccess`, `onError`, `concurrency`. Any other option is
+`PDX_ACTION_UNKNOWN_OPTION`. In the editor `addUser` is typed by its parameter and by what the body
+returns, so `addUser.execute(1)` is an error where it is written.
+
 ## Writing before the server agrees
 
 Invalidating after the response is honest and slow: the user waits a round trip to see their own

@@ -485,6 +485,17 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use one of `resource()`\'s options: key, staleTime, retry, tags, enabled, transform, onSuccess, onError, cache, stale.',
         reproducedIn: `${T}fetch-strict.test.ts`,
     },
+    PDX_ACTION_UNKNOWN_OPTION: {
+        severity: 'error', category: 'defect',
+        summary: '`@action … with { … }` holding an option `mutation()` does not take, or a `concurrency` that is not a policy.',
+        explanation: 'The options are handed to `mutation()`, which ignores a key it does not know: a misspelled `invalidte` would leave the lists stale after every save, and `concurrency: \'later\'` would quietly queue.',
+        fix: "Use one of the options — invalidate, optimistic, onSuccess, onError, concurrency, agent, consequential — and for `concurrency` one of 'queue', 'drop', 'coalesce', 'parallel'.",
+        example: {
+            bad: pdx('<pdx-button :action="save">Save</pdx-button>', "@action save() with { retries: 2 } {\n  await fetch('/api/save', { method: 'POST' });\n}"),
+            good: pdx('<pdx-button :action="save">Save</pdx-button>', "@action save() with { concurrency: 'drop' } {\n  await fetch('/api/save', { method: 'POST' });\n}"),
+        },
+        reproducedIn: `${T}action-rune.test.ts`,
+    },
     PDX_FETCH_NO_ERROR_UI: {
         severity: 'info', category: 'defect',
         summary: 'An `@fetch` whose error state the template never shows.',
