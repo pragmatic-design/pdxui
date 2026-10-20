@@ -408,6 +408,10 @@ semver.
 
 ### Fixes
 
+- A page that stays mounted while its route loader runs again — the same route, another id — no
+  longer renders its `@await` body with the alias undefined, which threw in a binding and logged an
+  unhandled effect error. The router wrote a level's data, state and error one by one, and a reader
+  saw the level with its data gone and its state still `'success'`; it writes them as one now. (#569)
 - An `export` of a value in a component's script is `PDX_SCRIPT_EXPORT`, and the declaration is
   compiled without it. It landed inside `setup()`, where it is a syntax error, and the module failed
   to load with no word from the compiler. A type export, a `@store` module and a `.pdx.ts` module
