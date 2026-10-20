@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- `@action` declares a write in a `.pdx`, as `@fetch` declares a read:
+  `@action save(dto: Dto, { signal }) when canSave with { invalidate: [...] } { … }` compiles to a
+  `mutation()` whose `fn` runs the body, `when` is `save.enabled()`, and `with` passes
+  `mutation()`'s options. The body may span lines and is rewritten like the rest of the script.
+  - An unknown option, or a `concurrency` that is not one of the four, is
+    `PDX_ACTION_UNKNOWN_OPTION`.
+  - In the editor `save` is core's `Mutation`, typed by the parameter and by what the body returns,
+    and the body is checked where it is written. (#501)
 - `mutation()` takes a `concurrency` policy for a call made while another is pending: `'queue'`
   (the default, as before), `'drop'`, `'coalesce'` or `'parallel'`. No policy aborts the running
   write.

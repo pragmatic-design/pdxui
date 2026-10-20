@@ -21,6 +21,8 @@ function statement(name: string, shape: string): string {
     if (name === 'prop') return "@prop label: string = 'x';";
     if (name === 'model') return "@model value: string = '';";
     if (name === 'event') return '@event changed: number;';
+    // The body of an @action is checked where it is written (#501): it names nothing undeclared here.
+    if (name === 'action') return "@action save(n: number) when true with { concurrency: 'drop' } { return n * 2; }";
     return shape.replace(/\s{2,}\/\/.*$/, '');
 }
 

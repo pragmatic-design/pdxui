@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { DECORATOR_RUNES, parseFetchDecl, parseVariantsBlock } from '@pdxui/compiler';
+import { DECORATOR_RUNES, parseActionDecl, parseFetchDecl, parseVariantsBlock } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -34,6 +34,28 @@ function topLevelCommaSplit(text: string): string[] {
     }
     out.push(text.slice(start));
     return out.filter(e => e.trim());
+}
+
+/**
+ * An `@action` (#501) projected: `inPlace`, the same length as `text`, with the head turned into
+ * `;async(params)=>` before the body and everything after the body blanked — the body is checked
+ * where it is written — and `decl`, appended after the script, which declares `name` as core's
+ * Mutation typed by the first parameter and by what a copy of the body returns. Null when the text is
+ * not a form of `@action` (the compiler reports it), or the head is too short to hold the arrow.
+ */
+function projectAction(text: string): { inPlace: string; decl: string } | null {
+    const d = parseActionDecl(text);
+    if (!d) return null;
+    const arrow = `;async(${d.params})=>`;
+    if (arrow.length > d.bodyStart) return null;
+    const keep = (str: string) => str.replace(/[^\n]/g, ' ');
+    const inPlace = arrow + keep(text.slice(arrow.length, d.bodyStart)) + text.slice(d.bodyStart, d.end) + keep(text.slice(d.end));
+    // The copy types `{ signal }`, which the script's lenient check leaves `any` in place.
+    const typedParams = d.params.replace(/\{\s*signal\s*\}\s*$/, '{ signal }: { signal: AbortSignal }');
+    const fn = `__pdx_action_${d.name}`;
+    const input = d.hasInput ? (d.inputType ?? 'any') : 'void';
+    const decl = `var ${d.name}: import('@pdxui/core').Mutation<Awaited<ReturnType<typeof ${fn}>>, ${input}>; async function ${fn}(${typedParams}) {${d.body}}`;
+    return { inPlace, decl };
 }
 
 /** Is the offset `idx` at the start of a line (only whitespace between the line start and idx)? */
@@ -143,6 +165,17 @@ export function projectScript(scriptContent: string): string {
             else if (c === ';' && depth === 0) { j++; ended = true; break; }
         }
         if (!ended) { j = s.indexOf('\n', m.index); if (j < 0) j = s.length; }
+        if (kw === 'action') {
+            const projected = projectAction(s.slice(m.index, j));
+            if (projected) {
+                // The head becomes an arrow over the body, which stays where it is written and is checked
+                // there; the typed copy at the end gives `name` its Mutation type (./project-script.ts).
+                projected.inPlace.split('').forEach((ch, o) => { out[m!.index + o] = ch; });
+                emitters.push(projected.decl);
+                RUNE_KW.lastIndex = j;
+                continue;
+            }
+        }
         if (kw === 'fetch') {
             // `as User` → `PdxResource<User>`, read by the compiler's own parser so the two cannot
             // disagree; `unknown` with no type. A line the compiler rejects stays `any`: it is

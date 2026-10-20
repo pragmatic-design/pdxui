@@ -36,6 +36,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('variants', 'Declare the component\'s variants: each axis is a prop typed with its values, reflected on the host, and styled with `@variant axis(value) { … }`.', '@variants { variant: { primary, ghost } = primary; }', '@variants {\n  ${1:variant}: { ${2:primary}, ${3:ghost} } = ${2:primary};\n}'),
     d('state','A visual state of the host, kept in sync with a boolean; CSS matches it with `:state(name)`.', '@state name = booleanExpression;', '@state ${1:name} = ${2:condition};'),
     d('form', 'Declare a form with its fields and validation.', '@form name: { field: string { required } };   // the colon is not optional', '@form ${1:name}: { ${2:field}: ${3:string} };'),
+    d('action', 'Declare a write, compiled to mutation(): `name.execute(arg)` runs the body; `when` is `name.enabled()`, `with` passes the options.', "@action save(dto: Dto) when canSave with { invalidate: ['GET:/api/users'] } { await api.save(dto); }", '@action ${1:save}(${2:dto}: ${3:Dto}) {\n  $4\n}'),
     d('fetch', 'Declare a data fetch, a reactive resource().', "@fetch name: 'GET /api/path' as Type;   // the method is part of the string", "@fetch ${1:data}: 'GET ${2:/api/path}' as ${3:Type[]};"),
     // The file IS the store: `@store name;` names it, `$store({…})` holds its state. `@store name = {…}`
     // is not a form the compiler reads — it is PDX_UNKNOWN_DECLARATION — and completion offered it (#58).

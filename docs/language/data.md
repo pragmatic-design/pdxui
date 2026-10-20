@@ -124,6 +124,78 @@ let page = $signal(1);
 
 alpha
 
+## Writing
+
+### @action
+
+#### Syntax
+
+```ebnf
+ActionDecl    ::= "@action" S Identifier S? "(" S? ActionParams? S? ")"
+                  ( S "when" S Expression )? ( S "with" S? ActionOptions )? S? "{" Statement* "}"
+ActionParams  ::= Identifier ( S? ":" S? Type )? ( S? "," S? "{" S? "signal" S? "}" )?
+                | "{" S? "signal" S? "}"
+ActionOptions ::= "{" S? ActionOption ( S? "," S? ActionOption )* ( S? "," )? S? "}"
+ActionOption  ::= ( "invalidate" | "optimistic" | "onSuccess" | "onError" | "agent" | "consequential" ) S? ":" S? Expression
+                | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote
+```
+
+The analyzer's form: `@action save(dto: Dto) when canSave with { invalidate: ['GET:/api/users'] } { await api.save(dto); }`.
+
+#### Semantics
+
+A declared write, the counterpart of `@fetch`. It compiles to a `mutation()` in the setup:
+`const save = mutation({ fn: async (dto, { signal }) => { … }, enabled: () => (canSave), ...{ options } })`.
+The first parameter is the argument of `save.execute(arg)`; an optional last parameter, written as
+the destructuring `{ signal }`, receives the call's `AbortSignal`, aborted by `save.cancel()` — it is
+never implicit. `when <expr>` is `save.enabled()`: a call whose turn comes while it is false does not
+run, and rejects with `ActionDisabledError`. The body, the `when` expression and the options are
+rewritten like the rest of the script, signal reads and writes included. `save` reaches the template
+like a `@fetch`: `execute(arg?)`, `pending()`, `enabled()`, `cancel()`, `data()`, `error()`,
+`state()`. `<pdx-button :action="save" :action-arg="dto">` runs it on click.
+
+The options are `mutation()`'s: `invalidate` (passed unchanged: an array names cache tags, and a
+`@fetch` is tagged with its own key, so `['GET:/api/users']` reaches it), `optimistic`,
+`onSuccess`, `onError`, and `concurrency` — what a call made while another is pending does:
+`'queue'` (the default) runs it after, `'drop'` ignores it, `'coalesce'` replaces the call waiting
+behind the running one, `'parallel'` runs it at once. `agent` and `consequential` are carried for the
+agent adapter (#502).
+
+#### Rules
+
+- The body may span lines; it is read to its balanced `}`. `when` and `with` are keywords only in
+  this position, and `when` comes before `with`.
+- An option not in the list, or a `concurrency` value that is not one of the four, raises
+  `PDX_ACTION_UNKNOWN_OPTION` on the declaration.
+- A declaration in no form of `@action` raises `PDX_UNKNOWN_DECLARATION`, and nothing is generated.
+- In the editor `save` is core's `Mutation`, typed by the first parameter and by what the body
+  returns: `save.execute(1)` on an action that takes a `Dto` is a type error.
+
+#### Examples
+
+```pdx
+<template>
+  <pdx-button :action="save" :action-arg="draft">Save</pdx-button>
+  @if (save.pending()) { <pdx-button @click="save.cancel()">Cancel</pdx-button> }
+  @if (save.error()) { <p>{{ save.error()?.message }}</p> }
+</template>
+
+<script>
+interface UserDto { name: string }
+
+let draft = $signal<UserDto>({ name: '' });
+const canSave = $derived(draft.name.length > 0);
+
+@action save(dto: UserDto, { signal }) when canSave with { invalidate: ['GET:/api/users'], concurrency: 'drop' } {
+  await fetch('/api/users', { method: 'POST', body: JSON.stringify(dto), signal });
+}
+</script>
+```
+
+#### Since
+
+beta (#501)
+
 ## Forms
 
 ### @form

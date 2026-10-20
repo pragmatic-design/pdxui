@@ -232,7 +232,8 @@ const canSave = $derived(draft.name.length > 0);
 
 ### Since
 
-beta (#142)
+beta (#142; the rune is **landed**, #501 — the agent options `agent` and `consequential` are carried,
+and read by #502)
 
 ## @form
 
