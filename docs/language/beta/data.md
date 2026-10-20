@@ -148,7 +148,7 @@ ActionParams  ::= Identifier ( S? ":" S? Type )? ( S? "," S? "{" S? "signal" S? 
                 | "{" S? "signal" S? "}"
 ActionOptions ::= "{" S? ActionOption ( S? "," S? ActionOption )* ( S? "," )? S? "}"
 ActionOption  ::= ( "invalidate" | "optimistic" | "onSuccess" | "onError" ) S? ":" S? Expression
-                | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote   /* proposed */
+                | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote   /* landed #500, #501 */
                 | "agent" S? ":" S? StringLiteral | "consequential" S? ":" S? ( "true" | "false" )    /* agents.md — landed #502 */
 ```
 
@@ -201,8 +201,9 @@ clicks while it is pending, and leaves a rejection on `save.error()` (#49 — la
 - `when` and `with` are keywords only in this position.
 - An option not in the list is an error; the code name `PDX_ACTION_UNKNOWN_OPTION` is this
   specification's (#142 lists the options, not the check). A `concurrency` value not in the list is
-  the same error.
-- Acceptance cases (proposed): under `'parallel'`, call 1 and call 2 apply optimistic values and
+  the same error (**landed**, #501: `compiler/tests/action-rune.test.ts`).
+- Acceptance cases (**landed**, #500 — `core/tests/mutation-concurrency.test.ts`, and the button's in
+  `ui/tests/unit/button-action.test.ts`): under `'parallel'`, call 1 and call 2 apply optimistic values and
   call 1 fails → call 2's value stays; `cancel()` with two calls waiting → both reject, `error()`
   unchanged; `when` turning false with a call waiting → that call does not run. Two `execute()` 10 ms apart under each policy — `'queue'` sends two
   in order, `'drop'` one, `'coalesce'` with three calls sends the first and the third, `'parallel'`

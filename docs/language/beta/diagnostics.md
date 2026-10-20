@@ -30,7 +30,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_VARIANTS_MALFORMED` | error | An axis of `@variants` that cannot be read: no values, declared twice, a default outside its values. | `@variants` | #153 (landed) |
 | `PDX_UNKNOWN_DIRECTIVE` | warn | A directive registered by no plugin. | directives | #296 (landed; #100 planned it and did not add it) |
 | `PDX_LOADER_UNKNOWN_OPTION` | error | An `@loader` option other than `staleTime`. | `@loader` | this specification (#148 asks for the check) |
-| `PDX_ACTION_UNKNOWN_OPTION` | error | An `@action` option outside its list. | `@action` | this specification |
+| `PDX_ACTION_UNKNOWN_OPTION` | error | An `@action` option outside its list. | `@action` | this specification (landed, #501) |
 | `PDX_RUNE_POSITION` | error | A `$` rune outside the position the compiler reads it in. | `$signal`, `$derived`, `$store`, `$effect`, `$watch` | this specification (decisions.md 12 — landed, #278) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host` | #133 (landed; decisions.md 21) |
 | `PDX_FORM_FIELD_RESERVED` | error | A form field named like a form member (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`). | `@form` | this specification (proposed, decisions.md 13) |
