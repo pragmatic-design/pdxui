@@ -678,9 +678,13 @@ describe('a document resolves from its own project, not from the editor folder',
     });
 
     afterAll(() => {
-        stub.on.configuration({ settings: { pdx: { typeCheck: true } } });
+        // This project's document is closed BEFORE the check is turned back on: turning it on
+        // re-checks every open document, and with this one open it builds the cold program the
+        // describe was spared — 3.6 s under coverage locally, over 10 s on a CI runner (#575).
+        stub.open.delete(pathToFileURL(join(web, 'src', 'page.pdx')).href);
         rmSync(mono, { recursive: true, force: true });
         stub.on.initialize({ rootUri: pathToFileURL(root).href });
+        stub.on.configuration({ settings: { pdx: { typeCheck: true } } });
     });
 
     it('offers the props of a library tag inside it', () => {
