@@ -556,28 +556,36 @@ beta (#132)
 
 ```ebnf
 ProvideDecl ::= "@provide" S Identifier S? "=" S? Expression S? ";"?
-InjectDecl  ::= "@inject" S Identifier ( S "as" S Identifier )? S? ";"?
+InjectDecl  ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? S? ";"?
 ```
 
-The analyzer's forms: `@provide key = value;` and `@inject key;`.
+The analyzer's forms: `@provide Token = value;` and `@inject name from Token;`.
 
 #### Semantics
 
-`@provide key = value;` publishes a value to the elements below this one under the string key
-`'key'`: after the setup body, `provide('key', value, ctx.el)`. The value is an expression of the
-setup, rewritten like the body, and evaluated once: `@provide count = count;` provides the signal's
-value at setup time, `@provide count = () => count;` a getter that reads it when called.
-`@inject key;` reads the value the nearest ancestor provides: before the setup body,
-`const key = inject('key', ctx.el);`; with `as alias` the local name is `alias`. The name is returned
-to the template like any other.
+A context is identified by a token: `context<T>(name)` from `@pdxui/core`, declared in a module and
+imported (`export const Theme = context<string>('theme');`). `@provide Theme = value;` publishes a
+value to the elements below this one under that token: after the setup body,
+`provide(Theme, value, ctx.el)`. The value is an expression of the setup, rewritten like the body,
+and evaluated once: `@provide Theme = theme;` provides the signal's value at setup time,
+`@provide Density = () => density;` a getter that reads it when called.
+`@inject theme from Theme;` reads the value the nearest ancestor provides under the token: before
+the setup body, `const theme = inject(Theme, ctx.el);`, typed by the token in the editor.
+`@inject theme from Theme = 'light';` supplies a default for when no ancestor provides one:
+`inject(Theme, ctx.el, 'light')`. The name is returned to the template like any other.
 
 #### Rules
 
-- `@provide` without `=` and `@inject` with a quoted key raise `PDX_UNKNOWN_DECLARATION`.
-- An `@inject` with no provider above throws `No provider for context "key" above <tag>` when the
-  component is set up — not checked at compile time. In TypeScript the context API takes a
-  `context<T>()` token: `inject(token, el, fallback)` is the optional form (#495); the runes take one
-  with #496.
+- The token is a name the script imports. A string key (`@provide theme = …`, `@inject theme;`,
+  `@inject theme as t;`), a name the script declares itself, or a name it does not import raises
+  `PDX_UNKNOWN_DECLARATION`, and nothing is generated for the line. A token declared in the script
+  is a new one for each component, so nothing else could reach it.
+- `@provide` without `=` raises `PDX_UNKNOWN_DECLARATION`.
+- The default is written as it is emitted: a literal, or a name the script imports. It is read
+  before the setup body, so a signal of the script is not yet there to read.
+- An `@inject` with no provider above and no default throws
+  `No provider for context "theme" above <tag>` when the component is set up — not checked at
+  compile time.
 - The `@provide` value is one line.
 
 #### Examples
@@ -588,10 +596,12 @@ to the template like any other.
 </template>
 
 <script>
+import { Theme, Density } from './contexts';
+
 let density = $signal('compact');
 
-@provide theme = 'invoice';
-@provide rowDensity = () => density;
+@provide Theme = 'invoice';
+@provide Density = () => density;
 
 function toggle() { density = density === 'compact' ? 'comfortable' : 'compact'; }
 </script>
@@ -603,8 +613,10 @@ function toggle() { density = density === 'compact' ? 'comfortable' : 'compact';
 </template>
 
 <script>
-@inject theme;
-@inject rowDensity as density;
+import { Theme, Density } from './contexts';
+
+@inject theme from Theme = 'plain';
+@inject density from Density;
 
 const label = 'Total';
 </script>
@@ -612,7 +624,7 @@ const label = 'Total';
 
 #### Since
 
-alpha
+alpha; by token since #496
 
 ### @tag
 

@@ -113,14 +113,20 @@ export interface WatchDecl {
 
 /** Declarative provide from @provide rune. */
 export interface ProvideDecl {
-    key: string;        // context key: 'theme'
-    expr: string;       // value expression: '$signal({ mode: "dark" })' or 'authService'
+    /** The context token the value is provided under, an identifier the script imports (#496). */
+    token: string;
+    /** The value expression: `theme`, `authService`. */
+    expr: string;
 }
 
-/** Declarative inject from @inject rune. */
+/** Declarative inject from @inject rune: `@inject name from Token = fallback;` (#496). */
 export interface InjectDecl {
-    key: string;        // context key: 'theme'
-    alias?: string;     // optional local variable name (default = key)
+    /** The local name the value is read under. */
+    name: string;
+    /** The context token, an identifier the script imports. */
+    token: string;
+    /** The value when nothing provides the token, as written; absent: inject throws instead. */
+    fallback?: string;
 }
 
 /** Data fetch declaration from @fetch rune. */
@@ -265,8 +271,8 @@ export interface ScriptAnalysis {
     customTag?: string;      // @tag 'app-custom-name' — overrides file-derived tag
     i18n?: I18nInfo;         // @i18n configuration block
     head: HeadInfo;          // @title/@meta head management
-    provides: ProvideDecl[];  // @provide key = expr;
-    injects: InjectDecl[];   // @inject key;
+    provides: ProvideDecl[];  // @provide Token = expr;
+    injects: InjectDecl[];   // @inject name from Token;
     effects: string[];
     emits: string[];         // $emit() call expressions
     lifecycle: { onMount: string[]; onDestroy: string[] };

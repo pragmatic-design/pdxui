@@ -33,23 +33,14 @@ export function context<T>(name: string): Context<T> {
     return Object.freeze({ name }) as Context<T>;
 }
 
-/**
- * What a value is keyed by at runtime. A token everywhere the API is typed; the string a `.pdx`'s
- * `@provide key` / `@inject key` still compiles to, until those runes take a token too (#496).
- */
-type ContextKey = Context<unknown> | string | symbol;
-
-/** A key as a message names it: a token's name, or the string. */
-const keyName = (key: ContextKey): string => (typeof key === 'object' ? key.name : String(key));
-
 // ─── Global Registry (fallback for app-wide providers) ──────────
 
-const globalRegistry = new Map<ContextKey, unknown>();
+const globalRegistry = new Map<Context<unknown>, unknown>();
 
 // ─── Element-Scoped Providers ───────────────────────────────────
 
 /** Map of element → map of key → value. Providers register here. */
-const elementProviders = new WeakMap<HTMLElement, Map<ContextKey, unknown>>();
+const elementProviders = new WeakMap<HTMLElement, Map<Context<unknown>, unknown>>();
 
 /**
  * Provide a value under `token` on an element (DOM-scoped): descendants inject it. Without an
@@ -63,16 +54,14 @@ const elementProviders = new WeakMap<HTMLElement, Map<ContextKey, unknown>>();
  * provided signal is writable by whoever injects it.
  */
 export function provide<T>(token: Context<T>, value: T, host?: HTMLElement): void {
-    // The key may also be a `.pdx`'s string key at runtime (see ContextKey).
-    const key: ContextKey = token;
     if (host) {
         let map = elementProviders.get(host);
         if (!map) { map = new Map(); elementProviders.set(host, map); }
-        map.set(key, value);
+        map.set(token, value);
         // Listen for context-request from descendants
         _ensureContextListener(host);
     } else {
-        globalRegistry.set(key, value);
+        globalRegistry.set(token, value);
     }
 }
 
@@ -83,13 +72,11 @@ export function provide<T>(token: Context<T>, value: T, host?: HTMLElement): voi
  * `fallback` is passed, `undefined` included, which is returned instead.
  */
 export function inject<T, F = never>(token: Context<T>, host?: HTMLElement, ...fallback: [F] | []): T | F {
-    // The key may also be a `.pdx`'s string key at runtime (see ContextKey).
-    const key: ContextKey = token;
-    const value = _resolve(key, host);
+    const value = _resolve(token, host);
     if (value !== undefined) return value as T;
     if (fallback.length > 0) return fallback[0] as F;
     const above = host ? ` above <${host.localName}>` : '';
-    throw new Error(`No provider for context "${keyName(key)}"${above}.`);
+    throw new Error(`No provider for context "${token.name}"${above}.`);
 }
 
 /** Clear all global providers (for testing). */
@@ -110,7 +97,7 @@ function _parentOrHost(el: Element): HTMLElement | null {
  * Walk up the DOM tree looking for a provider, ask the context protocol from `from`, then fall back
  * to global.
  */
-function _resolve(key: ContextKey, from?: HTMLElement): unknown {
+function _resolve(key: Context<unknown>, from?: HTMLElement): unknown {
     if (from) {
         // 1. PDX providers on the ancestors (DOM-scoped, nearest wins) — shadow-crossing
         let el: HTMLElement | null = _parentOrHost(from);
@@ -150,9 +137,9 @@ function _ensureContextListener(element: HTMLElement): void {
         // ignores its host's requests the same way.
         if (e.composedPath()[0] === element) return;
         const req = e as ContextRequestEvent;
-        // The protocol allows any value as a key; PDX's are tokens (and the strings a `.pdx` still
-        // compiles to). A lookup by identity simply does not find a key of another kind.
-        const key = req.context as ContextKey;
+        // The protocol allows any value as a key; PDX's are tokens. A lookup by identity simply does
+        // not find a key of another kind.
+        const key = req.context as Context<unknown>;
         const map = elementProviders.get(element);
         if (!map?.has(key)) return;
         e.stopPropagation();
@@ -209,9 +196,9 @@ export function installContextProtocol(): void {
 
     document.addEventListener('context-request', ((e: Event) => {
         const req = e as ContextRequestEvent;
-        if (!globalRegistry.has(req.context as ContextKey)) return;
+        if (!globalRegistry.has(req.context as Context<unknown>)) return;
         e.stopPropagation();
-        _answer(req, globalRegistry.get(req.context as ContextKey));
+        _answer(req, globalRegistry.get(req.context as Context<unknown>));
     }) as EventListener);
 }
 

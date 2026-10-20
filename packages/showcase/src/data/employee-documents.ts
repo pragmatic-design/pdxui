@@ -4,8 +4,8 @@
 // the list. If each fetched it there would be two requests on landing and two copies, and after an
 // upload the count would stay where it was until the next navigation.
 //
-// The route owns the list and provides it (`@provide employeeDocuments`); the section injects it and
-// asks the owner to read it again after a change.
+// The route owns the list and provides it (`@provide EmployeeDocumentsContext`); the section injects it
+// and asks the owner to read it again after a change.
 //
 // Only the route imports this module; the section reaches it through the inject, `url` included. A
 // module both import is a chunk of its own, and the entry names it in its preload map, and that puts

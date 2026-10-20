@@ -34,6 +34,7 @@ import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlo
 import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
+import { contextStringProvide, contextStringInject } from './context-keys';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -338,6 +339,9 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #478: a library component's alpha change events, read from its manifest (./alpha-events).
     alphaChangeEvent,
     alphaChangeListener,
+    // #496: the runes read a context by a token the script imports (./context-keys).
+    contextStringProvide,
+    contextStringInject,
     // #495: the context API is `provide(token, value, host)` and `inject(token, host, fallback?)`.
     removedExport('@pdxui/core', 'tryInject', '`inject(token, host, undefined)`', 495),
     removedExport('@pdxui/core', 'useProvided', '`inject(token, host)`, or `@inject` in a .pdx', 495),

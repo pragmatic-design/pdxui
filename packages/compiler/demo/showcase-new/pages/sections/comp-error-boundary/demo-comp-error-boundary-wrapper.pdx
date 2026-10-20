@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading">&lt;pdx-error-boundary&gt; — Component Wrapper</h2>
     <p class="pdx-txt-small pdx-ink-muted">
       Declarative error boundary with built-in fallback UI, retry button, max retries, and
-      <code>pdx-error</code> event for logging. Provides <code>errorContext</code> to descendants.
+      <code>pdx-error</code> event for logging. Provides <code>ErrorContext</code> to descendants.
     </p>
     <div class="demo-controls demo-row">
       <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="breakWidget">Make it throw</button>

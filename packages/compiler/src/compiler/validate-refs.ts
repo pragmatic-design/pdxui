@@ -34,7 +34,7 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
     for (const st of analysis.stores) s.add(st.name);
     for (const f of analysis.forms) s.add(f.name);
     for (const f of analysis.fetches) s.add(f.name);
-    for (const inj of analysis.injects) s.add(inj.alias ?? inj.key);
+    for (const inj of analysis.injects) s.add(inj.name);
     for (const e of analysis.exports) s.add(e.name);
     // A template `@snippet` of the script is a function of the render (#489).
     for (const sn of analysis.snippets) s.add(sn.name);

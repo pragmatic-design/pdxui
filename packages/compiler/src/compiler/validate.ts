@@ -107,6 +107,7 @@ function reactiveSurfaces(analysis: ScriptAnalysis, exclude: string): string[] {
     for (const sto of analysis.stores) if (sto.name !== exclude) expr(sto.initialExpr);
     for (const w of analysis.watches) { expr(w.source); expr(w.callback); expr(w.options); }
     for (const pr of analysis.provides) expr(pr.expr);
+    for (const inj of analysis.injects) if (inj.fallback) expr(inj.fallback);
     // A @fetch's options and a @form's expressions read the script's names too: `enabled: () => ready`
     // is a use of `ready` (#203). The URL's `${…}` are read through the same template literal.
     for (const f of analysis.fetches) { expr(f.options); if (f.hasReactiveParams) expr('`' + f.url + '`'); }
@@ -282,7 +283,7 @@ export function validate(
     for (const s of analysis.stores) reactiveNames.add(s.name);
     for (const f of analysis.forms) reactiveNames.add(f.name);
     for (const f of analysis.fetches) reactiveNames.add(f.name);
-    for (const inj of analysis.injects) reactiveNames.add(inj.alias ?? inj.key);
+    for (const inj of analysis.injects) reactiveNames.add(inj.name);
 
     // Function names — ok in template (event handlers, helpers)
     const functionNames = new Set<string>();

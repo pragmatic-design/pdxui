@@ -34,7 +34,7 @@ are checked against the manifest above._
 }
 ```
 
-**`<pdx-error-boundary>` — Component Wrapper** — Declarative error boundary with built-in fallback UI, retry button, max retries, and `pdx-error` event for logging. Provides `errorContext` to descendants.
+**`<pdx-error-boundary>` — Component Wrapper** — Declarative error boundary with built-in fallback UI, retry button, max retries, and `pdx-error` event for logging. Provides `ErrorContext` to descendants.
 
 ```html
 <pdx-error-boundary
@@ -84,15 +84,15 @@ onGlobalError((error, context) => {
 });
 ```
 
-**Context Protocol — errorContext** — Provides `errorContext` to all descendants via hierarchical provide/inject. Children can `@inject errorContext;` to read error state, retry count, and trigger retries.
+**Context Protocol — ErrorContext** — Provides its state to all descendants under the `ErrorContext` token. Children can `@inject boundary from ErrorContext;` to read error state, retry count, and trigger retries.
 
 ```js
-// In a child component:
-@inject errorContext;
+// In a child component (ErrorContext comes from '@pdxui/ui/error-boundary'):
+@inject boundary from ErrorContext;
 
-// errorContext.error()    → Error | null
-// errorContext.retryCount() → number
-// errorContext.canRetry()  → boolean
-// errorContext.retry()     → trigger retry
+// boundary.error()      → Error | null
+// boundary.retryCount() → number
+// boundary.canRetry()   → boolean
+// boundary.retry()      → trigger retry
 ```
 
