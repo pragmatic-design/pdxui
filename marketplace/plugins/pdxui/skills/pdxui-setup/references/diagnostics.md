@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 100 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 101 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1170,6 +1170,38 @@ let draft = $signal('');
 function reset() {
   draft = '';
 }
+</script>
+```
+
+### PDX_SCRIPT_EXPORT
+
+*error* — An `export` of a value in a component script.
+
+A component's script is the body of its setup, run once per instance; an `export` inside a function is a syntax error, and the module failed to load in the browser with no word from the compiler. There is nothing a component could export, so the declaration is compiled without its `export` and the line is reported. A type export (`export interface`, `export type`) is erased like any type; a `@store` module and a `.pdx.ts` module keep their exports.
+
+**Fix.** Move what you meant to share into a `.ts` module and import it from there; inside the component, drop the `export`.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ total }}</p>
+</template>
+<script>
+export const TAX = 0.22;
+const total = 100 * (1 + TAX);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ total }}</p>
+</template>
+<script>
+import { TAX } from './tax';
+const total = 100 * (1 + TAX);
 </script>
 ```
 

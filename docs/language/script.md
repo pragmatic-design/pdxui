@@ -33,6 +33,10 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
 - **The rest is TypeScript**, type-erased (overview.md). A syntax error raises
   `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, functions,
   classes, variables) raise `PDX_DUP_DECLARATION`.
+- **Nothing is exported.** The script is the body of the component's setup, run once per instance.
+  An `export` of a value raises `PDX_SCRIPT_EXPORT`, and the declaration is compiled without it; a
+  type export is erased like any type. What other files share goes in a `.ts` module. A `@store`
+  module and a `.pdx.ts` module are modules, and keep their exports.
 
 **The signal rewrite.** One pass over the TypeScript AST (`signal-rewrite-ast.ts`) rewrites the setup
 body, the bodies of `$effect`, `$watch`, `onMount` and `onDestroy`, every `$derived` expression and

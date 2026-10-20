@@ -108,6 +108,7 @@ const ROWS: Record<string, Row> = {
     PDX_INVALID_ENUM_VALUE: { src: pdx('<pdx-button size="huge">b</pdx-button>', 'let a = $signal(1);'), at: 'size="huge"' },
     PDX_UNRESOLVED_COMPONENT: { src: pdx('<pdx-nope></pdx-nope>', 'let a = $signal(1);'), at: '<pdx-nope>', via: 'validate-unknown-tags' },
     PDX_STORE_EXPORT: { src: pdx('<div></div>', "@store menu;\nlet s = $signal('a');\nexport const label = () => s;"), at: 'export const label' },
+    PDX_SCRIPT_EXPORT: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\nexport const TAX = 0.22;'), at: 'export const TAX' },
 };
 
 /**
