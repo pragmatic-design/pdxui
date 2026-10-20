@@ -247,7 +247,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // (+180 B in its chunk); core's form registry describes the choice controls by their model (+24 B).
 // Same machine, same day, the built dist: main 466.9 → this branch 467.2 KB; entry and blocking did
 // not move.
-const BUDGET_KB = { entry: 40, js: 468, css: 63, blocking: 97 };
+// entry 40 → 41: context values are keyed by typed tokens (#495). `inject` asks the context protocol
+// when no PDX ancestor provides the token (what `requestContext` did, which left the exports), names
+// the token and the component when nothing does, and the router and the form context create their
+// tokens at start — all in the entry, which every page reaches through the outlet. Same machine, same
+// day, the built dist: main entry 40.0 → this branch 40.2 KB (+172 B in the entry chunk), js 467.2 →
+// 468.0 KB; main sat on the entry's ceiling already.
+const BUDGET_KB = { entry: 41, js: 468, css: 63, blocking: 97 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
