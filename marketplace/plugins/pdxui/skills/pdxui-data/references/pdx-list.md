@@ -27,6 +27,8 @@ Data-driven list with custom rows.
 
 **Renders:** roles `list` · `listitem`
 
+**Injects:** `DataSourceContext` (optional)
+
 **Slot:** `item` — Scoped — renders one item. Receives `{ item, index, id }` (`id` is the value of `id-field`).; `empty` — Shown when the list has no items. Receives nothing, but write it `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
 
 

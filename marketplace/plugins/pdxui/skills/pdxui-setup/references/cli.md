@@ -192,7 +192,10 @@ npx pdx analyze --json              # prints it, writes nothing — the form for
 Reads every `.pdx` of the project and describes it as data. `components` lists each one with the tag
 it registers (the compiler's rule: `App.pdx` is `app-app`, or its `@tag`), its file, props with type
 and default, events with their payload, slots, exposed methods, signals, stores, `@fetch` endpoints,
-`@form` fields, and the other components it uses. `routes` is the route table: every component with
+`@form` fields, and the other components it uses. `provides` and `injects` list the context tokens of
+its `@provide` and `@inject`, each with the module it is imported from (`{ token: 'CurrentUser', from:
+'./contexts' }`); an inject with a fallback is `optional`. The library's `custom-elements.json`
+records the same under `x-pdx-context`. `routes` is the route table: every component with
 `@page`, sorted by path, as `{ path, file, tag, guard, loader, layout }`.
 
 It is what an agent reads before it touches a project: which components exist and how to call them,

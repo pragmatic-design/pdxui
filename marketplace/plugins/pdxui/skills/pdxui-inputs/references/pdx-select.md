@@ -77,6 +77,8 @@ paged table → `pdx-relation-picker`.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `presentation` · `status`
 
+**Injects:** `DataSourceContext` (optional)
+
 **Slot:** `item` — Scoped — renders one option in the list. Receives `{ label, value, raw, index }` (`raw` is the original option).; `selected` — Scoped — renders the selected value in the trigger. Receives `{ label, value, raw }`.
 
 

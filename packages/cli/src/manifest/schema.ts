@@ -24,6 +24,10 @@ export interface ComponentManifest {
     slots: { name: string; scoped: boolean; scopeType?: string }[];
     /** Exposed imperative API methods. */
     exposes: string[];
+    /** The context tokens it provides to the elements below it (`@provide`, #498). */
+    provides: ContextTokenManifest[];
+    /** The context tokens it reads from an ancestor (`@inject`); `optional` when it has a fallback. */
+    injects: (ContextTokenManifest & { optional: boolean })[];
     /** Reactive signal names. */
     signals: string[];
     /** Deep reactive store names. */
@@ -40,6 +44,13 @@ export interface ComponentManifest {
     forms?: FormManifest[];
     /** Component metadata for documentation and tooling. */
     metadata?: ComponentMetadata;
+}
+
+/** A context token, by its identifier and the module the script imports it from. */
+export interface ContextTokenManifest {
+    token: string;
+    /** The import specifier as written: `./contexts`, `@pdxui/router`. */
+    from: string;
 }
 
 export interface RouteManifest {

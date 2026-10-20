@@ -171,7 +171,7 @@ for (const mod of PACKAGES.flatMap(p => JSON.parse(readFileSync(p.manifest, 'utf
     const slots = (d.slots || []).filter(s => s.name).map(s => ({ name: s.name, desc: s.description || '' }));
     // The site's one-liner first; then the manifest's own `summary`, which a package outside the
     // library brings (the router's elements); then its description.
-    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, shapes: d.shapes || [], roles: d.roles || [], area: areaOf(tag, d.category) });
+    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, shapes: d.shapes || [], roles: d.roles || [], context: d['x-pdx-context'], area: areaOf(tag, d.category) });
   }
 }
 comps.sort((a, b) => a.tag.localeCompare(b.tag));
@@ -242,6 +242,11 @@ function renderComp(c) {
   if (c.events.length) lines.push('**Events:** ' + c.events.map(e => '`' + e.name + '`' + (e.detail ? ' → `detail: ' + e.detail + '`' : '') + (e.desc ? ' — ' + esc(e.desc) : '')).join('; '), '');
   // The ARIA roles it renders: what a test or a measuring script targets.
   if (c.roles && c.roles.length) lines.push('**Renders:** roles ' + c.roles.map(r => '`' + r + '`').join(' · '), '');
+  // The context tokens it provides to the elements below and reads from above (#498): what an
+  // ancestor must provide for it, and what its descendants can inject. `:token` is the prop's token.
+  const ctxField = c.context || {};
+  if (ctxField.provides && ctxField.provides.length) lines.push('**Provides:** ' + ctxField.provides.map(t => t.startsWith(':') ? 'the token in `' + t + '`' : '`' + t + '`').join(' · '), '');
+  if (ctxField.injects && ctxField.injects.length) lines.push('**Injects:** ' + ctxField.injects.map(i => '`' + i.token + '`' + (i.optional ? ' (optional)' : '')).join(' · '), '');
   // pdx-icon's `name` is a string, and every wrong one renders nothing, silently. The names are the
   // keys of the built-in set, read from the file that defines it, so the list cannot go stale.
   if (c.tag === 'pdx-icon') {

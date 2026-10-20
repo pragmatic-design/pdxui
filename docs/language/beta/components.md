@@ -509,7 +509,8 @@ called again on each change, and a plain value is delivered once (#103 — lande
 contexts as exported tokens — `DataSourceContext`, `ErrorContext`, `RouteParams`, `<pdx-provide
 :token>`, `<pdx-data-source :token>`). The runes' token form is #496 — landed: the token must be
 imported, and the default is a literal or an imported name. The manifest records which tokens each
-component provides and injects.
+component provides and injects (#498 — landed: `provides` and `injects` in `pdx analyze`, with the
+module of each token; `x-pdx-context` in the library's `custom-elements.json`).
 
 ### Rules
 

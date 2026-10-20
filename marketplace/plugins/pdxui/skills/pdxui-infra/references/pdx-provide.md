@@ -8,6 +8,8 @@ Provide context to a subtree.
 | `value` | — | object | `null` | Value to provide (for single value mode). Reactive if signal. |
 | `values` | — | object | `null` | Multiple values, a `Map` of token → value. Takes priority over token/value. |
 
+**Provides:** the token in `:token`
+
 
 #### Examples
 

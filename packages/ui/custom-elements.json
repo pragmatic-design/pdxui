@@ -1537,7 +1537,15 @@
               "name": "option",
               "description": "Scoped — renders one option. Receives `{ label, value, raw, highlighted, index }` (`raw` is the original item)."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "injects": [
+              {
+                "token": "DataSourceContext",
+                "optional": true
+              }
+            ]
+          }
         }
       ],
       "exports": [
@@ -8085,7 +8093,13 @@
               "name": "",
               "description": "The content placed inside the element."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "provides": [
+              ":token",
+              "DataSourceContext"
+            ]
+          }
         }
       ],
       "exports": [
@@ -10648,7 +10662,12 @@
               "name": "",
               "description": "The content placed inside the element."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "provides": [
+              "ErrorContext"
+            ]
+          }
         }
       ],
       "exports": [
@@ -13521,7 +13540,15 @@
               "name": "",
               "description": "The content placed inside the element."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "injects": [
+              {
+                "token": "DataSourceContext",
+                "optional": true
+              }
+            ]
+          }
         }
       ],
       "exports": [
@@ -15013,7 +15040,15 @@
               "name": "",
               "description": "The content placed inside the element."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "injects": [
+              {
+                "token": "DataSourceContext",
+                "optional": true
+              }
+            ]
+          }
         }
       ],
       "exports": [
@@ -17632,7 +17667,15 @@
               "name": "page",
               "description": "Scoped — renders one page button. Receives `{ page, isActive }`."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "injects": [
+              {
+                "token": "DataSourceContext",
+                "optional": true
+              }
+            ]
+          }
         }
       ],
       "exports": [
@@ -18583,7 +18626,12 @@
               "name": "",
               "description": "The content placed inside the element."
             }
-          ]
+          ],
+          "x-pdx-context": {
+            "provides": [
+              ":token"
+            ]
+          }
         }
       ],
       "exports": [
@@ -21530,6 +21578,14 @@
               "description": "The content placed inside the element."
             }
           ],
+          "x-pdx-context": {
+            "injects": [
+              {
+                "token": "DataSourceContext",
+                "optional": true
+              }
+            ]
+          },
           "cssProperties": [
             {
               "name": "--pdx-select-caret-size"

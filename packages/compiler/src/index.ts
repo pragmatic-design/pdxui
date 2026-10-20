@@ -7,6 +7,7 @@ export type { BrowserTarget } from './compiler/compile-context';
 // The registry of language changes (#121): what `pdx migrate` applies and PDX_REMOVED_FORM reports.
 export { LANGUAGE_CHANGES, languageChanges, removedExport, setLanguageChangesForTests } from './language/changes';
 export { projectTagRenames } from './language/app-prefix';
+export { importedLocalNames } from './compiler/import-names';
 export { stringContextKeys, contextTokenName, LIBRARY_CONTEXT_TOKENS, type ContextTokenRef } from './language/context-keys';
 export { projectRoutePatterns, routeTypesDts, writeRouteTypes, ROUTE_TYPES_FILE } from './route-types';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';

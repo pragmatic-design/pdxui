@@ -28,6 +28,11 @@ semver.
     (`errorContext` → `ErrorContext`, `dataSource` → `DataSourceContext`, `routeParams` →
     `RouteParams`). **A token it writes is `context<unknown>`: give each one its value's type.**
     (#497)
+  - The manifests say which contexts a component needs. `pdx analyze` lists each component's
+    `provides` and `injects`, each token with the module it is imported from, and an inject with a
+    fallback as `optional`. The library's `custom-elements.json` records them under
+    `x-pdx-context` — `pdx-list` injects `DataSourceContext`, `pdx-data-source` provides it — and
+    the skill's component pages show them. (#498)
 - Context values are keyed by typed tokens. `context<T>(name)` returns one; declare it once, in a
   module: `export const CurrentUser = context<User>('current-user');`. The token is the key, compared
   by identity, and carries the value's type (`ContextValue<typeof CurrentUser>` is `User`).

@@ -31,6 +31,8 @@ Page through long results.
 
 **Renders:** roles `navigation`
 
+**Injects:** `DataSourceContext` (optional)
+
 **Slot:** `page` — Scoped — renders one page button. Receives `{ page, isActive }`.
 
 
