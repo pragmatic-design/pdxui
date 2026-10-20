@@ -5,6 +5,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
+import { parseActionDecl } from '../src/compiler/action-decl';
 
 const file = (script: string, template = '<pdx-button @click="save.execute(draft)">Save</pdx-button>') =>
     `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
@@ -57,6 +58,24 @@ describe('@action — compiled to mutation()', () => {
         expect(codes("let draft = $signal('');\n@action save(dto: string) with { concurrency: 'later' } { await Promise.resolve(dto); }"))
             .toContain('PDX_ACTION_UNKNOWN_OPTION');
     });
+
+    // The parameter list was split at every top-level comma, and `<…>` was not a level: a type with
+    // two type arguments became two parameters, and the declaration was dropped (#578).
+    for (const [type, signal] of [
+        ["Omit<Person, 'id'>", true],
+        ["Omit<Person, 'id'>", false],
+        ['Record<string, number>', false],
+        ['(a: Map<string, number>) => void', true],
+    ] as const) {
+        it(`a parameter typed ${type}${signal ? ', with { signal }' : ''} is one parameter`, () => {
+            const params = `dto: ${type}${signal ? ', { signal }' : ''}`;
+            const script = `interface Person { id: number; name: string }\nlet draft = $signal({});\n@action save(${params}) { await Promise.resolve(dto); }`;
+            const { code, warnings } = run(script);
+            expect(warnings.filter((w) => w.severity === 'error').map((w) => w.message)).toEqual([]);
+            expect(code).toMatch(/const save = mutation\(\{ fn: async \(dto/);
+            expect(parseActionDecl(`@action save(${params}) { }`)?.inputType).toBe(type);
+        });
+    }
 
     it('control — an action with no options raises nothing', () => {
         expect(codes("let draft = $signal('');\n@action save(dto: string) { await Promise.resolve(dto); }")

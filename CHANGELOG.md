@@ -419,6 +419,9 @@ semver.
 
 ### Fixes
 
+- An `@action` whose parameter type has a comma in its type arguments — `dto: Omit<Person, 'id'>`,
+  `Record<string, number>` — compiles. The parameter list was split at that comma, the declaration
+  was dropped as not a form of `@action`, and its body was left in the script. (#578)
 - A `@defer` whose trigger has parentheses of its own — `when (…)`, `idle(ms)`, `timer(ms)` — keeps
   the components it renders out of the route's chunk. The compiler did not recognise the block, gave
   them a static import too, and the bundler put them back where the page loads. (#245)

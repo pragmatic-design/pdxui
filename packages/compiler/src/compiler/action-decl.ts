@@ -102,7 +102,7 @@ export function parseActionDecl(text: string): ActionDecl | null {
     }
 
     const params = text.slice(open + 1, close).trim();
-    const list = splitAtTopLevelCommas(params).map((p) => p.trim()).filter(Boolean);
+    const list = splitAtTopLevelCommas(params, { typeArguments: true }).map((p) => p.trim()).filter(Boolean);
     if (list.length > 2 || (list.length === 2 && !SIGNAL_PARAM.test(list[1]))) return null;
     const hasInput = list.length > 0 && !SIGNAL_PARAM.test(list[0]);
     const colon = hasInput ? list[0].indexOf(':') : -1;
