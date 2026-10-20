@@ -587,6 +587,8 @@ the setup body, `const theme = inject(Theme, ctx.el);`, typed by the token in th
   `No provider for context "theme" above <tag>` when the component is set up — not checked at
   compile time.
 - The `@provide` value is one line.
+- A `$` rune as the value (`@provide Theme = $signal('dark');`) is `PDX_RUNE_POSITION`: the value is
+  an argument of `provide()`, where no rune is read. Declare the signal first and provide it by name.
 
 #### Examples
 

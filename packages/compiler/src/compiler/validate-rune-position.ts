@@ -20,20 +20,35 @@ const STATEMENT: Record<string, string> = { $effect: 'effect', $watch: 'watch' }
 
 // Match: a declaration opening its line, `@name`. Read on the masked script.
 const DECLARATION = /^[ \t]*@[A-Za-z]/gm;
+// Match: the head of `@provide Token = value`, up to the `=`; the value is code (#550).
+const PROVIDE_HEAD = /^@provide\s+[A-Za-z_$][\w$]*\s*=/;
+
+/** Blank `code` from `at` to `end` to spaces, newlines kept. */
+const blank = (code: string, at: number, end: number): string =>
+    code.slice(0, at) + code.slice(at, end).replace(/[^\n]/g, ' ') + code.slice(end);
 
 /**
  * The script with every `@` declaration blanked to spaces, newlines kept: what is left is TypeScript,
- * at the same offsets. A rune inside a declaration (`@raw { … }`) is not a rune.
+ * at the same offsets. A rune inside a declaration (`@raw { … }`) is not a rune — except in the value
+ * of `@provide`, which is emitted as an argument of `provide()`: that value stays, and its range is
+ * returned, since no rune is in its position there.
  */
-function withoutDeclarations(code: string): string {
+function withoutDeclarations(code: string): { code: string; values: [number, number][] } {
     const masked = maskNonCode(code);
     let out = code;
+    const values: [number, number][] = [];
     for (const m of masked.matchAll(DECLARATION)) {
         const at = m.index + m[0].length - 2;
         const end = declarationEnd(code, masked, at);
-        out = out.slice(0, at) + out.slice(at, end).replace(/[^\n]/g, ' ') + out.slice(end);
+        const head = PROVIDE_HEAD.exec(masked.slice(at, end));
+        if (head) {
+            out = blank(out, at, at + head[0].length);
+            values.push([at + head[0].length, end]);
+        } else {
+            out = blank(out, at, end);
+        }
     }
-    return out;
+    return { code: out, values };
 }
 
 /** The node an expression is the value of, past any parentheses around it. */
@@ -68,12 +83,16 @@ export interface MisplacedRune {
 /** Every rune call of a script (its content) that is outside its position. */
 export function misplacedRunes(code: string): MisplacedRune[] {
     if (!/\$(?:signal|derived|store|effect|watch)\b/.test(code)) return [];
-    const sf = ts.createSourceFile('__pdx_runes.ts', withoutDeclarations(code), ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const { code: script, values } = withoutDeclarations(code);
+    const sf = ts.createSourceFile('__pdx_runes.ts', script, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
     const out: MisplacedRune[] = [];
+    const inValue = (at: number): boolean => values.some(([start, end]) => at >= start && at < end);
     const visit = (node: ts.Node): void => {
         if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
             const rune = node.expression.text;
-            const wrong = DECLARED[rune] ? !declaredInPosition(node, sf) : STATEMENT[rune] ? !statementInPosition(node, sf) : false;
+            const known = !!(DECLARED[rune] || STATEMENT[rune]);
+            const wrong = known && inValue(node.getStart(sf)) ? true
+                : DECLARED[rune] ? !declaredInPosition(node, sf) : STATEMENT[rune] ? !statementInPosition(node, sf) : false;
             if (wrong) out.push({ at: node.getStart(sf), rune, text: node.getText(sf) });
         }
         ts.forEachChild(node, visit);
