@@ -35,6 +35,7 @@ import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
 import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
+import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -360,6 +361,13 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     removedExport('@pdxui/core', 'createChannel', '`@prop` / `@model` down and `@event` up between a parent and its child, or `@expose` + a typed ref for an order', 144),
     removedExport('@pdxui/core', 'createCommands', '`@expose` + a typed ref (or `commandfor`) for a parent that orders its child', 144),
     removedExport('@pdxui/core', 'createCompoundParent', 'a token the parent provides with `@provide` and its children read with `@inject`, holding what they register in', 144),
+    // #506: `@loader user: loadUser;` names the loader (./loader-forms). The anonymous form first: the
+    // readers are rewritten to the name it gets.
+    loaderAnonymous,
+    loaderReaders,
+    loaderReadsAddress,
+    removedExport('@pdxui/router', 'currentLoaderData', "the page's named loader, `user.data()`, or `loaderData('/pattern')` for a level by its pattern", 506),
+    removedExport('@pdxui/router', 'currentLoaderState', "the page's named loader, `user.state()`, or `loaderState('/pattern')` for a level by its pattern", 506),
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

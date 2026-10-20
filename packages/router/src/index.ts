@@ -9,11 +9,11 @@
 export {
     createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
-    currentLoaderData, currentLoaderState, loaderData, loaderState, loaderError, currentRoute, currentNavError,
+    loaderData, loaderState, loaderError, loaderSource, currentRoute, currentNavError,
     navigation, onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
 } from './active';
-export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext } from './active';
+export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext, LoaderSource } from './active';
 // Typed routes (#150): augmented by the app's generated `.pdx/routes.d.ts`.
 export type { Navigate, RouteRegistry, RoutePath, RouteArgs, NavigationState } from './route-types';
 // The type of a route's params and, as a value, the context token the outlet provides them under (#495).

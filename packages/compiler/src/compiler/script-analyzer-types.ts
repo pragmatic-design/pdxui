@@ -233,6 +233,8 @@ export interface RouteInfo {
     page?: string;        // '/users/:id(number)'
     guard?: string;       // 'admin.users.view'
     loader?: string;      // function name
+    /** The name a named `@loader user: loadUser;` declares (#506); absent for the alpha's anonymous form. */
+    loaderName?: string;
     search?: string;      // raw string (backward compat)
     searchParams?: SearchParamDecl[];  // parsed schema
     prefetch?: string;    // 'hover', 'viewport', 'eager'

@@ -15,7 +15,7 @@ import { pdx } from '../src/plugin';
 const PAGE = `<template><div class="rows">{{ title }}</div></template>
 <script>
 @page '/rows';
-@loader loadRows;
+@loader rowData: loadRows;
 import { rowsFrom } from './api';
 let title = $signal('Rows');
 async function loadRows(): Promise<number[]> {

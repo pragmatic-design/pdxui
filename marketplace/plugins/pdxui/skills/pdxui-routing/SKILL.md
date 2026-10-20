@@ -14,7 +14,7 @@ A `.pdx` file becomes a page with `@page`. Everything else here is a declaration
 | a page | `@page '/path'` | [router](references/router.md) |
 | a variable segment | `@page '/x/:id'` + `currentParams()` | [router](references/router.md) § Params |
 | to protect it | `@guard 'permission'` | [router](references/router.md) § Protect a page |
-| data ready on entry | `@loader fn` | [router](references/router.md) § Data before the page |
+| data ready on entry | `@loader user: loadUser`, read as `user.data()` | [router](references/router.md) § Data before the page |
 | a shared frame | `@layout 'admin'`, or a parent page with a `<pdx-router-outlet>` | [router](references/router.md) § Shared layouts |
 | to keep a page's state when leaving | `@page '/x' { keepAlive }` | [router](references/router.md) § Destroy or keep |
 | the tab title and meta tags | `@title` · `@meta` | [head-scroll](references/head-scroll.md) |

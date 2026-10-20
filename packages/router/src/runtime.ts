@@ -19,9 +19,10 @@ import { routeMap } from './devtools-map';
 import type { RouteConfig, RouterOptions, RouteTable } from './types';
 
 export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext } from './types';
+export type { LoaderSource } from './state';
 export {
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
-    currentLoaderData, currentLoaderState, loaderData, loaderState, loaderError, currentRoute, currentNavError,
+    currentLoaderData, currentLoaderState, loaderData, loaderState, loaderError, loaderSource, currentRoute, currentNavError,
     currentNavErrorDepth, navigation,
 } from './state';
 export { setQuery, setQueryParam } from './address';

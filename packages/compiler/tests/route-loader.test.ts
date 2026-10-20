@@ -1,6 +1,6 @@
 // @loader reaches the route as a function reference, never as a STRING.
 //
-// The analyzer reads `@loader loadUser` and the router awaits `config.loader()`. The name refers
+// The analyzer reads `@loader account: loadUser` and the router awaits `config.loader()`. The name refers
 // to a function declared in the component's <script>, which the codegen puts INSIDE `setup(ctx)`,
 // where no module-level code can reach it; a `loader:"loadUser"` in __pdx_routes would be a call
 // on a string.
@@ -22,7 +22,7 @@ const out = (s: string) => {
 
 const LOADER_PAGE = src([
     "@page '/users/:id';",
-    '@loader loadUser;',
+    '@loader account: loadUser;',
     'async function loadUser() { return { name: "Ada" }; }',
     'let user = $signal(null);',
 ].join('\n'));
@@ -65,7 +65,7 @@ describe('@loader reaches the route as a function', () => {
         // it keeps working.
         const code = out(src([
             "@page '/users/:id';",
-            '@loader loadUser;',
+            '@loader account: loadUser;',
             'async function loadUser() { return 1; }',
             'let a = $signal(0);',
         ].join('\n'), '<button @click="loadUser()">go</button>'));
@@ -77,7 +77,7 @@ describe('@loader reaches the route as a function', () => {
     it('names an arrow-function loader too', () => {
         const code = out(src([
             "@page '/a';",
-            '@loader loadThing;',
+            '@loader thing: loadThing;',
             'const loadThing = async () => 42;',
             'let a = $signal(0);',
         ].join('\n')));
@@ -90,7 +90,7 @@ describe('@loader reaches the route as a function', () => {
     it('says so when @loader names a function that is not there', () => {
         // Silently emitting `loader: undefined` would leave the page rendering with no data and no
         // error, which is the failure this file guards against.
-        const code = out(src("@page '/a';\n@loader missingFn;\nlet a = $signal(0);"));
+        const code = out(src("@page '/a';\n@loader missing: missingFn;\nlet a = $signal(0);"));
 
         expect(code, 'a loader that does not exist was registered anyway')
             .not.toMatch(/loader:\s*missingFn/);
@@ -116,10 +116,10 @@ async function evaluateRoutes(code: string): Promise<Record<string, unknown>[]> 
         staticMarkup: (html: string) => html,
     };
     // The page also imports from `@pdxui/router`: declaring `@loader` auto-imports
-    // currentLoaderData/currentLoaderState so the page can read its own data. ESM cannot
+    // loaderSource so the page can read its own data. ESM cannot
     // be `new Function`'d, so that import becomes a destructure of an injected namespace, exactly as
     // the core one does — otherwise this harness reports a SyntaxError for a module that is fine.
-    const routerStub = 'const { currentLoaderData, currentLoaderState } = __router;';
+    const routerStub = 'const { loaderSource } = __router;';
     const src = code
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;')
         .replace(/import\s*\{[^}]*\}\s*from\s*'@pdxui\/router';?/g, routerStub)
@@ -128,7 +128,7 @@ async function evaluateRoutes(code: string): Promise<Record<string, unknown>[]> 
     const previous = g.__pdx_routes;
     g.__pdx_routes = [];
     try {
-        new Function('__core', '__router', src)(core, { currentLoaderData: () => undefined, currentLoaderState: () => 'idle' });
+        new Function('__core', '__router', src)(core, { loaderSource: () => ({}) });
         return g.__pdx_routes ?? [];
     } finally {
         g.__pdx_routes = previous;

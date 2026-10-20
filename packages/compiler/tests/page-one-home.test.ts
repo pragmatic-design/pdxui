@@ -111,7 +111,7 @@ describe('pdx migrate', () => {
     it('splits @route into @page and the declarations it carried, one per line', () => {
         const source = pdx("@route {\n  path: '/admin/users',\n  guard: 'users.read',\n  loader: loadUsers,\n  layout: 'admin',\n  keepAlive: true,\n  transition: 'fade',\n  search: { q?: string }\n}\nasync function loadUsers() { return []; }");
         const once = migrate(source);
-        expect(once).toBe(pdx("@page '/admin/users' { keepAlive, transition: 'fade' };\n@guard 'users.read';\n@loader loadUsers;\n@layout 'admin';\n@search { q?: string };\nasync function loadUsers() { return []; }"));
+        expect(once).toBe(pdx("@page '/admin/users' { keepAlive, transition: 'fade' };\n@guard 'users.read';\n@loader loadUsers: loadUsers;\n@layout 'admin';\n@search { q?: string };\nasync function loadUsers() { return []; }"));
         expect(migrate(once)).toBe(once);
         expect(defects(once, 'admin.pdx')).toEqual([]);
     });

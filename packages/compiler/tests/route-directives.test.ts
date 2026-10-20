@@ -32,7 +32,7 @@ describe('route directives', () => {
     it('detects @loader', () => {
         const a = analyzeScript(`
             @page '/products';
-            @loader fetchProducts;
+            @loader productList: fetchProducts;
             let products = $signal([]);
         `, 'products.pdx');
         expect(a.route.loader).toBe('fetchProducts');
@@ -69,7 +69,7 @@ describe('route directives', () => {
         const a = analyzeScript(`
             @page '/admin/users/:id' { prefetch: 'eager' };
             @guard 'admin.users.edit';
-            @loader fetchUser;
+            @loader account: fetchUser;
             @search { tab: string = 'profile' };
             @layout 'admin';
             let user = $signal(null);

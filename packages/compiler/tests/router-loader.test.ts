@@ -148,7 +148,7 @@ describe('scanForRoutes reads @loader', () => {
     });
 
     it('picks the name up from a page that declares one', () => {
-        const [r] = scan("<script>\n@page '/data';\n@loader loadRows;\nasync function loadRows() { return 1; }\n</script>");
+        const [r] = scan("<script>\n@page '/data';\n@loader rowData: loadRows;\nasync function loadRows() { return 1; }\n</script>");
 
         expect(r.loader).toBe('loadRows');
     });

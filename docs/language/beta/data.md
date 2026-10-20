@@ -53,7 +53,7 @@ resource; `execute(arg)`, `cancel()` on an action.
   (`x.loading()` is `x.state() === 'pending' && !x.data()`, #141 — **landed**: entries
   `async-is-pending`, `async-alpha-names`, read where the file declares the source; a loader's
   `'loading'`/`'done'` compared in a file are rewritten to `'pending'`/`'success'`,
-  `loader-state-words`; `currentLoaderState()` itself is #146's).
+  `loader-state-words`; `currentLoaderState()` itself is #146's, **landed** with #506: `loader-readers`).
 
 ### Since
 

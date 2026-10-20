@@ -48,7 +48,7 @@ export function tableRedirect(path: string): string | undefined {
  * A table route as the router takes it.
  *
  * Every field below must be carried, and a field dropped here fails in silence. Without `loader`
- * the loader code is unreachable — `currentLoaderData()` stays undefined and `currentLoaderState()`
+ * the loader code is unreachable — the page's `user.data()` stays undefined and `user.state()`
  * never leaves 'idle'; without `scroll` an `@scroll 'top'` does nothing; without `hasOutlet` every
  * nested route renders flat; without `label` and `labelKey` the breadcrumb loses its crumbs.
  */

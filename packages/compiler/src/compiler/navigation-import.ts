@@ -2,7 +2,7 @@
 //
 // The router's navigation state — `@if (navigation.pending()) { <progress bar> }` — is read by an
 // app shell that declares no route of its own, so no declaration implies it the way `@loader`
-// implies `currentLoaderData`: the READ is what asks for it. And the name is also a browser global,
+// implies `loaderSource`: the READ is what asks for it. And the name is also a browser global,
 // the Navigation API's `window.navigation`, so an unimported read would reach the wrong object.
 
 import type { TemplateNode } from '../parser/template';

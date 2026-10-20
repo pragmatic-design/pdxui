@@ -17,11 +17,11 @@
 export {
     createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
-    currentLoaderData, currentLoaderState, loaderData, loaderState, loaderError, currentRoute, currentNavError,
+    loaderData, loaderState, loaderError, loaderSource, currentRoute, currentNavError,
     currentNavErrorDepth, navigation,
     onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
     installRouteTable, routeTable, pageModule, toRouteConfig,
 } from './runtime';
 
-export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext } from './runtime';
+export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext, LoaderSource } from './runtime';

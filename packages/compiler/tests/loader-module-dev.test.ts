@@ -19,7 +19,7 @@ beforeAll(async () => {
         '<template><p>{{ title }}</p></template>',
         '<script>',
         "@page '/rows';",
-        '@loader loadRows;',
+        '@loader rowData: loadRows;',
         "import { rowsFrom } from './api';",
         "let title = $signal('Rows');",
         'async function loadRows(): Promise<number[]> { return rowsFrom("/api/rows"); }',

@@ -97,6 +97,15 @@ declare global {
     abort(): void;
     dispose(): void;
   }
+  // What \`@loader user: loadUser;\` gives (#506): the router's LoaderSource<T>, T what the function
+  // resolves to. tests/loader-types.test.ts fails when a member of LoaderSource is missing here.
+  interface PdxLoaderSource<T> {
+    readonly data: PdxReadonly<T | undefined>;
+    readonly state: PdxReadonly<'idle' | 'pending' | 'success' | 'error'>;
+    readonly error: PdxReadonly<Error | null>;
+    readonly pending: PdxReadonly<boolean>;
+    readonly stale: PdxReadonly<boolean>;
+  }
   // What \`@form\` gives: core's FormField, FieldArray and Form. A form is typed by two parameters
   // the projection writes out (./form-types): V, the values as getValues() returns them, nested; and
   // F, the fields, keyed as createForm flattens them — \`address.street\`, \`lines.0.product\`.
