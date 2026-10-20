@@ -177,6 +177,12 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
  * the record drawer and its question, the inline editor — to the first idle moment after it mounts,
  * and it paints at 2924, 2944, 2956, 2960 ms locally (2960 + 10% → 3300).
  *
+ * `/tickets/1` reads its record from the server since #507 (`@loader ticket: loadTicket;`), where it
+ * read it from the store in its own chunk: a cold load waits for one more request before the page
+ * mounts. Measured 2026-10-20 locally, two runs of three: 2228, 2184, 2216 and 2216, 2192, 2228 ms
+ * (2228 + 10% → 2500), against 1852–1884 ms before. The owner accepted the round trip as the cost of
+ * a page that loads its data.
+ *
  * Since #464 a route is judged on the median of three cold loads (`medianLcp`): one load on a shared
  * runner was a sample, and the HTTP/2 spec failed `/` on one at 1128 ms where the same code measured
  * 948 and 1000. The budgets are the ones above, set against single loads: the median only takes the
@@ -189,7 +195,7 @@ const median = (xs: number[]): number => [...xs].sort((a, b) => a - b)[Math.floo
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1100 },
     { route: '/tickets', root: 'tickets', budgetMs: 3300 },
-    { route: '/tickets/1', root: 'ticket', budgetMs: 2100 },
+    { route: '/tickets/1', root: 'ticket', budgetMs: 2500 },
 ];
 
 test.describe('each route\'s main content paints within its budget', () => {

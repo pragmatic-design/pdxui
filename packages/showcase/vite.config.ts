@@ -5,6 +5,7 @@ import { defineConfig } from 'vite';
 import { pdx } from '../compiler/src/index';
 import { mockAttachments } from './mock-attachments';
 import { mockAuth } from './mock-auth';
+import { mockTickets } from './mock-tickets';
 
 /**
  * The showcase — a service desk written in PDX, and the bench the production build is measured on.
@@ -24,11 +25,12 @@ export default defineConfig({
     // TransferHandle's `progress` only means something if it can be watched moving.
     // `mockAuth` serves `/api/auth` and `/api/account`: it signs a real JWT and verifies it on
     // every protected call, so the login slice exercises the store rather than a stub.
+    // `mockTickets` serves `GET /api/tickets/:id`, what the ticket page's `@loader` fetches.
     plugins: [
         // `defaultLayout`: the rail and the bar (`src/shell.pdx`) around every page that declares no
         // layout, and none around the sign-in, which says `@layout 'none'`.
         pdx({ devtools: false, defaultLayout: 'shell' }),
-        mockAttachments(), mockAuth(),
+        mockAttachments(), mockAuth(), mockTickets(),
     ],
     server: { port: 5310 },
     build: {

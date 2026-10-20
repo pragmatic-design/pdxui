@@ -184,13 +184,15 @@ test('map() lists every @page route with its params, and closes a guarded route 
     for (const path of declared) {
         const route = map.find((r) => r.path === path);
         expect(route, `${path} is missing from map()`).toBeDefined();
-        // The showcase's params carry no constraint, so each is a string.
-        const params = Array.from(path.matchAll(/:([A-Za-z0-9_]+)/g), (m) => ({ name: m[1], type: 'string' }));
+        // A param is a string unless its constraint says number: the ticket's `:id(number)` (#507).
+        // Match: `:id` or `:id(number)`. Groups: [1]=the name [2]=the constraint
+        const params = Array.from(path.matchAll(/:([A-Za-z0-9_]+)(?:\(([^)]*)\))?/g),
+            (m) => ({ name: m[1], type: m[2] === 'number' ? 'number' : 'string' }));
         expect(route!.params ?? [], `${path}: params`).toEqual(params);
     }
     // The suite signs in as the admin, whose role does not hold `tickets.billing`
     // (src/data/roles-seed.ts), and does hold `account.read`.
-    expect(map.find((r) => r.path === '/tickets/:id/billing')).toMatchObject({ guard: 'tickets.billing', access: false });
+    expect(map.find((r) => r.path === '/tickets/:id(number)/billing')).toMatchObject({ guard: 'tickets.billing', access: false });
     expect(map.find((r) => r.path === '/account')).toMatchObject({ guard: 'account.read', access: true });
 });
 

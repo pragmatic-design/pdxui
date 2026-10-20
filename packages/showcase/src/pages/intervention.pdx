@@ -12,7 +12,7 @@
 </template>
 
 <script>
-@page '/tickets/:id/interventions/:n' { label: interventionLabel };
+@page '/tickets/:id(number)/interventions/:n' { label: interventionLabel };
 @title $t('intervention.title', { n: n });
 
 @prop id: string = '';

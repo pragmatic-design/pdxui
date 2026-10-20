@@ -51,7 +51,7 @@ test.describe('one router; the build emits the route table as data — TRUE (#10
     test('the route table is in the bundle, as data', () => {
         // The compiler emits `{ path: "…", tag: "…" }` per route; the router builds its matcher from
         // it once, when it starts. A string literal, so minification keeps it.
-        expect(bundle('.js'), 'the route table is not in the production bundle').toContain('"/tickets/:id"');
+        expect(bundle('.js'), 'the route table is not in the production bundle').toContain('"/tickets/:id(number)"');
     });
 
     test('and the bundle carries one router, not two', () => {
@@ -60,13 +60,16 @@ test.describe('one router; the build emits the route table as data — TRUE (#10
         expect(bundle('.js').split('Redirect loop detected').length - 1, 'not exactly one router').toBe(1);
     });
 
-    test('this app declares only whole-segment patterns, so its navigation runs no regex', () => {
+    test('this app declares only whole-segment patterns: a navigation runs no regex but the ticket id\'s constraint', () => {
         // The rule — whole-segment patterns match by segment, a constraint is the one regex, a
         // pattern that is not made of whole segments keeps one — is measured by counting regex runs
         // in `packages/router/tests/matcher.test.ts`. Stated here so the claim is read with its
-        // condition rather than as an absolute.
-        const paths = ['/tickets/:id', '/tickets/:id/interventions/:n'];
-        for (const p of paths) expect(p).not.toMatch(/\(|\*|:\w+(?=[^\w/])/);
+        // condition rather than as an absolute. The ticket's `:id(number)` is the one constraint
+        // (#507): its loader receives the id as a number.
+        const paths = ['/tickets/:id(number)', '/tickets/:id(number)/interventions/:n'];
+        for (const p of paths) {
+            expect(p.replace(/:(\w+)\(number\)/g, ':$1'), 'a pattern that is not made of whole segments').not.toMatch(/\(|\*|:\w+(?=[^\w/])/);
+        }
     });
 });
 

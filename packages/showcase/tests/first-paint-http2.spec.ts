@@ -41,6 +41,10 @@ const CERT_DIR = join(PACKAGE, 'test-results', '.h2-cert');
  * `/tickets` meets #407's 2.0 s on its own; the budget leaves room for the gate's load, as the
  * HTTP/1.1 ones do.
  *
+ * `/tickets/1` waits for its record from the server since #507, one more request before the page
+ * mounts. Measured 2026-10-20 locally, beside the HTTP/1.1 spec with four workers, two runs of three:
+ * 1604, 1644, 1640 and 1628, 1612, 1588 ms (1644 + 10% → 1850), against 1356–1408 ms before.
+ *
  * Judged since #464 on the median of three cold loads: one load on a shared CI runner measured `/` at
  * 1128 ms where the same code measured 948 and 1000. The budgets stay: the median takes the outliers
  * out, it does not move the usual value.
@@ -48,7 +52,7 @@ const CERT_DIR = join(PACKAGE, 'test-results', '.h2-cert');
 const LCP_ROUTES: { route: string; root: string; budgetMs: number | null }[] = [
     { route: '/', root: 'dashboard', budgetMs: 1050 },
     { route: '/tickets', root: 'tickets', budgetMs: 2450 },
-    { route: '/tickets/1', root: 'ticket', budgetMs: 1550 },
+    { route: '/tickets/1', root: 'ticket', budgetMs: 1850 },
 ];
 
 /** A self-signed certificate for localhost, for this run only. */

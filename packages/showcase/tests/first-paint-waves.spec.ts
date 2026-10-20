@@ -62,41 +62,86 @@ const LATENCY_MS = 30;
  * screen's, and at CPU 4× they read as a third wave. With the mark at the connect: 82 → 84, and at
  * 4× 218 → 229, after it every time.
  */
-async function jsWaves(page: Page, url: string, pageTag?: string, cpu = 1): Promise<{ waves: number; files: string[]; after: string[] }> {
-    if (cpu !== 1) {
-        const cdp = await page.context().newCDPSession(page);
-        await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpu });
-    }
-    await page.route(/\.js(\?|$)/, async (route) => {
+async function jsWaves(page: Page, url: string, pageTag?: string, cpu = 1, data?: RegExp): Promise<{ waves: number; files: string[]; after: string[] }> {
+    await throttle(page, cpu);
+    await delay(page, data);
+    if (pageTag) await markMount(page, pageTag);
+    await page.goto(url, { waitUntil: 'networkidle' });
+    return countUntilMount(page, pageTag, data);
+}
+
+/**
+ * The same count for a NAVIGATION inside the app (L4): the page is loaded at `from` and idle, the
+ * timeline is cleared, and the router is sent to `to` the way a link sends it — `pushState` and a
+ * `popstate`, with no hover, so no prefetch starts anything before the navigation does. What counts
+ * is the JavaScript and the `data` requests asked for until `<pageTag>` connects.
+ */
+async function navigationWaves(page: Page, from: string, to: string, pageTag: string, data: RegExp, cpu = 1): Promise<{ waves: number; files: string[]; after: string[] }> {
+    await markMount(page, pageTag);
+    await page.goto(from, { waitUntil: 'networkidle' });
+    await throttle(page, cpu);
+    await delay(page, data);
+    await page.evaluate(() => performance.clearResourceTimings());
+    await page.evaluate((path) => {
+        history.pushState(null, '', path);
+        dispatchEvent(new PopStateEvent('popstate'));
+    }, to);
+    await page.locator(pageTag).waitFor({ state: 'attached' });
+    await page.waitForLoadState('networkidle');
+    return countUntilMount(page, pageTag, data);
+}
+
+/** CPU throttling on the page, at `cpu`× (1: none). */
+async function throttle(page: Page, cpu: number): Promise<void> {
+    if (cpu === 1) return;
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: cpu });
+}
+
+/** A round trip, `LATENCY_MS`, before every script and every request `data` matches is answered. */
+async function delay(page: Page, data?: RegExp): Promise<void> {
+    const delayed = async (route: Parameters<Parameters<Page['route']>[1]>[0]) => {
         await new Promise((r) => setTimeout(r, LATENCY_MS));
         await route.fallback();
-    });
-    if (pageTag) {
-        await page.addInitScript((tag) => {
-            const w = window as unknown as { __mountedAt?: number };
-            const define = customElements.define.bind(customElements);
-            customElements.define = (name, ctor, options) => {
-                if (name === tag) {
-                    const connected = ctor.prototype.connectedCallback as ((...a: unknown[]) => void) | undefined;
-                    ctor.prototype.connectedCallback = function (this: HTMLElement, ...args: unknown[]) {
-                        if (w.__mountedAt === undefined) w.__mountedAt = performance.now();
-                        return connected?.apply(this, args);
-                    };
-                }
-                return define(name, ctor, options);
-            };
-        }, pageTag);
-    }
-    await page.goto(url, { waitUntil: 'networkidle' });
+    };
+    await page.route(/\.js(\?|$)/, delayed);
+    if (data) await page.route(data, delayed);
+}
+
+/** Record when `<tag>` first connects, in `window.__mountedAt` (see `jsWaves` for why the connect). */
+async function markMount(page: Page, tag: string): Promise<void> {
+    await page.addInitScript((tag) => {
+        const w = window as unknown as { __mountedAt?: number };
+        const define = customElements.define.bind(customElements);
+        customElements.define = (name, ctor, options) => {
+            if (name === tag) {
+                const connected = ctor.prototype.connectedCallback as ((...a: unknown[]) => void) | undefined;
+                ctor.prototype.connectedCallback = function (this: HTMLElement, ...args: unknown[]) {
+                    if (w.__mountedAt === undefined) w.__mountedAt = performance.now();
+                    return connected?.apply(this, args);
+                };
+            }
+            return define(name, ctor, options);
+        };
+    }, tag);
+}
+
+/**
+ * The waves of the JavaScript and the `data` requests on the browser's timeline, up to the moment
+ * `<pageTag>` connected (all of them without a tag), and what started after it.
+ */
+async function countUntilMount(page: Page, pageTag: string | undefined, data: RegExp | undefined): Promise<{ waves: number; files: string[]; after: string[] }> {
     const paintedAt = pageTag
         ? await page.evaluate(() => (window as unknown as { __mountedAt?: number }).__mountedAt ?? Infinity)
         : Infinity;
     if (pageTag) expect(paintedAt, `<${pageTag}> never connected: the first screen was not measured`).not.toBe(Infinity);
     // `responseEnd`: the body is in, which is when an importer can go on to the next module.
-    const all = await page.evaluate(() =>
-        (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
-            .filter((e) => /\.js(\?|$)/.test(e.name))
-            .map((e) => ({ start: e.startTime, end: e.responseEnd, file: e.name.split('/').pop()! })));
+    const all = await page.evaluate(([source, flags]) => {
+        const counted = source === null ? null : new RegExp(source, flags);
+        return (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+            .filter((e) => /\.js(\?|$)/.test(e.name) || (counted !== null && counted.test(e.name)))
+            .map((e) => ({ start: e.startTime, end: e.responseEnd, file: e.name.split('/').pop()! }));
+    }, [data?.source ?? null, data?.flags ?? ''] as const);
     const spans = all.filter((s) => s.start <= paintedAt);
     const after = all.filter((s) => s.start > paintedAt).map((s) => s.file);
     spans.sort((a, b) => a.start - b.start);
@@ -132,6 +177,48 @@ test('control — the counter reads three waves where three are built', async ({
     const { waves, files } = await jsWaves(page, '/__waves/page.html');
     expect(files, 'the three modules were not all fetched').toHaveLength(3);
     expect(waves, `a chain of three imports read as ${waves} wave(s)`).toBe(3);
+});
+
+/** A served page whose `a.js` is `entry`, and a `b.js` and a data endpoint beside it. */
+async function servedPage(page: Page, entry: string): Promise<void> {
+    await page.route('**/__waves/**', (route) => {
+        const path = new URL(route.request().url()).pathname;
+        if (path.endsWith('.html')) {
+            return route.fulfill({ contentType: 'text/html', body: '<script type="module" src="/__waves/a.js"></script>' });
+        }
+        if (path === '/__waves/api/tickets/1') return route.fulfill({ contentType: 'application/json', body: '{"id":1}' });
+        return route.fulfill({ contentType: 'text/javascript', body: path === '/__waves/a.js' ? entry : 'export const b = 1;' });
+    });
+}
+
+test('control — the counter takes a data request as a wave: a chunk and a fetch started together are one', async ({ page }) => {
+    // a.js, then b.js and the data at once: two waves. A counter that left the data out would read
+    // two as well, so the next control is the one that tells them apart.
+    await servedPage(page, "await Promise.all([import('./b.js'), fetch('/__waves/api/tickets/1')]); window.__wavesDone = true;");
+    const { waves, files } = await jsWaves(page, '/__waves/page.html', undefined, 1, /\/__waves\/api\/tickets\//);
+    expect(files, 'the module and the data were not both fetched').toEqual(expect.arrayContaining(['a.js', 'b.js', '1']));
+    expect(waves, `a chunk and a fetch started together read as ${waves} wave(s): ${files.join(', ')}`).toBe(2);
+});
+
+test('control — and a fetch started only once the chunk arrived is a wave of its own', async ({ page }) => {
+    await servedPage(page, "await import('./b.js'); await fetch('/__waves/api/tickets/1'); window.__wavesDone = true;");
+    const { waves, files } = await jsWaves(page, '/__waves/page.html', undefined, 1, /\/__waves\/api\/tickets\//);
+    expect(files).toEqual(expect.arrayContaining(['a.js', 'b.js', '1']));
+    expect(waves, `a fetch chained after its chunk read as ${waves} wave(s): ${files.join(', ')}`).toBe(3);
+});
+
+test('a navigation to a route with a loader fetches its chunk and its data in two waves, not three (L4)', async ({ page }) => {
+    // `/tickets/:id` reads its record through `@loader ticket: loadTicket;`. The router starts the
+    // loader's own module beside the page's chunk (#119), and the loader's request when that module
+    // is in: the code, then the data — two round trips. Three is the loader found only inside the
+    // page's chunk. At CPU 4×, the throttled profile the cold first screen is measured on.
+    const { waves, files, after } = await navigationWaves(page, '/', '/tickets/1', 'app-ticket', /\/api\/tickets\/\d+$/, 4);
+    expect(files.some((f) => /^ticket-/.test(f)), `the ticket chunk was not fetched — nothing is being measured: ${files.join(', ')}`)
+        .toBe(true);
+    expect(files, `the record was not fetched before the page mounted: ${files.join(', ')} (after: ${after.join(', ')})`)
+        .toContain('1');
+    expect(waves, `a navigation to /tickets/1 costs ${waves} round-trips: ${files.join(', ')} (after the mount: ${after.join(', ')})`)
+        .toBeLessThanOrEqual(2);
 });
 
 test('the built page names the landing route chunk before the browser asks for it', () => {

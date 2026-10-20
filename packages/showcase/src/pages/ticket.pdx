@@ -25,14 +25,21 @@
           <span class="portrait" aria-hidden="true">{{ initials }}</span>
           <p class="pdx-txt-heading identity-name" data-test="identity-name">{{ reference }}</p>
           <p class="pdx-txt-small pdx-ink-muted" data-test="identity-sub">{{ $t('ticket.title', { id: id }) }}</p>
-          <!-- What it was opened on, a way to its record. Nothing when it names no asset. -->
-          @if (asset) {
-            <p class="pdx-txt-small identity-asset"><pdx-link :to="'/assets/' + asset.id" data-test="ticket-asset">{{ asset.serial }} · {{ asset.name }}</pdx-link></p>
-          }
-          <!-- The answer it is owed: from the customer's subscription that covers the
-               asset, else the customer's shortest. Nothing when the customer subscribes to nothing. -->
-          @if (sla) {
-            <p class="pdx-txt-small identity-sla" data-test="ticket-sla">{{ $t('ticket.sla', { hours: sla.slaHours, service: sla.name }) }}</p>
+          <!-- The record, as the route's loader fetched it before the page mounted (#507). -->
+          @await (ticket as t) {
+            <!-- What it was opened on, a way to its record. Nothing when it names no asset. -->
+            @if (asset) {
+              <p class="pdx-txt-small identity-asset"><pdx-link :to="'/assets/' + asset.id" data-test="ticket-asset">{{ asset.serial }} · {{ asset.name }}</pdx-link></p>
+            }
+            <!-- The answer it is owed: from the customer's subscription that covers the
+                 asset, else the customer's shortest. Nothing when the customer subscribes to nothing. -->
+            @if (sla) {
+              <p class="pdx-txt-small identity-sla" data-test="ticket-sla">{{ $t('ticket.sla', { hours: sla.slaHours, service: sla.name }) }}</p>
+            }
+          } @loading {
+            <!-- Not on a first visit, which mounts with the record in: while the loader runs for
+                 another ticket, the lines it will fill keep their room. -->
+            <div class="identity-pending" aria-hidden="true" data-test="ticket-pending"></div>
           }
         </div>
 
@@ -120,7 +127,10 @@
 </template>
 
 <script>
-@page '/tickets/:id' { label: ticketLabel };
+@page '/tickets/:id(number)' { label: ticketLabel };
+// The record, fetched before the page renders, beside the page's own chunk: a navigation here costs
+// the code and the data in two round trips, not three (`first-paint-waves.spec.ts`, L4).
+@loader ticket: loadTicket;
 @title $t('ticket.title', { id: id });
 
 // The crumb for THIS record, not for this route. A string label such as `'Ticket :id'` reaches the
@@ -151,17 +161,33 @@ const initials = $derived(reference.replace('T-', ''));
 import { downloadFile, saveBlob } from '@pdxui/core';
 // The store, for the crumb above: the label runs at module scope, so what it reads has to live
 // there too.
-import { ticketById } from '../data/tickets';
+import { ticketById, type Ticket } from '../data/tickets';
 import { assetById } from '../data/assets';
 import { slaFor } from '../data/services';
-import { currentPath, navigate } from '@pdxui/router';
+import { currentPath, navigate, type LoaderContext } from '@pdxui/router';
 
 @prop id: string = '';
 
+/**
+ * The ticket, from the server: the router calls this before the page renders, with the params
+ * coerced by the pattern — `id` is a number — and a signal it aborts when a newer navigation starts.
+ * Moved out of the component with its imports, so it can start beside the page's chunk.
+ *
+ * An id the server has no row for is `null`, not a failure: the page still opens, with its sections
+ * and its trail, as it did when it read the store — a ticket made in this browser lives in the
+ * browser's store, and the server has never heard of it.
+ */
+async function loadTicket({ params, signal }: LoaderContext<{ id: number }>): Promise<Ticket | null> {
+  const res = await fetch(`/api/tickets/${params.id}`, { signal });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`Ticket ${params.id}: ${res.status}`);
+  return res.json();
+}
+
 /** The asset the ticket was opened on, or none. */
-const asset = $derived(assetById(ticketById(Number(id))?.assetId ?? 0) ?? null);
+const asset = $derived(assetById(ticket.data()?.assetId ?? 0) ?? null);
 /** The service whose SLA the ticket is owed, or none. */
-const sla = $derived(slaFor(ticketById(Number(id))?.customerId ?? 0, asset?.kind ?? null));
+const sla = $derived(slaFor(ticket.data()?.customerId ?? 0, asset?.kind ?? null));
 
 // On the global on purpose: a signal declared here would be rebuilt with the component, and the
 // question this number answers is whether the component was rebuilt at all. It has to outlive it.
@@ -183,7 +209,7 @@ let section = $signal('attachments');
 /** Choose a page section — and leave a child route for it, or the outlet would keep the body. */
 function choose(next) {
   section = next;
-  if (onChild) navigate('/tickets/:id', { id: String(id) });
+  if (onChild) navigate('/tickets/:id', { id: Number(id) });
 }
 
 // ─── Attachments ───────────────────────────────────────────────────────────────
@@ -253,6 +279,7 @@ async function download(file) {
   .identity-asset { margin: var(--pdx-space-xs) 0 0; }
   .identity-asset a { color: var(--pdx-color-primary-ink); }
   .identity-sla { margin: var(--pdx-space-xs) 0 0; font-weight: 600; }
+  .identity-pending { height: 2.5em; margin: var(--pdx-space-xs) 0 0; }
 
   /* Inset as the rows are: inside the panel it would otherwise touch its edge. */
   .menu-group {
