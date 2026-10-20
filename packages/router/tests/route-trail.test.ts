@@ -53,9 +53,14 @@ definePage('pdx-t-thing');
     // never loads — and on its child, with a param the dictionary fills.
     { path: '/keyed', tag: 'pdx-t-keyed', labelKey: 'trail.keyed' },
     { path: '/keyed/:n', tag: 'pdx-t-keyed-child', labelKey: 'trail.child' },
+    // A constrained param (#566): the crumb links to the value, not to the constraint.
+    { path: '/orders/:id(number)', tag: 'pdx-t-order', hasOutlet: true, label: 'Order :id' },
+    { path: '/orders/:id(number)/lines/:n', tag: 'pdx-t-order-line', label: 'Line :n' },
 ];
 definePage('pdx-t-keyed');
 definePage('pdx-t-keyed-child');
+definePage('pdx-t-order', true);
+definePage('pdx-t-order-line');
 
 import { navigate } from '../src/runtime';
 import { routeTrail, loadTranslations, setLocale, initI18n } from '@pdxui/core';
@@ -75,6 +80,16 @@ describe('the trail the router publishes', () => {
         await tick();
 
         expect(routeTrail().map(c => c.label)).toEqual(['Tickets', 'Ticket 42', 'Intervention 7']);
+    });
+
+    it('a constrained param fills its href with the value, not the constraint (#566)', async () => {
+        navigate('/orders/12/lines/3');
+        await tick();
+
+        expect(routeTrail().map(c => [c.label, c.href])).toEqual([
+            ['Order 12', '/orders/12'],
+            ['Line 3', '/orders/12/lines/3'],
+        ]);
     });
 
     it('fills the params into each href, so every crumb is a place you can go', async () => {
