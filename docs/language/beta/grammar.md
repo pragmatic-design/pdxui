@@ -78,8 +78,8 @@ StateDecl      ::= "@state" S Identifier S? "=" S? Expression End               
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
 HostDecl       ::= "@host" S? "{" ( S? Attribute )* S? "}"                                          (β #133: the template's attribute grammar)
 ExposeDecl     ::= "@expose" S Identifier ( S? "," S? Identifier )* End
-ProvideDecl    ::= "@provide" S Identifier S? "=" S? Expression End                                  (β #139: Identifier is a token)
-InjectDecl     ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? End         (β #139)
+ProvideDecl    ::= "@provide" S Identifier S? "=" S? Expression End                                  (β #139: Identifier is a token — landed #496)
+InjectDecl     ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? End         (β #139 — landed #496)
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                                    (β #153)
 VariantAxis    ::= Identifier S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"
 TagDecl        ::= "@tag" S StringLiteral End

@@ -578,6 +578,13 @@ the setup body, `const theme = inject(Theme, ctx.el);`, typed by the token in th
 `@inject theme from Theme = 'light';` supplies a default for when no ancestor provides one:
 `inject(Theme, ctx.el, 'light')`. The name is returned to the template like any other.
 
+The token is the key of the Web Components context protocol, compared by identity: an `@inject` with
+no PDX provider above asks the protocol, so a provider from another library (Lit) that uses the same
+token answers, and a PDX provider answers such a library's consumers. A provided signal is writable
+by whoever injects it, and a protocol consumer that subscribes is called again on each change. The
+runtime API is `provide(token, value, host)` and `inject(token, host, fallback?)`; the components a
+library provides context from list their tokens in its manifest, and `pdx analyze` lists an app's.
+
 #### Rules
 
 - The token is a name the script imports. A string key (`@provide theme = …`, `@inject theme;`,
