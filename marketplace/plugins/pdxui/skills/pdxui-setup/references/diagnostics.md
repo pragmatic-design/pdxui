@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 102 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 103 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -39,6 +39,40 @@ write:
 </template>
 <script>
 @action save() with { concurrency: 'drop' } {
+  await fetch('/api/save', { method: 'POST' });
+}
+</script>
+```
+
+### PDX_AGENT_ACTION_UNBOUND
+
+*error* — An `@action` offered to agents (`with { agent }`) that no control of the template runs.
+
+An agent has no capability a person does not (decision 31): an action an agent may call must be one a person can call from the page too. With no `:action="name"` and no handler that calls `name.execute(…)` or `name(…)`, the agent could do what the user cannot.
+
+**Fix.** Give a person the same control — `<pdx-button :action="save">`, or a handler that calls `save.execute(…)` — or remove `agent`.
+
+Instead of:
+
+```html
+<template>
+  <p>Draft</p>
+</template>
+<script>
+@action save() with { agent: 'Save the draft' } {
+  await fetch('/api/save', { method: 'POST' });
+}
+</script>
+```
+
+write:
+
+```html
+<template>
+  <pdx-button :action="save">Save</pdx-button>
+</template>
+<script>
+@action save() with { agent: 'Save the draft' } {
   await fetch('/api/save', { method: 'POST' });
 }
 </script>

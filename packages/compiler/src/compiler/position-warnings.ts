@@ -245,7 +245,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const found = template ? re.exec(source.slice(template.from, template.to)) : null;
             return found ? template!.from + found.index + found[1].length : undefined;
         }
-        case 'PDX_ACTION_UNKNOWN_OPTION': {
+        case 'PDX_ACTION_UNKNOWN_OPTION':
+        case 'PDX_AGENT_ACTION_UNBOUND': {
             // Match: "`@action save`: …" — the declaration the message names.
             const action = /^`@action ([\w$]+)`/.exec(w.message)?.[1];
             return action ? find(source, script, new RegExp(`@action\\s+${escape(action)}\\b`)) : undefined;

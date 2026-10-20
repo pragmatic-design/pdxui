@@ -149,7 +149,7 @@ ActionParams  ::= Identifier ( S? ":" S? Type )? ( S? "," S? "{" S? "signal" S? 
 ActionOptions ::= "{" S? ActionOption ( S? "," S? ActionOption )* ( S? "," )? S? "}"
 ActionOption  ::= ( "invalidate" | "optimistic" | "onSuccess" | "onError" ) S? ":" S? Expression
                 | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote   /* proposed */
-                | "agent" S? ":" S? StringLiteral | "consequential" S? ":" S? ( "true" | "false" )    /* proposed: agents.md */
+                | "agent" S? ":" S? StringLiteral | "consequential" S? ":" S? ( "true" | "false" )    /* agents.md — landed #502 */
 ```
 
 ### Semantics
@@ -233,7 +233,8 @@ const canSave = $derived(draft.name.length > 0);
 ### Since
 
 beta (#142; the rune is **landed**, #501 — the agent options `agent` and `consequential` are carried,
-and read by #502)
+and read by #502 — landed: recorded in the `pdx analyze` manifest, and checked by
+`PDX_AGENT_ACTION_UNBOUND`)
 
 ## @form
 

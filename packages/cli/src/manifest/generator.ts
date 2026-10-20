@@ -4,6 +4,7 @@ import { readFileSync } from 'fs';
 import { relative } from 'pathe';
 import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, importedLocalNames, modelEventName, DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
 import type { ComponentManifest, RouteManifest, FetchManifest, FormManifest, ComponentMetadata } from './schema';
+import { typeToSchema } from './type-schema';
 
 /** The specifier of the import that binds `name`, among the script's import statements; '' when none does. */
 function importedFrom(imports: string[], name: string): string {
@@ -68,6 +69,10 @@ export function analyzeComponent(filePath: string, rootDir: string, prefix: stri
         })),
     }));
 
+    const agentActions = (analysis.actions ?? []).flatMap(a => a.agent === undefined ? [] : [{
+        name: a.name, agent: a.agent, consequential: a.consequential, input: typeToSchema(a.inputType),
+    }]);
+
     // Compute metadata
     const metadata: ComponentMetadata = {
         category: analysis.route?.page ? 'page' : undefined,
@@ -100,6 +105,8 @@ export function analyzeComponent(filePath: string, rootDir: string, prefix: stri
         // The tokens of @provide / @inject, which the compiler accepts only when imported (#496).
         provides: analysis.provides.map(p => ({ token: p.token, from: importedFrom(analysis.userImports, p.token) })),
         injects: analysis.injects.map(i => ({ token: i.token, from: importedFrom(analysis.userImports, i.token), optional: i.fallback !== undefined })),
+        // The @action an agent may call (#502): recorded only, for the WebMCP adapter.
+        ...(agentActions.length > 0 ? { actions: agentActions } : {}),
         signals: analysis.signals.map(s => s.name),
         stores: analysis.stores.map(s => s.name),
         dependencies: deps,

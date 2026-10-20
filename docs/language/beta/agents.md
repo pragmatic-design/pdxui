@@ -122,6 +122,10 @@ An `@action` is offered to agents only when it says so:
   `consequentialHint`; the input schema comes from the parameter's TypeScript type.
 - An action with `agent` that no control in the template runs is `PDX_AGENT_ACTION_UNBOUND`
   (error): principle 2, checked at build.
+- **Landed (#502):** the options are recorded in the `pdx analyze` manifest (`actions`: `name`,
+  `agent`, `consequential`, `input`), and the check above runs. The input schema is read from the
+  type's text — primitives, arrays and object literal types; a named type the analysis cannot
+  resolve from one file is `{}` until the adapter reads types with a checker.
 When the adapter is built — it waits for the WebMCP API to settle (decisions.md, «Still open») — it
 behaves as follows; the options and the build check above hold from now:
 

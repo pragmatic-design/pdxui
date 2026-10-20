@@ -8,7 +8,7 @@ import type {
     PropInfo, EventInfo, SlotInfo, SignalDecl, DerivedDecl, ExportDecl,
     StoreDecl, WatchDecl, FetchDecl, FormDecl, FormFieldDecl, RouteInfo,
     GlobalStoreDirective, HeadInfo, I18nInfo, ProvideDecl, InjectDecl, ScriptAnalysis, StateDecl, HostAttr,
-    ScriptSnippet,
+    ScriptSnippet, ActionInfo,
 } from './script-analyzer-types';
 import { parseHostBlock } from './host-block';
 import { parseVariantsBlock, variantProps, variantHostAttrs, type VariantAxis } from './variants';
@@ -28,7 +28,7 @@ import { RUNE_CALL, readDeclarators } from './rune-declarations';
 import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
-import { readActionDecl, actionOptionProblems, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
+import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -163,6 +163,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const events: EventInfo[] = [];
     const slots: SlotInfo[] = [];
     const snippets: ScriptSnippet[] = [];
+    const actions: ActionInfo[] = [];
     const generics: string[] = [];
     const signals: SignalDecl[] = [];
     const deriveds: DerivedDecl[] = [];
@@ -342,6 +343,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     hint: `The options are ${ACTION_OPTIONS.join(', ')}; \`concurrency\` is ${ACTION_CONCURRENCY.map((c) => `'${c}'`).join(' | ')}.`,
                 });
             }
+            actions.push({ name: action.decl.name, inputType: action.decl.inputType, ...actionAgentOptions(action.decl.options) });
             pushBody(`    ${compileAction(action.decl)}`, actionAt);
             if (!action.decl.name.startsWith('_')) exports.push({ name: action.decl.name, kind: 'const' });
             usedFeatures.add('mutation');
@@ -1199,6 +1201,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         events,
         slots,
         snippets,
+        actions,
         generics,
         signals,
         deriveds,

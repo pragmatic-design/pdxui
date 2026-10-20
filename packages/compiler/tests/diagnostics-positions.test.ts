@@ -81,6 +81,7 @@ const ROWS: Record<string, Row> = {
     PDX_FETCH_TYPE_COLON: { src: pdx('<p>{{ user }}</p>', "let a = $signal(1);\n@fetch user: 'GET /api/user' : User;"), at: '@fetch user' },
     PDX_FETCH_UNKNOWN_OPTION: { src: pdx('<p>{{ users }}</p>', "let a = $signal(1);\n@fetch users: 'GET /api/users' { stalTime: 1 };"), at: '@fetch users' },
     PDX_ACTION_UNKNOWN_OPTION: { src: pdx('<p>{{ a }}</p>', "let a = $signal(1);\n@action save() with { retries: 2 } {\n  await Promise.resolve(a);\n}"), at: '@action save' },
+    PDX_AGENT_ACTION_UNBOUND: { src: pdx('<p>{{ a }}</p>', "let a = $signal(1);\n@action save() with { agent: 'Save' } {\n  await Promise.resolve(a);\n}"), at: '@action save' },
     PDX_FORM_NO_SUBMIT: { src: pdx('<p>{{ login }}</p>', 'let a = $signal(1);\n@form login: { email: string { required } };'), at: '@form login' },
     PDX_FORM_ARRAY_RULES_IGNORED: { src: pdx('<p>{{ order }}</p>', 'let a = $signal(1);\n@form order: { lines: [{ name: string { required } }] };'), at: '@form order' },
     PDX_FORM_UNKNOWN_RULE: { src: pdx('<p>{{ f }}</p>', 'let a = $signal(1);\n@form f: { name: string { required, shout } };'), at: 'shout' },

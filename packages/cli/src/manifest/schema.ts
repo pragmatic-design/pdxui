@@ -1,6 +1,8 @@
 // Manifest types — output of pdx analyze.
 // Machine-readable component metadata for agent tooling, code generation, and documentation.
 
+import type { JsonSchema } from './type-schema';
+
 export interface PdxManifest {
     version: string;
     generatedAt: string;
@@ -28,6 +30,14 @@ export interface ComponentManifest {
     provides: ContextTokenManifest[];
     /** The context tokens it reads from an ancestor (`@inject`); `optional` when it has a fallback. */
     injects: (ContextTokenManifest & { optional: boolean })[];
+    /**
+     * Each `@action` an agent may call (`with { agent }`, #502): the description it is offered under,
+     * whether it is `consequential`, and `input`, the JSON schema of its parameter's type — read from
+     * the type's text where that is a primitive, an array or an object literal type, and `{}` (anything)
+     * where it names a type the generator cannot resolve. Only recorded: registering the tool is the
+     * WebMCP adapter's. Absent when the component has none.
+     */
+    actions?: { name: string; agent: string; consequential: boolean; input: JsonSchema }[];
     /** Reactive signal names. */
     signals: string[];
     /** Deep reactive store names. */

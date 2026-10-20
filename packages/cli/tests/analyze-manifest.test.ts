@@ -84,6 +84,32 @@ describe('pdx analyze', () => {
         ]);
     });
 
+    it('lists each @action an agent may call, with agent, consequential and the input schema (#502)', async () => {
+        write('src/editor.pdx', "<template><pdx-button :action=\"save\">Save</pdx-button><pdx-button :action=\"archive\">A</pdx-button><pdx-button :action=\"touch\">T</pdx-button></template>\n<script>\n"
+            + "@action save(dto: { name: string; age?: number; tags: string[] }) with { agent: 'Save the customer', consequential: true } { await Promise.resolve(dto); }\n"
+            + "@action archive(id: number) with { agent: 'Archive a customer' } { await Promise.resolve(id); }\n"
+            + "@action touch() { await Promise.resolve(); }\n</script>\n");
+        const [editor] = (await json()).components as (Manifest['components'][number] & { actions?: unknown })[];
+        expect(editor.actions).toEqual([
+            {
+                name: 'save', agent: 'Save the customer', consequential: true,
+                input: {
+                    type: 'object',
+                    properties: { name: { type: 'string' }, age: { type: 'number' }, tags: { type: 'array', items: { type: 'string' } } },
+                    required: ['name', 'tags'],
+                },
+            },
+            { name: 'archive', agent: 'Archive a customer', consequential: false, input: { type: 'number' } },
+        ]);
+    });
+
+    it('an input type the generator cannot read is {}, and an action without agent is not listed', async () => {
+        write('src/other.pdx', "<template><pdx-button :action=\"save\">Save</pdx-button></template>\n<script>\ninterface Dto { name: string }\n"
+            + "@action save(dto: Dto) with { agent: 'Save' } { await Promise.resolve(dto); }\n</script>\n");
+        const [other] = (await json()).components as (Manifest['components'][number] & { actions?: { input: unknown }[] })[];
+        expect(other.actions?.map((a) => a.input)).toEqual([{}]);
+    });
+
     it('--json prints the manifest and writes no file', async () => {
         write('src/hello.pdx', '<template><p>hi</p></template>\n');
         const manifest = await json();

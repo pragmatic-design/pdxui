@@ -199,7 +199,10 @@ and default, events with their payload, slots, exposed methods, signals, stores,
 `@form` fields, and the other components it uses. `provides` and `injects` list the context tokens of
 its `@provide` and `@inject`, each with the module it is imported from (`{ token: 'CurrentUser', from:
 './contexts' }`); an inject with a fallback is `optional`. The library's `custom-elements.json`
-records the same under `x-pdx-context`. `routes` is the route table: every component with
+records the same under `x-pdx-context`. `actions` lists each `@action` an agent may call — those with
+`with { agent: '…' }` — with its `agent`, `consequential` and `input`, the JSON schema of its
+parameter's type (`{}` when the type is one the analysis cannot read from its text alone, such as an
+interface). `routes` is the route table: every component with
 `@page`, sorted by path, as `{ path, file, tag, guard, loader, layout }`.
 
 It is what an agent reads before it touches a project: which components exist and how to call them,
