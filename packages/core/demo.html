@@ -36,7 +36,7 @@
             signal, computed, effect, batch,
             html, when, each, match, pipe,
             component, define, PdxElement,
-            createBus, setPermissions, requirePermission, hasPermission,
+            setPermissions, requirePermission, hasPermission,
         } from './src/index.ts';
 
         const app = document.getElementById('app');
@@ -186,23 +186,6 @@
                 <div style="margin-top:0.5rem;font-size:0.85rem;color:#666">
                     History: <span id="history-list">${() => JSON.stringify(editor.history())}</span>
                 </div>
-            </div>
-        `);
-
-        // ─── 9. Event Bus ──────────────────────────────────────────
-        const bus = createBus({ store: true });
-        const busLog = signal('');
-
-        bus.on('demo:ping', (payload) => {
-            busLog.set(prev => prev + `[${new Date().toLocaleTimeString()}] ping: ${JSON.stringify(payload)}\n`);
-        });
-
-        app.appendChild(html`
-            <h2>9. Event Bus (createBus)</h2>
-            <div class="demo-section">
-                <button id="bus-emit" @click=${() => bus.emit('demo:ping', { n: Math.floor(Math.random() * 100) })}>Emit Ping</button>
-                <button @click=${() => { bus.clear(); busLog.set(''); }}>Clear</button>
-                <div id="log">${busLog}</div>
             </div>
         `);
 

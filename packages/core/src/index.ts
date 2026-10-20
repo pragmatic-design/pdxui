@@ -57,10 +57,6 @@ export type { HttpResourceOptions } from './reactivity/http-resource';
 export { useQuery } from './reactivity/use-query';
 export type { UseQueryOptions, QueryResult } from './reactivity/use-query';
 
-// Event Bus
-export { createBus } from './reactivity/bus';
-export type { EventBus, EventRecord, BusOptions } from './reactivity/bus';
-
 // Resource (async data loading)
 export { resource, resourceWhen } from './reactivity/resource';
 export type { Resource, ResourceOptions, ResourceState, AsyncState, ResourceHandlers, ResourceFetcher } from './reactivity/resource';
@@ -212,8 +208,7 @@ export {
 export type { ComponentScope, PropChange } from './component/lifecycle';
 
 // Component Communication
-export { createChannel, createCommands, exposeOnElement } from './component/channel';
-export type { Channel, Commands } from './component/channel';
+export { exposeOnElement } from './component/channel';
 
 // Permissions
 export { setPermissions, hasPermission, requirePermission } from './component/permissions';
@@ -364,9 +359,9 @@ export type { RovingTabindexOptions, RovingTabindexReturn } from './a11y/roving-
 
 // ─── Tier 0C ──────────────────────────────────────────────────
 
-// Compound Component (parent↔child auto-wiring)
-export { createCompoundParent, discoverChildren } from './component/compound';
-export type { CompoundParentContext, CompoundOptions, ChildDiscoveryOptions } from './component/compound';
+// Compound Component (a parent that finds its children by selector)
+export { discoverChildren } from './component/compound';
+export type { ChildDiscoveryOptions } from './component/compound';
 
 // Typed Slots (named slots, scoped slots, forwarding)
 export { createSlotManager, forwardSlots } from './component/typed-slots';

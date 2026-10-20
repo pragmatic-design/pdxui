@@ -320,6 +320,6 @@ StoreRune ::= RuneDecl                      /* with "$store"; its argument is re
 
 Unchanged from alpha: the file is the store, its actions are plain functions inside it, and a
 component reads it with the generated hook (`const cart = useCart();`). `@store` is the one mechanism
-for state shared by the whole app (the untyped bus leaves the public API, #144). A `persist` value
+for state shared by the whole app (the untyped bus has left the public API, #144 — landed). A `persist` value
 other than `'local'` or `'session'` is `PDX_UNKNOWN_DECLARATION` in the beta grammar (alpha persisted
 it to `sessionStorage` silently) — landed, #278 (decisions.md 14).

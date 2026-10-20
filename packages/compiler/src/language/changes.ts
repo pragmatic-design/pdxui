@@ -354,6 +354,12 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     removedExport('@pdxui/core', 'provideWritable', '`provide(token, signal, host)`: a provided signal is writable, and `inject(token, host)` returns it', 495),
     removedExport('@pdxui/core', 'useWritable', '`inject(token, host)`, which returns the provided signal, or `@inject` in a .pdx', 495),
     removedExport('@pdxui/core', 'tryUseWritable', '`inject(token, host, undefined)`, or `@inject` in a .pdx', 495),
+    // #144: one mechanism per direction — `@prop` down, `@event` up, `@expose` for an order, a token for
+    // the descendants, `@store` for the app. The untyped messaging APIs leave the exports.
+    removedExport('@pdxui/core', 'createBus', 'a `@store` for state the whole app shares, or an `@event` the component dispatches for a message', 144),
+    removedExport('@pdxui/core', 'createChannel', '`@prop` / `@model` down and `@event` up between a parent and its child, or `@expose` + a typed ref for an order', 144),
+    removedExport('@pdxui/core', 'createCommands', '`@expose` + a typed ref (or `commandfor`) for a parent that orders its child', 144),
+    removedExport('@pdxui/core', 'createCompoundParent', 'a token the parent provides with `@provide` and its children read with `@inject`, holding what they register in', 144),
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

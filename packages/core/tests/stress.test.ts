@@ -4,7 +4,6 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { signal, computed, effect, batch } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { when, each, match, pipe } from '../src/renderer/helpers';
-import { createBus } from '../src/reactivity/bus';
 import { component } from '../src/component/component';
 import type { Signal } from '../src/utils/types';
 
@@ -241,47 +240,6 @@ describe('template stress', () => {
 
         expect(value()).toBe('binding');
         expect(document.body.querySelector('#mirror')?.textContent).toBe('binding');
-    });
-});
-
-// ─── Event Bus Stress ──────────────────────────────────────────────
-
-describe('event bus stress', () => {
-    it('1000 events with 10 handlers', () => {
-        const bus = createBus<{ 'tick': number }>();
-        const counters = Array.from({ length: 10 }, () => ({ sum: 0 }));
-
-        for (let i = 0; i < 10; i++) {
-            const counter = counters[i];
-            bus.on('tick', (n) => { counter.sum += n; });
-        }
-
-        for (let i = 0; i < 1000; i++) {
-            bus.emit('tick', i);
-        }
-
-        const expectedSum = (999 * 1000) / 2;
-        for (const counter of counters) {
-            expect(counter.sum).toBe(expectedSum);
-        }
-    });
-
-    it('store with 10,000 events + replay', () => {
-        const bus = createBus<{ 'log': string }>({ store: true });
-
-        for (let i = 0; i < 10_000; i++) {
-            bus.emit('log', `msg-${i}`);
-        }
-
-        expect(bus.history().length).toBe(10_000);
-
-        const replayed: string[] = [];
-        bus.on('log', (msg) => replayed.push(msg));
-        bus.replay();
-
-        expect(replayed.length).toBe(10_000);
-        expect(replayed[0]).toBe('msg-0');
-        expect(replayed[9999]).toBe('msg-9999');
     });
 });
 

@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- **Breaking:** one mechanism per direction. Four untyped messaging APIs leave `@pdxui/core`; an
+  import of one in a `.pdx` is `PDX_REMOVED_FORM`, and `pdx migrate` flags it:
+  - `createBus` → a `@store` for state the app shares, or an `@event` for a message;
+  - `createChannel` → `@prop` / `@model` down and `@event` up, or `@expose` + a typed ref;
+  - `createCommands` → `@expose` + a typed ref (or `commandfor`);
+  - `createCompoundParent`, which no library component used → a token the parent `@provide`s and
+    its children `@inject`.
+  `discoverChildren` and `exposeOnElement` stay. (#144)
 - **Breaking:** the `.pdx` context runes take a token: `@provide CurrentUser = me;`,
   `@inject user from CurrentUser;`, and `@inject theme from Theme = 'light';` for a default when
   nothing above provides one. The token is a `context<T>()` the script imports, and the editor types

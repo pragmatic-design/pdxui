@@ -4,23 +4,25 @@
 
 > **Formal reference:** [docs/language/script.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/script.md) defines the grammar of what this page teaches: what each construct accepts, what it generates, which diagnostic it raises.
 
-Props go down and events go up — until the two components that need each other are eight levels
-apart, or siblings, or not related at all. PDX ships six mechanisms for those cases. They are
-genuinely different, and picking the wrong one is the kind of mistake you only notice much later.
-Who should own a piece of state in the first place is on [Component Design](https://pdxui.com/docs/component-design)
-(CD-S1). Start here:
+There is one mechanism per direction, and each is a declaration a reader can see in the file — in
+the template, or at the top of the script. Who should own a piece of state in the first place is on
+[Component Design](https://pdxui.com/docs/component-design) (CD-S1).
 
-| what you have | reach for |
+| direction | the mechanism |
 | --- | --- |
-| an ancestor and a descendant, one value | `provide` / `inject`, by a `context<T>()` token |
-| the same, but the descendant must **write** it too | `provide` a signal; `inject` returns it |
-| a parent that must **order** a child to do something | `createCommands` |
-| both directions, typed, between two known components | `createChannel` |
-| components with no relationship at all | `createBus` |
-| a parent that must **discover** its children (`<pdx-tabs>` and its `<pdx-tab>`s) | `createCompoundParent` |
+| parent → child, data | `@prop`; `@model` when the child writes it back ([Components](https://pdxui.com/docs/components)) |
+| child → parent | `@event`, dispatched on the component and not bubbling |
+| parent → child, an order ("reload now") | `@expose` + a typed `:ref`, or `commandfor` / `command` ([Refs & Methods](https://pdxui.com/docs/imperative-methods)) |
+| ancestor → descendants, however deep | `@provide` / `@inject`, by a `context<T>()` token — below |
+| the descendant must **write** it too | `@provide` a signal; `@inject` gets the signal |
+| the whole app | a [`@store`](store.md) |
 
-Everything below except the bus resolves through the **DOM tree**: a consumer finds the nearest
-provider *above it*, so two branches can carry different values under the same token.
+The untyped bus, channel and command dispatcher (`createBus`, `createChannel`, `createCommands`) and
+`createCompoundParent` are gone: two components talking through them had no visible link in either
+file. An import of one is `PDX_REMOVED_FORM`, naming what to write instead.
+
+provide / inject resolves through the **DOM tree**: a consumer finds the nearest provider *above
+it*, so two branches can carry different values under the same token.
 
 ## provide / inject
 
@@ -112,101 +114,6 @@ const density = inject(Density, ctx.el);
 density();                    // read
 density.set('compact');       // write — the ancestor sees it
 ```
-
-## A parent that gives orders: `createCommands`
-
-One direction, parent → child, typed by a contract:
-
-```ts
-import { createCommands } from '@pdxui/core';
-
-const cmd = createCommands<{ refresh: void; scrollToRow: { row: number } }>();
-
-// parent
-cmd.send('scrollToRow', { row: 42 });
-
-// child — gets the dispatcher through a prop or an inject
-const off = cmd.on('refresh', () => reload());
-```
-
-Reach for it when the thing is an **action**, not a piece of state: "reload now", "clear the
-selection". If it can be expressed as a prop the child reacts to, use the prop — see
-[Refs & Methods](https://pdxui.com/docs/imperative-methods) for the same distinction on the imperative side.
-
-## Both directions: `createChannel`
-
-A channel is two command streams in one object, `send` going down and `emit` coming up:
-
-```ts
-import { createChannel } from '@pdxui/core';
-
-interface GridChannel {
-  down: { refresh: void; scrollTo: { row: number } };
-  up:   { rowSelected: { id: string }; sorted: { col: string } };
-}
-
-const ch = createChannel<GridChannel>();
-
-// parent
-ch.send('refresh');
-ch.on('rowSelected', ({ id }) => open(id));
-
-// child
-ch.on('refresh', () => reload());
-ch.emit('rowSelected', { id: '123' });
-```
-
-> **Give the two directions different names.** `send` and `emit` share one listener map, keyed by the
-> event name — so a `refresh` in `down` and a `refresh` in `up` deliver to the same listeners, in both
-> directions. `refresh` / `refreshed` is the convention; TypeScript will not catch this one for you.
-
-## Components with no relationship: `createBus`
-
-When the two ends are not ancestor and descendant — a toast from a background save, a filter panel
-and a grid on opposite sides of a layout — a bus is the honest answer:
-
-```ts
-import { createBus } from '@pdxui/core';
-
-const bus = createBus<{ 'invoice:saved': { id: string } }>();
-
-const off = bus.on('invoice:saved', ({ id }) => toast(`Saved ${id}`));
-bus.emit('invoice:saved', { id: 'INV-9' });
-```
-
-`createBus({ store: true })` records what went through it: `history()` returns the events and
-`replay()` sends them to the handlers registered now — a real help when you are debugging an order
-of operations, and the reason to prefix event names with the area they belong to.
-
-A bus is the one mechanism with no structure to it, which is both why it always works and why it
-should be the last one you reach for: nothing in the code says who listens.
-
-## A parent that discovers its children: `createCompoundParent`
-
-The `<pdx-tabs>` / `<pdx-tab>` shape — a parent that has to know which children exist, in order, and
-be told when one of them does something:
-
-```ts
-import { createCompoundParent, context, provide, inject } from '@pdxui/core';
-import type { CompoundParentContext } from '@pdxui/core';
-
-export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
-
-// parent
-const compound = createCompoundParent<TabChild>({
-    onChildAdded: (child, i) => { /* … */ },
-    onNotify: (event, payload) => { /* … */ },
-});
-provide(Tabs, compound, ctx.el);
-
-// child
-const parent = inject(Tabs, ctx.el);
-const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
-onDestroy(() => dispose());
-```
-
-`children` is a signal, so the parent's render follows registration. The child **must** unregister on
-destroy — that `dispose()` is not optional, or a removed tab stays in the list.
 
 ## How the built-in forms actually do it
 

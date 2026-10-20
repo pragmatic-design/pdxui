@@ -37,7 +37,7 @@ import {
     // Lifecycle
     onMount, onDestroy, onUpdated, onError, useEffect,
     // Communication
-    createChannel, createCommands, exposeOnElement,
+    exposeOnElement,
     // Error Boundary
     errorBoundary,
     // Scoped Slot
@@ -122,26 +122,6 @@ function testCommunication() {
     assert('2.3 expose: frozen (not writable)', (() => {
         try { el.open = () => {}; return false; } catch { return true; }
     })());
-
-    // Channel
-    const ch = createChannel();
-    const received = [];
-    ch.on('ping', () => received.push('pong'));
-    ch.send('ping');
-    assert('2.4 channel: send/on works', received[0] === 'pong');
-
-    const unsub = ch.on('tick', () => received.push('tick'));
-    ch.send('tick');
-    unsub();
-    ch.send('tick');
-    assert('2.5 channel: unsubscribe works', received.filter(r => r === 'tick').length === 1);
-
-    // Commands
-    const cmds = createCommands();
-    let cmdReceived = false;
-    cmds.on('refresh', () => { cmdReceived = true; });
-    cmds.send('refresh');
-    assert('2.6 commands: send/on works', cmdReceived);
 }
 
 // ─── 3. Deep Reactivity + Watch ─────────────────────────────────

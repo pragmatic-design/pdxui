@@ -1,93 +1,12 @@
-// Compound Component — parent↔child auto-wiring via provide/inject.
+// Compound components: a parent that finds its children by selector.
 // Pattern: <pdx-tabs><pdx-tab /><pdx-tab-panel /></pdx-tabs>
-// Parent discovers children, children access parent context.
-// Used by: Tabs, Accordion, Form, Table, Menu, Splitter.
+// `createCompoundParent`, the registry a parent provided to its children, left the public API (#144):
+// a parent provides a token with `@provide`, and its children `@inject` it.
 
 import { signal, effect } from '../reactivity/signal';
 import type { ReadonlySignal, Dispose } from '../utils/types';
 
-// ─── Types ─────────────────────────────────────────────────────
-
-export interface CompoundParentContext<TChild = unknown> {
-    /** Unique ID for this compound group. */
-    id: string;
-    /** Registered children (reactive). */
-    children: ReadonlySignal<TChild[]>;
-    /** Register a child. Returns dispose function to unregister. */
-    register(child: TChild): Dispose;
-    /** Shared state accessible by children. */
-    state: Record<string, unknown>;
-    /** Notify parent of a child event. */
-    notify(event: string, payload?: unknown): void;
-}
-
-export interface CompoundOptions<TChild = unknown> {
-    /** Called when a child registers. */
-    onChildAdded?: (child: TChild, index: number) => void;
-    /** Called when a child unregisters. */
-    onChildRemoved?: (child: TChild) => void;
-    /** Called when a child notifies. */
-    onNotify?: (event: string, payload?: unknown) => void;
-}
-
-// ─── createCompoundParent ─────────────────────────────────────
-
-let _nextId = 1;
-
-/**
- * Create a compound parent context.
- * The parent creates this and provides it to children via provide/inject.
- *
- * @example
- * // A token, declared once: export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
- * // In parent component (e.g. pdx-tabs):
- * const compound = createCompoundParent<TabChild>({
- *     onChildAdded: (child, i) => { ... },
- *     onNotify: (event, payload) => { ... },
- * });
- * provide(Tabs, compound, ctx.el);
- *
- * // In child component (e.g. pdx-tab):
- * const parent = inject(Tabs, ctx.el);
- * const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
- * onDestroy(() => dispose());
- */
-export function createCompoundParent<TChild = unknown>(
-    options?: CompoundOptions<TChild>,
-): CompoundParentContext<TChild> {
-    const id = `compound-${_nextId++}`;
-    const _children = signal<TChild[]>([]);
-
-    function register(child: TChild): Dispose {
-        _children.set(prev => {
-            const next = [...prev, child];
-            options?.onChildAdded?.(child, next.length - 1);
-            return next;
-        });
-
-        return () => {
-            _children.set(prev => {
-                const next = prev.filter(c => c !== child);
-                options?.onChildRemoved?.(child);
-                return next;
-            });
-        };
-    }
-
-    function notify(event: string, payload?: unknown): void {
-        options?.onNotify?.(event, payload);
-    }
-
-    return {
-        id,
-        children: _children as ReadonlySignal<TChild[]>,
-        register,
-        state: {},
-        notify,
-    };
-}
-
-// ─── DOM-based child discovery (alternative to provide/inject) ─
+// ─── DOM-based child discovery ─
 
 export interface ChildDiscoveryOptions {
     /** CSS selector for child elements. */

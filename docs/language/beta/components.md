@@ -18,9 +18,10 @@ live once, in `@pdxui/core`.
 | An async action a button runs | `@action` ([data.md](data.md)) + `pdx-button :action` | four wired lines per button |
 | Behaviour on an element | `attach:` ([template.md](template.md)) | a ref + `onMount` + manual cleanup |
 
-`createBus`, `createChannel` and `createCommands` leave the public exports of `@pdxui/core` in the
-beta (#144); `provideWritable`, `useWritable` and their `try*` variants have left with the other
-context functions (#495).
+`createBus`, `createChannel` and `createCommands` — and `createCompoundParent`, which no library
+component needs — have left the public exports of `@pdxui/core` in the beta (#144 — landed);
+`provideWritable`, `useWritable` and their `try*` variants have left with the other context
+functions (#495).
 
 ## @prop
 
@@ -521,7 +522,7 @@ module of each token; `x-pdx-context` in the library's `custom-elements.json`).
   `context<unknown>`: give it its type.
 - `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`,
   `tryUseWritable` leave the public exports (#495 — landed; an import of one is `PDX_REMOVED_FORM`;
-  the bus and channel APIs leave with #144).
+  the bus and channel APIs have left with #144 — landed).
 
 ### Examples
 

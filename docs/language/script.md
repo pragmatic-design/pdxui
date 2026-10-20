@@ -66,6 +66,20 @@ as written.
 
 ## Component declarations
 
+What a component declares to the outside is also how two components reach each other: one
+declaration per direction, each visible in the file.
+
+| Direction | The declaration |
+|---|---|
+| Parent → child, data | `@prop`; `@model` when the child writes it back |
+| Child → parent | `@event`, dispatched on the component, not bubbling unless `@event(bubbles)` |
+| Parent → child, an order | `@expose` + a typed `:ref`, or `commandfor` / `command` |
+| Ancestor → descendants | `@provide Token` / `@inject name from Token` |
+| The whole app | `@store` ([data.md](data.md)) |
+
+The untyped `createBus`, `createChannel` and `createCommands`, and `createCompoundParent`, are not
+exported: an import of one is `PDX_REMOVED_FORM`, naming the declaration to write instead (#144).
+
 ### @prop
 
 #### Syntax

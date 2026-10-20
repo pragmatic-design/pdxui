@@ -1,43 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { createCompoundParent, discoverChildren } from '../src/component/compound';
+import { discoverChildren } from '../src/component/compound';
 import { createSlotManager } from '../src/component/typed-slots';
 import { useAdaptive, adaptiveValue } from '../src/component/adaptive';
 import { showSkeleton } from '../src/component/auto-skeleton';
-
-describe('CompoundParent', () => {
-    it('registers and unregisters children', () => {
-        const parent = createCompoundParent<{ label: string }>();
-        expect(parent.children().length).toBe(0);
-        const dispose1 = parent.register({ label: 'Tab 1' });
-        const dispose2 = parent.register({ label: 'Tab 2' });
-        expect(parent.children().length).toBe(2);
-        dispose1();
-        expect(parent.children().length).toBe(1);
-        expect(parent.children()[0].label).toBe('Tab 2');
-        dispose2();
-        expect(parent.children().length).toBe(0);
-    });
-
-    it('calls onChildAdded/onChildRemoved callbacks', () => {
-        const added: string[] = [];
-        const removed: string[] = [];
-        const parent = createCompoundParent<string>({
-            onChildAdded: (child) => added.push(child),
-            onChildRemoved: (child) => removed.push(child),
-        });
-        const d = parent.register('A');
-        expect(added).toEqual(['A']);
-        d();
-        expect(removed).toEqual(['A']);
-    });
-
-    it('notify calls onNotify', () => {
-        let received: string | null = null;
-        const parent = createCompoundParent({ onNotify: (event) => { received = event; } });
-        parent.notify('tab-change');
-        expect(received).toBe('tab-change');
-    });
-});
 
 describe('discoverChildren', () => {
     it('finds children by selector', () => {

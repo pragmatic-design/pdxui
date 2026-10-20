@@ -58,9 +58,9 @@
     <div id="store-demo"></div>
 </div>
 
-<!-- ═══ 2. Component Expose + Channel ═══ -->
+<!-- ═══ 2. Component Expose ═══ -->
 <div class="card" id="section-comm">
-    <h2>2. Expose + Channel</h2>
+    <h2>2. Expose</h2>
     <div id="comm-demo"></div>
 </div>
 
@@ -120,7 +120,6 @@ import {
     when, each, match, show, dynamic,
     store, watch,
     onMount, onDestroy, useEffect,
-    createChannel, createCommands,
     errorBoundary,
     renderSlot,
     keyframes, spring, playKeyframes,
@@ -185,7 +184,7 @@ function log(msg) {
     `);
 })();
 
-// ═══ 2. Expose + Channel ═══════════════════════════════════════
+// ═══ 2. Expose ════════════════════════════════════════════════
 
 (() => {
     // Exposed dialog component
@@ -213,16 +212,6 @@ function log(msg) {
         `,
     });
 
-    // Channel
-    const ch = createChannel();
-    const msgCount = signal(0);
-    ch.on('ping', () => {
-        msgCount.set(v => v + 1);
-        log(`Channel: received ping #${msgCount.peek()}`);
-        ch.emit('pong');
-    });
-    ch.on('pong', () => log('Channel: pong received'));
-
     const el = document.getElementById('comm-demo');
     el.innerHTML = '<demo-dialog title="Exposed Dialog"></demo-dialog>';
     const dialogEl = el.querySelector('demo-dialog');
@@ -230,8 +219,6 @@ function log(msg) {
     el.appendChild(html`
         <div class="row" style="margin-top:0.5rem;">
             <button class="primary" @click=${() => dialogEl.open()}>Open Dialog (expose)</button>
-            <button @click=${() => ch.send('ping')}>Send Ping (channel)</button>
-            <span class="tag tag-blue">${() => `${msgCount()} pings`}</span>
         </div>
     `);
 })();

@@ -7,7 +7,7 @@ parent: api
 
 # Components API
 
-Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 103 exports, from `@pdxui/core`.
+Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures. 100 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -254,58 +254,6 @@ function createBottomSheet(content: Node, options?: BottomSheetOptions): BottomS
 
 Create a bottom sheet (mobile-optimized overlay).
 Fixed to bottom, draggable between detent points, swipe-down to dismiss.
-
-## `createChannel`
-
-```ts
-import { createChannel } from '@pdxui/core';
-
-function createChannel(): Channel<T>
-```
-
-Create a typed bidirectional channel.
-Messages are validated by TypeScript at compile time.
-At runtime, listeners are stored per-event, frozen for security.
-
-CONSTRAINT: send (down) and emit (up) share one listener map, keyed by event
-NAME — give `down` and `up` distinct names in the contract ('refresh' vs 'refreshed', say), or
-the listeners receive the messages of both directions.
-
-## `createCommands`
-
-```ts
-import { createCommands } from '@pdxui/core';
-
-function createCommands(): Commands<T>
-```
-
-Create a typed command dispatcher (parent→child direction only).
-Simpler than a full channel when bidirectional is not needed.
-
-## `createCompoundParent`
-
-```ts
-import { createCompoundParent } from '@pdxui/core';
-
-function createCompoundParent(options?: CompoundOptions<TChild>): CompoundParentContext<TChild>
-```
-
-Create a compound parent context.
-The parent creates this and provides it to children via provide/inject.
-
-@example
-// A token, declared once: export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
-// In parent component (e.g. pdx-tabs):
-const compound = createCompoundParent<TabChild>({
-    onChildAdded: (child, i) => { ... },
-    onNotify: (event, payload) => { ... },
-});
-provide(Tabs, compound, ctx.el);
-
-// In child component (e.g. pdx-tab):
-const parent = inject(Tabs, ctx.el);
-const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
-onDestroy(() => dispose());
 
 ## `createDialogQueue`
 
