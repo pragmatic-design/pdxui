@@ -147,13 +147,10 @@ before entering, and names what it loads:
   @await (user as u) {
     <h1>{{ u.name }}</h1>
   }
-  @if (user.state() === 'error') {
-    <p>Could not load the user: {{ user.error()?.message }}</p>
-  }
 </template>
 
 <script>
-import type { LoaderContext } from '@pdxui/router';
+import { notFound, redirect, type LoaderContext } from '@pdxui/router';
 interface User { id: number; name: string }
 
 @page '/users/:id(number)';
@@ -161,6 +158,8 @@ interface User { id: number; name: string }
 
 async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Promise<User> {
     const res = await fetch(`/api/users/${params.id}`, { signal });
+    if (res.status === 404) throw notFound();
+    if (res.status === 401) throw redirect('/login');
     return res.json();
 }
 </script>
@@ -179,6 +178,16 @@ reads it like any source. In the editor `user.data()` is typed by what the funct
 misspelt field is an error; annotate the context, `LoaderContext<{ id: number }>`, and `params` is
 typed too. The page mounts only once the loader has settled, which is what makes it *blocking* data
 — for declarative fetching inside the page see [Data layer](../../pdxui-data-layer/references/data.md).
+
+What the loader throws decides where the navigation ends:
+
+- `throw redirect('/login')` goes there instead, before the page is shown. The address it left is
+  replaced, so Back does not return to it; `redirect(to, { replace: false })` keeps it.
+- `throw notFound()` shows the not-found page of that level, with the address unchanged. On a child
+  route, the parent stays on screen with its data, and the not-found is where the child would be.
+- Any other error shows the level's error page instead of the page, with a **Try again** button that
+  runs the loader again. Its reason is still in `user.error()`. An app with its own error page calls
+  `retryNavigation()` from `@pdxui/router` for the same retry.
 
 Coming from the alpha: `@loader loadUser;` and `currentLoaderData()` are gone. `pdx migrate` names
 the loader after its function, `@loader loadUser: loadUser;`, and turns the page's

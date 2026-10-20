@@ -6,12 +6,15 @@
 // through that seam. `packages/router/tests/parity.test.ts` runs the behaviour suite against every
 // way of producing the routes.
 
+// `redirect` and `notFound` are a loader's outcomes (#147); `retryNavigation` is the retry of a
+// level's error page.
 export {
     createRouter, createRouterFromTable, configureRouter, destroyRouter, navigate,
     currentPath, currentParams, currentQuery, currentSearch, currentMeta, currentState,
     loaderData, loaderState, loaderError, loaderSource, currentRoute, currentNavError,
     navigation, onBeforeNavigate, onAfterNavigate,
     registerGuardChecker, setQuery, setQueryParam,
+    redirect, notFound, retryNavigation,
 } from './active';
 export type { RouteConfig, ResolvedRoute, RouterOptions, NavigationHop, RouteTable, TableRoute, LoaderContext, LoaderSource } from './active';
 // Typed routes (#150): augmented by the app's generated `.pdx/routes.d.ts`.

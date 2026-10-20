@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 428 keys in 78 components.
+> Generated from the sources. 430 keys in 78 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -350,9 +350,11 @@ placeholders, filled at render: keep them in the translation.
 | `rich-text` | `undo` | `Undo` | `@pdxui/ui/src/shared/i18n.ts` |
 | `router` | `backHome` | `← Back to home` | `@pdxui/router/src/outlet.ts` |
 | `router` | `error` | `Error {code}` | `@pdxui/router/src/outlet.ts` |
+| `router` | `loaderFailed` | `This page could not load its data` | `@pdxui/router/src/outlet.ts` |
 | `router` | `loadFailed` | `Failed to load page: {message}` | `@pdxui/router/src/outlet.ts` |
 | `router` | `loading` | `Loading...` | `@pdxui/router/src/outlet.ts` |
 | `router` | `notFound` | `Page not found` | `@pdxui/router/src/outlet.ts` |
+| `router` | `retry` | `Try again` | `@pdxui/router/src/outlet.ts` |
 | `search-input` | `clear` | `Clear search` | `@pdxui/ui/src/shared/i18n.ts` |
 | `search-input` | `placeholder` | `Search...` | `@pdxui/ui/src/shared/i18n.ts` |
 | `search-input` | `searching` | `Searching` | `@pdxui/ui/src/shared/i18n.ts` |

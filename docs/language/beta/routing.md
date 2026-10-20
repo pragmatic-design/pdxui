@@ -89,7 +89,9 @@ unannotated parameter is not yet typed from the pattern. `{ staleTime }` and `st
 loader: a redirect navigates to `to` before the current navigation commits (no history entry for the
 abandoned target by default); `notFound()` renders the not-found page **of the level**, with the URL
 unchanged; any other error renders the level's error page with a retry that re-runs the loader — the
-page is no longer mounted as if nothing happened.
+page is no longer mounted as if nothing happened. (**Landed**, #147 — `router/tests/loader-outcomes.test.ts`,
+`outlet-loader.test.ts`: the error page is the outlet's `'500'`, the retry is `retryNavigation()`, and
+the first outcome ends the run, so a level below it does not load.)
 
 **The identity of a loader call.** Everything a loader receives decides its result, so a call is
 identified by all of it:

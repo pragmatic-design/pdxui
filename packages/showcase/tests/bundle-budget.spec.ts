@@ -261,7 +261,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // loader's own module, the `@await` block that renders the record, and the router's `loaderSource`
 // (#506) now reached by a page. Same machine, same day, the built dist: main js 468.4 → this branch
 // 470.1 KB, entry 40.5 → 40.8 KB, blocking 96.8 → 97.0 KB, both still within theirs.
-const BUDGET_KB = { entry: 41, js: 471, css: 63, blocking: 97 };
+// entry 41 → 42, blocking 97 → 98: a loader's outcomes (#147) — the outlet renders a level's error
+// page at any depth, with a retry, and the router turns what a loader throws into a redirect, a
+// not-found or an error page. The outlet is in the entry, so all of it is. `redirect()` and
+// `notFound()` themselves are not: the router recognises them by a marker, and only the loaders that
+// throw them import them. Same machine, same day, the built dist: main entry 40.8 → this branch
+// 41.1 KB, blocking 97.0 → 97.4 KB, js 470.1 → 470.4 KB.
+const BUDGET_KB = { entry: 42, js: 471, css: 63, blocking: 98 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

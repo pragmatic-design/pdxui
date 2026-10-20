@@ -77,12 +77,15 @@ describe('a page with a named @loader', () => {
         expect(text('awaited')).toBe('User 7');
     });
 
-    it("a failing loader leaves state() 'error' and the reason in error()", async () => {
+    it("a failing loader leaves state() 'error' and the reason in error(), under the level's error page (#147)", async () => {
         gate.__loaderGate.fail = true;
         navigate('/nl/8');
         await settle();
-        expect(text('state')).toBe('error');
-        expect(text('error')).toBe('no such user');
+        const user = routerExports.loaderSource('/nl/:id(number)');
+        expect(user.state()).toBe('error');
+        expect(user.error()?.message).toBe('no such user');
+        expect(document.querySelector('app-named-loader'), 'the page stayed as if its loader had not failed').toBeNull();
+        expect(document.querySelector('pdx-router-outlet [role="alert"]')).not.toBeNull();
         gate.__loaderGate.fail = false;
     });
 });

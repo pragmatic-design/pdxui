@@ -240,12 +240,23 @@ the same key takes it instead of calling the loader. The prefetched call gets th
 a signal of its own: the navigation that takes it aborts it when superseded, and a call that expires
 unused is aborted as it is dropped.
 
+**Outcomes** (#147). A loader ends a navigation by what it throws. `throw redirect(to, { replace? })`
+from `@pdxui/router` sends it to `to` before the route is published, and the route never renders;
+with `replace` (the default) the abandoned address leaves no history entry, `{ replace: false }`
+keeps it. `throw notFound()` renders the not-found page of the level — the levels above it stay, with
+their data — and the address is unchanged. Any other error renders the level's error page, whose
+retry runs the navigation and the loader again (`retryNavigation()`, exported for an app's own error
+page); the page is not mounted. Loaders run outermost first, and the first outcome ends the run: a
+level below it does not load. The error page is the outlet's, or the app's own registered for the
+code: `'404'` for not found, `'500'` for a failure (`currentNavError()`, at `currentNavErrorDepth()`).
+
 #### Rules
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is
   registered without a loader.
-- A loader that throws sets the state to `'error'`, keeps the reason in `user.error()` until it
-  succeeds again, and logs it at run time; nothing is checked at compile time.
+- A loader that throws anything but a redirect sets the state to `'error'` and keeps the reason in
+  `user.error()` until it succeeds again; a failure other than `notFound()` is logged at run time.
+  Nothing is checked at compile time.
 - The alpha's anonymous `@loader loadUser;` and its readers `currentLoaderData()` /
   `currentLoaderState()` are `PDX_REMOVED_FORM`. `pdx migrate` names the loader after its function,
   `@loader loadUser: loadUser;`, and rewrites the readers to `loadUser.data()` / `loadUser.state()` on
@@ -259,13 +270,10 @@ unused is aborted as it is dropped.
   @await (user as u) {
     <h1>{{ u.name }}</h1>
   }
-  @if (user.state() === 'error') {
-    <p>Could not load the user: {{ user.error()?.message }}</p>
-  }
 </template>
 
 <script>
-import type { LoaderContext } from '@pdxui/router';
+import { notFound, redirect, type LoaderContext } from '@pdxui/router';
 interface User { id: number; name: string }
 
 @page '/users/:id(number)';
@@ -273,6 +281,8 @@ interface User { id: number; name: string }
 
 async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Promise<User> {
   const res = await fetch('/api/users/' + params.id, { signal });
+  if (res.status === 404) throw notFound();
+  if (res.status === 401) throw redirect('/login');
   return res.json();
 }
 </script>
@@ -280,7 +290,7 @@ async function loadUser({ params, signal }: LoaderContext<{ id: number }>): Prom
 
 #### Since
 
-alpha; the named form, beta (#506)
+alpha; the named form, beta (#506); outcomes, beta (#147)
 
 ## How the page renders
 

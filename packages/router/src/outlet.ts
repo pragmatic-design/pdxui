@@ -16,7 +16,7 @@
 
 import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV, trackUrgentLoad } from '@pdxui/core';
 import { RouteParams } from './route-types';
-import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig } from './active';
+import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig, retryNavigation } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
 import { takeRoutePrefetch, cancelOtherPrefetches } from './prefetch';
 
@@ -29,6 +29,8 @@ registerComponentStrings('router', {
     error: 'Error {code}',
     backHome: '← Back to home',
     loadFailed: 'Failed to load page: {message}',
+    loaderFailed: 'This page could not load its data',
+    retry: 'Try again',
 });
 
 const routerString = (key: string): string => getComponentString('router', key)();
@@ -579,15 +581,16 @@ class PdxRouterOutlet extends HTMLElement {
             // that expects a child is the parent alone, which is what a bare parent URL means —
             // not a 404.
             //
-            // Except when the level that would have gone here was REFUSED. A guard denies one level
-            // of the chain; the levels above it were allowed and keep rendering, and the refusal
-            // belongs to the outlet the denied level would have used — the tab is refused, the page
-            // stays. `currentNavErrorDepth()` is the level the runtime denied at, and it is 0 for a
-            // 404 and for a denial with nothing allowed above it, which is the whole-page
+            // Except when the level that would have gone here ENDED ON AN ERROR: a guard refused it,
+            // or its loader reported not found or failed (#147). The levels above it keep rendering,
+            // and the error page belongs to the outlet the level would have used — the tab is
+            // refused, the page stays. `currentNavErrorDepth()` is that level, and it is 0 for a
+            // no-match 404 and for an error with nothing above it, which is the whole-page
             // behaviour of a flat route.
-            const refusedHere = currentNavError() === '403' && currentNavErrorDepth() === this._depth;
-            if (this._depth > 0 && !refusedHere) return;
-            // 403 (guard denied) vs 404 (no match) — the runtime tells us which.
+            const erredHere = currentNavError() !== null && currentNavErrorDepth() === this._depth;
+            if (this._depth > 0 && !erredHere) return;
+            // 403 (guard denied), 404 (no match, or notFound()), 500 (a loader failed) — the runtime
+            // tells us which.
             this._showErrorPage(currentNavError() ?? '404', location.pathname);
             this._focusActive(); // error page self-announces via role="alert"
             return;
@@ -1023,7 +1026,9 @@ class PdxRouterOutlet extends HTMLElement {
         el.setAttribute('role', 'alert');
         const headline = code === '404'
             ? routerString('notFound')
-            : routerString('error').replace('{code}', code);
+            : code === '500'
+                ? routerString('loaderFailed')
+                : routerString('error').replace('{code}', code);
         el.setAttribute('aria-label', headline);
         el.style.cssText = 'display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;';
         el.innerHTML = `
@@ -1041,6 +1046,16 @@ class PdxRouterOutlet extends HTMLElement {
         // `path` is the live URL (attacker-controllable) → inject via textContent, never innerHTML.
         const _codeEl = el.querySelector('code');
         if (_codeEl) _codeEl.textContent = path;
+        // A loader that failed may succeed on a second try (#147): the retry runs the navigation, and
+        // the level's loader, again — the levels above keep their data.
+        if (code === '500') {
+            const retry = document.createElement('button');
+            retry.type = 'button';
+            retry.textContent = routerString('retry');
+            retry.style.cssText = 'margin-top:24px';
+            retry.addEventListener('click', () => retryNavigation());
+            _homeEl?.before(retry);
+        }
         this.appendChild(el);
         this._errorElement = el;
         this._activeElement = el;

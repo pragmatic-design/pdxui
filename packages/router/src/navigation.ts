@@ -224,6 +224,16 @@ export async function handleNavigation(fullPath: string, isBack = false, depth =
     }
 }
 
+/**
+ * Resolve the address on screen again: the retry of a level's error page (#147). A level whose loader
+ * failed holds no data, so its loader runs again; a level above it that loaded is kept, as on any
+ * navigation that leaves its own params alone. No history entry is written: the address is the same.
+ */
+export function retryNavigation(): void {
+    if (!isBrowser) return;
+    void handleNavigation(stripBase(location.pathname) + location.search);
+}
+
 async function resolveNavigation(navId: number, fullPath: string, isBack: boolean, depth: number, commit?: (target: string) => void): Promise<void> {
     const isCurrent = () => navId === _navSeq;
 
@@ -337,7 +347,7 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
             if (isBrowser) writeUrl('replace', null, config.basePath + redirectTo);
             return handleNavigation(redirectTo, isBack, depth + 1);
         }
-        return publishDenied(path, query, params, chain, level, prevPath);
+        return publishLevelError('403', path, query, params, chain, level, prevPath, true);
     }
 
     // Every level's chunk starts now, all at once, and beside it every level's loader, outermost
@@ -347,8 +357,21 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
     const chunks = startChunks(chain);
     _loaderFocus.set(route.path);
     const pendingLoaders = planLoaders(chain, params);
-    if (pendingLoaders.length > 0
-        && !await runLoaders(pendingLoaders, isCurrent, { chunks, params, search: _search.peek() })) return;
+    if (pendingLoaders.length > 0) {
+        const outcome = await runLoaders(pendingLoaders, isCurrent, { chunks, params, search: _search.peek() });
+        if (outcome.kind === 'superseded') return;
+        // A loader's outcome (#147). The address already says `path` — the commit ran when the
+        // hooks accepted — so a redirect replaces that entry, unless the loader asked to keep it.
+        if (outcome.kind === 'redirect') {
+            if (!isRouterTarget(outcome.to)) { refuse(`a loader's redirect from "${path}"`, outcome.to); return; }
+            if (isBrowser) writeUrl(outcome.replace ? 'replace' : 'push', null, config.basePath + outcome.to);
+            return handleNavigation(outcome.to, isBack, depth + 1);
+        }
+        if (outcome.kind !== 'loaded') {
+            const code = outcome.kind === 'notFound' ? '404' : '500';
+            return publishLevelError(code, path, query, params, chain, chain.indexOf(outcome.level), prevPath, false);
+        }
+    }
 
     _path.set(path);
     _params.set(params);
@@ -364,22 +387,27 @@ async function resolveNavigation(navId: number, fullPath: string, isBack: boolea
 }
 
 /**
- * A guard denied the level at `depth`.
+ * The level at `depth` ends the navigation on an error page: a guard denied it ('403'), or its loader
+ * reported not found ('404') or failed ('500', #147).
  *
- * The levels ABOVE it were allowed, and they stay. `_route = null` is right only at the top: below
- * it, it would take a page down for a permission on one of its tabs, and leave the visitor on a 403
- * whose only way back is the browser's Back button. The chain is truncated to the allowed prefix,
- * so each outlet above the denial renders the level it already had, and the outlet at `depth`
- * finds no level of its own and shows the refusal there.
+ * The levels ABOVE it stay. `_route = null` is right only at the top: below it, it would take a page
+ * down for a permission — or a record — of one of its tabs, and leave the visitor on an error page
+ * whose only way back is the browser's Back button. The chain is truncated to the prefix above, so
+ * each outlet above renders the level it already had, and the outlet at `depth` finds no level of
+ * its own and shows the error page there.
+ *
+ * A denial clears the loaders: a denied branch leaves nothing readable behind it, and none of its
+ * loaders has run. A loader's outcome keeps them: the levels above loaded and are on screen, and the
+ * failed level's reason stays in `loaderError(path)`.
  */
-function publishDenied(
-    path: string, query: Record<string, string>, params: Record<string, string>,
-    chain: RouteConfig[], depth: number, prevPath: string,
+function publishLevelError(
+    code: '403' | '404' | '500', path: string, query: Record<string, string>, params: Record<string, string>,
+    chain: RouteConfig[], depth: number, prevPath: string, clear: boolean,
 ): void {
     _path.set(path);
-    _navError.set('403'); // distinguishes guard denial from 404 in the outlet
+    _navError.set(code); // which error page the outlet at `depth` renders
     _navErrorDepth.set(depth);
-    clearLoaders();         // a denied branch leaves nothing readable behind it
+    if (clear) clearLoaders();
     if (depth === 0) {
         _route.set(null); // nothing was allowed: the error page is the page
     } else {

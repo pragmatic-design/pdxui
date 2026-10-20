@@ -41,7 +41,9 @@
         "notFound": "Pagina non trovata",
         "error": "Errore {code}",
         "backHome": "← Torna alla home",
-        "loadFailed": "Caricamento della pagina fallito: {message}"
+        "loadFailed": "Caricamento della pagina fallito: {message}",
+        "loaderFailed": "Questa pagina non è riuscita a caricare i suoi dati",
+        "retry": "Riprova"
     },
     "breadcrumb": {
         "label": "Percorso di navigazione",
