@@ -189,9 +189,8 @@ function dataSourceUse(c) {
   if (!/\bDataSource\b/.test(src)) return null;
   const ways = [];
   if (c.props.some(p => p.name === 'source')) ways.push('bind one to `:source`');
-  // Match: tryInject('dataSource', …), with or without a type argument — which nests its own `<>`:
-  // `tryInject<DataSource<any>>(…)`, so no `[^>]*` here.
-  if (/tryInject\b[^(]*\(\s*'dataSource'/.test(src)) ways.push('place the component inside a <DS>, which it injects');
+  // Match: inject(DataSourceContext, …), the token a <pdx-data-source> provides under (#495).
+  if (/\binject\s*\(\s*DataSourceContext\b/.test(src)) ways.push('place the component inside a <DS>, which it injects');
   if (!ways.length && /\bfield\.source\b/.test(src)) ways.push("give a schema field a `source`: the control it renders for that field reads it");
   return ways.length ? ways : ['it reads one: see its props'];
 }

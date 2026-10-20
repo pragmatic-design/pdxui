@@ -338,6 +338,14 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #478: a library component's alpha change events, read from its manifest (./alpha-events).
     alphaChangeEvent,
     alphaChangeListener,
+    // #495: the context API is `provide(token, value, host)` and `inject(token, host, fallback?)`.
+    removedExport('@pdxui/core', 'tryInject', '`inject(token, host, undefined)`', 495),
+    removedExport('@pdxui/core', 'useProvided', '`inject(token, host)`, or `@inject` in a .pdx', 495),
+    removedExport('@pdxui/core', 'tryUseProvided', '`inject(token, host, undefined)`, or `@inject` in a .pdx', 495),
+    removedExport('@pdxui/core', 'requestContext', '`inject(token, host)`, which asks the context protocol too', 495),
+    removedExport('@pdxui/core', 'provideWritable', '`provide(token, signal, host)`: a provided signal is writable, and `inject(token, host)` returns it', 495),
+    removedExport('@pdxui/core', 'useWritable', '`inject(token, host)`, which returns the provided signal, or `@inject` in a .pdx', 495),
+    removedExport('@pdxui/core', 'tryUseWritable', '`inject(token, host, undefined)`, or `@inject` in a .pdx', 495),
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

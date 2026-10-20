@@ -2,7 +2,8 @@
 // Uses IntersectionObserver on a sentinel element for efficient detection.
 // After each load completes, re-checks if sentinel is still visible to continue loading.
 
-import { component, html, tryInject, onDestroy } from '@pdxui/core';
+import { component, html, inject, onDestroy } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
 import { uiString } from '../shared/i18n';
 import type { DataSource } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -45,11 +46,7 @@ component('pdx-infinite-scroll', {
             const explicit = ctx.source() as DataSource<unknown> | null;
             if (explicit) return explicit;
             if (!_injectedDS) {
-                try {
-                    _injectedDS = tryInject('dataSource', ctx.el) as DataSource<unknown> | null ?? null;
-                } catch {
-                    _injectedDS = null;
-                }
+                _injectedDS = inject(DataSourceContext, ctx.el, null) as DataSource<unknown> | null;
             }
             return _injectedDS;
         }

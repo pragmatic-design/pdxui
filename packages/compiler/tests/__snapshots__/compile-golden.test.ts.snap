@@ -5304,7 +5304,7 @@ import '@pdxui/ui/data-source';
   __pdx_style.textContent = ".demo-row { max-width: 320px; }\\n.demo-col { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 400px; }\\n.field { display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }\\n\\n.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }\\n.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }\\n.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }\\n\\ndetails.source { margin-top: var(--pdx-space-sm); }\\ndetails.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }\\ndetails.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">DataSource &amp; pdx-data-source</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>DataSource</code> is the reactive data layer for lists, tables, and selects.\\n      <code>&lt;pdx-data-source&gt;</code> is a non-rendering component that creates one declaratively.\\n    </p>  <app-demo-comp-data-source-programmatic class="demo-section"></app-demo-comp-data-source-programmatic>  <app-demo-comp-data-source-declarative class="demo-section"></app-demo-comp-data-source-declarative>  <app-demo-comp-data-source-provider class="demo-section"></app-demo-comp-data-source-provider>  <app-demo-comp-data-source-remote class="demo-section"></app-demo-comp-data-source-remote>  <app-demo-comp-data-source-cascading class="demo-section"></app-demo-comp-data-source-cascading>  <section> <h2 class="pdx-txt-heading">pdx-data-source Props</h2> <div class="props-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>url</code></td><td>String</td><td>\\'\\'</td><td>REST endpoint. Creates restTransport.</td></tr><tr><td><code>:data</code></td><td>Array</td><td>null</td><td>Static data. Creates arrayTransport.</td></tr><tr><td><code>:transport</code></td><td>Object</td><td>null</td><td>Custom IDataTransport (priority).</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field.</td></tr><tr><td><code>:page-size</code></td><td>Number</td><td>0</td><td>Pagination. 0 = none.</td></tr><tr><td><code>auto-load</code></td><td>Boolean</td><td>true</td><td>Load on creation.</td></tr><tr><td><code>name</code></td><td>String</td><td>\\'\\'</td><td>Context key for provide (ds:{name}).</td></tr></tbody></table> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">DataSource &amp; pdx-data-source</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>DataSource</code> is the reactive data layer for lists, tables, and selects.\\n      <code>&lt;pdx-data-source&gt;</code> is a non-rendering component that creates one declaratively.\\n    </p>  <app-demo-comp-data-source-programmatic class="demo-section"></app-demo-comp-data-source-programmatic>  <app-demo-comp-data-source-declarative class="demo-section"></app-demo-comp-data-source-declarative>  <app-demo-comp-data-source-provider class="demo-section"></app-demo-comp-data-source-provider>  <app-demo-comp-data-source-remote class="demo-section"></app-demo-comp-data-source-remote>  <app-demo-comp-data-source-cascading class="demo-section"></app-demo-comp-data-source-cascading>  <section> <h2 class="pdx-txt-heading">pdx-data-source Props</h2> <div class="props-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>url</code></td><td>String</td><td>\\'\\'</td><td>REST endpoint. Creates restTransport.</td></tr><tr><td><code>:data</code></td><td>Array</td><td>null</td><td>Static data. Creates arrayTransport.</td></tr><tr><td><code>:transport</code></td><td>Object</td><td>null</td><td>Custom IDataTransport (priority).</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field.</td></tr><tr><td><code>:page-size</code></td><td>Number</td><td>0</td><td>Pagination. 0 = none.</td></tr><tr><td><code>auto-load</code></td><td>Boolean</td><td>true</td><td>Load on creation.</td></tr><tr><td><code>:token</code></td><td>Context</td><td>null</td><td>A token of your own the source is provided under too; it is always provided under <code>DataSourceContext</code>.</td></tr></tbody></table> </div> </section> </div> '));
 component('app-comp-data-source', {
   props: {},
   setup(ctx) {
@@ -7025,7 +7025,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = ".demo-box {\\n  padding: var(--pdx-space-md);\\n  border: 1px solid var(--pdx-color-border);\\n  border-radius: var(--pdx-radius-md);\\n  max-width: 500px;\\n}\\n.demo-child {\\n  padding: var(--pdx-space-sm);\\n  margin-bottom: var(--pdx-space-xs);\\n  background: var(--pdx-color-inset);\\n  border-radius: var(--pdx-radius-sm);\\n}\\n.demo-controls {\\n  margin-top: var(--pdx-space-sm);\\n}\\n.patterns-list {\\n  display: flex;\\n  flex-direction: column;\\n  gap: var(--pdx-space-sm);\\n}\\n.pattern-item {\\n  padding: var(--pdx-space-sm) var(--pdx-space-md);\\n  border-left: 3px solid var(--pdx-color-primary);\\n  background: var(--pdx-color-inset);\\n  border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;\\n}\\n.pattern-item strong { display: block; margin-bottom: 2px; }\\n.pattern-item p { margin: 0; }\\n\\n.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }\\n.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }\\n.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }\\n\\ndetails.source { margin-top: var(--pdx-space-sm); }\\ndetails.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }\\ndetails.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Provide — Cascading Values</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Blazor-style <code>CascadingValue</code> for Web Components.\\n      <code>&lt;pdx-provide&gt;</code> wraps children and makes values available via hierarchical\\n      Context Protocol. Nearest ancestor wins (scoped override).\\n    </p>  <app-demo-comp-provide-single class="demo-section"></app-demo-comp-provide-single>  <app-demo-comp-provide-multiple class="demo-section"></app-demo-comp-provide-multiple>  <app-demo-comp-provide-scoped class="demo-section"></app-demo-comp-provide-scoped>  <app-demo-comp-provide-patterns class="demo-section"></app-demo-comp-provide-patterns>  <section> <h2 class="pdx-txt-heading">API Reference</h2> <h3 class="pdx-txt-subheading">&lt;pdx-provide&gt; Props</h3> <div class="props-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>name</code></td><td>String</td><td>\\'\\'</td><td>Context key (single value mode).</td></tr><tr><td><code>:value</code></td><td>any</td><td>null</td><td>Value to provide (single value mode).</td></tr><tr><td><code>:values</code></td><td>Object</td><td>null</td><td>Multiple key→value pairs (takes priority).</td></tr></tbody></table> </div> <h3 class="pdx-txt-subheading" style="margin-top: 1.5rem">Consumer API</h3> <div class="props-table"> <table><thead><tr><th>API</th><th>Usage</th><th>Description</th></tr></thead><tbody><tr><td><code>@inject key;</code></td><td>.pdx files</td><td>Compiler rune — generates inject() call.</td></tr><tr><td><code>useProvided(key)</code></td><td>setup()</td><td>Composable — injects from current element\\'s ancestors.</td></tr><tr><td><code>inject(key, el)</code></td><td>anywhere</td><td>Manual — walks DOM from el upward.</td></tr></tbody></table> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Provide — Cascading Values</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Blazor-style <code>CascadingValue</code> for Web Components.\\n      <code>&lt;pdx-provide&gt;</code> wraps children and makes values available via hierarchical\\n      Context Protocol. Nearest ancestor wins (scoped override).\\n    </p>  <app-demo-comp-provide-single class="demo-section"></app-demo-comp-provide-single>  <app-demo-comp-provide-multiple class="demo-section"></app-demo-comp-provide-multiple>  <app-demo-comp-provide-scoped class="demo-section"></app-demo-comp-provide-scoped>  <app-demo-comp-provide-patterns class="demo-section"></app-demo-comp-provide-patterns>  <section> <h2 class="pdx-txt-heading">API Reference</h2> <h3 class="pdx-txt-subheading">&lt;pdx-provide&gt; Props</h3> <div class="props-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>:token</code></td><td>Context</td><td>null</td><td>Context token, <code>context&lt;T&gt;(\\'name\\')</code> (single value mode).</td></tr><tr><td><code>:value</code></td><td>any</td><td>null</td><td>Value to provide (single value mode).</td></tr><tr><td><code>:values</code></td><td>Map</td><td>null</td><td>A Map of token → value (takes priority).</td></tr></tbody></table> </div> <h3 class="pdx-txt-subheading" style="margin-top: 1.5rem">Consumer API</h3> <div class="props-table"> <table><thead><tr><th>API</th><th>Usage</th><th>Description</th></tr></thead><tbody><tr><td><code>inject(token, el)</code></td><td>anywhere</td><td>Walks the DOM from el upward; throws, naming the token, when nothing provides it.</td></tr><tr><td><code>inject(token, el, fallback)</code></td><td>anywhere</td><td>The same, and returns <code>fallback</code> when nothing provides it.</td></tr></tbody></table> </div> </section> </div> '));
 component('app-comp-provide', {
   props: {},
   setup(ctx) {
@@ -16408,7 +16408,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-data-
 ============================================================
 import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Wrapping Children — Provider Pattern</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      The core pattern: <code>&lt;pdx-data-source&gt;</code> <strong>wraps</strong> its consumers.\\n      The select inside reads data from the parent DataSource automatically.\\n      Multiple components can share the same source.\\n    </p> <div class="demo-col"> <pdx-data-source id-field="id" name="products"> <div class="field"> <label class="pdx-txt-small pdx-weight-medium">Pick a product</label> <pdx-select labelField="name" valueField="id" searchable clearable placeholder="Select product..."></pdx-select> </div> <div class="field"> <label class="pdx-txt-small pdx-weight-medium">Pick another (same source)</label> <pdx-select labelField="name" valueField="id" placeholder="Same data..."></pdx-select> </div> </pdx-data-source> </div> <details class="source"><summary>Source</summary><pre><code>&lt;!-- No :source needed — children inject automatically --&gt;\\n&lt;pdx-data-source :data="products" id-field="id"&gt;\\n  &lt;pdx-select labelField="name" valueField="id" /&gt;\\n  &lt;pdx-select labelField="name" valueField="id" /&gt;\\n&lt;/pdx-data-source&gt;</code></pre></details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Wrapping Children — Provider Pattern</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      The core pattern: <code>&lt;pdx-data-source&gt;</code> <strong>wraps</strong> its consumers.\\n      The select inside reads data from the parent DataSource automatically.\\n      Multiple components can share the same source.\\n    </p> <div class="demo-col"> <pdx-data-source id-field="id"> <div class="field"> <label class="pdx-txt-small pdx-weight-medium">Pick a product</label> <pdx-select labelField="name" valueField="id" searchable clearable placeholder="Select product..."></pdx-select> </div> <div class="field"> <label class="pdx-txt-small pdx-weight-medium">Pick another (same source)</label> <pdx-select labelField="name" valueField="id" placeholder="Same data..."></pdx-select> </div> </pdx-data-source> </div> <details class="source"><summary>Source</summary><pre><code>&lt;!-- No :source needed — children inject automatically --&gt;\\n&lt;pdx-data-source :data="products" id-field="id"&gt;\\n  &lt;pdx-select labelField="name" valueField="id" /&gt;\\n  &lt;pdx-select labelField="name" valueField="id" /&gt;\\n&lt;/pdx-data-source&gt;</code></pre></details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;return [__el6];};
 component('app-demo-comp-data-source-provider', {
   props: {},
@@ -26577,24 +26577,32 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-provi
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, bindInterpolation, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, context, effect, staticBlock, staticMarkup } from '@pdxui/core';
 import '@pdxui/ui/provide';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Multiple Values</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Pass an object to <code>:values</code> to provide multiple keys at once.\\n    </p> <div class="demo-box"> <pdx-provide> <div class="demo-child">\\n          theme: <strong><!----></strong>,\\n          locale: <strong><!----></strong>,\\n          debug: <strong><!----></strong> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide :values="appConfig"&gt;\\n  &lt;!-- inject(\\'theme\\'), inject(\\'locale\\'), inject(\\'debug\\') --&gt;\\n  &lt;app-dashboard /&gt;\\n&lt;/pdx-provide&gt;\\n\\nconst appConfig = {\\n  theme: \\'dark\\',\\n  locale: \\'en\\',\\n  debug: false,\\n};</code></pre></details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el7=__el6.firstChild.nextSibling;const __t8=__el7.firstChild;const __el9=__el7.nextSibling.nextSibling;const __t10=__el9.firstChild;const __el11=__el9.nextSibling.nextSibling;const __t12=__el11.firstChild;return [__el5,__t8,__t10,__t12];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Multiple Values</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Pass a <code>Map</code> of token to value to <code>:values</code> to provide several at once.\\n    </p> <div class="demo-box"> <pdx-provide> <div class="demo-child">\\n          theme: <strong><!----></strong>,\\n          locale: <strong><!----></strong>,\\n          debug: <strong><!----></strong> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide :values="appConfig"&gt;\\n  &lt;!-- inject(Theme, el), inject(Locale, el), inject(Debug, el) --&gt;\\n  &lt;app-dashboard /&gt;\\n&lt;/pdx-provide&gt;\\n\\nconst appConfig = new Map([\\n  [Theme, \\'dark\\'],\\n  [Locale, \\'en\\'],\\n  [Debug, false],\\n]);</code></pre></details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el8=__el7.firstChild.nextSibling;const __t9=__el8.firstChild;const __el10=__el8.nextSibling.nextSibling;const __t11=__el10.firstChild;const __el12=__el10.nextSibling.nextSibling;const __t13=__el12.firstChild;return [__el6,__t9,__t11,__t13];};
 component('app-demo-comp-provide-multiple', {
   props: {},
   setup(ctx) {
-const multiValues = { theme: 'dark', locale: 'en', debug: false };
-    return { multiValues };
+const Theme = context        ('theme');
+    
+    const Locale = context        ('locale');
+    
+    const Debug = context         ('debug');
+    
+    const config = { theme: 'dark', locale: 'en', debug: false };
+    
+    const multiValues = new Map                  ([[Theme, config.theme], [Locale, config.locale], [Debug, config.debug]]);
+    return { Theme, Locale, Debug, config, multiValues };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el5,__t8,__t10,__t12]=__walk0(__frag);
-    let __el5w_values = {}; effect(() => { const __b = ctx.multiValues; if (Object.is(__b, __el5w_values)) return; __el5w_values = __b; assignBoundProperty(__el5, "values", __b); });
-    bindInterpolation(__t8,()=>ctx.multiValues.theme);
-    bindInterpolation(__t10,()=>ctx.multiValues.locale);
-    bindInterpolation(__t12,()=>String(ctx.multiValues.debug));
+    const [__el6,__t9,__t11,__t13]=__walk0(__frag);
+    let __el6w_values = {}; effect(() => { const __b = ctx.multiValues; if (Object.is(__b, __el6w_values)) return; __el6w_values = __b; assignBoundProperty(__el6, "values", __b); });
+    bindInterpolation(__t9,()=>ctx.config.theme);
+    bindInterpolation(__t11,()=>ctx.config.locale);
+    bindInterpolation(__t13,()=>String(ctx.config.debug));
     return __frag;
   })(),
 });
@@ -26625,20 +26633,23 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-provi
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, component, context, effect, staticBlock, staticMarkup } from '@pdxui/core';
 import '@pdxui/ui/provide';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Scoped Override</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Nested providers shadow outer ones. The nearest ancestor wins — like CSS cascading.\\n    </p> <div class="demo-box"> <pdx-provide name="color"> <div class="demo-child">\\n          Outer color: <strong style="color: blue">blue</strong> </div> <pdx-provide name="color"> <div class="demo-child">\\n            Inner override: <strong style="color: red">red</strong> </div> </pdx-provide> <div class="demo-child">\\n          Back to outer: <strong style="color: blue">blue</strong> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="color" :value="\\'blue\\'"&gt;\\n  &lt;!-- inject(\\'color\\') → \\'blue\\' --&gt;\\n  &lt;pdx-provide name="color" :value="\\'red\\'"&gt;\\n    &lt;!-- inject(\\'color\\') → \\'red\\' (nearest wins) --&gt;\\n  &lt;/pdx-provide&gt;\\n  &lt;!-- inject(\\'color\\') → \\'blue\\' again --&gt;\\n&lt;/pdx-provide&gt;</code></pre></details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Scoped Override</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Nested providers of one token shadow outer ones. The nearest ancestor wins — like CSS cascading.\\n    </p> <div class="demo-box"> <pdx-provide> <div class="demo-child">\\n          Outer color: <strong style="color: blue">blue</strong> </div> <pdx-provide> <div class="demo-child">\\n            Inner override: <strong style="color: red">red</strong> </div> </pdx-provide> <div class="demo-child">\\n          Back to outer: <strong style="color: blue">blue</strong> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide :token="Color" :value="\\'blue\\'"&gt;\\n  &lt;!-- inject(Color, el) → \\'blue\\' --&gt;\\n  &lt;pdx-provide :token="Color" :value="\\'red\\'"&gt;\\n    &lt;!-- inject(Color, el) → \\'red\\' (nearest wins) --&gt;\\n  &lt;/pdx-provide&gt;\\n  &lt;!-- inject(Color, el) → \\'blue\\' again --&gt;\\n&lt;/pdx-provide&gt;</code></pre></details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el7=__el4.firstChild.nextSibling.nextSibling.nextSibling;return [__el4,__el7];};
 component('app-demo-comp-provide-scoped', {
   props: {},
   setup(ctx) {
-
+const Color = context        ('color');
+    return { Color };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el4,__el7]=__walk0(__frag);
+    let __el4w_token = {}; effect(() => { const __b = ctx.Color; if (Object.is(__b, __el4w_token)) return; __el4w_token = __b; assignBoundProperty(__el4, "token", __b); });
     { assignBoundProperty(__el4, "value", 'blue'); }
+    let __el7w_token = {}; effect(() => { const __b = ctx.Color; if (Object.is(__b, __el7w_token)) return; __el7w_token = __b; assignBoundProperty(__el7, "token", __b); });
     { assignBoundProperty(__el7, "value", 'red'); }
     return __frag;
   })(),
@@ -26650,26 +26661,31 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-provi
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, context, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 import '@pdxui/ui/provide';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Single Named Value</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Provide one value by name. Children inject it with <code>@inject</code> or <code>useProvided()</code>.\\n    </p> <div class="demo-box"> <pdx-provide name="greeting"> <div class="demo-child">\\n          Child sees greeting: <strong><!----></strong> </div> <div class="demo-controls"> <button class="pdx-btn pdx-btn-sm pdx-btn-outline">Change Greeting</button> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="greeting" :value="greetingMsg"&gt;\\n  &lt;!-- all descendants can inject(\\'greeting\\') --&gt;\\n  &lt;app-my-widget /&gt;\\n&lt;/pdx-provide&gt;\\n\\n// In app-my-widget setup:\\nconst greeting = useProvided(\\'greeting\\');</code></pre></details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el8=__el7.firstChild.nextSibling;const __t9=__el8.firstChild;const __el10=__el7.nextSibling.nextSibling;const __el11=__el10.firstChild.nextSibling;return [__el6,__t9,__el11];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Single Value</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Provide one value under a context token. Children inject it with <code>inject(Greeting, el)</code>.\\n    </p> <div class="demo-box"> <pdx-provide> <div class="demo-child">\\n          Child sees greeting: <strong><!----></strong> </div> <div class="demo-controls"> <button class="pdx-btn pdx-btn-sm pdx-btn-outline">Change Greeting</button> </div> </pdx-provide> </div> <details class="source"><summary>Source</summary><pre><code>// greeting.ts\\nexport const Greeting = context&lt;string&gt;(\\'greeting\\');\\n\\n&lt;pdx-provide :token="Greeting" :value="greetingMsg"&gt;\\n  &lt;!-- all descendants can inject(Greeting, el) --&gt;\\n  &lt;app-my-widget /&gt;\\n&lt;/pdx-provide&gt;\\n\\n// In app-my-widget setup:\\nconst greeting = inject(Greeting, ctx.el);</code></pre></details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __el6=__el5.firstChild.nextSibling;const __el7=__el6.firstChild.nextSibling;const __t8=__el7.firstChild;const __el9=__el6.nextSibling.nextSibling;const __el10=__el9.firstChild.nextSibling;return [__el5,__t8,__el10];};
 component('app-demo-comp-provide-single', {
   props: {},
   setup(ctx) {
     const __greetingMsg = signal('Hello from provider!', { name: 'demo-comp-provide-single:greetingMsg' });
-function changeGreeting() {
+const Greeting = context        ('greeting');
+    
+    
+    
+    function changeGreeting() {
       __greetingMsg.setRaw(__greetingMsg.peek() === 'Hello from provider!' ? 'Ciao dal provider!' : 'Hello from provider!');
     }
-    return { greetingMsg: __greetingMsg, changeGreeting };
+    return { Greeting, greetingMsg: __greetingMsg, changeGreeting };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el6,__t9,__el11]=__walk0(__frag);
-    let __el6w_value = {}; effect(() => { const __b = ctx.greetingMsg(); if (Object.is(__b, __el6w_value)) return; __el6w_value = __b; assignBoundProperty(__el6, "value", __b); });
-    bindInterpolation(__t9,()=>ctx.greetingMsg());
-    __el11.addEventListener('click', safeHandler(batchHandler(ctx.changeGreeting), ctx.el?.tagName?.toLowerCase(), 'click'));
+    const [__el5,__t8,__el10]=__walk0(__frag);
+    let __el5w_token = {}; effect(() => { const __b = ctx.Greeting; if (Object.is(__b, __el5w_token)) return; __el5w_token = __b; assignBoundProperty(__el5, "token", __b); });
+    let __el5w_value = {}; effect(() => { const __b = ctx.greetingMsg(); if (Object.is(__b, __el5w_value)) return; __el5w_value = __b; assignBoundProperty(__el5, "value", __b); });
+    bindInterpolation(__t8,()=>ctx.greetingMsg());
+    __el10.addEventListener('click', safeHandler(batchHandler(ctx.changeGreeting), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
   })(),
 });

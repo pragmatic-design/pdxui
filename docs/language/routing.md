@@ -460,8 +460,9 @@ The analyzer's form: `@params { id: number }`. The block may span lines.
 #### Semantics
 
 `@params` types the route's params and declares each one as a name the page reads. The route
-carries `paramTypes:{id:"number"}`, and the setup reads the `routeParams` context the main
-`<pdx-router-outlet>` provides, `const __routeParams = inject('routeParams', ctx.el)`, and declares
+carries `paramTypes:{id:"number"}`, and the setup reads the params the main `<pdx-router-outlet>`
+provides under the router's `RouteParams` token (#495), imported for it,
+`const __routeParams = inject(RouteParams, ctx.el, null) ?? (() => ({}))` — empty outside an outlet — and declares
 one computed per field under the field's own name, `const id = computed(() => Number(__routeParams()?.id ?? 0))`,
 before the deriveds and the body. A `number` field is coerced with `Number` (`0` when absent), a
 `boolean` field is `=== 'true'`, any other type is the string (`''` when absent). It is read like a

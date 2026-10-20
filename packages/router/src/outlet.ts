@@ -15,6 +15,7 @@
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
 import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV, trackUrgentLoad } from '@pdxui/core';
+import { RouteParams } from './route-types';
 import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
 import { takeRoutePrefetch, cancelOtherPrefetches } from './prefetch';
@@ -361,8 +362,8 @@ class PdxRouterOutlet extends HTMLElement {
                 // caught by the same-path early return, so this never renders twice.
                 this._handleRouteChange(this._levelRoute(currentRoute()));
             });
-            // Provide routeParams to all descendants via hierarchical Context Protocol
-            provide('routeParams', routeParams, this);
+            // Provide routeParams to all descendants via hierarchical Context Protocol, under its token
+            provide(RouteParams, routeParams, this);
             // The page's leave guards are asked where onBeforeNavigate is: BEFORE the address is
             // written. Asked once the route has changed, the address bar would name the destination
             // while "Unsaved changes" is open, and a refusal would come back with a push.

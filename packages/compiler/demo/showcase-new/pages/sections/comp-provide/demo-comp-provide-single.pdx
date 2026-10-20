@@ -1,11 +1,11 @@
 <template>
   <section>
-    <h2 class="pdx-txt-heading">Single Named Value</h2>
+    <h2 class="pdx-txt-heading">Single Value</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Provide one value by name. Children inject it with <code>@inject</code> or <code>useProvided()</code>.
+      Provide one value under a context token. Children inject it with <code>inject(Greeting, el)</code>.
     </p>
     <div class="demo-box">
-      <pdx-provide name="greeting" :value="greetingMsg">
+      <pdx-provide :token="Greeting" :value="greetingMsg">
         <div class="demo-child">
           Child sees greeting: <strong>{{ greetingMsg }}</strong>
         </div>
@@ -14,19 +14,24 @@
         </div>
       </pdx-provide>
     </div>
-    @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide name="greeting" :value="greetingMsg"&gt;
-  &lt;!-- all descendants can inject('greeting') --&gt;
+    @raw {<details class="source"><summary>Source</summary><pre><code>// greeting.ts
+export const Greeting = context&lt;string&gt;('greeting');
+
+&lt;pdx-provide :token="Greeting" :value="greetingMsg"&gt;
+  &lt;!-- all descendants can inject(Greeting, el) --&gt;
   &lt;app-my-widget /&gt;
 &lt;/pdx-provide&gt;
 
 // In app-my-widget setup:
-const greeting = useProvided('greeting');</code></pre></details>}
+const greeting = inject(Greeting, ctx.el);</code></pre></details>}
   </section>
 </template>
 
 <script>
 import '@pdxui/ui/provide';
+import { context } from '@pdxui/core';
 
+const Greeting = context<string>('greeting');
 let greetingMsg = $signal('Hello from provider!');
 
 function changeGreeting() {

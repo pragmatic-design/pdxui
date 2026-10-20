@@ -212,6 +212,10 @@ export function compileNewMode(
     if (analysis.route.loader) {
         autoImportRouter(allUserImports, ['currentLoaderData', 'currentLoaderState']);
     }
+    // @params: the outlet provides the params under the router's `RouteParams` token (#495).
+    if (analysis.route.params && analysis.route.params.length > 0) {
+        autoImportRouter(allUserImports, ['RouteParams']);
+    }
     // navigation: no declaration implies it — reading it does (navigation-import.ts says why).
     if (templateNavigation || (navigationFromRouter && setupReadsNavigation(setupParts))) {
         autoImportRouter(allUserImports, ['navigation']);

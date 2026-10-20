@@ -2,32 +2,37 @@
   <section>
     <h2 class="pdx-txt-heading">Multiple Values</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Pass an object to <code>:values</code> to provide multiple keys at once.
+      Pass a <code>Map</code> of token to value to <code>:values</code> to provide several at once.
     </p>
     <div class="demo-box">
       <pdx-provide :values="multiValues">
         <div class="demo-child">
-          theme: <strong>{{ multiValues.theme }}</strong>,
-          locale: <strong>{{ multiValues.locale }}</strong>,
-          debug: <strong>{{ String(multiValues.debug) }}</strong>
+          theme: <strong>{{ config.theme }}</strong>,
+          locale: <strong>{{ config.locale }}</strong>,
+          debug: <strong>{{ String(config.debug) }}</strong>
         </div>
       </pdx-provide>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-provide :values="appConfig"&gt;
-  &lt;!-- inject('theme'), inject('locale'), inject('debug') --&gt;
+  &lt;!-- inject(Theme, el), inject(Locale, el), inject(Debug, el) --&gt;
   &lt;app-dashboard /&gt;
 &lt;/pdx-provide&gt;
 
-const appConfig = {
-  theme: 'dark',
-  locale: 'en',
-  debug: false,
-};</code></pre></details>}
+const appConfig = new Map([
+  [Theme, 'dark'],
+  [Locale, 'en'],
+  [Debug, false],
+]);</code></pre></details>}
   </section>
 </template>
 
 <script>
 import '@pdxui/ui/provide';
+import { context } from '@pdxui/core';
 
-const multiValues = { theme: 'dark', locale: 'en', debug: false };
+const Theme = context<string>('theme');
+const Locale = context<string>('locale');
+const Debug = context<boolean>('debug');
+const config = { theme: 'dark', locale: 'en', debug: false };
+const multiValues = new Map<unknown, unknown>([[Theme, config.theme], [Locale, config.locale], [Debug, config.debug]]);
 </script>

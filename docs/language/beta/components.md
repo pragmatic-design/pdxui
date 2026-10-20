@@ -18,8 +18,9 @@ live once, in `@pdxui/core`.
 | An async action a button runs | `@action` ([data.md](data.md)) + `pdx-button :action` | four wired lines per button |
 | Behaviour on an element | `attach:` ([template.md](template.md)) | a ref + `onMount` + manual cleanup |
 
-`createBus`, `createChannel`, `createCommands`, `provideWritable`, `useWritable` and their `try*`
-variants leave the public exports of `@pdxui/core` in the beta (#144).
+`createBus`, `createChannel` and `createCommands` leave the public exports of `@pdxui/core` in the
+beta (#144); `provideWritable`, `useWritable` and their `try*` variants have left with the other
+context functions (#495).
 
 ## @prop
 
@@ -503,8 +504,11 @@ a value to the elements below; `@inject user from CurrentUser;` reads the neares
 Components context protocol, compared by identity (#103 — landed), so a provider from another library
 that uses the same token answers. With a signal as the provided value, a consumer that subscribes is
 called again on each change, and a plain value is delivered once (#103 — landed). The runtime API is `provide(token, value, host)` and
-`inject(token, host, default?)`; the manifest records which tokens each component provides and
-injects.
+`inject(token, host, default?)` (#495 — landed: `context<T>()`, `ContextValue<C>`, the two functions,
+`inject` asking the protocol when no PDX provider has the token, and the library's and router's
+contexts as exported tokens — `DataSourceContext`, `ErrorContext`, `RouteParams`, `<pdx-provide
+:token>`, `<pdx-data-source :token>`). The runes' token form is #496; the manifest records which
+tokens each component provides and injects.
 
 ### Rules
 
@@ -513,7 +517,8 @@ injects.
   `pdx migrate` generates a `contexts.ts` with one token per key and rewrites both sides
   (`@inject me from User`).
 - `useProvided`, `tryUseProvided`, `tryInject`, `requestContext`, `provideWritable`, `useWritable`,
-  `tryUseWritable` leave the public exports (#139; the bus and channel APIs leave with #144).
+  `tryUseWritable` leave the public exports (#495 — landed; an import of one is `PDX_REMOVED_FORM`;
+  the bus and channel APIs leave with #144).
 
 ### Examples
 

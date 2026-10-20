@@ -8029,13 +8029,12 @@
             },
             {
               "kind": "field",
-              "name": "name",
-              "description": "Name for Context Protocol provide. Descendants can inject('ds:{name}').",
+              "name": "token",
+              "description": "A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided\nunder too: a component below injects that one by it, past a nearer `<pdx-data-source>`.",
               "type": {
-                "text": "string"
+                "text": "object"
               },
-              "default": "''",
-              "attribute": "name"
+              "default": "null"
             },
             {
               "kind": "method",
@@ -8079,15 +8078,6 @@
                 "text": "boolean"
               },
               "default": "true"
-            },
-            {
-              "name": "name",
-              "fieldName": "name",
-              "description": "Name for Context Protocol provide. Descendants can inject('ds:{name}').",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             }
           ],
           "slots": [
@@ -18557,17 +18547,16 @@
           "tagName": "pdx-provide",
           "category": "Infrastructure",
           "order": 111,
-          "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue; when two provide\nthe same name, the nearest ancestor wins.",
+          "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
           "members": [
             {
               "kind": "field",
-              "name": "name",
-              "description": "Context key name (for single value mode).",
+              "name": "token",
+              "description": "The context token the value is provided under (single value mode): `context<T>('name')`.",
               "type": {
-                "text": "string"
+                "text": "object"
               },
-              "default": "''",
-              "attribute": "name"
+              "default": "null"
             },
             {
               "kind": "field",
@@ -18581,24 +18570,14 @@
             {
               "kind": "field",
               "name": "values",
-              "description": "Multiple values to provide (object of key→value). Takes priority over name/value.",
+              "description": "Multiple values, a `Map` of token → value. Takes priority over token/value.",
               "type": {
                 "text": "object"
               },
               "default": "null"
             }
           ],
-          "attributes": [
-            {
-              "name": "name",
-              "fieldName": "name",
-              "description": "Context key name (for single value mode).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            }
-          ],
+          "attributes": [],
           "slots": [
             {
               "name": "",

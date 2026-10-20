@@ -11,6 +11,7 @@
 // router may not depend on it.
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as core from '@pdxui/core';
+import * as routerExports from '../src/index';
 import { compile } from '../../compiler/src/plugin';
 
 const MODES = [
@@ -38,8 +39,12 @@ function runPage(mode: (typeof MODES)[number]): void {
     // Match: the one `import { … } from '@pdxui/core'` line. Groups: [1]=the names
     const imported = /^import \{([^}]*)\} from '@pdxui\/core';$/m.exec(code);
     expect(imported, 'the module imports nothing from @pdxui/core — this test is reading nothing').not.toBeNull();
+    // And what it imports from the router: `RouteParams`, the token the outlet provides the params
+    // under (#495) — this router's, the one the outlet below provides with.
+    // Match: the `import { … } from '@pdxui/router'` line, when there is one. Groups: [1]=the names
+    const fromRouter = /^import \{([^}]*)\} from '@pdxui\/router';$/m.exec(code)?.[1] ?? '';
     const body = code.split('\n').filter((l) => !/^\s*import\s/.test(l)).join('\n');
-    new Function('core', `const {${imported![1]}} = core;\n${body}`)(core);
+    new Function('core', 'router', `const {${imported![1]}} = core;\nconst {${fromRouter}} = router;\n${body}`)(core, routerExports);
     expect(routes.map((r) => r.path), `the ${mode.name} page registered no route`).toContain(`${mode.base}/:id`);
 }
 

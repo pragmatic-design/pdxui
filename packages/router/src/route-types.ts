@@ -11,6 +11,8 @@
 // With the registry empty — no generated file, or code outside an app — every path is a string and
 // every param a string or a number, as before.
 
+import { context, type Context, type Signal } from '@pdxui/core';
+
 /**
  * One key per `@page` pattern, its params as the value. Augmented by the generated
  * `.pdx/routes.d.ts`. The marker member is not a route: it keeps the interface from being empty and
@@ -29,6 +31,13 @@ export type RoutePath = [Registered] extends [never] ? string : Registered;
 export type RouteParams<P extends string> = P extends Registered
     ? RouteRegistry[P]
     : Record<string, string | number>;
+
+/**
+ * The context token the router outlet provides the current route's params under (#495): a signal of
+ * the raw params, read below the outlet with `inject(RouteParams, el, null)`. The same name as the type
+ * above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `RouteParams` the token.
+ */
+export const RouteParams: Context<Signal<Record<string, string>>> = context('route-params');
 
 /** Navigation state: kept with the history entry, not in the URL. */
 export type NavigationState = Record<string, unknown>;

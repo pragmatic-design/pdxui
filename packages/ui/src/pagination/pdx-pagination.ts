@@ -2,7 +2,8 @@
 // Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
 // Priority: explicit props > :source prop > injected DataSource from context.
 
-import { component, html, signal, tryInject } from '@pdxui/core';
+import { component, html, signal, inject } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
 import type { SlotFunction } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -54,7 +55,7 @@ component('pdx-pagination', {
             if (explicitSource) return explicitSource;
             // Try inject from pdx-data-source ancestor
             if (!_ds) {
-                try { _ds = tryInject('dataSource', ctx.el) as DataSource<unknown> | null; } catch { _ds = null; }
+                _ds = inject(DataSourceContext, ctx.el, null) as DataSource<unknown> | null;
             }
             return _ds;
         }

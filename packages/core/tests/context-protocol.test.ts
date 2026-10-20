@@ -7,7 +7,7 @@
 // received, so neither side could find a provider from another library.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { provide, requestContext, clearProviders } from '../src/component/context';
+import { context, provide, inject, clearProviders } from '../src/component/context';
 import { signal } from '../src/reactivity/signal';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
@@ -45,37 +45,39 @@ beforeEach(() => {
 });
 
 describe('the Web Components context protocol', () => {
-    it('a protocol provider answers PDX requestContext, for an object key', () => {
+    // `requestContext` left @pdxui/core (#495): `inject` asks the protocol when no PDX provider has the token.
+    it('a protocol provider answers PDX inject, for the token it holds', () => {
         const { parent, child } = tree();
-        const KEY = { description: 'theme' };
-        protocolProvider(parent, KEY, 'dark');
-        expect(requestContext(child, KEY as unknown as symbol)).toBe('dark');
+        const Theme = context<string>('theme');
+        protocolProvider(parent, Theme, 'dark');
+        expect(inject(Theme, child)).toBe('dark');
     });
 
-    it('a protocol provider answers PDX requestContext, for a string key', () => {
+    it('control — a protocol provider of another token of the same name does not answer it', () => {
         const { parent, child } = tree();
-        protocolProvider(parent, 'locale', 'it');
-        expect(requestContext(child, 'locale')).toBe('it');
+        protocolProvider(parent, context<string>('theme'), 'dark');
+        expect(inject(context<string>('theme'), child, 'none')).toBe('none');
     });
 
     it('PDX provide answers a protocol request', () => {
         const { parent, child } = tree();
-        const KEY = Symbol('user');
-        provide(KEY, { name: 'Ada' }, parent);
+        const User = context<{ name: string }>('user');
+        provide(User, { name: 'Ada' }, parent);
         let got: unknown;
-        child.dispatchEvent(protocolRequest(KEY, (v) => { got = v; }));
+        child.dispatchEvent(protocolRequest(User, (v) => { got = v; }));
         expect(got).toEqual({ name: 'Ada' });
     });
 
     it('PDX provide stops the request it answers, and ignores one for another key', () => {
         const { parent, child } = tree();
-        provide('a', 1, parent);
+        const A = context<number>('a');
+        provide(A, 1, parent);
         let reachedDocument = 0;
         const count = () => { reachedDocument++; };
         document.addEventListener('context-request', count);
         try {
-            child.dispatchEvent(protocolRequest('a', () => {}));
-            child.dispatchEvent(protocolRequest('b', () => {}));
+            child.dispatchEvent(protocolRequest(A, () => {}));
+            child.dispatchEvent(protocolRequest(context<number>('b'), () => {}));
         } finally {
             document.removeEventListener('context-request', count);
         }
@@ -85,10 +87,11 @@ describe('the Web Components context protocol', () => {
     it('a subscribing request to a provided signal is called again on each change, until unsubscribe', () => {
         const { parent, child } = tree();
         const theme = signal('light');
-        provide('theme', theme, parent);
+        const Theme = context<typeof theme>('theme');
+        provide(Theme, theme, parent);
         const seen: unknown[] = [];
         let unsubscribe: (() => void) | undefined;
-        child.dispatchEvent(protocolRequest('theme', (v, u) => { seen.push(v); unsubscribe = u; }, true));
+        child.dispatchEvent(protocolRequest(Theme, (v, u) => { seen.push(v); unsubscribe = u; }, true));
         expect(seen).toEqual(['light']);
         expect(typeof unsubscribe).toBe('function');
         theme.set('dark');
@@ -101,24 +104,26 @@ describe('the Web Components context protocol', () => {
     it('a consumer may unsubscribe inside the first answer', () => {
         const { parent, child } = tree();
         const theme = signal('light');
-        provide('theme', theme, parent);
+        const Theme = context<typeof theme>('theme');
+        provide(Theme, theme, parent);
         const seen: unknown[] = [];
-        child.dispatchEvent(protocolRequest('theme', (v, u) => { seen.push(v); u?.(); }, true));
+        child.dispatchEvent(protocolRequest(Theme, (v, u) => { seen.push(v); u?.(); }, true));
         theme.set('dark');
         expect(seen).toEqual(['light']);
     });
 
     it('the subscription ends when the providing component is destroyed', async () => {
         const theme = signal('light');
+        const Theme = context<typeof theme>('theme');
         const seen: unknown[] = [];
         component('pdx-ctx-protocol-host', {
-            setup(ctx) { provide('theme', theme, ctx.el); return {}; },
+            setup(ctx) { provide(Theme, theme, ctx.el); return {}; },
             render: () => html`<span></span>`,
         });
         const host = document.createElement('pdx-ctx-protocol-host');
         document.body.appendChild(host);
         await Promise.resolve();
-        host.querySelector('span')!.dispatchEvent(protocolRequest('theme', (v) => { seen.push(v); }, true));
+        host.querySelector('span')!.dispatchEvent(protocolRequest(Theme, (v) => { seen.push(v); }, true));
         theme.set('dark');
         host.remove();
         theme.set('blue');
@@ -127,9 +132,10 @@ describe('the Web Components context protocol', () => {
 
     it('a subscribing request to a plain value is answered once', () => {
         const { parent, child } = tree();
-        provide('size', 'md', parent);
+        const Size = context<string>('size');
+        provide(Size, 'md', parent);
         const seen: unknown[] = [];
-        child.dispatchEvent(protocolRequest('size', (v) => { seen.push(v); }, true));
+        child.dispatchEvent(protocolRequest(Size, (v) => { seen.push(v); }, true));
         expect(seen).toEqual(['md']);
     });
 });

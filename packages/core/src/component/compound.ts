@@ -39,15 +39,16 @@ let _nextId = 1;
  * The parent creates this and provides it to children via provide/inject.
  *
  * @example
+ * // A token, declared once: export const Tabs = context<CompoundParentContext<TabChild>>('tabs');
  * // In parent component (e.g. pdx-tabs):
  * const compound = createCompoundParent<TabChild>({
  *     onChildAdded: (child, i) => { ... },
  *     onNotify: (event, payload) => { ... },
  * });
- * provide('pdx-tabs', compound);
+ * provide(Tabs, compound, ctx.el);
  *
  * // In child component (e.g. pdx-tab):
- * const parent = inject<CompoundParentContext<TabChild>>('pdx-tabs');
+ * const parent = inject(Tabs, ctx.el);
  * const dispose = parent.register({ label: 'Tab 1', panel: panelEl });
  * onDestroy(() => dispose());
  */

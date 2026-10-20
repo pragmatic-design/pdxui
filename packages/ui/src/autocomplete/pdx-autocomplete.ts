@@ -1,7 +1,8 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, isDataSource, tryInject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
+import { signal, computed, effect, html, component, isDataSource, inject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
+import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
@@ -111,7 +112,7 @@ component('pdx-autocomplete', {
                 }
             }
             // Fallback: try Context Protocol from ancestor <pdx-data-source>
-            const injected = tryInject<DataSource<any>>('dataSource', ctx.el);
+            const injected = inject(DataSourceContext, ctx.el, null);
             if (injected && isDataSource(injected)) {
                 _externalDS.set(injected);
             } else {

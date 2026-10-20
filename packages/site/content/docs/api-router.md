@@ -7,7 +7,7 @@ parent: api
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 27 exports, from `@pdxui/router`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 28 exports, from `@pdxui/router`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -282,6 +282,18 @@ const routeParams
 ```
 
 Signal for current route params — provided to descendants via Context Protocol.
+
+## `RouteParams`
+
+```ts
+import { RouteParams } from '@pdxui/router';
+
+const RouteParams: Context<Signal<Record<string, string>>>
+```
+
+The context token the router outlet provides the current route's params under (#495): a signal of
+the raw params, read below the outlet with `inject(RouteParams, el, null)`. The same name as the type
+above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `RouteParams` the token.
 
 ## `setQuery`
 

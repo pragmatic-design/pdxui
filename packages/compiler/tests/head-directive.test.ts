@@ -166,7 +166,9 @@ describe('@params — typed route parameters', () => {
 @params { id: number };
 </script>
         `);
-        expect(code).toContain("inject('routeParams'");
+        // The outlet's token (#495), with a fallback: outside an outlet the params are empty, not a throw.
+        expect(code).toContain('inject(RouteParams, ctx.el, null)');
+        expect(code).toMatch(/import \{[^}]*\bRouteParams\b[^}]*\} from '@pdxui\/router'/);
         expect(code).toContain('computed(');
         expect(code).toContain('Number(');
     });
@@ -179,7 +181,7 @@ describe('@params — typed route parameters', () => {
 @params { slug: string };
 </script>
         `);
-        expect(code).toContain("inject('routeParams'");
+        expect(code).toContain('inject(RouteParams, ctx.el, null)');
         expect(code).toContain("__routeParams()?.slug ?? ''");
     });
 

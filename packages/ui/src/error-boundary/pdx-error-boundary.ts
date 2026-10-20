@@ -11,7 +11,7 @@
 //     <pdx-data-heavy-panel />
 //   </pdx-error-boundary>
 
-import { component, html, signal, computed, provide } from '@pdxui/core';
+import { component, html, signal, computed, provide, context } from '@pdxui/core';
 import { errorBoundary } from '@pdxui/core';
 import type { Signal, ReadonlySignal } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -27,6 +27,12 @@ export interface ErrorContext {
     /** Trigger a retry. */
     retry: () => void;
 }
+
+/**
+ * The context token the nearest boundary provides its `ErrorContext` under (#495): a component inside
+ * reads it with `inject(ErrorContext, el, null)`.
+ */
+export const ErrorContext = context<ErrorContext>('error-boundary');
 
 /**
  * Catches render errors and effect failures from its children and shows a fallback UI with retry.
@@ -60,7 +66,7 @@ component('pdx-error-boundary', {
             canRetry: _canRetry,
             retry,
         };
-        provide('errorContext', errorContext, ctx.el);
+        provide(ErrorContext, errorContext, ctx.el);
 
         // The children, kept for Retry. The fallback clears everything between the
         // boundary's markers, the projected children included, and a Retry that rendered a new

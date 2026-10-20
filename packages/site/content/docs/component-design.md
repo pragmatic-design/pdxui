@@ -73,8 +73,8 @@ rule: the rules belong to the form's validator.
 | reach | put it in |
 |---|---|
 | one component | `$signal` |
-| a subtree reads it | `provide` a read value |
-| a descendant must write it | `provideWritable` |
+| a subtree reads it | `provide` a read value, under a `context<T>()` token |
+| a descendant must write it | `provide` a signal |
 | the parent gives orders | `createCommands` / `createChannel` |
 | unrelated components, or kept across navigation | [`@store`](/docs/store) |
 | an event between unrelated components | `createBus` |
