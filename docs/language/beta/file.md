@@ -28,9 +28,10 @@ use runes), unchanged.
   `pdx migrate` converts it (migration.md). Landed (#158): the registry entry `legacy-script`, and the
   legacy code generator is removed — a file without a script compiles like one with an empty script.
 - A second `<template>` or `<script>` is `PDX_DUPLICATE_TEMPLATE` / `PDX_DUPLICATE_SCRIPT`, as in alpha.
-- **One reading rule for declarations** (decisions.md 11 — proposed): any declaration may span lines
-  when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end of
-  that block. Alpha allowed it declaration by declaration. Not landed: #524, which waits for `@action` (#142).
+- **One reading rule for declarations** (decisions.md 11 — landed, #524): any declaration may span
+  lines when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end
+  of that block. Alpha allowed it declaration by declaration. The full rule, bodies included, is in
+  [script.md](../script.md#the-script-and-its-rewrite).
 
 ### Since
 

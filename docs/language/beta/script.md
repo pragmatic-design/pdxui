@@ -21,7 +21,7 @@ ScriptItem     ::= Declaration | RuneStatement | Statement
 
 Unchanged from alpha in how declarations are found (a line that starts with `@keyword` in code) and
 what the template sees (every top-level name except those starting with `_`). The beta has one
-reading rule (decisions.md 11 — proposed): every declaration may span lines when it opens a balanced
+reading rule (decisions.md 11 — landed, #524): every declaration may span lines when it opens a balanced
 `{ … }` or `( … )` on its first line, and it ends at its `;` or at the end of that block; alpha
 allowed it declaration by declaration. A malformed declaration of a known keyword is `PDX_UNKNOWN_DECLARATION`, with the
 form below as its hint.

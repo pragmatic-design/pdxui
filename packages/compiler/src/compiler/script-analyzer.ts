@@ -30,6 +30,7 @@ import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
+import { readDeclarationsOntoOneLine } from './declaration-reading';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -124,8 +125,11 @@ function declareRouteNames(route: RouteInfo, exports: ExportDecl[]): void {
 export function analyzeScript(script: string, _filename: string, options: { originBase?: number; lineBase?: number } = {}): ScriptAnalysis {
     // Normalize compact single-line scripts: split statements to separate lines
     // so that line-based regex matching works for agent-generated compact code.
-    const { text: normalized, lineOrigins } = normalizeStatementsWithOrigins(script);
-    const lines = normalized.split('\n');
+    const { text: compact, lineOrigins } = normalizeStatementsWithOrigins(script);
+    // One reading rule (#524): a declaration that opens a block on its first line is read to the end
+    // of that block, onto that line, before any rune's parser sees it.
+    const { lines, consumed: readOntoAnother } = readDeclarationsOntoOneLine(compact.split('\n'));
+    const normalized = lines.join('\n');
     // Where line i was written in the .pdx, when the caller wants a source map.
     const originBase = options.originBase;
     const originOf = (i: number): number | null =>
@@ -219,6 +223,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const warnings: ValidationWarning[] = [];
 
     for (let i = 0; i < lines.length; i++) {
+        // A line read onto its declaration's first line (#524): what it held is there now.
+        if (readOntoAnother.has(i)) continue;
         const line = lines[i];
         const trimmed = line.trim();
 
