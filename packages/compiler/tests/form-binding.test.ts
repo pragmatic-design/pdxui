@@ -12,13 +12,15 @@ function makeHtml(content: string): HtmlNode[] {
 
 /**
  * The first model of each control that declares one, as the plugin reads it from the manifest
- * (`modelEventOf`, #478/#480/#479). A control with none keeps the compiler's alpha table.
+ * (`modelEventOf`, #478–#482). Every library value control has one since #125.
  */
 const MODELS: Record<string, string> = {
     'pdx-checkbox': 'checked', 'pdx-switch': 'checked', 'pdx-toggle': 'pressed',
     'pdx-segmented': 'value', 'pdx-slider': 'value', 'pdx-rating': 'value',
     'pdx-input': 'value', 'pdx-textarea': 'value', 'pdx-password-input': 'value', 'pdx-search-input': 'value',
-    'pdx-masked-input': 'value', 'pdx-number-input': 'value', 'pdx-otp-input': 'value',
+    'pdx-masked-input': 'value', 'pdx-number-input': 'value', 'pdx-otp-input': 'value', 'pdx-pin-input': 'value',
+    'pdx-select': 'value', 'pdx-autocomplete': 'value', 'pdx-tag-input': 'value', 'pdx-color-picker': 'value',
+    'pdx-date-picker': 'value', 'pdx-time-picker': 'value', 'pdx-radio-group': 'value', 'pdx-checkbox-group': 'value',
 };
 const modelEventOf = (tag: string) => (MODELS[tag] ? { model: MODELS[tag], event: `${MODELS[tag]}-change` } : null);
 
@@ -110,16 +112,16 @@ describe('applyFormBindings — checked controls', () => {
     });
 });
 
-// ─── Other controls (use pdx-change) ─────────────────────────
+// ─── Other controls (their model, value-change) ──────────────
 
 describe('applyFormBindings — non-text controls', () => {
-    it('injects :value and @pdx-change on pdx-select', () => {
+    it('injects :value and @value-change on pdx-select, its model (#481)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-select name="color"></pdx-select></pdx-form>'
         );
 
         expect(result).toContain(':value=');
-        expect(result).toContain('@pdx-change=');
+        expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
     });
 
@@ -209,20 +211,20 @@ describe('applyFormBindings — no overwrite', () => {
 
         // Should keep the custom binding
         expect(result).toContain(':value="custom"');
-        // Should still inject @pdx-change and @pdx-blur
-        expect(result).toContain('@pdx-change=');
+        // Should still inject @value-change and @pdx-blur
+        expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
     });
 
-    it('does NOT overwrite existing @pdx-change binding', () => {
+    it('does NOT overwrite existing @value-change binding', () => {
         const result = applyAndGet(
-            '<pdx-form :form="f"><pdx-select name="x" @pdx-change="handler"></pdx-select></pdx-form>'
+            '<pdx-form :form="f"><pdx-select name="x" @value-change="handler"></pdx-select></pdx-form>'
         );
 
         // Should keep original handler
-        expect(result).toContain('@pdx-change="handler"');
-        // Count: should have exactly one @pdx-change
-        expect(result.split('@pdx-change').length - 1).toBe(1);
+        expect(result).toContain('@value-change="handler"');
+        // Count: should have exactly one @value-change
+        expect(result.split('@value-change').length - 1).toBe(1);
     });
 
     it('does NOT overwrite existing @pdx-blur binding', () => {
@@ -302,8 +304,24 @@ describe('applyFormBindings — scope boundaries', () => {
             '<pdx-form :form="f"><div name="x">text</div></pdx-form>'
         );
 
-        expect(result).not.toContain('@pdx-change=');
+        expect(result).not.toContain('@value-change=');
         expect(result).not.toContain(':value=');
+    });
+});
+
+// ─── Without the library's manifest ─────────────────────────
+
+describe('applyFormBindings — a control whose model is not known', () => {
+    // A compile without the component registry knows no model. The binding no longer falls back to
+    // the alpha `pdx-change`, which no library control emits since #125: it uses the beta
+    // convention, the `value` model's event and its `detail.value`.
+    it('is bound with value-change and e.detail?.value, not pdx-change', () => {
+        const nodes = makeHtml('<pdx-form :form="f"><pdx-select name="color"></pdx-select></pdx-form>');
+        applyFormBindings(nodes, undefined, null);
+        const result = (nodes[0] as HtmlNode).content;
+        expect(result).toContain('@value-change=');
+        expect(result).toContain('onChange(e.detail?.value)');
+        expect(result).not.toContain('pdx-change');
     });
 });
 

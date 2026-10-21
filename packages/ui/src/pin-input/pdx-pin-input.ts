@@ -1,7 +1,7 @@
 // pdx-pin-input — Masked code input (PIN entry). Same as pdx-otp-input with mask=true.
 // Displays dots (●) instead of characters. Use for passwords/PINs.
 
-import { component, html, useFormAssociated } from '@pdxui/core';
+import { component, html, model, useFormAssociated } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 
 // PinInput is OtpInput with mask=true and numeric=true defaults
@@ -11,14 +11,17 @@ import '../otp-input/pdx-otp-input';
 /**
  * A masked code input for entering a PIN: each cell shows a dot instead of the character typed.
  *
- * @fires pdx-input {{ value }} - On every character typed or deleted: the PIN so far.
  * @fires pdx-complete {{ value }} - When every cell is filled: the whole PIN.
+ * @alphaevent pdx-input
+ * @alphadetail value $event.detail.value
  */
 component('pdx-pin-input', {
     formAssociated: true,
+    // The PIN so far (#125). Each character typed or deleted in the inner pdx-otp-input writes it, and
+    // the write dispatches `value-change`.
+    models: { value: model<string>('') },
     props: {
         length: { type: Number, default: 4 },
-        value: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
         size: { type: String, default: '' },
@@ -27,32 +30,23 @@ component('pdx-pin-input', {
         label: { type: String, default: '' },
     },
     setup(ctx) {
-        // The typed value lives in the inner pdx-otp-input: without the relay,
-        // getFormValue would read only the initial prop and the PIN would never
-        // reach the form on submit.
-        let _current = (ctx.value() as string) ?? '';
-        ctx.track(() => { _current = (ctx.value() as string) ?? ''; });
-        // The inner pdx-otp-input's events stay on it (#138): the pin-input keeps the value, then
-        // dispatches each event again from its host, which is where the app listens. The otp-input's
-        // value is its model, announced with `value-change` (#479); the pin-input's own event is still
-        // `pdx-input`, until its batch of #125.
+        // The inner pdx-otp-input's events stay on it (#138): its model's `value-change` is the
+        // pin-input's own model, written from it; `pdx-complete` is dispatched again from the host.
         function onInput(e: Event) {
             const v = (e as CustomEvent).detail?.value;
-            if (typeof v === 'string') _current = v;
-            ctx.emit('pdx-input', (e as CustomEvent).detail);
+            if (typeof v === 'string') ctx.value.set(v);
         }
         function onComplete(e: Event) { ctx.emit('pdx-complete', (e as CustomEvent).detail); }
-        useFormAssociated(ctx, { getFormValue: () => (_current ? _current : null) });
+        useFormAssociated(ctx, { getFormValue: () => { const v = ctx.value() as string; return v ? v : null; } });
 
         // Imperative API: focus/blur/clear (delegates to inner pdx-otp-input)
         ctx.expose({
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() {
-                const otp = ctx.el.querySelector('pdx-otp-input') as any;
+                const otp = ctx.el.querySelector('pdx-otp-input') as HTMLElement & { clear?: () => void } | null;
                 if (otp && typeof otp.clear === 'function') otp.clear();
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-input', { value: '' });
+                ctx.value.set('');
             },
         });
 

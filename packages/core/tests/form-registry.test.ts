@@ -21,7 +21,7 @@ describe('form registry', () => {
         for (const tag of ['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']) {
             expect(getFormControlConfig(tag), tag).toMatchObject({ textInput: true, valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
         }
-        for (const tag of ['pdx-number-input', 'pdx-otp-input']) {
+        for (const tag of ['pdx-number-input', 'pdx-otp-input', 'pdx-pin-input']) {
             expect(getFormControlConfig(tag), tag).toMatchObject({ valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
         }
     });
@@ -45,8 +45,11 @@ describe('form registry', () => {
         }
     });
 
-    it('control: one with no model yet keeps the default alpha event', () => {
-        expect(getFormControlConfig('pdx-pin-input')).toEqual({});
+    it('no built-in control is left on an alpha event (#125)', () => {
+        for (const tag of getRegisteredFormControls()) {
+            expect(getFormControlConfig(tag)?.valueEvent, tag).toMatch(/-change$/);
+            expect(getFormControlConfig(tag)?.valueEvent, tag).not.toBe('pdx-change');
+        }
     });
 
     it('registers a custom control (case-insensitive)', () => {

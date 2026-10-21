@@ -151,11 +151,12 @@ describe('the form binding', () => {
         expect(code).not.toContain("'pdx-change'");
     });
 
-    it('control: one that lists none keeps its alpha event', () => {
-        // pdx-select has no model yet (#481).
+    it('one whose model is not known is bound by the beta convention, not the alpha event (#125)', () => {
+        // No `modelEventOf` names pdx-select's model here; no library control emits pdx-change any more.
         const code = formCode('pdx-select');
-        expect(code).toContain("'pdx-change'");
-        expect(code).not.toContain('value-change');
+        expect(code).toContain("'value-change'");
+        expect(code).toContain('e.detail?.value');
+        expect(code).not.toContain("'pdx-change'");
     });
 
     it('a text field listens to its model\'s live event and binds no reactive :value (#479)', () => {

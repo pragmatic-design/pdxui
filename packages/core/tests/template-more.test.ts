@@ -347,23 +347,23 @@ describe('two-way modifiers', () => {
         expect(chosen()).toBe('b');
     });
 
-    it('a custom element with .lazy listens only to pdx-change', () => {
+    it('a custom element with no model hears no alpha commit with .lazy (#125)', () => {
         const v = signal('');
         const el = mount(html`<pdx-thing ::value.lazy=${v}></pdx-thing>`).firstElementChild!;
 
-        el.dispatchEvent(new CustomEvent('pdx-input', { detail: { value: 'typing' } }));
-        expect(v()).toBe('');
-
         el.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: 'committed' } }));
-        expect(v()).toBe('committed');
+        expect(v()).toBe('');
     });
 
-    it('a custom element that carries no detail falls back to reading the property', () => {
+    it('a model event that carries no value falls back to reading the property', () => {
+        if (!customElements.get('x-tm-field')) {
+            customElements.define('x-tm-field', class extends HTMLElement { static models = new Set(['value']); value = ''; });
+        }
         const v = signal('');
-        const el = mount(html`<pdx-thing ::value=${v}></pdx-thing>`).firstElementChild!;
+        const el = mount(html`<x-tm-field ::value=${v}></x-tm-field>`).firstElementChild!;
 
         (el as unknown as { value: string }).value = 'from-the-property';
-        el.dispatchEvent(new CustomEvent('pdx-input'));
+        el.dispatchEvent(new CustomEvent('value-change'));
 
         expect(v()).toBe('from-the-property');
     });

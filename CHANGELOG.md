@@ -290,6 +290,15 @@ semver.
     function, `@loader loadUser: loadUser;`, rewrites the page's readers to `loadUser.data()` and
     `loadUser.state()`, and flags them on a page with no loader. It flags a loader that reads
     `location` or `currentParams()`: the router hands it its params. (#506)
+- **Breaking:** `::x` on a component listens to its model's event only. The alpha listening to
+  `pdx-input` and `pdx-change` is gone: every value component of the library declares its model, the
+  last one, `pdx-pin-input`, with this change (`value-change`; it no longer emits `pdx-input`).
+  - On a library component's prop that is not a model, `::x` is now `PDX_TWO_WAY_NOT_MODEL`, as on a
+    project's component: `::page` on `pdx-pagination` was one-way in all but name.
+  - An element whose class is defined after the binding — a component loaded later — is listened to
+    once it is defined; it bound one way.
+  - The form binding, compiled without the library's manifest, binds a control by the beta convention,
+    `value-change` and `detail.value`, not `pdx-change`. (#125)
 - The pickers declare their value as a model, announced with `value-change` and `{ value }`:
   `pdx-select`, `pdx-autocomplete`, `pdx-cascader`, `pdx-tree-select`, `pdx-transfer`, `pdx-tag-input`,
   `pdx-mention`, `pdx-date-picker`, `pdx-time-picker`, `pdx-calendar` and `pdx-color-picker`. `::value`

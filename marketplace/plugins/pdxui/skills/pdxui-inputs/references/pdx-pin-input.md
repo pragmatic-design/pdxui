@@ -5,12 +5,12 @@ Segmented PIN entry.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `length` | `length` | number | `4` | Number of PIN cells. |
-| `value` | `value` | string | `''` | The current value. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `numeric` | `numeric` | boolean | `true` | Restrict input to digits. |
 | `label` | `label` | string | `''` | The cells' group name. Empty: the pin-input.label component string, «PIN». |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -20,7 +20,7 @@ Segmented PIN entry.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-complete` → `detail: { value }` — When every cell is filled: the whole PIN.; `pdx-input` → `detail: { value }` — On every character typed or deleted: the PIN so far.
+**Events:** `pdx-complete` → `detail: { value }` — When every cell is filled: the whole PIN.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 
 #### Examples

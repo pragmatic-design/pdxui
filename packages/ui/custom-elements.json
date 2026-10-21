@@ -18189,16 +18189,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -18248,6 +18238,16 @@
               "attribute": "label"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -18266,14 +18266,23 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "On every character typed or deleted: the PIN so far.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-complete",
@@ -18293,15 +18302,6 @@
                 "text": "number"
               },
               "default": "4"
-            },
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             },
             {
               "name": "disabled",
@@ -18343,6 +18343,15 @@
               "name": "label",
               "fieldName": "label",
               "description": "The cells' group name. Empty: the pin-input.label component string, «PIN».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },

@@ -2,13 +2,14 @@
 // injects bindings on child form controls that have a `name` attribute.
 //
 // This pass runs BEFORE rewriteHtmlBindings, operating on the raw HTML nodes.
-// It modifies HtmlNode.content strings to add :value, @pdx-change, @pdx-blur
-// on form controls, and :error, :touched, :warning on pdx-form-field wrappers.
+// It modifies HtmlNode.content strings to add the control's model (:value, :checked), its model's
+// event (@value-change, @checked-change) and @pdx-blur on form controls, and :error, :touched,
+// :warning on pdx-form-field wrappers.
 //
 // Rules:
 //   1. Only affects elements INSIDE <pdx-form :form="xxx"> ... </pdx-form>
 //   2. Only affects elements with a `name="yyy"` attribute
-//   3. Never overwrites existing explicit bindings (:value, @pdx-change, etc.)
+//   3. Never overwrites existing explicit bindings (:value, @value-change, etc.)
 //   4. The form variable name is extracted from the :form binding
 
 import type { TemplateNode, HtmlNode } from '../parser/template';
@@ -36,9 +37,9 @@ export class FormControlRegistry {
             'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete',
             'pdx-toggle', 'pdx-date-picker', 'pdx-time-picker',
         ]);
-        // The controls that declare a model (#125) are not here: the binding reads their model, its
-        // event and its prop from the manifest (`modelEventOf`). What is left is the alpha table of
-        // the controls whose batch has not landed yet.
+        // Every library value control declares a model (#125): the binding reads its model, its event
+        // and its prop from the manifest (`modelEventOf`). These hold only what
+        // `registerCompilerFormControl` registers for a custom control.
         this.checked = new Set();
         // The text fields declare their model too (#479); they stay here because the binding writes no
         // reactive `:value` to a field the user is typing in.
@@ -80,7 +81,13 @@ const CHECKED_CONTROLS = _defaultRegistry.checked;
 const TEXT_INPUT_CONTROLS = _defaultRegistry.textInput;
 const EVENT_NAME = _defaultRegistry.eventName;
 const VALUE_EXPR = _defaultRegistry.valueExpr;
-const DEFAULT_VALUE_EXPR = 'e.detail?.value ?? e.target?.value';
+/**
+ * A control whose model is not known — a compile without the component registry, which reads it from
+ * the manifest — is bound by the beta convention: the `value` model's event and its `detail.value`.
+ * The alpha `pdx-change` was the fallback until #125; no library control emits it any more.
+ */
+const DEFAULT_EVENT = 'value-change';
+const DEFAULT_VALUE_EXPR = 'e.detail?.value';
 
 // ─── Main Entry ───────────────────────────────────────────────
 
@@ -374,7 +381,8 @@ function injectFormFieldBindings(tagStr: string, formVar: string, fieldPath: str
 }
 
 /**
- * Inject :value (or :checked), @pdx-change, @pdx-blur on form controls.
+ * Inject the model (:value, :checked), its event (@value-change, @checked-change) and @pdx-blur on
+ * form controls.
  * Uses .pdx binding syntax — rewriteHtmlBindings converts to interpolations.
  */
 function injectControlBindings(tagStr: string, tagName: string, formVar: string, fieldPath: string, model: { model: string; event: string } | null): string {
@@ -396,8 +404,8 @@ function injectControlBindings(tagStr: string, tagName: string, formVar: string,
     // Change event binding — inject as pre-rewritten template interpolation
     // Use __pdx_form_change_N pattern: the actual handler is already a final expression
     // A control that lists models is bound to its first model's event, whose detail is `{ value }`
-    // (#478); the hand-written table holds the alpha events of the controls that list none yet.
-    const eventName = model ? model.event : (EVENT_NAME[tagName] || 'pdx-change');
+    // (#478); the table holds what `registerCompilerFormControl` registered for a custom control.
+    const eventName = model ? model.event : (EVENT_NAME[tagName] || DEFAULT_EVENT);
     if (!tagStr.includes(`@${eventName}=`)) {
         const valueExpr = model ? 'e.detail.value' : (VALUE_EXPR[tagName] || DEFAULT_VALUE_EXPR);
         // Inject as already-rewritten: @event=${handler} (no quotes = no rewrite)

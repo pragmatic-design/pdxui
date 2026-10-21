@@ -28,6 +28,9 @@ export interface ComponentEntry {
     source: 'ui' | 'project';
 }
 
+/** What a known component with no model answers: `::x` on it binds nothing back. */
+const NO_MODELS: ReadonlySet<string> = new Set();
+
 /**
  * Registry of all auto-importable components.
  * Built at plugin start, updated on new file detection.
@@ -184,13 +187,13 @@ export class ComponentResolver {
     /**
      * The models a component declares (#124) — what `::x` may bind — or null when they are not known.
      * A project `.pdx` is read for its `@model`s, again whenever the file changes, and a component that
-     * declares none answers an empty set. A library component answers what its manifest lists, and null
-     * while it lists none: those keep the alpha two-way listening until #125 gives them their models.
+     * declares none answers an empty set. A library component answers what its manifest lists, and an
+     * empty set when it lists none: the alpha two-way listening those had is gone (#125).
      */
     modelsOf(tag: string): ReadonlySet<string> | null {
         const entry = this.map.get(tag);
         if (!entry) return null;
-        if (entry.source === 'ui') return this.libraryModels.get(tag) ?? null;
+        if (entry.source === 'ui') return this.libraryModels.get(tag) ?? NO_MODELS;
         try {
             const { mtimeMs } = statSync(entry.importPath);
             const cached = this.projectModels.get(entry.importPath);

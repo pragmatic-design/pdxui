@@ -682,8 +682,8 @@ function bindStyleProp(el: HTMLElement, prop: string, value: TemplateValue): voi
  *
  * The inline build calls this too, so the two builds listen the same way: a component through its
  * model's event (#124) — with `.lazy`, the native `change` its inner input bubbles to the host, the
- * commit (#479) — or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
- * checkbox through `change`. The inline path had its own copy that listened to `input` on
+ * commit (#479); a prop that is not a model, one way (#125) — a `<select>` and a checkbox through
+ * `change`. The inline path had its own copy that listened to `input` on
  * everything, and `::value` was one-way on a component in a production build (#97).
  */
 export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue): void {
@@ -720,12 +720,16 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
 
     const applyValue = twoWayWriter(el, accessor, mods);
 
-    // A component that declares the prop as a model (#124) announces its writes with
-    // `<kebab-prop>-change` and `{ value }`, and that is all the binding listens to. The class is
-    // looked up by tag: an element not upgraded yet is still a plain HTMLElement.
+    // A component brings its value back through a model (#124): it announces its writes with
+    // `<kebab-prop>-change` and `{ value }`, and that is all the binding listens to. Every library value
+    // component declares its model since #125, which removed the alpha listening to `pdx-input` /
+    // `pdx-change`. A prop that is not a model binds one way: the compiler refuses `::x` there for a
+    // component whose models it knows (PDX_TWO_WAY_NOT_MODEL).
     if (el.tagName.includes('-')) {
-        const ctor = customElements.get(el.tagName.toLowerCase()) as { models?: ReadonlySet<string> } | undefined;
-        if (ctor?.models?.has(prop)) {
+        const tag = el.tagName.toLowerCase();
+        const listen = (): void => {
+            const ctor = customElements.get(tag) as { models?: ReadonlySet<string> } | undefined;
+            if (!ctor?.models?.has(prop)) return;
             // `.lazy` is the commit (#479): the model's event is live, and a text field's commit is its
             // inner input's native `change`, which bubbles to the host. The model holds the value.
             if (mods.lazy) {
@@ -736,30 +740,11 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
                 const detail = (e as CustomEvent).detail as { value?: unknown } | null;
                 applyValue(detail && typeof detail === 'object' && 'value' in detail ? detail.value : (el as unknown as Record<string, unknown>)[prop]);
             });
-            return;
-        }
-    }
-
-    // Custom elements (pdx-*) don't emit `pdx-<prop>` and may not write the property back;
-    // they emit `pdx-input` (live) / `pdx-change` (committed) carrying the value in
-    // e.detail. Listen to those and read the payload — a `pdx-<prop>` listener never
-    // fires, and ::value/::checked would be silently one-way on every component. This is the
-    // alpha listening, kept for the library components that do not declare their models yet (#125).
-    if (el.tagName.includes('-')) {
-        const onEvt = (e: Event) => {
-            const detail = (e as CustomEvent).detail;
-            let raw: unknown;
-            if (detail && typeof detail === 'object' && prop in (detail as object)) {
-                raw = (detail as Record<string, unknown>)[prop];
-            } else if (detail && typeof detail === 'object' && 'value' in (detail as object)) {
-                raw = (detail as Record<string, unknown>).value;
-            } else {
-                raw = (el as unknown as Record<string, unknown>)[prop];
-            }
-            applyValue(raw);
         };
-        const events = mods.lazy ? ['pdx-change'] : ['pdx-input', 'pdx-change'];
-        for (const ev of events) el.addEventListener(ev, onEvt);
+        // The class is looked up by tag. An element whose class is not defined yet has no model to look
+        // up: the listener is added when it is (a component loaded later would otherwise bind one way).
+        if (customElements.get(tag)) listen();
+        else void customElements.whenDefined(tag).then(listen);
         return;
     }
 
