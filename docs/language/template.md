@@ -332,10 +332,11 @@ Two-way binding is a contract (#124): `::name` is valid on a component's `@model
 `bindTwoWay(el, 'value', signal)` binds it. Signal to element: an `effect` assigns the
 property. Element to signal: on an `<input>` or `<textarea>` the `input` event (`change` for
 `checked`), on a `<select>` `change`; on a custom element that declares the prop as a model, its
-`<kebab-name>-change` event and `detail.value`, and nothing else. On a library component that
-declares no model yet (#125) the alpha listening stays: its `pdx-input` and `pdx-change` events,
-whose value is the `detail` field named like the bound property, else `detail.value`, else the
-element's property.
+`<kebab-name>-change` event and `detail.value`, and nothing else — every value component of the
+library declares its model (#125), and the alpha listening to `pdx-input` and `pdx-change` is gone.
+An element whose class is defined after the binding is listened to once it is. A prop that is not a
+model binds one way, and the compiler refuses `::x` on it wherever it knows the component's models,
+the library's included: `PDX_TWO_WAY_NOT_MODEL`.
 
 The value is always read and written as `{ get, set }` (#126): a signal is `{ get: sig, set:
 sig.set }`, and the general form `::value="{ get: () => format(cents), set: (s) => cents = parse(s) }"`
@@ -352,8 +353,8 @@ modifiers wrap the setter, so there is one mechanism:
 #### Rules
 
 - `::x` on a component prop that is not a model raises `PDX_TWO_WAY_NOT_MODEL` (error), for a project
-  component and for a library component whose manifest lists its models; `pdx migrate` flags each
-  one. A library component that lists no model is not checked.
+  component and for every library component, from its manifest; `pdx migrate` flags each one. A
+  library component that lists no model has nothing to bind both ways (#125).
 - In the editor, the value bound to a model is checked against the model's type.
 - A value that is not a signal (no `.set`) falls back to a one-way `:name` binding. Not checked
   today.

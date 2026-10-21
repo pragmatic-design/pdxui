@@ -136,12 +136,13 @@ beforeAll(() => {
         customElements.define('x-probe', class extends HTMLElement { value: unknown = undefined; });
     }
     if (!customElements.get('x-field')) {
-        // A component with no native input: ::value has to listen for its event.
+        // A component with no native input: ::value has to listen for its model's event (#124).
         customElements.define('x-field', class extends HTMLElement {
+            static models = new Set(['value']);
             private v = '';
             get value() { return this.v; }
             set value(next: string) { this.v = next; this.setAttribute('data-value', String(next)); }
-            change(next: string) { this.value = next; this.dispatchEvent(new CustomEvent('pdx-change', { detail: next, bubbles: true })); }
+            change(next: string) { this.value = next; this.dispatchEvent(new CustomEvent('value-change', { detail: { value: next } })); }
         });
     }
     if (!customElements.get('x-snip')) {
@@ -193,7 +194,7 @@ const ROWS: Row[] = [
         read: (h) => h.querySelector('select')!.value,
     },
     {
-        name: '::value on a component that emits pdx-change', expected: '<x-field data-value="b"></x-field><p>b</p>',
+        name: '::value on a component\'s model', expected: '<x-field data-value="b"></x-field><p>b</p>',
         template: '<x-field ::value="v"></x-field><p>{{ v }}</p>',
         script: "let v = $signal('a');",
         act: (h) => { (h.querySelector('x-field') as unknown as { change(v: string): void }).change('b'); },

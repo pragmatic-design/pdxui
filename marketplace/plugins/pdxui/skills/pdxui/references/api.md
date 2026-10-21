@@ -607,8 +607,8 @@ Two-way binding: `::value`, `::checked`, with the modifiers `.lazy`, `.trim`, `.
 
 The inline build calls this too, so the two builds listen the same way: a component through its
 model's event (#124) — with `.lazy`, the native `change` its inner input bubbles to the host, the
-commit (#479) — or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
-checkbox through `change`. The inline path had its own copy that listened to `input` on
+commit (#479); a prop that is not a model, one way (#125) — a `<select>` and a checkbox through
+`change`. The inline path had its own copy that listened to `input` on
 everything, and `::value` was one-way on a component in a production build (#97).
 
 ### `booleanIcon`

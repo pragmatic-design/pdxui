@@ -1474,7 +1474,7 @@ The compiler erases a script's TypeScript, types only, keeping every position. T
 
 *error* — `::x` on a component prop that is not one of its models (#124).
 
-Two-way binding is a contract: the child declares which of its props it writes back, with `@model`, and dispatches `<name>-change` when it does. On any other prop nothing brings the value back, and the binding is silently one-way. Checked for project components and for library components whose manifest lists their models; native `value`, `checked` and `files` are the platform's models.
+Two-way binding is a contract: the child declares which of its props it writes back, with `@model`, and dispatches `<name>-change` when it does. On any other prop nothing brings the value back, and the binding is silently one-way. Checked for project components and for every library component, from its manifest — one that lists no model, a navigation component, has nothing to bind both ways (#125); native `value`, `checked` and `files` are the platform's models.
 
 **Fix.** Declare `@model x` in the child, or bind it one way with `:x`.
 

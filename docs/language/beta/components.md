@@ -100,7 +100,9 @@ lifecycle callbacks (`formResetCallback` restores the initial value, `formDisabl
 `disabled`, `formStateRestoreCallback` restores the value). Descriptor: `model<T>(d, { form: true })`.
 
 Every value component of `@pdxui/ui` declares its value as a model and emits exactly one change event
-per model (#125); the alias events of alpha (`pdx-change`, `change`, `valuechange`, `pressedchange`,
+per model (#125 — landed, in five batches, #478–#482, and its closing step: core's two-way binding
+listens to a component's model only, and the compiler refuses `::x` on a library component's prop that
+is not a model); the alias events of alpha (`pdx-change`, `change`, `valuechange`, `pressedchange`,
 `pdx-pressed-change`) are removed; `pdx migrate` rewrites listeners and their payload reads (migration.md).
 
 The model event's payload is always `{ value: T }`, where `value` is the **model's** value. That is

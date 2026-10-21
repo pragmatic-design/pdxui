@@ -35,7 +35,7 @@ describe('the form binding reaches the controls of this template', () => {
         // file. Nothing here can see the `pdx-input name="deep"` in its template.
         const out = wire('<pdx-form :form="f"><pdx-inner-field name="deep"></pdx-inner-field></pdx-form>');
         expect(out, 'a child component was wired — the boundary moved').not.toContain('@pdx-blur=');
-        expect(out).not.toContain('@pdx-change=');
+        expect(out).not.toContain('@value-change=');
         expect(out).not.toContain(':value=');
     });
 

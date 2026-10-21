@@ -1,7 +1,8 @@
 // Two-way binding is a contract (#124): `::name` is valid on a component's `@model` and on the value
 // properties of native form elements, which are the platform's models. On a component whose models are
 // known — a project .pdx, or a library component whose manifest lists them — `::x` on anything else is
-// PDX_TWO_WAY_NOT_MODEL. A library component that lists no model yet is left as it was (#125).
+// PDX_TWO_WAY_NOT_MODEL — a library component that lists none included: nothing announces its value
+// back since #125 removed the alpha listening.
 
 import type { TemplateNode } from '../parser/template';
 import type { ValidationWarning } from './validate';

@@ -193,29 +193,42 @@ describe('two-way binding (::attr)', () => {
         expect(document.body.querySelector('input')!.value).toBe('static');
     });
 
-    // Custom elements emit pdx-input/pdx-change with the value in e.detail; listening for a
-    // `pdx-value` that is never emitted would leave ::value silently one-way.
-    it('binds ::value on a custom element via pdx-input / e.detail', () => {
+    // A component's value comes back through its model's event, `<kebab-model>-change` with
+    // `{ value }` (#124). Every library value component has its model since #125: the alpha listening
+    // to `pdx-input` / `pdx-change` is gone.
+    it('binds ::value on a custom element through its model\'s event, and only that', () => {
+        if (!customElements.get('x-tw-field')) {
+            customElements.define('x-tw-field', class extends HTMLElement { static models = new Set(['value']); value = ''; });
+        }
         const name = signal('a');
-        const frag = html`<pdx-fake-input ::value=${name}></pdx-fake-input>`;
-        document.body.appendChild(frag);
-        const el = document.body.querySelector('pdx-fake-input')!;
-        // Forward binding still sets the property
+        document.body.appendChild(html`<x-tw-field ::value=${name}></x-tw-field>`);
+        const el = document.body.querySelector('x-tw-field')!;
         expect((el as unknown as { value: string }).value).toBe('a');
-        // Backward: component emits pdx-input with the fresh value in detail
-        el.dispatchEvent(new CustomEvent('pdx-input', { detail: { value: 'typed' } }));
+        el.dispatchEvent(new CustomEvent('pdx-input', { detail: { value: 'alpha live' } }));
+        el.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: 'alpha commit' } }));
+        expect(name(), 'an alpha event wrote the signal').toBe('a');
+        el.dispatchEvent(new CustomEvent('value-change', { detail: { value: 'typed' } }));
         expect(name()).toBe('typed');
-        // pdx-change also updates
-        el.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: 'committed' } }));
-        expect(name()).toBe('committed');
     });
 
-    it('binds ::checked on a custom element via e.detail.checked', () => {
+    it('a custom element with no model: ::value is one-way, and the alpha events write nothing (#125)', () => {
+        const name = signal('a');
+        document.body.appendChild(html`<x-tw-no-model ::value=${name}></x-tw-no-model>`);
+        const el = document.body.querySelector('x-tw-no-model')!;
+        expect((el as unknown as { value: string }).value).toBe('a');
+        el.dispatchEvent(new CustomEvent('pdx-input', { detail: { value: 'typed' } }));
+        el.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: 'committed' } }));
+        expect(name()).toBe('a');
+    });
+
+    it('an element defined after the binding listens to its model once it is defined', async () => {
         const checked = signal(false);
-        const frag = html`<pdx-fake-check ::checked=${checked}></pdx-fake-check>`;
-        document.body.appendChild(frag);
-        const el = document.body.querySelector('pdx-fake-check')!;
-        el.dispatchEvent(new CustomEvent('pdx-change', { detail: { checked: true, value: 'x' } }));
+        document.body.appendChild(html`<x-tw-late ::checked=${checked}></x-tw-late>`);
+        const el = document.body.querySelector('x-tw-late')!;
+        customElements.define('x-tw-late', class extends HTMLElement { static models = new Set(['checked']); checked = false; });
+        await customElements.whenDefined('x-tw-late');
+        await Promise.resolve();
+        el.dispatchEvent(new CustomEvent('checked-change', { detail: { value: true } }));
         expect(checked()).toBe(true);
     });
 });

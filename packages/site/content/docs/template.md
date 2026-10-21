@@ -61,9 +61,9 @@ the value properties of native form elements (`value`, `checked`, `files`) and o
 `@model x` ([Components](/docs/components)). It listens where the value changes: `input` on a text
 field, `change` on a `<select>` and on `::checked`, and on a component its `<name>-change` event
 (`value-change` for `::value`), reading `detail.value` — so `<pdx-select ::value="country">` works as
-`<input ::value="name">` does. On the library component that declares no model yet, `pdx-pin-input`, it
-listens to `pdx-input` and `pdx-change`, as before. `::x` on a component prop that is not a model is an error,
-`PDX_TWO_WAY_NOT_MODEL`.
+`<input ::value="name">` does: every value component of the library declares its model. `::x` on a
+component prop that is not a model is an error, `PDX_TWO_WAY_NOT_MODEL` — `::page` on `pdx-pagination`,
+say, which announces a page but holds no model.
 
 Modifiers shape the value on its way back — the list is closed, and anything else is the error
 `PDX_BINDING_MODIFIER`:

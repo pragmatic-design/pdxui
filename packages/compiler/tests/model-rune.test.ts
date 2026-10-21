@@ -132,14 +132,25 @@ describe('the resolver knows the models', () => {
         }
     });
 
-    it('of a library component, from its manifest; null while it lists none (#125 gives them theirs)', () => {
+    it('of a library component, from its manifest; an empty set when it lists none (#125)', () => {
         const r = new ComponentResolver();
         r.registerUiManifest(process.cwd());
         expect([...r.modelsOf('pdx-input')!]).toEqual(['value']);
         expect([...r.modelsOf('pdx-select')!]).toEqual(['value']);
-        // pdx-pin-input has no model yet: it keeps its alpha event until #125's closing step.
-        expect(r.has('pdx-pin-input')).toBe(true);
-        expect(r.modelsOf('pdx-pin-input')).toBeNull();
+        expect([...r.modelsOf('pdx-pin-input')!]).toEqual(['value']);
+        // A navigation component announces a page, not a value it holds for a parent (#289): no model,
+        // and that is known — so `::page` on it is refused, not left to a listening that is gone.
+        expect(r.has('pdx-pagination')).toBe(true);
+        expect([...r.modelsOf('pdx-pagination')!]).toEqual([]);
         expect(r.modelsOf('pdx-not-a-component')).toBeNull();
+    });
+
+    it('`::x` on a library component that lists no model is PDX_TWO_WAY_NOT_MODEL (#125)', () => {
+        const r = new ComponentResolver();
+        r.registerUiManifest(process.cwd());
+        const { warnings } = compile('<template>\n  <pdx-pagination ::page="p"></pdx-pagination>\n</template>\n<script>\nlet p = $signal(1);\n</script>\n',
+            'page.pdx', [], undefined, { modelsOf: (tag) => r.modelsOf(tag) });
+        expect(warnings.filter((w) => w.code === 'PDX_TWO_WAY_NOT_MODEL').map((w) => w.message))
+            .toEqual([expect.stringContaining("'::page' on <pdx-pagination>")]);
     });
 });

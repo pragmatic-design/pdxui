@@ -2,7 +2,8 @@
 //
 // Events stay on the element that emits them unless declared to bubble. Three components counted on
 // the inner element's event bubbling up through them: pdx-form-template's pdx-submit was the inner
-// pdx-form's, pdx-pin-input's pdx-input and pdx-change were the inner pdx-otp-input's, and
+// pdx-form's, pdx-pin-input's pdx-input and pdx-change were the inner pdx-otp-input's (its value is
+// now its own model, written from the inner one's, #125), and
 // pdx-toggle-group heard its toggles' pressedchange on its own host. Each now listens to the inner
 // element and dispatches from its host, so a listener on the wrapper hears it and nothing above does.
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -37,12 +38,12 @@ describe('a wrapper dispatches its inner component\'s events from its own host',
         expect(aboveTemplate, 'the submit climbed past the template').toHaveLength(0);
     });
 
-    it('pdx-pin-input: a typed digit is a pdx-input on the pin-input', async () => {
+    it('pdx-pin-input: a typed digit is the pin-input\'s own model event, value-change (#125)', async () => {
         const pin = document.createElement('pdx-pin-input');
         pin.setAttribute('length', '4');
         document.body.appendChild(pin);
         await tick(50);
-        const onPin = heard(pin, 'pdx-input');
+        const onPin = heard(pin, 'value-change');
 
         const cell = pin.querySelector<HTMLInputElement>('.pdx-otp-cell')!;
         cell.value = '7';
