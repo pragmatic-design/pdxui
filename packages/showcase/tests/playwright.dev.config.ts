@@ -37,7 +37,9 @@ export default defineConfig({
     timeout: 30_000,
     // Signed in, as the build's suite is: the dev server's routes are behind the login too.
     globalSetup: './session.ts',
-    use: { baseURL: `http://localhost:${PORT}`, trace: 'off', locale: 'en-US', storageState: sessionFile(PORT) },
+    // A failure keeps its trace, as the build's config does: a red in the pre-push gate that passes
+    // alone is read from it, not guessed at (#587).
+    use: { baseURL: `http://localhost:${PORT}`, trace: 'retain-on-failure', locale: 'en-US', storageState: sessionFile(PORT) },
     webServer: {
         // The dev server, with nothing built: no `vite build`, no preview. `--force` so a stale
         // dependency cache cannot answer for a plugin that has changed.
