@@ -31,9 +31,31 @@ export function createLazy<T extends HTMLElement = HTMLElement>(tag: LazyTag): T
     return document.createElement(tag) as T;
 }
 
+// The prefetches waiting for idle time, and the loads they started: nobody awaits either, so a test
+// environment torn down under them failed its run (#603). `settlePrefetches()` is what waits.
+const scheduled = new Set<() => void>();
+const loading = new Set<Promise<void>>();
+
 /** Load `tags` once the browser is idle: what a component will need before its user asks. */
 export function prefetchTags(tags: readonly LazyTag[]): void {
-    const run = () => { for (const tag of tags) void loadTag(tag); };
+    const run = () => {
+        if (!scheduled.delete(run)) return;
+        for (const tag of tags) {
+            // `finally` passes a failed load on, unhandled, as the bare `loadTag()` did.
+            const load: Promise<void> = loadTag(tag).finally(() => loading.delete(load));
+            loading.add(load);
+        }
+    };
+    scheduled.add(run);
     if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 2000 });
     else setTimeout(run, 0);
+}
+
+/**
+ * Starts every prefetch still waiting for idle time, and resolves once every prefetched load has
+ * settled. For a test environment, which must not be torn down while a module is still loading.
+ */
+export async function settlePrefetches(): Promise<void> {
+    for (const run of [...scheduled]) run();
+    await Promise.allSettled([...loading]);
 }
