@@ -27,6 +27,24 @@ async function openPermissions(page: Page): Promise<void> {
     await expect(box(page, 'billing.write', 'admin')).toBeVisible();
 }
 
+/**
+ * A request to the mock server's `/api` as the signed-in admin, with the bearer the app attaches;
+ * its JSON answer. The page has no control that deletes a role, so a row puts a role back here.
+ */
+async function adminApi(page: Page, method: 'GET' | 'PUT', path: string, body?: unknown): Promise<unknown> {
+    const { status, json } = await page.evaluate(async ({ method, path, body }) => {
+        const { access } = JSON.parse(localStorage.getItem('showcase.auth') ?? '{}') as { access?: string };
+        const res = await fetch(`/api${path}`, {
+            method,
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${access}` },
+            body: body === undefined ? undefined : JSON.stringify(body),
+        });
+        return { status: res.status, json: await res.json() as unknown };
+    }, { method, path, body });
+    expect(status, `${method} /api${path}: ${JSON.stringify(json)}`).toBe(200);
+    return json;
+}
+
 /** A fresh browser, signed in through the form as `username`, on the account page. */
 async function signedInAs(browser: Browser, info: TestInfo, username: string): Promise<Page> {
     const context = await browser.newContext({ storageState: GUEST, baseURL: String(info.project.use.baseURL), locale: 'en-US' });
@@ -99,6 +117,17 @@ test('a new role, given to an account in Users, is what that account may do at i
     await expect(tom.locator('[data-test="perms"]')).toContainText('read the billing');
     await expect(tom.locator('[data-test="close-month"]')).toHaveCount(0);
     await tom.context().close();
+
+    // Put back what the row took, as every row here does: a second pass on the same server found
+    // two «Supervisor» options and failed (#591). Read from the server, which owns the state; the
+    // page shows the seed roles until it has answered. Tom first: the server refuses to drop a role
+    // somebody holds.
+    await adminApi(page, 'PUT', '/admin/accounts/tech', { roles: ['technician'] });
+    const now = await adminApi(page, 'GET', '/admin/access') as { roles: { key: string }[] };
+    await adminApi(page, 'PUT', '/admin/roles', { roles: now.roles.filter(r => r.key !== 'supervisor') });
+    const after = await adminApi(page, 'GET', '/admin/access') as { roles: { key: string }[]; accounts: { username: string; roles: string[] }[] };
+    expect(after.roles.map(r => r.key), 'the new role is still on the server').not.toContain('supervisor');
+    expect(after.accounts.find(a => a.username === 'tech')?.roles, "Tom's roles are not back to the seed").toEqual(['technician']);
 });
 
 test('without settings.permissions the matrix is read-only', async ({ browser }, info) => {
