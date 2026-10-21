@@ -55,6 +55,7 @@ proposals the implementing issue may change.
 | `<pdx-pin-input>` | `<pdx-otp-input mask numeric length="4">` — pin-input defaulted to 4 cells and `numeric`, otp-input to 6; an explicit `length` or `:numeric` is carried over | mechanical | † (decision 48) |
 | `<pdx-button toggle :pressed="p">` | `<pdx-toggle variant="solid" ::pressed="p">` (an explicit outline or ghost variant is kept) | mechanical | † (decisions 49, 53) |
 | `<pdx-button-group mode="multiple">` or `mode="single"` | `<pdx-toggle-group type="multiple">` or `type="single"`, with `pdx-toggle` items | mechanical where every child is a plain button; flagged otherwise | † (decision 51) |
+| `<pdx-relative-time style="short">` | `<pdx-relative-time format-style="short">`: a prop `style` replaced the element's own | mechanical for `long`, `short`, `narrow`; any other `style` is an inline style — landed: `relative-time-style` | #545 |
 | `@pdx-open` / `@pdx-close` on an overlay | `@open-change` (`$event.detail.value`) | mechanical | † (decision 50) |
 | overlay `hide()`, dropdown-menu/fab/context-menu `open()`; wizard `goNext()`/`goPrev()`/`goto()`, carousel `goto()`, pagination `goto()` | `close()`, `show()`; `next()`/`prev()`/`goTo(n)` | mechanical in templates and `:ref` calls; flagged elsewhere | † (decision 50) |
 | `:style.color="c"`, `:style.--accent="c"` | `:style="{ color: c, '--accent': c }"` | mechanical (merged into an existing object) — landed: `style-dot` | #129 (decision 5) |

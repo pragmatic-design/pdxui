@@ -33,6 +33,7 @@ import { legacyScript, mixinRemoved } from './legacy-script';
 import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlock } from './route-fields';
 import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
+import { relativeTimeStyle } from './relative-time-style';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
 import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
 import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
@@ -341,6 +342,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     storePersist,
     // #281: `@defer (hover)` is `interaction` (./defer-hover).
     deferHover,
+    // #545: `<pdx-relative-time>`'s `style` prop is `format-style` (./relative-time-style).
+    relativeTimeStyle,
     // #478: a library component's alpha change events, read from its manifest (./alpha-events).
     alphaChangeEvent,
     alphaChangeListener,

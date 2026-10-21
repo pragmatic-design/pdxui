@@ -27,7 +27,7 @@
         <tbody>
           <tr><td><code>datetime</code></td><td>String</td><td>''</td><td>ISO date string or timestamp</td></tr>
           <tr><td><code>locale</code></td><td>String</td><td>'' (auto)</td><td>Locale for Intl.RelativeTimeFormat</td></tr>
-          <tr><td><code>style</code></td><td>String</td><td>'long'</td><td>'long', 'short', or 'narrow'</td></tr>
+          <tr><td><code>format-style</code></td><td>String</td><td>'long'</td><td>'long', 'short', or 'narrow'</td></tr>
           <tr><td><code>numeric</code></td><td>String</td><td>'auto'</td><td>'always' or 'auto' (e.g. "yesterday" vs "1 day ago")</td></tr>
           <tr><td><code>updateInterval</code></td><td>Number</td><td>60000</td><td>Auto-update interval in ms (0 = disabled)</td></tr>
           <tr><td><code>showTooltip</code></td><td>Boolean</td><td>true</td><td>Show absolute date on hover</td></tr>

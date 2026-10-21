@@ -256,6 +256,10 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-relative-time`'s wording length is `format-style` (`formatStyle`), no longer
+  `style`. A prop named `style` replaced the element's own `style`, so `el.style.color = …` threw.
+  `pdx migrate` rewrites `style="long"`, `"short"` and `"narrow"` on the tag; any other `style` is an
+  inline style and is left. (#545)
 - One reading rule for declarations: any of them may span lines when it opens a balanced `{ … }` or
   `( … )` on its first line. `@prop size: {`, a `@slot` signature, `@fetch`'s and `@loader`'s options,
   `@title $t(…)` and a `@snippet`'s parameters were misread when wrapped; they compile as their
@@ -437,6 +441,12 @@ semver.
 
 ### Fixes
 
+- A `@prop`, `@model` or typed `@slot` named after one of the `HTMLElement` members whose replacement
+  breaks the element — `style`, `children`, `dataset`, `classList`, `className`, `innerHTML`,
+  `textContent`, `shadowRoot` and the `on*` event handlers — is `PDX_NAME_RESERVED`, and a TypeScript
+  descriptor is warned in development. A prop `onclick` was never called on a click, and code outside
+  the component that used the element's member broke. `id`, `title`, `prefix` and `offsetTop` stay
+  allowed. (#545)
 - An `@action` whose parameter type has a comma in its type arguments — `dto: Omit<Person, 'id'>`,
   `Record<string, number>` — compiles. The parameter list was split at that comma, the declaration
   was dropped as not a form of `@action`, and its body was left in the script. (#578)
