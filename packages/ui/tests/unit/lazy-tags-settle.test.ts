@@ -1,0 +1,23 @@
+// settlePrefetches() waits for a prefetch whether or not idle time has come (#603).
+//
+// Its own module graph: nothing else in this file loads the prefetched tags.
+
+import { describe, it, expect, vi } from 'vitest';
+
+// Idle time never comes here: what settles the prefetch has to start it.
+vi.stubGlobal('requestIdleCallback', () => 0);
+const { prefetchTags, settlePrefetches } = await import('../../src/shared/lazy-tags');
+
+describe('settlePrefetches', () => {
+    // A cold module load under the gate's load takes seconds, as in data-grid-editor-before-module.
+    it('starts a prefetch still waiting for idle time and resolves once its tag is defined', async () => {
+        prefetchTags(['pdx-input']);
+        expect(customElements.get('pdx-input')).toBeUndefined();
+        await settlePrefetches();
+        expect(customElements.get('pdx-input'), 'pdx-input').toBeDefined();
+    }, 10_000);
+
+    it('resolves at once when nothing is pending', async () => {
+        await expect(settlePrefetches()).resolves.toBeUndefined();
+    });
+});
