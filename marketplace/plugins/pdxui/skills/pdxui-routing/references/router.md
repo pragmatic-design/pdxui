@@ -85,6 +85,10 @@ template and the script read, like a `$derived`, and it follows the URL: going f
 const next = $derived(id + 1);   // `id` is a number: 1, then 2
 ```
 
+When the path already says the type, name the param alone: `@params { id }` with
+`@page '/users/:id(number)'` makes `id` a number, and any other param is a string — the same rule the
+router coerces by. A name the path has no param for is an error.
+
 A `number` param is converted with `Number` (`0` when the URL does not have it), a `boolean` one is
 `true` only for the text `'true'`, and any other type is the string (`''` when absent). Untyped, the
 same values are in `currentParams()`, as strings:

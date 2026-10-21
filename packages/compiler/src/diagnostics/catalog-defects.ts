@@ -590,8 +590,8 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_ROUTE_FIELD_INVALID: {
         severity: 'error', category: 'defect', fixable: true,
         summary: 'A `@params` or `@search` field its parser cannot read, such as a type in quotes.',
-        explanation: 'The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name.',
-        fix: '`@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes.',
+        explanation: 'The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name, or a name alone that the path has a param for, which takes its type from the path.',
+        fix: '`@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes. A `@params` name alone the path does not have: name a param of the path, or write its type.',
         example: {
             bad: pdx('<p>{{ id }}</p>', "@page '/users/:id';\n@params { id: 'number' };"),
             good: pdx('<p>{{ id }}</p>', "@page '/users/:id';\n@params { id: number };"),

@@ -125,6 +125,30 @@ describe("an unannotated loader's params, typed from the pattern", () => {
     });
 });
 
+// `@params { id, tab }` (#564): a name alone has the type the compiler gives it from the pattern,
+// wherever @page is written.
+describe('@params names alone, typed from the pattern', () => {
+    const PARAMS = (body: string, pageFirst = true) => {
+        const page = "@page '/users/:id(number)/:tab';";
+        const params = '@params { id, tab };';
+        return [...(pageFirst ? [page, params] : [params, page]), `function f() { ${body} }`, ''].join('\n');
+    };
+
+    it('a number param read as a string is an error', () => {
+        const d = diagnose(PARAMS('id.toUpperCase();'));
+        expect(d.some(m => /toUpperCase/.test(m)), JSON.stringify(d)).toBe(true);
+    });
+
+    it('control — the number param as a number, the other as a string', () => {
+        expect(diagnose(PARAMS('id.toFixed(); tab.toUpperCase();'))).toEqual([]);
+    });
+
+    it('the same with @page written after @params', () => {
+        expect(diagnose(PARAMS('id.toUpperCase();', false)).some(m => /toUpperCase/.test(m))).toBe(true);
+        expect(diagnose(PARAMS('id.toFixed(); tab.toUpperCase();', false))).toEqual([]);
+    });
+});
+
 describe("PdxLoaderContext follows the router's LoaderContext", () => {
     it('every member of LoaderContext<P> is declared for the editor', () => {
         const body = (source: string, name: string) => {

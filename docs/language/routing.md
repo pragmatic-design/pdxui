@@ -511,10 +511,11 @@ alpha
 
 ```ebnf
 ParamsDecl  ::= "@params" S? "{" S? ParamField ( S? "," S? ParamField )* S? "}" S? ";"?
-ParamField  ::= Identifier S? ":" S? Identifier
+ParamField  ::= Identifier ( S? ":" S? Identifier )?
 ```
 
-The analyzer's form: `@params { id: number }`. The block may span lines.
+The analyzer's form: `@params { id: number }`, or a name alone, `@params { id }` (#564). The block
+may span lines.
 
 #### Semantics
 
@@ -528,11 +529,18 @@ before the deriveds and the body. A `number` field is coerced with `Number` (`0`
 `$derived`: `{{ id }}` in the template, `id` in the script (rewritten to `id()`), and it follows a
 navigation that changes the param while the page stays mounted.
 
+A name alone takes its type from the param of the same name in `@page`'s first path, wherever `@page`
+is written in the script: `:id(number)` is `number`, any other constraint and an unconstrained param
+`string` — the rule the router's `coerceParams` and the loader's typed `params` follow. With
+`@page '/users/:id(number)/:tab'`, `@params { id, tab }` is `@params { id: number, tab: string }`.
+
 #### Rules
 
-- A field that is not `name: type` with a bare type name — a type in quotes, `id: 'number'` —
-  raises `PDX_ROUTE_FIELD_INVALID` and is dropped.
-- A field that names no param of the path is not checked today; it reads as the default.
+- A field that is not `name: type` with a bare type name, or a name alone — a type in quotes,
+  `id: 'number'` — raises `PDX_ROUTE_FIELD_INVALID` and is dropped.
+- A name alone that the path has no param for has no type to take: `PDX_ROUTE_FIELD_INVALID`, and
+  the field is dropped. Without `@page`, every name alone is.
+- A `name: type` field that names no param of the path is not checked today; it reads as the default.
 - The name is the field's: declaring `const id` beside `@params { id }` declares it twice.
 
 #### Examples

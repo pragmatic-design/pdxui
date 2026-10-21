@@ -143,6 +143,8 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
     // The page's pattern (its first path) and the function its named loader calls, when there are both.
     let pattern: string | null = null;
     let loaderFn: string | null = null;
+    // The `@params` declaration, typed once the pattern is known.
+    let paramsDecl: string | null = null;
     const out = s.split('');
     // Each name a rune introduces → the type it is declared with at the end.
     const names = new Map<string, string>();
@@ -267,10 +269,12 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
             const path = /^@page\s+(['"])([^'"\n]+)\1/.exec(s.slice(m.index, j));
             if (path) pattern = path[2];
         }
-        if (kw === 'params' || kw === 'search') {
-            // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
+        if (kw === 'search') {
+            // `searchParams`, under the type the compiler gives it (./route-name-types).
             for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);
         }
+        // Each param, read after the loop: a name alone takes its type from @page's pattern (#564).
+        if (kw === 'params') paramsDecl = s.slice(m.index, j);
         if (kw === 'generic') {
             // `@generic T extends { id: string }, K;` (#490): inside the component a type parameter is
             // opaque, and reads as what its constraint promises — `unknown` without one.
@@ -295,6 +299,9 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
         }
         for (let k = m.index; k < j; k++) if (out[k] !== '\n') out[k] = ' ';
         RUNE_KW.lastIndex = j;
+    }
+    if (paramsDecl !== null) {
+        for (const [name, type] of routeNameTypes('params', paramsDecl, pattern ?? '')) names.set(name, type);
     }
     let res = out.join('');
     res = res.replace(RUNE_DECL, (_all, indent: string, kw: string, rest: string) => `${indent}${kw === 'let' ? 'var' : 'var  '}${rest}`);

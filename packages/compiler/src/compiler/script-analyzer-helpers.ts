@@ -3,6 +3,7 @@
 
 import type { FormFieldDecl, HeadInfo, RouteInfo, RouteParamDecl, SearchParamDecl } from './script-analyzer-types';
 import { skipNonCode, findClosing, endsWithExpressionKeyword, splitAtDepthZero } from './tokenizer';
+import { routeParams } from '../text-scan';
 
 // ─── Tokenizer-Based Type Extraction ─────────────────────────────
 
@@ -798,25 +799,41 @@ export interface InvalidRouteField {
     name?: string;
     /** The form the parser reads, when the field only quoted a type it knows. */
     unquoted?: string;
+    /** Set on a `@params` name alone that the pattern has no param for: there is no type to take. */
+    notInPattern?: boolean;
+}
+
+/**
+ * The type each param of `pattern` takes, by name: what the router's `coerceParams` hands over —
+ * `:id(number)` a number, every other param a string. A `@params` name alone takes it (#564).
+ */
+function patternParamTypes(pattern: string): Map<string, string> {
+    return new Map(routeParams(pattern).map((p) => [p.name, p.constraint === 'number' ? 'number' : 'string']));
 }
 
 /** The field shape each parser reads — what `parseRouteParams` and `parseSearchParams` match. */
 const ROUTE_FIELD: Record<'params' | 'search', RegExp> = {
-    // Match: `id: number`
-    params: /^\w+\s*:\s*\w+$/,
+    // Match: `id: number`, or `id` alone, which takes its type from the pattern (#564)
+    params: /^\w+(?:\s*:\s*\w+)?$/,
     // Match: `page?: number = 1` — the types @search coerces.
     search: /^\w+\??\s*:\s*(?:string|number|boolean)(?:\s*=\s*.+)?$/,
 };
 
 /**
  * The fields of a `@params` or `@search` block that its parser would skip (#105). A quoted type the
- * parser knows comes back with the form it reads instead.
+ * parser knows comes back with the form it reads instead. A `@params` name alone is read when
+ * `pattern` has a param of that name, and comes back marked `notInPattern` when it has none.
  */
-export function invalidRouteFields(block: string, kind: 'params' | 'search'): InvalidRouteField[] {
+export function invalidRouteFields(block: string, kind: 'params' | 'search', pattern = ''): InvalidRouteField[] {
     const inner = block.trim().replace(/^\{/, '').replace(/\}$/, '');
     const out: InvalidRouteField[] = [];
+    const fromPattern = kind === 'params' ? patternParamTypes(pattern) : new Map<string, string>();
     for (const raw of splitAtTopLevelCommas(inner)) {
         const text = raw.trim();
+        if (kind === 'params' && IDENTIFIER.test(text) && !fromPattern.has(text)) {
+            out.push({ text, name: text, notInPattern: true });
+            continue;
+        }
         if (!text || ROUTE_FIELD[kind].test(text)) continue;
         const name = /^(\w+)/.exec(text)?.[1];
         // Match: `name?: 'type' = default` with a quoted type the parser knows.
@@ -832,16 +849,27 @@ export function invalidRouteFields(block: string, kind: 'params' | 'search'): In
  * Parse a route params block into typed param declarations.
  * Input: '{ id: number, slug: string }'
  * Output: [{ name: 'id', type: 'number' }, { name: 'slug', type: 'string' }]
+ *
+ * A name alone takes the type its param has in `pattern`, the page's path (#564):
+ * `'{ id, tab }'` with `'/users/:id(number)/:tab'` is id a number and tab a string. A name alone the
+ * pattern has no param for is no field — `invalidRouteFields` names it.
  */
-export function parseRouteParams(block: string): RouteParamDecl[] {
+export function parseRouteParams(block: string, pattern = ''): RouteParamDecl[] {
     const params: RouteParamDecl[] = [];
     const inner = block.replace(/^\{/, '').replace(/\}$/, '');
+    const fromPattern = patternParamTypes(pattern);
     // Field by field, not one regex over the block: `(\w+)\s*:\s*(\w+)` in an exec loop re-scans a
     // long run of word characters from every start position (CodeQL js/polynomial-redos, #266). The
-    // fields are separated by `,`, `;` or a line break; each is `name: type`, both one identifier.
+    // fields are separated by `,`, `;` or a line break; each is `name: type`, both one identifier,
+    // or a name alone.
     for (const field of inner.split(/[,;\n]/)) {
         const colon = field.indexOf(':');
-        if (colon === -1) continue;
+        if (colon === -1) {
+            const name = field.trim();
+            const type = fromPattern.get(name);
+            if (type !== undefined) params.push({ name, type });
+            continue;
+        }
         const name = field.slice(0, colon).trim();
         const type = field.slice(colon + 1).trim();
         if (IDENTIFIER.test(name) && IDENTIFIER.test(type)) params.push({ name, type });
