@@ -7,7 +7,7 @@
 // not import core; `packages/core/tests/reserved-element-names.test.ts` holds it to the class.
 //
 // HTMLElement's own members are not here. Several are props on purpose — `title`, `id` (a route's
-// `:id`), `prefix`, `style`, `offsetTop` — and which of them to refuse is #545's question.
+// `:id`), `prefix`, `offsetTop`; the ones refused are `reserved-dom-names.ts` (#545).
 
 /** Members of the element class kept on purpose: a form component's `form` replaces the form getter. */
 export const ELEMENT_NAMES_KEPT: ReadonlySet<string> = new Set(['form']);

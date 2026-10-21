@@ -113,7 +113,7 @@
   "pdx-list:emptyIcon": "Icon shown in the empty state.",
 
   "pdx-relative-time:datetime": "The date/time to render relative to now.",
-  "pdx-relative-time:style": "Wording length: 'long', 'short' or 'narrow'.",
+  "pdx-relative-time:formatStyle": "Wording length: 'long', 'short' or 'narrow'.",
   "pdx-relative-time:numeric": "'always' (1 day ago) or 'auto' (yesterday).",
   "pdx-relative-time:updateInterval": "How often (ms) to refresh the text.",
   "pdx-relative-time:showTooltip": "Shows the absolute date on hover.",

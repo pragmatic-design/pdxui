@@ -19533,13 +19533,13 @@
             },
             {
               "kind": "field",
-              "name": "style",
+              "name": "formatStyle",
               "description": "Wording length: 'long', 'short' or 'narrow'.",
               "type": {
                 "text": "string"
               },
               "default": "'long'",
-              "attribute": "style"
+              "attribute": "formatstyle"
             },
             {
               "kind": "field",
@@ -19592,8 +19592,8 @@
               "default": "''"
             },
             {
-              "name": "style",
-              "fieldName": "style",
+              "name": "formatstyle",
+              "fieldName": "formatStyle",
               "description": "Wording length: 'long', 'short' or 'narrow'.",
               "type": {
                 "text": "string"

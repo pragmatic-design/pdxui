@@ -840,9 +840,9 @@ A state is a name and the condition it is on for. Without both, nothing is decla
 
 ### PDX_NAME_RESERVED
 
-*error* — A `@prop`, `@model` or typed `@slot` named after a member of the element (#542).
+*error* — A `@prop`, `@model` or typed `@slot` named after a member of the element (#542, #545).
 
-Each becomes a property of the element, defined over the member of the same name: `@slot body: ();` replaced the method that renders the component, which then rendered nothing, with nothing said. The names are the element class's own members — `body`, `track`, `emit`, `frame`, `attr`, the lifecycle callbacks and the form-associated API — less `form`, which a form component replaces on purpose.
+Each becomes a property of the element, defined over the member of the same name: `@slot body: ();` replaced the method that renders the component, which then rendered nothing, with nothing said. The names are the element class's own members — `body`, `track`, `emit`, `frame`, `attr`, the lifecycle callbacks and the form-associated API — less `form`, which a form component replaces on purpose; and the `HTMLElement` members whose replacement breaks the element for code outside the component — `style`, `children`, `dataset`, `classList`, `className`, `innerHTML`, `textContent`, `shadowRoot` and the `on*` event handlers. `id`, `title`, `prefix` and `offsetTop` stay allowed.
 
 **Fix.** Rename the declaration.
 

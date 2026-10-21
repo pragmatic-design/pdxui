@@ -12,6 +12,7 @@ import { exposeOnElement } from './channel';
 import { componentLabel, componentFile } from './global-error';
 import { devSetupBegin, devSetupEnd, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
+import { replacesDomMember } from './reserved-dom-members';
 import { renderSlot } from '../renderer/slot';
 import { bindHost } from './host';
 import type { HostBindings } from './host';
@@ -562,15 +563,17 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     }
 
     // A prop, model or typed snippet is defined on the instance, over the member of the same name (#542):
-    // one named after a member of this class or PdxElement replaces it. A `.pdx` is refused at compile
-    // time (PDX_NAME_RESERVED); a TypeScript descriptor is told here. `form` replaces the form getter
-    // on purpose, for a form component.
+    // one named after a member of this class or PdxElement replaces it, and one named after `style`, an
+    // `on*` handler or the other HTMLElement members of `reserved-dom-members.ts` breaks the element for
+    // code outside the component (#545). A `.pdx` is refused at compile time (PDX_NAME_RESERVED); a
+    // TypeScript descriptor is told here. `form` replaces the form getter on purpose, for a form component.
     if (DEV) {
         for (const name of propNames) {
             if (name === 'form') continue;
             const member = Object.prototype.hasOwnProperty.call(Comp.prototype, name)
                 || Object.prototype.hasOwnProperty.call(PdxElement.prototype, name);
             if (member) console.warn(`[pdx] <${tag}> declares '${name}', which is a member of the element: the declaration replaces it, and the component may not render. Rename it.`);
+            else if (replacesDomMember(name)) console.warn(`[pdx] <${tag}> declares '${name}', which is HTMLElement's own '${name}': the declaration replaces it, and code that uses the element's '${name}' breaks. Rename it.`);
         }
     }
 

@@ -63,7 +63,8 @@ component('pdx-relative-time', {
         datetime: { type: String, default: '' },
         /** Locale of the wording. Empty: the page's language (`lang`), then the browser's. */
         locale: { type: String, default: '' },
-        style: { type: String, default: 'long' },
+        // Not `style`, which would replace the element's own CSSStyleDeclaration (#545).
+        formatStyle: { type: String, default: 'long' },
         numeric: { type: String, default: 'auto' },
         updateInterval: { type: Number, default: 60000 },
         showTooltip: { type: Boolean, default: true },
@@ -89,7 +90,7 @@ component('pdx-relative-time', {
             }
             // The prop, then the page's lang, then the browser.
             const locale = resolveLocale(ctx.el, ctx.locale() as string);
-            const style = ctx.style() as string;
+            const style = ctx.formatStyle() as string;
             const numeric = ctx.numeric() as string;
 
             spanEl.setAttribute('datetime', date.toISOString());
@@ -121,7 +122,7 @@ component('pdx-relative-time', {
             // Subscribe to all props
             void ctx.datetime();
             void ctx.locale();
-            void ctx.style();
+            void ctx.formatStyle();
             void ctx.numeric();
             void ctx.updateInterval();
             void ctx.showTooltip();

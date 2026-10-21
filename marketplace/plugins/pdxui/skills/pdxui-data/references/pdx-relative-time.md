@@ -6,7 +6,7 @@ Auto-updating “3 days ago”.
 |---|---|---|---|---|
 | `datetime` | `datetime` | string | `''` | The date/time to render relative to now. |
 | `locale` | `locale` | string | `''` | Locale of the wording. Empty: the page's language (`lang`), then the browser's. |
-| `style` | `style` | string | `'long'` | Wording length: 'long', 'short' or 'narrow'. |
+| `formatStyle` | `formatstyle` | string | `'long'` | Wording length: 'long', 'short' or 'narrow'. |
 | `numeric` | `numeric` | string | `'auto'` | 'always' (1 day ago) or 'auto' (yesterday). |
 | `updateInterval` | `updateinterval` | number | `60000` | How often (ms) to refresh the text. |
 | `showTooltip` | `showtooltip` | boolean | `true` | Shows the absolute date on hover. |
@@ -71,8 +71,8 @@ are checked against the manifest above._
 **Styles** — Intl.RelativeTimeFormat style: long, short, narrow.
 
 ```html
-<pdx-relative-time :datetime="date" style="short"></pdx-relative-time>
-<pdx-relative-time :datetime="date" style="narrow"></pdx-relative-time>
+<pdx-relative-time :datetime="date" format-style="short"></pdx-relative-time>
+<pdx-relative-time :datetime="date" format-style="narrow"></pdx-relative-time>
 ```
 
 **Auto-Update** — Updates every 10 seconds. Watch the text change over time.

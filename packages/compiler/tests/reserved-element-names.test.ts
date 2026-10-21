@@ -19,6 +19,23 @@ describe('PDX_NAME_RESERVED', () => {
         expect(reserved('@prop emit: string;')).toHaveLength(1);
     });
 
+    it("a name that would break the element's DOM — style, className, an on* handler — is an error (#545)", () => {
+        const [style] = reserved('let a = $signal(1);\n@prop style: string;');
+        expect(style).toMatchObject({ severity: 'error', line: 4 });
+        expect(style.message).toContain("'style'");
+        for (const decl of ['@model className: string = \'\';', '@slot children: ();', '@prop dataset: object;',
+            '@prop classList: object;', '@prop innerHTML: string;', '@prop textContent: string;',
+            '@prop shadowRoot: object;', '@prop onclick: object;', '@prop onkeypress: object;', '@prop onfocusin: object;']) {
+            expect(reserved(decl), decl).toHaveLength(1);
+        }
+    });
+
+    it("HTMLElement's members kept on purpose, and names that only start with on, are not (#545)", () => {
+        for (const name of ['id', 'prefix', 'offsetTop', 'once', 'online', 'onSelect']) {
+            expect(reserved(`@prop ${name}: string;`), name).toEqual([]);
+        }
+    });
+
     it('a name the element does not have, or one core keeps on purpose, is not', () => {
         expect(reserved('@prop label: string;')).toEqual([]);
         // The host's global attributes, read into the prop and taken off the host.
