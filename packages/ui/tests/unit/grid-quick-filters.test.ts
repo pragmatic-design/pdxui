@@ -3,7 +3,7 @@
 // A row of chips under the header, one per usual filter, empty and grey until set, and a search box.
 // With «+ Add filter» and the active chips only, a reader would have to open a menu to learn what
 // could be filtered at all.
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/data-grid/pdx-data-grid';
 
@@ -54,8 +54,9 @@ describe('quick filters', () => {
     it('a click opens the filter popover of its column', async () => {
         const el = await mount();
         quickChips(el)[0].click();
-        await tick(20);
-        expect(document.querySelector('.pdx-dg-filter-popover'), 'no popover opened').not.toBeNull();
+        // The popover opens once its controls are defined, loaded on first use (#448): waited for,
+        // not a fixed tick, which raced the import (#589).
+        await vi.waitFor(() => expect(document.querySelector('.pdx-dg-filter-popover'), 'no popover opened').not.toBeNull());
     });
 
     it('set, the chip reads the value\'s label and the data is filtered; × returns it to empty', async () => {
