@@ -86,15 +86,19 @@ const REMOVED_ROUTE_FORM = /^@(?:route|alias|prefetch|head)\b|^@transition\s+['"
  * The message quotes the field's name first, which is how position-warnings finds it; the hint is the
  * form the parser reads, when there is one.
  */
-function routeFieldWarnings(block: string, kind: 'params' | 'search'): ValidationWarning[] {
+function routeFieldWarnings(block: string, kind: 'params' | 'search', pattern?: string): ValidationWarning[] {
     const types = kind === 'search' ? 'string, number or boolean' : 'a bare type name such as number or string';
-    return invalidRouteFields(block, kind).map((f) => ({
+    return invalidRouteFields(block, kind, pattern ?? '').map((f) => ({
         code: 'PDX_ROUTE_FIELD_INVALID',
         severity: 'error' as const,
-        message: f.unquoted
+        message: f.notInPattern
+            ? `@params field '${f.name}' has no type, and ${pattern ? `@page '${pattern}' has no param :${f.name}` : 'there is no @page'} to take one from: the field is dropped.`
+            : f.unquoted
             ? `@${kind} field '${f.name}' writes its type in quotes, which @${kind} does not read: the field is dropped. Write "${f.unquoted}".`
             : `@${kind} field ${f.name ? `'${f.name}'` : `"${f.text}"`} is not \`name: type\` with ${types}: the field is dropped.`,
-        hint: f.unquoted ?? `@${kind} { ${kind === 'search' ? 'q?: string, page: number = 1' : 'id: number'} }`,
+        hint: f.notInPattern
+            ? `Name a param of the path, or write the type: @params { ${f.name}: string }`
+            : f.unquoted ?? `@${kind} { ${kind === 'search' ? 'q?: string, page: number = 1' : 'id: number'} }`,
     }));
 }
 
@@ -191,6 +195,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const variants: VariantAxis[] = [];
     const parts: string[] = [];
     const route: RouteInfo = {};
+    // The `{ … }` of `@params`, read once @page's pattern is known (#564).
+    let paramsBlockText: string | null = null;
     let globalStore: GlobalStoreDirective | undefined;
     let customTag: string | undefined;
     let i18nInfo: I18nInfo | undefined;
@@ -896,11 +902,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const block = extractBlock(lines, i);
             const paramsBlock = extractSearchBlock(block.content.trim());
             if (paramsBlock) {
-                route.params = parseRouteParams(paramsBlock);
-                warnings.push(...routeFieldWarnings(paramsBlock, 'params'));
-                // Each param is a name the template and the script read, a computed like a
-                // $derived: without this it was emitted and reachable by nobody (#185).
-                declareRouteNames(route, exports);
+                // Read after the loop: a name alone takes its type from @page's pattern (#564),
+                // which may be written below.
+                paramsBlockText = paramsBlock;
                 i = block.endLine;
                 continue;
             }
@@ -1166,6 +1170,14 @@ export function analyzeScript(script: string, _filename: string, options: { orig
 
         // ─── Everything else → body ───
         pushBody(line, i);
+    }
+
+    if (paramsBlockText !== null) {
+        route.params = parseRouteParams(paramsBlockText, route.page ?? '');
+        warnings.push(...routeFieldWarnings(paramsBlockText, 'params', route.page));
+        // Each param is a name the template and the script read, a computed like a
+        // $derived: without this it was emitted and reachable by nobody (#185).
+        declareRouteNames(route, exports);
     }
 
     // A named `@loader user: loadUser;` (#506): `user` is the route's loader as a source, read from the

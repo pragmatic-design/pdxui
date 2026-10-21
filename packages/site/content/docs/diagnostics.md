@@ -1215,9 +1215,9 @@ The fragment is kept as written, so a signal read inside it is not called and is
 
 *error* — A `@params` or `@search` field its parser cannot read, such as a type in quotes.
 
-The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name.
+The field is dropped: the param is undefined in the page. `@search` reads string, number and boolean; `@params` a bare type name, or a name alone that the path has a param for, which takes its type from the path.
 
-**Fix.** `@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes. `pdx check --fix` and the editor apply it.
+**Fix.** `@params { id: number }`, `@search { q?: string, page: number = 1 }` — the type without quotes. A `@params` name alone the path does not have: name a param of the path, or write its type. `pdx check --fix` and the editor apply it.
 
 Instead of:
 

@@ -178,9 +178,11 @@ alpha → beta (#119, #146, #147, #148)
 ParamsDecl ::= "@params" S? "{" S? ParamField ( S? "," S? ParamField )* S? "}" End
 ```
 
-Unchanged in form; in the beta its types come from the same path constraints the loader's `params`
-uses, so the route's `paramTypes` has one reader (#146). It stays for components that read params
-without a loader.
+A field may be a name alone, `@params { id, tab }` (#564 — landed): it takes the type the path gives
+the param, the same rule the loader's `params` is typed by — `:id(number)` a number, every other param
+a string. `name: type` stays. In the beta its types come from the same path constraints the loader's
+`params` uses, so the route's `paramTypes` has one reader (#146). It stays for components that read
+params without a loader.
 
 ### @search — unchanged
 

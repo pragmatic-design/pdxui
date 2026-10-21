@@ -106,6 +106,13 @@ declare global {
     readonly pending: PdxReadonly<boolean>;
     readonly stale: PdxReadonly<boolean>;
   }
+  // What a named loader receives (#505, #564): the router's LoaderContext<P>, P the page pattern's
+  // params as the router coerces them. tests/loader-types.test.ts fails when a member is missing here.
+  interface PdxLoaderContext<P> {
+    params: P;
+    query: Record<string, string | string[]>;
+    signal: AbortSignal;
+  }
   // What \`@form\` gives: core's FormField, FieldArray and Form. A form is typed by two parameters
   // the projection writes out (./form-types): V, the values as getValues() returns them, nested; and
   // F, the fields, keyed as createForm flattens them — \`address.street\`, \`lines.0.product\`.

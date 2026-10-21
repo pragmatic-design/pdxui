@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { DECORATOR_RUNES, parseActionDecl, parseFetchDecl, parseVariantsBlock } from '@pdxui/compiler';
+import { DECORATOR_RUNES, parseActionDecl, parseFetchDecl, parseVariantsBlock, routeParamsType } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -58,6 +58,61 @@ function projectAction(text: string): { inPlace: string; decl: string } | null {
     return { inPlace, decl };
 }
 
+/** Text the projection inserts, at an offset of the script; the virtual file maps around it. */
+export interface ScriptInsertion {
+    /** The offset in the script the text goes before. */
+    at: number;
+    length: number;
+}
+
+/** The index of the bracket that closes the one at `open`, strings stepped over; -1 if none. */
+function closingBracket(s: string, open: number): number {
+    const pairs: Record<string, string> = { '(': ')', '{': '}', '[': ']' };
+    const stack: string[] = [];
+    for (let i = open; i < s.length; i++) {
+        const c = s[i];
+        if (c === "'" || c === '"' || c === '`') {
+            for (i++; i < s.length && s[i] !== c; i++) if (s[i] === '\\') i++;
+            continue;
+        }
+        if (pairs[c]) stack.push(pairs[c]);
+        else if (c === ')' || c === '}' || c === ']') {
+            if (stack.pop() !== c) return -1;
+            if (stack.length === 0) return i;
+        }
+    }
+    return -1;
+}
+
+/**
+ * Where the loader `fn`'s first parameter ends, to type it (#564): after the parameter as written,
+ * before a default (`= {}`). Null when `fn` is not declared as a function or a const arrow here, takes
+ * no parameter, or its first parameter is annotated already — the author's type stands.
+ */
+function loaderParamEnd(s: string, fn: string): number | null {
+    // Match: `function loadUser(` or `const loadUser = async (` — the parameter list's `(`. Groups: none
+    const decl = new RegExp(`(?:\\bfunction\\s+${fn}\\s*|\\b(?:const|let|var)\\s+${fn}\\s*=\\s*(?:async\\s*)?)\\(`).exec(s);
+    if (!decl) return null;
+    const open = decl.index + decl[0].length - 1;
+    const close = closingBracket(s, open);
+    if (close < 0) return null;
+    // The first parameter: up to its top-level `,`, or the list's end.
+    let end = open + 1;
+    let colon = -1, equals = -1;
+    for (; end < close; end++) {
+        const c = s[end];
+        if (c === '(' || c === '{' || c === '[') { const inner = closingBracket(s, end); if (inner < 0) return null; end = inner; continue; }
+        if (c === ',') break;
+        if (c === ':' && colon < 0) colon = end;
+        if (c === '=' && s[end + 1] !== '>' && equals < 0) equals = end;
+    }
+    if (colon >= 0 && (equals < 0 || colon < equals)) return null;
+    const stop = equals >= 0 ? equals : end;
+    let at = stop;
+    while (at > open + 1 && /\s/.test(s[at - 1])) at--;
+    return at > open + 1 ? at : null;
+}
+
 /** Is the offset `idx` at the start of a line (only whitespace between the line start and idx)? */
 function atLineStart(s: string, idx: number): boolean {
     let i = idx - 1;
@@ -73,7 +128,23 @@ function atLineStart(s: string, idx: number): boolean {
  *    the end, typed (their lines are blanked) → the references resolve.
  *  - the `$…` runes stay (they are declared ambient). */
 export function projectScript(scriptContent: string): string {
+    return projectScriptMapped(scriptContent, { typeLoader: false }).text;
+}
+
+/**
+ * The projection of `projectScript`, and with `typeLoader` one insertion that moves offsets (#564): a
+ * named loader's first parameter typed `: PdxLoaderContext<P>`, P the page pattern's params as the
+ * router coerces them. No length-preserving form types an unannotated parameter — a function
+ * declaration's parameters take no contextual type, and a `.ts` file reads no JSDoc type — so the
+ * text is inserted, and the virtual file maps every offset around it (./virtual-file.ts).
+ */
+export function projectScriptMapped(scriptContent: string, { typeLoader = true } = {}): { text: string; insertions: ScriptInsertion[] } {
     const s = scriptContent;
+    // The page's pattern (its first path) and the function its named loader calls, when there are both.
+    let pattern: string | null = null;
+    let loaderFn: string | null = null;
+    // The `@params` declaration, typed once the pattern is known.
+    let paramsDecl: string | null = null;
     const out = s.split('');
     // Each name a rune introduces → the type it is declared with at the end.
     const names = new Map<string, string>();
@@ -188,12 +259,22 @@ export function projectScript(scriptContent: string): string {
             // anonymous `@loader fn;` declares nothing, and the compiler reports it.
             // Match: the name and the function. Groups: [1]=the name [2]=the function
             const named = /^@loader\s+([A-Za-z_$][\w$]*)\s*:\s*([A-Za-z_$][\w$]*)/.exec(s.slice(m.index, j));
-            if (named) names.set(named[1], `PdxLoaderSource<Awaited<ReturnType<typeof ${named[2]}>>>`);
+            if (named) {
+                names.set(named[1], `PdxLoaderSource<Awaited<ReturnType<typeof ${named[2]}>>>`);
+                loaderFn = named[2];
+            }
         }
-        if (kw === 'params' || kw === 'search') {
-            // Each param, and `searchParams`, under the type the compiler gives it (./route-name-types).
+        if (kw === 'page' && pattern === null) {
+            // Match: the first quoted path of `@page '/users/:id(number)', …`. Groups: [1]=the quote [2]=the path
+            const path = /^@page\s+(['"])([^'"\n]+)\1/.exec(s.slice(m.index, j));
+            if (path) pattern = path[2];
+        }
+        if (kw === 'search') {
+            // `searchParams`, under the type the compiler gives it (./route-name-types).
             for (const [name, type] of routeNameTypes(kw, s.slice(m.index, j))) names.set(name, type);
         }
+        // Each param, read after the loop: a name alone takes its type from @page's pattern (#564).
+        if (kw === 'params') paramsDecl = s.slice(m.index, j);
         if (kw === 'generic') {
             // `@generic T extends { id: string }, K;` (#490): inside the component a type parameter is
             // opaque, and reads as what its constraint promises — `unknown` without one.
@@ -219,13 +300,27 @@ export function projectScript(scriptContent: string): string {
         for (let k = m.index; k < j; k++) if (out[k] !== '\n') out[k] = ' ';
         RUNE_KW.lastIndex = j;
     }
+    if (paramsDecl !== null) {
+        for (const [name, type] of routeNameTypes('params', paramsDecl, pattern ?? '')) names.set(name, type);
+    }
     let res = out.join('');
     res = res.replace(RUNE_DECL, (_all, indent: string, kw: string, rest: string) => `${indent}${kw === 'let' ? 'var' : 'var  '}${rest}`);
     // `$derived(x)` is `computed(() => x)`: x is read later, so a const declared below it is no use
     // before its declaration (#467). Same length, so the offsets hold: `$drv(()=>x)`. Not for an
     // object literal, which an arrow would read as its body: `$derived({ … })` stays as written.
     res = res.replace(/\$derived\((?!\s*\{)/g, '$drv(()=>');
+    // Every replacement above kept the length, so an offset of `s` is still one of `res`. The one
+    // insertion comes last: the loader's first parameter, typed from the pattern the router matched.
+    const insertions: ScriptInsertion[] = [];
+    if (typeLoader && pattern !== null && loaderFn !== null) {
+        const at = loaderParamEnd(s, loaderFn);
+        if (at !== null) {
+            const text = `: PdxLoaderContext<${routeParamsType(pattern)}>`;
+            res = res.slice(0, at) + text + res.slice(at);
+            insertions.push({ at, length: text.length });
+        }
+    }
     // `var`: declared after the code that reads them, as the compiler makes them available before it.
     const decls = [...[...names].map(([n, type]) => `var ${n}: ${type};`), ...emitters].join(' ');
-    return decls ? `${res}\n;${decls}` : res;
+    return { text: decls ? `${res}\n;${decls}` : res, insertions };
 }

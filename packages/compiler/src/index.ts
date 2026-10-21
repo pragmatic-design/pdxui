@@ -10,7 +10,7 @@ export { projectTagRenames } from './language/app-prefix';
 export { importedLocalNames } from './compiler/import-names';
 export { parseActionDecl, type ActionDecl } from './compiler/action-decl';
 export { stringContextKeys, contextTokenName, LIBRARY_CONTEXT_TOKENS, type ContextTokenRef } from './language/context-keys';
-export { projectRoutePatterns, routeTypesDts, writeRouteTypes, ROUTE_TYPES_FILE } from './route-types';
+export { projectRoutePatterns, routeTypesDts, writeRouteTypes, routeParamsType, ROUTE_TYPES_FILE } from './route-types';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';
 export type { AlphaEvents, AlphaLookup } from './language/alpha-events';
 export { generateDts, modelEventName } from './compiler/dts-generator';

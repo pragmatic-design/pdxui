@@ -138,7 +138,7 @@ OutletDecl     ::= "@outlet" S ( "'" Word "'" | '"' Word '"' ) S? "->" S? String
 ScrollDecl     ::= "@scroll" S ( "'top'" | "'preserve'" | '"top"' | '"preserve"' ) End
 RedirectDecl   ::= "@redirect" S StringLiteral ( S? "->" S? StringLiteral )? End
 ParamsDecl     ::= "@params" S? "{" S? ParamField ( S? "," S? ParamField )* S? "}" End
-ParamField     ::= Identifier S? ":" S? Identifier
+ParamField     ::= Identifier ( S? ":" S? Identifier )?                                                (a name alone: β #564)
 SearchDecl     ::= "@search" S? "{" S? SearchField ( S? "," S? SearchField )* S? "}" End
 SearchField    ::= Identifier "?"? S? ":" S? ( "string" | "number" | "boolean" ) ( S? "=" S? Expression )?
 TitleDecl      ::= "@title" S Expression End
