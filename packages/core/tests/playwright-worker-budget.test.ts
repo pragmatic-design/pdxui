@@ -77,6 +77,8 @@ describe('every Playwright suite decides how much of the machine it takes', () =
             'showcase/tests/playwright.hmr.config.ts',
             // And a fourth, on no server at all: the scenario apps' builds, weighed (#244).
             'showcase/tests/playwright.scenarios.config.ts',
+            // And a fifth, the build again with nothing else running: the specs that time a page (#606).
+            'showcase/tests/playwright.timing.config.ts',
             'site/tests/playwright.config.ts',
         ]);
     });

@@ -120,8 +120,9 @@ jobs:
           # So is the HMR config (#246), which saves a .pdx while its own dev server runs.
           - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev && pnpm --filter @pdxui/showcase run test:hmr' }
           # The scenario apps (#244, #243) build three small apps, weigh two and measure the heap of the
-          # third over 100 mounts: once, with the second.
-          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2 && pnpm --filter @pdxui/showcase run test:scenarios' }
+          # third over 100 mounts: once, with the second. So do the timed specs (#606), after the shard,
+          # with nothing else running on the runner.
+          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2 && pnpm --filter @pdxui/showcase run test:timing && pnpm --filter @pdxui/showcase run test:scenarios' }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
