@@ -36,7 +36,7 @@
       @pdx-close="naming = ''" data-test="view-name-dialog">
       <form class="name-form" @submit="commitName">
         <pdx-form-field :label="$t('app.views.name')" :error="nameError" :show-error="nameError !== ''">
-          <pdx-input :value="draft" :aria-label="$t('app.views.name')" autofocus @pdx-input="e => { draft = e.detail.value; nameError = ''; }" data-test="view-name"></pdx-input>
+          <pdx-input :value="draft" :aria-label="$t('app.views.name')" autofocus @value-change="e => { draft = e.currentTarget.value; nameError = ''; }" data-test="view-name"></pdx-input>
         </pdx-form-field>
         <div class="name-actions">
           <pdx-button variant="ghost" @click="naming = ''">{{ $t('app.views.cancel') }}</pdx-button>

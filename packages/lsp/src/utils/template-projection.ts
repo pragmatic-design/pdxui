@@ -12,6 +12,7 @@
 import type { TemplateNode } from '@pdxui/compiler';
 import { parseDeferTriggers } from '@pdxui/compiler';
 import { SegmentMap } from './segment-map';
+import { handlerEventType } from './handler-event';
 
 export interface TemplateProjection { code: string; map: SegmentMap; }
 
@@ -172,12 +173,8 @@ export function projectTemplate(
                 // type, asked as `::name`. A modifier changes what is written, so it is not checked.
                 const modelType = name.startsWith('::') && !bare.includes('.') && resolveType ? resolveType(tag, name) : null;
                 const type = name.startsWith(':') && resolveType ? resolveType(tag, bare) : null;
-                // Every handler's `$event` is typed (#122): the event the component declares, or
-                // `PdxEvent` — a DOM event by its name, `CustomEvent<unknown>` for any other.
-                const event = bare.split('.')[0];
-                const eventType = /^@[^@]/.test(name)
-                    ? (resolveType?.(tag, '@' + event) ?? `PdxEvent<${JSON.stringify(event)}, ${JSON.stringify(tag.toLowerCase())}>`)
-                    : null;
+                // Every handler's `$event` is typed (#122, #479; ./handler-event).
+                const eventType = handlerEventType(name, tag, resolveType);
                 emit(';');
                 if (eventType && ARROW_HANDLER.test(expr.trim())) {
                     // A handler that IS an arrow is called with the event (the compiler's ARROW): its

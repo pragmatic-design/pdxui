@@ -65,10 +65,12 @@ describe('a section that calls useForm() is wired to the form above it', () => {
     });
 
     it('an explicit binding is kept, as in the form\'s own file', () => {
+        // pdx-input's model event, as a build reads it from the manifest (#479).
+        const modelEventOf = (tag: string) => (tag === 'pdx-input' ? { model: 'value', event: 'value-change' } : null);
         const { code } = compile(sfc(
             "import { useForm } from '@pdxui/core';\nconst form = useForm();\nfunction mine(e) {}",
-            '<pdx-input name="deep" @pdx-input="mine"></pdx-input>',
-        ), 'section.pdx');
+            '<pdx-input name="deep" @value-change="mine"></pdx-input>',
+        ), 'section.pdx', [], undefined, { modelEventOf });
         expect(code).not.toContain('tryUseForm(ctx.el)?.fields.deep?.onChange(');
     });
 });

@@ -17,10 +17,13 @@ describe('form registry', () => {
         expect(isFormControl('pdx-select')).toBe(true);
     });
 
-    it('marks text inputs with textInput + pdx-input event', () => {
-        const cfg = getFormControlConfig('pdx-input');
-        expect(cfg?.textInput).toBe(true);
-        expect(cfg?.valueEvent).toBe('pdx-input');
+    it('marks text inputs with textInput, on their model\'s live event (#479)', () => {
+        for (const tag of ['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']) {
+            expect(getFormControlConfig(tag), tag).toMatchObject({ textInput: true, valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
+        }
+        for (const tag of ['pdx-number-input', 'pdx-otp-input']) {
+            expect(getFormControlConfig(tag), tag).toMatchObject({ valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
+        }
     });
 
     it('marks checkbox/switch as checked controls, on their model\'s event (#480)', () => {

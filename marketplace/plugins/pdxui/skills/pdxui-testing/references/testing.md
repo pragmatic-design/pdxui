@@ -72,7 +72,7 @@ chart canvas. Reaching for it first is a smell; reaching for it third is fine.
   before asserting.
 - **`fireEvent(el, name, detail?)`** — dispatches a real event, bubbling and composed. With a `detail`
   it dispatches a `CustomEvent`, which is how you drive a component's own `@event` contract:
-  `fireEvent(input, 'pdx-input', { value: 'hello' })`.
+  `fireEvent(row, 'selected', { id: '7' })`.
 - **`waitFor(condition, timeout?)`** — waits for a **condition to return true**, not for an assertion
   to stop throwing: `await waitFor(() => queryByRole(el, 'dialog') !== null)`. Default timeout 3 s.
 - **`cleanup()`** — unmounts every container. Put it in `afterEach`, or one test's DOM is the next

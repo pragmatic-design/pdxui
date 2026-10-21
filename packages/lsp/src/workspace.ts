@@ -22,14 +22,38 @@ import type { WorkspaceFile } from './capabilities/references';
 // parsed as an annotation, and they are a source of false positives.
 const SAFE_PROP_TYPE = /^(string|number|boolean|(?:'[^']*'(?:\s*\|\s*'[^']*')*))$/;
 
+// A field type the host type takes as written: primitives, `null`, `undefined`, string and number
+// literals, and unions of them. Anything else is `any` there: a type that cannot be parsed alone, or a
+// false error no cast in a template could answer.
+// Groups: none
+const HOST_FIELD_TYPE = /^(?:string|number|boolean|null|undefined|'[^']*'|-?\d+(?:\.\d+)?)(?:\s*\|\s*(?:string|number|boolean|null|undefined|'[^']*'|-?\d+(?:\.\d+)?))*$/;
+const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
+
+/**
+ * The type of a component's element, as a handler reads it on `$event.currentTarget` (#479):
+ * `HTMLElement` with each field (a prop, a model) and each method the manifest lists — a text field's
+ * commit is a native `change` on the host, read as `$event.currentTarget.value`. Null when the
+ * manifest lists no member.
+ */
+function hostTypeOf(comp: NonNullable<ReturnType<ProjectRegistry['describe']>>): string | null {
+    const members = comp.members ?? [];
+    if (members.length === 0) return null;
+    const parts = members.filter(m => IDENTIFIER.test(m.name)).map(m => (m.kind === 'method'
+        ? `${m.name}(...args: any[]): any`
+        : `${m.name}: ${HOST_FIELD_TYPE.test(m.type?.trim() ?? '') ? m.type!.trim() : 'any'}`));
+    return `HTMLElement & { ${parts.join('; ')} }`;
+}
+
 /**
  * The safe TS type of an attribute-prop of a component, or null. For `@name`, the type of that
  * event's `$event`: `CustomEvent<Payload>` when the component declares a self-contained payload,
- * null otherwise — the handler keeps `$event: any`.
+ * null otherwise — the handler keeps `$event: any`. For `$host`, the type of the component's
+ * element, which a handler's `$event.currentTarget` is.
  */
 export function resolvePropType(registry: Pick<ProjectRegistry, 'describe'>, tag: string, attr: string): string | null {
     const comp = registry.describe(tag);
     if (!comp) return null;
+    if (attr === '$host') return hostTypeOf(comp);
     // A .pdx of the project declares its slots and events itself, so what it leaves out is `unknown`.
     // A library component is described by its manifest, which types neither a slot's context nor an
     // event's detail: what it cannot say stays unchecked (null) rather than wrong (#122).
@@ -89,7 +113,7 @@ export function resolveSnippetType(registry: Pick<ProjectRegistry, 'describe'>, 
 }
 
 /** A project's `ResolveType`: a `::name` asks for its model's type, anything else for the prop's. */
-function projectResolveType(registry: ProjectRegistry): (tag: string, attr: string) => string | null {
+export function projectResolveType(registry: ProjectRegistry): (tag: string, attr: string) => string | null {
     return (tag, attr) => attr.startsWith('::') ? resolveModelType(registry, tag, attr.slice(2)) : resolvePropType(registry, tag, attr);
 }
 

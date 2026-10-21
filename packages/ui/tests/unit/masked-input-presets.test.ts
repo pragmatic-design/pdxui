@@ -8,15 +8,16 @@ import { cleanup, tick } from './helpers';
 
 import '../../src/masked-input/pdx-masked-input';
 
-type Masked = HTMLElement & { value: string };
+type Masked = HTMLElement & { value: string; getFormatted(): string; isValid(): boolean };
 
-async function mountMask(mask: string): Promise<{ el: Masked; input: HTMLInputElement; changes: Record<string, unknown>[] }> {
+async function mountMask(mask: string): Promise<{ el: Masked; input: HTMLInputElement; changes: unknown[] }> {
     document.body.innerHTML = `<pdx-masked-input mask="${mask}" aria-label="Field"></pdx-masked-input>`;
     await tick(20);
     const el = document.body.firstElementChild as Masked;
     const input = el.querySelector('input') as HTMLInputElement;
-    const changes: Record<string, unknown>[] = [];
-    el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+    // Its model's event (#479): the unmasked value, on each write.
+    const changes: unknown[] = [];
+    el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
     return { el, input, changes };
 }
 
@@ -41,7 +42,8 @@ describe('pdx-masked-input phone-intl', () => {
         const { el, input, changes } = await mountMask('phone-intl');
         await type(input, digits);
         expect(input.value).toBe(formatted);
-        expect(changes.at(-1)).toMatchObject({ value: digits, formatted });
+        expect(changes.at(-1)).toBe(digits);
+        expect(el.getFormatted()).toBe(formatted);
         expect(el.value).toBe(digits);
     });
 
@@ -77,12 +79,14 @@ describe('pdx-masked-input date and time ranges', () => {
         ['date', '02292023', '02/29/2023'],
         ['time', '2460', '24:60'],
         ['time', '1275', '12:75'],
-    ])('%s %s is out of range: aria-invalid and valid: false, the digits untouched', async (mask, digits, formatted) => {
-        const { input, changes } = await mountMask(mask);
+    ])('%s %s is out of range: aria-invalid and isValid() false, the digits untouched', async (mask, digits, formatted) => {
+        const { el, input, changes } = await mountMask(mask);
         await type(input, digits);
         expect(input.value).toBe(formatted);
         expect(input.getAttribute('aria-invalid')).toBe('true');
-        expect(changes.at(-1)).toMatchObject({ value: digits, formatted, valid: false });
+        expect(changes.at(-1)).toBe(digits);
+        expect(el.getFormatted()).toBe(formatted);
+        expect(el.isValid()).toBe(false);
     });
 
     it.each([
@@ -91,18 +95,20 @@ describe('pdx-masked-input date and time ranges', () => {
         ['time', '2359', '23:59'],
         ['time', '0000', '00:00'],
     ])('%s %s is valid', async (mask, digits, formatted) => {
-        const { input, changes } = await mountMask(mask);
+        const { el, input, changes } = await mountMask(mask);
         await type(input, digits);
         expect(input.value).toBe(formatted);
         expect(input.hasAttribute('aria-invalid')).toBe(false);
-        expect(changes.at(-1)).toMatchObject({ value: digits, formatted, valid: true });
+        expect(changes.at(-1)).toBe(digits);
+        expect(el.getFormatted()).toBe(formatted);
+        expect(el.isValid()).toBe(true);
     });
 
     it('an incomplete date is not judged', async () => {
-        const { input, changes } = await mountMask('date');
+        const { el, input } = await mountMask('date');
         await type(input, '13');
         expect(input.hasAttribute('aria-invalid')).toBe(false);
-        expect(changes.at(-1)).toMatchObject({ valid: true });
+        expect(el.isValid()).toBe(true);
     });
 });
 

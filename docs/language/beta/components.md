@@ -110,6 +110,15 @@ beta event is `checked-change` with `{ value: boolean }`, and the identifier sta
 `value` property. Every component's mapping «alpha detail field → beta» is part of its manifest, and
 `pdx migrate` uses it (migration.md).
 
+A text field's model event is live: `value-change` fires on every write, every keystroke. Its
+**commit**, on blur or Enter, is the inner input's native `change`, which bubbles to the host — no
+second event is declared (#479). Where the field commits a value no typing produced (a stepper of
+`pdx-number-input`, a clear button), it dispatches that `change` itself, as a native number input does
+for its spin buttons. So `@change` on `<pdx-input>` saves on commit, reading the model on the host
+(`$event.currentTarget.value`), and `::value.lazy` on a model writes the signal on that `change`, not on
+the model's event. The manifest records the alpha commit event (`alphaCommit`, `@alphacommit` on the
+component's JSDoc), and `pdx migrate` rewrites a listener on it to `@change`, not to the model's event.
+
 ### Rules
 
 - `::x` on a component prop that is not a `@model` is `PDX_TWO_WAY_NOT_MODEL` (error), hint «declare

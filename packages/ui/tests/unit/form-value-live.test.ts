@@ -125,10 +125,10 @@ describe('form value reflects live state after interaction', () => {
 describe('number-input typed value is observable', () => {
     beforeEach(cleanup);
 
-    it('emits pdx-input while typing (not only from stepper/arrows)', async () => {
+    it('announces value-change while typing (not only from stepper/arrows) (#479)', async () => {
         const el = await mountEl('pdx-number-input', { value: '0', max: '1000' });
         let received: number | undefined;
-        el.addEventListener('pdx-input', ((e: CustomEvent) => { received = e.detail?.value; }) as EventListener);
+        el.addEventListener('value-change', ((e: CustomEvent) => { received = e.detail?.value; }) as EventListener);
 
         const input = el.querySelector('input') as HTMLInputElement;
         input.value = '123';

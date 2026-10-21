@@ -25,7 +25,8 @@ function wire(content: string): string {
 describe('the form binding reaches the controls of this template', () => {
     it('wires a named control written beside the form', () => {
         const out = wire('<pdx-form :form="f"><pdx-input name="here"></pdx-input></pdx-form>');
-        expect(out, 'the control the recipe promises is not wired').toContain('@pdx-input=');
+        // The change event is the control's model's, read from the manifest (#479); the blur is the same for every control.
+        expect(out, 'the control the recipe promises is not wired').toContain('@pdx-blur=');
         expect(out).toContain('here');
     });
 
@@ -33,7 +34,7 @@ describe('the form binding reaches the controls of this template', () => {
         // The child tag is not a form control, and whatever it renders is compiled from its own
         // file. Nothing here can see the `pdx-input name="deep"` in its template.
         const out = wire('<pdx-form :form="f"><pdx-inner-field name="deep"></pdx-inner-field></pdx-form>');
-        expect(out, 'a child component was wired — the boundary moved').not.toContain('@pdx-input=');
+        expect(out, 'a child component was wired — the boundary moved').not.toContain('@pdx-blur=');
         expect(out).not.toContain('@pdx-change=');
         expect(out).not.toContain(':value=');
     });

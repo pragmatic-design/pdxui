@@ -40,15 +40,13 @@ export class FormControlRegistry {
         // event and its prop from the manifest (`modelEventOf`). What is left is the alpha table of
         // the controls whose batch has not landed yet.
         this.checked = new Set();
+        // The text fields declare their model too (#479); they stay here because the binding writes no
+        // reactive `:value` to a field the user is typing in.
         this.textInput = new Set([
             'pdx-input', 'pdx-textarea', 'pdx-password-input',
             'pdx-search-input', 'pdx-masked-input',
         ]);
-        this.eventName = {
-            'pdx-input': 'pdx-input', 'pdx-textarea': 'pdx-input',
-            'pdx-password-input': 'pdx-input', 'pdx-search-input': 'pdx-input',
-            'pdx-masked-input': 'pdx-input', 'pdx-number-input': 'pdx-change',
-        };
+        this.eventName = {};
         this.valueExpr = {};
     }
 

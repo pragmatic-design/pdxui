@@ -136,4 +136,20 @@ describe('::name on a model', () => {
         el.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: 'not the model' } }));
         expect(sig()).toBe('start');
     });
+
+    it('.lazy writes the signal on the native change, the commit, and not on each write of the model (#479)', () => {
+        const name = tag();
+        defineField(name);
+        const sig = signal('start');
+        const host = document.createElement('div');
+        host.append(html([`<${name} ::value.lazy=`, `></${name}>`] as unknown as TemplateStringsArray, sig));
+        document.body.appendChild(host);
+        mounted.push(host);
+        const el = host.querySelector(name) as Host;
+        el.write('typing');
+        expect(sig(), 'a live write is not the commit').toBe('start');
+        // The inner input's change, bubbling to the host: the property is what the signal gets.
+        el.querySelector('p')!.dispatchEvent(new Event('change', { bubbles: true }));
+        expect(sig()).toBe('typing');
+    });
 });

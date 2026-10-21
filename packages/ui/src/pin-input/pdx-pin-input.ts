@@ -33,7 +33,9 @@ component('pdx-pin-input', {
         let _current = (ctx.value() as string) ?? '';
         ctx.track(() => { _current = (ctx.value() as string) ?? ''; });
         // The inner pdx-otp-input's events stay on it (#138): the pin-input keeps the value, then
-        // dispatches each event again from its host, which is where the app listens.
+        // dispatches each event again from its host, which is where the app listens. The otp-input's
+        // value is its model, announced with `value-change` (#479); the pin-input's own event is still
+        // `pdx-input`, until its batch of #125.
         function onInput(e: Event) {
             const v = (e as CustomEvent).detail?.value;
             if (typeof v === 'string') _current = v;
@@ -67,7 +69,7 @@ component('pdx-pin-input', {
             :label="${() => (ctx.label() as string) || uiString('pin-input', 'label')}"
             autocomplete="off"
             mask
-            @pdx-input="${ctx.onInput}"
+            @value-change="${ctx.onInput}"
             @pdx-complete="${ctx.onComplete}"
         ></pdx-otp-input>
     `,

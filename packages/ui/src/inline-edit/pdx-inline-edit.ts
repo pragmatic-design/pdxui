@@ -299,15 +299,9 @@ component('pdx-inline-edit', {
                     if (val != null) num.setAttribute('value', String(val));
                     num.style.width = '100%';
                     num.style.minWidth = '180px';
-                    num.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.value ?? num.value;
-                    });
-                    // Typing: the number input reports each keystroke as pdx-input with the parsed
-                    // value. The native `input` event would read `num.value`, the host prop, which typing
-                    // does not update — Enter would then save the value the edit started with.
-                    num.addEventListener('pdx-input', (e: CustomEvent) => {
-                        if (e.detail && 'value' in e.detail) _editValue = e.detail.value;
-                    });
+                    // Typing and stepping: the number input's model event, `value-change`, carries the
+                    // parsed value on each write (#479), so Enter saves what was typed.
+                    onControlValue(num, 'pdx-change', (e) => e.detail?.value ?? num.value, (v) => { _editValue = v; });
                     container.appendChild(num);
                     // Focus the inner input: now, when the element is defined and rendered on append
                     // (so nothing typed before the focus arrives is lost); else once it has built.

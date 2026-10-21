@@ -46,7 +46,7 @@ autosave queue and the leave guard.
 **A form's field groups are sections.** Move a group into its own `.pdx` and call `tryUseForm()` in
 its script: that declares it a section of the `<pdx-form>` above it, and the compiler wires its named
 controls and `<pdx-form-field name>`s to that form, as it does in the form's own file — no `:value`, no
-`@pdx-input` (`recipes.md`, "A long form filled in more than one sitting"). The route keeps
+`@value-change` (`recipes.md`, "A long form filled in more than one sitting"). The route keeps
 the form, the loading and what the sections share; each section is a component.
 
 ### CD-B3 — Do not extract what has no life of its own

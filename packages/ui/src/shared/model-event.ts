@@ -21,6 +21,10 @@ export function firstModelOf(control: Element): string | null {
  * Calls `onValue` with each new value `control` announces: its first model's event and its
  * `detail.value`, or, for a control that declares no model, `alphaEvent` and what `readAlpha` reads
  * off it. Returns the teardown.
+ *
+ * A control whose class is not defined yet has no model to look up — pdx-field-list creates its
+ * controls without importing them (#479). The listener is wired when the class is defined: until it
+ * is, the element is a plain one and announces nothing.
  */
 export function onControlValue(
     control: Element,
@@ -28,12 +32,21 @@ export function onControlValue(
     readAlpha: (e: CustomEvent) => unknown,
     onValue: (value: unknown) => void,
 ): () => void {
-    const model = firstModelOf(control);
-    const type = model ? modelEventName(model) : alphaEvent;
-    const listener = (e: Event): void => {
-        const ce = e as CustomEvent<{ value?: unknown } | null>;
-        onValue(model ? ce.detail?.value : readAlpha(ce));
+    let detach: (() => void) | null = null;
+    let disposed = false;
+    const attach = (): void => {
+        if (disposed) return;
+        const model = firstModelOf(control);
+        const type = model ? modelEventName(model) : alphaEvent;
+        const listener = (e: Event): void => {
+            const ce = e as CustomEvent<{ value?: unknown } | null>;
+            onValue(model ? ce.detail?.value : readAlpha(ce));
+        };
+        control.addEventListener(type, listener);
+        detach = () => control.removeEventListener(type, listener);
     };
-    control.addEventListener(type, listener);
-    return () => control.removeEventListener(type, listener);
+    const tag = control.tagName.toLowerCase();
+    if (!tag.includes('-') || customElements.get(tag)) attach();
+    else void customElements.whenDefined(tag).then(attach);
+    return () => { disposed = true; detach?.(); };
 }

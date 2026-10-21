@@ -73,8 +73,8 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every keystroke</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>On blur / commit</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>On every keystroke: its model's event, what <code>::value</code> listens to</span></div>
+        <div class="opt-row"><code>change</code><span>—</span><span>The commit, on blur or Enter, and after the clear button: the inner input's native event, bubbling to the host. Read <code>$event.currentTarget.value</code></span></div>
         <div class="opt-row"><code>pdx-focus</code><span>—</span><span>Input focused</span></div>
         <div class="opt-row"><code>pdx-blur</code><span>—</span><span>Input blurred</span></div>
         <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Clear button clicked</span></div>

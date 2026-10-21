@@ -13,7 +13,7 @@
         <pdx-field-list name="tasks" label="Tasks" addLabel="+ Add task" :itemFields="taskFields" :itemDefault="taskDefault">
           <slot name="row" let:item let:index>
             <div class="task-row">
-              <pdx-input :value="item.title" aria-label="Task" @pdx-input="e => setTask(index, 'title', e.detail.value)"></pdx-input>
+              <pdx-input :value="item.title" aria-label="Task" @value-change="e => setTask(index, 'title', e.currentTarget.value)"></pdx-input>
               <pdx-select :options="people" :value="item.assignee" placeholder="Assign to…" label="Assignee" @pdx-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>
             </div>
           </slot>
@@ -26,7 +26,7 @@
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-field-list name="tasks" :itemFields="taskFields" :itemDefault="taskDefault"&gt;
   &lt;slot name="row" let:item let:index&gt;
-    &lt;pdx-input :value="item.title" @pdx-input="e =&gt; setTask(index, 'title', e.detail.value)"&gt;&lt;/pdx-input&gt;
+    &lt;pdx-input :value="item.title" @value-change="e =&gt; setTask(index, 'title', e.currentTarget.value)"&gt;&lt;/pdx-input&gt;
     &lt;pdx-select :options="people" :value="item.assignee"
       @pdx-change="e =&gt; setTask(index, 'assignee', e.detail.value)"&gt;&lt;/pdx-select&gt;
   &lt;/slot&gt;

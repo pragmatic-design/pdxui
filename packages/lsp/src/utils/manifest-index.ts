@@ -36,6 +36,11 @@ export interface ManifestComponent {
     attributes: ManifestMember[];
     events: ManifestMember[];
     slots: ManifestSlot[];
+    /**
+     * The element's members, its fields (props and models) and its methods, as the manifest lists
+     * them: what a handler reads on `$event.currentTarget` (#479). A project component has none here.
+     */
+    members?: (ManifestMember & { kind: 'field' | 'method' })[];
 }
 
 interface RawMember { name?: string; type?: { text?: string }; default?: string; description?: string; }
@@ -74,6 +79,7 @@ function readManifest(manifestPath: string): Map<string, ManifestComponent> {
             const decl = d as {
                 customElement?: boolean; tagName?: string; description?: string;
                 attributes?: RawMember[]; events?: RawMember[];
+                members?: (RawMember & { kind?: string })[];
                 // `signature` and `generics` are the typed snippets' (#490): the manifest generator
                 // records them for a component that declares `slot<(…) => Node>()` (#491).
                 slots?: Array<{ name?: string; description?: string; signature?: string }>;
@@ -88,6 +94,9 @@ function readManifest(manifestPath: string): Map<string, ManifestComponent> {
                 events: (decl.events ?? []).map(mapMember),
                 slots: (decl.slots ?? []).map(s => ({ name: s.name ?? '', description: s.description ?? '', ...(s.signature ? { signature: s.signature } : {}) })),
                 ...(decl.generics?.length ? { generics: decl.generics } : {}),
+                members: (decl.members ?? [])
+                    .filter((m): m is RawMember & { kind: 'field' | 'method' } => m.kind === 'field' || m.kind === 'method')
+                    .map(m => ({ ...mapMember(m), kind: m.kind })),
             });
         }
     }

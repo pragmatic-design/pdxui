@@ -25,7 +25,7 @@
           <span role="columnheader" class="mark" :data-test="'role-' + role.key" :data-active="String(role.active)">
             @if (canEdit()) {
               <pdx-input size="sm" :value="roleName(role.key)" :aria-label="$t('settings.permissions.rename', { name: roleName(role.key) })"
-                @pdx-change="e => rename(role, e.detail.value)" :data-test="'role-name-' + role.key"></pdx-input>
+                @change="e => rename(role, e.currentTarget.value)" :data-test="'role-name-' + role.key"></pdx-input>
             } @else {
               <span class="role">{{ roleName(role.key) }}</span>
             }

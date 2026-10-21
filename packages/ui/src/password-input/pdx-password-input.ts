@@ -1,17 +1,24 @@
 // pdx-password-input — Input with toggle visibility and optional strength meter.
 // Uses pdx-input wrapper pattern. Toggle button in suffix position.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, html, signal, generatedId, model } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * A password field the user can reveal or hide, with an optional strength meter below it.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
  */
 component('pdx-password-input', {
     formAssociated: true,
+    // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
+    // Enter, is the inner input's native `change`, which bubbles to the host.
+    models: { value: model<string>('') },
     props: {
-        value: { type: String, default: '' },
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
@@ -46,14 +53,7 @@ component('pdx-password-input', {
         function onInput(e: Event) {
             const val = (e.target as HTMLInputElement).value;
             liveValue.set(val);
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-input', { value: val });
-        }
-
-        function onChange(e: Event) {
-            const val = (e.target as HTMLInputElement).value;
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-change', { value: val });
+            ctx.value.set(val);
         }
 
         function onFocus() { ctx.emit('pdx-focus'); }
@@ -116,18 +116,19 @@ component('pdx-password-input', {
         ctx.expose({
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
+            // A commit no typing produced: the model's write, then the native change a commit makes.
             clear() {
                 liveValue.set('');
                 const inp = ctx.el.querySelector('input') as HTMLInputElement | null;
                 if (inp) inp.value = '';
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-change', { value: '' });
+                ctx.value.set('');
+                dispatchCommit(inp);
             },
             /** Select the whole text, so the next keystroke replaces it. Does not focus first. */
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { visible, toggleVisibility, wrapClass, onInput, onChange, onFocus, onBlur, onWrapClick, strength, strengthLabel, strengthColor, strengthId, describedBy };
+        return { visible, toggleVisibility, wrapClass, onInput, onFocus, onBlur, onWrapClick, strength, strengthLabel, strengthColor, strengthId, describedBy };
     },
     render: (ctx) => html`
         <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}">
@@ -145,7 +146,6 @@ component('pdx-password-input', {
                 :aria-describedby="${ctx.describedBy}"
                 autocomplete="current-password"
                 @input="${ctx.onInput}"
-                @change="${ctx.onChange}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             />

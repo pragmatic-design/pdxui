@@ -2,9 +2,9 @@
 // Uses .pdx-input-wrap pattern: border on wrapper, not on input.
 // Foundation for all specialized inputs (number, password, search, masked, date).
 
-import { component, html } from '@pdxui/core';
+import { component, html, model } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 
 // Password-manager (LastPass/1Password/Dashlane/…) overlay icons are noise on most fields
 // (search, quantities, codes). We suppress them by DEFAULT and only opt in when the field
@@ -23,16 +23,23 @@ function allowsPasswordManager(type: string, autocomplete: string): boolean {
  *
  * @slot prefix - Content inside the input's frame, before the text (an icon, a unit, a currency sign).
  * @slot suffix - Content inside the input's frame, after the text.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
  */
 component('pdx-input', {
     formAssociated: true,
+    // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
+    // Enter, is the inner input's native `change`, which bubbles to the host.
+    models: { value: model<string>('') },
     props: {
         // `date` and `time` are the native input's, and a date field in a form is ordinary: the
         // enum lists them so the validator does not warn about `<pdx-input type="date">` on a page
         // where it works. `<pdx-date-picker>` remains the component
         // for a calendar, a format and a locale — this is the plain field.
         type: { type: String, default: 'text', enum: ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'date', 'time'] },
-        value: { type: String, default: '' },
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
@@ -62,7 +69,7 @@ component('pdx-input', {
         // before the template renders, it would be null, and never looked up again while `value`
         // stays put — Clear would leave the text, autofocus and a click on the frame focus nothing.
         const inputEl = (): HTMLInputElement | null => ctx.el.querySelector<HTMLInputElement>('input.pdx-input');
-        // `value` is the live value: the user's typing is written to it, so the
+        // `value` is the live value and the model: the user's typing is written to it, so the
         // count, the clear button and FormData read it — there is no private copy to drift.
 
         function wrapClass(): string {
@@ -78,20 +85,13 @@ component('pdx-input', {
         }
 
         function onInput(e: Event) {
-            const val = (e.target as HTMLInputElement).value;
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-input', { value: val });
-        }
-
-        function onChange(e: Event) {
-            const val = (e.target as HTMLInputElement).value;
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-change', { value: val });
+            ctx.value.set((e.target as HTMLInputElement).value);
         }
 
         function onFocus() { ctx.emit('pdx-focus'); }
         function onBlur() { ctx.emit('pdx-blur'); }
 
+        // A commit no typing produced: the model's write, then the native change a commit makes.
         function onClear() {
             if (ctx.disabled() || ctx.readonly()) return;
             const input = inputEl();
@@ -99,9 +99,8 @@ component('pdx-input', {
                 input.value = '';
                 input.focus();
             }
-            setOwnProp(ctx.el, 'value', '');
-            ctx.emit('pdx-input', { value: '' });
-            ctx.emit('pdx-change', { value: '' });
+            ctx.value.set('');
+            dispatchCommit(input);
             ctx.emit('pdx-clear');
         }
 
@@ -143,7 +142,7 @@ component('pdx-input', {
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { wrapClass, onInput, onChange, onFocus, onBlur, onClear, onWrapClick, countText, isOverCount };
+        return { wrapClass, onInput, onFocus, onBlur, onClear, onWrapClick, countText, isOverCount };
     },
     render: (ctx) => html`
         <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}">
@@ -177,7 +176,6 @@ component('pdx-input', {
                 :aria-invalid="${() => ctx.error() ? 'true' : null}"
                 :aria-required="${() => ctx.required() ? 'true' : null}"
                 @input="${ctx.onInput}"
-                @change="${ctx.onChange}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             />

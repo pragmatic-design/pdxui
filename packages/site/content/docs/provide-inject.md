@@ -139,7 +139,7 @@ and then the control reads and writes through the form's field:
 <template>
   <pdx-input
     :value="form.fields.price.value()"
-    @pdx-input="e => form.fields.price.onChange(e.detail.value)" />
+    @value-change="e => form.fields.price.onChange(e.detail.value)" />
 </template>
 ```
 

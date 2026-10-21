@@ -9,6 +9,8 @@ import { parseSFC, parseTemplate } from '@pdxui/compiler';
 import { PdxTsService } from './utils/ts-service';
 import { buildVirtualFile } from './utils/virtual-file';
 import { mapTsDiagnostics } from './capabilities/ts-diagnostics';
+import { buildRegistry } from './utils/project-registry';
+import { projectResolveType, resolveSnippetType } from './workspace';
 
 /** One TypeScript error, placed on the .pdx. */
 export interface PdxTypeError {
@@ -27,12 +29,16 @@ export interface PdxTypeError {
  */
 export function typecheckPdx(rootDir: string, files: { path: string; content: string }[], options: { routeTypes?: boolean } = {}): Map<string, PdxTypeError[]> {
     const svc = new PdxTsService(rootDir, undefined, options);
+    // The project's components, as the editor types them: a handler's event, a model, a snippet (#479).
+    const registry = buildRegistry(rootDir);
+    const resolveType = projectResolveType(registry);
     const projected = files.flatMap((f) => {
         const descriptor = parseSFC(f.content);
         if (!descriptor.script) return [];
         const tmpl = descriptor.template;
         const ast = tmpl ? parseTemplate(tmpl.content, 1) : [];
-        const vf = buildVirtualFile(descriptor.script.content, descriptor.script.start, ast, tmpl?.content ?? null, tmpl ? tmpl.start : -1);
+        const vf = buildVirtualFile(descriptor.script.content, descriptor.script.start, ast, tmpl?.content ?? null, tmpl ? tmpl.start : -1,
+            resolveType, undefined, (tag, name) => resolveSnippetType(registry, tag, name));
         const uri = pathToFileURL(f.path).href;
         return [{ file: f, vf, fileName: svc.virtualName(uri) }];
     });

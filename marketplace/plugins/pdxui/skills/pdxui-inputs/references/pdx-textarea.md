@@ -4,7 +4,6 @@ Multi-line text input that can auto-grow.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
@@ -23,6 +22,7 @@ Multi-line text input that can auto-grow.
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -33,7 +33,7 @@ Multi-line text input that can auto-grow.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` → `detail: { value }` — Fired when the value changes.; `pdx-focus` — Fired when it receives focus.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 
 #### Examples

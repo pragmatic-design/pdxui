@@ -5,7 +5,6 @@ Text field with sizes, states and addons.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `type` | `type` | 'text' \| 'email' \| 'password' \| 'number' \| 'tel' \| 'url' \| 'search' \| 'date' \| 'time' | `'text'` | Native input type (text, email, password, …). |
-| `value` | `value` | string | `''` | The current value. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
@@ -25,6 +24,7 @@ Text field with sizes, states and addons.
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `prefix` | `prefix` | string | `''` | Prefix text (e.g. "$", "https://"). For icons use slot. |
 | `suffix` | `suffix` | string | `''` | Suffix text (e.g. "kg", ".com"). For icons use slot. |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -35,7 +35,7 @@ Text field with sizes, states and addons.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` → `detail: { value }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.; `pdx-focus` — Fired when it receives focus.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `status`
 

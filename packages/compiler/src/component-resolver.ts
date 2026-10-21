@@ -50,7 +50,7 @@ export class ComponentResolver {
     /** tag → the models a library component's manifest lists (#124); only components that list some. */
     private libraryModels = new Map<string, Set<string>>();
     /** tag → the alpha events a library component's manifest records (#478); only components that record some. */
-    private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string> }>();
+    private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string>; commit?: string }>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
     /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
@@ -374,7 +374,10 @@ export class ComponentResolver {
             if (decl.models && decl.models.length > 0) this.libraryModels.set(decl.tagName, new Set(decl.models));
             // The alpha events it no longer emits, and how their detail reads now (#478).
             if (decl.alphaEvents && decl.alphaEvents.length > 0) {
-                this.libraryAlpha.set(decl.tagName, { events: [...decl.alphaEvents], detail: { ...(decl.alphaDetail ?? {}) } });
+                this.libraryAlpha.set(decl.tagName, {
+                    events: [...decl.alphaEvents], detail: { ...(decl.alphaDetail ?? {}) },
+                    ...(decl.alphaCommit ? { commit: decl.alphaCommit } : {}),
+                });
             }
             this.props.set(decl.tagName, settable);
             this.methods.set(decl.tagName, methods);
@@ -629,7 +632,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; required?: boolean; type?: { text?: string } }
 interface ManifestDeclaration {
     tagName?: string; members?: ManifestMember[]; models?: string[];
-    alphaEvents?: string[]; alphaDetail?: Record<string, string>;
+    alphaEvents?: string[]; alphaDetail?: Record<string, string>; alphaCommit?: string;
 }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 

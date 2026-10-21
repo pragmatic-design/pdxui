@@ -1,7 +1,7 @@
 // pdx-search-input — Input with search icon, clear, debounce, Escape to clear.
 // Uses pdx-input wrapper pattern. Emits pdx-search after debounce.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, model } from '@pdxui/core';
 // The search glyph is a <pdx-icon> in this component's own template, so it is registered
 // here: on a page that does not import the whole library the tag would never upgrade and the
 // prefix would measure 0x0.
@@ -11,16 +11,21 @@ import { defineIcons } from '../icon/icon-map';
 import iconSearch from '../icon/pragmatic/search';
 defineIcons({ search: iconSearch });
 import { uiString } from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * A search field with a search icon, a clear button and Escape to clear, that emits the search after
  * a debounce or on Enter.
+ *
+ * @alphaevent pdx-input
+ * @alphadetail value $event.currentTarget.value
  */
 component('pdx-search-input', {
     formAssociated: true,
+    // Typing writes it (#479), and the write dispatches `value-change`, live. `pdx-search` stays: it is
+    // the debounced query, not the value.
+    models: { value: model<string>('') },
     props: {
-        value: { type: String, default: '' },
         /** The input's placeholder. Empty: the search-input.placeholder component string, «Search...». */
         placeholder: { type: String, default: '' },
         ariaLabel: { type: String, default: '' },
@@ -63,8 +68,7 @@ component('pdx-search-input', {
         function onInput(e: Event) {
             const val = (e.target as HTMLInputElement).value;
             liveValue.set(val);
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-input', { value: val });
+            ctx.value.set(val);
 
             // Debounced search event (cancelled on destroy too)
             if (debounceTimer) clearTimeout(debounceTimer);
@@ -87,12 +91,13 @@ component('pdx-search-input', {
             }
         }
 
+        // A commit no typing produced: the model's write, then the native change a commit makes.
         function clear() {
             liveValue.set('');
             const input = ctx.el.querySelector('input') as HTMLInputElement | null;
             if (input) { input.value = ''; input.focus(); }
-            setOwnProp(ctx.el, 'value', '');
-            ctx.emit('pdx-input', { value: '' });
+            ctx.value.set('');
+            dispatchCommit(input);
             emitSearch('');
             ctx.emit('pdx-clear');
         }

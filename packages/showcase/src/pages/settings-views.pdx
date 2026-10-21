@@ -27,7 +27,7 @@
             <span role="cell" class="name-cell">
               @if (renaming === view.key) {
                 <form class="rename" @submit="commitRename($event, view.key)">
-                  <pdx-input :value="draft" :aria-label="$t('settings.views.name')" autofocus @pdx-input="e => draft = e.detail.value" data-test="rename-input"></pdx-input>
+                  <pdx-input :value="draft" :aria-label="$t('settings.views.name')" autofocus @value-change="e => draft = e.currentTarget.value" data-test="rename-input"></pdx-input>
                   <pdx-button size="sm" variant="primary" type="submit">{{ $t('settings.views.save') }}</pdx-button>
                   <pdx-button size="sm" variant="ghost" @click="renaming = ''">{{ $t('settings.views.cancel') }}</pdx-button>
                 </form>

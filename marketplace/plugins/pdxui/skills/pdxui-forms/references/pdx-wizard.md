@@ -13,8 +13,8 @@ if you like, grouped under one or more forms. **Not when** the steps are section
   `async` handler blocks nothing.
 - `form.validate()` is async and covers the whole form, so it is no use per step: touch the step's fields with
   `onBlur()` and read their `error()`.
-- Listen with `.self`: `<pdx-input>` also emits a bubbling `pdx-change`, and without it a keystroke becomes the
-  step.
+- Listen with `.self`: a component inside a step that announces a bubbling `pdx-change` of its own would
+  otherwise become the step.
 - Steps are discovered once, in the first frame: a panel added later (behind an `@if`) is not a step.
 - Setting `:value` moves the step without `pdx-before-change`: right for restoring a draft, a bypass otherwise.
 

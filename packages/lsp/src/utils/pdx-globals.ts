@@ -37,6 +37,9 @@ declare global {
   type PdxEvent<N extends string, T extends string> = N extends keyof HTMLElementEventMap
     ? Omit<HTMLElementEventMap[N], 'target' | 'currentTarget'> & { readonly target: PdxElementOf<T>; readonly currentTarget: PdxElementOf<T> }
     : CustomEvent<any>;
+  // A handler on a component: its event, whose currentTarget is the component's element, typed with the
+  // fields and methods its manifest lists (#479) — the model a text field's commit reads.
+  type PdxOn<E, H> = Omit<E, 'currentTarget'> & { readonly currentTarget: H };
   const $el: HTMLElement;
   const $refs: Record<string, HTMLElement>;
   // The @pdxui/core helpers the compiler auto-imports (used with no import in the .pdx).

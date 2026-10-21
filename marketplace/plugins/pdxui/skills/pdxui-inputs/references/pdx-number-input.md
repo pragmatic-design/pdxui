@@ -7,8 +7,11 @@ Numeric field with steppers and formatting.
 - `value` `null`, `undefined`, `''` or `NaN` shows an empty field with its `placeholder`, and `el.value`
   reads `null`. With no `value` at all it starts empty, even with a `min`: a number nobody entered is
   not shown as data.
-- Clearing the text and leaving the field (blur or Enter) makes it empty and emits
-  `pdx-change {value: null}`; it does not snap back to 0 or to `min`.
+- Clearing the text makes it empty and announces `value-change {value: null}`; leaving the field
+  (blur or Enter) keeps it empty: it does not snap back to 0 or to `min`.
+- `value-change` is live, on every keystroke and step. The commit is the native `change` on the host:
+  the browser's after typing, the component's own after a stepper, an arrow key or the wheel. `@change`
+  and `::value.lazy` hear it.
 - `min` and `max` bound numbers only; empty stays empty. A stepper press or ArrowUp/ArrowDown on an
   empty field starts from `min` if there is one, else from 0.
 - The form value is `null` when empty, so a `required` rule reports it missing; `0` is a number and
@@ -18,7 +21,6 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | number \| null | `null` | The number, or `null` when the field is empty. |
 | `min` | `min` | number | `-Infinity` | Minimum allowed value. |
 | `max` | `max` | number | `Infinity` | Maximum allowed value. |
 | `step` | `step` | number | `1` | Increment step. |
@@ -39,6 +41,7 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `currency` | `currency` | string | `''` | ISO currency code for currency formatting (e.g. EUR). |
 | `colorBySign` | `colorbysign` | boolean | `false` | Color the number green (positive) / red (negative) |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `value` | `value` | number \| null | `null` | The number, or `null` when the field is empty. |
 
 **API (via `:ref`)**
 
@@ -49,7 +52,7 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` → `detail: { value }` — Fired when the value changes.; `pdx-focus` — Fired when it receives focus.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: number | null }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `spinbutton`
 

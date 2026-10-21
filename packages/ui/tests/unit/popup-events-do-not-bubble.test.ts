@@ -75,19 +75,19 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         expect(drawerCloses(), 'the drawer heard the picker close').toBe(0);
     });
 
-    it('a pdx-change from a pdx-input stays on the input: the pdx-form around it does not hear it (#138)', async () => {
+    it('a pdx-input\'s value-change stays on the input: the pdx-form around it does not hear it (#138, #479)', async () => {
         const form = document.createElement('pdx-form') as HTMLElement & { form: unknown };
         form.form = createForm({ initialValues: { name: '' } });
         const input = document.createElement('pdx-input');
         form.appendChild(input);
         document.body.appendChild(form);
         await tick(50);
-        const formChanges = count(form, 'pdx-change');
-        const inputChanges = count(input, 'pdx-change');
+        const formChanges = count(form, 'value-change');
+        const inputChanges = count(input, 'value-change');
 
         const native = input.querySelector('input') as HTMLInputElement;
         native.value = 'Rex';
-        native.dispatchEvent(new Event('change', { bubbles: true }));
+        native.dispatchEvent(new Event('input', { bubbles: true }));
         await tick(10);
 
         expect(inputChanges(), 'the input did not announce its change').toBe(1);

@@ -10,14 +10,21 @@
 // survive.
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import * as core from '@pdxui/core';
+import { join } from 'node:path';
 import { compile } from '../../../compiler/src/plugin';
+import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import { tick, cleanup } from './helpers';
 import '../../src/form/pdx-form';
 import '../../src/input/pdx-input';
 
+// The controls' models, from the library's manifest, as a build reads them: the form binds pdx-input
+// to its model's event (#479).
+const resolver = new ComponentResolver();
+resolver.registerUiManifest(join(__dirname, '../../../showcase'));
+
 /** Compile a .pdx and run the module: the core import becomes the injected namespace. */
 function load(filename: string, source: string): void {
-    const { code } = compile(source, filename, [], undefined, {});
+    const { code } = compile(source, filename, [], undefined, { modelEventOf: (t) => resolver.modelEventOf(t) });
     const body = code.replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;');
     expect(body, `${filename} imports something besides @pdxui/core`).not.toMatch(/^import /m);
     new Function('__core', body)(core);
@@ -49,9 +56,11 @@ beforeAll(() => {
 });
 afterEach(() => { cleanup(); delete (window as unknown as { __probeForm?: unknown }).__probeForm; });
 
-/** Type into a pdx-input as it reports it: its own `pdx-input` event. */
+/** Type into a pdx-input's own field: the component writes its model, and announces `value-change` (#479). */
 function type(el: Element, value: string): void {
-    el.dispatchEvent(new CustomEvent('pdx-input', { detail: { value }, bubbles: true }));
+    const field = el.querySelector('input')!;
+    field.value = value;
+    field.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
 describe('a form section in its own component, compiled and mounted', () => {

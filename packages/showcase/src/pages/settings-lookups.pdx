@@ -46,9 +46,9 @@
             <div class="row cats" role="row" data-test="category" :data-code="c.code" :data-active="c.active ? 'true' : 'false'">
               <span role="cell"><span :class="'pdx-dg-badge pdx-dg-badge-' + (c.active ? c.color : 'muted')">{{ c.code }}</span></span>
               <pdx-input role="cell" size="sm" :value="c.label.en" :aria-label="$t('settings.categories.en') + ' — ' + c.code"
-                @pdx-change="e => rename(c, 'en', e.detail.value)" data-test="label-en"></pdx-input>
+                @change="e => rename(c, 'en', e.currentTarget.value)" data-test="label-en"></pdx-input>
               <pdx-input role="cell" size="sm" :value="c.label.it" :aria-label="$t('settings.categories.it') + ' — ' + c.code"
-                @pdx-change="e => rename(c, 'it', e.detail.value)" data-test="label-it"></pdx-input>
+                @change="e => rename(c, 'it', e.currentTarget.value)" data-test="label-it"></pdx-input>
               <span role="cell" class="pdx-txt-small">{{ c.appliesTo.map(a => $t('settings.lookups.owner.' + a)).join(', ') }}</span>
               <span role="cell" class="num pdx-txt-small" data-test="usage">{{ usageOf(c.code) }}</span>
               <span role="cell">
@@ -87,10 +87,10 @@
     <pdx-dialog :open="adding" size="md" :title="$t('settings.categories.add')" @pdx-close="adding = false" data-test="category-dialog">
       <form class="add-form" @submit="saveNew">
         <pdx-form-field :label="$t('settings.categories.en')" :error="addError" :show-error="addError !== ''">
-          <pdx-input :value="draftEn" @pdx-input="e => { draftEn = e.detail.value; addError = ''; }" data-test="category-en"></pdx-input>
+          <pdx-input :value="draftEn" @value-change="e => { draftEn = e.currentTarget.value; addError = ''; }" data-test="category-en"></pdx-input>
         </pdx-form-field>
         <pdx-form-field :label="$t('settings.categories.it')">
-          <pdx-input :value="draftIt" @pdx-input="e => draftIt = e.detail.value" data-test="category-it"></pdx-input>
+          <pdx-input :value="draftIt" @value-change="e => draftIt = e.currentTarget.value" data-test="category-it"></pdx-input>
         </pdx-form-field>
         <pdx-form-field :label="$t('settings.categories.color')">
           <pdx-select :options="toneOptions" :value="draftColor" @pdx-change="e => draftColor = e.detail.value" data-test="category-color"></pdx-select>

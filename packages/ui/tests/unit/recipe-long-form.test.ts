@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
+import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import '../../src/index';
 import { tick, cleanup } from './helpers';
 
@@ -28,7 +29,11 @@ let tag = '';
 beforeAll(() => {
     const block = recipeBlock();
     if (!block) return;
-    const { code } = compile(block, 'shipment-form.pdx', [], undefined, {});
+    // The controls' models, from the library's manifest, as a build reads them: the form binds a text
+    // field to its model's event (#479).
+    const resolver = new ComponentResolver();
+    resolver.registerUiManifest(join(__dirname, '../../../showcase'));
+    const { code } = compile(block, 'shipment-form.pdx', [], undefined, { modelEventOf: (t) => resolver.modelEventOf(t) });
     tag = 'app-shipment-form';
     const body = code
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;')
