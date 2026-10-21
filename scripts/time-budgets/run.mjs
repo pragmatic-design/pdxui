@@ -1,35 +1,37 @@
 #!/usr/bin/env node
-// node scripts/time-budgets/run.mjs [--runs N] [--only check,analyze,build]
+// node scripts/time-budgets/run.mjs --base <dir> [--runs N] [--only check,analyze,build]
 //
 // The project-wide passes a developer waits on, timed against the showcase (#247): `pdx check`,
 // `pdx analyze`, and a cold `pdx build` — the showcase's `dist/` and `node_modules/.vite` removed
-// before each run. Each runs N times (3 by default) through the BUILT CLI, `packages/cli/dist`, so
-// run `pnpm build` first. The median of each is compared with its budget in budgets.json, and the
-// script exits non-zero when a median is over its budget or a command fails.
+// before each run. Each runs through the BUILT CLI, `packages/cli/dist`, so run `pnpm build` first.
 //
-// A budget of null is not measured against: it prints the median, so the first CI run can set it.
-// A budget is the CI measurement + 20%, rounded up to 100 ms. The first three CI runs, on one tree,
-// put the same pass's median up to 20% apart from one runner to the next, so the measurement is
-// the slowest of them. A budget is raised only in a commit that says why the pass got slower, and
-// lowered when a measurement is more than 20% under it.
+// A pass is judged against `main`, not against a number of milliseconds (#593). `--base` is a built
+// checkout of `main` (installed and `pnpm build`-ed); each pass runs N times (3 by default) in both
+// trees, alternating, on the same machine, and the median on this tree over the median on `main` is
+// held to the pass's `maxRatio` in budgets.json (verdict.mjs). An absolute budget judged the runner:
+// a runner 19-24% slower failed a change that `pdx` does not read. The script exits non-zero when a
+// ratio is over its budget or a command fails. Without `--base` it only prints this tree's medians,
+// and in CI (`CI` set) it refuses to run without one.
+//
+// A `maxRatio` is raised only in a commit that says why the pass got slower.
 
 import { spawnSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { judge } from './verdict.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..');
-const showcase = join(repo, 'packages', 'showcase');
-const cli = join(repo, 'packages', 'cli', 'dist', 'index.mjs');
 const COMMANDS = ['check', 'analyze', 'build'];
 
 function parseArgs(argv) {
-    const options = { runs: 3, only: COMMANDS };
+    const options = { runs: 3, only: COMMANDS, base: null };
     for (let i = 0; i < argv.length; i++) {
         if (argv[i] === '--runs') options.runs = Number(argv[++i]);
         else if (argv[i] === '--only') options.only = (argv[++i] ?? '').split(',').filter(Boolean);
+        else if (argv[i] === '--base') options.base = resolve(argv[++i] ?? '');
         else throw new Error(`unknown argument ${argv[i]}`);
     }
     if (!Number.isInteger(options.runs) || options.runs < 1) throw new Error('--runs takes a positive integer');
@@ -37,10 +39,17 @@ function parseArgs(argv) {
     return options;
 }
 
+/** A checkout the passes run in: its showcase and its built CLI. */
+function tree(root) {
+    const t = { root, showcase: join(root, 'packages', 'showcase'), cli: join(root, 'packages', 'cli', 'dist', 'index.mjs') };
+    if (!existsSync(t.cli)) throw new Error(`no built CLI at ${t.cli}: run \`pnpm build\` in ${root} first`);
+    return t;
+}
+
 /** Remove what makes a build warm: the output and Vite's dependency cache. */
-function coldStart() {
-    rmSync(join(showcase, 'dist'), { recursive: true, force: true });
-    rmSync(join(showcase, 'node_modules', '.vite'), { recursive: true, force: true });
+function coldStart(t) {
+    rmSync(join(t.showcase, 'dist'), { recursive: true, force: true });
+    rmSync(join(t.showcase, 'node_modules', '.vite'), { recursive: true, force: true });
 }
 
 /**
@@ -50,11 +59,11 @@ function coldStart() {
 const scratch = mkdtempSync(join(tmpdir(), 'pdx-time-budgets-'));
 const ARGS = { analyze: ['--out', join(scratch, 'pdx-manifest.json')] };
 
-/** One run of `pdx <command>` in the showcase: its wall time, or the output that says why it failed. */
-function runOnce(command) {
-    if (command === 'build') coldStart();
+/** One run of `pdx <command>` in a tree's showcase: its wall time, or the output that says why it failed. */
+function runOnce(t, command) {
+    if (command === 'build') coldStart(t);
     const start = performance.now();
-    const r = spawnSync(process.execPath, [cli, command, ...(ARGS[command] ?? [])], { cwd: showcase, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
+    const r = spawnSync(process.execPath, [t.cli, command, ...(ARGS[command] ?? [])], { cwd: t.showcase, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     const ms = performance.now() - start;
     if (r.status !== 0) {
         const output = `${r.stdout ?? ''}\n${r.stderr ?? ''}`.trim().split('\n').slice(-40).join('\n');
@@ -71,43 +80,48 @@ const median = (xs) => {
 
 function main() {
     const options = parseArgs(process.argv.slice(2));
-    if (!existsSync(cli)) throw new Error(`no built CLI at ${cli}: run \`pnpm build\` first`);
+    if (!options.base && process.env.CI) throw new Error('--base is required in CI: a pass is judged against main on the same runner (#593)');
+    const branch = tree(repo);
+    const base = options.base ? tree(options.base) : null;
     const budgets = JSON.parse(readFileSync(join(here, 'budgets.json'), 'utf8'));
 
-    const rows = [];
+    const medians = { branch: {}, base: {} };
+    const times = {};
     let failed = false;
     for (const command of options.only) {
-        const times = [];
-        for (let i = 0; i < options.runs; i++) {
-            const run = runOnce(command);
-            if (run.failed) {
-                console.error(`pdx ${command} failed on run ${i + 1}:\n${run.failed}`);
-                failed = true;
-                break;
+        times[command] = { branch: [], base: [] };
+        // Alternating, so a stretch where the machine is slower falls on both sides; and which side
+        // goes first alternates too, since the first run of a pair warms the files both trees share
+        // (pnpm's store is linked into both).
+        for (let i = 0; i < options.runs && !failed; i++) {
+            const pair = i % 2 === 0 ? [['base', base], ['branch', branch]] : [['branch', branch], ['base', base]];
+            for (const [side, t] of base ? pair : [['branch', branch]]) {
+                const run = runOnce(t, command);
+                if (run.failed) {
+                    console.error(`pdx ${command} failed on ${side === 'base' ? 'main' : 'this tree'}, run ${i + 1}:\n${run.failed}`);
+                    failed = true;
+                    break;
+                }
+                times[command][side].push(run.ms);
+                console.log(`pdx ${command} ${side === 'base' ? 'main' : 'this tree'} run ${i + 1}: ${Math.round(run.ms)} ms`);
             }
-            times.push(run.ms);
-            console.log(`pdx ${command} run ${i + 1}: ${Math.round(run.ms)} ms`);
         }
-        if (times.length < options.runs) {
-            rows.push({ command, median: null, budget: budgets[command]?.ms ?? null, verdict: 'failed' });
-            continue;
-        }
-        const m = Math.round(median(times));
-        const budget = budgets[command]?.ms ?? null;
-        const over = budget !== null && m > budget;
-        if (over) failed = true;
-        rows.push({ command, median: m, budget, verdict: budget === null ? 'no budget yet' : over ? 'OVER' : 'ok', times });
+        if (times[command].branch.length === options.runs) medians.branch[command] = Math.round(median(times[command].branch));
+        if (times[command].base.length === options.runs) medians.base[command] = Math.round(median(times[command].base));
     }
 
+    const rows = judge(medians.branch, medians.base, budgets);
+    if (rows.some((r) => r.verdict === 'OVER')) failed = true;
+    const runs = (xs) => xs.map(Math.round).join(', ');
     const table = [
-        '| command | runs (ms) | median (ms) | budget (ms) | |',
-        '|---|---|---|---|---|',
-        ...rows.map((r) => `| pdx ${r.command} | ${(r.times ?? []).map(Math.round).join(', ')} | ${r.median ?? '—'} | ${r.budget ?? '—'} | ${r.verdict} |`),
+        '| command | this tree (ms) | main (ms) | ratio | max ratio | |',
+        '|---|---|---|---|---|---|',
+        ...rows.map((r) => `| pdx ${r.command} | ${runs(times[r.command].branch)} → ${r.branch} | ${r.base === null ? '—' : `${runs(times[r.command].base)} → ${r.base}`} | ${r.ratio ?? '—'} | ${r.maxRatio ?? '—'} | ${r.verdict} |`),
     ].join('\n');
     console.log(`\n${table}\n`);
     if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, `## Time budgets\n\n${table}\n`);
     if (failed) {
-        console.error('A pass is over its budget or failed. A budget is raised only in a commit that says why the pass got slower.');
+        console.error('A pass is over its ratio to main, or failed. A maxRatio is raised only in a commit that says why the pass got slower.');
         process.exit(1);
     }
 }

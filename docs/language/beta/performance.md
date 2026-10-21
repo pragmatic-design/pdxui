@@ -14,7 +14,7 @@ in the roadmap (#107, #109–#119) is not repeated. The order of the work this p
 | C2 | A production compile costs at most 3× a development one | `compiler/tests/perf/production-speed.test.ts:69` | **landed** |
 | C3 | One component compiles in a few ms in development | `compiler/tests/perf/compiler-bench.test.ts:103` asserts an average under 50 ms for ten components, what its comment says (#264; it asserted 200). Measured on 2026-10-12: 14.3–16.8 ms | **landed** |
 | C4 | **Edit to screen in development**: a `.pdx` save reaches the open page within 300 ms on the showcase; an edit to `<style scoped>` only swaps the style, without remounting the component or losing its state | `showcase/tests/hmr.spec.ts` on its own dev server (`playwright.hmr.config.ts`): a template edit in the DOM within 300 ms of the save (25–36 ms measured locally on 2026-10-14), and a style edit that changes the computed style while the section is the same node and an unbound input keeps its value. The style-only decision: `compiler/tests/hmr-style.test.ts` | **landed** (#246) |
-| C5 | **Project-wide passes** — `pdx check`, `pdx analyze`, a cold `pdx build` of the showcase — each have a time budget in CI, set at the first measurement + 20% | CI timings | proposed |
+| C5 | **Project-wide passes** — `pdx check`, `pdx analyze`, a cold `pdx build` of the showcase — each have a time budget in CI: the median on the branch over the median on `main`, both timed on the same runner, at most 1.15 (`scripts/time-budgets/`; #593 replaced absolute budgets, which a slower runner failed with an unchanged tree) | CI timings | **landed** (#247, #593) |
 
 ## The compiled output
 

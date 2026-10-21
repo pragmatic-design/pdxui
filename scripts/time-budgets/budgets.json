@@ -1,5 +1,5 @@
 {
-  "check": { "ms": 2700, "measured": "2026-10-14, three CI runs, medians 2127, 1860, 2236 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" },
-  "analyze": { "ms": 1000, "measured": "2026-10-14, three CI runs, medians 741, 686, 773 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" },
-  "build": { "ms": 7500, "measured": "2026-10-14, three CI runs, medians 5957, 5239, 6248 ms; budget = the slowest + 20%", "runner": "ubuntu-latest (GitHub-hosted, ubuntu-24.04; westus3, westus3, eastus2)" }
+  "check": { "maxRatio": 1.15, "history": "Absolute until #593: 2700 ms, from 2026-10-14's three CI medians (2127, 1860, 2236 ms) + 20%. A runner 19-24% slower failed it with an unchanged tree (2975 ms on #592)." },
+  "analyze": { "maxRatio": 1.15, "history": "Absolute until #593: 1000 ms, from 2026-10-14's three CI medians (741, 686, 773 ms) + 20%." },
+  "build": { "maxRatio": 1.15, "history": "Absolute until #593: 7500 ms, from 2026-10-14's three CI medians (5957, 5239, 6248 ms) + 20%. A runner 19-24% slower failed it with an unchanged tree (8479 ms on #592)." }
 }
