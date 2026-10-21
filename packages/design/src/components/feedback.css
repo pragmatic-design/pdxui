@@ -139,7 +139,7 @@
 .pdx-skeleton-table-row { height: 3rem; width: 100%; border-radius: var(--pdx-radius-sm); }
 .pdx-skeleton-switch  { height: 1.5rem; width: 2.75rem; border-radius: var(--pdx-radius-full); }
 .pdx-skeleton-slider  { height: 0.25rem; width: 100%; border-radius: var(--pdx-radius-full); }
-.pdx-skeleton-select  { height: var(--pdx-input-min-height, 2.5rem); width: 100%; border-radius: var(--pdx-radius-md); }
+.pdx-skeleton-select  { height: var(--pdx-control-min-height, var(--pdx-input-min-height, 2.5rem)); width: 100%; border-radius: var(--pdx-radius-md); }
 
 /* ── Universal loading overlay via aria-busy ──
    Any component with aria-busy="true" gets a subtle loading overlay.

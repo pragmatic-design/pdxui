@@ -13,6 +13,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import { lintTokens, scanCss, unreadTokens, tokensNamedIn } from '../../design/scripts/lint-tokens.mjs';
 import { generate, renderReference, replaceRegion } from '../../design/scripts/gen-theming-reference.mjs';
+import { foreignTokenReads, lintComponentTokens, componentNames } from '../../design/scripts/component-tokens.mjs';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -338,5 +339,41 @@ describe('THEMING.md §11 agrees with tokens.css', () => {
             .toContain('`--pdx-card-style`');
         expect(listedTokens(body), 'a token nothing reads is listed as a knob')
             .not.toContain('--pdx-card-style');
+    });
+});
+
+// A component's CSS reads its own tokens and global ones (#514; beta spec, styles.md, «Component
+// tokens»): reading another component's ties the two together, and a page that overrides one
+// changes the other without knowing. What is shared is a global token, `--pdx-control-*`.
+describe('a component stylesheet reads only its own tokens and global ones', () => {
+    const NAMES = ['button', 'toggle', 'input', 'card'];
+
+    it('flags the first argument of a var() that is another component\'s token', () => {
+        const found = foreignTokenReads('components/toggle.css', '.pdx-toggle { min-height: var(--pdx-button-min-height, 2rem); }', NAMES);
+        expect(found).toEqual([{ file: 'components/toggle.css', token: '--pdx-button-min-height', owner: 'button', line: 1 }]);
+    });
+
+    it('control — its own token, a global one, and an old name kept as a fallback alias pass', () => {
+        const css = [
+            '.pdx-toggle { width: var(--pdx-toggle-width); }',
+            '.pdx-toggle { min-height: var(--pdx-control-min-height, var(--pdx-button-min-height, 2rem)); }',
+            '.pdx-toggle { color: var(--pdx-color-text); }',
+        ].join('\n');
+        expect(foreignTokenReads('components/toggle.css', css, NAMES)).toEqual([]);
+    });
+
+    it('control — a stylesheet that styles the token\'s component may read it, by tag, class or surface class', () => {
+        expect(foreignTokenReads('surfaces/forms.css', 'pdx-toggle .x { width: var(--pdx-toggle-width); }', NAMES)).toEqual([]);
+        expect(foreignTokenReads('surfaces/base.css', '.pdx-surface-card { border-radius: var(--pdx-card-radius); }', NAMES)).toEqual([]);
+    });
+
+    it('control — a theme sets and reads every component\'s tokens: it is no component\'s stylesheet', () => {
+        expect(foreignTokenReads('themes/pragmatic.css', '.pdx-primary { background: var(--pdx-button-bg); }', NAMES)).toEqual([]);
+    });
+
+    it('holds on the design CSS: no stylesheet reads another component\'s token', () => {
+        const { files: scanned, reads } = lintComponentTokens(DESIGN_SRC, componentNames(REPO));
+        expect(scanned, 'nothing was scanned: the assertion below would pass on an empty set').toBeGreaterThan(80);
+        expect(reads.map((r: { file: string; token: string; owner: string; line: number }) => `${r.file}:${r.line} reads ${r.token} (${r.owner}'s)`)).toEqual([]);
     });
 });

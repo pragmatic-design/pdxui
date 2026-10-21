@@ -14464,9 +14464,6 @@
               "name": "--pdx-input-focus-ring"
             },
             {
-              "name": "--pdx-input-height"
-            },
-            {
               "name": "--pdx-input-min-height",
               "default": "2.5rem"
             }

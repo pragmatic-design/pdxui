@@ -20,7 +20,9 @@ pdx-tag-input { display: block; }
 .pdx-tag-input {
     flex-wrap: wrap;
     gap: 4px;
-    min-height: calc(var(--pdx-input-height, 2.5rem) - 2px);
+    /* `--pdx-input-height` was read here and is declared nowhere, so this was 2.5rem: kept, through
+       the shared control height a page may set (#514). */
+    min-height: calc(var(--pdx-control-min-height, 2.5rem) - 2px);
     padding: var(--pdx-space-2xs) var(--pdx-space-xs);
     align-items: center;
     cursor: text;

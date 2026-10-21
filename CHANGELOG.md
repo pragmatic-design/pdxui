@@ -250,6 +250,11 @@ semver.
 
 ### Changed
 
+- A design stylesheet that reads another component's token, as the first argument of a `var()`, fails
+  `pnpm lint`. What components shared is now global: `--pdx-control-min-height` and
+  `--pdx-control-radius`, read with the old token as the fallback alias, so a theme that sets
+  `--pdx-button-min-height`, `--pdx-input-min-height` or `--pdx-button-radius` still applies.
+  `pdx-input`'s manifest no longer lists `--pdx-input-height`, which nothing declared. (#514)
 - A `<style scoped>` block of a component whose template writes nothing inside a component's tag
   compiles, on `baseline-2026`, to the donut scope's single-root form: `@scope ([data-pdx-H]) to (…)`,
   each selector `:scope S` alone, same specificity. The showcase's CSS falls 63.0 → 62.3 KB gzip. (#511)

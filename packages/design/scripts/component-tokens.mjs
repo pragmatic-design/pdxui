@@ -13,8 +13,15 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 
-/** Namespaces that are a component's name and not its tokens: `--pdx-row-*` sizes a table row, not pdx-row. */
-export const GLOBAL_PREFIXES = ['--pdx-row-'];
+/**
+ * The registry of global namespaces (#514): tokens no component owns, whatever their prefix looks like.
+ *   - `--pdx-row-*` sizes a table row, not the layout component pdx-row;
+ *   - `--pdx-control-*` is what controls share — the height a row of buttons and inputs aligns on,
+ *     the corner a button-like control takes. A component that needs another's measure reads it here,
+ *     with the other's token as the fallback alias, so a theme that sets the old name still applies.
+ * Every other token is global when no component name is its prefix (`--pdx-color-*`, `--pdx-space-*`).
+ */
+export const GLOBAL_PREFIXES = ['--pdx-row-', '--pdx-control-'];
 
 /** Lazy, as in lint-tokens.mjs: under a bundler `import.meta.url` is not a file: URL, and callers there pass the root. */
 function defaultSrc() {
@@ -66,6 +73,60 @@ export function ownerOf(token, names) {
     let best = null;
     for (const name of names) if (token.startsWith(`--pdx-${name}-`) && (!best || name.length > best.length)) best = name;
     return best;
+}
+
+/** The component names, from the ui manifest: each tag without `pdx-`. `repo` is the repository root. */
+export function componentNames(repo) {
+    const manifest = JSON.parse(readFileSync(join(repo, 'packages', 'ui', 'custom-elements.json'), 'utf8'));
+    return manifest.modules.flatMap((m) => (m.declarations ?? []).filter((d) => d.tagName).map((d) => d.tagName.replace(/^pdx-/, '')));
+}
+
+/**
+ * The components a stylesheet styles: the one its file name names, and every one its selectors name —
+ * as a tag (`pdx-toggle`), a class (`.pdx-toggle`) or a surface class (`.pdx-surface-card`).
+ */
+function styledBy(file, css, names) {
+    const base = file.split('/').pop().replace(/\.css$/, '');
+    // The preludes only: what stands before each `{`, so a token name in a value is no selector.
+    const preludes = [...css.matchAll(/([^{}]*)\{/g)].map((m) => m[1]).join('\n');
+    const out = new Set(names.includes(base) ? [base] : []);
+    for (const name of names) {
+        // Match: `pdx-<name>` or `pdx-surface-<name>` as a whole word, after a `.` or not. Groups: none
+        if (new RegExp(`(^|[^\\w-])\\.?pdx-(surface-)?${name}(?![\\w-])`).test(preludes)) out.add(name);
+    }
+    return out;
+}
+
+/**
+ * The reads of another component's token in one stylesheet (#514): each custom property read as the
+ * FIRST argument of a `var()` that a component owns and the stylesheet does not style. A fallback alias
+ * is not a read. A theme and `tokens.css` set every component's tokens: they are no component's
+ * stylesheet, and are not checked. `file` is relative to packages/design/src, with `/`.
+ */
+export function foreignTokenReads(file, css, names) {
+    if (file.startsWith('themes/') || file === 'tokens.css') return [];
+    const text = css.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
+    const own = styledBy(file, text, names);
+    const out = [];
+    // Match: `var(` and the property it reads. Groups: [1]=the property
+    for (const m of text.matchAll(/var\(\s*(--pdx-[\w-]+)/g)) {
+        if (text.slice(0, m.index).trimEnd().endsWith(',')) continue; // a fallback, as in primaryReads
+        const owner = ownerOf(m[1], names);
+        if (!owner || own.has(owner)) continue;
+        out.push({ file, token: m[1], owner, line: text.slice(0, m.index).split('\n').length });
+    }
+    return out;
+}
+
+/** Every read of another component's token across the design CSS, and how many files were scanned. */
+export function lintComponentTokens(src, names) {
+    const files = cssFiles(src);
+    const reads = [];
+    for (const f of files) {
+        const rel = f.slice(src.length + 1).split(/[\\/]/).join('/');
+        reads.push(...foreignTokenReads(rel, readFileSync(f, 'utf8'), names));
+    }
+    return { files: files.length, reads };
 }
 
 /**
