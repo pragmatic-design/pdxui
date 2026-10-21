@@ -100,7 +100,7 @@ attributes and does not wire hyphenated events, so both go through a `ref`; Vue 
 
 **See it running.** The [Integration](https://pdxui.com/integrations) page embeds three real apps — React, Vue 3 and
 Angular — each installing `@pdxui/*` from a registry the way an external consumer does, and each
-wiring the same four components: `pdx-button`, `pdx-select` (object `options` plus the `pdx-change`
+wiring the same four components: `pdx-button`, `pdx-select` (object `options` plus the `value-change`
 event), `pdx-data-grid` (`columns` + `data`), and `pdx-dialog` opened through its imperative
 `.show()`. The sources live in `integrations/{react,vue,angular}` and the page shows the wiring code
 beside each demo.

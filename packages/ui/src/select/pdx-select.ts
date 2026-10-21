@@ -3,7 +3,7 @@
 // `multiple` enables multi-select with chip tags.
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
-import { component, html, signal, computed, effect, prop, event, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, prop, model, event, generatedId } from '@pdxui/core';
 import { createDataSource, isDataSource, inject } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
@@ -48,14 +48,22 @@ function normaliseOptions(
  *
  * @slot item - Scoped — renders one option in the list. Receives `{ label, value, raw, index }` (`raw` is the original option).
  * @slot selected - Scoped — renders the selected value in the trigger. Receives `{ label, value, raw }`.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value
+ * @alphadetail item $event.currentTarget.selectedItem
+ * @alphadetail items $event.currentTarget.selectedItem
  */
 component('pdx-select', {
     formAssociated: true,
+    // The selection (#481): the option's value, or null; in multiple mode the array of values. A pick,
+    // a removed tag and the clear button write it, and the write dispatches `value-change`.
+    models: { value: model<unknown>(null, { type: String }) },
     props: {
         options: prop<unknown[]>(() => []),
         /** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
         source: prop<DataSource<unknown> | null>(null),
-        value: prop<string | null>(null, { type: String }),
         labelField: prop('label'),
         valueField: prop('value'),
         placeholder: prop(''),
@@ -97,13 +105,11 @@ component('pdx-select', {
         debounce: prop(200),
     },
     events: {
-        /** Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple. */
-        'pdx-change': event<{ value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }>(),
         /** Fired when the list opens. */
         'pdx-open': event<void>({ bubbles: false }),
         /** Fired when the list closes. */
         'pdx-close': event<void>({ bubbles: false }),
-        /** Fired when the clear button empties the selection, after its `pdx-change`. */
+        /** Fired when the clear button empties the selection, after its `value-change`. */
         'pdx-clear': event<void>(),
         /** Fired as the user types in the search input. */
         'pdx-search': event<{ query: string }>(),
@@ -244,24 +250,21 @@ component('pdx-select', {
         });
 
         /**
-         * UI-03: reflect the user's current selection onto the host `value` prop so
-         * `el.value` is readable after a choice (previously the value lived only in
-         * `pdx-change.detail`). Single → the scalar value; multiple → comma-joined.
-         * Writes through the prop signal (setRaw) — the _reflecting guard stops the
-         * sync track above from rebuilding _selectedValues from this same write.
+         * Writes the user's selection to the model, which dispatches `value-change` (#481). Single →
+         * the scalar value; multiple → the array. The _reflecting guard stops the sync track above
+         * from rebuilding _selectedValues from this same write.
          */
         function reflectValue(): void {
             const sel = _selectedValues();
-            // Multiple: the ARRAY is reflected, not the comma-joined string — a join
+            // Multiple: the ARRAY is written, not the comma-joined string — a join
             // loses the type (numbers→strings on the round trip) and collides with
-            // values containing commas; el.value is consistent with
-            // pdx-change.detail.values.
+            // values containing commas.
             const next = ctx.multiple()
                 ? Array.from(sel)
                 : (sel.size > 0 ? (sel.values().next().value ?? null) : null);
             _reflecting = true;
             try {
-                (ctx.el as { value?: unknown }).value = next;
+                ctx.value.set(next);
             } finally {
                 _reflecting = false;
             }
@@ -432,14 +435,9 @@ component('pdx-select', {
                 else set.add(item.value);
                 _selectedValues.set(set);
                 reflectValue();
-                ctx.emit('pdx-change', {
-                    values: Array.from(set),
-                    items: flatItems().filter(i => set.has(i.value)).map(i => i._raw),
-                });
             } else {
                 _selectedValues.set(new Set([item.value]));
                 reflectValue();
-                ctx.emit('pdx-change', { value: item.value, item: item._raw });
                 close();
             }
             updateHiddenInput();
@@ -450,22 +448,12 @@ component('pdx-select', {
             set.delete(val);
             _selectedValues.set(set);
             reflectValue();
-            ctx.emit('pdx-change', {
-                values: Array.from(set),
-                items: flatItems().filter(i => set.has(i.value)).map(i => i._raw),
-            });
             updateHiddenInput();
         }
 
         function clearSelection() {
             _selectedValues.set(new Set());
             reflectValue();
-            const mul = ctx.multiple();
-            if (mul) {
-                ctx.emit('pdx-change', { values: [], items: [] });
-            } else {
-                ctx.emit('pdx-change', { value: null, item: null });
-            }
             ctx.emit('pdx-clear');
             updateHiddenInput();
         }

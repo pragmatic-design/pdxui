@@ -7,7 +7,7 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-tag-input placeholder="Paste comma-separated values here..." @pdx-change="onPasteChange"></pdx-tag-input>
+      <pdx-tag-input placeholder="Paste comma-separated values here..." @value-change="onPasteChange"></pdx-tag-input>
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
       Pasted tags: <strong>{{ pasteTagsStr() }}</strong>
@@ -35,7 +35,7 @@ function addLog(text) { tagInputLog.addLog(text); }
 let pasteTags = $signal([]);
 
 function onPasteChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     pasteTags = tags;
     addLog('paste change: [' + tags.join(', ') + ']');
 }

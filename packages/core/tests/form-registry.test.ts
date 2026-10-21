@@ -39,8 +39,14 @@ describe('form registry', () => {
         }
     });
 
+    it('describes the pickers by their model\'s event (#481)', () => {
+        for (const tag of ['pdx-select', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']) {
+            expect(getFormControlConfig(tag), tag).toMatchObject({ valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
+        }
+    });
+
     it('control: one with no model yet keeps the default alpha event', () => {
-        expect(getFormControlConfig('pdx-select')).toEqual({});
+        expect(getFormControlConfig('pdx-pin-input')).toEqual({});
     });
 
     it('registers a custom control (case-insensitive)', () => {

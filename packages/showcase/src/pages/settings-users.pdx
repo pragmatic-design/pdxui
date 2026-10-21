@@ -30,7 +30,7 @@
           <span role="cell">
             @if (canEdit()) {
               <pdx-select multiple size="sm" :options="roleOptions" :value="a.roles" :aria-label="$t('settings.users.rolesOf', { name: a.name })"
-                @pdx-change="e => saveAccountRoles(a.username, e.detail.values)" :data-test="'roles-' + a.username"></pdx-select>
+                @value-change="e => saveAccountRoles(a.username, e.detail.value)" :data-test="'roles-' + a.username"></pdx-select>
             } @else {
               @for (a.roles as r; track r) {
                 <span class="pdx-badge role">{{ roleName(r) }}</span>

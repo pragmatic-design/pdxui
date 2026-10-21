@@ -534,7 +534,7 @@ function createFieldElement(field: FormFieldSchema, form: Form<Record<string, un
                 t = setTimeout(() => loader(q).then(items => setOptions(toOpts(items))), 200);
             };
             control.addEventListener('pdx-search', onQuery); // pdx-select
-            control.addEventListener('pdx-input', onQuery);  // pdx-autocomplete
+            control.addEventListener('query-change', onQuery);  // pdx-autocomplete (#481)
         }
     }
 

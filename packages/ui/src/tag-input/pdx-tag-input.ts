@@ -1,10 +1,10 @@
 // pdx-tag-input — Multi-tag input with chip rendering, paste support, keyboard nav.
 // Uses .pdx-input-wrap for consistent border/focus and .pdx-chip for tag rendering.
 
-import { component, html, signal, computed, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, computed, model, event, useFormAssociated } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tag-input';
@@ -16,11 +16,27 @@ import '@pdxui/design/components/chip';
  * duplicates prevented.
  *
  * @slot tag - Scoped — renders one tag. Receives `{ tag, index }`.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail tags $event.detail.value
+ * @alphadetail value $event.detail.value
+ * @alpharename pdx-input draft-change
  */
 component('pdx-tag-input', {
     formAssociated: true,
+    // The tags (#481). Adding one, removing one and clear() write them, and the write dispatches
+    // `value-change`. The text being typed is not the value: it is announced with `draft-change`.
+    models: { value: model<string[]>(() => [], { type: Array }) },
+    events: {
+        /** The text typed into the field, before it becomes a tag. */
+        'draft-change': event<{ value: string }>(),
+        /** A tag was added. */
+        'pdx-add': event<{ tag: string; tags: string[] }>(),
+        /** A tag was removed. */
+        'pdx-remove': event<{ tag: string; index: number; tags: string[] }>(),
+    },
     props: {
-        value: { type: Array, default: [] },
         placeholder: { type: String, default: '' },
         maxTags: { type: Number, default: 0 },
         maxLength: { type: Number, default: 0 },
@@ -83,10 +99,9 @@ component('pdx-tag-input', {
             if (!validate(tag)) return false;
             const next = [...tags(), tag];
             tags.set(next);
-            setOwnProp(ctx.el, 'value', next);
+            ctx.value.set(next);
             announcement.set(format(uiString('tag-input', 'added'), { tag }));
             ctx.emit('pdx-add', { tag, tags: next });
-            ctx.emit('pdx-change', { tags: next });
             return true;
         }
 
@@ -97,7 +112,7 @@ component('pdx-tag-input', {
             for (const part of parts) {
                 if (addTag(part)) changed = true;
             }
-            // pdx-change already emitted per-add; no extra emit needed
+            // value-change already dispatched per add; no extra one needed
             return changed;
         }
 
@@ -107,17 +122,15 @@ component('pdx-tag-input', {
             const tag = current[index];
             const next = current.filter((_, i) => i !== index);
             tags.set(next);
-            setOwnProp(ctx.el, 'value', next);
+            ctx.value.set(next);
             announcement.set(format(uiString('tag-input', 'removed'), { tag }));
             ctx.emit('pdx-remove', { tag, index, tags: next });
-            ctx.emit('pdx-change', { tags: next });
         }
 
         function clear() {
             tags.set([]);
             inputValue.set('');
-            setOwnProp(ctx.el, 'value', []);
-            ctx.emit('pdx-change', { tags: [] });
+            ctx.value.set([]);
         }
 
         function getTags(): string[] {
@@ -165,7 +178,7 @@ component('pdx-tag-input', {
                 (e.target as HTMLInputElement).value = '';
             } else {
                 inputValue.set(val);
-                ctx.emit('pdx-input', { value: val });
+                ctx.emit('draft-change', { value: val });
             }
         }
 

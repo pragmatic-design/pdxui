@@ -93,16 +93,24 @@ describe('an event with a detail says what is in it', () => {
     }
 
     it('found the emits to check', () => {
-        // The control: a scan that finds nothing makes the next assertion pass by default.
-        expect(checks.length).toBeGreaterThan(150);
+        // The control: a scan that finds nothing makes the next assertion pass by default. Named emits,
+        // not a count: a count falls each time a batch of #125 removes alpha emits, and a threshold
+        // lowered to follow it guards less every time.
+        expect(checks).toEqual(expect.arrayContaining([
+            'pdx-tag-input pdx-add', 'pdx-tag-input pdx-remove', 'pdx-select pdx-search', 'pdx-calendar pdx-navigate',
+            'pdx-autocomplete query-change', 'pdx-tag-input draft-change', 'pdx-pagination pdx-change',
+        ]));
     });
 
     it('has a detail in the manifest for every one of them', () => {
         expect([...new Set(undocumented)]).toEqual([]);
     });
 
-    it('says pdx-tag-input carries its list in detail.tags — the payload the lab guessed wrong', () => {
-        const change = eventsByTag.get('pdx-tag-input')?.find(e => e.name === 'pdx-change');
-        expect(change?.detail).toMatch(/\btags\b/);
+    it('says pdx-tag-input carries its list in value-change\'s detail.value, and in pdx-add\'s detail.tags', () => {
+        // The payload the lab guessed wrong was `pdx-change`'s `detail.tags`; the model (#481) carries
+        // the list as `value`, and pdx-add still names it `tags`.
+        const events = eventsByTag.get('pdx-tag-input');
+        expect(events?.find(e => e.name === 'value-change')?.detail).toMatch(/\bvalue\b/);
+        expect(events?.find(e => e.name === 'pdx-add')?.detail).toMatch(/\btags\b/);
     });
 });

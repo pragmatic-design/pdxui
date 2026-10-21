@@ -5,12 +5,12 @@
       Provide a <code>presets</code> array to show a clickable color grid for quick selection.
     </p>
     <div class="demo-box">
-      <pdx-color-picker :presets="presetColors" @pdx-change="onPresetChange" />
+      <pdx-color-picker :presets="presetColors" @change="onPresetChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ presetValue }}</p>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
   :presets="presetColors"
-  @pdx-change="onPresetChange" /&gt;
+  @change="onPresetChange" /&gt;
 
 const presetColors = [
   '#ef4444', '#f97316', '#eab308', '#22c55e',
@@ -26,5 +26,5 @@ const presetColors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8
 
 let presetValue = $signal('');
 
-function onPresetChange(e) { presetValue = e.detail.value ?? e.detail; }
+function onPresetChange(e) { presetValue = e.currentTarget.value; }
 </script>

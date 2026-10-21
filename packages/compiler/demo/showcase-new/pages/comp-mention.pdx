@@ -57,8 +57,8 @@
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>pdx-select</code><span>{ item, trigger, query }</span><span>Mention item selected</span></div>
-        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>Text changed</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value }</span><span>Value committed</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Its model: the text changed</span></div>
+        <div class="opt-row"><code>change</code><span>—</span><span>The commit, a native event: on blur after typing, and when a mention is picked</span></div>
       </div>
     </section>
   </div>

@@ -75,7 +75,8 @@
                 const el = s.querySelector('pdx-select');
                 el.options = OPTIONS;
                 api.read = () => ({ value: el.value, detail: api._detail ?? null });
-                el.addEventListener('pdx-change', e => { api._detail = e.detail?.value ?? null; });
+                // Its model's event (#481).
+                el.addEventListener('value-change', e => { api._detail = e.detail?.value ?? null; });
             },
 
             // gotchas.md:95 — "a static createDataSource({data}) does NOT render the rows"

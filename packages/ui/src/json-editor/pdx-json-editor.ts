@@ -182,6 +182,8 @@ async function makeField(f: FieldDef, val: unknown, onEdit: OnEdit): Promise<Ctr
         const ti = document.createElement('pdx-tag-input') as HTMLElement & { value: unknown };
         ti.setAttribute('label', f.label);
         ti.value = Array.isArray(val) ? val : []; wrap.appendChild(ti);
+        // Its model event (#481), which does not bubble to the listeners on the root.
+        ti.addEventListener('value-change', onEdit);
         return { el: wrap, read: () => (ti.value || []) };
     }
     if (f.type === 'enum') {
@@ -190,6 +192,8 @@ async function makeField(f: FieldDef, val: unknown, onEdit: OnEdit): Promise<Ctr
         sel.setAttribute('label', f.label);
         sel.setAttribute('searchable', ''); if (!f.req) sel.setAttribute('clearable', '');
         sel.options = await optionsFor(f); sel.value = val == null ? '' : val;
+        // Its model event (#481), which does not bubble to the listeners on the root.
+        sel.addEventListener('value-change', onEdit);
         wrap.appendChild(sel);
         return { el: wrap, read: () => { const v = sel.value || ''; return v === '' ? null : v; } };
     }
@@ -255,6 +259,13 @@ component('pdx-json-editor', {
             ctx.value.set(value);
         }
 
+        // The build that is current: a later build, or the setup's destruction, moves it on. Not the
+        // track's cleanup, which also runs when the track re-runs on the editor's own edit and builds
+        // nothing — that marked the live build stale, and every edit after the first that came
+        // through onEdit (a sub-modal's apply, a removed row, a library control) was dropped (#481).
+        let _currentBuild = 0;
+        ctx.track(() => () => { _currentBuild++; });
+
         ctx.track(() => {
             const schema = ctx.schema() as (FieldDef & { kind?: 'object' | 'list'; item?: FieldDef[] }) | null;
             const raw = ctx.value() as unknown;
@@ -263,24 +274,23 @@ component('pdx-json-editor', {
             _builtSchema = schema;
             const data = typeof raw === 'string' ? safeParse(raw) : raw;
             // ctx.frame: a setup a move destroyed does not build again; and the root is built
-            // asynchronously, so a build this run no longer owns — a destroyed setup, or a later run
-            // of this track — does not append its root next to the current one.
-            let superseded = false;
+            // asynchronously, so a build that is no longer current — a destroyed setup, or a later
+            // build — does not append its root next to the current one.
+            const build = ++_currentBuild;
+            const live = (): boolean => build === _currentBuild;
             ctx.frame(() => {
                 ctx.el.innerHTML = '';
                 ctx.el.classList.add('pdx-json-editor-root');
-                buildRoot(schema, data, () => { if (!superseded) emit(); }).then((r) => {
-                    if (superseded) return;
+                buildRoot(schema, data, () => { if (live()) emit(); }).then((r) => {
+                    if (!live()) return;
                     root = r;
                     ctx.el.appendChild(r.el);
-                    // Recompute + emit on any edit within (inputs, selects); sub-modal applies and
-                    // root-list removals come through buildRoot's onEdit.
+                    // Recompute + emit on any edit within (native inputs); the library controls' model
+                    // events, sub-modal applies and root-list removals come through buildRoot's onEdit.
                     r.el.addEventListener('input', emit);
                     r.el.addEventListener('change', emit);
-                    r.el.addEventListener('pdx-change', emit);
                 });
             });
-            return () => { superseded = true; };
         });
 
         return { read: () => (root ? root.read() : null) };

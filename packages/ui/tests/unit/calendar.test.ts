@@ -107,11 +107,11 @@ describe('pdx-calendar', () => {
         expect(root?.classList.contains('disabled')).toBe(true);
     });
 
-    it('emits pdx-change on cell click', async () => {
+    it('emits value-change on cell click', async () => {
         const el = await mount('pdx-calendar');
         await tick(100);
         let emitted = false;
-        el.addEventListener('pdx-change', () => { emitted = true; });
+        el.addEventListener('value-change', () => { emitted = true; });
         const cell = el.querySelector('[role="gridcell"]:not(.pdx-cal-disabled)') as HTMLElement;
         cell?.click();
         expect(emitted).toBe(true);

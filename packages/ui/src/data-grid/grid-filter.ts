@@ -150,8 +150,9 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
                     sel.value = String(gc.inlineFilterValues[col.field]);
                 }
             });
-            sel.addEventListener('pdx-change', (e: CustomEvent) => {
-                gc.inlineFilterValues[col.field] = e.detail.value ?? 'all';
+            // Its model event, `value-change` (#481).
+            onControlValue(sel, 'pdx-change', (e) => e.detail?.value, (v) => {
+                gc.inlineFilterValues[col.field] = (v ?? 'all') as string;
                 applyFilters(gc);
             });
             sel.addEventListener('pdx-clear', () => {
@@ -187,8 +188,9 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
             if (gc.inlineFilterValues[col.field]) {
                 requestAnimationFrame(() => { picker.value = String(gc.inlineFilterValues[col.field]); });
             }
-            picker.addEventListener('pdx-change', (e: CustomEvent) => {
-                gc.inlineFilterValues[col.field] = e.detail.value ?? '';
+            // Its model event, `value-change` (#481).
+            onControlValue(picker, 'pdx-change', (e) => e.detail?.value, (v) => {
+                gc.inlineFilterValues[col.field] = (v ?? '') as string;
                 debouncedApplyFilters(gc);
             });
             picker.addEventListener('pdx-clear', () => {

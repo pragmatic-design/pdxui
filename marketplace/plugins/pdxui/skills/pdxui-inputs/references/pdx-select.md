@@ -24,8 +24,8 @@ value is free text; the options are a hierarchy → `pdx-tree-select`; the rows 
 paged table → `pdx-relation-picker`.
 
 **Pitfalls**
-- `pdx-change.detail` changes shape with `multiple`: `{ value, item }` single, `{ values, items }` multiple; a
-  clear sends `{ value: null }` or `{ values: [] }`. Read `e.detail.value`, not `e.detail`.
+- `value-change` carries `{ value }`: the option's value, or with `multiple` the array of values; a clear
+  writes `null` or `[]`. The option itself is `el.selectedItem` (the options, with `multiple`).
 - With `multiple`, `el.value` is the ARRAY. The comma-joined string survives only in the hidden input a native
   form submits, where a value containing a comma cannot round-trip.
 - `creatable` makes the typed text both value and label and emits `pdx-create`; storing the new option is yours.
@@ -38,7 +38,6 @@ paged table → `pdx-relation-picker`.
 |---|---|---|---|---|
 | `options` | — | unknown[] | `() => []` | The selectable options. |
 | `source` | — | DataSource<unknown> \| null | `null` | DataSource instance — dedicated prop for data-driven select. Takes priority over options. |
-| `value` | `value` | string \| null | `null` | The current value. |
 | `labelField` | `labelfield` | string | `'label'` | Object field used as the option label. |
 | `valueField` | `valuefield` | string | `'value'` | Object field used as the option value. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
@@ -63,6 +62,7 @@ paged table → `pdx-relation-picker`.
 | `createLabel` | `createlabel` | string | `''` | Label template for the create option. Use {query} as placeholder. Empty: the select.create component string, «Create "{query}"» in English. |
 | `remote` | `remote` | boolean | `false` | Enable debounced server-side filtering for remote DataSource. |
 | `debounce` | `debounce` | number | `200` | Debounce delay in ms for remote search. |
+| `value` | `value` | unknown | `null` | The current value. |
 
 **API (via `:ref`)**
 
@@ -73,7 +73,7 @@ paged table → `pdx-relation-picker`.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }` — Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple.; `pdx-clear` — Fired when the clear button empties the selection, after its `pdx-change`.; `pdx-close` — Fired when the list closes. Does not bubble.; `pdx-create` → `detail: { value: string; label: string }` — Fired when the user creates an option from the search text.; `pdx-open` — Fired when the list opens. Does not bubble.; `pdx-search` → `detail: { query: string }` — Fired as the user types in the search input.
+**Events:** `pdx-clear` — Fired when the clear button empties the selection, after its `value-change`.; `pdx-close` — Fired when the list closes. Does not bubble.; `pdx-create` → `detail: { value: string; label: string }` — Fired when the user creates an option from the search text.; `pdx-open` — Fired when the list opens. Does not bubble.; `pdx-search` → `detail: { query: string }` — Fired as the user types in the search input.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `presentation` · `status`
 
@@ -242,7 +242,7 @@ function onCountryChange(e) {
 
 ```html
 <pdx-select :options="cascadeCountries" clearable
-  @pdx-change="onCountryChange" placeholder="Select country..." />
+  @value-change="onCountryChange" placeholder="Select country..." />
 
 <pdx-select :options="filteredCities" labelField="name" valueField="id"
   :disabled="!selectedCountry" searchable clearable

@@ -60,7 +60,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value, labels }</span><span>Selection changed</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Its model, the path: selection changed; <code>getLabels()</code> gives the labels</span></div>
         <div class="opt-row"><code>pdx-open</code><span>—</span><span>Panel opened</span></div>
         <div class="opt-row"><code>pdx-close</code><span>—</span><span>Panel closed</span></div>
         <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>

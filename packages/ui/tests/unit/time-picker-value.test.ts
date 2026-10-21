@@ -1,6 +1,6 @@
 // pdx-time-picker reflects its value on the element, and can be empty.
 //
-// Two parts of the value contract. The value is not only in the pdx-change event: `el.value` follows
+// Two parts of the value contract. The value is not only in the value-change event: `el.value` follows
 // when the user sets 02:15, because registerFormControl names `value` as the control's value.
 // And an empty value is not «00 : 00» with aria-valuenow 0 on both spinbuttons — that is midnight, on
 // screen and to a screen reader, not «no time».
@@ -27,7 +27,7 @@ async function press(el: HTMLElement, index: number, key: string): Promise<void>
 
 function record(el: HTMLElement): string[] {
     const seen: string[] = [];
-    el.addEventListener('pdx-change', (e) => seen.push((e as CustomEvent).detail.value));
+    el.addEventListener('value-change', (e) => seen.push((e as CustomEvent).detail.value));
     return seen;
 }
 

@@ -340,7 +340,8 @@ export function createDefaultEditor(
         const input = createLazy('pdx-date-picker') as any;
         input.size = 'sm';
         requestAnimationFrame(() => { if (value) input.value = value; });
-        input.addEventListener('pdx-change', (e: any) => onChange(e.detail?.value));
+        // Its model event, `value-change` (#481).
+        onControlValue(input, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = input;
     } else if (colType === 'enum' && col.def.filterOptions) {
         const select = createLazy('pdx-select') as any;
@@ -349,7 +350,8 @@ export function createDefaultEditor(
             select.options = col.def.filterOptions;
             select.value = value;
         });
-        select.addEventListener('pdx-change', (e: any) => onChange(e.detail?.value));
+        // Its model event, `value-change` (#481).
+        onControlValue(select, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = select;
     } else {
         // Default: text input

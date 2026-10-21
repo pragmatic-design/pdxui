@@ -4,7 +4,6 @@ Type to add removable tags.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | — | array | `[]` | The current value. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
 | `maxTags` | `maxtags` | number | `0` | Maximum number of tags allowed. |
 | `maxLength` | `maxlength` | number | `0` | Maximum length of a single tag. |
@@ -19,6 +18,7 @@ Type to add removable tags.
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**
 
@@ -31,7 +31,7 @@ Type to add removable tags.
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 
-**Events:** `pdx-add` → `detail: { tag, tags }` — Fired on `pdx-add`.; `pdx-change` → `detail: { tags }` — Fired when the value changes.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.; `pdx-remove` → `detail: { tag, index, tags }` — Fired when an item is removed.
+**Events:** `draft-change` → `detail: { value: string }` — The text typed into the field, before it becomes a tag.; `pdx-add` → `detail: { tag: string; tags: string[] }` — A tag was added.; `pdx-remove` → `detail: { tag: string; index: number; tags: string[] }` — A tag was removed.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group` · `status`
 
@@ -47,13 +47,13 @@ are checked against the manifest above._
 **Basic** — Simple tag input. Type a value and press Enter or , to add a tag. Press Backspace on empty input to remove the last tag.
 
 ```html
-<pdx-tag-input placeholder="Add tags..." @pdx-change="onChange" />
+<pdx-tag-input placeholder="Add tags..." @value-change="onChange" />
 ```
 
 **With Initial Values** — Pre-populated tags via the `:value` binding (array of strings).
 
 ```html
-<pdx-tag-input :value="['JavaScript', 'TypeScript', 'Rust']" @pdx-change="onChange" />
+<pdx-tag-input :value="['JavaScript', 'TypeScript', 'Rust']" @value-change="onChange" />
 ```
 
 **Max Tags** — Limited to 5 tags. The input field disappears when the limit is reached.

@@ -153,7 +153,7 @@ function onCountryPick(e) {
 
 ```html
 <pdx-select :options="countryList" clearable
-  @pdx-change="onCountryPick" />
+  @value-change="onCountryPick" />
 
 <pdx-select :options="filteredCityList" labelField="name"
   valueField="id" :value="pickedCity"

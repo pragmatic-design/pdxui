@@ -14,7 +14,7 @@
         :debounce="300"
         :min-length="2"
         remote
-        @pdx-change="onCountryChange" />
+        @value-change="onCountryChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Country: {{ countryValue }}</p>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-autocomplete

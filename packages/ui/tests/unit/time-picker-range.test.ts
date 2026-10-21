@@ -29,12 +29,12 @@ async function press(host: HTMLElement, segment: 'hour' | 'minute', key: string)
     const el = host.querySelector('pdx-time-picker')!;
     let emitted: string | null = null;
     const onChange = (e: Event) => { emitted = (e as CustomEvent).detail.value; };
-    el.addEventListener('pdx-change', onChange);
+    el.addEventListener('value-change', onChange);
     const values = host.querySelectorAll<HTMLElement>('.pdx-time-value');
     expect(values.length, 'the picker rendered no segments').toBeGreaterThan(1);
     values[segment === 'hour' ? 0 : 1].dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
     await tick(20);
-    el.removeEventListener('pdx-change', onChange);
+    el.removeEventListener('value-change', onChange);
     return emitted;
 }
 
@@ -45,14 +45,20 @@ describe('pdx-time-picker min/max', () => {
         expect(await press(host, 'hour', 'ArrowDown')).toBe('08:00');
     });
 
+    // At the bound the step is pulled back to the value the picker already holds: the model announces
+    // only a change (#481), so nothing is announced, and the value and the segment stay at the bound.
     it('will not step below min', async () => {
         const host = await mount('value="09:00" min="09:00" max="17:00"');
-        expect(await press(host, 'hour', 'ArrowDown')).toBe('09:00');
+        expect(await press(host, 'hour', 'ArrowDown')).toBeNull();
+        expect((host.querySelector('pdx-time-picker') as HTMLElement & { value: string }).value).toBe('09:00');
+        expect(host.querySelectorAll('[role="spinbutton"]')[0].getAttribute('aria-valuenow')).toBe('9');
     });
 
     it('will not step above max', async () => {
         const host = await mount('value="17:00" min="09:00" max="17:00"');
-        expect(await press(host, 'hour', 'ArrowUp')).toBe('17:00');
+        expect(await press(host, 'hour', 'ArrowUp')).toBeNull();
+        expect((host.querySelector('pdx-time-picker') as HTMLElement & { value: string }).value).toBe('17:00');
+        expect(host.querySelectorAll('[role="spinbutton"]')[0].getAttribute('aria-valuenow')).toBe('17');
     });
 
     it('still moves inside the range', async () => {

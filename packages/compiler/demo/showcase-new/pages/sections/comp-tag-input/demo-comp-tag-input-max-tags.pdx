@@ -6,7 +6,7 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-tag-input :max-tags="5" placeholder="Max 5 tags..." @pdx-change="onMaxChange"></pdx-tag-input>
+      <pdx-tag-input :max-tags="5" placeholder="Max 5 tags..." @value-change="onMaxChange"></pdx-tag-input>
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
       Tags: <strong>{{ maxTagsStr() }}</strong>
@@ -30,7 +30,7 @@ function addLog(text) { tagInputLog.addLog(text); }
 let maxTags = $signal([]);
 
 function onMaxChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     maxTags = tags;
     addLog('max-tags change (' + tags.length + '/5): [' + tags.join(', ') + ']');
 }

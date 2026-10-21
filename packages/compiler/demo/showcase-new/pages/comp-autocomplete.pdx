@@ -72,8 +72,8 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-change</code></td><td><code>{ value, label, item }</code></td><td>Fired when a suggestion is chosen (and on clear). <code>value</code> is the suggestion's value field — the string itself for string suggestions — and <code>label</code> the text shown.</td></tr>
-            <tr><td><code>pdx-input</code></td><td><code>{ value }</code></td><td>Fired on every keystroke.</td></tr>
+            <tr><td><code>value-change</code></td><td><code>{ value }</code></td><td>Its model: fired when a value is committed — a suggestion chosen, free text confirmed, or the field cleared. <code>value</code> is the suggestion's value field, the string itself for string suggestions; <code>getText()</code> is the text shown and <code>getSelectedItem()</code> the suggestion.</td></tr>
+            <tr><td><code>query-change</code></td><td><code>{ value }</code></td><td>Fired on every keystroke, with the text typed: the query, which is not the value.</td></tr>
             <tr><td><code>pdx-clear</code></td><td>—</td><td>Fired when clear button is clicked.</td></tr>
           </tbody>
         </table>

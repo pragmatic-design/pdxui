@@ -164,10 +164,10 @@ describe('pdx-select: named by its label, not by its value', () => {
 });
 
 describe('pdx-select: type-ahead on the trigger', () => {
-    it('closed, showing Red: "b" picks Blue and emits pdx-change', async () => {
+    it('closed, showing Red: "b" picks Blue and emits value-change', async () => {
         const el = await select({ value: 'Red' });
         const changes: unknown[] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+        el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
         key(combobox(el), 'b');
         await tick(20);
         expect((el as unknown as { value: unknown }).value).toBe('Blue');

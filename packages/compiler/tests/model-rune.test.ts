@@ -136,9 +136,10 @@ describe('the resolver knows the models', () => {
         const r = new ComponentResolver();
         r.registerUiManifest(process.cwd());
         expect([...r.modelsOf('pdx-input')!]).toEqual(['value']);
-        // pdx-select gets its model with the pickers (#481).
-        expect(r.has('pdx-select')).toBe(true);
-        expect(r.modelsOf('pdx-select')).toBeNull();
+        expect([...r.modelsOf('pdx-select')!]).toEqual(['value']);
+        // pdx-pin-input has no model yet: it keeps its alpha event until #125's closing step.
+        expect(r.has('pdx-pin-input')).toBe(true);
+        expect(r.modelsOf('pdx-pin-input')).toBeNull();
         expect(r.modelsOf('pdx-not-a-component')).toBeNull();
     });
 });

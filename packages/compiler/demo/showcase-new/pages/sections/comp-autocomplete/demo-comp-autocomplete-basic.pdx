@@ -9,14 +9,14 @@
         placeholder="Type a fruit..."
         :suggestions="fruits"
         clearable
-        @pdx-change="onFruitChange" />
+        @value-change="onFruitChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ fruitValue }}</p>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-autocomplete
   placeholder="Type a fruit..."
   :suggestions="['Apple', 'Banana', 'Cherry', ...]"
   clearable
-  @pdx-change="onSelect" /&gt;</code></pre></details>}
+  @value-change="onSelect" /&gt;</code></pre></details>}
   </section>
 </template>
 

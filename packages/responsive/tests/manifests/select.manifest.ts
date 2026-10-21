@@ -330,10 +330,11 @@ export const select: ComponentManifest = {
                 expectAttr: { selector: 'section:not([hidden]) [data-test="sel"] .pdx-select-trigger', name: 'aria-expanded', value: 'false' },
                 expectFocus: 'section:not([hidden]) [data-test="sel"] .pdx-select-trigger',
             },
-            // Type-ahead with the list closed: "s" from Italy → Spain, exactly one pdx-change.
+            // Type-ahead with the list closed: "s" from Italy → Spain, exactly one value-change (its
+            // model, #481).
             {
                 key: 's',
-                expectEvent: { selector: 'section:not([hidden]) [data-test="sel"]', name: 'pdx-change' },
+                expectEvent: { selector: 'section:not([hidden]) [data-test="sel"]', name: 'value-change' },
                 expectAttr: { selector: 'section:not([hidden]) [data-test="sel"] [data-option-index="2"]', name: 'aria-selected', value: 'true' },
             },
         ],

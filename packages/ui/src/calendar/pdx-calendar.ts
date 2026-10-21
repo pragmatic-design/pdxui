@@ -3,7 +3,7 @@
 // 13 calendar systems (display via Intl), week numbers, fiscal year, highlighted dates.
 // Keyboard: Arrow (day), PageUp/Down (month), Shift+PageUp/Down (year), Home/End (week), Enter/Space (select).
 
-import { component, html, signal, registerComponentStrings, getComponentString } from '@pdxui/core';
+import { component, html, signal, model, registerComponentStrings, getComponentString } from '@pdxui/core';
 import {
     generateMonthGrid, addMonths, addYears, addDays,
     getMonthNames, formatWithCalendar, getFirstDayOfWeek,
@@ -52,12 +52,20 @@ type SelectionMode = 'date' | 'range' | 'multi' | 'week' | 'month' | 'year' | 'q
  * A standalone calendar grid in which the user selects a date, a range of dates or several dates,
  * also from the keyboard alone.
  *
- * @fires pdx-change {{ value } | { rangeStart, rangeEnd } | { values } | { value, rangeStart, rangeEnd } | { value, quarter, fiscalYear, rangeStart, rangeEnd }} - Fired when the value changes.
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value
+ * @alphadetail rangeStart $event.currentTarget.getRange()[0]
+ * @alphadetail rangeEnd $event.currentTarget.getRange()[1]
+ * @alphadetail quarter $event.currentTarget.getQuarter()?.quarter
+ * @alphadetail fiscalYear $event.currentTarget.getQuarter()?.fiscalYear
  */
 component('pdx-calendar', {
+    // The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
+    // mode; `[start, end]` in `range` and `week` mode (`end` is '' while a range is being built); the
+    // array of ISO dates in `multi` mode. A choice writes it, and the write dispatches `value-change`.
+    models: { value: model<string | string[]>('') },
     props: {
-        /** Selected date (ISO string) for single mode. */
-        value: { type: String, default: '' },
         /** Range start (ISO). */
         rangeStart: { type: String, default: '' },
         /** Range end (ISO). */
@@ -117,6 +125,13 @@ component('pdx-calendar', {
             const fd = ctx.firstDay() as number;
             return fd >= 0 ? fd : getFirstDayOfWeek(locale());
         };
+        /** The model as one date: '' when the mode holds an array (range, week, multi). */
+        const singleValue = (): string => {
+            const v = ctx.value();
+            return typeof v === 'string' ? v : '';
+        };
+        /** The quarter last chosen in `quarter` mode. */
+        let _lastQuarter: { quarter: number; fiscalYear: number } | null = null;
 
         // The view opens on the selection: `value`, then `rangeStart`, then today — a range opened on
         // today's month would show nothing selected until the user paged back to it.
@@ -125,7 +140,7 @@ component('pdx-calendar', {
         function initView(): void {
             const min = (ctx.min() as string) || undefined;
             const max = (ctx.max() as string) || undefined;
-            const start = (ctx.value() as string) || (ctx.rangeStart() as string) || clampDate(today(), min, max);
+            const start = singleValue() || (ctx.rangeStart() as string) || clampDate(today(), min, max);
             const d = parseISO(start);
             _viewYear.set(d.year);
             _viewMonth.set(d.month);
@@ -157,9 +172,18 @@ component('pdx-calendar', {
             _focusPending = !(_viewReady && focusActiveCell());
         }
 
-        // Sync external value changes
+        // Sync external value changes. An array is a range or the multi selection: a range is drawn from
+        // `rangeStart` / `rangeEnd`, so it is copied there; the multi selection is the list itself.
         ctx.track(() => {
-            const val = ctx.value() as string;
+            const raw = ctx.value();
+            if (Array.isArray(raw)) {
+                if (selMode() === 'multi') _multiSelected.set([...raw as string[]]);
+                else {
+                    setOwnProp(ctx.el, 'rangeStart', raw[0] ?? '');
+                    setOwnProp(ctx.el, 'rangeEnd', raw[1] ?? '');
+                }
+            }
+            const val = singleValue() || (Array.isArray(raw) && selMode() !== 'multi' ? (raw[0] as string) ?? '' : '');
             if (val) {
                 const d = parseISO(val);
                 _viewYear.set(d.year);
@@ -220,14 +244,15 @@ component('pdx-calendar', {
 
         // ─── Selection ─────────────────────────────────────
 
-        /** A choice is written to the host's own props before it is announced: the
-         *  cells are styled from `value` / `rangeStart` / `rangeEnd`, so otherwise a calendar on its
-         *  own would emit and show nothing selected. `values` (multi mode) has no prop. */
-        function choose(detail: { value?: string; rangeStart?: string; rangeEnd?: string } & Record<string, unknown>): void {
-            if (detail.value !== undefined) setOwnProp(ctx.el, 'value', detail.value);
-            if (detail.rangeStart !== undefined) setOwnProp(ctx.el, 'rangeStart', detail.rangeStart);
-            if (detail.rangeEnd !== undefined) setOwnProp(ctx.el, 'rangeEnd', detail.rangeEnd);
-            ctx.emit('pdx-change', detail);
+        /** A choice: the range it covers is written to the host's own props first, since the cells
+         *  are styled from `rangeStart` / `rangeEnd`; then the model, which dispatches `value-change`. */
+        function choose(value: string | string[], range?: { start: string; end: string }, quarter?: { quarter: number; fiscalYear: number }): void {
+            if (range) {
+                setOwnProp(ctx.el, 'rangeStart', range.start);
+                setOwnProp(ctx.el, 'rangeEnd', range.end);
+            }
+            _lastQuarter = quarter ?? null;
+            ctx.value.set(value);
         }
 
         function selectDate(iso: string): void {
@@ -235,7 +260,7 @@ component('pdx-calendar', {
             const mode = selMode();
 
             if (mode === 'date') {
-                choose({ value: iso });
+                choose(iso);
             } else if (mode === 'range') {
                 // The start being built lives in an INTERNAL authoritative state:
                 // reading it from the prop would require the parent's echo (standalone the
@@ -246,13 +271,13 @@ component('pdx-calendar', {
                     // Start new range
                     _rangeBuilding.set(true);
                     _pendingRangeStart.set(iso);
-                    choose({ rangeStart: iso, rangeEnd: '' });
+                    choose([iso, ''], { start: iso, end: '' });
                 } else {
                     // Complete range
                     _rangeBuilding.set(false);
                     _pendingRangeStart.set('');
                     const [s, e] = iso < start ? [iso, start] : [start, iso];
-                    choose({ rangeStart: s, rangeEnd: e });
+                    choose([s, e], { start: s, end: e });
                 }
             } else if (mode === 'multi') {
                 const current = _multiSelected.peek().slice();
@@ -260,25 +285,22 @@ component('pdx-calendar', {
                 if (idx >= 0) current.splice(idx, 1);
                 else current.push(iso);
                 _multiSelected.set(current);
-                choose({ values: current });
+                choose(current);
             } else if (mode === 'week') {
                 const range = getWeekRange(iso, firstDayOfWeek());
-                choose({ rangeStart: range.start, rangeEnd: range.end });
+                choose([range.start, range.end], range);
             } else if (mode === 'month') {
                 const d = parseISO(iso);
-                const range = getMonthRange(d.year, d.month);
-                choose({ value: iso, rangeStart: range.start, rangeEnd: range.end });
+                choose(iso, getMonthRange(d.year, d.month));
             } else if (mode === 'year') {
                 const d = parseISO(iso);
-                const range = getYearRange(d.year);
-                choose({ value: iso, rangeStart: range.start, rangeEnd: range.end });
+                choose(iso, getYearRange(d.year));
             } else if (mode === 'quarter') {
                 const d = parseISO(iso);
                 const fiscal = ctx.fiscalStartMonth() as number;
                 const q = getFiscalQuarter(d.month, fiscal);
                 const fy = getFiscalYear(d.year, d.month, fiscal);
-                const range = getQuarterRange(fy, q, fiscal);
-                choose({ value: iso, quarter: q, fiscalYear: fy, rangeStart: range.start, rangeEnd: range.end });
+                choose(iso, getQuarterRange(fy, q, fiscal), { quarter: q, fiscalYear: fy });
             }
         }
 
@@ -287,7 +309,7 @@ component('pdx-calendar', {
             if (mode === 'month') {
                 // Month selection mode: emit and stay in months view
                 const range = getMonthRange(_viewYear.peek(), month);
-                choose({ value: range.start, rangeStart: range.start, rangeEnd: range.end });
+                choose(range.start, range);
                 return;
             }
             if (mode === 'quarter') {
@@ -296,7 +318,7 @@ component('pdx-calendar', {
                 const q = getFiscalQuarter(month, fiscal);
                 const fy = getFiscalYear(_viewYear.peek(), month, fiscal);
                 const range = getQuarterRange(fy, q, fiscal);
-                choose({ value: range.start, quarter: q, fiscalYear: fy, rangeStart: range.start, rangeEnd: range.end });
+                choose(range.start, range, { quarter: q, fiscalYear: fy });
                 return;
             }
             // Normal drill-down to days
@@ -309,7 +331,7 @@ component('pdx-calendar', {
             if (mode === 'year') {
                 // Year selection mode: emit and stay in years view
                 const range = getYearRange(year);
-                choose({ value: range.start, rangeStart: range.start, rangeEnd: range.end });
+                choose(range.start, range);
                 return;
             }
             // Drill-down to months
@@ -326,7 +348,7 @@ component('pdx-calendar', {
             if (cell.today) cls += ' pdx-cal-today';
             if (isDateDisabled(iso)) cls += ' pdx-cal-disabled';
 
-            const val = ctx.value() as string;
+            const val = singleValue();
             const rStart = _pendingRangeStart() || (ctx.rangeStart() as string);
             const rEnd = ctx.rangeEnd() as string;
             const cStart = ctx.compareStart() as string;
@@ -506,7 +528,7 @@ component('pdx-calendar', {
         });
 
         function updateCellStyles(): void {
-            const val = ctx.value() as string;
+            const val = singleValue();
             const rStart = _pendingRangeStart() || (ctx.rangeStart() as string);
             const rEnd = ctx.rangeEnd() as string;
             const mode = selMode();
@@ -798,6 +820,13 @@ component('pdx-calendar', {
         ctx.expose({
             /** Focus the active day (or the month / year shown), now or once the view is drawn. */
             focusView,
+            /** The range the selection covers, `[start, end]` as ISO dates: the range itself, or the
+             *  week, month, quarter or year chosen; `['', '']` when the mode covers none. */
+            getRange(): [string, string] {
+                return [(ctx.rangeStart.peek() as string) || '', (ctx.rangeEnd.peek() as string) || ''];
+            },
+            /** The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise. */
+            getQuarter(): { quarter: number; fiscalYear: number } | null { return _lastQuarter; },
         });
 
         return { navigate, goToday, switchView, selectDate };

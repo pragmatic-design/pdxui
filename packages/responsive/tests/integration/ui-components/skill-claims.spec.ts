@@ -42,7 +42,8 @@ function openDrawer(page: Page): Promise<void> {
 test.describe('claims that are no longer true — the skill must not teach these workarounds', () => {
     test('gotchas.md:27 — "pdx-select does NOT reflect the choice onto .value" — it does now', async ({ page }) => {
         // The workaround was to stash the value yourself: `el.__val = e.detail.value`. `reflectValue()`
-        // (packages/ui/src/select/pdx-select.ts:222) writes the selection back through the prop signal.
+        // (packages/ui/src/select/pdx-select.ts) writes the selection to its model, which announces
+        // `value-change` (#481).
         const errors = await openCase(page, 'select-value');
         await page.click('pdx-select .pdx-select-trigger, pdx-select [role="combobox"]');
         await expect(page.locator('[role="option"]')).toHaveCount(3);

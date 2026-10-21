@@ -10,7 +10,7 @@
         <pdx-autocomplete
           placeholder="Search language..."
           highlight
-          @pdx-change="onLangChange" />
+          @value-change="onLangChange" />
       </pdx-data-source>
       <p class="pdx-txt-small pdx-ink-muted result">Language: {{ langValue }}</p>
     </div>

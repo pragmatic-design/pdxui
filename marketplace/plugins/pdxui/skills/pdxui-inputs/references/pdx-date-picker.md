@@ -10,11 +10,11 @@ with `editable`, lets it be typed.
 **Pitfalls**
 - Without `editable` the date cannot be typed at all, and `editable` covers the modes `date` and `datetime` only.
 - An editable value commits on Enter or blur — AFTER the native `change` of its text box. Listen to
-  `pdx-change`, not `change`, or a resumed draft comes back without its end date.
+  `value-change`, not `change`, or a resumed draft comes back without its end date.
 - A typed date that does not exist, or falls outside `min`/`max`, marks the field invalid and keeps the last
   good value.
-- `pdx-change.detail` has a different shape per mode: `{ value }`, `{ rangeStart, rangeEnd }`, `{ value, time }`,
-  `{ values }`…
+- The value has a shape per mode: the ISO date; the date and its time, `2026-03-14T09:30`, in `datetime`;
+  `[start, end]` for a range or a week. `getDate()`, `getRange()` and `getTime()` read the parts.
 - `calendar` changes the display only; the value and its math stay Gregorian ISO.
 
 **Composes with** `pdx-form` + `pdx-form-field` (wired by `name`) · `pdx-auto-form` / `pdx-form-template` (a
@@ -23,7 +23,6 @@ leaves both the field and its panel).
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | Selected value (ISO date/time string). |
 | `rangeStart` | `rangestart` | string | `''` | Range start (ISO). |
 | `rangeEnd` | `rangeend` | string | `''` | Range end (ISO). |
 | `mode` | `mode` | string | `'date'` | Picker mode. |
@@ -55,16 +54,21 @@ leaves both the field and its panel).
 | `firstDay` | `firstday` | number | `-1` | First day of week (-1 = auto). |
 | `ariaLabel` | `arialabel` | string | `''` | Aria label. |
 | `editable` | `editable` | boolean | `false` | The date can be typed: the trigger's text is an input (still the combobox), read in the locale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the popup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep the plain trigger. |
+| `value` | `value` | string \| string[] | `''` | The current value. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
+| `getDate()` | The date chosen, ISO: the range's start in a range or week mode; '' with none. |
+| `getRange()` | The range chosen, or the one a week, month, quarter or year covers: `[start, end]`, ISO dates. |
+| `getTime()` | The time, `HH:mm[:ss]`: the start's in a range. |
+| `getEndTime()` | The end's time in a range with times. |
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` → `detail: { rangeStart, rangeEnd, value } | { value } | { values } | { value, time } | { rangeStart, rangeEnd, timeStart, timeEnd } | { value, rangeStart, rangeEnd }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-open` — Fired when it opens. Does not bubble.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `dialog`
 

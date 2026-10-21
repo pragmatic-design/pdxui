@@ -76,7 +76,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ value, rangeStart, rangeEnd }</span><span>Selection changed</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Its model: the date, the date and its time, or <code>[start, end]</code> for a range</span></div>
         <div class="opt-row"><code>pdx-open</code><span>—</span><span>Popover opened</span></div>
         <div class="opt-row"><code>pdx-close</code><span>—</span><span>Popover closed</span></div>
         <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>

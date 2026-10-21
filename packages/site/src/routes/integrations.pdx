@@ -66,12 +66,12 @@ const reactCode = "// React: object props + events via ref (two tiny hooks)\n"
   + "}\n\n"
   + "useProp(gridRef, 'columns', columns);\n"
   + "useProp(gridRef, 'data', rows);\n"
-  + "useEvent(selectRef, 'pdx-change', e => setRole(e.detail.value));\n\n"
+  + "useEvent(selectRef, 'value-change', e => setRole(e.detail.value));\n\n"
   + "<pdx-button onClick={() => dialogRef.current.show()}>Open</pdx-button>\n"
   + "<pdx-data-grid ref={gridRef} />";
 
-const vueCode = "<!-- Vue 3: .prop forces a DOM property; @pdx-* for events -->\n"
-  + "<pdx-select :options.prop=\"roles\" @pdx-change=\"e => role = e.detail.value\" />\n"
+const vueCode = "<!-- Vue 3: .prop forces a DOM property; @ for events -->\n"
+  + "<pdx-select :options.prop=\"roles\" @value-change=\"e => role = e.detail.value\" />\n"
   + "<pdx-data-grid :columns.prop=\"columns\" :data.prop=\"rows\" />\n"
   + "<pdx-dialog ref=\"dlg\">...</pdx-dialog>\n\n"
   + "// open it imperatively\n"
@@ -81,7 +81,7 @@ const vueCode = "<!-- Vue 3: .prop forces a DOM property; @pdx-* for events -->\
 
 const angularCode = "// Angular: CUSTOM_ELEMENTS_SCHEMA + [prop]/(event) + template ref\n"
   + "@Component({ schemas: [CUSTOM_ELEMENTS_SCHEMA], template: `\n"
-  + "  <pdx-select [options]=\"roles\" (pdx-change)=\"onChange($event)\" />\n"
+  + "  <pdx-select [options]=\"roles\" (value-change)=\"onChange($event)\" />\n"
   + "  <pdx-data-grid [columns]=\"columns\" [data]=\"rows\" />\n"
   + "  <pdx-button (click)=\"dialog.show()\">Open</pdx-button>\n"
   + "  <pdx-dialog #dialog>...</pdx-dialog>\n"
@@ -92,10 +92,10 @@ const frameworks = [
     note: 'JSX stringifies object props to attributes and does not wire hyphenated events, so pass them via a ref with two tiny hooks. onClick wires imperative calls. React 19 improves property binding.',
     code: reactCode },
   { id: 'vue', label: 'Vue 3', url: 'Vue 3 + Vite',
-    note: 'Configure the compiler with isCustomElement for <pdx-*>. Bind arrays/objects with the .prop modifier so Vue sets them as DOM properties (not stringified attributes). Events use @pdx-...',
+    note: 'Configure the compiler with isCustomElement for <pdx-*>. Bind arrays/objects with the .prop modifier so Vue sets them as DOM properties (not stringified attributes). Events use @, as @value-change.',
     code: vueCode },
   { id: 'angular', label: 'Angular', url: 'Angular 18 (JIT) + Vite',
-    note: 'Add CUSTOM_ELEMENTS_SCHEMA to the component. [prop] binds DOM properties (arrays/objects too), (pdx-change) binds the custom event, and a template ref (#dialog) gives the element to call .show().',
+    note: 'Add CUSTOM_ELEMENTS_SCHEMA to the component. [prop] binds DOM properties (arrays/objects too), (value-change) binds the custom event, and a template ref (#dialog) gives the element to call .show().',
     code: angularCode },
 ];
 

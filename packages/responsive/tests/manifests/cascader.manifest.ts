@@ -286,9 +286,10 @@ export const cascader: ComponentManifest = {
                 expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-column:nth-child(2) [role="option"]:nth-child(1)', name: 'aria-selected', value: 'true' },
             },
             {
-                // Enter on the leaf: one pdx-change, the panel closes, the focus stays on the trigger.
+                // Enter on the leaf: one value-change (its model, #481), the panel closes, the focus
+                // stays on the trigger.
                 key: 'Enter',
-                expectEvent: { selector: 'section:not([hidden]) [data-test="casc-open"]', name: 'pdx-change' },
+                expectEvent: { selector: 'section:not([hidden]) [data-test="casc-open"]', name: 'value-change' },
                 expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger', name: 'aria-expanded', value: 'false' },
                 expectFocus: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger',
             },

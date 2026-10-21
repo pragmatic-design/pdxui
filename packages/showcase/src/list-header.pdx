@@ -13,7 +13,7 @@
         :label="$t('app.views.label')"
         :options="pickerOptions"
         :value="activeView"
-        @pdx-change="e => chooseView(e.detail.value)"
+        @value-change="e => chooseView(e.detail.value)"
         data-test="view-picker"></pdx-select>
       <pdx-button size="sm" variant="ghost" :disabled="!modified" :aria-label="$t('app.views.reset')" :title="$t('app.views.reset')"
         @click="resetView" data-test="view-reset"><pdx-icon name="rotate-ccw" aria-hidden="true"></pdx-icon></pdx-button>

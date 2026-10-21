@@ -2,7 +2,7 @@
 // Each segment has visible up/down arrow buttons + keyboard + mouse wheel.
 // 12h/24h auto-detected from locale via Intl.DateTimeFormat.
 
-import { component, html, signal, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
+import { component, html, signal, model, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { is12HourClock } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -23,18 +23,25 @@ registerComponentStrings('time-picker', {
 });
 
 registerFormControl('pdx-time-picker', {
-    valueEvent: 'pdx-change',
+    valueEvent: 'value-change',
     valueProp: 'value',
+    valueExpr: 'e.detail?.value',
 });
 
 /**
  * A segmented time input: the user sets the hour, minute, optional seconds and AM/PM with the
  * keyboard, the mouse wheel or typed digits, and the value is always `HH:mm` on the 24-hour clock.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent pdx-input
+ * @alphadetail value $event.detail.value
  */
 component('pdx-time-picker', {
     formAssociated: true,
+    // `HH:mm[:ss]` on the 24-hour clock, or '' for no time (#481). Each step of an arrow, the wheel, a
+    // typed digit and the AM/PM toggle writes it, and the write dispatches `value-change`.
+    models: { value: model<string>('') },
     props: {
-        value: { type: String, default: '' },
         format: { type: String, default: 'auto' },
         showSeconds: { type: Boolean, default: false },
         step: { type: Number, default: 1 },
@@ -159,13 +166,10 @@ component('pdx-time-picker', {
             const empty = _empty.peek();
             if (!empty) clampToRange();
             const val = empty ? '' : formatOutput();
-            // Reflect on the host: registerFormControl names `value` as this control's value, which
-            // must not stay '' with the value living only in the event. `_reflected` first, so the
-            // value track sees its own write.
+            // The model, which dispatches `value-change`. `_reflected` first, so the value track sees
+            // its own write.
             _reflected = val;
-            (ctx.el as unknown as { value: string }).value = val;
-            ctx.emit('pdx-change', { value: val });
-            ctx.emit('pdx-input', { value: val });
+            ctx.value.set(val);
         }
 
         /** The first arrow, digit or wheel step on an empty picker starts from `min`, else 00:00. */

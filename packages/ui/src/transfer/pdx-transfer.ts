@@ -11,10 +11,9 @@
 // - simple: click to select (highlight), buttons to move selected
 // - direct: click item to move it immediately (no selection step)
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, model } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/transfer';
@@ -45,14 +44,22 @@ export interface TransferItem {
 /**
  * A dual-list shuttle: the user moves items between a source list and a target list, with search,
  * select-all and disabled items, and the chosen values take part in a form.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail targetValues $event.detail.value
+ * @alphadetail changes $event.currentTarget.getChanges()
+ * @alphadetail direction $event.currentTarget.getDirection()
  */
 component('pdx-transfer', {
+    // The values on the target (right) side (#481). A move, setValue() and clear() write it, and the
+    // write dispatches `value-change`. In DataSource mode the partition comes from the source, and a
+    // move writes the target values it leaves; the diff to persist is getChanges().
+    models: { value: model<string[]>(() => [], { type: Array }) },
     props: {
         // ── Model 1: Simple (items + value) ──
         /** All items — array of { value, label, disabled? } */
         items: { type: Array, default: [] },
-        /** Values currently in the target (right) panel */
-        value: { type: Array, default: [] },
 
         // ── Model 2/3: DataSource ──
         /** DataSource or raw array of objects */
@@ -205,6 +212,11 @@ component('pdx-transfer', {
 
         // ── Move operations ──
 
+        // The last move: in DataSource mode, the diff to persist, one `{ value, [assignedField] }` per
+        // item moved (getChanges()); its direction in either mode (getDirection()).
+        let _lastChanges: Record<string, unknown>[] = [];
+        let _lastDirection: 'right' | 'left' | null = null;
+
         function applyMove(movedValues: string[], direction: 'right' | 'left'): void {
             const targetVals = getTargetValues();
             let newTargetSet: Set<string>;
@@ -228,17 +240,19 @@ component('pdx-transfer', {
                 const av = ctx.assignedValue() as string;
                 const assignedTrue = av || true;
                 const assignedFalse = av ? '' : false;
-                const changes = movedValues.map(v => ({
+                _lastChanges = movedValues.map(v => ({
                     value: v,
                     [af]: direction === 'right' ? assignedTrue : assignedFalse,
                 }));
-                ctx.emit('pdx-change', { changes, targetValues: [...getTargetValues()], direction });
+                _lastDirection = direction;
+                ctx.value.set([...getTargetValues()]);
             } else {
+                _lastChanges = [];
+                _lastDirection = direction;
                 _internalValue.set(newTarget);
-                // The target list is the host's `value`. In DataSource mode above the
+                // The target list is the model. In DataSource mode above the
                 // partition comes from the source and `value` is not read.
-                setOwnProp(ctx.el, 'value', [...newTarget]);
-                ctx.emit('pdx-change', { value: newTarget });
+                ctx.value.set([...newTarget]);
             }
         }
 
@@ -671,19 +685,22 @@ component('pdx-transfer', {
         ctx.expose({
             /** The keys currently on the target side. */
             getValue() { return _internalValue(); },
-            /** Replace the target side and emit `pdx-change`, dropping any move not yet committed. */
+            /** Replace the target side, which dispatches `value-change`, dropping any move not yet committed. */
             setValue(v: string[]) {
                 _localOverrides.clear(); _overridesVersion.set(x => x + 1);
                 _internalValue.set(Array.isArray(v) ? v : []);
-                setOwnProp(ctx.el, 'value', [..._internalValue.peek()]);
-                ctx.emit('pdx-change', { value: _internalValue.peek() });
+                ctx.value.set([..._internalValue.peek()]);
             },
             clear() {
                 _localOverrides.clear(); _overridesVersion.set(x => x + 1);
                 _internalValue.set([]);
-                setOwnProp(ctx.el, 'value', []);
-                ctx.emit('pdx-change', { value: [] }); ctx.emit('pdx-clear');
+                ctx.value.set([]);
+                ctx.emit('pdx-clear');
             },
+            /** In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []. */
+            getChanges(): Record<string, unknown>[] { return _lastChanges; },
+            /** The last move's direction, 'right' (to the target) or 'left'; null before any move. */
+            getDirection(): 'right' | 'left' | null { return _lastDirection; },
         });
 
         return {};

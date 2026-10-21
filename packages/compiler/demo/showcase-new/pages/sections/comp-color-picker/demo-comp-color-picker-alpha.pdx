@@ -5,13 +5,13 @@
       Enable <code>show-alpha</code> to add an opacity slider. The output includes the alpha channel.
     </p>
     <div class="demo-box">
-      <pdx-color-picker value="#ef4444" show-alpha @pdx-change="onAlphaChange" />
+      <pdx-color-picker value="#ef4444" show-alpha @change="onAlphaChange" />
       <p class="pdx-txt-small pdx-ink-muted result">RGBA: {{ alphaValue }}</p>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
   value="#ef4444"
   show-alpha
-  @pdx-change="onAlphaChange" /&gt;</code></pre></details>}
+  @change="onAlphaChange" /&gt;</code></pre></details>}
   </section>
 </template>
 
@@ -19,5 +19,5 @@
 // ─── Alpha ───
 let alphaValue = $signal('rgba(239, 68, 68, 1)');
 
-function onAlphaChange(e) { alphaValue = e.detail.value ?? e.detail; }
+function onAlphaChange(e) { alphaValue = e.currentTarget.value; }
 </script>

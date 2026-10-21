@@ -93,7 +93,7 @@
           <pdx-input :value="draftIt" @value-change="e => draftIt = e.currentTarget.value" data-test="category-it"></pdx-input>
         </pdx-form-field>
         <pdx-form-field :label="$t('settings.categories.color')">
-          <pdx-select :options="toneOptions" :value="draftColor" @pdx-change="e => draftColor = e.detail.value" data-test="category-color"></pdx-select>
+          <pdx-select :options="toneOptions" :value="draftColor" @value-change="e => draftColor = e.detail.value" data-test="category-color"></pdx-select>
         </pdx-form-field>
         <fieldset class="applies">
           <legend class="pdx-label">{{ $t('settings.categories.appliesTo') }}</legend>

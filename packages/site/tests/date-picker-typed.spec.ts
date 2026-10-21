@@ -61,13 +61,14 @@ test('datetime: a typed 12-hour time sets the field, the panel\'s time and the e
     const host = page.locator('pdx-date-picker').filter({ has: appt });
     await host.evaluate((el) => {
         (window as unknown as { __dp: unknown[] }).__dp = [];
-        el.addEventListener('pdx-change', (e) => (window as unknown as { __dp: unknown[] }).__dp.push((e as CustomEvent).detail));
+        el.addEventListener('value-change', (e) => (window as unknown as { __dp: unknown[] }).__dp.push((e as CustomEvent).detail));
     });
     await appt.fill('06/23/2024 2:30 PM');
     await appt.press('Enter');
-    await expect(host).toHaveJSProperty('value', '2024-06-23');
+    // In datetime mode the value is the date and its time (#481).
+    await expect(host).toHaveJSProperty('value', '2024-06-23T14:30');
     await expect(appt).toHaveValue('06/23/2024 14:30');
-    expect(await page.evaluate(() => (window as unknown as { __dp: unknown[] }).__dp)).toEqual([{ value: '2024-06-23', time: '14:30' }]);
+    expect(await page.evaluate(() => (window as unknown as { __dp: unknown[] }).__dp)).toEqual([{ value: '2024-06-23T14:30' }]);
     await expect(host.locator('pdx-time-picker')).toHaveJSProperty('value', '14:30');
 
     await appt.fill('06/23/2024 25:99');

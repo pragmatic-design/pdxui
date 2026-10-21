@@ -8,11 +8,11 @@
     <div class="demo-col" style="max-width: 400px">
       <div class="field">
         <pdx-label text="Country"></pdx-label>
-        <pdx-select :options="cascadeCountries" clearable placeholder="Select country..." @pdx-change="onCountryChange" />
+        <pdx-select :options="cascadeCountries" clearable placeholder="Select country..." @value-change="onCountryChange" />
       </div>
       <div class="field">
         <pdx-label text="City"></pdx-label>
-        <pdx-select :options="filteredCities" labelField="name" valueField="id" :value="selectedCity" :disabled="!selectedCountry" searchable clearable placeholder="Select city..." @pdx-change="onCityChange" />
+        <pdx-select :options="filteredCities" labelField="name" valueField="id" :value="selectedCity" :disabled="!selectedCountry" searchable clearable placeholder="Select city..." @value-change="onCityChange" />
       </div>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>let selectedCountry = $signal('');
@@ -26,7 +26,7 @@ function onCountryChange(e) {
 }
 
 &lt;pdx-select :options="cascadeCountries" clearable
-  @pdx-change="onCountryChange" placeholder="Select country..." /&gt;
+  @value-change="onCountryChange" placeholder="Select country..." /&gt;
 
 &lt;pdx-select :options="filteredCities" labelField="name" valueField="id"
   :disabled="!selectedCountry" searchable clearable

@@ -87,7 +87,7 @@ describe('pdx-select', () => {
         await tick(50);
 
         let changeEvent: any = null;
-        el.addEventListener('pdx-change', (e: any) => { changeEvent = e.detail; });
+        el.addEventListener('value-change', (e: any) => { changeEvent = e.detail; });
 
         // Open
         const trigger = el.querySelector('.pdx-select-trigger') as HTMLElement;
@@ -115,7 +115,7 @@ describe('pdx-select', () => {
         (el.querySelectorAll('.pdx-select-option')[1] as HTMLElement).click();
         await tick(50);
 
-        // Previously the value lived only in pdx-change.detail; now el.value is readable.
+        // el.value is the model, and readable after a choice.
         expect((el as any).value).toBe('Green');
     });
 
@@ -164,7 +164,7 @@ describe('pdx-select', () => {
         (opts[2] as HTMLElement).click();
         await tick(50);
 
-        // A real array, not a comma-joined string: consistent with pdx-change.detail.values
+        // A real array, not a comma-joined string: consistent with value-change.detail.value
         // and with no loss of type for numeric values.
         expect((el as any).value).toEqual(['Red', 'Blue']);
         expect((el as any).selectedItem).toEqual(['Red', 'Blue']);
@@ -247,7 +247,7 @@ describe('pdx-select', () => {
         await tick(50);
 
         let changeEvent: any = null;
-        el.addEventListener('pdx-change', (e: any) => { changeEvent = e.detail; });
+        el.addEventListener('value-change', (e: any) => { changeEvent = e.detail; });
 
         // Click clear
         const clear = el.querySelector('.pdx-input-clear') as HTMLElement;
@@ -301,7 +301,7 @@ describe('pdx-select', () => {
         await tick(50);
 
         let changeEvent: any = null;
-        el.addEventListener('pdx-change', (e: any) => { changeEvent = e.detail; });
+        el.addEventListener('value-change', (e: any) => { changeEvent = e.detail; });
 
         (el.querySelector('.pdx-select-trigger') as HTMLElement).click();
         await tick(50);
@@ -310,8 +310,8 @@ describe('pdx-select', () => {
         (options[0] as HTMLElement).click();
         await tick(50);
 
-        expect(changeEvent.values).toBeTruthy();
-        expect(changeEvent.values).toContain('Red');
+        expect(changeEvent.value).toBeTruthy();
+        expect(changeEvent.value).toContain('Red');
     });
 
     // ─── Keyboard ───────────────────��──────────────
@@ -364,7 +364,7 @@ describe('pdx-select', () => {
         await tick(50);
 
         let changeEvent: any = null;
-        el.addEventListener('pdx-change', (e: any) => { changeEvent = e.detail; });
+        el.addEventListener('value-change', (e: any) => { changeEvent = e.detail; });
 
         const trigger = el.querySelector('.pdx-select-trigger') as HTMLElement;
         // ↓ opens on the first option (APG select-only), ↓ moves on

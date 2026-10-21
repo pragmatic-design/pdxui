@@ -1084,16 +1084,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "suggestions",
               "description": "The list of suggestions to match against.",
               "type": {
@@ -1301,6 +1291,16 @@
               "attribute": "warning"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "open",
               "parameters": [],
@@ -1317,31 +1317,58 @@
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
-            }
-          ],
-          "events": [
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "When the value is committed: a suggestion picked (`value` is its value field, `item` the suggestion), the field cleared, or free text confirmed by leaving the field or pressing Enter with no option chosen (`value` and `label` the text, `item` null). Once per edit, like a native `change`.",
-              "detail": "{ value, label, item }"
             },
             {
-              "name": "pdx-input",
+              "kind": "method",
+              "name": "getText",
+              "parameters": [],
+              "description": "The text the field shows: the picked suggestion's label, or the free text."
+            },
+            {
+              "kind": "method",
+              "name": "getSelectedItem",
+              "parameters": [],
+              "description": "The suggestion last picked, as given; null when the value is free text or set from outside."
+            }
+          ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "label": "$event.currentTarget.getText()",
+            "item": "$event.currentTarget.getSelectedItem()"
+          },
+          "alphaRename": {
+            "pdx-input": "query-change"
+          },
+          "events": [
+            {
+              "name": "query-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
+              "description": "The text typed, on each keystroke: the query the suggestions are filtered by.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-clear",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value is cleared."
+              "description": "Fired when the clear button empties the field, after its `value-change`."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             }
           ],
           "roles": [
@@ -1351,15 +1378,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "labelfield",
               "fieldName": "labelField",
@@ -1530,6 +1548,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "''"
             }
           ],
           "slots": [
@@ -3505,16 +3532,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Selected date (ISO string) for single mode.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "rangeStart",
               "description": "Range start (ISO).",
               "type": {
@@ -3692,20 +3709,56 @@
               "attribute": "disabled"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string | string[]"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focusView",
               "parameters": [],
               "description": "Focus the active day (or the month / year shown), now or once the view is drawn."
+            },
+            {
+              "kind": "method",
+              "name": "getRange",
+              "parameters": [],
+              "description": "The range the selection covers, `[start, end]` as ISO dates: the range itself, or the\nweek, month, quarter or year chosen; `['', '']` when the mode covers none."
+            },
+            {
+              "kind": "method",
+              "name": "getQuarter",
+              "parameters": [],
+              "description": "The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "values": "$event.detail.value",
+            "rangeStart": "$event.currentTarget.getRange()[0]",
+            "rangeEnd": "$event.currentTarget.getRange()[1]",
+            "quarter": "$event.currentTarget.getQuarter()?.quarter",
+            "fiscalYear": "$event.currentTarget.getQuarter()?.fiscalYear"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value } | { rangeStart, rangeEnd } | { values } | { value, rangeStart, rangeEnd } | { value, quarter, fiscalYear, rangeStart, rangeEnd }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string | string[] }"
             },
             {
               "name": "pdx-navigate",
@@ -3732,15 +3785,6 @@
             "row"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Selected date (ISO string) for single mode.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "rangestart",
               "fieldName": "rangeStart",
@@ -3884,6 +3928,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string | string[]"
+              },
+              "default": "''"
             }
           ]
         }
@@ -4536,15 +4589,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "Selected path — array of values from root to leaf",
-              "type": {
-                "text": "array"
-              },
-              "default": "[]"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "Placeholder text",
               "type": {
@@ -4643,10 +4687,25 @@
               "attribute": "name"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "() => []"
+            },
+            {
               "kind": "method",
               "name": "getValue",
               "parameters": [],
               "description": "The current path, as the keys from the root down."
+            },
+            {
+              "kind": "method",
+              "name": "getLabels",
+              "parameters": [],
+              "description": "The labels of the current path, from the root down."
             },
             {
               "kind": "method",
@@ -4659,7 +4718,7 @@
                   }
                 }
               ],
-              "description": "Set the path and emit `pdx-change`. The event carries the keys only — its `labels` is empty."
+              "description": "Set the path, which dispatches `value-change`."
             },
             {
               "kind": "method",
@@ -4668,7 +4727,25 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "labels": "$event.currentTarget.getLabels()"
+          },
           "events": [
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string[] }"
+            },
             {
               "name": "pdx-load-error",
               "type": {
@@ -4690,14 +4767,6 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when it closes. Does not bubble."
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, labels }"
             },
             {
               "name": "pdx-clear",
@@ -6396,16 +6465,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'#000000'",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "format",
               "description": "Output format: 'hex', 'rgb' or 'hsl'.",
               "type": {
@@ -6504,6 +6563,16 @@
               "attribute": "clearable"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'#000000'",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -6520,24 +6589,48 @@
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
-            }
-          ],
-          "events": [
-            {
-              "name": "pdx-input",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "While dragging; `value` is in the picker's current format.",
-              "detail": "{ value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }"
             },
             {
-              "name": "pdx-change",
+              "kind": "method",
+              "name": "getHex",
+              "parameters": [],
+              "description": "The colour as `#rrggbb`, whatever the format."
+            },
+            {
+              "kind": "method",
+              "name": "getRgb",
+              "parameters": [],
+              "description": "The colour as `{ r, g, b, a }`."
+            },
+            {
+              "kind": "method",
+              "name": "getHsl",
+              "parameters": [],
+              "description": "The colour as `{ h, s, l, a }`."
+            }
+          ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value",
+            "hex": "$event.currentTarget.getHex()",
+            "rgb": "$event.currentTarget.getRgb()",
+            "hsl": "$event.currentTarget.getHsl()"
+          },
+          "alphaCommit": "pdx-change",
+          "events": [
+            {
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "When a colour is committed.",
-              "detail": "{ value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
@@ -6546,15 +6639,6 @@
             "slider"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'#000000'"
-            },
             {
               "name": "format",
               "fieldName": "format",
@@ -6635,6 +6719,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'#000000'"
             }
           ]
         }
@@ -8128,16 +8221,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Selected value (ISO date/time string).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "rangeStart",
               "description": "Range start (ISO).",
               "type": {
@@ -8444,6 +8527,40 @@
               "attribute": "editable"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string | string[]"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "method",
+              "name": "getDate",
+              "parameters": [],
+              "description": "The date chosen, ISO: the range's start in a range or week mode; '' with none."
+            },
+            {
+              "kind": "method",
+              "name": "getRange",
+              "parameters": [],
+              "description": "The range chosen, or the one a week, month, quarter or year covers: `[start, end]`, ISO dates."
+            },
+            {
+              "kind": "method",
+              "name": "getTime",
+              "parameters": [],
+              "description": "The time, `HH:mm[:ss]`: the start's in a range."
+            },
+            {
+              "kind": "method",
+              "name": "getEndTime",
+              "parameters": [],
+              "description": "The end's time in a range with times."
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -8462,14 +8579,29 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.getDate()",
+            "values": "$event.detail.value",
+            "rangeStart": "$event.currentTarget.getRange()[0]",
+            "rangeEnd": "$event.currentTarget.getRange()[1]",
+            "time": "$event.currentTarget.getTime()",
+            "timeStart": "$event.currentTarget.getTime()",
+            "timeEnd": "$event.currentTarget.getEndTime()"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ rangeStart, rangeEnd, value } | { value } | { values } | { value, time } | { rangeStart, rangeEnd, timeStart, timeEnd } | { value, rangeStart, rangeEnd }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string | string[] }"
             },
             {
               "name": "pdx-clear",
@@ -8505,15 +8637,6 @@
             "dialog"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Selected value (ISO date/time string).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "rangestart",
               "fieldName": "rangeStart",
@@ -8765,6 +8888,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string | string[]"
+              },
+              "default": "''"
             }
           ],
           "shapes": [
@@ -15447,16 +15579,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Current text value (clean text, no markup)",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "trigger",
               "description": "Trigger character(s) — comma-separated for multiple (default: '@')",
               "type": {
@@ -15602,16 +15724,51 @@
               },
               "default": "''",
               "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
+              "kind": "method",
+              "name": "getMentionMarkup",
+              "parameters": [],
+              "description": "The text with each mention as `@[Label](id)`: the form to persist."
+            },
+            {
+              "kind": "method",
+              "name": "getMentions",
+              "parameters": [],
+              "description": "The mentions in the text: `{ value, label, trigger }` each."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value",
+            "mentions": "$event.currentTarget.getMentions()",
+            "markup": "$event.currentTarget.getMentionMarkup()"
+          },
+          "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value, mentions, markup }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-select",
@@ -15620,14 +15777,6 @@
               },
               "description": "Fired when an item is selected.",
               "detail": "{ item, trigger, query }"
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, mentions, markup }"
             }
           ],
           "roles": [
@@ -15636,15 +15785,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Current text value (clean text, no markup)",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "trigger",
               "fieldName": "trigger",
@@ -15757,6 +15897,15 @@
               "name": "name",
               "fieldName": "name",
               "description": "Form field name",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },
@@ -21071,16 +21220,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string | null"
-              },
-              "default": "null",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "labelField",
               "description": "Object field used as the option label.",
               "type": {
@@ -21319,6 +21458,16 @@
             },
             {
               "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "null",
+              "attribute": "value"
+            },
+            {
+              "kind": "field",
               "name": "selectedItem",
               "readonly": true,
               "description": "Read-only, via a ref: `el.selectedItem`."
@@ -21342,15 +21491,19 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "values": "$event.detail.value",
+            "item": "$event.currentTarget.selectedItem",
+            "items": "$event.currentTarget.selectedItem"
+          },
           "events": [
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the selection changes: `value` and `item` in single mode, `values` and `items` in multiple.",
-              "detail": "{ value: unknown; item: unknown } | { values: unknown[]; items: unknown[] }"
-            },
             {
               "name": "pdx-open",
               "type": {
@@ -21370,7 +21523,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the clear button empties the selection, after its `pdx-change`."
+              "description": "Fired when the clear button empties the selection, after its `value-change`."
             },
             {
               "name": "pdx-search",
@@ -21387,6 +21540,14 @@
               },
               "description": "Fired when the user creates an option from the search text.",
               "detail": "{ value: string; label: string }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             }
           ],
           "roles": [
@@ -21397,15 +21558,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string | null"
-              },
-              "default": "null"
-            },
             {
               "name": "labelfield",
               "fieldName": "labelField",
@@ -21603,6 +21755,15 @@
                 "text": "number"
               },
               "default": "200"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "unknown"
+              },
+              "default": "null"
             }
           ],
           "slots": [
@@ -23685,15 +23846,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "array"
-              },
-              "default": "[]"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "Placeholder text shown while empty.",
               "type": {
@@ -23833,6 +23985,15 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "() => []"
+            },
+            {
               "kind": "method",
               "name": "addTag",
               "parameters": [
@@ -23883,38 +24044,52 @@
               "description": "Removes focus from it."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "tags": "$event.detail.value",
+            "value": "$event.detail.value"
+          },
+          "alphaRename": {
+            "pdx-input": "draft-change"
+          },
           "events": [
+            {
+              "name": "draft-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The text typed into the field, before it becomes a tag.",
+              "detail": "{ value: string }"
+            },
             {
               "name": "pdx-add",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-add`.",
-              "detail": "{ tag, tags }"
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ tags }"
+              "description": "A tag was added.",
+              "detail": "{ tag: string; tags: string[] }"
             },
             {
               "name": "pdx-remove",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is removed.",
-              "detail": "{ tag, index, tags }"
+              "description": "A tag was removed.",
+              "detail": "{ tag: string; index: number; tags: string[] }"
             },
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string[] }"
             }
           ],
           "roles": [
@@ -24532,16 +24707,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "format",
               "description": "Time format, e.g. '12h' or '24h'.",
               "type": {
@@ -24641,6 +24806,16 @@
               "attribute": "arialabel"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -24659,22 +24834,24 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change",
+            "pdx-input"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-input",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-blur",
@@ -24689,15 +24866,6 @@
             "spinbutton"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "format",
               "fieldName": "format",
@@ -24783,6 +24951,15 @@
               "name": "arialabel",
               "fieldName": "ariaLabel",
               "description": "Accessible name when there is no visible label.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },
@@ -25787,15 +25964,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "Values currently in the target (right) panel",
-              "type": {
-                "text": "array"
-              },
-              "default": "[]"
-            },
-            {
-              "kind": "field",
               "name": "source",
               "description": "DataSource or raw array of objects",
               "type": {
@@ -25934,6 +26102,15 @@
               "attribute": "name"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "() => []"
+            },
+            {
               "kind": "method",
               "name": "getValue",
               "parameters": [],
@@ -25950,23 +26127,47 @@
                   }
                 }
               ],
-              "description": "Replace the target side and emit `pdx-change`, dropping any move not yet committed."
+              "description": "Replace the target side, which dispatches `value-change`, dropping any move not yet committed."
             },
             {
               "kind": "method",
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
+            },
+            {
+              "kind": "method",
+              "name": "getChanges",
+              "parameters": [],
+              "description": "In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []."
+            },
+            {
+              "kind": "method",
+              "name": "getDirection",
+              "parameters": [],
+              "description": "The last move's direction, 'right' (to the target) or 'left'; null before any move."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "targetValues": "$event.detail.value",
+            "changes": "$event.currentTarget.getChanges()",
+            "direction": "$event.currentTarget.getDirection()"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ changes, targetValues, direction } | { value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string[] }"
             },
             {
               "name": "pdx-clear",
@@ -26148,15 +26349,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "Selected value(s) — string for single, string[] for multiple",
-              "type": {
-                "text": "object"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "multiple",
               "description": "Allow multiple selection",
               "type": {
@@ -26255,10 +26447,25 @@
               "attribute": "name"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string | string[] | null"
+              },
+              "default": "null"
+            },
+            {
               "kind": "method",
               "name": "getValue",
               "parameters": [],
               "description": "The current selection: one key, the array of keys when `multiple`, or null."
+            },
+            {
+              "kind": "method",
+              "name": "getLabel",
+              "parameters": [],
+              "description": "The label of the selected node, or the labels joined with ', ' when `multiple`."
             },
             {
               "kind": "method",
@@ -26271,7 +26478,7 @@
                   }
                 }
               ],
-              "description": "Set the selection and emit `pdx-change`, as a click on the tree would."
+              "description": "Set the selection, which dispatches `value-change`, as a click on the tree would."
             },
             {
               "kind": "method",
@@ -26280,7 +26487,25 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value",
+            "label": "$event.currentTarget.getLabel()"
+          },
           "events": [
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string | string[] | null }"
+            },
             {
               "name": "pdx-load-error",
               "type": {
@@ -26302,14 +26527,6 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when it closes. Does not bubble."
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value } | { value, label }"
             },
             {
               "name": "pdx-clear",

@@ -57,11 +57,12 @@ const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
     ...['pdx-checkbox', 'pdx-switch', 'pdx-radio']
         .map((tag): [string, FormControlConfig] => [tag, { checked: true, valueProp: 'checked', valueEvent: 'checked-change', valueExpr: 'e.detail?.value' }]),
     ['pdx-toggle', { valueProp: 'pressed', valueEvent: 'pressed-change', valueExpr: 'e.detail?.value' }],
-    ...['pdx-radio-group', 'pdx-checkbox-group', 'pdx-segmented', 'pdx-slider', 'pdx-rating']
+    // ...and the pickers (#481).
+    ...['pdx-radio-group', 'pdx-checkbox-group', 'pdx-segmented', 'pdx-slider', 'pdx-rating',
+        'pdx-select', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
         .map((tag): [string, FormControlConfig] => [tag, { valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
-    // Standard controls, on the alpha event until their batch of #125 lands
-    ...['pdx-select', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
-        .map((tag): [string, FormControlConfig] => [tag, {}]),
+    // On the alpha event until its batch of #125 lands
+    ['pdx-pin-input', {}],
 ];
 
 const _formControls = new Map<string, FormControlConfig>(BUILT_IN_CONTROLS);

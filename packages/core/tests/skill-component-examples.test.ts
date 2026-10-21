@@ -167,6 +167,8 @@ describe('the component pages', () => {
         const s = surface('pdx-select');
         expect(s.props.has('options')).toBe(true);
         expect(s.props.has('nosuchprop')).toBe(false);
-        expect(s.events.has('pdx-change')).toBe(true);
+        // Its model's event (#481), and not the alpha one it no longer emits.
+        expect(s.events.has('value-change')).toBe(true);
+        expect(s.events.has('pdx-change')).toBe(false);
     });
 });

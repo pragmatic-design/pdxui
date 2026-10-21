@@ -50,7 +50,7 @@ export class ComponentResolver {
     /** tag → the models a library component's manifest lists (#124); only components that list some. */
     private libraryModels = new Map<string, Set<string>>();
     /** tag → the alpha events a library component's manifest records (#478); only components that record some. */
-    private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string>; commit?: string }>();
+    private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string>; commit?: string; renamed?: Record<string, string> }>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
     /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
@@ -377,6 +377,7 @@ export class ComponentResolver {
                 this.libraryAlpha.set(decl.tagName, {
                     events: [...decl.alphaEvents], detail: { ...(decl.alphaDetail ?? {}) },
                     ...(decl.alphaCommit ? { commit: decl.alphaCommit } : {}),
+                    ...(decl.alphaRename ? { renamed: { ...decl.alphaRename } } : {}),
                 });
             }
             this.props.set(decl.tagName, settable);
@@ -632,7 +633,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; required?: boolean; type?: { text?: string } }
 interface ManifestDeclaration {
     tagName?: string; members?: ManifestMember[]; models?: string[];
-    alphaEvents?: string[]; alphaDetail?: Record<string, string>; alphaCommit?: string;
+    alphaEvents?: string[]; alphaDetail?: Record<string, string>; alphaCommit?: string; alphaRename?: Record<string, string>;
 }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }
 

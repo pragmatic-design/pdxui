@@ -1,8 +1,8 @@
 // pdx-autocomplete emits its value field, and says when nothing matches.
 //
-// 1. With labelField="name" valueField="code", picking «Milan» emits the code, not the label: a
-//    reader who sets value-field expects the code. `value` is the value field, `label` the label,
-//    `item` the raw suggestion; the input — and the host's `value`, the text typed — show the label.
+// 1. With labelField="name" valueField="code", picking «Milan» makes the code the value, not the
+//    label: a reader who sets value-field expects the code. The model (#481) is the value field;
+//    the input shows the label, which getText() answers, and getSelectedItem() the raw suggestion.
 // 2. Typing «zzz» does not leave the popup closed and the status region empty. pdx-select says
 //    "No results"; so does the autocomplete, in the list and in the status region.
 
@@ -10,7 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/autocomplete/pdx-autocomplete';
 
-type Ac = HTMLElement & { suggestions: unknown[]; value: string };
+type Ac = HTMLElement & { suggestions: unknown[]; value: string; getText(): string; getSelectedItem(): unknown };
 
 async function autocomplete(attrs: Record<string, string> = {}, suggestions: unknown[] = []): Promise<{ ac: Ac; input: HTMLInputElement }> {
     const ac = document.createElement('pdx-autocomplete') as Ac;
@@ -38,29 +38,32 @@ const CITIES = [{ name: 'Milan', code: 'MXP' }, { name: 'Rome', code: 'FCO' }];
 describe('pdx-autocomplete value field', () => {
     beforeEach(cleanup);
 
-    it('picking an object suggestion emits its value field as value, and its label as label', async () => {
+    it('picking an object suggestion makes its value field the value, and its label the text', async () => {
         const { ac, input } = await autocomplete({ 'label-field': 'name', 'value-field': 'code' }, CITIES);
         const changes: Record<string, unknown>[] = [];
-        ac.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+        ac.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
         type(input, 'mi');
         await vi.waitFor(() => expect(ac.querySelectorAll('[role="option"]')).toHaveLength(1));
         pick(ac, 'Milan');
-        expect(changes).toHaveLength(1);
-        expect(changes[0]).toMatchObject({ value: 'MXP', label: 'Milan', item: { name: 'Milan', code: 'MXP' } });
-        // The text shown, and the host's value (the text), stay the label.
+        expect(changes).toEqual([{ value: 'MXP' }]);
+        expect(ac.getText()).toBe('Milan');
+        expect(ac.getSelectedItem()).toEqual({ name: 'Milan', code: 'MXP' });
+        // The text shown stays the label; the host's value is the model, the code.
         await tick();
         expect(input.value).toBe('Milan');
-        expect(ac.value).toBe('Milan');
+        expect(ac.value).toBe('MXP');
     });
 
-    it('the control: string suggestions emit the string as value and label', async () => {
+    it('the control: string suggestions make the string the value and the text', async () => {
         const { ac, input } = await autocomplete({}, ['Apple', 'Banana']);
         const changes: Record<string, unknown>[] = [];
-        ac.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+        ac.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
         type(input, 'ap');
         await vi.waitFor(() => expect(ac.querySelectorAll('[role="option"]')).toHaveLength(1));
         pick(ac, 'Apple');
-        expect(changes[0]).toMatchObject({ value: 'Apple', label: 'Apple', item: 'Apple' });
+        expect(changes).toEqual([{ value: 'Apple' }]);
+        expect(ac.getText()).toBe('Apple');
+        expect(ac.getSelectedItem()).toBe('Apple');
     });
 });
 
