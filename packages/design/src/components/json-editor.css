@@ -15,7 +15,7 @@
 .jfld { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; color: var(--pdx-color-muted); }
 /* A switch carries its own label beside it: it sits on the controls' row, not the captions'. */
 .jfld-bool { justify-content: flex-end; }
-.jfld-bool > pdx-switch { display: flex; align-items: center; min-height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1)); }
+.jfld-bool > pdx-switch { display: flex; align-items: center; min-height: calc(var(--pdx-control-min-height, var(--pdx-input-min-height)) * var(--pdx-density-factor, 1)); }
 .jdt { height: 34px; padding: 0 .6rem; border-radius: 6px; border: 1px solid var(--pdx-color-border); background: var(--pdx-color-surface); color: var(--pdx-color-text); }
 
 /* Object body (grid of fields) */

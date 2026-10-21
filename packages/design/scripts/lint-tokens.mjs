@@ -14,6 +14,7 @@
 import { readdirSync, readFileSync, statSync } from 'fs';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { join, relative, sep } from 'path';
+import { componentNames, lintComponentTokens } from './component-tokens.mjs';
 
 /** Lazy: under a bundler `import.meta.url` is not a file: URL, and callers there pass a root. */
 function defaultSrc() {
@@ -183,6 +184,15 @@ function main() {
     const repoRoot = join(defaultSrc(), '..', '..', '..');
     const { unread } = unreadTokens(repoRoot);
     console.log(`[lint-tokens] ${unread.length} declared token(s) read by nothing (ratchet — the ceiling is asserted in core's design-tokens test).`);
+
+    // A component's stylesheet reads its own tokens and global ones (#514). Zero exceptions.
+    const { reads } = lintComponentTokens(defaultSrc(), componentNames(repoRoot));
+    if (reads.length > 0) {
+        console.error(`[lint-tokens] ${reads.length} read(s) of another component's token:`);
+        for (const r of reads) console.error(`  ${r.token} (${r.owner}'s)\n    ${r.file}:${r.line}`);
+        console.error('\nFix: read a global token (`--pdx-control-*`, …) with the other token as its fallback alias.');
+        process.exit(1);
+    }
 
     if (phantoms.length === 0) {
         console.log(`[lint-tokens] ${files} css files, ${declared} tokens declared, 0 used without a fallback and never declared.`);

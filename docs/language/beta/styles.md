@@ -179,7 +179,11 @@ the cascade at any level: `:root`, a subtree, one element.
 ### Rules
 
 - A component's CSS reads only its own `--pdx-<component>-*` tokens and global tokens: reading
-  another component's is a design lint error.
+  another component's is a design lint error (#514 — landed). A stylesheet's own components are the
+  one its file name names and every one its selectors name (`pdx-x`, `.pdx-x`, `.pdx-surface-x`); a
+  theme and `tokens.css` set every component's tokens and are not checked. What components share is
+  global, `--pdx-control-min-height` and `--pdx-control-radius`, read with the other component's token
+  as the fallback alias so a theme that sets the old name still applies.
 
 ### Since
 
@@ -189,7 +193,7 @@ beta (#154)
 the default `tokens.css` gives) and on its docs page, `pdx-button`'s `--pdx-button-bg`, `-bg-hover` and
 `-color` on every variant, and three tokens renamed to the convention with their old names still read
 (`--pdx-button-shadow-hover`, `--pdx-button-transform-hover`, `--pdx-accordion-transform-open`). The
-lint rule, with a registry of global tokens and the shared ones made global, is #514. Full text in
+lint rule, with a registry of global tokens and the shared ones made global, landed with #514. Full text in
 [styles.md](../styles.md#component-tokens).
 
 ## States in CSS

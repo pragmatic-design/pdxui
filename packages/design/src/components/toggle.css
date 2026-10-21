@@ -10,8 +10,9 @@
     justify-content: center;
     gap: var(--pdx-space-xs);
     padding: 0.375rem 0.75rem;
-    min-height: var(--pdx-button-min-height, 2.25rem);
-    border-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    /* The shared control measures (#514): a button's, read through the global, as a theme sets them. */
+    min-height: var(--pdx-control-min-height, var(--pdx-button-min-height, 2.25rem));
+    border-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
     font-family: inherit;
     font-size: var(--pdx-text-sm);
     font-weight: var(--pdx-weight-medium);
@@ -102,14 +103,14 @@
 
 /* First button gets left radius */
 .pdx-toggle-group > pdx-toggle:first-child .pdx-toggle-btn {
-    border-top-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
-    border-bottom-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-top-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    border-bottom-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
 }
 
 /* Last button gets right radius */
 .pdx-toggle-group > pdx-toggle:last-child .pdx-toggle-btn {
-    border-top-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
-    border-bottom-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-top-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    border-bottom-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
 }
 
 /* Collapse adjacent borders — skip first */
@@ -127,13 +128,13 @@
 }
 
 .pdx-toggle-group-vertical > pdx-toggle:first-child .pdx-toggle-btn {
-    border-top-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
-    border-top-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-top-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    border-top-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
 }
 
 .pdx-toggle-group-vertical > pdx-toggle:last-child .pdx-toggle-btn {
-    border-bottom-left-radius: var(--pdx-button-radius, var(--pdx-radius-md));
-    border-bottom-right-radius: var(--pdx-button-radius, var(--pdx-radius-md));
+    border-bottom-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    border-bottom-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
 }
 
 .pdx-toggle-group-vertical > pdx-toggle:not(:first-child) .pdx-toggle-btn {

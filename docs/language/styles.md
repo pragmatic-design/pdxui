@@ -446,8 +446,13 @@ is a renamed token's old name, not part of the surface.
 - A token renamed to the convention keeps its old name as the fallback of the new one, so a theme
   written before the rename keeps working: `--pdx-button-hover-shadow`, `--pdx-button-hover-transform`
   and `--pdx-accordion-open-transform` still apply.
-- A component's CSS reading another component's token is to become a design lint error (#514). Not
-  checked today.
+- A component's CSS reading another component's token — as the first argument of a `var()` — is a
+  design lint error, `pnpm lint` (#514). A stylesheet's own components are the one its file name names
+  and every one its selectors name (`pdx-x`, `.pdx-x`, `.pdx-surface-x`); a theme and `tokens.css` are
+  not checked. A measure two components share is a global token, read with the other's token as the
+  fallback alias: `--pdx-control-min-height` (the height a row of buttons and inputs aligns on) and
+  `--pdx-control-radius` (the corner of a button-like control). The registry of global namespaces is
+  `GLOBAL_PREFIXES` in `packages/design/scripts/component-tokens.mjs`.
 
 #### Examples
 

@@ -239,7 +239,7 @@
    the field beside it at normal density and 13 at comfortable. The height
    is the text field's own formula (inputs.css), so a theme that changes one changes both. */
 .pdx-form-field-input > pdx-switch > .pdx-switch-wrap {
-    min-height: calc(var(--pdx-input-min-height) * var(--pdx-density-factor, 1));
+    min-height: calc(var(--pdx-control-min-height, var(--pdx-input-min-height)) * var(--pdx-density-factor, 1));
     align-items: center;
 }
 
