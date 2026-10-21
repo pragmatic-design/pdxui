@@ -14,7 +14,7 @@
          padding and cuts its value. No `name`: the mode is the page's value, not a field
          of the form, so it goes up as an event. -->
     <pdx-form-field :label="$t('intake.fields.mode')">
-      <pdx-select :options="modes" :value="mode" @pdx-change="e => modechange(e.detail.value)" data-test="mode"></pdx-select>
+      <pdx-select :options="modes" :value="mode" @value-change="e => modechange(e.detail.value)" data-test="mode"></pdx-select>
     </pdx-form-field>
   </div>
 </template>

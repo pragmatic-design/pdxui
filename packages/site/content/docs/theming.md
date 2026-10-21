@@ -73,7 +73,7 @@ made anywhere:
 
 ```pdx
 <template>
-  <pdx-select :value="currentTheme()" @pdx-change="e => setTheme(e.detail.value)" :options="themes" />
+  <pdx-select :value="currentTheme()" @value-change="e => setTheme(e.detail.value)" :options="themes" />
   <pdx-button @click="toggleDarkMode">{{ currentScheme() === 'dark' ? '☀' : '☾' }}</pdx-button>
 </template>
 ```

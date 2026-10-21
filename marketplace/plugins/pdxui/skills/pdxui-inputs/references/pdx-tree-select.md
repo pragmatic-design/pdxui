@@ -15,14 +15,13 @@ toggles only the node clicked).
   not found unless its branch matches.
 - Nodes have a fixed shape, `{ value, label, children?, disabled?, isLeaf? }`: no `idField` / `labelField` as on
   `pdx-tree`.
-- The compiler does not wire it inside `<pdx-form>`: bind `:value` and `@pdx-change` yourself.
+- The compiler does not wire it inside `<pdx-form>`: bind `::value` yourself (its model, `value-change`).
 
 **Composes with** — it shares the `loadChildren` shape with `pdx-tree` and `pdx-cascader`.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `options` | — | array | `[]` | Tree of options |
-| `value` | — | object | `null` | Selected value(s) — string for single, string[] for multiple |
 | `multiple` | `multiple` | boolean | `false` | Allow multiple selection |
 | `placeholder` | `placeholder` | string | `''` | Placeholder |
 | `label` | `label` | string | `''` | Accessible name (aria-label) for the trigger; falls back to placeholder |
@@ -33,16 +32,18 @@ toggles only the node clicked).
 | `loadChildren` | — | function | `null` | Lazy load: (node) => Promise<TreeSelectNode[]> |
 | `size` | `size` | string | `''` | Size |
 | `name` | `name` | string | `''` | Form field name |
+| `value` | — | string \| string[] \| null | `null` | The current value. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `getValue()` | The current selection: one key, the array of keys when `multiple`, or null. |
-| `setValue(v)` | Set the selection and emit `pdx-change`, as a click on the tree would. |
+| `getLabel()` | The label of the selected node, or the labels joined with ', ' when `multiple`. |
+| `setValue(v)` | Set the selection, which dispatches `value-change`, as a click on the tree would. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { value } | { value, label }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be reopened.; `pdx-open` — Fired when it opens. Does not bubble.
+**Events:** `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be reopened.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string | string[] | null }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `tree` · `treeitem`
 

@@ -1,7 +1,7 @@
 // The catalogue says what an event carries, what a component renders, and which icon names exist.
 //
 // Without them an agent pays for three gaps with browser measurements: event payloads
-// (pdx-tag-input's list is `detail.tags`, not `detail.value`), rendered roles (pdx-select's trigger
+// (pdx-tag-input's pdx-add carries the list as `detail.tags`, its value-change as `detail.value`), rendered roles (pdx-select's trigger
 // is a combobox; pdx-transfer's rows are options, not checkboxes), and pdx-icon's names (in
 // pragmatic-icon-data.ts; the lucide file is an empty registrar). The detail shapes and roles come from the manifest, the icon names from the
 // icon file: this checks they reach the pages an agent reads.
@@ -25,8 +25,11 @@ function entry(area: string, tag: string): string {
 }
 
 describe('events carry their detail', () => {
-    it('pdx-tag-input says its list is detail.tags', () => {
-        expect(entry('inputs', 'pdx-tag-input')).toContain('`pdx-change` → `detail: { tags }`');
+    it('pdx-tag-input says where its list is: value-change\'s detail.value, pdx-add\'s detail.tags', () => {
+        // Its model (#481) carries the list as `value`; pdx-add still names it `tags`.
+        const page = entry('inputs', 'pdx-tag-input');
+        expect(page).toContain('`value-change` → `detail: { value: string[] }`');
+        expect(page).toContain('`pdx-add` → `detail: { tag: string; tags: string[] }`');
     });
 
     it('a detail declared with a typed @fires shows up too — pdx-button-group passes a string', () => {

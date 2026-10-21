@@ -355,8 +355,9 @@ component('pdx-inline-edit', {
                     if (size) sel.setAttribute('size', size);
                     sel.options = (ctx.options() as any[]) || [];
                     sel.value = val ?? '';
-                    sel.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.value ?? sel.value;
+                    // Its model event, `value-change` (#481).
+                    onControlValue(sel, 'pdx-change', (e) => e.detail?.value ?? sel.value, (v) => {
+                        _editValue = v;
                         // Auto-confirm on select (unless action mode)
                         if ((ctx.saveOn() as string) !== 'action') confirmEdit();
                     });
@@ -369,18 +370,14 @@ component('pdx-inline-edit', {
                     if (size) sel.setAttribute('size', size);
                     sel.options = (ctx.options() as any[]) || [];
                     sel.value = Array.isArray(val) ? val : [];
-                    sel.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.value ?? sel.value;
-                    });
+                    onControlValue(sel, 'pdx-change', (e) => e.detail?.value ?? sel.value, (v) => { _editValue = v; });
                     container.appendChild(sel);
                     break;
                 }
                 case 'color': {
                     const cp = document.createElement('pdx-color-picker') as any;
                     cp.value = val ?? '#000000';
-                    cp.addEventListener('pdx-change', (e: CustomEvent) => {
-                        _editValue = e.detail?.value ?? cp.value;
-                    });
+                    onControlValue(cp, 'pdx-change', (e) => e.detail?.value ?? cp.value, (v) => { _editValue = v; });
                     container.appendChild(cp);
                     break;
                 }

@@ -135,18 +135,19 @@ const CASES: Case[] = [
         act: (el) => key(el, 'ArrowRight'),
         props: { value: (d) => d.value },
     },
+    // The pickers announce their model (#481): `value-change`, the value in `detail.value`.
     {
-        name: 'pdx-color-picker', html: '<pdx-color-picker value="#ff0000" inline></pdx-color-picker>', event: 'pdx-change',
+        name: 'pdx-color-picker', html: '<pdx-color-picker value="#ff0000" inline></pdx-color-picker>', event: 'value-change',
         act: (el) => typeInto(q(el, '.pdx-color-hex-input'), '#00ff00', ['change']),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-mention (the text)', html: '<pdx-mention></pdx-mention>', event: 'pdx-input',
+        name: 'pdx-mention (the text)', html: '<pdx-mention></pdx-mention>', event: 'value-change',
         act: (el) => typeInto(q(el, 'textarea'), 'hello there'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-select', html: `<pdx-select options='["Red","Green","Blue"]'></pdx-select>`, event: 'pdx-change',
+        name: 'pdx-select', html: `<pdx-select options='["Red","Green","Blue"]'></pdx-select>`, event: 'value-change',
         act: async (el) => {
             q<HTMLElement>(el, '.pdx-select-trigger').click();
             await tick();
@@ -155,19 +156,19 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-date-picker, a date', html: '<pdx-date-picker inline></pdx-date-picker>', event: 'pdx-change',
-        act: (el) => { q(el, 'pdx-calendar').dispatchEvent(new CustomEvent('pdx-change', { detail: { value: '2026-09-14' } })); },
+        name: 'pdx-date-picker, a date', html: '<pdx-date-picker inline></pdx-date-picker>', event: 'value-change',
+        act: (el) => { q(el, 'pdx-calendar').dispatchEvent(new CustomEvent('value-change', { detail: { value: '2026-09-14' } })); },
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-date-picker, a range', html: '<pdx-date-picker inline mode="range"></pdx-date-picker>', event: 'pdx-change',
+        name: 'pdx-date-picker, a range', html: '<pdx-date-picker inline mode="daterange"></pdx-date-picker>', event: 'value-change',
         act: (el) => {
-            q(el, 'pdx-calendar').dispatchEvent(new CustomEvent('pdx-change', { detail: { rangeStart: '2026-09-01', rangeEnd: '2026-09-05' } }));
+            q(el, 'pdx-calendar').dispatchEvent(new CustomEvent('value-change', { detail: { value: ['2026-09-01', '2026-09-05'] } }));
         },
-        props: { rangeStart: (d) => d.rangeStart, rangeEnd: (d) => d.rangeEnd },
+        props: { value: (d) => d.value, rangeStart: (d) => (d.value as string[])[0], rangeEnd: (d) => (d.value as string[])[1] },
     },
     {
-        name: 'pdx-time-picker', html: '<pdx-time-picker></pdx-time-picker>', event: 'pdx-change',
+        name: 'pdx-time-picker', html: '<pdx-time-picker></pdx-time-picker>', event: 'value-change',
         act: (el) => key(el.querySelectorAll('[role="spinbutton"]')[0], 'ArrowUp'),
         props: { value: (d) => d.value },
     },
@@ -182,13 +183,13 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-tag-input', html: '<pdx-tag-input></pdx-tag-input>', event: 'pdx-change',
+        name: 'pdx-tag-input', html: '<pdx-tag-input></pdx-tag-input>', event: 'value-change',
         act: (el) => {
             const field = q<HTMLInputElement>(el, 'input');
             typeInto(field, 'urgent');
             key(field, 'Enter');
         },
-        props: { value: (d) => d.tags },
+        props: { value: (d) => d.value },
     },
     {
         name: 'pdx-toggle', html: '<pdx-toggle value="bold">B</pdx-toggle>', event: 'pressed-change',
@@ -222,25 +223,29 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-calendar, a date', html: '<pdx-calendar inline value="2026-09-10"></pdx-calendar>', event: 'pdx-change',
+        name: 'pdx-calendar, a date', html: '<pdx-calendar inline value="2026-09-10"></pdx-calendar>', event: 'value-change',
         act: (el) => q<HTMLElement>(el, '[data-iso="2026-09-15"]').click(),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-calendar, a range', html: '<pdx-calendar inline mode="range" value="2026-09-10"></pdx-calendar>', event: 'pdx-change',
+        name: 'pdx-calendar, a range', html: '<pdx-calendar inline mode="range" value="2026-09-10"></pdx-calendar>', event: 'value-change',
         act: (el) => {
             q<HTMLElement>(el, '[data-iso="2026-09-12"]').click();
             q<HTMLElement>(el, '[data-iso="2026-09-15"]').click();
         },
-        props: { rangeStart: (d) => d.rangeStart, rangeEnd: (d) => d.rangeEnd },
+        props: { value: (d) => d.value, rangeStart: (d) => (d.value as string[])[0], rangeEnd: (d) => (d.value as string[])[1] },
     },
     {
-        name: 'pdx-autocomplete, typing', html: '<pdx-autocomplete></pdx-autocomplete>', event: 'pdx-input',
-        act: (el) => typeInto(q(el, 'input:not([type="hidden"])'), 'Rom'),
+        name: 'pdx-autocomplete, a value committed on Enter', html: '<pdx-autocomplete></pdx-autocomplete>', event: 'value-change',
+        act: (el) => {
+            const field = q<HTMLInputElement>(el, 'input:not([type="hidden"])');
+            typeInto(field, 'Rom');
+            key(field, 'Enter');
+        },
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-cascader', html: '<pdx-cascader></pdx-cascader>', event: 'pdx-change',
+        name: 'pdx-cascader', html: '<pdx-cascader></pdx-cascader>', event: 'value-change',
         setup: (el) => { el.options = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]; },
         act: async (el) => {
             q<HTMLElement>(el, '.pdx-cascader-trigger').click();
@@ -250,7 +255,7 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-tree-select', html: '<pdx-tree-select></pdx-tree-select>', event: 'pdx-change',
+        name: 'pdx-tree-select', html: '<pdx-tree-select></pdx-tree-select>', event: 'value-change',
         setup: (el) => { el.options = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]; },
         act: async (el) => {
             q<HTMLElement>(el, '[role="combobox"]').click();
@@ -260,7 +265,7 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-transfer', html: '<pdx-transfer></pdx-transfer>', event: 'pdx-change',
+        name: 'pdx-transfer', html: '<pdx-transfer></pdx-transfer>', event: 'value-change',
         setup: (el) => { el.items = [{ value: 'a', label: 'A' }, { value: 'b', label: 'B' }]; el.value = ['b']; },
         act: async (el) => {
             const source = el.querySelectorAll('.pdx-transfer-panel')[0];

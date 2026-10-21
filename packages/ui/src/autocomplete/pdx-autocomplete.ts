@@ -1,12 +1,12 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, isDataSource, inject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
+import { signal, computed, effect, html, component, model, event, isDataSource, inject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/autocomplete';
@@ -47,13 +47,29 @@ function buildHighlight(label: string, query: string): HTMLSpanElement {
  * A text input with suggestions whose value is free text: the user can type anything, or pick a
  * suggestion from a local list or a remote data source.
  *
- * @fires pdx-change {{ value, label, item }} - When the value is committed: a suggestion picked (`value` is its value field, `item` the suggestion), the field cleared, or free text confirmed by leaving the field or pressing Enter with no option chosen (`value` and `label` the text, `item` null). Once per edit, like a native `change`.
  * @slot option - Scoped — renders one option. Receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail label $event.currentTarget.getText()
+ * @alphadetail item $event.currentTarget.getSelectedItem()
+ * @alpharename pdx-input query-change
  */
 component('pdx-autocomplete', {
     formAssociated: true,
+    // The committed value (#481): a suggestion picked (its value field, or its label when it has
+    // none), the field cleared, or free text confirmed by leaving the field or pressing Enter with no
+    // option chosen. Once per edit, like a native `change`. The text typed is not the value: it is
+    // announced with `query-change`.
+    models: { value: model<unknown>('', { type: String }) },
+    events: {
+        /** The text typed, on each keystroke: the query the suggestions are filtered by. */
+        'query-change': event<{ value: string }>(),
+        /** Fired when the clear button empties the field, after its `value-change`. */
+        'pdx-clear': event<void>(),
+    },
     props: {
-        value: { type: String, default: '' },
         suggestions: { type: Array, default: () => [] },
         source: { type: Object, default: null },
         labelField: { type: String, default: 'label' },
@@ -120,30 +136,31 @@ component('pdx-autocomplete', {
             }
         });
 
-        // The text last announced with pdx-change, or set from outside: free text typed since then is
-        // committed — announced — when the field is left or Enter is pressed.
+        // The text last committed, or set from outside: free text typed since then is committed —
+        // written to the model — when the field is left or Enter is pressed.
         let _committed = '';
+        // The suggestion last picked, or null for free text: what getSelectedItem() answers.
+        let _selectedItem: unknown = null;
+        // True while the component writes its own model, so the sync below does not read it back.
+        let _writing = false;
 
-        // Sync external value prop → query. Typing also writes `value` (setOwnProp in onInput), and
-        // then it equals the query already: only a value set from OUTSIDE is a committed one.
-        ctx.track(() => {
-            const v = ctx.value();
-            if (v !== undefined && v !== null && v !== '') {
-                if (v !== _query.peek()) _committed = v as string;
-                _query.set(v as string);
-            }
-        });
+        /** Writes a committed value to the model, which dispatches `value-change`. */
+        function commit(value: unknown, text: string, item: unknown): void {
+            _committed = text;
+            _selectedItem = item;
+            _writing = true;
+            try { ctx.value.set(value); } finally { _writing = false; }
+        }
 
         /**
-         * Announce free text the way a pick is announced. The value is free text, and inside a
-         * pdx-form the compiler wires this control on pdx-change: typed and never picked, it would never
+         * Commit free text the way a pick is committed. The value is free text, and inside a pdx-form
+         * the compiler wires this control on its model's event: typed and never picked, it would never
          * reach the form. Like a native `change`, it fires once per edit, on commit.
          */
         function commitText(): void {
             const q = _query();
             if (q === _committed) return;
-            _committed = q;
-            ctx.emit('pdx-change', { value: q, label: q, item: null });
+            commit(q, q, null);
         }
 
         // ── For external DS: track data signal ──
@@ -170,6 +187,19 @@ component('pdx-autocomplete', {
                 return normalize(_dsData(), lf, vf);
             }
             return normalize(ctx.suggestions() as any[], lf, vf);
+        });
+
+        // Sync a value set from OUTSIDE → the text shown: the label of the suggestion whose value it
+        // is, or the value itself as free text. After `allItems`, which it reads.
+        ctx.track(() => {
+            const v = ctx.value();
+            if (_writing) return;
+            if (v !== undefined && v !== null && v !== '') {
+                const text = untracked(() => allItems().find((i) => i.value === v)?.label) ?? String(v);
+                _committed = text;
+                _selectedItem = null;
+                _query.set(text);
+            }
         });
 
         const filteredItems = computed((): NormalisedOption[] => {
@@ -201,13 +231,10 @@ component('pdx-autocomplete', {
 
         function selectSuggestion(item: NormalisedOption) {
             _query.set(item.label);
-            setOwnProp(ctx.el, 'value', item.label);
-            // `value` is the suggestion's value field — the code, the id — and `label` what the input
-            // shows, whatever the label. A suggestion
-            // with no value field at all still sends its label.
+            // The value is the suggestion's value field — the code, the id — and the text what the
+            // input shows, whatever the label. A suggestion with no value field at all sends its label.
             const hasValue = !(typeof item._raw === 'object' && item._raw !== null && item.value === item._raw);
-            _committed = item.label;
-            ctx.emit('pdx-change', { value: hasValue ? item.value : item.label, label: item.label, item: item._raw });
+            commit(hasValue ? item.value : item.label, item.label, item._raw);
             close();
         }
 
@@ -215,9 +242,8 @@ component('pdx-autocomplete', {
             const val = (e.target as HTMLInputElement).value;
             _query.set(val);
             _activeIndex.set(-1);
-            // `value` is the live text, as in pdx-input.
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-input', { value: val });
+            // The query, not the value: the value is what is committed.
+            ctx.emit('query-change', { value: val });
 
             const min = ctx.minLength() as number;
 
@@ -284,9 +310,7 @@ component('pdx-autocomplete', {
                     const q = _query().trim();
                     if (q && !allItems().some(i => i.label.toLowerCase() === q.toLowerCase())) {
                         _query.set('');
-                        setOwnProp(ctx.el, 'value', '');
-                        _committed = '';
-                        ctx.emit('pdx-change', { value: '', label: '', item: null });
+                        commit('', '', null);
                     }
                 } else {
                     commitText();
@@ -337,9 +361,7 @@ component('pdx-autocomplete', {
 
         function clear() {
             _query.set('');
-            setOwnProp(ctx.el, 'value', '');
-            _committed = '';
-            ctx.emit('pdx-change', { value: '', label: '', item: null });
+            commit('', '', null);
             ctx.emit('pdx-clear');
             close();
         }
@@ -419,7 +441,13 @@ component('pdx-autocomplete', {
             if (_blurTimer) clearTimeout(_blurTimer);
         });
 
-        ctx.expose({ open, close, clear });
+        ctx.expose({
+            open, close, clear,
+            /** The text the field shows: the picked suggestion's label, or the free text. */
+            getText(): string { return _query.peek(); },
+            /** The suggestion last picked, as given; null when the value is free text or set from outside. */
+            getSelectedItem(): unknown { return _selectedItem; },
+        });
 
         useFormAssociated(ctx, { getFormValue: () => { const v = _query(); return v != null && v !== '' ? String(v) : null; } });
         // The host is the one submitter. A hidden input carrying the name would send the value a

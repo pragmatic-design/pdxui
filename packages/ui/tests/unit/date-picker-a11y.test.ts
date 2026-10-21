@@ -1,8 +1,8 @@
-// pdx-date-picker: one pdx-change per pick, focus back on the trigger after a pick, a view that opens
+// pdx-date-picker: one value-change per pick, focus back on the trigger after a pick, a view that opens
 // where min/max allow, and a popup that is the dialog the trigger announces.
 //
-// The inner calendar's pdx-change does not bubble out of the picker next to the picker's own, which
-// would give a listener two per pick with two shapes; a pick that closes the popup does not leave
+// The inner calendar's model event does not bubble out of the picker next to the picker's own, which
+// would give a listener two per pick; a pick that closes the popup does not leave
 // focus on <body>; "2024 only" does not open on today's month with all 42 cells disabled; the panel
 // has a role and a name, and opening it moves focus into it; the month and year grids have a label.
 import { describe, it, expect, beforeEach, vi } from 'vitest';
@@ -22,13 +22,13 @@ async function open(el: HTMLElement): Promise<void> {
 
 function changes(el: HTMLElement): CustomEvent[] {
     const seen: CustomEvent[] = [];
-    el.addEventListener('pdx-change', (e) => seen.push(e as CustomEvent));
+    el.addEventListener('value-change', (e) => seen.push(e as CustomEvent));
     return seen;
 }
 
 beforeEach(cleanup);
 
-describe('one pdx-change per change', () => {
+describe('one value-change per change', () => {
     it('a date pick is one event, with the picked value, and the host value follows', async () => {
         const el = await mount('pdx-date-picker', { value: '2024-06-15' });
         await tick(50);
@@ -50,7 +50,7 @@ describe('one pdx-change per change', () => {
         cell(el, '2024-06-08').click();
         await tick(20);
         expect(seen).toHaveLength(2);
-        expect(seen[1].detail).toEqual({ rangeStart: '2024-06-03', rangeEnd: '2024-06-08', value: '2024-06-03' });
+        expect(seen[1].detail).toEqual({ value: ['2024-06-03', '2024-06-08'] });
     });
 
     it('a time change in datetime mode is one event', async () => {
@@ -59,9 +59,9 @@ describe('one pdx-change per change', () => {
         await open(el);
         const seen = changes(el);
         const tp = el.querySelector('pdx-time-picker')!;
-        tp.dispatchEvent(new CustomEvent('pdx-change', { detail: { value: '10:30' }, bubbles: true }));
+        tp.dispatchEvent(new CustomEvent('value-change', { detail: { value: '10:30' } }));
         await tick(20);
-        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-15', time: '10:30' }]);
+        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-15T10:30' }]);
     });
 });
 

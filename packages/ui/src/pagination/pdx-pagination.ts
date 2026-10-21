@@ -241,9 +241,9 @@ component('pdx-pagination', {
             select.setAttribute('size', 'sm');
             select.setAttribute('data-page-key', 'size');
             uiAttr(select, 'label', () => uiString('pagination', 'pageSize'));
-            select.addEventListener('pdx-change', (e) => {
-                // The pager's pdx-change is the one its listeners read; the select's stops here.
-                e.stopPropagation();
+            // The select's model event (#481), which does not bubble: the pager's pdx-change is the
+            // one its listeners read.
+            select.addEventListener('value-change', (e) => {
                 const next = Number((e as CustomEvent<{ value: string | null }>).detail.value);
                 if (!next) return;
                 const ds = resolveDS() as any;

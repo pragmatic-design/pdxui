@@ -9,9 +9,10 @@ Suggestions as you type.
 on blur.
 
 **Pitfalls**
-- After a pick, `el.value` is the LABEL the input shows; the code from `value-field` is only in
-  `pdx-change.detail.value`.
-- Typing emits `pdx-input`, not `pdx-change`: `pdx-change` fires on a pick, a clear, or a `force-selection` wipe.
+- After a pick, `el.value` is the CODE from `value-field`, not the label the input shows: that is
+  `el.getText()`, and the picked suggestion `el.getSelectedItem()`.
+- Typing emits `query-change` with the text, not `value-change`: the value changes on a pick, on free text
+  confirmed by blur or Enter, on a clear, or on a `force-selection` wipe.
 - `force-selection` compares the typed text with the labels, case-insensitively, 150 ms after blur.
 - Suggestions appear from `min-length` characters (default 1), at most `max-items` (default 10).
 - `remote` filters the source with `contains` on `label-field`: the server has to honour that operator.
@@ -21,7 +22,6 @@ on blur.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `suggestions` | — | array | `() => []` | The list of suggestions to match against. |
 | `source` | — | object | `null` | The data source to render from. |
 | `labelField` | `labelfield` | string | `'label'` | Object field used as the visible label. |
@@ -43,6 +43,7 @@ on blur.
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
+| `value` | `value` | unknown | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -51,8 +52,10 @@ on blur.
 | `open()` | Opens it. |
 | `close()` | Closes it. |
 | `clear()` | Clears the value. |
+| `getText()` | The text the field shows: the picked suggestion's label, or the free text. |
+| `getSelectedItem()` | The suggestion last picked, as given; null when the value is free text or set from outside. |
 
-**Events:** `pdx-change` → `detail: { value, label, item }` — When the value is committed: a suggestion picked (`value` is its value field, `item` the suggestion), the field cleared, or free text confirmed by leaving the field or pressing Enter with no option chosen (`value` and `label` the text, `item` null). Once per edit, like a native `change`.; `pdx-clear` — Fired when the value is cleared.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-clear` — Fired when the clear button empties the field, after its `value-change`.; `query-change` → `detail: { value: string }` — The text typed, on each keystroke: the query the suggestions are filtered by.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
@@ -74,10 +77,10 @@ are checked against the manifest above._
   placeholder="Type a fruit..."
   :suggestions="['Apple', 'Banana', 'Cherry', ...]"
   clearable
-  @pdx-change="onSelect" />
+  @value-change="onSelect" />
 ```
 
-**Object Array — Custom Fields** — Use `label-field` and `value-field` for object arrays. The input shows the label; `pdx-change` sends the value field as `value`, with `label` and the whole `item`.
+**Object Array — Custom Fields** — Use `label-field` and `value-field` for object arrays. The input shows the label; The value is the value field; `getText()` is the label shown and `getSelectedItem()` the whole item.
 
 ```html
 <pdx-autocomplete
@@ -85,7 +88,7 @@ are checked against the manifest above._
   :suggestions="cities"
   label-field="name"
   value-field="code"
-  @pdx-change="onSelect" />
+  @value-change="onSelect" />
 ```
 
 ```js
@@ -122,7 +125,7 @@ const countryDS = createDataSource({
     placeholder="Must match a color..."
     :suggestions="colors"
     force-selection
-    @pdx-change="onColorChange" />
+    @value-change="onColorChange" />
   <p class="pdx-txt-small pdx-ink-muted result">Color: {{ colorValue }}</p>
 </div>
 ```
@@ -156,6 +159,6 @@ const countryDS = createDataSource({
   searchable
   creatable
   @pdx-create="onTagCreate"
-  @pdx-change="onTagChange" />
+  @value-change="onTagChange" />
 ```
 

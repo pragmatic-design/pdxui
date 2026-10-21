@@ -1,9 +1,9 @@
 // Free text typed into pdx-autocomplete reaches the form.
 //
-// The component says its value is free text. Inside a pdx-form the compiler wires it by name, on
-// `pdx-change` (codegen-form-binding.ts: autocomplete has no entry in `eventName`, so the default),
-// with `e.detail?.value ?? e.target?.value`. If `pdx-change` came only on a pick, on clear, and on a
-// forceSelection blur, text typed and never picked would never reach the form. The handler below is the one the compiler generates, written out.
+// The component says its value is free text. Inside a pdx-form the compiler wires it by name, on its
+// model's event, `value-change` (#481), with `e.detail?.value`. If the model were written only on a
+// pick, on clear, and on a forceSelection blur, text typed and never picked would never reach the
+// form. The handler below is the one the compiler generates, written out.
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm } from '@pdxui/core';
@@ -19,9 +19,9 @@ async function wired(suggestions: unknown[] = ['Rome', 'Milan']) {
     document.body.appendChild(ac);
     await tick(20);
     ac.suggestions = suggestions;
-    // What the compiler injects for a control it does not know as a text input.
-    ac.addEventListener('pdx-change', ((e: CustomEvent) =>
-        form.fields.city.onChange(e.detail?.value ?? (e.target as Ac).value)) as EventListener);
+    // What the compiler injects for a control that declares a model.
+    ac.addEventListener('value-change', ((e: CustomEvent) =>
+        form.fields.city.onChange(e.detail?.value)) as EventListener);
     await tick();
     return { form, ac, input: ac.querySelector('input') as HTMLInputElement };
 }
@@ -58,18 +58,18 @@ describe('pdx-autocomplete free text in a form', () => {
     it('one commit per edit: leaving the field again announces nothing new', async () => {
         const { ac, input } = await wired();
         const changes: unknown[] = [];
-        ac.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+        ac.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
         type(input, 'Xyz');
         await blur(input);
         input.focus();
         await blur(input);
-        expect(changes).toEqual([{ value: 'Xyz', label: 'Xyz', item: null }]);
+        expect(changes).toEqual([{ value: 'Xyz' }]);
     });
 
     it('a pick is not announced a second time when the field is left', async () => {
         const { ac, input } = await wired();
         const changes: unknown[] = [];
-        ac.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+        ac.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
         type(input, 'ro');
         await vi.waitFor(() => expect(ac.querySelectorAll('[role="option"]')).toHaveLength(1));
         (ac.querySelector('[role="option"]') as HTMLElement).dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }));
@@ -80,7 +80,7 @@ describe('pdx-autocomplete free text in a form', () => {
     it('a value set from outside is not announced back when the field is left', async () => {
         const { ac, input } = await wired();
         const changes: unknown[] = [];
-        ac.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+        ac.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
         ac.value = 'Turin';
         await tick();
         input.focus();

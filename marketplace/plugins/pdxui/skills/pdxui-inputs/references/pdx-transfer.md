@@ -13,7 +13,6 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `items` | — | array | `[]` | All items — array of { value, label, disabled? } |
-| `value` | — | array | `[]` | Values currently in the target (right) panel |
 | `source` | — | object | `null` | DataSource or raw array of objects |
 | `labelField` | `labelfield` | string | `'label'` | Field to use as item label (default: 'label') |
 | `valueField` | `valuefield` | string | `'value'` | Field to use as item value/id (default: 'value') |
@@ -28,16 +27,19 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 | `showAllButtons` | `showallbuttons` | boolean | `false` | Show "move all" buttons |
 | `draggable` | `draggable` | boolean | `false` | Enable drag and drop |
 | `name` | `name` | string | `''` | Form field name |
+| `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `getValue()` | The keys currently on the target side. |
-| `setValue(v)` | Replace the target side and emit `pdx-change`, dropping any move not yet committed. |
+| `setValue(v)` | Replace the target side, which dispatches `value-change`, dropping any move not yet committed. |
 | `clear()` | Clears the value. |
+| `getChanges()` | In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []. |
+| `getDirection()` | The last move's direction, 'right' (to the target) or 'left'; null before any move. |
 
-**Events:** `pdx-change` → `detail: { changes, targetValues, direction } | { value }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.
+**Events:** `pdx-clear` — Fired when the value is cleared.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group` · `listbox` · `option`
 

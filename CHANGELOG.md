@@ -290,6 +290,30 @@ semver.
     function, `@loader loadUser: loadUser;`, rewrites the page's readers to `loadUser.data()` and
     `loadUser.state()`, and flags them on a page with no loader. It flags a loader that reads
     `location` or `currentParams()`: the router hands it its params. (#506)
+- The pickers declare their value as a model, announced with `value-change` and `{ value }`:
+  `pdx-select`, `pdx-autocomplete`, `pdx-cascader`, `pdx-tree-select`, `pdx-transfer`, `pdx-tag-input`,
+  `pdx-mention`, `pdx-date-picker`, `pdx-time-picker`, `pdx-calendar` and `pdx-color-picker`. `::value`
+  binds each both ways, and a form binds each to its model.
+  - The value is the mode's whole value: a multiple select's array of values, the cascader's path,
+    `[start, end]` for a range or a week of the calendar and the date picker, and in `datetime` mode the
+    date and its time, `2026-03-14T09:30` — so changing the time alone is a change of the value.
+  - **Breaking:** they no longer emit `pdx-change`, `pdx-input` or `change`. A listener on one is
+    `PDX_REMOVED_FORM`, and `pdx migrate` rewrites an inline handler through each component's mapping:
+    the parts that are not the value are read from the element — `selectedItem`, `getLabels()`,
+    `getLabel()`, `getRange()`, `getTime()`, `getQuarter()`, `getHex()`, `getChanges()` and the rest.
+  - `pdx-autocomplete`'s value is the committed value — the picked suggestion's value field, or free
+    text confirmed — not the text typed: `el.value` is the code, `getText()` the label shown and
+    `getSelectedItem()` the suggestion. The text typed is a declared event, `query-change`, and
+    `pdx-tag-input`'s draft is `draft-change`; `pdx migrate` rewrites `@pdx-input` on them to those
+    (`alphaRename` in the manifest, `@alpharename` on the JSDoc).
+  - `pdx-color-picker` and `pdx-mention` commit with a native `change` bubbling to the host, as the text
+    fields do: on the hex field's or the textarea's own, and dispatched when a drag ends, a preset or a
+    mention is picked.
+  - At its `min` or `max`, `pdx-time-picker` announces nothing: the step comes back to the value it
+    holds.
+  - `pdx-json-editor` no longer drops, after its first edit, a sub-modal's apply, a removed row, or now
+    a select or tag input inside it: the rebuild guard marked the build stale when the editor's own
+    write re-ran its track. (#481)
 - The text fields declare their value as a model, announced live with `value-change` and `{ value }`:
   `pdx-input`, `pdx-textarea`, `pdx-number-input` (`number | null`), `pdx-password-input`,
   `pdx-search-input`, `pdx-masked-input` (the unmasked value) and `pdx-otp-input`. `::value` binds each

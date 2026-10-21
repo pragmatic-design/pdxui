@@ -3,20 +3,19 @@
 Set hours and minutes.
 
 **The value** is `HH:mm` (`HH:mm:ss` with `show-seconds`) on the 24-hour clock, whatever the display
-format. It is on the element after every change — `el.value` equals `pdx-change.detail.value` — so a
+format. It is on the element after every change — `el.value` equals `value-change`'s `detail.value` — so a
 form can bind it like any other input.
 
 **`''` means empty**, as in the native `<input type="time">`: every segment shows `--`, a screen reader
 hears the `time-picker.empty` string instead of a number, and `el.value` is `''`. The first arrow press,
 typed digit or wheel step on a segment starts from `min` (if set) or 00:00. `el.clear()` returns to
-empty and emits `pdx-change {value: ''}`. There is no `placeholder` prop: `--` is the empty display.
+empty and emits `value-change {value: ''}`. There is no `placeholder` prop: `--` is the empty display.
 
 Typing fills a segment: two digits (or one that cannot start a larger number, like `3` for the hour)
 move to the next segment.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `format` | `format` | string | `'auto'` | Time format, e.g. '12h' or '24h'. |
 | `showSeconds` | `showseconds` | boolean | `false` | Includes a seconds field. |
 | `step` | `step` | number | `1` | Increment step. |
@@ -27,6 +26,7 @@ move to the next segment.
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `locale` | `locale` | string | `''` | Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -36,7 +36,7 @@ move to the next segment.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-change` → `detail: { value }` — Fired when the value changes.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.
+**Events:** `pdx-blur` — Fired when it loses focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group` · `spinbutton`
 
@@ -47,11 +47,11 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Basic** — Bound to a signal: the arrows, the wheel and typed digits all emit `pdx-change` with the new value. An empty picker shows `--`, the way the native time input does — not midnight.
+**Basic** — Bound to a signal: the arrows, the wheel and typed digits all write its model, which emits `value-change` with the new value. An empty picker shows `--`, the way the native time input does — not midnight.
 
 ```html
 <pdx-time-picker :value="meeting" format="24h" aria-label="Meeting time"
-  @pdx-change="e => meeting = e.detail.value"></pdx-time-picker>
+  @value-change="e => meeting = e.detail.value"></pdx-time-picker>
 ```
 
 ```js
@@ -118,10 +118,10 @@ let meeting = $signal('09:30');
 <div class="comp-card">
   <div class="form-grid-2">
     <pdx-form-field label="Start" hint="Opening hours 08:00–20:00">
-      <pdx-time-picker :value="start" format="24h" min="08:00" max="20:00" step="15" aria-label="Start" @pdx-change="e => start = e.detail.value"></pdx-time-picker>
+      <pdx-time-picker :value="start" format="24h" min="08:00" max="20:00" step="15" aria-label="Start" @value-change="e => start = e.detail.value"></pdx-time-picker>
     </pdx-form-field>
     <pdx-form-field label="End" hint="After the start">
-      <pdx-time-picker :value="end" format="24h" :min="start" max="20:00" step="15" aria-label="End" @pdx-change="e => end = e.detail.value"></pdx-time-picker>
+      <pdx-time-picker :value="end" format="24h" :min="start" max="20:00" step="15" aria-label="End" @value-change="e => end = e.detail.value"></pdx-time-picker>
     </pdx-form-field>
   </div>
   <p class="pdx-txt-small summary">Booked <strong>{{ start }}</strong> – <strong>{{ end }}</strong> · {{ duration() }}</p>

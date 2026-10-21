@@ -2,10 +2,9 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, html, signal, model, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
-import { setOwnProp } from '../shared/own-prop';
 import { onPressOutside } from '../shared/press-outside';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -19,8 +18,9 @@ registerComponentStrings('tree-select', {
 });
 
 registerFormControl('pdx-tree-select', {
-    valueEvent: 'pdx-change',
+    valueEvent: 'value-change',
     valueProp: 'value',
+    valueExpr: 'e.detail?.value',
 });
 
 export interface TreeSelectNode {
@@ -37,14 +37,19 @@ export interface TreeSelectNode {
  *
  * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be reopened.
  * @slot node - Scoped — renders one node's label. Receives `{ node, level, expanded }`.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail label $event.currentTarget.getLabel()
  */
 component('pdx-tree-select', {
     formAssociated: true,
+    // The selection (#481): one node's value, or the array of values when `multiple`. A click on the
+    // tree, the clear button, setValue() and clear() write it, and the write dispatches `value-change`.
+    models: { value: model<string | string[] | null>(null, { type: Object }) },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
-        /** Selected value(s) — string for single, string[] for multiple */
-        value: { type: Object, default: null },
         /** Allow multiple selection */
         multiple: { type: Boolean, default: false },
         /** Placeholder */
@@ -395,12 +400,10 @@ component('pdx-tree-select', {
                 else newSet.add(node.value);
                 const newVal = [...newSet];
                 _internalValue.set(newVal);
-                setOwnProp(ctx.el, 'value', [...newVal]);   // the live selection
-                ctx.emit('pdx-change', { value: newVal });
+                ctx.value.set([...newVal]);
             } else {
                 _internalValue.set(node.value);
-                setOwnProp(ctx.el, 'value', node.value);
-                ctx.emit('pdx-change', { value: node.value, label: node.label });
+                ctx.value.set(node.value);
                 closePopover();
             }
         }
@@ -409,8 +412,7 @@ component('pdx-tree-select', {
             e.stopPropagation();
             const emptyVal = isMultiple() ? [] : '';
             _internalValue.set(emptyVal);
-            setOwnProp(ctx.el, 'value', emptyVal);
-            ctx.emit('pdx-change', { value: emptyVal });
+            ctx.value.set(emptyVal);
             ctx.emit('pdx-clear');
         }
 
@@ -687,13 +689,18 @@ component('pdx-tree-select', {
         ctx.expose({
             /** The current selection: one key, the array of keys when `multiple`, or null. */
             getValue() { return _internalValue(); },
-            /** Set the selection and emit `pdx-change`, as a click on the tree would. */
-            setValue(v: string | string[] | null) { _internalValue.set(v); setOwnProp(ctx.el, 'value', v); ctx.emit('pdx-change', { value: v }); },
+            /** The label of the selected node, or the labels joined with ', ' when `multiple`. */
+            getLabel(): string {
+                const v = _internalValue.peek();
+                const values = Array.isArray(v) ? v : v ? [v] : [];
+                return values.map((x) => findNode(x)?.label ?? x).join(', ');
+            },
+            /** Set the selection, which dispatches `value-change`, as a click on the tree would. */
+            setValue(v: string | string[] | null) { _internalValue.set(v); ctx.value.set(v); },
             clear() {
                 const empty = Array.isArray(_internalValue.peek()) ? [] : null;
                 _internalValue.set(empty as string[] | null);
-                setOwnProp(ctx.el, 'value', empty);
-                ctx.emit('pdx-change', { value: empty });
+                ctx.value.set(empty);
                 ctx.emit('pdx-clear');
             },
         });

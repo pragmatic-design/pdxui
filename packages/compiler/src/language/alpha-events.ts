@@ -11,7 +11,8 @@
 //                           hears a native `change` from an inner input, so it is not an error.
 //
 // A text field had two alpha events, a live one and a commit (`alphaCommit`, #479): the live one becomes
-// the model's event, the commit the inner input's native `change`.
+// the model's event, the commit the inner input's native `change`. A picker's query or draft is neither
+// (`alphaRename`, #481): its alpha event becomes a declared event of its own name.
 
 import { escapeForRegExp } from '../compiler/regexp-escape';
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
@@ -29,6 +30,11 @@ export interface AlphaEvents {
      * input's native event, which bubbles to the host; the model's event is live.
      */
     commit?: string;
+    /**
+     * Alpha events that are now declared events of another name (#481), which the model's event is
+     * not: a picker's `pdx-input` was the query typed, and is `query-change`.
+     */
+    renamed?: Record<string, string>;
 }
 
 /** tag → its alpha events, or null when it records none (or has no model to move to). */
@@ -118,8 +124,12 @@ function rewriteHandler(value: string, detail: Record<string, string>): string |
     return failed ? null : head + next;
 }
 
-/** The event a listener on an alpha event moves to: `change` for the commit, the model's event otherwise. */
-const targetOf = (l: Listener): string => (l.alpha.commit === l.event ? 'change' : l.alpha.modelEvent);
+/**
+ * The event a listener on an alpha event moves to: its new name when it was renamed, `change` for the
+ * commit, the model's event otherwise.
+ */
+const targetOf = (l: Listener): string =>
+    l.alpha.renamed?.[l.event] ?? (l.alpha.commit === l.event ? 'change' : l.alpha.modelEvent);
 
 /** The rewritten attribute, or null when its handler must be rewritten by hand. */
 function rewriteListener(l: Listener): string | null {

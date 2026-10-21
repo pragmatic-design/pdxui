@@ -4,7 +4,6 @@ A month calendar surface.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | Selected date (ISO string) for single mode. |
 | `rangeStart` | `rangestart` | string | `''` | Range start (ISO). |
 | `rangeEnd` | `rangeend` | string | `''` | Range end (ISO). |
 | `mode` | `mode` | string | `'date'` | Selection mode. |
@@ -23,14 +22,17 @@ A month calendar surface.
 | `firstDay` | `firstday` | number | `-1` | First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1. |
 | `inline` | `inline` | boolean | `false` | Inline mode (no external popover wrapper). |
 | `disabled` | `disabled` | boolean | `false` | Disabled state. |
+| `value` | `value` | string \| string[] | `''` | The current value. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `focusView()` | Focus the active day (or the month / year shown), now or once the view is drawn. |
+| `getRange()` | The range the selection covers, `[start, end]` as ISO dates: the range itself, or the week, month, quarter or year chosen; `['', '']` when the mode covers none. |
+| `getQuarter()` | The quarter last chosen in `quarter` mode, and its fiscal year; null otherwise. |
 
-**Events:** `pdx-change` → `detail: { value } | { rangeStart, rangeEnd } | { values } | { value, rangeStart, rangeEnd } | { value, quarter, fiscalYear, rangeStart, rangeEnd }` — Fired when the value changes.; `pdx-navigate` → `detail: { year, month }` — Fired on navigation.; `pdx-view-change` → `detail: { view }` — Fired when the view changes.
+**Events:** `pdx-navigate` → `detail: { year, month }` — Fired on navigation.; `pdx-view-change` → `detail: { view }` — Fired when the view changes.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row`
 

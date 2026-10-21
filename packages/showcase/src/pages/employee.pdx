@@ -80,7 +80,7 @@
       @pdx-cancel="ending = false"
       data-test="end-employment-dialog">
       <pdx-form-field :label="$t('employees.record.endDate')">
-        <pdx-date-picker editable :value="endDate" @pdx-change="e => endDate = e.detail.value" data-test="end-employment-date"></pdx-date-picker>
+        <pdx-date-picker editable :value="endDate" @value-change="e => endDate = e.currentTarget.getDate()" data-test="end-employment-date"></pdx-date-picker>
       </pdx-form-field>
     </pdx-alert-dialog>
   </section>

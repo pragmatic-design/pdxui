@@ -53,7 +53,7 @@ describe('parseTypedDate: the locale\'s pattern, or ISO', () => {
 });
 
 // A datetime picker keeps a time typed after the date: the field does not go back to the previous
-// time, pdx-change carries the `time`, and "25:99" is not taken without a word.
+// time, the value carries the time (`2024-06-23T14:30`, #481), and "25:99" is not taken without a word.
 describe('parseTypedDateTime: the date, and the time after it', () => {
     const t = (hours: number, minutes: number, seconds = 0) => ({ hours, minutes, seconds });
 
@@ -97,7 +97,7 @@ function type(el: HTMLElement, text: string): HTMLInputElement {
 const enter = (i: HTMLElement) => i.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
 function changes(el: HTMLElement): CustomEvent[] {
     const seen: CustomEvent[] = [];
-    el.addEventListener('pdx-change', (e) => seen.push(e as CustomEvent));
+    el.addEventListener('value-change', (e) => seen.push(e as CustomEvent));
     return seen;
 }
 
@@ -130,7 +130,7 @@ describe('pdx-date-picker editable', () => {
         expect(i.getAttribute('aria-expanded')).toBe('true');
     });
 
-    it('en-US: "06/23/2024" + Enter commits 2024-06-23, one pdx-change, the calendar on June 2024', async () => {
+    it('en-US: "06/23/2024" + Enter commits 2024-06-23, one value-change, the calendar on June 2024', async () => {
         const el = await mount('pdx-date-picker', { locale: 'en-US', editable: '', value: '2024-01-10' }) as Picker;
         await tick(50);
         const seen = changes(el);
@@ -215,16 +215,16 @@ describe('pdx-date-picker editable, mode="datetime": the typed time', () => {
     const datetime = (extra: Record<string, string> = {}) =>
         mount('pdx-date-picker', { locale: 'en-US', editable: '', mode: 'datetime', ...extra }) as Promise<Picker>;
 
-    it('"06/23/2024 14:30" + Enter: the date, the time in the field and the panel, one pdx-change with both', async () => {
+    it('"06/23/2024 14:30" + Enter: the date, the time in the field and the panel, one value-change with both', async () => {
         const el = await datetime();
         await tick(50);
         const seen = changes(el);
         const i = type(el, '06/23/2024 14:30');
         enter(i);
         await tick(50);
-        expect(el.value).toBe('2024-06-23');
+        expect(el.value).toBe('2024-06-23T14:30');
         expect(i.value, 'the typed time went back to the previous one').toBe('06/23/2024 14:30');
-        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-23', time: '14:30' }]);
+        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-23T14:30' }]);
         expect(timePicker(el)?.value, 'the panel\'s time picker still shows the old time').toBe('14:30');
     });
 
@@ -234,7 +234,7 @@ describe('pdx-date-picker editable, mode="datetime": the typed time', () => {
         const seen = changes(el);
         enter(type(el, '06/23/2024 2:30 PM'));
         await tick(50);
-        expect(seen.map(e => e.detail.time)).toEqual(['14:30']);
+        expect(seen.map(e => e.detail.value)).toEqual(['2024-06-23T14:30']);
         expect(input(el)!.value).toBe('06/23/2024 14:30');
     });
 
@@ -259,9 +259,9 @@ describe('pdx-date-picker editable, mode="datetime": the typed time', () => {
         const seen = changes(el);
         enter(type(el, '06/24/2024'));
         await tick(50);
-        expect(el.value).toBe('2024-06-24');
+        expect(el.value).toBe('2024-06-24T14:30');
         expect(input(el)!.value).toBe('06/24/2024 14:30');
-        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-24', time: '14:30' }]);
+        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-24T14:30' }]);
     });
 
     it('the same date with a new time is a change too', async () => {
@@ -272,7 +272,7 @@ describe('pdx-date-picker editable, mode="datetime": the typed time', () => {
         const seen = changes(el);
         enter(type(el, '06/23/2024 09:15'));
         await tick(50);
-        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-23', time: '09:15' }]);
+        expect(seen.map(e => e.detail)).toEqual([{ value: '2024-06-23T09:15' }]);
     });
 
     it('seconds: kept with show-seconds; without it, seconds other than zero are not dropped in silence', async () => {
@@ -281,7 +281,7 @@ describe('pdx-date-picker editable, mode="datetime": the typed time', () => {
         const seen = changes(withSeconds);
         enter(type(withSeconds, '06/23/2024 14:30:15'));
         await tick(50);
-        expect(seen.map(e => e.detail.time)).toEqual(['14:30:15']);
+        expect(seen.map(e => e.detail.value)).toEqual(['2024-06-23T14:30:15']);
 
         cleanup();
         const without = await datetime();

@@ -119,6 +119,16 @@ for its spin buttons. So `@change` on `<pdx-input>` saves on commit, reading the
 the model's event. The manifest records the alpha commit event (`alphaCommit`, `@alphacommit` on the
 component's JSDoc), and `pdx migrate` rewrites a listener on it to `@change`, not to the model's event.
 
+A picker's model is the **mode's whole value** (#481): `pdx-date-picker` holds the ISO date, the date
+and its time (`2026-03-14T09:30`) in `datetime` mode, `[start, end]` in a range or week mode; a
+multiple `pdx-select` holds the array of values. The parts are read from the element (`getRange()`,
+`getTime()`), which is where the manifest maps the alpha `rangeStart` and `rangeEnd`. What a picker
+announces that is **not** its value is a declared event of its own: `pdx-autocomplete`'s query is
+`query-change`, `pdx-tag-input`'s draft `draft-change`, each `{ value: string }`. The manifest records
+the alpha event they replace (`alphaRename`, `@alpharename <alpha> <event>` on the JSDoc), and
+`pdx migrate` rewrites `@pdx-input` on those two to the new name. `pdx-color-picker` and `pdx-mention`
+commit with a native `change`, as the text fields do.
+
 ### Rules
 
 - `::x` on a component prop that is not a `@model` is `PDX_TWO_WAY_NOT_MODEL` (error), hint «declare

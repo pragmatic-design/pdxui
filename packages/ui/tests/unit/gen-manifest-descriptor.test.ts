@@ -145,6 +145,7 @@ describe('gen-manifest reads the alpha events a component no longer emits (#478)
         ' * @alphadetail checked $event.detail.value',
         ' * @alphadetail value $event.currentTarget.value',
         ' * @alphacommit pdx-change',
+        ' * @alpharename pdx-input query-change',
         ' */',
         "component('pdx-widget', {",
         '    models: { checked: model(false) },',
@@ -165,10 +166,15 @@ describe('gen-manifest reads the alpha events a component no longer emits (#478)
         expect(decl().alphaCommit).toBe('pdx-change');
     });
 
+    it('@alpharename becomes alphaRename: an alpha event that is now a declared event of another name (#481)', () => {
+        expect(decl().alphaRename).toEqual({ 'pdx-input': 'query-change' });
+    });
+
     it('the control: a component that records none lists neither', () => {
         expect(declaration().alphaEvents).toBeUndefined();
         expect(declaration().alphaDetail).toBeUndefined();
         expect(declaration().alphaCommit).toBeUndefined();
+        expect(declaration().alphaRename).toBeUndefined();
     });
 });
 

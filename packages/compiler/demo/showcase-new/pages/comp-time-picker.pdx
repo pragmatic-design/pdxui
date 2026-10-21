@@ -55,7 +55,7 @@
         <div class="opt-row"><code>locale</code><span>string</span><span>Locale for <code>format="auto"</code></span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
         <div class="opt-row"><code>name</code><span>string</span><span>Form field name (form-associated)</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>event</span><span><code>detail.value</code>: the new value</span></div>
+        <div class="opt-row"><code>value-change</code><span>event</span><span>Its model: <code>detail.value</code>, the new value</span></div>
       </div>
     </section>
   </div>

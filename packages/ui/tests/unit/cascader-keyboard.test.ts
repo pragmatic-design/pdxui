@@ -73,7 +73,7 @@ describe('pdx-cascader keyboard', () => {
         const el = await mount();
         const t = trigger(el);
         const changes: string[][] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+        el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
         const steps: [string, string | null][] = [
             ['ArrowDown', 'Europe'], ['ArrowRight', 'Italy'], ['ArrowDown', 'France'], ['ArrowUp', 'Italy'],
             ['ArrowRight', 'Rome'], ['ArrowDown', 'Milan'], ['ArrowLeft', 'Italy'], ['ArrowRight', 'Rome'], ['End', 'Milan'],
@@ -119,7 +119,7 @@ describe('pdx-cascader keyboard', () => {
         const el = await mount('change-on-select');
         const t = trigger(el);
         const changes: string[][] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+        el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
         key(t, 'ArrowDown');
         await tick(20);
         key(t, 'ArrowRight');
@@ -143,7 +143,7 @@ describe('pdx-cascader search', () => {
         const results = el.querySelectorAll('[role="listbox"] [role="option"]');
         expect(results.length).toBe(1);
         const changes: string[][] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.value));
+        el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail.value));
         key(input, 'ArrowDown');
         await tick(20);
         expect(active(input)).toBe('Europe / Italy / Rome');

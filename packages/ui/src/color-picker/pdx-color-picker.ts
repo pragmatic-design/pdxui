@@ -2,10 +2,11 @@
 // Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
 // Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
 
-import { component, html, signal, computed, effect, useFormAssociated, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, model, useFormAssociated, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/color-picker';
@@ -91,14 +92,23 @@ function parseColor(input: string): { h: number; s: number; v: number; a: number
  * Colour selection from a swatch trigger or an inline panel, with alpha channel and preset palettes,
  * output as hex, rgb or hsl.
  *
- * @fires pdx-input {{ value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }} - While dragging; `value` is in the picker's current format.
- * @fires pdx-change {{ value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }} - When a colour is committed.
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail hex $event.currentTarget.getHex()
+ * @alphadetail rgb $event.currentTarget.getRgb()
+ * @alphadetail hsl $event.currentTarget.getHsl()
+ * @alphacommit pdx-change
  */
 component('pdx-color-picker', {
     formAssociated: true,
+    // The colour in the picker's format (#481). Every step of a drag or a key writes it, and the write
+    // dispatches `value-change`, live. The commit is a native `change` bubbling to the host: the hex
+    // field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
+    // a preset is picked or the colour is cleared.
+    models: { value: model<string>('#000000') },
     props: {
-        value:     { type: String, default: '#000000' },
-        format:    { type: String, default: 'hex' },
+        format:   { type: String, default: 'hex' },
         showAlpha: { type: Boolean, default: false },
         presets:   { type: Array, default: () => [] },
         disabled:  { type: Boolean, default: false },
@@ -120,7 +130,7 @@ component('pdx-color-picker', {
         let _reflected: string | null = null;
         function reflect(v: string): void {
             _reflected = v;
-            setOwnProp(ctx.el, 'value', v);
+            ctx.value.set(v);
         }
 
         // Sync value prop to internal HSV
@@ -148,12 +158,10 @@ component('pdx-color-picker', {
             return hexColor();
         });
 
-        function payload() {
-            const c = rgbColor();
-            return { value: displayValue(), hex: hexColor(), rgb: { ...c, a: alpha() }, hsl: { ...hslColor(), a: alpha() } };
-        }
-        function emitInput() { reflect(displayValue()); ctx.emit('pdx-input', payload()); }
-        function emitChange() { reflect(displayValue()); ctx.emit('pdx-change', payload()); }
+        /** A live write: the model, which dispatches `value-change`. */
+        function emitInput() { reflect(displayValue()); }
+        /** A commit no typing produced: the write, then the native `change` a commit makes. */
+        function emitChange() { reflect(displayValue()); dispatchCommit(ctx.el); }
 
         // Shared drag helper — attaches pointermove/pointerup on document
         function startDrag(onMove: (e: PointerEvent) => void) {
@@ -199,8 +207,8 @@ component('pdx-color-picker', {
 
         // ── Keyboard ─────────────────────────────
         // Every slider, opacity included, has a tab stop and keys, not only a pointer path.
-        // Each key step emits pdx-input; the keyup that ends it commits (pdx-change), as a drag's
-        // pointerup does.
+        // Each key step writes the model; the keyup that ends it commits (a native `change`), as a
+        // drag's pointerup does.
         const interactive = () => !ctx.disabled() && !ctx.readonly();
         let _keyStepped = false;
         /** The new value for a slider key, or null for a key the slider does not handle. */
@@ -260,9 +268,10 @@ component('pdx-color-picker', {
             });
         }
 
+        // The hex field's own `change` is the commit, and bubbles to the host: only the write is left.
         function onHexInput(e: Event) {
             const parsed = parseColor((e.target as HTMLInputElement).value);
-            if (parsed) { hue.set(parsed.h); sat.set(parsed.s); val.set(parsed.v); alpha.set(parsed.a); emitChange(); }
+            if (parsed) { hue.set(parsed.h); sat.set(parsed.s); val.set(parsed.v); alpha.set(parsed.a); emitInput(); }
         }
 
         function onPresetClick(color: string) {
@@ -274,7 +283,7 @@ component('pdx-color-picker', {
         function onClear() {
             hue.set(0); sat.set(0); val.set(100); alpha.set(1);
             reflect('');
-            ctx.emit('pdx-change', { value: '', hex: '', rgb: { r: 0, g: 0, b: 0, a: 1 }, hsl: { h: 0, s: 0, l: 0, a: 1 } });
+            dispatchCommit(ctx.el);
         }
 
         function togglePopup() { if (!ctx.disabled() && !ctx.inline()) _open.set(!_open()); }
@@ -338,6 +347,12 @@ component('pdx-color-picker', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() { onClear(); },
+            /** The colour as `#rrggbb`, whatever the format. */
+            getHex(): string { return hexColor.peek(); },
+            /** The colour as `{ r, g, b, a }`. */
+            getRgb(): { r: number; g: number; b: number; a: number } { return { ...rgbColor.peek(), a: alpha.peek() }; },
+            /** The colour as `{ h, s, l, a }`. */
+            getHsl(): { h: number; s: number; l: number; a: number } { return { ...hslColor.peek(), a: alpha.peek() }; },
         });
 
         useFormAssociated(ctx, { getFormValue: () => (ctx.value() as string) || null });

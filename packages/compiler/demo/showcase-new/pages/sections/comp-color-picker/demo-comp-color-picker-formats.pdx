@@ -7,17 +7,17 @@
     <div class="demo-box formats-row">
       <div class="format-col">
         <p class="pdx-txt-small"><strong>hex</strong></p>
-        <pdx-color-picker value="#8b5cf6" format="hex" @pdx-change="onHexChange" />
+        <pdx-color-picker value="#8b5cf6" format="hex" @change="onHexChange" />
         <p class="pdx-txt-small pdx-ink-muted result">{{ hexOutput }}</p>
       </div>
       <div class="format-col">
         <p class="pdx-txt-small"><strong>rgb</strong></p>
-        <pdx-color-picker value="#8b5cf6" format="rgb" @pdx-change="onRgbChange" />
+        <pdx-color-picker value="#8b5cf6" format="rgb" @change="onRgbChange" />
         <p class="pdx-txt-small pdx-ink-muted result">{{ rgbOutput }}</p>
       </div>
       <div class="format-col">
         <p class="pdx-txt-small"><strong>hsl</strong></p>
-        <pdx-color-picker value="#8b5cf6" format="hsl" @pdx-change="onHslChange" />
+        <pdx-color-picker value="#8b5cf6" format="hsl" @change="onHslChange" />
         <p class="pdx-txt-small pdx-ink-muted result">{{ hslOutput }}</p>
       </div>
     </div>
@@ -34,7 +34,7 @@ let hexOutput = $signal('#8b5cf6');
 let rgbOutput = $signal('#8b5cf6');
 let hslOutput = $signal('#8b5cf6');
 
-function onHexChange(e) { hexOutput = e.detail.value ?? e.detail; }
-function onRgbChange(e) { rgbOutput = e.detail.value ?? e.detail; }
-function onHslChange(e) { hslOutput = e.detail.value ?? e.detail; }
+function onHexChange(e) { hexOutput = e.currentTarget.value; }
+function onRgbChange(e) { rgbOutput = e.currentTarget.value; }
+function onHslChange(e) { hslOutput = e.currentTarget.value; }
 </script>

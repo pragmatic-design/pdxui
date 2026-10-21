@@ -223,8 +223,9 @@ function buildConditionRow(
         return readOne(valueEl);
     };
 
-    opSelect.addEventListener('pdx-change', (e: any) => {
-        const op = (e.detail?.value ?? currentOp) as FilterOperator;
+    // Its model event, `value-change` (#481).
+    onControlValue(opSelect, 'pdx-change', (e) => e.detail?.value, (v) => {
+        const op = (v ?? currentOp) as FilterOperator;
         trackedOp = op;
         valueEl.style.display = isNullOpf(op) ? 'none' : '';
         valueEl2.style.display = isBetween(op) ? '' : 'none';
@@ -232,8 +233,8 @@ function buildConditionRow(
         onChange(op, readVal());
     });
 
-    // Each control's model event — pdx-input's and pdx-number-input's `value-change`, live (#479) — or the
-    // date picker's alpha `pdx-change` until it declares its model.
+    // Each control's model event: pdx-input's and pdx-number-input's `value-change`, live (#479), and the
+    // date picker's (#481).
     const onValueChange = () => onChange(readOp(), readVal());
     for (const el of [valueEl, valueEl2]) onControlValue(el, 'pdx-change', () => undefined, onValueChange);
 
@@ -418,8 +419,8 @@ export function buildEnumSelect(
         });
     }
 
-    const emit = (e: CustomEvent) => onChange(((e.detail?.values ?? []) as unknown[]).map(String));
-    sel.addEventListener('pdx-change', emit);
+    // Its model event, `value-change` (#481): the selected values, an array in multiple mode.
+    onControlValue(sel, 'pdx-change', (e) => e.detail?.values, (v) => onChange(((v ?? []) as unknown[]).map(String)));
     sel.addEventListener('pdx-clear', () => onChange([]));
     return sel;
 }

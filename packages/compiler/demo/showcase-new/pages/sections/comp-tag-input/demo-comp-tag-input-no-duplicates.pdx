@@ -7,7 +7,7 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-tag-input :value="dupeTags" placeholder="Try adding 'hello' twice..." @pdx-change="onDupeChange"></pdx-tag-input>
+      <pdx-tag-input :value="dupeTags" placeholder="Try adding 'hello' twice..." @value-change="onDupeChange"></pdx-tag-input>
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
       {{ dupeMessage }}
@@ -37,7 +37,7 @@ let dupeTags = $signal(['hello', 'world']);
 let dupeMessage = $signal('Try adding "hello" again — it will be rejected.');
 
 function onDupeChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     dupeTags = tags;
     if (tags.length <= 2) {
         dupeMessage = 'Duplicates rejected. Current: [' + tags.join(', ') + ']';

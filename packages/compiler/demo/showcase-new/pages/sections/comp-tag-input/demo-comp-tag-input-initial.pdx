@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Pre-populated tags via the <code>:value</code> binding (array of strings).</p>
 
     <div class="demo-stack">
-      <pdx-tag-input :value="initialTags" @pdx-change="onPrefilledChange"></pdx-tag-input>
+      <pdx-tag-input :value="initialTags" @value-change="onPrefilledChange"></pdx-tag-input>
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
       Current tags: <strong>{{ prefilledTagsStr() }}</strong>
@@ -12,7 +12,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input :value="['JavaScript', 'TypeScript', 'Rust']" @pdx-change="onChange" /&gt;</code></pre>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input :value="['JavaScript', 'TypeScript', 'Rust']" @value-change="onChange" /&gt;</code></pre>
     </details>
   </section>
 </template>
@@ -30,7 +30,7 @@ let initialTags = $signal(['JavaScript', 'TypeScript', 'Rust']);
 let prefilledTags = $signal(['JavaScript', 'TypeScript', 'Rust']);
 
 function onPrefilledChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     prefilledTags = tags;
     addLog('prefilled change: [' + tags.join(', ') + ']');
 }

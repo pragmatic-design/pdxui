@@ -1,7 +1,7 @@
 /**
  * The date-picker page from the keyboard, measured with getByRole in Chromium: "2024 only" opens a
  * named dialog on December 2024 — not on today's month, with every day disabled — with focus on a day
- * that can be picked, a keyboard pick is one pdx-change, not two, and focus comes back to the trigger
+ * that can be picked, a keyboard pick is one value-change, not two, and focus comes back to the trigger
  * rather than dropping to <body>.
  */
 import { test, expect } from '@playwright/test';
@@ -12,7 +12,7 @@ test('"2024 only" opens a named dialog on the last allowed month, and a pick is 
     const host = page.locator('pdx-date-picker').filter({ has: trigger });
     await host.evaluate((el) => {
         (window as unknown as { __changes: unknown[] }).__changes = [];
-        el.addEventListener('pdx-change', (e) => (window as unknown as { __changes: unknown[] }).__changes.push((e as CustomEvent).detail));
+        el.addEventListener('value-change', (e) => (window as unknown as { __changes: unknown[] }).__changes.push((e as CustomEvent).detail));
     });
 
     await trigger.focus();

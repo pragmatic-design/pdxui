@@ -8,11 +8,11 @@
     <div class="demo-col">
       <div class="field">
         <label class="pdx-txt-small pdx-weight-medium">Country</label>
-        <pdx-select :options="countryList" clearable placeholder="Select country..." @pdx-change="onCountryPick" />
+        <pdx-select :options="countryList" clearable placeholder="Select country..." @value-change="onCountryPick" />
       </div>
       <div class="field">
         <label class="pdx-txt-small pdx-weight-medium">City</label>
-        <pdx-select :options="filteredCityList" labelField="name" valueField="id" :value="pickedCity" :disabled="!pickedCountry" searchable clearable placeholder="Select city..." @pdx-change="onCityPick" />
+        <pdx-select :options="filteredCityList" labelField="name" valueField="id" :value="pickedCity" :disabled="!pickedCountry" searchable clearable placeholder="Select city..." @value-change="onCityPick" />
       </div>
       <p class="pdx-txt-small pdx-ink-muted">
         Selected: {{ pickedCountry || '—' }} / {{ pickedCityLabel || '—' }}
@@ -31,7 +31,7 @@ function onCountryPick(e) {
 }
 
 &lt;pdx-select :options="countryList" clearable
-  @pdx-change="onCountryPick" /&gt;
+  @value-change="onCountryPick" /&gt;
 
 &lt;pdx-select :options="filteredCityList" labelField="name"
   valueField="id" :value="pickedCity"

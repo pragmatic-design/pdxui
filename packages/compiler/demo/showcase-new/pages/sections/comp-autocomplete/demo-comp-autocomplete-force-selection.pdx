@@ -10,7 +10,7 @@
         placeholder="Must match a color..."
         :suggestions="colors"
         force-selection
-        @pdx-change="onColorChange" />
+        @value-change="onColorChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Color: {{ colorValue }}</p>
     </div>
   </section>

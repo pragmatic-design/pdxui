@@ -6,11 +6,11 @@ with `editable`, lets it be typed.
 **Pitfalls**
 - Without `editable` the date cannot be typed at all, and `editable` covers the modes `date` and `datetime` only.
 - An editable value commits on Enter or blur — AFTER the native `change` of its text box. Listen to
-  `pdx-change`, not `change`, or a resumed draft comes back without its end date.
+  `value-change`, not `change`, or a resumed draft comes back without its end date.
 - A typed date that does not exist, or falls outside `min`/`max`, marks the field invalid and keeps the last
   good value.
-- `pdx-change.detail` has a different shape per mode: `{ value }`, `{ rangeStart, rangeEnd }`, `{ value, time }`,
-  `{ values }`…
+- The value has a shape per mode: the ISO date; the date and its time, `2026-03-14T09:30`, in `datetime`;
+  `[start, end]` for a range or a week. `getDate()`, `getRange()` and `getTime()` read the parts.
 - `calendar` changes the display only; the value and its math stay Gregorian ISO.
 
 **Composes with** `pdx-form` + `pdx-form-field` (wired by `name`) · `pdx-auto-form` / `pdx-form-template` (a

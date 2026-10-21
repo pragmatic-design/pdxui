@@ -2,11 +2,10 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, html, signal, model, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 import { onPressOutside } from '../shared/press-outside';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -21,8 +20,9 @@ registerComponentStrings('cascader', {
 });
 
 registerFormControl('pdx-cascader', {
-    valueEvent: 'pdx-change',
+    valueEvent: 'value-change',
     valueProp: 'value',
+    valueExpr: 'e.detail?.value',
 });
 
 export interface CascaderNode {
@@ -40,14 +40,19 @@ export interface CascaderNode {
  *
  * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.
  * @slot option - Scoped — renders one option in a column. Receives `{ node, level, selected }`.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail labels $event.currentTarget.getLabels()
  */
 component('pdx-cascader', {
     formAssociated: true,
+    // The selected path, the values from the root down (#481). A choice, the clear button, setValue()
+    // and clear() write it, and the write dispatches `value-change`.
+    models: { value: model<string[]>(() => [], { type: Array }) },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
-        /** Selected path — array of values from root to leaf */
-        value: { type: Array, default: [] },
         /** Placeholder text */
         placeholder: { type: String, default: '' },
         /** Accessible name (aria-label) for the trigger; falls back to placeholder */
@@ -293,8 +298,7 @@ component('pdx-cascader', {
 
         function selectValue(path: string[]): void {
             _internalValue.set([...path]);
-            setOwnProp(ctx.el, 'value', [...path]);   // the live path
-            ctx.emit('pdx-change', { value: path, labels: resolvePathNodes(path).map(n => n.label) });
+            ctx.value.set([...path]);
         }
 
         async function onItemClick(node: CascaderNode, level: number): Promise<void> {
@@ -340,8 +344,7 @@ component('pdx-cascader', {
         function onClear(e: Event): void {
             e.stopPropagation();
             _internalValue.set([]);
-            setOwnProp(ctx.el, 'value', []);
-            ctx.emit('pdx-change', { value: [], labels: [] });
+            ctx.value.set([]);
             ctx.emit('pdx-clear');
             closePopover();
         }
@@ -648,9 +651,11 @@ component('pdx-cascader', {
         ctx.expose({
             /** The current path, as the keys from the root down. */
             getValue() { return _internalValue(); },
-            /** Set the path and emit `pdx-change`. The event carries the keys only — its `labels` is empty. */
-            setValue(v: string[]) { _internalValue.set(Array.isArray(v) ? v : []); setOwnProp(ctx.el, 'value', [..._internalValue.peek()]); ctx.emit('pdx-change', { value: _internalValue.peek(), labels: [] }); },
-            clear() { _internalValue.set([]); setOwnProp(ctx.el, 'value', []); ctx.emit('pdx-change', { value: [], labels: [] }); ctx.emit('pdx-clear'); },
+            /** The labels of the current path, from the root down. */
+            getLabels(): string[] { return resolvePathNodes(_internalValue.peek()).map(n => n.label); },
+            /** Set the path, which dispatches `value-change`. */
+            setValue(v: string[]) { _internalValue.set(Array.isArray(v) ? v : []); ctx.value.set([..._internalValue.peek()]); },
+            clear() { _internalValue.set([]); ctx.value.set([]); ctx.emit('pdx-clear'); },
         });
 
         return { openPopover, closePopover };

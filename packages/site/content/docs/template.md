@@ -60,9 +60,9 @@ user types, without writing the `@input` handler. Two-way binding is a contract:
 the value properties of native form elements (`value`, `checked`, `files`) and on a component's
 `@model x` ([Components](/docs/components)). It listens where the value changes: `input` on a text
 field, `change` on a `<select>` and on `::checked`, and on a component its `<name>-change` event
-(`value-change` for `::value`), reading `detail.value`. On a library component that declares no
-model yet it listens to `pdx-input` and `pdx-change`, as before — so `<pdx-select ::value="country">`
-works as `<input ::value="name">` does. `::x` on a component prop that is not a model is an error,
+(`value-change` for `::value`), reading `detail.value` — so `<pdx-select ::value="country">` works as
+`<input ::value="name">` does. On the library component that declares no model yet, `pdx-pin-input`, it
+listens to `pdx-input` and `pdx-change`, as before. `::x` on a component prop that is not a model is an error,
 `PDX_TWO_WAY_NOT_MODEL`.
 
 Modifiers shape the value on its way back — the list is closed, and anything else is the error

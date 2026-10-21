@@ -885,6 +885,14 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     // The alpha event that was the commit, apart from the live one (#479): `pdx migrate` moves a
     // listener on it to the inner input's native `change`, not to the model's event.
     const alphaCommit = tags.find(t => t.tag === 'alphacommit')?.text.trim() || '';
+    // An alpha event that is now a declared event of another name (#481), `@alpharename <alpha> <new>`:
+    // a picker's query, which is not its model.
+    const alphaRename = {};
+    for (const t of tags.filter(t => t.tag === 'alpharename')) {
+        // Match: `<alpha event> <new event>`. Groups: [1]=the alpha event [2]=the new one
+        const m = /^(\S+)\s+(\S+)$/.exec(t.text.trim());
+        if (m) alphaRename[m[1]] = m[2];
+    }
     const summary = tags.find(t => t.tag === 'summary')?.text || '';
     const description = jsdocDescription(statement);
 
@@ -943,6 +951,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             ...(alphaEvents.length ? { alphaEvents } : {}),
             ...(Object.keys(alphaDetail).length ? { alphaDetail } : {}),
             ...(alphaCommit ? { alphaCommit } : {}),
+            ...(Object.keys(alphaRename).length ? { alphaRename } : {}),
             ...(events.length ? { events } : {}),
             ...(roles.length ? { roles } : {}),
             attributes,

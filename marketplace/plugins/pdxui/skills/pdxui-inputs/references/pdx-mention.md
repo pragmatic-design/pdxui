@@ -6,7 +6,6 @@ Type @ to mention people.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | Current text value (clean text, no markup) |
 | `trigger` | `trigger` | string | `'@'` | Trigger character(s) — comma-separated for multiple (default: '@') |
 | `items` | — | array | `[]` | Static suggestions array |
 | `source` | — | object | `null` | DataSource or raw array for remote search |
@@ -22,8 +21,16 @@ Type @ to mention people.
 | `disabled` | `disabled` | boolean | `false` | Disabled |
 | `readonly` | `readonly` | boolean | `false` | Readonly |
 | `name` | `name` | string | `''` | Form field name |
+| `value` | `value` | string | `''` | The current value. |
 
-**Events:** `pdx-change` → `detail: { value, mentions, markup }` — Fired when the value changes.; `pdx-input` → `detail: { value, mentions, markup }` — Fired on each input as the user types.; `pdx-select` → `detail: { item, trigger, query }` — Fired when an item is selected.
+**API (via `:ref`)**
+
+| Call | Notes |
+|---|---|
+| `getMentionMarkup()` | The text with each mention as `@[Label](id)`: the form to persist. |
+| `getMentions()` | The mentions in the text: `{ value, label, trigger }` each. |
+
+**Events:** `pdx-select` → `detail: { item, trigger, query }` — Fired when an item is selected.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `listbox` · `option` · `status`
 

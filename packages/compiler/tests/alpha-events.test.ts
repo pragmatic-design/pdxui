@@ -115,6 +115,30 @@ describe('a text field\'s commit event (#479)', () => {
     });
 });
 
+describe('an alpha event renamed to a declared event (#481)', () => {
+    // `pdx-q` moved to its model `value`, the selection: `pdx-change` was the selection, `pdx-input` the
+    // query typed, which is not the value. The query is now a declared `query-change`.
+    const PICK: AlphaLookup = (tag) => (tag === 'pdx-q' ? {
+        events: ['pdx-input', 'pdx-change'],
+        detail: { value: '$event.detail.value' },
+        modelEvent: 'value-change',
+        renamed: { 'pdx-input': 'query-change' },
+    } : null);
+    const fix = (text: string) => (alphaChangeEvent.fix as (t: string, c: object) => string)(text, { alphaOf: PICK });
+
+    it('the renamed listener moves to its new name, the other to the model\'s event', () => {
+        expect(fix('<pdx-q @pdx-input="e => load(e.detail.value)" @pdx-change="save($event.detail.value)"></pdx-q>'))
+            .toBe('<pdx-q @query-change="e => load(e.detail.value)" @value-change="save($event.detail.value)"></pdx-q>');
+    });
+
+    it('PDX_REMOVED_FORM names the new event for the renamed one', () => {
+        const found = compile(page('<pdx-q @pdx-input="save(1)" @pdx-change="save(2)"></pdx-q>'), 'page.pdx', [], undefined, { alphaOf: PICK })
+            .warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');
+        expect(found[0].message).toContain('`@query-change`');
+        expect(found[1].message).toContain('`@value-change`');
+    });
+});
+
 describe('the form binding', () => {
     const SETUP = "<script>\n  let f = $form({ agree: false, qty: 0 });\n</script>";
     const formCode = (tag: string, modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
@@ -156,7 +180,7 @@ describe('the resolver reads them from a manifest', () => {
         write('package.json', { name: 'app', dependencies: { '@acme/widgets': '1.0.0' } });
         write('node_modules/@acme/widgets/package.json', {
             name: '@acme/widgets', version: '1.0.0', customElements: 'custom-elements.json',
-            exports: { './box': './src/box.js', './plain': './src/plain.js', './loose': './src/loose.js', './field': './src/field.js' },
+            exports: { './box': './src/box.js', './plain': './src/plain.js', './loose': './src/loose.js', './field': './src/field.js', './pick': './src/pick.js' },
         });
         write('node_modules/@acme/widgets/custom-elements.json', {
             schemaVersion: '1.0.0',
@@ -169,6 +193,10 @@ describe('the resolver reads them from a manifest', () => {
                 { kind: 'javascript-module', path: 'src/field.js', declarations: [declaration('acme-field', {
                     models: ['value'],
                     alphaEvents: ['pdx-input', 'pdx-change'], alphaDetail: { value: '$event.currentTarget.value' }, alphaCommit: 'pdx-change',
+                })] },
+                { kind: 'javascript-module', path: 'src/pick.js', declarations: [declaration('acme-pick', {
+                    models: ['value'],
+                    alphaEvents: ['pdx-input', 'pdx-change'], alphaDetail: { value: '$event.detail.value' }, alphaRename: { 'pdx-input': 'query-change' },
                 })] },
                 // Alpha events with no model to name instead: nothing to point a listener at.
                 { kind: 'javascript-module', path: 'src/loose.js', declarations: [declaration('acme-loose', { alphaEvents: ['pdx-change'] })] },
@@ -197,6 +225,14 @@ describe('the resolver reads them from a manifest', () => {
         r.registerUiManifest(root);
         expect(r.alphaOf('acme-field')).toEqual({
             events: ['pdx-input', 'pdx-change'], detail: { value: '$event.currentTarget.value' }, modelEvent: 'value-change', commit: 'pdx-change',
+        });
+    });
+
+    it('alphaOf carries an alpha event renamed to a declared event (#481)', () => {
+        const r = new ComponentResolver();
+        r.registerUiManifest(root);
+        expect(r.alphaOf('acme-pick')).toEqual({
+            events: ['pdx-input', 'pdx-change'], detail: { value: '$event.detail.value' }, modelEvent: 'value-change', renamed: { 'pdx-input': 'query-change' },
         });
     });
 });

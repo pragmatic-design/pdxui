@@ -13,7 +13,7 @@
         creatable
         clearable
         @pdx-create="onTagCreate"
-        @pdx-change="onTagChange" />
+        @value-change="onTagChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Tag: {{ tagValue }}</p>
       @if (createdTags.length > 0) {
         <p class="pdx-txt-small pdx-ink-muted">Created: {{ createdTags.join(', ') }}</p>
@@ -25,7 +25,7 @@
   searchable
   creatable
   @pdx-create="onTagCreate"
-  @pdx-change="onTagChange" /&gt;</code></pre></details>}
+  @value-change="onTagChange" /&gt;</code></pre></details>}
   </section>
 </template>
 

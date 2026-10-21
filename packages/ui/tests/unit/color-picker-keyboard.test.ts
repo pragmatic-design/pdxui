@@ -9,17 +9,22 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/color-picker/pdx-color-picker';
 
-type Picker = HTMLElement & { value: string };
-type Detail = { value: string; hex: string; rgb: { a: number } };
+type Picker = HTMLElement & { value: string; getHex(): string; getRgb(): { a: number } };
+/** A commit: the native `change` (#481), with the colour as the element then held it. */
+type Commit = { value: string; hex: string; rgb: { a: number } };
 
-async function mountPicker(attrs: string): Promise<{ el: Picker; inputs: Detail[]; changes: Detail[] }> {
+async function mountPicker(attrs: string): Promise<{ el: Picker; inputs: string[]; changes: Commit[] }> {
     document.body.innerHTML = `<pdx-color-picker ${attrs}></pdx-color-picker>`;
     await tick(30);
     const el = document.querySelector('pdx-color-picker') as Picker;
-    const inputs: Detail[] = [];
-    const changes: Detail[] = [];
-    el.addEventListener('pdx-input', (e) => inputs.push((e as CustomEvent).detail));
-    el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail));
+    const inputs: string[] = [];
+    const changes: Commit[] = [];
+    // The live writes are the model's `value-change`; the commit is a native `change` (#481).
+    el.addEventListener('value-change', (e) => inputs.push((e as CustomEvent<{ value: string }>).detail.value));
+    el.addEventListener('change', (e) => {
+        if (e instanceof CustomEvent) return;
+        changes.push({ value: el.value, hex: el.getHex(), rgb: el.getRgb() });
+    });
     return { el, inputs, changes };
 }
 const press = (el: Element, key: string, shiftKey = false): KeyboardEvent => {
@@ -32,7 +37,7 @@ const press = (el: Element, key: string, shiftKey = false): KeyboardEvent => {
 beforeEach(cleanup);
 
 describe('the sliders are tab stops the arrow keys move', () => {
-    it('hue: tabindex 0; ArrowRight +1 emits pdx-input, keyup commits; Shift ×10; Home/End', async () => {
+    it('hue: tabindex 0; ArrowRight +1 writes the model, keyup commits; Shift ×10; Home/End', async () => {
         const { el, inputs, changes } = await mountPicker('inline value="#ff0000"');
         const hue = el.querySelector('.pdx-color-hue-slider') as HTMLElement;
         expect(hue.getAttribute('tabindex')).toBe('0');

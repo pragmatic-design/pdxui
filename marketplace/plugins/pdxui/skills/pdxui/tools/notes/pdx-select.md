@@ -18,8 +18,8 @@ value is free text; the options are a hierarchy → `pdx-tree-select`; the rows 
 paged table → `pdx-relation-picker`.
 
 **Pitfalls**
-- `pdx-change.detail` changes shape with `multiple`: `{ value, item }` single, `{ values, items }` multiple; a
-  clear sends `{ value: null }` or `{ values: [] }`. Read `e.detail.value`, not `e.detail`.
+- `value-change` carries `{ value }`: the option's value, or with `multiple` the array of values; a clear
+  writes `null` or `[]`. The option itself is `el.selectedItem` (the options, with `multiple`).
 - With `multiple`, `el.value` is the ARRAY. The comma-joined string survives only in the hidden input a native
   form submits, where a value containing a comma cannot round-trip.
 - `creatable` makes the typed text both value and label and emits `pdx-create`; storing the new option is yours.

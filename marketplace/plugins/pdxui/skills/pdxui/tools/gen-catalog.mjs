@@ -237,7 +237,7 @@ function renderComp(c) {
     lines.push('');
   }
   // The detail each event carries, from the manifest. Without it an app measures payloads in a
-  // browser, or guesses pdx-tag-input's list is `detail.value` — it is `detail.tags`.
+  // browser, or guesses pdx-tag-input's `pdx-add` carries `detail.value` — it is `detail.tags`.
   // Not escaped: it sits in a code span, where a `\|` would print its backslash.
   if (c.events.length) lines.push('**Events:** ' + c.events.map(e => '`' + e.name + '`' + (e.detail ? ' → `detail: ' + e.detail + '`' : '') + (e.desc ? ' — ' + esc(e.desc) : '')).join('; '), '');
   // The ARIA roles it renders: what a test or a measuring script targets.

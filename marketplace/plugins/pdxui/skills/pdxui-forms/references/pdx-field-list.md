@@ -95,7 +95,7 @@ const orderForm = createForm({
   <slot name="row" let:item let:index>
     <pdx-input :value="item.title" @value-change="e => setTask(index, 'title', e.currentTarget.value)"></pdx-input>
     <pdx-select :options="people" :value="item.assignee"
-      @pdx-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>
+      @value-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>
   </slot>
 </pdx-field-list>
 ```

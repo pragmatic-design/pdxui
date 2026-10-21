@@ -5,12 +5,12 @@
       Default color picker with a swatch trigger. Click the swatch to open the panel.
     </p>
     <div class="demo-box">
-      <pdx-color-picker value="#3b82f6" @pdx-change="onColorChange" />
+      <pdx-color-picker value="#3b82f6" @change="onColorChange" />
       <p class="pdx-txt-small pdx-ink-muted result">Selected: {{ colorValue }}</p>
     </div>
     @raw {<details class="source"><summary>Source</summary><pre><code>&lt;pdx-color-picker
   value="#3b82f6"
-  @pdx-change="onColorChange" /&gt;</code></pre></details>}
+  @change="onColorChange" /&gt;</code></pre></details>}
   </section>
 </template>
 
@@ -18,5 +18,5 @@
 // ─── Basic ───
 let colorValue = $signal('#3b82f6');
 
-function onColorChange(e) { colorValue = e.detail.value ?? e.detail; }
+function onColorChange(e) { colorValue = e.currentTarget.value; }
 </script>

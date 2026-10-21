@@ -3,12 +3,13 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, html, signal, useFormAssociated, generatedId } from '@pdxui/core';
+import { component, html, signal, model, useFormAssociated, generatedId } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/mention';
@@ -39,12 +40,21 @@ interface MentionRange {
  * A textarea where typing a trigger such as @ opens floating suggestions, to insert a mention.
  *
  * @slot suggestion - Scoped — renders one suggestion. Receives `{ item, index, active }`.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail mentions $event.currentTarget.getMentions()
+ * @alphadetail markup $event.currentTarget.getMentionMarkup()
+ * @alphacommit pdx-change
  */
 component('pdx-mention', {
     formAssociated: true,
+    // The text, clean of markup (#481). Typing and a picked mention write it, and the write dispatches
+    // `value-change`, live. The commit is the textarea's native `change`, which bubbles to the host: on
+    // blur after typing, and dispatched by the component when a mention is picked.
+    models: { value: model<string>('') },
     props: {
-        /** Current text value (clean text, no markup) */
-        value: { type: String, default: '' },
         /** Trigger character(s) — comma-separated for multiple (default: '@') */
         trigger: { type: String, default: '@' },
         /** Static suggestions array */
@@ -252,16 +262,17 @@ component('pdx-mention', {
             return result;
         }
 
+        /** The mentions in the text, in the order they were made. */
+        function getMentions(): { value: string; label: string; trigger: string }[] {
+            return _mentions.map(m => ({ value: m.value, label: m.label, trigger: m.trigger }));
+        }
+
         function emitValues(): void {
             if (!_textareaEl) return;
-            const text = _textareaEl.value;
-            const mentions = _mentions.map(m => ({ value: m.value, label: m.label, trigger: m.trigger }));
-            const markup = getMentionMarkup();
-            _markup.set(markup);
-            // `value` is the live text. Equal to the textarea's, so the external-value
+            _markup.set(getMentionMarkup());
+            // The model is the live text. Equal to the textarea's, so the external-value
             // track sees no change and keeps the mention ranges.
-            setOwnProp(ctx.el, 'value', text);
-            ctx.emit('pdx-input', { value: text, mentions, markup });
+            ctx.value.set(_textareaEl.value);
         }
 
         // ── Event handlers ──
@@ -299,10 +310,10 @@ component('pdx-mention', {
 
             syncMirror();
             emitValues();
-            const mentions = _mentions.map(m => ({ value: m.value, label: m.label, trigger: m.trigger }));
             ctx.emit('pdx-select', { item, trigger, query: _query.peek() });
-            setOwnProp(ctx.el, 'value', _textareaEl.value);
-            ctx.emit('pdx-change', { value: _textareaEl.value, mentions, markup: getMentionMarkup() });
+            // A commit no typing produced: the text was set by script, so the browser fires no
+            // `change` for it on blur.
+            dispatchCommit(_textareaEl);
             closeDropdown();
         }
 
@@ -620,6 +631,13 @@ component('pdx-mention', {
         // The host is the one submitter, the markup. No hidden input carries the name: filled only by
         // the suggestion list, it would send "" beside the value.
         reflectNameToHost(ctx);
+
+        ctx.expose({
+            /** The text with each mention as `@[Label](id)`: the form to persist. */
+            getMentionMarkup,
+            /** The mentions in the text: `{ value, label, trigger }` each. */
+            getMentions,
+        });
 
         return { getMentionMarkup };
     },

@@ -4,7 +4,6 @@ Choose a color visually.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `'#000000'` | The current value. |
 | `format` | `format` | string | `'hex'` | Output format: 'hex', 'rgb' or 'hsl'. |
 | `showAlpha` | `showalpha` | boolean | `false` | Shows the opacity (alpha) slider. |
 | `presets` | — | array | `() => []` | Preset swatch colours. |
@@ -15,6 +14,7 @@ Choose a color visually.
 | `label` | `label` | string | `''` | Visible label text. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `clearable` | `clearable` | boolean | `false` | Shows a clear button to reset the value. |
+| `value` | `value` | string | `'#000000'` | The current value. |
 
 **API (via `:ref`)**
 
@@ -23,8 +23,11 @@ Choose a color visually.
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
+| `getHex()` | The colour as `#rrggbb`, whatever the format. |
+| `getRgb()` | The colour as `{ r, g, b, a }`. |
+| `getHsl()` | The colour as `{ h, s, l, a }`. |
 
-**Events:** `pdx-change` → `detail: { value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }` — When a colour is committed.; `pdx-input` → `detail: { value, hex, rgb: { r, g, b, a }, hsl: { h, s, l, a } }` — While dragging; `value` is in the picker's current format.
+**Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `dialog` · `group` · `slider`
 
@@ -40,7 +43,7 @@ are checked against the manifest above._
 ```html
 <pdx-color-picker
   value="#3b82f6"
-  @pdx-change="onColorChange" />
+  @change="onColorChange" />
 ```
 
 **Inline — Always Visible** — With `inline`, the color panel is always visible — no popup trigger needed.
@@ -49,7 +52,7 @@ are checked against the manifest above._
 <pdx-color-picker
   value="#10b981"
   inline
-  @pdx-change="onInlineChange" />
+  @change="onInlineChange" />
 ```
 
 **With Alpha — Opacity Slider** — Enable `show-alpha` to add an opacity slider. The output includes the alpha channel.
@@ -58,7 +61,7 @@ are checked against the manifest above._
 <pdx-color-picker
   value="#ef4444"
   show-alpha
-  @pdx-change="onAlphaChange" />
+  @change="onAlphaChange" />
 ```
 
 **Presets / Swatches** — Provide a `presets` array to show a clickable color grid for quick selection.
@@ -66,7 +69,7 @@ are checked against the manifest above._
 ```html
 <pdx-color-picker
   :presets="presetColors"
-  @pdx-change="onPresetChange" />
+  @change="onPresetChange" />
 ```
 
 ```js

@@ -6,7 +6,7 @@
       An empty picker starts from <code>min</code> on the first arrow press.
     </p>
     <div class="demo-row">
-      <pdx-time-picker :value="office" format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours" @pdx-change="e => office = e.detail.value"></pdx-time-picker>
+      <pdx-time-picker :value="office" format="24h" min="09:00" max="18:00" step="30" aria-label="Office hours" @value-change="e => office = e.detail.value"></pdx-time-picker>
       <span class="pdx-txt-small pdx-ink-muted">value: <code>{{ office || '(empty)' }}</code> · range 09:00–18:00</span>
     </div>
     <details class="source-block">

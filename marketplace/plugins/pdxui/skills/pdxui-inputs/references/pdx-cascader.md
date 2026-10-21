@@ -5,7 +5,6 @@ Drill through nested options.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `options` | — | array | `[]` | Tree of options |
-| `value` | — | array | `[]` | Selected path — array of values from root to leaf |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text |
 | `label` | `label` | string | `''` | Accessible name (aria-label) for the trigger; falls back to placeholder |
 | `searchable` | `searchable` | boolean | `false` | Show search input for filtering |
@@ -16,16 +15,18 @@ Drill through nested options.
 | `loadChildren` | — | function | `null` | Lazy load function: (node) => Promise<CascaderNode[]> |
 | `size` | `size` | string | `''` | Component size |
 | `name` | `name` | string | `''` | Form field name |
+| `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `getValue()` | The current path, as the keys from the root down. |
-| `setValue(v)` | Set the path and emit `pdx-change`. The event carries the keys only — its `labels` is empty. |
+| `getLabels()` | The labels of the current path, from the root down. |
+| `setValue(v)` | Set the path, which dispatches `value-change`. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-change` → `detail: { value, labels }` — Fired when the value changes.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.; `pdx-open` — Fired when it opens. Does not bubble.
+**Events:** `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 

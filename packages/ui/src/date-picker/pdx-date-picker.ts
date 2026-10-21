@@ -2,7 +2,7 @@
 // Modes: date | datetime | daterange | datetimerange | time | week | month | year | quarter
 // Structure: input trigger + popover → calendar panel + optional time + presets sidebar.
 
-import { component, html, signal, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
+import { component, html, signal, model, untracked, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
 import type { PopoverReturn } from '@pdxui/core';
 import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, getFiscalYear } from '@pdxui/core';
 import type { CalendarSystem } from '@pdxui/core';
@@ -49,8 +49,9 @@ registerComponentStrings('date-picker', {
 });
 
 registerFormControl('pdx-date-picker', {
-    valueEvent: 'pdx-change',
+    valueEvent: 'value-change',
     valueProp: 'value',
+    valueExpr: 'e.detail?.value',
 });
 
 export interface DatePreset {
@@ -61,12 +62,25 @@ export interface DatePreset {
 /**
  * A date picker composed of a calendar and a time picker, with several selection modes, calendar
  * systems and presets.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.getDate()
+ * @alphadetail values $event.detail.value
+ * @alphadetail rangeStart $event.currentTarget.getRange()[0]
+ * @alphadetail rangeEnd $event.currentTarget.getRange()[1]
+ * @alphadetail time $event.currentTarget.getTime()
+ * @alphadetail timeStart $event.currentTarget.getTime()
+ * @alphadetail timeEnd $event.currentTarget.getEndTime()
  */
 component('pdx-date-picker', {
     formAssociated: true,
+    // The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
+    // mode; the date and its time, `2026-03-14T09:30`, in `datetime` mode or with `show-time`; the time
+    // in `time` mode; `[start, end]` in `daterange`, `datetimerange` (each with its time) and `week`
+    // mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
+    // dispatches `value-change`.
+    models: { value: model<string | string[]>('') },
     props: {
-        /** Selected value (ISO date/time string). */
-        value: { type: String, default: '' },
         /** Range start (ISO). */
         rangeStart: { type: String, default: '' },
         /** Range end (ISO). */
@@ -176,7 +190,8 @@ component('pdx-date-picker', {
 
             if (mode === 'time') return _timeValue() || '';
 
-            const val = _internalValue() || ctx.value() as string;
+            // The model's date: the sync track writes it in, whatever shape the mode gives it.
+            const val = _internalValue();
             const rStart = _internalRangeStart() || ctx.rangeStart() as string;
             const rEnd = _internalRangeEnd() || ctx.rangeEnd() as string;
 
@@ -233,64 +248,113 @@ component('pdx-date-picker', {
             return getComponentString('date-picker', 'placeholder')();
         }
 
-        // ─── Calendar Events ───────────────────────────────
+        // ─── The model (#481) ──────────────────────────────
 
-        // Sync external props into internal state
+        /** The mode holds a range: `[start, end]`. */
+        function holdsRange(): boolean { return isRange() || modeStr() === 'week'; }
+        /** A date and its time, as one ISO string; '' with no date. */
+        const withTime = (date: string, time: string): string => (date ? `${date}T${time}` : '');
+        /** The multi mode's dates. */
+        let _internalMulti: string[] = [];
+        /** A time-only picker has a time: until one is set, or after a clear, its value is ''. */
+        let _timeSet = false;
+
+        /** The model's value for the mode, from the internal state. */
+        function currentModel(): string | string[] {
+            const mode = modeStr();
+            if (mode === 'time') return _timeSet ? _timeValue.peek() : '';
+            if (mode === 'multi') return [..._internalMulti];
+            if (holdsRange()) {
+                const rs = _internalRangeStart.peek();
+                const re = _internalRangeEnd.peek();
+                if (!rs && !re) return [];
+                return hasTime()
+                    ? [withTime(rs, _timeValue.peek()), withTime(re, _timeEndValue.peek())]
+                    : [rs, re];
+            }
+            const v = _internalValue.peek();
+            return hasTime() ? withTime(v, _timeValue.peek()) : v;
+        }
+
+        /** Writes the model from the internal state, which dispatches `value-change`. */
+        function announce(): void {
+            ctx.value.set(currentModel());
+        }
+
+        /** The range on the host's own props, which the calendar is drawn from. */
+        function reflectRange(start: string, end: string): void {
+            setOwnProp(ctx.el, 'rangeStart', start);
+            setOwnProp(ctx.el, 'rangeEnd', end);
+        }
+
+        /** Splits `2026-03-14T09:30` into its date and its time ('' for a date alone). */
+        function splitDateTime(v: string): [string, string] {
+            const at = v.indexOf('T');
+            return at < 0 ? [v, ''] : [v.slice(0, at), v.slice(at + 1)];
+        }
+
+        // Sync external props into internal state: the model as the mode holds it, and the range props.
         ctx.track(() => {
-            const v = ctx.value() as string;
+            const v = ctx.value();
             const rs = ctx.rangeStart() as string;
             const re = ctx.rangeEnd() as string;
-            if (v) _internalValue.set(v);
-            if (rs) _internalRangeStart.set(rs);
-            if (re) _internalRangeEnd.set(re);
+            untracked(() => {
+                if (Array.isArray(v)) {
+                    if (modeStr() === 'multi') _internalMulti = [...v as string[]];
+                    else {
+                        const [sd, st] = splitDateTime((v[0] as string) ?? '');
+                        const [ed, et] = splitDateTime((v[1] as string) ?? '');
+                        _internalRangeStart.set(sd);
+                        _internalRangeEnd.set(ed);
+                        if (st) _timeValue.set(st);
+                        if (et) _timeEndValue.set(et);
+                    }
+                } else if (typeof v === 'string' && v) {
+                    if (modeStr() === 'time') { _timeValue.set(v); _timeSet = true; }
+                    else {
+                        const [d, t] = splitDateTime(v);
+                        _internalValue.set(d);
+                        if (t) _timeValue.set(t);
+                    }
+                }
+                if (rs) _internalRangeStart.set(rs);
+                if (re) _internalRangeEnd.set(re);
+            });
         });
 
-        /** The user's choice on the host's own props, before the event. */
-        function reflectChoice(value: string, range?: { start: string; end: string }): void {
-            setOwnProp(ctx.el, 'value', value);
-            if (range) {
-                setOwnProp(ctx.el, 'rangeStart', range.start);
-                setOwnProp(ctx.el, 'rangeEnd', range.end);
-            }
-        }
+        // ─── Calendar Events ───────────────────────────────
 
-        /** The inner calendar's and time picker's `pdx-change` stops at them: the picker announces the
-         *  change itself, in its own shape. Bubbling out beside the picker's, it would give a listener
-         *  on the picker two events per pick with two shapes. The listener is on the child
-         *  itself, added when the picker built it, so no listener above it sees the event. */
-        function ownChildChange(e: Event): void {
-            e.stopPropagation();
-        }
-
-        function onCalendarChange(e: CustomEvent): void {
-            ownChildChange(e);
-            const detail = e.detail;
+        /** The calendar's model event, which does not bubble: the picker announces its own. */
+        function onCalendarChange(e: CustomEvent<{ value: string | string[] }>): void {
+            const v = e.detail.value;
             const mode = modeStr();
 
-            if (detail.rangeStart !== undefined) {
-                // Update internal range state immediately for the calendar to re-render
-                _internalRangeStart.set(detail.rangeStart);
-                _internalRangeEnd.set(detail.rangeEnd || '');
-                if (detail.value) _internalValue.set(detail.value);
-                reflectChoice(detail.value || detail.rangeStart, { start: detail.rangeStart, end: detail.rangeEnd || '' });
-                ctx.emit('pdx-change', {
-                    rangeStart: detail.rangeStart,
-                    rangeEnd: detail.rangeEnd || '',
-                    value: detail.value || detail.rangeStart,
-                });
+            if (Array.isArray(v)) {
+                if (mode === 'multi') {
+                    _internalMulti = [...v];
+                    announce();
+                    return;
+                }
+                // A range, or a week: update the internal range at once, for the calendar to re-render.
+                const start = v[0] ?? '';
+                const end = v[1] ?? '';
+                _internalRangeStart.set(start);
+                _internalRangeEnd.set(end);
+                reflectRange(start, end);
+                announce();
                 // Close only when range is complete (both ends selected)
-                if (detail.rangeEnd && !hasTime()) {
-                    closePopover();
+                if (end && !hasTime()) closePopover();
+            } else if (v) {
+                _internalValue.set(v);
+                // A month, a year or a quarter covers a range, which the calendar holds.
+                const [rs, re] = (e.currentTarget as HTMLElement & { getRange(): [string, string] }).getRange();
+                if (mode !== 'date' && mode !== 'datetime' && rs) {
+                    _internalRangeStart.set(rs);
+                    _internalRangeEnd.set(re);
+                    reflectRange(rs, re);
                 }
-            } else if (detail.value) {
-                _internalValue.set(detail.value);
-                reflectChoice(detail.value);
-                ctx.emit('pdx-change', { value: detail.value });
-                if (!hasTime() && mode !== 'range') {
-                    closePopover();
-                }
-            } else if (detail.values) {
-                ctx.emit('pdx-change', { values: detail.values });
+                announce();
+                if (!hasTime() && mode !== 'range') closePopover();
             }
         }
 
@@ -299,7 +363,7 @@ component('pdx-date-picker', {
             const cal = document.createElement('pdx-calendar');
             cal.setAttribute('inline', '');
             initCalendarStructuralProps(cal);
-            cal.addEventListener('pdx-change', onCalendarChange as EventListener);
+            cal.addEventListener('value-change', onCalendarChange as EventListener);
             return cal;
         }
 
@@ -345,32 +409,22 @@ component('pdx-date-picker', {
             tp.setAttribute('locale', loc);
             if (ctx.showSeconds() as boolean) tp.setAttribute('show-seconds', '');
             tp.setAttribute('step', String(ctx.timeStep() as number));
-            tp.addEventListener('pdx-change', onChange as EventListener);
+            tp.addEventListener('value-change', onChange as EventListener);
             return tp;
         }
 
-        function onTimeChange(e: CustomEvent): void {
-            ownChildChange(e);
+        /** The time picker's model event, which does not bubble. A time with no date yet waits for it. */
+        function onTimeChange(e: CustomEvent<{ value: string }>): void {
             _timeValue.set(e.detail.value);
-            const val = ctx.value() as string;
-            if (val) {
-                ctx.emit('pdx-change', { value: val, time: e.detail.value });
-            }
+            if (isTimeOnly()) _timeSet = true;
+            if (isTimeOnly() || _internalValue.peek() || _internalRangeStart.peek() || _internalRangeEnd.peek()) announce();
         }
 
-        function onTimeEndChange(e: CustomEvent): void {
-            ownChildChange(e);
+        function onTimeEndChange(e: CustomEvent<{ value: string }>): void {
             _timeEndValue.set(e.detail.value);
-            // The end time is emitted, not only collected: otherwise the consumer could not
+            // The end time is announced, not only collected: otherwise the consumer could not
             // receive it.
-            const rs = _internalRangeStart.peek() || (ctx.rangeStart() as string);
-            const re = _internalRangeEnd.peek() || (ctx.rangeEnd() as string);
-            if (rs || re) {
-                ctx.emit('pdx-change', {
-                    rangeStart: rs, rangeEnd: re,
-                    timeStart: _timeValue.peek(), timeEnd: e.detail.value,
-                });
-            }
+            if (_internalRangeStart.peek() || _internalRangeEnd.peek()) announce();
         }
 
         function onPresetClick(preset: DatePreset): void {
@@ -380,13 +434,11 @@ component('pdx-date-picker', {
                 _internalRangeStart.set(preset.value[0]);
                 _internalRangeEnd.set(preset.value[1]);
                 _internalValue.set(preset.value[0]);
-                reflectChoice(preset.value[0], { start: preset.value[0], end: preset.value[1] });
-                ctx.emit('pdx-change', { rangeStart: preset.value[0], rangeEnd: preset.value[1], value: preset.value[0] });
+                reflectRange(preset.value[0], preset.value[1]);
             } else {
                 _internalValue.set(preset.value);
-                reflectChoice(preset.value);
-                ctx.emit('pdx-change', { value: preset.value });
             }
+            announce();
             closePopover();
         }
 
@@ -394,18 +446,18 @@ component('pdx-date-picker', {
             _internalValue.set('');
             _internalRangeStart.set('');
             _internalRangeEnd.set('');
+            _internalMulti = [];
+            _timeSet = false;
             _timeValue.set('00:00');
             _timeEndValue.set('00:00'); // reopening without a stale time
-            reflectChoice('', { start: '', end: '' });
-            ctx.emit('pdx-change', { value: '', rangeStart: '', rangeEnd: '' });
+            reflectRange('', '');
+            announce();
             ctx.emit('pdx-clear');
         }
 
         function onTodayClick(): void {
-            const t = today();
-            _internalValue.set(t);
-            reflectChoice(t);
-            ctx.emit('pdx-change', { value: t });
+            _internalValue.set(today());
+            announce();
             if (!hasTime()) closePopover();
         }
 
@@ -519,7 +571,7 @@ component('pdx-date-picker', {
 
         /** The editable input's text, in the locale's numeric pattern — what it reads back. */
         function typedText(): string {
-            const val = _internalValue.peek() || (ctx.value() as string);
+            const val = _internalValue.peek();
             if (!val) return '';
             const date = formatTypedDate(val, locale());
             return modeStr() === 'datetime' ? `${date} ${_timeValue.peek()}` : date;
@@ -537,13 +589,13 @@ component('pdx-date-picker', {
 
         /** Commit what is typed (Enter, blur). Empty clears; a date that does not exist or cannot be
          *  picked is aria-invalid, keeps the last good value and the text, and fires nothing; a new
-         *  valid date is the value, with one pdx-change. In datetime a time after the
+         *  valid date is the value, with one value-change. In datetime a time after the
          *  date is read too — it sets the time, and one that is not a time is invalid; a date alone
          *  keeps the time already set; the event carries `time` as the time picker's does. */
         function commitTyped(): void {
             if (!_inputEl) return;
             const text = _inputEl.value.trim();
-            const current = _internalValue.peek() || (ctx.value() as string);
+            const current = _internalValue.peek();
             if (!text) {
                 _inputEl.removeAttribute('aria-invalid');
                 _typing = false;
@@ -564,14 +616,11 @@ component('pdx-date-picker', {
             _typing = false;
             if (iso !== current || (withTime && time !== currentTime)) {
                 _internalValue.set(iso);
-                reflectChoice(iso);
                 if (withTime) {
                     _timeValue.set(time);
                     if (_timeEl) _timeEl.value = time;
-                    ctx.emit('pdx-change', { value: iso, time });
-                } else {
-                    ctx.emit('pdx-change', { value: iso });
                 }
+                announce();
             }
             _inputEl.value = typedText();
         }
@@ -837,7 +886,7 @@ component('pdx-date-picker', {
             const clearable = ctx.clearable() as boolean;
             const disabled = ctx.disabled() as boolean;
             const readonly_ = ctx.readonly() as boolean;
-            const val = _internalValue() || ctx.value() as string;
+            const val = _internalValue();
             const rStart = _internalRangeStart() || ctx.rangeStart() as string;
             const rEnd = _internalRangeEnd() || ctx.rangeEnd() as string;
             const cStart = ctx.compareStart() as string;
@@ -882,8 +931,16 @@ component('pdx-date-picker', {
         (ctx.el as unknown as Record<string, unknown>).openPopover = openPopover;
         (ctx.el as unknown as Record<string, unknown>).closePopover = closePopover;
 
-        // Imperative API: focus/blur/clear
+        // Imperative API: focus/blur/clear, and the parts of the value
         ctx.expose({
+            /** The date chosen, ISO: the range's start in a range or week mode; '' with none. */
+            getDate(): string { return holdsRange() ? _internalRangeStart.peek() : _internalValue.peek(); },
+            /** The range chosen, or the one a week, month, quarter or year covers: `[start, end]`, ISO dates. */
+            getRange(): [string, string] { return [_internalRangeStart.peek(), _internalRangeEnd.peek()]; },
+            /** The time, `HH:mm[:ss]`: the start's in a range. */
+            getTime(): string { return _timeValue.peek(); },
+            /** The end's time in a range with times. */
+            getEndTime(): string { return _timeEndValue.peek(); },
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() { onClear(); },

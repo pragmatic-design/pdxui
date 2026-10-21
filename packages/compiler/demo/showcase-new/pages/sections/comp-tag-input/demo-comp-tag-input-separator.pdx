@@ -7,7 +7,7 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-tag-input separator=";" placeholder="Use ; to separate..." @pdx-change="onSepChange"></pdx-tag-input>
+      <pdx-tag-input separator=";" placeholder="Use ; to separate..." @value-change="onSepChange"></pdx-tag-input>
     </div>
 
     <details class="source-block">
@@ -26,7 +26,7 @@ function addLog(text) { tagInputLog.addLog(text); }
 
 // Custom Separator
 function onSepChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     addLog('separator change: [' + tags.join('; ') + ']');
 }
 </script>

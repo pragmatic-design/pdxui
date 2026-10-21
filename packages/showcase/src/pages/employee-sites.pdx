@@ -101,7 +101,7 @@
       @pdx-cancel="periods.ending.set(null)"
       data-test="site-end-dialog">
       <pdx-form-field :label="$t('employees.sites.endDate')" :error="endError">
-        <pdx-date-picker editable :value="endDate" @pdx-change="e => periods.endDate.set(e.detail.value)" data-test="site-end-date"></pdx-date-picker>
+        <pdx-date-picker editable :value="endDate" @value-change="e => periods.endDate.set(e.currentTarget.getDate())" data-test="site-end-date"></pdx-date-picker>
       </pdx-form-field>
     </pdx-alert-dialog>
 

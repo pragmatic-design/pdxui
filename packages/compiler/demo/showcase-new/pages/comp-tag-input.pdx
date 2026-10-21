@@ -88,10 +88,10 @@
       <h2 class="pdx-txt-heading section-heading">Events Reference</h2>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>When</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>{ tags: string[] }</span><span>Tag added or removed</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value: string[] }</span><span>Its model: tag added or removed</span></div>
         <div class="opt-row"><code>pdx-add</code><span>{ tag, tags }</span><span>Single tag added</span></div>
         <div class="opt-row"><code>pdx-remove</code><span>{ tag, index, tags }</span><span>Single tag removed</span></div>
-        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every keystroke in the input field</span></div>
+        <div class="opt-row"><code>draft-change</code><span>{ value }</span><span>On every keystroke in the input field: the draft, not yet a tag</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard Shortcuts</h3>

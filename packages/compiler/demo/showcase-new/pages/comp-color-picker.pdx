@@ -56,8 +56,8 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-change</code></td><td><code>{ value, hex, rgb, hsl, alpha }</code></td><td>Fired when the color value changes (final selection).</td></tr>
-            <tr><td><code>pdx-input</code></td><td><code>{ value }</code></td><td>Fired continuously while dragging the color area or sliders.</td></tr>
+            <tr><td><code>change</code></td><td>—</td><td>The commit, a native event: when a drag or a key step ends, a preset is picked or a hex is typed. Read <code>value</code>, <code>getHex()</code>, <code>getRgb()</code> and <code>getHsl()</code> on the element.</td></tr>
+            <tr><td><code>value-change</code></td><td><code>{ value }</code></td><td>Its model: fired continuously while dragging the color area or sliders.</td></tr>
             <tr><td><code>pdx-clear</code></td><td>—</td><td>Fired when the color is cleared (if clearable).</td></tr>
           </tbody>
         </table>

@@ -7,7 +7,7 @@
     </p>
 
     <div class="demo-stack">
-      <pdx-tag-input placeholder="Add tags..." @pdx-change="onBasicChange"></pdx-tag-input>
+      <pdx-tag-input placeholder="Add tags..." @value-change="onBasicChange"></pdx-tag-input>
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-sm)">
       Current tags: <strong>{{ basicTagsStr() }}</strong>
@@ -15,7 +15,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input placeholder="Add tags..." @pdx-change="onChange" /&gt;</code></pre>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input placeholder="Add tags..." @value-change="onChange" /&gt;</code></pre>
     </details>
   </section>
 </template>
@@ -31,7 +31,7 @@ function addLog(text) { tagInputLog.addLog(text); }
 let basicTags = $signal([]);
 
 function onBasicChange(e) {
-    const tags = e.detail ? e.detail.tags : [];
+    const tags = e.detail ? e.detail.value : [];
     basicTags = tags;
     addLog('basic change: [' + tags.join(', ') + ']');
 }

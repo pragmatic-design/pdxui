@@ -12,7 +12,7 @@
       </div>
       <div class="demo-stack">
         <span class="pdx-txt-small pdx-weight-semibold">step 15 — press ↑ on the minutes</span>
-        <pdx-time-picker :value="quarter" format="24h" step="15" aria-label="Quarter hours" @pdx-change="e => quarter = e.detail.value"></pdx-time-picker>
+        <pdx-time-picker :value="quarter" format="24h" step="15" aria-label="Quarter hours" @value-change="e => quarter = e.detail.value"></pdx-time-picker>
         <span class="pdx-txt-small pdx-ink-muted">value: <code>{{ quarter }}</code></span>
       </div>
     </div>
