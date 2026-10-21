@@ -10,6 +10,7 @@ import type { FilterFieldInfo } from '../shared/filter-popover';
 import { RELATIVE_DATE_OPS } from '@pdxui/core';
 import { openGridMenu } from './grid-menu';
 import { createLazy } from '../shared/lazy-tags';
+import { onControlValue } from '../shared/model-event';
 
 // ─── Filter state (per-grid via gc.inlineFilterValues) ─────
 
@@ -171,8 +172,9 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
                     input.value = null;
                 }
             });
-            input.addEventListener('pdx-change', (e: CustomEvent) => {
-                gc.inlineFilterValues[col.field] = e.detail.value ?? '';
+            // Its model event, `value-change` (#479), live and debounced like the text filter.
+            onControlValue(input, 'pdx-change', (e) => e.detail?.value, (v) => {
+                gc.inlineFilterValues[col.field] = (v ?? '') as string;
                 debouncedApplyFilters(gc);
             });
             return wrapWithOpDropdown(gc, col, input);
@@ -203,8 +205,8 @@ function createFilterInput(gc: GridContext, col: AnyColumn): HTMLElement | null 
             if (gc.inlineFilterValues[col.field]) {
                 requestAnimationFrame(() => { input.value = String(gc.inlineFilterValues[col.field]); });
             }
-            input.addEventListener('pdx-input', (e: CustomEvent) => {
-                gc.inlineFilterValues[col.field] = e.detail.value ?? '';
+            onControlValue(input, 'pdx-input', (e) => e.detail?.value, (v) => {
+                gc.inlineFilterValues[col.field] = (v ?? '') as string;
                 debouncedApplyFilters(gc);
             });
             input.addEventListener('pdx-clear', () => {

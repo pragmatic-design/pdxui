@@ -70,6 +70,7 @@ Modifiers shape the value on its way back — the list is closed, and anything e
 
 ```pdx
 <input ::value.lazy="name" />            <!-- commit on change, not on each keystroke -->
+<pdx-input ::value.lazy="name" />        <!-- the same on a text field: its inner input's change, on blur or Enter -->
 <input ::value.trim="name" />            <!-- trim before writing -->
 <input ::value.debounce(300)="query" />  <!-- write 300 ms after the last input; at once on blur and on submit -->
 <input ::value.number="age" />           <!-- a number; empty writes null; "1,5" writes nothing and marks the field invalid -->

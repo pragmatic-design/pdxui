@@ -284,7 +284,7 @@ native one of an input inside. When ancestors do need to hear it, say so:
 @event(bubbles) selected: { id: string };   // bubbles, and crosses shadow roots
 ```
 
-The library's components follow the same rule: `pdx-change` stays on the `<pdx-input>` that sent
+The library's components follow the same rule: `value-change` stays on the `<pdx-input>` that sent
 it. `pdx migrate` writes `(bubbles)` on the `@event`s of an alpha project, which keeps what they did;
 `PDX_EVENT_BUBBLES_UNUSED` then lists the ones nothing hears above the component.
 

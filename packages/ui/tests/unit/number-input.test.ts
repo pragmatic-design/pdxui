@@ -1,8 +1,8 @@
-// A value TYPED into pdx-number-input must produce pdx-change when the edit is committed (blur or
-// Enter), as the native input's `change` does — not only pdx-input, or a handler on pdx-change
-// («Fired when the value changes», says the catalogue) loses everything typed and hears only
-// steppers, arrow keys and the wheel. And typing updates the host's `value`, which pdx-inline-edit
-// type="number" reads on the native `input` event to save what was typed.
+// A value TYPED into pdx-number-input is its model (#479): each keystroke writes it and announces
+// `value-change`, live, and the host's `value` follows, which pdx-inline-edit type="number" saves. The
+// commit is the inner input's native `change`: the browser fires it after typing, on blur or Enter, and
+// the component dispatches it itself after a value no typing produced — a step, an arrow key, the wheel —
+// as a native number input does for its spin buttons.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { required } from '@pdxui/core';
@@ -45,48 +45,61 @@ function record(el: HTMLElement, name: string): unknown[] {
     return seen;
 }
 
+/** How many native `change` events reach the host: the commits. */
+function commits(el: HTMLElement): () => number {
+    let n = 0;
+    el.addEventListener('change', (e) => { if (!(e instanceof CustomEvent)) n++; });
+    return () => n;
+}
+
 beforeEach(() => { document.body.innerHTML = ''; });
 
-describe('pdx-number-input commits a typed value', () => {
-    it('typing then blur emits exactly one pdx-change with the typed value, and reflects it', async () => {
+describe('pdx-number-input writes a typed value to its model', () => {
+    it('typing then blur announces the typed value once, and reflects it', async () => {
         const { el, input } = await mountNumber({ step: '0.1' });
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         type(input, '2.5');
         input.dispatchEvent(new FocusEvent('blur'));
         expect(changes).toEqual([2.5]);
         expect(el.value).toBe(2.5);
     });
 
-    it('Enter after typing commits once', async () => {
+    it('Enter and blur after typing announce nothing more', async () => {
         const { el, input } = await mountNumber({ step: '0.1' });
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         type(input, '7.3');
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
         input.dispatchEvent(new FocusEvent('blur'));
         expect(changes).toEqual([7.3]);
     });
 
-    it('focus and blur with no edit emit nothing', async () => {
+    it('focus and blur with no edit announce nothing, and commit nothing', async () => {
         const { el, input } = await mountNumber();
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
+        const committed = commits(el);
         input.dispatchEvent(new FocusEvent('focus'));
         input.dispatchEvent(new FocusEvent('blur'));
         expect(changes).toEqual([]);
+        expect(committed()).toBe(0);
     });
 
-    it('the control: ArrowUp emits pdx-change at once, as before', async () => {
+    it('ArrowUp announces the value and commits it at once: the native change, from the component', async () => {
         const { el, input } = await mountNumber();
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
+        const committed = commits(el);
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
         expect(changes).toEqual([1]);
+        expect(committed()).toBe(1);
     });
 
-    it('typing emits pdx-input on each keystroke, as before', async () => {
+    it('typing announces each keystroke, and commits nothing itself: the browser\'s change does', async () => {
         const { el, input } = await mountNumber();
-        const inputs = record(el, 'pdx-input');
+        const inputs = record(el, 'value-change');
+        const committed = commits(el);
         type(input, '4');
         type(input, '42');
         expect(inputs).toEqual([4, 42]);
+        expect(committed()).toBe(0);
     });
 });
 
@@ -120,11 +133,11 @@ describe('pdx-number-input can be empty', () => {
         }
     });
 
-    it('clearing a field holding 5 and leaving it emits pdx-change {value: null} and keeps it empty', async () => {
+    it('clearing a field holding 5 and leaving it announces null and keeps it empty', async () => {
         const { el, input } = await mountNumber();
         el.value = 5;
         await frames();
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         type(input, '');
         input.dispatchEvent(new FocusEvent('blur'));
         expect(changes).toEqual([null]);
@@ -132,9 +145,9 @@ describe('pdx-number-input can be empty', () => {
         expect(el.value).toBeNull();
     });
 
-    it('leaving an empty field empty emits nothing', async () => {
+    it('leaving an empty field empty announces nothing', async () => {
         const { el, input } = await mountNumber();
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         input.dispatchEvent(new FocusEvent('focus'));
         input.dispatchEvent(new FocusEvent('blur'));
         expect(changes).toEqual([]);
@@ -142,7 +155,7 @@ describe('pdx-number-input can be empty', () => {
 
     it('ArrowUp on an empty field starts from min: min="1" gives 1', async () => {
         const { el, input } = await mountNumber({ min: '1' });
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp' }));
         expect(changes).toEqual([1]);
         expect(input.value).toBe('1');
@@ -150,7 +163,7 @@ describe('pdx-number-input can be empty', () => {
 
     it('the stepper on an empty field with no min starts from 0: + gives 1', async () => {
         const { el } = await mountNumber();
-        const changes = record(el, 'pdx-change');
+        const changes = record(el, 'value-change');
         const plus = el.querySelector<HTMLButtonElement>('button[aria-label="Increase"]')!;
         plus.click();
         expect(changes).toEqual([1]);

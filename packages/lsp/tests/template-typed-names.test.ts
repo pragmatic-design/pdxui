@@ -73,6 +73,21 @@ describe('what the workspace answers for an event and a slot', () => {
         expect(resolvePropType(registry, 'app-card', '#footer')).toBe('unknown');
     });
 
+    it('the host of a library component: its fields with their types, its methods callable (#479)', () => {
+        const lib = {
+            describe: (tag: string) => (tag === 'pdx-lib' ? {
+                tag, description: '', filePath: '/lib/pdx-lib.ts', attributes: [], events: [], slots: [],
+                members: [
+                    { name: 'value', kind: 'field', type: 'number | null', description: '' },
+                    { name: 'options', kind: 'field', type: 'Array<{ id: string }>', description: '' },
+                    { name: 'clear', kind: 'method', type: '', description: '' },
+                ],
+            } : undefined),
+        } as unknown as Parameters<typeof resolvePropType>[0];
+        expect(resolvePropType(lib, 'pdx-lib', '$host')).toBe('HTMLElement & { value: number | null; options: any; clear(...args: any[]): any }');
+        expect(resolvePropType(lib, 'pdx-unknown', '$host')).toBeNull();
+    });
+
     it('a library component, whose manifest types neither: nothing to check against', () => {
         expect(resolvePropType(registry, 'pdx-lib', '@pdx-change')).toBeNull();
         expect(resolvePropType(registry, 'pdx-lib', '#item')).toBeNull();
@@ -100,6 +115,18 @@ describe("a handler's $event", () => {
         // A library manifest describes an event's detail in prose: reporting every read of it would
         // flag correct code that no cast can fix, since a template cannot write one.
         expect(diagnose('let v = $signal(0);', '<pdx-form @pdx-submit="v = $event.detail.values"></pdx-form>')).toEqual([]);
+    });
+
+    // A handler on a component reads the component: `@change` on `<pdx-input>` is its commit, and the
+    // model is on the host, `$event.currentTarget.value` (#479). Its currentTarget is the host's type.
+    const field: Resolve = (tag, attr) => (tag === 'pdx-field' && attr === '$host'
+        ? 'HTMLElement & { value: string; getFormatted(...args: any[]): any }' : null);
+
+    it('on a component, currentTarget is the component: its model and its methods read, a misspelt one is an error', () => {
+        expect(diagnose("let v = $signal('');", '<pdx-field @change="e => v = e.currentTarget.value"></pdx-field>', field)).toEqual([]);
+        expect(diagnose("let v = $signal('');", '<pdx-field @value-change="v = $event.currentTarget.getFormatted()"></pdx-field>', field)).toEqual([]);
+        const found = diagnose("let v = $signal('');", '<pdx-field @change="e => v = e.currentTarget.vlaue"></pdx-field>', field);
+        expect(found.map((f) => f.at)).toEqual(['vlaue']);
     });
 
     it('of a native event is its DOM event, whose target is the element it is written on', () => {

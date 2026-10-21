@@ -78,38 +78,39 @@ const q = <T extends Element>(el: Element, sel: string): T => {
 };
 
 const CASES: Case[] = [
+    // The text fields announce their model (#479): `value-change`, live, the value in `detail.value`.
     {
-        name: 'pdx-input, typing', html: '<pdx-input></pdx-input>', event: 'pdx-input',
+        name: 'pdx-input, typing', html: '<pdx-input></pdx-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), 'typed text'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-input, committing', html: '<pdx-input value="start"></pdx-input>', event: 'pdx-change',
+        name: 'pdx-input, committing', html: '<pdx-input value="start"></pdx-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), 'committed', ['input', 'change']),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-textarea', html: '<pdx-textarea></pdx-textarea>', event: 'pdx-change',
+        name: 'pdx-textarea', html: '<pdx-textarea></pdx-textarea>', event: 'value-change',
         act: (el) => typeInto(q(el, 'textarea'), 'two\nlines', ['input', 'change']),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-password-input', html: '<pdx-password-input></pdx-password-input>', event: 'pdx-input',
+        name: 'pdx-password-input', html: '<pdx-password-input></pdx-password-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), 's3cret'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-search-input', html: '<pdx-search-input></pdx-search-input>', event: 'pdx-input',
+        name: 'pdx-search-input', html: '<pdx-search-input></pdx-search-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), 'query'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-masked-input (the unmasked value)', html: '<pdx-masked-input mask="phone"></pdx-masked-input>', event: 'pdx-input',
+        name: 'pdx-masked-input (the unmasked value)', html: '<pdx-masked-input mask="phone"></pdx-masked-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), '5551234567'),
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-number-input, typing', html: '<pdx-number-input max="1000"></pdx-number-input>', event: 'pdx-input',
+        name: 'pdx-number-input, typing', html: '<pdx-number-input max="1000"></pdx-number-input>', event: 'value-change',
         act: (el) => typeInto(q(el, 'input'), '42'),
         props: { value: (d) => d.value },
     },
@@ -270,7 +271,7 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-otp-input', html: '<pdx-otp-input length="4"></pdx-otp-input>', event: 'pdx-input',
+        name: 'pdx-otp-input', html: '<pdx-otp-input length="4"></pdx-otp-input>', event: 'value-change',
         act: (el) => typeInto(q(el, '.pdx-otp-cell'), '7'),
         props: { value: (d) => d.value },
     },

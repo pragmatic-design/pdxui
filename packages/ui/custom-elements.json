@@ -13983,16 +13983,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "Placeholder text shown while empty.",
               "type": {
@@ -14182,6 +14172,16 @@
               "attribute": "suffix"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -14206,22 +14206,25 @@
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
+          "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-focus",
@@ -14257,15 +14260,6 @@
                 "text": "'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time'"
               },
               "default": "'text'"
-            },
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             },
             {
               "name": "placeholder",
@@ -14433,6 +14427,15 @@
               "name": "suffix",
               "fieldName": "suffix",
               "description": "Suffix text (e.g. \"kg\", \".com\"). For icons use slot.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },
@@ -15074,18 +15077,8 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "mask",
-              "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid, and the events carry\n`valid: false`.",
+              "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid.",
               "type": {
                 "text": "string"
               },
@@ -15163,6 +15156,16 @@
               "attribute": "placeholderchar"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -15185,24 +15188,41 @@
               "name": "selectText",
               "parameters": [],
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
-            }
-          ],
-          "events": [
-            {
-              "name": "pdx-input",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value, formatted, valid }"
             },
             {
-              "name": "pdx-change",
+              "kind": "method",
+              "name": "getFormatted",
+              "parameters": [],
+              "description": "The value as shown, with the mask's literals: `(555) 123-4567` for `5551234567`."
+            },
+            {
+              "kind": "method",
+              "name": "isValid",
+              "parameters": [],
+              "description": "False while a complete date or time preset value is out of range."
+            }
+          ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value",
+            "formatted": "$event.currentTarget.getFormatted()",
+            "valid": "$event.currentTarget.isValid()"
+          },
+          "alphaCommit": "pdx-change",
+          "events": [
+            {
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, formatted, valid } | { value, formatted }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-focus",
@@ -15221,18 +15241,9 @@
           ],
           "attributes": [
             {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "mask",
               "fieldName": "mask",
-              "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid, and the events carry\n`valid: false`.",
+              "description": "Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit\ncountry code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,\nzip-ext. A complete date or time out of range sets aria-invalid.",
               "type": {
                 "text": "string"
               },
@@ -15300,6 +15311,15 @@
                 "text": "string"
               },
               "default": "'_'"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ]
         }
@@ -16556,16 +16576,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The number, or `null` when the field is empty.",
-              "type": {
-                "text": "number | null"
-              },
-              "default": "null",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "min",
               "description": "Minimum allowed value.",
               "type": {
@@ -16765,6 +16775,16 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The number, or `null` when the field is empty.",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -16789,22 +16809,25 @@
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
+          "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "pdx-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-input",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: number | null }"
             },
             {
               "name": "pdx-blur",
@@ -16825,15 +16848,6 @@
             "spinbutton"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The number, or `null` when the field is empty.",
-              "type": {
-                "text": "number | null"
-              },
-              "default": "null"
-            },
             {
               "name": "min",
               "fieldName": "min",
@@ -17013,6 +17027,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The number, or `null` when the field is empty.",
+              "type": {
+                "text": "number | null"
+              },
+              "default": "null"
             }
           ]
         }
@@ -17050,16 +17073,6 @@
               },
               "default": "6",
               "attribute": "length"
-            },
-            {
-              "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
             },
             {
               "kind": "field",
@@ -17142,6 +17155,16 @@
               "attribute": "autocomplete"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -17160,14 +17183,23 @@
               "description": "Clears the value."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-complete",
@@ -17190,15 +17222,6 @@
                 "text": "number"
               },
               "default": "6"
-            },
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             },
             {
               "name": "disabled",
@@ -17271,6 +17294,15 @@
                 "text": "string"
               },
               "default": "'one-time-code'"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ]
         }
@@ -17701,16 +17733,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "Placeholder text shown while empty.",
               "type": {
@@ -17810,6 +17832,16 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -17834,22 +17866,25 @@
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
+          "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-focus",
@@ -17867,15 +17902,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "placeholder",
               "fieldName": "placeholder",
@@ -17965,6 +17991,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ]
         }
@@ -20529,16 +20564,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "The input's placeholder. Empty: the search-input.placeholder component string, «Search...».",
               "type": {
@@ -20618,6 +20643,16 @@
               "attribute": "shortcut"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -20642,21 +20677,30 @@
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
           "events": [
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
+            },
             {
               "name": "pdx-search",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when a search is performed.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-input",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on each input as the user types.",
               "detail": "{ value }"
             },
             {
@@ -20686,15 +20730,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "placeholder",
               "fieldName": "placeholder",
@@ -20762,6 +20797,15 @@
               "name": "shortcut",
               "fieldName": "shortcut",
               "description": "Keyboard shortcut hint displayed in suffix (e.g. \"Ctrl+K\")",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
               "type": {
                 "text": "string"
               },
@@ -24039,16 +24083,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "placeholder",
               "description": "Placeholder text shown while empty.",
               "type": {
@@ -24228,6 +24262,16 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "focus",
               "parameters": [],
@@ -24252,22 +24296,25 @@
               "description": "Select the whole text, so the next keystroke replaces it. Does not focus first."
             }
           ],
+          "models": [
+            "value"
+          ],
+          "alphaEvents": [
+            "pdx-input",
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.currentTarget.value"
+          },
+          "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "pdx-input",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on each input as the user types.",
-              "detail": "{ value }"
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-focus",
@@ -24285,15 +24332,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The current value.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "placeholder",
               "fieldName": "placeholder",
@@ -24455,6 +24493,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ]
         }

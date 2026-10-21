@@ -46,9 +46,12 @@ export interface CustomValidatorDef {
  * does not carry the registry (#244, the hello scenario).
  */
 const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
-    // Text inputs — skip reactive :value, use pdx-input event
+    // Text inputs (#479): their model's live `value-change`, with the value in `detail.value`; the
+    // reactive `:value` is skipped while the user types.
     ...['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']
-        .map((tag): [string, FormControlConfig] => [tag, { textInput: true, valueEvent: 'pdx-input' }]),
+        .map((tag): [string, FormControlConfig] => [tag, { textInput: true, valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
+    ...['pdx-number-input', 'pdx-otp-input']
+        .map((tag): [string, FormControlConfig] => [tag, { valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
     // The controls that declare a model (#480): its event, `<model>-change`, with the value in
     // `detail.value`, and the model as the prop.
     ...['pdx-checkbox', 'pdx-switch', 'pdx-radio']
@@ -57,7 +60,7 @@ const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
     ...['pdx-radio-group', 'pdx-checkbox-group', 'pdx-segmented', 'pdx-slider', 'pdx-rating']
         .map((tag): [string, FormControlConfig] => [tag, { valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
     // Standard controls, on the alpha event until their batch of #125 lands
-    ...['pdx-select', 'pdx-number-input', 'pdx-otp-input', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
+    ...['pdx-select', 'pdx-pin-input', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete']
         .map((tag): [string, FormControlConfig] => [tag, {}]),
 ];
 

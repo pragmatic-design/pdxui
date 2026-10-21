@@ -4,7 +4,6 @@ Search box with clear and shortcuts.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | The current value. |
 | `placeholder` | `placeholder` | string | `''` | The input's placeholder. Empty: the search-input.placeholder component string, «Search...». |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
@@ -13,6 +12,7 @@ Search box with clear and shortcuts.
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `debounce` | `debounce` | number | `300` | Debounce delay in ms for pdx-search event (0 = no debounce) |
 | `shortcut` | `shortcut` | string | `''` | Keyboard shortcut hint displayed in suffix (e.g. "Ctrl+K") |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -23,7 +23,7 @@ Search box with clear and shortcuts.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-focus` — Fired when it receives focus.; `pdx-input` → `detail: { value }` — Fired on each input as the user types.; `pdx-search` → `detail: { value }` — Fired when a search is performed.
+**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-focus` — Fired when it receives focus.; `pdx-search` → `detail: { value }` — Fired when a search is performed.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `searchbox` · `status`
 

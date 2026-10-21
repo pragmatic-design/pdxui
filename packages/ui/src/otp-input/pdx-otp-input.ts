@@ -1,19 +1,23 @@
 // pdx-otp-input — N-cell code input with auto-advance, paste spread, backspace nav.
 // Uses imperative DOM for dynamic cell count. Each cell is a native <input>.
 
-import { component, html, useFormAssociated } from '@pdxui/core';
+import { component, html, useFormAssociated, model } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 
 /**
  * A one-time code input, one character per cell, that advances as the user types, spreads a pasted
  * code across the cells and steps back on Backspace.
+ *
+ * @alphaevent pdx-input
+ * @alphadetail value $event.currentTarget.value
  */
 component('pdx-otp-input', {
     formAssociated: true,
+    // Every digit writes it (#479), and the write dispatches `value-change`. `pdx-complete` stays: it is
+    // the moment every cell is filled, not the value.
+    models: { value: model<string>('') },
     props: {
         length: { type: Number, default: 6 },
-        value: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
         size: { type: String, default: '' },
@@ -37,8 +41,7 @@ component('pdx-otp-input', {
         function emitValue() {
             const val = cells.join('');
             _reflected = val;
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-input', { value: val });
+            ctx.value.set(val);
             // Completion = every slot filled. Not `val.indexOf('') === -1`, which is always false
             // (indexOf('') returns 0), so pdx-complete would never fire.
             const len = ctx.length() as number;
@@ -191,8 +194,8 @@ component('pdx-otp-input', {
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() {
                 for (let i = 0; i < cells.length; i++) { cells[i] = ''; if (inputs[i]) inputs[i].value = ''; }
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-input', { value: '' });
+                _reflected = '';
+                ctx.value.set('');
             },
         });
 

@@ -10,7 +10,8 @@
 //   alpha-change-listener — changed, flagged: `@change=` on a component that emitted `change` still
 //                           hears a native `change` from an inner input, so it is not an error.
 //
-// No library component lists `alphaEvents` yet: each batch of #125 adds them as it moves.
+// A text field had two alpha events, a live one and a commit (`alphaCommit`, #479): the live one becomes
+// the model's event, the commit the inner input's native `change`.
 
 import { escapeForRegExp } from '../compiler/regexp-escape';
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
@@ -22,6 +23,12 @@ export interface AlphaEvents {
     detail: Record<string, string>;
     /** The first model's event, `checked-change`. */
     modelEvent: string;
+    /**
+     * The alpha event that was the commit, on blur or Enter, when the component had one apart from its
+     * live event (#479): a text field's `pdx-change`. A listener on it becomes `@change`, the inner
+     * input's native event, which bubbles to the host; the model's event is live.
+     */
+    commit?: string;
 }
 
 /** tag → its alpha events, or null when it records none (or has no model to move to). */
@@ -111,13 +118,16 @@ function rewriteHandler(value: string, detail: Record<string, string>): string |
     return failed ? null : head + next;
 }
 
+/** The event a listener on an alpha event moves to: `change` for the commit, the model's event otherwise. */
+const targetOf = (l: Listener): string => (l.alpha.commit === l.event ? 'change' : l.alpha.modelEvent);
+
 /** The rewritten attribute, or null when its handler must be rewritten by hand. */
 function rewriteListener(l: Listener): string | null {
     const handler = rewriteHandler(l.value, l.alpha.detail);
     if (handler === null) return null;
     // The spaces around the handler stay as written. A function, so a `$` in the handler is not a pattern.
     const value = l.value.replace(l.value.trim(), () => handler);
-    return `@${l.alpha.modelEvent}${l.modifiers}=${l.quote}${value}${l.quote}`;
+    return `@${targetOf(l)}${l.modifiers}=${l.quote}${value}${l.quote}`;
 }
 
 /** An alpha event other than `change`, which a native event from inside still answers. */
@@ -133,7 +143,7 @@ export const alphaChangeEvent: LanguageChange = {
         return listeners(text, context, isAlphaEvent).map((l) => ({
             line: lineAt(text, l.at),
             found: `@${l.event}${l.modifiers}`,
-            note: `Here, write \`@${l.alpha.modelEvent}\`.`,
+            note: `Here, write \`@${targetOf(l)}\`.`,
         }));
     },
     fix(text, context) {

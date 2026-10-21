@@ -20,10 +20,10 @@
               <pdx-select size="sm" placeholder="—" :label="c.name" :options="optionsFor(c)" :value="ctlVal(c)" @pdx-change="apply($event, c)"></pdx-select>
             }
             @if (c.kind === 'number') {
-              <pdx-number-input size="sm" :value="numVal(c)" @pdx-change="apply($event, c)"></pdx-number-input>
+              <pdx-number-input size="sm" :value="numVal(c)" @value-change="apply($event, c)"></pdx-number-input>
             }
             @if (c.kind === 'text') {
-              <pdx-input size="sm" :value="ctlVal(c)" placeholder="—" @pdx-input="apply($event, c)"></pdx-input>
+              <pdx-input size="sm" :value="ctlVal(c)" placeholder="—" @value-change="apply($event, c)"></pdx-input>
             }
           </span>
         </label>
@@ -135,7 +135,8 @@ onDestroy(() => { if (liveEl) { liveEl.remove(); liveEl = null; } });
 // '' / null value = the user cleared it → record as an explicit unset (falls back to the default).
 function apply(e, c) {
   const _d = (e && e.detail) || {};
-  // The switch announces its model, `checked-change` with `{ value }` (#480); the others their value.
+  // The switch announces its model, `checked-change` with `{ value }` (#480), the text and number fields
+  // theirs, `value-change` (#479); the select its value.
   if (c.kind === 'boolean') applied[c.name] = !!_d.value;
   else applied[c.name] = (_d.value === '' || _d.value == null) ? '' : String(_d.value);
   dirty = true;

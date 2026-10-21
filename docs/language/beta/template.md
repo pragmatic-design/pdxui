@@ -135,7 +135,7 @@ defined as sugar:
 
 | Modifier | Meaning |
 |---|---|
-| `.lazy` | commit on `change` (native) or on the model's change event, not on each input |
+| `.lazy` | commit on `change`, not on each input: the native one, which on a component with a model is the inner input's `change` bubbling to the host (its model's event is live, #479) |
 | `.debounce(ms)` | write `ms` after the last input; flushed on blur and on form submit |
 | `.trim` | trim a string before writing |
 | `.number` | write `Number(v)`; an empty entry writes `null`; an invalid one leaves the value unchanged and marks the element invalid (`aria-invalid`, `setCustomValidity`), or reports to the form field when bound to one |

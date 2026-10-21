@@ -681,7 +681,8 @@ function bindStyleProp(el: HTMLElement, prop: string, value: TemplateValue): voi
  * `.debounce(ms)`, of a signal or of the general form `{ get, set }` (#126, see ./two-way-value).
  *
  * The inline build calls this too, so the two builds listen the same way: a component through its
- * model's event (#124) or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
+ * model's event (#124) — with `.lazy`, the native `change` its inner input bubbles to the host, the
+ * commit (#479) — or, until it declares one, its `pdx-input`/`pdx-change`, a `<select>` and a
  * checkbox through `change`. The inline path had its own copy that listened to `input` on
  * everything, and `::value` was one-way on a component in a production build (#97).
  */
@@ -725,6 +726,12 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
     if (el.tagName.includes('-')) {
         const ctor = customElements.get(el.tagName.toLowerCase()) as { models?: ReadonlySet<string> } | undefined;
         if (ctor?.models?.has(prop)) {
+            // `.lazy` is the commit (#479): the model's event is live, and a text field's commit is its
+            // inner input's native `change`, which bubbles to the host. The model holds the value.
+            if (mods.lazy) {
+                el.addEventListener('change', () => applyValue((el as unknown as Record<string, unknown>)[prop]));
+                return;
+            }
             el.addEventListener(modelEvent(prop), (e) => {
                 const detail = (e as CustomEvent).detail as { value?: unknown } | null;
                 applyValue(detail && typeof detail === 'object' && 'value' in detail ? detail.value : (el as unknown as Record<string, unknown>)[prop]);

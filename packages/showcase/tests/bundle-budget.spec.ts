@@ -277,7 +277,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // against 59.5 KB for this branch built with `target: 'baseline-2024'` — the 2026 target's cost
 // falls from 3.5 to 2.8 KB; what is left is the pages that do write inside a component's tag. The
 // budgets are whole kilobytes, and 62 is under the measurement.
-const BUDGET_KB = { entry: 43, js: 472, css: 63, blocking: 99 };
+// js 472 → 473: the text fields declare their value as a model and commit through the native
+// `change` (#479). Seven components import `model`, the clear and stepper paths dispatch the commit
+// themselves, `onControlValue` waits for a control's class, and the masked input answers
+// `getFormatted()` and `isValid()`. The pre-push build: main 472.0 → this branch 472.1 KB.
+const BUDGET_KB = { entry: 43, js: 473, css: 63, blocking: 99 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -40,10 +40,10 @@ describe('pdx-input', () => {
         expect(input?.disabled || el.querySelector('.pdx-input-wrap')?.classList.contains('pdx-disabled')).toBeTruthy();
     });
 
-    it('emits pdx-input on user input', async () => {
+    it('announces value-change on user input, its model\'s event (#479)', async () => {
         const el = await mount('pdx-input');
         let emitted = false;
-        el.addEventListener('pdx-input', () => { emitted = true; });
+        el.addEventListener('value-change', () => { emitted = true; });
 
         const input = el.querySelector('input') as HTMLInputElement;
         input.value = 'test';

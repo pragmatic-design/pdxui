@@ -135,8 +135,10 @@ describe('the resolver knows the models', () => {
     it('of a library component, from its manifest; null while it lists none (#125 gives them theirs)', () => {
         const r = new ComponentResolver();
         r.registerUiManifest(process.cwd());
-        expect(r.has('pdx-input')).toBe(true);
-        expect(r.modelsOf('pdx-input')).toBeNull();
+        expect([...r.modelsOf('pdx-input')!]).toEqual(['value']);
+        // pdx-select gets its model with the pickers (#481).
+        expect(r.has('pdx-select')).toBe(true);
+        expect(r.modelsOf('pdx-select')).toBeNull();
         expect(r.modelsOf('pdx-not-a-component')).toBeNull();
     });
 });

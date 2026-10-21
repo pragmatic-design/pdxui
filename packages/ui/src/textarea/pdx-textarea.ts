@@ -1,16 +1,23 @@
 // pdx-textarea — Multi-line input with auto-resize, char/word count, sizes, states.
 // Uses .pdx-input-wrap pattern for consistency with pdx-input.
 
-import { component, html, signal } from '@pdxui/core';
-import { setOwnProp } from '../shared/own-prop';
+import { component, html, signal, model } from '@pdxui/core';
+import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * A multi-line text input with auto-resize, a character or word count and validation states.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
  */
 component('pdx-textarea', {
     formAssociated: true,
+    // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur, is the
+    // inner textarea's native `change`, which bubbles to the host.
+    models: { value: model<string>('') },
     props: {
-        value: { type: String, default: '' },
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
@@ -93,14 +100,7 @@ component('pdx-textarea', {
             const ta = e.target as HTMLTextAreaElement;
             liveValue.set(ta.value);
             autoResize(ta);
-            setOwnProp(ctx.el, 'value', ta.value);
-            ctx.emit('pdx-input', { value: ta.value });
-        }
-
-        function onChange(e: Event) {
-            const val = (e.target as HTMLTextAreaElement).value;
-            setOwnProp(ctx.el, 'value', val);
-            ctx.emit('pdx-change', { value: val });
+            ctx.value.set(ta.value);
         }
 
         function onFocus() { ctx.emit('pdx-focus'); }
@@ -160,18 +160,19 @@ component('pdx-textarea', {
         ctx.expose({
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
+            // A commit no typing produced: the model's write, then the native change a commit makes.
             clear() {
                 liveValue.set('');
                 const ta = textareaEl();
                 if (ta) ta.value = '';
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-change', { value: '' });
+                ctx.value.set('');
+                dispatchCommit(ta);
             },
             /** Select the whole text, so the next keystroke replaces it. Does not focus first. */
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { wrapClass, getResize, onInput, onChange, onFocus, onBlur, onWrapClick, charCountText, wordCountText, isOverCount };
+        return { wrapClass, getResize, onInput, onFocus, onBlur, onWrapClick, charCountText, wordCountText, isOverCount };
     },
     render: (ctx) => html`
         <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}" style="height:auto;min-height:auto">
@@ -193,7 +194,6 @@ component('pdx-textarea', {
                 :aria-required="${() => ctx.required() ? 'true' : null}"
                 :style="${() => 'resize:' + ctx.getResize() + ';width:100%'}"
                 @input="${ctx.onInput}"
-                @change="${ctx.onChange}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             ></textarea>

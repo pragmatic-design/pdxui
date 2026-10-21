@@ -85,6 +85,36 @@ describe('the rewrite pdx migrate applies', () => {
     });
 });
 
+describe('a text field\'s commit event (#479)', () => {
+    // `pdx-t` moved to its model `value`: `pdx-input` was live, `pdx-change` the commit, on blur or Enter.
+    // The live one becomes the model's event; the commit becomes the inner input's native `change`.
+    const TEXT: AlphaLookup = (tag) => (tag === 'pdx-t' ? {
+        events: ['pdx-input', 'pdx-change'],
+        detail: { value: '$event.currentTarget.value' },
+        modelEvent: 'value-change',
+        commit: 'pdx-change',
+    } : null);
+    const fix = (text: string) => (alphaChangeEvent.fix as (t: string, c: object) => string)(text, { alphaOf: TEXT });
+
+    it('the commit listener becomes @change, the live one the model\'s event, each reading the host\'s value', () => {
+        expect(fix('<pdx-t @pdx-change="e => save(e.detail.value)" @pdx-input="total = $event.detail.value"></pdx-t>'))
+            .toBe('<pdx-t @change="e => save(e.currentTarget.value)" @value-change="total = $event.currentTarget.value"></pdx-t>');
+    });
+
+    it('PDX_REMOVED_FORM names @change for the commit, the model\'s event for the live one', () => {
+        const found = compile(page('<pdx-t @pdx-change="save(1)" @pdx-input="save(2)"></pdx-t>'), 'page.pdx', [], undefined, { alphaOf: TEXT })
+            .warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');
+        expect(found.map((w) => w.message.includes('`@change`'))).toEqual([true, false]);
+        expect(found[1].message).toContain('`@value-change`');
+    });
+
+    it('a rewritten commit listener is not found again: @change on a tag that never emitted change', () => {
+        const once = fix('<pdx-t @pdx-change="save($event.detail.value)"></pdx-t>');
+        expect(alphaChangeEvent.detect(once, { alphaOf: TEXT })).toEqual([]);
+        expect(alphaChangeListener.detect(once, { alphaOf: TEXT })).toEqual([]);
+    });
+});
+
 describe('the form binding', () => {
     const SETUP = "<script>\n  let f = $form({ agree: false, qty: 0 });\n</script>";
     const formCode = (tag: string, modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
@@ -97,11 +127,18 @@ describe('the form binding', () => {
         expect(code).not.toContain("'pdx-change'");
     });
 
-    it('control: one that lists none keeps its hand-written alpha event', () => {
-        // pdx-input has no model yet (#479): its row of the table stays.
-        const code = formCode('pdx-input');
-        expect(code).toContain("'pdx-input'");
-        expect(code).not.toContain('-change\'');
+    it('control: one that lists none keeps its alpha event', () => {
+        // pdx-select has no model yet (#481).
+        const code = formCode('pdx-select');
+        expect(code).toContain("'pdx-change'");
+        expect(code).not.toContain('value-change');
+    });
+
+    it('a text field listens to its model\'s live event and binds no reactive :value (#479)', () => {
+        const code = formCode('pdx-input', (tag) => (tag === 'pdx-input' ? { model: 'value', event: 'value-change' } : null));
+        expect(code).toContain("'value-change'");
+        expect(code).toContain('e.detail.value');
+        expect(code).not.toContain("'pdx-input'");
     });
 });
 
@@ -119,7 +156,7 @@ describe('the resolver reads them from a manifest', () => {
         write('package.json', { name: 'app', dependencies: { '@acme/widgets': '1.0.0' } });
         write('node_modules/@acme/widgets/package.json', {
             name: '@acme/widgets', version: '1.0.0', customElements: 'custom-elements.json',
-            exports: { './box': './src/box.js', './plain': './src/plain.js', './loose': './src/loose.js' },
+            exports: { './box': './src/box.js', './plain': './src/plain.js', './loose': './src/loose.js', './field': './src/field.js' },
         });
         write('node_modules/@acme/widgets/custom-elements.json', {
             schemaVersion: '1.0.0',
@@ -129,6 +166,10 @@ describe('the resolver reads them from a manifest', () => {
                     alphaEvents: ['pdx-change'], alphaDetail: { checked: '$event.detail.value' },
                 })] },
                 { kind: 'javascript-module', path: 'src/plain.js', declarations: [declaration('acme-plain', {})] },
+                { kind: 'javascript-module', path: 'src/field.js', declarations: [declaration('acme-field', {
+                    models: ['value'],
+                    alphaEvents: ['pdx-input', 'pdx-change'], alphaDetail: { value: '$event.currentTarget.value' }, alphaCommit: 'pdx-change',
+                })] },
                 // Alpha events with no model to name instead: nothing to point a listener at.
                 { kind: 'javascript-module', path: 'src/loose.js', declarations: [declaration('acme-loose', { alphaEvents: ['pdx-change'] })] },
             ],
@@ -149,5 +190,13 @@ describe('the resolver reads them from a manifest', () => {
         expect(r.alphaOf('acme-box')).toEqual({ events: ['pdx-change'], detail: { checked: '$event.detail.value' }, modelEvent: 'checked-change' });
         expect(r.alphaOf('acme-plain')).toBeNull();
         expect(r.alphaOf('acme-loose')).toBeNull();
+    });
+
+    it('alphaOf carries the commit event a text field records (#479)', () => {
+        const r = new ComponentResolver();
+        r.registerUiManifest(root);
+        expect(r.alphaOf('acme-field')).toEqual({
+            events: ['pdx-input', 'pdx-change'], detail: { value: '$event.currentTarget.value' }, modelEvent: 'value-change', commit: 'pdx-change',
+        });
     });
 });

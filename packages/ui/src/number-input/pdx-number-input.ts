@@ -2,10 +2,11 @@
 // Cursor-position-aware step, sign toggle, locale formatting.
 // Stepper buttons rendered OUTSIDE the input wrap (input-group style).
 
-import { component, html, signal, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { resolveLocale, numberSeparators } from '../shared/locale';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { reflectNameToHost } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 import { placeBeforeCaret, caretAfterPlace } from './caret-digit';
 
 /**
@@ -20,12 +21,22 @@ function isEmptyValue(v: unknown): boolean {
 /**
  * A number input the user steps by a step, or on the digit before the caret, with a sign toggle
  * and locale formatting.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphacommit pdx-change
  */
 component('pdx-number-input', {
     formAssociated: true,
-    props: {
+    // Typing and stepping write it (#479), and the write dispatches `value-change`, live. The commit is
+    // the inner input's native `change`: the browser's on blur or Enter after typing, the component's own
+    // after a step, as a native number input fires one for its spin buttons.
+    models: {
         /** The number, or `null` when the field is empty. */
-        value: { type: Number, default: null },
+        value: model<number | null>(null, { type: Number }),
+    },
+    props: {
         min: { type: Number, default: -Infinity },
         max: { type: Number, default: Infinity },
         step: { type: Number, default: 1 },
@@ -174,23 +185,22 @@ component('pdx-number-input', {
             sb.style.left = left + 'px';
         }
 
-        // The value at the last pdx-change. Typing moves _value without emitting; blur or Enter
-        // commits it — one pdx-change when it differs from this.
+        // The value at the last commit. Typing moves _value and writes the model as it goes; blur or
+        // Enter commits it, and the browser's own `change` is that commit.
         let _committed = _value;
 
-        /** Write a committed value back to the host's `value`. `_lastProp` first, so the value
-         *  track below sees its own reflection and does not treat it as a parent change. */
+        /** Write a committed value to the model. `_lastProp` first, so the value track below sees its
+         *  own write and does not treat it as a parent change. */
         function reflect(v: number | null) {
             _committed = v;
             _lastProp = v;
-            (ctx.el as unknown as { value: number | null }).value = v;
+            ctx.value.set(v);
         }
 
-        /** Commit a typed value: the native input's `change`, as pdx-change. */
+        /** Commit a typed value: the model already holds it, and the native input's `change` announces it. */
         function commit() {
             if (_value === _committed) return;
             reflect(_value);
-            ctx.emit('pdx-change', { value: _value });
         }
 
         function setValue(v: number | null) {
@@ -213,8 +223,10 @@ component('pdx-number-input', {
                     _restoreCursor = -1;
                 }
             }
+            // A value no typing produced — a step, the wheel, a key: the model's write, then the native
+            // change a commit makes.
             reflect(clamped);
-            ctx.emit('pdx-change', { value: clamped });
+            dispatchCommit(inputEl);
             syncSign();
         }
 
@@ -320,16 +332,14 @@ component('pdx-number-input', {
             // When allowNegative, display is always positive — apply current sign
             if (num !== null && isNegativeAllowed() && isNeg()) num = -Math.abs(num);
             _value = normalize(num);   // cleared text is empty, not 0
-            // Make typed value observable: sync live state + emit pdx-input.
-            // pdx-change is NOT emitted per keystroke: it fires on the steppers, and on blur or
-            // Enter for a typed value (commit()). The input is not re-formatted here either, to
-            // avoid clobbering the cursor while the user is typing.
+            // Make the typed value observable: the live state and the model, whose write dispatches
+            // `value-change`. The input is not re-formatted here, to avoid clobbering the cursor while
+            // the user is typing.
             _liveValue.set(_value);
-            // `value` is live while typing, as a native input's is. Not reflect(): that
-            // also moves _committed, and the pdx-change of the blur would then never fire.
+            // `value` is live while typing, as a native input's is. Not reflect(): that also moves
+            // _committed, which is the commit's business.
             _lastProp = _value;
-            setOwnProp(ctx.el, 'value', _value);
-            ctx.emit('pdx-input', { value: _value });
+            ctx.value.set(_value);
         }
 
         function onBlur() {
@@ -470,8 +480,9 @@ component('pdx-number-input', {
                 _liveValue.set(null);
                 displayValue.set('');
                 if (inputEl) inputEl.value = '';
-                (ctx.el as any).value = null;
-                ctx.emit('pdx-change', { value: null });
+                // A commit no typing produced: the model's write, then the native change a commit makes.
+                ctx.value.set(null);
+                dispatchCommit(inputEl);
             },
             /** Select the whole text, so the next keystroke replaces it. Does not focus first. */
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },

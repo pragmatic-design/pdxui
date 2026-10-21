@@ -344,7 +344,7 @@ modifiers wrap the setter, so there is one mechanism:
 
 | Modifier | Meaning |
 |---|---|
-| `.lazy` | commit on `change` (native), on `pdx-change` (a library component without a model), on the model's change event otherwise |
+| `.lazy` | commit on `change` (native), on `pdx-change` (a library component without a model); on a component's model, on the native `change` that bubbles to the host from its inner input, reading the model's property — the model's event is live (#479) |
 | `.debounce(ms)` | write `ms` after the last input; written at once on the element's `focusout` and on its form's `submit` (in the capture phase, before the form's own listeners) |
 | `.trim` | trim a string before writing |
 | `.number` | write `Number(v)` after trimming; an empty entry writes `null`; an invalid one writes nothing and marks the element invalid — `aria-invalid="true"`, and `setCustomValidity` on a native control — until a valid entry clears it |

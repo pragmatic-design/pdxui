@@ -12,11 +12,13 @@ function makeHtml(content: string): HtmlNode[] {
 
 /**
  * The first model of each control that declares one, as the plugin reads it from the manifest
- * (`modelEventOf`, #478/#480). A control with none keeps the compiler's alpha table.
+ * (`modelEventOf`, #478/#480/#479). A control with none keeps the compiler's alpha table.
  */
 const MODELS: Record<string, string> = {
     'pdx-checkbox': 'checked', 'pdx-switch': 'checked', 'pdx-toggle': 'pressed',
     'pdx-segmented': 'value', 'pdx-slider': 'value', 'pdx-rating': 'value',
+    'pdx-input': 'value', 'pdx-textarea': 'value', 'pdx-password-input': 'value', 'pdx-search-input': 'value',
+    'pdx-masked-input': 'value', 'pdx-number-input': 'value', 'pdx-otp-input': 'value',
 };
 const modelEventOf = (tag: string) => (MODELS[tag] ? { model: MODELS[tag], event: `${MODELS[tag]}-change` } : null);
 
@@ -29,56 +31,56 @@ function applyAndGet(content: string): string {
 // ─── Text input controls ─────────────────────────────────────
 
 describe('applyFormBindings — text input controls', () => {
-    it('injects @pdx-input and @pdx-blur on pdx-input (no :value)', () => {
+    it('injects @value-change and @pdx-blur on pdx-input, its model (no :value)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-input name="x"></pdx-input></pdx-form>'
         );
 
         // Text inputs skip :value binding (controlled-input loop prevention)
         expect(result).not.toContain(':value=');
-        // Should inject pdx-input event (not pdx-change) for text inputs
-        expect(result).toContain('@pdx-input=');
+        // Its model's live event (#479), not the commit
+        expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
         // Check form variable reference
         expect(result).toContain('ctx.f.fields.x');
     });
 
-    it('injects @pdx-input on pdx-textarea (no :value)', () => {
+    it('injects @value-change on pdx-textarea (no :value)', () => {
         const result = applyAndGet(
             '<pdx-form :form="myForm"><pdx-textarea name="bio"></pdx-textarea></pdx-form>'
         );
 
         expect(result).not.toContain(':value=');
-        expect(result).toContain('@pdx-input=');
+        expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
         expect(result).toContain('ctx.myForm.fields.bio');
     });
 
-    it('injects @pdx-input on pdx-password-input (no :value)', () => {
+    it('injects @value-change on pdx-password-input (no :value)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-password-input name="pw"></pdx-password-input></pdx-form>'
         );
 
         expect(result).not.toContain(':value=');
-        expect(result).toContain('@pdx-input=');
+        expect(result).toContain('@value-change=');
     });
 
-    it('injects @pdx-input on pdx-search-input (no :value)', () => {
+    it('injects @value-change on pdx-search-input (no :value)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-search-input name="q"></pdx-search-input></pdx-form>'
         );
 
         expect(result).not.toContain(':value=');
-        expect(result).toContain('@pdx-input=');
+        expect(result).toContain('@value-change=');
     });
 
-    it('injects @pdx-input on pdx-masked-input (no :value)', () => {
+    it('injects @value-change on pdx-masked-input (no :value)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-masked-input name="phone"></pdx-masked-input></pdx-form>'
         );
 
         expect(result).not.toContain(':value=');
-        expect(result).toContain('@pdx-input=');
+        expect(result).toContain('@value-change=');
     });
 });
 
@@ -121,13 +123,14 @@ describe('applyFormBindings — non-text controls', () => {
         expect(result).toContain('@pdx-blur=');
     });
 
-    it('injects :value and @pdx-change on pdx-number-input', () => {
+    it('injects :value and @value-change on pdx-number-input, its model (#479)', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-number-input name="qty"></pdx-number-input></pdx-form>'
         );
 
         expect(result).toContain(':value=');
-        expect(result).toContain('@pdx-change=');
+        expect(result).toContain('@value-change=');
+        expect(result).toContain('e.detail.value');
     });
 
     it('injects :value and @value-change on pdx-slider, its model', () => {
@@ -261,7 +264,7 @@ describe('applyFormBindings — scope boundaries', () => {
             '<pdx-input name="x"></pdx-input>'
         );
 
-        expect(result).not.toContain('@pdx-input=');
+        expect(result).not.toContain('@value-change=');
         expect(result).not.toContain('@pdx-blur=');
     });
 
@@ -281,7 +284,7 @@ describe('applyFormBindings — scope boundaries', () => {
             '<pdx-form><pdx-input name="x"></pdx-input></pdx-form>'
         );
 
-        expect(result).not.toContain('@pdx-input=');
+        expect(result).not.toContain('@value-change=');
         expect(result).not.toContain('@pdx-blur=');
     });
 
@@ -290,7 +293,7 @@ describe('applyFormBindings — scope boundaries', () => {
             '<pdx-form :form="f"><pdx-input></pdx-input></pdx-form>'
         );
 
-        expect(result).not.toContain('@pdx-input=');
+        expect(result).not.toContain('@value-change=');
         expect(result).not.toContain('@pdx-blur=');
     });
 
@@ -314,10 +317,10 @@ describe('applyFormBindings — multiple html nodes', () => {
             { type: 'html', content: '</pdx-form>' } as HtmlNode,
         ];
 
-        applyFormBindings(nodes);
+        applyFormBindings(nodes, undefined, modelEventOf);
 
         const secondNode = nodes[1] as HtmlNode;
-        expect(secondNode.content).toContain('@pdx-input=');
+        expect(secondNode.content).toContain('@value-change=');
         expect(secondNode.content).toContain('@pdx-blur=');
     });
 
@@ -327,10 +330,10 @@ describe('applyFormBindings — multiple html nodes', () => {
             { type: 'html', content: '<pdx-input name="out"></pdx-input>' } as HtmlNode,
         ];
 
-        applyFormBindings(nodes);
+        applyFormBindings(nodes, undefined, modelEventOf);
 
         const secondNode = nodes[1] as HtmlNode;
-        expect(secondNode.content).not.toContain('@pdx-input=');
+        expect(secondNode.content).not.toContain('@value-change=');
     });
 
     it('skips non-html nodes gracefully', () => {
@@ -340,10 +343,10 @@ describe('applyFormBindings — multiple html nodes', () => {
             { type: 'html', content: '<pdx-input name="x"></pdx-input></pdx-form>' } as HtmlNode,
         ];
 
-        applyFormBindings(nodes);
+        applyFormBindings(nodes, undefined, modelEventOf);
 
         const thirdNode = nodes[2] as HtmlNode;
-        expect(thirdNode.content).toContain('@pdx-input=');
+        expect(thirdNode.content).toContain('@value-change=');
     });
 });
 
@@ -355,7 +358,7 @@ describe('applyFormBindings — self-closing tags', () => {
             '<pdx-form :form="f"><pdx-input name="x" /></pdx-form>'
         );
 
-        expect(result).toContain('@pdx-input=');
+        expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
         // Should still end with />
         expect(result).toContain('/>');
@@ -446,7 +449,7 @@ describe('applyFormBindings — pdx-field-group', () => {
         const nodes = makeHtml(
             '<pdx-form :form="f"><pdx-field-group name="customer"><pdx-input name="name" /></pdx-field-group></pdx-form><pdx-form :form="g"><pdx-input name="x" /></pdx-form>'
         );
-        applyFormBindings(nodes);
+        applyFormBindings(nodes, undefined, modelEventOf);
         const result = (nodes[0] as HtmlNode).content;
         // Second form should NOT have customer prefix
         expect(result).toContain('g.fields.x');

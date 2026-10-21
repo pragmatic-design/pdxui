@@ -1,8 +1,9 @@
 // pdx-masked-input — Input with pattern mask (phone, credit card, date, custom).
 // Auto-formats as user types, manages cursor position around mask chars.
 
-import { component, html, signal, useFormAssociated } from '@pdxui/core';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
+import { reflectNameToHost } from '../shared/own-prop';
+import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * Country calling codes of one and two digits (ITU-T E.164); every other code has three. The codes
@@ -62,16 +63,26 @@ function outOfRange(preset: string, digits: string): boolean {
 /**
  * An input that formats what the user types to a pattern, a built-in preset such as phone, card or
  * date, or a custom one.
+ *
+ * @alphaevent pdx-input
+ * @alphaevent pdx-change
+ * @alphadetail value $event.currentTarget.value
+ * @alphadetail formatted $event.currentTarget.getFormatted()
+ * @alphadetail valid $event.currentTarget.isValid()
+ * @alphacommit pdx-change
  */
 component('pdx-masked-input', {
     formAssociated: true,
+    // Typing writes it (#479), unmasked, and the write dispatches `value-change`, live. The commit, on blur
+    // or Enter, is the inner input's native `change`, which bubbles to the host. What the alpha events
+    // also carried, the formatted text and whether it is in range, the element answers itself:
+    // `getFormatted()` and `isValid()`.
+    models: { value: model<string>('') },
     props: {
-        value: { type: String, default: '' },
         /**
          * Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit
          * country code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,
-         * zip-ext. A complete date or time out of range sets aria-invalid, and the events carry
-         * `valid: false`.
+         * zip-ext. A complete date or time out of range sets aria-invalid.
          */
         mask: { type: String, default: '' },
         placeholder: { type: String, default: '' },
@@ -157,16 +168,8 @@ component('pdx-masked-input', {
                 if (input && gen === writeGen) input.value = masked;
             });
 
-            const unmasked = stripMask(masked);
-            // `value` is the unmasked value, as the prop is read (applyMask(value) is the display).
-            setOwnProp(ctx.el, 'value', unmasked);
-            ctx.emit('pdx-input', { value: unmasked, formatted: masked, valid: isValid() });
-        }
-
-        function onChange() {
-            const unmasked = stripMask(displayValue() as string);
-            setOwnProp(ctx.el, 'value', unmasked);
-            ctx.emit('pdx-change', { value: unmasked, formatted: displayValue(), valid: isValid() });
+            // `value` is the unmasked value, as the model is read (applyMask(value) is the display).
+            ctx.value.set(stripMask(masked));
         }
 
         /** False while a complete date/time preset value is out of range. */
@@ -223,14 +226,19 @@ component('pdx-masked-input', {
                 displayValue.set('');
                 const inp = ctx.el.querySelector('input') as HTMLInputElement | null;
                 if (inp) inp.value = '';
-                (ctx.el as any).value = '';
-                ctx.emit('pdx-change', { value: '', formatted: '' });
+                // A commit no typing produced: the model's write, then the native change a commit makes.
+                ctx.value.set('');
+                dispatchCommit(inp);
             },
             /** Select the whole text, so the next keystroke replaces it. Does not focus first. */
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
+            /** The value as shown, with the mask's literals: `(555) 123-4567` for `5551234567`. */
+            getFormatted(): string { return displayValue() as string; },
+            /** False while a complete date or time preset value is out of range. */
+            isValid(): boolean { return isValid(); },
         });
 
-        return { displayValue, wrapClass, getPlaceholder, getInputmode, onInput, onChange, onFocus, onBlur, isValid };
+        return { displayValue, wrapClass, getPlaceholder, getInputmode, onInput, onFocus, onBlur, isValid };
     },
     render: (ctx) => html`
         <div :class="${ctx.wrapClass}">
@@ -248,7 +256,6 @@ component('pdx-masked-input', {
                 :aria-label="${() => ctx.ariaLabel() || null}"
                 :aria-invalid="${() => ctx.error() || !ctx.isValid() ? 'true' : null}"
                 @input="${ctx.onInput}"
-                @change="${ctx.onChange}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             />

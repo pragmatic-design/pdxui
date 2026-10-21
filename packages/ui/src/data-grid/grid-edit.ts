@@ -7,6 +7,7 @@ import { columnsToFormFields, createEditForm } from '@pdxui/core';
 import { getFieldValue } from '@pdxui/core';
 import { t } from './grid-i18n';
 import { createLazy } from '../shared/lazy-tags';
+import { onControlValue } from '../shared/model-event';
 
 // ─── Edit Cell State ───────────────────────────────────────
 
@@ -332,7 +333,8 @@ export function createDefaultEditor(
             }
         }
         requestAnimationFrame(() => { input.value = value != null ? Number(value) : null; });
-        input.addEventListener('pdx-change', (e: any) => onChange(e.detail?.value));
+        // Its model event, `value-change` (#479): each write, so the grid's own Enter saves what was typed.
+        onControlValue(input, 'pdx-change', (e) => e.detail?.value, (v) => onChange(v));
         editor = input;
     } else if (colType === 'date') {
         const input = createLazy('pdx-date-picker') as any;
@@ -354,7 +356,7 @@ export function createDefaultEditor(
         const input = createLazy('pdx-input') as any;
         input.size = 'sm';
         requestAnimationFrame(() => { input.value = value != null ? String(value) : ''; });
-        input.addEventListener('pdx-input', (e: any) => onChange(e.detail?.value ?? input.value));
+        onControlValue(input, 'pdx-input', (e) => e.detail?.value ?? input.value, (v) => onChange(v));
         editor = input;
     }
 

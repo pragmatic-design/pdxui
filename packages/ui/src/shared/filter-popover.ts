@@ -7,6 +7,7 @@ import type { FieldType } from '@pdxui/core';
 import { uiString } from './i18n';
 import { onPressOutside } from './press-outside';
 import { createLazy, loadTag, type LazyTag } from './lazy-tags';
+import { onControlValue } from './model-event';
 
 /** Operators that take NO value input: empties + relative-date presets. */
 const NO_VALUE_OPS = new Set<string>(['isnull', 'isnotnull', ...RELATIVE_DATE_OPS]);
@@ -231,11 +232,10 @@ function buildConditionRow(
         onChange(op, readVal());
     });
 
+    // Each control's model event — pdx-input's and pdx-number-input's `value-change`, live (#479) — or the
+    // date picker's alpha `pdx-change` until it declares its model.
     const onValueChange = () => onChange(readOp(), readVal());
-    for (const el of [valueEl, valueEl2]) {
-        el.addEventListener('pdx-input', onValueChange);
-        el.addEventListener('pdx-change', onValueChange);
-    }
+    for (const el of [valueEl, valueEl2]) onControlValue(el, 'pdx-change', () => undefined, onValueChange);
 
     // Enter key → apply filter
     if (onEnter) {

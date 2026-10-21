@@ -102,7 +102,7 @@ const form = tryUseForm();   // the declaration; the bindings find the form them
 </script>
 ```
 
-You write no `:value`, no `@pdx-input`, no prop to pass the form down: `<pdx-form>` provides it,
+You write no `:value`, no `@value-change`, no prop to pass the form down: `<pdx-form>` provides it,
 and the section's bindings look it up. Measured: two named controls, one beside `<pdx-form>` and
 one in a child, typed into both, read `{ "here": "A", "deep": "A" }`.
 

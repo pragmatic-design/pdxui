@@ -290,6 +290,29 @@ semver.
     function, `@loader loadUser: loadUser;`, rewrites the page's readers to `loadUser.data()` and
     `loadUser.state()`, and flags them on a page with no loader. It flags a loader that reads
     `location` or `currentParams()`: the router hands it its params. (#506)
+- The text fields declare their value as a model, announced live with `value-change` and `{ value }`:
+  `pdx-input`, `pdx-textarea`, `pdx-number-input` (`number | null`), `pdx-password-input`,
+  `pdx-search-input`, `pdx-masked-input` (the unmasked value) and `pdx-otp-input`. `::value` binds each
+  both ways, and a form binds each to its model.
+  - They no longer emit `pdx-input` or `pdx-change`. The commit, on blur or Enter, is the inner input's
+    native `change`, which bubbles to the host: `@change` saves on commit and reads
+    `$event.currentTarget.value`. A stepper of `pdx-number-input` and the clear buttons dispatch that
+    `change` themselves.
+  - `pdx migrate` rewrites `@pdx-input` to `@value-change` and `@pdx-change` to `@change`, so a commit
+    handler stays a commit handler, and `detail.value` reads the element's `value`. The manifest
+    records the commit event as `alphaCommit` (`@alphacommit` on the JSDoc).
+  - `pdx-masked-input`'s alpha `detail.formatted` and `detail.valid` are its methods `getFormatted()`
+    and `isValid()`, and `pdx migrate` rewrites them so.
+  - `::value.lazy` on a component's model writes on that native `change`, not on the model's event.
+  - `pdx-search-input` keeps `pdx-search` and `pdx-clear`, `pdx-otp-input` keeps `pdx-complete`, and
+    `pdx-pin-input` still announces `pdx-input`.
+  - A library control created before its class is defined — `pdx-field-list` creates its controls
+    without importing them — is wired to its model's event once the class is defined; it was wired to
+    the alpha one.
+  - In the editor and `pdx check --types`, a handler's `$event.currentTarget` on a component is that
+    component's element, with the props, models and methods its manifest lists, so
+    `@change="e => save(e.currentTarget.value)"` is checked. `pdx check --types` types the project's
+    components as the editor does; it typed none. (#479)
 - The editors and the upload declare their value as a model, announced with `value-change` and
   `{ value }`: `pdx-rich-text`, `pdx-json-editor`, `pdx-inline-edit`, and `pdx-file-upload`, whose
   value is the `File[]` it holds. `::value` binds each both ways — on `pdx-file-upload` for the first

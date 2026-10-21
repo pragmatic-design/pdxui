@@ -882,6 +882,9 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         const m = /^(\S+)\s+(\S[\s\S]*)$/.exec(t.text.trim());
         if (m) alphaDetail[m[1]] = m[2].trim();
     }
+    // The alpha event that was the commit, apart from the live one (#479): `pdx migrate` moves a
+    // listener on it to the inner input's native `change`, not to the model's event.
+    const alphaCommit = tags.find(t => t.tag === 'alphacommit')?.text.trim() || '';
     const summary = tags.find(t => t.tag === 'summary')?.text || '';
     const description = jsdocDescription(statement);
 
@@ -939,6 +942,7 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             ...(models.length ? { models: models.map(m => m.name) } : {}),
             ...(alphaEvents.length ? { alphaEvents } : {}),
             ...(Object.keys(alphaDetail).length ? { alphaDetail } : {}),
+            ...(alphaCommit ? { alphaCommit } : {}),
             ...(events.length ? { events } : {}),
             ...(roles.length ? { roles } : {}),
             attributes,
