@@ -25,7 +25,12 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
   strings and comments, then reads it line by line: a declaration is recognised where a line starts
   with `@keyword` in code (not in a comment or a string). A declaration of a known keyword that matches
   none of its forms is dropped and raises `PDX_UNKNOWN_DECLARATION`, whose hint is the form below.
-  Only `@i18n`, `@raw` and `@snippet` may span lines (a balanced `{ … }` block).
+  **One reading rule** (#524): any declaration may span lines when it opens a balanced `{ … }` or
+  `( … )` on its first line; it is read to the line where the blocks its first line opened have all
+  closed. What that line opens next is the declaration's own — `@form`'s options after its schema —
+  and a body, `@raw { … }`, `@action …(…) { … }` or `@snippet …(…) { … }`, keeps its lines and is read
+  to its balanced `}`. A `//` comment on a line read onto another is dropped. A declaration with no
+  block (`@guard 'x';`, `@tag 'app-x';`) is written on one line.
 - **One grammar.** Every script is read this way, with or without `setup`, whatever it contains
   ([overview.md](overview.md#one-script-grammar)); the legacy markers and `@mixin` are removed forms.
 - **What the template sees.** Every top-level `const`, `let`, `function`, rune and declared name is

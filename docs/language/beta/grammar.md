@@ -30,7 +30,7 @@ S              ::= ( " " | "\t" | "\n" | "\r" )+
 Paren          ::= "(" S? Expression S? ")"
 End            ::= S? ";"?
 /* A declaration may span lines when it opens a balanced { … } or ( … ) on its first line; it ends at
-   its ";" or at the end of that block (proposed — decisions.md 11). */
+   its ";" or at the end of that block (landed — decisions.md 11, #524). */
 ```
 
 ## The file

@@ -250,6 +250,10 @@ semver.
 
 ### Changed
 
+- One reading rule for declarations: any of them may span lines when it opens a balanced `{ … }` or
+  `( … )` on its first line. `@prop size: {`, a `@slot` signature, `@fetch`'s and `@loader`'s options,
+  `@title $t(…)` and a `@snippet`'s parameters were misread when wrapped; they compile as their
+  one-line form. A body (`@raw`, `@action`, `@snippet`) keeps its lines. (#524)
 - A design stylesheet that reads another component's token, as the first argument of a `var()`, fails
   `pnpm lint`. What components shared is now global: `--pdx-control-min-height` and
   `--pdx-control-radius`, read with the old token as the fallback alias, so a theme that sets
