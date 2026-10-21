@@ -4,7 +4,7 @@
 // named by the operator, not by its symbol ("⊃") with the operator only in `title`; Escape closes
 // either menu, and opening one moves focus into it. A native button's Enter and Space are its click, so the
 // triggers are clicked here; the keys inside the menus are pressed.
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/data-grid/pdx-data-grid';
 import '../../src/pagination/pdx-pagination';
@@ -108,8 +108,9 @@ describe('the toolbar Add Filter menu', () => {
         key(focused(), 'Enter');
         expect(menu()).toBeNull();
         expect(btn.getAttribute('aria-expanded')).toBe('false');
-        await tick(20);
-        expect(document.querySelector('.pdx-dg-filter-popover')?.textContent).toContain('City');
+        // The popover opens once its controls are defined, loaded on first use (#448): waited for,
+        // not a fixed tick (#589).
+        await vi.waitFor(() => expect(document.querySelector('.pdx-dg-filter-popover')?.textContent).toContain('City'));
     });
 
     it('Escape closes it and returns focus to the button', async () => {
