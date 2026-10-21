@@ -186,8 +186,9 @@ describe('CSS scoping', () => {
         it('the stylesheet the bundler asks for is scoped and minified', () => {
             const css = styleCssFor(parseSFC(SOURCE), 'test.pdx', 0, true);
             expect(css, 'the comment survived').not.toContain('/* comment */');
-            // The default target's donut scope (#152), minified.
-            expect(css, 'the block is not scoped').toContain(`@scope ([data-pdx-${hash('test.pdx')}],[data-pdx-${hash('test.pdx')}-in]) to ([data-pdx-root]>*){:scope .btn`);
+            // The default target's donut scope (#152), minified; one root, as the template writes
+            // nothing inside a component's tag (#511).
+            expect(css, 'the block is not scoped').toContain(`@scope ([data-pdx-${hash('test.pdx')}]) to ([data-pdx-root]>*){:scope .btn`);
             expect(css).toContain('color:red');
         });
 

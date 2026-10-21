@@ -394,6 +394,9 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                     for (const style of descriptor.styles ?? (descriptor.style ? [descriptor.style] : [])) {
                         if (style.src) style.content = resolver(style.src, file);
                     }
+                    // And the template's: whether it writes anything inside a component's tag decides
+                    // the scope's form (#511), and must be read from what the transform compiled.
+                    if (descriptor.template?.src) descriptor.template.content = resolver(descriptor.template.src, file);
                     return styleCssFor(descriptor, file, index, true, target);
                 } catch {
                     // A file that moved between the transform and this load: an empty stylesheet is

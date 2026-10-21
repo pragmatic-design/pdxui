@@ -75,9 +75,11 @@ describe('integration — correct imports', () => {
 describe('integration — scoped CSS', () => {
     it('generates the donut scope around its rules (#152)', () => {
         const { code } = compileDemo('counter.pdx');
-        // `>` reaches the module escaped, `>`, inside the injected string.
-        expect(code).toMatch(/@scope \(\[data-pdx-\w+\], \[data-pdx-\w+-in\]\) to \(\[data-pdx-root\] (?:>|\\u003E) \*\) \{[^}]*\.counter-card/);
-        expect(code).toMatch(/:scope \.value, :where\(:not\(\[data-pdx-\w+\]\)\):scope:is\(\.value\)/);
+        // `>` reaches the module escaped, `>`, inside the injected string. The counter writes nothing
+        // inside a component's tag: one root, one form per selector (#511).
+        expect(code).toMatch(/@scope \(\[data-pdx-\w+\]\) to \(\[data-pdx-root\] (?:>|\\u003E) \*\) \{[^}]*\.counter-card/);
+        expect(code).toMatch(/:scope \.value \{/);
+        expect(code).not.toMatch(/:where\(:not\(\[data-pdx-\w+\]\)\)/);
     });
 
     it('generates setAttribute in setup for scope', () => {

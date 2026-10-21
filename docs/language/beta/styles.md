@@ -30,8 +30,10 @@ landed).
   tag — which light DOM projects into the child's subtree — carries the compiler's mark
   `data-pdx-H-in` and stays in the component's scope. Each selector keeps the specificity it had under
   the ancestor form (`:scope S, :where(:not([data-pdx-H])):scope:is(S)`). The host itself is styled
-  with `:scope`, which becomes `:where(:scope)[data-pdx-H]`. The full rewrite is in
-  [styles.md](../styles.md#style-scoped).
+  with `:scope`, which becomes `:where(:scope)[data-pdx-H]`. A template that writes nothing inside
+  a child's tag has nothing marked, and gets the single-root form,
+  `@scope ([data-pdx-H]) to ([data-pdx-root] > *)` with `:scope S` alone (#511 — landed). The full
+  rewrite is in [styles.md](../styles.md#style-scoped).
 - `target: 'baseline-2024'`: the alpha output, the ancestor selector `[data-pdx-H] sel`, which also
   reaches children (the documented alpha behaviour) and marks nothing. `:scope` is rewritten to the
   host, `[data-pdx-H]`, so a block that styles its host means the same on both targets.

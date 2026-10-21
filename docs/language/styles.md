@@ -45,7 +45,11 @@ the compiler was given; the setup the compiler generates calls `ctx.el.setAttrib
   `[data-pdx-HASH] S` had, so a page's scoped rule weighs against a global one as before. `:scope` is
   the host: it becomes `:where(:scope)[data-pdx-HASH]`. A trailing pseudo-element stays outside the
   `:is()` (`:is(.a)::before`). The selectors inside `@media`, `@supports`, `@layer`, `@container` and
-  `@starting-style` get a scope of their own inside the at-rule.
+  `@starting-style` get a scope of their own inside the at-rule. A template that writes nothing
+  inside a component's tag marks nothing, and its blocks get the single-root form:
+  `@scope ([data-pdx-HASH]) to ([data-pdx-root] > *) { … }`, each selector `S` becoming `:scope S`
+  alone, with the same specificity (#511). The dev injection and the production stylesheet decide it
+  from the same template, an external `<template src>` included.
 - **`'baseline-2024'`** — each top-level rule has its selector list split at every comma and each part
   prefixed with `[data-pdx-HASH] ` (a descendant combinator): `.a, .b:hover { … }` becomes
   `[data-pdx-HASH] .a, [data-pdx-HASH] .b:hover { … }`, and `:scope` becomes `[data-pdx-HASH]`. The
@@ -120,7 +124,8 @@ Under the default target `.card .title` reaches the browser as `:scope .card .ti
 
 #### Since
 
-alpha; the donut scope of `'baseline-2026'` and `:scope` as the host since beta (#152).
+alpha; the donut scope of `'baseline-2026'` and `:scope` as the host since beta (#152); its
+single-root form for a template that marks nothing since #511.
 
 ### `<style>` without `scoped`
 

@@ -57,13 +57,53 @@ describe('the donut scope', () => {
     });
 
     it('is what the default target compiles a scoped block to; baseline-2024 keeps the ancestor form', () => {
-        const sfc = parseSFC('<template><p class="a">x</p></template>\n<style scoped>.a { color: red; } :scope { display: block; }</style>');
+        const sfc = parseSFC('<template><pdx-card><p class="a">x</p></pdx-card></template>\n<style scoped>.a { color: red; } :scope { display: block; }</style>');
         const id = `data-pdx-${hash('d.pdx')}`;
         expect(styleCssFor(sfc, 'd.pdx', 0, false)).toContain(`@scope ([${id}], [${id}-in])`);
         const legacy = styleCssFor(sfc, 'd.pdx', 0, false, 'baseline-2024');
         expect(legacy).toContain(`[${id}] .a { color: red; }`);
         expect(legacy, ':scope is the host on the 2024 target too').toContain(`[${id}] { display: block; }`);
         expect(legacy).not.toContain('@scope');
+    });
+});
+
+// The second root and the second form of each selector exist only for the elements a template writes
+// inside a component's tag. A template that writes none pays for neither (#511).
+describe('a template that marks nothing', () => {
+    const SINGLE = '@scope ([data-pdx-abc]) to ([data-pdx-root] > *)';
+    const id = `data-pdx-${hash('d.pdx')}`;
+    const css = '.a { color: red; } :scope { display: block; } .b::before { content: "x"; }';
+    const sfc = (template: string) => parseSFC(`<template>${template}</template>\n<style scoped>${css}</style>`);
+
+    it('is one root, and each selector one form', () => {
+        expect(donutScope('.a { color: red }', H, false)).toBe(`${SINGLE} {:scope .a { color: red }}`);
+        expect(donutScope(':scope { display: block }', H, false)).toContain(':where(:scope)[data-pdx-abc] { display: block }');
+        const out = styleCssFor(sfc('<div class="a"><p class="b">x</p></div>'), 'd.pdx', 0, false);
+        expect(out).toContain(`@scope ([${id}]) to ([data-pdx-root] > *)`);
+        expect(out).not.toContain(`${id}-in`);
+        expect(out).not.toContain(':where(:not(');
+    });
+
+    it('control — a template with an element inside a component tag keeps both roots and both forms', () => {
+        const out = styleCssFor(sfc('<div class="a"><pdx-card><p class="b">x</p></pdx-card></div>'), 'd.pdx', 0, false);
+        expect(out).toContain(`@scope ([${id}], [${id}-in])`);
+        expect(out).toContain(`:where(:not([${id}])):scope:is(.a)`);
+    });
+
+    it('control — a component tag with nothing written inside it marks nothing', () => {
+        expect(styleCssFor(sfc('<div class="a"><pdx-card></pdx-card></div>'), 'd.pdx', 0, false)).not.toContain(`${id}-in`);
+    });
+
+    it('dev and production agree, for both templates', () => {
+        for (const template of ['<p class="a">x</p>', '<pdx-card><p class="a">x</p></pdx-card>']) {
+            const source = `<template>${template}</template>\n<script>\nlet n = $signal(1);\n</script>\n<style scoped>${css}</style>`;
+            const dev = compile(source, 'd.pdx').code;
+            // The dev module injects the very CSS the production style module serves.
+            const served = styleCssFor(parseSFC(source), 'd.pdx', 0, false);
+            expect(dev, `dev injects other CSS than the style module serves for ${template}`).toContain(JSON.stringify(served).slice(1, 40));
+            expect(dev.includes(`${id}-in`), `the compiled template and its CSS disagree for ${template}`)
+                .toBe(served.includes(`${id}-in`));
+        }
     });
 });
 

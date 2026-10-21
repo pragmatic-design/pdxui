@@ -77,8 +77,21 @@ describe('<style src> in a production build', () => {
         const load = plugin.load as unknown as (this: { warn(m: string): void }, id: string) => string | null;
         const css = load.call({ warn: () => {} }, '\0' + styleModuleId(file, 0));
         expect(css).toContain('rebeccapurple');
-        // The default target's donut scope (#152), rooted at the file's own scope attribute, minified.
-        expect(css).toContain(`@scope ([data-pdx-${hash(file)}],[data-pdx-${hash(file)}-in])`);
+        // The default target's donut scope (#152), rooted at the file's own scope attribute, minified;
+        // one root, as the template writes nothing inside a component's tag (#511).
+        expect(css).toContain(`@scope ([data-pdx-${hash(file)}]) to`);
         expect(css).toContain('.card');
+    });
+
+    it('and reads a <template src> to decide the scope\'s form, as the transform compiled it (#511)', () => {
+        const slotted = join(dir, 'slotted.pdx');
+        writeFileSync(join(dir, 'slotted.html'), '<pdx-card><p class="card">x</p></pdx-card>\n');
+        writeFileSync(slotted, '<template src="./slotted.html"></template>\n<script>\nlet a = $signal(1);\n</script>\n<style scoped>.card { color: teal; }</style>\n');
+        const [plugin] = pdx();
+        (plugin.configResolved as unknown as (c: unknown) => void)({ root: dir, base: '/', server: { fs: { allow: [] } }, command: 'build', mode: 'production' });
+        const load = plugin.load as unknown as (this: { warn(m: string): void }, id: string) => string | null;
+        const css = load.call({ warn: () => {} }, '\0' + styleModuleId(slotted, 0));
+        expect(css, 'the projected <p> lost its root: the template in the other file was not read')
+            .toContain(`@scope ([data-pdx-${hash(slotted)}],[data-pdx-${hash(slotted)}-in])`);
     });
 });

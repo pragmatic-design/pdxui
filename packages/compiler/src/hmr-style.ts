@@ -26,6 +26,7 @@ export const STYLE_EVENT = 'pdx:style';
  * - the same source outside the content of the style blocks: the template, the script and every
  *   block's opening tag (so its `scoped`, its `lang`) as they were;
  * - inline blocks only: a `src=` block's CSS lives in another file;
+ * - an inline template: the CSS's scope form follows what the template marks (#511);
  * - the same `bind()` names in each block: a name is a custom property the setup sets, so a new one
  *   changes the module's code;
  * - a light-DOM component: a `<template shadow>`'s CSS is adopted in its setup, not in a head element.
@@ -41,6 +42,8 @@ export function styleOnlyUpdate(prev: string, next: string, filename: string, ta
     const newBlocks = styleBlocks(after);
     if (oldBlocks.length !== newBlocks.length || newBlocks.length === 0) return null;
     if (newBlocks.some((b) => b.src !== null) || oldBlocks.some((b) => b.src !== null)) return null;
+    // The CSS depends on the template too (#511), and a `<template src>` is not in this source.
+    if (after.template?.src) return null;
     if (withoutStyles(prev, before) !== withoutStyles(next, after)) return null;
 
     const swaps: StyleSwap[] = [];

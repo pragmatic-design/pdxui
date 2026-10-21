@@ -272,6 +272,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // it on demand kept the entry at 41.7 KB but put the module between a navigation and its loader's
 // data — three waves where `first-paint-waves.spec.ts` (L4) holds two. Same machine, same day, the
 // built dist: main entry 41.1 → this branch 42.6 KB, blocking 97.4 → 98.9 KB, js 470.4 → 472.0 KB.
+// css 63 stays: a template that writes nothing inside a component's tag gets the donut scope's
+// single-root form (#511). Same machine, same day, the built dist: main 63.0 → this branch 62.3 KB,
+// against 59.5 KB for this branch built with `target: 'baseline-2024'` — the 2026 target's cost
+// falls from 3.5 to 2.8 KB; what is left is the pages that do write inside a component's tag. The
+// budgets are whole kilobytes, and 62 is under the measurement.
 const BUDGET_KB = { entry: 43, js: 472, css: 63, blocking: 99 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;

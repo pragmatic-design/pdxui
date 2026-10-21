@@ -121,10 +121,13 @@ With `scoped`, the compiler puts an attribute on the host element and wraps the 
 
 ```css
 /* you write */          .title { font-weight: 600; }
-/* the browser gets */   @scope ([data-pdx-a1b2c3], [data-pdx-a1b2c3-in]) to ([data-pdx-root] > *) {
-                           :scope .title, :where(:not([data-pdx-a1b2c3])):scope:is(.title) { font-weight: 600; }
+/* the browser gets */   @scope ([data-pdx-a1b2c3]) to ([data-pdx-root] > *) {
+                           :scope .title { font-weight: 600; }
                          }
 ```
+
+When your template writes content inside a child's tag, the scope gets a second root for it,
+`[data-pdx-a1b2c3-in]`, and each selector a second form that matches that content itself.
 
 Every component host carries `data-pdx-root`, so the scope ends where a child begins. What follows:
 
