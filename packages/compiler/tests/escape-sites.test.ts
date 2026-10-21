@@ -4,7 +4,6 @@ import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
 import { compile } from '../src/plugin';
 import { parseObjectLiteralToJson } from '../src/compiler/script-analyzer-helpers';
-import { templateGenerator } from './template-generator';
 import { markup } from './static-markup-of';
 
 /** Every template's cooked text in the module, joined: what the markup holds at runtime. */
@@ -53,11 +52,6 @@ describe('@raw inside a loop binds nothing', () => {
     it('a scoped slot body, built inline since #364: the attribute is the text', () => {
         const { code } = compile(inSlot(src), 'raw-loop.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<span title="${item}">x</span>');
-    });
-
-    it('the template generator: the markup carries the text', () => {
-        const template = /<template>([\s\S]*)<\/template>/.exec(src)![1];
-        expect(templateText(templateGenerator(template, ['items']))).toContain('<span title=${item}>');
     });
 });
 

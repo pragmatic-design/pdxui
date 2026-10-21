@@ -1,11 +1,9 @@
 // What is written between `<component :is>` and `</component>` (#358).
 //
-// `dynamic()` takes no children, so that content has nowhere to go. One scanner says where it is,
-// for the two places that need it: the template path — the legacy mode's — drops it from the nodes
-// it generates (the inline path discards it on its own, in a sink of its static tree), and
-// validation reports it once, read off the template's text, as PDX_DYNAMIC_CONTENT.
+// `dynamic()` takes no children, so that content has nowhere to go. The render discards it on its
+// own, in a sink of its static tree; validation reports it once, read off the template's text, as
+// PDX_DYNAMIC_CONTENT.
 
-import type { HtmlNode, TemplateNode } from '../parser/template';
 import type { ValidationWarning } from './validate';
 import { findTagEnd } from './codegen-template-rewrite';
 
@@ -32,70 +30,6 @@ function closeOf(text: string, from: number, state: { depth: number }): number {
         } else if (!/\/\s*>$/.test(text.slice(m.index, end + 1))) {
             state.depth++;
         }
-        COMPONENT_TAG.lastIndex = end + 1;
-    }
-    return -1;
-}
-
-/** The node's text from `from` on, with its place in the template kept. */
-function tailOf(node: HtmlNode, from: number): HtmlNode | null {
-    const content = node.content.slice(from);
-    if (!content) return null;
-    const shifts = node.shifts ?? [];
-    const before = shifts.filter((s) => s <= from).length;
-    const tail: HtmlNode = { ...node, content };
-    if (node.loc?.offset != null) {
-        const skipped = node.content.slice(0, from);
-        const lines = skipped.split('\n');
-        tail.loc = {
-            offset: node.loc.offset + from + before,
-            line: node.loc.line + lines.length - 1,
-            column: lines.length > 1 ? lines[lines.length - 1].length : node.loc.column + from,
-        };
-    }
-    const kept = shifts.filter((s) => s > from).map((s) => s - from);
-    if (kept.length) tail.shifts = kept; else delete tail.shifts;
-    return tail;
-}
-
-/**
- * The nodes without what any dynamic component encloses: each `<component :is …>` keeps its opening
- * tag, and its content and closing tag are gone — whatever nodes they span. Only the template path
- * uses it: the inline path keeps the closing tag to close the sink it opened.
- */
-export function dropDynamicContent(nodes: TemplateNode[]): TemplateNode[] {
-    const out: TemplateNode[] = [];
-    const state = { depth: 0 };
-    for (const node of nodes) {
-        if (node.type !== 'html' || node.raw) {
-            if (state.depth === 0) out.push(node);
-            continue;
-        }
-        let rest: HtmlNode | null = node;
-        while (rest) {
-            if (state.depth > 0) {
-                const end = closeOf(rest.content, 0, state);
-                if (end === -1) break;
-                rest = tailOf(rest, end);
-                continue;
-            }
-            const open = firstDynamicOpen(rest.content);
-            if (open === -1) { out.push(rest); break; }
-            out.push({ ...rest, content: rest.content.slice(0, open) });
-            state.depth = 1;
-            rest = tailOf(rest, open);
-        }
-    }
-    return out.filter((n) => n.type !== 'html' || n.content !== '');
-}
-
-/** Index just past the first `<component :is …>` tag of `text` that encloses content, or -1. */
-function firstDynamicOpen(text: string): number {
-    COMPONENT_TAG.lastIndex = 0;
-    let m: RegExpExecArray | null;
-    while ((m = COMPONENT_TAG.exec(text)) !== null) {
-        const end = findTagEnd(text, m.index);
-        if (!m[1] && opensDynamic(text.slice(m.index, end + 1))) return end + 1;
         COMPONENT_TAG.lastIndex = end + 1;
     }
     return -1;

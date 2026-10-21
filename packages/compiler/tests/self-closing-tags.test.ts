@@ -5,23 +5,12 @@
 // rendering its own content — drops it. It is the form JSX and Vue write by habit; Vue and Svelte
 // expand it, and so does the compiler. Void elements (<input />, <br />) keep their form.
 
-// The first block measures the template generator, which expands the tag in its markup. A .pdx in
-// the new mode no longer reaches it — a scoped slot's body was the last part it wrote, until #364 —
-// so it is called directly: the legacy mode still renders through it. The second block
-// measures the tree the inline path — every .pdx's render — builds from the parsed template.
+// What is measured is the tree the inline path — every .pdx's render — builds from the parsed template.
 import { describe, it, expect } from 'vitest';
 import { generateInlineNodes } from '../src/compiler/codegen-template-inline';
-import { generateNodes } from '../src/compiler/codegen-template';
 import { createCompileContext } from '../src/compiler/compile-context';
 import { parseTemplate } from '../src/parser/template';
 import { withBlockCopies, stubStaticBlock } from './stub-block-copies';
-
-/** The template generator's html`` for `template`, with `v` declared by the script as the cases read it. */
-function render(template: string, opts: { production?: boolean } = {}): string {
-    const ctx = createCompileContext(opts);
-    ctx.declaredNames = new Set(['v']);
-    return generateNodes(parseTemplate(template), new Set(), ctx);
-}
 
 type Node = { tagName: string; children: Node[] };
 /** The tree the inline render builds for `template`, with every runtime call stubbed. */
@@ -47,38 +36,6 @@ function inlineTree(template: string): Node {
         document, stubStaticBlock(document), noop, { v: () => 'x' }, noop, id, id) as Node;
 }
 const tags = (n: Node) => n.children.map((c) => c.tagName).filter((t) => t !== '#text');
-
-describe('self-closing tags in a template', () => {
-    for (const [mode, opts] of [['dev', {}], ['prod', { production: true }]] as const) {
-        it(`${mode}: <pdx-x a="1" /> is <pdx-x a="1"></pdx-x>, and the next element stays its sibling`, () => {
-            const out = render('<div><pdx-x a="1" /><p>after</p></div>', opts);
-            expect(out).toContain('<pdx-x a="1"></pdx-x><p>after</p>');
-            expect(out).not.toMatch(/<pdx-x[^>]*\/>/);
-        });
-    }
-
-    it('a bound self-closing component closes after its rewritten attributes', () => {
-        const out = render('<pdx-x :a="v" @pdx-change="v = $event.detail" /><span>next</span>');
-        expect(out).toMatch(/<pdx-x :a=\$\{ctx\.v\} @pdx-change=\$\{[^}]*\}[^>]*><\/pdx-x><span>next<\/span>/);
-    });
-
-    it('a plain element too: <div class="gap" />', () => {
-        expect(render('<div class="gap" /><p>x</p>')).toContain('<div class="gap"></div><p>x</p>');
-    });
-
-    it('void elements keep their form', () => {
-        const out = render('<input type="text" /><br/><img src="a.png" />');
-        expect(out).toContain('<input type="text" />');
-        expect(out).toContain('<br/>');
-        expect(out).toContain('<img src="a.png" />');
-        expect(out).not.toContain('</input>');
-        expect(out).not.toContain('</br>');
-    });
-
-    it('a /> inside a quoted attribute value is not the end of the tag', () => {
-        expect(render('<pdx-x title="a/>b" /><p>x</p>')).toContain('<pdx-x title="a/>b"></pdx-x><p>x</p>');
-    });
-});
 
 describe('self-closing tags — the inline render, every .pdx\'s', () => {
     it('the element after a self-closing component is its sibling, not its child', () => {

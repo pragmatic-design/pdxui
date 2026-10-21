@@ -405,19 +405,3 @@ const LOOP_VAR_FALLBACK = new Set([
     'item', 'index', 'i', 'e', 'v', 'el', 'prev', 'n', 'k',
     'error', 'err', 'retry',
 ]);
-
-/**
- * An expression made safe to use as an arrow's BODY: `() => ${asArrowBody(expr)}`.
- *
- * `() => { a: 1 }` is an arrow with a block body, not one returning an object. `a: 1` reads as a
- * label followed by an expression, and the comma before the next pair makes it a syntax error —
- * so `:item-default="{ activity: '', hours: 1 }"` would compile to a module Rollup cannot parse,
- * with an error pointing at the GENERATED line of a `.pdx` whose own line number cannot be
- * recovered, for a mistake the author did not make.
- *
- * Only a leading `{` is ambiguous. An array literal is not — `() => [1, 2]` returns the array —
- * and an application binds arrays constantly and an object rarely.
- */
-export function asArrowBody(expr: string): string {
-    return expr.trimStart().startsWith('{') ? `(${expr})` : expr;
-}

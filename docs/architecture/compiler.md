@@ -187,8 +187,9 @@ component('pdx-counter', {
 The codegen's sub-modules each own one responsibility:
 
 - **codegen-setup.ts**: builds the body of `setup()` — prop accessors, signals, lifecycle hooks, CSS scoping
-- **codegen-template.ts**: turns the AST into an `html\`\`` tagged template
-- **codegen-template-rewrite.ts**: rewrites the special attributes (`:prop` → a property binding, `@event` → an event listener)
+- **codegen-template-inline.ts**: turns the template AST into imperative DOM code, the one render path (#107)
+- **codegen-template.ts**: what the render shares with other generators — transition, virtual-list and `@await` options, a `@defer`'s loader, the hoisting of a scoped slot's function and of a loop's invariant reads (the `html\`\`` generator is removed, #526)
+- **codegen-template-rewrite.ts**: event handlers, a two-way accessor, the `dynamic(…)` and `renderSlot(…)` calls
 - **codegen-prefix.ts**: adds `ctx.` to the free identifiers in the template (the template reaches the component's scope through the context)
 - **codegen-styles.ts**: applies CSS scoping with `[data-pdx-HASH]` and handles `bind()` → `var()`
 - **codegen-template-inline.ts**: an alternative production mode that emits imperative DOM instead of `html\`\``
@@ -271,8 +272,8 @@ To find your way around the compiler's source:
 | **Transformation** | `compiler/signal-rewrite.ts` | 625 | count++ → __count.set() |
 | **Generation** | `compiler/codegen.ts` | 646 | The orchestrator: picks the mode, calls the sub-generators |
 | | `compiler/codegen-setup.ts` | 342 | Generates the body of setup() |
-| | `compiler/codegen-template.ts` | 343 | AST → an html\`\` tagged template |
-| | `compiler/codegen-template-rewrite.ts` | 302 | :prop/@event → JS bindings |
+| | `compiler/codegen-template.ts` | 167 | Options and hoisting the render shares |
+| | `compiler/codegen-template-rewrite.ts` | 307 | Event handlers, `dynamic(…)`, `renderSlot(…)` |
 | | `compiler/codegen-prefix.ts` | 105 | Adds ctx. to the identifiers |
 | | `compiler/codegen-styles.ts` | 200 | CSS scoping with [data-pdx-HASH] |
 | | `compiler/codegen-template-inline.ts` | 391 | Imperative DOM generation (prod) |

@@ -22,23 +22,11 @@ export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX };
 // ─── Template-literal escaping ─────────────────────────────────────
 
 /**
- * Escape author-written literal HTML text so it can be safely embedded inside a
- * `html\`...\`` tagged template. Without this, an author's backtick breaks the
- * module (SyntaxError) and `${...}` would be EXECUTED as a real interpolation.
- * Order matters: backslash first, then backtick and ${.
- * Apply ONLY to literal author text — NEVER to generated code/placeholders/bindings.
- */
-export function escapeForTemplateLiteral(s: string): string {
-    return s.replace(/\\/g, '\\\\').replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
-}
-
-/**
  * Escape author text that is embedded in a template literal whose `${...}` interpolations must
  * KEEP WORKING — a reactive `@fetch` URL, where `${id}` is the whole feature.
  *
- * So this differs from {@link escapeForTemplateLiteral} in exactly one way: it does not touch
- * `${`. It still escapes the backslash and the backtick, and the backslash MUST go first or the
- * escapes it introduces would themselves be escaped.
+ * It does not touch `${`. It escapes the backslash and the backtick, and the backslash MUST go first
+ * or the escapes it introduces would themselves be escaped.
  *
  * Applying the wrong one of the two makes a URL executable code — as does escaping the HTTP
  * method, which can never contain either character, while the URL goes in raw.

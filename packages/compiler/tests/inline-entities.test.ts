@@ -1,9 +1,8 @@
-// The inline path must decode HTML entities, because the template path does.
+// The inline path must decode HTML entities, as a browser parsing the same markup would.
 //
-// The template path emits the markup into `html``` and core parses it with innerHTML, so the
-// BROWSER decodes `&lt;`, `&amp;` and `&#64;`. The inline path builds the DOM itself —
-// `createTextNode(...)` and `setAttribute(...)` — and if it hands them the raw source text, an
-// entity stays on screen as an entity.
+// Markup parsed with innerHTML has `&lt;`, `&amp;` and `&#64;` decoded by the BROWSER. The inline path
+// builds the DOM itself — `createTextNode(...)` and `setAttribute(...)` — and if it hands them the raw
+// source text, an entity stays on screen as an entity.
 //
 // A `<pre><code>` block showing PDX source escapes its `@for` as `&#64;for`, precisely so the
 // compiler does not read it as a directive; undecoded, the page renders `&#64;for (items as item; …)`
@@ -14,7 +13,6 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
-import { templateGenerator } from './template-generator';
 
 /**
  * The render of `template`; with `inSlot`, inside a scoped slot's body, which is built inline too since #364.
@@ -56,10 +54,7 @@ describe('a static attribute value', () => {
     });
 });
 
-describe('and the two generators agree', () => {
-    // The template generator is the reference: whatever the browser would do with innerHTML is what
-    // the inline path has to produce. It is called directly — no .pdx in the new mode reaches it since
-    // #364, when a scoped slot's body moved to the inline path, which is measured here as well.
+describe('no entity is left encoded, in the render or a scoped slot body', () => {
     const CASES = [
         '<pre><code>&#64;for (x as y) {</code></pre>',
         '<p>&lt;div&gt; &amp; &quot;q&quot;</p>',
@@ -68,13 +63,10 @@ describe('and the two generators agree', () => {
 
     for (const markup of CASES) {
         it(`${markup.slice(0, 40)}…`, () => {
-            // What the template path ships is the markup verbatim — the browser decodes it later.
-            // So the comparison is: every entity the template path passes through, the inline path
-            // has already resolved, and nothing is left encoded in the inline output.
+            // The control: the source carries entities, so nothing below passes on an empty case.
+            expect(markup).toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
             expect(emitted(markup), 'an entity survived into the inline output').not.toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
             expect(emitted(markup, true), 'an entity survived into a scoped slot body').not.toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
-            expect(templateGenerator(markup), 'the template path stopped carrying the markup — re-read this test')
-                .toMatch(/&(?:#\d+|lt|gt|amp|quot|#39);/);
         });
     }
 });

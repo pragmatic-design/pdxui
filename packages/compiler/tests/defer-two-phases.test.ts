@@ -1,24 +1,15 @@
 // `@defer` in two phases, compiled (#281; docs/language/beta/template.md → «`@defer` — two phases»).
 //
-// Both render paths read `@defer (<render>; prefetch <prefetch>)`, `when (expr)` and `@error (err, retry)`
-// and emit them as `defer()`'s options. `hover` is a removed form, rewritten to `interaction`. The
+// The render path reads `@defer (<render>; prefetch <prefetch>)`, `when (expr)` and `@error (err, retry)`
+// and emits them as `defer()`'s options. `hover` is a removed form, rewritten to `interaction`. The
 // runtime half is `core/tests/defer-two-phases.test.ts`.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { generateNodes } from '../src/compiler/codegen-template';
-import { parseTemplate } from '../src/parser/template';
 import { parseDeferTriggers } from '../src/compiler/defer-triggers';
 import { deferHover } from '../src/language/defer-hover';
-import { createCompileContext } from '../src/compiler/compile-context';
 
 const pdx = (template: string, script = '') => `<template>\n  ${template}\n</template>\n<script>\n${script}\n</script>\n`;
 const errors = (source: string) => compile(source, 'd.pdx').warnings.filter((w) => w.severity === 'error');
-
-/** The `defer({ … })` options the template path emits for a template. */
-function templatePath(template: string): string {
-    const imports = new Set<string>();
-    return generateNodes(parseTemplate(template), imports, createCompileContext());
-}
 
 describe('the trigger grammar', () => {
     it('splits the phases at the top-level ; and the triggers at the top-level |', () => {
@@ -46,12 +37,6 @@ describe('a compiled @defer (viewport; prefetch idle)', () => {
         expect(code).toContain("prefetch:'idle'");
     });
 
-    it("and on the template path", () => {
-        const code = templatePath('@defer (viewport; prefetch idle) { <p>x</p> }');
-        expect(code).toContain("trigger: 'viewport'");
-        expect(code).toContain("prefetch: 'idle'");
-    });
-
     it('compiles with no diagnostic', () => {
         expect(errors(pdx('@defer (viewport; prefetch idle) { <p>x</p> }'))).toEqual([]);
     });
@@ -62,24 +47,22 @@ describe('a compiled @defer (viewport; prefetch idle)', () => {
 });
 
 describe('when (expr)', () => {
-    it('is emitted as a function of the expression, its signals read, on both paths', () => {
+    it('is emitted as a function of the expression, its signals read', () => {
         const source = pdx('@defer (when (tab === \'sales\'); prefetch when (ready)) { <p>x</p> }', "let tab = $signal('a');\nlet ready = $signal(false);");
         const { code } = compile(source, 'd.pdx');
         expect(code).toMatch(/when:\(\)=>\(ctx\.tab\(\) === 'sales'\)/);
         expect(code).toMatch(/prefetchWhen:\(\)=>\(ctx\.ready\(\)\)/);
         expect(code).not.toMatch(/trigger:/);
         expect(errors(source)).toEqual([]);
-        expect(templatePath("@defer (when (open)) { <p>x</p> }")).toMatch(/when: \(\) => \(ctx\.open/);
     });
 });
 
 describe('@error (err, retry)', () => {
-    it('binds the names on both paths, err and retry by default', () => {
+    it('binds the names, err and retry by default', () => {
         const named = compile(pdx('@defer (viewport) { <p>x</p> } @error (e, again) { <button @click="again()">{{ e.message }}</button> }'), 'd.pdx');
         expect(named.code).toMatch(/error:\(e,again\)=>/);
         expect(named.warnings.filter((w) => w.severity === 'error')).toEqual([]);
         expect(compile(pdx('@defer (viewport) { <p>x</p> } @error { <button @click="retry()">{{ err.message }}</button> }'), 'd.pdx').code).toMatch(/error:\(err,retry\)=>/);
-        expect(templatePath('@defer (viewport) { <p>x</p> } @error (e, again) { <p>x</p> }')).toMatch(/error: \(e, again\) =>/);
     });
 });
 
