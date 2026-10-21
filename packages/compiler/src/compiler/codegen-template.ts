@@ -1,190 +1,17 @@
-// Template code generation — converts template AST nodes to html`` tagged template strings.
-// Shared between new mode and legacy mode.
+// What the inline render path (./codegen-template-inline) shares with the generator that once built a
+// render as an html`` tagged template: the options of a transition, of a virtual list and of an
+// `@await`, the loader of a `@defer`, the hoisting of a scoped slot's function and of a loop's
+// invariant reads. That generator is gone (#526): nothing reached it after the legacy mode (#158).
 // All state is passed via CompileContext — no module-level mutable variables.
-// HTML attribute rewriting is in codegen-template-rewrite.ts.
 
-import type {
-    TemplateNode, IfNode, ForNode, SwitchNode,
-    RequireNode, InterpolationNode, TransitionConfig,
-    ShowNode, PortalNode, DeferNode, TryNode, AwaitNode,
-    SlotTemplateNode,
-} from '../parser/template';
+import type { ForNode, TransitionConfig, AwaitNode, SlotTemplateNode } from '../parser/template';
 import type { CompileContext } from './compile-context';
-import { prefixCtx, callSignals, isRowBinding, withLoopScope, withBoundaryScope, trackKeyArg, pipeChain } from './codegen-prefix';
-import { rewriteHtmlBindings, isSimpleAccess, scopedSlotCall } from './codegen-template-rewrite';
-import { templateMark, htmlOriginOf } from './codegen-origins';
 import { jsQuote, jsString } from './js-literal';
-import { deferTriggerOptions } from './defer-triggers';
-import { escapeForTemplateLiteral } from './codegen-shared';
 import { virtualRowTag } from './validate-virtual';
-import { dropDynamicContent } from './dynamic-content';
-
-/** `${…}` with an origin mark just inside its `${`, where it is part of the expression, not the HTML. */
-function markInterpolation(code: string, mark: string): string {
-    return mark && code.startsWith('${') ? '${' + mark + code.slice(2) : code;
-}
-
-// ─── Node Generation ───────────────────────────────────────────────
 
 /**
- * Convert an array of AST nodes into a `html\`...\`` tagged template string.
- * Buffers consecutive HTML text, flushes before each dynamic node.
- * Tracks which @pdxui/core imports are needed (when, each, match, etc).
- */
-export function generateNodes(nodes: TemplateNode[], imports: Set<string>, ctx: CompileContext): string {
-    // What a `<component :is>` encloses renders nowhere: no content, no stray `</component>` (#358).
-    nodes = dropDynamicContent(nodes);
-    if (nodes.length === 0) return 'html``';
-
-    const parts: string[] = [];
-    let htmlBuf = '';
-    // Where each html node's content starts in the buffer, and the .pdx origin of its characters.
-    let segments: { start: number; at: ((k: number) => number | null) | null }[] = [];
-
-    function flushHtml() {
-        if (htmlBuf) {
-            const segs = segments;
-            const originAt = segs.some((seg) => seg.at) ? (i: number) => {
-                const seg = segs.filter((g) => g.start <= i).pop();
-                return seg?.at ? seg.at(i - seg.start) : null;
-            } : undefined;
-            parts.push(rewriteHtmlBindings(htmlBuf, ctx, originAt));
-            htmlBuf = '';
-            segments = [];
-        }
-    }
-
-    for (const node of nodes) {
-        switch (node.type) {
-            case 'html':
-                if (node.raw) {
-                    // @raw: escaped for the html`` literal and nothing else — no binding rewrite.
-                    flushHtml();
-                    parts.push(escapeForTemplateLiteral(node.content));
-                    break;
-                }
-                segments.push({ start: htmlBuf.length, at: htmlOriginOf(ctx, node) });
-                htmlBuf += node.content;
-                break;
-            case 'interpolation':
-                flushHtml();
-                parts.push(markInterpolation(generateInterpolation(node, imports, ctx), templateMark(ctx, node.exprOffset)));
-                break;
-            case 'if':
-                flushHtml();
-                parts.push(markInterpolation(generateIf(node, imports, ctx), templateMark(ctx, node.exprOffset)));
-                break;
-            case 'for':
-                flushHtml();
-                parts.push(markInterpolation(generateFor(node, imports, ctx), templateMark(ctx, node.exprOffset)));
-                break;
-            case 'switch':
-                flushHtml();
-                parts.push(generateSwitch(node, imports, ctx));
-                break;
-            case 'require':
-                flushHtml();
-                parts.push(generateRequire(node, imports, ctx));
-                break;
-            case 'show':
-                flushHtml();
-                parts.push(generateShow(node, imports, ctx));
-                break;
-            case 'portal':
-                flushHtml();
-                parts.push(generatePortal(node, imports, ctx));
-                break;
-            case 'defer':
-                flushHtml();
-                parts.push(generateDefer(node, imports, ctx));
-                break;
-            case 'try':
-                flushHtml();
-                parts.push(generateTry(node, imports, ctx));
-                break;
-            case 'await':
-                flushHtml();
-                parts.push(generateAwait(node, imports, ctx));
-                break;
-            case 'let': {
-                // @let assigns a computed value to ctx, accessible by subsequent template nodes
-                flushHtml();
-                const letExpr = callSignals(prefixCtx(node.expr, ctx), ctx);
-                parts.push(`\${(() => { ctx.${node.name} = ${letExpr}; return ''; })()}`);
-                break;
-            }
-            case 'slot-template':
-                flushHtml();
-                parts.push(generateSlotTemplate(node, imports, ctx));
-                break;
-            case 'scoped-slot':
-                // The fallback is the node's body, generated like any block's (#276).
-                flushHtml();
-                parts.push(`\${${scopedSlotCall(node.tag, `() => ${generateNodes(node.body, imports, ctx)}`, ctx)}}`);
-                break;
-            case 'custom-directive':
-                flushHtml();
-                if (ctx.customDirectiveHandlers && ctx.customDirectiveHandlers.has(node.name)) {
-                    const handler = ctx.customDirectiveHandlers.get(node.name)!;
-                    const bodyCode = generateNodes(node.body, imports, ctx);
-                    parts.push(`\${${handler.generate(node.expr, bodyCode, imports)}}`);
-                } else {
-                    parts.push(`<!-- unknown directive @${node.name} -->`);
-                }
-                break;
-        }
-    }
-    flushHtml();
-
-    const result = 'html`' + parts.join('') + '`';
-    if (result.includes('renderSlot(')) imports.add('renderSlot');
-    if (result.includes('dynamic(')) imports.add('dynamic');
-    if (result.includes('errorBoundary(')) imports.add('errorBoundary');
-    if (result.includes('safeHandler(')) imports.add('safeHandler');
-    // Every compiled handler runs inside batch() (#114, buildEventHandler).
-    if (result.includes('batchHandler(')) imports.add('batchHandler');
-    return result;
-}
-
-// ─── Per-Node Generators ───────────────────────────────────────────
-
-function generateInterpolation(node: InterpolationNode, imports: Set<string>, ctx: CompileContext): string {
-    const expr = prefixCtx(node.expr, ctx);
-
-    if (node.pipes.length > 0) {
-        // core's value chain, not the `pipe` signal operator it used to import (#199).
-        imports.add('templatePipe');
-        return `\${() => ${pipeChain(callSignals(expr, ctx), node.pipes, ctx)}}`;
-    }
-
-    if (isSimpleAccess(node.expr, ctx)) {
-        return `\${${expr}}`;
-    }
-    return `\${() => ${callSignals(expr, ctx)}}`;
-}
-
-function generateIf(node: IfNode, imports: Set<string>, ctx: CompileContext): string {
-    if (ctx.production) {
-        const cond = node.condition.trim();
-        if (cond === 'true') {
-            return generateNodes(node.body, imports, ctx).slice(5, -1);
-        }
-        if (cond === 'false') {
-            if (node.elseBody) return generateNodes(node.elseBody, imports, ctx).slice(5, -1);
-            return '';
-        }
-    }
-    imports.add('when');
-    const condition = callSignals(prefixCtx(node.condition, ctx), ctx);
-    const thenCode = generateNodes(node.body, imports, ctx);
-    const elseCode = node.elseBody ? `() => ${generateNodes(node.elseBody, imports, ctx)}` : 'null';
-    const transition = generateTransition(node.transition);
-    return `\${when(() => ${condition}, () => ${thenCode}, ${elseCode}${transition})}`;
-}
-
-/**
- * The options object of an `eachVirtual` call (#283), the same on both render paths: the estimate
- * written in `@virtual(n)`, the rows' tag for the spacers, getters for a plain item, and `@empty`.
+ * The options object of an `eachVirtual` call (#283): the estimate written in `@virtual(n)`, the rows'
+ * tag for the spacers, getters for a plain item, and `@empty`.
  */
 export function virtualOptions(node: ForNode, getters: boolean, empty: string | null): string {
     const parts = [
@@ -194,60 +21,6 @@ export function virtualOptions(node: ForNode, getters: boolean, empty: string | 
         empty ? `empty:${empty}` : '',
     ].filter(Boolean);
     return `{${parts.join(',')}}`;
-}
-
-function generateFor(node: ForNode, imports: Set<string>, ctx: CompileContext): string {
-    if (node.virtual) {
-        // `@for … @virtual` (#283): the call the inline path emits, for the legacy mode's template.
-        const rows = isRowBinding(node);
-        imports.add('eachVirtual');
-        const itemsExpr = callSignals(prefixCtx(node.items, ctx), ctx);
-        const body = withLoopScope(node, rows, ctx, () => generateNodes(node.body, imports, ctx));
-        const params = node.index ? `${node.item}, ${node.index}` : node.item;
-        const empty = node.emptyBody ? `() => ${generateNodes(node.emptyBody, imports, ctx)}` : null;
-        return `\${eachVirtual(() => ${itemsExpr}, ${trackKeyArg(node, ctx)}, (${params}) => ${body}, ${virtualOptions(node, rows, empty)})}`;
-    }
-    // A plain `item` becomes a row getter (eachRow): a row reused for the same key reads its
-    // current item and index. A destructured binding keeps value rows, `eachDestructured`: its names
-    // are bound once, from the object the row was created with, and a large append is sliced as
-    // eachRow's is (#398).
-    const rows = isRowBinding(node);
-    const helper = rows ? 'eachRow' : 'eachDestructured';
-    imports.add(helper);
-    const itemsExpr = callSignals(prefixCtx(node.items, ctx), ctx);
-
-    const keyArg = trackKeyArg(node, ctx);
-    const bodyCode = withLoopScope(node, rows, ctx, () => generateNodes(node.body, imports, ctx));
-    const transition = generateTransition(node.transition);
-    const renderParams = node.index ? `${node.item}, ${node.index}` : node.item;
-    const eachCall = `${helper}(() => ${itemsExpr}, ${keyArg}, (${renderParams}) => ${bodyCode}${transition})`;
-
-    if (ctx.production) {
-        const invariants = extractLoopInvariants(bodyCode, node.item, ctx);
-        if (invariants.length > 0) {
-            imports.add('computed');
-            const hoisted = invariants.map(name =>
-                `const __li_${name} = computed(() => ctx.${name}());`
-            ).join(' ');
-            let optimized = eachCall;
-            for (const name of invariants) {
-                optimized = optimized.replace(new RegExp(`ctx\\.${name}\\(\\)`, 'g'), `__li_${name}()`);
-                // Match: `ctx.NAME` passed by reference — not followed by a word char, `(` or `.`
-                // (a member of the signal object is never a read of its value).
-                optimized = optimized.replace(new RegExp(`ctx\\.${name}(?!\\w|\\(|\\.)`, 'g'), `__li_${name}()`);
-            }
-            return `\${(() => { ${hoisted} return ${optimized}; })()}`;
-        }
-    }
-
-    // @empty fallback — shown when the array is empty
-    if (node.emptyBody) {
-        imports.add('when');
-        const emptyCode = generateNodes(node.emptyBody, imports, ctx);
-        return `\${when(() => ${itemsExpr}?.length > 0, () => ${eachCall}, () => ${emptyCode})}`;
-    }
-
-    return `\${${eachCall}}`;
 }
 
 /**
@@ -274,9 +47,9 @@ export function extractLoopInvariants(bodyCode: string, loopVar: string, ctx: Co
     let hm: RegExpExecArray | null;
     while ((hm = handlerRe.exec(bodyCode)) !== null) handlerNames.add(hm[1]);
     // A `:ref` target is the signal itself, written by the binding, never a read of its value:
-    // `bindRef(el, ctx.NAME)` on the inline path, `:ref=${ctx.NAME}` on the template path. Hoisted,
-    // the binding would receive the value (`null`) and the ref would never be set (#262).
-    const refRe = /(?:bindRef\([^,]+,|:ref=\$\{)\s*ctx\.([\w$]+)/g;
+    // `bindRef(el, ctx.NAME)`. Hoisted, the binding would receive the value (`null`) and the ref would
+    // never be set (#262).
+    const refRe = /bindRef\([^,]+,\s*ctx\.([\w$]+)/g;
     while ((hm = refRe.exec(bodyCode)) !== null) handlerNames.add(hm[1]);
 
     const reads = new Set<string>();
@@ -289,15 +62,12 @@ export function extractLoopInvariants(bodyCode: string, loopVar: string, ctx: Co
         if (handlerNames.has(name)) continue;    // event handler — never hoist/invoke
         if (ctx.nonSignalNames?.has(name)) continue; // a const/let/function/form — not reactive
         // Already hoisted by a NESTED each(): the inner loop body emitted
-        // `const __li_NAME = computed(() => ctx.NAME())` and rewrote its reads to __li_NAME().
+        // `const __li<n>_NAME = computed(() => ctx.NAME())` and rewrote its reads to it.
         // Re-hoisting at this (outer) level would replace that inner declaration's own
-        // `ctx.NAME()` initializer with the shadowing `__li_NAME()` → a self-referential
-        // `const __li_NAME = computed(() => __li_NAME())` → TDZ at render. Leave it to the
-        // inner loop (its computed still reads ctx.NAME() reactively).
-        //
-        // The digits are the inline path's names, which carry the generator's
-        // counter: every line that path writes lands in ONE block, so a second loop in
-        // the same block cannot reuse the plain name. Matched here so the skip covers both.
+        // `ctx.NAME()` initializer with the shadowing name → a self-referential computed → TDZ at
+        // render. Leave it to the inner loop (its computed still reads ctx.NAME() reactively). The
+        // digits are the generator's counter: every line it writes lands in ONE block, so a second
+        // loop in the same block cannot reuse the plain name.
         if (new RegExp(`__li\\d*_${name}\\b`).test(bodyCode)) continue;
         reads.add(name);
     }
@@ -314,82 +84,12 @@ export function extractLoopInvariants(bodyCode: string, loopVar: string, ctx: Co
     });
 }
 
-function generateSwitch(node: SwitchNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('match');
-    const expr = callSignals(prefixCtx(node.expr, ctx), ctx);
-    const caseParts = node.cases.map(c => {
-        const bodyCode = generateNodes(c.body, imports, ctx);
-        return `    ${jsString(c.value)}: () => ${bodyCode}`;
-    });
-    if (node.defaultBody) {
-        caseParts.push(`    _: () => ${generateNodes(node.defaultBody, imports, ctx)}`);
-    }
-    return `\${match(() => ${expr}, {\n${caseParts.join(',\n')}\n  })}`;
-}
-
-function generateRequire(node: RequireNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('requirePermission');
-    const bodyCode = generateNodes(node.body, imports, ctx);
-    const elseCode = node.elseBody ? `() => ${generateNodes(node.elseBody, imports, ctx)}` : 'null';
-    return `\${requirePermission(${jsQuote(node.permission)}, () => ${bodyCode}, ${elseCode})}`;
-}
-
-function generateShow(node: ShowNode, imports: Set<string>, ctx: CompileContext): string {
-    if (ctx.production) {
-        const cond = node.condition.trim();
-        if (cond === 'true') return generateNodes(node.body, imports, ctx).slice(5, -1);
-        if (cond === 'false') return '';
-    }
-    imports.add('show');
-    const condition = callSignals(prefixCtx(node.condition, ctx), ctx);
-    const bodyCode = generateNodes(node.body, imports, ctx);
-    return `\${show(() => ${condition}, ${bodyCode})}`;
-}
-
-function generatePortal(node: PortalNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('portal');
-    const bodyCode = generateNodes(node.body, imports, ctx);
-    return `\${portal(() => ${bodyCode}, ${jsQuote(node.target)})}`;
-}
-
-/**
- * The custom-element tags a deferred body renders, in source order and without repeats: the
- * library's and the app's alike (#136), as `deferLoadFn` imports whichever `importPathOf` resolves.
- *
- * Read from the generated code rather than walked on the AST: the body has already been through
- * every other generator here, so whatever tag survives into it is a tag that will be rendered —
- * including the ones a `@for` or an `@if` inside the block produced.
- */
-function deferredTags(bodyCode: string): string[] {
-    const seen = new Set<string>();
-    // Match: an opening tag whose name has a hyphen, a custom element. Groups: [1]=the name
-    for (const m of bodyCode.matchAll(/<([a-z][\w]*-[\w-]+)/gi)) seen.add(m[1].toLowerCase());
-    return [...seen];
-}
-
-function generateDefer(node: DeferNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('defer');
-    const bodyCode = generateNodes(node.body, imports, ctx);
-    const optionParts = deferTriggerOptions(node.trigger, (e) => callSignals(prefixCtx(e, ctx), ctx));
-    if (node.placeholder) optionParts.push(`placeholder: () => ${generateNodes(node.placeholder, imports, ctx)}`);
-    if (node.loading) optionParts.push(`loading: () => ${generateNodes(node.loading, imports, ctx)}`);
-    if (node.error) {
-        // `@error (err, retry)`, as `@await`'s (#281): the names reach the branch, `err` and `retry` by default.
-        const errorVar = node.errorVar || 'err';
-        const retryVar = node.retryVar ?? 'retry';
-        const errorBody = node.error;
-        optionParts.push(`error: (${errorVar}, ${retryVar}) => ${withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx))}`);
-    }
-
-    return `\${defer({ ${optionParts.join(', ')} }, ${deferLoadFn(deferredTags(bodyCode), ctx)}, () => ${bodyCode})}`;
-}
-
 /**
  * `defer`'s second argument, a `loadFn`: the block loads what it renders. Passing `null` would
  * leave the components to the tag scan's STATIC import at the top of the module — which is what
  * decides the chunk, so the payload would not be deferred at all, only the render. And the static
  * import of a tag used only inside a defer is dropped (`injectComponentImports`), so with `null`
- * nothing would import it at all: shared with the inline path for that reason (#44).
+ * nothing would import it at all (#44).
  *
  * Emitted for every tag in the body, not only the ones used exclusively here: a component
  * rendered elsewhere too keeps its static import, and `import()` on an already-loaded module
@@ -404,38 +104,6 @@ export function deferLoadFn(tags: string[], ctx: CompileContext): string {
         : 'null';
 }
 
-function generateTry(node: TryNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('errorBoundary');
-    const bodyCode = generateNodes(node.body, imports, ctx);
-    const catchCode = withBoundaryScope(node.errorVar, node.retryVar, ctx, () => generateNodes(node.catchBody, imports, ctx));
-    return `\${errorBoundary(() => ${bodyCode}, (${node.errorVar}, ${node.retryVar}) => ${catchCode})}`;
-}
-
-/**
- * `@await` → core's awaitBlock, which decides the branch from the awaited value: a source by its
- * `state()` and `data()`, a promise by whether it settled, a plain value by data.md's E5 — never by
- * truthiness, which a Promise object always passes. `as name` is bound in the body as a getter, like
- * a @for row's item; the timing options pass through.
- */
-function generateAwait(node: AwaitNode, imports: Set<string>, ctx: CompileContext): string {
-    imports.add('awaitBlock');
-    const awaited = callSignals(prefixCtx(node.condition, ctx), ctx);
-    const bound = node.as;
-    const bodyCode = bound
-        ? withLoopScope({ item: bound }, true, ctx, () => generateNodes(node.body, imports, ctx))
-        : generateNodes(node.body, imports, ctx);
-    const loadingCode = node.loading ? `() => ${generateNodes(node.loading, imports, ctx)}` : 'null';
-    let errorCode = 'null';
-    if (node.errorBody) {
-        const errorVar = node.errorVar || 'err';
-        const retryVar = node.retryVar ?? 'retry';
-        const errorBody = node.errorBody;
-        errorCode = `(${errorVar}, ${retryVar}) => ${withBoundaryScope(errorVar, retryVar, ctx, () => generateNodes(errorBody, imports, ctx))}`;
-    }
-    const opts = awaitTimingArg(node);
-    return `\${awaitBlock(() => ${awaited}, (${bound ?? ''}) => ${bodyCode}, ${loadingCode}, ${errorCode}${opts ? `, ${opts}` : ''})}`;
-}
-
 /** `@await`'s `{ minMs, maxMs }` as awaitBlock's last argument, or '' when neither is set. */
 export function awaitTimingArg(node: AwaitNode): string {
     const opts: string[] = [];
@@ -444,36 +112,9 @@ export function awaitTimingArg(node: AwaitNode): string {
     return opts.length ? `{${opts.join(',')}}` : '';
 }
 
-// ─── @slot (parent-side scoped slot template) ─────────────────────
-
-/**
- * Generate a scoped slot carrier element.
- * @slot(item, { value, index }) { <span>${value}</span> }
- *
- * Hoists the slot function OUTSIDE the html`` template to avoid nested template
- * literal issues with Vite's es-module-lexer. The generated code references
- * a variable: ${slotCarrier('item', __pdxSlot_item)}
- */
-function generateSlotTemplate(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext): string {
-    return `\${${hoistSlotTemplate(node, imports, ctx)}}`;
-}
-
-/**
- * Hoist a scoped slot's function and return the EXPRESSION that carries it.
- *
- * Split out of `generateSlotTemplate` so the inline render path can use it too: it needs the same
- * carrier, appended to a parent rather than interpolated into a template, and a second
- * implementation of the hoisting is exactly the kind of copy that drifts — a slot name that is not
- * an identifier is one of the cases it has to get right.
- */
-function hoistSlotTemplate(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext): string {
-    return hoistSlotFunction(node, imports, ctx, () => `return ${generateNodes(node.body, imports, ctx)};`);
-}
-
 /**
  * Hoist a scoped slot's function, whose statements `body` generates with the slot's scope variables
- * in scope as plain locals, and return the EXPRESSION that carries it. The template path and the
- * inline path (#364) differ only in how they build the body.
+ * in scope as plain locals, and return the EXPRESSION that carries it (#364).
  */
 export function hoistSlotFunction(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext, body: () => string): string {
     imports.add('slotCarrier');
@@ -509,8 +150,7 @@ export function hoistSlotFunction(node: SlotTemplateNode, imports: Set<string>, 
 
 /**
  * The options a `when` / `each` / `eachRow` call takes for `@transition`, `@stagger`, `@mode` and
- * `@move`, as `, { … }` to append after its last argument, or '' for a block without them. Both
- * render paths call it, so they cannot disagree about what a block animates (#85).
+ * `@move`, as `, { … }` to append after its last argument, or '' for a block without them (#85).
  */
 export function generateTransition(config?: TransitionConfig): string {
     if (!config) return '';

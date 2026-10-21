@@ -9,11 +9,10 @@ The `<template>` block is HTML with three additions: interpolation (`{{ }}`), bo
 A template compiles along one **render path**, in the dev server and in a production build alike
 (#107): the **inline path**, imperative `createElement` code (`codegen-template-inline.ts`).
 `pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`), and nothing else
-does (#238). The **template path** — an `html\`…\`` tagged template that core parses and binds at
-runtime (`codegen-template.ts`) — generates nothing in a `.pdx` in the new mode: the body of a scoped
-slot fill was the last part it built, until #364, and the legacy mode that rendered through it is
-removed (#158): it is reached by nothing, its Rules below describe code that no file runs, and #526
-removes it.
+does (#238). The **template path** — an `html\`…\`` tagged template that core parsed and bound at
+runtime — is removed (#526): the body of a scoped slot fill was the last part it built, until #364,
+and the legacy mode that rendered through it is removed (#158). `html\`\`` stays in core for
+components written by hand.
 
 ```ebnf
 Template       ::= ( Text | Comment | AtEscape | Element | Interpolation | Directive )*
@@ -78,13 +77,11 @@ text, anything else as `String(value)` — `interpolationText` in core, used by 
 - `${…}` in text is `PDX_RAW_INTERPOLATION` (warning): it is written as the text the author typed,
   never evaluated.
 - The end is the first `}}` outside a string and outside braces, so `{{ { a: 1 }.a }}` is read whole.
-  An expression that starts with `{` compiles to `() => { … }` on the template path — a block, not an
-  object — and the module does not parse. Not checked today.
-- `{{ }}` inside an attribute value — `title="{{ n }}"` — is not a binding form. The template path
-  emits `title="${ctx.n}"`; the inline path sets the attribute to `''` and spills the rest of the tag
-  into the text. Bind with `:title="n"`. Not checked today.
+- `{{ }}` inside an attribute value — `title="{{ n }}"` — is not a binding form: the render sets the
+  attribute to `''` and spills the rest of the tag into the text. Bind with `:title="n"`. Not checked
+  today.
 - A Node, a fragment or an array value is put in as nodes — an array's items one after the other —
-  on both render paths (`bindInterpolation`).
+  (`bindInterpolation`).
 - An unclosed `{{` stops the compile: `Unclosed interpolation`.
 
 #### Examples
@@ -197,9 +194,7 @@ the same way, and has no `effect`: a later change of what it read does not reach
   literal value outside a prop's declared values is `PDX_INVALID_ENUM_VALUE` (warning). The plugin
   passes what it knows of the components; a bare `compile()` has no list and checks none of them.
 - The shorthand `:name` without a value reads the identifier of the same name: `<input :value>` is
-  `<input :value="value">`, on both render paths.
-- The template path also accepts `:name="${expr}"` and strips the `${ }` — but the check above stops
-  the compile first.
+  `<input :value="value">`.
 - A modifier other than `.once` on `:name` raises `PDX_BINDING_MODIFIER` (error). `:class.x` and
   `:style.x` are not modifiers: they are removed forms (#129), `PDX_REMOVED_FORM`.
 
@@ -334,7 +329,7 @@ Two-way binding is a contract (#124): `::name` is valid on a component's `@model
 `files` of `<input>`, `<textarea>`, `<select>`), which are the platform's models.
 
 `::value="name"` compiles to `::value=${ctx.name}` — the signal itself, not its value — and core's
-`bindTwoWay(el, 'value', signal)` binds it, on both paths. Signal to element: an `effect` assigns the
+`bindTwoWay(el, 'value', signal)` binds it. Signal to element: an `effect` assigns the
 property. Element to signal: on an `<input>` or `<textarea>` the `input` event (`change` for
 `checked`), on a `<select>` `change`; on a custom element that declares the prop as a model, its
 `<kebab-name>-change` event and `detail.value`, and nothing else. On a library component that
@@ -507,7 +502,7 @@ type are `any` there as in the script.
 - Only a bare signal name is rewritten into `.set`. `user.name = x` assigns a field of the signal's
   current value, which notifies nothing. Not checked today.
 - A modifier that is not in the list — `.ctrl`, `.meta` — is ignored. Not checked today.
-- A key filter applies to keyboard events only, on both render paths: `@click.enter` fires on a click.
+- A key filter applies to keyboard events only: `@click.enter` fires on a click.
 - A component's events: the parent listens with the name the child dispatches, lowercase — HTML
   lowercases attribute names. The child's declaration is checked (`PDX_EVENT_NAME_CASE`, see
   [script.md](script.md)); the listener is not.
@@ -1621,8 +1616,7 @@ The `;` ends the declaration at depth zero, outside strings.
 #### Semantics
 
 `@let total = price * qty;` evaluates the expression once, when the enclosing template is rendered,
-and assigns it to `ctx.total`; nodes after it read it as `total`. On the template path that is
-`${(() => { ctx.total = …; return ''; })()}`, on the inline path the statement `ctx.total = …;`.
+and assigns it to `ctx.total`; nodes after it read it as `total`: the statement `ctx.total = …;`.
 
 #### Rules
 
@@ -1663,8 +1657,8 @@ The analyzer's form is `@raw { … }`.
 
 The text between the braces is emitted as written: no `{{ }}`, no binding, no directive, no `${ }` is
 read in it, and it is not checked for `PDX_RAW_INTERPOLATION`. It is still **markup**: tags in it are
-elements, and entities are decoded. The template path escapes it only for the `html` literal; the
-inline path builds its elements and sets their attributes as plain values.
+elements, and entities are decoded. The render builds its elements and sets their attributes as plain
+values.
 
 #### Rules
 

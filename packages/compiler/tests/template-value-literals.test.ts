@@ -6,8 +6,7 @@
 // The others went through `JSON.stringify`, which leaves `</script>` as it is — a module inlined in
 // a page ends at it — and U+2028/U+2029, which an older parser reads as line breaks.
 //
-// The checks, on the inline path — every .pdx's render since #107, and a scoped slot's body since
-// #364 — and on the template generator, called directly (the legacy mode still renders through it):
+// The checks, on the inline path — every .pdx's render since #107, and a scoped slot's body since #364:
 //   - the module parses;
 //   - the payload is TEXT: no identifier `__PWNED` exists in the parsed module;
 //   - the module contains no `</script` and no raw U+2028;
@@ -17,7 +16,6 @@ import { describe, it, expect } from 'vitest';
 import ts from 'typescript';
 import { compile } from '../src/plugin';
 import { jsString } from '../src/compiler/js-literal';
-import { templateGenerator } from './template-generator';
 
 const BREAKOUT = `'+(globalThis.__PWNED=1)+'`;
 const NASTY = `a"b\`c\\d\${e}</script><b>\u2028f`;
@@ -25,12 +23,7 @@ const NASTY = `a"b\`c\\d\${e}</script><b>\u2028f`;
 // The same, without the `"` that would close the attribute it is written in.
 const ATTR = NASTY.replace(/"/g, '');
 
-/**
- * `markup`: on the template path the value is not a JavaScript string but the TEXT of the `html```
- * template, next to the rest of the markup — `<` is what that text is made of. There it has to
- * parse, stay text, and come back as written; `</script` and U+2028 are the concerns of a string
- * literal, which is what the inline path writes.
- */
+/** `markup`: the value is an attribute of the block's static markup, written as HTML (#369). */
 type Case = { site: string; template: string; value?: string; markup?: true };
 
 const cases: Case[] = [
@@ -42,10 +35,9 @@ const cases: Case[] = [
     { site: 'static attribute value', template: `<p title="${ATTR}">x</p>`, value: ATTR, markup: true },
 ];
 
-type Path = 'the render' | 'a scoped slot body' | 'the template generator';
+type Path = 'the render' | 'a scoped slot body';
 
 function module(template: string, path: Path): string {
-    if (path === 'the template generator') return templateGenerator(`<div>${template}</div>`, ['on', 'mode'], { production: true });
     const body = path === 'the render' ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
     const src = `<template>\n  ${body}\n</template>\n\n<script>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
     return compile(src, 'probe.pdx', [], undefined, { production: true }).code;
@@ -85,16 +77,12 @@ function attributeValues(html: string): string[] {
 }
 
 describe('template values become string literals in the generated module (#69)', () => {
-    for (const path of ['the render', 'a scoped slot body', 'the template generator'] as const) {
+    for (const path of ['the render', 'a scoped slot body'] as const) {
         for (const c of cases) {
             it(`${c.site}, ${path}: parses, and the value stays text`, () => {
                 const code = module(c.template, path);
-                const { identifiers, strings, templateText } = walk(parsed(code));
+                const { identifiers, strings } = walk(parsed(code));
                 expect(identifiers.has('__PWNED'), `the value ran as code:\n${code}`).toBe(false);
-                if (c.markup && path === 'the template generator') {
-                    expect(templateText.some((t) => t.includes(c.value!)), `the markup does not carry the value as written:\n${code}`).toBe(true);
-                    return;
-                }
                 expect(code.includes('</script'), 'a `</script` ends an inlined module').toBe(false);
                 expect(code.includes('\u2028'), 'a raw U+2028 is a line break to an older parser').toBe(false);
                 if (c.markup && c.value) {

@@ -3,7 +3,6 @@
 // path, the inline one (#107); binding deduplication is the inline path's since #236.
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { templateGenerator } from './template-generator';
 import { markup } from './static-markup-of';
 
 describe('#1 loop-invariant hoisting (production)', () => {
@@ -108,12 +107,6 @@ describe('#3 template-literal escaping', () => {
         const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();
-    });
-
-    it('the template generator escapes them in its html``', () => {
-        const code = templateGenerator('<p>a ` b ${y}</p>', ['y']);
-        expect(code).toContain('a \\` b \\${y}');
-        expect(() => new Function(code)).not.toThrow();
     });
 });
 

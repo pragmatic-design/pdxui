@@ -1,11 +1,7 @@
-// Tests for compiler fixes: scoped styles, prefixCtx, rewriteHtmlBindings, defineEmits
+// Tests for compiler fixes: scoped styles, prefixCtx, bindings, defineEmits
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { templateGenerator } from './template-generator';
-import { generateNodes } from '../src/compiler/codegen-template';
-import { createCompileContext } from '../src/compiler/compile-context';
-import { parseTemplate } from '../src/parser/template';
 import { markup, builds } from './static-markup-of';
 
 // The ancestor form is baseline-2024's (#152); baseline-2026's donut scope is scope-donut.test.ts.
@@ -100,7 +96,7 @@ describe('prefixCtx fix', () => {
     });
 });
 
-describe('rewriteHtmlBindings fix', () => {
+describe('binding fixes', () => {
     it('handles single-quoted attribute values', () => {
         const { code } = compile(`
 <template>
@@ -119,52 +115,38 @@ describe('rewriteHtmlBindings fix', () => {
         expect(code).toContain('ctx.remove(item.id)');
     });
 
-    it('rewrites :ref="name" to :ref=${ctx.name}', () => {
-        const code = templateGenerator(`<canvas :ref="canvasEl"></canvas>`);
+    // On the inline path, every .pdx's (#107, #526): what the template generator once wrote into its
+    // html`` attributes is a call on the element.
+    const inline = (template: string, script: string) =>
+        compile(`<template>${template}</template>\n<script>\n${script}\n</script>\n`, 'test.pdx').code;
 
-        expect(code).toContain(':ref=${ctx.canvasEl}');
+    it(':ref="name" hands the element to the ref', () => {
+        const code = inline('<canvas :ref="canvasEl"></canvas>', 'let canvasEl = ref();\nimport { ref } from "@pdxui/core";');
+        expect(code).toMatch(/bindRef\(__el\d+,\s*ctx\.canvasEl\)/);
     });
 
-    it('handles ::value with modifiers', () => {
-        const code = templateGenerator(`<input ::value.trim="name">`);
-
-        expect(code).toContain('::value.trim=${ctx.name}');
+    it('::value with a modifier binds both ways, the modifier kept', () => {
+        const code = inline('<input ::value.trim="name">', "let name = $signal('');");
+        expect(code).toMatch(/bindTwoWay\(__el\d+,\s*'value\.trim',/);
     });
 });
 
-describe('kebab-case normalization', () => {
-    it('converts camelCase :prop to kebab-case in output', () => {
-        const code = templateGenerator(`<pdx-select :itemTemplate="renderFn"></pdx-select>`);
+describe('bound names on the inline path', () => {
+    const inline = (template: string, script: string) =>
+        compile(`<template>${template}</template>\n<script>\n${script}\n</script>\n`, 'test.pdx').code;
 
-        expect(code).toContain(':item-template=');
-        expect(code).not.toContain(':itemTemplate=');
+    it('a camelCase prop is assigned as written, multi-word too', () => {
+        const code = inline('<pdx-select :itemTemplate="renderFn"></pdx-select><pdx-grid :selectedRowKeys="keys"></pdx-grid>',
+            'function renderFn() { return null; }\nlet keys = $signal([]);');
+        expect(code).toMatch(/assignBoundProperty\(__el\d+, "itemTemplate", /);
+        expect(code).toMatch(/assignBoundProperty\(__el\d+, "selectedRowKeys", /);
     });
 
-    it('converts camelCase ::prop to kebab-case in output', () => {
-        const code = templateGenerator(`<pdx-field ::formValue="val"></pdx-field>`);
-
-        expect(code).toContain('::form-value=');
-        expect(code).not.toContain('::formValue=');
-    });
-
-    it('preserves single-word props unchanged', () => {
-        const code = templateGenerator(`<pdx-select :options="items" :disabled="off"></pdx-select>`);
-
-        expect(code).toContain(':options=');
-        expect(code).toContain(':disabled=');
-    });
-
-    it('preserves class and style bindings', () => {
-        const code = templateGenerator(`<div :class="cls" :style="stl"></div>`);
-
-        expect(code).toContain(':class=');
-        expect(code).toContain(':style=');
-    });
-
-    it('handles multi-word camelCase', () => {
-        const code = templateGenerator(`<pdx-grid :selectedRowKeys="keys"></pdx-grid>`);
-
-        expect(code).toContain(':selected-row-keys=');
+    it('control — :class and :style are not props: they bind the class and the style', () => {
+        const code = inline('<div :class="cls" :style="stl"></div>', "let cls = $signal('a');\nlet stl = $signal('');");
+        expect(code).not.toMatch(/assignBoundProperty\(__el\d+, "(class|style)"/);
+        expect(code, 'the bindings themselves were dropped').toContain('ctx.cls()');
+        expect(code).toContain('ctx.stl()');
     });
 });
 
@@ -342,77 +324,5 @@ function go() {}
         expect(builds(builder, 'span')).toBe(true);
         expect(builder).not.toContain('draft');
         expect(builder).not.toContain('go');
-    });
-});
-
-describe('HTML comments are copied verbatim, never rewritten — the template generator', () => {
-    // The template generator keeps the comment in its html`` markup. A .pdx in the new mode no longer
-    // reaches it — a scoped slot's body was the last part it wrote, until #364 — so each case calls it
-    // directly, with the names the script declared; the legacy mode still renders through it.
-    const compileTemplatePath = (source: string, _name: string) => {
-        const template = /<template>([\s\S]*)<\/template>/.exec(source)![1];
-        const ctx = createCompileContext();
-        ctx.declaredNames = new Set([...source.matchAll(/(?:let|function)\s+(\w+)/g)].map((m) => m[1]));
-        return { code: generateNodes(parseTemplate(template), new Set(), ctx) };
-    };
-
-    it('does not rewrite a directive mentioned inside a comment', () => {
-        const out = compileTemplatePath(`
-<template>
-  <!-- no @click="go" here -->
-  <a href="/x">x</a>
-</template>
-<script>
-let count = $signal(0);
-function go() {}
-</script>`, 'x.pdx').code;
-
-        expect(out).toContain('<!-- no @click="go" here -->');
-        expect(out).not.toContain('safeHandler');
-    });
-
-    it('leaves bindings and interpolation inside a comment alone', () => {
-        const out = compileTemplatePath(`
-<template>
-  <!-- :value="draft.name" and {{ count }} are examples, not bindings -->
-  <span>{{ count }}</span>
-</template>
-<script>
-let count = $signal(0);
-let draft = $signal({ name: 'a' });
-</script>`, 'x.pdx').code;
-
-        expect(out).toContain('<!-- :value="draft.name" and {{ count }} are examples, not bindings -->');
-        // The real interpolation outside the comment still compiles.
-        expect(out).toContain('${ctx.count}');
-    });
-
-    it('a > inside a comment does not end it early', () => {
-        const out = compileTemplatePath(`
-<template>
-  <!-- a -> b, and 1 > 0 -->
-  <span>ok</span>
-</template>
-<script>
-let count = $signal(0);
-</script>`, 'x.pdx').code;
-
-        expect(out).toContain('<!-- a -> b, and 1 > 0 -->');
-        expect(out).toContain('<span>ok</span>');
-    });
-
-    it('escapes a backtick or ${ in a comment so the html`` literal survives', () => {
-        const out = compileTemplatePath(`
-<template>
-  <!-- use \`html\` with \${x} carefully -->
-  <span>ok</span>
-</template>
-<script>
-let count = $signal(0);
-</script>`, 'x.pdx').code;
-
-        // Escaped in the emitted source, so the html`` literal is not closed by the prose.
-        expect(out).toContain('\\`html\\`');
-        expect(out).toContain('\\${x}');
     });
 });
