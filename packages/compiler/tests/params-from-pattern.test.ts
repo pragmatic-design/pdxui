@@ -9,6 +9,8 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { parseRouteParams } from '../src/compiler/script-analyzer-helpers';
+import { routeParamsType } from '../src/route-types';
+import { coerceParams } from '../../router/src/matcher';
 
 const pdx = (script: string) => `<template>\n  <p>{{ id }}</p>\n</template>\n<script>\n${script}\n</script>\n`;
 const invalid = (r: { warnings: { code: string; message: string }[] }) => r.warnings.filter((w) => w.code === 'PDX_ROUTE_FIELD_INVALID');
@@ -39,6 +41,20 @@ describe('parseRouteParams with the pattern', () => {
         expect(parseRouteParams('{ nmae }', '/users/:id(number)')).toEqual([]);
         expect(parseRouteParams('{ id }')).toEqual([]);
     });
+});
+
+// The compiler may not depend on the router, so the rule is written twice; this holds the copies to
+// the router's: for each constraint, the type @params and the loader's context give a param is the
+// type of the value coerceParams hands over.
+describe("the rule is the router's coerceParams", () => {
+    for (const constraint of ['number', 'uuid', 'slug', 'string', '[A-Z]{3}', '']) {
+        it(constraint ? `:x(${constraint})` : ':x', () => {
+            const pattern = constraint ? `/a/:x(${constraint})` : '/a/:x';
+            const router = typeof coerceParams(pattern, { x: '1' }).x;
+            expect(parseRouteParams('{ x }', pattern)).toEqual([{ name: 'x', type: router }]);
+            expect(routeParamsType(pattern)).toBe(`{ x: ${router} }`);
+        });
+    }
 });
 
 describe('@params { id } compiles from the pattern', () => {
