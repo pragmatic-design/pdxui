@@ -224,8 +224,10 @@ with a repeated key as an array; and `signal`, aborted when a newer navigation s
 it, and `user.stale()` is true while the result shown is a kept one its loader runs again for (below). `@await (user as u)`
 renders its body with the data. The compiler imports `loaderSource` from `@pdxui/router` into the
 module. In the editor `user.data()` is typed by what the function resolves to,
-`Awaited<ReturnType<typeof loadUser>>`; the function's own parameter is typed where it is annotated,
-`LoaderContext<{ id: number }>`. Another level's are `loaderData(pattern)`, `loaderState(pattern)` and
+`Awaited<ReturnType<typeof loadUser>>`. The function's first parameter, left unannotated, is typed
+from the page's pattern (#564), as the router coerces it: `@page '/users/:id(number)/:tab'` gives
+`LoaderContext<{ id: number; tab: string }>`, so `params.id.toUpperCase()` and a param the pattern does
+not declare are errors. A parameter the author annotated keeps its annotation. Another level's are `loaderData(pattern)`, `loaderState(pattern)` and
 `loaderError(pattern)`. Because it runs before the component exists, a loader cannot read the page's
 props or signals; a child level's loader reads its parent's `loaderData(parentPattern)`, which is
 published before it runs. The name may be the function's own, `@loader loadUser: loadUser;`: in the

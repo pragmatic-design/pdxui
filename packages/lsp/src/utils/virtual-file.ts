@@ -1,9 +1,10 @@
 // Virtual file — assembles the virtual TS file for a .pdx:
-//   [projected script (offsets 1:1 with the script)] + [;export {};] + [__pdxRender(){…}]
-// and provides the two-way mapping between .pdx offsets and virtual offsets.
+//   [projected script] + [;export {};] + [__pdxRender(){…}]
+// and provides the two-way mapping between .pdx offsets and virtual offsets. The projected script is
+// 1:1 with the script but for the text it inserts (`insertions`, #564), which the mapping steps over.
 
 import type { TemplateNode } from '@pdxui/compiler';
-import { projectScript } from './project-script';
+import { projectScriptMapped, type ScriptInsertion } from './project-script';
 import { projectTemplate } from './template-projection';
 import type { ResolveType, ResolveSnippet } from './template-projection';
 import type { SegmentMap } from './segment-map';
@@ -14,7 +15,9 @@ const EPILOGUE = '\n;export {};\n';
 export interface VirtualFile {
     content: string;
     scriptStart: number;     // the offset in the .pdx where the <script> content starts
-    scriptLen: number;       // the length of the <script> content (the 1:1 region at the head of the virtual file)
+    scriptLen: number;       // the length of the <script> content
+    /** What the projection inserted into the script, in order: the only offsets it moved. */
+    insertions: ScriptInsertion[];
     templateMap: SegmentMap | null;
     /** Where the template projection starts in `content`; -1 when there is none. What comes after it
      *  is checked under `strict`, what comes before it is not (#468). */
@@ -30,7 +33,8 @@ export function buildVirtualFile(
     /** What types a `@snippet`'s parameters (#490). */
     resolveSnippet?: ResolveSnippet,
 ): VirtualFile {
-    const { script, declarations } = typeRefs(projectScript(scriptContent), refTargets(ast, resolveExposed));
+    const projected = projectScriptMapped(scriptContent);
+    const { script, declarations } = typeRefs(projected.text, refTargets(ast, resolveExposed));
     let content = script + EPILOGUE + (declarations ? declarations + '\n' : '');
     let templateMap: SegmentMap | null = null;
     let templateBase = -1;
@@ -42,19 +46,38 @@ export function buildVirtualFile(
         templateMap = proj.map;
     }
 
-    return { content, scriptStart, scriptLen: scriptContent.length, templateMap, templateBase };
+    return { content, scriptStart, scriptLen: scriptContent.length, insertions: projected.insertions, templateMap, templateBase };
+}
+
+/** The script region's length in the virtual file: the script's, and what was inserted into it. */
+function scriptVirtualLen(vf: VirtualFile): number {
+    return vf.scriptLen + vf.insertions.reduce((sum, ins) => sum + ins.length, 0);
 }
 
 /** A .pdx offset → the virtual file's offset, or -1 when it is outside a projected region. */
 export function pdxToVirtual(vf: VirtualFile, pdxOffset: number): number {
     if (pdxOffset >= vf.scriptStart && pdxOffset <= vf.scriptStart + vf.scriptLen) {
-        return pdxOffset - vf.scriptStart; // the script region: 1:1 at the head of the virtual file
+        // The script region: 1:1 at the head of the virtual file, moved by what was inserted before it.
+        const off = pdxOffset - vf.scriptStart;
+        return off + vf.insertions.filter((ins) => ins.at <= off).reduce((sum, ins) => sum + ins.length, 0);
     }
     return vf.templateMap ? vf.templateMap.toGen(pdxOffset) : -1;
 }
 
-/** A virtual file offset → the .pdx offset, or -1 when it lands in the scaffolding. */
+/**
+ * A virtual file offset → the .pdx offset, or -1 when it lands in the scaffolding. An offset inside
+ * inserted text has no character of its own in the .pdx: it is the place the text was inserted at.
+ */
 export function virtualToPdx(vf: VirtualFile, vOffset: number): number {
-    if (vOffset <= vf.scriptLen) return vf.scriptStart + vOffset; // the script region, 1:1
+    if (vOffset <= scriptVirtualLen(vf)) {
+        let shift = 0;
+        for (const ins of vf.insertions) {
+            const start = ins.at + shift;
+            if (vOffset < start) break;
+            if (vOffset < start + ins.length) return vf.scriptStart + ins.at;
+            shift += ins.length;
+        }
+        return vf.scriptStart + vOffset - shift;
+    }
     return vf.templateMap ? vf.templateMap.toSrc(vOffset) : -1;
 }

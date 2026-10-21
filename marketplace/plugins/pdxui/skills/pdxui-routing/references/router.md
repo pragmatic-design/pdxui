@@ -175,8 +175,9 @@ request stops. A loader that takes no argument is fine too.
 what it resolved to, `user.state()` reports `idle → pending → success` (or `error`), `user.error()`
 is why it last failed, and `user.pending()` is true while a navigation runs it. `@await (user as u)`
 reads it like any source. In the editor `user.data()` is typed by what the function returns, so a
-misspelt field is an error; annotate the context, `LoaderContext<{ id: number }>`, and `params` is
-typed too. The page mounts only once the loader has settled, which is what makes it *blocking* data
+misspelt field is an error. `params` is typed from the page's pattern even when you write no type:
+`:id(number)` is a number, as the router hands it over, and a param the pattern does not declare is
+an error. An annotation you write, `LoaderContext<{ id: number }>`, is kept. The page mounts only once the loader has settled, which is what makes it *blocking* data
 — for declarative fetching inside the page see [Data layer](../../pdxui-data-layer/references/data.md).
 
 What the loader throws decides where the navigation ends:

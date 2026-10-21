@@ -11,6 +11,9 @@ semver.
 
 ### Features
 
+- In the editor and `pdx check --types`, a named loader's unannotated first parameter is typed from the
+  page's pattern: `@page '/users/:id(number)'` gives `params: { id: number }`, as the router coerces it,
+  and a param the pattern does not declare is an error. (#564)
 - A route loader's results are kept in core's cache, per route, params and query. A page entered
   again shows its kept result at once, `user.stale()` true, while the loader runs again; with
   `@loader user: loadUser { staleTime: 30_000 };` a result younger than that is used with no request.
