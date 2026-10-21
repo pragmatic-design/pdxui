@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { openTags, findOpenTag, elementContent, removeHtmlComments, routeParams, openingTagTexts, removeElements, elementBodies } from '../src/text-scan';
 import { isRouterSeam, injectAfterHeadOpen, shortPath, stripHtmlComments } from '../src/plugin-utils';
 import { coreRuntimeNames } from '../src/compiler/core-import-names';
+import { importedLocalNames } from '../src/compiler/import-names';
 import { parseIgnores } from '../src/compiler/ignores';
 import { minifyHTML } from '../src/compiler/minify';
 import { injectSplash } from '../src/splash';
@@ -96,6 +97,20 @@ describe('the compiler passes built on them', () => {
         expect(coreRuntimeNames("import { signal, type Signal, computed } from '@pdxui/core';")).toEqual(['signal', 'computed']);
         expect(coreRuntimeNames("import type { Signal } from '@pdxui/core';")).toEqual([]);
         expect(coreRuntimeNames('import {} {a} x')).toEqual(['a']);
+    });
+
+    it('importedLocalNames: the local names of the six forms, and an import whose names read `from`', () => {
+        expect(importedLocalNames("import a from 'x'")).toEqual(['a']);
+        expect(importedLocalNames("import * as ns from 'x'")).toEqual(['ns']);
+        expect(importedLocalNames("import { b, c as d, type T } from 'x'")).toEqual(['b', 'd']);
+        expect(importedLocalNames("import a, { b } from 'x'")).toEqual(['a', 'b']);
+        expect(importedLocalNames("import type { T } from 'x'")).toEqual([]);
+        expect(importedLocalNames("import 'x'")).toEqual([]);
+        expect(importedLocalNames('import { from, as as from2 } from "x";')).toEqual(['from', 'from2']);
+        expect(importedLocalNames("import { \"a b\" as c } from 'x'")).toEqual(['c']);
+        expect(importedLocalNames("import { a } from x")).toEqual([]);
+        // The type guard looked only after the first space: with two, T was bound.
+        expect(importedLocalNames("import  type { T } from 'x'")).toEqual([]);
     });
 
     it('parseIgnores: the three forms, with and without a reason, and -file', () => {
