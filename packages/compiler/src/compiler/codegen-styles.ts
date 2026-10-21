@@ -6,6 +6,8 @@ import { jsQuote, jsString } from './js-literal';
 import type { BrowserTarget } from './compile-context';
 import { donutScope } from './scope-donut';
 import { expandVariantRules } from './variants';
+import { parseTemplate } from '../parser/template';
+import { templateMarksSlotted } from './slotted-marks';
 
 // ─── Public ────────────────────────────────────────────────────────
 
@@ -44,6 +46,7 @@ export function generateStyles(descriptor: SFCDescriptor, filename: string, prod
         return blocks.map((_, index) => `import ${jsQuote(styleModuleId(filename, index))};\n`).join('') + '\n';
     }
 
+    const slotted = descriptorMarksSlotted(descriptor, blocks, target);
     return blocks.map((block, index) => {
         // Normalise line endings FIRST. The .pdx source is read verbatim, so on a CRLF
         // checkout (git core.autocrlf=true on Windows) the emitted style string carried
@@ -54,7 +57,7 @@ export function generateStyles(descriptor: SFCDescriptor, filename: string, prod
         // did and the golden snapshots do not move.
         const id = index === 0 ? hash(filename) : `${hash(filename)}-${index}`;
 
-        let css = blockCss(block.scoped, content, filename, target);
+        let css = blockCss(block.scoped, content, filename, target, slotted);
         if (production) css = minifyCSS(css);
         return styleInjection(css, id);
     }).join('');
@@ -97,8 +100,20 @@ export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: 
     if (!block) return '';
     // Line endings first: see the note in generateStyles.
     const content = block.content.replace(/\r\n/g, '\n');
-    const css = blockCss(block.scoped, content, filename, target);
+    const css = blockCss(block.scoped, content, filename, target, descriptorMarksSlotted(descriptor, styleBlocks(descriptor), target));
     return production ? minifyCSS(css) : css;
+}
+
+/**
+ * Whether the template writes any element inside a component's tag — what the donut scope's second
+ * root is for (#511). Read from the descriptor, so the dev injection and the production style module,
+ * which see the file at different times, decide alike; the template must be the resolved one (a
+ * `<template src>` read in). Only asked for a scoped block on the 2026 target, the one case it changes.
+ */
+function descriptorMarksSlotted(descriptor: SFCDescriptor, blocks: SFCStyle[], target: BrowserTarget): boolean {
+    if (target === 'baseline-2024' || !blocks.some((b) => b.scoped)) return true;
+    const template = descriptor.template?.content;
+    return template ? templateMarksSlotted(parseTemplate(template)) : false;
 }
 
 /**
@@ -106,13 +121,14 @@ export function styleCssFor(descriptor: SFCDescriptor, filename: string, index: 
  * A plain block kept them as written, which no browser reads, while the setup still set the bound
  * custom property (#205).
  */
-function blockCss(scoped: boolean | undefined, content: string, filename: string, target: BrowserTarget): string {
+function blockCss(scoped: boolean | undefined, content: string, filename: string, target: BrowserTarget, slotted: boolean): string {
     const scopeId = `data-pdx-${hash(filename)}`;
     if (!scoped) return transformCssFunctions(content, scopeId).trim();
     // baseline-2026 stops at nested components (./scope-donut); baseline-2024 keeps the ancestor
     // scope, which reaches into them (#152). A `@variant` becomes rules on the host's `:scope` first
-    // (#153), and each target's scoping compiles that `:scope` as it does any other.
-    return target === 'baseline-2024' ? scopeStyles(content, scopeId) : donutScope(expandVariantRules(transformCssFunctions(content, scopeId)), scopeId);
+    // (#153), and each target's scoping compiles that `:scope` as it does any other. A template that
+    // marks nothing gets the donut's single-root form (#511).
+    return target === 'baseline-2024' ? scopeStyles(content, scopeId) : donutScope(expandVariantRules(transformCssFunctions(content, scopeId)), scopeId, slotted);
 }
 
 /**

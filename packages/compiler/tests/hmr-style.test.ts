@@ -33,9 +33,21 @@ describe('styleOnlyUpdate: which saves are a style swap', () => {
     it('a change inside <style scoped> only: the block\'s element id and its new scoped CSS', () => {
         const swaps = styleOnlyUpdate(PAGE, PAGE.replace('color: red', 'color: blue'), FILE);
         expect(swaps).toEqual([{ id: `pdx-s-${hash(FILE)}`, css: expect.stringContaining('color: blue') }]);
-        // As the compile scopes it on the default target: the donut scope (#152).
-        expect(swaps![0].css, 'the CSS is scoped as the compile scopes it').toContain(`@scope ([data-pdx-${hash(FILE)}], [data-pdx-${hash(FILE)}-in])`);
+        // As the compile scopes it on the default target: the donut scope (#152), with one root, since
+        // the page writes nothing inside a component's tag (#511).
+        expect(swaps![0].css, 'the CSS is scoped as the compile scopes it').toContain(`@scope ([data-pdx-${hash(FILE)}]) to`);
         expect(swaps![0].css).toContain('.note');
+    });
+
+    it('a page that writes inside a component tag keeps the second root in its swap (#511)', () => {
+        const slotted = PAGE.replace('<p class="note">{{ text }}</p>', '<pdx-card><p class="note">{{ text }}</p></pdx-card>');
+        const swaps = styleOnlyUpdate(slotted, slotted.replace('color: red', 'color: blue'), FILE);
+        expect(swaps![0].css).toContain(`@scope ([data-pdx-${hash(FILE)}], [data-pdx-${hash(FILE)}-in])`);
+    });
+
+    it('a page whose template is in another file is a full update: its CSS follows that template (#511)', () => {
+        const external = PAGE.replace(/<template>[\s\S]*?<\/template>/, '<template src="./note.html"></template>');
+        expect(styleOnlyUpdate(external, external.replace('color: red', 'color: blue'), FILE)).toBeNull();
     });
 
     it('scopes the swap for the target the plugin compiles for', () => {

@@ -123,7 +123,11 @@ describe('the pages compose their sections as components', () => {
             sfc.styles.forEach((block, i) => {
                 if (!block.scoped) return;
                 const css = styleCssFor(sfc, rel, i, false);
-                if (css.includes('{') && !css.includes(donutPrelude(`data-pdx-${hash(rel)}`))) open.push(`${page}.pdx, style block ${i}`);
+                // Either form stops at nested components: one root when the page writes nothing
+                // inside a component's tag (#511), the second root when it does.
+                const id = `data-pdx-${hash(rel)}`;
+                const donut = css.includes(donutPrelude(id, true)) || css.includes(donutPrelude(id, false));
+                if (css.includes('{') && !donut) open.push(`${page}.pdx, style block ${i}`);
             });
         }
         expect(open, 'a page\'s scoped sheet reaches into its sections: it is not a donut scope').toEqual([]);

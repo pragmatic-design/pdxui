@@ -250,6 +250,9 @@ semver.
 
 ### Changed
 
+- A `<style scoped>` block of a component whose template writes nothing inside a component's tag
+  compiles, on `baseline-2026`, to the donut scope's single-root form: `@scope ([data-pdx-H]) to (…)`,
+  each selector `:scope S` alone, same specificity. The showcase's CSS falls 63.0 → 62.3 KB gzip. (#511)
 - A level whose own params are unchanged but whose query changed runs its loader again: the query is
   part of what a loader is called with, and two queries are two results. (#148)
 - The router keeps loader results in core's cache, which is now part of every routed app's entry:

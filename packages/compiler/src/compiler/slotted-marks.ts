@@ -19,7 +19,7 @@ import { VOID_ELEMENTS } from './codegen-template-inline';
  * ancestors. `opened` is the stack of open elements across the template — whether each is, or is
  * under, a component — and is updated as the markup opens and closes tags.
  */
-function markHtml(node: HtmlNode, attr: string, opened: boolean[]): HtmlNode {
+function markHtml(node: HtmlNode, attr: string, opened: boolean[], onMark: () => void): HtmlNode {
     if (node.raw) return node;
     const content = node.content;
     const insert = ` ${attr}`;
@@ -54,7 +54,7 @@ function markHtml(node: HtmlNode, attr: string, opened: boolean[]): HtmlNode {
             const selfClosing = content[k - 1] === '/';
             const at = selfClosing ? k - 1 : k;
             out += content.slice(i, at);
-            if (under) { from.push(at); out += insert; }
+            if (under) { from.push(at); out += insert; onMark(); }
             out += content.slice(at, k + 1);
             if (!VOID_ELEMENTS.has(name) && !selfClosing) opened.push(name.includes('-') || under);
         }
@@ -73,8 +73,19 @@ function markHtml(node: HtmlNode, attr: string, opened: boolean[]): HtmlNode {
     };
 }
 
+/**
+ * Whether the template has any element to mark: one written inside a component's tag. When it has
+ * none, the donut scope needs no second root and no second form of a selector (#511). Answered by
+ * running the marking itself, so the CSS and the markup cannot disagree on what counts.
+ */
+export function templateMarksSlotted(nodes: TemplateNode[]): boolean {
+    let marks = 0;
+    markSlotted(nodes, 'data-pdx-probe-in', () => { marks++; });
+    return marks > 0;
+}
+
 /** The template with its slotted elements marked `attr` (`data-pdx-<hash>-in`). */
-export function markSlotted(nodes: TemplateNode[], attr: string): TemplateNode[] {
+export function markSlotted(nodes: TemplateNode[], attr: string, onMark: () => void = () => undefined): TemplateNode[] {
     const opened: boolean[] = [];
     /** A body walked from the stack as it was at its block, which it leaves so: a branch closes what it opens. */
     const body = (list: TemplateNode[]): TemplateNode[] => {
@@ -86,7 +97,7 @@ export function markSlotted(nodes: TemplateNode[], attr: string): TemplateNode[]
     const optional = (list: TemplateNode[] | undefined) => (list ? body(list) : undefined);
     const walk = (list: TemplateNode[]): TemplateNode[] => list.map((node): TemplateNode => {
         switch (node.type) {
-            case 'html': return markHtml(node, attr, opened);
+            case 'html': return markHtml(node, attr, opened, onMark);
             case 'if': case 'require': return { ...node, body: body(node.body), elseBody: optional(node.elseBody) };
             case 'for': return { ...node, body: body(node.body), emptyBody: optional(node.emptyBody) };
             case 'switch': return { ...node, cases: node.cases.map((c) => ({ ...c, body: body(c.body) })), defaultBody: optional(node.defaultBody) };

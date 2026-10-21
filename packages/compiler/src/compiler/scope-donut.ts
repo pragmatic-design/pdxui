@@ -18,6 +18,8 @@
 //     never the host;
 //   - `:scope` is the host: `:scope` → `:where(:scope)[data-pdx-H]`, the weight of `[data-pdx-H]`, and a
 //     projected root is not styled as one.
+// A template that writes nothing inside a component's tag has no projected root: its blocks get the
+// single-root form, `@scope ([data-pdx-H]) to (…)` with `S` → `:scope S` (#511).
 // `@media`, `@supports`, `@layer`, `@container` and `@starting-style` hold a scope of their own; every
 // other at-rule — `@keyframes`, `@font-face`, an author's `@scope` — is copied as written.
 
@@ -26,9 +28,14 @@ const NESTED_AT_RULES = new Set(['media', 'supports', 'layer', 'container', 'sta
 /** The fixed attribute core puts on every component host. */
 export const ROOT_ATTR = 'data-pdx-root';
 
-/** The prelude of the donut scope for a component's scope attribute. */
-export function donutPrelude(scopeId: string): string {
-    return `@scope ([${scopeId}], [${scopeId}-in]) to ([${ROOT_ATTR}] > *)`;
+/**
+ * The prelude of the donut scope for a component's scope attribute. Without `slotted` — a template
+ * that writes nothing inside a component's tag (#511) — the host is the only root.
+ */
+export function donutPrelude(scopeId: string, slotted = true): string {
+    return slotted
+        ? `@scope ([${scopeId}], [${scopeId}-in]) to ([${ROOT_ATTR}] > *)`
+        : `@scope ([${scopeId}]) to ([${ROOT_ATTR}] > *)`;
 }
 
 /** The index of the `}` that closes the block opened at `open`, braces in strings skipped. */
@@ -99,23 +106,31 @@ function splitPseudoElement(sel: string): [string, string] {
     return [sel, ''];
 }
 
-/** One selector of a scoped rule, rewritten for the donut. */
-function donutSelector(sel: string, scopeId: string): string {
+/**
+ * One selector of a scoped rule, rewritten for the donut. The second form, which matches a projected
+ * root itself, only when the template has projected roots (`slotted`).
+ */
+function donutSelector(sel: string, scopeId: string, slotted: boolean): string {
     SCOPE_PSEUDO.lastIndex = 0;
     if (SCOPE_PSEUDO.test(sel)) {
         SCOPE_PSEUDO.lastIndex = 0;
         return sel.replace(SCOPE_PSEUDO, `:where(:scope)[${scopeId}]`);
     }
+    if (!slotted) return `:scope ${sel}`;
     const [base, pseudo] = splitPseudoElement(sel);
     return `:scope ${sel}, :where(:not([${scopeId}])):scope:is(${base})${pseudo}`;
 }
 
-/** A block's CSS — comments out and its functions transformed — as donut scopes. */
-export function donutScope(css: string, scopeId: string): string {
+/**
+ * A block's CSS — comments out and its functions transformed — as donut scopes. `slotted` says the
+ * template marks elements inside a component's tag (./slotted-marks): without them, one root and one
+ * form per selector (#511).
+ */
+export function donutScope(css: string, scopeId: string, slotted = true): string {
     let out = '';
     let run = ''; // style rules waiting for their @scope
     const flush = (): void => {
-        if (run.trim()) out += `${donutPrelude(scopeId)} {${run}}`;
+        if (run.trim()) out += `${donutPrelude(scopeId, slotted)} {${run}}`;
         run = '';
     };
     let pos = 0;
@@ -136,7 +151,7 @@ export function donutScope(css: string, scopeId: string): string {
             const name = (/^@([\w-]+)/.exec(prelude)?.[1] ?? '').toLowerCase();
             const close = blockEnd(css, end);
             const inner = css.slice(end + 1, close);
-            out += NESTED_AT_RULES.has(name) ? `${prelude} {${donutScope(inner, scopeId)}}` : `${prelude} {${inner}}`;
+            out += NESTED_AT_RULES.has(name) ? `${prelude} {${donutScope(inner, scopeId, slotted)}}` : `${prelude} {${inner}}`;
             pos = close + 1;
             continue;
         }
@@ -144,7 +159,7 @@ export function donutScope(css: string, scopeId: string): string {
         const brace = css.indexOf('{', pos);
         if (brace === -1) { flush(); out += css.slice(pos); break; }
         const close = blockEnd(css, brace);
-        const selectors = splitList(css.slice(pos, brace)).map((s) => donutSelector(s, scopeId)).join(', ');
+        const selectors = splitList(css.slice(pos, brace)).map((s) => donutSelector(s, scopeId, slotted)).join(', ');
         run += `${selectors} {${css.slice(brace + 1, close)}}`;
         pos = close + 1;
     }
