@@ -8,6 +8,7 @@ import { parseSFC } from '../../src/parser/sfc';
 import { minifyHTML } from '../../src/compiler/minify';
 import { parseIgnores } from '../../src/compiler/ignores';
 import { coreRuntimeNames } from '../../src/compiler/core-import-names';
+import { importedLocalNames } from '../../src/compiler/import-names';
 import { injectSplash } from '../../src/splash';
 import { stripHtmlComments, isRouterSeam, injectAfterHeadOpen, shortPath } from '../../src/plugin-utils';
 import { legacyScript } from '../../src/language/legacy-script';
@@ -82,6 +83,9 @@ const cases: [string, () => void][] = [
         { type: 'html', content: '</ul>' },
     ] as TemplateNode[])],
     ['@render: a name and a run of tabs (alert #173)', () => parseTemplate('@render $' + '\t'.repeat(N))],
+    ['import clause: a name, a run of tabs and from without a quote (alert #174)', () => importedLocalNames('import a' + '\t'.repeat(N) + 'from')],
+    ['import named list: { repeated (alert #175)', () => importedLocalNames(`import ${'{'.repeat(N)} from 'x'`)],
+    ['import specifier: a run of tabs between two names (alert #176)', () => importedLocalNames(`import { a${'\t'.repeat(N)}b } from 'x'`)],
 ];
 
 describe('linear scans in the compiler', () => {
