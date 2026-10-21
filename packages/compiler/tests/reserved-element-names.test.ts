@@ -20,8 +20,8 @@ describe('PDX_NAME_RESERVED', () => {
     });
 
     it("a name that would break the element's DOM — style, className, an on* handler — is an error (#545)", () => {
-        const [style] = reserved('@prop style: string;');
-        expect(style).toMatchObject({ severity: 'error' });
+        const [style] = reserved('let a = $signal(1);\n@prop style: string;');
+        expect(style).toMatchObject({ severity: 'error', line: 4 });
         expect(style.message).toContain("'style'");
         for (const decl of ['@model className: string = \'\';', '@slot children: ();', '@prop dataset: object;',
             '@prop classList: object;', '@prop innerHTML: string;', '@prop textContent: string;',
