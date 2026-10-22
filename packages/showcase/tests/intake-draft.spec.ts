@@ -17,8 +17,10 @@ const step = (page: Page, label: string) => page.locator(`[data-wizard-step][dat
 const next = (page: Page) => page.locator('[data-wizard-next]');
 const offer = (page: Page) => page.locator('[data-test="draft-offer"]');
 const field = (page: Page, test: string) => page.locator(`[data-test="${test}"] input:not([type="hidden"])`);
-/** A date picker's value, ISO: the hidden input the form submits, not the text shown in the locale. */
-const dateOf = (page: Page, test: string) => page.locator(`[data-test="${test}"] input[type="hidden"]`);
+/** A date picker's value, ISO: its model, which the form submits (#135), not the text shown in the locale. */
+const dateOf = (page: Page, test: string) => () => page
+    .locator(`pdx-date-picker[data-test="${test}"], [data-test="${test}"] pdx-date-picker`).first()
+    .evaluate((el) => (el as HTMLElement & { value: unknown }).value);
 
 async function openIntake(page: Page): Promise<void> {
     await page.goto('/intake');
@@ -74,8 +76,8 @@ test('Resume puts the values back, on the step it was left on', async ({ page })
     await page.locator('[data-test="draft-resume"]').click();
 
     await expect(step(page, 'Window'), 'resumed at the beginning instead of where it was left').toBeVisible();
-    await expect(dateOf(page, 'starts')).toHaveValue('2026-10-01');
-    await expect(dateOf(page, 'ends')).toHaveValue('2026-10-03');
+    await expect.poll(dateOf(page, 'starts')).toBe('2026-10-01');
+    await expect.poll(dateOf(page, 'ends')).toBe('2026-10-03');
     // And the steps behind it, which are the ones a reader will go back to check.
     await page.locator('[data-wizard-back], [data-wizard-prev]').click();
     await expect(field(page, 'requester')).toHaveValue('Anna Bianchi');
@@ -150,6 +152,6 @@ test('the draft holds values, not files — and says which attachment it could n
     await expect(offer(page), 'the draft lost an attachment and said nothing').toContainText('site-plan.pdf');
 
     await page.locator('[data-test="draft-resume"]').click();
-    await expect(dateOf(page, 'starts')).toHaveValue('2026-10-01');
+    await expect.poll(dateOf(page, 'starts')).toBe('2026-10-01');
     await expect(page.locator('[data-test="attachment"]'), 'a file came back out of localStorage').not.toContainText('site-plan.pdf');
 });
