@@ -18,7 +18,16 @@ semver.
   `form.reset()` and a restored form state write the model, so a parent's `::value` follows; the
   component's `required` and `error` props are its validity; a disabled fieldset sets its `disabled`
   prop. The option was read as part of the default or the type before, and broke the compiled module.
-  The library's value components take it in the next parts. (#135)
+  (#135)
+- Seventeen value components of `@pdxui/ui` declare their model `{ form }` instead of wiring the form
+  by hand: autocomplete, checkbox, checkbox-group, color-picker, masked-input, mention, number-input,
+  otp-input, pin-input, radio, radio-group, rating, segmented, slider, switch, tag-input and toggle.
+  `form.reset()` now puts each back to the value it mounted with — before, it left them as they were
+  — and a restored form state writes the model; a required `pdx-checkbox` makes the form invalid
+  until it is checked. A component whose form value is not its model as it is says what it submits in
+  its setup, `ctx.formValue(() => …)`: a clamped number, a group's selection, a mention's markup. A
+  control inside another one with a form model — a checkbox in a checkbox group — is the outer one's:
+  it does not reset or restore itself after it. (#135)
 - A value still waiting in a `::x.debounce(ms)` binding to a form field is written before the form's
   `handleSubmit` validates and before `validate()`, when the page calls them from code as well as on a
   submit event: the submitted value is the one typed (beta rule F6). `required` on a control bound to a form
@@ -277,6 +286,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** what a native `<form>` receives from some value components (#135).
+  - **Lists:** `pdx-tag-input` and `pdx-checkbox-group` submit one entry per item under their `name`,
+    as a native multi-select does, instead of one entry holding the JSON array. A range `pdx-slider`
+    submits two entries, the low and the high, instead of `"20,80"`.
+  - **Empty fields:** an empty `pdx-otp-input`, `pdx-pin-input`, `pdx-masked-input` or
+    `pdx-color-picker` submits an empty entry, as a native text input does, instead of none.
+  - **Autocomplete:** a picked `pdx-autocomplete` suggestion submits its value, the code its model
+    holds, instead of the label shown. Free text is submitted as typed, as before.
 - **Breaking:** inside `<pdx-form :form="f">`, a control is no longer wired to its field by its `name`,
   nor a `<pdx-form-field>` by its `name`: each is `PDX_REMOVED_FORM`. A control binds through its
   model, `::value="f.email"`, and a form field names its field, `:field="f.email"`. `pdx migrate`
@@ -536,6 +553,8 @@ semver.
 
 ### Fixes
 
+- A `pdx-mention` whose `value` a parent sets submits that text in a native form; before, it kept
+  submitting the markup of the text it replaced. (#135)
 - A `@prop`, `@model` or typed `@slot` named after one of the `HTMLElement` members whose replacement
   breaks the element — `style`, `children`, `dataset`, `classList`, `className`, `innerHTML`,
   `textContent`, `shadowRoot` and the `on*` event handlers — is `PDX_NAME_RESERVED`, and a TypeScript

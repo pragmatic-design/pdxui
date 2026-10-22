@@ -10,7 +10,7 @@
 // arrow keys that move AND check. A focusGroup() on the <pdx-radio> hosts would fight that: it finds
 // no current item while focus sits on the inner input, and sends ArrowDown back to the first radio.
 
-import { component, html, useFormAssociated, untracked, generatedId, model } from '@pdxui/core';
+import { component, html, untracked, generatedId, model } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
 
@@ -22,8 +22,8 @@ import { nameGroup, authoredName } from '../shared/group-name';
  * @alphadetail value $event.detail.value
  */
 component('pdx-radio-group', {
-    formAssociated: true,
-    models: { value: model('') },
+    // A form submits the chosen value, nothing with no choice as a native radio group, and resets it (#135).
+    models: { value: model('', { form: true }) },
     props: {
         name: { type: String, default: '' },
         orientation: { type: String, default: 'vertical' },
@@ -90,7 +90,7 @@ component('pdx-radio-group', {
             });
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = ctx.value() as string; return v || null; } });
+        ctx.formValue?.(() => (ctx.value() as string) || null);
 
         return {};
     },

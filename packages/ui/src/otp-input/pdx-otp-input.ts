@@ -1,7 +1,7 @@
 // pdx-otp-input — N-cell code input with auto-advance, paste spread, backspace nav.
 // Uses imperative DOM for dynamic cell count. Each cell is a native <input>.
 
-import { component, html, useFormAssociated, model } from '@pdxui/core';
+import { component, html, model } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 
 /**
@@ -12,10 +12,9 @@ import { uiString, format, uiAttr} from '../shared/i18n';
  * @alphadetail value $event.currentTarget.value
  */
 component('pdx-otp-input', {
-    formAssociated: true,
     // Every digit writes it (#479), and the write dispatches `value-change`. `pdx-complete` stays: it is
     // the moment every cell is filled, not the value.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         length: { type: Number, default: 6 },
         disabled: { type: Boolean, default: false },
@@ -186,7 +185,6 @@ component('pdx-otp-input', {
         });
 
         // The prop, not `cells`: a plain array is not reactive, so the form value never followed typing.
-        useFormAssociated(ctx, { getFormValue: () => { const v = ctx.value() as string; return v ? v : null; } });
 
         // Imperative API: focus/blur/clear
         ctx.expose({

@@ -146,7 +146,8 @@ native `value`/`checked`/`files`; on any other component prop it is `PDX_TWO_WAY
 form-associated: a native `<form>` submits the model under the host's `name` (a boolean as a checkbox,
 an array as repeated entries), `form.reset()` restores it through the model, its own `required` and
 `error` props are its validity, and a disabled fieldset sets its `disabled` prop. Leave the inner
-`<input>` unnamed, or the value goes twice.
+`<input>` unnamed, or the value goes twice. When the form should receive something other than the
+model as it is (a clamped number, a selection), say it in the setup: `ctx.formValue(() => …)`.
 
 **A button that runs a component's method needs no script**: every `@expose`d method is an invoker
 command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The

@@ -1,7 +1,7 @@
 // pdx-tag-input — Multi-tag input with chip rendering, paste support, keyboard nav.
 // Uses .pdx-input-wrap for consistent border/focus and .pdx-chip for tag rendering.
 
-import { component, html, signal, computed, model, event, useFormAssociated } from '@pdxui/core';
+import { component, html, signal, computed, model, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
@@ -24,10 +24,9 @@ import '@pdxui/design/components/chip';
  * @alpharename pdx-input draft-change
  */
 component('pdx-tag-input', {
-    formAssociated: true,
     // The tags (#481). Adding one, removing one and clear() write them, and the write dispatches
     // `value-change`. The text being typed is not the value: it is announced with `draft-change`.
-    models: { value: model<string[]>(() => [], { type: Array }) },
+    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
     events: {
         /** The text typed into the field, before it becomes a tag. */
         'draft-change': event<{ value: string }>(),
@@ -220,7 +219,6 @@ component('pdx-tag-input', {
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const t = tags(); return t.length > 0 ? JSON.stringify(t) : null; } });
         // The host is the one submitter, the tags as JSON. A hidden input carrying the name would send
         // them a second time, comma-joined.
         reflectNameToHost(ctx);

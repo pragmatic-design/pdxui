@@ -2,7 +2,7 @@
 // Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
 // Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
 
-import { component, html, signal, computed, effect, model, useFormAssociated, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, model, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
@@ -101,12 +101,11 @@ function parseColor(input: string): { h: number; s: number; v: number; a: number
  * @alphacommit pdx-change
  */
 component('pdx-color-picker', {
-    formAssociated: true,
     // The colour in the picker's format (#481). Every step of a drag or a key writes it, and the write
     // dispatches `value-change`, live. The commit is a native `change` bubbling to the host: the hex
     // field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
     // a preset is picked or the colour is cleared.
-    models: { value: model<string>('#000000') },
+    models: { value: model<string>('#000000', { form: true }) },
     props: {
         format:   { type: String, default: 'hex' },
         showAlpha: { type: Boolean, default: false },
@@ -355,7 +354,6 @@ component('pdx-color-picker', {
             getHsl(): { h: number; s: number; l: number; a: number } { return { ...hslColor.peek(), a: alpha.peek() }; },
         });
 
-        useFormAssociated(ctx, { getFormValue: () => (ctx.value() as string) || null });
         // The host is the one submitter. A hidden input carrying the name would send the value a
         // second time.
         reflectNameToHost(ctx);

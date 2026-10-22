@@ -3,7 +3,7 @@
 // Features: sizes, full width, vertical, disabled per-item, form name,
 // animated indicator (Mantine/Ark pattern), roving tabindex keyboard nav.
 
-import { component, html, useFormAssociated, DEV, model } from '@pdxui/core';
+import { component, html, DEV, model } from '@pdxui/core';
 import { reflectNameToHost } from '../shared/own-prop';
 import { nameGroup } from '../shared/group-name';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -31,9 +31,9 @@ interface SegmentOption {
  * @alphadetail value $event.detail.value
  */
 component('pdx-segmented', {
-    formAssociated: true,
-    // A choice writes it (#480), and the write dispatches `value-change`.
-    models: { value: model('') },
+    // A choice writes it (#480), and the write dispatches `value-change`. A form submits it, nothing
+    // with no choice as a native radio group, and resets it (#135).
+    models: { value: model('', { form: true }) },
     props: {
         /** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
         options: { type: Array, default: [] },
@@ -129,7 +129,7 @@ component('pdx-segmented', {
             });
         });
 
-        useFormAssociated(ctx, { getFormValue: () => (ctx.value() as string) || null });
+        ctx.formValue?.(() => (ctx.value() as string) || null);
         // The host is the one submitter. No hidden input carries the name, or it would send the value
         // a second time.
         reflectNameToHost(ctx);

@@ -478,7 +478,9 @@ rather than for an application:
 `useFormAssociated`
 
 They are public because the package barrel is flat, not because they are an API to build on: the
-component *is* the API. If you find yourself needing one, the component you are rebuilding probably
+component *is* the API. `useFormAssociated` is the older, hand-written form association; a component
+declares its model `{ form }` instead ([Components](/docs/components)), as the library's value
+components do. If you find yourself needing one, the component you are rebuilding probably
 already does it.
 
 The form family — `useForm`, `tryUseForm`, `useFieldGroupPath`, `useFormCoordinator` — lives with

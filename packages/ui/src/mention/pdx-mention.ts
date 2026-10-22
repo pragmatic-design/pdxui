@@ -3,7 +3,7 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, html, signal, model, useFormAssociated, generatedId } from '@pdxui/core';
+import { component, html, signal, model, generatedId } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
@@ -49,11 +49,11 @@ interface MentionRange {
  * @alphacommit pdx-change
  */
 component('pdx-mention', {
-    formAssociated: true,
     // The text, clean of markup (#481). Typing and a picked mention write it, and the write dispatches
     // `value-change`, live. The commit is the textarea's native `change`, which bubbles to the host: on
-    // blur after typing, and dispatched by the component when a mention is picked.
-    models: { value: model<string>('') },
+    // blur after typing, and dispatched by the component when a mention is picked. A form submits the
+    // markup, which keeps whom each mention names, and resets the text (#135).
+    models: { value: model<string>('', { form: true }) },
     props: {
         /** Trigger character(s) — comma-separated for multiple (default: '@') */
         trigger: { type: String, default: '@' },
@@ -516,6 +516,8 @@ component('pdx-mention', {
                 _textareaEl.value = val;
                 _prevLength = val.length;
                 _mentions = []; // Reset mentions on external value change
+                // With no mention left the markup is the text, or a form submits the text it replaced.
+                _markup.set(val);
                 syncMirror();
             }
         });
@@ -627,7 +629,7 @@ component('pdx-mention', {
             if (_statusEl && _statusEl.textContent !== text) _statusEl.textContent = text;
         }
 
-        useFormAssociated(ctx, { getFormValue: () => _markup() || null });
+        ctx.formValue?.(() => _markup() || null);
         // The host is the one submitter, the markup. No hidden input carries the name: filled only by
         // the suggestion list, it would send "" beside the value.
         reflectNameToHost(ctx);

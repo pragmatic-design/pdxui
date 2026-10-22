@@ -41,7 +41,7 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `currency` | `currency` | string | `''` | ISO currency code for currency formatting (e.g. EUR). |
 | `colorBySign` | `colorbysign` | boolean | `false` | Color the number green (positive) / red (negative) |
 | `loading` | `loading` | boolean | `false` | Show loading state |
-| `value` | `value` | number \| null | `null` | The number, or `null` when the field is empty. |
+| `value` | `value` | number \| null | `null` | The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135). |
 
 **API (via `:ref`)**
 

@@ -12,3 +12,6 @@ the group cannot report it and warns once.
 
 Listen on the group, not on the children: the children's own `checked-change` stops at the group,
 and the group's `value` always matches what is checked. Classes you put on the group are kept.
+
+In a native `<form>` the group is the field: `name` goes on the group, which submits one entry per
+checked value, and `form.reset()` puts its selection back, the children with it.

@@ -7,10 +7,12 @@
 // The model's value is the form's value — `toFormValue` is the serialization — and the form's lifecycle
 // writes the model back: a reset to the value it mounted with, a restored state to the value saved
 // with it. The component's `required` and `error` props, when it declares them, are its validity, and
-// its `disabled` prop follows a disabled fieldset.
+// its `disabled` prop follows a disabled fieldset. A component that submits something other than its
+// model as it is — a clamped number, a selection — says what in its setup, `ctx.formValue(() => …)`.
 
 import type { Signal } from '../utils/types';
 import { DEV } from '../utils/env';
+import { signal as createSignal } from '../reactivity/signal';
 
 /** What `ElementInternals.setFormValue` takes. */
 export type FormValue = FormData | string | File | null;
@@ -90,6 +92,7 @@ function missingMessage(value: unknown): string {
 
 /** The parts of the element the wiring uses: its live attributes and its form API. */
 export interface FormModelElement {
+    readonly parentElement: Element | null;
     attr(name: string): Signal<string | null>;
     setFormValue(value: FormValue, state?: string | null): void;
     setValidity(flags?: ValidityStateFlags, message?: string): void;
@@ -100,6 +103,19 @@ export interface FormModelCallbacks {
     reset(): void;
     disabled(disabled: boolean): void;
     restore(state: unknown): void;
+}
+
+/** Every element wired here, so a control can tell it sits inside another. */
+const wired = new WeakSet<object>();
+
+/**
+ * Whether the element is part of another form model's control — a checkbox in a checkbox group. That
+ * control owns its value: it resets and restores through its own model and hands its children their
+ * state, so a child that reset itself too, after it, would undo what the group just did.
+ */
+function partOfAnother(el: FormModelElement): boolean {
+    for (let up = el.parentElement; up; up = up.parentElement) if (wired.has(up)) return true;
+    return false;
 }
 
 /**
@@ -122,11 +138,16 @@ export function wireFormModel(
     const name = el.attr('name');
     const initial = signal.peek();
     let warned = false;
+    // What the component's setup says the form submits instead of the model, if it says so.
+    const submitted = createSignal<(() => unknown) | null>(null);
+    ctx.formValue = (get: () => unknown) => submitted.setRaw(get);
+    wired.add(el);
 
     track(() => {
         const value = signal();
+        const get = submitted();
         const checked = checkedValue?.();
-        const entry = toFormValue(value, name(), typeof checked === 'string' && checked !== '' ? checked : 'on');
+        const entry = toFormValue(get ? get() : value, name(), typeof checked === 'string' && checked !== '' ? checked : 'on');
         if (isUnsupportedFormValue(entry)) {
             if (DEV && !warned) {
                 warned = true;
@@ -148,13 +169,15 @@ export function wireFormModel(
     });
 
     return {
-        reset: () => signal.set(initial),
+        reset: () => {
+            if (!partOfAnother(el)) signal.set(initial);
+        },
         disabled: (disabled) => {
             if (props.includes('disabled')) (el as unknown as { disabled: boolean }).disabled = disabled;
         },
         // The browser hands back the state this element saved, which `stateOf` wrote as JSON.
         restore: (state) => {
-            if (typeof state === 'string') signal.set(JSON.parse(state));
+            if (typeof state === 'string' && !partOfAnother(el)) signal.set(JSON.parse(state));
         },
     };
 }

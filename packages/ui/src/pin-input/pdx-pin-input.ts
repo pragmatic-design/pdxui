@@ -1,7 +1,7 @@
 // pdx-pin-input — Masked code input (PIN entry). Same as pdx-otp-input with mask=true.
 // Displays dots (●) instead of characters. Use for passwords/PINs.
 
-import { component, html, model, useFormAssociated } from '@pdxui/core';
+import { component, html, model } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 
 // PinInput is OtpInput with mask=true and numeric=true defaults
@@ -16,10 +16,9 @@ import '../otp-input/pdx-otp-input';
  * @alphadetail value $event.detail.value
  */
 component('pdx-pin-input', {
-    formAssociated: true,
     // The PIN so far (#125). Each character typed or deleted in the inner pdx-otp-input writes it, and
     // the write dispatches `value-change`.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         length: { type: Number, default: 4 },
         disabled: { type: Boolean, default: false },
@@ -37,7 +36,6 @@ component('pdx-pin-input', {
             if (typeof v === 'string') ctx.value.set(v);
         }
         function onComplete(e: Event) { ctx.emit('pdx-complete', (e as CustomEvent).detail); }
-        useFormAssociated(ctx, { getFormValue: () => { const v = ctx.value() as string; return v ? v : null; } });
 
         // Imperative API: focus/blur/clear (delegates to inner pdx-otp-input)
         ctx.expose({
