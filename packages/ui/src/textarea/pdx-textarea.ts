@@ -2,6 +2,7 @@
 // Uses .pdx-input-wrap pattern for consistency with pdx-input.
 
 import { component, html, signal, model } from '@pdxui/core';
+import { submitThroughInnerField } from '../shared/inner-field';
 import { dispatchCommit } from '../shared/commit-change';
 
 /**
@@ -13,10 +14,9 @@ import { dispatchCommit } from '../shared/commit-change';
  * @alphacommit pdx-change
  */
 component('pdx-textarea', {
-    formAssociated: true,
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur, is the
     // inner textarea's native `change`, which bubbles to the host.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
@@ -39,6 +39,8 @@ component('pdx-textarea', {
         loading: { type: Boolean, default: false },
     },
     setup(ctx) {
+        // The inner field submits; a form reset puts it and the model back to the mounted text (#135).
+        submitThroughInnerField(ctx);
         // Looked up when needed: a setup-time capture runs before the template renders.
         const textareaEl = (): HTMLTextAreaElement | null => ctx.el.querySelector<HTMLTextAreaElement>('textarea');
         const liveValue = signal(ctx.value() as string || '');

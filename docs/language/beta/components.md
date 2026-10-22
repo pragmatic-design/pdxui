@@ -86,15 +86,15 @@ ModelDecl    ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? 
 
 ### Semantics
 
-Declares a prop **that can be bound both ways** (#124 — landed; `{ form }` is #135). It creates the prop, an event
+Declares a prop **that can be bound both ways** (#124 — landed; `{ form }` is #135 — landed). It creates the prop, an event
 `<kebab-name>-change` carrying `CustomEvent<{ value: T }>` (not bubbling), and makes an assignment to
 the name inside the component write the prop and dispatch the event. A parent binds it with
 `::name="sig"` ([template.md](template.md)). The value properties of native form elements (`value`,
 `checked`, `files` of `<input>`, `<textarea>`, `<select>`) are the platform's models and bind the same
 way. Descriptor: `models: { value: model<T>(default) }`.
 
-`{ form }` makes the component **form-associated** (#135 — the mechanism landed, and the seventeen
-library components that wired the form by hand declare it; the rest of the library follows):
+`{ form }` makes the component **form-associated** (#135 — landed; every value component of the
+library declares it):
 `formAssociated`, `attachInternals()`, and
 `setFormValue` on each change of the model — a string as is, a number as its string, a boolean as a
 native checkbox (the component's `value` prop, or `'on'`, when true; no entry when false), an array as

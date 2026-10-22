@@ -7,6 +7,7 @@ import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 import { onPressOutside } from '../shared/press-outside';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/cascader';
@@ -46,10 +47,10 @@ export interface CascaderNode {
  * @alphadetail labels $event.currentTarget.getLabels()
  */
 component('pdx-cascader', {
-    formAssociated: true,
     // The selected path, the values from the root down (#481). A choice, the clear button, setValue()
     // and clear() write it, and the write dispatches `value-change`.
-    models: { value: model<string[]>(() => [], { type: Array }) },
+    // A form submits the path, one entry per level, and resets it (#135).
+    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
@@ -100,7 +101,8 @@ component('pdx-cascader', {
         let _searchInputEl: HTMLInputElement | null = null;
         let _clearEl: HTMLButtonElement | null = null;
         let _iconEl: HTMLElement | null = null;
-        let _hiddenEl: HTMLInputElement | null = null;
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
+        reflectNameToHost(ctx);
         let _popover: ReturnType<typeof usePopover> | null = null;
         /** Removes the press-outside listener, added when the panel opens (#427). */
         let _outsideDispose: (() => void) | null = null;
@@ -371,7 +373,6 @@ component('pdx-cascader', {
             const el = ctx.el;
             const disabled = ctx.disabled() as boolean;
             const size = ctx.size() as string;
-            const name = ctx.name() as string;
             const clearable = ctx.clearable() as boolean;
             const ph = (ctx.placeholder() as string) || getComponentString('cascader', 'placeholder')();
 
@@ -467,12 +468,6 @@ component('pdx-cascader', {
             _popover.setTrigger(_triggerEl);
             _popover.setContent(_panelEl);
 
-            if (name) {
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                el.appendChild(_hiddenEl);
-            }
             _domReady.set(true);
         });
 
@@ -487,7 +482,6 @@ component('pdx-cascader', {
             const search = _search();
             const loading = _loading();
             const display = displayText();
-            const valuePath = getValuePath();
             const clearable = ctx.clearable() as boolean;
             const disabled = ctx.disabled() as boolean;
             const searchable = ctx.searchable() as boolean;
@@ -505,8 +499,6 @@ component('pdx-cascader', {
                 _iconEl.className = 'pdx-cascader-icon' + (open ? ' open' : '');
             }
             if (_triggerEl) _triggerEl.setAttribute('aria-expanded', String(open));
-
-            if (_hiddenEl) _hiddenEl.value = valuePath.join(',');
 
             if (!_panelEl || !_panelContentEl) return;
             _panelEl.style.display = open ? '' : 'none';

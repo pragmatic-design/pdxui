@@ -277,6 +277,166 @@ test.describe('the form model: a reset gives back the value each control mounted
     }
 });
 
+// The rest of the library (#135, part 3): the pickers that submitted through a hidden input of their
+// own, and the editors that did not take part at all. Each submits its model once — the host, no
+// hidden input beside it — and a reset gives the mounted value back.
+test.describe('the form model, the rest of the library: once, and reset', () => {
+    const OPTS = `options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]'`;
+    const TREE = `options='[{"value":"fruit","label":"Fruit","children":[{"value":"apple","label":"Apple"},{"value":"pear","label":"Pear"}]}]'`;
+    const PATHS = `options='[{"value":"it","label":"Italy","children":[{"value":"lz","label":"Lazio"}]},{"value":"fr","label":"France","children":[{"value":"idf","label":"Ile-de-France"}]}]'`;
+    const ITEMS = `items='[{"value":"a","label":"A"},{"value":"b","label":"B"},{"value":"c","label":"C"}]'`;
+    // [markup, a value written to the model, submitted at mount, submitted after the write]
+    const CASES: [string, unknown, string[], string[]][] = [
+        [`<pdx-select name="n" ${OPTS} value="it"></pdx-select>`, 'fr', ['it'], ['fr']],
+        [`<pdx-select name="n" ${OPTS} multiple value="it"></pdx-select>`, ['it', 'fr'], ['it'], ['it', 'fr']],
+        ['<pdx-date-picker name="n" value="2026-01-15"></pdx-date-picker>', '2026-02-01', ['2026-01-15'], ['2026-02-01']],
+        ['<pdx-date-picker name="n" mode="daterange"></pdx-date-picker>', ['2026-01-01', '2026-01-31'], [''], ['2026-01-01', '2026-01-31']],
+        ['<pdx-time-picker name="n" value="09:30"></pdx-time-picker>', '14:00', ['09:30'], ['14:00']],
+        [`<pdx-cascader name="n" ${PATHS} value='["it","lz"]'></pdx-cascader>`, ['fr', 'idf'], ['it', 'lz'], ['fr', 'idf']],
+        [`<pdx-tree-select name="n" ${TREE} value="apple"></pdx-tree-select>`, 'pear', ['apple'], ['pear']],
+        [`<pdx-tree-select name="n" ${TREE} multiple value='["apple"]'></pdx-tree-select>`, ['apple', 'pear'], ['apple'], ['apple', 'pear']],
+        ['<pdx-inline-edit name="n" type="text" value="Jane"></pdx-inline-edit>', 'Joan', ['Jane'], ['Joan']],
+        [`<pdx-transfer name="n" ${ITEMS} value='["a"]'></pdx-transfer>`, ['a', 'c'], ['a'], ['a', 'c']],
+        [`<pdx-json-editor name="n" value='{"a":1}'></pdx-json-editor>`, { a: 2 }, ['{"a":1}'], ['{"a":2}']],
+    ];
+
+    for (const [markup, next, atMount, afterWrite] of CASES) {
+        const tag = markup.match(/^<([a-z-]+)/)![1];
+        const variant = /\bmultiple\b|daterange/.test(markup) ? ' (several values)' : '';
+        test(tag + variant, async ({ page }) => {
+            await form(page, markup);
+            const host = page.locator(`#f > ${tag}`);
+            const modelValue = () => host.evaluate((el) => (el as unknown as { value: unknown }).value);
+            const mounted = await modelValue();
+            expect(await submitted(page, 'n'), 'as mounted, once').toEqual(atMount);
+            await host.evaluate((el, v) => { (el as unknown as { value: unknown }).value = v; }, next);
+            await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+            expect(await submitted(page, 'n'), 'after the model is written').toEqual(afterWrite);
+            await page.evaluate(() => (document.getElementById('f') as HTMLFormElement).reset());
+            await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+            expect(await submitted(page, 'n'), 'after form.reset()').toEqual(atMount);
+            expect(await modelValue(), 'the model is back too').toEqual(mounted);
+        });
+    }
+
+    test('pdx-select with nothing chosen submits an empty entry, as a native select with an empty placeholder', async ({ page }) => {
+        await form(page, `<pdx-select name="n" ${OPTS}></pdx-select>`);
+        expect(await submitted(page, 'n')).toEqual(['']);
+    });
+
+    test('pdx-inline-edit submits a number as its string and an object as JSON', async ({ page }) => {
+        await form(page, '<pdx-inline-edit name="n" type="number"></pdx-inline-edit>');
+        const host = page.locator('#f > pdx-inline-edit');
+        expect(await submitted(page, 'n')).toEqual([]);
+        await host.evaluate((el) => { (el as unknown as { value: unknown }).value = 42; });
+        expect(await submitted(page, 'n')).toEqual(['42']);
+        await host.evaluate((el) => { (el as unknown as { value: unknown }).value = { x: 1 }; });
+        expect(await submitted(page, 'n')).toEqual(['{"x":1}']);
+    });
+
+    test('pdx-rich-text submits its document as JSON', async ({ page }) => {
+        await form(page, '<pdx-rich-text name="n"></pdx-rich-text>');
+        const host = page.locator('#f > pdx-rich-text');
+        const doc = { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text: 'Hi' }] }] };
+        await host.evaluate((el, d) => { (el as unknown as { value: unknown }).value = d; }, doc);
+        await expect.poll(() => submitted(page, 'n')).toHaveLength(1);
+        const [json] = await submitted(page, 'n');
+        expect(JSON.parse(json), 'the model, as JSON').toEqual(await host.evaluate((el) => (el as unknown as { value: unknown }).value));
+    });
+
+    test('pdx-file-upload submits the files it holds, a dropped one too, and a reset empties it', async ({ page }) => {
+        // Before #135 the files came from the inner input alone: a dropped file was never submitted.
+        await form(page, '<pdx-file-upload name="cv" multiple></pdx-file-upload>');
+        await page.locator('#f pdx-file-upload input[type="file"]').setInputFiles({ name: 'cv.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') });
+        // A file dropped on the zone reaches the model, not the inner input.
+        await page.locator('#f > pdx-file-upload').evaluate((el) => {
+            const host = el as unknown as { value: File[] };
+            host.value = [...host.value, new File(['y'], 'photo.png', { type: 'image/png' })];
+        });
+        const names = () => page.evaluate(() => new FormData(document.getElementById('f') as HTMLFormElement)
+            .getAll('cv').map((v) => (v as File).name));
+        expect(await names()).toEqual(['cv.pdf', 'photo.png']);
+        await page.evaluate(() => (document.getElementById('f') as HTMLFormElement).reset());
+        // Empty, it sends what an empty native file input sends: one file with no name.
+        expect(await names()).toEqual(['']);
+    });
+});
+
+// The issue's acceptance test: a form of library controls gives the FormData a native form with the
+// same controls would, a reset restores them, and a required empty one makes the form invalid.
+test.describe('acceptance (#135): library controls in a native form', () => {
+    const LIBRARY = `
+        <pdx-input name="title" value="Report"></pdx-input>
+        <pdx-select name="country" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' value="fr"></pdx-select>
+        <pdx-checkbox name="agree" label="Agree" checked></pdx-checkbox>
+        <pdx-checkbox name="news" label="News" value="yes"></pdx-checkbox>
+        <pdx-tag-input name="tags"></pdx-tag-input>
+        <pdx-file-upload name="cv"></pdx-file-upload>`;
+    const NATIVE = `
+        <input name="title" value="Report">
+        <select name="country"><option value="it">Italy</option><option value="fr" selected>France</option></select>
+        <input type="checkbox" name="agree" checked>
+        <input type="checkbox" name="news" value="yes">
+        <select name="tags" multiple><option value="urgent">urgent</option><option value="later">later</option></select>
+        <input type="file" name="cv">`;
+
+    const entries = (page: Page, id: string) => page.evaluate((formId) =>
+        [...new FormData(document.getElementById(formId) as HTMLFormElement).entries()]
+            .map(([k, v]) => `${k}=${typeof v === 'string' ? v : (v as File).name}`), id);
+
+    test('the FormData a native form gives, a reset, and a required empty control', async ({ page }) => {
+        await form(page, LIBRARY);
+        await page.evaluate((markup) => {
+            const n = document.createElement('form');
+            n.id = 'native';
+            n.innerHTML = markup;
+            document.body.appendChild(n);
+        }, NATIVE);
+
+        expect(await entries(page, 'f'), 'as mounted').toEqual(await entries(page, 'native'));
+
+        // The same edits on both: two tags, one file.
+        const tags = page.locator('#f pdx-tag-input input:not([type="hidden"])');
+        for (const t of ['urgent', 'later']) { await tags.fill(t); await tags.press('Enter'); }
+        await page.locator('#native select[name="tags"]').selectOption(['urgent', 'later']);
+        const file = { name: 'cv.pdf', mimeType: 'application/pdf', buffer: Buffer.from('x') };
+        await page.locator('#f pdx-file-upload input[type="file"]').setInputFiles(file);
+        await page.locator('#native input[type="file"]').setInputFiles(file);
+        expect(await entries(page, 'f'), 'after the edits').toEqual(await entries(page, 'native'));
+
+        for (const id of ['f', 'native']) await page.evaluate((i) => (document.getElementById(i) as HTMLFormElement).reset(), id);
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+        expect(await entries(page, 'f'), 'after form.reset()').toEqual(await entries(page, 'native'));
+
+        const valid = () => page.evaluate(() => (document.getElementById('f') as HTMLFormElement).checkValidity());
+        expect(await valid()).toBe(true);
+        await page.locator('#f > pdx-input').evaluate((el) => el.setAttribute('required', ''));
+        await page.locator('#f > pdx-input input').fill('');
+        expect(await valid(), 'a required pdx-input left empty').toBe(false);
+    });
+    // A .pdx component with `@model value: string { form }`, compiled and submitted, is
+    // packages/showcase/tests/form-model.spec.ts.
+
+    // The text fields submit through their inner native field, which keeps the name for autofill and
+    // password managers. A reset puts the field back to the value the component mounted with — read
+    // in the same task as the reset, before any frame.
+    for (const [tag, field] of [['pdx-input', 'input'], ['pdx-password-input', 'input'], ['pdx-search-input', 'input'], ['pdx-textarea', 'textarea']] as const) {
+        test(`${tag}: a reset gives back the mounted text, at once, and the model with it`, async ({ page }) => {
+            await form(page, `<${tag} name="t" value="init"></${tag}>`);
+            await page.locator(`#f ${tag} ${field}`).fill('typed');
+            const afterReset = await page.evaluate(() => {
+                const f = document.getElementById('f') as HTMLFormElement;
+                f.reset();
+                return new FormData(f).getAll('t');
+            });
+            expect(afterReset).toEqual(['init']);
+            await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+            expect(await page.locator(`#f > ${tag}`).evaluate((el) => (el as unknown as { value: unknown }).value)).toBe('init');
+            expect(await page.locator(`#f ${tag} ${field}`).inputValue()).toBe('init');
+        });
+    }
+});
+
 test.describe('the form model: a group owns its children', () => {
     // A child resetting itself after its group, to the unchecked state it mounted with, would undo
     // the group: the boxes and radios show what the group's value says.

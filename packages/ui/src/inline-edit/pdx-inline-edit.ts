@@ -8,6 +8,7 @@ import { registerComponentStrings, getComponentString, registerFormControl } fro
 import { resolveLocale } from '../shared/locale';
 import { onControlValue } from '../shared/model-event';
 import { onPressOutside } from '../shared/press-outside';
+import { reflectNameToHost } from '../shared/own-prop';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -43,11 +44,10 @@ registerFormControl('pdx-inline-edit', {
  * @alphadetail value $event.detail.value
  */
 component('pdx-inline-edit', {
-    formAssociated: true,
     // A commit writes it (#482), and the write dispatches `value-change`.
     models: {
         /** Current value */
-        value: model<unknown>(null, { type: Object }),
+        value: model<unknown>(null, { type: Object, form: true }),
     },
     props: {
         /** Data type — determines which editor to show */
@@ -90,7 +90,14 @@ component('pdx-inline-edit', {
         let _displayEl: HTMLElement | null = null;
         let _editorEl: HTMLElement | null = null;
         // _actionsEl reserved for future use (action buttons container)
-        let _hiddenEl: HTMLInputElement | null = null;
+        // A form submits the value (#135): text and a number as they are, a boolean as true/false, an
+        // object as JSON. The host is the one submitter, under its name.
+        ctx.formValue?.(() => {
+            const v = ctx.value();
+            if (v === null || v === undefined) return null;
+            return typeof v === 'object' ? JSON.stringify(v) : String(v);
+        });
+        reflectNameToHost(ctx);
         let _rootEl: HTMLElement | null = null;
         /** Removes the press-outside listener, added when editing starts (#427). */
         let _outsideDispose: (() => void) | null = null;
@@ -449,8 +456,6 @@ component('pdx-inline-edit', {
         // ── Build DOM ── (ctx.frame: a setup a move destroyed does not build again)
         ctx.frame(() => {
             const el = ctx.el;
-            const name = ctx.name() as string;
-
             _rootEl = document.createElement('div');
             _rootEl.className = 'pdx-inline-edit';
 
@@ -486,13 +491,6 @@ component('pdx-inline-edit', {
                 if (to && !ctx.el.contains(to)) confirmEdit();
             });
             _rootEl.appendChild(_editorEl);
-
-            if (name) {
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                _rootEl.appendChild(_hiddenEl);
-            }
 
             el.appendChild(_rootEl);
             _domReady.set(true);
@@ -564,9 +562,6 @@ component('pdx-inline-edit', {
                 }
             }
 
-            if (_hiddenEl) {
-                _hiddenEl.value = val !== null && val !== undefined ? JSON.stringify(val) : '';
-            }
         });
 
         // Exposes the methods on the host: the setup's `return {}` gives them only to the render context,

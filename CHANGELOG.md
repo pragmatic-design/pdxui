@@ -28,6 +28,17 @@ semver.
   its setup, `ctx.formValue(() => …)`: a clamped number, a group's selection, a mention's markup. A
   control inside another one with a form model — a checkbox in a checkbox group — is the outer one's:
   it does not reset or restore itself after it. (#135)
+- The rest of the library's value components take part in a native form through their model, and a
+  reset restores them (#135):
+  - **The pickers that submitted through a hidden `<input>`:** select, date-picker, time-picker,
+    cascader, tree-select and inline-edit. The host submits now, and the hidden input is gone.
+  - **The components that did not take part at all:** transfer, rich-text, json-editor and
+    file-upload. A file dropped on a `pdx-file-upload` is submitted too; before, only a file picked
+    through the dialog reached the form.
+  - **The text fields:** input, textarea, password-input and search-input keep submitting through
+    their inner native field, which holds the `name` for autofill and password managers. A reset now
+    puts the field and its model back to the mounted text; before, it emptied the field and left the
+    model as it was.
 - A value still waiting in a `::x.debounce(ms)` binding to a form field is written before the form's
   `handleSubmit` validates and before `validate()`, when the page calls them from code as well as on a
   submit event: the submitted value is the one typed (beta rule F6). `required` on a control bound to a form
@@ -294,6 +305,15 @@ semver.
     `pdx-color-picker` submits an empty entry, as a native text input does, instead of none.
   - **Autocomplete:** a picked `pdx-autocomplete` suggestion submits its value, the code its model
     holds, instead of the label shown. Free text is submitted as typed, as before.
+  - **More lists:** a multiple `pdx-select`, a multiple `pdx-tree-select`, `pdx-transfer`, a range
+    `pdx-date-picker` and a `pdx-cascader` path submit one entry per item instead of a comma-joined,
+    JSON or `start/end` entry.
+  - **Inline edit:** `pdx-inline-edit` submits text and numbers as they are and a boolean as
+    `true`/`false`, with JSON only for an object, instead of JSON for every value (`"\"Jane\""`). With
+    no value it submits nothing, instead of an empty entry.
+  - **Documents and files:** `pdx-rich-text` (a JSON document as JSON) and `pdx-json-editor` submit
+    under their `name`. An empty `pdx-file-upload` submits what an empty native file input does: one
+    file with no name.
 - **Breaking:** inside `<pdx-form :form="f">`, a control is no longer wired to its field by its `name`,
   nor a `<pdx-form-field>` by its `name`: each is `PDX_REMOVED_FORM`. A control binds through its
   model, `::value="f.email"`, and a form field names its field, `:field="f.email"`. `pdx migrate`

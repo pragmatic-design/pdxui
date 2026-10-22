@@ -157,11 +157,11 @@ describe('pdx-inline-edit', () => {
         expect(cancel).toBeTruthy();
     });
 
-    it('renders hidden input when name set', async () => {
+    it('submits through the host, with no hidden input (#135)', async () => {
         const el = await mountInlineEdit({ name: 'myfield', value: 'test' });
-        const hidden = el.querySelector('input[type="hidden"]');
-        expect(hidden).toBeTruthy();
-        expect(hidden?.getAttribute('name')).toBe('myfield');
+        // The host submits (#135): no input inside carries the name, which is on the host.
+        expect(el.querySelector('input[name]')).toBeNull();
+        expect(el.getAttribute('name')).toBe('myfield');
     });
 
     it('has role=button on display element', async () => {

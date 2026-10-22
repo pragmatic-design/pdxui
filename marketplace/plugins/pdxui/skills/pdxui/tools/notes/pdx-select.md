@@ -20,8 +20,9 @@ paged table → `pdx-relation-picker`.
 **Pitfalls**
 - `value-change` carries `{ value }`: the option's value, or with `multiple` the array of values; a clear
   writes `null` or `[]`. The option itself is `el.selectedItem` (the options, with `multiple`).
-- With `multiple`, `el.value` is the ARRAY. The comma-joined string survives only in the hidden input a native
-  form submits, where a value containing a comma cannot round-trip.
+- With `multiple`, `el.value` is the ARRAY, and a native form receives one entry per value under the
+  select's `name` (`formData.getAll(name)`), as from a native multi-select. With nothing chosen, a single
+  select submits an empty entry.
 - `creatable` makes the typed text both value and label and emits `pdx-create`; storing the new option is yours.
 - Over 100 options the list virtualizes by itself.
 

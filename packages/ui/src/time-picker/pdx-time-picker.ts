@@ -5,6 +5,7 @@
 import { component, html, signal, model, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { is12HourClock } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/time-picker';
@@ -37,10 +38,10 @@ registerFormControl('pdx-time-picker', {
  * @alphadetail value $event.detail.value
  */
 component('pdx-time-picker', {
-    formAssociated: true,
     // `HH:mm[:ss]` on the 24-hour clock, or '' for no time (#481). Each step of an arrow, the wheel, a
     // typed digit and the AM/PM toggle writes it, and the write dispatches `value-change`.
-    models: { value: model<string>('') },
+    // A form submits it as it is, and resets it (#135).
+    models: { value: model<string>('', { form: true }) },
     props: {
         format: { type: String, default: 'auto' },
         showSeconds: { type: Boolean, default: false },
@@ -265,7 +266,8 @@ component('pdx-time-picker', {
         let _minuteEl: HTMLElement | null = null;
         let _secondEl: HTMLElement | null = null;
         let _periodEl: HTMLElement | null = null;
-        let _hiddenEl: HTMLInputElement | null = null;
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
+        reflectNameToHost(ctx);
         let _groupEl: HTMLElement | null = null;
         let _built = false;
 
@@ -285,7 +287,6 @@ component('pdx-time-picker', {
             const showSec = ctx.showSeconds() as boolean;
             const use12h_ = is12h();
             const size = ctx.size() as string;
-            const name = ctx.name() as string;
 
             const wrap = document.createElement('div');
             wrap.className = 'pdx-time-picker' + (size ? ` pdx-time-picker-${size}` : '') + (disabled ? ' disabled' : '');
@@ -312,12 +313,6 @@ component('pdx-time-picker', {
                 const perCol = buildSegment('period', 'AM', getComponentString('time-picker', 'period')());
                 _periodEl = perCol.querySelector('.pdx-time-value')!;
                 wrap.appendChild(perCol);
-            }
-            if (name) {
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                wrap.appendChild(_hiddenEl);
             }
             el.appendChild(wrap);
         });
@@ -350,7 +345,6 @@ component('pdx-time-picker', {
                 show(_minuteEl, String(m).padStart(2, '0'), String(m));
                 show(_secondEl, String(s).padStart(2, '0'), String(s));
                 show(_periodEl, period, period);
-                if (_hiddenEl) _hiddenEl.value = empty ? '' : formatOutput();
             });
         });
 

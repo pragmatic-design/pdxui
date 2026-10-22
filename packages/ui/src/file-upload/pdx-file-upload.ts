@@ -4,6 +4,7 @@
 import { component, html, signal, computed, generatedId, model, untracked } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/file-upload';
@@ -73,8 +74,9 @@ function acceptHint(accept: string): string {
  */
 component('pdx-file-upload', {
     // The files it holds (#482): adding, removing or clearing writes it, and the write dispatches
-    // `value-change`; a value set from outside replaces the list.
-    models: { value: model<File[]>(() => [], { type: Array }) },
+    // `value-change`; a value set from outside replaces the list. A form submits every file it holds —
+    // a dropped one too, which the inner input never had — and a reset empties it (#135).
+    models: { value: model<File[]>(() => [], { type: Array, form: true }) },
     props: {
         accept: { type: String, default: '' },
         multiple: { type: Boolean, default: false },
@@ -89,6 +91,14 @@ component('pdx-file-upload', {
         size: { type: String, default: '' },
     },
     setup(ctx) {
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it,
+        // and the inner input is kept out of the form, or a picked file would go twice.
+        reflectNameToHost(ctx);
+        // With no file, the entry a native file input sends: an empty file with no name.
+        ctx.formValue?.(() => {
+            const files = ctx.value() as File[];
+            return files.length > 0 ? files : new File([], '', { type: 'application/octet-stream' });
+        });
         const entries = signal<FileEntry[]>([]);
         const dragging = signal(false);
         const rejections = signal<Rejection[]>([]);
@@ -362,7 +372,7 @@ component('pdx-file-upload', {
                 hidden
                 :accept=${ctx.accept}
                 :multiple=${ctx.multiple}
-                :name=${ctx.name}
+                form="pdx-file-upload-no-submit"
                 @change=${ctx.onInputChange} />
             <div class="pdx-file-rejections" role="status">
                 ${() => (ctx.rejections() as Rejection[]).map((r) => html`<div class="pdx-file-error">${ctx.rejectionText(r)}</div>`)}

@@ -8,7 +8,7 @@ import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, g
 import type { CalendarSystem } from '@pdxui/core';
 
 import { resolveLocale } from '../shared/locale';
-import { setOwnProp } from '../shared/own-prop';
+import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
 import { parseTypedDateTime, formatTypedDate, dateAllowed } from './typed-date';
 import '../calendar/pdx-calendar';
 import '../time-picker/pdx-time-picker';
@@ -73,13 +73,12 @@ export interface DatePreset {
  * @alphadetail timeEnd $event.currentTarget.getEndTime()
  */
 component('pdx-date-picker', {
-    formAssociated: true,
     // The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
     // mode; the date and its time, `2026-03-14T09:30`, in `datetime` mode or with `show-time`; the time
     // in `time` mode; `[start, end]` in `daterange`, `datetimerange` (each with its time) and `week`
     // mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
-    // dispatches `value-change`.
-    models: { value: model<string | string[]>('') },
+    // dispatches `value-change`. A form submits it, a range as two entries, and resets it (#135).
+    models: { value: model<string | string[]>('', { form: true }) },
     props: {
         /** Range start (ISO). */
         rangeStart: { type: String, default: '' },
@@ -557,8 +556,9 @@ component('pdx-date-picker', {
         /** The panel's time picker (datetime modes): a typed time is written back to it. */
         let _timeEl: (HTMLElement & { value: string }) | null = null;
         let _calendarEl: any = null;
-        let _hiddenEl: HTMLInputElement | null = null;
         let _built = false;
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
+        reflectNameToHost(ctx);
 
         /** The trigger's name: aria-label, else the placeholder, else date-picker.choose — a string a
          *  locale can reach, not a literal 'Choose date'. */
@@ -633,7 +633,6 @@ component('pdx-date-picker', {
             const readonly_ = ctx.readonly() as boolean;
             const size = ctx.size() as string;
             const isInline = ctx.inline() as boolean;
-            const name = ctx.name() as string;
             const timeOnly = isTimeOnly();
             const showTimePicker = hasTime();
             const presets = ctx.presets() as DatePreset[];
@@ -741,13 +740,6 @@ component('pdx-date-picker', {
                     });
                 }
                 el.appendChild(_triggerEl);
-
-                // Hidden input
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                if (!name) _hiddenEl.style.display = 'none';
-                el.appendChild(_hiddenEl);
 
                 // Panel
                 _panelEl = document.createElement('div');
@@ -907,14 +899,6 @@ component('pdx-date-picker', {
                 if (_clearEl) {
                     _clearEl.style.display = (clearable && display && !disabled && !readonly_) ? '' : 'none';
                 }
-                // Update hidden input — in range mode it serializes both
-                // ends (or the submit would lose rangeStart/rangeEnd)
-                if (_hiddenEl) {
-                    _hiddenEl.value = (isRange() && rStart && rEnd)
-                        ? `${rStart}/${rEnd}`
-                        : (val || '');
-                }
-
                 // Sync selection props via setAttribute (lowercased camelCase matches observedAttributes)
                 if (_calendarEl) {
                     _calendarEl.setAttribute('value', val || '');
