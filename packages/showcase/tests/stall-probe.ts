@@ -13,8 +13,13 @@
 // - `runner.heartbeat`: the same interval in the test's own process. A gap here as well means the
 //   machine stalled every process, not the page.
 //
+// An empty record is an answer too: the page ran and nothing stalled, so it was waiting on something.
+// The first failure it recorded was a route chunk refused by the preview server, with the page idle.
+//
 // Kept in sessionStorage, so a full navigation inside the test does not lose what came before it.
-// Times are epoch milliseconds, the clock of the trace's wall time.
+// Times are epoch milliseconds, the clock of the trace's wall time. The list reporter does not print
+// the record: it is in the failed test's trace.zip, under `resources/`, named by the sha1 that the
+// `stall-probe.json` attach step gives in `test.trace`.
 import type { Page, TestInfo } from '@playwright/test';
 
 const GAP_MS = 300;
@@ -41,6 +46,8 @@ export async function startStallProbe(page: Page): Promise<StallProbe> {
     await page.addInitScript(({ key, gapMs }) => {
         const read = (): PageRecord => JSON.parse(sessionStorage.getItem(key) ?? '{"heartbeat":[],"longTasks":[]}') as PageRecord;
         const write = (add: (r: PageRecord) => void): void => { const r = read(); add(r); sessionStorage.setItem(key, JSON.stringify(r)); };
+        // Written at once, so an empty record reads «ran, and nothing stalled», never «did not run».
+        write(() => undefined);
         let last = Date.now();
         setInterval(() => {
             const now = Date.now();
@@ -67,7 +74,7 @@ export async function startStallProbe(page: Page): Promise<StallProbe> {
         async read() {
             if (page.isClosed()) return { page: { unreadable: 'the page was closed' }, runner };
             const fromPage = page.evaluate((key) => sessionStorage.getItem(key), KEY)
-                .then((raw): StallRecord['page'] => raw ? JSON.parse(raw) as PageRecord : { unreadable: 'nothing recorded: no navigation ran the init script' })
+                .then((raw): StallRecord['page'] => raw ? JSON.parse(raw) as PageRecord : { unreadable: 'no record: no document of this origin ran the init script' })
                 .catch((e: unknown): StallRecord['page'] => ({ unreadable: `evaluate failed: ${String(e)}` }));
             const late = new Promise<StallRecord['page']>((resolve) => {
                 setTimeout(() => resolve({ unreadable: `no answer in ${READ_TIMEOUT_MS} ms: the page was still frozen` }), READ_TIMEOUT_MS).unref();
