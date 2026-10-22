@@ -10,12 +10,14 @@ or the grid's `FieldDefinition[]` → `pdx-auto-form`; nor to submit several sep
 is one `<pdx-form name>` each under `createFormCoordinator()` (recipes: *A long form filled in more than one sitting*).
 
 **Pitfalls**
-- A named control is wired only in the file that holds `<pdx-form>`, or in a component whose script calls
-  `tryUseForm()`. A plain child component's controls stay unbound, silently.
+- Inside `<pdx-form :form>` a control binds its field through its model, `::value="form.x"`, and a form field
+  names it, `:field="form.x"`: a control with only a `name` there is `PDX_REMOVED_FORM` (#128). Only a
+  section — a component whose script calls `tryUseForm()` — still has its named controls wired, until #613.
 - A section calls `tryUseForm()`, not `useForm()`: a child can set up before its form, and `useForm()` then throws.
 - A `<pdx-field-group>` written in the PARENT does not prefix the controls of a section component inside
   it: put the group in the section.
-- Inside a group the DOM carries the full path: select `[name="customer.email"]`, not `[name="email"]`.
+- Inside a group a field is bound by its full path, `::value="form['customer.email']"`, and its control's `name`
+  is the full path too: select `[name="customer.email"]`.
 - With `warnUnsaved`, a save from `@pdx-submit` does not tell the form it succeeded: call `form.reset(saved)`
   before navigating away, or the page asks about work it just saved (recipes: *Do not leave with unsaved work*).
 - `:source` + `record-id` does not find a record whose id is a number: pass the id the rows carry.
@@ -257,24 +259,23 @@ const orderSchema = {
 };
 ```
 
-**2. Declarative Composition (Template)** — Same nested DTO, but composed declaratively in the template with `<pdx-field-group>` and compiler auto-binding. The compiler resolves `name="email"` inside `<pdx-field-group name="customer">` to `form['customer.email']`.
+**2. Declarative Composition (Template)** — Same nested DTO, but composed declaratively in the template with `<pdx-field-group>`. A field inside `<pdx-field-group name="customer">` is bound by its full path, `::value="form['customer.email']"`.
 
 ```html
 <pdx-form :form="orderForm">
-  <pdx-form-field name="orderNumber" label="Order #" required>
-    <pdx-input name="orderNumber" />
+  <pdx-form-field :field="orderForm.orderNumber" label="Order #" required>
+    <pdx-input name="orderNumber" ::value="orderForm.orderNumber" />
   </pdx-form-field>
 
   <pdx-field-group name="customer" label="Customer">
-    <pdx-form-field name="name" label="Name" required>
-      <pdx-input name="name" />
+    <pdx-form-field :field="orderForm['customer.name']" label="Name" required>
+      <pdx-input name="customer.name" ::value="orderForm['customer.name']" />
     </pdx-form-field>
-    <!-- compiler resolves to form['customer.name'] -->
   </pdx-field-group>
 
   <pdx-field-group name="shipping" label="Shipping">
-    <pdx-form-field name="street" label="Street">...</pdx-form-field>
-    <pdx-form-field name="city" label="City">...</pdx-form-field>
+    <pdx-form-field :field="orderForm['shipping.street']" label="Street">...</pdx-form-field>
+    <pdx-form-field :field="orderForm['shipping.city']" label="City">...</pdx-form-field>
   </pdx-field-group>
 </pdx-form>
 ```
@@ -307,29 +308,29 @@ const orderForm = createForm({
 ```html
 <div class="demo-block">
   <pdx-form :form="displayForm">
-    <pdx-form-field name="name" label="Full Name" required>
-      <pdx-input name="name"></pdx-input>
+    <pdx-form-field :field="displayForm.name" label="Full Name" required>
+      <pdx-input name="name" ::value="displayForm.name"></pdx-input>
     </pdx-form-field>
     <pdx-field-group name="address" label="Address" display="panel">
       <div class="form-grid-3">
-        <pdx-form-field name="street" label="Street">
-          <pdx-input name="street"></pdx-input>
+        <pdx-form-field :field="displayForm['address.street']" label="Street">
+          <pdx-input name="address.street" ::value="displayForm['address.street']"></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="city" label="City">
-          <pdx-input name="city"></pdx-input>
+        <pdx-form-field :field="displayForm['address.city']" label="City">
+          <pdx-input name="address.city" ::value="displayForm['address.city']"></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="zip" label="ZIP">
-          <pdx-input name="zip"></pdx-input>
+        <pdx-form-field :field="displayForm['address.zip']" label="ZIP">
+          <pdx-input name="address.zip" ::value="displayForm['address.zip']"></pdx-input>
         </pdx-form-field>
       </div>
     </pdx-field-group>
     <pdx-field-group name="billing" label="Billing Info" display="panel" collapsed>
       <div class="form-grid">
-        <pdx-form-field name="card" label="Card Number">
-          <pdx-input name="card" placeholder="**** **** **** ****"></pdx-input>
+        <pdx-form-field :field="displayForm['billing.card']" label="Card Number">
+          <pdx-input name="billing.card" ::value="displayForm['billing.card']" placeholder="**** **** **** ****"></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="expiry" label="Expiry">
-          <pdx-input name="expiry" placeholder="MM/YY"></pdx-input>
+        <pdx-form-field :field="displayForm['billing.expiry']" label="Expiry">
+          <pdx-input name="billing.expiry" ::value="displayForm['billing.expiry']" placeholder="MM/YY"></pdx-input>
         </pdx-form-field>
       </div>
     </pdx-field-group>
@@ -337,7 +338,7 @@ const orderForm = createForm({
 </div>
 ```
 
-**1. Basic Form (Compiler Auto-Binding)** — Just add `name="field"` to controls inside `<pdx-form>`. The compiler generates value binding, onChange, and onBlur automatically.
+**1. Basic Form (Bound Through the Model)** — Just add `name="field"` to controls inside `<pdx-form>`. The compiler generates value binding, onChange, and onBlur automatically.
 
 ```js
 @form basicForm: {
@@ -353,14 +354,14 @@ const saveBasic = basicForm.handleSubmit(async (values) => { await api.saveProfi
 
 ```html
 <pdx-form :form="basicForm" @pdx-submit="saveBasic">
-  <pdx-form-field name="name" label="Full Name" required>
-    <pdx-input name="name"></pdx-input>
+  <pdx-form-field :field="basicForm.name" label="Full Name" required>
+    <pdx-input name="name" ::value="basicForm.name"></pdx-input>
   </pdx-form-field>
   <!-- compiler generates :value, @pdx-change, @pdx-blur -->
 </pdx-form>
 ```
 
-**2. Nested DTO (Field Groups)** — `<pdx-field-group name="customer">` scopes child fields to a nested object. Field `name="email"` inside the group becomes `form['customer.email']`.
+**2. Nested DTO (Field Groups)** — `<pdx-field-group name="customer">` scopes child fields to a nested object. A field inside it is bound by its full path, `::value="form['customer.email']"`.
 
 ```js
 @form nestedForm: {
@@ -379,15 +380,14 @@ const saveBasic = basicForm.handleSubmit(async (values) => { await api.saveProfi
 
 ```html
 <pdx-form :form="nestedForm">
-  <pdx-form-field name="orderNumber" label="Order Number" required>
-    <pdx-input name="orderNumber" />
+  <pdx-form-field :field="nestedForm.orderNumber" label="Order Number" required>
+    <pdx-input name="orderNumber" ::value="nestedForm.orderNumber" />
   </pdx-form-field>
 
   <pdx-field-group name="customer" label="Customer">
-    <pdx-form-field name="name" label="Name" required>
-      <pdx-input name="name" />
+    <pdx-form-field :field="nestedForm['customer.name']" label="Name" required>
+      <pdx-input name="customer.name" ::value="nestedForm['customer.name']" />
     </pdx-form-field>
-    <!-- compiler resolves to form['customer.name'] -->
   </pdx-field-group>
 
   <pdx-field-group name="shipping" label="Shipping">
@@ -447,8 +447,8 @@ const dsForm = createForm({
 
 ```html
 <pdx-form :form="dsForm" @pdx-submit="saveDsForm">
-  <pdx-form-field name="companyName" label="Company Name" required>
-    <pdx-input name="companyName"></pdx-input>
+  <pdx-form-field :field="dsForm.companyName" label="Company Name" required>
+    <pdx-input name="companyName" ::value="dsForm.companyName"></pdx-input>
   </pdx-form-field>
   <pdx-form-actions submitLabel="Save to Storage" />
 </pdx-form>
@@ -466,17 +466,17 @@ const dsForm = createForm({
 </details>
 ```
 
-**8. All Control Types in Form** — Every pdx-* control works with compiler auto-binding inside a form.
+**8. All Control Types in Form** — Every pdx-* value control binds a form field through its model.
 
 ```html
 <pdx-form :form="allTypesForm">
-  <pdx-form-field name="text" label="Text Input">
-    <pdx-input name="text"></pdx-input>
+  <pdx-form-field :field="allTypesForm.text" label="Text Input">
+    <pdx-input name="text" ::value="allTypesForm.text"></pdx-input>
   </pdx-form-field>
-  <pdx-form-field name="slider" label="Slider">
-    <pdx-slider name="slider" :min="0" :max="100"></pdx-slider>
+  <pdx-form-field :field="allTypesForm.slider" label="Slider">
+    <pdx-slider name="slider" ::value="allTypesForm.slider" :min="0" :max="100"></pdx-slider>
   </pdx-form-field>
-  <!-- Every pdx-* control with name="x" is auto-wired by the compiler -->
+  <!-- Every pdx-* value control binds its field through its model: ::value, ::checked -->
   <pdx-form-actions submitLabel="Submit All" />
 </pdx-form>
 ```

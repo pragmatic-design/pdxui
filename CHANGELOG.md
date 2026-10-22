@@ -264,6 +264,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** inside `<pdx-form :form="f">`, a control is no longer wired to its field by its `name`,
+  nor a `<pdx-form-field>` by its `name`: each is `PDX_REMOVED_FORM`. A control binds through its
+  model, `::value="f.email"`, and a form field names its field, `:field="f.email"`. `pdx migrate`
+  (`form-name-binding`) writes both, the control's model from its manifest, and keeps the control's
+  `name` as the full path inside a `<pdx-field-group>`; a control with no manifest entry or with
+  several models (`pdx-checkbox`: `checked`, `indeterminate`) is flagged. A form section — a
+  component that calls `useForm()` / `tryUseForm()` — keeps its named controls wired until #613. The
+  showcase's and the demo pages' forms are migrated. (#128)
 - **Breaking:** a form's fields are its members: `f.email`, a nested one `f['customer.name']`, beside
   `f.valid()` and `f.reset()`. `f.fields` is gone; `f.fields.x` in a `.pdx` is `PDX_REMOVED_FORM`, and
   `pdx migrate` rewrites it to `f.x` in `.pdx` and `.ts` files, for the names a file declares as a form.

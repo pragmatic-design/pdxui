@@ -3,33 +3,33 @@
     <h2 class="pdx-txt-heading section-heading">2. Nested DTO (Field Groups)</h2>
     <p class="pdx-txt-small pdx-ink-muted">
       <code>&lt;pdx-field-group name="customer"&gt;</code> scopes child fields to a nested object.
-      Field <code>name="email"</code> inside the group becomes <code>form['customer.email']</code>.
+      A field inside it is bound by its full path, <code>::value="form['customer.email']"</code>.
     </p>
 
     <div class="demo-block">
       <pdx-form :form="nestedForm" @pdx-submit="saveNestedForm">
-        <pdx-form-field name="orderNumber" label="Order Number" required>
-          <pdx-input name="orderNumber" placeholder="ORD-001"></pdx-input>
+        <pdx-form-field :field="nestedForm.orderNumber" label="Order Number" required>
+          <pdx-input name="orderNumber" ::value="nestedForm.orderNumber" placeholder="ORD-001"></pdx-input>
         </pdx-form-field>
 
         <pdx-field-group name="customer" label="Customer">
-          <pdx-form-field name="name" label="Name" required>
-            <pdx-input name="name" placeholder="Jane Doe"></pdx-input>
+          <pdx-form-field :field="nestedForm['customer.name']" label="Name" required>
+            <pdx-input name="customer.name" ::value="nestedForm['customer.name']" placeholder="Jane Doe"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" type="email" placeholder="jane@test.com"></pdx-input>
+          <pdx-form-field :field="nestedForm['customer.email']" label="Email" required>
+            <pdx-input name="customer.email" ::value="nestedForm['customer.email']" type="email" placeholder="jane@test.com"></pdx-input>
           </pdx-form-field>
         </pdx-field-group>
 
         <pdx-field-group name="shipping" label="Shipping Address">
-          <pdx-form-field name="street" label="Street">
-            <pdx-input name="street" placeholder="123 Main St"></pdx-input>
+          <pdx-form-field :field="nestedForm['shipping.street']" label="Street">
+            <pdx-input name="shipping.street" ::value="nestedForm['shipping.street']" placeholder="123 Main St"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="city" label="City">
-            <pdx-input name="city" placeholder="New York"></pdx-input>
+          <pdx-form-field :field="nestedForm['shipping.city']" label="City">
+            <pdx-input name="shipping.city" ::value="nestedForm['shipping.city']" placeholder="New York"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="zip" label="ZIP">
-            <pdx-input name="zip" placeholder="10001"></pdx-input>
+          <pdx-form-field :field="nestedForm['shipping.zip']" label="ZIP">
+            <pdx-input name="shipping.zip" ::value="nestedForm['shipping.zip']" placeholder="10001"></pdx-input>
           </pdx-form-field>
         </pdx-field-group>
 
@@ -61,15 +61,14 @@
 }
 
 &lt;pdx-form :form="nestedForm"&gt;
-  &lt;pdx-form-field name="orderNumber" label="Order Number" required&gt;
-    &lt;pdx-input name="orderNumber" /&gt;
+  &lt;pdx-form-field :field="nestedForm.orderNumber" label="Order Number" required&gt;
+    &lt;pdx-input name="orderNumber" ::value="nestedForm.orderNumber" /&gt;
   &lt;/pdx-form-field&gt;
 
   &lt;pdx-field-group name="customer" label="Customer"&gt;
-    &lt;pdx-form-field name="name" label="Name" required&gt;
-      &lt;pdx-input name="name" /&gt;
+    &lt;pdx-form-field :field="nestedForm['customer.name']" label="Name" required&gt;
+      &lt;pdx-input name="customer.name" ::value="nestedForm['customer.name']" /&gt;
     &lt;/pdx-form-field&gt;
-    &lt;!-- compiler resolves to form['customer.name'] --&gt;
   &lt;/pdx-field-group&gt;
 
   &lt;pdx-field-group name="shipping" label="Shipping"&gt;

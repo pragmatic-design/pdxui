@@ -60,11 +60,11 @@
     <!-- A NEW role: a name, and whose permissions it starts from. The key is the name's, made unique. -->
     <pdx-dialog :open="newOpen" size="md" :title="$t('settings.permissions.newRole')" @pdx-close="newOpen = false" data-test="role-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="role-form">
-        <pdx-form-field name="name" :label="$t('settings.permissions.roleName')">
-          <pdx-input name="name" data-test="new-role-name"></pdx-input>
+        <pdx-form-field :field="draft.name" :label="$t('settings.permissions.roleName')">
+          <pdx-input name="name" ::value="draft.name" data-test="new-role-name"></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="copyFrom" :label="$t('settings.permissions.copyFrom')">
-          <pdx-select name="copyFrom" :options="copyOptions" data-test="new-role-copy"></pdx-select>
+        <pdx-form-field :field="draft.copyFrom" :label="$t('settings.permissions.copyFrom')">
+          <pdx-select name="copyFrom" ::value="draft.copyFrom" :options="copyOptions" data-test="new-role-copy"></pdx-select>
         </pdx-form-field>
         <div class="actions">
           <pdx-button variant="ghost" @click="newOpen = false" data-test="role-cancel">{{ $t('settings.permissions.cancel') }}</pdx-button>

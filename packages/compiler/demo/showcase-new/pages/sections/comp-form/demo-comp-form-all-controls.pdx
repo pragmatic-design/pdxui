@@ -2,42 +2,42 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">8. All Control Types in Form</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Every pdx-* control works with compiler auto-binding inside a form.
+      Every pdx-* value control binds a form field through its model.
     </p>
 
     <div class="demo-block">
       <pdx-form :form="allTypesForm">
         <div class="form-grid-2">
-          <pdx-form-field name="text" label="Text Input">
-            <pdx-input name="text" placeholder="Text"></pdx-input>
+          <pdx-form-field :field="allTypesForm.text" label="Text Input">
+            <pdx-input name="text" ::value="allTypesForm.text" placeholder="Text"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="password" label="Password">
-            <pdx-password-input name="password" placeholder="Password"></pdx-password-input>
+          <pdx-form-field :field="allTypesForm.password" label="Password">
+            <pdx-password-input name="password" ::value="allTypesForm.password" placeholder="Password"></pdx-password-input>
           </pdx-form-field>
-          <pdx-form-field name="number" label="Number">
-            <pdx-number-input name="number"></pdx-number-input>
+          <pdx-form-field :field="allTypesForm.number" label="Number">
+            <pdx-number-input name="number" ::value="allTypesForm.number"></pdx-number-input>
           </pdx-form-field>
-          <pdx-form-field name="slider" label="Slider">
-            <pdx-slider name="slider" :min="0" :max="100"></pdx-slider>
+          <pdx-form-field :field="allTypesForm.slider" label="Slider">
+            <pdx-slider name="slider" ::value="allTypesForm.slider" :min="0" :max="100"></pdx-slider>
           </pdx-form-field>
-          <pdx-form-field name="rating" label="Rating">
-            <pdx-rating name="rating"></pdx-rating>
+          <pdx-form-field :field="allTypesForm.rating" label="Rating">
+            <pdx-rating name="rating" ::value="allTypesForm.rating"></pdx-rating>
           </pdx-form-field>
-          <pdx-form-field name="color" label="Color">
-            <pdx-color-picker name="color" inline></pdx-color-picker>
+          <pdx-form-field :field="allTypesForm.color" label="Color">
+            <pdx-color-picker name="color" ::value="allTypesForm.color" inline></pdx-color-picker>
           </pdx-form-field>
         </div>
 
-        <pdx-form-field name="textarea" label="Textarea">
-          <pdx-textarea name="textarea" rows="2" placeholder="Multi-line text"></pdx-textarea>
+        <pdx-form-field :field="allTypesForm.textarea" label="Textarea">
+          <pdx-textarea name="textarea" ::value="allTypesForm.textarea" rows="2" placeholder="Multi-line text"></pdx-textarea>
         </pdx-form-field>
 
         <div class="form-grid-2">
-          <pdx-form-field name="checkbox" label="">
-            <pdx-checkbox name="checkbox" label="I agree to terms"></pdx-checkbox>
+          <pdx-form-field :field="allTypesForm.checkbox" label="">
+            <pdx-checkbox name="checkbox" ::checked="allTypesForm.checkbox" label="I agree to terms"></pdx-checkbox>
           </pdx-form-field>
-          <pdx-form-field name="switch" label="">
-            <pdx-switch name="switch" label="Enable feature"></pdx-switch>
+          <pdx-form-field :field="allTypesForm.switch" label="">
+            <pdx-switch name="switch" ::checked="allTypesForm.switch" label="Enable feature"></pdx-switch>
           </pdx-form-field>
         </div>
 
@@ -46,13 +46,13 @@
     </div>
 
     @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>&lt;pdx-form :form="allTypesForm"&gt;
-  &lt;pdx-form-field name="text" label="Text Input"&gt;
-    &lt;pdx-input name="text"&gt;&lt;/pdx-input&gt;
+  &lt;pdx-form-field :field="allTypesForm.text" label="Text Input"&gt;
+    &lt;pdx-input name="text" ::value="allTypesForm.text"&gt;&lt;/pdx-input&gt;
   &lt;/pdx-form-field&gt;
-  &lt;pdx-form-field name="slider" label="Slider"&gt;
-    &lt;pdx-slider name="slider" :min="0" :max="100"&gt;&lt;/pdx-slider&gt;
+  &lt;pdx-form-field :field="allTypesForm.slider" label="Slider"&gt;
+    &lt;pdx-slider name="slider" ::value="allTypesForm.slider" :min="0" :max="100"&gt;&lt;/pdx-slider&gt;
   &lt;/pdx-form-field&gt;
-  &lt;!-- Every pdx-* control with name="x" is auto-wired by the compiler --&gt;
+  &lt;!-- Every pdx-* value control binds its field through its model: ::value, ::checked --&gt;
   &lt;pdx-form-actions submitLabel="Submit All" /&gt;
 &lt;/pdx-form&gt;</code></pre></details>}
   </section>

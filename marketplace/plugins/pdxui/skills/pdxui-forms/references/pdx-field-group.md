@@ -22,15 +22,15 @@ are checked against the manifest above._
 
 ```html
 <pdx-form :form="orderForm" @pdx-submit="submitOrder">
-  <pdx-form-field name="reference" label="Order reference" required>
-    <pdx-input name="reference"></pdx-input>
+  <pdx-form-field :field="orderForm.reference" label="Order reference" required>
+    <pdx-input name="reference" ::value="orderForm.reference"></pdx-input>
   </pdx-form-field>
   <pdx-field-group name="customer" label="Customer">
-    <pdx-form-field name="name" label="Name" required>
-      <pdx-input name="name"></pdx-input>
+    <pdx-form-field :field="orderForm['customer.name']" label="Name" required>
+      <pdx-input name="customer.name" ::value="orderForm['customer.name']"></pdx-input>
     </pdx-form-field>
-    <pdx-form-field name="email" label="Email" required>
-      <pdx-input name="email" type="email"></pdx-input>
+    <pdx-form-field :field="orderForm['customer.email']" label="Email" required>
+      <pdx-input name="customer.email" ::value="orderForm['customer.email']" type="email"></pdx-input>
     </pdx-form-field>
   </pdx-field-group>
   <pdx-form-actions submitLabel="Place order"></pdx-form-actions>
@@ -56,16 +56,16 @@ const orderForm = createForm({
   <pdx-form :form="nestedForm">
     <pdx-field-group name="customer" label="Customer">
       <div class="form-stack">
-        <pdx-form-field name="name" label="Name">
-          <pdx-input name="name"></pdx-input>
+        <pdx-form-field :field="nestedForm['customer.name']" label="Name">
+          <pdx-input name="customer.name" ::value="nestedForm['customer.name']"></pdx-input>
         </pdx-form-field>
         <pdx-field-group name="address" label="Address">
           <div class="form-grid-2">
-            <pdx-form-field name="street" label="Street">
-              <pdx-input name="street"></pdx-input>
+            <pdx-form-field :field="nestedForm['customer.address.street']" label="Street">
+              <pdx-input name="customer.address.street" ::value="nestedForm['customer.address.street']"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="city" label="City">
-              <pdx-input name="city"></pdx-input>
+            <pdx-form-field :field="nestedForm['customer.address.city']" label="City">
+              <pdx-input name="customer.address.city" ::value="nestedForm['customer.address.city']"></pdx-input>
             </pdx-form-field>
           </div>
         </pdx-field-group>

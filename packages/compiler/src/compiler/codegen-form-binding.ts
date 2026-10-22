@@ -1,5 +1,8 @@
-// Form-binding auto-wire — detects <pdx-form :form="xxx"> in template HTML and
-// injects bindings on child form controls that have a `name` attribute.
+// Form-binding auto-wire of a form SECTION — a component whose script calls useForm()/tryUseForm():
+// its form controls that have a `name` attribute are wired to the form above it, looked up at event
+// time. Inside `<pdx-form :form>` nothing is wired by name since #128 (a control binds through its
+// model, `::value="f.x"`; the name wiring there is PDX_REMOVED_FORM, `language/form-name-binding.ts`),
+// and a section keeps this until #613 gives it an explicit binding.
 //
 // This pass runs BEFORE rewriteHtmlBindings, operating on the raw HTML nodes.
 // It modifies HtmlNode.content strings to add the control's model (:value, :checked), its model's
@@ -7,10 +10,9 @@
 // :warning on pdx-form-field wrappers.
 //
 // Rules:
-//   1. Only affects elements INSIDE <pdx-form :form="xxx"> ... </pdx-form>
+//   1. Only in a section, and not inside a `<pdx-form :form>` the section draws itself
 //   2. Only affects elements with a `name="yyy"` attribute
-//   3. Never overwrites existing explicit bindings (:value, @value-change, etc.)
-//   4. The form variable name is extracted from the :form binding
+//   3. Never overwrites existing explicit bindings (:value, @value-change, `::`, etc.)
 
 import type { TemplateNode, HtmlNode } from '../parser/template';
 import { jsQuote } from './js-literal';
@@ -236,10 +238,11 @@ function processHtmlContent(content: string, ctx: FormCtx): string {
                 const tagName = extractTagName(tagStr.slice(1));
 
                 if (tagName === 'pdx-form') {
-                    // Extract form variable name from :form="xxx"
+                    // A `<pdx-form :form>` inside a section is a form of its own, whose controls bind
+                    // through their models (#128): nothing inside it is wired by name.
                     const formMatch = tagStr.match(/:form=(?:"([^"]+)"|'([^']+)'|`([^`]+)`)/);
                     if (formMatch) {
-                        formVar = formMatch[1] ?? formMatch[2] ?? formMatch[3];
+                        formVar = null;
                         depth++;
                     }
                     result += tagStr;
@@ -304,7 +307,7 @@ function getFormState(content: string, formVar: string | null, depth: number, gr
     // took quadratic time on `<pdx-form` repeated without its `>` (#70).
     for (const tag of openTags(content, 'pdx-form')) {
         const value = lastAttributeValue(tag, ':form');
-        if (value !== undefined) { fv = value; d++; }
+        if (value !== undefined) { fv = null; d++; }
     }
     while (closeRegex.exec(content) !== null) {
         d = Math.max(baseDepth, d - 1);

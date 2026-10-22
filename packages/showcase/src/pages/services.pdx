@@ -30,29 +30,29 @@
     <pdx-dialog :open="createOpen" size="lg" :title="$t('services.new')" @pdx-close="createOpen = false" data-test="create-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
         <div class="grid">
-          <pdx-form-field name="code" :label="$t('services.fields.code')">
-            <pdx-input name="code" data-test="new-code"></pdx-input>
+          <pdx-form-field :field="draft.code" :label="$t('services.fields.code')">
+            <pdx-input name="code" ::value="draft.code" data-test="new-code"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="name" :label="$t('services.fields.name')">
-            <pdx-input name="name" data-test="new-name"></pdx-input>
+          <pdx-form-field :field="draft.name" :label="$t('services.fields.name')">
+            <pdx-input name="name" ::value="draft.name" data-test="new-name"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
-            <pdx-textarea name="description" rows="2" data-test="new-description"></pdx-textarea>
+          <pdx-form-field class="wide" :field="draft.description" :label="$t('services.fields.description')">
+            <pdx-textarea name="description" ::value="draft.description" rows="2" data-test="new-description"></pdx-textarea>
           </pdx-form-field>
-          <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
-            <pdx-number-input name="slaHours" min="1" data-test="new-slaHours"></pdx-number-input>
+          <pdx-form-field :field="draft.slaHours" :label="$t('services.fields.slaHours')">
+            <pdx-number-input name="slaHours" ::value="draft.slaHours" min="1" data-test="new-slaHours"></pdx-number-input>
           </pdx-form-field>
-          <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
-            <pdx-number-input name="resolveHours" min="1" data-test="new-resolveHours"></pdx-number-input>
+          <pdx-form-field :field="draft.resolveHours" :label="$t('services.fields.resolveHours')">
+            <pdx-number-input name="resolveHours" ::value="draft.resolveHours" min="1" data-test="new-resolveHours"></pdx-number-input>
           </pdx-form-field>
-          <pdx-form-field name="price" :label="$t('services.fields.price')">
-            <pdx-number-input name="price" min="0" data-test="new-price"></pdx-number-input>
+          <pdx-form-field :field="draft.price" :label="$t('services.fields.price')">
+            <pdx-number-input name="price" ::value="draft.price" min="0" data-test="new-price"></pdx-number-input>
           </pdx-form-field>
-          <pdx-form-field name="covers" :label="$t('services.fields.covers')">
-            <pdx-select name="covers" multiple :options="kinds" data-test="new-covers"></pdx-select>
+          <pdx-form-field :field="draft.covers" :label="$t('services.fields.covers')">
+            <pdx-select name="covers" ::value="draft.covers" multiple :options="kinds" data-test="new-covers"></pdx-select>
           </pdx-form-field>
-          <pdx-form-field name="active" :label="$t('services.fields.active')">
-            <pdx-switch name="active" data-test="new-active"></pdx-switch>
+          <pdx-form-field :field="draft.active" :label="$t('services.fields.active')">
+            <pdx-switch name="active" ::checked="draft.active" data-test="new-active"></pdx-switch>
           </pdx-form-field>
         </div>
         <div class="actions">

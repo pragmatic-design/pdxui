@@ -53,10 +53,11 @@ An `@page` loads what the screen needs, holds what its pieces share, and places 
 template is a stack of fieldsets or wizard steps, with no component among them, is rendering rather
 than composing.
 
-**A form's field groups are sections.** `<pdx-form :form>` wires every `<pdx-form-field
-name="x">` and its named control at compile time. A group of fields moved into its own component
-keeps that wiring when its script calls [`tryUseForm()`](/docs/forms): the call declares it a section
-of the form above it, and the compiler wires its template to that form. The route keeps the form and
+**A form's field groups are sections.** In the form's own file each control binds its field,
+`::value="form.x"`, and each `<pdx-form-field>` names it, `:field="form.x"`. A group of fields moved
+into its own component is wired to the form when its script calls [`tryUseForm()`](/docs/forms): the
+call declares it a section of the form above it, and the compiler wires its named controls to that
+form (until #613 gives a section an explicit binding). The route keeps the form and
 what the sections share; each section is a component.
 
 ### CD-B3 — Do not extract what has no life of its own

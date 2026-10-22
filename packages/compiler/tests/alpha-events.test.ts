@@ -139,10 +139,12 @@ describe('an alpha event renamed to a declared event (#481)', () => {
     });
 });
 
-describe('the form binding', () => {
-    const SETUP = "<script>\n  let f = $form({ agree: false, qty: 0 });\n</script>";
+// A form section's named controls (#613 keeps them until a section binds explicitly); inside
+// `<pdx-form :form>` a control binds through its model and nothing is wired by name (#128).
+describe('the form binding of a section', () => {
+    const SETUP = "<script>\n  import { tryUseForm } from '@pdxui/core';\n  tryUseForm();\n</script>";
     const formCode = (tag: string, modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
-        compile(`<template>\n<pdx-form :form="f"><${tag} name="agree"></${tag}></pdx-form>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, { modelEventOf }).code;
+        compile(`<template>\n<${tag} name="agree"></${tag}>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, { modelEventOf }).code;
 
     it('a control that lists models listens to its first model\'s event and reads detail.value', () => {
         const code = formCode('pdx-checkbox', (tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null));

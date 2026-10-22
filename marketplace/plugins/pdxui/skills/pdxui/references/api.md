@@ -4088,8 +4088,8 @@ function registerFormControl(tagName: string, config?: FormControlConfig): void
 ```
 
 Register a custom element as a form control.
-Once registered, the compiler auto-wires it inside <pdx-form>,
-and pdx-form-template can render it via JSON schema.
+Once registered, pdx-form-template can render it via JSON schema. Inside <pdx-form :form> a
+control binds its field through its model (`::value="f.x"`, #128).
 
 ### `registerFormFieldType`
 

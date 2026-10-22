@@ -63,14 +63,19 @@ field or `undefined`, never one of the form's members; `formFieldNames(user)` li
 
 ## Binding the fields
 
-Wrap the fields in `<pdx-form :form>` and give each control the field's `name`. The compiler wires
-change and blur into `form.x` for every named control, and `<pdx-form-field>` takes its error,
-touched and warning from the same place — you write no `:value`, no `@input`:
+Wrap the fields in `<pdx-form :form>`, bind each control to its field through the control's model —
+`::value="user.email"` on a text input, `::checked="user.accepted"` on a checkbox or a switch,
+`::pressed="user.bold"` on a toggle — and give each `<pdx-form-field>` its field, `:field="user.email"`.
+The binding writes the field, marks the control invalid while the field shows an error and required
+when the schema requires it, and leaving the control touches the field; the form field shows the
+error, warning and required marker. The control keeps its `name`: it is what a native form submits
+and what a test selects. A misspelled field is an error in the editor, and so is a field of the wrong
+type for the model (`::checked` on a `string` field):
 
 ```pdx
 <pdx-form :form="user" @pdx-submit="save($event.detail.values)">
-  <pdx-form-field name="name" label="Name"><pdx-input name="name" /></pdx-form-field>
-  <pdx-form-field name="email" label="Email"><pdx-input name="email" type="email" /></pdx-form-field>
+  <pdx-form-field :field="user.name" label="Name"><pdx-input name="name" ::value="user.name" /></pdx-form-field>
+  <pdx-form-field :field="user.email" label="Email"><pdx-input name="email" ::value="user.email" type="email" /></pdx-form-field>
   <pdx-button type="submit" :disabled="!user.valid()">Save</pdx-button>
 </pdx-form>
 
@@ -85,13 +90,7 @@ function save(values) { /* already validated */ }
 </script>
 ```
 
-**Or bind each control to its field explicitly**, through the control's model: `::value="user.email"`
-on a text input, `::checked="user.accepted"` on a checkbox or a switch, `::pressed="user.bold"` on a
-toggle. The binding writes the field, marks the control invalid while the field shows an error and
-required when the schema requires it, and leaving the control touches the field. `<pdx-form-field
-:field="user.email">` shows that field's error, warning and required marker — no `name`, and no
-`<pdx-form>` needed around it. A misspelled field is an error in the editor, and so is a field of the
-wrong type for the model (`::checked` on a `string` field):
+The binding needs no `<pdx-form>` around it, and a form field needs no `name`:
 
 ```pdx
 <pdx-form-field label="Email" :field="user.email">
@@ -102,8 +101,11 @@ wrong type for the model (`::checked` on a `string` field):
 </pdx-form-field>
 ```
 
-`.number`'s parse error («Enter a number.») is the field's error, until an entry parses. A control
-bound this way inside `<pdx-form :form>` is not wired a second time by a `name` it also has.
+`.number`'s parse error («Enter a number.») is the field's error, until an entry parses. Before #128
+a control was wired to its field by its `name` alone; that is `PDX_REMOVED_FORM` now, and
+`pdx migrate` writes the binding from the control's manifest — flagging a control with no manifest or
+with several models, such as `pdx-checkbox` (`checked`, `indeterminate`). A form section — a component
+that calls `tryUseForm()`, below — still has its named controls wired, until #613.
 
 **A group of checkboxes or radios outside a form** binds to one signal with `::group`: checkboxes to
 an array of the values that are checked, radios to the value of the one selected — no handler per

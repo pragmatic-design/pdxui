@@ -77,18 +77,17 @@ route rather than on the authentication. The credential fields: `autocomplete="u
 
 ## A long form filled in more than one sitting: `<pdx-form :form>`
 
-For a form you write by hand, this is the best path: a form from
-`createForm`, a `<pdx-form :form>` around the fields, and in each `<pdx-form-field name="x">` a
-control carrying **the same** `name="x"`. The compiler wires the rest (`codegen-form-binding.ts`):
-every named control gets its change and blur events routed into `form.x`, and every named
-field gets its `error` / `touched` / `warning` from it. You write no `:value`, no `@input`.
+For a form you write by hand, this is the best path: a form from `createForm`, a `<pdx-form :form>`
+around the fields, each control bound to its field through its model — `::value="form.x"`,
+`::checked` on a checkbox or a switch — and each `<pdx-form-field :field="form.x">`. The binding
+writes the field, marks the control invalid and required from it, and touches it on leave; the form
+field shows its error, warning and required marker. A control wired by its `name` alone is
+`PDX_REMOVED_FORM` (#128); `pdx migrate` writes the binding.
 
-**A long form splits into sections, and each section is a component.** The wiring is a
-compile-time pass over the HTML of one `.pdx`, and it runs in two places:
-
-- in the file that holds `<pdx-form :form>`, over what is inside it;
-- in a file whose script calls **`tryUseForm()`** (or `useForm()`): that call declares "this
-  component is a section of the form above me", and its **whole template** is wired to that form.
+**A long form splits into sections, and each section is a component.** A section is a file whose
+script calls **`tryUseForm()`** (or `useForm()`): that call declares "this component is a section of
+the form above me", and its named controls are wired to that form by name — the one place the name
+wiring stays, until #613 gives a section an explicit binding.
 
 ```pdx
 <!-- employee-identity.pdx: a section, used inside the page's <pdx-form> -->
@@ -169,17 +168,17 @@ A shipment form whose draft survives closing the tab:
 ```html recipe:long-form
 <template>
   <pdx-form :form="form" @pdx-submit="send">
-    <pdx-form-field name="shipper" label="Shipper" required>
-      <pdx-input name="shipper"></pdx-input>
+    <pdx-form-field :field="form.shipper" label="Shipper" required>
+      <pdx-input name="shipper" ::value="form.shipper"></pdx-input>
     </pdx-form-field>
-    <pdx-form-field name="service" label="Service">
-      <pdx-select name="service" :options="services"></pdx-select>
+    <pdx-form-field :field="form.service" label="Service">
+      <pdx-select name="service" ::value="form.service" :options="services"></pdx-select>
     </pdx-form-field>
-    <pdx-form-field name="weight" label="Weight (kg)">
-      <pdx-number-input name="weight"></pdx-number-input>
+    <pdx-form-field :field="form.weight" label="Weight (kg)">
+      <pdx-number-input name="weight" ::value="form.weight"></pdx-number-input>
     </pdx-form-field>
-    <pdx-form-field name="notes" label="Notes">
-      <pdx-textarea name="notes"></pdx-textarea>
+    <pdx-form-field :field="form.notes" label="Notes">
+      <pdx-textarea name="notes" ::value="form.notes"></pdx-textarea>
     </pdx-form-field>
     <pdx-form-actions submitLabel="Send"></pdx-form-actions>
   </pdx-form>
@@ -225,14 +224,15 @@ What that gives you (`packages/ui/tests/unit/recipe-long-form.test.ts` runs this
   With `validateOn: 'onChange'` every keystroke validates, and the field shows the error at once;
   with the default `'onBlur'` it appears on the first blur and then follows every keystroke.
 - **The field keeps its node, and so its focus.** The gotcha "a controlled `:value` plus `@input`
-  recreates the input" does **not** apply inside `<pdx-form :form>`: text controls get no `:value`.
+  recreates the input" does **not** apply to `::value`: the binding writes the value only when it
+  changes, and the control is never re-created.
 - `@pdx-submit` fires after `validate()` passes, with `detail.values`; a failed submit scrolls to the
   first error.
 
-Nested data: wrap fields in `<pdx-field-group name="customer">` and a field `name="email"` inside it is
-`form['customer.email']`. The compiler writes that full path into the DOM too: the control and
-its `pdx-form-field` carry `name="customer.email"`, so that is the selector to use in a test or a
-measurement — `[name="customer.email"]`, not `[name="email"]`. Repeated rows: `pdx-field-list` — see
+Nested data: a field of `customer` is bound by its full path, `::value="form['customer.email']"`,
+and `<pdx-field-group name="customer">` groups it on screen. Write the control's `name` as the full
+path too, `name="customer.email"` (`pdx migrate` does): that is the selector to use in a test or a
+measurement. Repeated rows: `pdx-field-list` — see
 its `itemFields` note for when a row needs its own component.
 
 **Your own validator is a function.** A `Validator` takes the value and returns the message when it
@@ -242,11 +242,11 @@ expression you need not write one: `pattern(regex, msg)`.
 ```html
 <template>
   <pdx-form :form="form" @pdx-submit="book">
-    <pdx-form-field name="chip" label="Microchip">
-      <pdx-input name="chip"></pdx-input>
+    <pdx-form-field :field="form.chip" label="Microchip">
+      <pdx-input name="chip" ::value="form.chip"></pdx-input>
     </pdx-form-field>
-    <pdx-form-field name="day" label="Day">
-      <pdx-input name="day"></pdx-input>
+    <pdx-form-field :field="form.day" label="Day">
+      <pdx-input name="day" ::value="form.day"></pdx-input>
     </pdx-form-field>
   </pdx-form>
 </template>
@@ -276,8 +276,8 @@ in the browser's own words.
 ```html
 <template>
   <pdx-form :form="form" @pdx-submit="save">
-    <pdx-form-field name="name" label="Owner" required>
-      <pdx-input name="name"></pdx-input>
+    <pdx-form-field :field="form.name" label="Owner" required>
+      <pdx-input name="name" ::value="form.name"></pdx-input>
     </pdx-form-field>
     <pdx-form-actions submitLabel="Save"></pdx-form-actions>
   </pdx-form>

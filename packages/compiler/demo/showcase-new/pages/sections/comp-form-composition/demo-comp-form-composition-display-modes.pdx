@@ -8,31 +8,31 @@
 
     <div class="demo-block">
       <pdx-form :form="displayForm">
-        <pdx-form-field name="name" label="Full Name" required>
-          <pdx-input name="name"></pdx-input>
+        <pdx-form-field :field="displayForm.name" label="Full Name" required>
+          <pdx-input name="name" ::value="displayForm.name"></pdx-input>
         </pdx-form-field>
 
         <pdx-field-group name="address" label="Address" display="panel">
           <div class="form-grid-3">
-            <pdx-form-field name="street" label="Street">
-              <pdx-input name="street"></pdx-input>
+            <pdx-form-field :field="displayForm['address.street']" label="Street">
+              <pdx-input name="address.street" ::value="displayForm['address.street']"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="city" label="City">
-              <pdx-input name="city"></pdx-input>
+            <pdx-form-field :field="displayForm['address.city']" label="City">
+              <pdx-input name="address.city" ::value="displayForm['address.city']"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="zip" label="ZIP">
-              <pdx-input name="zip"></pdx-input>
+            <pdx-form-field :field="displayForm['address.zip']" label="ZIP">
+              <pdx-input name="address.zip" ::value="displayForm['address.zip']"></pdx-input>
             </pdx-form-field>
           </div>
         </pdx-field-group>
 
         <pdx-field-group name="billing" label="Billing Info" display="panel" collapsed>
           <div class="form-grid">
-            <pdx-form-field name="card" label="Card Number">
-              <pdx-input name="card" placeholder="**** **** **** ****"></pdx-input>
+            <pdx-form-field :field="displayForm['billing.card']" label="Card Number">
+              <pdx-input name="billing.card" ::value="displayForm['billing.card']" placeholder="**** **** **** ****"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="expiry" label="Expiry">
-              <pdx-input name="expiry" placeholder="MM/YY"></pdx-input>
+            <pdx-form-field :field="displayForm['billing.expiry']" label="Expiry">
+              <pdx-input name="billing.expiry" ::value="displayForm['billing.expiry']" placeholder="MM/YY"></pdx-input>
             </pdx-form-field>
           </div>
         </pdx-field-group>

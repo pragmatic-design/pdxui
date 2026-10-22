@@ -267,10 +267,13 @@ all of the form's own, `state`, `touched` and `submitting` among them.
 ### Rules
 
 - The implicit wiring of alpha — a control with `name="x"` inside `<pdx-form :form="f">` — is a
-  language change. `pdx migrate` reads the control's model from the manifest and writes
-  `::<model>="f.x"` (`::checked` for `pdx-checkbox` and `pdx-switch`, `::pressed` for `pdx-toggle`,
-  `::value` for the others); a control with no manifest entry, or with more than one model, is
-  flagged. `name` on `pdx-form-field` becomes `:field`.
+  language change (landed, #128: `PDX_REMOVED_FORM`, `form-name-binding`). `pdx migrate` reads the
+  control's model from the manifest and writes `::<model>="f.x"` (`::checked` for `pdx-switch`,
+  `::pressed` for `pdx-toggle`, `::value` for the others), keeping its `name` as the full path; a
+  control with no manifest entry, or with more than one model — `pdx-checkbox`, whose manifest lists
+  `checked` and `indeterminate` — is flagged. `name` on `pdx-form-field` becomes `:field`. A form
+  section, a component that calls `useForm()` / `tryUseForm()`, keeps its named controls wired until
+  #613 gives it an explicit binding.
 - `required` on the markup of a bound control: `PDX_FORM_REQUIRED_IN_MARKUP` (warning), pointing at
   the schema.
 - The alpha rules stay (`PDX_FORM_FIELD_UNPARSED`, `PDX_FORM_ARRAY_RULES_IGNORED`,

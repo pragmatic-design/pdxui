@@ -43,11 +43,11 @@
         <pdx-form :form="assignment" @pdx-submit="onSave" data-test="site-form">
           <p class="pdx-txt-small pdx-ink-muted" data-test="site-form-site">{{ editing?.siteName ?? '' }}</p>
           <div class="grid">
-            <pdx-form-field name="role" :label="$t('employees.sites.fields.role')">
-              <pdx-input name="role" data-test="role"></pdx-input>
+            <pdx-form-field :field="assignment.role" :label="$t('employees.sites.fields.role')">
+              <pdx-input name="role" ::value="assignment.role" data-test="role"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="start" :label="$t('employees.sites.fields.start')">
-              <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
+            <pdx-form-field :field="assignment.start" :label="$t('employees.sites.fields.start')">
+              <pdx-date-picker name="start" ::value="assignment.start" editable data-test="start"></pdx-date-picker>
             </pdx-form-field>
           </div>
           <div class="actions">
@@ -77,11 +77,11 @@
       @show (missingSite) { <p class="pdx-txt-small pdx-ink-danger" role="alert" data-test="site-missing">{{ $t('employees.sites.missing') }}</p> }
       <pdx-form :form="adding" @pdx-submit="onAdd" data-test="site-add-form">
         <div class="grid">
-          <pdx-form-field name="role" :label="$t('employees.sites.fields.role')">
-            <pdx-input name="role" data-test="new-role"></pdx-input>
+          <pdx-form-field :field="adding.role" :label="$t('employees.sites.fields.role')">
+            <pdx-input name="role" ::value="adding.role" data-test="new-role"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="start" :label="$t('employees.sites.fields.start')">
-            <pdx-date-picker name="start" editable data-test="new-start"></pdx-date-picker>
+          <pdx-form-field :field="adding.start" :label="$t('employees.sites.fields.start')">
+            <pdx-date-picker name="start" ::value="adding.start" editable data-test="new-start"></pdx-date-picker>
           </pdx-form-field>
         </div>
         <div class="actions">

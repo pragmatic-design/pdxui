@@ -7,11 +7,11 @@
 
     <div class="demo-block">
       <pdx-form :form="asyncForm">
-        <pdx-form-field name="username" label="Username" required>
-          <pdx-input name="username" placeholder="Try 'admin' or 'root'..."></pdx-input>
+        <pdx-form-field :field="asyncForm.username" label="Username" required>
+          <pdx-input name="username" ::value="asyncForm.username" placeholder="Try 'admin' or 'root'..."></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="email" label="Email" required>
-          <pdx-input name="email" type="email" placeholder="Also async-checked"></pdx-input>
+        <pdx-form-field :field="asyncForm.email" label="Email" required>
+          <pdx-input name="email" ::value="asyncForm.email" type="email" placeholder="Also async-checked"></pdx-input>
         </pdx-form-field>
       </pdx-form>
       <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-sm)">

@@ -260,18 +260,17 @@ describe('form auto-binding — all injected ${} bindings stay live', () => {
     // tag — every binding after the first spills into a text run and gets escaped to \${...},
     // rendering as literal code under the labels. findTagEnd is brace-aware.
     it('does not escape the 2nd+ injected binding on a form-field / control', () => {
+        // A form section's, the one place the name wiring stays (#613).
         const source = `<template>
-<pdx-form :form="userForm">
   <pdx-form-field name="name" label="Name">
     <pdx-input name="name" />
   </pdx-form-field>
-</pdx-form>
 </template>
 <script>
-@form userForm: { name: string };
+import { tryUseForm } from '@pdxui/core';
+tryUseForm();
 </script>`;
-        const { code, warnings } = compile(source, 'formbind.pdx', [], undefined, { production: false });
-        expect(warnings.map(w => w.code), 'the form is not declared').not.toContain('PDX_UNKNOWN_DECLARATION');
+        const { code } = compile(source, 'formbind.pdx', [], undefined, { production: false });
         // The injected bindings are live — bound properties and a listener — never literal text.
         expect(code).not.toContain('\\${');
         expect(code).toMatch(/assignBoundProperty\(__el\d+, "touched", __b\)/);
@@ -294,19 +293,17 @@ describe('#16 @fetch URL is escaped', () => {
     });
 });
 
-describe('#11 form-binding accepts single-quoted :form', () => {
-    it('wires bindings when :form uses single quotes', () => {
+describe('#11 a single-quoted :form is read', () => {
+    it('reports the named control inside it as the removed name wiring (#128)', () => {
         const source = `<template>
 <pdx-form :form='userForm'>
   <pdx-input name="email" />
 </pdx-form>
 </template>
 <script>
-@form userForm { email: string }
+@form userForm: { email: string };
 </script>`;
-        const { code } = compile(source, 'sqform.pdx', [], undefined, { production: false });
-        // The control got auto-wired bindings from the form.
-        expect(code).toContain('userForm');
-        expect(code).toMatch(/onChange|\.value\(\)/);
+        const { warnings } = compile(source, 'sqform.pdx', [], undefined, { production: false });
+        expect(warnings.map(w => w.code)).toContain('PDX_REMOVED_FORM');
     });
 });

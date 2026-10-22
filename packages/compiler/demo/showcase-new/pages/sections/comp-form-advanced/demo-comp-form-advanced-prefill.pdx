@@ -14,23 +14,23 @@
 
       <pdx-form :form="prefillForm" @pdx-submit="savePrefill">
         <div class="form-grid-2">
-          <pdx-form-field name="name" label="Full Name" required>
-            <pdx-input name="name" placeholder="Name"></pdx-input>
+          <pdx-form-field :field="prefillForm.name" label="Full Name" required>
+            <pdx-input name="name" ::value="prefillForm.name" placeholder="Name"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" type="email" placeholder="Email"></pdx-input>
+          <pdx-form-field :field="prefillForm.email" label="Email" required>
+            <pdx-input name="email" ::value="prefillForm.email" type="email" placeholder="Email"></pdx-input>
           </pdx-form-field>
         </div>
         <div class="form-grid-2">
-          <pdx-form-field name="role" label="Role">
-            <pdx-select name="role" :options="roleOptions" placeholder="Select role"></pdx-select>
+          <pdx-form-field :field="prefillForm.role" label="Role">
+            <pdx-select name="role" ::value="prefillForm.role" :options="roleOptions" placeholder="Select role"></pdx-select>
           </pdx-form-field>
-          <pdx-form-field name="department" label="Department">
-            <pdx-input name="department" placeholder="Engineering"></pdx-input>
+          <pdx-form-field :field="prefillForm.department" label="Department">
+            <pdx-input name="department" ::value="prefillForm.department" placeholder="Engineering"></pdx-input>
           </pdx-form-field>
         </div>
-        <pdx-form-field name="bio" label="Bio">
-          <pdx-textarea name="bio" rows="2" placeholder="Short bio..."></pdx-textarea>
+        <pdx-form-field :field="prefillForm.bio" label="Bio">
+          <pdx-textarea name="bio" ::value="prefillForm.bio" rows="2" placeholder="Short bio..."></pdx-textarea>
         </pdx-form-field>
         <pdx-form-actions submitLabel="Save Changes" resetLabel="Discard"></pdx-form-actions>
       </pdx-form>

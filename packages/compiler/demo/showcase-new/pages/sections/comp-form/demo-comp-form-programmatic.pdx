@@ -7,20 +7,20 @@
 
     <div class="demo-block">
       <pdx-form :form="codeForm">
-        <pdx-form-field name="username" label="Username" required>
-          <pdx-input name="username" placeholder="Choose a username"></pdx-input>
+        <pdx-form-field :field="codeForm.username" label="Username" required>
+          <pdx-input name="username" ::value="codeForm.username" placeholder="Choose a username"></pdx-input>
         </pdx-form-field>
 
-        <pdx-form-field name="age" label="Age">
-          <pdx-number-input name="age" :min="0" :max="150"></pdx-number-input>
+        <pdx-form-field :field="codeForm.age" label="Age">
+          <pdx-number-input name="age" ::value="codeForm.age" :min="0" :max="150"></pdx-number-input>
         </pdx-form-field>
 
-        <pdx-form-field name="role" label="Role">
-          <pdx-select name="role" :options="roleOptions" placeholder="Select role"></pdx-select>
+        <pdx-form-field :field="codeForm.role" label="Role">
+          <pdx-select name="role" ::value="codeForm.role" :options="roleOptions" placeholder="Select role"></pdx-select>
         </pdx-form-field>
 
-        <pdx-form-field name="agree" label="">
-          <pdx-checkbox name="agree" label="I agree to the terms"></pdx-checkbox>
+        <pdx-form-field :field="codeForm.agree" label="">
+          <pdx-checkbox name="agree" ::checked="codeForm.agree" label="I agree to the terms"></pdx-checkbox>
         </pdx-form-field>
 
         <pdx-form-actions submitLabel="Create Account"></pdx-form-actions>

@@ -18,11 +18,11 @@
         <div class="nested-card">
           <h5 class="pdx-txt-small pdx-weight-medium">Customer Info</h5>
           <pdx-form :form="customerForm" name="customer">
-            <pdx-form-field name="name" label="Name" required>
-              <pdx-input name="name" placeholder="Customer name"></pdx-input>
+            <pdx-form-field :field="customerForm.name" label="Name" required>
+              <pdx-input name="name" ::value="customerForm.name" placeholder="Customer name"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="email" label="Email" required>
-              <pdx-input name="email" type="email" placeholder="Email"></pdx-input>
+            <pdx-form-field :field="customerForm.email" label="Email" required>
+              <pdx-input name="email" ::value="customerForm.email" type="email" placeholder="Email"></pdx-input>
             </pdx-form-field>
           </pdx-form>
         </div>
@@ -30,15 +30,15 @@
         <div class="nested-card">
           <h5 class="pdx-txt-small pdx-weight-medium">Shipping</h5>
           <pdx-form :form="shippingForm" name="shipping">
-            <pdx-form-field name="address" label="Address" required>
-              <pdx-input name="address" placeholder="Street address"></pdx-input>
+            <pdx-form-field :field="shippingForm.address" label="Address" required>
+              <pdx-input name="address" ::value="shippingForm.address" placeholder="Street address"></pdx-input>
             </pdx-form-field>
             <div class="form-grid-2">
-              <pdx-form-field name="city" label="City" required>
-                <pdx-input name="city" placeholder="City"></pdx-input>
+              <pdx-form-field :field="shippingForm.city" label="City" required>
+                <pdx-input name="city" ::value="shippingForm.city" placeholder="City"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="zip" label="ZIP" required>
-                <pdx-input name="zip" placeholder="ZIP code"></pdx-input>
+              <pdx-form-field :field="shippingForm.zip" label="ZIP" required>
+                <pdx-input name="zip" ::value="shippingForm.zip" placeholder="ZIP code"></pdx-input>
               </pdx-form-field>
             </div>
           </pdx-form>

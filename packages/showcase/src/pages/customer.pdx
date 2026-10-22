@@ -123,11 +123,11 @@
       data-test="subscription-dialog">
       <pdx-form :form="subscribing" @pdx-submit="onSubscribe" data-test="subscription-form">
         <div class="grid">
-          <pdx-form-field name="serviceId" :label="$t('customers.services.service')">
-            <pdx-select name="serviceId" :options="offered" data-test="new-service"></pdx-select>
+          <pdx-form-field :field="subscribing.serviceId" :label="$t('customers.services.service')">
+            <pdx-select name="serviceId" ::value="subscribing.serviceId" :options="offered" data-test="new-service"></pdx-select>
           </pdx-form-field>
-          <pdx-form-field name="since" :label="$t('customers.services.since')">
-            <pdx-date-picker name="since" editable data-test="new-since"></pdx-date-picker>
+          <pdx-form-field :field="subscribing.since" :label="$t('customers.services.since')">
+            <pdx-date-picker name="since" ::value="subscribing.since" editable data-test="new-since"></pdx-date-picker>
           </pdx-form-field>
         </div>
         <div class="actions">

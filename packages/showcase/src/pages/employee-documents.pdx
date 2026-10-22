@@ -51,11 +51,11 @@
         <pdx-form :form="docForm" @pdx-submit="onSave" data-test="doc-form">
           <p class="pdx-txt-small pdx-ink-muted">{{ editing?.name ?? '' }}</p>
           <div class="grid">
-            <pdx-form-field name="label" :label="$t('employees.documents.fields.label')">
-              <pdx-input name="label" data-test="label"></pdx-input>
+            <pdx-form-field :field="docForm.label" :label="$t('employees.documents.fields.label')">
+              <pdx-input name="label" ::value="docForm.label" data-test="label"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="expires" :label="$t('employees.documents.fields.expires')">
-              <pdx-date-picker name="expires" editable data-test="expires"></pdx-date-picker>
+            <pdx-form-field :field="docForm.expires" :label="$t('employees.documents.fields.expires')">
+              <pdx-date-picker name="expires" ::value="docForm.expires" editable data-test="expires"></pdx-date-picker>
             </pdx-form-field>
           </div>
           <div class="actions">

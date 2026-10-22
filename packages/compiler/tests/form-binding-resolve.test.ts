@@ -1,9 +1,10 @@
 // Two passes that had almost no tests: the form auto-wire and the AST tag walk.
 //
-// `applyFormBindings` rewrites raw HTML before any binding codegen runs: inside `<pdx-form :form="f">`
-// every control with a `name` gets its value, change and blur wiring written for it. The rules it
-// follows — only inside a form, only with a name, never over an explicit binding — are the whole
-// feature, and they existed only as code.
+// `applyFormBindings` rewrites raw HTML before any binding codegen runs: in a form SECTION — a file
+// that calls `useForm()` / `tryUseForm()` — every control with a `name` gets its value, change and blur
+// wiring written for it, to the form above. The rules it follows — only in a section, only with a name,
+// never over an explicit binding — are the whole feature. Inside `<pdx-form :form>` nothing is wired by
+// name since #128 (`form-name-binding.test.ts`); a section keeps it until #613.
 //
 // `findComponentTags` walks the template AST for custom elements. Its interesting part is the list
 // of child collections it recurses into: a tag used only inside `@placeholder` or `@error` and not
@@ -16,43 +17,39 @@ import { findComponentTags, generateComponentImports } from '../src/compiler/res
 import { FormControlRegistry } from '../src/compiler/codegen-form-binding';
 
 const SETUP = "<script>\n  let f = $form({ email: '' });\n</script>";
+const SECTION = "<script>\n  import { tryUseForm } from '@pdxui/core';\n  tryUseForm();\n</script>";
 
-function tpl(inner: string): string {
-    const { code } = compile(`<template>\n${inner}\n</template>\n${SETUP}`, 'form.pdx');
+function tpl(inner: string, script = SECTION): string {
+    const { code } = compile(`<template>\n${inner}\n</template>\n${script}`, 'form.pdx');
     return code;
 }
 
-describe('the form auto-wire', () => {
-    it('wires a named control inside the form', () => {
-        const code = tpl('<pdx-form :form="f"><pdx-input name="email" /></pdx-form>');
-        expect(code).toContain('email');
-        // The three things the author would otherwise write by hand.
-        expect(code).toMatch(/value/i);
-        expect(code).toMatch(/pdx-input|input/i);
+describe('the form auto-wire of a section', () => {
+    it('wires a named control to the form above', () => {
+        const code = tpl('<pdx-input name="email" />');
+        expect(code).toContain('tryUseForm(ctx.el)?.email?.onChange(');
+        expect(code).toContain('tryUseForm(ctx.el)?.email?.onBlur()');
     });
 
     it('leaves a control with no name alone', () => {
         // A control with no name has nothing to bind TO — wiring it would invent a field.
-        const withName = tpl('<pdx-form :form="f"><pdx-input name="email" /></pdx-form>');
-        const without = tpl('<pdx-form :form="f"><pdx-input /></pdx-form>');
-        expect(without.length).toBeLessThan(withName.length);
+        expect(tpl('<pdx-input />')).not.toContain('tryUseForm(ctx.el)');
     });
 
-    it('leaves a named control that is not inside a form alone', () => {
-        const inside = tpl('<pdx-form :form="f"><pdx-input name="email" /></pdx-form>');
-        const outside = tpl('<div><pdx-input name="email" /></div>');
-        expect(outside.length).toBeLessThan(inside.length);
+    it('leaves a named control alone in a file that is not a section, inside <pdx-form :form> too (#128)', () => {
+        expect(tpl('<pdx-input name="email" />', SETUP)).not.toContain('onChange(');
+        expect(tpl('<pdx-form :form="f"><pdx-input name="email" /></pdx-form>', SETUP)).not.toContain('onChange(');
     });
 
     it('never overwrites a binding the author wrote', () => {
         // Rule 3. If the author bound :value themselves, theirs is the one that must survive.
-        const code = tpl('<pdx-form :form="f"><pdx-input name="email" :value="mine" /></pdx-form>');
+        const code = tpl('<pdx-input name="email" :value="mine" />');
         expect(code).toContain('mine');
     });
 
     it('binds a checkbox by its checked state, not by a value string', () => {
         // Its model, as the plugin reads it from the manifest (#480).
-        const { code } = compile(`<template>\n<pdx-form :form="f"><pdx-checkbox name="agree" /></pdx-form>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, {
+        const { code } = compile(`<template>\n<pdx-checkbox name="agree" />\n</template>\n${SECTION}`, 'form.pdx', [], undefined, {
             modelEventOf: (tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null),
         });
         expect(code).toContain('agree');
@@ -61,14 +58,14 @@ describe('the form auto-wire', () => {
     });
 
     it('wires a pdx-form-field wrapper to the field it names', () => {
-        const code = tpl('<pdx-form :form="f"><pdx-form-field name="email"><pdx-input name="email" /></pdx-form-field></pdx-form>');
-        expect(code).toMatch(/error/i);
-        expect(code).toMatch(/touched/i);
+        const code = tpl('<pdx-form-field name="email"><pdx-input name="email" /></pdx-form-field>');
+        expect(code).toContain('tryUseForm(ctx.el)?.email?.error()');
+        expect(code).toContain('tryUseForm(ctx.el)?.email?.touched()');
     });
 
     it('reaches a control nested several elements deep', () => {
-        const code = tpl('<pdx-form :form="f"><div><fieldset><pdx-input name="email" /></fieldset></div></pdx-form>');
-        expect(code).toContain('email');
+        const code = tpl('<div><fieldset><pdx-input name="email" /></fieldset></div>');
+        expect(code).toContain('tryUseForm(ctx.el)?.email?.onChange(');
     });
 });
 

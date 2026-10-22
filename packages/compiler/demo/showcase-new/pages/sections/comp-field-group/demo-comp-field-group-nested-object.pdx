@@ -8,16 +8,16 @@
     <div class="demo-split">
       <pdx-form :form="orderForm" @pdx-submit="submitOrder">
         <div class="form-stack">
-          <pdx-form-field name="reference" label="Order reference" required>
-            <pdx-input name="reference"></pdx-input>
+          <pdx-form-field :field="orderForm.reference" label="Order reference" required>
+            <pdx-input name="reference" ::value="orderForm.reference"></pdx-input>
           </pdx-form-field>
           <pdx-field-group name="customer" label="Customer">
             <div class="form-grid-2">
-              <pdx-form-field name="name" label="Name" required>
-                <pdx-input name="name"></pdx-input>
+              <pdx-form-field :field="orderForm['customer.name']" label="Name" required>
+                <pdx-input name="customer.name" ::value="orderForm['customer.name']"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="email" label="Email" required>
-                <pdx-input name="email" type="email"></pdx-input>
+              <pdx-form-field :field="orderForm['customer.email']" label="Email" required>
+                <pdx-input name="customer.email" ::value="orderForm['customer.email']" type="email"></pdx-input>
               </pdx-form-field>
             </div>
           </pdx-field-group>
@@ -33,15 +33,15 @@
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="orderForm" @pdx-submit="submitOrder"&gt;
-  &lt;pdx-form-field name="reference" label="Order reference" required&gt;
-    &lt;pdx-input name="reference"&gt;&lt;/pdx-input&gt;
+  &lt;pdx-form-field :field="orderForm.reference" label="Order reference" required&gt;
+    &lt;pdx-input name="reference" ::value="orderForm.reference"&gt;&lt;/pdx-input&gt;
   &lt;/pdx-form-field&gt;
   &lt;pdx-field-group name="customer" label="Customer"&gt;
-    &lt;pdx-form-field name="name" label="Name" required&gt;
-      &lt;pdx-input name="name"&gt;&lt;/pdx-input&gt;
+    &lt;pdx-form-field :field="orderForm['customer.name']" label="Name" required&gt;
+      &lt;pdx-input name="customer.name" ::value="orderForm['customer.name']"&gt;&lt;/pdx-input&gt;
     &lt;/pdx-form-field&gt;
-    &lt;pdx-form-field name="email" label="Email" required&gt;
-      &lt;pdx-input name="email" type="email"&gt;&lt;/pdx-input&gt;
+    &lt;pdx-form-field :field="orderForm['customer.email']" label="Email" required&gt;
+      &lt;pdx-input name="customer.email" ::value="orderForm['customer.email']" type="email"&gt;&lt;/pdx-input&gt;
     &lt;/pdx-form-field&gt;
   &lt;/pdx-field-group&gt;
   &lt;pdx-form-actions submitLabel="Place order"&gt;&lt;/pdx-form-actions&gt;
