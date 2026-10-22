@@ -10,8 +10,6 @@
 // its `disabled` prop follows a disabled fieldset.
 
 import type { Signal } from '../utils/types';
-import { required as requiredRule } from './validators';
-import { resolveValidationMessage } from './validation-i18n';
 import { DEV } from '../utils/env';
 
 /** What `ElementInternals.setFormValue` takes. */
@@ -66,26 +64,35 @@ function stateOf(value: unknown): string | null {
     return null;
 }
 
-/** Whether a required model holds nothing: core's `required()` rule, and `false` as a native checkbox. */
-function missingMessage(value: unknown): string | undefined {
-    if (value === false) return resolveValidationMessage(requiredRule()(null));
-    return resolveValidationMessage(requiredRule()(value));
+/** Whether a required model holds nothing, as a native required control judges it. */
+function isMissing(value: unknown): boolean {
+    return value === null || value === undefined || value === '' || value === false
+        || (Array.isArray(value) && value.length === 0);
 }
 
-/** What the element gives `wireFormModel`: the parts of PdxElement and its context the wiring uses. */
-export interface FormModelHost {
-    tag: string;
-    model: string;
-    /** The model's signal as the component writes it: a write dispatches its change event. */
-    signal: Signal<unknown>;
-    /** The other props' signals, by name: `value` (a boolean model's checked value), `required`, `error`, `disabled`. */
-    props: Record<string, Signal<unknown> | undefined>;
-    /** The `name` attribute, live. */
-    name: () => string | null;
-    track: (fn: () => void) => void;
-    setFormValue: (value: FormValue, state?: string | null) => void;
-    setValidity: (flags: ValidityStateFlags, message?: string) => void;
-    setDisabled: (disabled: boolean) => void;
+/**
+ * The message a native required control shows, in the browser's language: a text input's, or a
+ * checkbox's for a boolean model. Read from an element made once, not translated here.
+ */
+const nativeMissing: Partial<Record<'text' | 'checkbox', string>> = {};
+function missingMessage(value: unknown): string {
+    const kind = typeof value === 'boolean' ? 'checkbox' : 'text';
+    if (nativeMissing[kind] === undefined) {
+        const probe = document.createElement('input');
+        probe.type = kind;
+        probe.required = true;
+        // A DOM with no constraint validation (happy-dom) gives '': setValidity refuses an empty
+        // message with a flag set, so the browser's English text stands in.
+        nativeMissing[kind] = probe.validationMessage || 'Please fill out this field.';
+    }
+    return nativeMissing[kind]!;
+}
+
+/** The parts of the element the wiring uses: its live attributes and its form API. */
+export interface FormModelElement {
+    attr(name: string): Signal<string | null>;
+    setFormValue(value: FormValue, state?: string | null): void;
+    setValidity(flags?: ValidityStateFlags, message?: string): void;
 }
 
 /** The form lifecycle callbacks of one instance, which the element's own callbacks call. */
@@ -95,42 +102,59 @@ export interface FormModelCallbacks {
     restore(state: unknown): void;
 }
 
-/** Wire one instance's model to its form: value, validity, and the lifecycle callbacks. */
-export function wireFormModel(host: FormModelHost): FormModelCallbacks {
-    const initial = host.signal.peek();
+/**
+ * Wire one instance's model to its form: value, validity, and the lifecycle callbacks. `ctx` is the
+ * component's context once its props are signals; `model` the model declared `{ form }`; `props` the
+ * names the component declares, of which `value` (a boolean model's checked value), `required`,
+ * `error` and `disabled` are read when present. Lives here, not in `component()`, so an app with no
+ * form model carries none of it (#135).
+ */
+export function wireFormModel(
+    el: FormModelElement, track: (fn: () => void) => void, ctx: Record<string, unknown>,
+    model: string, props: readonly string[], tag: string,
+): FormModelCallbacks {
+    const declared = (n: string): Signal<unknown> | undefined =>
+        n !== model && props.includes(n) ? ctx[n] as Signal<unknown> : undefined;
+    const signal = ctx[model] as Signal<unknown>;
+    const checkedValue = declared('value');
+    const errorProp = declared('error');
+    const requiredProp = declared('required');
+    const name = el.attr('name');
+    const initial = signal.peek();
     let warned = false;
 
-    host.track(() => {
-        const value = host.signal();
-        const checked = host.props.value?.();
-        const entry = toFormValue(value, host.name(), typeof checked === 'string' && checked !== '' ? checked : 'on');
+    track(() => {
+        const value = signal();
+        const checked = checkedValue?.();
+        const entry = toFormValue(value, name(), typeof checked === 'string' && checked !== '' ? checked : 'on');
         if (isUnsupportedFormValue(entry)) {
             if (DEV && !warned) {
                 warned = true;
-                console.warn(`[pdx] <${host.tag}>'s model '${host.model}' is declared { form }, but its value has no form serialization (strings, numbers, booleans, arrays, files and null do). It is not submitted.`);
+                console.warn(`[pdx] <${tag}>'s model '${model}' is declared { form }, but its value has no form serialization (strings, numbers, booleans, arrays, files and null do). It is not submitted.`);
             }
-            host.setFormValue(null);
+            el.setFormValue(null);
             return;
         }
-        host.setFormValue(entry, stateOf(value));
+        el.setFormValue(entry, stateOf(value));
     });
 
-    host.track(() => {
-        const value = host.signal();
-        const error = host.props.error?.();
-        const required = host.props.required?.() === true;
-        if (typeof error === 'string' && error !== '') { host.setValidity({ customError: true }, error); return; }
-        const missing = required ? missingMessage(value) : undefined;
-        if (missing) host.setValidity({ valueMissing: true }, missing);
-        else host.setValidity({});
+    track(() => {
+        const value = signal();
+        const error = errorProp?.();
+        const required = requiredProp?.() === true;
+        if (typeof error === 'string' && error !== '') { el.setValidity({ customError: true }, error); return; }
+        if (required && isMissing(value)) el.setValidity({ valueMissing: true }, missingMessage(value));
+        else el.setValidity({});
     });
 
     return {
-        reset: () => host.signal.set(initial),
-        disabled: (disabled) => host.setDisabled(disabled),
+        reset: () => signal.set(initial),
+        disabled: (disabled) => {
+            if (props.includes('disabled')) (el as unknown as { disabled: boolean }).disabled = disabled;
+        },
         // The browser hands back the state this element saved, which `stateOf` wrote as JSON.
         restore: (state) => {
-            if (typeof state === 'string') host.signal.set(JSON.parse(state));
+            if (typeof state === 'string') signal.set(JSON.parse(state));
         },
     };
 }

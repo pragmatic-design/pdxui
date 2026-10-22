@@ -3,7 +3,7 @@
 // ElementInternals, which happy-dom does not have: packages/showcase/tests/form-model.spec.ts, in Chromium.
 
 import { describe, it, expect } from 'vitest';
-import { toFormValue, isUnsupportedFormValue } from '../src/form/form-model';
+import { toFormValue, isUnsupportedFormValue, wireFormModel } from '../src/form/form-model';
 import { model } from '../src/component/component-descriptor';
 
 const entries = (v: unknown): [string, string][] =>
@@ -51,8 +51,8 @@ describe('toFormValue — the model\'s value as the form submits it', () => {
 });
 
 describe('model(d, { form: true })', () => {
-    it('marks the model form; without it the model is not marked', () => {
-        expect(model<string>('', { form: true })).toEqual({ type: String, default: '', model: true, form: true });
+    it('carries the form wiring; without it the model does not', () => {
+        expect(model<string>('', { form: true })).toEqual({ type: String, default: '', model: true, form: wireFormModel });
         expect(model<string>('')).toEqual({ type: String, default: '', model: true });
         expect(model<string>('', { form: false })).toEqual({ type: String, default: '', model: true });
     });

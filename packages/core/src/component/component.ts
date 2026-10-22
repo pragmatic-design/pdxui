@@ -55,7 +55,6 @@ export function __pdx_hmr_restore(tag: string): void {
 // they have always been imported from.
 import type { PropType, PropDefinition, TypedProp, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
 import { modelEvent } from '../utils/model-event';
-import { wireFormModel } from '../form/form-model';
 import type { FormModelCallbacks } from '../form/form-model';
 export type { PropType, PropDefinition, TypedProp } from './component-descriptor';
 
@@ -250,9 +249,17 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     const declaredStates = options.states && options.states.length > 0 ? new Set(options.states) : null;
 
     // A model declared `{ form }` (#135) is the component's form value, and makes it form-associated.
-    const formModels = [...modelNames].filter(n => (modelDefs[n] as ModelSpec<unknown>).form);
+    // Its spec carries the wiring (`model(d, { form: true })`, or the compiler's `form: wireFormModel`),
+    // so this module does not import it and an app with no form model does not carry it.
+    const formModels = [...modelNames].filter(n => typeof (modelDefs[n] as ModelSpec<unknown>).form === 'function');
     if (DEV && formModels.length > 1) console.warn(`[pdx] <${tag}> declares more than one model { form } (${formModels.join(', ')}); a form takes one value from a control, and '${formModels[0]}' is it.`);
+    if (DEV) {
+        for (const n of modelNames) {
+            if ((modelDefs[n] as { form?: unknown }).form === true) console.warn(`[pdx] <${tag}>'s model '${n}' says form: true by hand; declare it with model(default, { form: true }), which carries the form wiring. It is not form-associated.`);
+        }
+    }
     const formModel = formModels[0] ?? null;
+    const wireForm = formModel ? (modelDefs[formModel] as ModelSpec<unknown>).form! : null;
 
     const useShadow = options.shadow ?? false;
     const useFormAssociated = (options.formAssociated ?? false) || formModel !== null;
@@ -512,24 +519,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             }
 
             // The model declared `{ form }` is the form's value, and the form's lifecycle writes it (#135).
-            if (formModel && this._internals) {
-                const declared = (n: string): Signal<unknown> | undefined =>
-                    n !== formModel && propNames.includes(n) ? ctx[n] as Signal<unknown> : undefined;
-                const nameAttr = this.attr('name');
-                this._formModel = wireFormModel({
-                    tag,
-                    model: formModel,
-                    signal: ctx[formModel] as Signal<unknown>,
-                    props: { value: declared('value'), required: declared('required'), error: declared('error') },
-                    name: () => nameAttr(),
-                    track: (fn) => this.track(fn),
-                    setFormValue: (v, s) => this.setFormValue(v, s),
-                    setValidity: (flags, msg) => this.setValidity(flags, msg),
-                    setDisabled: (disabled) => {
-                        if (propNames.includes('disabled')) (this as unknown as { disabled: boolean }).disabled = disabled;
-                    },
-                });
-            }
+            if (wireForm && this._internals) this._formModel = wireForm(this, (fn) => this.track(fn), ctx, formModel!, propNames, tag);
 
             // Activate composable lifecycle scope during setup
             const scope: ComponentScope = {

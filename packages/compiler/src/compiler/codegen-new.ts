@@ -182,6 +182,8 @@ export function compileNewMode(
     const propsCode = buildPropsObject(analysis.props.filter(p => !p.model));
     const models = analysis.props.filter(p => p.model);
     const modelsCode = models.length > 0 ? buildPropsObject(models) : '';
+    // A model `{ form }` (#135) names core's form wiring in its entry.
+    if (models.some(p => p.form)) imports.add('wireFormModel');
     // An `export` inside setup() is a syntax error at load: reported as PDX_SCRIPT_EXPORT, emitted without it (#551).
     // A .pdx.ts module (scriptOnly) unwraps the setup into the module itself, where its exports belong.
     const body = scriptOnly ? analysis.body : dropScriptExports(analysis.body);

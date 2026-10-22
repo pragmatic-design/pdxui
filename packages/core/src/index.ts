@@ -110,6 +110,8 @@ export type { FormSchema, FormFieldSchema, FormSectionSchema, FormFieldType, Fie
 
 // Form-Associated Custom Elements (ElementInternals mixin)
 export { useFormAssociated } from './form/form-associated';
+// A `.pdx` model `{ form }` (#135): the compiler puts this in the model's entry, as `model(d, { form: true })` does.
+export { wireFormModel } from './form/form-model';
 export type { FormAssociatedOptions } from './form/form-associated';
 
 // Form Context (provide/inject for <pdx-form>)

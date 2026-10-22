@@ -100,8 +100,8 @@ native checkbox (the component's `value` prop, or `'on'`, when true; no entry wh
 one entry per item under the `name` (a native multi-select; none without a name), a `File` as the
 file, `null` as no entry; a value with no rule (a plain object) is not submitted, and is reported in
 development. `setValidity` from the component's own props when it declares them: `error` (a non-empty
-string is a custom error) and `required` (the model empty, as core's `required()` judges it, or
-`false`, is `valueMissing`). The form lifecycle callbacks write the model, so a parent's `::name` hears
+string is a custom error) and `required` (a model that is `null`, `''`, `false` or an empty array is
+`valueMissing`, as a native required control judges it, with the browser's own message). The form lifecycle callbacks write the model, so a parent's `::name` hears
 them: `formResetCallback` restores the value it mounted with, `formStateRestoreCallback` the value
 saved with the state; `formDisabledCallback` sets the `disabled` prop, when it declares one. One model
 of a component may declare it. Descriptor: `model<T>(d, { form: true })`.

@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-458 value exports.
+459 value exports.
 
 ### `__adoptStyles`
 
@@ -6142,6 +6142,20 @@ Usage:
   ${when(() => isOpen(), () => html`<span>Open!</span>`)}
   ${when(() => isOpen(), () => html`<span>Yes</span>`, () => html`<span>No</span>`,
          { enter: 'fade-in', exit: 'fade-out' })}
+
+### `wireFormModel`
+
+```ts
+import { wireFormModel } from '@pdxui/core';
+
+function wireFormModel(el: FormModelElement, track: (fn: () => void) => void, ctx: Record<string, unknown>, model: string, props: readonly string[], tag: string): FormModelCallbacks
+```
+
+Wire one instance's model to its form: value, validity, and the lifecycle callbacks. `ctx` is the
+component's context once its props are signals; `model` the model declared `{ form }`; `props` the
+names the component declares, of which `value` (a boolean model's checked value), `required`,
+`error` and `disabled` are read when present. Lives here, not in `component()`, so an app with no
+form model carries none of it (#135).
 
 ## @pdxui/router
 

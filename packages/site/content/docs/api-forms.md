@@ -7,7 +7,7 @@ parent: api
 
 # Forms API
 
-Forms, fields, field arrays, validators, schemas and form-associated custom elements. 45 exports, from `@pdxui/core`.
+Forms, fields, field arrays, validators, schemas and form-associated custom elements. 46 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -604,3 +604,17 @@ function validationMessage(key: string, fallback: string, params?: Record<string
 
 Create a ValidationMessage with key, params, and fallback.
 Use this in custom validators for i18n support.
+
+## `wireFormModel`
+
+```ts
+import { wireFormModel } from '@pdxui/core';
+
+function wireFormModel(el: FormModelElement, track: (fn: () => void) => void, ctx: Record<string, unknown>, model: string, props: readonly string[], tag: string): FormModelCallbacks
+```
+
+Wire one instance's model to its form: value, validity, and the lifecycle callbacks. `ctx` is the
+component's context once its props are signals; `model` the model declared `{ form }`; `props` the
+names the component declares, of which `value` (a boolean model's checked value), `required`,
+`error` and `disabled` are read when present. Lives here, not in `component()`, so an app with no
+form model carries none of it (#135).

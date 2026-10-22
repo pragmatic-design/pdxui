@@ -288,7 +288,13 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 474 → 469: inside `<pdx-form :form>` a control binds its field through its model, and the name
 // wiring the compiler injected on every named control and form field is gone (#128). The pre-push
 // build: main 473.0 → this branch 468.8 KB.
-const BUDGET_KB = { entry: 43, js: 469, css: 63, blocking: 99 };
+// js 469 → 470, blocking 99 → 100 (owner's OK): a model declared `{ form }` makes its component
+// form-associated (#135). The wiring lives in `form/form-model.ts` and reaches a bundle through
+// `model()`, which the library's value components import, so the showcase carries it before any of
+// them declares `{ form }`; `component()` keeps only the three form callbacks. The required message
+// is the browser's own, read from a native input, so core's validators stay out. Same machine, same
+// day, the built dist: main js 468.7 → this branch 469.5 KB, blocking 99.0 → 99.1 KB, entry 42.8 → 42.9 KB.
+const BUDGET_KB = { entry: 43, js: 470, css: 63, blocking: 100 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

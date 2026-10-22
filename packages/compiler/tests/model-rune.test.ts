@@ -177,9 +177,15 @@ describe('@model … { form }', () => {
     });
 
     for (const [name, opts] of Object.entries({ dev: {}, build: { production: true } })) {
-        it(`goes into the descriptor as form: true — ${name}`, () => {
+        it(`goes into the descriptor with core's form wiring, imported — ${name}`, () => {
             const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, opts);
-            expect(code).toMatch(/models: \{\s*value: \{ type: String, default: '', form: true \}\s*\}/);
+            expect(code).toMatch(/models: \{\s*value: \{ type: String, default: '', form: wireFormModel \}\s*\}/);
+            expect(code).toMatch(/import \{[^}]*\bwireFormModel\b[^}]*\} from '@pdxui\/core'/);
         });
     }
+
+    it('control: without { form } the wiring is not imported', () => {
+        const { code } = compile(sfc("@model value: string = '';"), 'field.pdx', [], undefined, {});
+        expect(code).not.toContain('wireFormModel');
+    });
 });

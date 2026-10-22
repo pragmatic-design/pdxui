@@ -26,8 +26,9 @@ export function buildPropsObject(props: { name: string; runtimeType: string; def
         if (p.default !== undefined) parts.push(`default: ${p.default}`);
         // Core reports a required prop the host did not set, in development (#123, #130).
         if (p.required) parts.push('required: true');
-        // A model `{ form }` makes the component form-associated through it, in core (#135).
-        if (p.form) parts.push('form: true');
+        // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
+        // caller imports `wireFormModel` (see codegen-new), and an app without one does not carry it.
+        if (p.form) parts.push('form: wireFormModel');
         return `    ${p.name}: { ${parts.join(', ')} }`;
     });
     return `{\n${entries.join(',\n')}\n  }`;

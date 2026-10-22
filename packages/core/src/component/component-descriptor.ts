@@ -14,6 +14,8 @@
 // write, which `::name` binds both ways (#124). `slots`, `expose` and `variants` are part of the
 // descriptor's type now; each gets its behaviour in its own issue (docs/language/beta/components.md).
 
+import { wireFormModel } from '../form/form-model';
+
 /** The runtime type an attribute value is coerced to. Object, Array and Function are property-only. */
 export type PropType = typeof String | typeof Number | typeof Boolean | typeof Object | typeof Array | typeof Function;
 
@@ -105,8 +107,12 @@ export function event<D = void>(options?: { bubbles?: boolean }): EventSpec<D> {
  */
 export interface ModelSpec<T> extends PropSpec<T> {
     readonly model: true;
-    /** Declared `{ form: true }` (#135): the component is form-associated, and this model is its form value. */
-    readonly form?: true;
+    /**
+     * Declared `{ form: true }` (#135): the component is form-associated, and this model is its form
+     * value. It holds the wiring itself, so only an app that declares one carries it: `component()`
+     * does not import it.
+     */
+    readonly form?: typeof wireFormModel;
 }
 
 /** Options of {@link model}: {@link prop}'s, and `form`. */
@@ -122,7 +128,7 @@ export interface ModelOptions extends PropOptions {
 /** Declare a model: `model<string>('')`, `model<Item[]>(() => [])`, `model<string>('', { form: true })`. */
 export function model<T>(defaultValue?: T | (() => T), options?: ModelOptions): ModelSpec<T> {
     const spec = { ...propBuilder(defaultValue, options), model: true as const };
-    return options?.form ? { ...spec, form: true } : spec;
+    return options?.form ? { ...spec, form: wireFormModel } : spec;
 }
 
 export { modelEvent } from '../utils/model-event';

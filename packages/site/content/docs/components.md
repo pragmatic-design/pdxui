@@ -278,9 +278,12 @@ model's value: a string as is, a number as its string, a boolean as a checkbox d
 `value`, or `on`, when true; nothing when false), an array as one entry per item, a `File` as the file,
 `null` as nothing. `form.reset()` puts the model back to the value it mounted with — through the model,
 so the parent's `::value` follows. The component's own `required` and `error` props, when it has them,
-are its validity: `form.checkValidity()` is false while a required model is empty or the error is
-set. A disabled `<fieldset>` sets its `disabled` prop. Leave the inner `<input>` without a `name`: the
+are its validity: `form.checkValidity()` is false while a required model is empty (`null`, `''`,
+`false`, an empty array — what a native required control counts as empty, with the browser's message)
+or the error is set. A disabled `<fieldset>` sets its `disabled` prop. Leave the inner `<input>` without a `name`: the
 host is what the form reads. In TypeScript: `models: { value: model<string>('', { form: true }) }`.
+Either way the model carries core's `wireFormModel`, which `component()` calls once the props exist;
+you never call it yourself, and a component without `{ form }` does not load it.
 
 ## @event — what a component communicates
 
