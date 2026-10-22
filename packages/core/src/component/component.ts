@@ -91,6 +91,12 @@ export interface ComponentContextBase {
     setFormValue?(value: FormData | string | File | null): void;
     /** Set form validity (form-associated components only). */
     setValidity?(flags: ValidityStateFlags, message?: string): void;
+    /**
+     * What the form submits, when it is not the model declared `{ form }` as it is (#135): a value
+     * serialized as the model's would be (`null` for no entry). Reset, restore and `required` stay on
+     * the model. Present only on a component with a form model, in a DOM with form association.
+     */
+    formValue?(get: () => unknown): void;
     /** Track an effect for auto-disposal on disconnect. `options.name` names it for the inspector. */
     track(fn: () => void | (() => void), options?: EffectOptions): Dispose;
     /**

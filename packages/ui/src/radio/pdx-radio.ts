@@ -2,7 +2,7 @@
 // Maps to .pdx-radio CSS class from design system (forms.css).
 // Use inside <pdx-radio-group> for managed selection + keyboard nav.
 
-import { component, html, useFormAssociated, untracked, model } from '@pdxui/core';
+import { component, html, untracked, model } from '@pdxui/core';
 import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
 
 // One submitter per radio: the host. The inner <input type="radio"> stays, because the
@@ -27,10 +27,9 @@ type RadioHost = HTMLElement & { form: HTMLFormElement | null; name: string; che
  * @alphadetail value $event.currentTarget.value
  */
 component('pdx-radio', {
-    formAssociated: true,
     // Selecting it writes it (#480), and the write dispatches `checked-change`. A sibling the browser
-    // unchecks is set from outside, and announces nothing, as it never did.
-    models: { checked: model(false) },
+    // unchecks is set from outside, and announces nothing, as it never did. A form resets it (#135).
+    models: { checked: model(false, { form: true }) },
     props: {
         disabled: { type: Boolean, default: false },
         label: { type: String, default: '' },
@@ -90,9 +89,7 @@ component('pdx-radio', {
 
         // Inside a pdx-radio-group the group is the field and submits the value; the radio submits
         // nothing, or the choice went out twice.
-        useFormAssociated(ctx, {
-            getFormValue: () => ctx.checked() && !host.closest('pdx-radio-group') ? ((ctx.value() as string) || 'on') : null,
-        });
+        ctx.formValue?.(() => ctx.checked() && !host.closest('pdx-radio-group') ? ((ctx.value() as string) || 'on') : null);
         reflectNameToHost(ctx);
 
         return { onChange, boxClass, wrapClass, innerName };

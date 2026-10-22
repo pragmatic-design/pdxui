@@ -3,7 +3,7 @@
 // Uses focusGroup from core for roving tabindex in group mode.
 // Distinct from Segmented: toggle = action state (0..N), segmented = exclusive selection (1).
 
-import { component, html, useFormAssociated, prop, event, model } from '@pdxui/core';
+import { component, html, prop, event, model } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
 import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -20,9 +20,8 @@ import '@pdxui/design/components/toggle';
  * @alphadetail pressed $event.detail.value
  */
 component('pdx-toggle', {
-    formAssociated: true,
     // A click writes it (#480), and the write dispatches `pressed-change`.
-    models: { pressed: model(false) },
+    models: { pressed: model(false, { form: true }) },
     props: {
         disabled: prop(false),
         value: prop(''),
@@ -50,7 +49,6 @@ component('pdx-toggle', {
             return cls;
         }
 
-        useFormAssociated(ctx, { getFormValue: () => ctx.pressed() ? (ctx.value() as string || 'on') : null });
 
         // Imperative API: focus/blur/clear
         ctx.expose({

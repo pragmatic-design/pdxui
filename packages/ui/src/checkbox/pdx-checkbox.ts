@@ -2,7 +2,7 @@
 // Maps to .pdx-checkbox CSS class from design system (forms.css).
 // tristate=true: click cycles unchecked → checked → indeterminate → unchecked.
 
-import { component, html, useFormAssociated, model } from '@pdxui/core';
+import { component, html, model } from '@pdxui/core';
 import { reflectNameToHost } from '../shared/own-prop';
 // A container rule in form.css (`.has-warning .pdx-checkbox`) styles this element, and it owns
 // no stylesheet of its own, so nothing else would carry it.
@@ -19,10 +19,10 @@ import '@pdxui/design/components/form';
  * @alphadetail state ($event.currentTarget.indeterminate ? null : $event.detail.value)
  */
 component('pdx-checkbox', {
-    formAssociated: true,
     // A click writes them (#480): `checked-change`, and in a tristate `indeterminate-change` too.
+    // `checked` is what a form submits, as a native checkbox: `value`, or `on`, when checked (#135).
     models: {
-        checked: model(false),
+        checked: model(false, { form: true }),
         indeterminate: model(false),
     },
     props: {
@@ -99,7 +99,6 @@ component('pdx-checkbox', {
             return cls;
         }
 
-        useFormAssociated(ctx, { getFormValue: () => ctx.checked() ? ((ctx.value() as string) || 'on') : null });
         // The host is the one submitter; an inner checkbox carrying the name too would send the value
         // a second time.
         reflectNameToHost(ctx);

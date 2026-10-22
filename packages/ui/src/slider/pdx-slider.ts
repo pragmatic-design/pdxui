@@ -2,7 +2,7 @@
 // Custom DOM (not <input type="range">) for full control over track/fill/thumb styling.
 // Uses PointerEvents for unified mouse/touch/pen. ARIA slider role.
 
-import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
+import { component, html, signal, model } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
 
@@ -16,10 +16,9 @@ import { reflectNameToHost } from '../shared/own-prop';
  * @alphadetail max $event.detail.value[1]
  */
 component('pdx-slider', {
-    formAssociated: true,
     // A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
     // still marks the end of a drag. In range mode it holds `[min, max]`.
-    models: { value: model<number | number[]>(0, { type: Number }) },
+    models: { value: model<number | number[]>(0, { type: Number, form: true }) },
     props: {
         min: { type: Number, default: 0 },
         max: { type: Number, default: 100 },
@@ -53,10 +52,10 @@ component('pdx-slider', {
         let trackEl: HTMLElement | null = null;
         let draggingThumb: 'single' | 'min' | 'max' | null = null;
         const isDragging = signal(false);
-        // The form value: "min,max" in range mode, where `value` holds the array.
-        const _formVal = signal<string>('');
+        // The form value, snapped and clamped: the low and the high in range mode, two entries (#135).
+        const _formVal = signal<number | number[]>(0);
         function syncFormVal() {
-            _formVal.set(ctx.range() ? `${_rangeMin},${_rangeMax}` : String(_value));
+            _formVal.set(ctx.range() ? [_rangeMin, _rangeMax] : _value);
         }
 
         function clamp(v: number): number {
@@ -320,7 +319,7 @@ component('pdx-slider', {
             });
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = _formVal(); return v !== '' ? v : null; } });
+        ctx.formValue?.(() => _formVal());
         // The host is the one submitter: a hidden input carrying the name would send the value a
         // second time.
         reflectNameToHost(ctx);

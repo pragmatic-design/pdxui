@@ -5653,7 +5653,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "Comma-separated selected values",
+              "description": "Comma-separated selected values. A form submits one entry per value, and resets it (#135).",
               "type": {
                 "text": "string"
               },
@@ -5733,7 +5733,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "Comma-separated selected values",
+              "description": "Comma-separated selected values. A form submits one entry per value, and resets it (#135).",
               "type": {
                 "text": "string"
               },
@@ -16935,7 +16935,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "The number, or `null` when the field is empty.",
+              "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
               "type": {
                 "text": "number | null"
               },
@@ -17189,7 +17189,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "The number, or `null` when the field is empty.",
+              "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
               "type": {
                 "text": "number | null"
               },

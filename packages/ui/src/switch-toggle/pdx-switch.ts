@@ -2,7 +2,7 @@
 // Maps to .pdx-toggle CSS class from design system (forms.css).
 // Uses role="switch" for proper a11y semantics.
 
-import { component, html, useFormAssociated, model } from '@pdxui/core';
+import { component, html, model } from '@pdxui/core';
 import { reflectNameToHost } from '../shared/own-prop';
 import { uiString } from '../shared/i18n';
 
@@ -15,9 +15,8 @@ import { uiString } from '../shared/i18n';
  * @alphadetail value $event.currentTarget.value
  */
 component('pdx-switch', {
-    formAssociated: true,
     // A toggle writes it (#480), and the write dispatches `checked-change`.
-    models: { checked: model(false) },
+    models: { checked: model(false, { form: true }) },
     props: {
         disabled: { type: Boolean, default: false },
         loading: { type: Boolean, default: false },
@@ -55,7 +54,6 @@ component('pdx-switch', {
             return cls;
         }
 
-        useFormAssociated(ctx, { getFormValue: () => ctx.checked() ? ((ctx.value() as string) || 'on') : null });
         // The host is the one submitter; an inner checkbox carrying the name too would send the value
         // a second time.
         reflectNameToHost(ctx);

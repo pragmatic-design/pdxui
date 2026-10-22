@@ -3,7 +3,7 @@
 // threshold colors (Element+), hover preview, readonly vs disabled.
 // Uses aria-valuenow/min/max on role="slider" (WAI pattern).
 
-import { component, html, signal, effect, useFormAssociated, model } from '@pdxui/core';
+import { component, html, signal, effect, model } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -19,9 +19,8 @@ import '@pdxui/design/components/rating';
  * @alphadetail value $event.detail.value
  */
 component('pdx-rating', {
-    formAssociated: true,
     // A click or a key writes it (#480), and the write dispatches `value-change`.
-    models: { value: model(0) },
+    models: { value: model(0, { form: true }) },
     props: {
         count: { type: Number, default: 5 },
         precision: { type: Number, default: 1 },
@@ -216,7 +215,6 @@ component('pdx-rating', {
             return html`${stars}`;
         }
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = _value(); return v !== undefined && v !== null ? String(v) : null; } });
         // The host is the one submitter. No hidden input carries the name, or it would send the value
         // a second time.
         reflectNameToHost(ctx);

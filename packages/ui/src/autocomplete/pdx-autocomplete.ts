@@ -1,7 +1,7 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, model, event, isDataSource, inject, useFormAssociated, untracked, generatedId } from '@pdxui/core';
+import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
@@ -57,12 +57,11 @@ function buildHighlight(label: string, query: string): HTMLSpanElement {
  * @alpharename pdx-input query-change
  */
 component('pdx-autocomplete', {
-    formAssociated: true,
     // The committed value (#481): a suggestion picked (its value field, or its label when it has
     // none), the field cleared, or free text confirmed by leaving the field or pressing Enter with no
     // option chosen. Once per edit, like a native `change`. The text typed is not the value: it is
     // announced with `query-change`.
-    models: { value: model<unknown>('', { type: String }) },
+    models: { value: model<unknown>('', { type: String, form: true }) },
     events: {
         /** The text typed, on each keystroke: the query the suggestions are filtered by. */
         'query-change': event<{ value: string }>(),
@@ -449,7 +448,14 @@ component('pdx-autocomplete', {
             getSelectedItem(): unknown { return _selectedItem; },
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = _query(); return v != null && v !== '' ? String(v) : null; } });
+        // A form submits the model: a picked suggestion's value, the code (#135). Free text typed and
+        // not committed yet is what leaving the field will commit, 150 ms after the blur — a click on a
+        // submit button is sooner, so the form takes the text now, as a native input would.
+        ctx.formValue?.(() => {
+            const q = _query();
+            const v = ctx.value();
+            return q === _committed || ctx.forceSelection() ? v : q;
+        });
         // The host is the one submitter. A hidden input carrying the name would send the value a
         // second time.
         reflectNameToHost(ctx);

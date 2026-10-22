@@ -1,7 +1,7 @@
 // pdx-masked-input — Input with pattern mask (phone, credit card, date, custom).
 // Auto-formats as user types, manages cursor position around mask chars.
 
-import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
+import { component, html, signal, model } from '@pdxui/core';
 import { reflectNameToHost } from '../shared/own-prop';
 import { dispatchCommit } from '../shared/commit-change';
 
@@ -72,12 +72,11 @@ function outOfRange(preset: string, digits: string): boolean {
  * @alphacommit pdx-change
  */
 component('pdx-masked-input', {
-    formAssociated: true,
     // Typing writes it (#479), unmasked, and the write dispatches `value-change`, live. The commit, on blur
     // or Enter, is the inner input's native `change`, which bubbles to the host. What the alpha events
     // also carried, the formatted text and whether it is in range, the element answers itself:
     // `getFormatted()` and `isValid()`.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         /**
          * Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit
@@ -210,7 +209,6 @@ component('pdx-masked-input', {
             if (propVal) displayValue.set(applyMask(propVal));
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = stripMask(displayValue() as string); return v != null && v !== '' ? v : null; } });
         // The host is the one submitter: the unmasked value, under the host's name. The inner input
         // does not carry the name, or it would send the masked text a second time.
         reflectNameToHost(ctx);

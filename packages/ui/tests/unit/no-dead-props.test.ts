@@ -39,6 +39,13 @@ const HELPER_READS: Record<string, string[]> = {
 };
 
 /**
+ * A model declared `{ form: true }` is wired by core (`form/form-model.ts`), which reads these props
+ * off the component when it declares them: `value` as a boolean model's checked value, `required` and
+ * `error` as its validity, `disabled` for a disabled fieldset (#135).
+ */
+const FORM_MODEL_READS = ['value', 'required', 'error', 'disabled'];
+
+/**
  * The source without its comments. A `//` right after `:` or a quote is a URL in a string
  * (`'http://www.w3.org/2000/svg'`), not a comment, and is kept.
  */
@@ -70,6 +77,7 @@ function deadProps(text: string): { checked: number; dead: string[] } {
     const viaHelpers = new Set(Object.entries(HELPER_READS)
         .filter(([helper]) => new RegExp(`\\b${helper}\\(`).test(rest))
         .flatMap(([, props]) => props));
+    if (/\bform: true\b/.test(rest)) for (const p of FORM_MODEL_READS) viaHelpers.add(p);
 
     let checked = 0;
     const dead: string[] = [];
@@ -115,6 +123,13 @@ describe('the scan can fail', () => {
         expect(deadProps(withName.replace('    setup(ctx) {', '    setup(ctx) {\n        reflectNameToHost(ctx);')).dead).toEqual([]);
         expect(deadProps(withName.replace('    setup(ctx) {', '    setup(ctx) {\n        // reflectNameToHost(ctx) one day')).dead)
             .toEqual(['pdx-probe.name']);
+    });
+
+    it('counts a model declared { form: true } as reading value, and not the words in a comment', () => {
+        const withValue = LIVE.replace('        used: {', '        value: { type: String, default: null },\n        used: {');
+        expect(deadProps(withValue.replace('    props: {', '    models: { on: model(false, { form: true }) },\n    props: {')).dead).toEqual([]);
+        expect(deadProps(withValue.replace('    props: {', '    // one day: form: true\n    props: {')).dead)
+            .toEqual(['pdx-probe.value']);
     });
 
     it('does not accuse a prop that is read, by call or by string key after a URL', () => {

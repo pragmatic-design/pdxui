@@ -17,6 +17,9 @@ the group cannot report it and warns once.
 Listen on the group, not on the children: the children's own `checked-change` stops at the group,
 and the group's `value` always matches what is checked. Classes you put on the group are kept.
 
+In a native `<form>` the group is the field: `name` goes on the group, which submits one entry per
+checked value, and `form.reset()` puts its selection back, the children with it.
+
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `orientation` | `orientation` | string | `'vertical'` | Layout orientation — horizontal or vertical. |
@@ -24,7 +27,7 @@ and the group's `value` always matches what is checked. Classes you put on the g
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `label` | `label` | string | `''` | Accessible name of the group. Without it, a <pdx-label> right before the group names it. |
-| `value` | `value` | string | `''` | Comma-separated selected values |
+| `value` | `value` | string | `''` | Comma-separated selected values. A form submits one entry per value, and resets it (#135). |
 
 **Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 

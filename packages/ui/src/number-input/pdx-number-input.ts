@@ -2,7 +2,7 @@
 // Cursor-position-aware step, sign toggle, locale formatting.
 // Stepper buttons rendered OUTSIDE the input wrap (input-group style).
 
-import { component, html, signal, useFormAssociated, model } from '@pdxui/core';
+import { component, html, signal, model } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { resolveLocale, numberSeparators } from '../shared/locale';
 import { reflectNameToHost } from '../shared/own-prop';
@@ -28,13 +28,12 @@ function isEmptyValue(v: unknown): boolean {
  * @alphacommit pdx-change
  */
 component('pdx-number-input', {
-    formAssociated: true,
     // Typing and stepping write it (#479), and the write dispatches `value-change`, live. The commit is
     // the inner input's native `change`: the browser's on blur or Enter after typing, the component's own
     // after a step, as a native number input fires one for its spin buttons.
     models: {
-        /** The number, or `null` when the field is empty. */
-        value: model<number | null>(null, { type: Number }),
+        /** The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135). */
+        value: model<number | null>(null, { type: Number, form: true }),
     },
     props: {
         min: { type: Number, default: -Infinity },
@@ -464,7 +463,7 @@ component('pdx-number-input', {
             });
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const v = _liveValue(); return v !== undefined && v !== null ? String(v) : null; } });
+        ctx.formValue?.(() => _liveValue());
         // The host is the one submitter, with the number unformatted. The inner input does not carry
         // the name, or it would send the grouped text ("12,345") a second time.
         reflectNameToHost(ctx);

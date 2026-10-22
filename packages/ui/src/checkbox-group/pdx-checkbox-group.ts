@@ -8,7 +8,7 @@
 // track would re-run on every click and put the selection back to the stale prop. Its own classes go
 // through classList, so the author's classes survive.
 
-import { component, html, createSelection, useFormAssociated, untracked, DEV, model } from '@pdxui/core';
+import { component, html, createSelection, untracked, DEV, model } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
 import '../checkbox/pdx-checkbox'; // rendered by this component, and registered by nobody else
@@ -21,10 +21,9 @@ import '../checkbox/pdx-checkbox'; // rendered by this component, and registered
  * @alphadetail values $event.detail.value.split(',').filter(Boolean)
  */
 component('pdx-checkbox-group', {
-    formAssociated: true,
     models: {
-        /** Comma-separated selected values */
-        value: model(''),
+        /** Comma-separated selected values. A form submits one entry per value, and resets it (#135). */
+        value: model('', { form: true }),
     },
     props: {
         orientation: { type: String, default: 'vertical' },
@@ -136,7 +135,7 @@ component('pdx-checkbox-group', {
             });
         });
 
-        useFormAssociated(ctx, { getFormValue: () => { const selected = Array.from(selection.selected()); return selected.length > 0 ? JSON.stringify(selected) : null; } });
+        ctx.formValue?.(() => Array.from(selection.selected()));
 
         return {};
     },
