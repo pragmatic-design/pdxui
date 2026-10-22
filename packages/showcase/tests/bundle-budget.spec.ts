@@ -281,7 +281,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // `change` (#479). Seven components import `model`, the clear and stepper paths dispatch the commit
 // themselves, `onControlValue` waits for a control's class, and the masked input answers
 // `getFormatted()` and `isValid()`. The pre-push build: main 472.0 → this branch 472.1 KB.
-const BUDGET_KB = { entry: 43, js: 473, css: 63, blocking: 99 };
+// js 473 → 474 (owner's OK): a control binds a form field through its model (#128) — the field's
+// two-way protocol in core, its `.number` parse error, `pdx-form-field`'s `:field`. Same machine, same
+// day, the built dist: main 483 836 → this branch 484 351 bytes gzip (472.5 → 473.0 KB); CI's Linux
+// build measured the branch at 473.1.
+const BUDGET_KB = { entry: 43, js: 474, css: 63, blocking: 99 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

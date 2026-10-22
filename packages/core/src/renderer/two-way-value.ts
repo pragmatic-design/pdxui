@@ -126,23 +126,18 @@ export function twoWayWriter(el: Element, accessor: TwoWayAccessor, mods: TwoWay
     const write = (raw: unknown): void => {
         let value = raw;
         if (mods.trim && typeof value === 'string') value = value.trim();
-        if (mods.number && accessor.field) {
+        if (mods.number) {
+            const n = parseNumber(value);
+            const message = n === undefined ? 'Enter a number.' : null;
             // Bound to a form field, the parse error is the field's (#128): it shows where its other
             // errors do, and the field's binding marks the control.
-            const n = parseNumber(value);
-            if (n === undefined) { accessor.field.parseError('Enter a number.'); return; }
-            accessor.field.parseError(null);
-            value = n;
-        } else if (mods.number) {
-            const n = parseNumber(value);
-            const validatable = typeof (el as Partial<Validatable>).setCustomValidity === 'function' ? el as unknown as Validatable : null;
-            if (n === undefined) {
-                el.setAttribute('aria-invalid', 'true');
-                validatable?.setCustomValidity('Enter a number.');
-                return;
+            if (accessor.field) accessor.field.parseError(message);
+            else {
+                if (message) el.setAttribute('aria-invalid', 'true');
+                else el.removeAttribute('aria-invalid');
+                (el as Partial<Validatable>).setCustomValidity?.(message ?? '');
             }
-            el.removeAttribute('aria-invalid');
-            validatable?.setCustomValidity('');
+            if (n === undefined) return;
             value = n;
         }
         accessor.set(value);

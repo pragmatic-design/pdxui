@@ -438,14 +438,8 @@ export function createForm<T extends Record<string, unknown>>(
     const _parseErrors = signal<Record<string, string>>({});
 
     function setParseError(name: string, message: string | null): void {
-        const current = _parseErrors.peek();
-        if (message === null) {
-            if (!(name in current)) return;
-            const { [name]: _cleared, ...rest } = current;
-            _parseErrors.set(rest);
-        } else if (current[name] !== message) {
-            _parseErrors.set({ ...current, [name]: message });
-        }
+        const { [name]: was, ...rest } = _parseErrors.peek();
+        if (was !== (message ?? undefined)) _parseErrors.set(message === null ? rest : { ...rest, [name]: message });
     }
 
     /**
