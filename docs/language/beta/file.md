@@ -106,7 +106,12 @@ entry in its own issue)
 is `'baseline-2026'`. `'baseline-2024'` is the support target for existing projects whose users run
 older browsers: it emits today's mechanisms where the beta output depends on a 2026 feature. It is
 maintained frozen — fixed, not developed — with a reduced certification run, and retired when `@scope`
-is Baseline widely available (September 2028); #121 carries the details (decisions.md 16).
+is Baseline widely available (September 2028); #121 carries the details (decisions.md 16). The
+reduced run is a CI job of its own (#509 — landed): Dim 1, the contract math, on the 13 themes, with
+the scenario pages building the design CSS for `baseline-2024` (`PDX_TARGET=baseline-2024`). DOM, ARIA
+and keyboard do not depend on the target, so Dims 2, 4 and 5 are not run for it. A scenario that
+asserts what only `baseline-2026` gives declares `onlyOn` in its manifest, with the reason, and is left
+out of that run.
 
 | Output | `baseline-2026` | `baseline-2024` |
 |---|---|---|

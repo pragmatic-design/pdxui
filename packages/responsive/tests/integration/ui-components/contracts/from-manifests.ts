@@ -5,6 +5,7 @@
 import { manifests, scenarioPage } from './generated/manifests';
 import { THEMES } from '../../../manifests/_themes';
 import type { ContractBlock } from '../../../manifests/_types';
+import { certifyTarget, type CertifyTarget } from '../../../certify-target';
 
 export interface ContractUnit {
     component: string;
@@ -27,12 +28,18 @@ function mergeBlocks(base: ContractBlock, extra?: ContractBlock): ContractBlock 
     };
 }
 
-export function buildContractUnits(): ContractUnit[] {
+/**
+ * The units of the run for `target` — the one the pages are built for, by default. A scenario
+ * certified on another target only (`onlyOn`, #509) is left out, on every theme.
+ */
+export function buildContractUnits(target: CertifyTarget = certifyTarget()): ContractUnit[] {
     const units: ContractUnit[] = [];
     for (const m of manifests) {
         if (!m.contracts) continue;
         const themes = m.themes ?? THEMES;
         for (const [scenario, baseBlock] of Object.entries(m.contracts.scenarios)) {
+            const only = m.scenarios.find((s) => s.id === scenario)?.onlyOn;
+            if (only && only.target !== target) continue;
             for (const theme of themes) {
                 const ov = m.contracts.themeOverrides?.[theme]?.[scenario];
                 units.push({
