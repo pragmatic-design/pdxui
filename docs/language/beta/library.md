@@ -22,7 +22,7 @@ their issues are #286–#293.
 |---|---|---|
 | Contract | declares its API with the typed descriptor, or is a `.pdx` file — one declaration model for both | #123, #137 |
 | Value | a value component declares a `@model` and emits exactly one change event per model, `{ value }` | #124, #125 — landed |
-| Forms | a value component is form-associated: it takes part in `<form>`, `FormData`, reset and validity | #135 |
+| Forms | a value component is form-associated: it takes part in `<form>`, `FormData`, reset and validity | #135 — landed |
 | States | visual states are custom states (`:state(name)`), not classes on the host | #132 |
 | Parts | its stylable inner elements are named parts (`data-part`), listed in the manifest | #134 |
 | Host | host attributes and listeners are declared with `@host` | #133 |

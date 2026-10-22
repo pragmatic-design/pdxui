@@ -14,6 +14,7 @@
 import { component, html, signal, model } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/transfer';
@@ -54,8 +55,9 @@ export interface TransferItem {
 component('pdx-transfer', {
     // The values on the target (right) side (#481). A move, setValue() and clear() write it, and the
     // write dispatches `value-change`. In DataSource mode the partition comes from the source, and a
-    // move writes the target values it leaves; the diff to persist is getChanges().
-    models: { value: model<string[]>(() => [], { type: Array }) },
+    // move writes the target values it leaves; the diff to persist is getChanges(). A form submits the
+    // target values, one entry each, and resets them (#135).
+    models: { value: model<string[]>(() => [], { type: Array, form: true }) },
     props: {
         // ── Model 1: Simple (items + value) ──
         /** All items — array of { value, label, disabled? } */
@@ -114,7 +116,8 @@ component('pdx-transfer', {
         let _moveLeftBtn: HTMLButtonElement | null = null;
         let _moveAllRightBtn: HTMLButtonElement | null = null;
         let _moveAllLeftBtn: HTMLButtonElement | null = null;
-        let _hiddenEl: HTMLInputElement | null = null;
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
+        reflectNameToHost(ctx);
 
         // Drag state
         let _dragValue: string | null = null;
@@ -388,7 +391,6 @@ component('pdx-transfer', {
             const searchable = ctx.searchable() as boolean;
             const showAll = ctx.showAllButtons() as boolean;
             const size = ctx.size() as string;
-            const name = ctx.name() as string;
             const mode = getMode();
             const isDraggable = ctx.draggable() as boolean;
             const srcTitle = (ctx.sourceTitle() as string) || getComponentString('transfer', 'source')();
@@ -444,12 +446,6 @@ component('pdx-transfer', {
             }
             root.appendChild(tgtPanel);
 
-            if (name) {
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                root.appendChild(_hiddenEl);
-            }
             el.appendChild(root);
             _domReady.set(true);
         });
@@ -489,8 +485,6 @@ component('pdx-transfer', {
             if (_moveLeftBtn) _moveLeftBtn.disabled = tgtChecked.size === 0;
             if (_moveAllRightBtn) _moveAllRightBtn.disabled = allSrcCount === 0;
             if (_moveAllLeftBtn) _moveAllLeftBtn.disabled = allTgtCount === 0;
-
-            if (_hiddenEl) _hiddenEl.value = JSON.stringify([...getTargetValues()]);
         });
 
         // ── DOM builders ──
@@ -702,6 +696,10 @@ component('pdx-transfer', {
             /** The last move's direction, 'right' (to the target) or 'left'; null before any move. */
             getDirection(): 'right' | 'left' | null { return _lastDirection; },
         });
+
+        // A form submits the target values, one entry each (#135). Last in the setup: the getter runs
+        // at once, and reads state declared above.
+        ctx.formValue?.(() => [...getTargetValues()]);
 
         return {};
     },

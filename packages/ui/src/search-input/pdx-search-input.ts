@@ -2,6 +2,7 @@
 // Uses pdx-input wrapper pattern. Emits pdx-search after debounce.
 
 import { component, html, signal, model } from '@pdxui/core';
+import { submitThroughInnerField } from '../shared/inner-field';
 // The search glyph is a <pdx-icon> in this component's own template, so it is registered
 // here: on a page that does not import the whole library the tag would never upgrade and the
 // prefix would measure 0x0.
@@ -21,10 +22,9 @@ import { dispatchCommit } from '../shared/commit-change';
  * @alphadetail value $event.currentTarget.value
  */
 component('pdx-search-input', {
-    formAssociated: true,
     // Typing writes it (#479), and the write dispatches `value-change`, live. `pdx-search` stays: it is
     // the debounced query, not the value.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         /** The input's placeholder. Empty: the search-input.placeholder component string, «Search...». */
         placeholder: { type: String, default: '' },
@@ -39,6 +39,8 @@ component('pdx-search-input', {
         shortcut: { type: String, default: '' },
     },
     setup(ctx) {
+        // The inner field submits; a form reset puts it and the model back to the mounted text (#135).
+        submitThroughInnerField(ctx);
         const liveValue = signal('');
         let debounceTimer: ReturnType<typeof setTimeout> | null = null;
         // The debounce must not emit pdx-search after the unmount

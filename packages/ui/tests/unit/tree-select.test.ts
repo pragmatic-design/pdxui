@@ -84,11 +84,11 @@ describe('pdx-tree-select', () => {
         expect(trigger?.classList.contains('disabled')).toBe(true);
     });
 
-    it('renders hidden input when name set', async () => {
+    it('submits through the host, with no hidden input (#135)', async () => {
         const el = await mountTreeSelect({ name: 'food' });
-        const hidden = el.querySelector('input[type="hidden"]');
-        expect(hidden).toBeTruthy();
-        expect(hidden?.getAttribute('name')).toBe('food');
+        // The host submits (#135): no input inside carries the name, which is on the host.
+        expect(el.querySelector('input[name]')).toBeNull();
+        expect(el.getAttribute('name')).toBe('food');
     });
 
     it('renders clear button when value set', async () => {

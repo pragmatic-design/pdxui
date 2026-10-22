@@ -223,12 +223,12 @@ describe('pdx-time-picker', () => {
         expect(wrap?.classList.contains('disabled')).toBe(true);
     });
 
-    it('renders hidden input when name is set', async () => {
+    it('submits through the host, with no hidden input (#135)', async () => {
         const el = await mount('pdx-time-picker', { name: 'startTime' });
         await tick(100);
-        const hidden = el.querySelector('input[type="hidden"]');
-        expect(hidden).toBeTruthy();
-        expect(hidden?.getAttribute('name')).toBe('startTime');
+        // The host submits (#135): no input inside carries the name, which is on the host.
+        expect(el.querySelector('input[name]')).toBeNull();
+        expect(el.getAttribute('name')).toBe('startTime');
     });
 
     it('parses initial value correctly', async () => {
@@ -331,12 +331,12 @@ describe('pdx-date-picker', () => {
         expect(trigger?.classList.contains('pdx-input-lg')).toBe(true);
     });
 
-    it('renders hidden input when name is set', async () => {
+    it('submits through the host, with no hidden input (#135)', async () => {
         const el = await mount('pdx-date-picker', { name: 'birthdate' });
         await tick(100);
-        const hidden = el.querySelector('input[type="hidden"]');
-        expect(hidden).toBeTruthy();
-        expect(hidden?.getAttribute('name')).toBe('birthdate');
+        // The host submits (#135): no input inside carries the name, which is on the host.
+        expect(el.querySelector('input[name]')).toBeNull();
+        expect(el.getAttribute('name')).toBe('birthdate');
     });
 
     it('renders panel element (initially hidden)', async () => {

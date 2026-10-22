@@ -2,6 +2,7 @@
 // Uses pdx-input wrapper pattern. Toggle button in suffix position.
 
 import { component, html, signal, generatedId, model } from '@pdxui/core';
+import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
 
@@ -14,10 +15,9 @@ import { dispatchCommit } from '../shared/commit-change';
  * @alphacommit pdx-change
  */
 component('pdx-password-input', {
-    formAssociated: true,
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
@@ -33,6 +33,8 @@ component('pdx-password-input', {
         loading: { type: Boolean, default: false },
     },
     setup(ctx) {
+        // The inner field submits; a form reset puts it and the model back to the mounted text (#135).
+        submitThroughInnerField(ctx);
         const visible = signal(false);
         const liveValue = signal('');
 

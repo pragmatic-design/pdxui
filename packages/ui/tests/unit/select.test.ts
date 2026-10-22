@@ -27,12 +27,12 @@ describe('pdx-select', () => {
         expect(caret).toBeTruthy();
     });
 
-    it('renders hidden input for form participation', async () => {
+    it('submits through the host, with no hidden input (#135)', async () => {
         const el = await mount('pdx-select', { name: 'color' });
         await tick(50);
-        const hidden = el.querySelector('input[type="hidden"]') as HTMLInputElement;
-        expect(hidden).toBeTruthy();
-        expect(hidden?.name).toBe('color');
+        // The host submits (#135): no input inside carries the name, which is on the host.
+        expect(el.querySelector('input[name]')).toBeNull();
+        expect(el.getAttribute('name')).toBe('color');
     });
 
     // ─── Opening / Closing ──────────────────────────

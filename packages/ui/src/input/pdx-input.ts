@@ -3,6 +3,7 @@
 // Foundation for all specialized inputs (number, password, search, masked, date).
 
 import { component, html, model } from '@pdxui/core';
+import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
 
@@ -30,10 +31,9 @@ function allowsPasswordManager(type: string, autocomplete: string): boolean {
  * @alphacommit pdx-change
  */
 component('pdx-input', {
-    formAssociated: true,
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
-    models: { value: model<string>('') },
+    models: { value: model<string>('', { form: true }) },
     props: {
         // `date` and `time` are the native input's, and a date field in a form is ordinary: the
         // enum lists them so the validator does not warn about `<pdx-input type="date">` on a page
@@ -65,6 +65,8 @@ component('pdx-input', {
         suffix: { type: String, default: '' },
     },
     setup(ctx) {
+        // The inner field submits; a form reset puts it and the model back to the mounted text (#135).
+        submitThroughInnerField(ctx);
         // The inner input, looked up when it is needed. Cached from a setup-time track, which runs
         // before the template renders, it would be null, and never looked up again while `value`
         // stays put — Clear would leave the text, autofocus and a click on the frame focus nothing.

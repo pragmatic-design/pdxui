@@ -6,6 +6,7 @@ import { component, html, signal, model, generatedId } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tree-select';
@@ -43,10 +44,11 @@ export interface TreeSelectNode {
  * @alphadetail label $event.currentTarget.getLabel()
  */
 component('pdx-tree-select', {
-    formAssociated: true,
     // The selection (#481): one node's value, or the array of values when `multiple`. A click on the
     // tree, the clear button, setValue() and clear() write it, and the write dispatches `value-change`.
-    models: { value: model<string | string[] | null>(null, { type: Object }) },
+    // A form submits it, one entry per value when multiple, an empty entry with none as a native
+    // select; and resets it (#135).
+    models: { value: model<string | string[] | null>(null, { type: Object, form: true }) },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
@@ -89,7 +91,12 @@ component('pdx-tree-select', {
         let _treeContainerEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;
         let _clearEl: HTMLButtonElement | null = null;
-        let _hiddenEl: HTMLInputElement | null = null;
+        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
+        reflectNameToHost(ctx);
+        ctx.formValue?.(() => {
+            const v = ctx.value();
+            return isMultiple() ? (Array.isArray(v) ? v : []) : (v ?? '');
+        });
         let _popover: ReturnType<typeof usePopover> | null = null;
         /** Removes the press-outside listener, added when the panel opens (#427). */
         let _outsideDispose: (() => void) | null = null;
@@ -440,7 +447,6 @@ component('pdx-tree-select', {
             const el = ctx.el;
             const disabled = ctx.disabled() as boolean;
             const size = ctx.size() as string;
-            const name = ctx.name() as string;
             const clearable = ctx.clearable() as boolean;
             const ph = (ctx.placeholder() as string) || getComponentString('tree-select', 'placeholder')();
 
@@ -526,12 +532,6 @@ component('pdx-tree-select', {
             _popover.setTrigger(_triggerEl);
             _popover.setContent(_panelEl);
 
-            if (name) {
-                _hiddenEl = document.createElement('input');
-                _hiddenEl.type = 'hidden';
-                _hiddenEl.name = name;
-                el.appendChild(_hiddenEl);
-            }
             _domReady.set(true);
         });
 
@@ -563,9 +563,6 @@ component('pdx-tree-select', {
             }
             if (_triggerEl) _triggerEl.setAttribute('aria-expanded', String(open));
 
-            if (_hiddenEl) {
-                _hiddenEl.value = multi ? JSON.stringify([...selected]) : ([...selected][0] || '');
-            }
 
             if (!_panelEl || !_treeContainerEl) return;
             _panelEl.style.display = open ? '' : 'none';

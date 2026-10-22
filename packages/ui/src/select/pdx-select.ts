@@ -10,6 +10,7 @@ import { usePopover, overlayStack } from '@pdxui/core';
 import { createVirtualizer } from '@pdxui/core';
 import type { DataSource, PopoverPlacement } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
+import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/select';
@@ -56,10 +57,11 @@ function normaliseOptions(
  * @alphadetail items $event.currentTarget.selectedItem
  */
 component('pdx-select', {
-    formAssociated: true,
     // The selection (#481): the option's value, or null; in multiple mode the array of values. A pick,
     // a removed tag and the clear button write it, and the write dispatches `value-change`.
-    models: { value: model<unknown>(null, { type: String }) },
+    // A form submits the selection: the value, an empty entry with none as a native select with an
+    // empty placeholder, one entry per value when multiple; and resets it (#135).
+    models: { value: model<unknown>(null, { type: String, form: true }) },
     props: {
         options: prop<unknown[]>(() => []),
         /** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
@@ -440,7 +442,6 @@ component('pdx-select', {
                 reflectValue();
                 close();
             }
-            updateHiddenInput();
         }
 
         function removeTag(val: unknown) {
@@ -448,14 +449,12 @@ component('pdx-select', {
             set.delete(val);
             _selectedValues.set(set);
             reflectValue();
-            updateHiddenInput();
         }
 
         function clearSelection() {
             _selectedValues.set(new Set());
             reflectValue();
             ctx.emit('pdx-clear');
-            updateHiddenInput();
         }
 
         // ── Search ──
@@ -608,17 +607,13 @@ component('pdx-select', {
             selectItem(item);
         }
 
-        // ── Hidden input for form participation ──
-        function updateHiddenInput() {
-            const hidden = ctx.el.querySelector('input[type="hidden"]') as HTMLInputElement;
-            if (!hidden) return;
-            const sel = _selectedValues();
-            if (ctx.multiple()) {
-                hidden.value = Array.from(sel).join(',');
-            } else {
-                hidden.value = sel.size > 0 ? String(sel.values().next().value) : '';
-            }
-        }
+        // ── Form: the host is the one submitter ──
+        ctx.formValue?.(() => {
+            const sel = Array.from(_selectedValues());
+            if (ctx.multiple()) return sel;
+            return sel.length > 0 ? sel[0] : '';
+        });
+        reflectNameToHost(ctx);
 
         // ── Popover setup ──
         // Popover setup: deferred to after mount (querySelector needs rendered DOM)
@@ -902,14 +897,6 @@ component('pdx-select', {
                 : ''}
             <span class="pdx-select-caret"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </div>
-
-        <input type="hidden"
-            :name="${() => ctx.name() || null}"
-            :value="${() => {
-                const sel = ctx._selectedValues();
-                if (ctx.multiple()) return Array.from(sel).join(',');
-                return sel.size > 0 ? String(sel.values().next().value) : '';
-            }}" />
 
         <div :class="${() => 'pdx-select-dropdown' + (ctx._open() ? ' open' : '')}">
             ${() => ctx.searchable() && ctx.searchPosition() === 'dropdown'

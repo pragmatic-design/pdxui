@@ -238,11 +238,16 @@ async function buildRoot(schema: FieldDef & { kind?: 'object' | 'list'; item?: F
  * @alphadetail value $event.detail.value
  */
 component('pdx-json-editor', {
-    models: { value: model<unknown>(null, { type: Object }) },
+    // A form submits the document as JSON under the host's `name`, and resets it (#135).
+    models: { value: model<unknown>(null, { type: Object, form: true }) },
     props: {
         schema: { type: Object, default: null },
     },
     setup(ctx) {
+        ctx.formValue?.(() => {
+            const v = ctx.value();
+            return v === null || v === undefined ? null : JSON.stringify(v);
+        });
         let root: Ctrl | null = null;
         // `value` is the live document: every edit writes it. The track below rebuilds
         // the editor when `value` changes, so it must recognise its own reflection — rebuilding on

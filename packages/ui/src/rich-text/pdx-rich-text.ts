@@ -37,7 +37,9 @@ import '@pdxui/design/components/menu';
  * @alphadetail wordCount $event.currentTarget.getWordCount()
  */
 component('pdx-rich-text', {
-  models: { value: model<unknown>(null, { type: Object }) },
+  // A form submits it under the host's `name` — HTML or text as it is, a JSON document as JSON — and
+  // resets it (#135).
+  models: { value: model<unknown>(null, { type: Object, form: true }) },
   props: {
     output: { type: String, default: 'json' },
     extensions: { type: Array, default: null },
@@ -65,6 +67,10 @@ component('pdx-rich-text', {
   },
 
   setup(ctx: any) {
+    ctx.formValue?.(() => {
+      const v = ctx.value();
+      return v !== null && typeof v === 'object' ? JSON.stringify(v) : v;
+    });
     let editorView: EditorView | null = null;
     let toolbarEl: HTMLElement | null = null;
     let wrapperEl: HTMLElement | null = null;
