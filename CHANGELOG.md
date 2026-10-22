@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- A control binds a form field through its model: `::value="f.email"`, `::checked="f.accepted"`,
+  `::pressed="f.bold"`. The binding writes the field; the control is marked invalid while the field
+  shows an error and required when the schema requires it (an `error`/`required` prop on a component,
+  `aria-invalid`/`aria-required` otherwise), and leaving it touches the field. `.number`'s parse error
+  is the field's error. `<pdx-form-field :field="f.email">` shows a field's error, warning and
+  required marker with no `name` and no `<pdx-form>`. In the editor a field is checked as its value
+  against the model: `::checked` on a `string` field is an error. A control bound this way is not
+  wired again by its `name` inside `<pdx-form>`. (#128)
 - In the editor and `pdx check --types`, a named loader's unannotated first parameter is typed from the
   page's pattern: `@page '/users/:id(number)'` gives `params: { id: number }`, as the router coerces it,
   and a param the pattern does not declare is an error. (#564)

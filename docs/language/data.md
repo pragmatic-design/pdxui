@@ -251,7 +251,9 @@ are validated under their dotted path (`'address.city'`). An external schema com
 with `value()`, `error()`, `touched()`, `dirty()`, `required`, `onChange(v)`, `onBlur()` (#128); beside
 them the form's own members, `valid()`, `errors()`, `dirty()`, `getValues()`, `handleSubmit(fn)`,
 `reset()`, `array(name)`. A field whose name is known only at run time is `formField(form, name)`,
-undefined for a name that is no field.
+undefined for a name that is no field. A control binds a field through its model,
+`::value="name.email"` ([template.md](template.md), «`::name` two-way binding»), and
+`<pdx-form-field :field="name.email">` shows its error, warning and required marker.
 
 `handleSubmit(fn)` returns a handler that returns the submit's promise; a second submit while one
 runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)

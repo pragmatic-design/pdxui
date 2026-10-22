@@ -15,6 +15,29 @@ import type { Signal } from '../utils/types';
 export interface TwoWayAccessor {
     get(): unknown;
     set(value: unknown): void;
+    /** When the value is a form field (#128): what the control takes from it besides the value. */
+    field?: TwoWayField;
+}
+
+/**
+ * The key a value carries to be bound as a form field (#128): `::value="f.email"`. The form puts it on
+ * each of its fields (`core/src/form/form.ts`); the renderer reads only this, so it does not depend on
+ * the form module.
+ */
+export const TWO_WAY_FIELD: unique symbol = Symbol.for('pdx.two-way-field');
+
+/** A form field as a two-way binding sees it. */
+export interface TwoWayField {
+    get(): unknown;
+    set(value: unknown): void;
+    /** The control was left: the field is touched, and validates if its form says so. */
+    blur(): void;
+    /** Whether the field shows an error now: touched, or submitted, and failing. */
+    invalid(): boolean;
+    /** Whether the field must be filled in. */
+    readonly required: boolean;
+    /** `.number`'s parse error, or null once an entry parses: the field's error while it stands. */
+    parseError(message: string | null): void;
 }
 
 /** The modifiers after the name: `value.trim.debounce(300)`. */
@@ -39,8 +62,10 @@ export function parseTwoWay(descriptor: string): { name: string; mods: TwoWayMod
     return { name, mods };
 }
 
-/** The value as an accessor: a signal, or the `{ get, set }` form; null for anything else. */
+/** The value as an accessor: a form field, a signal, or the `{ get, set }` form; null for anything else. */
 export function twoWayAccessor(value: unknown): TwoWayAccessor | null {
+    const field = value && typeof value === 'object' ? (value as { [TWO_WAY_FIELD]?: TwoWayField })[TWO_WAY_FIELD] : undefined;
+    if (field) return { get: () => field.get(), set: (v) => field.set(v), field };
     if (typeof value === 'function' && typeof (value as Signal<unknown>).set === 'function') {
         const sig = value as Signal<unknown>;
         return { get: () => sig(), set: (v) => sig.set(v) };
@@ -103,14 +128,16 @@ export function twoWayWriter(el: Element, accessor: TwoWayAccessor, mods: TwoWay
         if (mods.trim && typeof value === 'string') value = value.trim();
         if (mods.number) {
             const n = parseNumber(value);
-            const validatable = typeof (el as Partial<Validatable>).setCustomValidity === 'function' ? el as unknown as Validatable : null;
-            if (n === undefined) {
-                el.setAttribute('aria-invalid', 'true');
-                validatable?.setCustomValidity('Enter a number.');
-                return;
+            const message = n === undefined ? 'Enter a number.' : null;
+            // Bound to a form field, the parse error is the field's (#128): it shows where its other
+            // errors do, and the field's binding marks the control.
+            if (accessor.field) accessor.field.parseError(message);
+            else {
+                if (message) el.setAttribute('aria-invalid', 'true');
+                else el.removeAttribute('aria-invalid');
+                (el as Partial<Validatable>).setCustomValidity?.(message ?? '');
             }
-            el.removeAttribute('aria-invalid');
-            validatable?.setCustomValidity('');
+            if (n === undefined) return;
             value = n;
         }
         accessor.set(value);

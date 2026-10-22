@@ -12191,6 +12191,15 @@
           "members": [
             {
               "kind": "field",
+              "name": "field",
+              "description": "The form field this field shows (#128): `:field=\"f.email\"`. Its error, warning, touched state and\nrequired-ness, with no `name` and no surrounding `<pdx-form>`.",
+              "type": {
+                "text": "object"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
               "name": "name",
               "description": "Field name — if set and inside <pdx-form>, auto-wires error/touched from form context.",
               "type": {

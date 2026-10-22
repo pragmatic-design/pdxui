@@ -49,6 +49,32 @@ describe('::name on a model is type-checked', () => {
     });
 });
 
+describe('::name bound to a form field is checked as the field\'s value (#128)', () => {
+    // Inside an application, as form-store-types does: a flat form is core's own Form, resolved from
+    // the file's place. app-check declares `@model checked: boolean`.
+    const APP_URI = pathToFileURL(join(ROOT, 'packages', 'showcase', 'src', 'two-way-field.pdx')).href;
+    const types = (tag: string, attr: string) =>
+        (tag === 'app-field' && attr === '::value' ? 'string' : tag === 'app-check' && attr === '::checked' ? 'boolean' : null);
+    function inApp(script: string, template: string): string[] {
+        const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
+        const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
+        const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length, types);
+        return getTsDiagnostics(svc, APP_URI, vf, source).map(d => `${d.code} ${d.message.split('\n')[0]}`);
+    }
+    const FORM = '@form f: { email: string, accepted: boolean, address: { city: string } };';
+
+    it('a field of the model\'s type is fine, nested ones too', () => {
+        expect(inApp(FORM, '<app-field ::value="f.email"></app-field><app-check ::checked="f.accepted"></app-check>'
+            + `<app-field ::value="f['address.city']"></app-field>`)).toEqual([]);
+    });
+
+    it('::checked on a string field is an error, at the binding', () => {
+        const found = inApp(FORM, '<app-check ::checked="f.email"></app-check>');
+        expect(found).toHaveLength(1);
+        expect(found[0]).toMatch(/string.*not assignable.*boolean/);
+    });
+});
+
 describe('the workspace answers a model\'s type', () => {
     const registry = {
         describe: (tag: string) => tag === 'app-field' ? {

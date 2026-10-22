@@ -253,12 +253,12 @@ As alpha, with **explicit field binding** (#128). `@form f: Schema` exposes type
 with `value()`, `error()`, `touched()`, `dirty()` and `required` (landed: the fields are members of
 the form, and `f.fields` is gone) — and a control binds to one through
 **its own model**: `::value="f.email"` on a text input, `::checked="f.accepted"` on a checkbox or a
-switch, `::pressed="f.bold"` on a toggle — the model the control's manifest declares, as the alpha
+switch, `::pressed="f.bold"` on a toggle (landed) — the model the control's manifest declares, as the alpha
 form binding already distinguished (`codegen-form-binding.ts`, `checked` and `pressed` controls). The
 binding writes the field, and the control receives the field's error, `aria-invalid` and `required`.
 A field bound through a model whose type differs from the field's (`::checked` on a `string` field)
-is a type error of the strict projection. `<pdx-form-field :field="f.email">` renders the field's label, hint and error. Parse errors
-of `::value.number` land on the field. `required` lives in the schema only. A field named like a
+is a type error of the strict projection (landed). `<pdx-form-field :field="f.email">` renders the field's label, hint and error (landed). Parse errors
+of `::value.number` land on the field (landed). `required` lives in the schema only. A field named like a
 form member — `valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array` — is
 `PDX_FORM_FIELD_RESERVED` (error; decisions.md 13 — landed, #128): the compiler names the member and
 asks for another field name, and `createForm` refuses such a field when it runs. The members are

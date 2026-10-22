@@ -351,7 +351,9 @@ function maybeInjectBindings(tagStr: string, tagName: string, formVar: string, g
         return injectFormFieldBindings(result, formVar, resolvedPath);
     }
 
-    if (FORM_CONTROL_TAGS.has(tagName)) {
+    // A control bound with `::<model>="f.x"` (#128) is wired by that binding: the implicit one would
+    // write the field a second time on every change.
+    if (FORM_CONTROL_TAGS.has(tagName) && !/\s::[\w-]/.test(result)) {
         return injectControlBindings(result, tagName, formVar, resolvedPath, modelEventOf?.(tagName) ?? null);
     }
 

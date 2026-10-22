@@ -315,12 +315,12 @@ alpha
 ```ebnf
 TwoWayBinding  ::= "::" BoundName ( "." TwoWayModifier )* "=" AttrValue
 TwoWayModifier ::= "lazy" | "trim" | "number" | "debounce(" Digits ")"
-TwoWayValue    ::= Identifier ( "." Identifier )*
+TwoWayValue    ::= Identifier ( "." Identifier )* ( "[" StringLiteral "]" )?
                  | "{" S? "get" S? ":" S? Expression S? "," S? "set" S? ":" S? Expression S? "}"
 ```
 
-The quoted value is the name of a `$signal` (or a prop, or a `@model`), or the general form
-`{ get, set }`.
+The quoted value is the name of a `$signal` (or a prop, or a `@model`), a form field (`f.email`,
+`f['address.city']`), or the general form `{ get, set }`.
 
 #### Semantics
 
@@ -350,19 +350,28 @@ modifiers wrap the setter, so there is one mechanism:
 | `.trim` | trim a string before writing |
 | `.number` | write `Number(v)` after trimming; an empty entry writes `null`; an invalid one writes nothing and marks the element invalid — `aria-invalid="true"`, and `setCustomValidity` on a native control — until a valid entry clears it |
 
+Bound to a **form field** (#128) — `::value="f.email"`, `::checked="f.accepted"`, `::pressed="f.bold"`,
+the model the control declares — the binding reads and writes the field (`onChange`), and the control
+takes the rest of the field: it is marked invalid while the field shows an error (touched and failing),
+required when the field's validators include `required()`, and leaving it — focus going outside the
+element, not between its parts — touches the field. A component that declares an `error` or a
+`required` prop gets them as props; any other element `aria-invalid` and `aria-required`, a native
+control its own `required`. `.number`'s parse error is the field's error, shown where its others are,
+until an entry parses. A control bound this way inside `<pdx-form :form>` is not wired again by its
+`name`.
+
 #### Rules
 
 - `::x` on a component prop that is not a model raises `PDX_TWO_WAY_NOT_MODEL` (error), for a project
   component and for every library component, from its manifest; `pdx migrate` flags each one. A
   library component that lists no model has nothing to bind both ways (#125).
-- In the editor, the value bound to a model is checked against the model's type.
+- In the editor, the value bound to a model is checked against the model's type; a form field, by
+  its value's type: `::checked="f.email"` on a `string` field is an error.
 - A value that is not a signal (no `.set`) falls back to a one-way `:name` binding. Not checked
   today.
 - A modifier outside the list raises `PDX_BINDING_MODIFIER` (error), naming the list.
 - `.number` writing `0` for an empty or invalid entry was the alpha behaviour; `pdx migrate` flags every
   `::x.number` binding (`two-way-number`), whose value for those entries changed.
-- A `{ get, set }` value bound to a form field does not receive `.number`'s parse error yet: binding
-  to a form field is #128.
 - On a plain element other than `input`, `textarea` and `select`, the event listened to is
   `pdx-<name>`, which nothing dispatches: the binding is one-way. Not checked today.
 
