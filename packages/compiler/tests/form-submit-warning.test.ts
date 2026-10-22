@@ -22,7 +22,7 @@ function onSubmit(e) { console.log(e); }
 describe('PDX_FORM_NO_SUBMIT', () => {
     it('the control: a form with no submit path at all is still named', () => {
         const source = `<template>
-  <div><input :value="order.fields.sku.value()" /></div>
+  <div><input :value="order.sku.value()" /></div>
 </template>${SCRIPT}`;
         expect(codesOf(source), 'the check stopped firing altogether').toContain('PDX_FORM_NO_SUBMIT');
     });
@@ -42,7 +42,7 @@ describe('PDX_FORM_NO_SUBMIT', () => {
         // check that stopped at "there is a pdx-form somewhere" would miss it.
         const source = `<template>
   <pdx-form :form="order"><pdx-input name="sku" /></pdx-form>
-  <form><input :value="draft.fields.note.value()" /></form>
+  <form><input :value="draft.note.value()" /></form>
 </template>
 <script>
 @form order: { sku: string { required } }

@@ -44,7 +44,7 @@ describe('applyFormBindings — text input controls', () => {
         expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
         // Check form variable reference
-        expect(result).toContain('ctx.f.fields.x');
+        expect(result).toContain('ctx.f.x');
     });
 
     it('injects @value-change on pdx-textarea (no :value)', () => {
@@ -55,7 +55,7 @@ describe('applyFormBindings — text input controls', () => {
         expect(result).not.toContain(':value=');
         expect(result).toContain('@value-change=');
         expect(result).toContain('@pdx-blur=');
-        expect(result).toContain('ctx.myForm.fields.bio');
+        expect(result).toContain('ctx.myForm.bio');
     });
 
     it('injects @value-change on pdx-password-input (no :value)', () => {
@@ -187,7 +187,7 @@ describe('applyFormBindings — pdx-form-field', () => {
         expect(result).toContain(':error=');
         expect(result).toContain(':touched=');
         expect(result).toContain(':warning=');
-        expect(result).toContain('ctx.f.fields.email');
+        expect(result).toContain('ctx.f.email');
     });
 
     it('uses correct signal accessor pattern on form-field', () => {
@@ -195,9 +195,9 @@ describe('applyFormBindings — pdx-form-field', () => {
             '<pdx-form :form="myForm"><pdx-form-field name="name"></pdx-form-field></pdx-form>'
         );
 
-        expect(result).toContain('ctx.myForm.fields.name?.error()');
-        expect(result).toContain('ctx.myForm.fields.name?.touched()');
-        expect(result).toContain('ctx.myForm.fields.name?.warning()');
+        expect(result).toContain('ctx.myForm.name?.error()');
+        expect(result).toContain('ctx.myForm.name?.touched()');
+        expect(result).toContain('ctx.myForm.name?.warning()');
     });
 });
 
@@ -276,9 +276,9 @@ describe('applyFormBindings — scope boundaries', () => {
         );
 
         // "inside" should have bindings
-        expect(result).toContain('ctx.f.fields.inside');
+        expect(result).toContain('ctx.f.inside');
         // "outside" should NOT have bindings
-        expect(result).not.toContain('ctx.f.fields.outside');
+        expect(result).not.toContain('ctx.f.outside');
     });
 
     it('does NOT inject when form has no :form binding', () => {
@@ -400,23 +400,23 @@ describe('applyFormBindings — pdx-field-group', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-field-group name="customer"><pdx-input name="email" /></pdx-field-group></pdx-form>'
         );
-        // Should generate f.fields['customer.email'] (bracket notation for dotted path)
-        expect(result).toContain("f.fields['customer.email']");
+        // Should generate f['customer.email'] (bracket notation for dotted path)
+        expect(result).toContain("f['customer.email']");
     });
 
     it('prefixes pdx-form-field with group path', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-field-group name="customer"><pdx-form-field name="email"></pdx-form-field></pdx-field-group></pdx-form>'
         );
-        expect(result).toContain("f.fields['customer.email']?.error()");
-        expect(result).toContain("f.fields['customer.email']?.touched()");
+        expect(result).toContain("f['customer.email']?.error()");
+        expect(result).toContain("f['customer.email']?.touched()");
     });
 
     it('supports nested field-groups', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-field-group name="billing"><pdx-field-group name="address"><pdx-input name="city" /></pdx-field-group></pdx-field-group></pdx-form>'
         );
-        expect(result).toContain("f.fields['billing.address.city']");
+        expect(result).toContain("f['billing.address.city']");
     });
 
     it('pops group path on closing tag', () => {
@@ -424,17 +424,17 @@ describe('applyFormBindings — pdx-field-group', () => {
             '<pdx-form :form="f"><pdx-field-group name="customer"><pdx-input name="name" /></pdx-field-group><pdx-input name="notes" /></pdx-form>'
         );
         // Inside group: customer.name (dotted path)
-        expect(result).toContain("f.fields['customer.name']");
+        expect(result).toContain("f['customer.name']");
         // Outside group: plain field name (dot notation)
-        expect(result).toContain('f.fields.notes');
+        expect(result).toContain('f.notes');
     });
 
     it('mixes grouped and flat fields', () => {
         const result = applyAndGet(
             '<pdx-form :form="f"><pdx-input name="orderNumber" /><pdx-field-group name="customer"><pdx-input name="email" /></pdx-field-group></pdx-form>'
         );
-        expect(result).toContain('f.fields.orderNumber');
-        expect(result).toContain("f.fields['customer.email']");
+        expect(result).toContain('f.orderNumber');
+        expect(result).toContain("f['customer.email']");
     });
 
     it('rewrites name attribute to dotted path inside field-group', () => {
@@ -470,7 +470,7 @@ describe('applyFormBindings — pdx-field-group', () => {
         applyFormBindings(nodes, undefined, modelEventOf);
         const result = (nodes[0] as HtmlNode).content;
         // Second form should NOT have customer prefix
-        expect(result).toContain('g.fields.x');
-        expect(result).not.toContain("g.fields['customer.x']");
+        expect(result).toContain('g.x');
+        expect(result).not.toContain("g['customer.x']");
     });
 });

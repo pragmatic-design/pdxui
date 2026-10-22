@@ -8,7 +8,7 @@
 //
 // The record pages — asset, service, site — use the same queue, and the load before it. They leave
 // without asking, which is `saveChanged`; the employee asks, which is `flush`.
-import { signal, computed } from '@pdxui/core';
+import { signal, computed, formField } from '@pdxui/core';
 import type { Form, ReadonlySignal } from '@pdxui/core';
 
 type Values = Record<string, unknown>;
@@ -74,7 +74,7 @@ export function createAutosave<R extends object = Values>(options: AutosaveOptio
     const failed = signal(false);
 
     /** A value the rules refused, on a field the user has been at: «Not saved» while there is one. */
-    const refused = computed(() => Object.keys(form.errors()).some(name => form.fields[name]?.touched()));
+    const refused = computed(() => Object.keys(form.errors()).some(name => formField(form, name)?.touched()));
     const state = computed<SaveState>(() =>
         inflight() > 0 ? 'saving' : (refused() || failed()) ? 'refused' : savedAt() ? 'saved' : '');
 
@@ -91,7 +91,8 @@ export function createAutosave<R extends object = Values>(options: AutosaveOptio
 
     /** One field to the store, if the rules accept it and it changed. */
     async function writeField(name: string): Promise<void> {
-        const field = form.fields[name];
+        const field = formField(form, name);
+        if (!field) return;
         // Touched, so a refusal shows on the field now rather than at the next blur.
         field.onBlur();
         if (field.error()) return;
@@ -142,8 +143,8 @@ export function createAutosave<R extends object = Values>(options: AutosaveOptio
         const record = options.read();
         if (!record) return true;
         const changed = changedFields(record);
-        for (const name of changed) form.fields[name].onBlur();
-        if (changed.some(name => form.fields[name].error())) return false;
+        for (const name of changed) formField(form, name)?.onBlur();
+        if (changed.some(name => formField(form, name)?.error())) return false;
         for (const name of changed) await saveField(name);
         return true;
     }

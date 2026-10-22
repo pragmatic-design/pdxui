@@ -3,7 +3,7 @@
 // Default editors auto-created from column type; custom via col-edit:{field} slot.
 
 import type { GridContext, AnyColumn } from './grid-context';
-import { columnsToFormFields, createEditForm } from '@pdxui/core';
+import { columnsToFormFields, createEditForm, formField } from '@pdxui/core';
 import { getFieldValue } from '@pdxui/core';
 import { t } from './grid-i18n';
 import { createLazy } from '../shared/lazy-tags';
@@ -159,21 +159,21 @@ export function openEditDialog(gc: GridContext, rowId: unknown): void {
     // Build form fields from columns
     const editableFields = columnsToFormFields(cols);
     for (const fieldSchema of editableFields) {
-        const formField = createLazy('pdx-form-field') as any;
-        formField.setAttribute('label', fieldSchema.label || fieldSchema.name);
-        if (fieldSchema.required) formField.setAttribute('required', '');
+        const fieldEl = createLazy('pdx-form-field') as any;
+        fieldEl.setAttribute('label', fieldSchema.label || fieldSchema.name);
+        if (fieldSchema.required) fieldEl.setAttribute('required', '');
 
         const editor = createDefaultEditor(
             cols.find((c: AnyColumn) => c.field === fieldSchema.name)!,
             row[fieldSchema.name],
             (val: unknown) => {
-                form.fields[fieldSchema.name]?.onChange(val);
+                formField(form, fieldSchema.name)?.onChange(val);
             },
             () => {},
             () => {},
         );
-        formField.appendChild(editor);
-        formEl.appendChild(formField);
+        fieldEl.appendChild(editor);
+        formEl.appendChild(fieldEl);
     }
 
     dialog.appendChild(formEl);

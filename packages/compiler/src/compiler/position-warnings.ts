@@ -200,6 +200,14 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const form = name ?? /@form (\w+)/.exec(w.message)?.[1];
             return form ? find(source, script, new RegExp(`@form\\s+${escape(form)}\\b`)) : undefined;
         }
+        case 'PDX_FORM_FIELD_RESERVED': {
+            // Match: the field's name after its form's `@form f`, followed by its `:` or `?:`, at the name.
+            const form = /@form (\w+)/.exec(w.message)?.[1];
+            const field = quotedName(w.message);
+            return form && field
+                ? find(source, script, new RegExp(`(?<=@form\\s+${escape(form)}\\b[\\s\\S]*?)(?<![\\w$.])${escape(field)}(?=\\s*\\??\\s*:)`))
+                : undefined;
+        }
         case 'PDX_FORM_UNKNOWN_RULE': {
             // Match: the rule's name after its form's `@form f`, at the name.
             const form = /@form (\w+)/.exec(w.message)?.[1];

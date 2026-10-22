@@ -86,12 +86,12 @@ proposals the implementing issue may change.
 | `@meta { requiresAuth: true }` (route data) | `@page '/x' { meta: { requiresAuth: true } }` | mechanical — landed: `route-meta` | #277 (decision 8) |
 | `@defer (hover)` | `@defer (interaction)` — the same trigger | mechanical — landed: `defer-hover` | #281 (decision 37) |
 | `@prefetch 'hover';` | `@page '/x' { prefetch: 'hover' }` | mechanical — landed: `page-prefetch` | #277 (decision 19) |
-| a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged | † (decision 13) |
+| a form field named like a form member (`valid`, `reset`, …) | another name | `PDX_FORM_FIELD_RESERVED`; flagged — landed: `form-field-reserved` | #128 (decision 13) |
 | `x.isPending()` | `x.pending()` | mechanical — landed: `async-is-pending` | #141 |
 | `x.loading()`, `x.status()`, `x.isLoading()`, `state()` values `loading`/`reloading`/`stale`/`local` | the async vocabulary (`x.loading()` is `x.state() === 'pending' && !x.data()`) | flagged — landed: `async-alpha-names` (where the file declares the source) | #141 |
 | a control with `name="x"` inside `<pdx-form :form="f">` | `::<model>="f.x"`, the model read from the control's manifest: `::checked` on `pdx-checkbox`/`pdx-switch`, `::pressed` on `pdx-toggle`, `::value` on the others and on native inputs (`checked` for a native checkbox or radio) | mechanical; **flagged** for a control with no manifest entry or more than one model | #128 (model selection †) |
 | `<pdx-form-field name="email">` | `<pdx-form-field :field="f.email">` | mechanical | #128 |
-| `f.fields.email` | `f.email` | mechanical | #128 (rewrite †; see decision 13) |
+| `f.fields.email` | `f.email` | mechanical — landed: `form-fields-member` | #128 (see decision 13) |
 | `required` on a bound control | a rule in the schema | `PDX_FORM_REQUIRED_IN_MARKUP`; flagged | #128 |
 | `@loader loadUser;` + `currentLoaderData()` | `@loader loadUser: loadUser;` + `loadUser.data()` | mechanical; reports the rename — landed: `loader-anonymous`, `loader-readers`; an import of `currentLoaderData` flagged (`export:@pdxui/router:currentLoaderData`) | #146, #506 |
 | `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise — landed: `loader-readers` | #141, #146, #506 |

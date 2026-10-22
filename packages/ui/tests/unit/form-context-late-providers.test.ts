@@ -10,7 +10,7 @@
 // the first answer would stay on the wrong path.
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { component, html, createForm, createFormCoordinator, provideFormCoordinator, minLength } from '@pdxui/core';
+import { component, html, createForm, formField, createFormCoordinator, provideFormCoordinator, minLength } from '@pdxui/core';
 import type { FormCoordinator } from '@pdxui/core';
 import '../../src/form/pdx-form';
 import '../../src/form-field/pdx-form-field';
@@ -62,9 +62,9 @@ describe('form contexts provided after the child that reads them', () => {
         formEl.form = f;
         await mount(formEl);
 
-        f.fields['address.city'].onChange('x');
+        formField(f, 'address.city')!.onChange('x');
         await tick();
-        expect(f.fields['address.city'].error(), 'the validator did not run').toBe('At least 3 characters');
+        expect(formField(f, 'address.city')!.error(), 'the validator did not run').toBe('At least 3 characters');
         expect(shown(city), 'the field never found "address.city": it looked for "city"').toBe(true);
     });
 
@@ -86,7 +86,7 @@ describe('form contexts provided after the child that reads them', () => {
         );
         await tick(); await tick();
 
-        f.fields['order.address.city'].onChange('x');
+        formField(f, 'order.address.city')!.onChange('x');
         await tick();
         expect(shown(city), 'the field stayed on the inner group\'s path "address.city"').toBe(true);
     });

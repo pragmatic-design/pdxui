@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">
       Same nested DTO, but composed declaratively in the template with <code>&lt;pdx-field-group&gt;</code> and compiler auto-binding.
       The compiler resolves <code>name="email"</code> inside <code>&lt;pdx-field-group name="customer"&gt;</code>
-      to <code>form.fields['customer.email']</code>.
+      to <code>form['customer.email']</code>.
     </p>
 
     <div class="demo-block">
@@ -62,7 +62,7 @@
     &lt;pdx-form-field name="name" label="Name" required&gt;
       &lt;pdx-input name="name" /&gt;
     &lt;/pdx-form-field&gt;
-    &lt;!-- compiler resolves to form.fields['customer.name'] --&gt;
+    &lt;!-- compiler resolves to form['customer.name'] --&gt;
   &lt;/pdx-field-group&gt;
 
   &lt;pdx-field-group name="shipping" label="Shipping"&gt;

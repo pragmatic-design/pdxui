@@ -80,7 +80,7 @@ route rather than on the authentication. The credential fields: `autocomplete="u
 For a form you write by hand, this is the best path: a form from
 `createForm`, a `<pdx-form :form>` around the fields, and in each `<pdx-form-field name="x">` a
 control carrying **the same** `name="x"`. The compiler wires the rest (`codegen-form-binding.ts`):
-every named control gets its change and blur events routed into `form.fields.x`, and every named
+every named control gets its change and blur events routed into `form.x`, and every named
 field gets its `error` / `touched` / `warning` from it. You write no `:value`, no `@input`.
 
 **A long form splits into sections, and each section is a component.** The wiring is a
@@ -142,7 +142,7 @@ Two mechanisms, no shared implementation, and **they do not compose**. Pick one 
 | where a row lives | dotted paths in the form — `rooms.0.type`, `rooms.1.type` | `{ __id, value }` wrappers in a signal |
 | how you address a row | by **index**, and the index moves: removing a row re-indexes every row after it (the form carries each row's value, error, touched and dirty along) | by **`__id`**, which survives a removal, a move and an `update()` |
 | what a row can contain | plain controls only — text, email, number, textarea, checkbox, switch. A `select` gets **no options**; anything else becomes a text input | anything you can render |
-| writing one field of one row | the form field at that path: `form.fields['rooms.0.type'].onChange(v)` | `rows.update(i, { ...rows.getValues()[i], type: v })` — `update` keeps the `__id`, `replace` does not |
+| writing one field of one row | the form field at that path: `form['rooms.0.type'].onChange(v)` | `rows.update(i, { ...rows.getValues()[i], type: v })` — `update` keeps the `__id`, `replace` does not |
 
 **Choose the component** when the rows are plain fields and you want the table, the dialog mode and the buttons for free. **Choose the primitive** when a row needs a picker, a select with options or a component of its own — then draw it yourself, or keep `pdx-field-list` and put the row in its `row` slot, which receives `{ item, index, fields, remove }`.
 
@@ -159,7 +159,7 @@ createForm({
   validateOn?,         // 'onBlur' (default) | 'onChange' | 'onSubmit'
   warnings?, asyncValidators?, schema?, saveMode?, source?,
 })
-// → form.fields.x.{ value(), error(), touched(), dirty(), onChange(v), onBlur() }
+// → form.x.{ value(), error(), touched(), dirty(), onChange(v), onBlur() }
 //   form.setValues(partial) · form.getValues() · form.reset(values?) · form.validate()
 //   form.valid() · form.dirty() · form.handleSubmit(fn)
 ```
@@ -230,7 +230,7 @@ What that gives you (`packages/ui/tests/unit/recipe-long-form.test.ts` runs this
   first error.
 
 Nested data: wrap fields in `<pdx-field-group name="customer">` and a field `name="email"` inside it is
-`form.fields['customer.email']`. The compiler writes that full path into the DOM too: the control and
+`form['customer.email']`. The compiler writes that full path into the DOM too: the control and
 its `pdx-form-field` carry `name="customer.email"`, so that is the selector to use in a test or a
 measurement — `[name="customer.email"]`, not `[name="email"]`. Repeated rows: `pdx-field-list` — see
 its `itemFields` note for when a row needs its own component.

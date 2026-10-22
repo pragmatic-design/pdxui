@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 104 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 105 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -538,6 +538,36 @@ The options block is handed to `resource()`, which ignores a key it does not kno
 A rule written on a row field is parsed and then dropped: rows are never validated.
 
 **Fix.** `<pdx-field-list :item-fields="[{ name, required: true }]">`, which registers the rule as each row is added.
+
+### PDX_FORM_FIELD_RESERVED
+
+*error* — A `@form` field named like a member of the form (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`, …).
+
+Each field is a member of its form, `f.email` beside `f.valid()` and `f.reset()`: a field of a member's name would hide the member, so `createForm` refuses it.
+
+**Fix.** Give the field another name. The name is also what the server receives, so the rename is the author's to make; `pdx migrate` flags it and does not rewrite it.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@form f: { reset: boolean };
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@form f: { resetPassword: boolean };
+</script>
+```
 
 ### PDX_FORM_FIELD_UNPARSED
 

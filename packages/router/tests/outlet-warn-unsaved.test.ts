@@ -55,7 +55,7 @@ describe('a dirty warnUnsaved form, and a link away', () => {
 
     it('the dialog opens, and "Stay" keeps the page and the typed value', async () => {
         await openNewOwner();
-        form.fields.name.onChange('Rossi');
+        form.name.onChange('Rossi');
 
         clickOwnersLink();
         await tick();
@@ -68,12 +68,12 @@ describe('a dirty warnUnsaved form, and a link away', () => {
         await tick();
         expect(currentPath()).toBe('/owners/new');
         expect(document.querySelector('pdx-unsaved-owners'), 'the list was mounted behind "Stay"').toBeNull();
-        expect(form.fields.name.value()).toBe('Rossi');
+        expect(form.name.value()).toBe('Rossi');
     });
 
     it('"Leave" goes to the list', async () => {
         await openNewOwner();
-        form.fields.name.onChange('Rossi');
+        form.name.onChange('Rossi');
         clickOwnersLink();
         await tick();
         getDialogQueue().close(getDialogQueue().items()[0].id, true);
@@ -108,7 +108,7 @@ describe('a dirty warnUnsaved form: the address and the history', () => {
 
     it('while the question is open the address is still the page; "Stay" adds no history entry', async () => {
         await openNewOwner();
-        form.fields.name.onChange('Rossi');
+        form.name.onChange('Rossi');
         const before = history.length;
 
         clickOwnersLink();
@@ -126,7 +126,7 @@ describe('a dirty warnUnsaved form: the address and the history', () => {
 
     it('a refused Back puts the address back without a new entry', async () => {
         await openNewOwner();
-        form.fields.name.onChange('Rossi');
+        form.name.onChange('Rossi');
         const before = history.length;
 
         back('/owners');
@@ -144,7 +144,7 @@ describe('a dirty warnUnsaved form: the address and the history', () => {
 
     it('"Leave" towards a route that redirects asks once, and lands on the redirect target', async () => {
         await openNewOwner();
-        form.fields.name.onChange('Rossi');
+        form.name.onChange('Rossi');
         let asked = 0;
 
         navigate('/clients');

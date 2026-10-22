@@ -89,8 +89,8 @@ export { responsiveCSS, responsiveValue } from './reactivity/responsive-value';
 export type { ResponsiveValueOptions } from './reactivity/responsive-value';
 
 // Forms
-export { createForm, FORM_INTERNALS } from './form/form';
-export type { Form, FormField, FormFields, FormFieldName, FormValuesPatch, FormConfig, SaveMode, FieldSaveConfig, FormInternals } from './form/form';
+export { createForm, formField, formFieldNames, FORM_INTERNALS } from './form/form';
+export type { Form, FormMembers, FormField, FormFields, FormFieldName, FormValuesPatch, FormConfig, SaveMode, FieldSaveConfig, FormInternals } from './form/form';
 export { flattenValues, unflattenValues, getNestedValue, setNestedValue, getFieldsByPrefix } from './form/form-path';
 export { registerFormControl, registerFormFieldType, isFormControl, getFormControlConfig, getFieldTypeTag, getRegisteredFormControls } from './form/form-registry';
 export type { FormControlConfig, CustomValidatorDef } from './form/form-registry';

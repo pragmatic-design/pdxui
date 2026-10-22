@@ -37,6 +37,7 @@ import { relativeTimeStyle } from './relative-time-style';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
 import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
 import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
+import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './form-fields';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -371,6 +372,10 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     loaderReadsAddress,
     removedExport('@pdxui/router', 'currentLoaderData', "the page's named loader, `user.data()`, or `loaderData('/pattern')` for a level by its pattern", 506),
     removedExport('@pdxui/router', 'currentLoaderState', "the page's named loader, `user.state()`, or `loaderState('/pattern')` for a level by its pattern", 506),
+    // #128: a form's fields are its members, and a field may not be named like one (./form-fields).
+    formFieldsMember,
+    formFieldsMemberScript,
+    formFieldReserved,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

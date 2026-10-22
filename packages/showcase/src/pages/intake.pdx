@@ -164,7 +164,7 @@ function touchDraft() {
 
 // A typed date lands on blur, after its text box's native `change`, and the picker's `value-change`
 // stays on the picker (#124): the draft follows the two date fields of the form instead.
-$watch(() => [intake.fields.starts.value(), intake.fields.ends.value()], touchDraft);
+$watch(() => [intake.starts.value(), intake.ends.value()], touchDraft);
 
 function resumeDraft() {
   const found = draftOffer;
@@ -203,7 +203,7 @@ function onDetach() {
 // `intake.array('lines')` is the other representation of the same list, and the two do not
 // compose — reading it here, only to show a count, creates an empty one that then erases
 // every row from the submitted payload.
-const lineCount = $derived((intake.fields.lines.value() ?? []).length);
+const lineCount = $derived((intake.lines.value() ?? []).length);
 
 const canSubmit = $derived(intake.valid() && !coordinator.submitting());
 
@@ -262,7 +262,7 @@ function stepValid(index) {
   if (index === 2) {
     // The rows' own fields, by the dotted paths `<pdx-field-list>` registers as each row is
     // added — read from the field for the reason `lineCount` gives.
-    const rows = intake.fields.lines.value() ?? [];
+    const rows = intake.lines.value() ?? [];
     return touchAndCheck(rows.map((_, i) => `lines.${i}.activity`));
   }
   return true;
@@ -271,7 +271,7 @@ function stepValid(index) {
 function touchAndCheck(paths) {
   let ok = true;
   for (const path of paths) {
-    const field = intake.fields[path];
+    const field = intake[path];
     if (!field) continue;
     field.onBlur();
     if (field.error()) ok = false;

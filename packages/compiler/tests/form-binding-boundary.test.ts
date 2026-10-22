@@ -49,8 +49,8 @@ describe('the form binding reaches the controls of this template', () => {
         );
         const local = out.slice(out.indexOf('<pdx-input'), out.indexOf('<pdx-inner-field'));
         const nested = out.slice(out.indexOf('<pdx-inner-field'));
-        expect(local, 'the local control lost its wiring').toContain('f.fields.here');
-        expect(nested, 'the nested control gained wiring it cannot have').not.toContain('f.fields.deep');
+        expect(local, 'the local control lost its wiring').toContain('f.here');
+        expect(nested, 'the nested control gained wiring it cannot have').not.toContain('f.deep');
     });
 
     it('and a control nested in plain markup IS wired — the boundary is the component, not the depth', () => {
@@ -59,6 +59,6 @@ describe('the form binding reaches the controls of this template', () => {
         const out = wire(
             '<pdx-form :form="f"><div class="panel"><fieldset><pdx-input name="deep"></pdx-input></fieldset></div></pdx-form>',
         );
-        expect(out).toContain('f.fields.deep');
+        expect(out).toContain('f.deep');
     });
 });

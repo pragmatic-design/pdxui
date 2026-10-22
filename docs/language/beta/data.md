@@ -250,7 +250,8 @@ FormDecl ::= "@form" S Word S? ":" S? ( InlineSchema | Word ) ( S? FormOptions )
 ### Semantics
 
 As alpha, with **explicit field binding** (#128). `@form f: Schema` exposes typed fields — `f.email`
-with `value()`, `error()`, `touched()`, `dirty()` and `required` — and a control binds to one through
+with `value()`, `error()`, `touched()`, `dirty()` and `required` (landed: the fields are members of
+the form, and `f.fields` is gone) — and a control binds to one through
 **its own model**: `::value="f.email"` on a text input, `::checked="f.accepted"` on a checkbox or a
 switch, `::pressed="f.bold"` on a toggle — the model the control's manifest declares, as the alpha
 form binding already distinguished (`codegen-form-binding.ts`, `checked` and `pressed` controls). The
@@ -259,8 +260,9 @@ A field bound through a model whose type differs from the field's (`::checked` o
 is a type error of the strict projection. `<pdx-form-field :field="f.email">` renders the field's label, hint and error. Parse errors
 of `::value.number` land on the field. `required` lives in the schema only. A field named like a
 form member — `valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array` — is
-`PDX_FORM_FIELD_RESERVED` (error; decisions.md 13 — proposed): the compiler names the member and
-asks for another field name.
+`PDX_FORM_FIELD_RESERVED` (error; decisions.md 13 — landed, #128): the compiler names the member and
+asks for another field name, and `createForm` refuses such a field when it runs. The members are
+all of the form's own, `state`, `touched` and `submitting` among them.
 
 ### Rules
 

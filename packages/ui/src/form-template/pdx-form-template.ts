@@ -10,7 +10,7 @@
 //   <pdx-form-template :schema="mySchema" />
 //   <pdx-form-template :schema="mySchema" :form="existingForm" />
 
-import { component, html, signal, effect, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString } from '@pdxui/core';
+import { component, html, signal, effect, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames } from '@pdxui/core';
 import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternals, Validator, ValidatorSchema } from '@pdxui/core';
 // Self-contained: a schema can render ANY field control, so register the full form graph here (the
 // structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
@@ -178,12 +178,12 @@ component('pdx-form-template', {
         // ─── Wizard state ────────────────────────────────────────
         const _wizardStep = signal(0);
 
-        // Expand a step's schema fields to the leaf paths that actually exist in form.fields.
+        // Expand a step's schema fields to the leaf paths that are fields of the form.
         // A group/list field ('address', 'items') has NO own entry — the form is keyed by leaves
         // ('address.street', 'items.0.qty'), so an `f.name` lookup would silently skip them and
         // the gate would pass with invalid data.
         function stepLeafPaths(fields: FormFieldSchema[], form: Form<Record<string, unknown>>): string[] {
-            const keys = Object.keys(form.fields);
+            const keys = formFieldNames(form);
             const paths: string[] = [];
             for (const f of fields) {
                 if (f.type === 'group' || f.type === 'list') {
@@ -206,11 +206,11 @@ component('pdx-form-template', {
             if (form) {
                 const paths = stepLeafPaths(groups[step].fields, form);
                 // Touch step fields so their errors become visible.
-                for (const p of paths) form.fields[p]?.onBlur();
+                for (const p of paths) formField(form, p)?.onBlur();
                 // Await validation so ASYNC validators resolve before we read errors — reading
                 // field.error() synchronously right after onBlur would miss them.
                 await form.validate();
-                const hasError = paths.some(p => !!form.fields[p]?.error());
+                const hasError = paths.some(p => !!formField(form, p)?.error());
                 if (hasError) return; // don't advance if this step has errors
             }
             _wizardStep.set(step + 1);
@@ -552,12 +552,12 @@ function createFieldElement(field: FormFieldSchema, form: Form<Record<string, un
     }
 
     // Bind form field value → control (use resolved dotted path)
-    const formField = form.fields[fieldPath];
-    if (formField) {
+    const boundField = formField(form, fieldPath);
+    if (boundField) {
         const isChecked = CHECKED_TYPES.has(field.type);
 
         // Set initial value
-        const val = formField.value();
+        const val = boundField.value();
         if (isChecked) {
             if (val) control.setAttribute('checked', '');
         } else if (isMulti) {
@@ -576,17 +576,17 @@ function createFieldElement(field: FormFieldSchema, form: Form<Record<string, un
             if (isChecked) return e.detail?.checked ?? false;
             if (isMulti) return e.detail?.values ?? [];
             return e.detail?.value ?? (e.target as any)?.value;
-        }, (value) => formField.onChange(value));
+        }, (value) => boundField.onChange(value));
 
         control.addEventListener('pdx-blur', () => {
-            formField.onBlur();
+            boundField.onBlur();
         });
 
         // Manual error/touched wiring — pdx-form-field context inject doesn't work
         // for imperatively created elements (getCurrentScope() is null).
         // This replicates what the compiler generates for declarative templates.
         effect(() => {
-            const err = formField.error();
+            const err = boundField.error();
             if (err) {
                 wrapper.setAttribute('error', err);
                 wrapper.setAttribute('show-error', '');
@@ -596,7 +596,7 @@ function createFieldElement(field: FormFieldSchema, form: Form<Record<string, un
             }
         });
         effect(() => {
-            const touched = formField.touched();
+            const touched = boundField.touched();
             if (touched) wrapper.setAttribute('touched', '');
             else wrapper.removeAttribute('touched');
         });
@@ -769,21 +769,21 @@ function createListElement(
                 // top-level path) so list items keep semantics/keyboard/validation, not generic text.
                 if (tag === 'pdx-input' && f.type && f.type !== 'text') input.setAttribute('type', f.type);
 
-                const formField = form.fields[itemPath];
-                if (formField) {
-                    const val = formField.value();
+                const boundField = formField(form, itemPath);
+                if (boundField) {
+                    const val = boundField.value();
                     if (val !== undefined && val !== null && val !== '') {
                         (input as any).value = val;
                     }
                     // Its model's event, or the alpha one of a control that has no model yet (#125).
                     const isText = tag === 'pdx-input' || tag === 'pdx-textarea';
                     const evt = isText ? 'pdx-input' : 'pdx-change';
-                    onControlValue(input, evt, (e) => e.detail?.value ?? (e.target as any)?.value, (value) => formField.onChange(value));
-                    input.addEventListener('pdx-blur', () => formField.onBlur());
+                    onControlValue(input, evt, (e) => e.detail?.value ?? (e.target as any)?.value, (value) => boundField.onChange(value));
+                    input.addEventListener('pdx-blur', () => boundField.onBlur());
 
                     // Manual error wiring for list items (same reason as regular fields)
                     effect(() => {
-                        const err = formField.error();
+                        const err = boundField.error();
                         if (err) {
                             fieldWrapper.setAttribute('error', err);
                             fieldWrapper.setAttribute('show-error', '');
@@ -793,7 +793,7 @@ function createListElement(
                         }
                     });
                     effect(() => {
-                        if (formField.touched()) fieldWrapper.setAttribute('touched', '');
+                        if (boundField.touched()) fieldWrapper.setAttribute('touched', '');
                         else fieldWrapper.removeAttribute('touched');
                     });
                 }

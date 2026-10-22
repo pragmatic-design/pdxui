@@ -104,8 +104,8 @@ function nextStep() {
   const fields = stepFields[wizardStep];
   let valid = true;
   for (const f of fields) {
-    wizardForm.fields[f]?.onBlur();
-    if (wizardForm.fields[f]?.error()) valid = false;
+    formField(wizardForm, f)?.onBlur();
+    if (formField(wizardForm, f)?.error()) valid = false;
   }
   if (valid) wizardStep++;
 }
@@ -168,11 +168,11 @@ const form = createForm({
     password: [required(...), minLength(6, ...)],
     // Cross-field: reads another field's value
     confirmPassword: [required(...), (val) => {
-      const pw = form.fields.password?.value();
+      const pw = form.password?.value();
       return val !== pw ? 'Passwords do not match' : undefined;
     }],
     endDate: [required(...), (val) => {
-      const start = form.fields.startDate?.value();
+      const start = form.startDate?.value();
       if (start && val && val <= start)
         return 'End date must be after start date';
     }],
@@ -257,7 +257,7 @@ const orderSchema = {
 };
 ```
 
-**2. Declarative Composition (Template)** — Same nested DTO, but composed declaratively in the template with `<pdx-field-group>` and compiler auto-binding. The compiler resolves `name="email"` inside `<pdx-field-group name="customer">` to `form.fields['customer.email']`.
+**2. Declarative Composition (Template)** — Same nested DTO, but composed declaratively in the template with `<pdx-field-group>` and compiler auto-binding. The compiler resolves `name="email"` inside `<pdx-field-group name="customer">` to `form['customer.email']`.
 
 ```html
 <pdx-form :form="orderForm">
@@ -269,7 +269,7 @@ const orderSchema = {
     <pdx-form-field name="name" label="Name" required>
       <pdx-input name="name" />
     </pdx-form-field>
-    <!-- compiler resolves to form.fields['customer.name'] -->
+    <!-- compiler resolves to form['customer.name'] -->
   </pdx-field-group>
 
   <pdx-field-group name="shipping" label="Shipping">
@@ -360,7 +360,7 @@ const saveBasic = basicForm.handleSubmit(async (values) => { await api.saveProfi
 </pdx-form>
 ```
 
-**2. Nested DTO (Field Groups)** — `<pdx-field-group name="customer">` scopes child fields to a nested object. Field `name="email"` inside the group becomes `form.fields['customer.email']`.
+**2. Nested DTO (Field Groups)** — `<pdx-field-group name="customer">` scopes child fields to a nested object. Field `name="email"` inside the group becomes `form['customer.email']`.
 
 ```js
 @form nestedForm: {
@@ -387,7 +387,7 @@ const saveBasic = basicForm.handleSubmit(async (values) => { await api.saveProfi
     <pdx-form-field name="name" label="Name" required>
       <pdx-input name="name" />
     </pdx-form-field>
-    <!-- compiler resolves to form.fields['customer.name'] -->
+    <!-- compiler resolves to form['customer.name'] -->
   </pdx-field-group>
 
   <pdx-field-group name="shipping" label="Shipping">

@@ -97,7 +97,7 @@ describe('the outlet asks the components inside the page it is leaving', () => {
 
     it('a dirty warnUnsaved form in a child: the confirm opens, and Stay keeps the page', async () => {
         await go('/owner-form');
-        form.fields.name.onChange('Fido');
+        form.name.onChange('Fido');
 
         navigate('/elsewhere');
         await tick();
@@ -108,7 +108,7 @@ describe('the outlet asks the components inside the page it is leaving', () => {
         await tick();
 
         expect(currentPath()).toBe('/owner-form');
-        expect(form.fields.name.value()).toBe('Fido');
+        expect(form.name.value()).toBe('Fido');
         // Saved: clean again, so the next case can leave this page without being asked.
         form.reset({ name: 'Fido' });
     });

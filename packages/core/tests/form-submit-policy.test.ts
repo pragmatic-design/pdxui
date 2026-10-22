@@ -71,13 +71,13 @@ describe('F7 — an autosave keeps one save per field in flight, and sends the n
             return done.promise;
         });
 
-        form.fields.name.onChange('A');
+        form.name.onChange('A');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         expect(saves.map((s) => s.value), 'the first save did not start').toEqual(['A']);
 
-        form.fields.name.onChange('B');
+        form.name.onChange('B');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
-        form.fields.name.onChange('C');
+        form.name.onChange('C');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         expect(saves.length, 'a second save of the field started while the first ran').toBe(1);
 
@@ -100,9 +100,9 @@ describe('F7 — an autosave keeps one save per field in flight, and sends the n
             saves.push({ value, done });
             return done.promise.catch(() => { /* the save's failure is the callback's to report */ });
         });
-        form.fields.name.onChange('A');
+        form.name.onChange('A');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
-        form.fields.name.onChange('B');
+        form.name.onChange('B');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         saves[0].done.reject(new Error('down'));
         await vi.advanceTimersByTimeAsync(0);
@@ -115,8 +115,8 @@ describe('F7 — an autosave keeps one save per field in flight, and sends the n
         const form = createForm({ initialValues: { name: 'a', city: 'x' }, saveMode: 'onChange', saveDebounce: DEBOUNCE });
         const started: string[] = [];
         form.onFieldSave((field) => { started.push(field); return new Promise(() => {}); });
-        form.fields.name.onChange('A');
-        form.fields.city.onChange('Y');
+        form.name.onChange('A');
+        form.city.onChange('Y');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         expect(started.sort()).toEqual(['city', 'name']);
         form.dispose();
@@ -127,9 +127,9 @@ describe('F7 — an autosave keeps one save per field in flight, and sends the n
         const form = createForm({ initialValues: { name: 'a' }, saveMode: 'onChange', saveDebounce: DEBOUNCE });
         const values: unknown[] = [];
         form.onFieldSave((_field, value) => { values.push(value); });
-        form.fields.name.onChange('A');
+        form.name.onChange('A');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
-        form.fields.name.onChange('B');
+        form.name.onChange('B');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         expect(values).toEqual(['A', 'B']);
         form.dispose();
@@ -140,9 +140,9 @@ describe('F7 — an autosave keeps one save per field in flight, and sends the n
         const form = createForm({ initialValues: { name: 'a' }, saveMode: 'onChange', saveDebounce: DEBOUNCE });
         const saves: ReturnType<typeof held>[] = [];
         form.onFieldSave(() => { const done = held(); saves.push(done); return done.promise; });
-        form.fields.name.onChange('A');
+        form.name.onChange('A');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
-        form.fields.name.onChange('B');
+        form.name.onChange('B');
         await vi.advanceTimersByTimeAsync(DEBOUNCE);
         form.dispose();
         saves[0].resolve();

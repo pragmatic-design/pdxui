@@ -42,23 +42,23 @@ describe('an inline @form', () => {
     });
 
     it('a field that is not declared is an error', () => {
-        const d = diagnose(PROFILE + 'function f() { return profile.fields.nmae.value(); }');
+        const d = diagnose(PROFILE + 'function f() { return profile.nmae.value(); }');
         expect(d.some(m => /nmae/.test(m)), JSON.stringify(d)).toBe(true);
     });
 
     it('each field has the type it was declared with', () => {
-        const d = diagnose(PROFILE + 'function f() { const s: string = profile.fields.age.value(); return s; }');
+        const d = diagnose(PROFILE + 'function f() { const s: string = profile.age.value(); return s; }');
         expect(d.some(m => /number/.test(m) && /string/.test(m)), JSON.stringify(d)).toBe(true);
     });
 
     it('control — the surface a page uses is clean', () => {
         const uses = [
             'function f() {',
-            '  const n: string = profile.fields.name.value();',
-            '  const a: number = profile.fields.age.value();',
-            '  const b: boolean = profile.fields.admin.value();',
-            '  const k: string[] = profile.fields.skills.value();',
-            '  profile.fields.name.onChange("x"); profile.fields.name.error(); profile.fields.name.touched();',
+            '  const n: string = profile.name.value();',
+            '  const a: number = profile.age.value();',
+            '  const b: boolean = profile.admin.value();',
+            '  const k: string[] = profile.skills.value();',
+            '  profile.name.onChange("x"); profile.name.error(); profile.name.touched();',
             '  profile.valid(); profile.dirty(); profile.submitting(); profile.state(); profile.errors().name;',
             '  const v = profile.getValues(); const s: string = v.name;',
             '  profile.reset({ age: 3 }); profile.setValues({ name: "y" });',
@@ -86,10 +86,10 @@ describe('an inline @form', () => {
 
     it('a nested object: dotted fields, nested values', () => {
         const form = '@form f: { address: { street: string, zip: number } };\n';
-        expect(diagnose(form + 'function g() { const s: string = f.fields["address.street"].value(); const z: number = f.getValues().address.zip; return [s, z]; }'))
+        expect(diagnose(form + 'function g() { const s: string = f["address.street"].value(); const z: number = f.getValues().address.zip; return [s, z]; }'))
             .toEqual([]);
         // `createForm` flattens it: there is no field called `address`.
-        const d = diagnose(form + 'function g() { return f.fields.address; }');
+        const d = diagnose(form + 'function g() { return f.address; }');
         expect(d.some(m => /address/.test(m)), JSON.stringify(d)).toBe(true);
     });
 
@@ -98,7 +98,7 @@ describe('an inline @form', () => {
         const uses = [
             'function g() {',
             '  const rows = o.getValues().lines; const p: string = rows[0].product;',
-            '  const q: number = o.fields["lines.0.qty"].value();',
+            '  const q: number = o["lines.0.qty"].value();',
             '  o.array("lines").append({ product: "a", qty: 1 }); o.array("lines").items();',
             '  return [p, q];',
             '}',
@@ -108,14 +108,15 @@ describe('an inline @form', () => {
 
     it('with options after the fields', () => {
         const form = "@form f: { starts: string, ends: string } { validate: (v) => (v.ends < v.starts ? { ends: 'x' } : {}) };\n";
-        expect(diagnose(form + 'function g() { return f.fields.ends.value(); }')).toEqual([]);
+        expect(diagnose(form + 'function g() { return f.ends.value(); }')).toEqual([]);
     });
 });
 
 describe('an @form on an external schema', () => {
     it('is a form whose fields are not known, not any', () => {
-        const form = 'const UserSchema = {};\n@form user: UserSchema;\n';
-        expect(diagnose(form + 'function g() { user.valid(); return user.fields.anything; }')).toEqual([]);
+        const form = "import { formField } from '@pdxui/core';\nconst UserSchema = {};\n@form user: UserSchema;\n";
+        // Its fields are not members the type knows: a name is read with formField (#128).
+        expect(diagnose(form + "function g() { user.valid(); return formField(user, 'anything')?.value(); }")).toEqual([]);
         const d = diagnose(form + 'function g() { return user.nonsense; }');
         expect(d.some(m => /nonsense/.test(m)), JSON.stringify(d)).toBe(true);
     });
@@ -147,7 +148,7 @@ describe('PdxForm follows core\'s Form', () => {
     const globals = readFileSync(join(ROOT, 'packages/lsp/src/utils/pdx-globals.ts'), 'utf-8');
 
     for (const [core, file, editor] of [
-        ['Form', 'packages/core/src/form/form.ts', 'PdxForm'],
+        ['FormMembers', 'packages/core/src/form/form.ts', 'PdxFormMembers'],
         ['FormField', 'packages/core/src/form/form.ts', 'PdxFormField'],
         ['FieldArray', 'packages/core/src/form/field-array.ts', 'PdxFieldArray'],
     ] as const) {

@@ -4,7 +4,7 @@
 // validates onChange.
 // ZERO validation built-in — validation lives in @form rune or dev code.
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 
 
@@ -82,14 +82,14 @@ component('pdx-form-field', {
             const form = currentForm();
             // If the form already has this field, use it directly
             // (compiler already prefixed at build time)
-            if (form && form.fields[name]) return name;
+            if (form && formField(form, name)) return name;
             // Runtime fallback: prefix with the field-group path — for when the compiler cannot
             // resolve it statically (e.g. inside pdx-field-list, which creates items dynamically).
             // Read here, not kept: set up before its group, the field would find none.
             const groupPath = useFieldGroupPath(ctx.el);
             if (groupPath) {
                 const fullPath = `${groupPath}.${name}`;
-                if (form && form.fields[fullPath]) return fullPath;
+                if (form && formField(form, fullPath)) return fullPath;
             }
             return name;
         }
@@ -105,8 +105,9 @@ component('pdx-form-field', {
             if (inlineError) return resolveValidationMessage(inlineError) || inlineError;
             const form = currentForm();
             const name = resolveFieldName();
-            if (form && name && form.fields[name]) {
-                const err = form.fields[name].error();
+            const field = form && name ? formField(form, name) : undefined;
+            if (field) {
+                const err = field.error();
                 return err ? (resolveValidationMessage(err) || err) : '';
             }
             return '';
@@ -118,9 +119,8 @@ component('pdx-form-field', {
             if (inlineWarning) return inlineWarning;
             const form = currentForm();
             const name = resolveFieldName();
-            if (form && name && form.fields[name]) {
-                return form.fields[name].warning() ?? '';
-            }
+            const field = form && name ? formField(form, name) : undefined;
+            if (field) return field.warning() ?? '';
             return '';
         }
 
@@ -128,9 +128,8 @@ component('pdx-form-field', {
             if (ctx.touched()) return true;
             const form = currentForm();
             const name = resolveFieldName();
-            if (form && name && form.fields[name]) {
-                return form.fields[name].touched();
-            }
+            const field = form && name ? formField(form, name) : undefined;
+            if (field) return field.touched();
             return false;
         }
 
@@ -143,7 +142,7 @@ component('pdx-form-field', {
             if (ctx.required()) return true;
             const form = currentForm();
             const name = resolveFieldName();
-            return !!(form && name && form.fields[name]?.required === true);
+            return !!(form && name && formField(form, name)?.required === true);
         }
 
         function shouldShowError(): boolean {

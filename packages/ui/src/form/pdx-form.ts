@@ -5,7 +5,7 @@
 // Children (<pdx-form-field>, custom inputs) inject the form via useForm().
 // The form prop is required — create it with createForm() or @form rune.
 
-import { component, html, provideForm, useFormCoordinator, onDestroy, DEV } from '@pdxui/core';
+import { component, html, provideForm, useFormCoordinator, onDestroy, DEV, formField, formFieldNames } from '@pdxui/core';
 import type { Form, DataSource, FormCoordinator } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -150,9 +150,7 @@ component('pdx-form', {
             if (!f) return;
             // Read all field values to create reactive subscriptions
             const values: Record<string, unknown> = {};
-            for (const [name, field] of Object.entries(f.fields)) {
-                values[name] = (field as any).value();
-            }
+            for (const name of formFieldNames(f)) values[name] = formField(f, name)?.value();
             requestAnimationFrame(() => {
                 syncDomValues(ctx.el, values);
             });

@@ -2,7 +2,7 @@
 //
 // A tabbed form with rules needs it: a tab says how many of its fields hold a value the rules
 // refused, and «Not saved» leads to the first one — its tab opens and the field takes the focus.
-import { signal, computed } from '@pdxui/core';
+import { signal, computed, formField } from '@pdxui/core';
 import type { Form, ReadonlySignal } from '@pdxui/core';
 
 /** The `pdx-tabs` element, as this reads it: its panels, and `select`. */
@@ -26,7 +26,7 @@ export function createRefusedTabs(form: Form<Record<string, unknown>>, tabs: () 
     const tabFields = signal<Record<string, string[]>>({});
 
     const refusedNow = (name: string, errors: Record<string, unknown>) =>
-        !!errors[name] && !!form.fields[name]?.touched();
+        !!errors[name] && !!formField(form, name)?.touched();
 
     const counts = computed(() => {
         const errors = form.errors() as Record<string, unknown>;

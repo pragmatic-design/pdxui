@@ -6,7 +6,7 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { waitUntil } from './wait-until';
-import { createForm, FORM_INTERNALS } from '../src/form/form';
+import { createForm, formField, formFieldNames, FORM_INTERNALS } from '../src/form/form';
 import type { FormInternals } from '../src/form/form';
 
 const internals = (form: unknown): FormInternals =>
@@ -100,10 +100,10 @@ describe('when validation runs', () => {
             validators: { name: [(v: string) => (v ? undefined : 'Required')] },
         });
 
-        form.fields.name.onChange('');
+        form.name.onChange('');
         expect(form.errors().name, 'an error for a value still being written').toBeUndefined();
 
-        form.fields.name.onBlur();
+        form.name.onBlur();
         expect(form.errors().name).toBe('Required');
     });
 
@@ -113,7 +113,7 @@ describe('when validation runs', () => {
             validateOn: 'onChange',
             validators: { name: [(v: string) => (v ? undefined : 'Required')] },
         });
-        form.fields.name.onChange('');
+        form.name.onChange('');
         expect(form.errors().name).toBe('Required');
     });
 
@@ -124,11 +124,11 @@ describe('when validation runs', () => {
             validators: { name: [(v: string) => (v ? undefined : 'Required')] },
         });
 
-        form.fields.name.onBlur();
+        form.name.onBlur();
         expect(form.errors().name, 'onSubmit validated on blur').toBeUndefined();
 
         // Touched now — a later edit re-runs the rule so a corrected field can go green.
-        form.fields.name.onChange('');
+        form.name.onChange('');
         expect(form.errors().name).toBe('Required');
     });
 
@@ -144,10 +144,10 @@ describe('dirty, touched and reset', () => {
         const form = createForm<Record<string, unknown>>({ initialValues: { a: 'x' } });
         expect(form.dirty()).toBe(false);
 
-        form.fields.a.onChange('y');
+        formField(form, 'a')!.onChange('y');
         expect(form.dirty()).toBe(true);
 
-        form.fields.a.onChange('x');
+        formField(form, 'a')!.onChange('x');
         expect(form.dirty(), 'a value typed back to its original is not a change').toBe(false);
     });
 
@@ -170,8 +170,8 @@ describe('dirty, touched and reset', () => {
             initialValues: { a: 'x' },
             validators: { a: [(v: string) => (v === 'x' ? undefined : 'no')] },
         });
-        form.fields.a.onChange('y');
-        form.fields.a.onBlur();
+        form.a.onChange('y');
+        form.a.onBlur();
         expect(form.errors().a).toBe('no');
 
         form.reset();
@@ -190,9 +190,9 @@ describe('dirty, touched and reset', () => {
 
     it('a single field resets on its own', () => {
         const form = createForm({ initialValues: { a: 'x', b: 'y' } });
-        form.fields.a.onChange('1');
-        form.fields.b.onChange('2');
-        form.fields.a.reset();
+        form.a.onChange('1');
+        form.b.onChange('2');
+        form.a.reset();
         expect(form.getValues()).toEqual({ a: 'x', b: '2' });
     });
 });
@@ -266,7 +266,7 @@ describe('per-field save', () => {
         });
         form.onFieldSave(saved);
 
-        form.fields.a.onChange('y');
+        form.a.onChange('y');
         await waitUntil(() => saved.mock.calls.length > 0, 'the autosave to fire');
 
         expect(saved).toHaveBeenCalledWith('a', 'y');
@@ -281,8 +281,8 @@ describe('per-field save', () => {
         });
         form.onFieldSave(saved);
 
-        form.fields.a.onChange('1');
-        form.fields.b.onChange('2');
+        form.a.onChange('1');
+        form.b.onChange('2');
         await waitUntil(() => saved.mock.calls.length > 0, 'the autosave to fire');
 
         expect(saved).toHaveBeenCalledWith('a', '1');
@@ -294,9 +294,9 @@ describe('per-field save', () => {
         const form = createForm({ initialValues: { a: 'x' }, saveMode: 'onChange', saveDebounce: 15 });
         form.onFieldSave(saved);
 
-        form.fields.a.onChange('1');
-        form.fields.a.onChange('2');
-        form.fields.a.onChange('3');
+        form.a.onChange('1');
+        form.a.onChange('2');
+        form.a.onChange('3');
         await new Promise((r) => setTimeout(r, 40)); // SLEEP-OK: asserts EXACTLY one coalesced call, which only a settled window can show
 
         expect(saved.mock.calls).toEqual([['a', '3']]);
@@ -307,11 +307,11 @@ describe('per-field save', () => {
         const form = createForm({ initialValues: { a: 'x' }, saveMode: 'onBlur', saveDebounce: 1 });
         form.onFieldSave(saved);
 
-        form.fields.a.onChange('y');
+        form.a.onChange('y');
         await new Promise((r) => setTimeout(r, 15)); // SLEEP-OK: asserts the autosave did NOT fire before blur, so waiting is the point
         expect(saved).not.toHaveBeenCalled();
 
-        form.fields.a.onBlur();
+        form.a.onBlur();
         await waitUntil(() => saved.mock.calls.length > 0, 'the blur autosave to fire');
         expect(saved).toHaveBeenCalledWith('a', 'y');
     });
@@ -320,7 +320,7 @@ describe('per-field save', () => {
 describe('nested values', () => {
     it('flattens the initial object into dotted fields and gives it back nested', () => {
         const form = createForm({ initialValues: { customer: { name: 'Ada', city: 'Roma' } } });
-        expect(Object.keys(form.fields)).toEqual(['customer.name', 'customer.city']);
+        expect(formFieldNames(form)).toEqual(['customer.name', 'customer.city']);
         expect(form.getValues()).toEqual({ customer: { name: 'Ada', city: 'Roma' } });
     });
 
@@ -366,7 +366,7 @@ describe('dynamic fields (FORM_INTERNALS)', () => {
         internals(form).renameFields('items.1', 'items.0');
 
         expect(internals(form).getFieldPaths()).toContain('items.0.qty');
-        expect(form.fields['items.0.qty'].value()).toBe(7);
+        expect(formField(form, 'items.0.qty')!.value()).toBe(7);
     });
 
     it('bumps the version so a list re-renders', () => {
@@ -383,7 +383,7 @@ describe('dispose', () => {
         const form = createForm({ initialValues: { a: 'x' }, saveMode: 'onChange', saveDebounce: 20 });
         form.onFieldSave(saved);
 
-        form.fields.a.onChange('y');
+        form.a.onChange('y');
         form.dispose();
         await new Promise((r) => setTimeout(r, 50)); // SLEEP-OK: asserts a disposed form never wrote at all, so there is nothing to await
 

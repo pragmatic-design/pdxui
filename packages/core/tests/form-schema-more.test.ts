@@ -7,6 +7,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { createFormFromSchema, evaluateVisibility } from '../src/form/form-schema';
 import type { FormSchema } from '../src/form/form-schema';
+import { formFieldNames } from '../src/form/form';
 
 const schema = (fields: FormSchema['fields']): FormSchema => ({ fields });
 
@@ -50,7 +51,7 @@ describe('createFormFromSchema — initial values', () => {
         ]));
         // The form addresses the field as `address.city`, but getValues() hands back the shape
         // the server wants — nested, not a literal dotted key.
-        expect(Object.keys(form.fields)).toEqual(['address.city', 'address.zip']);
+        expect(formFieldNames(form)).toEqual(['address.city', 'address.zip']);
         const address = form.getValues().address as Record<string, unknown>;
         expect(address.city).toBe('Roma');
         expect(address.zip).toBe('');

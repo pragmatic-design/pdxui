@@ -3,12 +3,13 @@
 // `createForm` flattens `{ customer: { name } }` into the field `customer.name`, and each row of an
 // array of objects into `lines.0.qty`; the array itself is a field too. `Form` typed `fields`,
 // `errors` and `warnings` by the top-level keys, so `form.fields['customer.name']` did not compile
-// and `form.fields.customer`, which never exists, did. `pnpm typecheck` compiles this file: the
-// cases below are the type test, and the run checks the runtime is the one described.
+// and `form.fields.customer`, which never exists, did. The fields are members of the form since
+// #128, keyed the same way. `pnpm typecheck` compiles this file: the cases below are the type
+// test, and the run checks the runtime is the one described.
 
 import { describe, it, expect, expectTypeOf } from 'vitest';
-import { createForm, required } from '../src/index';
-import type { Form, FormField } from '../src/index';
+import { createForm, formField, required } from '../src/index';
+import type { Form, FormField, FormFields } from '../src/index';
 
 interface Address { city: string; zip: string }
 type Order = { reference: string; customer: { name: string; address: Address }; lines: { qty: number; sku: string }[]; tags: string[] };
@@ -23,18 +24,18 @@ const initialValues: Order = {
 describe('fields keyed by the flattened name', () => {
     it('reach a nested field, a row field and an array, with no cast', async () => {
         const form = createForm({ initialValues, validators: { 'customer.name': [required()] } });
-        expect(form.fields['customer.name'].value()).toBe('Ada');
-        expect(form.fields['customer.address.city'].value()).toBe('Roma');
-        expect(form.fields['lines.0.qty'].value()).toBe(2);
-        expect(form.fields.tags.value()).toEqual(['x']);
-        form.fields['customer.name'].onChange('');
+        expect(form['customer.name'].value()).toBe('Ada');
+        expect(form['customer.address.city'].value()).toBe('Roma');
+        expect(form['lines.0.qty'].value()).toBe(2);
+        expect(form.tags.value()).toEqual(['x']);
+        form['customer.name'].onChange('');
         expect(await form.validate()).toBe(false);
         expect(form.errors()['customer.name']).toEqual(expect.any(String));
         expect(form.warnings()['customer.name']).toBeUndefined();
     });
 
     it('type each field by the value it holds, and know no other', () => {
-        type F = Form<Order>['fields'];
+        type F = FormFields<Order>;
         expectTypeOf<F['customer.name']>().toEqualTypeOf<FormField<string>>();
         // An interface is entered like an object type: its keys are fields too.
         expectTypeOf<F['customer.address.zip']>().toEqualTypeOf<FormField<string>>();
@@ -59,15 +60,15 @@ describe('fields keyed by the flattened name', () => {
     it('take a nested subset in setValues and reset, as the runtime merges it', () => {
         const form = createForm({ initialValues });
         form.setValues({ customer: { address: { city: 'Milano' } } });
-        expect(form.fields['customer.address.city'].value()).toBe('Milano');
-        expect(form.fields['customer.address.zip'].value(), 'a field the patch does not name').toBe('00100');
+        expect(form['customer.address.city'].value()).toBe('Milano');
+        expect(form['customer.address.zip'].value(), 'a field the patch does not name').toBe('00100');
         form.reset({ customer: { name: 'Bea' } });
-        expect(form.fields['customer.name'].value()).toBe('Bea');
+        expect(form['customer.name'].value()).toBe('Bea');
         // @ts-expect-error — a nested key the values do not have
         form.setValues({ customer: { nmae: 'x' } });
     });
 
-    it('leave a form typed by a record what it was: any name, any value', () => {
-        type F = Form<Record<string, unknown>>['fields'];
-        expectTypeOf<F['anything']>().toEqualTypeOf<FormField<unknown>>();
+    it('leave a form typed by a record to formField: any name, any value', () => {
+        expectTypeOf(formField).parameter(0).toEqualTypeOf<Form<Record<string, unknown>>>();
+        expectTypeOf(formField).returns.toEqualTypeOf<FormField<unknown> | undefined>();
     });});

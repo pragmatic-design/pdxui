@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-456 value exports.
+458 value exports.
 
 ### `__adoptStyles`
 
@@ -2172,6 +2172,28 @@ function formatWithCalendar(iso: string, locale: string = 'en', calendar: Calend
 ```
 
 Format a date using a specific calendar system.
+
+### `formField`
+
+```ts
+import { formField } from '@pdxui/core';
+
+function formField(form: Form<Record<string, unknown>>, name: string): FormField<unknown> | undefined
+```
+
+The field named `name`, when the name is known only at run time: a `name` attribute, a column, a
+schema entry. Undefined when the form has no such field — and for the name of one of the form's
+own members, which `form[name]` would return instead (`formField(form, 'reset')` is undefined).
+
+### `formFieldNames`
+
+```ts
+import { formFieldNames } from '@pdxui/core';
+
+function formFieldNames(form: Form<Record<string, unknown>>): string[]
+```
+
+The names of a form's fields as they are now, rows a field list added included.
 
 ### `forwardSlots`
 

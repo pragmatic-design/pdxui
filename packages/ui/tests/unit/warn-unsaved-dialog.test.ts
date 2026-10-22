@@ -25,7 +25,7 @@ function mountDirtyPage(): Guarded {
     });
     const el = document.createElement(tag) as Guarded;
     document.body.appendChild(el);
-    form.fields.name.onChange('Rex');
+    form.name.onChange('Rex');
     return el;
 }
 

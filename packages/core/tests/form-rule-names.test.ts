@@ -7,7 +7,7 @@
 import { describe, it, expect } from 'vitest';
 import * as validators from '../src/form/validators';
 import * as core from '../src/index';
-import { CORE_FORM_RULES } from '../../compiler/src/compiler/form-rules';
+import { CORE_FORM_RULES, FORM_MEMBERS } from '../../compiler/src/compiler/form-rules';
 
 /**
  * The validator factories: every function `validators.ts` exports but its helpers — the two schema
@@ -27,5 +27,15 @@ describe('CORE_FORM_RULES', () => {
         for (const name of CORE_FORM_RULES) {
             expect((core as Record<string, unknown>)[name], name).toBeTypeOf('function');
         }
+    });
+});
+
+// The members a field may not be named like (#128): the compiler's PDX_FORM_FIELD_RESERVED reads
+// `FORM_MEMBERS`, and a member added to the form and missing there would pass the compiler and be
+// refused only when the page runs.
+describe('FORM_MEMBERS', () => {
+    it('is exactly the members of a form createForm creates', () => {
+        const members = Object.keys(core.createForm({ initialValues: {} })).sort();
+        expect([...FORM_MEMBERS].sort()).toEqual(members);
     });
 });

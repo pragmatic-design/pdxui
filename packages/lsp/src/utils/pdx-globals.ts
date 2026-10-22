@@ -118,8 +118,9 @@ declare global {
   }
   // What \`@form\` gives: core's FormField, FieldArray and Form. A form is typed by two parameters
   // the projection writes out (./form-types): V, the values as getValues() returns them, nested; and
-  // F, the fields, keyed as createForm flattens them — \`address.street\`, \`lines.0.product\`.
-  // tests/form-store-types.test.ts fails when a member of the three is missing here.
+  // F, the fields, keyed as createForm flattens them — \`address.street\`, \`lines.0.product\` — each a
+  // member of the form beside its own (#128). tests/form-store-types.test.ts fails when a member of
+  // the three is missing here.
   interface PdxFormField<T> {
     readonly value: PdxReadonly<T> & { set(v: T | ((prev: T) => T)): void; setRaw(v: T): void };
     readonly error: PdxReadonly<string | undefined>;
@@ -146,8 +147,8 @@ declare global {
     getValues(): T[];
     dispose(): void;
   }
-  interface PdxForm<V, F> {
-    readonly fields: F;
+  type PdxForm<V, F> = PdxFormMembers<V> & F;
+  interface PdxFormMembers<V> {
     readonly valid: PdxReadonly<boolean>;
     readonly dirty: PdxReadonly<boolean>;
     readonly touched: PdxReadonly<boolean>;

@@ -189,11 +189,12 @@ function collectHtml(nodes: TemplateNode[]): string {
     return out;
 }
 
-/** `form.fields.x`, as a binding reaches it: the setup's form, or the injected one. */
+/** `form.x`, a field as a member of its form (#128), as a binding reaches it: the setup's form, or the injected one. */
 function fieldRef(formVar: string, fieldPath: string): string {
     // A name that is not an identifier — a dotted path, or one with a hyphen — is a quoted key.
-    const field = /^[A-Za-z_$][\w$]*$/.test(fieldPath) ? `fields.${fieldPath}` : `fields[${jsQuote(fieldPath)}]`;
-    return formVar === INJECTED ? `${INJECTED_REF}?.${field}` : `ctx.${formVar}.${field}`;
+    const isIdentifier = /^[A-Za-z_$][\w$]*$/.test(fieldPath);
+    if (formVar === INJECTED) return isIdentifier ? `${INJECTED_REF}?.${fieldPath}` : `${INJECTED_REF}?.[${jsQuote(fieldPath)}]`;
+    return isIdentifier ? `ctx.${formVar}.${fieldPath}` : `ctx.${formVar}[${jsQuote(fieldPath)}]`;
 }
 
 /**
@@ -363,7 +364,7 @@ function maybeInjectBindings(tagStr: string, tagName: string, formVar: string, g
  */
 function injectFormFieldBindings(tagStr: string, formVar: string, fieldPath: string): string {
     let injected = '';
-    // Bracket notation for a dotted path (`fields['customer.name']`), dot notation otherwise.
+    // Bracket notation for a dotted path (`f['customer.name']`), dot notation otherwise.
     const f = fieldRef(formVar, fieldPath);
 
     if (!tagStr.includes(':error=')) {
