@@ -10,6 +10,11 @@
 //   ran nothing at all for that long.
 // - `page.longTasks`: the browser's own long tasks (≥ 50 ms). A gap covered by a long task of the same
 //   length was the page's script; a gap with none was not.
+// - `page.longFrames`: the same long work as the Long Animation Frames API sees it, with the scripts
+//   that ran: where each was entered (`invoker`, `sourceURL`, `sourceFunctionName`,
+//   `sourceCharPosition`, into a built chunk whose hidden source map names the source), and how its
+//   time went — forced style and layout, or `pauseDuration`, blocked on a synchronous call. A long
+//   task names no script ("self"); this is what does.
 // - `runner.heartbeat`: the same interval in the test's own process. A gap here as well means the
 //   machine stalled every process, not the page.
 //
@@ -26,7 +31,18 @@ const GAP_MS = 300;
 const KEY = '__pdx_stall_probe';
 const READ_TIMEOUT_MS = 5_000;
 
-type PageRecord = { heartbeat: { at: number; gap: number }[]; longTasks: { at: number; duration: number; name: string }[] };
+/** One script of a long animation frame: where it was entered, and how its time was spent. */
+type FrameScript = {
+    invoker: string; sourceURL: string; sourceFunctionName: string; sourceCharPosition: number;
+    duration: number; forcedStyleAndLayoutDuration: number; pauseDuration: number;
+};
+
+type PageRecord = {
+    heartbeat: { at: number; gap: number }[];
+    longTasks: { at: number; duration: number; name: string }[];
+    /** Frames over GAP_MS, with the scripts that ran in them (the Long Animation Frames API). */
+    longFrames: { at: number; duration: number; blockingDuration: number; scripts: FrameScript[] }[];
+};
 
 export interface StallRecord {
     /** What the page recorded, or why it could not be read — a page still frozen does not answer. */
@@ -44,7 +60,7 @@ export interface StallProbe {
 /** Starts recording on `page`, before its first navigation, and in this process. */
 export async function startStallProbe(page: Page): Promise<StallProbe> {
     await page.addInitScript(({ key, gapMs }) => {
-        const read = (): PageRecord => JSON.parse(sessionStorage.getItem(key) ?? '{"heartbeat":[],"longTasks":[]}') as PageRecord;
+        const read = (): PageRecord => JSON.parse(sessionStorage.getItem(key) ?? '{"heartbeat":[],"longTasks":[],"longFrames":[]}') as PageRecord;
         const write = (add: (r: PageRecord) => void): void => { const r = read(); add(r); sessionStorage.setItem(key, JSON.stringify(r)); };
         // Written at once, so an empty record reads «ran, and nothing stalled», never «did not run».
         write(() => undefined);
@@ -59,6 +75,23 @@ export async function startStallProbe(page: Page): Promise<StallProbe> {
                 write((r) => r.longTasks.push({ at: Math.round(performance.timeOrigin + e.startTime), duration: Math.round(e.duration), name: e.name }));
             }
         }).observe({ type: 'longtask', buffered: true });
+        // The entry's fields are read by name: the DOM typings of this TypeScript do not have the type.
+        type Loaf = PerformanceEntry & { blockingDuration: number; scripts: (FrameScript & PerformanceEntry)[] };
+        new PerformanceObserver((list) => {
+            for (const e of list.getEntries() as Loaf[]) {
+                if (e.duration < gapMs) continue;
+                write((r) => r.longFrames.push({
+                    at: Math.round(performance.timeOrigin + e.startTime),
+                    duration: Math.round(e.duration),
+                    blockingDuration: Math.round(e.blockingDuration),
+                    scripts: e.scripts.map((s) => ({
+                        invoker: s.invoker, sourceURL: s.sourceURL, sourceFunctionName: s.sourceFunctionName,
+                        sourceCharPosition: s.sourceCharPosition, duration: Math.round(s.duration),
+                        forcedStyleAndLayoutDuration: Math.round(s.forcedStyleAndLayoutDuration), pauseDuration: Math.round(s.pauseDuration),
+                    })),
+                }));
+            }
+        }).observe({ type: 'long-animation-frame', buffered: true });
     }, { key: KEY, gapMs: GAP_MS });
 
     const runner: StallRecord['runner'] = { heartbeat: [] };
