@@ -8,8 +8,19 @@
 //
 // The HTTP cache is cleared before every test: these specs were written against a new context, and
 // some measure a cold load (`first-paint.spec.ts` says so when a resource comes from the cache).
+//
+// Every page carries the stall probe (`stall-probe.ts`): a failed test gets `stall-probe.json`, which
+// says whether the page's script, the page, or the whole machine stopped while it waited (#611).
 import { test as base } from '../../responsive/tests/integration/ui-components/contracts/fixture';
+import { attachStallRecord, startStallProbe } from './stall-probe';
 
 export * from '../../responsive/tests/integration/ui-components/contracts/fixture';
 
-export const test = base.extend({ httpCache: 'clear' });
+export const test = base.extend({
+    httpCache: 'clear',
+    page: async ({ page }, use, testInfo) => {
+        const probe = await startStallProbe(page);
+        await use(page);
+        await attachStallRecord(testInfo, probe);
+    },
+});
