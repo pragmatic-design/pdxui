@@ -8,20 +8,20 @@
 
     <div class="demo-block">
       <pdx-form :form="dsForm" @pdx-submit="saveDsForm">
-        <pdx-form-field name="companyName" label="Company Name" required>
-          <pdx-input name="companyName" placeholder="Acme Inc."></pdx-input>
+        <pdx-form-field :field="dsForm.companyName" label="Company Name" required>
+          <pdx-input name="companyName" ::value="dsForm.companyName" placeholder="Acme Inc."></pdx-input>
         </pdx-form-field>
 
-        <pdx-form-field name="industry" label="Industry">
-          <pdx-select name="industry" :options="industryOptions" placeholder="Select industry"></pdx-select>
+        <pdx-form-field :field="dsForm.industry" label="Industry">
+          <pdx-select name="industry" ::value="dsForm.industry" :options="industryOptions" placeholder="Select industry"></pdx-select>
         </pdx-form-field>
 
-        <pdx-form-field name="website" label="Website">
-          <pdx-input name="website" type="url" placeholder="https://example.com"></pdx-input>
+        <pdx-form-field :field="dsForm.website" label="Website">
+          <pdx-input name="website" ::value="dsForm.website" type="url" placeholder="https://example.com"></pdx-input>
         </pdx-form-field>
 
-        <pdx-form-field name="active" label="">
-          <pdx-switch name="active" label="Active account"></pdx-switch>
+        <pdx-form-field :field="dsForm.active" label="">
+          <pdx-switch name="active" ::checked="dsForm.active" label="Active account"></pdx-switch>
         </pdx-form-field>
 
         <pdx-form-actions submitLabel="Save to Storage" resetLabel="Reset"></pdx-form-actions>
@@ -40,8 +40,8 @@
 });
 
 &lt;pdx-form :form="dsForm" @pdx-submit="saveDsForm"&gt;
-  &lt;pdx-form-field name="companyName" label="Company Name" required&gt;
-    &lt;pdx-input name="companyName"&gt;&lt;/pdx-input&gt;
+  &lt;pdx-form-field :field="dsForm.companyName" label="Company Name" required&gt;
+    &lt;pdx-input name="companyName" ::value="dsForm.companyName"&gt;&lt;/pdx-input&gt;
   &lt;/pdx-form-field&gt;
   &lt;pdx-form-actions submitLabel="Save to Storage" /&gt;
 &lt;/pdx-form&gt;</code></pre></details>}

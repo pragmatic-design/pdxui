@@ -27,7 +27,7 @@ async function openPersonal(page: Page, id = 1): Promise<void> {
     await expect(page.locator('[data-test="personal"]')).toBeVisible();
 }
 
-const field = (page: Page, name: string) => page.locator(`[data-test="personal-form"] pdx-form-field[name="${name}"]`);
+const field = (page: Page, name: string) => page.locator(`[data-test="personal-form"] pdx-form-field:has([name="${name}"])`);
 const input = (page: Page, name: string) => page.locator(`[data-test="personal-form"] [data-test="${name}"] input:not([type="hidden"])`);
 
 test('the list reads the store, and the rail reaches it', async ({ page }) => {
@@ -270,7 +270,7 @@ test('the Details are a complete form: every group in its tab, every field a PDX
             const box = page.locator(`[data-test="personal-form"] [data-test="group-${group}"]`);
             await expect(box, `no ${group} group on ${name}`).toBeVisible();
             for (const [field, tag] of Object.entries(fields)) {
-                await expect(box.locator(`pdx-form-field[name="${field}"] ${tag}[name="${field}"]`),
+                await expect(box.locator(`pdx-form-field:has(${tag}[name="${field}"]) ${tag}[name="${field}"]`),
                     `${group}: "${field}" is not a ${tag} in its field`).toHaveCount(1);
             }
         }
@@ -473,7 +473,7 @@ test('Contratti: an end before the start is refused on the field', async ({ page
     await form.locator('[data-test="start"] input:not([type="hidden"])').fill('2026-05-01');
     await form.locator('[data-test="end"] input:not([type="hidden"])').fill('2026-04-01');
     await form.locator('[data-test="contract-save"] button').click();
-    await expect(form.locator('pdx-form-field[name="end"] .pdx-field-error')).toContainText('after it starts');
+    await expect(form.locator('pdx-form-field:has([name="end"]) .pdx-field-error')).toContainText('after it starts');
     await expect(form, 'the refused save left the edit').toBeVisible();
 
     // …and in the add modal, which is built from a schema.

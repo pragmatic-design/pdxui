@@ -15,15 +15,15 @@
 
       <pdx-form :form="i18nForm">
         <div class="form-grid-2">
-          <pdx-form-field name="username" label="Username" required>
-            <pdx-input name="username" placeholder="min 3 chars"></pdx-input>
+          <pdx-form-field :field="i18nForm.username" label="Username" required>
+            <pdx-input name="username" ::value="i18nForm.username" placeholder="min 3 chars"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" type="email" placeholder="name@example.com"></pdx-input>
+          <pdx-form-field :field="i18nForm.email" label="Email" required>
+            <pdx-input name="email" ::value="i18nForm.email" type="email" placeholder="name@example.com"></pdx-input>
           </pdx-form-field>
         </div>
-        <pdx-form-field name="age" label="Age" required>
-          <pdx-number-input name="age" :min="0" :max="150"></pdx-number-input>
+        <pdx-form-field :field="i18nForm.age" label="Age" required>
+          <pdx-number-input name="age" ::value="i18nForm.age" :min="0" :max="150"></pdx-number-input>
         </pdx-form-field>
         <button type="submit" class="pdx-btn pdx-primary pdx-sm">Validate</button>
       </pdx-form>

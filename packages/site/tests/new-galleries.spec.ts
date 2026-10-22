@@ -83,7 +83,7 @@ test.describe('pdx-field-group', () => {
     test('a nested field shows its error while typing, and the values follow its path', async ({ page }) => {
         await gallery(page, 'pdx-field-group');
         const s = section(page, 'A nested object');
-        const field = s.locator('pdx-form-field[name="customer.email"]');
+        const field = s.locator('pdx-form-field:has([name="customer.email"])');
         await field.locator('input').fill('not-an-email');
         await expect(field.getByRole('alert')).toBeVisible();
         await expect(field.locator('input')).toHaveAttribute('aria-invalid', 'true');

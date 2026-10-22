@@ -5,18 +5,18 @@
     <div class="demo-container">
       <pdx-form :form="profileForm">
         <pdx-form-section name="personal" label="Personal">
-          <pdx-form-field name="first" label="First name"><pdx-input name="first" placeholder="Ada" /></pdx-form-field>
-          <pdx-form-field name="last" label="Last name"><pdx-input name="last" placeholder="Lovelace" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.first" label="First name"><pdx-input name="first" ::value="profileForm.first" placeholder="Ada" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.last" label="Last name"><pdx-input name="last" ::value="profileForm.last" placeholder="Lovelace" /></pdx-form-field>
         </pdx-form-section>
 
         <pdx-form-section name="contact" label="Contact">
-          <pdx-form-field name="email" label="Email"><pdx-input name="email" type="email" placeholder="ada@example.com" /></pdx-form-field>
-          <pdx-form-field name="phone" label="Phone"><pdx-input name="phone" placeholder="+39 …" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.email" label="Email"><pdx-input name="email" ::value="profileForm.email" type="email" placeholder="ada@example.com" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.phone" label="Phone"><pdx-input name="phone" ::value="profileForm.phone" placeholder="+39 …" /></pdx-form-field>
         </pdx-form-section>
 
         <pdx-form-section name="address" label="Address">
-          <pdx-form-field name="city" label="City"><pdx-input name="city" placeholder="Torino" /></pdx-form-field>
-          <pdx-form-field name="zip" label="ZIP"><pdx-input name="zip" placeholder="10100" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.city" label="City"><pdx-input name="city" ::value="profileForm.city" placeholder="Torino" /></pdx-form-field>
+          <pdx-form-field :field="profileForm.zip" label="ZIP"><pdx-input name="zip" ::value="profileForm.zip" placeholder="10100" /></pdx-form-field>
         </pdx-form-section>
 
         <pdx-form-actions submit-label="Save profile" reset-label="Reset"></pdx-form-actions>
@@ -26,8 +26,8 @@
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-form :form="profileForm"&gt;
   &lt;pdx-form-section name="personal" label="Personal"&gt;
-    &lt;pdx-form-field name="first" label="First name"&gt;&lt;pdx-input name="first" /&gt;&lt;/pdx-form-field&gt;
-    &lt;pdx-form-field name="last"  label="Last name"&gt;&lt;pdx-input name="last" /&gt;&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field :field="profileForm.first" label="First name"&gt;&lt;pdx-input name="first" ::value="profileForm.first" /&gt;&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field :field="profileForm.last"  label="Last name"&gt;&lt;pdx-input name="last" ::value="profileForm.last" /&gt;&lt;/pdx-form-field&gt;
   &lt;/pdx-form-section&gt;
   &lt;pdx-form-section name="contact" label="Contact"&gt; … &lt;/pdx-form-section&gt;
   &lt;pdx-form-actions submit-label="Save profile" /&gt;

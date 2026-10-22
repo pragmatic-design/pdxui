@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h2 class="pdx-txt-heading section-heading">1. Basic Form (Compiler Auto-Binding)</h2>
+    <h2 class="pdx-txt-heading section-heading">1. Basic Form (Bound Through the Model)</h2>
     <p class="pdx-txt-small pdx-ink-muted">
       Just add <code>name="field"</code> to controls inside <code>&lt;pdx-form&gt;</code>.
       The compiler generates value binding, onChange, and onBlur automatically.
@@ -8,20 +8,20 @@
 
     <div class="demo-block">
       <pdx-form :form="basicForm" @pdx-submit="saveBasic">
-        <pdx-form-field name="name" label="Full Name" required>
-          <pdx-input name="name" placeholder="John Doe"></pdx-input>
+        <pdx-form-field :field="basicForm.name" label="Full Name" required>
+          <pdx-input name="name" ::value="basicForm.name" placeholder="John Doe"></pdx-input>
         </pdx-form-field>
 
-        <pdx-form-field name="email" label="Email" required>
-          <pdx-input name="email" type="email" placeholder="john@example.com"></pdx-input>
+        <pdx-form-field :field="basicForm.email" label="Email" required>
+          <pdx-input name="email" ::value="basicForm.email" type="email" placeholder="john@example.com"></pdx-input>
         </pdx-form-field>
 
-        <pdx-form-field name="bio" label="Bio">
-          <pdx-textarea name="bio" placeholder="Tell us about yourself..." rows="3"></pdx-textarea>
+        <pdx-form-field :field="basicForm.bio" label="Bio">
+          <pdx-textarea name="bio" ::value="basicForm.bio" placeholder="Tell us about yourself..." rows="3"></pdx-textarea>
         </pdx-form-field>
 
-        <pdx-form-field name="notifications" label="">
-          <pdx-switch name="notifications" label="Email notifications"></pdx-switch>
+        <pdx-form-field :field="basicForm.notifications" label="">
+          <pdx-switch name="notifications" ::checked="basicForm.notifications" label="Email notifications"></pdx-switch>
         </pdx-form-field>
 
         <pdx-form-actions submitLabel="Save Profile" resetLabel="Reset"></pdx-form-actions>
@@ -45,8 +45,8 @@
 const saveBasic = basicForm.handleSubmit(async (values) =&gt; { await api.saveProfile(values); });
 
 &lt;pdx-form :form="basicForm" @pdx-submit="saveBasic"&gt;
-  &lt;pdx-form-field name="name" label="Full Name" required&gt;
-    &lt;pdx-input name="name"&gt;&lt;/pdx-input&gt;
+  &lt;pdx-form-field :field="basicForm.name" label="Full Name" required&gt;
+    &lt;pdx-input name="name" ::value="basicForm.name"&gt;&lt;/pdx-input&gt;
   &lt;/pdx-form-field&gt;
   &lt;!-- compiler generates :value, @pdx-change, @pdx-blur --&gt;
 &lt;/pdx-form&gt;</code></pre></details>}

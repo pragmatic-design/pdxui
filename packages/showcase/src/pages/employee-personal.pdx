@@ -42,20 +42,20 @@
           <fieldset class="group" data-test="group-residence">
             <legend class="group-title">{{ $t('employees.personal.groups.residence') }}</legend>
             <div class="grid four">
-              <pdx-form-field class="wide" name="street" :label="$t('employees.personal.fields.street')">
-                <pdx-input name="street" data-test="street"></pdx-input>
+              <pdx-form-field class="wide" :field="personal.street" :label="$t('employees.personal.fields.street')">
+                <pdx-input name="street" ::value="personal.street" data-test="street"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="city" :label="$t('employees.personal.fields.city')">
-                <pdx-autocomplete name="city" :suggestions="cities" data-test="city"></pdx-autocomplete>
+              <pdx-form-field :field="personal.city" :label="$t('employees.personal.fields.city')">
+                <pdx-autocomplete name="city" ::value="personal.city" :suggestions="cities" data-test="city"></pdx-autocomplete>
               </pdx-form-field>
-              <pdx-form-field name="postcode" :label="$t('employees.personal.fields.postcode')">
-                <pdx-masked-input name="postcode" mask="#####" data-test="postcode"></pdx-masked-input>
+              <pdx-form-field :field="personal.postcode" :label="$t('employees.personal.fields.postcode')">
+                <pdx-masked-input name="postcode" ::value="personal.postcode" mask="#####" data-test="postcode"></pdx-masked-input>
               </pdx-form-field>
-              <pdx-form-field name="province" :label="$t('employees.personal.fields.province')">
-                <pdx-masked-input name="province" mask="AA" data-test="province"></pdx-masked-input>
+              <pdx-form-field :field="personal.province" :label="$t('employees.personal.fields.province')">
+                <pdx-masked-input name="province" ::value="personal.province" mask="AA" data-test="province"></pdx-masked-input>
               </pdx-form-field>
-              <pdx-form-field name="country" :label="$t('employees.personal.fields.country')">
-                <pdx-select name="country" :options="countries" data-test="country"></pdx-select>
+              <pdx-form-field :field="personal.country" :label="$t('employees.personal.fields.country')">
+                <pdx-select name="country" ::value="personal.country" :options="countries" data-test="country"></pdx-select>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -63,17 +63,17 @@
           <fieldset class="group" data-test="group-birthPlace">
             <legend class="group-title">{{ $t('employees.personal.groups.birthPlace') }}</legend>
             <div class="grid four">
-              <pdx-form-field name="birthCity" :label="$t('employees.personal.fields.city')">
-                <pdx-autocomplete name="birthCity" :suggestions="cities" data-test="birthCity"></pdx-autocomplete>
+              <pdx-form-field :field="personal.birthCity" :label="$t('employees.personal.fields.city')">
+                <pdx-autocomplete name="birthCity" ::value="personal.birthCity" :suggestions="cities" data-test="birthCity"></pdx-autocomplete>
               </pdx-form-field>
-              <pdx-form-field name="birthPostcode" :label="$t('employees.personal.fields.postcode')">
-                <pdx-masked-input name="birthPostcode" mask="#####" data-test="birthPostcode"></pdx-masked-input>
+              <pdx-form-field :field="personal.birthPostcode" :label="$t('employees.personal.fields.postcode')">
+                <pdx-masked-input name="birthPostcode" ::value="personal.birthPostcode" mask="#####" data-test="birthPostcode"></pdx-masked-input>
               </pdx-form-field>
-              <pdx-form-field name="birthProvince" :label="$t('employees.personal.fields.province')">
-                <pdx-masked-input name="birthProvince" mask="AA" data-test="birthProvince"></pdx-masked-input>
+              <pdx-form-field :field="personal.birthProvince" :label="$t('employees.personal.fields.province')">
+                <pdx-masked-input name="birthProvince" ::value="personal.birthProvince" mask="AA" data-test="birthProvince"></pdx-masked-input>
               </pdx-form-field>
-              <pdx-form-field name="birthCountry" :label="$t('employees.personal.fields.country')">
-                <pdx-select name="birthCountry" :options="countries" data-test="birthCountry"></pdx-select>
+              <pdx-form-field :field="personal.birthCountry" :label="$t('employees.personal.fields.country')">
+                <pdx-select name="birthCountry" ::value="personal.birthCountry" :options="countries" data-test="birthCountry"></pdx-select>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -81,17 +81,17 @@
           <fieldset class="group" data-test="group-document">
             <legend class="group-title">{{ $t('employees.personal.groups.document') }}</legend>
             <div class="grid four">
-              <pdx-form-field name="documentType" :label="$t('employees.personal.fields.documentType')">
-                <pdx-select name="documentType" :options="documentTypes" data-test="documentType"></pdx-select>
+              <pdx-form-field :field="personal.documentType" :label="$t('employees.personal.fields.documentType')">
+                <pdx-select name="documentType" ::value="personal.documentType" :options="documentTypes" data-test="documentType"></pdx-select>
               </pdx-form-field>
-              <pdx-form-field name="documentNumber" :label="$t('employees.personal.fields.documentNumber')">
-                <pdx-input name="documentNumber" data-test="documentNumber"></pdx-input>
+              <pdx-form-field :field="personal.documentNumber" :label="$t('employees.personal.fields.documentNumber')">
+                <pdx-input name="documentNumber" ::value="personal.documentNumber" data-test="documentNumber"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="documentIssued" :label="$t('employees.personal.fields.documentIssued')">
-                <pdx-date-picker name="documentIssued" editable data-test="documentIssued"></pdx-date-picker>
+              <pdx-form-field :field="personal.documentIssued" :label="$t('employees.personal.fields.documentIssued')">
+                <pdx-date-picker name="documentIssued" ::value="personal.documentIssued" editable data-test="documentIssued"></pdx-date-picker>
               </pdx-form-field>
-              <pdx-form-field name="documentExpires" :label="$t('employees.personal.fields.documentExpires')">
-                <pdx-date-picker name="documentExpires" editable data-test="documentExpires"></pdx-date-picker>
+              <pdx-form-field :field="personal.documentExpires" :label="$t('employees.personal.fields.documentExpires')">
+                <pdx-date-picker name="documentExpires" ::value="personal.documentExpires" editable data-test="documentExpires"></pdx-date-picker>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -101,17 +101,17 @@
           <fieldset class="group" data-test="group-contacts">
             <legend class="group-title">{{ $t('employees.personal.groups.contacts') }}</legend>
             <div class="grid two">
-              <pdx-form-field name="email" :label="$t('employees.personal.fields.email')">
-                <pdx-input name="email" type="email" data-test="email"></pdx-input>
+              <pdx-form-field :field="personal.email" :label="$t('employees.personal.fields.email')">
+                <pdx-input name="email" ::value="personal.email" type="email" data-test="email"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="phone" :label="$t('employees.personal.fields.phone')">
-                <pdx-input name="phone" type="tel" data-test="phone"></pdx-input>
+              <pdx-form-field :field="personal.phone" :label="$t('employees.personal.fields.phone')">
+                <pdx-input name="phone" ::value="personal.phone" type="tel" data-test="phone"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="mobile" :label="$t('employees.personal.fields.mobile')">
-                <pdx-masked-input name="mobile" mask="+39 ### ### ####" data-test="mobile"></pdx-masked-input>
+              <pdx-form-field :field="personal.mobile" :label="$t('employees.personal.fields.mobile')">
+                <pdx-masked-input name="mobile" ::value="personal.mobile" mask="+39 ### ### ####" data-test="mobile"></pdx-masked-input>
               </pdx-form-field>
-              <pdx-form-field name="channel" :label="$t('employees.personal.fields.channel')">
-                <pdx-segmented name="channel" :options="channels" data-test="channel"></pdx-segmented>
+              <pdx-form-field :field="personal.channel" :label="$t('employees.personal.fields.channel')">
+                <pdx-segmented name="channel" ::value="personal.channel" :options="channels" data-test="channel"></pdx-segmented>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -119,11 +119,11 @@
           <fieldset class="group" data-test="group-emergency">
             <legend class="group-title">{{ $t('employees.personal.groups.emergency') }}</legend>
             <div class="grid two">
-              <pdx-form-field name="emergencyName" :label="$t('employees.personal.fields.emergencyName')">
-                <pdx-input name="emergencyName" data-test="emergencyName"></pdx-input>
+              <pdx-form-field :field="personal.emergencyName" :label="$t('employees.personal.fields.emergencyName')">
+                <pdx-input name="emergencyName" ::value="personal.emergencyName" data-test="emergencyName"></pdx-input>
               </pdx-form-field>
-              <pdx-form-field name="emergencyPhone" :label="$t('employees.personal.fields.emergencyPhone')">
-                <pdx-input name="emergencyPhone" type="tel" data-test="emergencyPhone"></pdx-input>
+              <pdx-form-field :field="personal.emergencyPhone" :label="$t('employees.personal.fields.emergencyPhone')">
+                <pdx-input name="emergencyPhone" ::value="personal.emergencyPhone" type="tel" data-test="emergencyPhone"></pdx-input>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -133,23 +133,23 @@
           <fieldset class="group" data-test="group-work">
             <legend class="group-title">{{ $t('employees.personal.groups.work') }}</legend>
             <div class="grid two">
-              <pdx-form-field name="skills" :label="$t('employees.personal.fields.skills')">
-                <pdx-tag-input name="skills" :placeholder="$t('employees.personal.fields.skillsHint')" data-test="skills"></pdx-tag-input>
+              <pdx-form-field :field="personal.skills" :label="$t('employees.personal.fields.skills')">
+                <pdx-tag-input name="skills" ::value="personal.skills" :placeholder="$t('employees.personal.fields.skillsHint')" data-test="skills"></pdx-tag-input>
               </pdx-form-field>
-              <pdx-form-field name="hireChannel" :label="$t('employees.personal.fields.hireChannel')">
-                <pdx-select name="hireChannel" :options="hireChannels" data-test="hireChannel"></pdx-select>
+              <pdx-form-field :field="personal.hireChannel" :label="$t('employees.personal.fields.hireChannel')">
+                <pdx-select name="hireChannel" ::value="personal.hireChannel" :options="hireChannels" data-test="hireChannel"></pdx-select>
               </pdx-form-field>
-              <pdx-form-field name="startTime" :label="$t('employees.personal.fields.startTime')">
-                <pdx-time-picker name="startTime" data-test="startTime"></pdx-time-picker>
+              <pdx-form-field :field="personal.startTime" :label="$t('employees.personal.fields.startTime')">
+                <pdx-time-picker name="startTime" ::value="personal.startTime" data-test="startTime"></pdx-time-picker>
               </pdx-form-field>
-              <pdx-form-field name="remote" :label="$t('employees.personal.fields.remote')">
-                <pdx-switch name="remote" data-test="remote"></pdx-switch>
+              <pdx-form-field :field="personal.remote" :label="$t('employees.personal.fields.remote')">
+                <pdx-switch name="remote" ::checked="personal.remote" data-test="remote"></pdx-switch>
               </pdx-form-field>
-              <pdx-form-field name="english" :label="$t('employees.personal.fields.english')">
-                <pdx-rating name="english" data-test="english"></pdx-rating>
+              <pdx-form-field :field="personal.english" :label="$t('employees.personal.fields.english')">
+                <pdx-rating name="english" ::value="personal.english" data-test="english"></pdx-rating>
               </pdx-form-field>
-              <pdx-form-field class="wide" name="notes" :label="$t('employees.personal.fields.notes')">
-                <pdx-textarea name="notes" rows="3" data-test="notes"></pdx-textarea>
+              <pdx-form-field class="wide" :field="personal.notes" :label="$t('employees.personal.fields.notes')">
+                <pdx-textarea name="notes" ::value="personal.notes" rows="3" data-test="notes"></pdx-textarea>
               </pdx-form-field>
             </div>
           </fieldset>
@@ -157,11 +157,11 @@
           <fieldset class="group" data-test="group-consents">
             <legend class="group-title">{{ $t('employees.personal.groups.consents') }}</legend>
             <div class="consents">
-              <pdx-form-field name="privacy">
-                <pdx-checkbox name="privacy" :label="$t('employees.personal.fields.privacy')" data-test="privacy"></pdx-checkbox>
+              <pdx-form-field :field="personal.privacy">
+                <pdx-checkbox name="privacy" ::checked="personal.privacy" :label="$t('employees.personal.fields.privacy')" data-test="privacy"></pdx-checkbox>
               </pdx-form-field>
-              <pdx-form-field name="marketing">
-                <pdx-checkbox name="marketing" :label="$t('employees.personal.fields.marketing')" data-test="marketing"></pdx-checkbox>
+              <pdx-form-field :field="personal.marketing">
+                <pdx-checkbox name="marketing" ::checked="personal.marketing" :label="$t('employees.personal.fields.marketing')" data-test="marketing"></pdx-checkbox>
               </pdx-form-field>
             </div>
           </fieldset>

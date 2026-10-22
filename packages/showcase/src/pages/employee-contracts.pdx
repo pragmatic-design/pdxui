@@ -43,17 +43,17 @@
       <div>
         <pdx-form :form="contract" @pdx-submit="onSave" data-test="contract-form">
           <div class="grid">
-            <pdx-form-field name="type" :label="$t('employees.contracts.fields.type')">
-              <pdx-select name="type" :options="typeOptions" data-test="type"></pdx-select>
+            <pdx-form-field :field="contract.type" :label="$t('employees.contracts.fields.type')">
+              <pdx-select name="type" ::value="contract.type" :options="typeOptions" data-test="type"></pdx-select>
             </pdx-form-field>
-            <pdx-form-field name="weeklyHours" :label="$t('employees.contracts.fields.weeklyHours')">
-              <pdx-number-input name="weeklyHours" data-test="weeklyHours"></pdx-number-input>
+            <pdx-form-field :field="contract.weeklyHours" :label="$t('employees.contracts.fields.weeklyHours')">
+              <pdx-number-input name="weeklyHours" ::value="contract.weeklyHours" data-test="weeklyHours"></pdx-number-input>
             </pdx-form-field>
-            <pdx-form-field name="start" :label="$t('employees.contracts.fields.start')">
-              <pdx-date-picker name="start" editable data-test="start"></pdx-date-picker>
+            <pdx-form-field :field="contract.start" :label="$t('employees.contracts.fields.start')">
+              <pdx-date-picker name="start" ::value="contract.start" editable data-test="start"></pdx-date-picker>
             </pdx-form-field>
-            <pdx-form-field name="end" :label="$t('employees.contracts.fields.end')">
-              <pdx-date-picker name="end" editable data-test="end"></pdx-date-picker>
+            <pdx-form-field :field="contract.end" :label="$t('employees.contracts.fields.end')">
+              <pdx-date-picker name="end" ::value="contract.end" editable data-test="end"></pdx-date-picker>
             </pdx-form-field>
           </div>
           <div class="actions">

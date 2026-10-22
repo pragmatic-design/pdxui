@@ -3,8 +3,8 @@
     <h1 class="pdx-txt-title">Field Group</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
       <code>&lt;pdx-field-group&gt;</code> — scopes the fields inside it to a nested object of the form.
-      Inside <code>&lt;pdx-field-group name="customer"&gt;</code>, a field written <code>name="email"</code> is
-      <code>form['customer.email']</code>, and <code>getValues()</code> returns <code>{ customer: { email } }</code>.
+      A field of <code>customer</code> is bound by its full path, <code>::value="form['customer.email']"</code>, and
+      <code>getValues()</code> returns <code>{ customer: { email } }</code>.
       Groups nest, and render inline, as a collapsible panel, or behind a dialog.
     </p>
 

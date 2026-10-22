@@ -28,26 +28,26 @@
             </div>
             <pdx-form :form="details" data-test="details-form">
               <div class="grid two">
-                <pdx-form-field name="name" :label="$t('services.fields.name')">
-                  <pdx-input name="name" data-test="name"></pdx-input>
+                <pdx-form-field :field="details.name" :label="$t('services.fields.name')">
+                  <pdx-input name="name" ::value="details.name" data-test="name"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="code" :label="$t('services.fields.code')">
-                  <pdx-input name="code" data-test="code"></pdx-input>
+                <pdx-form-field :field="details.code" :label="$t('services.fields.code')">
+                  <pdx-input name="code" ::value="details.code" data-test="code"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field class="wide" name="description" :label="$t('services.fields.description')">
-                  <pdx-textarea name="description" rows="2" data-test="description"></pdx-textarea>
+                <pdx-form-field class="wide" :field="details.description" :label="$t('services.fields.description')">
+                  <pdx-textarea name="description" ::value="details.description" rows="2" data-test="description"></pdx-textarea>
                 </pdx-form-field>
-                <pdx-form-field name="slaHours" :label="$t('services.fields.slaHours')">
-                  <pdx-number-input name="slaHours" min="1" data-test="slaHours"></pdx-number-input>
+                <pdx-form-field :field="details.slaHours" :label="$t('services.fields.slaHours')">
+                  <pdx-number-input name="slaHours" ::value="details.slaHours" min="1" data-test="slaHours"></pdx-number-input>
                 </pdx-form-field>
-                <pdx-form-field name="resolveHours" :label="$t('services.fields.resolveHours')">
-                  <pdx-number-input name="resolveHours" min="1" data-test="resolveHours"></pdx-number-input>
+                <pdx-form-field :field="details.resolveHours" :label="$t('services.fields.resolveHours')">
+                  <pdx-number-input name="resolveHours" ::value="details.resolveHours" min="1" data-test="resolveHours"></pdx-number-input>
                 </pdx-form-field>
-                <pdx-form-field name="price" :label="$t('services.fields.price')">
-                  <pdx-number-input name="price" min="0" data-test="price"></pdx-number-input>
+                <pdx-form-field :field="details.price" :label="$t('services.fields.price')">
+                  <pdx-number-input name="price" ::value="details.price" min="0" data-test="price"></pdx-number-input>
                 </pdx-form-field>
-                <pdx-form-field name="active" :label="$t('services.fields.active')">
-                  <pdx-switch name="active" data-test="active"></pdx-switch>
+                <pdx-form-field :field="details.active" :label="$t('services.fields.active')">
+                  <pdx-switch name="active" ::checked="details.active" data-test="active"></pdx-switch>
                 </pdx-form-field>
               </div>
             </pdx-form>

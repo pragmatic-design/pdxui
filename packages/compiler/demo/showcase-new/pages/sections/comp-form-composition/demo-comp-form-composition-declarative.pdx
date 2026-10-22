@@ -2,40 +2,40 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">2. Declarative Composition (Template)</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Same nested DTO, but composed declaratively in the template with <code>&lt;pdx-field-group&gt;</code> and compiler auto-binding.
-      The compiler resolves <code>name="email"</code> inside <code>&lt;pdx-field-group name="customer"&gt;</code>
-      to <code>form['customer.email']</code>.
+      Same nested DTO, but composed declaratively in the template with <code>&lt;pdx-field-group&gt;</code>.
+      A field inside <code>&lt;pdx-field-group name="customer"&gt;</code> is bound by its full path,
+      <code>::value="form['customer.email']"</code>.
     </p>
 
     <div class="demo-block">
       <pdx-form :form="declForm" @pdx-submit="saveDeclForm">
         <div class="form-grid">
-          <pdx-form-field name="orderNumber" label="Order #" required>
-            <pdx-input name="orderNumber"></pdx-input>
+          <pdx-form-field :field="declForm.orderNumber" label="Order #" required>
+            <pdx-input name="orderNumber" ::value="declForm.orderNumber"></pdx-input>
           </pdx-form-field>
         </div>
 
         <pdx-field-group name="customer" label="Customer">
           <div class="form-grid">
-            <pdx-form-field name="name" label="Name" required>
-              <pdx-input name="name" placeholder="Full name"></pdx-input>
+            <pdx-form-field :field="declForm['customer.name']" label="Name" required>
+              <pdx-input name="customer.name" ::value="declForm['customer.name']" placeholder="Full name"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="email" label="Email" required>
-              <pdx-input name="email" type="email" placeholder="email@company.com"></pdx-input>
+            <pdx-form-field :field="declForm['customer.email']" label="Email" required>
+              <pdx-input name="customer.email" ::value="declForm['customer.email']" type="email" placeholder="email@company.com"></pdx-input>
             </pdx-form-field>
           </div>
         </pdx-field-group>
 
         <pdx-field-group name="shipping" label="Shipping Address">
           <div class="form-grid-3">
-            <pdx-form-field name="street" label="Street">
-              <pdx-input name="street"></pdx-input>
+            <pdx-form-field :field="declForm['shipping.street']" label="Street">
+              <pdx-input name="shipping.street" ::value="declForm['shipping.street']"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="city" label="City">
-              <pdx-input name="city"></pdx-input>
+            <pdx-form-field :field="declForm['shipping.city']" label="City">
+              <pdx-input name="shipping.city" ::value="declForm['shipping.city']"></pdx-input>
             </pdx-form-field>
-            <pdx-form-field name="zip" label="ZIP">
-              <pdx-input name="zip"></pdx-input>
+            <pdx-form-field :field="declForm['shipping.zip']" label="ZIP">
+              <pdx-input name="shipping.zip" ::value="declForm['shipping.zip']"></pdx-input>
             </pdx-form-field>
           </div>
         </pdx-field-group>
@@ -54,20 +54,19 @@
     </div>
 
     @raw {<details class="source-block"><summary>Source</summary><pre class="pdx-txt-mono"><code>&lt;pdx-form :form="orderForm"&gt;
-  &lt;pdx-form-field name="orderNumber" label="Order #" required&gt;
-    &lt;pdx-input name="orderNumber" /&gt;
+  &lt;pdx-form-field :field="orderForm.orderNumber" label="Order #" required&gt;
+    &lt;pdx-input name="orderNumber" ::value="orderForm.orderNumber" /&gt;
   &lt;/pdx-form-field&gt;
 
   &lt;pdx-field-group name="customer" label="Customer"&gt;
-    &lt;pdx-form-field name="name" label="Name" required&gt;
-      &lt;pdx-input name="name" /&gt;
+    &lt;pdx-form-field :field="orderForm['customer.name']" label="Name" required&gt;
+      &lt;pdx-input name="customer.name" ::value="orderForm['customer.name']" /&gt;
     &lt;/pdx-form-field&gt;
-    &lt;!-- compiler resolves to form['customer.name'] --&gt;
   &lt;/pdx-field-group&gt;
 
   &lt;pdx-field-group name="shipping" label="Shipping"&gt;
-    &lt;pdx-form-field name="street" label="Street"&gt;...&lt;/pdx-form-field&gt;
-    &lt;pdx-form-field name="city" label="City"&gt;...&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field :field="orderForm['shipping.street']" label="Street"&gt;...&lt;/pdx-form-field&gt;
+    &lt;pdx-form-field :field="orderForm['shipping.city']" label="City"&gt;...&lt;/pdx-form-field&gt;
   &lt;/pdx-field-group&gt;
 &lt;/pdx-form&gt;
 

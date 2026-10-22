@@ -22,7 +22,7 @@ Read this BEFORE writing any `.pdx`: every entry cost real debugging.
   silence** — no class, no `grid-area`, no warning.
 - **A controlled `:value` plus an `@input` over the same signal** on a `<pdx-input>` → the input is recreated on every keystroke → and it loses
   focus. The answer: an **uncontrolled** input (`@input` alone to read it; no `:value` coming back). This does **not** apply inside
-  `<pdx-form :form>`: there the compiler wires named controls itself and gives text controls no `:value` — see the recipe
+  `<pdx-form :form>`: there each control binds its field with `::value="form.x"`, which writes the value only when it changes — see the recipe
   "A long form filled in more than one sitting".
 - **Props that collide with a read-only DOM property**: do NOT use `:prefix` on a custom element
   (`Element.prefix` is read-only → a TypeError). Put the value somewhere else (in the `value`, for instance).

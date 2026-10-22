@@ -11,7 +11,7 @@ import { hostDescriptor } from './codegen-host';
 import { liftStoreExports } from './store-exports';
 import { dropScriptExports } from './script-exports';
 import type { CompileContext } from './compile-context';
-import { applyFormBindings, applyInjectedFormBindings } from './codegen-form-binding';
+import { applyInjectedFormBindings } from './codegen-form-binding';
 import { maskNonCode } from './tokenizer';
 import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } from './navigation-import';
 import { builtinAttachmentsToImport } from './attach-names';
@@ -118,15 +118,12 @@ export function compileNewMode(
         ctx.importedNames.add(name);
     }
 
-    // Form-binding pass: auto-wire <pdx-input name="x"> inside <pdx-form :form="xxx">
-    // Always run — works whether the form was created via @form rune or manually.
-    // A file that calls useForm()/tryUseForm() is a SECTION of the form above it, and its whole
-    // template is wired to that form. Read from the script with comments and strings
-    // masked, so a mention is not a call.
+    // A file that calls useForm()/tryUseForm() is a SECTION of the form above it, and its named
+    // controls are wired to that form — until #613 gives a section an explicit binding. Read from the
+    // script with comments and strings masked, so a mention is not a call. Inside
+    // `<pdx-form :form>` nothing is wired by name any more (#128): a control binds through its model.
     if (declaresFormSection(descriptor.script?.content ?? '')) {
         if (applyInjectedFormBindings(ast, ctx.modelEventOf)) imports.add('tryUseForm');
-    } else {
-        applyFormBindings(ast, undefined, ctx.modelEventOf);
     }
 
     // One render path, in dev and in a build (#107): the inline path.

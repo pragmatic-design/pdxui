@@ -14,20 +14,20 @@
 
       <pdx-form :form="wizardForm">
         <div :style="step0Style()">
-          <pdx-form-field name="username" label="Username" required>
-            <pdx-input name="username" placeholder="Choose username"></pdx-input>
+          <pdx-form-field :field="wizardForm.username" label="Username" required>
+            <pdx-input name="username" ::value="wizardForm.username" placeholder="Choose username"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="password" label="Password" required>
-            <pdx-password-input name="password" placeholder="Min 6 characters"></pdx-password-input>
+          <pdx-form-field :field="wizardForm.password" label="Password" required>
+            <pdx-password-input name="password" ::value="wizardForm.password" placeholder="Min 6 characters"></pdx-password-input>
           </pdx-form-field>
         </div>
 
         <div :style="step1Style()">
-          <pdx-form-field name="fullName" label="Full Name" required>
-            <pdx-input name="fullName" placeholder="John Doe"></pdx-input>
+          <pdx-form-field :field="wizardForm.fullName" label="Full Name" required>
+            <pdx-input name="fullName" ::value="wizardForm.fullName" placeholder="John Doe"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="avatar" label="Avatar URL">
-            <pdx-input name="avatar" type="url" placeholder="https://..."></pdx-input>
+          <pdx-form-field :field="wizardForm.avatar" label="Avatar URL">
+            <pdx-input name="avatar" ::value="wizardForm.avatar" type="url" placeholder="https://..."></pdx-input>
           </pdx-form-field>
         </div>
 

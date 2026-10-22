@@ -278,6 +278,13 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   `createForm` when it runs, with the same code in the message.
 - `name.fields` is gone: `name.fields.x` is `PDX_REMOVED_FORM`, and `pdx migrate` rewrites it to
   `name.x` (`form-fields-member`).
+- Inside `<pdx-form :form="name">`, a library control with only a `name`, or a `<pdx-form-field name="x">`,
+  is `PDX_REMOVED_FORM` (#128): nothing wires it by its name. `pdx migrate` (`form-name-binding`)
+  writes `::<model>="name.x"` from the control's manifest — a control with no manifest entry, or with
+  more than one model (`pdx-checkbox`), is flagged — and `:field="name.x"` on the form field; inside a
+  `<pdx-field-group>` the path is the full one, and so is the control's `name`. A form section, a
+  component whose script calls `useForm()` / `tryUseForm()`, keeps its named controls wired to the form
+  above it (#613).
 - A rule on a field of a rows field is parsed and dropped: `PDX_FORM_ARRAY_RULES_IGNORED`. A row's
   rules are registered by `<pdx-field-list :item-fields>`.
 - A form that no `handleSubmit(` and no `<pdx-form :form="name">` submits is `PDX_FORM_NO_SUBMIT`

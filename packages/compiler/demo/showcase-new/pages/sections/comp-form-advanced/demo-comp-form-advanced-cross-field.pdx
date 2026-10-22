@@ -7,18 +7,18 @@
 
     <div class="demo-block">
       <pdx-form :form="crossForm">
-        <pdx-form-field name="password" label="New Password" required>
-          <pdx-password-input name="password" placeholder="Min 6 characters"></pdx-password-input>
+        <pdx-form-field :field="crossForm.password" label="New Password" required>
+          <pdx-password-input name="password" ::value="crossForm.password" placeholder="Min 6 characters"></pdx-password-input>
         </pdx-form-field>
-        <pdx-form-field name="confirmPassword" label="Confirm Password" required>
-          <pdx-password-input name="confirmPassword" placeholder="Must match"></pdx-password-input>
+        <pdx-form-field :field="crossForm.confirmPassword" label="Confirm Password" required>
+          <pdx-password-input name="confirmPassword" ::value="crossForm.confirmPassword" placeholder="Must match"></pdx-password-input>
         </pdx-form-field>
         <div class="form-grid-2">
-          <pdx-form-field name="startDate" label="Start Date" required>
-            <pdx-date-picker name="startDate"></pdx-date-picker>
+          <pdx-form-field :field="crossForm.startDate" label="Start Date" required>
+            <pdx-date-picker name="startDate" ::value="crossForm.startDate"></pdx-date-picker>
           </pdx-form-field>
-          <pdx-form-field name="endDate" label="End Date" required>
-            <pdx-date-picker name="endDate"></pdx-date-picker>
+          <pdx-form-field :field="crossForm.endDate" label="End Date" required>
+            <pdx-date-picker name="endDate" ::value="crossForm.endDate"></pdx-date-picker>
           </pdx-form-field>
         </div>
         <button type="submit" class="pdx-btn pdx-primary pdx-sm">Validate All</button>

@@ -1,8 +1,8 @@
 // The recipe's probe, compiled and mounted: a section in its own .pdx is part of the form.
 //
 // recipes.md («A long form filled in more than one sitting») measures it with a probe: a form with
-// two named controls, one written beside `<pdx-form>` and one inside a child component, typed into
-// both. A child that calls `useForm()`/`tryUseForm()` declares itself a section of the form above
+// two controls, one written beside `<pdx-form>` — bound through its model, `::value="f.here"` (#128) —
+// and one named inside a child component, typed into both. A child that calls `useForm()`/`tryUseForm()` declares itself a section of the form above
 // it, and the compiler wires its template (packages/compiler/tests/form-binding-injected.test.ts);
 // otherwise the child's control is never wired, and the form holds `{ here: 'A', deep: '' }`. This is
 // that probe: both .pdx files compiled with the real compiler, run against the real @pdxui/core,
@@ -40,7 +40,7 @@ const form = tryUseForm();
 
 const PROBE = `<template>
 <pdx-form :form="f">
-  <pdx-input class="here" name="here"></pdx-input>
+  <pdx-input class="here" name="here" ::value="f.here"></pdx-input>
   <app-probe-section></app-probe-section>
 </pdx-form>
 </template>

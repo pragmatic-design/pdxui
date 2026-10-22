@@ -3,14 +3,14 @@
     <h1>People</h1>
 
     <pdx-form :form="person" @pdx-submit="save.execute($event.detail.values)" data-test="crud-form">
-      <pdx-form-field name="name" label="Name">
-        <pdx-input name="name" data-test="name"></pdx-input>
+      <pdx-form-field :field="person.name" label="Name">
+        <pdx-input name="name" ::value="person.name" data-test="name"></pdx-input>
       </pdx-form-field>
-      <pdx-form-field name="email" label="Email">
-        <pdx-input name="email" type="email" data-test="email"></pdx-input>
+      <pdx-form-field :field="person.email" label="Email">
+        <pdx-input name="email" ::value="person.email" type="email" data-test="email"></pdx-input>
       </pdx-form-field>
-      <pdx-form-field name="role" label="Role">
-        <pdx-input name="role" data-test="role"></pdx-input>
+      <pdx-form-field :field="person.role" label="Role">
+        <pdx-input name="role" ::value="person.role" data-test="role"></pdx-input>
       </pdx-form-field>
       <pdx-button type="submit" variant="primary" :disabled="save.pending()" data-test="save">Save</pdx-button>
     </pdx-form>

@@ -60,7 +60,9 @@ describe('a section that calls useForm() is wired to the form above it', () => {
             "import { useForm, createForm } from '@pdxui/core';\nconst form = useForm();\nconst inner = createForm({ initialValues: { x: '' } });",
             '<pdx-form :form="inner"><pdx-input name="x"></pdx-input></pdx-form><pdx-input name="after"></pdx-input>',
         ), 'section.pdx');
-        expect(code, 'the inner form lost its control').toContain('ctx.inner.x?.onChange(');
+        // The inner form's control binds through its model (#128): nothing wires it by name.
+        expect(code, 'the inner form\'s control was wired by its name').not.toContain('ctx.inner.x?.onChange(');
+        expect(code, 'the inner form\'s control took the section\'s form').not.toContain('tryUseForm(ctx.el)?.x?.onChange(');
         expect(code, 'after the inner form, the section\'s form did not come back').toContain('tryUseForm(ctx.el)?.after?.onChange(');
     });
 
@@ -92,12 +94,12 @@ describe('control — a file that does not declare it is unchanged', () => {
         expect(code).not.toContain('tryUseForm(ctx.el)');
     });
 
-    it('the form\'s own file compiles exactly as before: no injected lookup', () => {
+    it('the form\'s own file has no injected lookup, and no name wiring (#128)', () => {
         const { code } = compile(sfc(
             "import { createForm } from '@pdxui/core';\nconst f = createForm({ initialValues: { here: '' } });",
             '<pdx-form :form="f"><pdx-input name="here"></pdx-input></pdx-form>',
         ), 'owner.pdx');
-        expect(code).toContain('ctx.f.here?.onChange(');
+        expect(code).not.toContain('ctx.f.here?.onChange(');
         expect(code).not.toContain('tryUseForm(ctx.el)');
     });
 });

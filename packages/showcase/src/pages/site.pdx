@@ -32,26 +32,26 @@
             </div>
             <pdx-form :form="details" data-test="details-form">
               <div class="grid two">
-                <pdx-form-field name="name" :label="$t('sites.fields.name')">
-                  <pdx-input name="name" data-test="name"></pdx-input>
+                <pdx-form-field :field="details.name" :label="$t('sites.fields.name')">
+                  <pdx-input name="name" ::value="details.name" data-test="name"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="status" :label="$t('sites.fields.status')">
-                  <pdx-segmented name="status" :options="statuses" data-test="status"></pdx-segmented>
+                <pdx-form-field :field="details.status" :label="$t('sites.fields.status')">
+                  <pdx-segmented name="status" ::value="details.status" :options="statuses" data-test="status"></pdx-segmented>
                 </pdx-form-field>
-                <pdx-form-field class="wide" name="address" :label="$t('sites.fields.address')">
-                  <pdx-input name="address" data-test="address"></pdx-input>
+                <pdx-form-field class="wide" :field="details.address" :label="$t('sites.fields.address')">
+                  <pdx-input name="address" ::value="details.address" data-test="address"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="city" :label="$t('sites.fields.city')">
-                  <pdx-input name="city" data-test="city"></pdx-input>
+                <pdx-form-field :field="details.city" :label="$t('sites.fields.city')">
+                  <pdx-input name="city" ::value="details.city" data-test="city"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="postcode" :label="$t('sites.fields.postcode')">
-                  <pdx-masked-input name="postcode" mask="#####" data-test="postcode"></pdx-masked-input>
+                <pdx-form-field :field="details.postcode" :label="$t('sites.fields.postcode')">
+                  <pdx-masked-input name="postcode" ::value="details.postcode" mask="#####" data-test="postcode"></pdx-masked-input>
                 </pdx-form-field>
-                <pdx-form-field name="province" :label="$t('sites.fields.province')">
-                  <pdx-masked-input name="province" mask="AA" data-test="province"></pdx-masked-input>
+                <pdx-form-field :field="details.province" :label="$t('sites.fields.province')">
+                  <pdx-masked-input name="province" ::value="details.province" mask="AA" data-test="province"></pdx-masked-input>
                 </pdx-form-field>
-                <pdx-form-field name="phone" :label="$t('sites.fields.phone')">
-                  <pdx-input name="phone" type="tel" data-test="phone"></pdx-input>
+                <pdx-form-field :field="details.phone" :label="$t('sites.fields.phone')">
+                  <pdx-input name="phone" ::value="details.phone" type="tel" data-test="phone"></pdx-input>
                 </pdx-form-field>
               </div>
             </pdx-form>

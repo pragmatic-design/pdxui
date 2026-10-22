@@ -7,8 +7,8 @@
 
     <div class="demo-block">
       <pdx-form :form="warningForm">
-        <pdx-form-field name="price" label="Price" required>
-          <pdx-number-input name="price" placeholder="Enter price"></pdx-number-input>
+        <pdx-form-field :field="warningForm.price" label="Price" required>
+          <pdx-number-input name="price" ::value="warningForm.price" placeholder="Enter price"></pdx-number-input>
         </pdx-form-field>
         <pdx-form-actions submitLabel="Save" resetLabel=""></pdx-form-actions>
       </pdx-form>

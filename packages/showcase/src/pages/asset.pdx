@@ -28,27 +28,27 @@
             </div>
             <pdx-form :form="details" data-test="details-form">
               <div class="grid two">
-                <pdx-form-field name="name" :label="$t('assets.fields.name')">
-                  <pdx-input name="name" data-test="name"></pdx-input>
+                <pdx-form-field :field="details.name" :label="$t('assets.fields.name')">
+                  <pdx-input name="name" ::value="details.name" data-test="name"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="serial" :label="$t('assets.fields.serial')">
-                  <pdx-input name="serial" data-test="serial"></pdx-input>
+                <pdx-form-field :field="details.serial" :label="$t('assets.fields.serial')">
+                  <pdx-input name="serial" ::value="details.serial" data-test="serial"></pdx-input>
                 </pdx-form-field>
-                <pdx-form-field name="kind" :label="$t('assets.fields.kind')">
-                  <pdx-select name="kind" :options="kinds" data-test="kind"></pdx-select>
+                <pdx-form-field :field="details.kind" :label="$t('assets.fields.kind')">
+                  <pdx-select name="kind" ::value="details.kind" :options="kinds" data-test="kind"></pdx-select>
                 </pdx-form-field>
-                <pdx-form-field name="status" :label="$t('assets.fields.status')">
-                  <pdx-segmented name="status" :options="statuses" data-test="status"></pdx-segmented>
+                <pdx-form-field :field="details.status" :label="$t('assets.fields.status')">
+                  <pdx-segmented name="status" ::value="details.status" :options="statuses" data-test="status"></pdx-segmented>
                 </pdx-form-field>
-                <pdx-form-field name="installed" :label="$t('assets.fields.installed')">
-                  <pdx-date-picker name="installed" editable data-test="installed"></pdx-date-picker>
+                <pdx-form-field :field="details.installed" :label="$t('assets.fields.installed')">
+                  <pdx-date-picker name="installed" ::value="details.installed" editable data-test="installed"></pdx-date-picker>
                 </pdx-form-field>
-                <pdx-form-field name="warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
-                  <pdx-date-picker name="warrantyEnds" editable data-test="warrantyEnds"></pdx-date-picker>
+                <pdx-form-field :field="details.warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
+                  <pdx-date-picker name="warrantyEnds" ::value="details.warrantyEnds" editable data-test="warrantyEnds"></pdx-date-picker>
                 </pdx-form-field>
                 <!-- The active categories for assets, and any this one carries. -->
-                <pdx-form-field class="wide" name="categories" :label="$t('assets.columns.categories')">
-                  <pdx-select name="categories" multiple :options="categoryChoices" data-test="categories"></pdx-select>
+                <pdx-form-field class="wide" :field="details.categories" :label="$t('assets.columns.categories')">
+                  <pdx-select name="categories" ::value="details.categories" multiple :options="categoryChoices" data-test="categories"></pdx-select>
                 </pdx-form-field>
               </div>
             </pdx-form>

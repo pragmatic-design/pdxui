@@ -79,10 +79,10 @@ describe('recipe: a long form filled in more than one sitting', () => {
         // <pdx-form>'s context. happy-dom sets children up before their parent, so the field has to
         // find the form even when it is set up first, or this could only be checked after a blur.
         const el = await mount();
-        const field = el.querySelector('pdx-form-field[name="shipper"]') as HTMLElement & { error: unknown };
+        // The field is bound by `:field` (#128): its error is the form field's to show, read from the field.
+        const field = el.querySelector('pdx-form-field:has([name="shipper"])') as HTMLElement;
         typeInto(el, 'shipper', 'Ad');
         await tick();
-        expect(field.error, 'the validator did not run on typing').toBe('At least 3 characters');
         expect(field.querySelector('[role="alert"]')?.textContent ?? '', 'no error under the field while typing').toContain('At least 3 characters');
         expect(field.querySelector('input')!.getAttribute('aria-invalid')).toBe('true');
 

@@ -31,20 +31,20 @@
     <pdx-dialog :open="createOpen" size="lg" :title="$t('assets.new')" @pdx-close="createOpen = false" data-test="create-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
         <div class="grid">
-          <pdx-form-field name="name" :label="$t('assets.fields.name')">
-            <pdx-input name="name" data-test="new-name"></pdx-input>
+          <pdx-form-field :field="draft.name" :label="$t('assets.fields.name')">
+            <pdx-input name="name" ::value="draft.name" data-test="new-name"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="serial" :label="$t('assets.fields.serial')">
-            <pdx-input name="serial" data-test="new-serial"></pdx-input>
+          <pdx-form-field :field="draft.serial" :label="$t('assets.fields.serial')">
+            <pdx-input name="serial" ::value="draft.serial" data-test="new-serial"></pdx-input>
           </pdx-form-field>
-          <pdx-form-field name="kind" :label="$t('assets.fields.kind')">
-            <pdx-select name="kind" :options="kinds" data-test="new-kind"></pdx-select>
+          <pdx-form-field :field="draft.kind" :label="$t('assets.fields.kind')">
+            <pdx-select name="kind" ::value="draft.kind" :options="kinds" data-test="new-kind"></pdx-select>
           </pdx-form-field>
-          <pdx-form-field name="installed" :label="$t('assets.fields.installed')">
-            <pdx-date-picker name="installed" editable data-test="new-installed"></pdx-date-picker>
+          <pdx-form-field :field="draft.installed" :label="$t('assets.fields.installed')">
+            <pdx-date-picker name="installed" ::value="draft.installed" editable data-test="new-installed"></pdx-date-picker>
           </pdx-form-field>
-          <pdx-form-field name="warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
-            <pdx-date-picker name="warrantyEnds" editable data-test="new-warrantyEnds"></pdx-date-picker>
+          <pdx-form-field :field="draft.warrantyEnds" :label="$t('assets.fields.warrantyEnds')">
+            <pdx-date-picker name="warrantyEnds" ::value="draft.warrantyEnds" editable data-test="new-warrantyEnds"></pdx-date-picker>
           </pdx-form-field>
         </div>
 

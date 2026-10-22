@@ -2,8 +2,8 @@
   <div class="page">
     <h1 class="pdx-txt-title">Form System</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
-      <code>&lt;pdx-form&gt;</code> — compound form with auto-binding, validation, save modes, schema-driven templates, and DataSource integration.
-      The compiler auto-wires controls inside <code>&lt;pdx-form&gt;</code> when they have a <code>name</code> attribute.
+      <code>&lt;pdx-form&gt;</code> — compound form with validation, save modes, schema-driven templates, and DataSource integration.
+      Each control binds its field through its model, <code>::value="form.email"</code>, and <code>&lt;pdx-form-field :field&gt;</code> shows the field's error.
     </p>
 
     <!-- ═══ 1. Basic Form — Compiler Binding ═══ -->

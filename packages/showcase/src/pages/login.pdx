@@ -23,11 +23,11 @@
     <!-- A real form: `<pdx-form>` validates before it emits, so `onSubmit` is only ever called
          with values that passed. The Enter key works because it is a real `<form>` underneath. -->
     <pdx-form :form="credentials" @pdx-submit="onSubmit" data-test="login-form">
-      <pdx-form-field name="username" :label="$t('login.username')">
-        <pdx-input name="username" autocomplete="username" data-test="username"></pdx-input>
+      <pdx-form-field :field="credentials.username" :label="$t('login.username')">
+        <pdx-input name="username" ::value="credentials.username" autocomplete="username" data-test="username"></pdx-input>
       </pdx-form-field>
-      <pdx-form-field name="password" :label="$t('login.password')">
-        <pdx-input name="password" type="password" autocomplete="current-password" data-test="password"></pdx-input>
+      <pdx-form-field :field="credentials.password" :label="$t('login.password')">
+        <pdx-input name="password" ::value="credentials.password" type="password" autocomplete="current-password" data-test="password"></pdx-input>
       </pdx-form-field>
 
       <pdx-button type="submit" variant="primary" :disabled="pending" data-test="sign-in">

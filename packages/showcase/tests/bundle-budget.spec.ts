@@ -285,7 +285,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // two-way protocol in core, its `.number` parse error, `pdx-form-field`'s `:field`. Same machine, same
 // day, the built dist: main 483 836 → this branch 484 351 bytes gzip (472.5 → 473.0 KB); CI's Linux
 // build measured the branch at 473.1.
-const BUDGET_KB = { entry: 43, js: 474, css: 63, blocking: 99 };
+// js 474 → 469: inside `<pdx-form :form>` a control binds its field through its model, and the name
+// wiring the compiler injected on every named control and form field is gone (#128). The pre-push
+// build: main 473.0 → this branch 468.8 KB.
+const BUDGET_KB = { entry: 43, js: 469, css: 63, blocking: 99 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -9,8 +9,8 @@
       <div class="demo-card">
         <h3 class="pdx-txt-small pdx-weight-semibold">onBlur (default)</h3>
         <pdx-form :form="blurForm">
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" placeholder="Validate on blur"></pdx-input>
+          <pdx-form-field :field="blurForm.email" label="Email" required>
+            <pdx-input name="email" ::value="blurForm.email" placeholder="Validate on blur"></pdx-input>
           </pdx-form-field>
         </pdx-form>
       </div>
@@ -18,8 +18,8 @@
       <div class="demo-card">
         <h3 class="pdx-txt-small pdx-weight-semibold">onChange</h3>
         <pdx-form :form="changeForm">
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" placeholder="Validate on change"></pdx-input>
+          <pdx-form-field :field="changeForm.email" label="Email" required>
+            <pdx-input name="email" ::value="changeForm.email" placeholder="Validate on change"></pdx-input>
           </pdx-form-field>
         </pdx-form>
       </div>
@@ -27,8 +27,8 @@
       <div class="demo-card">
         <h3 class="pdx-txt-small pdx-weight-semibold">onSubmit</h3>
         <pdx-form :form="submitForm">
-          <pdx-form-field name="email" label="Email" required>
-            <pdx-input name="email" placeholder="Validate on submit"></pdx-input>
+          <pdx-form-field :field="submitForm.email" label="Email" required>
+            <pdx-input name="email" ::value="submitForm.email" placeholder="Validate on submit"></pdx-input>
           </pdx-form-field>
           <button type="submit" class="pdx-btn pdx-primary pdx-sm">Submit</button>
         </pdx-form>
