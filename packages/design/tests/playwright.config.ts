@@ -43,7 +43,9 @@ export default defineConfig({
         trace: 'on-first-retry',
     },
     webServer: {
-        command: 'npx http-server ../. -p 3333 -s -c-1',
+        // A server of the repository's own, not `npx http-server`: nothing depends on that, so every
+        // CI run downloaded it, and a slow registry failed the job before a test ran (#615).
+        command: 'node static-server.mjs ../. 3333',
         port: 3333,
         reuseExistingServer: !process.env.CI,
     },

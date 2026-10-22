@@ -325,7 +325,7 @@ Key features used: `@layer`, `light-dark()`, `oklch()`, Container Queries, CSS N
 
 ```bash
 # Serve demo locally
-npx http-server . -p 3333 -c-1
+node tests/static-server.mjs . 3333
 # Open http://localhost:3333/demo/showcase.html
 
 # Run tests (137 automated checks)
