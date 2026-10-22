@@ -30,16 +30,16 @@ function windowForm(validateOn: 'onChange' | 'onBlur' | 'onSubmit' = 'onChange')
 describe('a form-level rule that reads every value', () => {
     it('puts its message on the field it names', () => {
         const form = windowForm();
-        form.fields.start.onChange('2026-03-10');
-        form.fields.end.onChange('2026-03-01');
-        expect(form.fields.end.error()).toBe('The end precedes the start');
+        form.start.onChange('2026-03-10');
+        form.end.onChange('2026-03-01');
+        expect(form.end.error()).toBe('The end precedes the start');
     });
 
     it('makes the form invalid while it stands', () => {
         // The half the page-level workaround could never have: `valid()` knew nothing about it.
         const form = windowForm();
-        form.fields.start.onChange('2026-03-10');
-        form.fields.end.onChange('2026-03-01');
+        form.start.onChange('2026-03-10');
+        form.end.onChange('2026-03-01');
         expect(form.valid()).toBe(false);
         expect(form.errors().end).toBe('The end precedes the start');
     });
@@ -47,12 +47,12 @@ describe('a form-level rule that reads every value', () => {
     it('and clears it when the values stop disagreeing', () => {
         // A rule is a RECOMPUTE, not an accumulation: correcting either field has to lift it.
         const form = windowForm();
-        form.fields.start.onChange('2026-03-10');
-        form.fields.end.onChange('2026-03-01');
-        expect(form.fields.end.error()).toBeTruthy();
+        form.start.onChange('2026-03-10');
+        form.end.onChange('2026-03-01');
+        expect(form.end.error()).toBeTruthy();
 
-        form.fields.end.onChange('2026-03-20');
-        expect(form.fields.end.error()).toBeUndefined();
+        form.end.onChange('2026-03-20');
+        expect(form.end.error()).toBeUndefined();
         expect(form.valid()).toBe(true);
     });
 
@@ -67,18 +67,18 @@ describe('a form-level rule that reads every value', () => {
             validateOn: 'onChange',
             validate: () => ({ end: 'The end precedes the start' }),
         });
-        form.fields.end.onChange('');
-        expect(form.fields.end.error()).toBe('This field is required');
+        form.end.onChange('');
+        expect(form.end.error()).toBe('This field is required');
     });
 
     it('runs on submit too, and fails it', async () => {
         // `validateOn: 'onSubmit'` never calls the field path, so a rule wired only there would
         // let a bad pair through the one gate that matters.
         const form = windowForm('onSubmit');
-        form.fields.start.onChange('2026-03-10');
-        form.fields.end.onChange('2026-03-01');
+        form.start.onChange('2026-03-10');
+        form.end.onChange('2026-03-01');
         expect(await form.validate(), 'submit validation passed a pair the rule rejects').toBe(false);
-        expect(form.fields.end.error()).toBe('The end precedes the start');
+        expect(form.end.error()).toBe('The end precedes the start');
     });
 
     it('and a form with no rule behaves exactly as before', () => {
@@ -88,8 +88,8 @@ describe('a form-level rule that reads every value', () => {
             validators: { start: [required()] },
             validateOn: 'onChange',
         });
-        form.fields.start.onChange('2026-03-10');
-        form.fields.end.onChange('2026-03-01');
+        form.start.onChange('2026-03-10');
+        form.end.onChange('2026-03-01');
         expect(form.valid()).toBe(true);
         expect(form.errors()).toEqual({});
     });
@@ -101,7 +101,7 @@ describe('a form-level rule that reads every value', () => {
             validateOn: 'onChange',
             validate: () => ({ nosuchfield: 'nope' } as Record<string, string>),
         });
-        form.fields.start.onChange('x');
+        form.start.onChange('x');
         expect(form.valid(), 'an unroutable message let the form call itself valid').toBe(false);
         expect((form.errors() as Record<string, string>).nosuchfield).toBe('nope');
     });

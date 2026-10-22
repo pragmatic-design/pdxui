@@ -15,7 +15,7 @@
 // field array wins.
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createForm, createFieldArray, FORM_INTERNALS } from '@pdxui/core';
+import { createForm, createFieldArray, formField, FORM_INTERNALS } from '@pdxui/core';
 import '../../src/field-list/pdx-field-list';
 import { cleanup } from './helpers';
 
@@ -86,7 +86,7 @@ describe('they are two storages, and under one name the array wins', () => {
         document.body.appendChild(el);
         await vi.waitFor(() => expect(el.querySelectorAll('.pdx-field-list-row')).toHaveLength(1));
 
-        form.fields['rooms.0.type'].onChange('edited in the list');
+        formField(form, 'rooms.0.type')!.onChange('edited in the list');
         expect((form.getValues() as { rooms: { type: string }[] }).rooms[0].type,
             'the edit did not reach getValues() at all').toBe('edited in the list');
 

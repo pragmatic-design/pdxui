@@ -1,6 +1,6 @@
 // The form-template wizard step-gate must validate group/list fields too, and wait for async
 // validators. Not by mapping step fields to `f.name`: a group field ('address') has no own entry
-// in form.fields — only its leaves ('address.street') — so such a gate would silently pass with
+// among the form's fields — only its leaves ('address.street') — so such a gate would silently pass with
 // invalid data and advance.
 
 import { describe, it, expect, beforeEach } from 'vitest';
@@ -51,7 +51,7 @@ describe('wizard gate validates group-field leaves', () => {
     it('advances once the required group leaf is filled', async () => {
         const el = await mountTemplate();
         const form = (el as any).getForm();
-        form.fields['address.street'].onChange('123 Main St');
+        form['address.street'].onChange('123 Main St');
         await tick(20);
 
         await (el as any).wizardNext();

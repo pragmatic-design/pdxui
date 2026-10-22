@@ -4,7 +4,7 @@
     <p class="pdx-txt-body pdx-ink-muted intro">
       <code>&lt;pdx-field-group&gt;</code> — scopes the fields inside it to a nested object of the form.
       Inside <code>&lt;pdx-field-group name="customer"&gt;</code>, a field written <code>name="email"</code> is
-      <code>form.fields['customer.email']</code>, and <code>getValues()</code> returns <code>{ customer: { email } }</code>.
+      <code>form['customer.email']</code>, and <code>getValues()</code> returns <code>{ customer: { email } }</code>.
       Groups nest, and render inline, as a collapsible panel, or behind a dialog.
     </p>
 

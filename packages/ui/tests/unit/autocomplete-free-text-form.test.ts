@@ -21,7 +21,7 @@ async function wired(suggestions: unknown[] = ['Rome', 'Milan']) {
     ac.suggestions = suggestions;
     // What the compiler injects for a control that declares a model.
     ac.addEventListener('value-change', ((e: CustomEvent) =>
-        form.fields.city.onChange(e.detail?.value)) as EventListener);
+        form.city.onChange(e.detail?.value)) as EventListener);
     await tick();
     return { form, ac, input: ac.querySelector('input') as HTMLInputElement };
 }

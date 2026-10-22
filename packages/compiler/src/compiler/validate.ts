@@ -8,7 +8,7 @@ import type { ScriptAnalysis } from './script-analyzer';
 import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
-import { checkFormRules } from './form-rules';
+import { checkFormRules, checkFormFieldNames } from './form-rules';
 import { DEFER_TRIGGERS, unknownDeferTriggers, parseDeferTriggers } from './defer-triggers';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
@@ -327,6 +327,8 @@ export function validate(
     checkUndeclaredRefs(analysis, templateIds, warnings);
     // A @form rule that is neither core's nor the script's.
     checkFormRules(analysis, warnings);
+    // A @form field named like a member of the form.
+    checkFormFieldNames(analysis, warnings);
 
     // ─── Check 1: Non-reactive variables in template ───────────────
 

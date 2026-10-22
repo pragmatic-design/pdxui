@@ -379,11 +379,11 @@
             const emailInput = document.getElementById('f-email');
             const msgInput = document.getElementById('f-message');
 
-            nameInput.oninput = (e) => form.fields.name.onChange(e.target.value);
-            nameInput.onblur = () => form.fields.name.onBlur();
-            emailInput.oninput = (e) => form.fields.email.onChange(e.target.value);
-            emailInput.onblur = () => form.fields.email.onBlur();
-            msgInput.oninput = (e) => form.fields.message.onChange(e.target.value);
+            nameInput.oninput = (e) => form.name.onChange(e.target.value);
+            nameInput.onblur = () => form.name.onBlur();
+            emailInput.oninput = (e) => form.email.onChange(e.target.value);
+            emailInput.onblur = () => form.email.onBlur();
+            msgInput.oninput = (e) => form.message.onChange(e.target.value);
 
             effect(() => {
                 const s = form.state();
@@ -396,12 +396,12 @@
             });
 
             effect(() => {
-                const err = form.fields.name.error();
+                const err = form.name.error();
                 document.getElementById('f-name-err').textContent = err || '';
                 nameInput.classList.toggle('error', !!err);
             });
             effect(() => {
-                const err = form.fields.email.error();
+                const err = form.email.error();
                 document.getElementById('f-email-err').textContent = err || '';
                 emailInput.classList.toggle('error', !!err);
             });

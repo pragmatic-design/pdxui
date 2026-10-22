@@ -24,7 +24,7 @@ function withRows() {
         addField(path: string, value: unknown): void;
     }>)[Object.getOwnPropertySymbols(form).find(s => String(s).includes('form-internals'))!];
     internals.addField('lines.0.activity', 'Survey');
-    form.fields.lines.onChange([{ activity: 'Survey' }]);
+    form.lines.onChange([{ activity: 'Survey' }]);
     return form;
 }
 
@@ -83,7 +83,7 @@ describe('a leaf that also has dotted children', () => {
         internals.addField('lines.0.activity', 'Survey');
         internals.addField('lines.1.activity', 'Report');
         // The stale mirror, exactly as the page ends up holding it.
-        form.fields.lines.onChange([{ activity: 'Survey' }, { activity: 'Report' }]);
+        form.lines.onChange([{ activity: 'Survey' }, { activity: 'Report' }]);
         internals.removeFields('lines.0');
         internals.renameFields('lines.1', 'lines.0');
         return form;
@@ -99,7 +99,7 @@ describe('a leaf that also has dotted children', () => {
         // empty list would come back undefined.
         const form = createForm<{ lines: unknown[] }>({ initialValues: { lines: [] } });
         expect(form.getValues().lines).toEqual([]);
-        form.fields.lines.onChange([{ activity: 'Typed straight in' }]);
+        form.lines.onChange([{ activity: 'Typed straight in' }]);
         expect(form.getValues().lines).toEqual([{ activity: 'Typed straight in' }]);
     });
 });

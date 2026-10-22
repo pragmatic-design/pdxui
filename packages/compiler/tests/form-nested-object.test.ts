@@ -11,7 +11,7 @@
 // objects (`[{ … }]`) and one for an object.
 //
 // What the author would see: the controls render, the characters appear as they type, and nothing
-// arrives. The compiler binds each one to `intake.fields['address.street']?.onChange(…)` — the
+// arrives. The compiler binds each one to `intake['address.street']?.onChange(…)` — the
 // optional chaining is right for a template and fatal here, because the field does not exist and
 // the call is skipped. `<pdx-field-group name="address">`, the component built for this, depends on
 // it the same way. And `docs/forms.md` documents the shape as supported: nested initial

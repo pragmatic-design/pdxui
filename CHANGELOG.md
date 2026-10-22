@@ -256,6 +256,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** a form's fields are its members: `f.email`, a nested one `f['customer.name']`, beside
+  `f.valid()` and `f.reset()`. `f.fields` is gone; `f.fields.x` in a `.pdx` is `PDX_REMOVED_FORM`, and
+  `pdx migrate` rewrites it to `f.x` in `.pdx` and `.ts` files, for the names a file declares as a form.
+  - A field named like a member of the form — `valid`, `errors`, `reset`, `dirty`, `state`, `touched`,
+    `getValues`, `handleSubmit`, `array` and the others — is `PDX_FORM_FIELD_RESERVED` on an inline
+    `@form`, and `createForm` throws with that code for any form. `pdx migrate` flags it: the field's
+    name is also the server's, so the rename is the author's.
+  - A name known only at run time is read with `formField(form, name)`, which returns the field or
+    `undefined` and never a member; `formFieldNames(form)` lists the fields. Both are exported from
+    `@pdxui/core`. A form typed by a record types no field members: it reads them this way. (#128)
 - **Breaking:** `pdx-relative-time`'s wording length is `format-style` (`formatStyle`), no longer
   `style`. A prop named `style` replaced the element's own `style`, so `el.style.color = …` threw.
   `pdx migrate` rewrites `style="long"`, `"short"` and `"narrow"` on the tag; any other `style` is an

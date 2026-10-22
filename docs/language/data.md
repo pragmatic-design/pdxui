@@ -247,8 +247,11 @@ are validated under their dotted path (`'address.city'`). An external schema com
 (Zod, Valibot, ArkType). The options map to `createForm`'s: `save` → `saveMode`, `fields` →
 `fieldConfig`, `validate` (a function that reads every value and returns messages by field),
 `warnUnsaved`, `source`, `parent` — and `source` or `parent` adds `name: 'formName'`. The result is a
-`Form`: `fields.x` (`value()`, `error()`, `touched()`, `onChange(v)`, `onBlur()`), `valid()`,
-`errors()`, `dirty()`, `getValues()`, `handleSubmit(fn)`, `reset()`, `array(name)`.
+`Form`: each field is a member, `name.x` — a nested one by its dotted path, `name['address.city']` —
+with `value()`, `error()`, `touched()`, `dirty()`, `required`, `onChange(v)`, `onBlur()` (#128); beside
+them the form's own members, `valid()`, `errors()`, `dirty()`, `getValues()`, `handleSubmit(fn)`,
+`reset()`, `array(name)`. A field whose name is known only at run time is `formField(form, name)`,
+undefined for a name that is no field.
 
 `handleSubmit(fn)` returns a handler that returns the submit's promise; a second submit while one
 runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)
@@ -265,6 +268,14 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   word (`Schemas.User`), is `PDX_UNKNOWN_DECLARATION`, and nothing is generated.
 - A field that produces nothing — fields separated by `;`, rules not in braces, an object nested in
   an object — is `PDX_FORM_FIELD_UNPARSED`.
+- A field named like a member of the form — `valid`, `dirty`, `touched`, `submitting`, `submitted`,
+  `errors`, `warnings`, `saveMode`, `validateOn`, `state`, `submitError`, `formError`, `handleSubmit`,
+  `reset`, `setValues`, `validate`, `array`, `getValues`, `onFieldSave`, `dispose` — is
+  `PDX_FORM_FIELD_RESERVED` (error): it would hide the member. An object's leaves are not checked
+  (`state: { code }` makes `state.code`). A form whose schema the compiler does not read is refused by
+  `createForm` when it runs, with the same code in the message.
+- `name.fields` is gone: `name.fields.x` is `PDX_REMOVED_FORM`, and `pdx migrate` rewrites it to
+  `name.x` (`form-fields-member`).
 - A rule on a field of a rows field is parsed and dropped: `PDX_FORM_ARRAY_RULES_IGNORED`. A row's
   rules are registered by `<pdx-field-list :item-fields>`.
 - A form that no `handleSubmit(` and no `<pdx-form :form="name">` submits is `PDX_FORM_NO_SUBMIT`
@@ -287,7 +298,7 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
 ```pdx
 <template>
   <form @submit="submit">
-    <input :value="signup.fields.name.value()" @input="setName" @blur="signup.fields.name.onBlur()" />
+    <input :value="signup.name.value()" @input="setName" @blur="signup.name.onBlur()" />
     @if (signup.errors().name) {
       <p>{{ signup.errors().name }}</p>
     }
@@ -312,7 +323,7 @@ function checkAge(values: { age: number }) {
 }
 
 function setName(e: Event) {
-  signup.fields.name.onChange((e.target as HTMLInputElement).value);
+  signup.name.onChange((e.target as HTMLInputElement).value);
 }
 
 const submit = signup.handleSubmit(async (values) => {

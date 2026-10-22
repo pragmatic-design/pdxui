@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { flattenValues, unflattenValues, getNestedValue, setNestedValue, getFieldsByPrefix } from '../src/form/form-path';
-import { createForm } from '../src/form/form';
+import { createForm, formField } from '../src/form/form';
 import { FORM_INTERNALS } from '../src/form/form';
 import type { FormInternals } from '../src/form/form';
 
@@ -253,10 +253,10 @@ describe('createForm — nested initialValues', () => {
                 customer: { name: 'Jane', email: 'jane@test.com' },
             },
         });
-        expect(form.fields['customer.name']).toBeDefined();
-        expect(form.fields['customer.email']).toBeDefined();
-        expect(form.fields['customer.name'].value()).toBe('Jane');
-        expect(form.fields['customer.email'].value()).toBe('jane@test.com');
+        expect(form['customer.name']).toBeDefined();
+        expect(form['customer.email']).toBeDefined();
+        expect(form['customer.name'].value()).toBe('Jane');
+        expect(form['customer.email'].value()).toBe('jane@test.com');
     });
 
     it('creates fields for deeply nested objects', () => {
@@ -265,8 +265,8 @@ describe('createForm — nested initialValues', () => {
                 billing: { address: { city: 'NYC' } },
             },
         });
-        expect(form.fields['billing.address.city']).toBeDefined();
-        expect(form.fields['billing.address.city'].value()).toBe('NYC');
+        expect(form['billing.address.city']).toBeDefined();
+        expect(form['billing.address.city'].value()).toBe('NYC');
     });
 
     it('creates fields for array items', () => {
@@ -275,9 +275,9 @@ describe('createForm — nested initialValues', () => {
                 items: [{ product: 'Widget', qty: 2 }],
             },
         });
-        expect(form.fields['items.0.product']).toBeDefined();
-        expect(form.fields['items.0.product'].value()).toBe('Widget');
-        expect(form.fields['items.0.qty'].value()).toBe(2);
+        expect(form['items.0.product']).toBeDefined();
+        expect(form['items.0.product'].value()).toBe('Widget');
+        expect(form['items.0.qty'].value()).toBe(2);
     });
 
     it('getValues() reconstructs nested object', () => {
@@ -306,7 +306,7 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: { customer: { name: 'Jane' } },
         });
-        const field = form.fields['customer.name'];
+        const field = form['customer.name'];
         field.onChange('John');
         expect(field.value()).toBe('John');
         expect(field.dirty()).toBe(true);
@@ -316,12 +316,12 @@ describe('createForm — nested initialValues', () => {
         const form = createForm({
             initialValues: { customer: { name: 'Jane' } },
         });
-        form.fields['customer.name'].onChange('John');
-        expect(form.fields['customer.name'].value()).toBe('John');
+        form['customer.name'].onChange('John');
+        expect(form['customer.name'].value()).toBe('John');
 
         form.reset();
-        expect(form.fields['customer.name'].value()).toBe('Jane');
-        expect(form.fields['customer.name'].dirty()).toBe(false);
+        expect(form['customer.name'].value()).toBe('Jane');
+        expect(form['customer.name'].dirty()).toBe(false);
     });
 
     it('reset(newValues) updates with flattened new values', () => {
@@ -329,7 +329,7 @@ describe('createForm — nested initialValues', () => {
             initialValues: { customer: { name: 'Jane' } },
         });
         form.reset({ customer: { name: 'Alice' } });
-        expect(form.fields['customer.name'].value()).toBe('Alice');
+        expect(form['customer.name'].value()).toBe('Alice');
     });
 
     it('setValues() applies nested partial update', () => {
@@ -339,7 +339,7 @@ describe('createForm — nested initialValues', () => {
             },
         });
         form.setValues({ customer: { name: 'John' } });
-        expect(form.fields['customer.name'].value()).toBe('John');
+        expect(form['customer.name'].value()).toBe('John');
         // email unchanged because setValues only updates matching keys
     });
 
@@ -352,7 +352,7 @@ describe('createForm — nested initialValues', () => {
         });
         const valid = await form.validate();
         expect(valid).toBe(false);
-        expect(form.fields['customer.name'].error()).toBe('Required');
+        expect(form['customer.name'].error()).toBe('Required');
     });
 
     it('form.valid is reactive to nested field errors', () => {
@@ -364,10 +364,10 @@ describe('createForm — nested initialValues', () => {
             validateOn: 'onChange',
         });
         // Trigger validation via onChange
-        form.fields['customer.name'].onChange('');
+        form['customer.name'].onChange('');
         expect(form.valid()).toBe(false);
 
-        form.fields['customer.name'].onChange('Jane');
+        form['customer.name'].onChange('Jane');
         expect(form.valid()).toBe(true);
     });
 });
@@ -379,9 +379,9 @@ describe('createForm — flat backward compat', () => {
         const form = createForm({
             initialValues: { name: '', email: '' },
         });
-        expect(form.fields.name).toBeDefined();
-        expect(form.fields.email).toBeDefined();
-        expect(form.fields.name.value()).toBe('');
+        expect(form.name).toBeDefined();
+        expect(form.email).toBeDefined();
+        expect(form.name.value()).toBe('');
     });
 
     it('getValues() returns flat object', () => {
@@ -395,13 +395,13 @@ describe('createForm — flat backward compat', () => {
         const form = createForm<Record<string, unknown>>({
             initialValues: { name: '' },
         });
-        form.fields.name.onChange('Jane');
-        expect(form.fields.name.value()).toBe('Jane');
-        expect(form.fields.name.dirty()).toBe(true);
+        formField(form, 'name')!.onChange('Jane');
+        expect(formField(form, 'name')!.value()).toBe('Jane');
+        expect(formField(form, 'name')!.dirty()).toBe(true);
 
         form.reset();
-        expect(form.fields.name.value()).toBe('');
-        expect(form.fields.name.dirty()).toBe(false);
+        expect(formField(form, 'name')!.value()).toBe('');
+        expect(formField(form, 'name')!.dirty()).toBe(false);
     });
 
     it('validation works on flat fields', async () => {
@@ -411,7 +411,7 @@ describe('createForm — flat backward compat', () => {
         });
         const valid = await form.validate();
         expect(valid).toBe(false);
-        expect(form.fields.name.error()).toBe('Required');
+        expect(form.name.error()).toBe('Required');
     });
 });
 
@@ -425,8 +425,8 @@ describe('FORM_INTERNALS', () => {
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
         internals.addField('email', 'test@test.com');
 
-        expect(form.fields['email']).toBeDefined();
-        expect(form.fields['email'].value()).toBe('test@test.com');
+        expect(formField(form, 'email')).toBeDefined();
+        expect(formField(form, 'email')!.value()).toBe('test@test.com');
     });
 
     it('addField is idempotent', () => {
@@ -436,7 +436,7 @@ describe('FORM_INTERNALS', () => {
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
         internals.addField('name', 'override');
         // Should NOT override existing field
-        expect(form.fields.name.value()).toBe('Jane');
+        expect(formField(form, 'name')!.value()).toBe('Jane');
     });
 
     it('removeFields removes all fields with prefix', () => {
@@ -446,11 +446,11 @@ describe('FORM_INTERNALS', () => {
             },
         });
         const internals = (form as any)[FORM_INTERNALS] as FormInternals;
-        expect(form.fields['items.0.product']).toBeDefined();
+        expect(form['items.0.product']).toBeDefined();
 
         internals.removeFields('items.0');
-        expect(form.fields['items.0.product']).toBeUndefined();
-        expect(form.fields['items.0.qty']).toBeUndefined();
+        expect(form['items.0.product']).toBeUndefined();
+        expect(form['items.0.qty']).toBeUndefined();
     });
 
     it('renameFields re-indexes fields', () => {
@@ -468,9 +468,9 @@ describe('FORM_INTERNALS', () => {
         internals.removeFields('items.0');
         internals.renameFields('items.1', 'items.0');
 
-        expect(form.fields['items.0.product']).toBeDefined();
-        expect(form.fields['items.0.product'].value()).toBe('B');
-        expect(form.fields['items.1.product']).toBeUndefined();
+        expect(form['items.0.product']).toBeDefined();
+        expect(form['items.0.product'].value()).toBe('B');
+        expect(form['items.1.product']).toBeUndefined();
     });
 
     it('getFieldPaths returns all current paths', () => {
@@ -498,7 +498,7 @@ describe('FORM_INTERNALS', () => {
         expect(form.valid()).toBe(true);
 
         // Change new field to dirty
-        form.fields['email'].onChange('changed');
+        formField(form, 'email')!.onChange('changed');
         expect(form.dirty()).toBe(true);
     });
 });
@@ -533,7 +533,7 @@ describe('FORM_INTERNALS — the timers of removed fields', () => {
 
         const internals = (form as unknown as Record<symbol, FormInternals>)[FORM_INTERNALS];
         internals.addField('items.0.name', '');
-        form.fields['items.0.name'].onChange('abc'); // arms the debounce
+        formField(form, 'items.0.name')!.onChange('abc'); // arms the debounce
         internals.removeFields('items.0'); // removed before the flush
 
         await vi.advanceTimersByTimeAsync(500);

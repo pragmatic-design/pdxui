@@ -23,9 +23,9 @@ added. **Not when** you want keyed rows that survive a removal → `createFieldA
 
 **Pitfalls**
 - It needs a form: `:form`, or an enclosing `<pdx-form>`. Without one the add button does nothing, silently.
-- A row's fields are not in `form.fields` until the row exists; a per-step check reads them by dotted path,
+- A row's fields are not fields of the form until the row exists; a per-step check reads them by dotted path,
   `lines.${i}.activity`.
-- `form.fields.<name>` — the array itself — mirrors the rows only when the array was seeded EMPTY; a filled
+- `form.<name>` — the array itself — mirrors the rows only when the array was seeded EMPTY; a filled
   initial array has no such leaf, and the dotted fields are the only state.
 - Inside a `<pdx-field-group>` its rows are prefixed with the group's path.
 
@@ -102,7 +102,7 @@ const orderForm = createForm({
 
 ```js
 function setTask(index, key, value) {
-  taskForm.fields['tasks.' + index + '.' + key].onChange(value);
+  taskForm['tasks.' + index + '.' + key].onChange(value);
 }
 ```
 

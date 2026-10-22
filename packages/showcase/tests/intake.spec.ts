@@ -360,7 +360,7 @@ test('a row added to the list is validated one by one, and reaches the payload',
 
     // Empty and required: the step does not advance.
     //
-    // The guard on this screen asks `intake.fields.lines.value()` which rows to check, so
+    // The guard on this screen asks `intake.lines.value()` which rows to check, so
     // `<pdx-field-list>` mirrors its rows, kept as dotted paths, onto that array field. Without
     // that the guard reads `[]`, has nothing to check, and lets the step through; the panel it
     // leaves then hides — correctly — and the fill below times out on a cell that has gone off

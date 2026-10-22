@@ -7,7 +7,7 @@
 // and what matches no field is the form's own error.
 
 import { describe, it, expect } from 'vitest';
-import { createForm, HttpError } from '../src/index';
+import { createForm, formField, HttpError } from '../src/index';
 
 const submitEvent = () => new Event('submit', { cancelable: true });
 
@@ -29,9 +29,9 @@ describe('server field errors in RFC 9457 shape', () => {
     it('land on their fields, and what matches no field is the form\'s error', async () => {
         const form = signUp();
         await rejectedWith(form, new HttpError(422, 'Unprocessable Entity', '/api/sign-up', problem));
-        expect(form.fields.email.error(), 'the email field shows nothing of the server\'s refusal').toBe('Already registered');
-        expect(form.fields['items.0.name'].error(), 'a row field missed its message').toBe('Required');
-        expect(form.fields['items.1.name'].error()).toBeUndefined();
+        expect(formField(form, 'email')!.error(), 'the email field shows nothing of the server\'s refusal').toBe('Already registered');
+        expect(formField(form, 'items.0.name')!.error(), 'a row field missed its message').toBe('Required');
+        expect(formField(form, 'items.1.name')!.error()).toBeUndefined();
         expect(form.formError(), 'the message for no field went nowhere').toBe('Try later');
         expect(form.valid(), 'a form the server refused reads as valid').toBe(false);
         expect(form.errors()).toMatchObject({ email: 'Already registered', 'items.0.name': 'Required' });
@@ -42,15 +42,15 @@ describe('server field errors in RFC 9457 shape', () => {
     it('a problem thrown as it is, not wrapped in an HttpError, lands too', async () => {
         const form = signUp();
         await rejectedWith(form, { errors: { email: 'Taken' } });
-        expect(form.fields.email.error()).toBe('Taken');
+        expect(formField(form, 'email')!.error()).toBe('Taken');
     });
 
     it('editing a field clears its message and leaves the others', async () => {
         const form = signUp();
         await rejectedWith(form, new HttpError(422, 'Unprocessable Entity', '/api/sign-up', problem));
-        form.fields.email.onChange('bob@example.test');
-        expect(form.fields.email.error(), 'the server\'s message outlived the edit').toBeUndefined();
-        expect(form.fields['items.0.name'].error()).toBe('Required');
+        formField(form, 'email')!.onChange('bob@example.test');
+        expect(formField(form, 'email')!.error(), 'the server\'s message outlived the edit').toBeUndefined();
+        expect(formField(form, 'items.0.name')!.error()).toBe('Required');
         expect(form.formError()).toBe('Try later');
     });
 
@@ -59,7 +59,7 @@ describe('server field errors in RFC 9457 shape', () => {
         await rejectedWith(form, new HttpError(422, 'Unprocessable Entity', '/api/sign-up', problem));
         let seenDuringSubmit: unknown[] = [];
         await form.handleSubmit(() => {
-            seenDuringSubmit = [form.fields.email.error(), form.fields['items.0.name'].error(), form.formError()];
+            seenDuringSubmit = [formField(form, 'email')!.error(), formField(form, 'items.0.name')!.error(), form.formError()];
             return Promise.resolve();
         })(submitEvent());
         expect(seenDuringSubmit, 'the old server errors were still there during the next submit').toEqual([undefined, undefined, undefined]);
@@ -70,7 +70,7 @@ describe('server field errors in RFC 9457 shape', () => {
     it('control — a plain Error leaves every field as it was, and no form error', async () => {
         const form = signUp();
         await rejectedWith(form, new Error('network'));
-        expect(form.fields.email.error()).toBeUndefined();
+        expect(formField(form, 'email')!.error()).toBeUndefined();
         expect(form.formError()).toBeUndefined();
         expect(form.valid()).toBe(true);
         expect(form.state()).toBe('error');
@@ -83,6 +83,6 @@ describe('server field errors in RFC 9457 shape', () => {
         });
         await form.handleSubmit(() => Promise.reject({ errors: { email: 'Taken' } }))(submitEvent());
         // The submit stopped on its own validation: nothing reached the server.
-        expect(form.fields.email.error()).toBe('Required here');
+        expect(form.email.error()).toBe('Required here');
     });
 });

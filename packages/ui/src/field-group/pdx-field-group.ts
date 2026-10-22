@@ -1,6 +1,6 @@
 // pdx-field-group — Scopes child field paths to a nested object in the form.
 // Inside <pdx-form :form="f">, a <pdx-field-group name="customer"> prefixes
-// all descendant field names: name="email" → form.fields['customer.email'].
+// all descendant field names: name="email" → form['customer.email'].
 //
 // The compiler handles static path prefixing at build time.
 // This component provides runtime context for dynamic cases (e.g., field-list items).

@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading section-heading">2. Nested DTO (Field Groups)</h2>
     <p class="pdx-txt-small pdx-ink-muted">
       <code>&lt;pdx-field-group name="customer"&gt;</code> scopes child fields to a nested object.
-      Field <code>name="email"</code> inside the group becomes <code>form.fields['customer.email']</code>.
+      Field <code>name="email"</code> inside the group becomes <code>form['customer.email']</code>.
     </p>
 
     <div class="demo-block">
@@ -69,7 +69,7 @@
     &lt;pdx-form-field name="name" label="Name" required&gt;
       &lt;pdx-input name="name" /&gt;
     &lt;/pdx-form-field&gt;
-    &lt;!-- compiler resolves to form.fields['customer.name'] --&gt;
+    &lt;!-- compiler resolves to form['customer.name'] --&gt;
   &lt;/pdx-field-group&gt;
 
   &lt;pdx-field-group name="shipping" label="Shipping"&gt;

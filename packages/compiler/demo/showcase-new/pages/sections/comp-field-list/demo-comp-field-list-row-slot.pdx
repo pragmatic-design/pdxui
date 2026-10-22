@@ -33,7 +33,7 @@
 &lt;/pdx-field-list&gt;
 
 function setTask(index, key, value) {
-  taskForm.fields['tasks.' + index + '.' + key].onChange(value);
+  taskForm['tasks.' + index + '.' + key].onChange(value);
 }</code></pre>
     </details>
   </section>
@@ -64,7 +64,7 @@ let taskValues = $signal('');
 function submitTasks(e) { taskValues = JSON.stringify(e.detail.values, null, 2); }
 
 function setTask(index, key, value) {
-  taskForm.fields['tasks.' + index + '.' + key].onChange(value);
+  taskForm['tasks.' + index + '.' + key].onChange(value);
 }
 </script>
 

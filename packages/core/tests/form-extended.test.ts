@@ -2,7 +2,7 @@
 // FormCoordinator, createFormFromSchema.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { createForm, getCoordinator } from '../src/form/form';
+import { createForm, formField, getCoordinator } from '../src/form/form';
 import { createDataSource } from '../src/data/data-source';
 import { required, email } from '../src/form/validators';
 import {
@@ -28,11 +28,11 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('AB');
+        form.name.onChange('AB');
         // Error is clear (value is not empty, required passes)
-        expect(form.fields.name.error()).toBeUndefined();
+        expect(form.name.error()).toBeUndefined();
         // Warning fires because length < 5
-        expect(form.fields.name.warning()).toBe('Name is short');
+        expect(form.name.warning()).toBe('Name is short');
     });
 
     it('warnings do not block form validity', () => {
@@ -42,9 +42,9 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('Hi');
+        form.name.onChange('Hi');
         // Warning present
-        expect(form.fields.name.warning()).toBe('Consider longer');
+        expect(form.name.warning()).toBe('Consider longer');
         // Form is still valid (warnings are non-blocking)
         expect(form.valid()).toBe(true);
     });
@@ -59,8 +59,8 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.a.onChange('');
-        form.fields.b.onChange('');
+        form.a.onChange('');
+        form.b.onChange('');
         const w = form.warnings();
         expect(w.a).toBe('a warning');
         expect(w.b).toBe('b warning');
@@ -73,11 +73,11 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('A');
-        expect(form.fields.name.warning()).toBe('Too short');
+        form.name.onChange('A');
+        expect(form.name.warning()).toBe('Too short');
 
-        form.fields.name.onChange('Alice');
-        expect(form.fields.name.warning()).toBeUndefined();
+        form.name.onChange('Alice');
+        expect(form.name.warning()).toBeUndefined();
     });
 
     it('warning field.warning() returns the warning message', () => {
@@ -87,8 +87,8 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.age.onChange(15);
-        expect(form.fields.age.warning()).toBe('Must be 18+');
+        form.age.onChange(15);
+        expect(form.age.warning()).toBe('Must be 18+');
     });
 
     it('reset clears warnings', () => {
@@ -98,11 +98,11 @@ describe('createForm — warnings', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('');
-        expect(form.fields.name.warning()).toBe('Empty');
+        form.name.onChange('');
+        expect(form.name.warning()).toBe('Empty');
 
         form.reset();
-        expect(form.fields.name.warning()).toBeUndefined();
+        expect(form.name.warning()).toBeUndefined();
     });
 });
 
@@ -119,7 +119,7 @@ describe('createForm — saveMode', () => {
         });
         form.onFieldSave(saveSpy);
 
-        form.fields.name.onChange('Alice');
+        form.name.onChange('Alice');
         vi.advanceTimersByTime(1000);
 
         expect(saveSpy).not.toHaveBeenCalled();
@@ -134,7 +134,7 @@ describe('createForm — saveMode', () => {
         });
         form.onFieldSave(saveSpy);
 
-        form.fields.name.onChange('Bob');
+        form.name.onChange('Bob');
         vi.advanceTimersByTime(200);
 
         expect(saveSpy).toHaveBeenCalledWith('name', 'Bob');
@@ -149,12 +149,12 @@ describe('createForm — saveMode', () => {
         });
         form.onFieldSave(saveSpy);
 
-        form.fields.name.onChange('Alice');
+        form.name.onChange('Alice');
         vi.advanceTimersByTime(200);
         // Not triggered yet (no blur)
         expect(saveSpy).not.toHaveBeenCalled();
 
-        form.fields.name.onBlur();
+        form.name.onBlur();
         vi.advanceTimersByTime(200);
         expect(saveSpy).toHaveBeenCalledWith('name', 'Alice');
     });
@@ -167,7 +167,7 @@ describe('createForm — saveMode', () => {
         });
         form.onFieldSave(saveSpy);
 
-        form.fields.name.onChange('Quick');
+        form.name.onChange('Quick');
         // immediate uses setTimeout(0) — need to advance just slightly
         vi.advanceTimersByTime(1);
 
@@ -185,12 +185,12 @@ describe('createForm — saveMode', () => {
         });
         form.onFieldSave(saveSpy);
 
-        form.fields.name.onChange('Override');
+        form.name.onChange('Override');
         vi.advanceTimersByTime(100);
         expect(saveSpy).toHaveBeenCalledWith('name', 'Override');
 
         saveSpy.mockClear();
-        form.fields.email.onChange('test@test.com');
+        form.email.onChange('test@test.com');
         vi.advanceTimersByTime(1000);
         // email uses form default (onSubmit) — no per-field save
         expect(saveSpy).not.toHaveBeenCalled();
@@ -339,7 +339,7 @@ describe('FormCoordinator', () => {
         coord.register('b', formB);
         expect(coord.dirty()).toBe(false);
 
-        formA.fields.x.onChange('changed');
+        formA.x.onChange('changed');
         expect(coord.dirty()).toBe(true);
     });
 
@@ -356,10 +356,10 @@ describe('FormCoordinator', () => {
         coord.register('b', formB);
 
         // Trigger validation on formA
-        formA.fields.name.onChange('');
+        formA.name.onChange('');
         expect(coord.valid()).toBe(false);
 
-        formA.fields.name.onChange('Alice');
+        formA.name.onChange('Alice');
         expect(coord.valid()).toBe(true);
     });
 
@@ -427,10 +427,10 @@ describe('createFormFromSchema', () => {
             ],
         });
 
-        expect(form.fields.name.value()).toBe('John');
-        expect(form.fields.age.value()).toBe(25);
+        expect(formField(form, 'name')!.value()).toBe('John');
+        expect(formField(form, 'age')!.value()).toBe(25);
         // checkbox default is false
-        expect(form.fields.agree.value()).toBe(false);
+        expect(formField(form, 'agree')!.value()).toBe(false);
     });
 
     it('uses type-based defaults when no default is specified', () => {
@@ -446,13 +446,13 @@ describe('createFormFromSchema', () => {
             ],
         });
 
-        expect(form.fields.text.value()).toBe('');
-        expect(form.fields.num.value()).toBe(0);
-        expect(form.fields.check.value()).toBe(false);
-        expect(form.fields.toggle.value()).toBe(false);
-        expect(form.fields.rate.value()).toBe(0);
-        expect(form.fields.slide.value()).toBe(0);
-        expect(form.fields.tags.value()).toEqual([]);
+        expect(formField(form, 'text')!.value()).toBe('');
+        expect(formField(form, 'num')!.value()).toBe(0);
+        expect(formField(form, 'check')!.value()).toBe(false);
+        expect(formField(form, 'toggle')!.value()).toBe(false);
+        expect(formField(form, 'rate')!.value()).toBe(0);
+        expect(formField(form, 'slide')!.value()).toBe(0);
+        expect(formField(form, 'tags')!.value()).toEqual([]);
     });
 
     it('creates required validator from schema', () => {
@@ -463,8 +463,8 @@ describe('createFormFromSchema', () => {
         });
 
         // Trigger validation
-        form.fields.name.onBlur();
-        expect(form.fields.name.error()).toBe('This field is required');
+        formField(form, 'name')!.onBlur();
+        expect(formField(form, 'name')!.error()).toBe('This field is required');
     });
 
     it('creates validators from schema rules', () => {
@@ -480,9 +480,9 @@ describe('createFormFromSchema', () => {
             ],
         });
 
-        form.fields.email.onChange('not-an-email');
-        form.fields.email.onBlur();
-        expect(form.fields.email.error()).toBe('Invalid email address');
+        formField(form, 'email')!.onChange('not-an-email');
+        formField(form, 'email')!.onBlur();
+        expect(formField(form, 'email')!.error()).toBe('Invalid email address');
     });
 
     it('creates minLength validator from schema', () => {
@@ -498,9 +498,9 @@ describe('createFormFromSchema', () => {
             ],
         });
 
-        form.fields.password.onChange('short');
-        form.fields.password.onBlur();
-        expect(form.fields.password.error()).toBe('Minimum 8 characters');
+        formField(form, 'password')!.onChange('short');
+        formField(form, 'password')!.onBlur();
+        expect(formField(form, 'password')!.error()).toBe('Minimum 8 characters');
     });
 
     it('creates custom-message validators from schema', () => {
@@ -517,9 +517,9 @@ describe('createFormFromSchema', () => {
             ],
         });
 
-        form.fields.name.onBlur();
+        formField(form, 'name')!.onBlur();
         // The required from the field.required prop fires first with the default message
-        expect(form.fields.name.error()).toBe('This field is required');
+        expect(formField(form, 'name')!.error()).toBe('This field is required');
     });
 
     it('applies per-field saveMode from schema', () => {
@@ -612,7 +612,7 @@ describe('createForm — source (DataSource binding)', () => {
 
         expect(ds.hasChanges()).toBe(false);
 
-        form.fields.name.onChange('b');
+        form.name.onChange('b');
 
         // The mutation propagated to the DataSource as an update on record #1.
         expect(form.dirty()).toBe(true);
@@ -631,7 +631,7 @@ describe('createForm — source (DataSource binding)', () => {
             source: ds,
         });
 
-        form.fields.name.onChange('changed');
+        form.name.onChange('changed');
         // No id → no record to patch → DataSource stays clean.
         expect(ds.hasChanges()).toBe(false);
 
@@ -647,7 +647,7 @@ describe('createForm — source (DataSource binding)', () => {
         ds.cancelChanges();
 
         // After dispose, further form edits no longer reach the DataSource.
-        form.fields.name.onChange('c');
+        form.name.onChange('c');
         expect(ds.hasChanges()).toBe(false);
     });
 });
@@ -671,7 +671,7 @@ describe('createForm — parent (nested-form coordination)', () => {
         const coord = getCoordinator(parent);
         expect(coord.dirty()).toBe(false);
 
-        child.fields.name.onChange('x');
+        child.name.onChange('x');
         expect(coord.dirty()).toBe(true);
     });
 

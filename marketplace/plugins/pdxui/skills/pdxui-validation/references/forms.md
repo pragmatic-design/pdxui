@@ -42,22 +42,29 @@ createForm({
 })
 ```
 
-`user` is a `Form`: `user.fields.name` (each with `value()`, `error()`, `touched()`, `onChange(v)`,
+`user` is a `Form`: `user.name` (each with `value()`, `error()`, `touched()`, `onChange(v)`,
 `onBlur()`), `user.valid()`, `user.errors()`, `user.getValues()`, `user.handleSubmit(fn)`,
 `user.reset()`, `user.array(name)`. They are **signals** — `user.valid()` with parentheses, and
 `user.errors()` gives the whole record.
 
 In the editor and in `pdx check --types`, `user` has that type with the fields you declared:
-`user.fields.age.value()` is a `number`, and `user.fields.nmae` or `user.values` is an error.
+`user.age.value()` is a `number`, and `user.nmae` or `user.values` is an error.
 Fields are keyed the way the form keys them. A nested object's fields are dotted:
-`user.fields['address.street']`. A row's fields carry their index: `user.fields['lines.0.qty']`.
+`user['address.street']`. A row's fields carry their index: `user['lines.0.qty']`.
 `user.getValues()` gives the nested object back. A form on an external schema (`@form user: UserSchema`)
 is a form whose fields the editor does not know.
+
+Each field is a member of the form, beside the form's own members — so a field cannot be called like
+one of them: a field named `reset`, `valid`, `errors`, `state`, `touched` or another member is
+`PDX_FORM_FIELD_RESERVED`, and `createForm` refuses it when the page runs. A name you know only at run
+time — read from a list, a column, a schema — goes through `formField(user, name)`, which returns the
+field or `undefined`, never one of the form's members; `formFieldNames(user)` lists the fields. Before
+#128 the fields lived under `user.fields`; `pdx migrate` rewrites `user.fields.name` to `user.name`.
 
 ## Binding the fields
 
 Wrap the fields in `<pdx-form :form>` and give each control the field's `name`. The compiler wires
-change and blur into `form.fields.x` for every named control, and `<pdx-form-field>` takes its error,
+change and blur into `form.x` for every named control, and `<pdx-form-field>` takes its error,
 touched and warning from the same place — you write no `:value`, no `@input`:
 
 ```pdx
@@ -119,7 +126,7 @@ all of them when the next submit starts; `submitError()` is still the rejection 
 
 ```ts
 // The server answers 422 with { "errors": { "Email": ["Already registered"], "": ["Try later"] } }
-signup.fields.email.error();   // 'Already registered'
+signup.email.error();          // 'Already registered'
 signup.formError();            // 'Try later'
 ```
 
@@ -127,7 +134,7 @@ signup.formError();            // 'Try later'
 required with no prop on its `<pdx-form-field>`: its control gets `aria-required="true"`, so a screen
 reader announces «Name, required» before any error, and its label gets the required marker (` *` by
 default). The `required` prop still does the same for a field the form does not require. Code that
-needs the answer reads `form.fields.name.required`; it is `true` when the field's validators include
+needs the answer reads `form.name.required`; it is `true` when the field's validators include
 `required()`, the rows a field list adds included, and always `false` for a form validated by an
 external Standard Schema, which does not say generically which fields it requires. A component that
 holds a validator list of its own asks `isRequiredValidator(v)`: only `required()` counts, not a
@@ -325,8 +332,8 @@ anything, so a half-saved screen is not reachable through it.
 | You want… | Do |
 | --- | --- |
 | a validated form | `@form user: { name: string { required } }` — the **colon** is not optional |
-| read a field | `user.fields.name.value()` |
-| write a field | `user.fields.name.onChange(v)` |
+| read a field | `user.name.value()` |
+| write a field | `user.name.onChange(v)` |
 | show a field error | `@if (user.errors().name) { … }` |
 | disable submit when invalid | `:disabled="!user.valid()"` |
 | save only if valid | `<pdx-form :form="user" @pdx-submit="save($event.detail.values)">`, or `const onSubmit = user.handleSubmit(save)` bound to your own `<form @submit="onSubmit">` |

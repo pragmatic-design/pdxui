@@ -17,6 +17,17 @@ export const CORE_FORM_RULES: ReadonlySet<string> = new Set([
     'required', 'minLength', 'maxLength', 'email', 'pattern', 'url', 'min', 'max', 'integer',
 ]);
 
+/**
+ * The members of a form @pdxui/core creates (`createForm` in `core/src/form/form.ts`). A field is a
+ * member beside them (#128), so a field of one of these names would hide it. The compiler cannot
+ * import from core; `core/tests/form-rule-names.test.ts` fails when the two lists drift.
+ */
+export const FORM_MEMBERS: ReadonlySet<string> = new Set([
+    'valid', 'dirty', 'touched', 'submitting', 'submitted', 'errors', 'warnings', 'saveMode', 'validateOn',
+    'state', 'submitError', 'formError', 'handleSubmit', 'reset', 'setValues', 'validate', 'array',
+    'getValues', 'onFieldSave', 'dispose',
+]);
+
 /** A rule's function name: `minLength: 3` → `minLength`. */
 function ruleName(rule: string): string {
     const colon = rule.indexOf(':');
@@ -61,6 +72,26 @@ export function coreRuleImports(analysis: ScriptAnalysis): string[] {
         for (const n of formRuleNames(f)) if (CORE_FORM_RULES.has(n) && !scriptDeclares(analysis, n)) out.add(n);
     }
     return [...out];
+}
+
+/**
+ * PDX_FORM_FIELD_RESERVED — an inline form's field named like a member of the form (decision 13). A
+ * form typed by a schema the compiler does not read is refused by `createForm` when it runs.
+ */
+export function checkFormFieldNames(analysis: ScriptAnalysis, warnings: ValidationWarning[]): void {
+    for (const f of analysis.forms) {
+        if (f.kind !== 'inline' || !f.fields) continue;
+        for (const fd of f.fields) {
+            // An object is no field, its leaves are (`state.code`); an array is one while it is empty.
+            if (fd.objectFields || !FORM_MEMBERS.has(fd.name)) continue;
+            warnings.push({
+                code: 'PDX_FORM_FIELD_RESERVED',
+                severity: 'error',
+                message: `@form ${f.name}: the field '${fd.name}' is named like the form's own '${fd.name}', which ${f.name}.${fd.name} has to stay.`,
+                hint: 'Give the field another name. The name is also what the server receives, so the rename is yours to make.',
+            });
+        }
+    }
 }
 
 /**

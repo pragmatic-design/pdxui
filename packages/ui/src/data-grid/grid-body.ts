@@ -2,7 +2,7 @@
 
 import type { GridContext, AnyColumn } from './grid-context';
 import { applyColSize, GRID_WIDGET } from './grid-context';
-import { getFieldValue, DEV } from '@pdxui/core';
+import { getFieldValue, DEV, formField } from '@pdxui/core';
 import { renderExpandCell, renderDetailRow } from './grid-detail';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
@@ -165,7 +165,7 @@ export function renderRows(
                 else focusEditor();
             } else if (isRowEditing && isColEditable) {
                 // Row edit mode — all editable cells become editors
-                const fieldObj = gc.editForm?.fields?.[col.field];
+                const fieldObj = gc.editForm ? formField(gc.editForm, col.field) : undefined;
                 td.appendChild(createDefaultEditor(col, value,
                     (val) => { fieldObj?.onChange(val); },
                     () => { commitRowEdit(gc); },

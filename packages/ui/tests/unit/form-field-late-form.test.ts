@@ -62,11 +62,11 @@ describe('a form field set up before its <pdx-form>', () => {
         const f = onChangeForm();
         const a = field('a');
         await mountForm(f, a);
-        f.fields.a.onChange('x');
-        a.error = f.fields.a.error();
+        f.a.onChange('x');
+        a.error = f.a.error();
         await tick();
         expect(a.error, 'the validator did not run').toBe('At least 3 characters');
-        expect(f.fields.a.touched(), 'the field was touched: the case no longer isolates onChange').toBe(false);
+        expect(f.a.touched(), 'the field was touched: the case no longer isolates onChange').toBe(false);
         expect(shown(a), 'the error is there but hidden until a blur — the field never found its form').toBe(true);
     });
 
@@ -74,7 +74,7 @@ describe('a form field set up before its <pdx-form>', () => {
         const f = onChangeForm();
         const a = field('a');
         await mountForm(f, a);
-        f.fields.a.onChange('x');
+        f.a.onChange('x');
         await tick();
         expect(shown(a), 'the form has an error for "a" and the field never showed it').toBe(true);
         expect(a.querySelector('[role="alert"]')?.textContent ?? '').toContain('At least 3 characters');
@@ -100,7 +100,7 @@ describe('pdx-form-actions set up before its <pdx-form>', () => {
         const submit = (): HTMLButtonElement => actions.querySelector<HTMLButtonElement>('button[type="submit"]')!;
         expect(submit().disabled).toBe(false);
 
-        f.fields.a.onChange('valid');
+        f.a.onChange('valid');
         let release!: () => void;
         f.handleSubmit(() => new Promise<void>((r) => { release = r; }))(new Event('submit'));
         await tick();

@@ -41,7 +41,7 @@ describe('a value edited while the submit is validating', () => {
         await flush();
         expect(check.seen, 'the async check never started').toEqual(['ann']);
 
-        form.fields.username.onChange('ann!');
+        form.username.onChange('ann!');
         check.answer(undefined); // "ann" is free — an answer about a value the field has left
         await submitting;
 
@@ -56,7 +56,7 @@ describe('a value edited while the submit is validating', () => {
 
         const first = form.handleSubmit(save)(new Event('submit'));
         await flush();
-        form.fields.username.onChange('ann!');
+        form.username.onChange('ann!');
         check.answer(undefined);
         await first;
 
@@ -76,12 +76,12 @@ describe('a value edited while the submit is validating', () => {
 
         const submitting = form.handleSubmit(save)(new Event('submit'));
         await flush();
-        form.fields.username.onChange('');
+        form.username.onChange('');
         check.answer(undefined);
         await submitting;
 
         expect(save).not.toHaveBeenCalled();
-        expect(form.fields.username.error(), 'the emptied field shows no error').toBeTruthy();
+        expect(form.username.error(), 'the emptied field shows no error').toBeTruthy();
     });
 
     it('control: a value that does not change submits as before', async () => {
@@ -106,7 +106,7 @@ describe('a value edited while the submit is validating', () => {
 
         const submitting = coordinator.submitAll(save);
         await flush();
-        form.fields.username.onChange('ann!');
+        form.username.onChange('ann!');
         check.answer(undefined);
 
         expect(await submitting, 'submitAll reported success').toBe(false);

@@ -28,19 +28,19 @@ describe('an error raised by validate() clears when the field is corrected', () 
     it('raises the errors on a failed validate', async () => {
         const form = makeForm();
         expect(await form.validate(), 'an empty form must not validate').toBe(false);
-        expect(form.fields.customer.error()).toBe('Customer is required');
-        expect(form.fields.address.error()).toBe('Address is required');
+        expect(form.customer.error()).toBe('Customer is required');
+        expect(form.address.error()).toBe('Address is required');
     });
 
     it('clears one field\'s error when that field is filled and blurred', async () => {
         const form = makeForm();
         await form.validate();
 
-        form.fields.customer.onChange('Condominio Vittoria');
-        form.fields.customer.onBlur();
+        form.customer.onChange('Condominio Vittoria');
+        form.customer.onBlur();
 
-        expect(form.fields.customer.error(), 'a corrected field must not keep its message').toBeUndefined();
-        expect(form.fields.address.error(), 'and the untouched one keeps its own').toBe('Address is required');
+        expect(form.customer.error(), 'a corrected field must not keep its message').toBeUndefined();
+        expect(form.address.error(), 'and the untouched one keeps its own').toBe('Address is required');
     });
 
     it('clears it on typing alone, without waiting for a blur', async () => {
@@ -49,19 +49,19 @@ describe('an error raised by validate() clears when the field is corrected', () 
         const form = makeForm();
         await form.validate();
 
-        form.fields.customer.onChange('Condominio Vittoria');
+        form.customer.onChange('Condominio Vittoria');
 
-        expect(form.fields.customer.error(), 'a visible error must react to the correction').toBeUndefined();
+        expect(form.customer.error(), 'a visible error must react to the correction').toBeUndefined();
     });
 
     it('puts the error back if the correction is undone', async () => {
         // The guard against "clear and never look again": emptying the field must raise it once more.
         const form = makeForm();
         await form.validate();
-        form.fields.customer.onChange('Condominio Vittoria');
-        form.fields.customer.onChange('');
+        form.customer.onChange('Condominio Vittoria');
+        form.customer.onChange('');
 
-        expect(form.fields.customer.error(), 'still required').toBe('Customer is required');
+        expect(form.customer.error(), 'still required').toBe('Customer is required');
     });
 
     it('stays quiet on a field nobody has touched or validated', async () => {
@@ -69,8 +69,8 @@ describe('an error raised by validate() clears when the field is corrected', () 
         // messages at someone who has not finished typing. `validateOn` defaults to onBlur for a
         // reason, and this change must not turn it into onChange for everybody.
         const form = makeForm();
-        form.fields.customer.onChange('C');
-        expect(form.fields.customer.error(), 'no submit, no blur, no message').toBeUndefined();
-        expect(form.fields.address.error()).toBeUndefined();
+        form.customer.onChange('C');
+        expect(form.customer.error(), 'no submit, no blur, no message').toBeUndefined();
+        expect(form.address.error()).toBeUndefined();
     });
 });

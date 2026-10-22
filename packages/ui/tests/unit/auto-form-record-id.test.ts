@@ -39,7 +39,7 @@ describe('pdx-auto-form record-id', () => {
     it('Save updates that record in the DataSource', async () => {
         const { el, ds } = await autoForm([{ id: 1, name: 'Alice', role: 'Engineer' }], '1');
         await vi.waitFor(() => expect(el.form?.getValues()).toMatchObject({ name: 'Alice' }));
-        (el.form as unknown as { fields: Record<string, { onChange(v: unknown): void }> }).fields.name.onChange('Alicia');
+        (el.form as unknown as Record<string, { onChange(v: unknown): void }>).name.onChange('Alicia');
         const save = [...el.querySelectorAll('pdx-button')].find((b) => b.getAttribute('variant') === 'primary') as HTMLElement;
         save.click();
         await vi.waitFor(() => expect(ds.getById(1)).toMatchObject({ name: 'Alicia' }));

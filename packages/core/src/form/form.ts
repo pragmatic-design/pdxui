@@ -207,9 +207,27 @@ export function getCoordinator(parentForm: Form<any>): FormCoordinator {
 /** Fallback name sequence for child forms registered without an explicit name. */
 let _anonFormSeq = 0;
 
-export interface Form<T extends Record<string, unknown>> {
-    /** Individual field accessors, keyed by the flattened name: `fields['customer.name']`. */
-    readonly fields: FormFields<T>;
+/**
+ * A form: its own members, and each field as a member beside them (#128), keyed by the flattened
+ * name — `form.email`, `form['customer.name']`, `form['lines.0.qty']`.
+ *
+ * The members are the fields whose names the type knows: an index signature names none, so a form
+ * typed by a record (`Form<Record<string, unknown>>`) types no field members, and an interface that
+ * extends one keeps its own keys. A name known only at run time is read with `formField(form, name)`,
+ * which cannot return a member. That is also what keeps a typed form assignable to a record-typed one.
+ */
+export type Form<T extends Record<string, unknown>> = FormMembers<T> & FormFields<KnownKeys<T>>;
+
+/** `T` without its index signatures: the keys a form can name at compile time. */
+type KnownKeys<T> = {
+    [K in keyof T as string extends K ? never : number extends K ? never : symbol extends K ? never : K]: T[K];
+};
+
+/**
+ * The form's own members. A field named like one of them is refused (`PDX_FORM_FIELD_RESERVED`,
+ * decision 13): it would hide the member, and `form.reset` would no longer reset anything.
+ */
+export interface FormMembers<T extends Record<string, unknown>> {
     /** Whether all fields pass validation. */
     readonly valid: ReadonlySignal<boolean>;
     /** Whether any field has been modified. */
@@ -295,8 +313,24 @@ export interface FormInternals {
     renameFields(oldPrefix: string, newPrefix: string): void;
     /** Get all current field paths. */
     getFieldPaths(): string[];
+    /** The field at a path, or undefined: never one of the form's own members. */
+    getField(path: string): FormField<unknown> | undefined;
     /** Signal that bumps when field structure changes (for reactive re-rendering). */
     readonly fieldVersion: () => number;
+}
+
+/**
+ * The field named `name`, when the name is known only at run time: a `name` attribute, a column, a
+ * schema entry. Undefined when the form has no such field — and for the name of one of the form's
+ * own members, which `form[name]` would return instead (`formField(form, 'reset')` is undefined).
+ */
+export function formField(form: Form<Record<string, unknown>>, name: string): FormField<unknown> | undefined {
+    return (form as { [FORM_INTERNALS]?: FormInternals })[FORM_INTERNALS]?.getField(name);
+}
+
+/** The names of a form's fields as they are now, rows a field list added included. */
+export function formFieldNames(form: Form<Record<string, unknown>>): string[] {
+    return (form as { [FORM_INTERNALS]?: FormInternals })[FORM_INTERNALS]?.getFieldPaths() ?? [];
 }
 
 // ─── createForm() ──────────────────────────────────────────────────
@@ -831,8 +865,7 @@ export function createForm<T extends Record<string, unknown>>(
     /** The submit running now: what a second submit returns instead of submitting again (beta spec, F2). */
     let runningSubmit: Promise<void> | null = null;
 
-    const form: Form<T> = {
-        fields: fieldMap as Form<T>['fields'],
+    const form: FormMembers<T> = {
         valid: valid as ReadonlySignal<boolean>,
         dirty: dirty as ReadonlySignal<boolean>,
         touched: touched as ReadonlySignal<boolean>,
@@ -979,6 +1012,24 @@ export function createForm<T extends Record<string, unknown>>(
         },
     };
 
+    // ─── Each field a member of the form (#128) ─────────────────────
+    // The members are what the literal above declares, read off it so the list cannot drift from it.
+    const ownMembers = new Set(Object.keys(form));
+    const members = form as unknown as Record<string, unknown>;
+
+    /** Put a field on the form as a member; a field named like a member is refused, not hidden. */
+    function exposeField(name: string): void {
+        if (ownMembers.has(name)) {
+            throw new Error(
+                `[pdx-form] PDX_FORM_FIELD_RESERVED: a field named '${name}' would hide the form's own `
+                + `'${name}'. Give the field another name.`,
+            );
+        }
+        members[name] = fieldMap[name];
+    }
+
+    for (const name of Object.keys(fieldMap)) exposeField(name);
+
     // ─── DataSource binding (@form { source }) ──────────────────────
     // Form edits flow to the DataSource as a patch on the bound record.
     if (config.source) {
@@ -1027,6 +1078,7 @@ export function createForm<T extends Record<string, unknown>>(
             }
             if (fieldValues[path]) return; // already exists — keep its value
             buildField(path, initialValue);
+            exposeField(path);
             flatSnapshot[path] = initialValue;
             _fieldVersion.set(v => v + 1);
         },
@@ -1040,6 +1092,7 @@ export function createForm<T extends Record<string, unknown>>(
                     delete fieldTouched[key];
                     delete fieldDirty[key];
                     delete fieldMap[key];
+                    delete members[key];
                     delete flatSnapshot[key];
                     delete dynamicValidators[key];
                     delete fieldValidate[key];
@@ -1071,6 +1124,7 @@ export function createForm<T extends Record<string, unknown>>(
                 fieldTouched[newKey] = fieldTouched[oldKey]; delete fieldTouched[oldKey];
                 fieldDirty[newKey] = fieldDirty[oldKey]; delete fieldDirty[oldKey];
                 fieldMap[newKey] = fieldMap[oldKey]; delete fieldMap[oldKey];
+                members[newKey] = fieldMap[newKey]; delete members[oldKey];
                 flatSnapshot[newKey] = flatSnapshot[oldKey]; delete flatSnapshot[oldKey];
             }
             _fieldVersion.set(v => v + 1);
@@ -1078,8 +1132,12 @@ export function createForm<T extends Record<string, unknown>>(
         getFieldPaths(): string[] {
             return Object.keys(fieldValues);
         },
+        getField(path: string): FormField<unknown> | undefined {
+            return Object.prototype.hasOwnProperty.call(fieldMap, path) ? fieldMap[path] : undefined;
+        },
         fieldVersion: () => _fieldVersion(),
     } satisfies FormInternals;
 
-    return form;
+    // The fields were put on it above: what the literal lacked for the type.
+    return form as Form<T>;
 }

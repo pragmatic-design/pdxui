@@ -62,8 +62,8 @@ function nextStep() {
   const fields = stepFields[wizardStep];
   let valid = true;
   for (const f of fields) {
-    wizardForm.fields[f]?.onBlur();
-    if (wizardForm.fields[f]?.error()) valid = false;
+    formField(wizardForm, f)?.onBlur();
+    if (formField(wizardForm, f)?.error()) valid = false;
   }
   if (valid) wizardStep++;
 }
@@ -73,7 +73,7 @@ function nextStep() {
 </template>
 
 <script>
-import { createForm, required, minLength } from '@pdxui/core';
+import { createForm, formField, required, minLength } from '@pdxui/core';
 
 // ─── 3. Wizard Form ───
 let wizardStep = $signal(0);
@@ -83,8 +83,8 @@ const stepFields = [['username', 'password'], ['fullName', 'avatar'], []];
 
 function goToStep(n) { wizardStep = n; }
 function prevStep() { if (wizardStep > 0) wizardStep = wizardStep - 1; }
-function nextStep() { if (wizardStep >= 2) { wizardForm.validate(); return; } const fields = stepFields[wizardStep]; let valid = true; for (const f of fields) { const field = wizardForm.fields[f]; if (field) { field.onBlur(); const err = field.error(); if (err) valid = false; } } if (valid) wizardStep = wizardStep + 1; }
-function wizardSummary() { const v = wizardForm.dirty(); return JSON.stringify({ username: wizardForm.fields.username?.value(), password: wizardForm.fields.password?.value() ? '***' : '', fullName: wizardForm.fields.fullName?.value(), avatar: wizardForm.fields.avatar?.value() }, null, 2); }
+function nextStep() { if (wizardStep >= 2) { wizardForm.validate(); return; } const fields = stepFields[wizardStep]; let valid = true; for (const f of fields) { const field = formField(wizardForm, f); if (field) { field.onBlur(); const err = field.error(); if (err) valid = false; } } if (valid) wizardStep = wizardStep + 1; }
+function wizardSummary() { const v = wizardForm.dirty(); return JSON.stringify({ username: wizardForm.username?.value(), password: wizardForm.password?.value() ? '***' : '', fullName: wizardForm.fullName?.value(), avatar: wizardForm.avatar?.value() }, null, 2); }
 function tabClass0() { return 'wizard-tab' + (wizardStep === 0 ? ' active' : ''); }
 function tabClass1() { return 'wizard-tab' + (wizardStep === 1 ? ' active' : ''); }
 function tabClass2() { return 'wizard-tab' + (wizardStep === 2 ? ' active' : ''); }

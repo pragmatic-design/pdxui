@@ -31,11 +31,11 @@
     password: [required(...), minLength(6, ...)],
     // Cross-field: reads another field's value
     confirmPassword: [required(...), (val) =&gt; {
-      const pw = form.fields.password?.value();
+      const pw = form.password?.value();
       return val !== pw ? 'Passwords do not match' : undefined;
     }],
     endDate: [required(...), (val) =&gt; {
-      const start = form.fields.startDate?.value();
+      const start = form.startDate?.value();
       if (start &amp;&amp; val &amp;&amp; val &lt;= start)
         return 'End date must be after start date';
     }],
@@ -48,7 +48,7 @@
 import { createForm, required, minLength } from '@pdxui/core';
 
 // ─── 6. Cross-Field Validation ───
-const crossForm = createForm({ initialValues: { password: '', confirmPassword: '', startDate: '', endDate: '' }, validators: { password: [required('Password is required'), minLength(6, 'Min 6 characters')], confirmPassword: [required('Confirm is required'), (val) => { const pw = crossForm.fields.password?.value(); return val !== pw ? 'Passwords do not match' : undefined; }], startDate: [required('Start date is required')], endDate: [required('End date is required'), (val) => { const start = crossForm.fields.startDate?.value(); if (start && val && val <= start) return 'End date must be after start date'; return undefined; }] }, validateOn: 'onBlur' });
+const crossForm = createForm({ initialValues: { password: '', confirmPassword: '', startDate: '', endDate: '' }, validators: { password: [required('Password is required'), minLength(6, 'Min 6 characters')], confirmPassword: [required('Confirm is required'), (val) => { const pw = crossForm.password?.value(); return val !== pw ? 'Passwords do not match' : undefined; }], startDate: [required('Start date is required')], endDate: [required('End date is required'), (val) => { const start = crossForm.startDate?.value(); if (start && val && val <= start) return 'End date must be after start date'; return undefined; }] }, validateOn: 'onBlur' });
 </script>
 
 <style scoped>

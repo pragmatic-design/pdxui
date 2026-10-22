@@ -2,7 +2,7 @@
 // Validates only its own fields (specified by `fields` prop).
 // Validation timing is configurable: onLeave, onSubmit, or blocking.
 
-import { component, html, signal, tryUseForm } from '@pdxui/core';
+import { component, html, signal, tryUseForm, formField } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
@@ -47,7 +47,7 @@ component('pdx-form-section', {
 
             // Touch section fields
             for (const name of names) {
-                const field = (form as Form<any>).fields[name];
+                const field = formField(form as Form<any>, name);
                 if (field) field.onBlur(); // trigger touched
             }
 
@@ -65,7 +65,7 @@ component('pdx-form-section', {
             if (!form) return;
             const names = getFieldNames();
             const hasDirty = names.some(n => {
-                const field = (form as Form<any>).fields[n];
+                const field = formField(form as Form<any>, n);
                 return field?.dirty();
             });
             _sectionDirty.set(hasDirty);

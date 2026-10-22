@@ -552,6 +552,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<p>x</p>', '@form f: { name: string { shout } };\nfunction shout() { return (v) => (v === String(v).toUpperCase() ? null : \'Shout it\'); }'),
         },
     },
+    PDX_FORM_FIELD_RESERVED: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@form` field named like a member of the form (`valid`, `errors`, `reset`, `dirty`, `getValues`, `handleSubmit`, `array`, …).',
+        explanation: 'Each field is a member of its form, `f.email` beside `f.valid()` and `f.reset()`: a field of a member\'s name would hide the member, so `createForm` refuses it.',
+        fix: 'Give the field another name. The name is also what the server receives, so the rename is the author\'s to make; `pdx migrate` flags it and does not rewrite it.',
+        example: {
+            bad: pdx('<p>x</p>', '@form f: { reset: boolean };'),
+            good: pdx('<p>x</p>', '@form f: { resetPassword: boolean };'),
+        },
+    },
     PDX_FORM_FIELD_UNPARSED: {
         severity: 'warn', category: 'defect',
         summary: 'A `@form` field the compiler did not understand.',

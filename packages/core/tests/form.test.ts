@@ -11,42 +11,42 @@ describe('createForm — basic fields', () => {
             initialValues: { name: 'Alice', age: 30 },
         });
 
-        expect(form.fields.name.value()).toBe('Alice');
-        expect(form.fields.age.value()).toBe(30);
+        expect(form.name.value()).toBe('Alice');
+        expect(form.age.value()).toBe(30);
     });
 
     it('tracks dirty state on change', () => {
         const form = createForm({ initialValues: { name: '' } });
 
-        expect(form.fields.name.dirty()).toBe(false);
+        expect(form.name.dirty()).toBe(false);
         expect(form.dirty()).toBe(false);
 
-        form.fields.name.onChange('Bob');
-        expect(form.fields.name.dirty()).toBe(true);
+        form.name.onChange('Bob');
+        expect(form.name.dirty()).toBe(true);
         expect(form.dirty()).toBe(true);
     });
 
     it('tracks touched state on blur', () => {
         const form = createForm({ initialValues: { name: '' } });
 
-        expect(form.fields.name.touched()).toBe(false);
+        expect(form.name.touched()).toBe(false);
         expect(form.touched()).toBe(false);
 
-        form.fields.name.onBlur();
-        expect(form.fields.name.touched()).toBe(true);
+        form.name.onBlur();
+        expect(form.name.touched()).toBe(true);
         expect(form.touched()).toBe(true);
     });
 
     it('reset clears all state', () => {
         const form = createForm({ initialValues: { name: '' } });
 
-        form.fields.name.onChange('Bob');
-        form.fields.name.onBlur();
+        form.name.onChange('Bob');
+        form.name.onBlur();
         expect(form.dirty()).toBe(true);
         expect(form.touched()).toBe(true);
 
         form.reset();
-        expect(form.fields.name.value()).toBe('');
+        expect(form.name.value()).toBe('');
         expect(form.dirty()).toBe(false);
         expect(form.touched()).toBe(false);
     });
@@ -55,13 +55,13 @@ describe('createForm — basic fields', () => {
         const form = createForm({ initialValues: { name: '', email: '' } });
 
         form.setValues({ name: 'Alice', email: 'a@b.com' });
-        expect(form.fields.name.value()).toBe('Alice');
-        expect(form.fields.email.value()).toBe('a@b.com');
+        expect(form.name.value()).toBe('Alice');
+        expect(form.email.value()).toBe('a@b.com');
     });
 
     it('getValues returns snapshot', () => {
         const form = createForm({ initialValues: { name: 'A', count: 1 } });
-        form.fields.name.onChange('B');
+        form.name.onChange('B');
 
         const values = form.getValues();
         expect(values).toEqual({ name: 'B', count: 1 });
@@ -76,12 +76,12 @@ describe('createForm — validation', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('');
-        expect(form.fields.name.error()).toBe('This field is required');
+        form.name.onChange('');
+        expect(form.name.error()).toBe('This field is required');
         expect(form.valid()).toBe(false);
 
-        form.fields.name.onChange('Alice');
-        expect(form.fields.name.error()).toBeUndefined();
+        form.name.onChange('Alice');
+        expect(form.name.error()).toBeUndefined();
         expect(form.valid()).toBe(true);
     });
 
@@ -92,14 +92,14 @@ describe('createForm — validation', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('');
-        expect(form.fields.name.error()).toBe('This field is required');
+        form.name.onChange('');
+        expect(form.name.error()).toBe('This field is required');
 
-        form.fields.name.onChange('AB');
-        expect(form.fields.name.error()).toBe('Minimum 3 characters');
+        form.name.onChange('AB');
+        expect(form.name.error()).toBe('Minimum 3 characters');
 
-        form.fields.name.onChange('Alice');
-        expect(form.fields.name.error()).toBeUndefined();
+        form.name.onChange('Alice');
+        expect(form.name.error()).toBeUndefined();
     });
 
     it('validates on blur by default', () => {
@@ -109,12 +109,12 @@ describe('createForm — validation', () => {
         });
 
         // No error yet (haven't blurred)
-        form.fields.name.onChange('');
-        expect(form.fields.name.error()).toBeUndefined();
+        form.name.onChange('');
+        expect(form.name.error()).toBeUndefined();
 
         // Blur triggers validation
-        form.fields.name.onBlur();
-        expect(form.fields.name.error()).toBe('This field is required');
+        form.name.onBlur();
+        expect(form.name.error()).toBe('This field is required');
     });
 
     it('errors signal aggregates all field errors', () => {
@@ -127,8 +127,8 @@ describe('createForm — validation', () => {
             validateOn: 'onChange',
         });
 
-        form.fields.name.onChange('');
-        form.fields.email.onChange('bad');
+        form.name.onChange('');
+        form.email.onChange('bad');
 
         const errs = form.errors();
         expect(errs.name).toBe('This field is required');
@@ -143,8 +143,8 @@ describe('createForm — validation', () => {
 
         const isValid = await form.validate();
         expect(isValid).toBe(false);
-        expect(form.fields.name.touched()).toBe(true);
-        expect(form.fields.age.touched()).toBe(true);
+        expect(form.name.touched()).toBe(true);
+        expect(form.age.touched()).toBe(true);
     });
 
     it('async validator runs after sync passes', async () => {
@@ -158,12 +158,12 @@ describe('createForm — validation', () => {
         });
 
         // Sync fails — async should NOT run
-        form.fields.username.onChange('');
+        form.username.onChange('');
         await new Promise(r => setTimeout(r, 50)); // SLEEP-OK: asserts the async validator did NOT run inside the debounce window
         expect(asyncCheck).not.toHaveBeenCalled();
 
         // Sync passes — async runs
-        form.fields.username.onChange('alice');
+        form.username.onChange('alice');
         await waitUntil(() => asyncCheck.mock.calls.length > 0, 'the debounced async validator to run');
         expect(asyncCheck).toHaveBeenCalledWith('alice');
     });

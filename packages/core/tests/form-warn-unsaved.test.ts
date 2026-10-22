@@ -55,7 +55,7 @@ afterEach(() => {
 describe('createForm({ warnUnsaved: true })', () => {
     it('dirty: leaving opens the in-app confirm with the registered strings', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
 
         const answer = askToLeave(el);
         expect(answer).toBeInstanceOf(Promise);
@@ -74,7 +74,7 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('"Leave" lets the navigation through', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         const answer = askToLeave(el);
         getDialogQueue().close(getDialogQueue().items()[0].id, true);
         expect(await answer).toBe(true);
@@ -82,7 +82,7 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('Escape (the dialog dismissed with no answer) keeps the page', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         const answer = askToLeave(el);
         getDialogQueue().closeAll();
         expect(await answer).toBe(false);
@@ -90,7 +90,7 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('the page has no outlet: the helper mounts one', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         expect(document.querySelector('pdx-overlay-outlet')).toBeNull();
         const answer = askToLeave(el);
         expect(document.querySelectorAll('pdx-overlay-outlet').length).toBe(1);
@@ -101,7 +101,7 @@ describe('createForm({ warnUnsaved: true })', () => {
     it('an app override of form.unsavedTitle is what the dialog shows', async () => {
         setComponentStrings('form', { unsavedTitle: 'Modifiche non salvate', unsavedStay: 'Resta' });
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         const answer = askToLeave(el);
         expect(getDialogQueue().items()[0]).toMatchObject({ title: 'Modifiche non salvate', cancelLabel: 'Resta' });
         getDialogQueue().closeAll();
@@ -116,14 +116,14 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('control — reset to the typed values makes it clean again', () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         form.reset({ name: 'Rex' });
         expect(askToLeave(el)).toBe(true);
     });
 
     it('after a successful submit, leaving does not ask', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         await form.handleSubmit(async () => { /* saved */ })(new Event('submit'));
         expect(form.state()).toBe('success');
         expect(askToLeave(el), 'the form asked about work it had just saved').toBe(true);
@@ -131,7 +131,7 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('control — a submit whose save fails still asks', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         await form.handleSubmit(async () => { throw new Error('server down'); })(new Event('submit'));
         expect(form.state()).toBe('error');
         const answer = askToLeave(el);
@@ -142,11 +142,11 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('a field edited while the save was in flight stays unsaved', async () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         let finishSave: () => void = () => {};
         const submitting = form.handleSubmit(() => new Promise<void>(r => { finishSave = r; }))(new Event('submit'));
         await new Promise(r => setTimeout(r, 0));
-        form.fields.name.onChange('Rexy');
+        form.name.onChange('Rexy');
         finishSave();
         await submitting;
         expect(form.dirty(), 'the edit made during the save was treated as saved').toBe(true);
@@ -177,7 +177,7 @@ describe('createForm({ warnUnsaved: true })', () => {
 
     it('control — without the option no guard is registered', () => {
         const el = mountFormPage(false);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         expect(el._beforeLeaveCallbacks ?? []).toHaveLength(0);
     });
 });
@@ -191,20 +191,20 @@ describe('closing or reloading the tab', () => {
 
     it('dirty: beforeunload is cancelled (the browser asks, in its own words)', () => {
         mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         expect(unload().defaultPrevented).toBe(true);
     });
 
     it('clean again: the listener is gone', () => {
         mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         form.reset({ name: 'Rex' });
         expect(unload().defaultPrevented).toBe(false);
     });
 
     it('the component is destroyed: the listener is gone', () => {
         const el = mountFormPage(true);
-        form.fields.name.onChange('Rex');
+        form.name.onChange('Rex');
         el.remove();
         expect(unload().defaultPrevented).toBe(false);
     });

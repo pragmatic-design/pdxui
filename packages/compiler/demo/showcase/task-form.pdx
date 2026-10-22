@@ -4,24 +4,24 @@
     <form @submit="handleSubmit">
       <div class="field">
         <label>Task *</label>
-        <input type="text" :value="task.fields.text.value()"
+        <input type="text" :value="task.text.value()"
                @input="onTextInput" @blur="onTextBlur"
                placeholder="What needs to be done?"
-               :class="task.fields.text.error() ? 'input-error' : ''" />
-        @if (task.fields.text.error()) {
-          <span class="err">{{ task.fields.text.error() }}</span>
+               :class="task.text.error() ? 'input-error' : ''" />
+        @if (task.text.error()) {
+          <span class="err">{{ task.text.error() }}</span>
         }
       </div>
       <div class="field">
         <label>Category *</label>
         <select @change="onCatChange" @blur="onCatBlur">
           <option value="">Select...</option>
-          <option value="design" :selected="task.fields.category.value() === 'design'">Design</option>
-          <option value="dev" :selected="task.fields.category.value() === 'dev'">Development</option>
-          <option value="test" :selected="task.fields.category.value() === 'test'">Testing</option>
+          <option value="design" :selected="task.category.value() === 'design'">Design</option>
+          <option value="dev" :selected="task.category.value() === 'dev'">Development</option>
+          <option value="test" :selected="task.category.value() === 'test'">Testing</option>
         </select>
-        @if (task.fields.category.error()) {
-          <span class="err">{{ task.fields.category.error() }}</span>
+        @if (task.category.error()) {
+          <span class="err">{{ task.category.error() }}</span>
         }
       </div>
       <div class="actions">
@@ -60,10 +60,10 @@ const handleSubmit = task.handleSubmit(async (values) => {
   store.addTask(values.text, values.category);
 });
 
-function onTextInput(e) { task.fields.text.onChange(e.target.value); }
-function onTextBlur() { task.fields.text.onBlur(); }
-function onCatChange(e) { task.fields.category.onChange(e.target.value); }
-function onCatBlur() { task.fields.category.onBlur(); }
+function onTextInput(e) { task.text.onChange(e.target.value); }
+function onTextBlur() { task.text.onBlur(); }
+function onCatChange(e) { task.category.onChange(e.target.value); }
+function onCatBlur() { task.category.onBlur(); }
 function resetForm() { task.reset(); }
 </script>
 

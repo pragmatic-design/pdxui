@@ -258,7 +258,7 @@ function personalRule(v) {
   return errors;
 }
 
-const country = $derived(personal.fields.country.value());
+const country = $derived(personal.country.value());
 
 const COUNTRIES = ['IT', 'FR', 'DE', 'ES', 'GB'];
 /** Each country in the reader's language, from the platform rather than from a dictionary. */
@@ -291,11 +291,11 @@ const autosave = createAutosave({
   // A tax code outside Italy is not kept: the field is hidden, and a hidden value is not an answer.
   extra: (name, value) => {
     if (name !== 'country' || value === 'IT') return {};
-    personal.fields.taxCode.onChange('');
+    personal.taxCode.onChange('');
     return { taxCode: '' };
   },
   // Now Italian: the tax code it lacks is asked for on its field, not left for someone to notice.
-  after: (name, value) => { if (name === 'country' && value === 'IT') personal.fields.taxCode.onBlur(); },
+  after: (name, value) => { if (name === 'country' && value === 'IT') personal.taxCode.onBlur(); },
 });
 
 const saveState = $derived(autosave.state());

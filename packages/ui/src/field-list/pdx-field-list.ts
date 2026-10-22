@@ -11,7 +11,7 @@
 //       :item-fields="[{ name: 'product', type: 'text', label: 'Product' }]"
 //       :item-default="{ product: '', qty: 1, price: 0 }" />
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the
@@ -229,7 +229,7 @@ component('pdx-field-list', {
          *
          * The rows are dotted fields — `lines.0.activity`, `lines.1.activity` — and `getValues()`
          * assembles them, which is why the payload is right. The leaf the array itself is,
-         * `form.fields.lines`, is updated by nobody else, so without this anything that read it would
+         * `form.lines`, is updated by nobody else, so without this anything that read it would
          * see an empty array with rows on screen: a count, a summary, or a step guard asking "are
          * these rows valid?" would have nothing to look at. `form.ts:646` describes the arrangement as this list
          * keeping its rows as dotted fields *and mirroring them onto the array field* — this is
@@ -249,14 +249,14 @@ component('pdx-field-list', {
             const form = getForm();
             if (!form) return;
             const prefix = getArrayPath();
-            const leaf = (form.fields as Record<string, { value(): unknown; onChange(v: unknown): void } | undefined>)[prefix];
+            const leaf = formField(form, prefix);
             if (!leaf) return;
             const fields = ctx.itemFields() as FieldListItemSchema[];
             const rows: Record<string, unknown>[] = [];
             for (let i = 0; i < count; i++) {
                 const row: Record<string, unknown> = {};
                 for (const field of fields) {
-                    const cell = (form.fields as Record<string, { value(): unknown } | undefined>)[`${prefix}.${i}.${field.name}`];
+                    const cell = formField(form, `${prefix}.${i}.${field.name}`);
                     row[field.name] = cell ? cell.value() : undefined;
                 }
                 rows.push(row);
@@ -355,8 +355,8 @@ component('pdx-field-list', {
                         const itemValues: Record<string, unknown> = {};
                         for (const field of fields) {
                             const fieldPath = `${prefix}.${i}.${field.name}`;
-                            const formField = form?.fields[fieldPath];
-                            itemValues[field.name] = formField?.value() ?? null;
+                            const boundField = form ? formField(form, fieldPath) : undefined;
+                            itemValues[field.name] = boundField?.value() ?? null;
                         }
                         // `remove` for a row that draws its own button.
                         const idx = i;
@@ -375,8 +375,8 @@ component('pdx-field-list', {
                             const cell = document.createElement('div');
                             cell.className = 'pdx-field-list-cell';
                             const fieldPath = `${prefix}.${i}.${field.name}`;
-                            const formField = form?.fields[fieldPath];
-                            const val = formField?.value();
+                            const boundField = form ? formField(form, fieldPath) : undefined;
+                            const val = boundField?.value();
                             cell.textContent = val != null ? String(val) : '';
                             cell.style.cursor = 'pointer';
                             cell.title = getComponentString('field-list', 'cellHint')();
@@ -390,14 +390,14 @@ component('pdx-field-list', {
                             const cell = document.createElement('div');
                             cell.className = 'pdx-field-list-cell';
                             const fieldPath = `${prefix}.${i}.${field.name}`;
-                            const formField = form?.fields[fieldPath];
+                            const boundField = form ? formField(form, fieldPath) : undefined;
 
                             const tag = TYPE_TAG[field.type || 'text'] || 'pdx-input';
                             const input = document.createElement(tag);
                             if (field.placeholder) input.setAttribute('placeholder', field.placeholder);
 
-                            if (formField) {
-                                const val = formField.value();
+                            if (boundField) {
+                                const val = boundField.value();
                                 if (CHECKED_TYPES.has(field.type || '')) {
                                     if (val) input.setAttribute('checked', '');
                                 } else {
@@ -409,8 +409,8 @@ component('pdx-field-list', {
                             const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
                             onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
                                 ? e.detail?.checked
-                                : (e.detail?.value ?? (e.target as any)?.value), (value) => formField?.onChange(value));
-                            input.addEventListener('pdx-blur', () => formField?.onBlur());
+                                : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField?.onChange(value));
+                            input.addEventListener('pdx-blur', () => boundField?.onBlur());
 
                             cell.appendChild(input);
                             row.appendChild(cell);
@@ -529,8 +529,8 @@ component('pdx-field-list', {
             if (editIdx != null && form) {
                 for (const field of fields) {
                     const fieldPath = `${prefix}.${editIdx}.${field.name}`;
-                    const formField = form.fields[fieldPath];
-                    if (!formField) continue;
+                    const boundField = formField(form, fieldPath);
+                    if (!boundField) continue;
 
                     const row = document.createElement('div');
                     row.className = 'pdx-field-list-dialog-field';
@@ -544,7 +544,7 @@ component('pdx-field-list', {
                     const input = document.createElement(tag);
                     if (field.placeholder) input.setAttribute('placeholder', field.placeholder);
 
-                    const val = formField.value();
+                    const val = boundField.value();
                     if (CHECKED_TYPES.has(field.type || '')) {
                         if (val) input.setAttribute('checked', '');
                     } else {
@@ -555,8 +555,8 @@ component('pdx-field-list', {
                     const eventName = (tag === 'pdx-input' || tag === 'pdx-textarea') ? 'pdx-input' : 'pdx-change';
                     onControlValue(input, eventName, (e) => CHECKED_TYPES.has(field.type || '')
                         ? e.detail?.checked
-                        : (e.detail?.value ?? (e.target as any)?.value), (value) => formField.onChange(value));
-                    input.addEventListener('pdx-blur', () => formField.onBlur());
+                        : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField.onChange(value));
+                    input.addEventListener('pdx-blur', () => boundField.onBlur());
 
                     row.appendChild(input);
                     content.appendChild(row);

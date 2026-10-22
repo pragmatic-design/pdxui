@@ -1,6 +1,6 @@
 // Pure utility functions for flattening/unflattening nested objects to dotted-path keys.
 // Used by createForm() to support nested DTOs (e.g., { customer: { name: 'Jane' } }
-// → form.fields['customer.name']).
+// → form['customer.name']).
 //
 // Design: arrays of objects are flattened per-item (items.0.product, items.1.qty).
 // Arrays of primitives are NOT flattened — the value stays as the array itself.

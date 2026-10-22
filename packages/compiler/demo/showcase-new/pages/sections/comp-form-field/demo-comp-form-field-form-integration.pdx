@@ -15,12 +15,12 @@
 &lt;pdx-form-field
   label="Name"
   required
-  :error="contact.fields.name.error()"
-  :touched="contact.fields.name.touched()"&gt;
+  :error="contact.name.error()"
+  :touched="contact.name.touched()"&gt;
   &lt;pdx-input
-    :value="contact.fields.name.value()"
-    @input="contact.fields.name.onChange($event.detail.value)"
-    @blur="contact.fields.name.onBlur()"&gt;
+    :value="contact.name.value()"
+    @input="contact.name.onChange($event.detail.value)"
+    @blur="contact.name.onBlur()"&gt;
   &lt;/pdx-input&gt;
 &lt;/pdx-form-field&gt;</code></pre>
     </div>

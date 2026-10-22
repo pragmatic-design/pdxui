@@ -58,7 +58,7 @@ const codeForm = createForm({
   validateOn: 'onBlur',
 });
 
-function codeFormValuesText() { const v = codeForm.dirty(); const out = { username: codeForm.fields.username?.value(), age: codeForm.fields.age?.value(), role: codeForm.fields.role?.value(), agree: codeForm.fields.agree?.value() }; return JSON.stringify(out, null, 2); }
+function codeFormValuesText() { const v = codeForm.dirty(); const out = { username: codeForm.username?.value(), age: codeForm.age?.value(), role: codeForm.role?.value(), agree: codeForm.agree?.value() }; return JSON.stringify(out, null, 2); }
 </script>
 
 <style scoped>

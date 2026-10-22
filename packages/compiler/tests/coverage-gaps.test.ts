@@ -177,7 +177,7 @@ describe('integration: @fetch + @form', () => {
 <template>
   <div>{{ users }}</div>
   <form @submit="contact.handleSubmit">
-    <input ::value="contact.fields.name.value">
+    <input ::value="contact.name.value">
   </form>
 </template>
 <script>

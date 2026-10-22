@@ -6,7 +6,7 @@
 // as optional until an error appeared (#249).
 
 import { describe, it, expect } from 'vitest';
-import { createForm, required, minLength, email, isRequiredValidator, FORM_INTERNALS } from '../src/index';
+import { createForm, formField, required, minLength, email, isRequiredValidator, FORM_INTERNALS } from '../src/index';
 import type { FormInternals } from '../src/index';
 
 describe('FormField.required', () => {
@@ -15,13 +15,13 @@ describe('FormField.required', () => {
             initialValues: { email: '', name: '' },
             validators: { email: [required(), email()], name: [minLength(2)] },
         });
-        expect(form.fields.email.required).toBe(true);
-        expect(form.fields.name.required, 'a validator that is not required() does not make a field required').toBe(false);
+        expect(form.email.required).toBe(true);
+        expect(form.name.required, 'a validator that is not required() does not make a field required').toBe(false);
     });
 
     it('is false for a field with no validators at all', () => {
         const form = createForm({ initialValues: { note: '' } });
-        expect(form.fields.note.required).toBe(false);
+        expect(form.note.required).toBe(false);
     });
 
     it('is true for a field added later with required()', () => {
@@ -30,20 +30,18 @@ describe('FormField.required', () => {
         internals.addField('items.0.title', '', [required()]);
         // A hand-written check that rejects an empty value is not `required()`, and does not count.
         internals.addField('items.0.note', '', [(v: unknown) => (v ? undefined : 'Write something')]);
-        const fields = form.fields as unknown as Record<string, { required: boolean }>;
-        expect(fields['items.0.title'].required).toBe(true);
-        expect(fields['items.0.note'].required).toBe(false);
+        expect(formField(form, 'items.0.title')?.required).toBe(true);
+        expect(formField(form, 'items.0.note')?.required).toBe(false);
     });
 
     it('reads the validators when asked, not when the field was built', () => {
         // A field that exists from `initialValues` and gets its validators from `addField` afterwards
         // — the rows a field list was handed at the start.
         const form = createForm({ initialValues: { 'row.title': '' } as Record<string, unknown> });
-        const fields = form.fields as unknown as Record<string, { required: boolean }>;
-        expect(fields['row.title'].required).toBe(false);
+        expect(formField(form, 'row.title')?.required).toBe(false);
         const internals = (form as unknown as { [FORM_INTERNALS]: FormInternals })[FORM_INTERNALS];
         internals.addField('row.title', '', [required()]);
-        expect(fields['row.title'].required).toBe(true);
+        expect(formField(form, 'row.title')?.required).toBe(true);
     });
 });
 
