@@ -19,7 +19,7 @@ import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from 
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
 
 /** The names `text` declares as a form. */
-function formNames(text: string): string[] {
+export function formNames(text: string): string[] {
     const names = new Set<string>();
     // Match: `@form signup` — the declared name. Groups: [1]=the name
     for (const m of text.matchAll(/@form\s+([A-Za-z_$][\w$]*)/g)) names.add(m[1]);

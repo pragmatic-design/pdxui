@@ -437,6 +437,16 @@ export function createForm<T extends Record<string, unknown>>(
      */
     const _parseErrors = signal<Record<string, string>>({});
 
+    /**
+     * The pending writes of the `.debounce` bindings on this form's fields (beta rule F6): run before a submit
+     * or a validate reads the values, so they read what was typed. A write with nothing pending is a
+     * no-op, so all of them run.
+     */
+    const pendingWrites = new Set<() => void>();
+    function flushPendingWrites(): void {
+        for (const flush of [...pendingWrites]) flush();
+    }
+
     function setParseError(name: string, message: string | null): void {
         const { [name]: was, ...rest } = _parseErrors.peek();
         if (was !== (message ?? undefined)) _parseErrors.set(message === null ? rest : { ...rest, [name]: message });
@@ -647,6 +657,7 @@ export function createForm<T extends Record<string, unknown>>(
             invalid: () => name in _parseErrors() || (_touched() && effectiveError(name) !== undefined),
             get required() { return field.required; },
             parseError: (message) => setParseError(name, message),
+            hold: (flush) => { pendingWrites.add(flush); return () => { pendingWrites.delete(flush); }; },
         };
 
         fieldMap[name] = field;
@@ -920,6 +931,8 @@ export function createForm<T extends Record<string, unknown>>(
             };
 
             async function runSubmit(): Promise<void> {
+                // What is still waiting in a `.debounce` binding is what was typed (beta rule F6).
+                flushPendingWrites();
                 // Touch all fields so errors show; and what the server said about the last submit
                 // goes — this one is judged on its own values.
                 batch(() => {
@@ -991,6 +1004,7 @@ export function createForm<T extends Record<string, unknown>>(
         },
 
         async validate(): Promise<boolean> {
+            flushPendingWrites();
             // Touch all fields
             batch(() => {
                 for (const name of Object.keys(fieldTouched)) fieldTouched[name].set(true);

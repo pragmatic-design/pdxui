@@ -105,7 +105,11 @@ The binding needs no `<pdx-form>` around it, and a form field needs no `name`:
 </pdx-form-field>
 ```
 
-`.number`'s parse error («Enter a number.») is the field's error, until an entry parses. Before #128
+`.number`'s parse error («Enter a number.») is the field's error, until an entry parses. A
+`::value.debounce(300)` binding writes what was typed before the form submits or validates, even when
+`handleSubmit` or `validate()` is called from code rather than by a submit. Whether a field is required
+is the schema's to say: `required` on a bound control is `PDX_FORM_REQUIRED_IN_MARKUP`, since the field
+already marks its control required from its rules. Before #128
 a control was wired to its field by its `name` alone; that is `PDX_REMOVED_FORM` now, and
 `pdx migrate` writes the binding from the control's manifest — flagging a control with no manifest or
 with several models, such as `pdx-checkbox` (`checked`, `indeterminate`). A form section — a component

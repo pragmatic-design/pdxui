@@ -38,7 +38,7 @@ import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha
 import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
 import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
 import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './form-fields';
-import { formNameBinding } from './form-name-binding';
+import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -379,6 +379,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     formFieldReserved,
     // #128: a control binds its field through its model, not by `name` (./form-name-binding).
     formNameBinding,
+    // #128: `required` is the schema's, not a bound control's markup (./form-name-binding).
+    formRequiredInMarkup,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

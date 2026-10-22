@@ -19,6 +19,7 @@ import { validateDeclarations } from './compiler/validate-declarations';
 import { validateSignalMutation } from './compiler/validate-signal-mutation';
 import { validateHandWrittenSignals } from './compiler/validate-hand-signals';
 import { checkRemovedForms } from './language/removed-forms';
+import { checkRequiredInMarkup } from './language/form-name-binding';
 import { validateRunePosition } from './compiler/validate-rune-position';
 import { validateScriptExports } from './compiler/script-exports';
 import { validateAgentActions } from './compiler/validate-agent-actions';
@@ -937,6 +938,8 @@ export function compile(
     if (descriptor.template) allWarnings.push(...validateDynamicContent(descriptor.template.content, descriptor.template.start, source));
     // A form the beta removed, from the registry of language changes (#121).
     allWarnings.push(...checkRemovedForms(descriptor, source, { alphaOf: options?.alphaOf }));
+    // `required` on a control bound to a form field: the schema's to say (#128).
+    allWarnings.push(...checkRequiredInMarkup(source));
     // A `$` rune where the compiler does not read it: left as written, undefined at run time (#278).
     allWarnings.push(...validateRunePosition(descriptor, source));
     // An `export` in a component script: inside setup() it is a syntax error at load (#551).

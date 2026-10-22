@@ -285,6 +285,12 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   `<pdx-field-group>` the path is the full one, and so is the control's `name`. A form section, a
   component whose script calls `useForm()` / `tryUseForm()`, keeps its named controls wired to the form
   above it (#613).
+- `required` on a control bound to a form field (`::value="name.x" required`, or `:required`) is
+  `PDX_FORM_REQUIRED_IN_MARKUP` (warning): the field marks its control required from its rules, and
+  the markup is a second place to say it that validation does not read. `pdx migrate` flags it
+  (`form-required-in-markup`).
+- A value still waiting in a `::x.debounce(ms)` binding to a field is written to it before
+  `handleSubmit` validates and before `validate()` (beta rule F6), whether or not a `submit` event started them.
 - A rule on a field of a rows field is parsed and dropped: `PDX_FORM_ARRAY_RULES_IGNORED`. A row's
   rules are registered by `<pdx-field-list :item-fields>`.
 - A form that no `handleSubmit(` and no `<pdx-form :form="name">` submits is `PDX_FORM_NO_SUBMIT`
