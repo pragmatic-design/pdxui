@@ -70,6 +70,37 @@ jobs:
           name: contracts-report-${{ matrix.project }}-${{ matrix.shard }}
           path: packages/responsive/test-results
 
+  # The frozen baseline-2024 target keeps a reduced run (decision 16, #509): Dim 1 on the 13 themes,
+  # with the scenario pages building the design CSS in the 2024 form (PDX_TARGET, read by the pages'
+  # Vite config and by Dim 1 from certify-target.ts). DOM, ARIA and keyboard do not depend on the
+  # target, so Dims 2, 4 and 5 are not run for it. A scenario certified on baseline-2026 only says so
+  # in its manifest (`onlyOn`), with the reason, and is left out here.
+  contracts-2024:
+    name: contracts (dim 1, baseline-2024)
+    runs-on: ubuntu-latest
+    env:
+      PDX_TARGET: baseline-2024
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with: { version: 10.8.1 }
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
+      - name: Generate scenarios + registry
+        run: pnpm --filter @pdxui/responsive test:gen
+      - name: Dim 1, contract math, on baseline-2024
+        run: >
+          pnpm --filter @pdxui/responsive exec playwright test
+          --config tests/playwright-ui.config.ts
+          --project=contracts
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: contracts-report-baseline-2024
+          path: packages/responsive/test-results
+
   # Dimension 5: visual regression in the pinned Docker image (bit-for-bit determinism).
   visual:
     name: visual (dim 5, docker)

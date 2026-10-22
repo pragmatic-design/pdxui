@@ -20,6 +20,8 @@ import { join } from 'node:path';
 import config from '../../responsive/tests/playwright-ui.config';
 import { CERTIFY_PROJECTS } from '../../responsive/tests/certify-projects';
 import { CERTIFY_EXCLUSIONS } from '../../responsive/tests/certify-exclusions';
+import { buildContractUnits } from '../../responsive/tests/integration/ui-components/contracts/from-manifests';
+import { manifests } from '../../responsive/tests/integration/ui-components/contracts/generated/manifests';
 
 const workflow = readFileSync(join(__dirname, '../../../.github/workflows/certify.yml'), 'utf-8');
 const SPEC_DIR = join(__dirname, '..', '..', 'responsive', 'tests', 'integration', 'ui-components');
@@ -162,6 +164,46 @@ describe('the CI matrix runs every certification project, and every spec is in o
             .map((m) => `${m[1]} ${m[2]}/${m[3]}`);
         const expected = CERTIFY_PROJECTS.flatMap((p) => Array.from({ length: p.shards }, (_, i) => `${p.name} ${i + 1}/${p.shards}`));
         expect(entries.sort()).toEqual(expected.sort());
+    });
+});
+
+// The frozen baseline-2024 target keeps a reduced certification run (decision 16, #509): Dim 1 on the
+// 13 themes with the design CSS in the 2024 form. DOM, ARIA and keyboard do not depend on the target,
+// so Dims 2, 4 and 5 are not run for it. A scenario that asserts what only the default target gives
+// is left out of it, with its reason where it is declared.
+describe('CI certifies the baseline-2024 target with a reduced Dim 1 run', () => {
+    const body = () => jobBody('contracts-2024');
+
+    it('has the job, and it runs playwright — the control', () => {
+        expect(playwrightInvocations(body()).length).toBeGreaterThan(0);
+    });
+
+    it('builds the pages for baseline-2024', () => {
+        expect(body()).toMatch(/PDX_TARGET:\s*baseline-2024/);
+    });
+
+    it('runs Dim 1 alone: the contracts project of the ui config, nothing else', () => {
+        const runs = playwrightInvocations(body());
+        expect(runs.map((r) => r.config)).toEqual(['tests/playwright-ui.config.ts']);
+        expect(runs[0].filters, 'a file filter').toEqual([]);
+        const flat = body().replace(/\s+/g, ' ');
+        expect(flat).toContain('--project=contracts');
+        expect(flat).not.toContain('run.mjs');
+    });
+
+    it('leaves out the scenarios certified on one target only, on every theme, and nothing else', () => {
+        const on2026 = buildContractUnits('baseline-2026');
+        const on2024 = buildContractUnits('baseline-2024');
+        const gone = on2026.filter((u) => !on2024.some((v) => v.scenario === u.scenario && v.theme === u.theme));
+        expect([...new Set(gone.map((u) => u.scenario))]).toEqual(['input-nested-theme']);
+        expect(gone.length, 'on each of the 13 themes').toBe(13);
+        expect(on2024.length + gone.length).toBe(on2026.length);
+    });
+
+    it('a scenario certified on one target says why, where it is declared', () => {
+        const only = manifests.flatMap((m) => m.scenarios).filter((s) => s.onlyOn);
+        expect(only.length, 'none declared: the check would pass on nothing').toBeGreaterThan(0);
+        for (const s of only) expect(s.onlyOn!.why.length, `${s.id} gives no reason`).toBeGreaterThan(40);
     });
 });
 

@@ -19,6 +19,7 @@ import type {
     OverlayRule,
     ResponsiveRule,
 } from '../integration/ui-components/contracts/types';
+import type { CertifyTarget } from '../certify-target';
 
 // ── Scenario: an isolated HTML fragment, selectable with ?scenario= ──
 
@@ -39,6 +40,11 @@ export interface ScenarioDef {
      * menu, say). A string of code run in the page after the mount.
      */
     setup?: string;
+    /**
+     * Certified on this browser target only, and why (#509): a scenario that asserts what one
+     * target provides and the other does not. Dim 1 leaves it out of the other target's run.
+     */
+    onlyOn?: { target: CertifyTarget; why: string };
 }
 
 // ── Dimension 1: the mathematical contract (reuses the existing *Rule types) ──

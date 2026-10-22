@@ -169,7 +169,9 @@ pnpm certify:visual   # Docker: visual regression against the committed baseline
 The `pre-push` hook runs `pnpm typecheck`, `pnpm lint`, `pnpm test` and the compiler benchmarks.
 Certification runs in CI on every pull request, all five dimensions. To run it before the push as
 well, push with `PDX_CERTIFY=1`: for a change to a component's look or geometry, a red seen before
-the push saves a round trip.
+the push saves a round trip. CI also runs Dim 1 a second time with the pages built for the frozen
+`baseline-2024` target (`PDX_TARGET=baseline-2024`). A scenario that asserts what only the default
+target gives declares `onlyOn` in its manifest, with the reason, and that run leaves it out.
 
 **Certification is declared, not scripted.** Each component has one hand-written manifest,
 `packages/responsive/tests/manifests/{name}.manifest.ts`. The manifest holds isolated scenarios

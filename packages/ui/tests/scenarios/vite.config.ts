@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { offlineEndpoint } from './offline-endpoint';
 import { designTargetPlugin } from '../../../compiler/src/design-target';
+import { certifyTarget } from '../../../responsive/tests/certify-target';
 
 // Scenarios don't use .pdx files — just HTML + ES modules importing @pdxui/*
 // The pdx() plugin is not needed here, only aliases for workspace packages — and its design-target
@@ -54,8 +55,8 @@ function uiSubpathAliases(): { find: string; replacement: string }[] {
 
 // The browser target the pages are certified for (#156): the design CSS in the form pdx() gives an
 // app on that target, and core told the same. The default target unless PDX_TARGET says
-// `baseline-2024`, the form with the behaviour attributes on <html>.
-const target = process.env.PDX_TARGET === 'baseline-2024' ? 'baseline-2024' : 'baseline-2026';
+// `baseline-2024`, the form with the behaviour attributes on <html>. Read where Dim 1 reads it (#509).
+const target = certifyTarget();
 
 export default defineConfig({
     server: { port: 5220 },

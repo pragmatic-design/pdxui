@@ -54,6 +54,12 @@ export const input: ComponentManifest = {
                     <div pdx-theme="material"><pdx-input data-test="material-input" placeholder="Material"></pdx-input></div>
                     <div pdx-theme="fluent"><pdx-input data-test="fluent-input" placeholder="Fluent"></pdx-input></div>
                 </div>`,
+            // Left out of the baseline-2024 run (#509), where it fails on every theme by design.
+            onlyOn: {
+                target: 'baseline-2026',
+                why: 'a theme subtree with its own input style needs the style query baseline-2026 gives; '
+                    + 'under baseline-2024 the input style is an attribute on <html>, one for the whole page',
+            },
         },
     ],
 
