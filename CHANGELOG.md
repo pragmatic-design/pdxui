@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- `@model value: T = d { form };` (`model<T>(d, { form: true })` in a descriptor) makes a component
+  form-associated through its model: a native `<form>` submits the model under the host's `name` (a
+  string as is, a number as its string, a boolean as a checkbox — its `value` or `on` when true,
+  nothing when false —, an array as one entry per item, a `File` as the file, `null` as nothing);
+  `form.reset()` and a restored form state write the model, so a parent's `::value` follows; the
+  component's `required` and `error` props are its validity; a disabled fieldset sets its `disabled`
+  prop. The option was read as part of the default or the type before, and broke the compiled module.
+  The library's value components take it in the next parts. (#135)
 - A value still waiting in a `::x.debounce(ms)` binding to a form field is written before the form's
   `handleSubmit` validates and before `validate()`, when the page calls them from code as well as on a
   submit event: the submitted value is the one typed (beta rule F6). `required` on a control bound to a form

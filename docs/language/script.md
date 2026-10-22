@@ -188,7 +188,10 @@ component's `models`.
 - The rules of `@prop` apply: `PDX_PROP_NO_TYPE`, `PDX_PROP_INVALID_TYPE`, `PDX_PROP_TYPE_MISMATCH`,
   `PDX_DUP_PROP`, `PDX_DUP_DECLARATION`.
 - Assigning a model is the point of it: it never raises `PDX_PROP_WRITE`.
-- `{ form }` (form association, #135) is not read yet.
+- `@model name: T = d { form };` (form association, #135) is the same model with `form: true` in its
+  descriptor entry; core makes the component form-associated through it
+  ([beta/components.md](beta/components.md) → «@model»). The option is taken off before the type and
+  the default are read, with or without a default.
 
 #### Examples
 

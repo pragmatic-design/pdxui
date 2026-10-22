@@ -73,7 +73,8 @@ Wrap the fields in `<pdx-form :form>`, bind each control to its field through th
 The binding writes the field, marks the control invalid while the field shows an error and required
 when the schema requires it, and leaving the control touches the field; the form field shows the
 error, warning and required marker. The control keeps its `name`: it is what a native form submits
-and what a test selects. A misspelled field is an error in the editor, and so is a field of the wrong
+and what a test selects. A component of your own is submitted by a native form the same way when
+its model is declared `@model value: T { form }` (Components → «`{ form }`»). A misspelled field is an error in the editor, and so is a field of the wrong
 type for the model (`::checked` on a `string` field):
 
 ```pdx

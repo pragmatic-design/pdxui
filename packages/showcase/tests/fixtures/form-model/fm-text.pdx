@@ -1,0 +1,11 @@
+<template>
+  <input class="inner" ::value="value" :disabled="disabled" />
+</template>
+
+<script>
+// A .pdx text field whose model is its form value (#135): tests/form-model.spec.ts.
+// The inner input has no name, so the host's value is the only one the form receives.
+@model value: string = 'init' { form };
+@prop required: boolean = false;
+@prop disabled: boolean = false;
+</script>

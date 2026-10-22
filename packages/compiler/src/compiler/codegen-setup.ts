@@ -19,13 +19,15 @@ import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 // ─── Public API ────────────────────────────────────────────────────
 
 /** Build the props: { ... } object string from PropInfo array. */
-export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true }[]): string {
+export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const parts = [`type: ${p.runtimeType}`];
         if (p.default !== undefined) parts.push(`default: ${p.default}`);
         // Core reports a required prop the host did not set, in development (#123, #130).
         if (p.required) parts.push('required: true');
+        // A model `{ form }` makes the component form-associated through it, in core (#135).
+        if (p.form) parts.push('form: true');
         return `    ${p.name}: { ${parts.join(', ')} }`;
     });
     return `{\n${entries.join(',\n')}\n  }`;

@@ -55,6 +55,8 @@ export function __pdx_hmr_restore(tag: string): void {
 // they have always been imported from.
 import type { PropType, PropDefinition, TypedProp, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
 import { modelEvent } from '../utils/model-event';
+import { wireFormModel } from '../form/form-model';
+import type { FormModelCallbacks } from '../form/form-model';
 export type { PropType, PropDefinition, TypedProp } from './component-descriptor';
 
 /** Map PropType constructor to its JS type. */
@@ -247,8 +249,13 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     // Declared states (#132): the host attaches its internals for them, and ctx.state sets them.
     const declaredStates = options.states && options.states.length > 0 ? new Set(options.states) : null;
 
+    // A model declared `{ form }` (#135) is the component's form value, and makes it form-associated.
+    const formModels = [...modelNames].filter(n => (modelDefs[n] as ModelSpec<unknown>).form);
+    if (DEV && formModels.length > 1) console.warn(`[pdx] <${tag}> declares more than one model { form } (${formModels.join(', ')}); a form takes one value from a control, and '${formModels[0]}' is it.`);
+    const formModel = formModels[0] ?? null;
+
     const useShadow = options.shadow ?? false;
-    const useFormAssociated = options.formAssociated ?? false;
+    const useFormAssociated = (options.formAssociated ?? false) || formModel !== null;
     // _skipAttrSync removed — attribute→prop sync must be identical in dev and prod
 
     // Object/Array/Function props are property-only (not attributes).
@@ -293,6 +300,13 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
 
         /** The host's custom states, when the descriptor declares any and the browser has them. */
         _customStates: CustomStateSet | null = null;
+
+        /** The form lifecycle of a model declared `{ form }` (#135), once the body has wired it. */
+        _formModel: FormModelCallbacks | null = null;
+
+        formResetCallback(): void { this._formModel?.reset(); }
+        formDisabledCallback(disabled: boolean): void { this._formModel?.disabled(disabled); }
+        formStateRestoreCallback(state: string | File | FormData | null): void { this._formModel?.restore(state); }
 
         /**
          * The signals setup returned, by name, for HMR state save/restore. A field, not a WeakMap keyed
@@ -495,6 +509,26 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                 ctx[name] = modelNames.has(name) ? modelSignal(propSig, (value) => {
                     this.emit(modelEvent(name), { value }, { bubbles: false });
                 }) : propSig;
+            }
+
+            // The model declared `{ form }` is the form's value, and the form's lifecycle writes it (#135).
+            if (formModel && this._internals) {
+                const declared = (n: string): Signal<unknown> | undefined =>
+                    n !== formModel && propNames.includes(n) ? ctx[n] as Signal<unknown> : undefined;
+                const nameAttr = this.attr('name');
+                this._formModel = wireFormModel({
+                    tag,
+                    model: formModel,
+                    signal: ctx[formModel] as Signal<unknown>,
+                    props: { value: declared('value'), required: declared('required'), error: declared('error') },
+                    name: () => nameAttr(),
+                    track: (fn) => this.track(fn),
+                    setFormValue: (v, s) => this.setFormValue(v, s),
+                    setValidity: (flags, msg) => this.setValidity(flags, msg),
+                    setDisabled: (disabled) => {
+                        if (propNames.includes('disabled')) (this as unknown as { disabled: boolean }).disabled = disabled;
+                    },
+                });
             }
 
             // Activate composable lifecycle scope during setup

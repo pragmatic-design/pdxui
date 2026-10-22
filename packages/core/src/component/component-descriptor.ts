@@ -105,11 +105,24 @@ export function event<D = void>(options?: { bubbles?: boolean }): EventSpec<D> {
  */
 export interface ModelSpec<T> extends PropSpec<T> {
     readonly model: true;
+    /** Declared `{ form: true }` (#135): the component is form-associated, and this model is its form value. */
+    readonly form?: true;
 }
 
-/** Declare a model: `model<string>('')`, `model<Item[]>(() => [])`; the options are {@link prop}'s. */
-export function model<T>(defaultValue?: T | (() => T), options?: PropOptions): ModelSpec<T> {
-    return { ...propBuilder(defaultValue, options), model: true };
+/** Options of {@link model}: {@link prop}'s, and `form`. */
+export interface ModelOptions extends PropOptions {
+    /**
+     * The component takes part in a native `<form>` through this model (#135): it is form-associated,
+     * the model's value is what the form submits, and a reset or a restored state writes the model.
+     * One model of a component may declare it.
+     */
+    form?: boolean;
+}
+
+/** Declare a model: `model<string>('')`, `model<Item[]>(() => [])`, `model<string>('', { form: true })`. */
+export function model<T>(defaultValue?: T | (() => T), options?: ModelOptions): ModelSpec<T> {
+    const spec = { ...propBuilder(defaultValue, options), model: true as const };
+    return options?.form ? { ...spec, form: true } : spec;
 }
 
 export { modelEvent } from '../utils/model-event';

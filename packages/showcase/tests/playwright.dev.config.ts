@@ -27,7 +27,8 @@ export default defineConfig({
     // `devtools-v2.spec.ts` here because `__PDX_DEVTOOLS__` exists in development only (#271).
     // `lifecycle.spec.ts` here because its fixture is a page of its own, which the dev server
     // serves beside the app and the build leaves out (#143).
-    testMatch: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'density.spec.ts', 'theme-behaviours.spec.ts', 'devtools-v2.spec.ts', 'lifecycle.spec.ts', 'scoped-styles.spec.ts'],
+    // `form-model.spec.ts` (#135) for the same reason: its fixture is a page of its own.
+    testMatch: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'density.spec.ts', 'theme-behaviours.spec.ts', 'devtools-v2.spec.ts', 'lifecycle.spec.ts', 'scoped-styles.spec.ts', 'form-model.spec.ts'],
     fullyParallel: true,
     // Derived, not a literal, for the reason `playwright-worker-budget.test.ts` states: a number
     // that is a quarter of a 32-core machine is four times an 8-core laptop's budget. Five tests

@@ -18,7 +18,7 @@ export const RESERVED_ELEMENT_NAMES: ReadonlySet<string> = new Set<string>([
     'attr', 'attributeChangedCallback', 'body', 'connected', 'connectedCallback', 'disconnected',
     'disconnectedCallback', 'emit', 'frame', 'track',
     // its form-associated API
-    'checkValidity', 'formResetCallback', 'formStateRestoreCallback', 'reportValidity', 'setFormValue',
+    'checkValidity', 'formDisabledCallback', 'formResetCallback', 'formStateRestoreCallback', 'reportValidity', 'setFormValue',
     'setValidity', 'validationMessage', 'validity',
     // its internals, and the ones component() adds
     '__pdx_restoreState', '__pdx_saveState', '_collectSlotFunctions', '_disposeUnprojected', '_ownsNode',

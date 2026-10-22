@@ -9,6 +9,6 @@ export { responsive } from './responsive';
 export { device } from './device';
 export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, PropDefinition, TypedProp, ComponentDeclarations, EventMap, HostOf } from './component';
 export { prop, event, model, slot } from './component-descriptor';
-export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, SlotSpec, EventDetail, EmitOf } from './component-descriptor';
+export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, ModelOptions, SlotSpec, EventDetail, EmitOf } from './component-descriptor';
 export type { Breakpoint, BreakpointMap } from './responsive';
 export type { DeviceType, Orientation } from './device';

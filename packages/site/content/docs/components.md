@@ -257,6 +257,31 @@ a parent that wants to listen without binding writes `@selected-id-change="…"`
 child does not declare `@model x` is an error, `PDX_TWO_WAY_NOT_MODEL`: nothing would bring the value
 back.
 
+### `{ form }` — the model is what a native form submits
+
+A component a native `<form>` should submit declares its model `{ form }`:
+
+```pdx
+<template>
+  <input ::value="value" :disabled="disabled" />
+</template>
+
+<script>
+@model value: string = '' { form };
+@prop required: boolean = false;
+@prop disabled: boolean = false;
+</script>
+```
+
+`<app-name-field name="first">` inside a `<form>` is then in its `FormData` as `first`, with the
+model's value: a string as is, a number as its string, a boolean as a checkbox does (the component's
+`value`, or `on`, when true; nothing when false), an array as one entry per item, a `File` as the file,
+`null` as nothing. `form.reset()` puts the model back to the value it mounted with — through the model,
+so the parent's `::value` follows. The component's own `required` and `error` props, when it has them,
+are its validity: `form.checkValidity()` is false while a required model is empty or the error is
+set. A disabled `<fieldset>` sets its `disabled` prop. Leave the inner `<input>` without a `name`: the
+host is what the form reads. In TypeScript: `models: { value: model<string>('', { form: true }) }`.
+
 ## @event — what a component communicates
 
 A component shouldn't know *what* the parent does when something happens: it just **emits an event**.

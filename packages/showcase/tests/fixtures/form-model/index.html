@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>PDX form-model fixture</title>
+  </head>
+  <body>
+    <!-- tests/form-model.spec.ts: served by the dev server, outside the showcase app. -->
+    <form id="f">
+      <fieldset id="fs">
+        <app-fm-text name="t"></app-fm-text>
+        <fm-check name="c" value="yes"></fm-check>
+        <fm-check name="c2"></fm-check>
+        <fm-tags name="tags"></fm-tags>
+        <fm-number name="n"></fm-number>
+        <fm-object name="o"></fm-object>
+      </fieldset>
+    </form>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
