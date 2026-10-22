@@ -11,6 +11,18 @@ semver.
 
 ### Features
 
+- The library's menus and pickers take a parent's typed snippet (#491):
+  - `pdx-select`: `item(option, index)` and `selected(option)`;
+  - `pdx-autocomplete`: `option(option, index, highlighted)`;
+  - `pdx-cascader`: `option(node, level, selected)`;
+  - `pdx-tree-select`: `node(node, level, expanded)`;
+  - `pdx-command`: `item(item, index, active)`;
+  - `pdx-menu`, `pdx-dropdown-menu` and `pdx-context-menu`: `item(item)`.
+
+  Each declares the slot in its descriptor, so a page's `@snippet` reaches it and the manifest records
+  the slot's signature, which the editor types the snippet's parameters from. The alpha scoped slot
+  still renders when no snippet is given. Core's `snippetOrSlot(ctx, name, args)` is what a TypeScript
+  component reads either one with.
 - `@model value: T = d { form };` (`model<T>(d, { form: true })` in a descriptor) makes a component
   form-associated through its model: a native `<form>` submits the model under the host's `name` (a
   string as is, a number as its string, a boolean as a checkbox — its `value` or `on` when true,
@@ -573,6 +585,8 @@ semver.
 
 ### Fixes
 
+- `pdx-select`'s `item` slot receives each option's position in the list as `index`; it was always
+  `0`. (#491)
 - A `pdx-mention` whose `value` a parent sets submits that text in a native form; before, it kept
   submitting the markup of the text it replaced. (#135)
 - A `@prop`, `@model` or typed `@slot` named after one of the `HTMLElement` members whose replacement

@@ -1,7 +1,7 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId } from '@pdxui/core';
+import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
@@ -47,7 +47,7 @@ function buildHighlight(label: string, query: string): HTMLSpanElement {
  * A text input with suggestions whose value is free text: the user can type anything, or pick a
  * suggestion from a local list or a remote data source.
  *
- * @slot option - Scoped — renders one option. Receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+ * @slot option - Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
  *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
@@ -91,6 +91,10 @@ component('pdx-autocomplete', {
         error: { type: Boolean, default: false },
         success: { type: Boolean, default: false },
         warning: { type: Boolean, default: false },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        option: slot<(option: { label: string; value: unknown; raw: unknown }, index: number, highlighted: boolean) => Node>(),
     },
     setup(ctx) {
         const uid = generatedId('pdx-ac');
@@ -462,7 +466,7 @@ component('pdx-autocomplete', {
 
         // Slot — read lazily (_projectSlots runs after setup)
         function getOptionSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['option'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'option', (s) => [{ label: s.label, value: s.value, raw: s.raw }, s.index, s.highlighted]);
         }
 
         return {

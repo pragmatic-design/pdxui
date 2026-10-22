@@ -61,7 +61,7 @@ on blur.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `option` — Scoped — renders one option. Receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+**Slot:** `option` — Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
 
 
 #### Examples

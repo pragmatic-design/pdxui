@@ -178,6 +178,37 @@ describe('gen-manifest reads the alpha events a component no longer emits (#478)
     });
 });
 
+describe('gen-manifest reads the descriptor\'s slots (#491)', () => {
+    const source = [
+        '/**',
+        ' * A widget.',
+        ' * @slot item - Renders one entry.',
+        ' */',
+        "component('pdx-widget', {",
+        '    slots: {',
+        '        item: slot<(item: { label: string }, index: number) => Node>(),',
+        '        footer: slot(),',
+        '    },',
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+    const slots = () => analyzeFile('src/widget/pdx-widget.ts', source, {})[0].declarations[0].slots;
+
+    it("a declared slot's signature is its parameter list, what the editor types a snippet from", () => {
+        expect(slots()).toContainEqual({ name: 'item', description: 'Renders one entry.', signature: '(item: { label: string }, index: number)' });
+    });
+
+    it('a slot declared with no signature takes no arguments', () => {
+        expect(slots()).toContainEqual(expect.objectContaining({ name: 'footer', signature: '()' }));
+    });
+
+    it('the control: a slot only the JSDoc names has no signature', () => {
+        const alpha = source.replace(/ {4}slots: \{[\s\S]*?\n {4}\},\n/, '');
+        expect(analyzeFile('src/widget/pdx-widget.ts', alpha, {})[0].declarations[0].slots)
+            .toEqual([{ name: 'item', description: 'Renders one entry.' }]);
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {
     const source = [
         '/**',

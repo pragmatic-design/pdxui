@@ -3,7 +3,7 @@
 // Items support icons, shortcuts, submenus, checkbox/radio, disabled, danger.
 // Dynamic items: pass a function to generate items based on the clicked target.
 
-import { component, html, signal, focusGroup, onDestroy } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, slot, snippetOrSlot } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -22,7 +22,7 @@ function loadIcon(): void {
  * A right-click menu that opens at the cursor, and also on a long press on mobile or Shift+F10 from
  * the keyboard.
  *
- * @slot item - Scoped — renders one menu entry. Receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-context-menu', {
     props: {
@@ -33,10 +33,14 @@ component('pdx-context-menu', {
         /** Min width of the menu panel */
         minWidth: { type: Number, default: 180 },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+    },
     setup(ctx) {
         const _open = signal(false);
         function getItemSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['item'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item]);
         }
         let _panelEl: HTMLElement | null = null;
         /** Removes the press-outside listener, added when the menu opens (#427). */

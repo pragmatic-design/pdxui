@@ -80,7 +80,7 @@ paged table → `pdx-relation-picker`.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `item` — Scoped — renders one option in the list. Receives `{ label, value, raw, index }` (`raw` is the original option).; `selected` — Scoped — renders the selected value in the trigger. Receives `{ label, value, raw }`.
+**Slot:** `item` — Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).; `selected` — Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
 
 
 #### Examples

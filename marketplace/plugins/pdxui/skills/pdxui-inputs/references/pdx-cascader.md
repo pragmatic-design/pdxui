@@ -30,7 +30,7 @@ Drill through nested options.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
-**Slot:** `option` — Scoped — renders one option in a column. Receives `{ node, level, selected }`.
+**Slot:** `option` — Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
 
 **Shapes:** `CascaderNode { value: string; label: string; children?: CascaderNode[]; isLeaf?: boolean; disabled?: boolean }`
 

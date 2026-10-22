@@ -25,7 +25,7 @@ A ⌘K command palette.
 
 **Renders:** roles `combobox` · `dialog` · `group` · `listbox` · `option` · `status`
 
-**Slot:** `item` — Scoped — renders one command. Receives `{ item, active, index }`.
+**Slot:** `item` — Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.
 
 **Shapes:** `CommandItem { id: string; label: string; group?: string; icon?: string; shortcut?: string; action?: () => void; keywords?: string; disabled?: boolean }`
 
