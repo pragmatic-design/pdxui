@@ -385,7 +385,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const name = propPrefix[2];
             const optional = propPrefix[3] === '?';
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
-            const { type: tsType, rest } = extractTypeAnnotation(trimmed, colonPos);
+            // `@model name: T = d { form }` (#135): the trailing option is taken off before the type
+            // and the default are read, which would otherwise swallow it.
+            // Match: ` { form }` at the end, before an optional `;`.
+            const formOption = rune === 'model' ? /\s*\{\s*form\s*\}\s*;?\s*$/.exec(trimmed) : null;
+            const declaration = formOption ? trimmed.slice(0, formOption.index) + ';' : trimmed;
+            const { type: tsType, rest } = extractTypeAnnotation(declaration, colonPos);
             if (tsType) {
                 if (isMalformedTsType(tsType)) {
                     warnings.push({
@@ -405,6 +410,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                     runtimeType: tsToRuntimeType(tsType),
                     default: defaultVal,
                     ...(rune === 'model' ? { model: true } : {}),
+                    ...(formOption ? { form: true } : {}),
                     ...(rune === 'prop' && !optional && defaultVal === undefined ? { required: true } : {}),
                 });
                 continue;

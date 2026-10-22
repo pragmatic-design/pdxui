@@ -142,6 +142,11 @@ writing it is `PDX_PROP_WRITE`. `@model value: string = '';` is a prop the compo
 The parent binds it with `<app-field ::value="name">`. `::x` is a contract: valid on a model and on
 native `value`/`checked`/`files`; on any other component prop it is `PDX_TWO_WAY_NOT_MODEL`, «declare
 `@model x` in the child». A TypeScript component declares `models: { value: model<string>('') }`.
+`@model value: string = '' { form };` (`model<string>('', { form: true })`) makes the component
+form-associated: a native `<form>` submits the model under the host's `name` (a boolean as a checkbox,
+an array as repeated entries), `form.reset()` restores it through the model, its own `required` and
+`error` props are its validity, and a disabled fieldset sets its `disabled` prop. Leave the inner
+`<input>` unnamed, or the value goes twice.
 
 **A button that runs a component's method needs no script**: every `@expose`d method is an invoker
 command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The

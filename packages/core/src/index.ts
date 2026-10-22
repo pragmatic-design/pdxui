@@ -110,6 +110,8 @@ export type { FormSchema, FormFieldSchema, FormSectionSchema, FormFieldType, Fie
 
 // Form-Associated Custom Elements (ElementInternals mixin)
 export { useFormAssociated } from './form/form-associated';
+// A `.pdx` model `{ form }` (#135): the compiler puts this in the model's entry, as `model(d, { form: true })` does.
+export { wireFormModel } from './form/form-model';
 export type { FormAssociatedOptions } from './form/form-associated';
 
 // Form Context (provide/inject for <pdx-form>)
@@ -189,7 +191,7 @@ export { define, __pdx_hmr_swap, __pdx_hmr_rerender } from './component/define';
 export { component, __pdx_hmr_save, __pdx_hmr_restore } from './component/component';
 export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, ComponentContextBase, TypedComponentContext, PropDefinition, TypedProp, ComponentDeclarations, EventMap, HostOf } from './component/component';
 export { prop, event, model, slot } from './component/component-descriptor';
-export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, SlotSpec, EventDetail, EmitOf } from './component/component-descriptor';
+export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, ModelOptions, SlotSpec, EventDetail, EmitOf } from './component/component-descriptor';
 
 // Services (provide/inject)
 export { context, provide, inject, clearProviders, installContextProtocol } from './component/context';

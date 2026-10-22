@@ -77,6 +77,17 @@ describe('getScriptDiagnostics', () => {
         expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
     });
 
+    it('a model `{ form }` (#135), with a default and without, is valid TypeScript in the projection', () => {
+        const sc = "\n@model value: string = '' { form };\n@model tags: string[] { form }\nfunction f() { value = tags.join(','); }\n";
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
+        expect(projectScript(sc)).toHaveLength(sc.length);
+        expect(projectScript(sc)).not.toContain('form');
+        const syntax = ts.transpileModule(projectScript(sc), { reportDiagnostics: true }).diagnostics ?? [];
+        expect(syntax.map(d => ts.flattenDiagnosticMessageText(d.messageText, '\n'))).toEqual([]);
+        expect(getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src).map((d: { message: string }) => d.message)).toEqual([]);
+    });
+
     it('a syntax error in the projected script is reported, not only the type errors (#487)', () => {
         const sc = '\nlet n = ;\n';
         const src = '<template></template>\n<script>' + sc + '</script>';

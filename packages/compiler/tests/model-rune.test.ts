@@ -154,3 +154,38 @@ describe('the resolver knows the models', () => {
             .toEqual([expect.stringContaining("'::page' on <pdx-pagination>")]);
     });
 });
+
+// `@model value: T = default { form }` (#135): the component is form-associated, and this model is the
+// value its form submits. The runtime half — a native <form> in Chromium — is
+// packages/showcase/tests/form-model.spec.ts.
+describe('@model … { form }', () => {
+    it('with a default: the default is the default, and the model is marked form', () => {
+        const analysis = analyzeScript("@model value: string = '' { form };", 'field.pdx');
+        expect(analysis.props).toEqual([expect.objectContaining({ name: 'value', tsType: 'string', default: "''", model: true, form: true })]);
+        expect(analysis.warnings).toEqual([]);
+    });
+
+    it('without a default: the type is the type', () => {
+        const analysis = analyzeScript('@model tags: string[] { form };', 'field.pdx');
+        expect(analysis.props).toEqual([expect.objectContaining({ name: 'tags', tsType: 'string[]', model: true, form: true })]);
+        expect(analysis.props[0].default).toBeUndefined();
+    });
+
+    it('control: a model without it is not marked, and an object default is left alone', () => {
+        const analysis = analyzeScript("@model value: string = '';\n@model point: { x: number } = { x: 0 };", 'field.pdx');
+        expect(analysis.props.map(p => [p.name, p.default, p.form])).toEqual([['value', "''", undefined], ['point', '{ x: 0 }', undefined]]);
+    });
+
+    for (const [name, opts] of Object.entries({ dev: {}, build: { production: true } })) {
+        it(`goes into the descriptor with core's form wiring, imported — ${name}`, () => {
+            const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, opts);
+            expect(code).toMatch(/models: \{\s*value: \{ type: String, default: '', form: wireFormModel \}\s*\}/);
+            expect(code).toMatch(/import \{[^}]*\bwireFormModel\b[^}]*\} from '@pdxui\/core'/);
+        });
+    }
+
+    it('control: without { form } the wiring is not imported', () => {
+        const { code } = compile(sfc("@model value: string = '';"), 'field.pdx', [], undefined, {});
+        expect(code).not.toContain('wireFormModel');
+    });
+});

@@ -13,6 +13,8 @@ export interface PropInfo {
     default?: string;     // default value expression as string
     /** `@model` (#124): a prop the component may write, which dispatches `<name>-change`. */
     model?: true;
+    /** `@model name: T = d { form }` (#135): the component is form-associated, through this model. */
+    form?: true;
     /** `@prop name: T;` with no default and no `?` (#130): a parent must set it. */
     required?: true;
 }

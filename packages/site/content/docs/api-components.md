@@ -647,10 +647,10 @@ Measure the relative position between two elements.
 ```ts
 import { model } from '@pdxui/core';
 
-function model(defaultValue?: T | (() => T), options?: PropOptions): ModelSpec<T>
+function model(defaultValue?: T | (() => T), options?: ModelOptions): ModelSpec<T>
 ```
 
-Declare a model: `model<string>('')`, `model<Item[]>(() => [])`; the options are {@link prop}'s.
+Declare a model: `model<string>('')`, `model<Item[]>(() => [])`, `model<string>('', { form: true })`.
 
 ## `moveMounted`
 

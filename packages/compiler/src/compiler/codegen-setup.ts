@@ -19,13 +19,16 @@ import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 // ─── Public API ────────────────────────────────────────────────────
 
 /** Build the props: { ... } object string from PropInfo array. */
-export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true }[]): string {
+export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const parts = [`type: ${p.runtimeType}`];
         if (p.default !== undefined) parts.push(`default: ${p.default}`);
         // Core reports a required prop the host did not set, in development (#123, #130).
         if (p.required) parts.push('required: true');
+        // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
+        // caller imports `wireFormModel` (see codegen-new), and an app without one does not carry it.
+        if (p.form) parts.push('form: wireFormModel');
         return `    ${p.name}: { ${parts.join(', ')} }`;
     });
     return `{\n${entries.join(',\n')}\n  }`;

@@ -163,6 +163,14 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
             // Match: the name and the `?` after it. Groups: [1]=up to the `?`
             const optional = /^(\s+[A-Za-z_$][\w$]*\s*)\?/.exec(s.slice(m.index + 1 + kw.length));
             if (optional) out[m.index + 1 + kw.length + optional[1].length] = ' ';
+            if (kw === 'model') {
+                // `@model name: T = d { form }` (#135): the option is no TypeScript, so it is blanked.
+                // Match: `{ form }` at the end of the declaration's line, before an optional `;`.
+                const lineEnd = s.indexOf('\n', m.index);
+                const line = s.slice(m.index, lineEnd < 0 ? s.length : lineEnd);
+                const form = /\{\s*form\s*\}(?=\s*;?\s*$)/.exec(line);
+                if (form) for (let o = 0; o < form[0].length; o++) out[m.index + form.index + o] = ' ';
+            }
             continue;
         }
         if (NAME_INTRO.has(kw)) {

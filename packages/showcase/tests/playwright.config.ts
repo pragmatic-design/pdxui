@@ -34,11 +34,11 @@ export default defineConfig({
     // And `devtools-v2.spec.ts`: `__PDX_DEVTOOLS__` exists in development only (#271).
     // And `hmr.spec.ts`, which saves a `.pdx` while a dev server runs: `playwright.hmr.config.ts` (#246).
     // And the scenario apps' budgets, which weigh other apps' builds: `playwright.scenarios.config.ts` (#244).
-    // And `lifecycle.spec.ts` and `scoped-styles.spec.ts`: their fixtures, under `fixtures/`, are pages
+    // And `lifecycle.spec.ts`, `scoped-styles.spec.ts` and `form-model.spec.ts`: their fixtures, under `fixtures/`, are pages
     // the dev server compiles on request; the preview serves only the showcase's build (#143, #152).
     // And the timed specs, which measured this suite's load with the page: `playwright.timing.config.ts`
     // runs them after it, with nothing else running (#606).
-    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts', 'hmr.spec.ts', 'scenario-*.spec.ts', 'lifecycle.spec.ts', 'scoped-styles.spec.ts',
+    testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts', 'hmr.spec.ts', 'scenario-*.spec.ts', 'lifecycle.spec.ts', 'scoped-styles.spec.ts', 'form-model.spec.ts',
         'first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts'],
     fullyParallel: true,
     workers: WORKERS,

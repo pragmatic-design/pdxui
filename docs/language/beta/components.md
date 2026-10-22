@@ -93,11 +93,18 @@ the name inside the component write the prop and dispatch the event. A parent bi
 `checked`, `files` of `<input>`, `<textarea>`, `<select>`) are the platform's models and bind the same
 way. Descriptor: `models: { value: model<T>(default) }`.
 
-`{ form }` makes the component **form-associated** (#135): `formAssociated`, `attachInternals()`,
-`setFormValue` on each change (strings as is, numbers and booleans as strings, arrays as repeated
-entries, `null` as no entry), `setValidity` from the component's validation state, and the form
-lifecycle callbacks (`formResetCallback` restores the initial value, `formDisabledCallback` maps to
-`disabled`, `formStateRestoreCallback` restores the value). Descriptor: `model<T>(d, { form: true })`.
+`{ form }` makes the component **form-associated** (#135 — the mechanism landed; the library's value
+components declare it in #135's next parts): `formAssociated`, `attachInternals()`, and
+`setFormValue` on each change of the model — a string as is, a number as its string, a boolean as a
+native checkbox (the component's `value` prop, or `'on'`, when true; no entry when false), an array as
+one entry per item under the `name` (a native multi-select; none without a name), a `File` as the
+file, `null` as no entry; a value with no rule (a plain object) is not submitted, and is reported in
+development. `setValidity` from the component's own props when it declares them: `error` (a non-empty
+string is a custom error) and `required` (a model that is `null`, `''`, `false` or an empty array is
+`valueMissing`, as a native required control judges it, with the browser's own message). The form lifecycle callbacks write the model, so a parent's `::name` hears
+them: `formResetCallback` restores the value it mounted with, `formStateRestoreCallback` the value
+saved with the state; `formDisabledCallback` sets the `disabled` prop, when it declares one. One model
+of a component may declare it. Descriptor: `model<T>(d, { form: true })`.
 
 Every value component of `@pdxui/ui` declares its value as a model and emits exactly one change event
 per model (#125 — landed, in five batches, #478–#482, and its closing step: core's two-way binding
