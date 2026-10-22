@@ -40,6 +40,9 @@ declare global {
   // A handler on a component: its event, whose currentTarget is the component's element, typed with the
   // fields and methods its manifest lists (#479) — the model a text field's commit reads.
   type PdxOn<E, H> = Omit<E, 'currentTarget'> & { readonly currentTarget: H };
+  // What a \`::x\` binding to a model of type M takes: a value of M, or a form field of M (#128). The
+  // value is the argument, so a mismatch is reported on it: \`::checked="f.email"\` on a string field.
+  function __pdxBind<M>(v: M | { onChange(value: M): void; onBlur(): void }): void;
   const $el: HTMLElement;
   const $refs: Record<string, HTMLElement>;
   // The @pdxui/core helpers the compiler auto-imports (used with no import in the .pdx).

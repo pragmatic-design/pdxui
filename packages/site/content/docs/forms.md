@@ -89,6 +89,26 @@ function save(values) { /* already validated */ }
 </script>
 ```
 
+**Or bind each control to its field explicitly**, through the control's model: `::value="user.email"`
+on a text input, `::checked="user.accepted"` on a checkbox or a switch, `::pressed="user.bold"` on a
+toggle. The binding writes the field, marks the control invalid while the field shows an error and
+required when the schema requires it, and leaving the control touches the field. `<pdx-form-field
+:field="user.email">` shows that field's error, warning and required marker — no `name`, and no
+`<pdx-form>` needed around it. A misspelled field is an error in the editor, and so is a field of the
+wrong type for the model (`::checked` on a `string` field):
+
+```pdx
+<pdx-form-field label="Email" :field="user.email">
+  <pdx-input type="email" ::value="user.email" />
+</pdx-form-field>
+<pdx-form-field label="Age" :field="user.age">
+  <pdx-input ::value.number="user.age" />
+</pdx-form-field>
+```
+
+`.number`'s parse error («Enter a number.») is the field's error, until an entry parses. A control
+bound this way inside `<pdx-form :form>` is not wired a second time by a `name` it also has.
+
 **A group of checkboxes or radios outside a form** binds to one signal with `::group`: checkboxes to
 an array of the values that are checked, radios to the value of the one selected — no handler per
 input:

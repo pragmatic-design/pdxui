@@ -190,7 +190,8 @@ export function projectTemplate(
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
                     emit('; })(null!);\n');
                 } else if (modelType) {
-                    emit(`((__v: ${modelType}) => __v)(`);
+                    // A value of the model's type, or a form field of it (#128).
+                    emit(`__pdxBind<${modelType}>(`);
                     map.add(gen, templateStart + exprAbs, expr.length); emit(expr);
                     emit(');\n');
                 } else if (type && type !== 'string' && STRING_LITERAL.test(expr)) {

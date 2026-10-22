@@ -25,6 +25,7 @@ let pinError = $signal(''); // set when the server refuses the PIN: pinError = '
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
+| `field` | — | object | `null` | The form field this field shows (#128): `:field="f.email"`. Its error, warning, touched state and required-ness, with no `name` and no surrounding `<pdx-form>`. |
 | `name` | `name` | string | `''` | Field name — if set and inside <pdx-form>, auto-wires error/touched from form context. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `hint` | `hint` | string | `''` | Helper text shown under the control. |

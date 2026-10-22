@@ -24,6 +24,7 @@ import { createFormCoordinator } from './form-coordinator';
 import type { FormCoordinator } from './form-coordinator';
 import type { FormBridge } from '../data/data-source';
 import { guardUnsavedWork } from './confirm-leave';
+import { TWO_WAY_FIELD, type TwoWayField } from '../renderer/two-way-value';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -426,7 +427,25 @@ export function createForm<T extends Record<string, unknown>>(
      * itself.
      */
     function effectiveError(name: string): string | undefined {
-        return fieldErrors[name]?.() ?? _crossErrors()[name] ?? _serverErrors()[name];
+        return _parseErrors()[name] ?? fieldErrors[name]?.() ?? _crossErrors()[name] ?? _serverErrors()[name];
+    }
+
+    /**
+     * An entry a bound control could not read as the field's value — `::value.number="f.age"` given
+     * "12a" (#128). It comes first: the value the validators judge is the one before it, not what is on
+     * screen. Cleared by the next value written to the field, and by a reset.
+     */
+    const _parseErrors = signal<Record<string, string>>({});
+
+    function setParseError(name: string, message: string | null): void {
+        const current = _parseErrors.peek();
+        if (message === null) {
+            if (!(name in current)) return;
+            const { [name]: _cleared, ...rest } = current;
+            _parseErrors.set(rest);
+        } else if (current[name] !== message) {
+            _parseErrors.set({ ...current, [name]: message });
+        }
     }
 
     /**
@@ -588,6 +607,7 @@ export function createForm<T extends Record<string, unknown>>(
 
             onChange(newValue: T[typeof name]): void {
                 _value.set(newValue);
+                setParseError(name, null);
                 // What the server said about the old value no longer holds for the new one.
                 if (name in _serverErrors.peek()) {
                     const { [name]: _cleared, ...rest } = _serverErrors.peek();
@@ -619,8 +639,20 @@ export function createForm<T extends Record<string, unknown>>(
                     _warning.set(undefined);
                     _touched.set(false);
                     _dirty.set(false);
+                    setParseError(name, null);
                 });
             },
+        };
+
+        // What `::value="f.email"` binds (#128): the renderer reads this key, not the form's types.
+        (field as { [TWO_WAY_FIELD]?: TwoWayField })[TWO_WAY_FIELD] = {
+            get: () => _value(),
+            set: (v) => field.onChange(v as T[typeof name]),
+            blur: () => field.onBlur(),
+            // A parse error shows at once: the entry on screen is not the field's value at all.
+            invalid: () => name in _parseErrors() || (_touched() && effectiveError(name) !== undefined),
+            get required() { return field.required; },
+            parseError: (message) => setParseError(name, message),
         };
 
         fieldMap[name] = field;
@@ -656,7 +688,8 @@ export function createForm<T extends Record<string, unknown>>(
         // The form-level rule's messages, including any keyed to no field: an unroutable message
         // that left `valid()` true would read exactly like a rule that passed. And the server's, on
         // its fields: a form the server just refused is not valid until they are edited.
-        return Object.keys(_crossErrors()).length === 0 && Object.keys(_serverErrors()).length === 0;
+        return Object.keys(_crossErrors()).length === 0 && Object.keys(_serverErrors()).length === 0
+            && Object.keys(_parseErrors()).length === 0;
     });
 
     const dirty = computed(() => {
@@ -686,14 +719,15 @@ export function createForm<T extends Record<string, unknown>>(
 
     const errors = computed(() => {
         _fieldVersion();
-        // The server's messages, then the form-level rule's, then each field's own, each overwriting
-        // the one before for the same field — the precedence `effectiveError` gives a single field.
+        // The server's messages, then the form-level rule's, then each field's own, then a parse
+        // error, each overwriting the one before for the same field — the precedence
+        // `effectiveError` gives a single field.
         const result: Record<string, string> = { ..._serverErrors(), ..._crossErrors() };
         for (const name of Object.keys(fieldErrors)) {
             const err = fieldErrors[name]();
             if (err) result[name] = err;
         }
-        return result;
+        return { ...result, ..._parseErrors() };
     });
 
     const formWarnings = computed(() => {
@@ -943,6 +977,7 @@ export function createForm<T extends Record<string, unknown>>(
                 _state.set('idle');
                 _submitted.set(false);
                 _submitError.set(undefined);
+                _parseErrors.set({});
             });
             // Reset field arrays
             for (const [, arr] of fieldArrays) arr.reset();

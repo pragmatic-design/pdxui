@@ -3,13 +3,13 @@
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
 // Importable without a DOM; calling html`` needs one (#93).
 
-import { effect, onDispose, untracked } from '../reactivity/signal';
+import { effect, onDispose, signal, untracked } from '../reactivity/signal';
 import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
 import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
-import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup } from './two-way-value';
+import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup, type TwoWayField } from './two-way-value';
 import { attach, type Attachment } from './attach';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
@@ -719,6 +719,7 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
     });
 
     const applyValue = twoWayWriter(el, accessor, mods);
+    if (accessor.field) bindFieldState(el, accessor.field);
 
     // A component brings its value back through a model (#124): it announces its writes with
     // `<kebab-prop>-change` and `{ value }`, and that is all the binding listens to. Every library value
@@ -752,6 +753,41 @@ export function bindTwoWay(el: Element, descriptor: string, value: TemplateValue
     const eventName = mods.lazy ? 'change' : resolveTwoWayEvent(el, prop);
     el.addEventListener(eventName, () => {
         applyValue((el as unknown as Record<string, unknown>)[prop]);
+    });
+}
+
+/**
+ * A control bound to a form field (#128) takes the rest of the field: it is marked invalid while the
+ * field shows an error, required when the field must be filled in, and leaving it touches the field.
+ * A component that declares an `error` or `required` prop gets them as props — it marks its own inner
+ * control — and any other element the ARIA attributes; a native control its own `required`. A
+ * component's props are read off its class, which may be defined after the binding: until then it is
+ * marked as a plain element. Leaving means focus going outside the element: moving between the parts
+ * of a component is not leaving it. Registered after the writer, so a debounced value is written
+ * before the blur validates it.
+ */
+function bindFieldState(el: Element, field: TwoWayField): void {
+    const tag = el.tagName.toLowerCase();
+    const component = tag.includes('-');
+    el.addEventListener('focusout', (e) => {
+        const to = (e as FocusEvent).relatedTarget;
+        if (to instanceof Node && el.contains(to)) return;
+        field.blur();
+    });
+    const defined = signal(!component || customElements.get(tag) !== undefined);
+    if (!defined.peek()) void customElements.whenDefined(tag).then(() => defined.set(true));
+    /** The field's state as the prop `name` where the element has it, else as `aria-<name>`. */
+    const mark = (name: 'invalid' | 'required', on: boolean, prop: string): void => {
+        const asProp = component
+            ? defined() && ((customElements.get(tag) as { attrs?: readonly string[] } | undefined)?.attrs ?? []).includes(prop)
+            : prop in el;
+        if (asProp) assignBoundProperty(el, prop, on);
+        if (on && !asProp) el.setAttribute(`aria-${name}`, 'true');
+        else el.removeAttribute(`aria-${name}`);
+    };
+    effect(() => {
+        mark('invalid', field.invalid(), 'error');
+        if (field.required) mark('required', true, 'required');
     });
 }
 

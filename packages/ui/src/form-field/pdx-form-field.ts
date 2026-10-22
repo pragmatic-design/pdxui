@@ -5,7 +5,7 @@
 // ZERO validation built-in — validation lives in @form rune or dev code.
 
 import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField } from '@pdxui/core';
-import type { Form } from '@pdxui/core';
+import type { Form, FormField } from '@pdxui/core';
 
 
 /** The controls a field marked aria-required: only those are unmarked when `required` goes, so a
@@ -22,6 +22,11 @@ const _namedByField = new WeakSet<Element>();
  */
 component('pdx-form-field', {
     props: {
+        /**
+         * The form field this field shows (#128): `:field="f.email"`. Its error, warning, touched state and
+         * required-ness, with no `name` and no surrounding `<pdx-form>`.
+         */
+        field: { type: Object, default: null },
         /** Field name — if set and inside <pdx-form>, auto-wires error/touched from form context. */
         name: { type: String, default: '' },
         label: { type: String, default: '' },
@@ -94,6 +99,15 @@ component('pdx-form-field', {
             return name;
         }
 
+        /** The field shown: the one bound with `:field`, else the form's field of that `name`. */
+        function currentField(): FormField<unknown> | undefined {
+            const bound = ctx.field() as FormField<unknown> | null;
+            if (bound) return bound;
+            const form = currentForm();
+            const name = resolveFieldName();
+            return form && name ? formField(form, name) : undefined;
+        }
+
         // Reactive locale tracking — bump signal when locale changes to re-resolve messages
         const _localeVer = signal(0);
         void onLocaleChange(() => _localeVer.set(v => v + 1));
@@ -103,9 +117,7 @@ component('pdx-form-field', {
             // Cascata: inline error prop > form context error
             const inlineError = ctx.error() as string;
             if (inlineError) return resolveValidationMessage(inlineError) || inlineError;
-            const form = currentForm();
-            const name = resolveFieldName();
-            const field = form && name ? formField(form, name) : undefined;
+            const field = currentField();
             if (field) {
                 const err = field.error();
                 return err ? (resolveValidationMessage(err) || err) : '';
@@ -117,18 +129,14 @@ component('pdx-form-field', {
             _localeVer(); // read to create reactive dependency
             const inlineWarning = ctx.warning() as string;
             if (inlineWarning) return inlineWarning;
-            const form = currentForm();
-            const name = resolveFieldName();
-            const field = form && name ? formField(form, name) : undefined;
+            const field = currentField();
             if (field) return field.warning() ?? '';
             return '';
         }
 
         function resolveTouched(): boolean {
             if (ctx.touched()) return true;
-            const form = currentForm();
-            const name = resolveFieldName();
-            const field = form && name ? formField(form, name) : undefined;
+            const field = currentField();
             if (field) return field.touched();
             return false;
         }
@@ -140,9 +148,7 @@ component('pdx-form-field', {
          */
         function isRequired(): boolean {
             if (ctx.required()) return true;
-            const form = currentForm();
-            const name = resolveFieldName();
-            return !!(form && name && formField(form, name)?.required === true);
+            return currentField()?.required === true;
         }
 
         function shouldShowError(): boolean {
