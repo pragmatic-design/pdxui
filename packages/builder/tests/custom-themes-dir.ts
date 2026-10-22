@@ -3,8 +3,9 @@
  *
  * By default the save endpoint writes into `packages/design/src/themes/custom/` — a directory the
  * design suite serves at the same time, in the same `pnpm test`. The spec's cleanup deletes the theme
- * file before rewriting the `_custom.css` that imports it; a request landing in between makes the
- * design suite's http-server crash on ENOENT, and its tests fail on a refused connection.
+ * file before rewriting the `_custom.css` that imports it; a request landing in between made the
+ * design suite's http-server crash on ENOENT, and its tests fail on a refused connection. (Its own
+ * server, since #615, answers that request 404 and stays up; the directory stays separate anyway.)
  *
  * A fixed path, not mkdtemp: the Playwright config is evaluated by the runner AND by every worker,
  * and the dev server (started from the config), the spec (in a worker) and the teardown must all
