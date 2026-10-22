@@ -2,7 +2,7 @@
 // Data-driven: pass `items` array. Auto-generates ARIA, keyboard nav, submenu positioning.
 // Used by pdx-dropdown-menu and pdx-context-menu as the rendering engine.
 
-import { component, html, signal, focusGroup } from '@pdxui/core';
+import { component, html, signal, focusGroup, slot, snippetOrSlot } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
@@ -44,7 +44,7 @@ export interface MenuItem {
  * A menu drawn in place from a list of items, with checkbox and radio items, submenus and keyboard
  * navigation, shown while it is open.
  *
- * @slot item - Scoped — renders one menu entry. Receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-menu', {
     props: {
@@ -67,6 +67,10 @@ component('pdx-menu', {
          */
         renderItem: { type: Function, default: null },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+    },
     setup(ctx) {
         const _menuEl = signal<HTMLElement | null>(null);
         let _focusDispose: Dispose | null = null;
@@ -79,7 +83,7 @@ component('pdx-menu', {
 
         // Slot — read lazily (_projectSlots runs after setup)
         function getItemSlot(): SlotFunction | undefined {
-            return ((ctx as any).__slots?.['item'] ?? ctx.renderItem() ?? undefined) as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item]) ?? (ctx.renderItem() as SlotFunction | null) ?? undefined;
         }
 
         // ─── Build menu DOM ──────────────────────────────────

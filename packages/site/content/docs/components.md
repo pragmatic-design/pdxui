@@ -398,6 +398,22 @@ A list that works for any item says so with a type parameter. With `@generic T e
 parent's `@snippet row(u, i)` is an element of whatever `:items` was given — `u.nmae` on a `User` is an
 error where it is written. Where nothing bound tells it, set it on the tag: `<app-user-list T="User">`.
 
+The library's menus and pickers take snippets the same way (#491), each with the arguments its
+reference lists: `pdx-select`'s `item(option, index)` and `selected(option)`, `pdx-autocomplete`'s
+`option(option, index, highlighted)`, `pdx-cascader`'s `option(node, level, selected)`,
+`pdx-tree-select`'s `node(node, level, expanded)`, `pdx-command`'s `item(item, index, active)`, and
+`item(item)` for `pdx-menu`, `pdx-dropdown-menu` and `pdx-context-menu`:
+
+```pdx
+<pdx-select :options="countries" ::value="country">
+  @snippet item(o, i) { <span>{{ o.label }}</span> <small>{{ o.value }}</small> }
+</pdx-select>
+```
+
+A component written in TypeScript reads the parent's template with core's `snippetOrSlot(ctx, name,
+args)`: the snippet when the parent gave one, called with the arguments `args` takes from the scope, and
+the alpha scoped slot of the same name otherwise.
+
 ### Scoped slots (data from the component to the content)
 
 Typed snippets replace them (#131): they still compile, until the beta removes them.

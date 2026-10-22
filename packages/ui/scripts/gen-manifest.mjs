@@ -217,6 +217,28 @@ function extractModels(optionsObj, sourceFile) {
     return models;
 }
 
+/**
+ * The slots a typed descriptor declares, `slots: { item: slot<(item: T, index: number) => Node>() }`
+ * (#491) → name → signature, the parameter list the editor types a parent's `@snippet` from. A
+ * `slot()` with no type argument takes no arguments, `()`.
+ */
+function extractSlotSignatures(optionsObj, sourceFile) {
+    const slotsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'slots');
+    const signatures = new Map();
+    if (!slotsProp || !ts.isObjectLiteralExpression(slotsProp.initializer)) return signatures;
+    for (const decl of slotsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(decl) || !ts.isCallExpression(decl.initializer)) continue;
+        const call = decl.initializer;
+        if (call.expression.getText(sourceFile) !== 'slot') continue;
+        const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        const fn = call.typeArguments?.[0];
+        const params = fn && ts.isFunctionTypeNode(fn) ? fn.parameters.map(p => p.getText(sourceFile)) : [];
+        signatures.set(name, `(${params.join(', ')})`);
+    }
+    return signatures;
+}
+
 /** The event a model dispatches, as core names it: `selectedId` → `selected-id-change`. */
 function modelEventName(name) {
     return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
@@ -864,6 +886,12 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     // …and every slot the component renders, documented or not.
     for (const name of scanSlots(scanText)) {
         if (!slots.some(s => s.name === name)) slots.push({ name, description: name ? '' : 'The content placed inside the element.' });
+    }
+    // …and the descriptor's declared slots with their signatures (#491).
+    for (const [name, signature] of extractSlotSignatures(optionsObj, sourceFile)) {
+        const known = slots.find(s => s.name === name);
+        if (known) known.signature = signature;
+        else slots.push({ name, description: '', signature });
     }
     const cssParts = tags.filter(t => t.tag === 'csspart').map(t => splitNameDesc(t.text));
     // The descriptor's `parts` (#134), each reached as `[data-part="name"]`; a `@csspart` describes it.

@@ -3,7 +3,7 @@
 // `multiple` enables multi-select with chip tags.
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
-import { component, html, signal, computed, effect, prop, model, event, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, prop, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import { createDataSource, isDataSource, inject } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
@@ -47,8 +47,8 @@ function normaliseOptions(
  * One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple
  * props, fed by an array or a DataSource.
  *
- * @slot item - Scoped — renders one option in the list. Receives `{ label, value, raw, index }` (`raw` is the original option).
- * @slot selected - Scoped — renders the selected value in the trigger. Receives `{ label, value, raw }`.
+ * @slot item - Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).
+ * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -117,6 +117,11 @@ component('pdx-select', {
         'pdx-search': event<{ query: string }>(),
         /** Fired when the user creates an option from the search text. */
         'pdx-create': event<{ value: string; label: string }>(),
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        item: slot<(option: { label: string; value: unknown; raw: unknown }, index: number) => Node>(),
+        selected: slot<(option: { label: string; value: unknown; raw: unknown }) => Node>(),
     },
     setup(ctx) {
         const uid = generatedId('pdx-sel');
@@ -285,14 +290,14 @@ component('pdx-select', {
             return flatItems().filter(i => sel.has(i.value));
         }
 
-        // Priority: scoped slot (@slot / <slot let:>) > function prop > default label
-        // ctx.slot() checks __slots first, falls back to defaultFn
+        // Priority: the parent's snippet (#491) > the alpha scoped slot (<slot let:>) > the function prop
+        // > the default label.
 
         function renderItemContent(item: NormalisedOption | null | undefined, index?: number): unknown {
             if (!item) return '';
             const itemData = { label: item.label, value: item.value, raw: item._raw, index: index ?? 0 };
-            // Check scoped slot first, then function prop, then plain label
-            if ((ctx as any).__slots?.['item']) return (ctx as any).__slots['item'](itemData);
+            const itemSlot = snippetOrSlot(ctx, 'item', (s) => [{ label: s.label, value: s.value, raw: s.raw }, s.index]);
+            if (itemSlot) return itemSlot(itemData);
             const tmpl = ctx.itemTemplate() as unknown as ((item: unknown) => unknown) | null;
             if (tmpl) return tmpl(itemData);
             return item.label;
@@ -301,7 +306,8 @@ component('pdx-select', {
         function renderSelectedContent(item: NormalisedOption | null | undefined): unknown {
             if (!item) return '';
             const itemData = { label: item.label, value: item.value, raw: item._raw };
-            if ((ctx as any).__slots?.['selected']) return (ctx as any).__slots['selected'](itemData);
+            const selectedSlot = snippetOrSlot(ctx, 'selected', (s) => [{ label: s.label, value: s.value, raw: s.raw }]);
+            if (selectedSlot) return selectedSlot(itemData);
             const tmpl = ctx.selectedTemplate() as unknown as ((item: unknown) => unknown) | null;
             if (tmpl) return tmpl(itemData);
             return item.label;
@@ -946,7 +952,7 @@ component('pdx-select', {
                                 @click="${(e: Event) => ctx.onOptionClick(e, item)}"
                                 @mouseenter="${() => ctx._activeIndex.set(vi.index)}">
                                 ${() => ctx.multiple() ? html`<span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>` : ''}
-                                ${() => ctx.renderItemContent(item)}</div>`;
+                                ${() => ctx.renderItemContent(item, vi.index)}</div>`;
                         });
                     }
 
@@ -967,7 +973,7 @@ component('pdx-select', {
                                     @click="${(e: Event) => ctx.onOptionClick(e, item)}"
                                     @mouseenter="${() => ctx._activeIndex.set(idx)}">
                                     ${() => ctx.multiple() ? html`<span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>` : ''}
-                                    ${() => ctx.renderItemContent(item)}</div>`);
+                                    ${() => ctx.renderItemContent(item, idx)}</div>`);
                             }
                         }
                         return result;
@@ -983,7 +989,7 @@ component('pdx-select', {
                             @click="${(e: Event) => ctx.onOptionClick(e, item)}"
                             @mouseenter="${() => ctx._activeIndex.set(idx)}">
                             ${() => ctx.multiple() ? html`<span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>` : ''}
-                            ${() => ctx.renderItemContent(item)}</div>`
+                            ${() => ctx.renderItemContent(item, idx)}</div>`
                     );
                 }}
                 ${() => ctx.showCreateOption()

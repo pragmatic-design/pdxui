@@ -25,7 +25,7 @@ A button that opens an action menu.
 
 **Renders:** roles `button`
 
-**Slot:** `trigger` — The menu button, when it is not this component's own: an avatar, a chip. The element placed here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click, ArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close. `label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it.; `item` — Scoped — renders one menu entry. Receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+**Slot:** `trigger` — The menu button, when it is not this component's own: an avatar, a chip. The element placed here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click, ArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close. `label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it.; `item` — Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
 
 
 #### Examples

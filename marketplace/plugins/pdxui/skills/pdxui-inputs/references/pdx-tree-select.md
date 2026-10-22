@@ -47,7 +47,7 @@ toggles only the node clicked).
 
 **Renders:** roles `combobox` · `tree` · `treeitem`
 
-**Slot:** `node` — Scoped — renders one node's label. Receives `{ node, level, expanded }`.
+**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
 
 **Shapes:** `TreeSelectNode { value: string; label: string; children?: TreeSelectNode[]; disabled?: boolean; isLeaf?: boolean }`
 

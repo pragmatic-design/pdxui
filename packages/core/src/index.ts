@@ -148,7 +148,7 @@ export { renderSlot, slotCarrier } from './renderer/slot';
 export type { SlotFunction } from './renderer/slot';
 
 // Typed snippets (#489): what `@render` compiles to
-export { renderSnippet } from './renderer/snippet';
+export { renderSnippet, snippetOrSlot } from './renderer/snippet';
 
 // Helpers
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';

@@ -6,7 +6,7 @@
 
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
 import '../menu/pdx-menu';
-import { component, html, signal, onDestroy, generatedId } from '@pdxui/core';
+import { component, html, signal, onDestroy, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -34,7 +34,7 @@ interface MenuHost extends HTMLElement {
  *   placed here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click,
  *   ArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close.
  *   `label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it.
- * @slot item - Scoped — renders one menu entry. Receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-dropdown-menu', {
     props: {
@@ -47,11 +47,15 @@ component('pdx-dropdown-menu', {
         disabled: { type: Boolean, default: false },
         minWidth: { type: Number, default: 200 },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+    },
     setup(ctx) {
         const _open = signal(false);
         const _menuId = generatedId('pdx-dropdown-menu');
         function getItemSlot(): SlotFunction | null {
-            return ((ctx as any).__slots?.['item'] as SlotFunction | undefined) ?? null;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item]) ?? null;
         }
         let _triggerEl: HTMLElement | null = null;
         /** True when the trigger is the author's (the `trigger` slot), not the button built here. */

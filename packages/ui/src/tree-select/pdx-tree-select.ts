@@ -2,7 +2,7 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal, model, generatedId } from '@pdxui/core';
+import { component, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
@@ -37,7 +37,7 @@ export interface TreeSelectNode {
  * with children loaded lazily.
  *
  * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be reopened.
- * @slot node - Scoped — renders one node's label. Receives `{ node, level, expanded }`.
+ * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -73,6 +73,10 @@ component('pdx-tree-select', {
         /** Form field name */
         name: { type: String, default: '' },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        node: slot<(node: { value: string; label: string; [key: string]: unknown }, level: number, expanded: boolean) => Node>(),
+    },
     setup(ctx) {
         const _open = signal(false);
         const _search = signal('');
@@ -86,7 +90,7 @@ component('pdx-tree-select', {
         let _textEl: HTMLElement | null = null;
         let _panelEl: HTMLElement | null = null;
         function getNodeSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['node'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
         }
         let _treeContainerEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;

@@ -22,7 +22,7 @@ A list of actions.
 
 **Renders:** roles `menu` · `menuitem` · `menuitemcheckbox` · `menuitemradio` · `presentation` · `separator`
 
-**Slot:** `item` — Scoped — renders one menu entry. Receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+**Slot:** `item` — Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
 
 **Shapes:** `MenuItem { key: string; label: string; type?: 'item' | 'checkbox' | 'radio' | 'separator' | 'label' | 'submenu'; icon?: string; shortcut?: string; disabled?: boolean; danger?: boolean; checked?: boolean; radioGroup?: string; children?: MenuItem[]; className?: string; lang?: string }`
 

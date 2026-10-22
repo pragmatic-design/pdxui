@@ -2,7 +2,7 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal, model, generatedId } from '@pdxui/core';
+import { component, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -40,7 +40,7 @@ export interface CascaderNode {
  * then Region, then City.
  *
  * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.
- * @slot option - Scoped — renders one option in a column. Receives `{ node, level, selected }`.
+ * @slot option - Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -75,6 +75,10 @@ component('pdx-cascader', {
         /** Form field name */
         name: { type: String, default: '' },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    slots: {
+        option: slot<(node: { value: string; label: string; [key: string]: unknown }, level: number, selected: boolean) => Node>(),
+    },
     setup(ctx) {
         const _open = signal(false);
         const _activePath = signal<string[]>([]);
@@ -95,7 +99,7 @@ component('pdx-cascader', {
         const _panelId = generatedId('pdx-cascader-panel');
         let _panelEl: HTMLElement | null = null;
         function getOptionSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['option'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'option', (s) => [s.node, s.level, s.selected]);
         }
         let _panelContentEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;
