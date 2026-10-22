@@ -12,6 +12,8 @@
 // gives it an explicit way to name the form it inherits; so does a `<pdx-form>` without `:form`.
 
 import { parseSFC } from '../parser/sfc';
+import type { ValidationWarning } from '../compiler/validate';
+import { formNames } from './form-fields';
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
 
 /**
@@ -183,3 +185,57 @@ export const formNameBinding: LanguageChange = {
         return out;
     },
 };
+
+// ─── `required` in the schema only (#128, step 5) ─────────────────────────────────────────────
+
+/** The message of PDX_FORM_REQUIRED_IN_MARKUP, the compiler's and `pdx migrate`'s. */
+const REQUIRED_MESSAGE = '`required` on a control bound to a form field is the schema\'s to say: write `required` in the field\'s rules, `@form f: { email: string { required } }` or `required()` among its validators.';
+
+/**
+ * Every control bound to a form field — `::<model>="f.x"`, `f` a form the file declares — that also
+ * says `required` (or `:required`) in its markup: its line, and the tag. The field already marks the
+ * control required when its validators include `required()` (#128, part 2), and two places that say
+ * it can disagree.
+ */
+function requiredInMarkup(text: string): LanguageChangeFinding[] {
+    const template = parseSFC(text).template;
+    if (!template || template.src) return [];
+    const forms = new Set(formNames(text));
+    if (forms.size === 0) return [];
+    const out: LanguageChangeFinding[] = [];
+    for (const t of tagsOf(template.content)) {
+        if (t.closing) continue;
+        // Match: a `::model` binding (modifiers allowed) to `form.field` or `form['a.b']`.
+        // Groups: [1]=the form
+        const bound = /(?:^|\s)::[\w-]+(?:\.[\w()]+)*=(?:"([A-Za-z_$][\w$]*)(?:\.[A-Za-z_$][\w$]*|\['[^']+'\])"|'([A-Za-z_$][\w$]*)(?:\.[A-Za-z_$][\w$]*|\["[^"]+"\])')/.exec(t.attrs);
+        const form = bound ? (bound[1] ?? bound[2]) : undefined;
+        if (!form || !forms.has(form)) continue;
+        // Match: `required` or `:required` as an attribute of its own. Groups: none
+        if (!/(?:^|\s):?required(?=[\s=/]|$)/.test(t.attrs)) continue;
+        out.push({ line: lineAt(text, template.start + t.index), found: `<${t.tag} … required>` });
+    }
+    return out;
+}
+
+/** `required` on a bound control: listed by `pdx migrate`, reported by the compiler as PDX_FORM_REQUIRED_IN_MARKUP. */
+export const formRequiredInMarkup: LanguageChange = {
+    id: 'form-required-in-markup',
+    kind: 'removed',
+    scope: 'pdx',
+    issue: 128,
+    message: REQUIRED_MESSAGE,
+    reportedAs: 'PDX_FORM_REQUIRED_IN_MARKUP',
+    detect: (text) => requiredInMarkup(text),
+    fix: 'flag',
+};
+
+/** PDX_FORM_REQUIRED_IN_MARKUP (warning): `required` on a control bound to a form field. */
+export function checkRequiredInMarkup(source: string): ValidationWarning[] {
+    return requiredInMarkup(source).map((f) => ({
+        code: 'PDX_FORM_REQUIRED_IN_MARKUP',
+        severity: 'warn',
+        message: `${f.found}: ${REQUIRED_MESSAGE}`,
+        hint: 'Remove `required` from the control, and require the field in the schema if it is not yet.',
+        line: f.line,
+    }));
+}

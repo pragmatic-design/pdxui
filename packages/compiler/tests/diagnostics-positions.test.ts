@@ -86,6 +86,7 @@ const ROWS: Record<string, Row> = {
     PDX_FORM_ARRAY_RULES_IGNORED: { src: pdx('<p>{{ order }}</p>', 'let a = $signal(1);\n@form order: { lines: [{ name: string { required } }] };'), at: '@form order' },
     PDX_FORM_UNKNOWN_RULE: { src: pdx('<p>{{ f }}</p>', 'let a = $signal(1);\n@form f: { name: string { required, shout } };'), at: 'shout' },
     PDX_FORM_FIELD_RESERVED: { src: pdx('<p>{{ f }}</p>', 'let a = $signal(1);\n@form f: { email: string, reset: boolean };'), at: 'reset' },
+    PDX_FORM_REQUIRED_IN_MARKUP: { src: pdx('<p>{{ f }}</p>\n  <pdx-input ::value="f.email" required></pdx-input>', 'let a = $signal(1);\n@form f: { email: string };\nfunction send() { f.handleSubmit(() => {}); }'), at: '::value="f.email" required' },
     PDX_FORM_FIELD_UNPARSED: { src: pdx('<p>{{ x }}</p>', 'let a = $signal(1);\n@form x: {\n  a: string,\n  weird: <<nonsense>>\n};'), at: 'weird' },
     PDX_REWRITE_FALLBACK: { src: pdx('<div>{{ count }}</div>', 'let count = $signal(0);\nfunction bump() { count = ( }'), at: 'function bump()' },
     PDX_PAGE_INVALID_PATH: { src: pdx('<p>x</p>', "@page 'users';"), at: "@page 'users'" },

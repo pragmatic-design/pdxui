@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 105 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 106 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -588,6 +588,38 @@ No field is generated, so the control bound to it swallows what is typed.
 The form validates and holds values, and no `handleSubmit` sends them anywhere.
 
 **Fix.** Wire `form.handleSubmit(async (values) => { … })`, or hand the form to `<pdx-form :form>`.
+
+### PDX_FORM_REQUIRED_IN_MARKUP
+
+*warn* — `required` on a control bound to a form field; it belongs in the schema.
+
+The field marks its control required when its validators include `required()`. A `required` written on the control says it a second time, in a place the validation does not read: the two can disagree, and the form submits an empty value the markup called required.
+
+**Fix.** Remove `required` from the control, and write it in the field's rules: `@form f: { email: string { required } }`, or `required()` among its validators.
+
+Instead of:
+
+```html
+<template>
+  <pdx-input ::value="f.email" required></pdx-input>
+</template>
+<script>
+@form f: { email: string };
+function send() { f.handleSubmit(() => {}); }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <pdx-input ::value="f.email"></pdx-input>
+</template>
+<script>
+@form f: { email: string { required } };
+function send() { f.handleSubmit(() => {}); }
+</script>
+```
 
 ### PDX_FORM_UNKNOWN_RULE
 

@@ -249,7 +249,7 @@ FormDecl ::= "@form" S Word S? ":" S? ( InlineSchema | Word ) ( S? FormOptions )
 
 ### Semantics
 
-As alpha, with **explicit field binding** (#128). `@form f: Schema` exposes typed fields — `f.email`
+As alpha, with **explicit field binding** (#128 — landed; a form section's binding is #613). `@form f: Schema` exposes typed fields — `f.email`
 with `value()`, `error()`, `touched()`, `dirty()` and `required` (landed: the fields are members of
 the form, and `f.fields` is gone) — and a control binds to one through
 **its own model**: `::value="f.email"` on a text input, `::checked="f.accepted"` on a checkbox or a
@@ -275,7 +275,7 @@ all of the form's own, `state`, `touched` and `submitting` among them.
   section, a component that calls `useForm()` / `tryUseForm()`, keeps its named controls wired until
   #613 gives it an explicit binding.
 - `required` on the markup of a bound control: `PDX_FORM_REQUIRED_IN_MARKUP` (warning), pointing at
-  the schema.
+  the schema (landed, #128).
 - The alpha rules stay (`PDX_FORM_FIELD_UNPARSED`, `PDX_FORM_ARRAY_RULES_IGNORED`,
   `PDX_FORM_UNKNOWN_RULE`, `PDX_FORM_NO_SUBMIT`).
 
@@ -289,7 +289,7 @@ the form does today was read in `core/src/form/form.ts` on 2026-10-11.
 | F3 | Submit **flushes** first: a debounced async validation still waiting is run now, not abandoned, and submit waits for every async validation of the current values before deciding. | **landed** in effect: `validateAll` runs every async validator on the current values and awaits them (`form.ts:579-599`) |
 | F4 | A value that changes **while submit is validating** stops that submit: it returns invalid, and the user submits again. Submit never sends a value it did not validate. | differs: the answer for the old value is skipped (`form.ts:591`) and does not count as an error, so the submit goes on and `getValues()` sends the new, unvalidated value |
 | F5 | **Server field errors.** When the submit handler — `handleSubmit(fn)`, or an `@action` called inside it — rejects with field errors — RFC 9457 problem details with an `errors` map of field path → messages — each message lands on its field's `error()`; a path with no field lands on the form's error. A field's server error clears on its next edit. | **landed** (#280): matched as written, else ignoring case; the form's error is `formError()`; all clear when a submit starts; `submitError()` stays the raw rejection |
-| F6 | A pending value from a `::x.debounce(ms)` binding (template.md, `::name`, #126) is written to its field before submit validates or reads the values. Acceptance: type, submit inside the debounce window → the submitted value is the typed one. | the modifier is beta (#126); nothing to flush today |
+| F6 | A pending value from a `::x.debounce(ms)` binding (template.md, `::name`, #126) is written to its field before submit validates or reads the values. Acceptance: type, submit inside the debounce window → the submitted value is the typed one. | **landed** (#128): a `.debounce` binding to a field hands the form its pending write, run before `handleSubmit` validates and before `validate()` |
 | F7 | The form's own autosave (`saveMode`, `saveDebounce`, grammar.md) is a write with the `'coalesce'` policy: a save waiting behind a running one is replaced by the newest values. | **landed** (#279): per field, one save in flight and at most one waiting, which starts with the newest value when the one in flight settles — for an `onFieldSave` callback that returns its save's promise; one returning nothing saves on every debounce |
 
 ### Examples

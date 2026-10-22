@@ -11,6 +11,11 @@ semver.
 
 ### Features
 
+- A value still waiting in a `::x.debounce(ms)` binding to a form field is written before the form's
+  `handleSubmit` validates and before `validate()`, when the page calls them from code as well as on a
+  submit event: the submitted value is the one typed (beta rule F6). `required` on a control bound to a form
+  field is `PDX_FORM_REQUIRED_IN_MARKUP` (warning): it belongs in the field's rules; `pdx migrate`
+  lists it. (#128)
 - A control binds a form field through its model: `::value="f.email"`, `::checked="f.accepted"`,
   `::pressed="f.bold"`. The binding writes the field; the control is marked invalid while the field
   shows an error and required when the schema requires it (an `error`/`required` prop on a component,

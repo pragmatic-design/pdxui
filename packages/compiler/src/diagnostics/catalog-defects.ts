@@ -562,6 +562,16 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
             good: pdx('<p>x</p>', '@form f: { resetPassword: boolean };'),
         },
     },
+    PDX_FORM_REQUIRED_IN_MARKUP: {
+        severity: 'warn', category: 'defect',
+        summary: '`required` on a control bound to a form field; it belongs in the schema.',
+        explanation: 'The field marks its control required when its validators include `required()`. A `required` written on the control says it a second time, in a place the validation does not read: the two can disagree, and the form submits an empty value the markup called required.',
+        fix: 'Remove `required` from the control, and write it in the field\'s rules: `@form f: { email: string { required } }`, or `required()` among its validators.',
+        example: {
+            bad: pdx('<pdx-input ::value="f.email" required></pdx-input>', '@form f: { email: string };\nfunction send() { f.handleSubmit(() => {}); }'),
+            good: pdx('<pdx-input ::value="f.email"></pdx-input>', '@form f: { email: string { required } };\nfunction send() { f.handleSubmit(() => {}); }'),
+        },
+    },
     PDX_FORM_FIELD_UNPARSED: {
         severity: 'warn', category: 'defect',
         summary: 'A `@form` field the compiler did not understand.',

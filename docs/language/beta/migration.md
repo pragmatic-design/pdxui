@@ -92,7 +92,7 @@ proposals the implementing issue may change.
 | a control with `name="x"` inside `<pdx-form :form="f">` | `::<model>="f.x"`, the model read from the control's manifest: `::checked` on `pdx-checkbox`/`pdx-switch`, `::pressed` on `pdx-toggle`, `::value` on the others and on native inputs (`checked` for a native checkbox or radio) | mechanical — landed: `form-name-binding`; **flagged** for a control with no manifest entry or more than one model (`pdx-checkbox`); a form section is #613 | #128 |
 | `<pdx-form-field name="email">` | `<pdx-form-field :field="f.email">` | mechanical — landed: `form-name-binding` | #128 |
 | `f.fields.email` | `f.email` | mechanical — landed: `form-fields-member` | #128 (see decision 13) |
-| `required` on a bound control | a rule in the schema | `PDX_FORM_REQUIRED_IN_MARKUP`; flagged | #128 |
+| `required` on a bound control | a rule in the schema | `PDX_FORM_REQUIRED_IN_MARKUP`; flagged — landed: `form-required-in-markup` | #128 |
 | `@loader loadUser;` + `currentLoaderData()` | `@loader loadUser: loadUser;` + `loadUser.data()` | mechanical; reports the rename — landed: `loader-anonymous`, `loader-readers`; an import of `currentLoaderData` flagged (`export:@pdxui/router:currentLoaderData`) | #146, #506 |
 | `currentLoaderState()` | `<name>.state()` | mechanical where the page has one loader; flagged otherwise — landed: `loader-readers` | #141, #146, #506 |
 | a loader reading params from `location` or `currentParams()` | `({ params, signal })` | flagged — landed: `loader-reads-address` | #146, #506 |

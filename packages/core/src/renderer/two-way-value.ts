@@ -38,6 +38,11 @@ export interface TwoWayField {
     readonly required: boolean;
     /** `.number`'s parse error, or null once an entry parses: the field's error while it stands. */
     parseError(message: string | null): void;
+    /**
+     * A `.debounce` binding's pending write, which the form runs before it submits or validates
+     * (beta rule F6). Returns the function that withdraws it.
+     */
+    hold(flush: () => void): () => void;
 }
 
 /** The modifiers after the name: `value.trim.debounce(300)`. */
@@ -161,7 +166,11 @@ export function twoWayWriter(el: Element, accessor: TwoWayAccessor, mods: TwoWay
         if (e.target instanceof Node && e.target.contains(el)) flush();
     };
     document.addEventListener('submit', onSubmit, true);
+    // Bound to a form field, the form writes it too, for a submit or a validate the page starts
+    // itself, with no submit event (beta rule F6).
+    const release = accessor.field?.hold(flush);
     onDispose(() => {
+        release?.();
         document.removeEventListener('submit', onSubmit, true);
         if (timer !== null) clearTimeout(timer);
     });
