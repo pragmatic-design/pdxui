@@ -117,7 +117,6 @@ component('pdx-transfer', {
         let _moveAllRightBtn: HTMLButtonElement | null = null;
         let _moveAllLeftBtn: HTMLButtonElement | null = null;
         // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        ctx.formValue?.(() => [...getTargetValues()]);
         reflectNameToHost(ctx);
 
         // Drag state
@@ -697,6 +696,10 @@ component('pdx-transfer', {
             /** The last move's direction, 'right' (to the target) or 'left'; null before any move. */
             getDirection(): 'right' | 'left' | null { return _lastDirection; },
         });
+
+        // A form submits the target values, one entry each (#135). Last in the setup: the getter runs
+        // at once, and reads state declared above.
+        ctx.formValue?.(() => [...getTargetValues()]);
 
         return {};
     },
