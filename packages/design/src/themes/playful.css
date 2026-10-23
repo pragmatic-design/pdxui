@@ -114,28 +114,28 @@
 
 /* Buttons: pill shape via --pdx-button-radius token, bouncy active, colored shadows.
    border-radius removed — flows from token via --_btn-r (groups need to override). */
-[pdx-theme="playful"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    font-weight: var(--pdx-weight-bold);
-}
-[pdx-theme="playful"] .pdx-primary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    --pdx-button-shadow-hover: 0 6px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
-    --pdx-button-transform-hover: translateY(-1px);
-}
-[pdx-theme="playful"] .pdx-danger:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    box-shadow: 0 6px 16px oklch(from var(--pdx-color-danger) l c h / 0.35);
-}
-[pdx-theme="playful"] .pdx-success:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    box-shadow: 0 6px 16px oklch(from var(--pdx-color-success) l c h / 0.35);
-}
-[pdx-theme="playful"] :is(.pdx-primary, .pdx-secondary, .pdx-danger, .pdx-success):active:not(:disabled):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    transform: scale(0.92);
-}
-[pdx-theme="playful"] .pdx-secondary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    border-color: oklch(from var(--pdx-color-primary) l c h / 0.3);
-}
-[pdx-theme="playful"] .pdx-secondary:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
-    border-color: var(--pdx-color-primary);
-    /* was an 8%-alpha primary tint → nearly transparent, leaving the text low-contrast on the page.
-       Darken the secondary's own fill instead (keeps contrast with secondary-text). */
-    filter: brightness(0.96);
-}
+[pdx-theme="playful"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        font-weight: var(--pdx-weight-bold);
+    }
+[pdx-theme="playful"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] .pdx-primary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        --pdx-button-shadow-hover: 0 6px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
+        --pdx-button-transform-hover: translateY(-1px);
+    }
+[pdx-theme="playful"] :where(pdx-button[variant="danger"]) > [data-part="root"]:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] .pdx-danger:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        box-shadow: 0 6px 16px oklch(from var(--pdx-color-danger) l c h / 0.35);
+    }
+[pdx-theme="playful"] :where(pdx-button[variant="success"]) > [data-part="root"]:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] .pdx-success:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        box-shadow: 0 6px 16px oklch(from var(--pdx-color-success) l c h / 0.35);
+    }
+[pdx-theme="playful"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="danger"],[variant="success"])) > [data-part="root"]:active:not(:disabled):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] :is(.pdx-primary,.pdx-secondary,.pdx-danger,.pdx-success):active:not(:disabled):not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        transform: scale(0.92);
+    }
+[pdx-theme="playful"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] .pdx-secondary:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        border-color: oklch(from var(--pdx-color-primary) l c h / 0.3);
+    }
+    [pdx-theme="playful"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)), [pdx-theme="playful"] .pdx-secondary:hover:not(:where([pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]), [pdx-theme="playful"] [pdx-theme]:not([pdx-theme="playful"]) *)) {
+        border-color: var(--pdx-color-primary);
+        /* was an 8%-alpha primary tint → nearly transparent, leaving the text low-contrast on the page.
+           Darken the secondary's own fill instead (keeps contrast with secondary-text). */
+        filter: brightness(0.96);
+    }

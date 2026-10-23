@@ -101,26 +101,30 @@ details.pdx-accordion[open] summary::after { transform: rotate(90deg); }
 }
 
 /* Button: gold gradient + premium hover */
-.pdx-primary {
-    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
-    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.80 0.16 90), oklch(0.72 0.18 75)));
-}
-.pdx-primary {
-    --pdx-button-shadow-hover: 0 4px 16px oklch(0.70 0.16 85 / 0.35);
-    --pdx-button-transform-hover: translateY(-1px);
-}
-.pdx-primary:hover {
-    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.74 0.18 88), oklch(0.66 0.20 72)));
+@variant pdx-button variant(primary) {
+    :scope > [data-part="root"] {
+        /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+        background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.80 0.16 90), oklch(0.72 0.18 75)));
+    }
+    :scope > [data-part="root"] {
+        --pdx-button-shadow-hover: 0 4px 16px oklch(0.70 0.16 85 / 0.35);
+        --pdx-button-transform-hover: translateY(-1px);
+    }
+    :scope > [data-part="root"]:hover {
+        background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.74 0.18 88), oklch(0.66 0.20 72)));
+    }
 }
 
-.pdx-secondary {
-    border-color: light-dark(oklch(0.78 0.12 85 / 0.3), oklch(0.78 0.12 85 / 0.25));
-}
-.pdx-secondary:hover {
-    /* Only retint the border on hover. The base .pdx-secondary hover darkens the element's OWN
-       (solid) background via filter: brightness(0.95) — overriding `background` here with a faint
-       gold tint wiped the solid fill out (button "disappeared" on hover, broken normal↔hover). */
-    border-color: var(--pdx-color-primary);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        border-color: light-dark(oklch(0.78 0.12 85 / 0.3), oklch(0.78 0.12 85 / 0.25));
+    }
+    :scope > [data-part="root"]:hover {
+        /* Only retint the border on hover. The base .pdx-secondary hover darkens the element's OWN
+           (solid) background via filter: brightness(0.95) — overriding `background` here with a faint
+           gold tint wiped the solid fill out (button "disappeared" on hover, broken normal↔hover). */
+        border-color: var(--pdx-color-primary);
+    }
 }
 
 /* Input: gold focus — standalone only; the wrapped ones use .pdx-input-wrap:focus-within

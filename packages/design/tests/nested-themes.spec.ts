@@ -161,7 +161,8 @@ test.describe('a nested theme is not reached by the outer theme\'s rules', () =>
         expect(THEMES.length).toBe(13);
         await setThemes(page, 'pragmatic-gold', 'pragmatic-gold');
         const found = await rulesReachingBody(page, 'pragmatic-gold');
-        expect(found.reaching.some((s) => s.startsWith('[pdx-theme="pragmatic-gold"] .pdx-primary'))).toBe(true);
+        // The primary's rule is a list since #512: `pdx-button[variant]`'s form first, then the class.
+        expect(found.reaching.some((s) => s.includes('[pdx-theme="pragmatic-gold"] .pdx-primary'))).toBe(true);
         expect((await primaryPaint(page))['0 background-image']).toContain('linear-gradient');
     });
 });

@@ -91,29 +91,29 @@
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* Buttons: uppercase, semibold, flat with no hover shadow — just color shift */
-[pdx-theme="metro"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    text-transform: uppercase;
-    font-weight: var(--pdx-weight-semibold);
-    font-size: var(--pdx-text-xs);
-    letter-spacing: 0.08em;
-}
+[pdx-theme="metro"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)), [pdx-theme="metro"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+        text-transform: uppercase;
+        font-weight: var(--pdx-weight-semibold);
+        font-size: var(--pdx-text-xs);
+        letter-spacing: 0.08em;
+    }
 
 /* No transform on active — Metro is rigid, not bouncy */
-[pdx-theme="metro"] :is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-danger):active:not(:disabled):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    transform: none;
-    filter: brightness(0.85);
-}
+[pdx-theme="metro"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="danger"])) > [data-part="root"]:active:not(:disabled):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)), [pdx-theme="metro"] :is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-danger):active:not(:disabled):not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+        transform: none;
+        filter: brightness(0.85);
+    }
 
 /* Secondary: transparent bg with strong border */
-[pdx-theme="metro"] .pdx-secondary:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    background: transparent;
-    border-color: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-ink);
-}
-[pdx-theme="metro"] .pdx-secondary:hover:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
-}
+[pdx-theme="metro"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)), [pdx-theme="metro"] .pdx-secondary:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+        background: transparent;
+        border-color: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-ink);
+    }
+    [pdx-theme="metro"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)), [pdx-theme="metro"] .pdx-secondary:hover:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+    }
 
 /* Tab: bold underline, no bg change */
 [pdx-theme="metro"] .pdx-tab.active:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)),

@@ -143,20 +143,20 @@
    Editorial focus uses text color instead of primary: --pdx-input-border-color-focus (#521). */
 
 /* ── Button: editorial underline hover ── */
-[pdx-theme="editorial"] .pdx-primary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
-    font-family: var(--pdx-font-heading);
-    letter-spacing: 0.04em;
-}
-[pdx-theme="editorial"] .pdx-primary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
-    --pdx-button-shadow-hover: 0 2px 0 0 var(--pdx-color-primary);
-}
-[pdx-theme="editorial"] .pdx-secondary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
-    font-family: var(--pdx-font-heading);
-    border-style: solid;
-}
-[pdx-theme="editorial"] .pdx-secondary:hover:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
-    border-color: var(--pdx-color-text);
-    /* keep secondary-text (it contrasts with the secondary fill); switching to color-text went
-       dark-on-secondary. Darken the fill for the hover cue instead. */
-    filter: brightness(0.96);
-}
+[pdx-theme="editorial"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)), [pdx-theme="editorial"] .pdx-primary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
+        font-family: var(--pdx-font-heading);
+        letter-spacing: 0.04em;
+    }
+    [pdx-theme="editorial"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)), [pdx-theme="editorial"] .pdx-primary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
+        --pdx-button-shadow-hover: 0 2px 0 0 var(--pdx-color-primary);
+    }
+[pdx-theme="editorial"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)), [pdx-theme="editorial"] .pdx-secondary:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
+        font-family: var(--pdx-font-heading);
+        border-style: solid;
+    }
+    [pdx-theme="editorial"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)), [pdx-theme="editorial"] .pdx-secondary:hover:not(:where([pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]), [pdx-theme="editorial"] [pdx-theme]:not([pdx-theme="editorial"]) *)) {
+        border-color: var(--pdx-color-text);
+        /* keep secondary-text (it contrasts with the secondary fill); switching to color-text went
+           dark-on-secondary. Darken the fill for the hover cue instead. */
+        filter: brightness(0.96);
+    }

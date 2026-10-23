@@ -133,20 +133,24 @@ details.pdx-accordion[open] {
 }
 
 /* ── Button: raised neumorphic surface ── */
-.pdx-primary {
-    box-shadow: var(--pdx-shadow-sm);
+@variant pdx-button variant(primary) {
+    :scope > [data-part="root"] {
+        box-shadow: var(--pdx-shadow-sm);
+    }
+    :scope > [data-part="root"] {
+        --pdx-button-shadow-hover: var(--pdx-shadow-md);
+    }
+    :scope > [data-part="root"]:active {
+        box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);
+    }
 }
-.pdx-primary {
-    --pdx-button-shadow-hover: var(--pdx-shadow-md);
-}
-.pdx-primary:active {
-    box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);
-}
-.pdx-secondary {
-    border: none;
-    box-shadow: var(--pdx-shadow-sm);
-}
-.pdx-secondary:hover {
-    box-shadow: var(--pdx-shadow-md);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        border: none;
+        box-shadow: var(--pdx-shadow-sm);
+    }
+    :scope > [data-part="root"]:hover {
+        box-shadow: var(--pdx-shadow-md);
+    }
 }
 }

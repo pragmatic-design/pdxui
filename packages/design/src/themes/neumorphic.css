@@ -133,19 +133,19 @@
 }
 
 /* ── Button: raised neumorphic surface ── */
-[pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    box-shadow: var(--pdx-shadow-sm);
-}
-[pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    --pdx-button-shadow-hover: var(--pdx-shadow-md);
-}
-[pdx-theme="neumorphic"] .pdx-primary:active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);
-}
-[pdx-theme="neumorphic"] .pdx-secondary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    border: none;
-    box-shadow: var(--pdx-shadow-sm);
-}
-[pdx-theme="neumorphic"] .pdx-secondary:hover:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
-    box-shadow: var(--pdx-shadow-md);
-}
+[pdx-theme="neumorphic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)), [pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+        box-shadow: var(--pdx-shadow-sm);
+    }
+    [pdx-theme="neumorphic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)), [pdx-theme="neumorphic"] .pdx-primary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+        --pdx-button-shadow-hover: var(--pdx-shadow-md);
+    }
+    [pdx-theme="neumorphic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)), [pdx-theme="neumorphic"] .pdx-primary:active:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+        box-shadow: inset 2px 2px 4px oklch(0 0 0 / 0.1), inset -1px -1px 3px oklch(1 0 0 / 0.4);
+    }
+[pdx-theme="neumorphic"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)), [pdx-theme="neumorphic"] .pdx-secondary:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+        border: none;
+        box-shadow: var(--pdx-shadow-sm);
+    }
+    [pdx-theme="neumorphic"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)), [pdx-theme="neumorphic"] .pdx-secondary:hover:not(:where([pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]), [pdx-theme="neumorphic"] [pdx-theme]:not([pdx-theme="neumorphic"]) *)) {
+        box-shadow: var(--pdx-shadow-md);
+    }

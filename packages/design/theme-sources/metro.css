@@ -91,28 +91,34 @@
 
 /* Buttons: uppercase, semibold, flat with no hover shadow — just color shift */
 @pdx-theme metro {
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    text-transform: uppercase;
-    font-weight: var(--pdx-weight-semibold);
-    font-size: var(--pdx-text-xs);
-    letter-spacing: 0.08em;
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        text-transform: uppercase;
+        font-weight: var(--pdx-weight-semibold);
+        font-size: var(--pdx-text-xs);
+        letter-spacing: 0.08em;
+    }
 }
 
 /* No transform on active — Metro is rigid, not bouncy */
-:is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-danger):active:not(:disabled) {
-    transform: none;
-    filter: brightness(0.85);
+@variant pdx-button variant(primary, secondary, outline, danger) {
+    :scope > [data-part="root"]:active:not(:disabled) {
+        transform: none;
+        filter: brightness(0.85);
+    }
 }
 
 /* Secondary: transparent bg with strong border */
-.pdx-secondary {
-    background: transparent;
-    border-color: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-ink);
-}
-.pdx-secondary:hover {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        background: transparent;
+        border-color: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-ink);
+    }
+    :scope > [data-part="root"]:hover {
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+    }
 }
 
 /* Tab: bold underline, no bg change */

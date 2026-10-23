@@ -130,12 +130,12 @@
 }
 
 /* M3 button sizes lg/xl — match the taller M3 inputs (lg=64px, xl=72px) */
-[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="lg"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    height: 4rem; min-height: 4rem;
-}
-[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xl"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    height: 4.5rem; min-height: 4.5rem;
-}
+[pdx-theme="material"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])[size="lg"]) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info)[size="lg"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        height: 4rem; min-height: 4rem;
+    }
+[pdx-theme="material"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])[size="xl"]) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info)[size="xl"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        height: 4.5rem; min-height: 4.5rem;
+    }
 
 /* M3 number addon tonal background */
 [pdx-theme="material"] .pdx-number-group > .pdx-input-addon:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
@@ -143,13 +143,13 @@
 }
 
 /* Buttons: M3 — label-large typography. Shape via --pdx-button-radius token. */
-[pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    padding: var(--pdx-space-sm) 1.5rem;
-    font-weight: 500;
-    letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
-    font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
-    line-height: 1.25rem;         /* M3 label-large: 20px */
-}
+[pdx-theme="material"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        padding: var(--pdx-space-sm) 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
+        font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
+        line-height: 1.25rem;         /* M3 label-large: 20px */
+    }
 
 /* Toggle: M3 — wider track, larger thumb */
 [pdx-theme="material"] .pdx-toggle:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
@@ -280,31 +280,31 @@
 }
 
 /* ── Button: M3 Filled — state layer on hover (onPrimary at 8%) ── */
-[pdx-theme="material"] .pdx-primary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    --pdx-button-shadow-hover: var(--pdx-shadow-sm);
-}
-[pdx-theme="material"] .pdx-primary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    filter: brightness(1.08);
-}
+[pdx-theme="material"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-primary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        --pdx-button-shadow-hover: var(--pdx-shadow-sm);
+    }
+    [pdx-theme="material"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-primary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        filter: brightness(1.08);
+    }
 
 /* ── Button: M3 Tonal (secondary) — secondary-container bg, on-secondary-container text ── */
-[pdx-theme="material"] .pdx-secondary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
-    color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
-    border-color: transparent;
-}
-[pdx-theme="material"] .pdx-secondary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    box-shadow: var(--pdx-shadow-sm);
-    filter: brightness(0.96);
-}
+[pdx-theme="material"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-secondary:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
+        color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
+        border-color: transparent;
+    }
+    [pdx-theme="material"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-secondary:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        box-shadow: var(--pdx-shadow-sm);
+        filter: brightness(0.96);
+    }
 
 /* ── Button: M3 Outlined — neutral stroke, surface bg ── */
-[pdx-theme="material"] .pdx-outline:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    border-color: var(--pdx-color-border);
-}
-[pdx-theme="material"] .pdx-outline:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
-}
+[pdx-theme="material"] :where(pdx-button[variant="outline"]) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-outline:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        border-color: var(--pdx-color-border);
+    }
+    [pdx-theme="material"] :where(pdx-button[variant="outline"]) > [data-part="root"]:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-outline:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
+    }
 
 /* ── Select: M3 filled style, dropdown with elevation ── */
 [pdx-theme="material"] .pdx-select-dropdown:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {

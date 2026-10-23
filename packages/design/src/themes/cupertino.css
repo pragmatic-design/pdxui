@@ -93,9 +93,9 @@
 /* Buttons: Apple — 44px touch target (default), generous padding.
    border-radius flows from --pdx-button-radius token via --_btn-r — NOT set directly here,
    otherwise button groups can't override radius to 0 for middle children. */
-[pdx-theme="cupertino"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    padding: var(--pdx-space-sm) var(--pdx-space-xl);
-}
+[pdx-theme="cupertino"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)), [pdx-theme="cupertino"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+        padding: var(--pdx-space-sm) var(--pdx-space-xl);
+    }
 /* Apple 44px touch target: flows from --pdx-button-min-height, which divides the 1.1 density
    back out so the rendered height is exactly the 44px the HIG asks for.
    No explicit height override — the token system handles alignment with inputs. */
@@ -201,10 +201,10 @@
 }
 
 /* ── Button: iOS subtle active state ── */
-[pdx-theme="cupertino"] :is(.pdx-primary, .pdx-secondary, .pdx-outline):active:not(:disabled):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    transform: scale(0.98);
-    filter: brightness(0.95);
-}
+[pdx-theme="cupertino"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"])) > [data-part="root"]:active:not(:disabled):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)), [pdx-theme="cupertino"] :is(.pdx-primary,.pdx-secondary,.pdx-outline):active:not(:disabled):not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
+        transform: scale(0.98);
+        filter: brightness(0.95);
+    }
 
 /* ── Calendar: Apple HIG — circle selected, ultra-subtle hover, vibrancy ── */
 [pdx-theme="cupertino"] .pdx-cal-cell:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {

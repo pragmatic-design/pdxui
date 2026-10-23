@@ -114,25 +114,29 @@ details.pdx-accordion[open] summary::after {
 }
 
 /* ── Buttons: premium gradient + hover lift ── */
-.pdx-primary {
-    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
-    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
-}
-.pdx-primary {
-    --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
-    --pdx-button-transform-hover: translateY(-1px);
-}
-.pdx-primary:hover {
-    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
+@variant pdx-button variant(primary) {
+    :scope > [data-part="root"] {
+        /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+        background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
+    }
+    :scope > [data-part="root"] {
+        --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
+        --pdx-button-transform-hover: translateY(-1px);
+    }
+    :scope > [data-part="root"]:hover {
+        background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
+    }
 }
 
-.pdx-secondary {
-    border-color: light-dark(oklch(0.55 0.10 235 / 0.3), oklch(0.55 0.10 235 / 0.25));
-}
-.pdx-secondary:hover {
-    /* Only retint the border on hover — the base .pdx-secondary darkens its OWN solid background
-       via filter: brightness(0.95); overriding `background` here wiped the solid fill out. */
-    border-color: var(--pdx-color-primary);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        border-color: light-dark(oklch(0.55 0.10 235 / 0.3), oklch(0.55 0.10 235 / 0.25));
+    }
+    :scope > [data-part="root"]:hover {
+        /* Only retint the border on hover — the base .pdx-secondary darkens its OWN solid background
+           via filter: brightness(0.95); overriding `background` here wiped the solid fill out. */
+        border-color: var(--pdx-color-primary);
+    }
 }
 
 /* ── Input: blue focus — standalone only; the wrapped ones use .pdx-input-wrap:focus-within

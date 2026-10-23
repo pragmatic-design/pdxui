@@ -107,12 +107,12 @@
 }
 
 /* Buttons: corporate — uppercase, structured, heavier weight */
-[pdx-theme="corporate"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
-    text-transform: uppercase;
-    font-size: var(--pdx-text-xs);
-    letter-spacing: 0.06em;
-    font-weight: var(--pdx-weight-bold);
-}
+[pdx-theme="corporate"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)), [pdx-theme="corporate"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]), [pdx-theme="corporate"] [pdx-theme]:not([pdx-theme="corporate"]) *)) {
+        text-transform: uppercase;
+        font-size: var(--pdx-text-xs);
+        letter-spacing: 0.06em;
+        font-weight: var(--pdx-weight-bold);
+    }
 
 /* Input: outlined with border-strong (--pdx-input-border-color, #519) — sharper, structured.
    Focus ring = single pixel primary (--pdx-input-focus-ring, #521). */

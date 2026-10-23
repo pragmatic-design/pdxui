@@ -158,7 +158,7 @@ The **famous** themes (Material, Fluent, Cupertino) follow the official specs �
 - [ ] Font and type scale
 - [ ] WCAG gate: 0 failures in light and dark
 - [ ] Screenshots of the main components, light and dark
-- [ ] The component overrides inside `@pdx-theme <name> { … }` in `theme-sources/<name>.css`, then `gen:theme-files`: the guard is the generator's, never hand-written
+- [ ] The component overrides inside `@pdx-theme <name> { … }` in `theme-sources/<name>.css`, then `gen:theme-files`: the guard is the generator's, never hand-written. A component variant's override is an `@variant pdx-<name> …` rule there, not a class rule (#512)
 
 ---
 

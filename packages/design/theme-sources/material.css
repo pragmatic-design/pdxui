@@ -130,11 +130,15 @@
 }
 
 /* M3 button sizes lg/xl — match the taller M3 inputs (lg=64px, xl=72px) */
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="lg"] {
-    height: 4rem; min-height: 4rem;
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(lg) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        height: 4rem; min-height: 4rem;
+    }
 }
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)[size="xl"] {
-    height: 4.5rem; min-height: 4.5rem;
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(xl) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        height: 4.5rem; min-height: 4.5rem;
+    }
 }
 
 /* M3 number addon tonal background */
@@ -143,12 +147,14 @@
 }
 
 /* Buttons: M3 — label-large typography. Shape via --pdx-button-radius token. */
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    padding: var(--pdx-space-sm) 1.5rem;
-    font-weight: 500;
-    letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
-    font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
-    line-height: 1.25rem;         /* M3 label-large: 20px */
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        padding: var(--pdx-space-sm) 1.5rem;
+        font-weight: 500;
+        letter-spacing: 0.00625rem;   /* M3 label-large: 0.1px */
+        font-size: var(--pdx-text-sm);    /* M3 label-large: 14px */
+        line-height: 1.25rem;         /* M3 label-large: 20px */
+    }
 }
 
 /* Toggle: M3 — wider track, larger thumb */
@@ -280,30 +286,36 @@ details.pdx-accordion[open] summary::after {
 }
 
 /* ── Button: M3 Filled — state layer on hover (onPrimary at 8%) ── */
-.pdx-primary {
-    --pdx-button-shadow-hover: var(--pdx-shadow-sm);
-}
-.pdx-primary:hover {
-    filter: brightness(1.08);
+@variant pdx-button variant(primary) {
+    :scope > [data-part="root"] {
+        --pdx-button-shadow-hover: var(--pdx-shadow-sm);
+    }
+    :scope > [data-part="root"]:hover {
+        filter: brightness(1.08);
+    }
 }
 
 /* ── Button: M3 Tonal (secondary) — secondary-container bg, on-secondary-container text ── */
-.pdx-secondary {
-    background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
-    color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
-    border-color: transparent;
-}
-.pdx-secondary:hover {
-    box-shadow: var(--pdx-shadow-sm);
-    filter: brightness(0.96);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        background: light-dark(oklch(from var(--pdx-color-primary) 0.90 0.04 h), oklch(from var(--pdx-color-primary) 0.30 0.06 h));
+        color: light-dark(oklch(from var(--pdx-color-primary) 0.25 0.08 h), oklch(from var(--pdx-color-primary) 0.90 0.04 h));
+        border-color: transparent;
+    }
+    :scope > [data-part="root"]:hover {
+        box-shadow: var(--pdx-shadow-sm);
+        filter: brightness(0.96);
+    }
 }
 
 /* ── Button: M3 Outlined — neutral stroke, surface bg ── */
-.pdx-outline {
-    border-color: var(--pdx-color-border);
-}
-.pdx-outline:hover {
-    background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
+@variant pdx-button variant(outline) {
+    :scope > [data-part="root"] {
+        border-color: var(--pdx-color-border);
+    }
+    :scope > [data-part="root"]:hover {
+        background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.08), oklch(from var(--pdx-color-primary) l c h / 0.12));
+    }
 }
 
 /* ── Select: M3 filled style, dropdown with elevation ── */
