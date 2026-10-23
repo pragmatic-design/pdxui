@@ -195,13 +195,15 @@ function nativeForm(selector: string, native: string | undefined): string | unde
  * be inside one and is not — the bound costs the browser an ancestor walk per candidate element.
  */
 function librarySelector(selector: string, host: string, native: string | undefined): string {
-    // Match: a leading `:scope`, the host itself. Groups: none
-    if (/^:scope(?![\w-])/.test(selector)) {
-        const rest = selector.slice(':scope'.length);
+    // Match: `:scope`, the host itself — first, or after a context the host sits in. Groups: none
+    const at = selector.search(/:scope(?![\w-])/);
+    if (at >= 0) {
+        const context = selector.slice(0, at);
+        const rest = selector.slice(at + ':scope'.length);
         // Match: a child combinator after `:scope`. Groups: [1]=the child selector
         const child = /^\s*>\s*(.+)$/s.exec(rest)?.[1];
         const own = child === undefined ? undefined : nativeForm(child, native);
-        return `:where(${host})${rest}${own === undefined ? '' : `, ${own}`}`;
+        return `${context}:where(${host})${rest}${own === undefined ? '' : `, ${context}${own}`}`;
     }
     const pseudo = PSEUDO_ELEMENT.exec(selector)?.[1] ?? '';
     const base = selector.slice(0, selector.length - pseudo.length);

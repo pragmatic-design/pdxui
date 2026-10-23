@@ -260,7 +260,7 @@ pdx-row > .pdx-input {
 :is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap {
     border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
 }
-:is(.pdx-input-group, pdx-input-group) > pdx-button button[class] {
+:is(.pdx-input-group, pdx-input-group) > pdx-button button[data-part="root"] {
     border-radius: var(--_r-tl) var(--_r-tr) var(--_r-br) var(--_r-bl);
 }
 
@@ -298,7 +298,7 @@ pdx-row > .pdx-input {
     margin-left: calc(-1 * var(--pdx-border-width));
 }
 :is(.pdx-input-group, pdx-input-group) > pdx-input:not(:first-child) .pdx-input-wrap,
-:is(.pdx-input-group, pdx-input-group) > pdx-button:not(:first-child) button[class] {
+:is(.pdx-input-group, pdx-input-group) > pdx-button:not(:first-child) button[data-part="root"] {
     margin-left: calc(-1 * var(--pdx-border-width));
 }
 
@@ -306,7 +306,7 @@ pdx-row > .pdx-input {
 :is(.pdx-input-group, pdx-input-group) > .pdx-input-wrap:focus-within,
 :is(.pdx-input-group, pdx-input-group) > pdx-input .pdx-input-wrap:focus-within,
 :is(.pdx-input-group, pdx-input-group) > button:focus-visible,
-:is(.pdx-input-group, pdx-input-group) > pdx-button button[class]:focus-visible {
+:is(.pdx-input-group, pdx-input-group) > pdx-button button[data-part="root"]:focus-visible {
     z-index: 1;
     position: relative;
 }

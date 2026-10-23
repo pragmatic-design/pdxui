@@ -221,7 +221,8 @@ test.describe('a generated theme is not reached into a nested theme', () => {
         await page.addStyleTag({ content: css });
         await setThemes(page, name, name);
         const found = await generatedRulesReachingBody(page, name);
-        expect(found.reaching.some((s) => s.startsWith('& .pdx-primary'))).toBe(true);
+        // The primary's rule is a list since #512, pdx-button's host form first, then `& .pdx-primary`.
+        expect(found.reaching.some((s) => s.startsWith('& :where(pdx-button:is([variant="primary"]'))).toBe(true);
     });
 });
 

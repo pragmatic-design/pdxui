@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/adaptive.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* ==========================================================================
    Pragmatic Design CSS — Adaptive
    Container Queries, touch adaptation, reduced motion, print.
@@ -135,10 +136,10 @@
    ========================================================================== */
 
 @media (pointer: coarse) {
-    :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-ghost, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-        min-height: var(--pdx-target-min);
-        min-width: var(--pdx-target-min);
-    }
+    :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="ghost"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"], :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-ghost,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info) {
+            min-height: var(--pdx-target-min);
+            min-width: var(--pdx-target-min);
+        }
 
     .pdx-input {
         min-height: var(--pdx-target-min);

@@ -10,6 +10,7 @@
  */
 
 import type { DesignLanguage, LanguageId } from './types.js';
+import { buttonVariantRule } from './button-variant.js';
 
 // ── Material Design 3 "Expressive" ──
 // Key traits: tonal surfaces, warm cream bg, filled inputs, rounded shapes.
@@ -568,10 +569,10 @@ const pragmatic: DesignLanguage = {
 & .pdx-surface-card { border-top: 3px solid var(--pdx-color-primary); }
 & .pdx-surface-card[interactive]:hover { box-shadow: 0 4px 12px oklch(from var(--pdx-color-primary) l c h / 0.15), var(--pdx-shadow-md); }
 /* Primary: brand gradient + hover lift */
-& .pdx-primary { background: linear-gradient(135deg, oklch(from var(--pdx-color-primary) calc(l + 0.05) c h), oklch(from var(--pdx-color-primary) calc(l - 0.02) c calc(h + 15))); }
-& .pdx-primary:hover { background: linear-gradient(135deg, oklch(from var(--pdx-color-primary) l c h), oklch(from var(--pdx-color-primary) calc(l - 0.05) c calc(h + 15))); box-shadow: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35); transform: translateY(-1px); }
-& .pdx-secondary { border-color: oklch(from var(--pdx-color-primary) l c h / 0.3); }
-& .pdx-secondary:hover { border-color: var(--pdx-color-primary); }
+${buttonVariantRule('primary')} { background: linear-gradient(135deg, oklch(from var(--pdx-color-primary) calc(l + 0.05) c h), oklch(from var(--pdx-color-primary) calc(l - 0.02) c calc(h + 15))); }
+${buttonVariantRule('primary', ':hover')} { background: linear-gradient(135deg, oklch(from var(--pdx-color-primary) l c h), oklch(from var(--pdx-color-primary) calc(l - 0.05) c calc(h + 15))); box-shadow: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35); transform: translateY(-1px); }
+${buttonVariantRule('secondary')} { border-color: oklch(from var(--pdx-color-primary) l c h / 0.3); }
+${buttonVariantRule('secondary', ':hover')} { border-color: var(--pdx-color-primary); }
 & .pdx-input:not(.pdx-input-wrap > *):focus-visible { border-color: var(--pdx-color-primary); box-shadow: var(--pdx-focus-ring); }
 & .pdx-page[aria-current="page"] { border-radius: var(--pdx-radius-full); }
 /* Brand accent on controls */

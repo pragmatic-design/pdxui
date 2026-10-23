@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/typography.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* ==========================================================================
    Pragmatic Design CSS — Typography
    Text role classes (pdx-txt-*) and ink color classes (pdx-ink-*).
@@ -122,17 +123,18 @@ body {
    C. Links
    ========================================================================== */
 
-.pdx-link {
-    color: var(--pdx-color-primary-ink);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    text-decoration-thickness: 1px;
-    transition: color var(--pdx-transition);
+/* The text link's class is also pdx-button's `link` variant (#512): one rule draws both. */
+:where(pdx-button[variant="link"]) > [data-part="root"], .pdx-link {
+        color: var(--pdx-color-primary-ink);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        text-decoration-thickness: 1px;
+        transition: color var(--pdx-transition);
 
-    &:hover { color: var(--pdx-color-primary-hover); }
-    &:visited { opacity: 0.85; }
-    &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; border-radius: var(--pdx-radius-sm); }
-}
+        &:hover { color: var(--pdx-color-primary-hover); }
+        &:visited { opacity: 0.85; }
+        &:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; border-radius: var(--pdx-radius-sm); }
+    }
 
 /* ==========================================================================
    D. Divider / Separator
