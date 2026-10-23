@@ -358,7 +358,7 @@ alpha
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                     /* in the script */
 VariantAxis    ::= Word S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"?
 VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
-VariantTest    ::= Word S? "(" S? Word S? ")"
+VariantTest    ::= Word S? "(" S? Word ( S? "," S? Word )* S? ")"
 LibraryRule    ::= "@variant" S ( TagName S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
 TagName        ::= "pdx-" Word
 ```
@@ -376,7 +376,9 @@ defaults to its first value. The generated `.d.ts` carries the union.
 selector of its body is put under the host's attribute test: `@variant variant(ghost) { .label { … } }`
 becomes `:scope[variant="ghost"] .label { … }`, and a selector that starts with `:scope` takes the
 test on the host itself (`:scope { … }` → `:scope[variant="ghost"] { … }`). `and` combines axes:
-`@variant variant(ghost) and size(sm)` tests both attributes. The scoping then compiles `:scope` as it
+`@variant variant(ghost) and size(sm)` tests both attributes. Several values of one axis test any of
+them: `@variant variant(ghost, danger)` is `:scope:is([variant="ghost"],[variant="danger"])`, and each
+value counts as styled. The scoping then compiles `:scope` as it
 does everywhere: `:where(:scope)[data-pdx-HASH][variant="ghost"] .label` inside the donut scope under
 `'baseline-2026'`, `[data-pdx-HASH][variant="ghost"] .label` under `'baseline-2024'`. An `@variant` may
 sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Under
@@ -418,7 +420,9 @@ replaced by the selector: `[data-part="root"]:hover` → `.pdx-ghost:hover`. A c
 keeps the rule's weight. A selector that names another part has no native form and yields the host
 selector alone. Values that share a native selector (`solid` and `primary` both give `.pdx-primary`)
 share their rules: the host test names them all, `:where(pdx-button:is([variant="primary"],
-[variant="solid"]))`. In a theme source the expansion runs before the theme's guard (`gen-themes.mjs`),
+[variant="solid"]))`. A rule for several values yields the native selectors of all of them as one
+`:is()`, `variant(primary, ghost)` → `:is(.pdx-primary,.pdx-ghost)`, which weighs one class; if one of
+them has no native selector, the rule yields the host selector alone. In a theme source the expansion runs before the theme's guard (`gen-themes.mjs`),
 so every selector it yields takes the theme root and the nested-theme guard like any other theme rule.
 
 #### Rules

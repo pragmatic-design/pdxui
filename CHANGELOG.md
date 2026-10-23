@@ -11,6 +11,9 @@ semver.
 
 ### Features
 
+- `@variant` takes several values of one axis, `@variant variant(ghost, danger) { … }`, and matches any of
+  them, in a `.pdx` and in `@pdxui/design` alike (#512). Before, a list was ignored and the rule
+  applied to every value.
 - A TypeScript component declares its variants in its descriptor (#512):
   `variants: { size: ['md', 'sm', 'lg'], variant: { primary: '.pdx-primary', ghost: '.pdx-ghost' } }`.
   Each axis is a prop typed with its values (`ctx.size` is `Signal<'md' | 'sm' | 'lg'>`), defaults to its

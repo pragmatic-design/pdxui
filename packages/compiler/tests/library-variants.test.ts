@@ -35,6 +35,18 @@ describe('a rule in a component\'s own stylesheet', () => {
             + ':not(:where(pdx-button[variant="ghost"][size="sm"] [data-pdx-root] [data-part="root"])) { padding: 0; }');
     });
 
+    it('several values test any of them, and their native selectors are one :is()', () => {
+        expect(expandLibraryVariants('@variant variant(solid, ghost) { [data-part="root"]:hover { color: red; } }', 'pdx-button', axesOf)).toBe(
+            ':where(pdx-button:is([variant="primary"],[variant="solid"],[variant="ghost"])) [data-part="root"]:hover'
+            + ':not(:where(pdx-button:is([variant="primary"],[variant="solid"],[variant="ghost"]) [data-pdx-root] [data-part="root"]:hover)), '
+            + ':is(.pdx-primary,.pdx-ghost):hover { color: red; }');
+    });
+
+    it('several values with one that has no native selector yield the host selector alone', () => {
+        expect(expandLibraryVariants('@variant size(sm, lg) { :scope { margin: 0; } }', 'pdx-button', axesOf)).toBe(
+            ':where(pdx-button:is([size="sm"],[size="lg"])) { margin: 0; }');
+    });
+
     it('a selector that names another part has no native form', () => {
         expect(expandLibraryVariants('@variant variant(ghost) { [data-part="icon"] { opacity: 1; } }', 'pdx-button', axesOf)).toBe(
             ':where(pdx-button[variant="ghost"]) [data-part="icon"]:not(:where(pdx-button[variant="ghost"] [data-pdx-root] [data-part="icon"])) { opacity: 1; }');
@@ -81,5 +93,12 @@ describe('the tests of every rule, for the diagnostics', () => {
         ]);
         expect(css.slice(tests[1].at, tests[1].at + 'size(sm)'.length)).toBe('size(sm)');
         expect(libraryVariantTests(css, 'pdx-button')[2].tag, 'the implied tag').toBe('pdx-button');
+    });
+
+    it('reads a list of values as one test per value, at the offset of their axis', () => {
+        const css = '@variant pdx-button variant(ghost, solid) { :scope { margin: 0 } }';
+        const tests = libraryVariantTests(css, undefined);
+        expect(tests.map(({ axis, value }) => `${axis}(${value})`)).toEqual(['variant(ghost)', 'variant(solid)']);
+        expect(css.slice(tests[1].at, tests[1].at + 'variant('.length)).toBe('variant(');
     });
 });

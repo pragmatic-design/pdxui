@@ -10,10 +10,11 @@
 //     @variant variant(ghost) and size(sm) { [data-part="root"] { padding-inline: 0; } }
 // is rewritten, before scoping, into rules on those attributes — `:scope[variant="ghost"][size="sm"]
 // [data-part="root"]` — which the scoping then compiles for the target: inside the donut scope under
-// baseline-2026, `[data-pdx-H][variant="ghost"]…` under baseline-2024.
+// baseline-2026, `[data-pdx-H][variant="ghost"]…` under baseline-2024. Several values of one axis,
+// `variant(ghost, danger)`, test any of them: `:is([variant="ghost"],[variant="danger"])`.
 
 import type { HostAttr, PropInfo } from './script-analyzer-types';
-import { expandVariantBlocks, VARIANT_TEST } from './variant-css';
+import { attributeTest, expandVariantBlocks, testValues, VARIANT_TEST } from './variant-css';
 
 /** One axis of `@variants`: its name, its values in order, and the default (always one of them). */
 export interface VariantAxis {
@@ -22,11 +23,11 @@ export interface VariantAxis {
     default: string;
 }
 
-/** One `@variant` test, `axis(value)`, with where it was written in the CSS it was read from. */
+/** One value of a `@variant` test, `axis(value)` or one of `axis(a, b)`, with where it was written. */
 export interface VariantTest {
     axis: string;
     value: string;
-    /** Offset of the test in the CSS. */
+    /** Offset of the test in the CSS — the same for every value of a list. */
     at: number;
 }
 
@@ -99,7 +100,7 @@ function underHost(sel: string, host: string): string {
  */
 export function expandVariantRules(css: string, hostOf: (attrs: string) => string = (attrs) => `:scope${attrs}`): string {
     return expandVariantBlocks(css, (tests, sel) =>
-        underHost(sel, hostOf([...tests.matchAll(VARIANT_TEST)].map((t) => `[${t[1]}="${t[2]}"]`).join(''))));
+        underHost(sel, hostOf([...tests.matchAll(VARIANT_TEST)].map((t) => attributeTest(t[1], testValues(t[2]))).join(''))));
 }
 
 /** Every test of every `@variant` prelude in the CSS, in order, with its offset. Comments ignored. */
@@ -109,7 +110,7 @@ export function variantTests(css: string): VariantTest[] {
     // Match: a `@variant` prelude up to its `{`. Groups: [1]=the tests
     for (const m of text.matchAll(/@variant\s+([^{};]+)\{/g)) {
         const base = m.index + m[0].indexOf(m[1]);
-        for (const t of m[1].matchAll(VARIANT_TEST)) tests.push({ axis: t[1], value: t[2], at: base + t.index });
+        for (const t of m[1].matchAll(VARIANT_TEST)) for (const value of testValues(t[2])) tests.push({ axis: t[1], value, at: base + t.index });
     }
     return tests;
 }
