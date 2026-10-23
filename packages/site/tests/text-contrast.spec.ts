@@ -124,7 +124,9 @@ const ALL_THEMES = [
     'neutral', 'material', 'fluent', 'cupertino', 'metro', 'corporate', 'playful', 'editorial',
     'cyberpunk', 'glass', 'neumorphic', 'pragmatic', 'pragmatic-gold',
 ];
-const BUTTONS = ':is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info)';
+// A native button by its variant class, a pdx-button by its root part: its variant is the host's
+// attribute, not a class (#512).
+const BUTTONS = ':is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info), pdx-button > [data-part="root"]';
 
 for (const theme of ALL_THEMES) {
     test(`${theme}: every button variant's label reaches AA, light and dark`, async ({ page }) => {

@@ -14,8 +14,9 @@ semver.
 - `pdx-button` declares its variants (#512): `variant` and `size` are reflected on the host
   (`<pdx-button variant="ghost" size="sm">`), and `size` defaults to `'md'` instead of `''`. Its rules in
   `@pdxui/design` are written once as `@variant pdx-button …` and compiled for the host and for the
-  native `<button class="pdx-ghost">`; the inner `<button>` still carries the variant class, until the
-  theme rules move as well.
+  native `<button class="pdx-ghost">`. So are the themes' button overrides, the stylesheets that reach
+  the button (toolbar, input group, the coarse-pointer target, the link style), and the theme engine's
+  rules, which it writes compiled.
 - `@variant` takes several values of one axis, `@variant variant(ghost, danger) { … }`, and matches any of
   them, in a `.pdx` and in `@pdxui/design` alike (#512). Before, a list was ignored and the rule
   applied to every value.
@@ -327,6 +328,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-button` no longer puts its variant class on its inner `<button>` (#512). The
+  variant is the host's attribute, `<pdx-button variant="ghost">`, and the design system styles it
+  through `@variant pdx-button` rules; the inner `<button>` carries `data-part="root"`, its base class
+  `pdx-button`, the same for every variant, and its state classes, `pdx-loading` and `pdx-pressed`. CSS that styled a `pdx-button` through
+  `.pdx-primary` and friends on its inner button must target the host instead:
+  `pdx-button[variant="primary"] > [data-part="root"]`. A native `<button class="pdx-primary">`
+  is styled as before.
 - **Breaking:** what a native `<form>` receives from some value components (#135).
   - **Lists:** `pdx-tag-input` and `pdx-checkbox-group` submit one entry per item under their `name`,
     as a native multi-select does, instead of one entry holding the JSON array. A range `pdx-slider`

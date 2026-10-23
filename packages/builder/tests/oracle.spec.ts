@@ -126,7 +126,8 @@ test('rendered contrast is measured, and it is right about our OKLCH colours', a
     expect(clean.pass).toBe(true);
 
     // Not vacuous: a label set to nearly its own fill has to be caught.
-    const broken = await sabotage(page, 'button.pdx-primary { color: oklch(0.36 0.02 260) !important; }');
+    // A pdx-button's variant is its host's attribute (#512): the inner button has no variant class.
+    const broken = await sabotage(page, 'pdx-button:is([variant="primary"], [variant="solid"]) > [data-part="root"] { color: oklch(0.36 0.02 260) !important; }');
     expect(broken.byRule.contrastRatio ?? 0).toBeGreaterThan(0);
     expect(broken.violations.some(v => v.rule === 'contrastRatio' && /1\.\d+:1/.test(v.detail))).toBe(true);
 

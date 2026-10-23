@@ -67,14 +67,11 @@ test('a design language\'s rule for the primary button reaches pdx-button throug
     const paint = await page.evaluate(() => {
         const doc = (document.querySelector('iframe') as HTMLIFrameElement).contentDocument!;
         const btn = doc.querySelector('pdx-button[data-test="primary"] > button') as HTMLElement;
-        const read = () => doc.defaultView!.getComputedStyle(btn).backgroundImage;
-        const withClass = read();
-        // The inner class is a leftover the button sheds (#512): the variant must carry the rule alone.
-        btn.classList.remove('pdx-primary');
-        return { withClass, withoutClass: read() };
+        return { classes: btn.className, image: doc.defaultView!.getComputedStyle(btn).backgroundImage };
     });
-    expect(paint.withClass, 'the control: the language paints the primary with a gradient').toContain('linear-gradient');
-    expect(paint.withoutClass).toBe(paint.withClass);
+    // The inner button carries no variant class: the variant alone carries the language's rule.
+    expect(paint.classes, 'the control: no class to reach it through').not.toMatch(/pdx-(primary|solid)/);
+    expect(paint.image).toContain('linear-gradient');
 });
 
 test('the WCAG token gate is clean for a generated theme, and it is a real check', async ({ page }) => {
