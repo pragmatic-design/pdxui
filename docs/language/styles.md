@@ -390,12 +390,16 @@ is the default. Both forms generate what `@variants` generates — a typed prop 
 the host — and `packages/ui/custom-elements.json` lists every axis with its values, its default and
 its native selectors.
 
-The rules live in `@pdxui/design`. In the component's own stylesheet,
-`packages/design/src/components/<name>.css` for `pdx-<name>`, the tag is implied and may be written.
-Anywhere else — a surface stylesheet, a theme source inside `@pdx-theme`, the theme engine's output —
-the rule names it: `@variant pdx-button variant(primary) { … }`. The design build compiles every rule
-with the transform a `.pdx` uses (`expandVariantRules`). A selector `S` of the body is relative to the
-host, as in a `.pdx`, and becomes
+The rules live in `@pdxui/design`, in sources the design build compiles, because `src/` reaches the
+browser as written. A stylesheet with `@variant` rules is written in
+`packages/design/variant-sources/<path>.css`, and `node packages/design/scripts/gen-variants.mjs`
+writes `src/<path>.css`; a theme source, `theme-sources/<name>.css`, is compiled by `gen-themes.mjs`.
+In the component's own stylesheet, `variant-sources/components/<name>.css` for `pdx-<name>`, the tag
+is implied and may be written. Anywhere else — a surface stylesheet, a theme source inside
+`@pdx-theme`, the theme engine's output — the rule names it: `@variant pdx-button variant(primary) { … }`.
+The design build compiles every rule with the block walker a `.pdx` uses (`expandVariantBlocks`, in
+`packages/compiler/src/compiler/variant-css.ts`). A selector `S` of the body is relative to the host,
+as in a `.pdx`, and becomes
 
 ```css
 :where(pdx-button[variant="ghost"]) S:not(:where(pdx-button[variant="ghost"] [data-pdx-root] S))
@@ -404,7 +408,8 @@ host, as in a `.pdx`, and becomes
 which reads: under the host's attribute test, and never inside another component. Core marks every
 component host with `data-pdx-root`, so a rule on the card's root does not reach the root of a
 component nested in the card. The host test sits in `:where()`, so a rule weighs what `S` weighs.
-`:scope` is the host, `:where(pdx-button[variant="ghost"])`. The form is the same on both targets: the
+`:scope` is the host, `:where(pdx-button[variant="ghost"])`; a pseudo-element stays last, after the
+bound. The form is the same on both targets: the
 design CSS is not scoped, and `:where()` and `:not()` with complex selectors are in `baseline-2024`.
 
 Where the axis gives a value a native selector, the same rule also yields it. The root part,
@@ -428,9 +433,11 @@ so every selector it yields takes the theme root and the nested-theme guard like
 - An `@variant` in a plain `<style>` block is copied as written: the browser drops it.
 - In the library, the design build checks the rules against `custom-elements.json`, so it runs after
   `pnpm --dir packages/ui run manifest`. A rule naming a tag, an axis or a value the manifest does not
-  declare is `PDX_VARIANT_UNKNOWN`, and fails the build. A declared value other than the default that no
-  rule of the package styles is `PDX_VARIANT_UNSTYLED`. A rule outside the component's own stylesheet
-  that does not name its tag is `PDX_VARIANT_UNKNOWN`.
+  declare is `PDX_VARIANT_UNKNOWN`, and fails the build: `gen-variants.mjs` and `gen-themes.mjs` write
+  nothing. A declared value other than the default that no rule of the package styles is
+  `PDX_VARIANT_UNSTYLED`; a value that shares the default's native selector has the default's look and
+  is not reported either. A rule outside the component's own stylesheet that does not name its tag is
+  `PDX_VARIANT_UNKNOWN`.
 - An axis is a closed set of values the CSS draws. An open value, such as a free colour
   (`pdx-avatar`'s `color`), stays a plain prop.
 - A native selector is a compound: a class (`.pdx-ghost`) or the attributes the native form needs. It
@@ -479,7 +486,7 @@ component('pdx-button', {
 The component's stylesheet writes the rules once. The tag is implied:
 
 ```css
-/* packages/design/src/components/button.css */
+/* packages/design/variant-sources/components/button.css */
 @variant variant(ghost) {
     [data-part="root"] { background: var(--pdx-button-bg, transparent); color: var(--pdx-color-muted); }
 }
