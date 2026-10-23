@@ -20,11 +20,15 @@ env:
   FC_FONTATIONS: '1'
   DBUS_SESSION_BUS_ADDRESS: 'disabled:'
 
+# Every job and every Chromium install has a timeout (#642): without one a stalled apt ran for six
+# hours. Each value sits above the longest successful run of 15 (2026-10-23): the install took up to
+# 16 minutes (median 0.3), a contracts job up to 21, visual up to 6. core's ci-timeouts test holds it.
 jobs:
   # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
   contracts:
     name: contracts (dim 1-4) (${{ matrix.project }} ${{ matrix.shard }}/${{ matrix.of }})
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +51,7 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
+        timeout-minutes: 25
       - name: Generate scenarios + registry
         run: pnpm --filter @pdxui/responsive test:gen
       # The whole certification folder, as `test:certify` runs it: no file filter. A list of named
@@ -78,6 +83,7 @@ jobs:
   contracts-2024:
     name: contracts (dim 1, baseline-2024)
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     env:
       PDX_TARGET: baseline-2024
     steps:
@@ -88,6 +94,7 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
+        timeout-minutes: 25
       - name: Generate scenarios + registry
         run: pnpm --filter @pdxui/responsive test:gen
       - name: Dim 1, contract math, on baseline-2024
@@ -105,6 +112,7 @@ jobs:
   visual:
     name: visual (dim 5, docker)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
         with: { lfs: true } # the PNG baselines are in Git LFS
