@@ -127,8 +127,23 @@ export type ModelMap = Record<string, ModelSpec<unknown>>;
  * Typed component context — its declared props and models as signals, and `emit` typed from its
  * declared events (any name when it declares none).
  */
-export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>> =
-    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P> & PropSignals<M>;
+export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>> =
+    Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P> & PropSignals<M> & VariantSignals<V>;
+
+/**
+ * One variant axis (#512): its values in order, or a record from each value to the native selector
+ * that draws the same look on plain HTML (`{ primary: '.pdx-primary' }`, #626). The first is the default.
+ */
+export type VariantAxisSpec = readonly string[] | Readonly<Record<string, string>>;
+
+/** The variant axes a descriptor declares, by name. */
+export type VariantMap = Record<string, VariantAxisSpec>;
+
+/** The values of an axis: the list's members, or the record's keys. */
+type VariantValue<A> = A extends readonly (infer T)[] ? T : keyof A & string;
+
+/** Each axis as a signal of its values. */
+type VariantSignals<V extends VariantMap> = { [K in keyof V]: Signal<VariantValue<V[K]>> };
 
 /**
  * Untyped component context — legacy compat for components without explicit prop typing.
@@ -144,17 +159,18 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
  * public elements, `[data-part="name"]`, for the manifest; a `.pdx` checks and binds them at compile
  * time. `models` (#124) are props the component may write: writing one dispatches its
  * `<name>-change`, and `::name` binds it both ways. `slots` (#489) are typed snippets: functions the
- * element holds as properties, which a `.pdx`'s `@render` calls. The others are part of the
- * descriptor's type now and get their behaviour in their own issues: expose #140, variants #153.
+ * element holds as properties, which a `.pdx`'s `@render` calls. `variants` (#512) are the axes the
+ * design CSS keys its `@variant` rules on: a prop per axis, typed with its values and reflected on the
+ * host as an attribute. `expose` is part of the descriptor's type now and gets its behaviour in #140.
  */
-export interface ComponentDeclarations<E extends EventMap = EventMap, M extends ModelMap = ModelMap> {
+export interface ComponentDeclarations<E extends EventMap = EventMap, M extends ModelMap = ModelMap, V extends VariantMap = VariantMap> {
     events?: E;
     models?: M;
     slots?: Record<string, SlotSpec<unknown>>;
     states?: readonly string[];
     parts?: readonly string[];
     expose?: readonly string[];
-    variants?: Record<string, readonly string[]>;
+    variants?: V;
 }
 
 /**
@@ -164,8 +180,8 @@ export interface ComponentDeclarations<E extends EventMap = EventMap, M extends 
  */
 export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown)>;
 
-export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>
-    extends ComponentDeclarations<E, M> {
+export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>>
+    extends ComponentDeclarations<E, M, V> {
     props?: P;
     /** Use Shadow DOM instead of Light DOM. Default: false (Light DOM). */
     shadow?: boolean;
@@ -178,10 +194,10 @@ export interface ComponentOptions<P extends Record<string, PropDefinition> = Rec
      * in development builds only, and an unhandled runtime error names it.
      */
     file?: string;
-    setup?: (ctx: TypedComponentContext<P, E, M>) => Record<string, unknown> | void;
-    render: (ctx: TypedComponentContext<P, E, M>) => DocumentFragment | Node;
+    setup?: (ctx: TypedComponentContext<P, E, M, V>) => Record<string, unknown> | void;
+    render: (ctx: TypedComponentContext<P, E, M, V>) => DocumentFragment | Node;
     /** See {@link HostOf}. */
-    host?: HostOf<TypedComponentContext<P, E, M>>;
+    host?: HostOf<TypedComponentContext<P, E, M, V>>;
 }
 
 /** Options with typed setup return — render ctx includes both props and setup exports. */
@@ -189,18 +205,19 @@ export interface ComponentOptionsWithSetup<
     P extends Record<string, PropDefinition>,
     S extends Record<string, unknown>,
     E extends EventMap = Record<never, never>,
-    M extends ModelMap = Record<never, never>
-> extends ComponentDeclarations<E, M> {
+    M extends ModelMap = Record<never, never>,
+    V extends VariantMap = Record<never, never>
+> extends ComponentDeclarations<E, M, V> {
     props?: P;
     shadow?: boolean;
     static?: boolean;
     formAssociated?: boolean;
     /** See {@link ComponentOptions.file}. */
     file?: string;
-    setup: (ctx: TypedComponentContext<P, E, M>) => S;
-    render: (ctx: TypedComponentContext<P, E, M> & S) => DocumentFragment | Node;
+    setup: (ctx: TypedComponentContext<P, E, M, V>) => S;
+    render: (ctx: TypedComponentContext<P, E, M, V> & S) => DocumentFragment | Node;
     /** See {@link HostOf}: its functions see what `setup` returns, as `render` does. */
-    host?: HostOf<TypedComponentContext<P, E, M> & S>;
+    host?: HostOf<TypedComponentContext<P, E, M, V> & S>;
 }
 
 // ─── component() ───────────────────────────────────────────────────
@@ -224,12 +241,12 @@ export interface ComponentOptionsWithSetup<
  *   });
  */
 /** Overload: setup returns a typed record → render ctx merges props + setup exports. */
-export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>(
-    tag: string, options: ComponentOptionsWithSetup<P, S, E, M>): void;
+export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+    tag: string, options: ComponentOptionsWithSetup<P, S, E, M, V>): void;
 /** Overload: no setup or setup returns void → render ctx has only props. */
-export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>>(
-    tag: string, options: ComponentOptions<P, E, M>): void;
-export function component<P extends Record<string, PropDefinition>, E extends EventMap, M extends ModelMap>(tag: string, options: ComponentOptions<P, E, M>): void {
+export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+    tag: string, options: ComponentOptions<P, E, M, V>): void;
+export function component<P extends Record<string, PropDefinition>, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>): void {
     // A model is a prop (#124): the same attribute, property and coercion, plus the event its own
     // writes dispatch. A prop and a model of one name would be two accessors on one property.
     const modelDefs = (options.models ?? {}) as Record<string, ModelSpec<unknown>>;
@@ -244,7 +261,19 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     // (`ctx.row`), so a function assigned after the render renders as well.
     const slotDefs: Record<string, PropDefinition> = {};
     for (const name of Object.keys(options.slots ?? {})) slotDefs[name] = { type: Function };
-    const propDefs = { ...(options.props ?? {}), ...modelDefs, ...slotDefs } as Record<string, PropDefinition>;
+    // A variant axis (#512) is a String prop defaulting to its first value — a list's first member, a
+    // record's first key — reflected on the host as a bound host attribute, where the design CSS's
+    // `@variant` rules read it. A value outside the axis reflects the default.
+    const variantDefs: Record<string, PropDefinition> = {};
+    const host: HostBindings = {};
+    for (const [name, spec] of Object.entries((options.variants ?? {}) as VariantMap)) {
+        if (DEV && options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a variant axis; the axis wins.`);
+        const values = Array.isArray(spec) ? spec as readonly string[] : Object.keys(spec);
+        variantDefs[name] = { type: String, default: values[0] };
+        host[':' + name] = (c: Record<string, () => string>) => values.includes(c[name]()) ? c[name]() : values[0];
+    }
+    Object.assign(host, options.host);
+    const propDefs = { ...(options.props ?? {}), ...variantDefs, ...modelDefs, ...slotDefs } as Record<string, PropDefinition>;
     const propNames = Object.keys(propDefs);
     // Declared events (#123): with any declared, a name that is not one is reported in development.
     // A model's event counts as declared.
@@ -552,12 +581,12 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             pushScope(scope);
             try {
                 if (options.setup) {
-                    const result = options.setup(ctx as TypedComponentContext<P, E, M>);
+                    const result = options.setup(ctx as TypedComponentContext<P, E, M, V>);
                     if (result) Object.assign(ctx, result);
                 }
-                // The host's declared attributes, bindings and listeners (#133), after setup: a
-                // binding reads what setup returned, as the render does.
-                if (options.host) bindHost(this, options.host as HostBindings, ctx, (fn) => this.track(fn));
+                // The host's declared attributes, bindings and listeners (#133), and its variant axes,
+                // after setup: a binding reads what setup returned, as the render does.
+                bindHost(this, host, ctx, (fn) => this.track(fn));
                 // Register signals for HMR save/restore
                 const signalMap = new Map<string, Signal<unknown>>();
                 for (const [key, value] of Object.entries(ctx)) {
@@ -588,7 +617,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
             popScope();
             if (DEV) devSetupEnd();
 
-            return options.render(ctx as TypedComponentContext<P, E, M>);
+            return options.render(ctx as TypedComponentContext<P, E, M, V>);
         }
     }
 

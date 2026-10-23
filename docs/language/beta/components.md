@@ -595,7 +595,7 @@ alpha → beta (#139 — landed)
 
 ```ts
 component('pdx-select', {
-  props:   { size: prop<'sm' | 'md' | 'lg'>('md'), options: prop.required<Option[]>() },
+  props:   { options: prop.required<Option[]>() },
   models:  { value: model<string>('', { form: true }) },
   events:  { open: event<void>() },
   slots:   { item: slot<(o: Option) => Node>() },
@@ -603,7 +603,7 @@ component('pdx-select', {
   parts:   ['trigger', 'popup'],
   expose:  ['focus'],
   host:    { role: 'combobox' },
-  variants: { size: ['sm', 'md', 'lg'] },
+  variants: { size: ['md', 'sm', 'lg'] },
   setup(ctx) { /* ctx typed from the fields above */ },
 });
 ```
@@ -628,7 +628,10 @@ and still dispatched. A `.pdx` compiles its `@event` names into `events`, `(bubb
 `{ bubbles: true }`. The manifest reads a prop's type and an event's detail type from the
 type arguments; `pdx-select` and `pdx-toggle` are written this way. The other fields are typed and get
 their behaviour in their own issues (`states` landed since, #132; `models`, #124; `slots`, #489: each
-is a function property of the element, which `@render` calls).
+is a function property of the element, which `@render` calls; `variants`, #512: each axis is a String
+prop typed with its values, defaulting to the first, and reflected on the host as an attribute — a
+value outside the axis reflects the default — and the manifest lists the axes, from which
+certification generates one scenario per value; the design build half is in [styles.md](styles.md)).
 The constructor form is still accepted.
 
 ### Since

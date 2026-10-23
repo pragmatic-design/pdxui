@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- A TypeScript component declares its variants in its descriptor (#512):
+  `variants: { size: ['md', 'sm', 'lg'], variant: { primary: '.pdx-primary', ghost: '.pdx-ghost' } }`.
+  Each axis is a prop typed with its values (`ctx.size` is `Signal<'md' | 'sm' | 'lg'>`), defaults to its
+  first value, and is reflected on the host as an attribute; a value outside the axis reflects the
+  default. The manifest lists every axis with its values, its default and the native selectors a record
+  gives (`variants` in `custom-elements.json`), and `pnpm certify:gen` generates one scenario per value,
+  each with the rule that the host reflects it. The design build's `@variant` rules and the library's
+  migration follow in #512 and #627–#633.
 - The library's menus and pickers take a parent's typed snippet (#491):
   - `pdx-select`: `item(option, index)` and `selected(option)`;
   - `pdx-autocomplete`: `option(option, index, highlighted)`;
