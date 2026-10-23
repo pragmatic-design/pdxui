@@ -64,6 +64,11 @@ describe('a rule in a component\'s own stylesheet', () => {
             .toBe(':where(pdx-button[size="sm"]) > [data-part="root"] { padding: 0; }');
     });
 
+    it('a context before the host stays before it, in both forms', () => {
+        expect(expandLibraryVariants('@variant pdx-button variant(ghost) { .pdx-toolbar :scope > button[data-part="root"]:hover { color: red; } }', undefined, axesOf)).toBe(
+            '.pdx-toolbar :where(pdx-button[variant="ghost"]) > button[data-part="root"]:hover, .pdx-toolbar button.pdx-ghost:hover { color: red; }');
+    });
+
     it('a pseudo-element stays last, after the bound', () => {
         expect(expandLibraryVariants('@variant variant(ghost) { [data-part="root"]::before { content: ""; } }', 'pdx-button', axesOf)).toBe(
             ':where(pdx-button[variant="ghost"]) [data-part="root"]:not(:where(pdx-button[variant="ghost"] [data-pdx-root] [data-part="root"]))::before, '

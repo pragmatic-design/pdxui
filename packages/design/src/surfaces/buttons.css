@@ -317,21 +317,21 @@
 }
 
 /* Override --_btn-r on children — no !important needed because buttons read var(--_btn-r).
-   WC selectors use button[class] to beat base button specificity (0,2,0). */
+   WC selectors use button[data-part="root"] to beat base button specificity (0,2,0). */
 .pdx-btn-group > :is(button, a, [role="button"]),
-.pdx-btn-group > pdx-button > button[class] {
+.pdx-btn-group > pdx-button > button[data-part="root"] {
     --_btn-r: 0;
 }
 
 /* First child: left radius */
 .pdx-btn-group > :first-child:is(button, a, [role="button"]),
-.pdx-btn-group > pdx-button:first-child > button[class] {
+.pdx-btn-group > pdx-button:first-child > button[data-part="root"] {
     --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md)) 0 0 var(--pdx-button-radius, var(--pdx-radius-md));
 }
 
 /* Last child: right radius */
 .pdx-btn-group > :last-child:is(button, a, [role="button"]),
-.pdx-btn-group > pdx-button:last-child > button[class] {
+.pdx-btn-group > pdx-button:last-child > button[data-part="root"] {
     --_btn-r: 0 var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md)) 0;
 }
 
@@ -341,7 +341,7 @@
 }
 
 /* Overlap borders: WC children (margin on inner button since pdx-button is display:contents) */
-.pdx-btn-group > pdx-button:not(:first-child) > button[class] {
+.pdx-btn-group > pdx-button:not(:first-child) > button[data-part="root"] {
     margin-left: calc(-1 * var(--pdx-border-width));
 }
 
@@ -353,20 +353,20 @@
 
 /* Override --_btn-r on children */
 .pdx-btn-group-vertical > :is(button, a, [role="button"]),
-.pdx-btn-group-vertical > pdx-button > button[class] {
+.pdx-btn-group-vertical > pdx-button > button[data-part="root"] {
     --_btn-r: 0;
     width: 100%;
 }
 
 /* First child: top radius */
 .pdx-btn-group-vertical > :first-child:is(button, a, [role="button"]),
-.pdx-btn-group-vertical > pdx-button:first-child > button[class] {
+.pdx-btn-group-vertical > pdx-button:first-child > button[data-part="root"] {
     --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md)) 0 0;
 }
 
 /* Last child: bottom radius */
 .pdx-btn-group-vertical > :last-child:is(button, a, [role="button"]),
-.pdx-btn-group-vertical > pdx-button:last-child > button[class] {
+.pdx-btn-group-vertical > pdx-button:last-child > button[data-part="root"] {
     --_btn-r: 0 0 var(--pdx-button-radius, var(--pdx-radius-md)) var(--pdx-button-radius, var(--pdx-radius-md));
 }
 

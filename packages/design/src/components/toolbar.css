@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/toolbar.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Toolbar — horizontal action bar with buttons, separators, groups, spacer.
    Used in card headers, editors, form actions, page toolbars.
 
@@ -105,15 +106,14 @@
 
 /* ===== Button hover inside toolbar — stronger contrast on gray bg ===== */
 
-.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost):hover {
-    background: light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
-}
+.pdx-toolbar :where(pdx-button[variant="ghost"]) > :is(button, a, [role="button"])[data-part="root"]:hover, .pdx-toolbar :is(button, a, [role="button"]).pdx-ghost:hover {
+        background: light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
+    }
 
-.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost)[aria-pressed="true"],
-.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-ghost).active {
-    background: light-dark(oklch(0.85 0 0), oklch(0.28 0 0));
-    color: var(--pdx-color-primary-ink);
-}
+    .pdx-toolbar :where(pdx-button[variant="ghost"]) > :is(button, a, [role="button"])[data-part="root"][aria-pressed="true"], .pdx-toolbar :is(button, a, [role="button"]).pdx-ghost[aria-pressed="true"], .pdx-toolbar :where(pdx-button[variant="ghost"]) > :is(button, a, [role="button"])[data-part="root"].active, .pdx-toolbar :is(button, a, [role="button"]).pdx-ghost.active {
+        background: light-dark(oklch(0.85 0 0), oklch(0.28 0 0));
+        color: var(--pdx-color-primary-ink);
+    }
 
 /* ===== Label inside toolbar ===== */
 

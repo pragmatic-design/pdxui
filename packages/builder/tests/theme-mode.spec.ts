@@ -60,6 +60,23 @@ for (const c of CASES) {
     });
 }
 
+test('a design language\'s rule for the primary button reaches pdx-button through its variant (#512)', async ({ page }) => {
+    await openTheme(page, '&language=pragmatic');
+    expect((await themeOf(page)).error).toBeUndefined();
+    await expect(page.frameLocator('[data-test="preview"]').locator('pdx-button[data-test="primary"] > button')).toBeVisible();
+    const paint = await page.evaluate(() => {
+        const doc = (document.querySelector('iframe') as HTMLIFrameElement).contentDocument!;
+        const btn = doc.querySelector('pdx-button[data-test="primary"] > button') as HTMLElement;
+        const read = () => doc.defaultView!.getComputedStyle(btn).backgroundImage;
+        const withClass = read();
+        // The inner class is a leftover the button sheds (#512): the variant must carry the rule alone.
+        btn.classList.remove('pdx-primary');
+        return { withClass, withoutClass: read() };
+    });
+    expect(paint.withClass, 'the control: the language paints the primary with a gradient').toContain('linear-gradient');
+    expect(paint.withoutClass).toBe(paint.withClass);
+});
+
 test('the WCAG token gate is clean for a generated theme, and it is a real check', async ({ page }) => {
     await openTheme(page);
     const t = await themeOf(page);

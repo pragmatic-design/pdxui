@@ -109,22 +109,24 @@
 }
 
 /* M3 filled: primary/danger/success buttons inside group lose own border (group provides container). */
-:is(.pdx-input-group, pdx-input-group) button:is(.pdx-primary, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    border: none;
+@variant pdx-button variant(primary, danger, success, warning, info) {
+    :is(.pdx-input-group, pdx-input-group) :scope > button[data-part="root"] {
+        border: none;
+    }
 }
 
 /* M3 input-group: buttons must match the taller 56px filled input at default size,
    but respect smaller sizes (xs/sm) when the group specifies them. */
-:is(.pdx-input-group, pdx-input-group):not([size]) > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group):not([size]) > pdx-button > button[data-part="root"],
 :is(.pdx-input-group, pdx-input-group):not([size]) > button {
     height: var(--pdx-input-min-height);
     min-height: var(--pdx-input-min-height);
 }
-:is(.pdx-input-group, pdx-input-group)[size="lg"] > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group)[size="lg"] > pdx-button > button[data-part="root"],
 :is(.pdx-input-group, pdx-input-group)[size="lg"] > button {
     height: 4rem; min-height: 4rem;
 }
-:is(.pdx-input-group, pdx-input-group)[size="xl"] > pdx-button > button[class],
+:is(.pdx-input-group, pdx-input-group)[size="xl"] > pdx-button > button[data-part="root"],
 :is(.pdx-input-group, pdx-input-group)[size="xl"] > button {
     height: 4.5rem; min-height: 4.5rem;
 }

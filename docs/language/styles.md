@@ -398,7 +398,11 @@ browser as written. A stylesheet with `@variant` rules is written in
 writes `src/<path>.css`; a theme source, `theme-sources/<name>.css`, is compiled by `gen-themes.mjs`.
 In the component's own stylesheet, `variant-sources/components/<name>.css` for `pdx-<name>`, the tag
 is implied and may be written. Anywhere else — a surface stylesheet, a theme source inside
-`@pdx-theme`, the theme engine's output — the rule names it: `@variant pdx-button variant(primary) { … }`.
+`@pdx-theme` — the rule names it: `@variant pdx-button variant(primary) { … }`. The theme engine's
+design languages are the exception: `createTheme().toCSS()` reaches the CLI and the builder with no
+build step, so they write the compiled, host-anchored form through `buttonVariantRule`
+(`packages/design/src/engine/button-variant.ts`), and `packages/cli/tests/engine-variant-parity.test.ts`
+holds every selector it gives equal to what the design build compiles from the `@variant` rule.
 The design build compiles every rule with the block walker a `.pdx` uses (`expandVariantBlocks`, in
 `packages/compiler/src/compiler/variant-css.ts`). A selector `S` of the body is relative to the host,
 as in a `.pdx`, and becomes
