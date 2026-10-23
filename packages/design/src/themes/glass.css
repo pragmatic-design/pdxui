@@ -85,24 +85,24 @@
 }
 
 /* Buttons: translucent with glow hover */
-[pdx-theme="glass"] .pdx-secondary:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
-    background: light-dark(oklch(1 0 0 / 0.25), oklch(1 0 0 / 0.08));
-    /* A frosted pane, not a coloured fill: the page's text, not secondary's near-white label, which
-       reads 1.02:1 on it in light. */
-    color: var(--pdx-color-text);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    border-color: light-dark(oklch(1 0 0 / 0.3), oklch(1 0 0 / 0.12));
-}
-[pdx-theme="glass"] .pdx-secondary:hover:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
-    background: light-dark(oklch(1 0 0 / 0.4), oklch(1 0 0 / 0.15));
-    box-shadow: 0 2px 8px oklch(0.5 0.15 240 / 0.2);
-}
+[pdx-theme="glass"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)), [pdx-theme="glass"] .pdx-secondary:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
+        background: light-dark(oklch(1 0 0 / 0.25), oklch(1 0 0 / 0.08));
+        /* A frosted pane, not a coloured fill: the page's text, not secondary's near-white label, which
+           reads 1.02:1 on it in light. */
+        color: var(--pdx-color-text);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        border-color: light-dark(oklch(1 0 0 / 0.3), oklch(1 0 0 / 0.12));
+    }
+    [pdx-theme="glass"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)), [pdx-theme="glass"] .pdx-secondary:hover:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
+        background: light-dark(oklch(1 0 0 / 0.4), oklch(1 0 0 / 0.15));
+        box-shadow: 0 2px 8px oklch(0.5 0.15 240 / 0.2);
+    }
 
 /* Primary button: frosted with glow */
-[pdx-theme="glass"] .pdx-primary:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
-    --pdx-button-shadow-hover: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
-}
+[pdx-theme="glass"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)), [pdx-theme="glass"] .pdx-primary:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)) {
+        --pdx-button-shadow-hover: 0 4px 16px oklch(from var(--pdx-color-primary) l c h / 0.35);
+    }
 
 /* Tab: glow bottom border */
 [pdx-theme="glass"] .pdx-tab.active:not(:where([pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]), [pdx-theme="glass"] [pdx-theme]:not([pdx-theme="glass"]) *)),

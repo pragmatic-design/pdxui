@@ -107,11 +107,13 @@ details.pdx-accordion[open] summary::after {
 }
 
 /* Buttons: corporate — uppercase, structured, heavier weight */
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    text-transform: uppercase;
-    font-size: var(--pdx-text-xs);
-    letter-spacing: 0.06em;
-    font-weight: var(--pdx-weight-bold);
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        text-transform: uppercase;
+        font-size: var(--pdx-text-xs);
+        letter-spacing: 0.06em;
+        font-weight: var(--pdx-weight-bold);
+    }
 }
 
 /* Input: outlined with border-strong (--pdx-input-border-color, #519) — sharper, structured.

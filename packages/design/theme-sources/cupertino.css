@@ -93,8 +93,10 @@
 /* Buttons: Apple — 44px touch target (default), generous padding.
    border-radius flows from --pdx-button-radius token via --_btn-r — NOT set directly here,
    otherwise button groups can't override radius to 0 for middle children. */
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    padding: var(--pdx-space-sm) var(--pdx-space-xl);
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        padding: var(--pdx-space-sm) var(--pdx-space-xl);
+    }
 }
 /* Apple 44px touch target: flows from --pdx-button-min-height, which divides the 1.1 density
    back out so the rendered height is exactly the 44px the HIG asks for.
@@ -201,9 +203,11 @@ details.pdx-accordion[open] summary::after {
 }
 
 /* ── Button: iOS subtle active state ── */
-:is(.pdx-primary, .pdx-secondary, .pdx-outline):active:not(:disabled) {
-    transform: scale(0.98);
-    filter: brightness(0.95);
+@variant pdx-button variant(primary, secondary, outline) {
+    :scope > [data-part="root"]:active:not(:disabled) {
+        transform: scale(0.98);
+        filter: brightness(0.95);
+    }
 }
 
 /* ── Calendar: Apple HIG — circle selected, ultra-subtle hover, vibrancy ── */

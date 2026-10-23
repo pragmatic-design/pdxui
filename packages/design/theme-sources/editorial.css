@@ -143,21 +143,25 @@ details.pdx-accordion summary::after {
    Editorial focus uses text color instead of primary: --pdx-input-border-color-focus (#521). */
 
 /* ── Button: editorial underline hover ── */
-.pdx-primary {
-    font-family: var(--pdx-font-heading);
-    letter-spacing: 0.04em;
+@variant pdx-button variant(primary) {
+    :scope > [data-part="root"] {
+        font-family: var(--pdx-font-heading);
+        letter-spacing: 0.04em;
+    }
+    :scope > [data-part="root"] {
+        --pdx-button-shadow-hover: 0 2px 0 0 var(--pdx-color-primary);
+    }
 }
-.pdx-primary {
-    --pdx-button-shadow-hover: 0 2px 0 0 var(--pdx-color-primary);
-}
-.pdx-secondary {
-    font-family: var(--pdx-font-heading);
-    border-style: solid;
-}
-.pdx-secondary:hover {
-    border-color: var(--pdx-color-text);
-    /* keep secondary-text (it contrasts with the secondary fill); switching to color-text went
-       dark-on-secondary. Darken the fill for the hover cue instead. */
-    filter: brightness(0.96);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        font-family: var(--pdx-font-heading);
+        border-style: solid;
+    }
+    :scope > [data-part="root"]:hover {
+        border-color: var(--pdx-color-text);
+        /* keep secondary-text (it contrasts with the secondary fill); switching to color-text went
+           dark-on-secondary. Darken the fill for the hover cue instead. */
+        filter: brightness(0.96);
+    }
 }
 }

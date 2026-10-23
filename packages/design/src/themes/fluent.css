@@ -104,27 +104,27 @@
 /* Fluent's border-strong at rest is --pdx-input-border-color above: a rule here, in the themes'
    layer, would beat the component's focus and error colours (#519). */
 /* Buttons: Fluent — compact (32px medium), no letter-spacing, semibold 600 */
-[pdx-theme="fluent"] :is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info):not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
-    letter-spacing: 0;
-    font-weight: var(--pdx-weight-semibold);
-    font-size: var(--pdx-text-sm);  /* body1Strong: 14px */
-    line-height: 1.25rem;       /* 20px */
-    padding: 5px 12px;          /* Fluent medium: 5px 12px → 32px height */
-}
+[pdx-theme="fluent"] :where(pdx-button:is([variant="primary"],[variant="solid"],[variant="secondary"],[variant="outline"],[variant="ghost"],[variant="link"],[variant="danger"],[variant="success"],[variant="warning"],[variant="info"])) > :is(button, a, [role="button"])[data-part="root"]:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)), [pdx-theme="fluent"] :is(button, a, [role="button"]):is(.pdx-primary,.pdx-secondary,.pdx-outline,.pdx-ghost,.pdx-link,.pdx-danger,.pdx-success,.pdx-warning,.pdx-info):not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+        letter-spacing: 0;
+        font-weight: var(--pdx-weight-semibold);
+        font-size: var(--pdx-text-sm);  /* body1Strong: 14px */
+        line-height: 1.25rem;       /* 20px */
+        padding: 5px 12px;          /* Fluent medium: 5px 12px → 32px height */
+    }
 /* Fluent button sizes: height flows from --pdx-button-min-height, which divides the 0.9 density
    back out so the rendered height is the 32px Fluent medium states.
    No explicit height override — the token system handles alignment with inputs.
    Size variants (xs/sm) use the base buttons.css calc() with density scaling. */
 
 /* Secondary: Fluent "outline" — thin border, transparent bg, neutral text */
-[pdx-theme="fluent"] .pdx-secondary:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
-    border-color: var(--pdx-color-border-strong);
-    background: transparent;
-    color: var(--pdx-color-text);
-}
-[pdx-theme="fluent"] .pdx-secondary:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
-    background: var(--pdx-color-inset);
-}
+[pdx-theme="fluent"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)), [pdx-theme="fluent"] .pdx-secondary:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+        border-color: var(--pdx-color-border-strong);
+        background: transparent;
+        color: var(--pdx-color-text);
+    }
+    [pdx-theme="fluent"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)), [pdx-theme="fluent"] .pdx-secondary:hover:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
+        background: var(--pdx-color-inset);
+    }
 
 /* Card: Fluent uses default bordered style — no overrides needed. */
 

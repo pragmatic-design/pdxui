@@ -104,12 +104,14 @@
    layer, would beat the component's focus and error colours (#519). */
 @pdx-theme fluent {
 /* Buttons: Fluent — compact (32px medium), no letter-spacing, semibold 600 */
-:is(button, a, [role="button"]):is(.pdx-primary, .pdx-secondary, .pdx-outline, .pdx-ghost, .pdx-link, .pdx-danger, .pdx-success, .pdx-warning, .pdx-info) {
-    letter-spacing: 0;
-    font-weight: var(--pdx-weight-semibold);
-    font-size: var(--pdx-text-sm);  /* body1Strong: 14px */
-    line-height: 1.25rem;       /* 20px */
-    padding: 5px 12px;          /* Fluent medium: 5px 12px → 32px height */
+@variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
+        letter-spacing: 0;
+        font-weight: var(--pdx-weight-semibold);
+        font-size: var(--pdx-text-sm);  /* body1Strong: 14px */
+        line-height: 1.25rem;       /* 20px */
+        padding: 5px 12px;          /* Fluent medium: 5px 12px → 32px height */
+    }
 }
 /* Fluent button sizes: height flows from --pdx-button-min-height, which divides the 0.9 density
    back out so the rendered height is the 32px Fluent medium states.
@@ -117,13 +119,15 @@
    Size variants (xs/sm) use the base buttons.css calc() with density scaling. */
 
 /* Secondary: Fluent "outline" — thin border, transparent bg, neutral text */
-.pdx-secondary {
-    border-color: var(--pdx-color-border-strong);
-    background: transparent;
-    color: var(--pdx-color-text);
-}
-.pdx-secondary:hover {
-    background: var(--pdx-color-inset);
+@variant pdx-button variant(secondary) {
+    :scope > [data-part="root"] {
+        border-color: var(--pdx-color-border-strong);
+        background: transparent;
+        color: var(--pdx-color-text);
+    }
+    :scope > [data-part="root"]:hover {
+        background: var(--pdx-color-inset);
+    }
 }
 
 /* Card: Fluent uses default bordered style — no overrides needed. */

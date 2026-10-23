@@ -114,26 +114,26 @@
 }
 
 /* ── Buttons: premium gradient + hover lift ── */
-[pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
-    background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
-}
-[pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
-    --pdx-button-transform-hover: translateY(-1px);
-}
-[pdx-theme="pragmatic"] .pdx-primary:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
-}
+[pdx-theme="pragmatic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+        /* The gradient is the theme's default: a page's `--pdx-button-bg` still wins (#154). */
+        background: var(--pdx-button-bg, linear-gradient(135deg, oklch(0.58 0.20 235), oklch(0.50 0.22 250)));
+    }
+    [pdx-theme="pragmatic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] .pdx-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+        --pdx-button-shadow-hover: 0 4px 16px oklch(0.50 0.20 235 / 0.35);
+        --pdx-button-transform-hover: translateY(-1px);
+    }
+    [pdx-theme="pragmatic"] :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"]:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] .pdx-primary:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+        background: var(--pdx-button-bg-hover, linear-gradient(135deg, oklch(0.52 0.22 235), oklch(0.45 0.24 250)));
+    }
 
-[pdx-theme="pragmatic"] .pdx-secondary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    border-color: light-dark(oklch(0.55 0.10 235 / 0.3), oklch(0.55 0.10 235 / 0.25));
-}
-[pdx-theme="pragmatic"] .pdx-secondary:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
-    /* Only retint the border on hover — the base .pdx-secondary darkens its OWN solid background
-       via filter: brightness(0.95); overriding `background` here wiped the solid fill out. */
-    border-color: var(--pdx-color-primary);
-}
+[pdx-theme="pragmatic"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] .pdx-secondary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+        border-color: light-dark(oklch(0.55 0.10 235 / 0.3), oklch(0.55 0.10 235 / 0.25));
+    }
+    [pdx-theme="pragmatic"] :where(pdx-button[variant="secondary"]) > [data-part="root"]:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] .pdx-secondary:hover:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {
+        /* Only retint the border on hover — the base .pdx-secondary darkens its OWN solid background
+           via filter: brightness(0.95); overriding `background` here wiped the solid fill out. */
+        border-color: var(--pdx-color-primary);
+    }
 
 /* ── Input: blue focus — standalone only; the wrapped ones use .pdx-input-wrap:focus-within
    (base) → niente doppio bordo interno+esterno. ── */
