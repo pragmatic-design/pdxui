@@ -6,10 +6,12 @@
    design build compiles it for `<pdx-button variant="ghost">` and for the native
    `<button class="pdx-ghost">` its axis maps. The body's `:is(button, a, [role="button"])[data-part="root"]`
    is the native element's selector with the root part for the class, so both forms weigh what the
-   class selector weighed. */
+   class selector weighed. It is written `:scope > …`: the inner <button> is the host's child, so the
+   rule cannot reach a nested component and takes no bound, which costs an ancestor walk per element
+   (the showcase's /tickets: 382 ms to render with it, against 255 on main; 223 without, against 214). */
 
 @variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         /* Local radius — button groups override this to 0/first/last */
         --_btn-r: var(--pdx-button-radius, var(--pdx-radius-md));
 
@@ -41,10 +43,10 @@
 /* The old names, `--pdx-button-hover-transform` and `-hover-shadow`, are read after the new ones so a
    theme written before #154 keeps its lift and glow. */
 @variant pdx-button variant(primary, secondary, danger, success, warning, info) {
-    :is(button, a, [role="button"])[data-part="root"]:hover {
+    :scope > :is(button, a, [role="button"])[data-part="root"]:hover {
         transform: var(--pdx-button-transform-hover, var(--pdx-button-hover-transform, none));
     }
-    :is(button, a, [role="button"])[data-part="root"]:hover:not(:focus-visible) {
+    :scope > :is(button, a, [role="button"])[data-part="root"]:hover:not(:focus-visible) {
         box-shadow: var(--pdx-button-shadow-hover, var(--pdx-button-hover-shadow, none));
     }
 }
@@ -61,7 +63,7 @@
     &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(primary) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         /* opt-in gradient: themes set --pdx-primary-gradient; default falls back to the solid color */
         background: var(--pdx-primary-gradient, var(--pdx-color-primary));
         color: var(--pdx-color-primary-text);
@@ -81,7 +83,7 @@
     &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(secondary) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-color-secondary);
         color: var(--pdx-color-secondary-text);
 
@@ -96,7 +98,7 @@
 }
 
 @variant pdx-button variant(outline) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: transparent;
         color: var(--pdx-color-text);
         border-color: light-dark(var(--pdx-gray-400), var(--pdx-gray-500));
@@ -121,7 +123,7 @@
 :is(button, a, [role="button"]).pdx-outline.pdx-outline-warning:hover { background: var(--pdx-warning-50); }
 
 @variant pdx-button variant(ghost) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: transparent;
         color: var(--pdx-color-muted);
 
@@ -140,7 +142,7 @@
     &:disabled, &[aria-disabled="true"] { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(danger) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-color-danger);
         color: var(--pdx-color-danger-text, white);
 
@@ -158,7 +160,7 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(success) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-color-success);
         color: var(--pdx-color-success-text, white);
         &:hover { filter: brightness(1.1); }
@@ -175,7 +177,7 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(warning) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-color-warning);
         color: var(--pdx-color-warning-text, var(--pdx-gray-900));
         &:hover { filter: brightness(0.92); }
@@ -194,7 +196,7 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; pointer-events: none; }
 }
 @variant pdx-button variant(info) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-color-accent);
         color: var(--pdx-color-accent-text);
         &:hover { filter: brightness(1.1); }
@@ -204,7 +206,7 @@
 }
 
 @variant pdx-button variant(link) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: transparent;
         color: var(--pdx-color-primary-ink);
         padding: 0;
@@ -225,63 +227,63 @@
    rules above: the variant classes on a chip or a badge are not a button and do not take them. A
    variant whose hover is a `filter` keeps it; its hover background is the token, or its own. */
 @variant pdx-button variant(primary) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-primary-gradient, var(--pdx-color-primary)));
         color: var(--pdx-button-color, var(--pdx-color-primary-text));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-primary-hover)); }
     }
 }
 @variant pdx-button variant(secondary) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-color-secondary));
         color: var(--pdx-button-color, var(--pdx-color-secondary-text));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-secondary))); }
     }
 }
 @variant pdx-button variant(outline) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, transparent);
         color: var(--pdx-button-color, var(--pdx-color-text));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-inset)); }
     }
 }
 @variant pdx-button variant(ghost) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, transparent);
         color: var(--pdx-button-color, var(--pdx-color-muted));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-inset)); color: var(--pdx-button-color, var(--pdx-color-text)); }
     }
 }
 @variant pdx-button variant(danger) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-color-danger));
         color: var(--pdx-button-color, var(--pdx-color-danger-text, white));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-color-danger-hover)); }
     }
 }
 @variant pdx-button variant(success) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-color-success));
         color: var(--pdx-button-color, var(--pdx-color-success-text, white));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-success))); }
     }
 }
 @variant pdx-button variant(warning) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-color-warning));
         color: var(--pdx-button-color, var(--pdx-color-warning-text, var(--pdx-gray-900)));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-warning))); }
     }
 }
 @variant pdx-button variant(info) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, var(--pdx-color-accent));
         color: var(--pdx-button-color, var(--pdx-color-accent-text));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, var(--pdx-color-accent))); }
     }
 }
 @variant pdx-button variant(link) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         background: var(--pdx-button-bg, transparent);
         color: var(--pdx-button-color, var(--pdx-color-primary-ink));
         &:hover { background: var(--pdx-button-bg-hover, var(--pdx-button-bg, transparent)); color: var(--pdx-button-color, var(--pdx-color-primary-hover)); }
@@ -294,7 +296,7 @@
    default/material stay at xs 1.75, sm 2.125, lg 3, xl 3.5.
    The same offsets are used for .pdx-input-{size} → the button↔input alignment is preserved. */
 @variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(xs) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         padding: 0 var(--pdx-space-xs);
         font-size: var(--pdx-text-xs);
         height: calc((var(--pdx-button-min-height) - 0.75rem) * var(--pdx-density-factor, 1));
@@ -303,7 +305,7 @@
 }
 
 @variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(sm) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         padding: 0 var(--pdx-space-sm);
         font-size: var(--pdx-text-sm);
         height: calc((var(--pdx-button-min-height) - 0.375rem) * var(--pdx-density-factor, 1));
@@ -312,7 +314,7 @@
 }
 
 @variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(lg) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         padding: 0 var(--pdx-space-lg);
         font-size: var(--pdx-text-base);
         height: calc((var(--pdx-button-min-height) + 0.5rem) * var(--pdx-density-factor, 1));
@@ -321,7 +323,7 @@
 }
 
 @variant pdx-button variant(primary, secondary, outline, ghost, link, danger, success, warning, info) and size(xl) {
-    :is(button, a, [role="button"])[data-part="root"] {
+    :scope > :is(button, a, [role="button"])[data-part="root"] {
         padding: 0 var(--pdx-space-xl);
         font-size: var(--pdx-text-lg);
         height: calc((var(--pdx-button-min-height) + 1rem) * var(--pdx-density-factor, 1));
@@ -337,17 +339,17 @@
 
 /* Active/pressed feedback */
 @variant pdx-button variant(primary, secondary, outline, danger, success, warning, info) {
-    [data-part="root"]:active:not(:disabled) {
+    :scope > [data-part="root"]:active:not(:disabled) {
         transform: scale(0.97);
     }
 }
 @variant pdx-button variant(ghost) {
-    [data-part="root"]:active:not(:disabled) {
+    :scope > [data-part="root"]:active:not(:disabled) {
         background: var(--pdx-color-inset);
     }
 }
 @variant pdx-button variant(ghost, outline) {
-    [aria-pressed="true"][data-part="root"] {
+    :scope > [aria-pressed="true"][data-part="root"] {
         background: light-dark(oklch(from var(--pdx-color-primary) l c h / 0.1), oklch(from var(--pdx-color-primary) l c h / 0.2));
         color: var(--pdx-color-primary-ink);
         border-color: var(--pdx-color-primary);
@@ -457,28 +459,28 @@
 }
 
 @variant pdx-button variant(danger, primary) {
-    [data-part="root"].pdx-loading::after {
+    :scope > [data-part="root"].pdx-loading::after {
         border-color: var(--pdx-color-primary-text);
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(secondary, ghost) {
-    [data-part="root"].pdx-loading::after {
+    :scope > [data-part="root"].pdx-loading::after {
         border-color: var(--pdx-color-text);
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(success, info) {
-    [data-part="root"].pdx-loading::after {
+    :scope > [data-part="root"].pdx-loading::after {
         border-color: light-dark(white, var(--pdx-gray-950));
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(warning) {
-    [data-part="root"].pdx-loading::after {
+    :scope > [data-part="root"].pdx-loading::after {
         border-color: var(--pdx-gray-900);
         border-right-color: transparent;
     }
@@ -498,29 +500,29 @@
     background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
 }
 @variant pdx-button variant(primary) {
-    [data-part="root"].pdx-pressed,
-    [data-part="root"].pdx-pressed:hover {
+    :scope > [data-part="root"].pdx-pressed,
+    :scope > [data-part="root"].pdx-pressed:hover {
         background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
     }
 }
 @variant pdx-button variant(secondary) {
-    [data-part="root"].pdx-pressed,
-    [data-part="root"].pdx-pressed:hover {
+    :scope > [data-part="root"].pdx-pressed,
+    :scope > [data-part="root"].pdx-pressed:hover {
         background: var(--pdx-color-border);
         color: var(--pdx-color-text);
     }
 }
 @variant pdx-button variant(outline) {
-    [data-part="root"].pdx-pressed,
-    [data-part="root"].pdx-pressed:hover {
+    :scope > [data-part="root"].pdx-pressed,
+    :scope > [data-part="root"].pdx-pressed:hover {
         background: var(--pdx-color-primary);
         color: var(--pdx-color-primary-text);
         border-color: var(--pdx-color-primary);
     }
 }
 @variant pdx-button variant(ghost) {
-    [data-part="root"].pdx-pressed,
-    [data-part="root"].pdx-pressed:hover {
+    :scope > [data-part="root"].pdx-pressed,
+    :scope > [data-part="root"].pdx-pressed:hover {
         background: var(--pdx-color-inset);
     }
 }

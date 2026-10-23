@@ -181,17 +181,33 @@ const ROOT_PART = /\[data-part=(["']?)root\1\]/g;
 // Match: a pseudo-element ending a selector. Groups: [1]=the pseudo-element
 const PSEUDO_ELEMENT = /(::[\w-]+(?:\([^)]*\))?|:(?:before|after|first-line|first-letter))$/;
 
-/** One selector of a library rule: under the host test and bounded, then its native form if it has one. */
+/** The native form of a selector: its root part replaced by the native selector, when it names no other part. */
+function nativeForm(selector: string, native: string | undefined): string | undefined {
+    const parts = selector.match(/\[data-part=/g)?.length ?? 0;
+    const rootParts = selector.match(ROOT_PART)?.length ?? 0;
+    if (native === undefined || rootParts === 0 || rootParts !== parts) return undefined;
+    return selector.replace(ROOT_PART, native);
+}
+
+/**
+ * One selector of a library rule: under the host test, then its native form if it has one. A
+ * descendant of the host is bounded at nested components; a child of the host, `:scope > S`, cannot
+ * be inside one and is not — the bound costs the browser an ancestor walk per candidate element.
+ */
 function librarySelector(selector: string, host: string, native: string | undefined): string {
     // Match: a leading `:scope`, the host itself. Groups: none
-    if (/^:scope(?![\w-])/.test(selector)) return `:where(${host})${selector.slice(':scope'.length)}`;
+    if (/^:scope(?![\w-])/.test(selector)) {
+        const rest = selector.slice(':scope'.length);
+        // Match: a child combinator after `:scope`. Groups: [1]=the child selector
+        const child = /^\s*>\s*(.+)$/s.exec(rest)?.[1];
+        const own = child === undefined ? undefined : nativeForm(child, native);
+        return `:where(${host})${rest}${own === undefined ? '' : `, ${own}`}`;
+    }
     const pseudo = PSEUDO_ELEMENT.exec(selector)?.[1] ?? '';
     const base = selector.slice(0, selector.length - pseudo.length);
     const bounded = `:where(${host}) ${base}:not(:where(${host} [data-pdx-root] ${base}))${pseudo}`;
-    const parts = selector.match(/\[data-part=/g)?.length ?? 0;
-    const rootParts = selector.match(ROOT_PART)?.length ?? 0;
-    if (native === undefined || rootParts === 0 || rootParts !== parts) return bounded;
-    return `${bounded}, ${selector.replace(ROOT_PART, native)}`;
+    const own = nativeForm(selector, native);
+    return own === undefined ? bounded : `${bounded}, ${own}`;
 }
 
 /**

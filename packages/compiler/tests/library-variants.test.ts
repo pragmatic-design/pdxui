@@ -57,6 +57,13 @@ describe('a rule in a component\'s own stylesheet', () => {
             ':where(pdx-button[size="lg"]), :where(pdx-button[size="lg"]):hover { display: block; }');
     });
 
+    it('a child of the host, `:scope > S`, needs no bound, and its root part yields the native selector', () => {
+        expect(expandLibraryVariants('@variant variant(ghost) { :scope > button[data-part="root"]:hover { color: red; } }', 'pdx-button', axesOf)).toBe(
+            ':where(pdx-button[variant="ghost"]) > button[data-part="root"]:hover, button.pdx-ghost:hover { color: red; }');
+        expect(expandLibraryVariants('@variant size(sm) { :scope > [data-part="root"] { padding: 0; } }', 'pdx-button', axesOf), 'no native selector: the host form alone')
+            .toBe(':where(pdx-button[size="sm"]) > [data-part="root"] { padding: 0; }');
+    });
+
     it('a pseudo-element stays last, after the bound', () => {
         expect(expandLibraryVariants('@variant variant(ghost) { [data-part="root"]::before { content: ""; } }', 'pdx-button', axesOf)).toBe(
             ':where(pdx-button[variant="ghost"]) [data-part="root"]:not(:where(pdx-button[variant="ghost"] [data-pdx-root] [data-part="root"]))::before, '
