@@ -11,6 +11,7 @@ const SOURCE = [
     "component('pdx-widget', {",
     '    variants: {',
     "        variant: { primary: '.pdx-primary', solid: '.pdx-primary', ghost: '.pdx-ghost' },",
+    '        /** md (the default), sm or lg — the scale of pdx-input. */',
     "        size: ['md', 'sm', 'lg'],",
     '    },',
     '    render: () => html`<div></div>`,',
@@ -36,6 +37,13 @@ describe('gen-manifest reads a descriptor\'s variants', () => {
             .toMatchObject({ kind: 'field', type: { text: "'md' | 'sm' | 'lg'" }, default: "'md'", attribute: 'size' });
         expect(d.attributes.find((a: { fieldName: string }) => a.fieldName === 'variant'))
             .toMatchObject({ name: 'variant', type: { text: "'primary' | 'solid' | 'ghost'" }, default: "'primary'" });
+    });
+
+    it('an axis\'s JSDoc describes its prop; without one, the shared description does', () => {
+        const d = declaration();
+        const described = (name: string) => d.members.find((m: { name: string }) => m.name === name)?.description;
+        expect(described('size')).toBe('md (the default), sm or lg — the scale of pdx-input.');
+        expect(described('variant')).toBe('Visual variant.');
     });
 
     it('a component that declares none has no variants entry', () => {

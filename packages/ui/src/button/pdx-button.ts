@@ -26,11 +26,19 @@ const VARIANT_MAP: Record<string, string> = {
  * the action keeps on its `error()`; the button is idle again.
  */
 component('pdx-button', {
-    props: {
-        variant: { type: String, default: 'primary', enum: ['solid', 'primary', 'secondary', 'outline', 'ghost', 'link', 'danger', 'success', 'warning', 'info'] },
-        // Five sizes, as buttons.css draws them (`[size]`).
+    // The axes its stylesheet keys by (#512), reflected on the host; each value maps the selector that
+    // draws the same look on a native <button>. Five sizes, the same scale as pdx-input and pdx-select.
+    variants: {
+        /** Visual variant. */
+        variant: {
+            primary: '.pdx-primary', solid: '.pdx-primary', secondary: '.pdx-secondary', outline: '.pdx-outline',
+            ghost: '.pdx-ghost', link: '.pdx-link', danger: '.pdx-danger', success: '.pdx-success',
+            warning: '.pdx-warning', info: '.pdx-info',
+        },
         /** xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. */
-        size: { type: String, default: '', enum: ['xs', 'sm', 'md', 'lg', 'xl'] },
+        size: { md: '[size="md"]', xs: '[size="xs"]', sm: '[size="sm"]', lg: '[size="lg"]', xl: '[size="xl"]' },
+    },
+    props: {
         disabled: { type: Boolean, default: false },
         loading: { type: Boolean, default: false },
         type: { type: String, default: 'button', enum: ['button', 'submit', 'reset'] },
@@ -140,7 +148,7 @@ component('pdx-button', {
             requestAnimationFrame(() => {
                 const btn = ctx.el.querySelector('button');
                 if (!btn) return;
-                if (s) btn.setAttribute('size', s);
+                if (s !== 'md') btn.setAttribute('size', s);
                 else btn.removeAttribute('size');
                 if (f) btn.setAttribute('full', '');
                 else btn.removeAttribute('full');
@@ -166,6 +174,7 @@ component('pdx-button', {
     // an icon-only button would be read "button".
     render: (ctx) => html`
         <button
+            data-part="root"
             :type=${() => ctx.type()}
             :class=${() => ctx.getClass()}
             :disabled=${() => ctx.isDisabled()}

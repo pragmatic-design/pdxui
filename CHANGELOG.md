@@ -11,6 +11,11 @@ semver.
 
 ### Features
 
+- `pdx-button` declares its variants (#512): `variant` and `size` are reflected on the host
+  (`<pdx-button variant="ghost" size="sm">`), and `size` defaults to `'md'` instead of `''`. Its rules in
+  `@pdxui/design` are written once as `@variant pdx-button …` and compiled for the host and for the
+  native `<button class="pdx-ghost">`; the inner `<button>` still carries the variant class, until the
+  theme rules move as well.
 - `@variant` takes several values of one axis, `@variant variant(ghost, danger) { … }`, and matches any of
   them, in a `.pdx` and in `@pdxui/design` alike (#512). Before, a list was ignored and the rule
   applied to every value.

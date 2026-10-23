@@ -3229,26 +3229,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "'solid' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
-              },
-              "default": "'primary'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -3354,6 +3334,74 @@
                 "text": "object"
               },
               "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "Visual variant.",
+              "type": {
+                "text": "'primary' | 'solid' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
+              },
+              "default": "'primary'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "primary",
+                "solid",
+                "secondary",
+                "outline",
+                "ghost",
+                "link",
+                "danger",
+                "success",
+                "warning",
+                "info"
+              ],
+              "default": "primary",
+              "native": {
+                "primary": ".pdx-primary",
+                "solid": ".pdx-primary",
+                "secondary": ".pdx-secondary",
+                "outline": ".pdx-outline",
+                "ghost": ".pdx-ghost",
+                "link": ".pdx-link",
+                "danger": ".pdx-danger",
+                "success": ".pdx-success",
+                "warning": ".pdx-warning",
+                "info": ".pdx-info"
+              }
+            },
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": "[size=\"md\"]",
+                "xs": "[size=\"xs\"]",
+                "sm": "[size=\"sm\"]",
+                "lg": "[size=\"lg\"]",
+                "xl": "[size=\"xl\"]"
+              }
             }
           ],
           "events": [
@@ -3375,24 +3423,6 @@
             }
           ],
           "attributes": [
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "'solid' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
-              },
-              "default": "'primary'"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''"
-            },
             {
               "name": "disabled",
               "fieldName": "disabled",
@@ -3473,6 +3503,24 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "Visual variant.",
+              "type": {
+                "text": "'primary' | 'solid' | 'secondary' | 'outline' | 'ghost' | 'link' | 'danger' | 'success' | 'warning' | 'info'"
+              },
+              "default": "'primary'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [

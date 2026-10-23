@@ -18,6 +18,22 @@ describe('pdx-button', () => {
         expect(btn?.className).toContain('pdx-danger');
     });
 
+    it('reflects its variant and size on the host, the defaults included (#512)', async () => {
+        const plain = await mount('pdx-button');
+        expect([plain.getAttribute('variant'), plain.getAttribute('size')]).toEqual(['primary', 'md']);
+        const ghost = await mount('pdx-button', { variant: 'ghost', size: 'sm' });
+        expect([ghost.getAttribute('variant'), ghost.getAttribute('size')]).toEqual(['ghost', 'sm']);
+        expect(ghost.querySelector('button')?.getAttribute('data-part'), 'the root part the @variant rules key on').toBe('root');
+        expect(ghost.querySelector('button')?.getAttribute('size'), 'the native size is kept on the inner button').toBe('sm');
+        expect(plain.querySelector('button')?.hasAttribute('size'), 'md is the native default: no attribute').toBe(false);
+    });
+
+    it('a variant outside the axis reflects the default', async () => {
+        const el = await mount('pdx-button', { variant: 'fancy' });
+        await tick();
+        expect(el.getAttribute('variant')).toBe('primary');
+    });
+
     it('disabled prop disables the button', async () => {
         const el = await mount('pdx-button', { disabled: '' });
         await tick();

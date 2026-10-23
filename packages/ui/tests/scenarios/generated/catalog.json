@@ -317,6 +317,66 @@
         {
           "id": "button-labels",
           "title": "Button — Labels of every variant"
+        },
+        {
+          "id": "button-variant-primary",
+          "title": "pdx-button — variant=\"primary\""
+        },
+        {
+          "id": "button-variant-solid",
+          "title": "pdx-button — variant=\"solid\""
+        },
+        {
+          "id": "button-variant-secondary",
+          "title": "pdx-button — variant=\"secondary\""
+        },
+        {
+          "id": "button-variant-outline",
+          "title": "pdx-button — variant=\"outline\""
+        },
+        {
+          "id": "button-variant-ghost",
+          "title": "pdx-button — variant=\"ghost\""
+        },
+        {
+          "id": "button-variant-link",
+          "title": "pdx-button — variant=\"link\""
+        },
+        {
+          "id": "button-variant-danger",
+          "title": "pdx-button — variant=\"danger\""
+        },
+        {
+          "id": "button-variant-success",
+          "title": "pdx-button — variant=\"success\""
+        },
+        {
+          "id": "button-variant-warning",
+          "title": "pdx-button — variant=\"warning\""
+        },
+        {
+          "id": "button-variant-info",
+          "title": "pdx-button — variant=\"info\""
+        },
+        {
+          "id": "button-size-md",
+          "title": "pdx-button — size=\"md\""
+        },
+        {
+          "id": "button-size-xs",
+          "title": "pdx-button — size=\"xs\""
+        },
+        {
+          "id": "button-size-sm",
+          "title": "pdx-button — size=\"sm\""
+        },
+        {
+          "id": "button-size-lg",
+          "title": "pdx-button — size=\"lg\""
+        },
+        {
+          "id": "button-size-xl",
+          "title": "pdx-button — size=\"xl\""
         }
       ]
     },

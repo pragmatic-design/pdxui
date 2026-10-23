@@ -54,17 +54,31 @@ function splitList(list: string): string[] {
     return parts.map((s) => s.trim()).filter(Boolean);
 }
 
+/** The CSS with each comment blanked to spaces, so offsets hold and a brace in a comment is not one. */
+function maskComments(css: string): string {
+    return css.replace(/\/\*[\s\S]*?\*\//g, (c) => ' '.repeat(c.length));
+}
+
+/**
+ * A prelude split where its head starts: the whitespace and comments before it, kept as written, and
+ * the head. A comment may name `@variant` or hold a `{`-free selector; it is never read as the head.
+ */
+function splitPrelude(prelude: string): { lead: string; head: string } {
+    const start = maskComments(prelude).search(/\S/);
+    if (start < 0) return { lead: prelude, head: '' };
+    return { lead: prelude.slice(0, start), head: prelude.slice(start).trim() };
+}
+
 /** The rules of a `@variant` body, each selector rewritten by `under`. */
 function rewriteBody(body: string, tests: string, under: (tests: string, selector: string) => string): string {
+    const masked = maskComments(body);
     let out = '';
     let pos = 0;
     while (pos < body.length) {
-        const open = body.indexOf('{', pos);
+        const open = masked.indexOf('{', pos);
         if (open === -1) { out += body.slice(pos); break; }
-        const end = blockEnd(body, open);
-        const prelude = body.slice(pos, open);
-        const lead = prelude.match(/^\s*/)?.[0] ?? '';
-        const head = prelude.trim();
+        const end = blockEnd(masked, open);
+        const { lead, head } = splitPrelude(body.slice(pos, open));
         if (head.startsWith('@')) {
             // An at-rule inside a variant (`@media`): its rules are rewritten too.
             out += `${lead}${head} {${rewriteBody(body.slice(open + 1, end), tests, under)}}`;
@@ -87,15 +101,15 @@ const NESTING = /^@(media|supports|layer|container|pdx-theme)\b/i;
  */
 export function expandVariantBlocks(css: string, under: (tests: string, selector: string) => string): string {
     if (!css.includes('@variant')) return css;
+    const masked = maskComments(css);
     let out = '';
     let pos = 0;
     while (pos < css.length) {
-        const open = css.indexOf('{', pos);
+        const open = masked.indexOf('{', pos);
         if (open === -1) { out += css.slice(pos); break; }
-        const end = blockEnd(css, open);
+        const end = blockEnd(masked, open);
         const prelude = css.slice(pos, open);
-        const head = prelude.trim();
-        const lead = prelude.slice(0, prelude.length - prelude.trimStart().length);
+        const { lead, head } = splitPrelude(prelude);
         // Match: `@variant` followed by its tests. Groups: [1]=the tests
         const variant = /^@variant\s+(.+)$/s.exec(head);
         if (variant) {
@@ -167,17 +181,33 @@ const ROOT_PART = /\[data-part=(["']?)root\1\]/g;
 // Match: a pseudo-element ending a selector. Groups: [1]=the pseudo-element
 const PSEUDO_ELEMENT = /(::[\w-]+(?:\([^)]*\))?|:(?:before|after|first-line|first-letter))$/;
 
-/** One selector of a library rule: under the host test and bounded, then its native form if it has one. */
+/** The native form of a selector: its root part replaced by the native selector, when it names no other part. */
+function nativeForm(selector: string, native: string | undefined): string | undefined {
+    const parts = selector.match(/\[data-part=/g)?.length ?? 0;
+    const rootParts = selector.match(ROOT_PART)?.length ?? 0;
+    if (native === undefined || rootParts === 0 || rootParts !== parts) return undefined;
+    return selector.replace(ROOT_PART, native);
+}
+
+/**
+ * One selector of a library rule: under the host test, then its native form if it has one. A
+ * descendant of the host is bounded at nested components; a child of the host, `:scope > S`, cannot
+ * be inside one and is not — the bound costs the browser an ancestor walk per candidate element.
+ */
 function librarySelector(selector: string, host: string, native: string | undefined): string {
     // Match: a leading `:scope`, the host itself. Groups: none
-    if (/^:scope(?![\w-])/.test(selector)) return `:where(${host})${selector.slice(':scope'.length)}`;
+    if (/^:scope(?![\w-])/.test(selector)) {
+        const rest = selector.slice(':scope'.length);
+        // Match: a child combinator after `:scope`. Groups: [1]=the child selector
+        const child = /^\s*>\s*(.+)$/s.exec(rest)?.[1];
+        const own = child === undefined ? undefined : nativeForm(child, native);
+        return `:where(${host})${rest}${own === undefined ? '' : `, ${own}`}`;
+    }
     const pseudo = PSEUDO_ELEMENT.exec(selector)?.[1] ?? '';
     const base = selector.slice(0, selector.length - pseudo.length);
     const bounded = `:where(${host}) ${base}:not(:where(${host} [data-pdx-root] ${base}))${pseudo}`;
-    const parts = selector.match(/\[data-part=/g)?.length ?? 0;
-    const rootParts = selector.match(ROOT_PART)?.length ?? 0;
-    if (native === undefined || rootParts === 0 || rootParts !== parts) return bounded;
-    return `${bounded}, ${selector.replace(ROOT_PART, native)}`;
+    const own = nativeForm(selector, native);
+    return own === undefined ? bounded : `${bounded}, ${own}`;
 }
 
 /**

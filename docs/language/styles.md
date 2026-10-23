@@ -411,7 +411,13 @@ which reads: under the host's attribute test, and never inside another component
 component host with `data-pdx-root`, so a rule on the card's root does not reach the root of a
 component nested in the card. The host test sits in `:where()`, so a rule weighs what `S` weighs.
 `:scope` is the host, `:where(pdx-button[variant="ghost"])`; a pseudo-element stays last, after the
-bound. The form is the same on both targets: the
+bound. A child of the host, `:scope > S`, cannot be inside a nested component and takes no bound:
+`:where(pdx-button[variant="ghost"]) > S`, and its native form is `S` with the root part replaced. The
+bound costs the browser a walk up the ancestors for every element `S` matches; on the showcase's
+`/tickets`, `pdx-button`'s rules written as descendants took the page from 255 to 382 ms to render
+(median of 15 cold loads, against main the same hour), and written as children of the host they
+cost nothing measurable (223 ms against main's 214). A part the host renders as its
+child is written `:scope > [data-part="…"]`. The form is the same on both targets: the
 design CSS is not scoped, and `:where()` and `:not()` with complex selectors are in `baseline-2024`.
 
 Where the axis gives a value a native selector, the same rule also yields it. The root part,
