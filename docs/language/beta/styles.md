@@ -111,14 +111,32 @@ attribute (`variant="ghost"`), and compiles each `@variant` rule of the style bl
 those attributes inside the component's scope — `:scope[variant="ghost"] …` under `baseline-2026`,
 `[data-pdx-H][variant="ghost"] …` under `baseline-2024`. `and` combines axes (compound variants). The
 values are CSS; colours are tokens. The manifest lists every axis and value, and certification
-generates one scenario per value. Descriptor: `variants: { size: ['sm', 'md', 'lg'] }`, with the same
-`@variant` rules in the component's stylesheet, processed by the design build.
+generates one scenario per value.
+
+In the library, `@variant` is the one source of every variant's look (maintainer decision 2026-10-23),
+and the CSS-only classes are produced from the same rules:
+- **The descriptor** declares the axes: a list, `size: ['md', 'sm', 'lg']`, or a record from value to
+  native selector, `variant: { primary: '.pdx-primary', ghost: '.pdx-ghost' }`. The first entry is the
+  default.
+- **The rules** live in `@pdxui/design`. In the component's own stylesheet
+  (`components/<name>.css`), the tag is implied. In a theme source or any other stylesheet, the rule
+  names it: `@variant pdx-button variant(primary) { … }`.
+- **The design build** compiles each body selector `S` to
+  `:where(<tag>[<axis>="<value>"]) S:not(:where(<tag>[…] [data-pdx-root] S))`: under the host's
+  attribute, never inside a nested component, with the weight of `S`. The form is the same on both
+  targets. Where the value has a native selector, the build also emits `S` with the root part
+  (`[data-part="root"]`) replaced by that selector, in the same rule.
+- **Open values** such as a free colour stay plain props.
+
+The full text is in [styles.md](../styles.md).
 
 **Landed** (#153) for a `.pdx`: `@variants`, `@variant` on both targets (and `:host(…)` under
 `<template shadow>`), `PDX_VARIANT_UNKNOWN`, `PDX_VARIANT_UNSTYLED`, and `PDX_VARIANTS_MALFORMED` for an
-axis that cannot be read; the full rewrite is in [styles.md](../styles.md). The library half — the
-descriptor's `variants`, the design build, the manifest and certification, `pdx-button` migrated — is
-#512.
+axis that cannot be read; the full rewrite is in [styles.md](../styles.md). **Specified** (#626) for
+the library: the form above. **Pending:**
+- #512: the descriptor's `variants`, the design build with both checks against the manifest, the
+  certification, and `pdx-button` migrated with its themes;
+- #627–#633: the rest of the library, one family per issue.
 
 ### Rules
 

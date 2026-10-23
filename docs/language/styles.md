@@ -359,6 +359,8 @@ VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                
 VariantAxis    ::= Word S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"?
 VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
 VariantTest    ::= Word S? "(" S? Word S? ")"
+LibraryRule    ::= "@variant" S ( TagName S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
+TagName        ::= "pdx-" Word
 ```
 
 #### Semantics
@@ -380,6 +382,40 @@ does everywhere: `:where(:scope)[data-pdx-HASH][variant="ghost"] .label` inside 
 sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Under
 `<template shadow>` the test is `:host([variant="ghost"])`.
 
+**In the library** (specified by #626, lands with #512). A library component declares its axes in its
+descriptor instead of a script. An axis is a list of values, `size: ['md', 'sm', 'lg']`, or a record
+from each value to the selector that draws the same look on native HTML,
+`variant: { primary: '.pdx-primary', solid: '.pdx-primary', ghost: '.pdx-ghost' }`; the first entry
+is the default. Both forms generate what `@variants` generates — a typed prop per axis, reflected on
+the host — and `packages/ui/custom-elements.json` lists every axis with its values, its default and
+its native selectors.
+
+The rules live in `@pdxui/design`. In the component's own stylesheet,
+`packages/design/src/components/<name>.css` for `pdx-<name>`, the tag is implied and may be written.
+Anywhere else — a surface stylesheet, a theme source inside `@pdx-theme`, the theme engine's output —
+the rule names it: `@variant pdx-button variant(primary) { … }`. The design build compiles every rule
+with the transform a `.pdx` uses (`expandVariantRules`). A selector `S` of the body is relative to the
+host, as in a `.pdx`, and becomes
+
+```css
+:where(pdx-button[variant="ghost"]) S:not(:where(pdx-button[variant="ghost"] [data-pdx-root] S))
+```
+
+which reads: under the host's attribute test, and never inside another component. Core marks every
+component host with `data-pdx-root`, so a rule on the card's root does not reach the root of a
+component nested in the card. The host test sits in `:where()`, so a rule weighs what `S` weighs.
+`:scope` is the host, `:where(pdx-button[variant="ghost"])`. The form is the same on both targets: the
+design CSS is not scoped, and `:where()` and `:not()` with complex selectors are in `baseline-2024`.
+
+Where the axis gives a value a native selector, the same rule also yields it. The root part,
+`[data-part="root"]`, is the element the native selector goes on, so `[data-part="root"]` in `S` is
+replaced by the selector: `[data-part="root"]:hover` → `.pdx-ghost:hover`. A class for an attribute
+keeps the rule's weight. A selector that names another part has no native form and yields the host
+selector alone. Values that share a native selector (`solid` and `primary` both give `.pdx-primary`)
+share their rules: the host test names them all, `:where(pdx-button:is([variant="primary"],
+[variant="solid"]))`. In a theme source the expansion runs before the theme's guard (`gen-themes.mjs`),
+so every selector it yields takes the theme root and the nested-theme guard like any other theme rule.
+
 #### Rules
 
 - An axis without values, declared twice, or whose default is not one of its values:
@@ -390,6 +426,17 @@ sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Un
   (warning). The default is the base rules' look and is never reported.
 - The values are CSS: a colour in them is a token, like any colour in a component (CD-C3).
 - An `@variant` in a plain `<style>` block is copied as written: the browser drops it.
+- In the library, the design build checks the rules against `custom-elements.json`, so it runs after
+  `pnpm --dir packages/ui run manifest`. A rule naming a tag, an axis or a value the manifest does not
+  declare is `PDX_VARIANT_UNKNOWN`, and fails the build. A declared value other than the default that no
+  rule of the package styles is `PDX_VARIANT_UNSTYLED`. A rule outside the component's own stylesheet
+  that does not name its tag is `PDX_VARIANT_UNKNOWN`.
+- An axis is a closed set of values the CSS draws. An open value, such as a free colour
+  (`pdx-avatar`'s `color`), stays a plain prop.
+- A native selector is a compound: a class (`.pdx-ghost`) or the attributes the native form needs. It
+  keeps the rule's weight only when it is one class or one attribute, like the part it replaces.
+- Rules outside `@variant` are plain CSS. A component's base look, and its states (`.pdx-loading`),
+  are written as such.
 
 #### Examples
 
@@ -417,9 +464,47 @@ sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Un
 `<app-button variant="ghost" size="sm">` matches the last three rules; the props are typed
 `variant?: 'primary' | 'ghost'` and `size?: 'sm' | 'md'`.
 
+In the library, the descriptor declares the axes and their native selectors:
+
+```ts
+component('pdx-button', {
+    variants: {
+        variant: { primary: '.pdx-primary', solid: '.pdx-primary', ghost: '.pdx-ghost' },
+        size: ['md', 'sm', 'lg'],
+    },
+    // …
+});
+```
+
+The component's stylesheet writes the rules once. The tag is implied:
+
+```css
+/* packages/design/src/components/button.css */
+@variant variant(ghost) {
+    [data-part="root"] { background: var(--pdx-button-bg, transparent); color: var(--pdx-color-muted); }
+}
+```
+
+The design build compiles that to one rule for `pdx-button variant="ghost"` and for a native
+`<button class="pdx-ghost">`:
+
+```css
+:where(pdx-button[variant="ghost"]) [data-part="root"]:not(:where(pdx-button[variant="ghost"] [data-pdx-root] [data-part="root"])),
+.pdx-ghost { background: var(--pdx-button-bg, transparent); color: var(--pdx-color-muted); }
+```
+
+A theme source names the tag:
+
+```css
+/* packages/design/theme-sources/material.css */
+@pdx-theme material {
+    @variant pdx-button variant(primary) { [data-part="root"]:hover { box-shadow: var(--pdx-shadow-sm); } }
+}
+```
+
 #### Since
 
-beta (#153)
+beta (#153). The library form is specified by #626 and lands with #512.
 
 ### Component tokens
 
