@@ -17,8 +17,10 @@ semver.
   first value, and is reflected on the host as an attribute; a value outside the axis reflects the
   default. The manifest lists every axis with its values, its default and the native selectors a record
   gives (`variants` in `custom-elements.json`), and `pnpm certify:gen` generates one scenario per value,
-  each with the rule that the host reflects it. The design build's `@variant` rules and the library's
-  migration follow in #512 and #627–#633.
+  each with the rule that the host reflects it. `@pdxui/design` compiles `@variant` rules in its
+  stylesheets and theme sources to the host's attribute test, bounded at nested components, plus the
+  native selector a value maps, and checks them against the manifest. The library's migration follows
+  in #512 and #627–#633.
 - The library's menus and pickers take a parent's typed snippet (#491):
   - `pdx-select`: `item(option, index)` and `selected(option)`;
   - `pdx-autocomplete`: `option(option, index, highlighted)`;

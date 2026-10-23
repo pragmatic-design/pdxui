@@ -13,6 +13,7 @@
 // baseline-2026, `[data-pdx-H][variant="ghost"]…` under baseline-2024.
 
 import type { HostAttr, PropInfo } from './script-analyzer-types';
+import { expandVariantBlocks, VARIANT_TEST } from './variant-css';
 
 /** One axis of `@variants`: its name, its values in order, and the default (always one of them). */
 export interface VariantAxis {
@@ -84,34 +85,6 @@ export function variantHostAttrs(axes: VariantAxis[]): HostAttr[] {
     return axes.map((a) => ({ name: `:${a.name}`, value: a.name }));
 }
 
-/** Where a block that starts at `open` (a `{`) closes. */
-function blockEnd(css: string, open: number): number {
-    let depth = 0;
-    for (let i = open; i < css.length; i++) {
-        if (css[i] === '{') depth++;
-        else if (css[i] === '}' && --depth === 0) return i;
-    }
-    return css.length - 1;
-}
-
-// Match: one test of a `@variant` prelude. Groups: [1]=axis [2]=value
-const TEST = /(\w+)\s*\(\s*([\w-]+)\s*\)/g;
-
-/** The selectors of a list, split at its top-level commas. */
-function splitList(list: string): string[] {
-    const parts: string[] = [];
-    let depth = 0;
-    let start = 0;
-    for (let i = 0; i < list.length; i++) {
-        const c = list[i];
-        if (c === '(' || c === '[') depth++;
-        else if (c === ')' || c === ']') depth--;
-        else if (c === ',' && depth === 0) { parts.push(list.slice(start, i)); start = i + 1; }
-    }
-    parts.push(list.slice(start));
-    return parts.map((s) => s.trim()).filter(Boolean);
-}
-
 /** One selector under the variant's host test: `S` → `HOST S`, `:scope…` → `HOST…`. */
 function underHost(sel: string, host: string): string {
     // Match: a leading `:scope` that is the whole compound's start. Groups: none
@@ -119,58 +92,14 @@ function underHost(sel: string, host: string): string {
     return `${host} ${sel}`;
 }
 
-/** The rules of a `@variant` body, each selector put under the host test. */
-function rewriteBody(body: string, host: string): string {
-    let out = '';
-    let pos = 0;
-    while (pos < body.length) {
-        const open = body.indexOf('{', pos);
-        if (open === -1) { out += body.slice(pos); break; }
-        const end = blockEnd(body, open);
-        const prelude = body.slice(pos, open);
-        const lead = prelude.match(/^\s*/)?.[0] ?? '';
-        const head = prelude.trim();
-        if (head.startsWith('@')) {
-            // An at-rule inside a variant (`@media`): its rules go under the host test too.
-            out += `${lead}${head} {${rewriteBody(body.slice(open + 1, end), host)}}`;
-        } else {
-            out += `${lead}${splitList(head).map((s) => underHost(s, host)).join(', ')} {${body.slice(open + 1, end)}}`;
-        }
-        pos = end + 1;
-    }
-    return out;
-}
-
 /**
  * The CSS with every `@variant tests { rules }` rewritten into its rules under the host's attributes.
  * `hostOf` builds the host test from the attribute selectors: `:scope[variant="ghost"]` in a scoped
- * block, `:host([variant="ghost"])` under shadow. `@variant` is found at the top level and inside
- * `@media`, `@supports`, `@layer`, `@container`; elsewhere it is copied as written.
+ * block, `:host([variant="ghost"])` under shadow. Where `@variant` is found is `expandVariantBlocks`'s.
  */
 export function expandVariantRules(css: string, hostOf: (attrs: string) => string = (attrs) => `:scope${attrs}`): string {
-    if (!css.includes('@variant')) return css;
-    let out = '';
-    let pos = 0;
-    while (pos < css.length) {
-        const open = css.indexOf('{', pos);
-        if (open === -1) { out += css.slice(pos); break; }
-        const end = blockEnd(css, open);
-        const prelude = css.slice(pos, open);
-        const head = prelude.trim();
-        const lead = prelude.slice(0, prelude.length - prelude.trimStart().length);
-        // Match: `@variant` followed by its tests. Groups: [1]=the tests
-        const variant = /^@variant\s+(.+)$/s.exec(head);
-        if (variant) {
-            const attrs = [...variant[1].matchAll(TEST)].map((t) => `[${t[1]}="${t[2]}"]`).join('');
-            out += lead + rewriteBody(css.slice(open + 1, end), hostOf(attrs)).trim();
-        } else if (/^@(media|supports|layer|container)\b/i.test(head)) {
-            out += `${prelude}{${expandVariantRules(css.slice(open + 1, end), hostOf)}}`;
-        } else {
-            out += css.slice(pos, end + 1);
-        }
-        pos = end + 1;
-    }
-    return out;
+    return expandVariantBlocks(css, (tests, sel) =>
+        underHost(sel, hostOf([...tests.matchAll(VARIANT_TEST)].map((t) => `[${t[1]}="${t[2]}"]`).join(''))));
 }
 
 /** Every test of every `@variant` prelude in the CSS, in order, with its offset. Comments ignored. */
@@ -180,7 +109,7 @@ export function variantTests(css: string): VariantTest[] {
     // Match: a `@variant` prelude up to its `{`. Groups: [1]=the tests
     for (const m of text.matchAll(/@variant\s+([^{};]+)\{/g)) {
         const base = m.index + m[0].indexOf(m[1]);
-        for (const t of m[1].matchAll(TEST)) tests.push({ axis: t[1], value: t[2], at: base + t.index });
+        for (const t of m[1].matchAll(VARIANT_TEST)) tests.push({ axis: t[1], value: t[2], at: base + t.index });
     }
     return tests;
 }
