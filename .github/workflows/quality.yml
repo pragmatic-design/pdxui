@@ -38,12 +38,17 @@ env:
   FC_FONTATIONS: '1'
   DBUS_SESSION_BUS_ADDRESS: 'disabled:'
 
+# Every job and every Chromium install has a timeout (#642): without one a stalled apt ran for six
+# hours. Each value sits above the longest successful run of 15 (2026-10-23): the install took up to
+# 16 minutes (median 0.3), a browser job up to 19, coverage 8.4, the others under 6. core's
+# ci-timeouts test holds it.
 jobs:
   # Build first, because the typecheck needs it: packages/framework checks against what core, ui
   # and router publish (dist/*.d.ts), not their sources, and a fresh runner has no dist.
   static:
     name: build · typecheck · lint
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -63,6 +68,7 @@ jobs:
   coverage:
     name: coverage (core · compiler · router · lsp)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -89,6 +95,7 @@ jobs:
   unit:
     name: unit (every other vitest suite)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -108,6 +115,7 @@ jobs:
   browser:
     name: browser (${{ matrix.suite }}${{ matrix.shard && format(' {0}', matrix.shard) || '' }})
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -134,6 +142,7 @@ jobs:
         run: pnpm build
       - name: Install Chromium
         run: pnpm --filter @pdxui/design exec playwright install --with-deps chromium
+        timeout-minutes: 25
       - name: Suite
         run: ${{ matrix.run }}
       - uses: actions/upload-artifact@v7
@@ -155,6 +164,7 @@ jobs:
   builder:
     name: builder · e2e + static build
     runs-on: ubuntu-latest
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -163,6 +173,7 @@ jobs:
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @pdxui/builder exec playwright install --with-deps chromium
+        timeout-minutes: 25
 
       - name: Builder e2e (dev server)
         run: pnpm --filter @pdxui/builder run test:e2e
@@ -186,6 +197,7 @@ jobs:
   time-budgets:
     name: time budgets
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -214,6 +226,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [static, coverage, unit, browser, builder, time-budgets]
     if: always()
+    timeout-minutes: 5
     steps:
       - name: Every job passed
         env:
