@@ -192,7 +192,7 @@ Clear all global providers (for testing).
 ```ts
 import { component } from '@pdxui/core';
 
-function component(tag: string, options: ComponentOptions<P, E, M>): void
+function component(tag: string, options: ComponentOptions<P, E, M, V>): void
 ```
 
 Define a function-based Web Component.

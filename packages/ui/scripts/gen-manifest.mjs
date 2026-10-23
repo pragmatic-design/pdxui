@@ -311,6 +311,37 @@ function stringArrayField(optionsObj, sourceFile, field) {
 }
 
 /**
+ * The variant axes a descriptor declares (#512): `size: ['md', 'sm']` or
+ * `variant: { primary: '.pdx-primary', ghost: '.pdx-ghost' }` → { name, values, default, native? }.
+ * The first value is the default; `native` maps each value of a record to the selector that draws it
+ * on plain HTML (#626).
+ */
+function extractVariants(optionsObj, sourceFile) {
+    const variantsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'variants');
+    if (!variantsProp || !ts.isObjectLiteralExpression(variantsProp.initializer)) return [];
+    const axes = [];
+    for (const decl of variantsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(decl)) continue;
+        const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        const init = decl.initializer;
+        if (ts.isArrayLiteralExpression(init)) {
+            const values = init.elements.filter(e => ts.isStringLiteralLike(e)).map(e => e.text);
+            if (values.length) axes.push({ name, values, default: values[0] });
+        } else if (ts.isObjectLiteralExpression(init)) {
+            const native = {};
+            for (const entry of init.properties) {
+                if (!ts.isPropertyAssignment(entry) || !ts.isStringLiteralLike(entry.initializer)) continue;
+                native[entry.name.getText(sourceFile).replace(/^['"]|['"]$/g, '')] = entry.initializer.text;
+            }
+            const values = Object.keys(native);
+            if (values.length) axes.push({ name, values, default: values[0], native });
+        }
+    }
+    return axes;
+}
+
+/**
  * The states a descriptor declares, `states: ['open', 'invalid']` (#132) → { name, description }, the
  * description from a `@cssstate name - text` tag on the component, as for `@csspart`.
  */
@@ -829,7 +860,16 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     const scanNode = shared ? statement : sourceFile;
     const cat = categories[tag] || { category: 'Other', order: 999 };
     const models = extractModels(optionsObj, sourceFile);
-    const props = [...extractProps(optionsObj, sourceFile, tag), ...models];
+    // A variant axis is a String prop typed with its values (#512); it replaces a prop of its name.
+    const variants = extractVariants(optionsObj, sourceFile);
+    const variantProps = variants.map(v => ({
+        name: v.name, type: v.values.map(x => `'${x}'`).join(' | '), runtime: 'string', default: `'${v.default}'`,
+        iconName: false, description: describeProp(v.name),
+    }));
+    const props = [
+        ...extractProps(optionsObj, sourceFile, tag).filter(p => !variants.some(v => v.name === p.name)),
+        ...variantProps, ...models,
+    ];
     const tags = jsdocTags(statement);
 
     // Events: JSDoc @fires (authoritative) merged with heuristic emit() scan.
@@ -976,6 +1016,9 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             members,
             // The props `::x` may bind (#124): the compiler's resolver reads them from here.
             ...(models.length ? { models: models.map(m => m.name) } : {}),
+            // The variant axes (#512): the design build checks its `@variant` rules against them, and
+            // certification generates one scenario per value.
+            ...(variants.length ? { variants } : {}),
             ...(alphaEvents.length ? { alphaEvents } : {}),
             ...(Object.keys(alphaDetail).length ? { alphaDetail } : {}),
             ...(alphaCommit ? { alphaCommit } : {}),

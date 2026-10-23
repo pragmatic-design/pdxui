@@ -239,6 +239,12 @@ export interface ComponentManifest {
     themes?: string[];
     /** The scenarios' HTML fragments */
     scenarios: ScenarioDef[];
+    /**
+     * The markup of the scenario generated for each variant value (#512), `{attrs}` where the tag's
+     * attributes go: `<pdx-button {attrs}>Save</pdx-button>`. Default: the bare tag. The values come
+     * from `custom-elements.json` (tooling/variant-scenarios.ts).
+     */
+    variantHtml?: string;
 
     /** Dim. 1 — mathematical geometry and style */
     contracts?: ContractSpec;
