@@ -54,6 +54,14 @@ describe('PDX_VARIANT_UNSTYLED', () => {
         expect(found.every((d) => d.severity === 'warn')).toBe(true);
     });
 
+    it('a rule for several values styles each of them, and an unknown one among them is reported alone', () => {
+        const files = [own('@variant variant(ghost, danger, dangr) and size(sm) { :scope { color: red } }')];
+        expect(codes(files, 'PDX_VARIANT_UNSTYLED')).toEqual([]);
+        expect(codes(files, 'PDX_VARIANT_UNKNOWN').map((d) => d.message)).toEqual([
+            "@variant pdx-button variant(dangr): 'dangr' is not a value of the axis 'variant' (primary, solid, ghost, danger).",
+        ]);
+    });
+
     it('a rule in a theme source styles the value too', () => {
         expect(codes([own('@variant variant(ghost) { :scope { color: red } }'), other('@variant pdx-button variant(danger) and size(sm) { :scope { color: red } }')], 'PDX_VARIANT_UNSTYLED')).toEqual([]);
     });

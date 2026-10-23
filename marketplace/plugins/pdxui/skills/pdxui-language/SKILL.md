@@ -179,7 +179,8 @@ A TypeScript component declares `states: ['open']` and calls `ctx.state('open', 
 component's variants once: each axis is a prop typed with its values (`variant: 'primary' | 'ghost'`),
 reflected on the host (`variant="ghost"`). The `<style scoped>` keys rules by it —
 `@variant variant(ghost) { [data-part="root"] { … } }`, `@variant variant(ghost) and size(sm) { … }`,
-`@variant size(sm) { :scope { … } }` for the host itself — instead of a class assembled from the prop.
+`@variant size(sm) { :scope { … } }` for the host itself, `@variant variant(ghost, danger) { … }` for
+any of several values — instead of a class assembled from the prop.
 A rule for a value that does not exist is `PDX_VARIANT_UNKNOWN`; a value (other than the default) no
 rule styles, `PDX_VARIANT_UNSTYLED`.
 

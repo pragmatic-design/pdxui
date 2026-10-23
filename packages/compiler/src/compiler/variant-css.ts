@@ -20,12 +20,12 @@ export interface LibraryAxis {
     native?: Record<string, string>;
 }
 
-/** One test of a library `@variant` prelude: the tag (written, or implied by the file), axis, value. */
+/** One value of a library `@variant` test: the tag (written, or implied by the file), axis, value. */
 export interface LibraryVariantTest {
     tag: string | undefined;
     axis: string;
     value: string;
-    /** Offset of the test in the CSS. */
+    /** Offset of the test in the CSS — the same for every value of a list. */
     at: number;
 }
 
@@ -110,37 +110,54 @@ export function expandVariantBlocks(css: string, under: (tests: string, selector
     return out;
 }
 
-// Match: one test of a `@variant` prelude. Groups: [1]=axis [2]=value
-export const VARIANT_TEST = /(\w+)\s*\(\s*([\w-]+)\s*\)/g;
+// Match: one test of a `@variant` prelude, one value or several. Groups: [1]=axis [2]=the values
+export const VARIANT_TEST = /(\w+)\s*\(\s*([\w-]+(?:\s*,\s*[\w-]+)*)\s*\)/g;
+
+/** The values of a test, `ghost, danger` → `['ghost', 'danger']`. */
+export function testValues(list: string): string[] {
+    return list.split(',').map((v) => v.trim());
+}
+
+/** The attribute test for some values of an axis: `[variant="ghost"]`, or `:is(…)` for several. */
+export function attributeTest(axis: string, values: string[]): string {
+    const attrs = values.map((v) => `[${axis}="${v}"]`);
+    return attrs.length > 1 ? `:is(${attrs.join(',')})` : attrs[0];
+}
 
 // Match: a custom element's name opening a prelude, before its tests. Groups: [1]=tag
 const PRELUDE_TAG = /^\s*([a-z][a-z0-9]*-[a-z0-9-]*)(?=\s)/;
 
 /** A prelude read: its tag (written, else the implied one) and its tests. */
-function readPrelude(prelude: string, impliedTag: string | undefined): { tag: string | undefined; tests: [string, string][] } {
+function readPrelude(prelude: string, impliedTag: string | undefined): { tag: string | undefined; tests: [string, string[]][] } {
     const written = PRELUDE_TAG.exec(prelude);
     const rest = written ? prelude.slice(written[0].length) : prelude;
-    return { tag: written?.[1] ?? impliedTag, tests: [...rest.matchAll(VARIANT_TEST)].map((t) => [t[1], t[2]]) };
+    return { tag: written?.[1] ?? impliedTag, tests: [...rest.matchAll(VARIANT_TEST)].map((t) => [t[1], testValues(t[2])]) };
 }
 
-/** The host's attribute test: `[variant="ghost"]`, or `:is(…)` naming every value sharing the native selector. */
-function attributeTests(tests: [string, string][], axes: LibraryAxis[]): string {
-    return tests.map(([name, value]) => {
+/**
+ * The host's attribute test: for each axis, its values and every value sharing one of their native
+ * selectors, in the axis's order — `[variant="ghost"]`, or `:is(…)` for several.
+ */
+function attributeTests(tests: [string, string[]][], axes: LibraryAxis[]): string {
+    return tests.map(([name, values]) => {
         const axis = axes.find((a) => a.name === name);
-        const native = axis?.native?.[value];
-        const sharing = native === undefined ? [value] : axis!.values.filter((v) => axis!.native![v] === native);
-        const attrs = sharing.map((v) => `[${name}="${v}"]`);
-        return attrs.length > 1 ? `:is(${attrs.join(',')})` : attrs[0];
+        if (!axis) return attributeTest(name, values);
+        const natives = new Set(values.map((v) => axis.native?.[v]));
+        natives.delete(undefined);
+        const selected = axis.values.filter((v) => values.includes(v) || natives.has(axis.native?.[v]));
+        return attributeTest(name, selected.length ? selected : values);
     }).join('');
 }
 
-/** The native compound of the tests, when every value has one. */
-function nativeCompound(tests: [string, string][], axes: LibraryAxis[]): string | undefined {
+/** The native compound of the tests, when every value has one: several of an axis are one `:is()`. */
+function nativeCompound(tests: [string, string[]][], axes: LibraryAxis[]): string | undefined {
     let compound = '';
-    for (const [name, value] of tests) {
-        const native = axes.find((a) => a.name === name)?.native?.[value];
-        if (native === undefined) return undefined;
-        compound += native;
+    for (const [name, values] of tests) {
+        const axis = axes.find((a) => a.name === name);
+        const natives = values.map((v) => axis?.native?.[v]);
+        if (natives.some((n) => n === undefined)) return undefined;
+        const unique = [...new Set(natives)];
+        compound += unique.length > 1 ? `:is(${unique.join(',')})` : unique[0];
     }
     return compound || undefined;
 }
@@ -187,7 +204,9 @@ export function libraryVariantTests(css: string, impliedTag: string | undefined)
         const written = PRELUDE_TAG.exec(m[1]);
         const offset = written ? written[0].length : 0;
         for (const t of m[1].slice(offset).matchAll(VARIANT_TEST)) {
-            found.push({ tag: written?.[1] ?? impliedTag, axis: t[1], value: t[2], at: base + offset + t.index });
+            for (const value of testValues(t[2])) {
+                found.push({ tag: written?.[1] ?? impliedTag, axis: t[1], value, at: base + offset + t.index });
+            }
         }
     }
     return found;

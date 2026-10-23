@@ -14,6 +14,7 @@ const CSS = expandLibraryVariants(`
     @variant pdx-button variant(ghost) { [data-part="root"] { color: rgb(255, 0, 0); } }
     @variant pdx-button variant(primary) { [data-part="root"] { color: rgb(0, 0, 255); } }
     @variant pdx-button size(sm) { :scope { outline: 3px solid rgb(0, 128, 0); } }
+    @variant pdx-button variant(ghost, solid) and size(sm, md) { [data-part="root"] { text-decoration: underline; } }
 `, undefined, (tag) => (tag === 'pdx-button' ? BUTTON : undefined));
 
 const PAGE = `<!doctype html><style>${CSS}</style>
@@ -42,4 +43,9 @@ test('a library @variant rule reaches its component and its native element, not 
     expect(await color('outside'), 'a root part under no host').toBe('rgb(0, 0, 0)');
     const outline = await page.evaluate(() => getComputedStyle(document.querySelector('pdx-button[size="sm"]')!).outlineColor);
     expect(outline, ':scope is the host').toBe('rgb(0, 128, 0)');
+    // Several values: any of them on each axis.
+    const line = (id: string) => page.evaluate((id) => getComputedStyle(document.getElementById(id)!).textDecorationLine, id);
+    expect(await line('ghost'), 'ghost and sm').toBe('underline');
+    expect(await line('solid'), 'solid with no size: the size test fails').toBe('none');
+    expect(await line('native-ghost'), 'the size axis has no native selector: no native form').toBe('none');
 });

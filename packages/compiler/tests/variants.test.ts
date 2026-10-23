@@ -81,6 +81,11 @@ describe('@variant in a scoped style', () => {
             .toBe('@media (min-width: 1px) { :scope[size="sm"] .a, :scope[size="sm"] .b { margin: 0 } }');
     });
 
+    it('several values of one axis test any of them', () => {
+        expect(expandVariantRules('@variant variant(ghost, danger) and size(sm) { .a { margin: 0 } }'))
+            .toBe(':scope:is([variant="ghost"],[variant="danger"])[size="sm"] .a { margin: 0 }');
+    });
+
     it('control — a style with no @variant is left exactly as it was', () => {
         const css = '.a { color: red; } @media (min-width: 1px) { .b { color: blue; } }';
         expect(expandVariantRules(css)).toBe(css);
@@ -111,6 +116,14 @@ describe('the two diagnostics', () => {
             "@variants declares size: lg, and no @variant rule styles it.",
         ]);
         expect(found.every((w) => w.severity === 'warn')).toBe(true);
+    });
+
+    it('a list of values is checked value by value, and styles each of them', () => {
+        const src = file(VARIANTS, '@variant variant(ghost, primay, danger) { .x { color: red; } }\n@variant size(sm, lg) { .x { margin: 0; } }');
+        expect(codes(src, 'PDX_VARIANT_UNKNOWN').map((w) => w.message)).toEqual([
+            "@variant variant(primay): 'primay' is not a value of the axis 'variant' (primary, ghost, danger).",
+        ]);
+        expect(codes(src, 'PDX_VARIANT_UNSTYLED')).toEqual([]);
     });
 
     it('control — every value styled, or the default unstyled, reports nothing', () => {
