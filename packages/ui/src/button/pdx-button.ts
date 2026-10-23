@@ -1,23 +1,11 @@
-// pdx-button — WC wrapper over Pragmatic CSS button classes.
-// Adds: variant prop, loading state (aria-busy), disabled guard, icon slot.
-// Maps variant names to .pdx-* CSS classes from the design system.
+// pdx-button — a button over the Pragmatic CSS button styles.
+// Adds: variant and size axes reflected on the host, loading state (aria-busy), disabled guard,
+// icon slot. The design system's `@variant pdx-button` rules key on the host's attributes (#512);
+// the inner <button> carries its base class, `pdx-button`, and its state classes.
 
 import { component, html, DEV } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
 import { hasAccessibleName } from '../shared/accessible-name';
-
-const VARIANT_MAP: Record<string, string> = {
-    solid: 'pdx-primary',
-    primary: 'pdx-primary',
-    secondary: 'pdx-secondary',
-    outline: 'pdx-outline',
-    ghost: 'pdx-ghost',
-    link: 'pdx-link',
-    danger: 'pdx-danger',
-    success: 'pdx-success',
-    warning: 'pdx-warning',
-    info: 'pdx-info',
-};
 
 /**
  * A button over the Pragmatic CSS button styles, with variants, sizes and a loading state.
@@ -87,11 +75,16 @@ component('pdx-button', {
             return a.concurrency !== 'coalesce' && a.concurrency !== 'parallel';
         }
 
+        /**
+         * The inner button's classes: `pdx-button`, the same for every variant, which keeps it under
+         * the design system's reset of a host's bare element rules, and its state classes. The variant
+         * is the host's attribute.
+         */
         function getClass(): string {
-            const base = VARIANT_MAP[ctx.variant() as string] || 'pdx-primary';
-            let cls = isBusy() ? `${base} pdx-loading` : base;
-            if (ctx.toggle() && _pressed) cls += ' pdx-pressed';
-            return cls;
+            const states: string[] = ['pdx-button'];
+            if (isBusy()) states.push('pdx-loading');
+            if (ctx.toggle() && _pressed) states.push('pdx-pressed');
+            return states.join(' ');
         }
 
         function isDisabled(): boolean {

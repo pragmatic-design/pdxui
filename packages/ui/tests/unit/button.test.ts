@@ -5,17 +5,24 @@ import '../../src/button/pdx-button';
 describe('pdx-button', () => {
     beforeEach(cleanup);
 
-    it('renders with default variant (primary)', async () => {
-        const el = await mount('pdx-button');
-        const btn = el.querySelector('button');
-        expect(btn).toBeTruthy();
-        expect(btn?.className).toContain('pdx-primary');
+    it('puts no variant class on its inner button: the host carries the variant (#512)', async () => {
+        const plain = await mount('pdx-button');
+        const danger = await mount('pdx-button', { variant: 'danger' });
+        expect(plain.querySelector('button')).toBeTruthy();
+        // `pdx-button` is the root's base class, the same for every variant: it keeps the button
+        // under the design system's reset of a host's bare element rules (`[class*="pdx-"]`).
+        expect([plain.querySelector('button')?.className, danger.querySelector('button')?.className]).toEqual(['pdx-button', 'pdx-button']);
+        expect([plain.getAttribute('variant'), danger.getAttribute('variant')]).toEqual(['primary', 'danger']);
     });
 
-    it('applies variant class', async () => {
-        const el = await mount('pdx-button', { variant: 'danger' });
-        const btn = el.querySelector('button');
-        expect(btn?.className).toContain('pdx-danger');
+    it('keeps the state classes, loading and pressed, on its inner button', async () => {
+        const busy = await mount('pdx-button', { loading: '' });
+        await tick();
+        expect(busy.querySelector('button')?.className).toBe('pdx-button pdx-loading');
+        const toggle = await mount('pdx-button', { toggle: '', pressed: '' });
+        await tick();
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
+        expect(toggle.querySelector('button')?.className).toBe('pdx-button pdx-pressed');
     });
 
     it('reflects its variant and size on the host, the defaults included (#512)', async () => {

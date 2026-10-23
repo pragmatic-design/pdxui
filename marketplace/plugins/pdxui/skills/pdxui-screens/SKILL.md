@@ -141,7 +141,7 @@ means none of them is.
 Keep the type scale short: a page title, a section heading, body, and a muted caption. Four levels
 are enough for a LOB screen; a fifth is usually a heading that wants to be a section instead.
 
-> **Check:** `document.querySelectorAll('.pdx-primary').length <= 1` per visible screen — a
+> **Check:** `document.querySelectorAll('pdx-button:is([variant="primary"], [variant="solid"]), .pdx-primary').length <= 1` per visible screen — a
 > destructive confirm inside a dialog is its own screen.
 
 ---
