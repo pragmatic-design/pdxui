@@ -68,6 +68,16 @@ describe('a rule in a component\'s own stylesheet', () => {
             .toBe('@pdx-theme material { @media (hover) { :where(pdx-button[size="sm"]) { margin: 0 } } }');
     });
 
+    it('a comment before an @variant does not hide it', () => {
+        expect(expandLibraryVariants('/* Sizes: @variant size(…) */\n@variant size(lg) { :scope { display: block; } }', 'pdx-button', axesOf))
+            .toBe('/* Sizes: @variant size(…) */\n:where(pdx-button[size="lg"]) { display: block; }');
+    });
+
+    it('a brace inside a comment is not a block', () => {
+        expect(expandLibraryVariants('/* as .pdx-input-{size} */\n@variant size(lg) { /* } */ :scope { display: block; } }', 'pdx-button', axesOf))
+            .toBe('/* as .pdx-input-{size} */\n/* } */ :where(pdx-button[size="lg"]) { display: block; }');
+    });
+
     it('control — a stylesheet with no @variant is left exactly as it was', () => {
         const css = '.pdx-primary { color: red; } @media (hover) { .b { color: blue; } }';
         expect(expandLibraryVariants(css, 'pdx-button', axesOf)).toBe(css);

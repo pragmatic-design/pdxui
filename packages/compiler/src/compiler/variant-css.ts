@@ -54,17 +54,31 @@ function splitList(list: string): string[] {
     return parts.map((s) => s.trim()).filter(Boolean);
 }
 
+/** The CSS with each comment blanked to spaces, so offsets hold and a brace in a comment is not one. */
+function maskComments(css: string): string {
+    return css.replace(/\/\*[\s\S]*?\*\//g, (c) => ' '.repeat(c.length));
+}
+
+/**
+ * A prelude split where its head starts: the whitespace and comments before it, kept as written, and
+ * the head. A comment may name `@variant` or hold a `{`-free selector; it is never read as the head.
+ */
+function splitPrelude(prelude: string): { lead: string; head: string } {
+    const start = maskComments(prelude).search(/\S/);
+    if (start < 0) return { lead: prelude, head: '' };
+    return { lead: prelude.slice(0, start), head: prelude.slice(start).trim() };
+}
+
 /** The rules of a `@variant` body, each selector rewritten by `under`. */
 function rewriteBody(body: string, tests: string, under: (tests: string, selector: string) => string): string {
+    const masked = maskComments(body);
     let out = '';
     let pos = 0;
     while (pos < body.length) {
-        const open = body.indexOf('{', pos);
+        const open = masked.indexOf('{', pos);
         if (open === -1) { out += body.slice(pos); break; }
-        const end = blockEnd(body, open);
-        const prelude = body.slice(pos, open);
-        const lead = prelude.match(/^\s*/)?.[0] ?? '';
-        const head = prelude.trim();
+        const end = blockEnd(masked, open);
+        const { lead, head } = splitPrelude(body.slice(pos, open));
         if (head.startsWith('@')) {
             // An at-rule inside a variant (`@media`): its rules are rewritten too.
             out += `${lead}${head} {${rewriteBody(body.slice(open + 1, end), tests, under)}}`;
@@ -87,15 +101,15 @@ const NESTING = /^@(media|supports|layer|container|pdx-theme)\b/i;
  */
 export function expandVariantBlocks(css: string, under: (tests: string, selector: string) => string): string {
     if (!css.includes('@variant')) return css;
+    const masked = maskComments(css);
     let out = '';
     let pos = 0;
     while (pos < css.length) {
-        const open = css.indexOf('{', pos);
+        const open = masked.indexOf('{', pos);
         if (open === -1) { out += css.slice(pos); break; }
-        const end = blockEnd(css, open);
+        const end = blockEnd(masked, open);
         const prelude = css.slice(pos, open);
-        const head = prelude.trim();
-        const lead = prelude.slice(0, prelude.length - prelude.trimStart().length);
+        const { lead, head } = splitPrelude(prelude);
         // Match: `@variant` followed by its tests. Groups: [1]=the tests
         const variant = /^@variant\s+(.+)$/s.exec(head);
         if (variant) {

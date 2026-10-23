@@ -86,6 +86,11 @@ describe('@variant in a scoped style', () => {
             .toBe(':scope:is([variant="ghost"],[variant="danger"])[size="sm"] .a { margin: 0 }');
     });
 
+    it('a comment before an @variant, or before a rule in its body, is kept and does not hide it', () => {
+        expect(expandVariantRules('/* the @variant rules */\n@variant size(sm) { /* tight */ .a { margin: 0 } }'))
+            .toBe('/* the @variant rules */\n/* tight */ :scope[size="sm"] .a { margin: 0 }');
+    });
+
     it('control — a style with no @variant is left exactly as it was', () => {
         const css = '.a { color: red; } @media (min-width: 1px) { .b { color: blue; } }';
         expect(expandVariantRules(css)).toBe(css);

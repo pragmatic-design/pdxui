@@ -18,8 +18,6 @@ no `@click` to write.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `variant` | `variant` | 'solid' \| 'primary' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
-| `size` | `size` | 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' | `''` | xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `type` | `type` | 'button' \| 'submit' \| 'reset' | `'button'` | Native button type: 'button', 'submit' or 'reset'. |
@@ -31,6 +29,8 @@ no `@click` to write.
 | `ariaLabelledby` | `arialabelledby` | string | `''` | The id of an element whose text names the button, forwarded to the inner `<button>`. |
 | `action` | — | object | `null` | A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. |
 | `actionArg` | — | object | `null` | The value a click passes to `action.execute`. |
+| `variant` | `variant` | 'primary' \| 'solid' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. |
 
 **Events:** `pdx-action-error` → `detail: { error }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.; `pdx-toggle` → `detail: { pressed }` — Fired when toggled open or closed. Does not bubble.
 

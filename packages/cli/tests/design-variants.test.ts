@@ -96,7 +96,7 @@ describe('the package', () => {
     it('no stylesheet under src carries an @variant: it would reach the browser unexpanded', () => {
         const src = join(DESIGN, 'src');
         const raw = (readdirSync(src, { recursive: true }) as string[])
-            .filter((f) => f.endsWith('.css') && readFileSync(join(src, f), 'utf8').includes('@variant'));
+            .filter((f) => f.endsWith('.css') && readFileSync(join(src, f), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').includes('@variant'));
         expect(raw).toEqual([]);
     });
 });

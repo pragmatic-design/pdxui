@@ -314,17 +314,21 @@ function stringArrayField(optionsObj, sourceFile, field) {
  * The variant axes a descriptor declares (#512): `size: ['md', 'sm']` or
  * `variant: { primary: '.pdx-primary', ghost: '.pdx-ghost' }` → { name, values, default, native? }.
  * The first value is the default; `native` maps each value of a record to the selector that draws it
- * on plain HTML (#626).
+ * on plain HTML (#626). `descriptions` maps an axis to its JSDoc, for its prop.
  */
 function extractVariants(optionsObj, sourceFile) {
+    const descriptions = new Map();
     const variantsProp = optionsObj.properties.find(
         p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'variants');
-    if (!variantsProp || !ts.isObjectLiteralExpression(variantsProp.initializer)) return [];
+    if (!variantsProp || !ts.isObjectLiteralExpression(variantsProp.initializer)) return { axes: [], descriptions };
     const axes = [];
     for (const decl of variantsProp.initializer.properties) {
         if (!ts.isPropertyAssignment(decl)) continue;
         const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
         const init = decl.initializer;
+        // The axis's own JSDoc describes its prop, as a prop's does.
+        const description = jsdocDescription(decl);
+        if (description) descriptions.set(name, description);
         if (ts.isArrayLiteralExpression(init)) {
             const values = init.elements.filter(e => ts.isStringLiteralLike(e)).map(e => e.text);
             if (values.length) axes.push({ name, values, default: values[0] });
@@ -338,7 +342,7 @@ function extractVariants(optionsObj, sourceFile) {
             if (values.length) axes.push({ name, values, default: values[0], native });
         }
     }
-    return axes;
+    return { axes, descriptions };
 }
 
 /**
@@ -861,10 +865,10 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     const cat = categories[tag] || { category: 'Other', order: 999 };
     const models = extractModels(optionsObj, sourceFile);
     // A variant axis is a String prop typed with its values (#512); it replaces a prop of its name.
-    const variants = extractVariants(optionsObj, sourceFile);
+    const { axes: variants, descriptions } = extractVariants(optionsObj, sourceFile);
     const variantProps = variants.map(v => ({
         name: v.name, type: v.values.map(x => `'${x}'`).join(' | '), runtime: 'string', default: `'${v.default}'`,
-        iconName: false, description: describeProp(v.name),
+        iconName: false, description: descriptions.get(v.name) ?? describeProp(v.name),
     }));
     const props = [
         ...extractProps(optionsObj, sourceFile, tag).filter(p => !variants.some(v => v.name === p.name)),

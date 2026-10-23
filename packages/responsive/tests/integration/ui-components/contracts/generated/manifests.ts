@@ -110,7 +110,7 @@ import { wizard } from '../../../../manifests/wizard.manifest';
 
 /** The variant axes `custom-elements.json` lists, by manifest name. */
 const variantAxes: Record<string, ManifestVariantAxis[]> = {
-
+    "button": [{"name":"variant","values":["primary","solid","secondary","outline","ghost","link","danger","success","warning","info"],"default":"primary","native":{"primary":".pdx-primary","solid":".pdx-primary","secondary":".pdx-secondary","outline":".pdx-outline","ghost":".pdx-ghost","link":".pdx-link","danger":".pdx-danger","success":".pdx-success","warning":".pdx-warning","info":".pdx-info"}},{"name":"size","values":["md","xs","sm","lg","xl"],"default":"md","native":{"md":"[size=\"md\"]","xs":"[size=\"xs\"]","sm":"[size=\"sm\"]","lg":"[size=\"lg\"]","xl":"[size=\"xl\"]"}}],
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
@@ -156,6 +156,21 @@ export const scenarioPage: Record<string, string> = {
     "button-action-pending": "tier-1a",
     "button-tokens": "tier-1a",
     "button-labels": "tier-1a",
+    "button-variant-primary": "tier-1a",
+    "button-variant-solid": "tier-1a",
+    "button-variant-secondary": "tier-1a",
+    "button-variant-outline": "tier-1a",
+    "button-variant-ghost": "tier-1a",
+    "button-variant-link": "tier-1a",
+    "button-variant-danger": "tier-1a",
+    "button-variant-success": "tier-1a",
+    "button-variant-warning": "tier-1a",
+    "button-variant-info": "tier-1a",
+    "button-size-md": "tier-1a",
+    "button-size-xs": "tier-1a",
+    "button-size-sm": "tier-1a",
+    "button-size-lg": "tier-1a",
+    "button-size-xl": "tier-1a",
     "calendar-month": "tier-3",
     "calendar-disabled": "tier-3",
     "calendar-minmax": "tier-3",
