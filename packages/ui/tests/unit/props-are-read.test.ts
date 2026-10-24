@@ -30,14 +30,55 @@ function tsFiles(dir: string): string[] {
     return out;
 }
 
+/** Past whitespace and `//` comment lines, from `i`. */
+function skipBlank(src: string, i: number): number {
+    for (;;) {
+        while (i < src.length && /\s/.test(src[i])) i++;
+        if (!src.startsWith('//', i)) return i;
+        const eol = src.indexOf('\n', i);
+        i = eol === -1 ? src.length : eol + 1;
+    }
+}
+
+/** Past a balanced `{ … }` that starts at `i`. */
+function skipBlock(src: string, i: number): number {
+    let depth = 0;
+    for (; i < src.length; i++) {
+        if (src[i] === '{') depth++;
+        else if (src[i] === '}' && --depth === 0) return i + 1;
+    }
+    return i;
+}
+
+/**
+ * Where a descriptor's props block opens, just past its `{`: `props` first in the descriptor, or after
+ * its `variants` (#627). A descriptor that opens with `models` is not read yet. -1 when neither.
+ */
+function propsStart(src: string, descriptor: number): number {
+    let i = skipBlank(src, descriptor);
+    // Match: `variants: {` at i. Groups: none
+    const variants = /^variants:\s*/.exec(src.slice(i, i + 32));
+    if (variants && src[i + variants[0].length] === '{') {
+        i = skipBlock(src, i + variants[0].length);
+        if (src[i] === ',') i++;
+        i = skipBlank(src, i);
+    }
+    // Match: `props: {` at i. Groups: none
+    const props = /^props:\s*\{/.exec(src.slice(i, i + 32));
+    return props ? i + props[0].length : -1;
+}
+
 /** The component a module registers, its top-level prop names, and the module's text outside them. */
 function declaredProps(src: string): { tag: string; names: string[]; rest: string } | null {
-    // `props` first in the descriptor, or after its `variants` (#627): a descriptor that opens with
-    // `models` is not read yet. Match: the registration, an optional `variants: { … }` (one level of
-    // nested braces, `size: { md: … }`), then `props: {`. Groups: [1]=tag
-    const m = src.match(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{(?:\s*\/\/[^\n]*)*\s*(?:variants:\s*\{(?:[^{}]|\{[^{}]*\})*\},?(?:\s*\/\/[^\n]*)*\s*)?props:\s*\{/);
-    if (!m || m.index === undefined) return null;
-    const start = m.index + m[0].length;
+    // The first registration of the module whose descriptor's props are read (a module may register
+    // two, pdx-toggle's does). Match: the registration up to the descriptor's `{`. Groups: [1]=tag
+    let m: RegExpMatchArray | undefined;
+    let start = -1;
+    for (const r of src.matchAll(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{/g)) {
+        start = propsStart(src, r.index! + r[0].length);
+        if (start >= 0) { m = r; break; }
+    }
+    if (!m) return null;
     let i = start, depth = 1;
     while (depth > 0 && i < src.length) { if (src[i] === '{') depth++; else if (src[i] === '}') depth--; i++; }
     const block = src.slice(start, i - 1);
