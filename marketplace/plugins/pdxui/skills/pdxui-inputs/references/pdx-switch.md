@@ -10,10 +10,10 @@ Toggle a setting on or off.
 | `description` | `description` | string | `''` | Secondary descriptive text. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label (forwarded to the inner input) |
 | `labelPosition` | `labelposition` | string | `'right'` | Where the label sits relative to the control. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `value` | `value` | string | `''` | The current value. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the track's size. |
 | `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 
 **API (via `:ref`)**

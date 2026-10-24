@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/segmented.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Segmented Control — iOS-style toggle between 2-4 options.
    Animated slider background follows the active item.
 
@@ -70,27 +71,27 @@
     box-shadow: var(--pdx-shadow-sm);
 }
 
-/* ===== Sizes ===== */
+/* ===== Sizes — keyed on the host's `size` (#629); on native markup `.pdx-segmented-sm` ===== */
 
-.pdx-segmented-sm {
-    padding: 0.1rem;
-    gap: 0.1rem;
-}
+:where(pdx-segmented[size="sm"]) > [data-part="root"], .pdx-segmented-sm {
+        padding: 0.1rem;
+        gap: 0.1rem;
+    }
 
-.pdx-segmented-sm .pdx-segmented-item {
-    padding: 0.2rem 0.5rem;
-    font-size: var(--pdx-text-xs);
-}
+    :where(pdx-segmented[size="sm"]) > [data-part="root"] .pdx-segmented-item, .pdx-segmented-sm .pdx-segmented-item {
+        padding: 0.2rem 0.5rem;
+        font-size: var(--pdx-text-xs);
+    }
 
-.pdx-segmented-lg {
-    padding: 0.2rem;
-    gap: 0.15rem;
-}
+:where(pdx-segmented[size="lg"]) > [data-part="root"], .pdx-segmented-lg {
+        padding: 0.2rem;
+        gap: 0.15rem;
+    }
 
-.pdx-segmented-lg .pdx-segmented-item {
-    padding: 0.4rem 1rem;
-    font-size: var(--pdx-text-base);
-}
+    :where(pdx-segmented[size="lg"]) > [data-part="root"] .pdx-segmented-item, .pdx-segmented-lg .pdx-segmented-item {
+        padding: 0.4rem 1rem;
+        font-size: var(--pdx-text-base);
+    }
 
 /* ===== Full width ===== */
 

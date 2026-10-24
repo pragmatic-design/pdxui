@@ -25,6 +25,12 @@ component('pdx-checkbox', {
         checked: model(false, { form: true }),
         indeterminate: model(false),
     },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the box's size. */
+        size: { md: '.pdx-checkbox-md', sm: '.pdx-checkbox-sm', lg: '.pdx-checkbox-lg' },
+    },
     props: {
         disabled: { type: Boolean, default: false },
         /** Enable 3-state cycle: unchecked → checked → indeterminate → unchecked */
@@ -33,7 +39,6 @@ component('pdx-checkbox', {
         description: { type: String, default: '' },
         value: { type: String, default: '' },
         name: { type: String, default: '' },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
         labelPosition: { type: String, default: 'right' },
@@ -86,8 +91,6 @@ component('pdx-checkbox', {
 
         function boxClass(): string {
             let cls = 'pdx-checkbox';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-checkbox-' + s;
             if (ctx.error()) cls += ' pdx-checkbox-error';
             return cls;
         }
@@ -110,6 +113,7 @@ component('pdx-checkbox', {
             <input
                 type="checkbox"
                 :class="${ctx.boxClass}"
+                data-part="root"
                 :checked="${ctx.checked}"
                 :disabled="${ctx.disabled}"
                 :required="${ctx.required}"

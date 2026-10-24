@@ -15,11 +15,11 @@ Pick a number by dragging.
 | `showLabel` | `showlabel` | boolean | `false` | Show value label on thumb while dragging |
 | `labelAlways` | `labelalways` | boolean | `false` | Always show label (not just on drag) |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `range` | `range` | boolean | `false` | Range mode: value is "min,max" |
 | `minGap` | `mingap` | number | `0` | Minimum gap between thumbs in range mode |
-| `color` | `color` | string | `''` | Color the fill portion |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the track's and thumb's size. |
+| `color` | `color` | 'primary' \| 'success' \| 'warning' | `'primary'` | primary (the default), success or warning: the fill's and thumb's colour. |
 | `value` | `value` | number \| number[] | `0` | The current value. |
 
 **API (via `:ref`)**

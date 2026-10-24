@@ -574,6 +574,18 @@
         {
           "id": "checkbox-mixed",
           "title": "Checkbox — Indeterminate"
+        },
+        {
+          "id": "checkbox-size-md",
+          "title": "pdx-checkbox — size=\"md\""
+        },
+        {
+          "id": "checkbox-size-sm",
+          "title": "pdx-checkbox — size=\"sm\""
+        },
+        {
+          "id": "checkbox-size-lg",
+          "title": "pdx-checkbox — size=\"lg\""
         }
       ]
     },
@@ -1857,6 +1869,18 @@
         {
           "id": "radio-disabled",
           "title": "Radio — Disabled"
+        },
+        {
+          "id": "radio-size-md",
+          "title": "pdx-radio — size=\"md\""
+        },
+        {
+          "id": "radio-size-sm",
+          "title": "pdx-radio — size=\"sm\""
+        },
+        {
+          "id": "radio-size-lg",
+          "title": "pdx-radio — size=\"lg\""
         }
       ]
     },
@@ -1899,6 +1923,18 @@
         {
           "id": "rating-disabled",
           "title": "Rating — Disabled"
+        },
+        {
+          "id": "rating-size-md",
+          "title": "pdx-rating — size=\"md\""
+        },
+        {
+          "id": "rating-size-sm",
+          "title": "pdx-rating — size=\"sm\""
+        },
+        {
+          "id": "rating-size-lg",
+          "title": "pdx-rating — size=\"lg\""
         }
       ]
     },
@@ -2063,6 +2099,18 @@
         {
           "id": "segmented-disabled",
           "title": "Segmented — Disabled"
+        },
+        {
+          "id": "segmented-size-md",
+          "title": "pdx-segmented — size=\"md\""
+        },
+        {
+          "id": "segmented-size-sm",
+          "title": "pdx-segmented — size=\"sm\""
+        },
+        {
+          "id": "segmented-size-lg",
+          "title": "pdx-segmented — size=\"lg\""
         }
       ]
     },
@@ -2156,6 +2204,30 @@
         {
           "id": "slider-disabled",
           "title": "Slider — Disabled"
+        },
+        {
+          "id": "slider-size-md",
+          "title": "pdx-slider — size=\"md\""
+        },
+        {
+          "id": "slider-size-sm",
+          "title": "pdx-slider — size=\"sm\""
+        },
+        {
+          "id": "slider-size-lg",
+          "title": "pdx-slider — size=\"lg\""
+        },
+        {
+          "id": "slider-color-primary",
+          "title": "pdx-slider — color=\"primary\""
+        },
+        {
+          "id": "slider-color-success",
+          "title": "pdx-slider — color=\"success\""
+        },
+        {
+          "id": "slider-color-warning",
+          "title": "pdx-slider — color=\"warning\""
         }
       ]
     },
@@ -2286,6 +2358,18 @@
         {
           "id": "switch-in-form",
           "title": "Switch — In a form, beside a text field (compact / normal / comfortable)"
+        },
+        {
+          "id": "switch-toggle-size-md",
+          "title": "pdx-switch — size=\"md\""
+        },
+        {
+          "id": "switch-toggle-size-sm",
+          "title": "pdx-switch — size=\"sm\""
+        },
+        {
+          "id": "switch-toggle-size-lg",
+          "title": "pdx-switch — size=\"lg\""
         }
       ]
     },
@@ -2513,6 +2597,18 @@
         {
           "id": "toggle-basic",
           "title": "Toggle — Basic"
+        },
+        {
+          "id": "toggle-size-md",
+          "title": "pdx-switch — size=\"md\""
+        },
+        {
+          "id": "toggle-size-sm",
+          "title": "pdx-switch — size=\"sm\""
+        },
+        {
+          "id": "toggle-size-lg",
+          "title": "pdx-switch — size=\"lg\""
         }
       ]
     },

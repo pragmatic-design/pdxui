@@ -367,6 +367,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** the choice controls declare `size` as a variant axis, sm, md and lg, and `pdx-slider`
+  its `color`, primary, success and warning (#629). Each is reflected on the host, the default
+  included, and drawn by `@variant` rules that also compile to the native classes on the element
+  alone, so `<input type="checkbox" class="pdx-checkbox pdx-checkbox-sm">` is sized as before. CSS that
+  reached a control through the class it put on its own elements must target the host instead:
+  - `pdx-checkbox`, `pdx-radio` and `pdx-switch` no longer put `.pdx-checkbox-{size}`,
+    `.pdx-radio-{size}` and `.pdx-toggle-{size}` on their input, which carries `data-part="root"`:
+    `pdx-checkbox[size="sm"] > label > [data-part="root"]`.
+  - `pdx-segmented`, `pdx-slider` and `pdx-rating` no longer put `.pdx-segmented-{size}`,
+    `.pdx-slider-{size}` and `.pdx-rating-{size}` on their root, nor `pdx-slider` `.pdx-slider-{color}`:
+    `pdx-slider[color="success"] > [data-part="root"] .pdx-slider-fill`.
+  - `pdx-checkbox-group` and `pdx-radio-group` keep `size` as a plain prop: they pass it to their
+    children, which carry the axis. `pdx-rating`'s `color` stays a plain prop: it takes any colour.
 - **Breaking:** the pickers declare `size` as a variant axis (#628), as the text fields do (below). It
   is reflected on the host, `md` included, and drawn by `@variant` rules that also compile to the
   native classes, so native markup is styled as before. CSS that reached a picker through the class

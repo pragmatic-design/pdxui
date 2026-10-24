@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/rating.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Rating — Star rating with precision, hover preview, threshold colors.
    Sizes: sm, default, lg. States: disabled, readonly, focused.
 */
@@ -54,17 +55,17 @@
     display: block;
 }
 
-/* ===== Sizes ===== */
+/* ===== Sizes — keyed on the host's `size` (#629); on native markup `.pdx-rating-sm` ===== */
 
-.pdx-rating-sm .pdx-rating-icon {
-    width: 1rem;
-    height: 1rem;
-}
+:where(pdx-rating[size="sm"]) > [data-part="root"] .pdx-rating-icon, .pdx-rating-sm .pdx-rating-icon {
+        width: 1rem;
+        height: 1rem;
+    }
 
-.pdx-rating-lg .pdx-rating-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-}
+:where(pdx-rating[size="lg"]) > [data-part="root"] .pdx-rating-icon, .pdx-rating-lg .pdx-rating-icon {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
 
 /* ===== States ===== */
 

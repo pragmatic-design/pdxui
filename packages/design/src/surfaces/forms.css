@@ -43,9 +43,10 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 }
 
-/* Checkbox sizes */
-.pdx-checkbox-sm { width: 1rem; height: 1rem; }
-.pdx-checkbox-lg { width: 1.5rem; height: 1.5rem; }
+/* Checkbox sizes, keyed on the host's `size` (#629). The box is the input inside the host's label;
+   on native markup the input alone, `.pdx-checkbox-sm`. `:where(label)` keeps the class's weight. */
+:where(pdx-checkbox[size="sm"]) > :where(label) > [data-part="root"], .pdx-checkbox-sm { width: 1rem; height: 1rem; }
+:where(pdx-checkbox[size="lg"]) > :where(label) > [data-part="root"], .pdx-checkbox-lg { width: 1.5rem; height: 1.5rem; }
 
 /* Checkbox error */
 .pdx-checkbox-error { border-color: var(--pdx-color-danger); }
@@ -104,11 +105,11 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 }
 
-/* Radio sizes */
-.pdx-radio-sm { width: 1rem; height: 1rem; }
-.pdx-radio-sm:checked { box-shadow: inset 0 0 0 3px var(--pdx-color-primary); }
-.pdx-radio-lg { width: 1.5rem; height: 1.5rem; }
-.pdx-radio-lg:checked { box-shadow: inset 0 0 0 5px var(--pdx-color-primary); }
+/* Radio sizes, keyed on the host's `size` (#629); on native markup `.pdx-radio-sm`. */
+:where(pdx-radio[size="sm"]) > :where(label) > [data-part="root"], .pdx-radio-sm { width: 1rem; height: 1rem; }
+    :where(pdx-radio[size="sm"]) > :where(label) > [data-part="root"]:checked, .pdx-radio-sm:checked { box-shadow: inset 0 0 0 3px var(--pdx-color-primary); }
+:where(pdx-radio[size="lg"]) > :where(label) > [data-part="root"], .pdx-radio-lg { width: 1.5rem; height: 1.5rem; }
+    :where(pdx-radio[size="lg"]) > :where(label) > [data-part="root"]:checked, .pdx-radio-lg:checked { box-shadow: inset 0 0 0 5px var(--pdx-color-primary); }
 
 /* Radio error */
 .pdx-radio-error { border-color: var(--pdx-color-danger); }
@@ -192,20 +193,20 @@
     &:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 }
 
-/* Toggle sizes */
-.pdx-toggle-sm {
-    width: 2rem;
-    height: 1.125rem;
-    &::before { width: calc(1.125rem - 4px); height: calc(1.125rem - 4px); }
-    &:checked::before { transform: translateX(0.875rem); }
-}
+/* Toggle sizes, keyed on pdx-switch's `size` (#629); on native markup `.pdx-toggle-sm`. */
+:where(pdx-switch[size="sm"]) > :where(label) > [data-part="root"], .pdx-toggle-sm {
+        width: 2rem;
+        height: 1.125rem;
+        &::before { width: calc(1.125rem - 4px); height: calc(1.125rem - 4px); }
+        &:checked::before { transform: translateX(0.875rem); }
+    }
 
-.pdx-toggle-lg {
-    width: 3.5rem;
-    height: 2rem;
-    &::before { width: calc(2rem - 4px); height: calc(2rem - 4px); }
-    &:checked::before { transform: translateX(1.5rem); }
-}
+:where(pdx-switch[size="lg"]) > :where(label) > [data-part="root"], .pdx-toggle-lg {
+        width: 3.5rem;
+        height: 2rem;
+        &::before { width: calc(2rem - 4px); height: calc(2rem - 4px); }
+        &:checked::before { transform: translateX(1.5rem); }
+    }
 
 /* Toggle error */
 .pdx-toggle-error { background: oklch(from var(--pdx-color-danger) l c h / 0.3); }

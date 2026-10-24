@@ -5,12 +5,12 @@ A compact set of exclusive options.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `options` | — | array | `[]` | Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `full` | `full` | boolean | `false` | Stretches to the full width of its container. |
 | `orientation` | `orientation` | string | `'horizontal'` | Layout orientation — horizontal or vertical. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `label` | `label` | string | `''` | Visible label text. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the items' size. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
