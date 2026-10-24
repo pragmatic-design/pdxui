@@ -675,6 +675,9 @@ semver.
 
 ### Fixes
 
+- `pdx-otp-input` follows a change after it is first drawn: a new `length`, `separator`, `error`,
+  `disabled` or `mask`, and a value set from outside, reach the cells. The first build wrote over the
+  class it found its container by, and every later build found none and did nothing. (#659)
 - `form-fields-member` no longer reads a translation key that starts with a form's name,
   `$t('intake.fields.requester')`, as a read of `intake.fields`: a file with a form named like its
   strings was told its keys were a removed form. (#613)
