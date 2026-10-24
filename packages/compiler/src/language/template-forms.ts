@@ -58,10 +58,19 @@ function tagsIn(text: string, from: number, to: number): Tag[] {
     return tags;
 }
 
+/**
+ * The last text read and its opening tags (#646): the four checks below read the same template on
+ * every compile. Callers read the tags and never change them.
+ */
+let lastTags: { text: string; tags: readonly Tag[] } | null = null;
+
 /** The opening tags of the template's elements. */
-function openingTags(text: string): Tag[] {
-    const range = templateRange(text);
-    return range ? tagsIn(text, range[0], range[1]).filter(t => !t.closing) : [];
+function openingTags(text: string): readonly Tag[] {
+    if (lastTags?.text !== text) {
+        const range = templateRange(text);
+        lastTags = { text, tags: range ? tagsIn(text, range[0], range[1]).filter(t => !t.closing) : [] };
+    }
+    return lastTags.tags;
 }
 
 /** An attribute in an opening tag: its name, its value, and where it is in the tag's text. */
