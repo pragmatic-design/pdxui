@@ -64,6 +64,26 @@ describe('a rule in a component\'s own stylesheet', () => {
             .toBe(':where(pdx-button[size="sm"]) > [data-part="root"] { padding: 0; }');
     });
 
+    // The element alone (#629): a native control has no wrapper, so the steps between the host and
+    // the root part are the component's, and its native form drops them.
+    it('a root part further down a child chain: the native form is its own compound, the steps before it dropped', () => {
+        const SIZE: LibraryAxis[] = [{ name: 'size', values: ['md', 'sm'], default: 'md', native: { md: '.pdx-checkbox-md', sm: '.pdx-checkbox-sm' } }];
+        const checkbox = (tag: string) => (tag === 'pdx-checkbox' ? SIZE : undefined);
+        expect(expandLibraryVariants('@variant size(sm) { :scope > .pdx-checkbox-wrap > [data-part="root"] { width: 1rem; } }', 'pdx-checkbox', checkbox)).toBe(
+            ':where(pdx-checkbox[size="sm"]) > .pdx-checkbox-wrap > [data-part="root"], .pdx-checkbox-sm { width: 1rem; }');
+        expect(expandLibraryVariants('@variant size(sm) { :scope > label > input[data-part="root"]:checked::before { content: ""; } }', 'pdx-checkbox', checkbox)).toBe(
+            ':where(pdx-checkbox[size="sm"]) > label > input[data-part="root"]:checked::before, input.pdx-checkbox-sm:checked::before { content: ""; }');
+    });
+
+    it('what follows the root part in the chain stays, and the root part first in it changes nothing', () => {
+        const SIZE: LibraryAxis[] = [{ name: 'size', values: ['md', 'sm'], default: 'md', native: { md: '.pdx-otp-md', sm: '.pdx-otp-sm' } }];
+        const otp = (tag: string) => (tag === 'pdx-otp-input' ? SIZE : undefined);
+        expect(expandLibraryVariants('@variant size(sm) { :scope > .wrap > [data-part="root"] .cell { width: 2rem; } }', 'pdx-otp-input', otp)).toBe(
+            ':where(pdx-otp-input[size="sm"]) > .wrap > [data-part="root"] .cell, .pdx-otp-sm .cell { width: 2rem; }');
+        expect(expandLibraryVariants('@variant size(sm) { :scope > [data-part="root"] .cell { width: 2rem; } }', 'pdx-otp-input', otp)).toBe(
+            ':where(pdx-otp-input[size="sm"]) > [data-part="root"] .cell, .pdx-otp-sm .cell { width: 2rem; }');
+    });
+
     it('a context before the host stays before it, in both forms', () => {
         expect(expandLibraryVariants('@variant pdx-button variant(ghost) { .pdx-toolbar :scope > button[data-part="root"]:hover { color: red; } }', undefined, axesOf)).toBe(
             '.pdx-toolbar :where(pdx-button[variant="ghost"]) > button[data-part="root"]:hover, .pdx-toolbar button.pdx-ghost:hover { color: red; }');

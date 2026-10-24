@@ -16,7 +16,7 @@ import { RUNES } from '../src/compiler/runes';
 import { DIRECTIVES } from '../src/parser/template';
 import { DIAGNOSTICS } from '../src/diagnostics/catalog';
 import { LANGUAGE, languageExamples, resolveStub } from './support/published-examples';
-import { libraryVariantTests } from '../src/compiler/variant-css';
+import { expandLibraryVariants, libraryVariantTests, type LibraryAxis } from '../src/compiler/variant-css';
 
 const PAGES = ['overview.md', 'script.md', 'template.md', 'styles.md', 'routing.md', 'data.md', 'diagnostics.md'];
 /** The pages whose `###` sections are constructs, each with the five parts. */
@@ -118,7 +118,7 @@ describe('docs/language, the formal reference', () => {
     });
 });
 
-describe('the library @variant rules the reference shows (#626, #627)', () => {
+describe('the library @variant rules the reference shows (#626, #627, #629)', () => {
     it('are read by the design build with the hosts they name, and no host read as an axis', () => {
         const fences = [...read('styles.md').matchAll(/^```css\n([\s\S]*?)^```/gm)].map(m => m[1]);
         const found: string[] = [];
@@ -137,6 +137,30 @@ describe('the library @variant rules the reference shows (#626, #627)', () => {
         }
         expect(rules, 'the reference shows library rules').toBeGreaterThanOrEqual(3);
         expect(found).toEqual([]);
+    });
+
+    it('compile to the selectors the reference says they compile to', () => {
+        // The axes the examples assume, as a component's descriptor would declare them.
+        const AXES: Record<string, LibraryAxis[]> = {
+            'pdx-checkbox': [{ name: 'size', values: ['md', 'sm', 'lg'], default: 'md', native: { md: '.pdx-checkbox-md', sm: '.pdx-checkbox-sm', lg: '.pdx-checkbox-lg' } }],
+        };
+        const page = read('styles.md');
+        const pairs: [path: string, css: string, compiled: string][] = [];
+        // Match: a css fence. Groups: [1]=its body
+        for (const fence of page.matchAll(/^```css\n([\s\S]*?)^```\n/gm)) {
+            // Match: the fence's first line naming a variant source. Groups: [1]=its path
+            const named = /^\/\* packages\/design\/variant-sources\/([\w/-]+)\.css \*\/\n/.exec(fence[1]);
+            // Match: the paragraph right after the fence, «It compiles to `…`». Groups: [1]=the selector
+            const compiled = /^\nIt compiles to `([^`]+)`/.exec(page.slice(fence.index! + fence[0].length))?.[1];
+            if (named && compiled) pairs.push([named[1], fence[1].slice(named[0].length), compiled]);
+        }
+        expect(pairs.length, 'the reference shows compiled examples').toBeGreaterThanOrEqual(2);
+        for (const [path, css, compiled] of pairs) {
+            const implied = /^components\/([\w-]+)$/.exec(path)?.[1];
+            const out = expandLibraryVariants(css, implied ? `pdx-${implied}` : undefined, (tag) => AXES[tag]);
+            // The selector the rule compiles to, before its block.
+            expect(out.slice(0, out.indexOf('{')).trim(), path).toBe(compiled);
+        }
     });
 });
 
