@@ -16,6 +16,7 @@ import { RUNES } from '../src/compiler/runes';
 import { DIRECTIVES } from '../src/parser/template';
 import { DIAGNOSTICS } from '../src/diagnostics/catalog';
 import { LANGUAGE, languageExamples, resolveStub } from './support/published-examples';
+import { libraryVariantTests } from '../src/compiler/variant-css';
 
 const PAGES = ['overview.md', 'script.md', 'template.md', 'styles.md', 'routing.md', 'data.md', 'diagnostics.md'];
 /** The pages whose `###` sections are constructs, each with the five parts. */
@@ -114,6 +115,28 @@ describe('docs/language, the formal reference', () => {
             for (const code of new Set(read(page).match(/\bPDX_[A-Z0-9_]+\b/g) ?? [])) if (!(code in DIAGNOSTICS)) found.push(`${page}: ${code}`);
         }
         expect(found, 'codes the catalogue does not have').toEqual([]);
+    });
+});
+
+describe('the library @variant rules the reference shows (#626, #627)', () => {
+    it('are read by the design build with the hosts they name, and no host read as an axis', () => {
+        const fences = [...read('styles.md').matchAll(/^```css\n([\s\S]*?)^```/gm)].map(m => m[1]);
+        const found: string[] = [];
+        let rules = 0;
+        for (const css of fences) {
+            // Match: a `@variant` prelude up to its `{`, its hosts first. Groups: [1]=the prelude
+            for (const m of css.matchAll(/@variant\s+([^{};]+)\{/g)) {
+                rules++;
+                const written = /^(pdx-[\w-]+)|^:is\(([^)]*)\)/.exec(m[1]);
+                const hosts = written ? (written[1] ? [written[1]] : written[2].split(',').map(s => s.trim())) : ['pdx-implied'];
+                const tests = libraryVariantTests(m[0] + '}', 'pdx-implied');
+                const read = [...new Set(tests.map(t => t.tag))];
+                if (read.join() !== hosts.join()) found.push(`${m[1].trim()}: read the hosts ${read.join(', ')}`);
+                if (tests.some(t => t.axis === 'is')) found.push(`${m[1].trim()}: read :is() as an axis`);
+            }
+        }
+        expect(rules, 'the reference shows library rules').toBeGreaterThanOrEqual(3);
+        expect(found).toEqual([]);
     });
 });
 

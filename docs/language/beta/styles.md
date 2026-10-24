@@ -120,7 +120,8 @@ and the CSS-only classes are produced from the same rules:
   default.
 - **The rules** live in `@pdxui/design`. In the component's own stylesheet
   (`components/<name>.css`), the tag is implied. In a theme source or any other stylesheet, the rule
-  names it: `@variant pdx-button variant(primary) { … }`.
+  names it: `@variant pdx-button variant(primary) { … }`. Components that share a look share one rule,
+  their tags in `:is()`: `@variant :is(pdx-input, pdx-textarea) size(sm) { … }` (#627).
 - **The design build** compiles each body selector `S` to
   `:where(<tag>[<axis>="<value>"]) S:not(:where(<tag>[…] [data-pdx-root] S))`: under the host's
   attribute, never inside a nested component, with the weight of `S`. The form is the same on both

@@ -104,6 +104,43 @@ describe('a rule outside the component\'s own stylesheet', () => {
     });
 });
 
+// Several components drawn by one rule (#627): `:is(pdx-a, pdx-b)` names the hosts.
+describe('a rule that names several hosts', () => {
+    const SIZE = (native?: Record<string, string>): LibraryAxis[] => [{ name: 'size', values: ['md', 'sm', 'lg'], default: 'md', ...(native ? { native } : {}) }];
+    const fields = (tag: string): LibraryAxis[] | undefined =>
+        tag === 'pdx-input' || tag === 'pdx-textarea' ? SIZE({ md: '.pdx-input-md', sm: '.pdx-input-sm', lg: '.pdx-input-lg' }) : tag === 'pdx-tag-input' ? SIZE() : undefined;
+
+    it('is one selector under :is() of the hosts, and the native form the axis maps', () => {
+        expect(expandLibraryVariants('@variant :is(pdx-input, pdx-textarea) size(sm) { :scope > [data-part="root"] { height: 1px; } }', undefined, fields)).toBe(
+            ':where(:is(pdx-input,pdx-textarea)[size="sm"]) > [data-part="root"], .pdx-input-sm { height: 1px; }');
+        expect(expandLibraryVariants('@variant :is(pdx-input, pdx-textarea) size(sm) { :scope > .pdx-input-wrap[data-part="root"] { height: 1px; } }', undefined, fields)).toBe(
+            ':where(:is(pdx-input,pdx-textarea)[size="sm"]) > .pdx-input-wrap[data-part="root"], .pdx-input-wrap.pdx-input-sm { height: 1px; }');
+    });
+
+    it('a descendant is bounded at nested components under every host', () => {
+        expect(expandLibraryVariants('@variant :is(pdx-input, pdx-textarea) size(lg) { .pdx-x { color: red; } }', undefined, fields)).toBe(
+            ':where(:is(pdx-input,pdx-textarea)[size="lg"]) .pdx-x:not(:where(:is(pdx-input,pdx-textarea)[size="lg"] [data-pdx-root] .pdx-x)) { color: red; }');
+    });
+
+    it('has a native form only where every host maps the value alike', () => {
+        expect(expandLibraryVariants('@variant :is(pdx-input, pdx-tag-input) size(sm) { :scope > [data-part="root"] { height: 1px; } }', undefined, fields)).toBe(
+            ':where(:is(pdx-input,pdx-tag-input)[size="sm"]) > [data-part="root"] { height: 1px; }');
+    });
+
+    it('one host in :is() is that host', () => {
+        expect(expandLibraryVariants('@variant :is(pdx-input) size(sm) { :scope { margin: 0; } }', undefined, fields)).toBe(
+            ':where(pdx-input[size="sm"]) { margin: 0; }');
+    });
+
+    it('its tests are read once per host, for the manifest check of each', () => {
+        const css = '@variant :is(pdx-input, pdx-tag-input) size(sm, lg) { :scope { margin: 0 } }';
+        const tests = libraryVariantTests(css, 'pdx-button');
+        expect(tests.map(({ tag, axis, value }) => `${tag} ${axis}(${value})`)).toEqual(
+            ['pdx-input size(sm)', 'pdx-input size(lg)', 'pdx-tag-input size(sm)', 'pdx-tag-input size(lg)']);
+        expect(css.slice(tests[2].at, tests[2].at + 'size('.length)).toBe('size(');
+    });
+});
+
 describe('the tests of every rule, for the diagnostics', () => {
     it('reads the tag, written or implied, and each axis and value with its offset', () => {
         const css = '/* @variant pdx-x a(b) { */\n@variant pdx-button variant(ghost) and size(sm) { :scope { margin: 0 } }\n@variant size(lg) { :scope { margin: 0 } }';

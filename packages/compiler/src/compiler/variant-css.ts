@@ -138,14 +138,40 @@ export function attributeTest(axis: string, values: string[]): string {
     return attrs.length > 1 ? `:is(${attrs.join(',')})` : attrs[0];
 }
 
-// Match: a custom element's name opening a prelude, before its tests. Groups: [1]=tag
-const PRELUDE_TAG = /^\s*([a-z][a-z0-9]*-[a-z0-9-]*)(?=\s)/;
+// Match: the hosts opening a prelude, before its tests — a custom element's name, or several in
+// `:is(…)` (#627). Groups: [1]=one tag [2]=the tags inside `:is()`
+const PRELUDE_TAG = /^\s*(?:([a-z][a-z0-9]*-[a-z0-9-]*)|:is\(\s*([a-z][a-z0-9]*-[a-z0-9-]*(?:\s*,\s*[a-z][a-z0-9]*-[a-z0-9-]*)*)\s*\))(?=\s)/;
 
-/** A prelude read: its tag (written, else the implied one) and its tests. */
-function readPrelude(prelude: string, impliedTag: string | undefined): { tag: string | undefined; tests: [string, string[]][] } {
+/** The hosts a prelude names, and the length of what names them; none when it names no host. */
+function preludeTags(prelude: string): { tags: string[]; length: number } {
     const written = PRELUDE_TAG.exec(prelude);
-    const rest = written ? prelude.slice(written[0].length) : prelude;
-    return { tag: written?.[1] ?? impliedTag, tests: [...rest.matchAll(VARIANT_TEST)].map((t) => [t[1], testValues(t[2])]) };
+    if (!written) return { tags: [], length: 0 };
+    return { tags: written[1] ? [written[1]] : testValues(written[2]), length: written[0].length };
+}
+
+/** A prelude read: its hosts (written, else the implied one; none when neither) and its tests. */
+function readPrelude(prelude: string, impliedTag: string | undefined): { tags: string[]; tests: [string, string[]][] } {
+    const written = preludeTags(prelude);
+    const tags = written.tags.length ? written.tags : impliedTag ? [impliedTag] : [];
+    return { tags, tests: [...prelude.slice(written.length).matchAll(VARIANT_TEST)].map((t) => [t[1], testValues(t[2])]) };
+}
+
+/**
+ * The host test of a prelude: each host with its attribute tests. Hosts whose tests read alike share
+ * them, `:is(pdx-input,pdx-textarea)[size="sm"]`; hosts whose axes differ are listed whole.
+ */
+function hostTest(tags: string[], tests: [string, string[]][], axesOf: (tag: string) => LibraryAxis[] | undefined): string {
+    if (tags.length === 0) return attributeTests(tests, []);
+    const own = tags.map((tag) => attributeTests(tests, axesOf(tag) ?? []));
+    if (tags.length === 1) return `${tags[0]}${own[0]}`;
+    if (own.every((t) => t === own[0])) return `:is(${tags.join(',')})${own[0]}`;
+    return `:is(${tags.map((tag, i) => `${tag}${own[i]}`).join(',')})`;
+}
+
+/** The native compound of the tests: the one every host maps alike, or none. */
+function hostsNative(tags: string[], tests: [string, string[]][], axesOf: (tag: string) => LibraryAxis[] | undefined): string | undefined {
+    const natives = (tags.length ? tags : [undefined]).map((tag) => nativeCompound(tests, (tag && axesOf(tag)) || []));
+    return natives.every((n) => n !== undefined && n === natives[0]) ? natives[0] : undefined;
 }
 
 /**
@@ -220,24 +246,28 @@ function librarySelector(selector: string, host: string, native: string | undefi
  */
 export function expandLibraryVariants(css: string, impliedTag: string | undefined, axesOf: (tag: string) => LibraryAxis[] | undefined): string {
     return expandVariantBlocks(css, (prelude, selector) => {
-        const { tag, tests } = readPrelude(prelude, impliedTag);
-        const axes = (tag && axesOf(tag)) || [];
-        return librarySelector(selector, `${tag ?? ''}${attributeTests(tests, axes)}`, nativeCompound(tests, axes));
+        const { tags, tests } = readPrelude(prelude, impliedTag);
+        return librarySelector(selector, hostTest(tags, tests, axesOf), hostsNative(tags, tests, axesOf));
     });
 }
 
-/** Every test of every library `@variant` prelude in the CSS, in order, with its tag. Comments ignored. */
+/**
+ * Every test of every library `@variant` prelude in the CSS, in order, with its tag — once per host
+ * for a rule that names several. Comments ignored.
+ */
 export function libraryVariantTests(css: string, impliedTag: string | undefined): LibraryVariantTest[] {
     const text = css.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
     const found: LibraryVariantTest[] = [];
     // Match: a `@variant` prelude up to its `{`. Groups: [1]=the prelude
     for (const m of text.matchAll(/@variant\s+([^{};]+)\{/g)) {
         const base = m.index + m[0].indexOf(m[1]);
-        const written = PRELUDE_TAG.exec(m[1]);
-        const offset = written ? written[0].length : 0;
-        for (const t of m[1].slice(offset).matchAll(VARIANT_TEST)) {
-            for (const value of testValues(t[2])) {
-                found.push({ tag: written?.[1] ?? impliedTag, axis: t[1], value, at: base + offset + t.index });
+        const written = preludeTags(m[1]);
+        const tags: (string | undefined)[] = written.tags.length ? written.tags : [impliedTag];
+        for (const tag of tags) {
+            for (const t of m[1].slice(written.length).matchAll(VARIANT_TEST)) {
+                for (const value of testValues(t[2])) {
+                    found.push({ tag, axis: t[1], value, at: base + written.length + t.index });
+                }
             }
         }
     }

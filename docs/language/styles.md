@@ -359,7 +359,8 @@ VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                
 VariantAxis    ::= Word S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"?
 VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
 VariantTest    ::= Word S? "(" S? Word ( S? "," S? Word )* S? ")"
-LibraryRule    ::= "@variant" S ( TagName S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
+LibraryRule    ::= "@variant" S ( Hosts S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
+Hosts          ::= TagName | ":is(" S? TagName ( S? "," S? TagName )* S? ")"
 TagName        ::= "pdx-" Word
 ```
 
@@ -432,7 +433,14 @@ selector alone. Values that share a native selector (`solid` and `primary` both 
 share their rules: the host test names them all, `:where(pdx-button:is([variant="primary"],
 [variant="solid"]))`. A rule for several values yields the native selectors of all of them as one
 `:is()`, `variant(primary, ghost)` → `:is(.pdx-primary,.pdx-ghost)`, which weighs one class; if one of
-them has no native selector, the rule yields the host selector alone. In a theme source the expansion runs before the theme's guard (`gen-themes.mjs`),
+them has no native selector, the rule yields the host selector alone.
+
+One rule may draw several components, where their look is the same (#627): the prelude names the
+hosts in `:is()`, `@variant :is(pdx-input, pdx-textarea) size(sm) { :scope > .pdx-input-wrap { … } }`,
+and compiles to one selector, `:where(:is(pdx-input,pdx-textarea)[size="sm"]) > .pdx-input-wrap`.
+The tests are checked against each host's axes, as if the rule were written once per host. The rule
+yields a native form only where every host maps the values to the same selector; hosts whose axes
+read the values differently are listed whole, `:is(pdx-a[size="sm"],pdx-b:is(…))`. In a theme source the expansion runs before the theme's guard (`gen-themes.mjs`),
 so every selector it yields takes the theme root and the nested-theme guard like any other theme rule.
 
 #### Rules
@@ -523,9 +531,21 @@ A theme source names the tag:
 }
 ```
 
+One rule draws the text fields that share a size, named in `:is()`:
+
+```css
+/* packages/design/variant-sources/surfaces/inputs.css */
+@variant :is(pdx-input, pdx-textarea, pdx-number-input) size(sm) {
+    :scope > .pdx-input-wrap { padding: 0 var(--pdx-space-xs); }
+}
+```
+
+It compiles to `:where(:is(pdx-input,pdx-textarea,pdx-number-input)[size="sm"]) > .pdx-input-wrap`.
+
 #### Since
 
-beta (#153). The library form is specified by #626 and lands with #512.
+beta (#153). The library form is specified by #626 and lands with #512; several hosts in one rule
+with #627.
 
 ### Component tokens
 
