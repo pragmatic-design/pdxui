@@ -25,12 +25,17 @@ component('pdx-search-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. `pdx-search` stays: it is
     // the debounced query, not the value.
     models: { value: model<string>('', { form: true }) },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         /** The input's placeholder. Empty: the search-input.placeholder component string, «Search...». */
         placeholder: { type: String, default: '' },
         ariaLabel: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         loading: { type: Boolean, default: false },
         name: { type: String, default: '' },
         /** Debounce delay in ms for pdx-search event (0 = no debounce) */
@@ -48,8 +53,6 @@ component('pdx-search-input', {
 
         function wrapClass(): string {
             let cls = 'pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             return cls;
         }
@@ -132,7 +135,7 @@ component('pdx-search-input', {
         return { liveValue, wrapClass, onInput, onKeydown, clear, onWrapClick, onFocus, onBlur };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}">
+        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
             <span class="pdx-input-prefix">
                 ${() => ctx.loading()
                     ? html`<span class="pdx-input-loading" role="status" :aria-label="${() => uiString('search-input', 'searching')}"></span>`

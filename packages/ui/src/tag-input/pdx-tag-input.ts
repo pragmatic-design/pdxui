@@ -35,6 +35,12 @@ component('pdx-tag-input', {
         /** A tag was removed. */
         'pdx-remove': event<{ tag: string; index: number; tags: string[] }>(),
     },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         placeholder: { type: String, default: '' },
         maxTags: { type: Number, default: 0 },
@@ -43,7 +49,6 @@ component('pdx-tag-input', {
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         allowDuplicates: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         name: { type: String, default: '' },
         label: { type: String, default: '' },
         error: { type: Boolean, default: false },
@@ -78,8 +83,6 @@ component('pdx-tag-input', {
 
         function wrapClass(): string {
             let cls = 'pdx-tag-input pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.readonly()) cls += ' readonly';
             if (ctx.error()) cls += ' error';
@@ -239,7 +242,7 @@ component('pdx-tag-input', {
     },
     render: (ctx) => html`
         <div
-            :class="${ctx.wrapClass}"
+            :class="${ctx.wrapClass}" data-part="root"
             role="group"
             :aria-label="${() => (ctx.label() as string) || uiString('tag-input', 'label')}"
             @click="${ctx.onWrapClick}"

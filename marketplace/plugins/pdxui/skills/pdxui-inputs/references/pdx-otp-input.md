@@ -7,12 +7,12 @@ One-time-code entry boxes.
 | `length` | `length` | number | `6` | Number of code cells. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `numeric` | `numeric` | boolean | `true` | Restrict input to digits. |
 | `mask` | `mask` | boolean | `false` | Mask the entered characters (like a password). |
 | `separator` | `separator` | number | `0` | The separator between items. |
 | `label` | `label` | string | `''` | The cells' group name. Empty: the otp-input.label component string, «Verification code». |
 | `autocomplete` | `autocomplete` | string | `'one-time-code'` | The cells' autocomplete: 'one-time-code' lets the browser offer a code it received by SMS. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the cells' size. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

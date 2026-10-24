@@ -11,13 +11,13 @@ Type to add removable tags.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
 | `allowDuplicates` | `allowduplicates` | boolean | `false` | Allow the same tag more than once. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**

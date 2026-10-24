@@ -15,13 +15,13 @@ Multi-line text input that can auto-grow.
 | `showCount` | `showcount` | boolean | `false` | Shows a live character counter. |
 | `wordCount` | `wordcount` | boolean | `false` | Counts words instead of characters. |
 | `resize` | `resize` | string | `'vertical'` | Resize behaviour: 'none', 'vertical', 'auto', …. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

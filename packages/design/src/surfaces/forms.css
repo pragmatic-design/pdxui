@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/surfaces/forms.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Form controls — checkbox, radio, toggle, range, field wrapper, fieldset */
 
 /* Checkbox */
@@ -418,11 +419,14 @@ pdx-form-field:last-child {
     font-weight: var(--pdx-weight-normal);
 }
 
-/* Label sizes */
-.pdx-field-label-xs { font-size: var(--pdx-text-xs); }
-.pdx-field-label-sm { font-size: var(--pdx-text-xs); }
-.pdx-field-label-lg { font-size: var(--pdx-text-base); }
-.pdx-field-label-xl { font-size: var(--pdx-text-lg); }
+/* Label sizes, keyed on `size` (#627). pdx-label's own label is its root part, `.pdx-field-label-sm`
+   on a native <label>; pdx-form-field's sits inside its root, and weighs what the class did. */
+:where(pdx-label:is([size="xs"],[size="sm"])) > [data-part="root"], :is(.pdx-field-label-xs,.pdx-field-label-sm) { font-size: var(--pdx-text-xs); }
+:where(pdx-label[size="lg"]) > [data-part="root"], .pdx-field-label-lg { font-size: var(--pdx-text-base); }
+:where(pdx-label[size="xl"]) > [data-part="root"], .pdx-field-label-xl { font-size: var(--pdx-text-lg); }
+:where(pdx-form-field:is([size="xs"],[size="sm"])) > :where([data-part="root"]) > .pdx-field-label { font-size: var(--pdx-text-xs); }
+:where(pdx-form-field[size="lg"]) > :where([data-part="root"]) > .pdx-field-label { font-size: var(--pdx-text-base); }
+:where(pdx-form-field[size="xl"]) > :where([data-part="root"]) > .pdx-field-label { font-size: var(--pdx-text-lg); }
 
 /* Propagate error state from input to label */
 .pdx-field:has([aria-invalid="true"]) > label,

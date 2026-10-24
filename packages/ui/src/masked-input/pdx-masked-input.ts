@@ -77,6 +77,12 @@ component('pdx-masked-input', {
     // also carried, the formatted text and whether it is in range, the element answers itself:
     // `getFormatted()` and `isValid()`.
     models: { value: model<string>('', { form: true }) },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         /**
          * Mask pattern: # = digit, A = letter, * = any. Or a preset: phone, phone-intl (a 1-3 digit
@@ -87,7 +93,6 @@ component('pdx-masked-input', {
         placeholder: { type: String, default: '' },
         ariaLabel: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         name: { type: String, default: '' },
         /** Character shown for unfilled positions */
@@ -181,8 +186,6 @@ component('pdx-masked-input', {
 
         function wrapClass(): string {
             let cls = 'pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.error() || !isValid()) cls += ' error';
             return cls;
@@ -239,7 +242,7 @@ component('pdx-masked-input', {
         return { displayValue, wrapClass, getPlaceholder, getInputmode, onInput, onFocus, onBlur, isValid };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}">
+        <div :class="${ctx.wrapClass}" data-part="root">
             <input
                 class="pdx-input"
                 type="text"

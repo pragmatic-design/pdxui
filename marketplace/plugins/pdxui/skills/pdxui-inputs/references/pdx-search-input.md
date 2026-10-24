@@ -7,11 +7,11 @@ Search box with clear and shortcuts.
 | `placeholder` | `placeholder` | string | `''` | The input's placeholder. Empty: the search-input.placeholder component string, «Search...». |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `debounce` | `debounce` | number | `300` | Debounce delay in ms for pdx-search event (0 = no debounce) |
 | `shortcut` | `shortcut` | string | `''` | Keyboard shortcut hint displayed in suffix (e.g. "Ctrl+K") |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

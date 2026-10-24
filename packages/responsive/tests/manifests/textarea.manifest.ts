@@ -4,7 +4,7 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/textarea/pdx-textarea.ts
  *      the HOST <pdx-textarea> → render:
- *        <div class="pdx-input-wrap pdx-textarea-wrap [pdx-input-{size}] [disabled|readonly|error|success|warning]"
+ *        <div class="pdx-input-wrap pdx-textarea-wrap [disabled|readonly|error|success|warning]" data-part="root"  ← sized by the host's size (#627)
  *             style="height:auto;min-height:auto">
  *          <textarea class="pdx-input" ... :aria-label :aria-invalid :style="resize:...;width:100%"></textarea>
  *        </div>

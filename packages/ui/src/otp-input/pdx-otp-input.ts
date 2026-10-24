@@ -15,11 +15,16 @@ component('pdx-otp-input', {
     // Every digit writes it (#479), and the write dispatches `value-change`. `pdx-complete` stays: it is
     // the moment every cell is filled, not the value.
     models: { value: model<string>('', { form: true }) },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same cells on native markup. `md` is the base look, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the cells' size. */
+        size: { md: '.pdx-otp-md', sm: '.pdx-otp-sm', lg: '.pdx-otp-lg' },
+    },
     props: {
         length: { type: Number, default: 6 },
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         numeric: { type: Boolean, default: true },
         mask: { type: Boolean, default: false },
         separator: { type: Number, default: 0 },
@@ -119,10 +124,9 @@ component('pdx-otp-input', {
             const isError = ctx.error();
             const isMask = ctx.mask();
             const isNumeric = ctx.numeric();
-            const size = ctx.size() as string;
             const groupName = (ctx.label() as string) || uiString('otp-input', 'label');
             const autocomplete = (ctx.autocomplete() as string) || 'one-time-code';
-            const shape = JSON.stringify([len, sep, disabled, isError, isMask, isNumeric, size, groupName, autocomplete]);
+            const shape = JSON.stringify([len, sep, disabled, isError, isMask, isNumeric, groupName, autocomplete]);
             if (val === _reflected && shape === _builtShape) return;
             _builtShape = shape;
 
@@ -132,7 +136,6 @@ component('pdx-otp-input', {
 
             // Set wrapper classes
             let cls = 'pdx-otp-wrap';
-            if (size) cls += ' pdx-otp-' + size;
             if (isError) cls += ' error';
             if (disabled) cls += ' disabled';
             container.className = cls;
@@ -199,5 +202,5 @@ component('pdx-otp-input', {
 
         return {};
     },
-    render: () => html`<div class="pdx-otp-container pdx-otp-wrap"></div>`,
+    render: () => html`<div class="pdx-otp-container pdx-otp-wrap" data-part="root"></div>`,
 });

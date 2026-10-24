@@ -362,6 +362,23 @@ semver.
 
 ### Changed
 
+- **Breaking:** the text fields declare `size` as a variant axis (#627). It is reflected on the host,
+  `md` included (`<pdx-input size="md">`), and drawn by `@variant` rules in `@pdxui/design` keyed on it,
+  which also compile to the native classes, so `<input class="pdx-input pdx-input-sm">` is styled as
+  before. A size outside the axis reflects `md`. CSS that reached a component through the class it put
+  on its own elements must target the host's `size` instead:
+  - `pdx-input`, `pdx-password-input`, `pdx-search-input`, `pdx-textarea`, `pdx-masked-input`,
+    `pdx-tag-input` and `pdx-number-input` no longer put `.pdx-input-{size}` on their frame. The frame
+    carries `data-part="root"`: `pdx-input[size="sm"] > [data-part="root"]`. pdx-number-input's inner
+    field is `data-part="field"`.
+  - `pdx-otp-input` no longer puts `.pdx-otp-{size}` on its cells' wrapper:
+    `pdx-otp-input[size="sm"] > [data-part="root"] .pdx-otp-cell`.
+  - `pdx-label` and `pdx-form-field` no longer put `.pdx-field-label-{size}` on their label:
+    `pdx-label[size="sm"] > [data-part="root"]`, `pdx-form-field[size="sm"] > [data-part="root"] > .pdx-field-label`.
+  - `pdx-form-field` passes a size other than `md` on to its controls, as it passed any size it was
+    given; its reflected default is not passed on.
+  - `pdx-input-group`, `pdx-pin-input` and `pdx-inline-edit` keep `size` as a plain prop. They pass
+    it on to their children and draw no size of their own.
 - **Breaking:** in a form section, a control is no longer wired to the form above by its `name`, nor a
   `<pdx-form-field>` by its `name` (#613). A section is a component that declares
   `@form x: Values from parent;` or calls `useForm()` / `tryUseForm()`. A named control with no binding

@@ -8,10 +8,10 @@ Input that enforces a fixed format.
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `placeholderChar` | `placeholderchar` | string | `'_'` | Character shown for unfilled positions |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

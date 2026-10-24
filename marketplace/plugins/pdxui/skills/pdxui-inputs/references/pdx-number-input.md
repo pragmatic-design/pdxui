@@ -28,7 +28,6 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `trimZeros` | `trimzeros` | boolean | `false` | Show only the decimals the value has, up to `precision`: 29.5 at `precision="3"` is "29.5", not "29.500". The value is still rounded to `precision`, and what the field emits does not change. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
@@ -41,6 +40,7 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `currency` | `currency` | string | `''` | ISO currency code for currency formatting (e.g. EUR). |
 | `colorBySign` | `colorbysign` | boolean | `false` | Color the number green (positive) / red (negative) |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | number \| null | `null` | The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135). |
 
 **API (via `:ref`)**

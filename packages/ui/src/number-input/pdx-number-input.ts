@@ -35,6 +35,12 @@ component('pdx-number-input', {
         /** The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135). */
         value: model<number | null>(null, { type: Number, form: true }),
     },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         min: { type: Number, default: -Infinity },
         max: { type: Number, default: Infinity },
@@ -48,7 +54,6 @@ component('pdx-number-input', {
         trimZeros: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         placeholder: { type: String, default: '' },
         name: { type: String, default: '' },
@@ -361,8 +366,6 @@ component('pdx-number-input', {
 
         function inputWrapClass(): string {
             let cls = 'pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.error()) cls += ' error';
             if (ctx.allowNegative()) cls += ' pdx-has-sign';
             if (ctx.colorBySign()) {
@@ -389,8 +392,6 @@ component('pdx-number-input', {
 
         function groupClass(): string {
             let cls = 'pdx-input-group pdx-number-group';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             return cls;
         }
@@ -495,11 +496,11 @@ component('pdx-number-input', {
         return { displayValue, inputWrapClass, groupClass, controlsLayout, isNeg, isNegativeAllowed, increment, decrement, toggleSign, onInput, onKeydown, onBlur, onFocus, ariaValueNow, ariaValueText, caretHint };
     },
     render: (ctx) => html`
-        <div :class="${ctx.groupClass}">
+        <div :class="${ctx.groupClass}" data-part="root">
             ${() => ctx.controlsLayout() === 'both'
                 ? html`<button class="pdx-input-addon pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('number-input', 'decrease')}" :disabled="${ctx.disabled}" @click="${ctx.decrement}">−</button>`
                 : ''}
-            <div :class="${ctx.inputWrapClass}">
+            <div :class="${ctx.inputWrapClass}" data-part="field">
                 <span class="pdx-number-sign-slot"></span>
                 <input
                     class="pdx-input"
