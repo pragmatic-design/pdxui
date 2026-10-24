@@ -22,12 +22,22 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
     return acc;
 }
 
-/** Named slots the component in `text` renders: literal `<slot name="x">` and scoped `__slots['x']`. */
+/**
+ * Named slots the component in `text` renders: literal `<slot name="x">`, scoped `__slots['x']`, and
+ * `snippetOrSlot(ctx, 'x', (s) => […], 'y')` (#491, #595) — the snippet `x`, and the alpha slot `y`
+ * when its name differs.
+ */
 function renderedSlots(text: string): { tag: string | null; names: string[] } {
     const tag = (text.match(/component\('([\w-]+)'/) ?? [])[1] ?? null;
     const names = new Set<string>();
     for (const m of text.matchAll(/<slot\s+name="([\w-]+)"/g)) names.add(m[1]);
     for (const m of text.matchAll(/__slots\??\.?\[\s*'([\w-]+)'\s*\]/g)) names.add(m[1]);
+    // Match: `snippetOrSlot(ctx, 'x', <args>])` with an optional `, 'y'` after the args' array.
+    // Groups: [1]=the snippet's name [2]=the alpha slot's, when given.
+    for (const m of text.matchAll(/snippetOrSlot\(\s*ctx\s*,\s*'([\w-]+)'[^\n]*?\](?:\s*,\s*'([\w-]+)')?\s*\)/g)) {
+        names.add(m[1]);
+        if (m[2]) names.add(m[2]);
+    }
     return { tag, names: [...names].sort() };
 }
 
@@ -63,6 +73,12 @@ describe('the scan can fail', () => {
     it('sees an undocumented scoped slot', () => {
         const src = "component('pdx-probe', { setup(ctx) { const s = (ctx as any).__slots?.['row']; } })";
         expect(undocumented([src], docs)).toEqual(['pdx-probe: row']);
+    });
+    it('sees an undocumented snippet, and the alpha slot it falls back to', () => {
+        const src = "component('pdx-probe', { setup(ctx) { const s = snippetOrSlot(ctx, 'item', (s) => [s.page, s.isActive], 'page'); } })";
+        expect(undocumented([src], docs)).toEqual(['pdx-probe: item', 'pdx-probe: page']);
+        const plain = "component('pdx-probe', { setup(ctx) { return snippetOrSlot(ctx, 'row', (s) => [s.item]); } })";
+        expect(undocumented([plain], docs)).toEqual(['pdx-probe: row']);
     });
     it('does not accuse a documented slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"footer\"></slot>` })";

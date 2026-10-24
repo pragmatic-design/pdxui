@@ -2,7 +2,7 @@
 // Data-driven: items with nesting, icons, badges, collapsible groups, active state.
 // Use inside a sidebar or standalone as vertical navigation.
 
-import { component, html, signal, sanitizeUrl, generatedId } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -57,8 +57,9 @@ function applyData(el: HTMLElement, data: Record<string, string> | undefined): v
  * A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a
  * collapsed icon-only mode.
  *
- * @slot item - Scoped — renders one navigation entry, a group's included. Receives `{ item, level, expanded, active }`.
- * @slot actions - Scoped — controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. Receives `{ item, level, active }`.
+ * @slot item - Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.
+ * @slot itemActions - Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.
+ * @slot actions - The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
  */
 component('pdx-nav-menu', {
     props: {
@@ -81,6 +82,12 @@ component('pdx-nav-menu', {
         /** `overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest. */
         actions: { type: String, default: 'inline', enum: ['inline', 'overlay'] },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots stay (#595).
+    // The `actions` slot shares its name with the prop above, so its snippet is `itemActions`.
+    slots: {
+        item: slot<(item: { key: string; label: string; icon?: string; badge?: string; href?: string; children?: unknown[]; [key: string]: unknown }, level: number, expanded: boolean, active: boolean) => Node>(),
+        itemActions: slot<(item: { key: string; label: string; icon?: string; badge?: string; href?: string; [key: string]: unknown }, level: number, active: boolean) => Node>(),
+    },
     setup(ctx) {
         /** Prefix of this menu's group ids, which the toggles' aria-controls point at. */
         const _uid = generatedId('pdx-nav');
@@ -88,10 +95,10 @@ component('pdx-nav-menu', {
         let _navEl: HTMLElement | null = null;
         let _built = false;
         function getItemSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['item'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.level, s.expanded, s.active]);
         }
         function getActionsSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['actions'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'itemActions', (s) => [s.item, s.level, s.active], 'actions');
         }
 
         function toggleGroup(key: string): void {

@@ -29,7 +29,7 @@ Data-driven list with custom rows.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `item` — Scoped — renders one item. Receives `{ item, index, id }` (`id` is the value of `id-field`).; `empty` — Shown when the list has no items. Receives nothing, but write it `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
+**Slot:** `item` — Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).; `empty` — Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
 
 
 #### Examples

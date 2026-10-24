@@ -20,7 +20,7 @@
 //     DOM is partial. The pattern requires them exactly in the two cases this component is for
 //     (lazy branches, and virtualization later), and they cost nothing in the others.
 
-import { component, html, onDestroy } from '@pdxui/core';
+import { component, html, onDestroy, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders.
 import '@pdxui/design/components/tree';
@@ -41,7 +41,7 @@ type CheckState = 'true' | 'false' | 'mixed';
  * @fires pdx-expand - `{ id, expanded }` — one branch opened or closed.
  * @fires pdx-check - `{ checked: string[] }` — the ids fully checked (a mixed parent is not one).
  * @fires pdx-load-error - `{ id, error }` — `loadChildren` rejected; the branch stays askable.
- * @slot node - Scoped — renders one node's label. Receives `{ node, level, expanded }`.
+ * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
  */
 component('pdx-tree', {
     props: {
@@ -64,6 +64,10 @@ component('pdx-tree', {
         /** Accessible name for the tree. */
         label: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        node: slot<(node: { [key: string]: unknown; isBranch?: boolean }, level: number, expanded: boolean) => Node>(),
     },
     setup(ctx) {
         let rootEl: HTMLElement | null = null;
@@ -194,7 +198,7 @@ component('pdx-tree', {
         // ─── Rendering ──────────────────────────────────────────
 
         function getNodeSlot(): SlotFunction | undefined {
-            return (ctx as unknown as { __slots?: Record<string, SlotFunction> }).__slots?.['node'];
+            return snippetOrSlot(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
         }
 
         function buildRow(node: TreeNode, level: number, position: number, setSize: number): HTMLElement {

@@ -8,7 +8,7 @@
 //     </slot>
 //   </pdx-breadcrumb>
 
-import { component, html, sanitizeUrl, routeTrail } from '@pdxui/core';
+import { component, html, sanitizeUrl, routeTrail, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 /** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
@@ -26,7 +26,7 @@ export interface BreadcrumbItem {
 /**
  * Navigation breadcrumbs, with overflow collapse and custom separators.
  *
- * @slot item - Scoped — renders one crumb. Receives `{ item, index, isFirst, isLast }`.
+ * @slot item - Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.
  */
 component('pdx-breadcrumb', {
     props: {
@@ -36,11 +36,15 @@ component('pdx-breadcrumb', {
         separator: { type: String, default: '' },
         maxItems: { type: Number, default: 0 },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        item: slot<(item: { key: string; label: string; href?: string; icon?: string }, index: number, isLast: boolean) => Node>(),
+    },
     setup(ctx) {
         let built = false;
 
         function getItemSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['item'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index, s.isLast]);
         }
 
         /**

@@ -15,7 +15,7 @@
 // Callback (backward compat):
 //   <pdx-list :items="${users}" :render-item="${renderUser}">
 
-import { component, html, inject, repeatWithSlot } from '@pdxui/core';
+import { component, html, inject, repeatWithSlot, slot, snippetOrSlot } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
@@ -43,8 +43,8 @@ export interface ListItem {
  * A list bound to data, an array or a DataSource, with custom item templates, a loading overlay
  * and an empty state.
  *
- * @slot item - Scoped — renders one item. Receives `{ item, index, id }` (`id` is the value of `id-field`).
- * @slot empty - Shown when the list has no items. Receives nothing, but write it `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
+ * @slot item - Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).
+ * @slot empty - Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
  */
 component('pdx-list', {
     props: {
@@ -59,6 +59,11 @@ component('pdx-list', {
         emptyTitle: { type: String, default: '' },
         emptyDescription: { type: String, default: '' },
         emptyIcon: { type: String, default: 'inbox', iconName: true },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        item: slot<(item: { [key: string]: unknown }, index: number) => Node>(),
+        empty: slot<() => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -92,10 +97,10 @@ component('pdx-list', {
 
         // Slot functions — read lazily (populated by _projectSlots AFTER setup)
         function getItemSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['item'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index]);
         }
         function getEmptySlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['empty'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'empty', () => []);
         }
 
         function resolveDS(): DataSource<unknown> | null {

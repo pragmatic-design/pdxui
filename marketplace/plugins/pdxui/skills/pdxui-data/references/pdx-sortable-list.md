@@ -18,7 +18,7 @@ move, so the array it owns stays the one source of truth.
 
 **Renders:** roles `list`
 
-**Slot:** `item` — Scoped — renders one row's content. Receives `{ item, index }`. Without it the row shows the item's `label-field`.
+**Slot:** `item` — Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index }`. Without either the row shows the item's `label-field`.
 
 
 #### Examples

@@ -10,7 +10,7 @@
 //     </slot>
 //   </pdx-description-list>
 
-import { component, html, repeatWithSlot } from '@pdxui/core';
+import { component, html, repeatWithSlot, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -31,7 +31,7 @@ export interface DescriptionListItem {
  * Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with
  * values as plain text or custom HTML.
  *
- * @slot value - Scoped — renders the value of one entry. Receives `{ item, label, value, index }`.
+ * @slot value - Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
  */
 component('pdx-description-list', {
     props: {
@@ -45,13 +45,17 @@ component('pdx-description-list', {
         colon: { type: Boolean, default: true },
         renderValue: { type: Object, default: null },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        value: slot<(item: { label: string; value: string | HTMLElement; span?: number; icon?: string }, index: number) => Node>(),
+    },
     setup(ctx) {
         let built = false;
         let listEl: HTMLElement | null = null;
 
         // Read slot lazily (_projectSlots runs after setup)
         function getValueSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['value'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'value', (s) => [s.item, s.index]);
         }
 
         function getItems(): DescriptionListItem[] {

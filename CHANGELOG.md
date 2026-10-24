@@ -42,6 +42,19 @@ semver.
   the slot's signature, which the editor types the snippet's parameters from. The alpha scoped slot
   still renders when no snippet is given. Core's `snippetOrSlot(ctx, name, args)` is what a TypeScript
   component reads either one with.
+- The library's lists and navigation take a parent's typed snippet the same way (#595):
+  - `pdx-list`: `item(item, index)` and `empty()`;
+  - `pdx-sortable-list`: `item(item, index)`;
+  - `pdx-description-list`: `value(item, index)`;
+  - `pdx-timeline`: `content(item, index)`;
+  - `pdx-tree`: `node(node, level, expanded)`;
+  - `pdx-breadcrumb`: `item(item, index, isLast)`;
+  - `pdx-nav-menu`: `item(item, level, expanded, active)` and `itemActions(item, level, active)`;
+  - `pdx-pagination`: `item(page, active)`.
+
+  `pdx-pagination`'s `page` slot and `pdx-nav-menu`'s `actions` slot share their names with a prop, so
+  their snippets are named apart; the props and the alpha slots keep their names. `snippetOrSlot`
+  takes the alpha slot's name as a fourth argument when it differs from the snippet's.
 - `@model value: T = d { form };` (`model<T>(d, { form: true })` in a descriptor) makes a component
   form-associated through its model: a native `<form>` submits the model under the host's `name` (a
   string as is, a number as its string, a boolean as a checkbox — its `value` or `on` when true,

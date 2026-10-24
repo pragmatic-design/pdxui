@@ -33,7 +33,7 @@ Page through long results.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `page` — Scoped — renders one page button. Receives `{ page, isActive }`.
+**Slot:** `item` — Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.; `page` — The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form.
 
 
 #### Examples

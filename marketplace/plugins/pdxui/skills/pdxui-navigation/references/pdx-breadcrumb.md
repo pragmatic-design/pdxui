@@ -30,7 +30,7 @@ that is a real URL; use the event for a crumb that changes state without a route
 
 **Renders:** roles `list`
 
-**Slot:** `item` — Scoped — renders one crumb. Receives `{ item, index, isFirst, isLast }`.
+**Slot:** `item` — Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.
 
 **Shapes:** `BreadcrumbItem { key: string; label: string; href?: string; icon?: string }`
 

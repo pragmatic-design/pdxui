@@ -3,7 +3,7 @@
 // Supports: left/right/alternate/horizontal mode, status colors,
 // icons, pending state, clickable items, connector styles.
 
-import { component, html } from '@pdxui/core';
+import { component, html, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -36,7 +36,7 @@ const STATUS_CLASS: Record<string, string> = {
 /**
  * A vertical or horizontal sequence of events, with status colors, icons and clickable items.
  *
- * @slot content - Scoped — renders the content of one entry. Receives `{ item, index, status }` (`status` is `'default'` when unset).
+ * @slot content - Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).
  */
 component('pdx-timeline', {
     props: {
@@ -51,6 +51,10 @@ component('pdx-timeline', {
         /** Dot vertical alignment relative to content: 'start' | 'center' | 'end' */
         dotAlign: { type: String, default: 'start' },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        content: slot<(item: { title: string; description?: string; date?: string; icon?: string; color?: string; status?: 'default' | 'success' | 'warning' | 'error' | 'info'; statusLabel?: string }, index: number) => Node>(),
+    },
     setup(ctx) {
         let _built = false;
         let _containerEl: HTMLElement | null = null;
@@ -59,7 +63,7 @@ component('pdx-timeline', {
         const pendingText = (): string => (ctx.pendingLabel() as string) || uiString('timeline', 'pending');
 
         function getContentSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['content'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'content', (s) => [s.item, s.index]);
         }
 
         function renderTimeline(): void {

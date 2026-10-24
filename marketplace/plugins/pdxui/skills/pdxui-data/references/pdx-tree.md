@@ -34,7 +34,7 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 
 **Renders:** roles `group` · `tree` · `treeitem`
 
-**Slot:** `node` — Scoped — renders one node's label. Receives `{ node, level, expanded }`.
+**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
 
 **Shapes:** `TreeNode { isBranch?: boolean }`
 
