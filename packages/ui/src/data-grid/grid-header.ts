@@ -142,9 +142,9 @@ function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTML
     const label = document.createElement('span');
     label.className = 'pdx-dg-th-label';
     label.id = generatedId('pdx-dg-th-label');
-    const headerSlot = gc.getSlot(`header:${col.field}`);
-    if (headerSlot) {
-        label.appendChild(headerSlot({ col, field: col.field, header: col.header }));
+    const customHeader = gc.customHeader(col);
+    if (customHeader) {
+        label.appendChild(customHeader);
     } else {
         label.textContent = col.header;
         // Tooltip for truncated text. On a sortable header the button's own title carries the

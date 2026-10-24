@@ -49,15 +49,13 @@ export function renderExpandCell(gc: GridContext, rowId: unknown): HTMLElement {
 export function renderDetailRow(gc: GridContext, row: Record<string, unknown>, index: number, rowId: unknown): HTMLElement | null {
     if (!gc.expandedRows.has(rowId)) return null;
 
-    const detailSlot = gc.getSlot('detail');
-    if (!detailSlot) return null;
+    const content = gc.customDetail(row, index, rowId);
+    if (!content) return null;
 
     const detailEl = document.createElement('div');
     detailEl.className = 'pdx-dg-detail-row';
     detailEl.setAttribute('data-detail-id', String(rowId));
-
-    const content = detailSlot({ row, index, id: rowId });
-    detailEl.appendChild(content instanceof DocumentFragment ? content : content);
+    detailEl.appendChild(content);
 
     return detailEl;
 }

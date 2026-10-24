@@ -421,6 +421,21 @@ inputs and media (#596): `pdx-carousel`'s `slide(slide, index, active)`, `pdx-fi
 `row(item, index, remove)` — `remove()` deletes that row —, `pdx-file-upload`'s `file(file, status,
 progress)`, `pdx-mention`'s `suggestion(item, index, active)` and `pdx-tag-input`'s `tag(tag, index)`.
 
+`pdx-data-grid` takes one snippet for every column (#597), since a snippet's name cannot carry a
+field the way the alpha `col:price` slot did: `cell(row, column, value)` and `header(column)`, which
+switch on `column.field`, and `detail(row)`. A column the snippet draws nothing for — no element, no
+text — is drawn by the grid as usual, so a page writes only the columns it changes; `value` is what the
+grid would show, a computed column's included. A command column the snippet draws nothing for keeps
+its Edit and Delete buttons.
+
+```pdx
+<pdx-data-grid :columns="columns" :data="orders">
+  @snippet cell(row, column) {
+    @if (column.field === 'customer') { <a :href="'/customers/' + row.customerId">{{ row.customer }}</a> }
+  }
+</pdx-data-grid>
+```
+
 ```pdx
 <pdx-pagination :total="total" :page-size="20" :page="page">
   @snippet item(p, active) { <b :class="{ current: active }">{{ p }}</b> }

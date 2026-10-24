@@ -14,6 +14,9 @@ function gcFor(grid: unknown): GridContext {
         hasFilterRow: () => true, // suppress filter icon → keep asserted DOM minimal
         hasToolbar: () => false,
         getSlot: () => undefined,
+        customCell: () => null,
+        customHeader: () => null,
+        customDetail: () => null,
         popoverFilters: {},
         grid,
     } as unknown as GridContext;

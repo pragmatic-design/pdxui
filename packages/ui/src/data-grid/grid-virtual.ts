@@ -20,7 +20,6 @@ export function setupVirtualScroll(
     maxHeight: number,
     getRows: () => Record<string, unknown>[],
     getCols: () => AnyColumn[],
-    getSlot: (name: string) => any,
     fill = false,
 ): VirtualScrollState {
     const overscan = 5;
@@ -169,13 +168,7 @@ export function setupVirtualScroll(
                     value = getFieldValue(row, col.field);
                 }
 
-                const cellSlot = getSlot(`col:${col.field}`);
-                if (cellSlot) {
-                    const content = cellSlot({ row, value, index: i, col });
-                    td.appendChild(content instanceof DocumentFragment ? content : content);
-                } else {
-                    td.appendChild(renderCellNode(value, col, row));
-                }
+                td.appendChild(gc.customCell(row, col, value, i) ?? renderCellNode(value, col, row));
 
                 rowEl.appendChild(td);
             }

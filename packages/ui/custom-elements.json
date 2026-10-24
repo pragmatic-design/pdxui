@@ -8032,6 +8032,9 @@
               "fields": [
                 "grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null",
                 "getSlot: (name: string) => SlotFunction | undefined",
+                "customCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown, index: number) => Node | null",
+                "customHeader: (col: AnyColumn) => Node | null",
+                "customDetail: (row: Record<string, unknown>, index: number, id: unknown) => Node | null",
                 "getSelectionMode: () => string",
                 "getRowClass: (row: Record<string, unknown>, index: number) => string",
                 "getIdField: () => string",
@@ -8069,6 +8072,23 @@
                 "update: () => void",
                 "dispose: () => void"
               ]
+            }
+          ],
+          "slots": [
+            {
+              "name": "cell",
+              "description": "Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.",
+              "signature": "(row: Record<string, unknown>, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown)"
+            },
+            {
+              "name": "header",
+              "description": "Draws a column's header: `header(column)`; a column it draws nothing for keeps its title. The alpha scoped slot `header:{field}` still draws one.",
+              "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
+            },
+            {
+              "name": "detail",
+              "description": "Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.",
+              "signature": "(row: Record<string, unknown>)"
             }
           ]
         }

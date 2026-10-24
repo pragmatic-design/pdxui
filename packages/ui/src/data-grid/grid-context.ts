@@ -13,6 +13,16 @@ export interface GridContext {
     grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null;
     /** Get a named slot function (lazy — populated after setup). */
     getSlot: (name: string) => SlotFunction | undefined;
+    /**
+     * A cell the page draws (#597): the `cell(row, column, value)` snippet's node, else the alpha
+     * `col:{field}` scoped slot's, else null — and the grid draws the cell itself. One snippet serves
+     * every column, so it returns nothing for the columns the page leaves to the grid.
+     */
+    customCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown, index: number) => Node | null;
+    /** A header the page draws: the `header(column)` snippet's node, else `header:{field}`'s, else null. */
+    customHeader: (col: AnyColumn) => Node | null;
+    /** A row's detail: the `detail(row)` snippet's node, else the alpha `detail` slot's, else null. */
+    customDetail: (row: Record<string, unknown>, index: number, id: unknown) => Node | null;
     /** Current selection mode: 'none' | 'single' | 'multiple'. */
     getSelectionMode: () => string;
     /**
