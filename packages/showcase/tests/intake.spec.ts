@@ -115,7 +115,8 @@ test('a field the form requires says so: aria-required on the control, the marke
     await expect(requester).toHaveAttribute('aria-required', 'true');
     await expect(email).toHaveAttribute('aria-required', 'true');
 
-    const label = page.locator('pdx-form-field[name="requester"] label');
+    // The field wrapping the requester control: it binds through `:field` since #613, not by `name`.
+    const label = page.locator('pdx-form-field', { has: page.locator('[data-test="requester"]') }).locator('label');
     const marker = () => label.evaluate((el) => getComputedStyle(el, '::after').content);
     expect(await marker(), 'no required marker on the label').toMatch(/^" \*"/);
 

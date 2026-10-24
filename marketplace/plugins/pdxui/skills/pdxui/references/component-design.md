@@ -43,10 +43,10 @@ is rendering, not composing.
 **Recognise it:** eight `<fieldset class="group">` blocks in one route, beside the loading, the
 autosave queue and the leave guard.
 
-**A form's field groups are sections.** Move a group into its own `.pdx` and call `tryUseForm()` in
-its script: that declares it a section of the `<pdx-form>` above it, and the compiler wires its named
-controls and `<pdx-form-field name>`s to that form, as it does in the form's own file — no `:value`, no
-`@value-change` (`recipes.md`, "A long form filled in more than one sitting"). The route keeps
+**A form's field groups are sections.** Move a group into its own `.pdx` and declare the form it sits
+in, `@form form: Values from parent;`: its controls bind `::value="form.x"` and its form fields
+`:field="form.x"`, as in the form's own file (`recipes.md`, "A long form filled in more than one
+sitting"). The route keeps
 the form, the loading and what the sections share; each section is a component.
 
 ### CD-B3 — Do not extract what has no life of its own

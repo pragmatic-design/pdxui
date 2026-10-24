@@ -269,6 +269,12 @@ export function buildSetupBody(
         else parts.push(decl);
     };
     for (const f of analysis.forms) {
+        // A section's inherited form (#613): the form of the `<pdx-form>` above, read lazily — each
+        // `f.x` follows that form from the moment it is provided. It reads nothing the script declares.
+        if (f.kind === 'inherited') {
+            parts.push(`    const ${f.name} = inheritedForm(ctx.el);`);
+            continue;
+        }
         // Extended-option tail shared by inline + external forms. `warnUnsaved` goes to createForm,
         // which installs the leave guard itself: the in-app confirm, not window.confirm.
         const optionParts: string[] = [];

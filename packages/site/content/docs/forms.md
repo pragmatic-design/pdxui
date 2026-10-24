@@ -113,8 +113,9 @@ is the schema's to say: `required` on a bound control is `PDX_FORM_REQUIRED_IN_M
 already marks its control required from its rules. Before #128
 a control was wired to its field by its `name` alone; that is `PDX_REMOVED_FORM` now, and
 `pdx migrate` writes the binding from the control's manifest — flagging a control with no manifest or
-with several models, such as `pdx-checkbox` (`checked`, `indeterminate`). A form section — a component
-that calls `tryUseForm()`, below — still has its named controls wired, until #613.
+with several models, such as `pdx-checkbox` (`checked`, `indeterminate`). A form section binds the
+same way, through the form it inherits (below); a component that only calls `tryUseForm()` still has
+its named controls wired, until #613 finishes removing that.
 
 **A group of checkboxes or radios outside a form** binds to one signal with `::group`: checkboxes to
 an array of the values that are checked, radios to the value of the one selected — no handler per
@@ -181,19 +182,23 @@ pdx-form.compact { --pdx-field-required-marker: ' (required)'; }
 pdx-form.quiet   { --pdx-field-required-marker: none; }
 ```
 
-**A section in its own component is wired too.** The wiring is compile-time, so a control inside a
-child component is compiled from another file. A child whose script calls `tryUseForm()` declares
-itself a section of the `<pdx-form>` above it, and its named controls are wired to that form like the
-ones beside `<pdx-form>`, with no `:value` and no event handler. A child that does not call it is not
-wired.
+**A section in its own component binds the form it inherits.** `@form profile: ProfileValues from
+parent;` makes the component a section of the `<pdx-form>` it is placed in: it creates no form, and
+`profile` is that one. Its controls bind the fields exactly as the ones beside `<pdx-form>` do. The
+form is not there yet when the section sets up — a child connects before its parent — so each
+`profile.x` follows the form from the moment it is found: the value shows, typing writes the field,
+leaving touches it, and the form's reset reaches it. Outside any form the section renders and writes
+nowhere. `ProfileValues` names the form's values: the editor types `profile.phone` from it. The
+declaration compiles to core's `inheritedForm(ctx.el)`, which a component written in TypeScript calls
+itself.
 
 ```pdx
 <template>
-  <pdx-form-field name="phone" label="Phone"><pdx-input name="phone" /></pdx-form-field>
+  <pdx-form-field :field="profile.phone" label="Phone"><pdx-input ::value="profile.phone" /></pdx-form-field>
 </template>
 <script>
-import { tryUseForm } from '@pdxui/core';
-const form = tryUseForm();   // declares the section; answers undefined if the form is not there yet
+type ProfileValues = { name: string; phone: string };   // the page's form's values, or imported from its module
+@form profile: ProfileValues from parent;
 </script>
 ```
 
@@ -326,23 +331,24 @@ The grammar of the options is in the [reference](https://github.com/pragmatic-de
 ## One form, several components
 
 A section that becomes its own `.pdx` does not need the form passed down as a prop — `<pdx-form>`
-provides it to its whole subtree. The section calls `tryUseForm()`, and that call is also what tells
-the compiler to wire its named controls to that form (see *Binding the fields*):
+provides it to its whole subtree, and the section names it with `from parent` (see *Binding the
+fields*):
 
 ```pdx
 <template>
-  <pdx-form-field name="iban" label="IBAN"><pdx-input name="iban" /></pdx-form-field>
+  <pdx-form-field :field="payment.iban" label="IBAN"><pdx-input ::value="payment.iban" /></pdx-form-field>
 </template>
 
 <script>
-import { tryUseForm } from '@pdxui/core';
+type PaymentValues = { holder: string; iban: string };
 
-const form = tryUseForm();   // the nearest <pdx-form>, or undefined if it is not there yet
+@form payment: PaymentValues from parent;
 </script>
 ```
 
-`tryUseForm()` rather than `useForm()`: a child can set up before its form, and `useForm()` then
-throws, while the wired controls look the form up themselves and catch up when it appears.
+A child can set up before its form, which is why `payment.iban` is read when it is asked rather than
+when the section starts: the binding catches up when the form appears. Code of the section's own that
+needs the form object reads it the same way, `tryUseForm(ctx.el)` inside `ctx.track()`;
 [Component Communication](/docs/provide-inject) covers that ordering with the rest of the context
 mechanisms.
 
@@ -370,5 +376,5 @@ anything, so a half-saved screen is not reachable through it.
 | save only if valid | `<pdx-form :form="user" @pdx-submit="save($event.detail.values)">`, or `const onSubmit = user.handleSubmit(save)` bound to your own `<form @submit="onSubmit">` |
 | a list of rows | `[{ … }]` in the schema, then `user.array('lines')` → `append()` / `remove(i)` |
 | the same validation as the backend | `@form x: ExternalSchema` |
-| one form across several components | `<pdx-form :form>` + `tryUseForm()` in each section: its named controls are wired |
+| one form across several components | `<pdx-form :form>` + `@form x: Values from parent;` in each section, whose controls bind `::value="x.field"` |
 | several forms, one Save | `createFormCoordinator()` above them, `name` on each `<pdx-form>` |

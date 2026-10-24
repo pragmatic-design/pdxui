@@ -7,7 +7,7 @@ parent: api
 
 # Forms API
 
-Forms, fields, field arrays, validators, schemas and form-associated custom elements. 46 exports, from `@pdxui/core`.
+Forms, fields, field arrays, validators, schemas and form-associated custom elements. 47 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -237,6 +237,19 @@ function getRegisteredFormControls(): string[]
 ```
 
 Get all registered control tag names (for compiler).
+
+## `inheritedForm`
+
+```ts
+import { inheritedForm } from '@pdxui/core';
+
+function inheritedForm(el: HTMLElement): Form<T>
+```
+
+The form the element `el` sits under, read lazily: what a section's `@form f: Schema from parent;`
+compiles to (#613). Each `f.x` is a stand-in made once — the same object every read, so a binding
+holds it — that reads the inherited form's member `x` when asked, and follows the form from the
+moment `<pdx-form>` provides it. Outside any form, it reads nothing and writes nowhere.
 
 ## `integer`
 

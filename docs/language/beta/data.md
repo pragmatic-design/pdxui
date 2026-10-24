@@ -272,8 +272,10 @@ all of the form's own, `state`, `touched` and `submitting` among them.
   `::pressed` for `pdx-toggle`, `::value` for the others), keeping its `name` as the full path; a
   control with no manifest entry, or with more than one model — `pdx-checkbox`, whose manifest lists
   `checked` and `indeterminate` — is flagged. `name` on `pdx-form-field` becomes `:field`. A form
-  section, a component that calls `useForm()` / `tryUseForm()`, keeps its named controls wired until
-  #613 gives it an explicit binding.
+  section names the form it inherits, `@form f: Schema from parent;` (landed, #613 part 1): `f.x` reads
+  the form of the `<pdx-form>` above it lazily, and its controls bind as any control does. A component
+  that calls `useForm()` / `tryUseForm()` keeps its named controls wired until #613's second part
+  removes that wiring and migrates it.
 - `required` on the markup of a bound control: `PDX_FORM_REQUIRED_IN_MARKUP` (warning), pointing at
   the schema (landed, #128).
 - The alpha rules stay (`PDX_FORM_FIELD_UNPARSED`, `PDX_FORM_ARRAY_RULES_IGNORED`,

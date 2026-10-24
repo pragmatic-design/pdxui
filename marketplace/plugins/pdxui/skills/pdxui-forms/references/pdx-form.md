@@ -4,16 +4,16 @@ Schema-driven form with validation.
 
 **Takes a DataSource:** bind one to `:source`.
 
-**Use it when** you write the form by hand: fields laid out in markup, each `<pdx-form-field name="x">`
-holding a control with the same `name`, wired by the compiler. **Not when** the fields come from a schema
+**Use it when** you write the form by hand: fields laid out in markup, each `<pdx-form-field :field="form.x">`
+holding a control bound to the same field, `::value="form.x"`. **Not when** the fields come from a schema
 or the grid's `FieldDefinition[]` → `pdx-auto-form`; nor to submit several separate forms together — that
 is one `<pdx-form name>` each under `createFormCoordinator()` (recipes: *A long form filled in more than one sitting*).
 
 **Pitfalls**
 - Inside `<pdx-form :form>` a control binds its field through its model, `::value="form.x"`, and a form field
-  names it, `:field="form.x"`: a control with only a `name` there is `PDX_REMOVED_FORM` (#128). Only a
-  section — a component whose script calls `tryUseForm()` — still has its named controls wired, until #613.
-- A section calls `tryUseForm()`, not `useForm()`: a child can set up before its form, and `useForm()` then throws.
+  names it, `:field="form.x"`: a control with only a `name` there is `PDX_REMOVED_FORM` (#128).
+- A section in its own component declares the form it sits in, `@form form: Values from parent;`, and binds
+  the same way: the form is read when asked, since a child can set up before it (#613).
 - A `<pdx-field-group>` written in the PARENT does not prefix the controls of a section component inside
   it: put the group in the section.
 - Inside a group a field is bound by its full path, `::value="form['customer.email']"`, and its control's `name`

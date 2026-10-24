@@ -57,6 +57,11 @@ function fieldsOf(fields: FormFieldDecl[]): string {
  * fields of unknown name and value. Null for a declaration neither reading understands.
  */
 export function formTypeOf(declaration: string): string | null {
+    // A section's inherited form (#613): `SchemaName` names the inherited form's VALUES, a type in the
+    // script's scope, so its fields are known — `intake.email` reads, `intake.emial` is an error.
+    // Match: @form name: SchemaName from parent   Groups: [1]=the values type
+    const inherited = /^@form\s+\w+\s*:\s*(\w+)\s+from\s+parent\b/.exec(declaration);
+    if (inherited) return `${CORE_FORM}<${inherited[1]}>`;
     // Match: @form name: SchemaName   (external: a name, where an inline schema opens a brace)
     if (/^@form\s+\w+\s*:\s*\w/.test(declaration)) return `${CORE_FORM}<Record<string, unknown>>`;
     const fields = inlineFormFields(declaration);
