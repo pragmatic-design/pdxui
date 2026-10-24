@@ -5,14 +5,14 @@ A small count or status dot on anything.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `value` | `value` | string | `''` | The current value. |
-| `variant` | `variant` | string | `'primary'` | Visual variant. |
 | `max` | `max` | number | `99` | Maximum allowed value. |
 | `dot` | `dot` | boolean | `false` | Renders a small dot instead of a count. |
 | `pulse` | `pulse` | boolean | `false` | Adds a pulsing animation. |
 | `hideZero` | `hidezero` | boolean | `true` | Hides the badge when the value is 0. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
-| `shape` | `shape` | string | `'pill'` | Shape: 'pill' (default, full radius) or 'square' (rounded rectangle). |
 | `label` | `label` | string | `''` | What the badge means, read instead of its colour or its bare number: "Online", "3 unread messages". A dot without it is read as its variant ("success indicator"). |
+| `variant` | `variant` | 'primary' \| 'secondary' \| 'success' \| 'danger' \| 'warning' \| 'info' \| 'muted' \| 'outline' \| 'outline-primary' \| 'outline-success' \| 'outline-danger' \| 'outline-warning' | `'primary'` | primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
+| `shape` | `shape` | 'pill' \| 'square' | `'pill'` | pill (the default, full radius) or square (a rounded rectangle). |
 
 **Renders:** roles `status`
 

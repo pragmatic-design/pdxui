@@ -112,7 +112,7 @@ export const badge: ComponentManifest = {
             },
             'badge-outline': {
                 standalone: ['primary', 'success', 'danger', 'warning'].map((v) => ({
-                    selector: `[data-test="o-${v}"] .pdx-badge-outline-${v}`,
+                    selector: `[data-test="o-${v}"] .pdx-badge`,
                     description: `outline ${v} badge text is legible on the page (AA)`,
                     contrast: { op: '>=' as const, value: 4.5 },
                 })),

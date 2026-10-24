@@ -6,7 +6,7 @@
  * does not exist. A presence dot is not colour only, and "Offline" is not red, as if being away were
  * an error. A clickable avatar group works from the keyboard, not only with a mouse.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -63,11 +63,16 @@ test('each presence dot has its status written beside it, and offline is muted, 
     await page.goto('/components/pdx-avatar', { waitUntil: 'domcontentloaded' });
     const items = section(page, 'With Status Dot').locator('.status-item');
     await expect(items.locator('.pdx-txt-caption')).toHaveText(['Online', 'Away', 'Offline', 'Busy']);
-    await expect(items.filter({ hasText: 'Offline' }).locator('.pdx-dot')).toHaveClass(/pdx-dot-muted/);
+    // The colour is the host's `variant` (#631), and it is drawn: not the danger dot's colour.
+    const offline = items.filter({ hasText: 'Offline' }).locator('pdx-badge');
+    await expect(offline).toHaveAttribute('variant', 'muted');
+    const background = (dot: Locator) => dot.evaluate((el) => getComputedStyle(el).backgroundColor);
+    const busyDot = items.filter({ hasText: 'Busy' }).locator('.pdx-dot');
+    expect(await background(offline.locator('.pdx-dot'))).not.toBe(await background(busyDot));
 
     const team = section(page, 'Composition').locator('.team-row').filter({ hasText: 'Offline' });
-    await expect(team.locator('.pdx-dot')).toHaveClass(/pdx-dot-muted/);
-    await expect(team.locator('.pdx-badge')).not.toHaveClass(/danger/);
+    await expect(team.locator('pdx-badge[dot]')).toHaveAttribute('variant', 'muted');
+    await expect(team.locator('pdx-badge:not([dot])')).not.toHaveAttribute('variant', /danger/);
 });
 
 test('the clickable group is reached by Tab, and Enter on "+4" fires the overflow event', async ({ page }) => {

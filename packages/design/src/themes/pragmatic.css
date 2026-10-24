@@ -159,7 +159,7 @@
 
 /* ── Alert/Badge: blue accent ── */
 [pdx-theme="pragmatic"] .pdx-alert-info:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { border-left-color: var(--pdx-color-primary); }
-[pdx-theme="pragmatic"] .pdx-badge-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+[pdx-theme="pragmatic"] :where(pdx-badge[variant="primary"]) > :where(:not(.pdx-dot))[data-part="root"]:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)), [pdx-theme="pragmatic"] :where(:not(.pdx-dot)).pdx-badge-primary:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
 
 /* ── Table: blue header accent ── */
 [pdx-theme="pragmatic"] .pdx-table th:not(:where([pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]), [pdx-theme="pragmatic"] [pdx-theme]:not([pdx-theme="pragmatic"]) *)) {

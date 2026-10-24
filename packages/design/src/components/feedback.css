@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/feedback.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Feedback — alerts, badges, skeleton, loading overlay, status dots, empty state, tooltip, callout */
 
 /* Alerts — base styles apply to .pdx-alert AND all variant classes */
@@ -48,26 +49,29 @@
     line-height: var(--pdx-line-tight);
 }
 
-.pdx-badge-primary   { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
-.pdx-badge-secondary { background: var(--pdx-color-inset); color: var(--pdx-color-text); border: var(--pdx-border-width) solid var(--pdx-color-border); }
-.pdx-badge-success   { background: var(--pdx-color-success-soft); color: var(--pdx-color-success-ink); }
-.pdx-badge-danger    { background: var(--pdx-color-danger-soft); color: var(--pdx-color-danger-ink); }
-.pdx-badge-warning   { background: var(--pdx-color-warning-soft); color: var(--pdx-color-warning-ink); }
-.pdx-badge-info      { background: var(--pdx-color-accent-soft); color: var(--pdx-color-accent-ink); }
+/* Badge variants, sizes and shape, keyed on pdx-badge's host (#631). The counter is the root part
+   when it is not a dot; on a native badge `.pdx-badge-{variant}`, `.pdx-badge-sm`, `.pdx-badge-square`.
+   `:where(:not(.pdx-dot))` keeps the counter's rules off the dot and at the class's weight. */
+:where(pdx-badge[variant="primary"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+:where(pdx-badge[variant="secondary"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-secondary { background: var(--pdx-color-inset); color: var(--pdx-color-text); border: var(--pdx-border-width) solid var(--pdx-color-border); }
+:where(pdx-badge[variant="success"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-success { background: var(--pdx-color-success-soft); color: var(--pdx-color-success-ink); }
+:where(pdx-badge[variant="danger"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-danger { background: var(--pdx-color-danger-soft); color: var(--pdx-color-danger-ink); }
+:where(pdx-badge[variant="warning"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-warning { background: var(--pdx-color-warning-soft); color: var(--pdx-color-warning-ink); }
+:where(pdx-badge[variant="info"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-info { background: var(--pdx-color-accent-soft); color: var(--pdx-color-accent-ink); }
 
 /* Badge outline variants — border + text colored, transparent bg */
-.pdx-badge-outline          { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-border); color: var(--pdx-color-text); }
-.pdx-badge-outline-primary  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-primary); color: var(--pdx-color-primary-ink); }
-.pdx-badge-outline-success  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-success); color: var(--pdx-color-success-ink); }
-.pdx-badge-outline-danger   { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-danger); color: var(--pdx-color-danger-ink); }
-.pdx-badge-outline-warning  { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-warning); color: var(--pdx-color-warning-ink); }
+:where(pdx-badge[variant="outline"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-outline { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-border); color: var(--pdx-color-text); }
+:where(pdx-badge[variant="outline-primary"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-outline-primary { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-primary); color: var(--pdx-color-primary-ink); }
+:where(pdx-badge[variant="outline-success"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-outline-success { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-success); color: var(--pdx-color-success-ink); }
+:where(pdx-badge[variant="outline-danger"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-outline-danger { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-danger); color: var(--pdx-color-danger-ink); }
+:where(pdx-badge[variant="outline-warning"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-outline-warning { background: transparent; border: var(--pdx-border-width) solid var(--pdx-color-warning); color: var(--pdx-color-warning-ink); }
 
 /* Badge sizes */
-.pdx-badge-sm { font-size: 0.65rem; padding: 1px var(--pdx-space-xs); }
-.pdx-badge-lg { font-size: var(--pdx-text-sm); padding: var(--pdx-space-xs) var(--pdx-space-md); }
+:where(pdx-badge[size="sm"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-sm { font-size: 0.65rem; padding: 1px var(--pdx-space-xs); }
+:where(pdx-badge[size="lg"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-lg { font-size: var(--pdx-text-sm); padding: var(--pdx-space-xs) var(--pdx-space-md); }
 
 /* Badge shape */
-.pdx-badge-square { border-radius: var(--pdx-radius-sm); }
+:where(pdx-badge[shape="square"]) > :where(:not(.pdx-dot))[data-part="root"], :where(:not(.pdx-dot)).pdx-badge-square { border-radius: var(--pdx-radius-sm); }
 
 /* Badge overlay — position badge on corner of parent */
 .pdx-badge-anchor {
@@ -196,11 +200,20 @@
     flex-shrink: 0;
 }
 
+/* A native dot's colour: its own class. */
 .pdx-dot-success { background: var(--pdx-color-success); }
 .pdx-dot-danger  { background: var(--pdx-color-danger); }
 .pdx-dot-warning { background: var(--pdx-color-warning); }
 .pdx-dot-muted   { background: var(--pdx-color-muted); }
 .pdx-dot-primary { background: var(--pdx-color-primary); }
+
+/* pdx-badge's dot: its host's variant (#631). No root part in the selector, so no native form —
+   a native dot has the classes above. */
+:where(pdx-badge[variant="success"]) > .pdx-dot { background: var(--pdx-color-success); }
+:where(pdx-badge[variant="danger"]) > .pdx-dot { background: var(--pdx-color-danger); }
+:where(pdx-badge[variant="warning"]) > .pdx-dot { background: var(--pdx-color-warning); }
+:where(pdx-badge[variant="muted"]) > .pdx-dot { background: var(--pdx-color-muted); }
+:where(pdx-badge[variant="primary"]) > .pdx-dot { background: var(--pdx-color-primary); }
 
 .pdx-dot-pulse {
     animation: pdx-pulse 2s ease-in-out infinite;

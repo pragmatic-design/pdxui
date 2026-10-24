@@ -211,6 +211,74 @@
         {
           "id": "badge-outline",
           "title": "Badge — Outline variants"
+        },
+        {
+          "id": "badge-variant-primary",
+          "title": "pdx-badge — variant=\"primary\""
+        },
+        {
+          "id": "badge-variant-secondary",
+          "title": "pdx-badge — variant=\"secondary\""
+        },
+        {
+          "id": "badge-variant-success",
+          "title": "pdx-badge — variant=\"success\""
+        },
+        {
+          "id": "badge-variant-danger",
+          "title": "pdx-badge — variant=\"danger\""
+        },
+        {
+          "id": "badge-variant-warning",
+          "title": "pdx-badge — variant=\"warning\""
+        },
+        {
+          "id": "badge-variant-info",
+          "title": "pdx-badge — variant=\"info\""
+        },
+        {
+          "id": "badge-variant-muted",
+          "title": "pdx-badge — variant=\"muted\""
+        },
+        {
+          "id": "badge-variant-outline",
+          "title": "pdx-badge — variant=\"outline\""
+        },
+        {
+          "id": "badge-variant-outline-primary",
+          "title": "pdx-badge — variant=\"outline-primary\""
+        },
+        {
+          "id": "badge-variant-outline-success",
+          "title": "pdx-badge — variant=\"outline-success\""
+        },
+        {
+          "id": "badge-variant-outline-danger",
+          "title": "pdx-badge — variant=\"outline-danger\""
+        },
+        {
+          "id": "badge-variant-outline-warning",
+          "title": "pdx-badge — variant=\"outline-warning\""
+        },
+        {
+          "id": "badge-size-md",
+          "title": "pdx-badge — size=\"md\""
+        },
+        {
+          "id": "badge-size-sm",
+          "title": "pdx-badge — size=\"sm\""
+        },
+        {
+          "id": "badge-size-lg",
+          "title": "pdx-badge — size=\"lg\""
+        },
+        {
+          "id": "badge-shape-pill",
+          "title": "pdx-badge — shape=\"pill\""
+        },
+        {
+          "id": "badge-shape-square",
+          "title": "pdx-badge — shape=\"square\""
         }
       ]
     },
@@ -230,6 +298,26 @@
         {
           "id": "banner-closable",
           "title": "Banner — Closable"
+        },
+        {
+          "id": "banner-variant-info",
+          "title": "pdx-banner — variant=\"info\""
+        },
+        {
+          "id": "banner-variant-success",
+          "title": "pdx-banner — variant=\"success\""
+        },
+        {
+          "id": "banner-variant-warning",
+          "title": "pdx-banner — variant=\"warning\""
+        },
+        {
+          "id": "banner-variant-danger",
+          "title": "pdx-banner — variant=\"danger\""
+        },
+        {
+          "id": "banner-variant-error",
+          "title": "pdx-banner — variant=\"error\""
         }
       ]
     },
@@ -1942,6 +2030,18 @@
         {
           "id": "progress-indeterminate",
           "title": "Progress — Indeterminate"
+        },
+        {
+          "id": "progress-size-md",
+          "title": "pdx-progress — size=\"md\""
+        },
+        {
+          "id": "progress-size-sm",
+          "title": "pdx-progress — size=\"sm\""
+        },
+        {
+          "id": "progress-size-lg",
+          "title": "pdx-progress — size=\"lg\""
         }
       ]
     },
@@ -2678,6 +2778,30 @@
         {
           "id": "toast-rich",
           "title": "Toast — Rich (title + message)"
+        },
+        {
+          "id": "toast-position-top-right",
+          "title": "pdx-toast — position=\"top-right\""
+        },
+        {
+          "id": "toast-position-top-left",
+          "title": "pdx-toast — position=\"top-left\""
+        },
+        {
+          "id": "toast-position-bottom-right",
+          "title": "pdx-toast — position=\"bottom-right\""
+        },
+        {
+          "id": "toast-position-bottom-left",
+          "title": "pdx-toast — position=\"bottom-left\""
+        },
+        {
+          "id": "toast-position-top-center",
+          "title": "pdx-toast — position=\"top-center\""
+        },
+        {
+          "id": "toast-position-bottom-center",
+          "title": "pdx-toast — position=\"bottom-center\""
         }
       ]
     },

@@ -49,8 +49,18 @@ const ICON_MAP: Record<string, string> = {
  * pausing on hover and offering action buttons.
  */
 component('pdx-toast', {
-    props: {
-        position: { type: String, default: 'top-right' },
+    // The axis toast.css and adaptive.css key by (#631), reflected on the host; each value maps the
+    // container's attribute that places the same stack on native markup.
+    variants: {
+        /** Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center. */
+        position: {
+            'top-right': '.pdx-toast-container[position="top-right"]',
+            'top-left': '.pdx-toast-container[position="top-left"]',
+            'bottom-right': '.pdx-toast-container[position="bottom-right"]',
+            'bottom-left': '.pdx-toast-container[position="bottom-left"]',
+            'top-center': '.pdx-toast-container[position="top-center"]',
+            'bottom-center': '.pdx-toast-container[position="bottom-center"]',
+        },
     },
     setup(ctx) {
         const queue = getToastQueue();
@@ -58,7 +68,6 @@ component('pdx-toast', {
 
         function renderToasts(items: Toast[]) {
             if (!containerEl) return;
-            containerEl.setAttribute('position', ctx.position() as string || 'top-right');
 
             const existingIds = new Set<string>();
             for (const child of Array.from(containerEl.children)) {
@@ -222,7 +231,7 @@ component('pdx-toast', {
 
         return {};
     },
-    render: (ctx) => html`
-        <div class="pdx-toast-container" :position="${ctx.position}"></div>
+    render: () => html`
+        <div class="pdx-toast-container" data-part="root"></div>
     `,
 });

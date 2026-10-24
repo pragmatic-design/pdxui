@@ -4,7 +4,7 @@ Transient, stacked notifications.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `position` | `position` | string | `'top-right'` | Where toasts appear (e.g. 'top-right'). |
+| `position` | `position` | 'top-right' \| 'top-left' \| 'bottom-right' \| 'bottom-left' \| 'top-center' \| 'bottom-center' | `'top-right'` | Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center. |
 
 **Renders:** roles `alert` · `status`
 

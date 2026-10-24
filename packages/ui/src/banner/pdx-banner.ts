@@ -28,8 +28,13 @@ const VARIANT_ICONS: Record<string, string> = {
  * can close or which dismisses itself.
  */
 component('pdx-banner', {
+    // The axis banner.css keys by (#631), reflected on the host; each value maps the class that draws
+    // the same banner on native markup. `error` is `danger`'s other name, and shares its class.
+    variants: {
+        /** info (the default), success, warning, danger, or error (danger). */
+        variant: { info: '.pdx-banner-info', success: '.pdx-banner-success', warning: '.pdx-banner-warning', danger: '.pdx-banner-danger', error: '.pdx-banner-danger' },
+    },
     props: {
-        variant: { type: String, default: 'info' },
         closable: { type: Boolean, default: false },
         autoDismiss: { type: Number, default: 0 },
         showIcon: { type: Boolean, default: true },
@@ -77,8 +82,7 @@ component('pdx-banner', {
         });
 
         function bannerClass(): string {
-            const v = ctx.variant() as string;
-            let cls = 'pdx-banner pdx-banner-' + (v === 'error' ? 'danger' : v);
+            let cls = 'pdx-banner';
             if (ctx.subtle()) cls += ' pdx-banner-subtle';
             return cls;
         }
@@ -106,7 +110,7 @@ component('pdx-banner', {
         return { bannerClass, iconName };
     },
     render: (ctx) => html`
-        <div :class="${ctx.bannerClass}" role="${() => (ctx.variant() as string) === 'danger' || (ctx.variant() as string) === 'error' ? 'alert' : 'status'}">
+        <div :class="${ctx.bannerClass}" data-part="root" role="${() => (ctx.variant() as string) === 'danger' || (ctx.variant() as string) === 'error' ? 'alert' : 'status'}">
             ${() => ctx.showIcon() ? html`<pdx-icon :name="${ctx.iconName}" size="sm" class="pdx-banner-icon"></pdx-icon>` : ''}
             <span class="pdx-banner-text"><slot></slot></span>
             ${() => ctx.closable() ? html`

@@ -367,6 +367,23 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-badge`, `pdx-banner`, `pdx-progress` and `pdx-toast` declare their axes (#631),
+  reflected on the host with their defaults, and drawn by `@variant` rules that also compile to the
+  native classes.
+  - `pdx-badge`: `variant` (primary, secondary, success, danger, warning, info, muted, outline, and
+    outline with a colour), `size` (sm, md, lg) and `shape` (pill, square). Its counter no longer
+    carries `.pdx-badge-{variant}`, `.pdx-badge-{size}` or `.pdx-badge-square`, nor its dot
+    `.pdx-dot-{variant}`; the element is `data-part="root"`. A native dot keeps its `.pdx-dot-{variant}`.
+  - `pdx-banner`: `variant` (info, success, warning, danger, and error, danger's other name). Its root
+    no longer carries `.pdx-banner-{variant}`.
+  - `pdx-progress`: `size` (sm, md, lg). Its track and its ring no longer carry `.pdx-progress-{size}`.
+  - `pdx-toast`: `position` (top-right, top-left, bottom-right, bottom-left, top-center, bottom-center).
+    Its container no longer carries the `position` attribute; it is `data-part="root"`. A native
+    `.pdx-toast-container` keeps its `position` attribute.
+  - These keep their props, since they only pass them on or choose markup: `pdx-progress`'s `variant`,
+    set as an attribute on its bar and ring, which the stylesheet draws; `pdx-alert-dialog`'s
+    `variant`, which picks its confirm button's class; and `pdx-spinner`'s and `pdx-block-ui`'s
+    `variant`, and `pdx-spinner`'s `size`, an inline pixel size.
 - **Breaking:** `pdx-chip` and `pdx-fab` declare their axes (#630), reflected on the host with their
   defaults, and drawn by `@variant` rules that also compile to the native classes.
   - `pdx-chip`: `variant` — outline (the default, the base look), primary, success, danger, warning,

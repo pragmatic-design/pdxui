@@ -12,6 +12,13 @@ import '@pdxui/design/components/progress';
  * A linear or circular progress indicator, determinate with a value or indeterminate and animated.
  */
 component('pdx-progress', {
+    // The axis progress.css keys by (#631), reflected on the host; each value maps the class that draws
+    // the same track on native markup. `md` is the base look. The colour `variant` stays a prop: it is
+    // passed to the bar and the ring as attributes, which progress.css draws natively.
+    variants: {
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-progress-md', sm: '.pdx-progress-sm', lg: '.pdx-progress-lg' },
+    },
     props: {
         /** Current value (0-100). Omit or -1 for indeterminate. */
         value: { type: Number, default: -1 },
@@ -19,8 +26,6 @@ component('pdx-progress', {
         max: { type: Number, default: 100 },
         /** Color variant: primary (default), success, warning, danger */
         variant: { type: String, default: '' },
-        /** Size: sm, md (default), lg */
-        size: { type: String, default: '' },
         /** Show percentage label */
         showLabel: { type: Boolean, default: false },
         /** Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext). */
@@ -46,8 +51,6 @@ component('pdx-progress', {
 
         function rootClass(): string {
             let cls = ctx.circular() ? 'pdx-progress-circular' : 'pdx-progress';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-progress-' + s;
             if (isIndeterminate()) cls += ' pdx-progress-indeterminate';
             if (ctx.striped()) cls += ' pdx-progress-striped';
             return cls;
@@ -128,7 +131,7 @@ component('pdx-progress', {
     },
     render: (ctx) => html`
         ${() => ctx.circular() ? html`
-            <div :class="${ctx.rootClass}" role="progressbar" :aria-label="${() => (ctx.ariaLabel() as string) || uiString('progress', 'label')}"
+            <div :class="${ctx.rootClass}" data-part="root" role="progressbar" :aria-label="${() => (ctx.ariaLabel() as string) || uiString('progress', 'label')}"
                 aria-valuemin="0" :aria-valuemax="${ctx.max}"
                 :aria-valuenow="${ctx.ariaValueNow}" :aria-valuetext="${ctx.ariaValueText}">
                 <svg class="pdx-progress-ring" viewBox="0 0 100 100">
@@ -142,7 +145,7 @@ component('pdx-progress', {
             <div role="progressbar" :aria-label="${() => (ctx.ariaLabel() as string) || uiString('progress', 'label')}"
                 aria-valuemin="0" :aria-valuemax="${ctx.max}"
                 :aria-valuenow="${ctx.ariaValueNow}" :aria-valuetext="${ctx.ariaValueText}" style="display:flex;align-items:center;gap:var(--pdx-space-sm);width:100%">
-                <div :class="${ctx.rootClass}">
+                <div :class="${ctx.rootClass}" data-part="root">
                     <div class="pdx-progress-bar"></div>
                 </div>
                 ${() => ctx.showLabel() ? html`<span class="pdx-progress-label" style="font-size:var(--pdx-text-xs);color:var(--pdx-color-muted);white-space:nowrap;min-width:3ch;text-align:right"></span>` : ''}
