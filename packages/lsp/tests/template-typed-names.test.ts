@@ -20,6 +20,7 @@ import { getTsDiagnostics } from '../src/capabilities/ts-diagnostics';
 import { resolvePropType, resolveSnippetType } from '../src/workspace';
 import type { ResolveSnippet } from '../src/utils/template-projection';
 import { describeProjectComponent } from '../src/utils/project-components';
+import { buildRegistry } from '../src/utils/project-registry';
 import { mkdtempSync, writeFileSync, rmSync } from 'fs';
 import { tmpdir } from 'os';
 
@@ -174,8 +175,8 @@ describe("a scoped slot's context", () => {
     });
 
     it('control — the slot of a component that cannot type it (a library one) is left unchecked', () => {
-        // `<pdx-nav-menu>`'s item is whatever the app passed in `:items`: a generic its manifest
-        // cannot state until the component declares its slot's signature (#491).
+        // The alpha scoped slot's context: `<pdx-nav-menu>`'s manifest types its snippet `item`
+        // (#595, below), not the `let:` form, which stays unchecked until #131 removes it.
         expect(diagnose('let x = $signal(1);', '<pdx-nav-menu><slot name="item" let:item><b>{{ item.label }}</b></slot></pdx-nav-menu>')).toEqual([]);
     });
 });
@@ -215,6 +216,31 @@ describe("a snippet's parameters", () => {
 
     it('control — of a component whose signature is not known, they are left unchecked', () => {
         expect(diagnose(USER, '<app-other>@snippet row(u) { <p>{{ u.anything }}</p> }</app-other>', undefined, snippets)).toEqual([]);
+    });
+});
+
+// #595: a library component's snippet, typed from the repository's own manifest, not a stand-in.
+// `pdx-nav-menu` declares `item(item, level, expanded, active)` and `itemActions(item, level, active)`.
+describe("a library component's snippet, from the real manifest (#595)", () => {
+    const registry = buildRegistry(ROOT);
+    const fromManifest: ResolveSnippet = (tag, name) => resolveSnippetType(registry, tag, name);
+    const NAV = "let nav = $signal([{ key: 'home', label: 'Home' }]);";
+
+    it('the manifest is the one read: pdx-nav-menu records its signatures', () => {
+        expect(fromManifest('pdx-nav-menu', 'item')?.signature).toMatch(/^\(item: \{ key: string; label: string;/);
+        expect(fromManifest('pdx-nav-menu', 'itemActions')?.signature).toMatch(/level: number, active: boolean\)$/);
+    });
+
+    // The entry carries `[key: string]: unknown`, for the fields an app adds to its own items: a member
+    // the signature does not name reads as `unknown`, not as an error. What it names is typed.
+    it('a misspelt member of a typed field is an error at the member, and so is a wrong use of the level', () => {
+        const found = diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet item(it, level) { <b>{{ it.label.lenght }} {{ level.toUpperCase() }}</b> }</pdx-nav-menu>', undefined, fromManifest);
+        expect(found.map((f) => f.at)).toEqual(['lenght', 'toUpperCase']);
+    });
+
+    it('control — the declared members read, and so does the renamed snippet', () => {
+        expect(diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet item(it, level, open, on) { <b>{{ it.label }} {{ level + 1 }} {{ open && on }}</b> }</pdx-nav-menu>', undefined, fromManifest)).toEqual([]);
+        expect(diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet itemActions(it, level, on) { <i>{{ it.key }}{{ on }}</i> }</pdx-nav-menu>', undefined, fromManifest)).toEqual([]);
     });
 });
 

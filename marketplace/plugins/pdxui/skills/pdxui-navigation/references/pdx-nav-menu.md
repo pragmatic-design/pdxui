@@ -26,7 +26,7 @@ A multi-level navigation menu.
 
 **Renders:** roles `group` · `navigation`
 
-**Slot:** `item` — Scoped — renders one navigation entry, a group's included. Receives `{ item, level, expanded, active }`.; `actions` — Scoped — controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. Receives `{ item, level, active }`.
+**Slot:** `item` — Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.; `itemActions` — Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.; `actions` — The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
 
 **Shapes:** `NavMenuItem { key: string; label: string; icon?: string; badge?: string; badgeVariant?: 'default' | 'primary' | 'danger' | 'success'; children?: NavMenuItem[]; type?: 'item' | 'header' | 'separator'; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string> }`
 

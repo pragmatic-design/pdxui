@@ -2,7 +2,7 @@
 // Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
 // Priority: explicit props > :source prop > injected DataSource from context.
 
-import { component, html, signal, inject } from '@pdxui/core';
+import { component, html, signal, inject, slot, snippetOrSlot } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { SlotFunction } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
@@ -18,7 +18,8 @@ type SizeSelect = HTMLElement & { options: { value: string; label: string }[]; v
  * Page navigation with numbered buttons, previous/next and first/last, collapsing large ranges
  * behind an ellipsis.
  *
- * @slot page - Scoped — renders one page button. Receives `{ page, isActive }`.
+ * @slot item - Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.
+ * @slot page - The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form.
  */
 component('pdx-pagination', {
     props: {
@@ -41,11 +42,16 @@ component('pdx-pagination', {
         /** Show total info text */
         showTotal: { type: Boolean, default: false },
     },
+    // A parent's `@snippet` sets this, positional arguments; the alpha scoped slot stays (#595). The
+    // `page` slot shares its name with the prop above, so its snippet is `item`.
+    slots: {
+        item: slot<(page: number, active: boolean) => Node>(),
+    },
     setup(ctx) {
         const _page = signal(1);
         let _built = false;
         function getPageSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['page'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'item', (s) => [s.page, s.isActive], 'page');
         }
         let _ds: DataSource<unknown> | null = null;
 

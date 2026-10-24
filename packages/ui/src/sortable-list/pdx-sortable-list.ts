@@ -22,7 +22,7 @@
 // the app's language, the strings come from `uiString`, and `labelOf` reads the ITEM rather than
 // the row's text. Those travel as `a11y` options; the state machine does not.
 
-import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId } from '@pdxui/core';
+import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction, Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -35,8 +35,8 @@ import '@pdxui/design/components/sortable-list';
  * It emits `pdx-reorder` with the indices and never writes to `items`: the application applies the
  * move, so the array it owns stays the one source of truth.
  *
- * @slot item - Scoped — renders one row's content. Receives `{ item, index }`. Without it the row
- *   shows the item's `label-field`.
+ * @slot item - Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which
+ *   receives `{ item, index }`. Without either the row shows the item's `label-field`.
  */
 component('pdx-sortable-list', {
     props: {
@@ -51,6 +51,10 @@ component('pdx-sortable-list', {
         handle: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
     },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    slots: {
+        item: slot<(item: unknown, index: number) => Node>(),
+    },
     setup(ctx) {
         let built = false;
         let listEl: HTMLElement | null = null;
@@ -63,7 +67,7 @@ component('pdx-sortable-list', {
         let refocusIndex = -1;
 
         function getItemSlot(): SlotFunction | undefined {
-            return (ctx as unknown as { __slots?: Record<string, SlotFunction> }).__slots?.['item'];
+            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index]);
         }
 
         function rows(): unknown[] {

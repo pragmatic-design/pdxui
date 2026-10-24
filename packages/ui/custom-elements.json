@@ -2880,7 +2880,8 @@
           "slots": [
             {
               "name": "item",
-              "description": "Scoped — renders one crumb. Receives `{ item, index, isFirst, isLast }`."
+              "description": "Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.",
+              "signature": "(item: { key: string; label: string; href?: string; icon?: string }, index: number, isLast: boolean)"
             }
           ],
           "cssProperties": [
@@ -9154,7 +9155,8 @@
           "slots": [
             {
               "name": "value",
-              "description": "Scoped — renders the value of one entry. Receives `{ item, label, value, index }`."
+              "description": "Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.",
+              "signature": "(item: { label: string; value: string | HTMLElement; span?: number; icon?: string }, index: number)"
             }
           ]
         }
@@ -15224,11 +15226,13 @@
           "slots": [
             {
               "name": "item",
-              "description": "Scoped — renders one item. Receives `{ item, index, id }` (`id` is the value of `id-field`)."
+              "description": "Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).",
+              "signature": "(item: { [key: string]: unknown }, index: number)"
             },
             {
               "name": "empty",
-              "description": "Shown when the list has no items. Receives nothing, but write it `<slot name=\"empty\" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored."
+              "description": "Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name=\"empty\" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.",
+              "signature": "()"
             },
             {
               "name": "",
@@ -16581,11 +16585,17 @@
           "slots": [
             {
               "name": "item",
-              "description": "Scoped — renders one navigation entry, a group's included. Receives `{ item, level, expanded, active }`."
+              "description": "Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.",
+              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; href?: string; children?: unknown[]; [key: string]: unknown }, level: number, expanded: boolean, active: boolean)"
+            },
+            {
+              "name": "itemActions",
+              "description": "Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.",
+              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; href?: string; [key: string]: unknown }, level: number, active: boolean)"
             },
             {
               "name": "actions",
-              "description": "Scoped — controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. Receives `{ item, level, active }`."
+              "description": "The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form."
             }
           ]
         }
@@ -17905,8 +17915,13 @@
           ],
           "slots": [
             {
+              "name": "item",
+              "description": "Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.",
+              "signature": "(page: number, active: boolean)"
+            },
+            {
               "name": "page",
-              "description": "Scoped — renders one page button. Receives `{ page, isActive }`."
+              "description": "The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form."
             }
           ],
           "x-pdx-context": {
@@ -22554,7 +22569,8 @@
           "slots": [
             {
               "name": "item",
-              "description": "Scoped — renders one row's content. Receives `{ item, index }`. Without it the row\nshows the item's `label-field`."
+              "description": "Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which\nreceives `{ item, index }`. Without either the row shows the item's `label-field`.",
+              "signature": "(item: unknown, index: number)"
             }
           ]
         }
@@ -25238,7 +25254,8 @@
           "slots": [
             {
               "name": "content",
-              "description": "Scoped — renders the content of one entry. Receives `{ item, index, status }` (`status` is `'default'` when unset)."
+              "description": "Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).",
+              "signature": "(item: { title: string; description?: string; date?: string; icon?: string; color?: string; status?: 'default' | 'success' | 'warning' | 'error' | 'info'; statusLabel?: string }, index: number)"
             }
           ]
         }
@@ -26966,7 +26983,8 @@
           "slots": [
             {
               "name": "node",
-              "description": "Scoped — renders one node's label. Receives `{ node, level, expanded }`."
+              "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
+              "signature": "(node: { [key: string]: unknown; isBranch?: boolean }, level: number, expanded: boolean)"
             }
           ],
           "cssProperties": [

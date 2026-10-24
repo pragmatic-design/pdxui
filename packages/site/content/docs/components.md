@@ -410,9 +410,23 @@ reference lists: `pdx-select`'s `item(option, index)` and `selected(option)`, `p
 </pdx-select>
 ```
 
+So do the lists and the navigation (#595): `pdx-list`'s `item(item, index)` and `empty()`,
+`pdx-sortable-list`'s `item(item, index)`, `pdx-description-list`'s `value(item, index)`,
+`pdx-timeline`'s `content(item, index)`, `pdx-tree`'s `node(node, level, expanded)`,
+`pdx-breadcrumb`'s `item(item, index, isLast)`, and `pdx-nav-menu`'s `item(item, level, expanded,
+active)`. Two scoped slots share their name with a prop, so their snippets are named apart and the
+prop stays what it was: `pdx-pagination`'s `page` slot is the snippet `item(page, active)`, and
+`pdx-nav-menu`'s `actions` slot is `itemActions(item, level, active)`.
+
+```pdx
+<pdx-pagination :total="total" :page-size="20" :page="page">
+  @snippet item(p, active) { <b :class="{ current: active }">{{ p }}</b> }
+</pdx-pagination>
+```
+
 A component written in TypeScript reads the parent's template with core's `snippetOrSlot(ctx, name,
-args)`: the snippet when the parent gave one, called with the arguments `args` takes from the scope, and
-the alpha scoped slot of the same name otherwise.
+args, slotName?)`: the snippet when the parent gave one, called with the arguments `args` takes from
+the scope, and otherwise the alpha scoped slot, `slotName` when its name differs from the snippet's.
 
 ### Scoped slots (data from the component to the content)
 

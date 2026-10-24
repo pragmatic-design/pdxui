@@ -13,14 +13,18 @@ import type { SlotFunction } from './slot';
 /**
  * The template a component draws an entry with, as the `SlotFunction` it calls with a scope object
  * (#491): the parent's snippet when it gave one — the slot declared `slot<(…) => Node>()`, called
- * with the arguments `args` takes from the scope — or else the alpha scoped slot of the same name
- * (`<slot name="x" let:…>`), called with the scope as it is. Undefined when the parent gave neither.
- * Read where the component draws, so a snippet set after mount is the one drawn.
+ * with the arguments `args` takes from the scope — or else the alpha scoped slot (`<slot name="x"
+ * let:…>`), called with the scope as it is. Undefined when the parent gave neither. Read where the
+ * component draws, so a snippet set after mount is the one drawn.
+ *
+ * `slotName` is the alpha slot's name when the snippet's differs: a slot that shares its name with a
+ * prop is renamed on the snippet side only (#595, `pdx-pagination`'s `page` is the snippet `item`).
  */
 export function snippetOrSlot(
     ctx: object,
     name: string,
     args: (scope: Record<string, unknown>) => readonly unknown[],
+    slotName: string = name,
 ): SlotFunction | undefined {
     const c = ctx as Record<string, unknown> & { __slots?: Record<string, SlotFunction | undefined> };
     const declared = typeof c[name] === 'function' ? (c[name] as () => unknown)() : undefined;
@@ -28,7 +32,7 @@ export function snippetOrSlot(
         const snippet = declared as (...a: readonly unknown[]) => Node | null | undefined;
         return (scope) => snippet(...args(scope)) ?? document.createDocumentFragment();
     }
-    return c.__slots?.[name];
+    return c.__slots?.[slotName];
 }
 
 /**

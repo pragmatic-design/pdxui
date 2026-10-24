@@ -15,7 +15,7 @@ A vertical sequence of events.
 
 **Events:** `pdx-click` → `detail: { item, index }` — Fired on `pdx-click`.
 
-**Slot:** `content` — Scoped — renders the content of one entry. Receives `{ item, index, status }` (`status` is `'default'` when unset).
+**Slot:** `content` — Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).
 
 **Shapes:** `TimelineItem { title: string; description?: string; date?: string; icon?: string; color?: string; status?: 'default' | 'success' | 'warning' | 'error' | 'info'; statusLabel?: string }`
 
