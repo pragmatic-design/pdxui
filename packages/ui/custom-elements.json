@@ -12398,16 +12398,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "horizontal",
               "description": "Horizontal layout: label left, input right",
               "type": {
@@ -12425,6 +12415,29 @@
               },
               "default": "''",
               "attribute": "a11ylabel"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md"
             }
           ],
           "roles": [
@@ -12540,15 +12553,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "horizontal",
               "fieldName": "horizontal",
               "description": "Horizontal layout: label left, input right",
@@ -12565,6 +12569,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -14242,16 +14255,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -14392,6 +14395,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -14427,6 +14440,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -14515,15 +14548,6 @@
                 "text": "boolean"
               },
               "default": "false"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
-              "type": {
-                "text": "'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''"
             },
             {
               "name": "error",
@@ -14650,6 +14674,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-button.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -14927,16 +14960,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "hint",
               "description": "Secondary hint text.",
               "type": {
@@ -14954,6 +14977,36 @@
               },
               "default": "''",
               "attribute": "description"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl: the label's text size.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-field-label-md",
+                "xs": ".pdx-field-label-xs",
+                "sm": ".pdx-field-label-sm",
+                "lg": ".pdx-field-label-lg",
+                "xl": ".pdx-field-label-xl"
+              }
             }
           ],
           "attributes": [
@@ -15003,15 +15056,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "hint",
               "fieldName": "hint",
               "description": "Secondary hint text.",
@@ -15028,6 +15072,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl: the label's text size.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -15338,16 +15391,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -15375,6 +15418,16 @@
               },
               "default": "'_'",
               "attribute": "placeholderchar"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -15425,6 +15478,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -15498,15 +15571,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -15532,6 +15596,15 @@
                 "text": "string"
               },
               "default": "'_'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -16892,16 +16965,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -17022,6 +17085,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
               "type": {
@@ -17057,6 +17130,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -17156,15 +17249,6 @@
                 "text": "boolean"
               },
               "default": "false"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             },
             {
               "name": "error",
@@ -17275,6 +17359,15 @@
               "default": "false"
             },
             {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135).",
@@ -17342,16 +17435,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "numeric",
               "description": "Restrict input to digits.",
               "type": {
@@ -17402,6 +17485,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the cells' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -17431,6 +17524,22 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-otp-md",
+                "sm": ".pdx-otp-sm",
+                "lg": ".pdx-otp-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input"
@@ -17488,15 +17597,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "numeric",
               "fieldName": "numeric",
               "description": "Restrict input to digits.",
@@ -17540,6 +17640,15 @@
                 "text": "string"
               },
               "default": "'one-time-code'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the cells' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -18024,16 +18133,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -18084,6 +18183,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -18119,6 +18228,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -18190,15 +18319,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -18242,6 +18362,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -20854,16 +20983,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "loading",
               "description": "Shows a loading / busy state.",
               "type": {
@@ -20904,6 +21023,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -20939,6 +21068,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input"
@@ -21018,15 +21167,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "loading",
               "fieldName": "loading",
               "description": "Shows a loading / busy state.",
@@ -21061,6 +21201,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -24030,16 +24179,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "name",
               "description": "Form field name, submitted with the form.",
               "type": {
@@ -24097,6 +24236,16 @@
               },
               "default": "false",
               "attribute": "loading"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -24160,6 +24309,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -24275,15 +24444,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "name",
               "fieldName": "name",
               "description": "Form field name, submitted with the form.",
@@ -24336,6 +24496,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -24483,16 +24652,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -24553,6 +24712,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -24588,6 +24757,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -24722,15 +24911,6 @@
               "default": "'vertical'"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -24783,6 +24963,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",

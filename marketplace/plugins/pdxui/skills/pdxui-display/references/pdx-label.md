@@ -9,9 +9,9 @@ A form label tied to its control.
 | `required` | `required` | boolean | `false` | Marks the field as required. |
 | `optional` | `optional` | boolean | `false` | Shows an 'optional' marker. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `hint` | `hint` | string | `''` | Secondary hint text. |
 | `description` | `description` | string | `''` | Secondary descriptive text. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl: the label's text size. |
 
 
 #### Examples

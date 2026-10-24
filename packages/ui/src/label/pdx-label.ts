@@ -8,21 +8,24 @@ import { component, html, signal, generatedId } from '@pdxui/core';
  * An accessible form label, with a required or optional indicator, a hint and a description.
  */
 component('pdx-label', {
+    // The axis forms.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same label on a native <label>. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl: the label's text size. */
+        size: { md: '.pdx-field-label-md', xs: '.pdx-field-label-xs', sm: '.pdx-field-label-sm', lg: '.pdx-field-label-lg', xl: '.pdx-field-label-xl' },
+    },
     props: {
         for: { type: String, default: '' },
         text: { type: String, default: '' },
         required: { type: Boolean, default: false },
         optional: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         hint: { type: String, default: '' },
         description: { type: String, default: '' },
     },
     setup(ctx) {
         function cssClass(): string {
             let cls = 'pdx-field-label';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-field-label-' + s;
             if (ctx.required()) cls += ' pdx-field-required';
             if (ctx.optional()) cls += ' pdx-field-optional';
             if (ctx.disabled()) cls += ' pdx-field-label-disabled';
@@ -82,7 +85,7 @@ component('pdx-label', {
         return { cssClass, forValue };
     },
     render: (ctx) => html`
-        <label :class="${ctx.cssClass}" :for="${ctx.forValue}">
+        <label :class="${ctx.cssClass}" data-part="root" :for="${ctx.forValue}">
             ${() => ctx.text() || html`<slot></slot>`}
         </label>
         ${() => ctx.description() ? html`<span class="pdx-field-description">${ctx.description}</span>` : ''}

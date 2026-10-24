@@ -4,7 +4,7 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/tag-input/pdx-tag-input.ts
  *      the HOST <pdx-tag-input> (CSS host: display:block) → render: an inner
- *        <div class="pdx-tag-input pdx-input-wrap [pdx-input-{size}] [disabled|readonly|error|success|warning]"
+ *        <div class="pdx-tag-input pdx-input-wrap [disabled|readonly|error|success|warning]" data-part="root"  ← sized by the host's size (#627)
  *             role="group" :aria-label="label || 'Tag input'" @click=onWrapClick>
  *          <span class="pdx-chip pdx-chip-sm">
  *            <span>{tag}</span>

@@ -18,12 +18,17 @@ component('pdx-password-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
     models: { value: model<string>('', { form: true }) },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         placeholder: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         name: { type: String, default: '' },
         ariaLabel: { type: String, default: '' },
@@ -45,8 +50,6 @@ component('pdx-password-input', {
 
         function wrapClass(): string {
             let cls = 'pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.error()) cls += ' error';
             return cls;
@@ -133,7 +136,7 @@ component('pdx-password-input', {
         return { visible, toggleVisibility, wrapClass, onInput, onFocus, onBlur, onWrapClick, strength, strengthLabel, strengthColor, strengthId, describedBy };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}">
+        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
             <input
                 class="pdx-input"
                 :type="${() => ctx.visible() ? 'text' : 'password'}"

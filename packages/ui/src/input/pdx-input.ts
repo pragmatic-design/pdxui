@@ -34,6 +34,12 @@ component('pdx-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
     models: { value: model<string>('', { form: true }) },
+    // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-button. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         // `date` and `time` are the native input's, and a date field in a form is ordinary: the
         // enum lists them so the validator does not warn about `<pdx-input type="date">` on a page
@@ -44,9 +50,6 @@ component('pdx-input', {
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         required: { type: Boolean, default: false },
-        // Five sizes, as inputs.css draws them (`.pdx-input-{size}`); the enum lists all five.
-        /** xs, sm, md (the default), lg or xl — the same scale as pdx-button. */
-        size: { type: String, default: '', enum: ['xs', 'sm', 'md', 'lg', 'xl'] },
         error: { type: Boolean, default: false },
         success: { type: Boolean, default: false },
         warning: { type: Boolean, default: false },
@@ -76,8 +79,6 @@ component('pdx-input', {
 
         function wrapClass(): string {
             let cls = 'pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.readonly()) cls += ' readonly';
             if (ctx.error()) cls += ' error';
@@ -147,7 +148,7 @@ component('pdx-input', {
         return { wrapClass, onInput, onFocus, onBlur, onClear, onWrapClick, countText, isOverCount };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" @click="${ctx.onWrapClick}">
+        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
             ${() => ctx.prefix() ? html`<span class="pdx-input-prefix">${ctx.prefix}</span>` : ''}
             <slot name="prefix"></slot>
             <input

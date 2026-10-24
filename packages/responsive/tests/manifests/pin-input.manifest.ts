@@ -11,7 +11,8 @@
  *     render: <pdx-otp-input mask ...>           ← inner CE
  *       render: <div class="pdx-otp-container pdx-otp-wrap"> ← wrapper celle (inline-flex)
  *         <input class="pdx-otp-cell" type="password"> × length
- * The visual classes (.pdx-otp-wrap, .error, .disabled, .pdx-otp-sm/-lg) are on the wrapper.
+ * The visual classes (.pdx-otp-wrap, .error, .disabled) are on the wrapper; the cells' size is the inner
+ * pdx-otp-input's `size`, which pin-input passes on (#627).
  * The measurable cells are the <input.pdx-otp-cell> elements. A PIN IS a masked OTP (● dots).
  *
  * Geometria base (.pdx-otp-cell): width/height 2.5rem (sm 2rem, lg 3rem), border solid,

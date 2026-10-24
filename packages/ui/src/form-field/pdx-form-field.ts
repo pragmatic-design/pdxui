@@ -21,6 +21,12 @@ const _namedByField = new WeakSet<Element>();
  * wiring between them and no validation of its own.
  */
 component('pdx-form-field', {
+    // The axis forms.css keys by (#627), reflected on the host: the label's text size, the same scale
+    // as pdx-label. A size other than `md` is also passed on to the field's library controls.
+    variants: {
+        /** xs, sm, md (the default), lg or xl. */
+        size: ['md', 'xs', 'sm', 'lg', 'xl'],
+    },
     props: {
         /**
          * The form field this field shows (#128): `:field="f.email"`. Its error, warning, touched state and
@@ -52,7 +58,6 @@ component('pdx-form-field', {
         touched: { type: Boolean, default: false },
         /** Force error display even if not touched */
         showError: { type: Boolean, default: false },
-        size: { type: String, default: '' },
         /** Horizontal layout: label left, input right */
         horizontal: { type: Boolean, default: false },
         /**
@@ -174,8 +179,6 @@ component('pdx-form-field', {
 
         function labelClass(): string {
             let cls = 'pdx-field-label';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-field-label-' + s;
             if (isRequired()) cls += ' pdx-field-required';
             if (ctx.optional()) cls += ' pdx-field-optional';
             if (ctx.disabled()) cls += ' pdx-field-label-disabled';
@@ -327,7 +330,9 @@ component('pdx-form-field', {
                     if (disabled) wc.setAttribute('disabled', '');
                     if (err) wc.setAttribute('error', '');
                     else wc.removeAttribute('error');
-                    if (size) wc.setAttribute('size', size);
+                    // `md` is the axis's default, which every field reflects: only a size the author
+                    // gave the field is passed on, as before the axis (#627), when it was empty.
+                    if (size && size !== 'md') wc.setAttribute('size', size);
                 }
             };
             requestAnimationFrame(lastWire);
@@ -350,7 +355,7 @@ component('pdx-form-field', {
         return { fieldId, inputId, labelId, hintId, errorId, descId, shouldShowError, resolveError, resolveWarning, wrapClass, labelClass };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}">
+        <div :class="${ctx.wrapClass}" data-part="root">
             ${() => ctx.label() ? html`
                 <label :class="${ctx.labelClass}" :id="${() => ctx.labelId}" :for="${() => ctx.inputId}">${ctx.label}</label>
             ` : ''}

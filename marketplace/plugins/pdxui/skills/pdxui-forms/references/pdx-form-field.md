@@ -38,9 +38,9 @@ let pinError = $signal(''); // set when the server refuses the PIN: pinError = '
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `touched` | `touched` | boolean | `false` | Whether the field has been interacted with (gates validation display). |
 | `showError` | `showerror` | boolean | `false` | Force error display even if not touched |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `horizontal` | `horizontal` | boolean | `false` | Horizontal layout: label left, input right |
 | `a11yLabel` | `a11ylabel` | string | `''` | The control's name when the field shows no `label`: set as its aria-label. A visible label wins, and a control that names itself keeps its own name. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl. |
 
 **Renders:** roles `alert`
 

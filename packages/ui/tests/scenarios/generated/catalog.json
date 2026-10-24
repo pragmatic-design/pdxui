@@ -1053,6 +1053,26 @@
         {
           "id": "form-field-in-stack",
           "title": "Form Field — Children of pdx-stack gap=\"md\""
+        },
+        {
+          "id": "form-field-size-md",
+          "title": "pdx-form-field — size=\"md\""
+        },
+        {
+          "id": "form-field-size-xs",
+          "title": "pdx-form-field — size=\"xs\""
+        },
+        {
+          "id": "form-field-size-sm",
+          "title": "pdx-form-field — size=\"sm\""
+        },
+        {
+          "id": "form-field-size-lg",
+          "title": "pdx-form-field — size=\"lg\""
+        },
+        {
+          "id": "form-field-size-xl",
+          "title": "pdx-form-field — size=\"xl\""
         }
       ]
     },
@@ -1210,6 +1230,26 @@
         {
           "id": "input-nested-theme",
           "title": "Input — Nested themes"
+        },
+        {
+          "id": "input-size-md",
+          "title": "pdx-input — size=\"md\""
+        },
+        {
+          "id": "input-size-xs",
+          "title": "pdx-input — size=\"xs\""
+        },
+        {
+          "id": "input-size-sm",
+          "title": "pdx-input — size=\"sm\""
+        },
+        {
+          "id": "input-size-lg",
+          "title": "pdx-input — size=\"lg\""
+        },
+        {
+          "id": "input-size-xl",
+          "title": "pdx-input — size=\"xl\""
         }
       ]
     },
@@ -1267,6 +1307,26 @@
         {
           "id": "label-disabled",
           "title": "Label — Disabled"
+        },
+        {
+          "id": "label-size-md",
+          "title": "pdx-label — size=\"md\""
+        },
+        {
+          "id": "label-size-xs",
+          "title": "pdx-label — size=\"xs\""
+        },
+        {
+          "id": "label-size-sm",
+          "title": "pdx-label — size=\"sm\""
+        },
+        {
+          "id": "label-size-lg",
+          "title": "pdx-label — size=\"lg\""
+        },
+        {
+          "id": "label-size-xl",
+          "title": "pdx-label — size=\"xl\""
         }
       ]
     },
@@ -1309,6 +1369,26 @@
         {
           "id": "masked-input-sizes",
           "title": "Masked Input — Sizes"
+        },
+        {
+          "id": "masked-input-size-md",
+          "title": "pdx-masked-input — size=\"md\""
+        },
+        {
+          "id": "masked-input-size-xs",
+          "title": "pdx-masked-input — size=\"xs\""
+        },
+        {
+          "id": "masked-input-size-sm",
+          "title": "pdx-masked-input — size=\"sm\""
+        },
+        {
+          "id": "masked-input-size-lg",
+          "title": "pdx-masked-input — size=\"lg\""
+        },
+        {
+          "id": "masked-input-size-xl",
+          "title": "pdx-masked-input — size=\"xl\""
         }
       ]
     },
@@ -1488,6 +1568,26 @@
         {
           "id": "number-input-sizes",
           "title": "Number Input — Sizes"
+        },
+        {
+          "id": "number-input-size-md",
+          "title": "pdx-number-input — size=\"md\""
+        },
+        {
+          "id": "number-input-size-xs",
+          "title": "pdx-number-input — size=\"xs\""
+        },
+        {
+          "id": "number-input-size-sm",
+          "title": "pdx-number-input — size=\"sm\""
+        },
+        {
+          "id": "number-input-size-lg",
+          "title": "pdx-number-input — size=\"lg\""
+        },
+        {
+          "id": "number-input-size-xl",
+          "title": "pdx-number-input — size=\"xl\""
         }
       ]
     },
@@ -1511,6 +1611,18 @@
         {
           "id": "otp-input-sizes",
           "title": "OTP Input — Sizes"
+        },
+        {
+          "id": "otp-input-size-md",
+          "title": "pdx-otp-input — size=\"md\""
+        },
+        {
+          "id": "otp-input-size-sm",
+          "title": "pdx-otp-input — size=\"sm\""
+        },
+        {
+          "id": "otp-input-size-lg",
+          "title": "pdx-otp-input — size=\"lg\""
         }
       ]
     },
@@ -1553,6 +1665,26 @@
         {
           "id": "password-input-sizes",
           "title": "Password Input — Sizes"
+        },
+        {
+          "id": "password-input-size-md",
+          "title": "pdx-password-input — size=\"md\""
+        },
+        {
+          "id": "password-input-size-xs",
+          "title": "pdx-password-input — size=\"xs\""
+        },
+        {
+          "id": "password-input-size-sm",
+          "title": "pdx-password-input — size=\"sm\""
+        },
+        {
+          "id": "password-input-size-lg",
+          "title": "pdx-password-input — size=\"lg\""
+        },
+        {
+          "id": "password-input-size-xl",
+          "title": "pdx-password-input — size=\"xl\""
         }
       ]
     },
@@ -1808,6 +1940,26 @@
         {
           "id": "search-input-sizes",
           "title": "Search Input — Sizes"
+        },
+        {
+          "id": "search-input-size-md",
+          "title": "pdx-search-input — size=\"md\""
+        },
+        {
+          "id": "search-input-size-xs",
+          "title": "pdx-search-input — size=\"xs\""
+        },
+        {
+          "id": "search-input-size-sm",
+          "title": "pdx-search-input — size=\"sm\""
+        },
+        {
+          "id": "search-input-size-lg",
+          "title": "pdx-search-input — size=\"lg\""
+        },
+        {
+          "id": "search-input-size-xl",
+          "title": "pdx-search-input — size=\"xl\""
         }
       ]
     },
@@ -2110,6 +2262,26 @@
         {
           "id": "tag-input-disabled",
           "title": "Tag Input — Disabled"
+        },
+        {
+          "id": "tag-input-size-md",
+          "title": "pdx-tag-input — size=\"md\""
+        },
+        {
+          "id": "tag-input-size-xs",
+          "title": "pdx-tag-input — size=\"xs\""
+        },
+        {
+          "id": "tag-input-size-sm",
+          "title": "pdx-tag-input — size=\"sm\""
+        },
+        {
+          "id": "tag-input-size-lg",
+          "title": "pdx-tag-input — size=\"lg\""
+        },
+        {
+          "id": "tag-input-size-xl",
+          "title": "pdx-tag-input — size=\"xl\""
         }
       ]
     },
@@ -2133,6 +2305,26 @@
         {
           "id": "textarea-error",
           "title": "Textarea — Error"
+        },
+        {
+          "id": "textarea-size-md",
+          "title": "pdx-textarea — size=\"md\""
+        },
+        {
+          "id": "textarea-size-xs",
+          "title": "pdx-textarea — size=\"xs\""
+        },
+        {
+          "id": "textarea-size-sm",
+          "title": "pdx-textarea — size=\"sm\""
+        },
+        {
+          "id": "textarea-size-lg",
+          "title": "pdx-textarea — size=\"lg\""
+        },
+        {
+          "id": "textarea-size-xl",
+          "title": "pdx-textarea — size=\"xl\""
         }
       ]
     },

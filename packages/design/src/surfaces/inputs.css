@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/surfaces/inputs.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Input, select, textarea + input wrapper + input group */
 
 /* ── Base input (still works standalone) ── */
@@ -155,22 +156,21 @@
 }
 
 /* Sizes derived from --pdx-input-min-height with fixed offsets (as buttons.css does): the
-   hierarchy xs<sm<md<lg<xl is guaranteed in EVERY theme, the default unchanged (input-min-height 2.5rem). */
-.pdx-input-xs { font-size: var(--pdx-text-xs); height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); }
-.pdx-input-xs.pdx-input,
-.pdx-input-xs.pdx-input-wrap { padding: 0 var(--pdx-space-xs); }
+   hierarchy xs<sm<md<lg<xl is guaranteed in EVERY theme, the default unchanged (input-min-height 2.5rem).
+   Keyed on the text fields' `size` (#627), and compiled for a native field too: the root part is
+   `.pdx-input-{size}` there, `.pdx-input-sm` and `.pdx-input-sm.pdx-input-wrap`. pdx-number-input's
+   inner field is sized as its group is; written with `:where()`, it weighs what the class did. */
+:where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xs"]) > [data-part="root"], .pdx-input-xs, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xs"]) > :where([data-part="root"]) > [data-part="field"] { font-size: var(--pdx-text-xs); height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.75rem) * var(--pdx-density-factor, 1)); }
+    :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xs"]) > :is(.pdx-input, .pdx-input-wrap)[data-part="root"], :is(.pdx-input, .pdx-input-wrap).pdx-input-xs, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xs"]) > :where([data-part="root"]) > .pdx-input-wrap[data-part="field"] { padding: 0 var(--pdx-space-xs); }
 
-.pdx-input-sm { font-size: var(--pdx-text-sm); height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); }
-.pdx-input-sm.pdx-input,
-.pdx-input-sm.pdx-input-wrap { padding: 0 var(--pdx-space-xs); }
+:where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="sm"]) > [data-part="root"], .pdx-input-sm, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="sm"]) > :where([data-part="root"]) > [data-part="field"] { font-size: var(--pdx-text-sm); height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) - 0.375rem) * var(--pdx-density-factor, 1)); }
+    :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="sm"]) > :is(.pdx-input, .pdx-input-wrap)[data-part="root"], :is(.pdx-input, .pdx-input-wrap).pdx-input-sm, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="sm"]) > :where([data-part="root"]) > .pdx-input-wrap[data-part="field"] { padding: 0 var(--pdx-space-xs); }
 
-.pdx-input-lg { font-size: var(--pdx-text-base); height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); }
-.pdx-input-lg.pdx-input,
-.pdx-input-lg.pdx-input-wrap { padding: 0 var(--pdx-space-md); }
+:where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="lg"]) > [data-part="root"], .pdx-input-lg, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="lg"]) > :where([data-part="root"]) > [data-part="field"] { font-size: var(--pdx-text-base); height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 0.5rem) * var(--pdx-density-factor, 1)); }
+    :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="lg"]) > :is(.pdx-input, .pdx-input-wrap)[data-part="root"], :is(.pdx-input, .pdx-input-wrap).pdx-input-lg, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="lg"]) > :where([data-part="root"]) > .pdx-input-wrap[data-part="field"] { padding: 0 var(--pdx-space-md); }
 
-.pdx-input-xl { font-size: var(--pdx-text-lg); height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); }
-.pdx-input-xl.pdx-input,
-.pdx-input-xl.pdx-input-wrap { padding: 0 var(--pdx-space-md); }
+:where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xl"]) > [data-part="root"], .pdx-input-xl, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xl"]) > :where([data-part="root"]) > [data-part="field"] { font-size: var(--pdx-text-lg); height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); min-height: calc((var(--pdx-input-min-height) + 1rem) * var(--pdx-density-factor, 1)); }
+    :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xl"]) > :is(.pdx-input, .pdx-input-wrap)[data-part="root"], :is(.pdx-input, .pdx-input-wrap).pdx-input-xl, :where(:is(pdx-input,pdx-password-input,pdx-search-input,pdx-textarea,pdx-masked-input,pdx-tag-input,pdx-number-input)[size="xl"]) > :where([data-part="root"]) > .pdx-input-wrap[data-part="field"] { padding: 0 var(--pdx-space-md); }
 
 /* ── Mobile: anti-zoom iOS + touch targets ── */
 @media (pointer: coarse) {
@@ -544,9 +544,9 @@ pdx-row > .pdx-input {
 .pdx-otp-wrap.error .pdx-otp-cell { border-color: var(--pdx-color-danger); }
 .pdx-otp-wrap.error .pdx-otp-cell:focus { box-shadow: 0 0 0 2px oklch(from var(--pdx-color-danger) l c h / 0.15); }
 
-/* OTP sizes */
-.pdx-otp-sm .pdx-otp-cell { width: 2rem; height: 2rem; font-size: var(--pdx-text-base); }
-.pdx-otp-lg .pdx-otp-cell { width: 3rem; height: 3rem; font-size: var(--pdx-text-xl); }
+/* OTP sizes, keyed on pdx-otp-input's `size` (#627); on native markup, `.pdx-otp-sm` on the wrap. */
+:where(pdx-otp-input[size="sm"]) > [data-part="root"] .pdx-otp-cell, .pdx-otp-sm .pdx-otp-cell { width: 2rem; height: 2rem; font-size: var(--pdx-text-base); }
+:where(pdx-otp-input[size="lg"]) > [data-part="root"] .pdx-otp-cell, .pdx-otp-lg .pdx-otp-cell { width: 3rem; height: 3rem; font-size: var(--pdx-text-xl); }
 
 .pdx-otp-separator {
     font-size: var(--pdx-text-lg);

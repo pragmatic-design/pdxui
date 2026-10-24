@@ -8,12 +8,12 @@ Password field with reveal and strength.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
 | `required` | `required` | boolean | `false` | Marks the field as required. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `showStrength` | `showstrength` | boolean | `false` | Show strength meter below input |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

@@ -32,7 +32,10 @@ function tsFiles(dir: string): string[] {
 
 /** The component a module registers, its top-level prop names, and the module's text outside them. */
 function declaredProps(src: string): { tag: string; names: string[]; rest: string } | null {
-    const m = src.match(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{\s*props:\s*\{/);
+    // `props` first in the descriptor, or after its `variants` (#627): a descriptor that opens with
+    // `models` is not read yet. Match: the registration, an optional `variants: { … }` (one level of
+    // nested braces, `size: { md: … }`), then `props: {`. Groups: [1]=tag
+    const m = src.match(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{(?:\s*\/\/[^\n]*)*\s*(?:variants:\s*\{(?:[^{}]|\{[^{}]*\})*\},?(?:\s*\/\/[^\n]*)*\s*)?props:\s*\{/);
     if (!m || m.index === undefined) return null;
     const start = m.index + m[0].length;
     let i = start, depth = 1;

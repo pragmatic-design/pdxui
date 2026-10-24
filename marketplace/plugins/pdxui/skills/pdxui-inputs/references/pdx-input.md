@@ -9,7 +9,6 @@ Text field with sizes, states and addons.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
 | `required` | `required` | boolean | `false` | Marks the field as required. |
-| `size` | `size` | 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' | `''` | xs, sm, md (the default), lg or xl — the same scale as pdx-button. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `success` | `success` | boolean | `false` | Applies the success state styling. |
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
@@ -24,6 +23,7 @@ Text field with sizes, states and addons.
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `prefix` | `prefix` | string | `''` | Prefix text (e.g. "$", "https://"). For icons use slot. |
 | `suffix` | `suffix` | string | `''` | Suffix text (e.g. "kg", ".com"). For icons use slot. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-button. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
