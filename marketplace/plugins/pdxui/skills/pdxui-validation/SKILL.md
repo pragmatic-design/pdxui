@@ -15,7 +15,7 @@ The form model: schema, validators, binding, saving. The form COMPONENTS (`pdx-f
 | a validated form | `@form user: { name: string { required } }` |
 | a rule that reads two fields | a second block after the fields: `@form b: { … } { validate: rule }` |
 | save as the user types, or on blur | `saveMode` / `saveDebounce`, globally or per field |
-| a section in its own `.pdx` | `<pdx-form :form>` around it, `tryUseForm()` inside |
+| a section in its own `.pdx` | `<pdx-form :form>` around it, `@form x: Values from parent;` inside, `::value="x.field"` on its controls |
 | several forms, one Save | `createFormCoordinator()` above them, `name` on each `<pdx-form>` |
 
 The whole table is in [forms](references/forms.md) § In practice.
@@ -27,8 +27,9 @@ The whole table is in [forms](references/forms.md) § In practice.
 - **A field's own validator wins while it fails**: "required" and a cross-field message are not shown
   together. A message keyed to a name that is not a field still makes the form invalid.
   ([forms](references/forms.md) § A rule that reads two fields)
-- **`tryUseForm()`, not `useForm()`, in a section**: a child can set up before its form, and
-  `useForm()` then throws. ([forms](references/forms.md) § One form, several components)
+- **A section names its form with `from parent`, not `useForm()`**: a child can set up before its
+  form, and `useForm()` then throws; `@form x: Values from parent;` reads the form when it is asked,
+  so the bindings catch up. ([forms](references/forms.md) § One form, several components)
 - **A `<pdx-field-group>` in the parent does not prefix a section component's controls.** Put the
   group inside the section, around its controls. (same section)
 

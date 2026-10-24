@@ -49,10 +49,12 @@ export function compileNewMode(
     }
     // @form needs createForm, and the core validators its inline schemas name — sub-fields' included.
     // A rule the script declares is the script's, and is not imported (#203).
-    if (analysis.forms.length > 0) {
+    // A section's inherited form (#613) creates nothing: it reads the form above it.
+    if (analysis.forms.some(f => f.kind !== 'inherited')) {
         imports.add('createForm');
         for (const name of coreRuleImports(analysis)) imports.add(name);
     }
+    if (analysis.forms.some(f => f.kind === 'inherited')) imports.add('inheritedForm');
     // @title/@meta needs useHead import
     if (analysis.head.meta.length > 0 || (analysis.head.title && !analysis.head.title.isDynamic)) {
         imports.add('useHead');

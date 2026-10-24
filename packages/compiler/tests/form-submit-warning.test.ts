@@ -37,6 +37,16 @@ describe('PDX_FORM_NO_SUBMIT', () => {
             .not.toContain('PDX_FORM_NO_SUBMIT');
     });
 
+    it("a section's inherited form is not: the page that owns it submits it (#613)", () => {
+        const source = `<template>
+  <pdx-input ::value="intake.requester" />
+</template>
+<script>
+@form intake: IntakeValues from parent;
+</script>`;
+        expect(codesOf(source), 'a section was told to wire the submit of its page\'s form').not.toContain('PDX_FORM_NO_SUBMIT');
+    });
+
     it('and the form it names is the one in the element, not any form on the page', () => {
         // Two forms, one of them inside a `<pdx-form>`: the other still needs its handler, and a
         // check that stopped at "there is a pdx-form somewhere" would miss it.

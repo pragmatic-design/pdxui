@@ -100,8 +100,8 @@ export interface FetchManifest {
 export interface FormManifest {
     /** Variable name: 'contact'. */
     name: string;
-    /** 'inline' or 'external' schema. */
-    kind: 'inline' | 'external';
+    /** 'inline' or 'external' schema, or 'inherited': a section's form of the page above it (#613). */
+    kind: 'inline' | 'external' | 'inherited';
     /** Schema reference for external: 'UserSchema'. */
     schemaRef?: string;
     /** Field declarations for inline schemas. */

@@ -84,35 +84,29 @@ writes the field, marks the control invalid and required from it, and touches it
 field shows its error, warning and required marker. A control wired by its `name` alone is
 `PDX_REMOVED_FORM` (#128); `pdx migrate` writes the binding.
 
-**A long form splits into sections, and each section is a component.** A section is a file whose
-script calls **`tryUseForm()`** (or `useForm()`): that call declares "this component is a section of
-the form above me", and its named controls are wired to that form by name — the one place the name
-wiring stays, until #613 gives a section an explicit binding.
+**A long form splits into sections, and each section is a component.** A section names the form it
+sits in with **`@form form: Values from parent;`** (#613): it creates no form, `form` is the one of the
+`<pdx-form>` above, and its controls bind the fields as any control does.
 
 ```pdx
 <!-- employee-identity.pdx: a section, used inside the page's <pdx-form> -->
 <template>
-  <pdx-form-field name="firstName" label="First name"><pdx-input name="firstName" /></pdx-form-field>
-  <pdx-form-field name="lastName" label="Last name"><pdx-input name="lastName" /></pdx-form-field>
+  <pdx-form-field :field="form.firstName" label="First name"><pdx-input ::value="form.firstName" /></pdx-form-field>
+  <pdx-form-field :field="form.lastName" label="Last name"><pdx-input ::value="form.lastName" /></pdx-form-field>
 </template>
 <script>
-import { tryUseForm } from '@pdxui/core';
-const form = tryUseForm();   // the declaration; the bindings find the form themselves
+type EmployeeValues = { firstName: string; lastName: string };   // the page's form's values
+@form form: EmployeeValues from parent;
 </script>
 ```
 
-You write no `:value`, no `@value-change`, no prop to pass the form down: `<pdx-form>` provides it,
-and the section's bindings look it up. Measured: two named controls, one beside `<pdx-form>` and
-one in a child, typed into both, read `{ "here": "A", "deep": "A" }`.
-
-**`tryUseForm()`, not `useForm()`, for the declaration.** ⚠️ A child can set up BEFORE its
-`<pdx-form>` — happy-dom connects children before parents, and a browser does too when the form's
-module loads after the fields'. `useForm()` then throws; `tryUseForm()` answers
-`undefined`, and the section still works, because the generated bindings do not use your variable:
-each one calls `tryUseForm(ctx.el)`, which re-runs the moment a form is provided. The same holds for a
-section rendered with no form above it at all — its controls are simply unbound. Your own `form`
-variable is what the lookup found at setup, so it can be `undefined`: guard it (`form?.…`) where your
-code reads it.
+No prop passes the form down: `<pdx-form>` provides it. ⚠️ A child can set up BEFORE its
+`<pdx-form>` — happy-dom connects children before parents, and in Chromium a projected child mounts
+detached — so `form.firstName` is read when it is asked, not at setup: the binding follows the form
+from the moment it is provided (value shown, typing written, leaving touches, reset reaches it).
+Measured in Chromium on the showcase's intake wizard. A section rendered with no form above it renders
+and writes nowhere. A component that only calls `tryUseForm()` still has its named controls wired by
+name, until #613 finishes removing that wiring.
 
 A control is wired only in a file that is inside a form or declares itself a section.
 A plain child component that does neither is compiled from another file and is never seen. And

@@ -116,6 +116,7 @@ export type { FormAssociatedOptions } from './form/form-associated';
 
 // Form Context (provide/inject for <pdx-form>)
 export { provideForm, useForm, tryUseForm, provideFormCoordinator, useFormCoordinator, provideFieldGroupPath, useFieldGroupPath } from './form/form-context';
+export { inheritedForm } from './form/inherited-form';
 export { createFormCoordinator } from './form/form-coordinator';
 export type { FormCoordinator, CoordinatedValues } from './form/form-coordinator';
 

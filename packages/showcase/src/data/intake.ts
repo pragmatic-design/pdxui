@@ -45,6 +45,19 @@ export const customerTransport: IDataTransport<Customer> = {
     },
 };
 
+/**
+ * The values of the page's `intake` form, as its `@form intake: { … }` declares them: what a step,
+ * a section of that form, names it inherits with (`@form intake: IntakeValues from parent;`, #613).
+ */
+export interface IntakeValues {
+    requester: string;
+    email: string;
+    starts: string;
+    ends: string;
+    address: { street: string; city: string };
+    lines: { activity: string; hours: number }[];
+}
+
 /** What an intake submission looks like once both forms are aggregated. */
 export interface IntakeSubmission {
     intake: Record<string, unknown>;

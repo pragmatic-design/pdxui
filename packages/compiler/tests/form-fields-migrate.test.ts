@@ -43,6 +43,21 @@ describe('form-fields-member', () => {
             .toBe("const f = createForm({ initialValues: { a: '' } });\nf.a.onChange('x');\nf?.['b.c'];\n");
     });
 
+    it("leaves alone a translation key that starts with the form's name", () => {
+        // A page whose form is `intake` and whose strings are `intake.fields.*` (#613's showcase step).
+        const page = `<template>
+  <pdx-form-field :label="$t('intake.fields.requester')"></pdx-form-field>
+  <label>{{ $t("intake.fields.customer") }}</label>
+  <p>{{ intake.fields.email.error() }}</p>
+</template>
+<script>
+@form intake: IntakeValues from parent;
+const help = \`intake.fields.help\`;
+</script>`;
+        expect(formFieldsMember.detect(page).map((f) => f.line)).toEqual([4]);
+        expect(formFieldsMemberScript.detect(page.slice(page.indexOf('<script>'))).map((f) => f.line)).toEqual([]);
+    });
+
     it('leaves alone the fields of what is not a form', () => {
         const ts = 'const grid = createGrid();\ngrid.fields.map((x) => x);\nschema.fields[0];\n';
         expect(formFieldsMemberScript.detect(ts)).toEqual([]);

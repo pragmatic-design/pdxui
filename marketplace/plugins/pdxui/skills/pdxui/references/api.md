@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-460 value exports.
+461 value exports.
 
 ### `__adoptStyles`
 
@@ -2858,6 +2858,19 @@ function humanizeField(field: string): string
 ```
 
 Humanize a field name: 'firstName' → 'First Name', 'address.city' → 'City'.
+
+### `inheritedForm`
+
+```ts
+import { inheritedForm } from '@pdxui/core';
+
+function inheritedForm(el: HTMLElement): Form<T>
+```
+
+The form the element `el` sits under, read lazily: what a section's `@form f: Schema from parent;`
+compiles to (#613). Each `f.x` is a stand-in made once — the same object every read, so a binding
+holds it — that reads the inherited form's member `x` when asked, and follows the form from the
+moment `<pdx-form>` provides it. Outside any form, it reads nothing and writes nowhere.
 
 ### `initDevTools`
 

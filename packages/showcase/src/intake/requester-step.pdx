@@ -4,11 +4,11 @@
        `querySelectorAll('[data-wizard-step]')`, so a panel inside a step component is found as one
        in the page is. -->
   <div data-wizard-step :data-label="$t('intake.steps.requester')">
-    <pdx-form-field name="requester" :label="$t('intake.fields.requester')">
-      <pdx-input name="requester" data-test="requester"></pdx-input>
+    <pdx-form-field :field="intake.requester" :label="$t('intake.fields.requester')">
+      <pdx-input name="requester" ::value="intake.requester" data-test="requester"></pdx-input>
     </pdx-form-field>
-    <pdx-form-field name="email" :label="$t('intake.fields.email')">
-      <pdx-input name="email" type="email" data-test="email"></pdx-input>
+    <pdx-form-field :field="intake.email" :label="$t('intake.fields.email')">
+      <pdx-input name="email" ::value="intake.email" type="email" data-test="email"></pdx-input>
     </pdx-form-field>
 
     <!-- PAGED and SEARCHED at the source, not a preloaded list: the picker asks for a page
@@ -32,11 +32,14 @@
 
 <script>
 // Intake's first step: who is asking, and for which customer and asset. Its fields are the
-// `intake` form's — `tryUseForm()` makes this component a section of the form above it, so its
-// named controls are wired to that form. What it picks goes to the page, which holds the values
-// every step and the submit read (CD-S1).
-import { createDataSource, tryUseForm } from '@pdxui/core';
+// `intake` form's — the page's, which this step inherits (`from parent`, #613), and its controls
+// bind to them as a control beside `<pdx-form>` does. What it picks goes to the page, which holds
+// the values every step and the submit read (CD-S1).
+import { createDataSource } from '@pdxui/core';
 import { customerTransport } from '../data/intake';
+import type { IntakeValues } from '../data/intake';
+
+@form intake: IntakeValues from parent;
 
 /** The customer picked, as the page holds it: its name, for the line under the picker. */
 @prop customerName: string = '';
@@ -46,8 +49,6 @@ import { customerTransport } from '../data/intake';
 @event customerpicked: object;
 /** An asset was picked: its id, or 0. */
 @event assetpicked: number;
-
-tryUseForm();
 
 const customers = createDataSource({ transport: customerTransport, idField: 'id', pageSize: 5 });
 

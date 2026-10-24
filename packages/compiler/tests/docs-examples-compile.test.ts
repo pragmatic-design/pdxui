@@ -101,7 +101,10 @@ describe('the pdx examples the site publishes', () => {
         const forms = all.filter(f => f.where.startsWith('forms.md ') && /^\s*@form\s/m.test(f.source));
         expect(forms.length, 'forms.md declares no form any more').toBeGreaterThan(0);
         for (const f of forms) {
-            expect(compileOf(f).code, `${f.where} declares a form that emits no createForm`).toMatch(/createForm\(/);
+            // A section's inherited form (#613) promises the form above it, not a new one.
+            const inherited = /^\s*@form\s+\w+\s*:\s*\w+\s+from\s+parent\b/m.test(f.source);
+            expect(compileOf(f).code, `${f.where} declares a form that emits no ${inherited ? 'inheritedForm' : 'createForm'}`)
+                .toMatch(inherited ? /inheritedForm\(ctx\.el\)/ : /createForm\(/);
         }
         const fetches = all.filter(f => f.where.startsWith('data.md ') && /^\s*@fetch\s/m.test(f.source));
         expect(fetches.length, 'data.md declares no fetch any more').toBeGreaterThan(0);

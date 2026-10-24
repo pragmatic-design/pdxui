@@ -69,7 +69,10 @@ export function parseTwoWay(descriptor: string): { name: string; mods: TwoWayMod
 
 /** The value as an accessor: a form field, a signal, or the `{ get, set }` form; null for anything else. */
 export function twoWayAccessor(value: unknown): TwoWayAccessor | null {
-    const field = value && typeof value === 'object' ? (value as { [TWO_WAY_FIELD]?: TwoWayField })[TWO_WAY_FIELD] : undefined;
+    // A function may carry a field too: an inherited form's member (#613) is callable, to forward a
+    // call to the form, and stands for the field of its name.
+    const field = value && (typeof value === 'object' || typeof value === 'function')
+        ? (value as { [TWO_WAY_FIELD]?: TwoWayField })[TWO_WAY_FIELD] : undefined;
     if (field) return { get: () => field.get(), set: (v) => field.set(v), field };
     if (typeof value === 'function' && typeof (value as Signal<unknown>).set === 'function') {
         const sig = value as Signal<unknown>;

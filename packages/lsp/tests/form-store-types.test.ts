@@ -35,6 +35,20 @@ const PROFILE = '@form profile: { name: string { required }, age: number, admin:
 // (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
 beforeAll(() => { diagnose('let x = 1;', '<p>{{ x }}</p>'); }, 60_000);
 
+// #613: a section's inherited form is core's Form of the values its declaration names.
+describe('an inherited @form (from parent)', () => {
+    const SECTION = 'type Values = { email: string; address: { city: string } };\n@form f: Values from parent;\n';
+
+    it('a field the values do not declare is an error', () => {
+        const d = diagnose(SECTION, '<p>{{ f.emial.value() }}</p>');
+        expect(d.some(m => /emial/.test(m)), JSON.stringify(d)).toBe(true);
+    });
+
+    it("control — the declared fields read, a nested one by its path, and the form's own members", () => {
+        expect(diagnose(SECTION, "<p>{{ f.email.value() }} {{ f['address.city'].error() }} {{ f.valid() }}</p>")).toEqual([]);
+    });
+});
+
 describe('an inline @form', () => {
     it('a member Form does not have is an error', () => {
         const d = diagnose(PROFILE, '<p>{{ profile.values.name }}</p>');

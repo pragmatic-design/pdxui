@@ -143,9 +143,10 @@ and then the control reads and writes through the form's field:
 </template>
 ```
 
-That is the mechanism, written out. In an app you rarely write it: a component that calls
-`tryUseForm()` or `useForm()` is a section of the form, and the compiler wires every control with a
-`name` in its template the same way ([Forms](/docs/forms), "One form, several components").
+That is the mechanism, written out. In an app you rarely write it: a section declares the form it
+inherits, `@form form: Values from parent;`, and binds each control to its field, `::value="form.price"`,
+read lazily so the binding follows the form from the moment it appears ([Forms](/docs/forms), "One
+form, several components").
 
 `tryUseForm()` is the version that answers `undefined` instead of throwing, for a section that can
 also be rendered outside a form.

@@ -178,8 +178,11 @@ export interface FormFieldDecl {
 export interface FormDecl {
     /** Variable name: 'user', 'contact'. */
     name: string;
-    /** 'inline' = schema declared in @form, 'external' = imported schema ref. */
-    kind: 'inline' | 'external';
+    /**
+     * 'inline' = schema declared in @form, 'external' = imported schema ref, 'inherited' = the form a
+     * section inherits from the `<pdx-form>` above it (`@form f: Schema from parent;`, #613).
+     */
+    kind: 'inline' | 'external' | 'inherited';
     /** For inline: parsed field declarations. */
     fields?: FormFieldDecl[];
     /** For external: the schema expression (e.g. 'UserSchema'). */

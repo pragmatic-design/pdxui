@@ -518,6 +518,17 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             }
         }
 
+        // ─── @form name: SchemaExpr from parent; (a section's inherited form, #613) ───
+        // The form of the `<pdx-form>` the component is projected into, not a new one: the schema
+        // types it, and the form is read when the section is connected under it.
+        // Match: @form intake: IntakeSchema from parent;  Groups: [1]=name [2]=schema
+        const formInherited = trimmed.match(/^@form\s+(\w+)\s*:\s*(\w+)\s+from\s+parent\s*;?\s*$/);
+        if (formInherited) {
+            forms.push({ name: formInherited[1], kind: 'inherited', schemaExpr: formInherited[2] });
+            if (!formInherited[1].startsWith('_')) exports.push({ name: formInherited[1], kind: 'const' });
+            continue;
+        }
+
         // ─── @form name: SchemaExpr { options } (external schema + options block) ───
         // Match: @form orderForm: OrderSchema { save: 'onSubmit'; source: orderDs; }
         const formExternalWithOpts = trimmed.match(/^@form\s+(\w+)\s*:\s*(\w+)\s*\{/);

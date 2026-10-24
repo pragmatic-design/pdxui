@@ -43,8 +43,9 @@ function fieldsReads(text: string, scope: LanguageChangeScope): { index: number;
     const out: { index: number; found: string; replacement: string }[] = [];
     for (const name of formNames(text)) {
         // Match: the form, `.fields` or `?.fields`, then `.`, `?.`, `[` or `?.[`. Groups: [1]=`?` on the
-        // form [2]=what follows `fields`
-        const re = new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(\\?)?\\.fields(\\?\\.\\[|\\?\\.|\\.|\\[)`, 'g');
+        // form [2]=what follows `fields`. Not right after a quote: `$t('intake.fields.requester')` is a
+        // translation key that starts with the form's name, not a read of its fields (#613).
+        const re = new RegExp(`(?<![\\w$.'"\`])${escapeForRegExp(name)}(\\?)?\\.fields(\\?\\.\\[|\\?\\.|\\.|\\[)`, 'g');
         for (const m of text.matchAll(re)) {
             if (m.index < range.from || m.index >= range.to) continue;
             const optional = m[1] === '?' || m[2].startsWith('?');

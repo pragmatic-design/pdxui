@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- A form section names the form it inherits (#613): `@form intake: IntakeValues from parent;` makes a
+  component projected into `<pdx-form>` a section of that form, and its controls bind its fields as any
+  control does, `::value="intake.email"` and `<pdx-form-field :field="intake.email">`. It compiles to
+  core's new `inheritedForm(ctx.el)`: each `intake.x` reads the form when asked, so a binding made
+  before the form is found — a child connects before its parent, a projected child mounts detached —
+  follows it from the moment `<pdx-form>` provides it. The showcase's intake requester step uses it.
+  A component that only calls `tryUseForm()` keeps its name wiring until #613's second part.
 - `pdx-button` declares its variants (#512): `variant` and `size` are reflected on the host
   (`<pdx-button variant="ghost" size="sm">`), and `size` defaults to `'md'` instead of `''`. Its rules in
   `@pdxui/design` are written once as `@variant pdx-button …` and compiled for the host and for the
@@ -635,6 +642,9 @@ semver.
 
 ### Fixes
 
+- `form-fields-member` no longer reads a translation key that starts with a form's name,
+  `$t('intake.fields.requester')`, as a read of `intake.fields`: a file with a form named like its
+  strings was told its keys were a removed form. (#613)
 - `pdx-select`'s `item` slot receives each option's position in the list as `index`; it was always
   `0`. (#491)
 - A `pdx-mention` whose `value` a parent sets submits that text in a native form; before, it kept

@@ -454,6 +454,8 @@ export function validate(
 
     const templateHtml = htmlOf(ast);
     for (const f of analysis.forms) {
+        // A section's inherited form (#613) is submitted by the page that owns it.
+        if (f.kind === 'inherited') continue;
         const hasSubmitHandler = analysis.body.includes(`.handleSubmit(`) ||
                                  analysis.body.includes(`${f.name}.handleSubmit`);
         // A form handed to `<pdx-form :form="…">` must NOT wire one: that component validates and

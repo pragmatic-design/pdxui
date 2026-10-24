@@ -212,6 +212,7 @@ The analyzer's form: `@form name: { field: string { required } };`
 
 ```ebnf
 FormDecl      ::= "@form" S Word S? ":" S? ( InlineSchema | SchemaName ) ( S? FormOptions )? S? ";"?
+                | "@form" S Word S? ":" S? SchemaName S "from" S "parent" S? ";"?
 SchemaName    ::= Word
 InlineSchema  ::= "{" S? Field ( S? "," S? Field )* ( S? "," )? S? "}"
 Field         ::= ScalarField | ObjectField | RowsField
@@ -255,6 +256,17 @@ undefined for a name that is no field. A control binds a field through its model
 `::value="name.email"` ([template.md](template.md), «`::name` two-way binding»), and
 `<pdx-form-field :field="name.email">` shows its error, warning and required marker.
 
+`@form name: SchemaName from parent;` makes the component a **section** of the form above it (#613):
+it creates no form, and `name` is the form of the `<pdx-form>` it is projected into —
+`const name = inheritedForm(ctx.el)`. The section binds that form's fields as any control does,
+`::value="name.email"` and `<pdx-form-field :field="name.email">`. The form is not there when the
+section sets up (a child connects before its parent, and a projected child mounts detached), so each
+`name.x` is a stand-in made once that reads the inherited form when asked: before the form is found it
+reads nothing and writes nowhere, and from the moment `<pdx-form>` provides it, every reading — the
+binding made at mount included — is the field's. Called, `name.reset()` or `name.valid()`, it calls
+the form's member. `SchemaName` names the form's values, for the reader and the editor; nothing is
+generated from it. This is not the `parent` option, which makes a NEW form a child of another.
+
 `handleSubmit(fn)` returns a handler that returns the submit's promise; a second submit while one
 runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)
 whose `onFieldSave` callback returns its save's promise keeps one save per field in flight and at
@@ -282,9 +294,10 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   is `PDX_REMOVED_FORM` (#128): nothing wires it by its name. `pdx migrate` (`form-name-binding`)
   writes `::<model>="name.x"` from the control's manifest — a control with no manifest entry, or with
   more than one model (`pdx-checkbox`), is flagged — and `:field="name.x"` on the form field; inside a
-  `<pdx-field-group>` the path is the full one, and so is the control's `name`. A form section, a
-  component whose script calls `useForm()` / `tryUseForm()`, keeps its named controls wired to the form
-  above it (#613).
+  `<pdx-field-group>` the path is the full one, and so is the control's `name`. A form section binds
+  through `@form name: Schema from parent;` (#613); a component whose script calls `useForm()` /
+  `tryUseForm()` still has its named controls wired to the form above it, until #613's second part
+  removes that.
 - `required` on a control bound to a form field (`::value="name.x" required`, or `:required`) is
   `PDX_FORM_REQUIRED_IN_MARKUP` (warning): the field marks its control required from its rules, and
   the markup is a second place to say it that validation does not read. `pdx migrate` flags it
@@ -294,7 +307,7 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
 - A rule on a field of a rows field is parsed and dropped: `PDX_FORM_ARRAY_RULES_IGNORED`. A row's
   rules are registered by `<pdx-field-list :item-fields>`.
 - A form that no `handleSubmit(` and no `<pdx-form :form="name">` submits is `PDX_FORM_NO_SUBMIT`
-  (info).
+  (info). An inherited form (`from parent`) is not: the page that owns it submits it.
 - `?` makes a field not required even when its rules say `required`; on an object or a rows field it
   changes nothing.
 - A rule is one of core's validators — `required`, `minLength`, `maxLength`, `email`, `pattern`, `url`,
