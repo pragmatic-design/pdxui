@@ -44,6 +44,28 @@ describe('PDX_VARIANT_UNKNOWN', () => {
     });
 });
 
+// A rule naming several hosts (#627) is checked as if written once per host.
+describe('a rule that names several hosts', () => {
+    const FIELDS = new Map([
+        ['pdx-input', [{ name: 'size', values: ['md', 'sm'], default: 'md' }]],
+        ['pdx-textarea', [{ name: 'size', values: ['md', 'sm'], default: 'md' }]],
+        ['pdx-label', []],
+    ]);
+    const check = (css: string) => checkVariants([other(css)], FIELDS) as Diagnostic[];
+
+    it('styles the value on each host', () => {
+        expect(check('@variant :is(pdx-input, pdx-textarea) size(sm) { :scope { margin: 0 } }')).toEqual([]);
+    });
+
+    it('names the host that does not declare the axis, or is not a component', () => {
+        expect(check('@variant :is(pdx-input, pdx-label, pdx-inptu) size(sm) { :scope { margin: 0 } }').map((d) => `${d.code}: ${d.message}`)).toEqual([
+            "PDX_VARIANT_UNKNOWN: @variant pdx-label size(sm): 'size' is not a variant axis of pdx-label (none declared).",
+            "PDX_VARIANT_UNKNOWN: @variant pdx-inptu size(sm): 'pdx-inptu' is not a component of @pdxui/ui.",
+            'PDX_VARIANT_UNSTYLED: pdx-textarea declares size: sm, and no @variant rule of @pdxui/design styles it.',
+        ]);
+    });
+});
+
 describe('PDX_VARIANT_UNSTYLED', () => {
     it('a declared value other than the default that no rule of the package styles', () => {
         const found = codes([own('@variant variant(ghost) { :scope { color: red } }')], 'PDX_VARIANT_UNSTYLED');

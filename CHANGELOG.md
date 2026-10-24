@@ -11,6 +11,9 @@ semver.
 
 ### Features
 
+- A library `@variant` rule may draw several components (#627): `@variant :is(pdx-input, pdx-textarea) size(sm) { … }`
+  compiles to one selector, `:where(:is(pdx-input,pdx-textarea)[size="sm"]) …`, and is checked against each
+  host's axes. Before, `:is(…)` in the prelude was read as an axis named `is`.
 - A form section names the form it inherits (#613): `@form intake: IntakeValues from parent;` makes a
   component projected into `<pdx-form>` a section of that form, and its controls bind its fields as any
   control does, `::value="intake.email"` and `<pdx-form-field :field="intake.email">`. It compiles to
