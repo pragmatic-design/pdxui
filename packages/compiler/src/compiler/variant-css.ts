@@ -216,9 +216,32 @@ function nativeForm(selector: string, native: string | undefined): string | unde
 }
 
 /**
+ * A chain from the compound that holds the root part on: `.wrap > [data-part="root"] .cell` →
+ * `[data-part="root"] .cell`. The steps before it are the component's own markup between its host
+ * and the element the native selector goes on, which a native control does not have (#629). The
+ * chain as written when the root part is not at its top level.
+ */
+function fromRootCompound(chain: string): string {
+    const at = chain.search(ROOT_PART);
+    if (at < 0) return chain;
+    // Where the compound holding the root part starts: just after the last combinator before it,
+    // at the top level — not inside `:is(…)`, `:where(…)` or an attribute's brackets.
+    let depth = 0;
+    let start = 0;
+    for (let i = 0; i < at; i++) {
+        const c = chain[i];
+        if (c === '(' || c === '[') depth++;
+        else if (c === ')' || c === ']') depth--;
+        else if (depth === 0 && (c === '>' || c === '+' || c === '~' || /\s/.test(c))) start = i + 1;
+    }
+    return depth === 0 ? chain.slice(start).trimStart() : chain;
+}
+
+/**
  * One selector of a library rule: under the host test, then its native form if it has one. A
  * descendant of the host is bounded at nested components; a child of the host, `:scope > S`, cannot
  * be inside one and is not — the bound costs the browser an ancestor walk per candidate element.
+ * In a child chain, the native form starts at the root part's compound (#629).
  */
 function librarySelector(selector: string, host: string, native: string | undefined): string {
     // Match: `:scope`, the host itself — first, or after a context the host sits in. Groups: none
@@ -228,7 +251,7 @@ function librarySelector(selector: string, host: string, native: string | undefi
         const rest = selector.slice(at + ':scope'.length);
         // Match: a child combinator after `:scope`. Groups: [1]=the child selector
         const child = /^\s*>\s*(.+)$/s.exec(rest)?.[1];
-        const own = child === undefined ? undefined : nativeForm(child, native);
+        const own = child === undefined ? undefined : nativeForm(fromRootCompound(child), native);
         return `${context}:where(${host})${rest}${own === undefined ? '' : `, ${context}${own}`}`;
     }
     const pseudo = PSEUDO_ELEMENT.exec(selector)?.[1] ?? '';

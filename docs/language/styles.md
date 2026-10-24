@@ -417,7 +417,11 @@ component host with `data-pdx-root`, so a rule on the card's root does not reach
 component nested in the card. The host test sits in `:where()`, so a rule weighs what `S` weighs.
 `:scope` is the host, `:where(pdx-button[variant="ghost"])`; a pseudo-element stays last, after the
 bound. A child of the host, `:scope > S`, cannot be inside a nested component and takes no bound:
-`:where(pdx-button[variant="ghost"]) > S`, and its native form is `S` with the root part replaced. The
+`:where(pdx-button[variant="ghost"]) > S`, and its native form is `S` with the root part replaced. In a
+chain, the native form starts at the root part's own compound (#629): the steps before it are the
+component's markup between its host and the element, which a native control does not have, so
+`:scope > .pdx-checkbox-wrap > [data-part="root"]` yields `.pdx-checkbox-sm`, not
+`.pdx-checkbox-wrap > .pdx-checkbox-sm`. What follows the root part stays. The
 bound costs the browser a walk up the ancestors for every element `S` matches; on the showcase's
 `/tickets`, `pdx-button`'s rules written as descendants took the page from 255 to 382 ms to render
 (median of 15 cold loads, against main the same hour), and written as children of the host they
@@ -542,10 +546,21 @@ One rule draws the text fields that share a size, named in `:is()`:
 
 It compiles to `:where(:is(pdx-input,pdx-textarea,pdx-number-input)[size="sm"]) > .pdx-input-wrap`.
 
+A control drawn on an element its host wraps keeps the native class on that element alone:
+
+```css
+/* packages/design/variant-sources/components/checkbox.css */
+@variant size(sm) {
+    :scope > .pdx-checkbox-wrap > [data-part="root"] { width: 1rem; height: 1rem; }
+}
+```
+
+It compiles to `:where(pdx-checkbox[size="sm"]) > .pdx-checkbox-wrap > [data-part="root"], .pdx-checkbox-sm`.
+
 #### Since
 
 beta (#153). The library form is specified by #626 and lands with #512; several hosts in one rule
-with #627.
+with #627; the native form of a chain from its root part's compound with #629.
 
 ### Component tokens
 

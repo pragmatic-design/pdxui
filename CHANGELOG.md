@@ -11,6 +11,11 @@ semver.
 
 ### Features
 
+- In a library `@variant` rule whose root part is further down a child chain,
+  `:scope > .pdx-checkbox-wrap > [data-part="root"]`, the native form is the root part's own compound,
+  `.pdx-checkbox-sm`, and the steps before it are dropped (#629). They are the component's markup
+  around the element, which a native control does not have. Before, it kept them,
+  `.pdx-checkbox-wrap > .pdx-checkbox-sm`, and a bare native input lost its size class.
 - A library `@variant` rule may draw several components (#627): `@variant :is(pdx-input, pdx-textarea) size(sm) { … }`
   compiles to one selector, `:where(:is(pdx-input,pdx-textarea)[size="sm"]) …`, and is checked against each
   host's axes. Before, `:is(…)` in the prelude was read as an axis named `is`.
