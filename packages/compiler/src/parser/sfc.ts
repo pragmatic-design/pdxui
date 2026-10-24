@@ -49,10 +49,38 @@ export interface SFCDescriptor {
 }
 
 /**
+ * The last source parsed and its blocks (#646). One compile parses the same .pdx about fifteen times:
+ * `compile()` once, and each check of a removed form (`language/`) again, because a check takes the
+ * file's text, the same signature `pdx migrate` calls it with. That was a third of the time those
+ * checks added to a compile. One entry is enough: the calls of one compile come one after another.
+ */
+let last: { source: string; descriptor: SFCDescriptor } | null = null;
+
+/**
  * Parse a .pdx Single File Component into its constituent blocks.
  * Extracts attributes: setup, scoped, lang, src.
+ *
+ * Each call returns its own blocks: `compile()` writes into them (an external `src=`'s content, a
+ * plugin's script), and a copy keeps that from reaching the next caller of the same source.
  */
 export function parseSFC(source: string): SFCDescriptor {
+    if (last?.source !== source) last = { source, descriptor: parseBlocks(source) };
+    return copyDescriptor(last.descriptor);
+}
+
+/** A descriptor whose blocks and lists are new objects; `style` stays the first of `styles`. */
+function copyDescriptor(d: SFCDescriptor): SFCDescriptor {
+    const styles = d.styles.map(s => ({ ...s }));
+    return {
+        template: d.template ? { ...d.template } : null,
+        script: d.script ? { ...d.script } : null,
+        style: styles[0] ?? null,
+        styles,
+        ...(d.errors ? { errors: [...d.errors] } : {}),
+    };
+}
+
+function parseBlocks(source: string): SFCDescriptor {
     const errors: string[] = [];
     const tpl = extractBlock(source, 'template', errors);
     // Detect shadow attribute on <template shadow>

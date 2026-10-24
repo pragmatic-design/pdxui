@@ -28,8 +28,12 @@ export function checkRemovedForms(descriptor: SFCDescriptor, source: string, con
             findings = change.detect(source, context);
         } else if (change.scope === 'script' && script) {
             // Found in the script, placed in the file: its first line is the line the content starts on.
-            const offset = lineOf(source, script.start) - 1;
-            findings = change.detect(script.content, context).map((f) => ({ ...f, line: f.line + offset }));
+            // Counted only when there is something to place: nearly every check finds nothing (#646).
+            findings = change.detect(script.content, context);
+            if (findings.length > 0) {
+                const offset = lineOf(source, script.start) - 1;
+                findings = findings.map((f) => ({ ...f, line: f.line + offset }));
+            }
         }
         for (const f of findings) {
             out.push({
