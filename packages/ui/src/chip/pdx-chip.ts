@@ -22,10 +22,21 @@ import '@pdxui/design/components/chip';
  * @slot icon - An icon shown before the chip's label.
  */
 component('pdx-chip', {
+    // The axes chip.css keys by (#630), reflected on the host; each value maps the class that draws the
+    // same look on a native chip. `outline` and `md` are the base look, which no class adds to.
+    variants: {
+        /** outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour. */
+        variant: {
+            outline: '.pdx-chip-outline', primary: '.pdx-chip-primary', success: '.pdx-chip-success',
+            danger: '.pdx-chip-danger', warning: '.pdx-chip-warning', info: '.pdx-chip-info', tonal: '.pdx-chip-tonal',
+            'tonal-primary': '.pdx-chip-tonal-primary', 'tonal-success': '.pdx-chip-tonal-success',
+            'tonal-danger': '.pdx-chip-tonal-danger', 'tonal-warning': '.pdx-chip-tonal-warning',
+        },
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-chip-md', sm: '.pdx-chip-sm', lg: '.pdx-chip-lg' },
+    },
     props: {
         label: { type: String, default: '' },
-        variant: { type: String, default: '' },
-        size: { type: String, default: '' },
         /**
          * Shows a × button — the chip's tab stop — named "Remove {label}", which emits pdx-remove. The
          * chip does not remove itself: the app removes it and owns focus afterwards (move it to the
@@ -45,10 +56,6 @@ component('pdx-chip', {
     setup(ctx) {
         function cssClass(): string {
             let cls = 'pdx-chip';
-            const v = ctx.variant() as string;
-            if (v) cls += ' pdx-chip-' + v;
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-chip-' + s;
             if (ctx.selected()) cls += ' selected';
             if (ctx.disabled()) cls += ' disabled';
             return cls;
@@ -99,6 +106,7 @@ component('pdx-chip', {
     render: (ctx) => html`
         <span
             :class="${ctx.cssClass}"
+            data-part="root"
             @click="${ctx.toggle}"
             @keydown="${ctx.onKeydown}"
             :role="${() => ctx.toggleOnPill() ? 'button' : null}"

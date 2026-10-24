@@ -6184,26 +6184,6 @@
             },
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "removable",
               "description": "Shows a × button — the chip's tab stop — named \"Remove {label}\", which emits pdx-remove. The\nchip does not remove itself: the app removes it and owns focus afterwards (move it to the\nnext chip's ×, or the previous one), or a keyboard user is left on <body>.",
               "type": {
@@ -6261,6 +6241,72 @@
               },
               "default": "''",
               "attribute": "avatar"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour.",
+              "type": {
+                "text": "'outline' | 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'tonal' | 'tonal-primary' | 'tonal-success' | 'tonal-danger' | 'tonal-warning'"
+              },
+              "default": "'outline'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "outline",
+                "primary",
+                "success",
+                "danger",
+                "warning",
+                "info",
+                "tonal",
+                "tonal-primary",
+                "tonal-success",
+                "tonal-danger",
+                "tonal-warning"
+              ],
+              "default": "outline",
+              "native": {
+                "outline": ".pdx-chip-outline",
+                "primary": ".pdx-chip-primary",
+                "success": ".pdx-chip-success",
+                "danger": ".pdx-chip-danger",
+                "warning": ".pdx-chip-warning",
+                "info": ".pdx-chip-info",
+                "tonal": ".pdx-chip-tonal",
+                "tonal-primary": ".pdx-chip-tonal-primary",
+                "tonal-success": ".pdx-chip-tonal-success",
+                "tonal-danger": ".pdx-chip-tonal-danger",
+                "tonal-warning": ".pdx-chip-tonal-warning"
+              }
+            },
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-chip-md",
+                "sm": ".pdx-chip-sm",
+                "lg": ".pdx-chip-lg"
+              }
             }
           ],
           "events": [
@@ -6289,24 +6335,6 @@
               "name": "label",
               "fieldName": "label",
               "description": "Visible label text.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
               "type": {
                 "text": "string"
               },
@@ -6365,6 +6393,24 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour.",
+              "type": {
+                "text": "'outline' | 'primary' | 'success' | 'danger' | 'warning' | 'info' | 'tonal' | 'tonal-primary' | 'tonal-success' | 'tonal-danger' | 'tonal-warning'"
+              },
+              "default": "'outline'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -11026,36 +11072,6 @@
             },
             {
               "kind": "field",
-              "name": "position",
-              "description": "Position: bottom-right (default), bottom-left, top-right, top-left",
-              "type": {
-                "text": "string"
-              },
-              "default": "'bottom-right'",
-              "attribute": "position"
-            },
-            {
-              "kind": "field",
-              "name": "variant",
-              "description": "Variant: primary, secondary, danger",
-              "type": {
-                "text": "string"
-              },
-              "default": "'primary'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "Size: sm, md, lg",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "direction",
               "description": "Speed dial direction: up (default), down, left, right",
               "type": {
@@ -11105,6 +11121,36 @@
               "attribute": "trigger"
             },
             {
+              "kind": "field",
+              "name": "variant",
+              "description": "primary (the default), secondary or danger.",
+              "type": {
+                "text": "'primary' | 'secondary' | 'danger'"
+              },
+              "default": "'primary'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "description": "bottom-right (the default), bottom-left, top-right or top-left.",
+              "type": {
+                "text": "'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'"
+              },
+              "default": "'bottom-right'",
+              "attribute": "position"
+            },
+            {
               "kind": "method",
               "name": "open",
               "parameters": [],
@@ -11121,6 +11167,46 @@
               "name": "toggle",
               "parameters": [],
               "description": "Toggles it open/closed."
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "primary",
+                "secondary",
+                "danger"
+              ],
+              "default": "primary",
+              "native": {
+                "primary": ".pdx-fab-primary",
+                "secondary": ".pdx-fab-secondary",
+                "danger": ".pdx-fab-danger"
+              }
+            },
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-fab-md",
+                "sm": ".pdx-fab-sm",
+                "lg": ".pdx-fab-lg"
+              }
+            },
+            {
+              "name": "position",
+              "values": [
+                "bottom-right",
+                "bottom-left",
+                "top-right",
+                "top-left"
+              ],
+              "default": "bottom-right"
             }
           ],
           "events": [
@@ -11163,33 +11249,6 @@
                 "text": "string"
               },
               "default": "''"
-            },
-            {
-              "name": "position",
-              "fieldName": "position",
-              "description": "Position: bottom-right (default), bottom-left, top-right, top-left",
-              "type": {
-                "text": "string"
-              },
-              "default": "'bottom-right'"
-            },
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Variant: primary, secondary, danger",
-              "type": {
-                "text": "string"
-              },
-              "default": "'primary'"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size: sm, md, lg",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
             },
             {
               "name": "direction",
@@ -11235,6 +11294,33 @@
                 "text": "string"
               },
               "default": "'click'"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "primary (the default), secondary or danger.",
+              "type": {
+                "text": "'primary' | 'secondary' | 'danger'"
+              },
+              "default": "'primary'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
+            },
+            {
+              "name": "position",
+              "fieldName": "position",
+              "description": "bottom-right (the default), bottom-left, top-right or top-left.",
+              "type": {
+                "text": "'bottom-right' | 'bottom-left' | 'top-right' | 'top-left'"
+              },
+              "default": "'bottom-right'"
             }
           ],
           "shapes": [

@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/fab.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-fab — Floating Action Button + Speed Dial
    Supports: direction (up/down/left/right), type (linear/circle/semi-circle/quarter-circle),
    tooltip labels, mask overlay, variants, sizes */
@@ -13,11 +14,11 @@
     gap: var(--pdx-space-sm);
 }
 
-/* Position */
-.pdx-fab-bottom-right { bottom: var(--pdx-space-lg); right: var(--pdx-space-lg); }
-.pdx-fab-bottom-left { bottom: var(--pdx-space-lg); left: var(--pdx-space-lg); }
-.pdx-fab-top-right { top: var(--pdx-space-lg); right: var(--pdx-space-lg); }
-.pdx-fab-top-left { top: var(--pdx-space-lg); left: var(--pdx-space-lg); }
+/* Position, keyed on the host's `position` (#630): it places the host itself. */
+:where(pdx-fab[position="bottom-right"]) { bottom: var(--pdx-space-lg); right: var(--pdx-space-lg); }
+:where(pdx-fab[position="bottom-left"]) { bottom: var(--pdx-space-lg); left: var(--pdx-space-lg); }
+:where(pdx-fab[position="top-right"]) { top: var(--pdx-space-lg); right: var(--pdx-space-lg); }
+:where(pdx-fab[position="top-left"]) { top: var(--pdx-space-lg); left: var(--pdx-space-lg); }
 
 /* Direction — DOM order: [dial] [fab-button]. Flex reverses so FAB is at the edge.
    up: FAB at bottom, dial above → column (dial on top, fab below)
@@ -52,15 +53,15 @@
     justify-content: center;
 }
 
-/* Sizes */
-.pdx-fab-sm { width: 40px; height: 40px; }
-.pdx-fab-md { width: 56px; height: 56px; }
-.pdx-fab-lg { width: 72px; height: 72px; }
+/* Sizes and variants, keyed on the host's `size` and `variant` (#630); on a native button
+   `.pdx-fab-{size}` and `.pdx-fab-{variant}`. The defaults, md and primary, have a look of their own. */
+:where(pdx-fab[size="sm"]) > [data-part="root"], .pdx-fab-sm { width: 40px; height: 40px; }
+:where(pdx-fab[size="md"]) > [data-part="root"], .pdx-fab-md { width: 56px; height: 56px; }
+:where(pdx-fab[size="lg"]) > [data-part="root"], .pdx-fab-lg { width: 72px; height: 72px; }
 
-/* Variants */
-.pdx-fab-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
-.pdx-fab-secondary { background: var(--pdx-color-surface); color: var(--pdx-color-text); border: 1px solid var(--pdx-color-border); }
-.pdx-fab-danger { background: var(--pdx-color-danger); color: white; }
+:where(pdx-fab[variant="primary"]) > [data-part="root"], .pdx-fab-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+:where(pdx-fab[variant="secondary"]) > [data-part="root"], .pdx-fab-secondary { background: var(--pdx-color-surface); color: var(--pdx-color-text); border: 1px solid var(--pdx-color-border); }
+:where(pdx-fab[variant="danger"]) > [data-part="root"], .pdx-fab-danger { background: var(--pdx-color-danger); color: white; }
 
 /* Open state — icon rotates */
 .pdx-fab-open .pdx-fab-icon { transform: rotate(45deg); }

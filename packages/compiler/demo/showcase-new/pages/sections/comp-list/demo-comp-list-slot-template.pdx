@@ -11,7 +11,7 @@
               <strong>{{ item.name }}</strong>
               <span class="pdx-ink-muted">{{ item.email }}</span>
             </div>
-            <pdx-chip size="xs">{{ item.dept }}</pdx-chip>
+            <pdx-chip size="sm">{{ item.dept }}</pdx-chip>
           </div>
         </slot>
       </pdx-list>

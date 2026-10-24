@@ -3,9 +3,9 @@
  *
  * Contracts DERIVED by inspecting the source and the CSS:
  *   - Source: packages/ui/src/fab/pdx-fab.ts
- *       · the HOST <pdx-fab> gets the container classes `pdx-fab-container pdx-fab-{position}`
+ *       · the HOST <pdx-fab> gets the container class `pdx-fab-container`, and its `position` attribute places it (#630)
  *         (position:fixed, z-index:90). It is NOT the button.
- *       · the round button is an INNER <button class="pdx-fab pdx-fab-{variant} pdx-fab-{size}">
+ *       · the round button is an INNER <button class="pdx-fab" data-part="root">, sized and coloured by the host's size and variant (#630)
  *         created in requestAnimationFrame inside ctx.track. It is the measurable element.
  *       · the button HAS an aria-label (from the `label` prop, 'Actions' by default) plus aria-haspopup and
  *         aria-expanded. → a11y is fine (an icon with no text, covered by the aria-label).

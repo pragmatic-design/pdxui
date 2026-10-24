@@ -5,14 +5,14 @@ Compact, optionally removable tag.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `label` | `label` | string | `''` | Visible label text. |
-| `variant` | `variant` | string | `''` | Visual variant. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `removable` | `removable` | boolean | `false` | Shows a × button — the chip's tab stop — named "Remove {label}", which emits pdx-remove. The chip does not remove itself: the app removes it and owns focus afterwards (move it to the next chip's ×, or the previous one), or a keyboard user is left on <body>. |
 | `selectable` | `selectable` | boolean | `false` | A toggle button (role="button", aria-pressed): click, Enter or Space flips `selected` and emits pdx-toggle. |
 | `selected` | `selected` | boolean | `false` | Selected state. A user toggle writes it before pdx-toggle; a parent that sets it afterwards wins. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `value` | `value` | string | `''` | Value passed in remove/toggle event detail for identification. |
 | `avatar` | `avatar` | string | `''` | Avatar URL — renders a small circle image before the label. |
+| `variant` | `variant` | 'outline' \| 'primary' \| 'success' \| 'danger' \| 'warning' \| 'info' \| 'tonal' \| 'tonal-primary' \| 'tonal-success' \| 'tonal-danger' \| 'tonal-warning' | `'outline'` | outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 **Events:** `pdx-remove` → `detail: { value, label }` — Fired when an item is removed.; `pdx-toggle` → `detail: { selected, value }` — Fired when toggled open or closed. Does not bubble.
 

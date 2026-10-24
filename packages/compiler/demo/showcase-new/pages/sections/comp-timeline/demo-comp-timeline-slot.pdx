@@ -8,7 +8,7 @@
           <pdx-card variant="outline" compact>
             <div class="tl-slot-header">
               <strong>{{ item.title }}</strong>
-              <pdx-chip size="xs" :class="item.status === 'success' ? 'pdx-success' : item.status === 'warning' ? 'pdx-warning' : 'pdx-info'">{{ item.status }}</pdx-chip>
+              <pdx-chip size="sm" :class="item.status === 'success' ? 'pdx-success' : item.status === 'warning' ? 'pdx-warning' : 'pdx-info'">{{ item.status }}</pdx-chip>
             </div>
             <p class="tl-slot-desc">{{ item.description }}</p>
             <small class="pdx-ink-muted">{{ item.date }}</small>
@@ -24,7 +24,7 @@
     &lt;pdx-card variant="outline" compact&gt;
       &lt;div class="header"&gt;
         &lt;strong&gt;{item.title}&lt;/strong&gt;
-        &lt;pdx-chip size="xs" :variant="{item.status}"&gt;
+        &lt;pdx-chip size="sm" :variant="{item.status}"&gt;
           {item.status}
         &lt;/pdx-chip&gt;
       &lt;/div&gt;
