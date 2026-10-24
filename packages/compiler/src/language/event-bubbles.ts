@@ -74,6 +74,7 @@ export const emitRemoved: LanguageChange = {
     scope: 'pdx',
     issue: 138,
     message: 'dispatch with the function the declaration creates: `@event saved: T;` then `saved(x)`.',
+    marker: '$emit',
     detect(text) {
         const findings: LanguageChangeFinding[] = [];
         for (const { from, to } of emitBlocks(text)) {

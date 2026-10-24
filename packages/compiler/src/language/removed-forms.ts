@@ -7,7 +7,7 @@
 
 import type { SFCDescriptor } from '../parser/sfc';
 import type { ValidationWarning } from '../compiler/validate';
-import { languageChanges, type LanguageChangeContext } from './changes';
+import { hasMarker, languageChanges, type LanguageChangeContext } from './changes';
 
 /** The line (1-based) of `index` in `text`. */
 function lineOf(text: string, index: number): number {
@@ -24,9 +24,12 @@ export function checkRemovedForms(descriptor: SFCDescriptor, source: string, con
     for (const change of languageChanges()) {
         if (change.kind !== 'removed' || change.reportedAs) continue;
         let findings: { line: number; found: string; note?: string }[] = [];
+        // A text without the form's marker holds no instance of it, and is not scanned (#648).
         if (change.scope === 'pdx') {
+            if (change.marker !== undefined && !hasMarker(source, change.marker)) continue;
             findings = change.detect(source, context);
         } else if (change.scope === 'script' && script) {
+            if (change.marker !== undefined && !hasMarker(script.content, change.marker)) continue;
             // Found in the script, placed in the file: its first line is the line the content starts on.
             // Counted only when there is something to place: nearly every check finds nothing (#646).
             findings = change.detect(script.content, context);

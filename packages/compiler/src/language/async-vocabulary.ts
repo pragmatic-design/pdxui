@@ -71,6 +71,7 @@ function isPendingRenamed(scope: LanguageChangeScope): LanguageChange {
         scope,
         issue: 141,
         message: '`isPending()` is `pending()`: any request in flight, first load or refresh.',
+        marker: 'isPending',
         detect: (text) => findings(text, memberCalls(text, 'isPending', scope)),
         fix: (text) => {
             let out = text;
@@ -91,6 +92,8 @@ function alphaNamesFlagged(scope: LanguageChangeScope): LanguageChange {
         issue: 141,
         message: 'the async vocabulary is data(), error(), state(), pending(), stale(): `loading()` is '
             + "`state() === 'pending' && !data()`, a refresh is `state() === 'success' && pending()`, `isStale()` is `stale()`, `hasData()` is `data() !== undefined`.",
+        // Match: a call of one of the flagged members, or of `state` (compared with a removed value).
+        marker: /\.\s*(?:loading|status|isLoading|hasData|isStale|state)\s*\(/,
         detect: (text) => findings(text, memberCalls(text, 'loading|status|isLoading|hasData|isStale', scope)),
         fix: 'flag',
     };

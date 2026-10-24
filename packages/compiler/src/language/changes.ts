@@ -93,10 +93,22 @@ export interface LanguageChange {
     reportedAs?: string;
     /** For a removed export of `@pdxui/*`: what leaves the package and what replaces it. */
     export?: { from: string; name: string; replacement: string };
+    /**
+     * What every instance of the form contains — a substring, or a regex that is neither global nor
+     * sticky — so that a text without it is not scanned (#648). The compiler runs `detect` only where
+     * `hasMarker` holds; the compiler's tests fail when a detected fixture lacks it. Every `removed`
+     * entry the compiler checks names one.
+     */
+    marker?: string | RegExp;
     /** Every place the form is in `text` (a file in the entry's scope). */
     detect(text: string, context?: LanguageChangeContext): LanguageChangeFinding[];
     /** The mechanical rewrite of a whole text, or `'flag'` when a person must rewrite it. */
     fix: ((text: string, context?: LanguageChangeContext) => string) | 'flag';
+}
+
+/** Whether `text` holds a change's marker: a string as a substring, a regex by `test`. */
+export function hasMarker(text: string, marker: string | RegExp): boolean {
+    return typeof marker === 'string' ? text.includes(marker) : marker.test(text);
 }
 
 /** The line (1-based) of `index` in `text`. */
@@ -126,6 +138,7 @@ export function removedExport(from: string, name: string, replacement: string, i
         issue,
         message: `\`${name}\` is no longer exported by ${from}: use ${replacement}.`,
         export: { from, name, replacement },
+        marker: name,
         detect: (text) => findAll(text, re),
         fix: 'flag',
     };

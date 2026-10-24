@@ -67,6 +67,7 @@ export const navigateUrl: LanguageChange = {
     scope: 'script',
     issue: 150,
     message: '`navigate()` takes a declared route pattern and its params, `navigate(\'/users/:id\', { id })`; a concrete URL is `navigate.url(\'/users/42\')`.',
+    marker: 'navigate',
     detect: (text, context) => rewritable(text, context).map((c) => findingOf(text, c)),
     fix: (text, context) => {
         let out = text;

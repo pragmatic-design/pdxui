@@ -201,6 +201,7 @@ export const refAttribute: LanguageChange = {
     scope: 'pdx',
     issue: 129,
     message: '`ref="x"` is removed: write `:ref="x"`.',
+    marker: 'ref=',
     detect: (text) => findAttrs(text, /^ref$/),
     fix: (text) => rewriteTags(text, (t, tag) => {
         const [a] = attrsOf(tag.text, /^ref$/);
@@ -215,6 +216,7 @@ export const showAttribute: LanguageChange = {
     scope: 'pdx',
     issue: 129,
     message: 'The `:show` attribute is removed: wrap the element in `@show (condition) { … }`.',
+    marker: ':show=',
     detect: (text) => findAttrs(text, /^:show$/),
     fix: (text) => rewriteTags(text, (t, tag) => {
         const [a] = attrsOf(tag.text, /^:show$/);
@@ -239,6 +241,7 @@ export const classDot: LanguageChange = {
     scope: 'pdx',
     issue: 129,
     message: '`:class.x` is removed: write the object form, `:class="{ x: condition }"` (merged with an existing one).',
+    marker: ':class.',
     detect: (text) => findAttrs(text, /^:class\./),
     fix: (text) => rewriteTags(text, mergeDotted('class')),
 };
@@ -249,6 +252,7 @@ export const styleDot: LanguageChange = {
     scope: 'pdx',
     issue: 129,
     message: '`:style.x` is removed: write the object form, `:style="{ color: c, \'--accent\': a }"` (custom properties quoted).',
+    marker: ':style.',
     detect: (text) => findAttrs(text, /^:style\./),
     fix: (text) => rewriteTags(text, mergeDotted('style')),
 };

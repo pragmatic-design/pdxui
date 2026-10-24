@@ -149,6 +149,8 @@ export const alphaChangeEvent: LanguageChange = {
     scope: 'pdx',
     issue: 478,
     message: 'the component no longer emits its alpha change event: listen to its model\'s event, whose detail is `{ value }`.',
+    // Match: an event listener attribute, the one `listeners` reads (LISTENER, not global).
+    marker: /\s@[A-Za-z][\w-]*(?:\.[\w-]+)*\s*=/,
     detect(text, context): LanguageChangeFinding[] {
         return listeners(text, context, isAlphaEvent).map((l) => ({
             line: lineAt(text, l.at),

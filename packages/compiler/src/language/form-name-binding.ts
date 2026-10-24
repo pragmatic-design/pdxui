@@ -192,6 +192,8 @@ export const formNameBinding: LanguageChange = {
     scope: 'pdx',
     issue: 128,
     message: 'a control is bound to its form field through its model, `::value="f.email"`, and `<pdx-form-field>` names its field, `:field="f.email"` — no longer by `name` inside `<pdx-form :form>` or in a form section.',
+    // Every use is a static `name=` attribute.
+    marker: 'name=',
     detect(text, context) {
         return usesOf(text, context).map((u): LanguageChangeFinding => {
             const models = modelsOf(u.tag, context);
