@@ -11,7 +11,7 @@
 //       :item-fields="[{ name: 'product', type: 'text', label: 'Product' }]"
 //       :item-default="{ product: '', qty: 1, price: 0 }" />
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, snippetOrSlot } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the
@@ -53,7 +53,7 @@ export interface FieldListItemSchema {
  * An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,
  * and the values come back as an array.
  *
- * @slot row - Scoped — renders one row. Receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the slot's content).
+ * @slot row - Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
  */
 component('pdx-field-list', {
     props: {
@@ -77,6 +77,10 @@ component('pdx-field-list', {
         removable: { type: Boolean, default: true },
         /** Display mode: inline (default), dialog. */
         display: { type: String, default: 'inline' },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    slots: {
+        row: slot<(item: { [field: string]: unknown }, index: number, remove: () => void) => Node>(),
     },
     setup(ctx) {
         // The context form is looked up when read, and kept once found: set up before its
@@ -590,7 +594,7 @@ component('pdx-field-list', {
         }
 
         function getRowSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['row'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'row', (s) => [s.item, s.index, s.remove]);
         }
 
         return { addItem, removeItem, editItem, closeDialog, getRowSlot };

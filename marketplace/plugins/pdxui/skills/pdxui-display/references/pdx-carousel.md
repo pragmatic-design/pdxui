@@ -34,7 +34,7 @@ A swipeable slideshow.
 
 **Renders:** roles `group` · `region` · `tab` · `tablist`
 
-**Slot:** `slide` — Scoped — renders one slide. Receives `{ slide, index, isActive }`.
+**Slot:** `slide` — Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.
 
 **Shapes:** `CarouselItem { src?: string; alt?: string; content?: string; caption?: string }`
 

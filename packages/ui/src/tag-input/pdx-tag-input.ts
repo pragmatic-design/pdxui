@@ -1,7 +1,7 @@
 // pdx-tag-input — Multi-tag input with chip rendering, paste support, keyboard nav.
 // Uses .pdx-input-wrap for consistent border/focus and .pdx-chip for tag rendering.
 
-import { component, html, signal, computed, model, event } from '@pdxui/core';
+import { component, html, signal, computed, model, event, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
@@ -15,7 +15,7 @@ import '@pdxui/design/components/chip';
  * A text field where the user enters several tags, shown as chips, with paste support and
  * duplicates prevented.
  *
- * @slot tag - Scoped — renders one tag. Receives `{ tag, index }`.
+ * @slot tag - Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.
  *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
@@ -51,6 +51,10 @@ component('pdx-tag-input', {
         warning: { type: Boolean, default: false },
         /** Show loading state */
         loading: { type: Boolean, default: false },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    slots: {
+        tag: slot<(tag: string, index: number) => Node>(),
     },
     setup(ctx) {
         const tags = signal<string[]>([]);
@@ -224,7 +228,7 @@ component('pdx-tag-input', {
         reflectNameToHost(ctx);
 
         function getTagSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['tag'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'tag', (s) => [s.tag, s.index]);
         }
 
         return {

@@ -35,7 +35,7 @@ Type to add removable tags.
 
 **Renders:** roles `group` · `status`
 
-**Slot:** `tag` — Scoped — renders one tag. Receives `{ tag, index }`.
+**Slot:** `tag` — Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.
 
 
 #### Examples

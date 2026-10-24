@@ -416,7 +416,10 @@ So do the lists and the navigation (#595): `pdx-list`'s `item(item, index)` and 
 `pdx-breadcrumb`'s `item(item, index, isLast)`, and `pdx-nav-menu`'s `item(item, level, expanded,
 active)`. Two scoped slots share their name with a prop, so their snippets are named apart and the
 prop stays what it was: `pdx-pagination`'s `page` slot is the snippet `item(page, active)`, and
-`pdx-nav-menu`'s `actions` slot is `itemActions(item, level, active)`.
+`pdx-nav-menu`'s `actions` slot is `itemActions(item, level, active)`. And so do the remaining
+inputs and media (#596): `pdx-carousel`'s `slide(slide, index, active)`, `pdx-field-list`'s
+`row(item, index, remove)` — `remove()` deletes that row —, `pdx-file-upload`'s `file(file, status,
+progress)`, `pdx-mention`'s `suggestion(item, index, active)` and `pdx-tag-input`'s `tag(tag, index)`.
 
 ```pdx
 <pdx-pagination :total="total" :page-size="20" :page="page">
