@@ -114,8 +114,8 @@ already marks its control required from its rules. Before #128
 a control was wired to its field by its `name` alone; that is `PDX_REMOVED_FORM` now, and
 `pdx migrate` writes the binding from the control's manifest — flagging a control with no manifest or
 with several models, such as `pdx-checkbox` (`checked`, `indeterminate`). A form section binds the
-same way, through the form it inherits (below); a component that only calls `tryUseForm()` still has
-its named controls wired, until #613 finishes removing that.
+same way, through the form it inherits (below), and a named control in it is `PDX_REMOVED_FORM` too;
+`pdx migrate` flags a section that only calls `tryUseForm()`, which names no values type.
 
 **A group of checkboxes or radios outside a form** binds to one signal with `::group`: checkboxes to
 an array of the values that are checked, radios to the value of the one selected — no handler per

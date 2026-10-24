@@ -10,18 +10,10 @@
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
-import { ComponentResolver } from '../src/component-resolver';
 import { readFileSync, readdirSync, statSync } from 'fs';
 import { resolve, relative, join } from 'path';
 
 const DEMO_ROOT = resolve(__dirname, '../demo');
-
-// The library's models, as the plugin reads them from the manifest: a control that declares one is
-// bound to its model by a form (#480), and without it the output would bind it as no build does. The
-// other lookups stay off, so the snapshots keep what they locked.
-const resolver = new ComponentResolver();
-resolver.registerUiManifest();
-const modelEventOf = (tag: string) => resolver.modelEventOf(tag);
 
 function collectPdx(dir: string): string[] {
     const out: string[] = [];
@@ -42,7 +34,7 @@ describe('compile golden — demo corpus', () => {
             const source = readFileSync(file, 'utf8');
             let snapshot: string;
             try {
-                const { code, warnings } = compile(source, rel, [], undefined, { modelEventOf });
+                const { code, warnings } = compile(source, rel);
                 // Sort warnings for determinism; they are part of the locked behavior.
                 const warnLines = warnings.map((w) => `${w.code}: ${w.message}`).sort();
                 snapshot = `// ${warnLines.length} warning(s)\n${warnLines.join('\n')}\n${'='.repeat(60)}\n${code}`;

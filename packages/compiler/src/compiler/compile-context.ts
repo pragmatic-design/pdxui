@@ -107,12 +107,6 @@ export interface CompileContext {
      */
     readonly propsOf: PropsLookup | null;
 
-    /**
-     * The event of a component's first model (#478): a form control that lists models is bound to it.
-     * Null in a compile without a component registry: the form binding keeps its hand-written events.
-     */
-    readonly modelEventOf: ModelEventLookup | null;
-
     /** Where a `<pdx-…>` tag's module lives — used by `@defer` to import what it renders. */
     readonly importPathOf: ((tag: string) => string | null) | null;
 
@@ -160,9 +154,6 @@ export type BrowserTarget = 'baseline-2026' | 'baseline-2024';
 /** tag → the props a binding can set on it, or null when the tag is unknown. */
 export type PropsLookup = (tag: string) => ReadonlySet<string> | null | undefined;
 
-/** tag → its first model and that model's event (`checked`, `checked-change`), or null when it lists none. */
-export type ModelEventLookup = (tag: string) => { model: string; event: string } | null;
-
 /** Create a fresh CompileContext for a single compilation. */
 export function createCompileContext(options?: {
     production?: boolean;
@@ -171,7 +162,6 @@ export function createCompileContext(options?: {
     /** Sink the caller owns; codegen diagnostics are appended to it. A fresh array if omitted. */
     warnings?: ValidationWarning[];
     propsOf?: PropsLookup;
-    modelEventOf?: ModelEventLookup;
     importPathOf?: (tag: string) => string | null;
     mapOrigins?: boolean;
     templateOrigin?: number | null;
@@ -202,7 +192,6 @@ export function createCompileContext(options?: {
         customDirectives: options?.customDirectives ?? new Set(),
         warnings: options?.warnings ?? [],
         propsOf: options?.propsOf ?? null,
-        modelEventOf: options?.modelEventOf ?? null,
         importPathOf: options?.importPathOf ?? null,
         mapOrigins: options?.mapOrigins ?? false,
         templateOrigin: options?.templateOrigin ?? null,

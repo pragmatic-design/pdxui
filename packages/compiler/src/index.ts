@@ -80,9 +80,6 @@ export type { SharedLoading } from './compiler/shared-loading';
 // tooling like the LSP for offset-stable identifier matching in the script block).
 export { maskNonCode, skipNonCode } from './compiler/tokenizer';
 
-// Form binding — register custom form controls for compiler auto-wiring
-export { registerCompilerFormControl } from './compiler/codegen-form-binding';
-
 // Plugin system
 export { PluginRunner } from './plugin-system';
 export type { CompilerPlugin, PluginContext } from './plugin-system';

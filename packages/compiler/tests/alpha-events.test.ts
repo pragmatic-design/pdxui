@@ -3,8 +3,8 @@
 // A component that moves to its model no longer emits its alpha change event. Its manifest records
 // the alpha events (`alphaEvents`) and how each alpha `detail.<field>` reads now (`alphaDetail`); the
 // resolver hands them out as `alphaOf`, and the model's event as `modelEventOf`. The compiler reports
-// a listener on an alpha event as PDX_REMOVED_FORM naming the model's event, the form binding listens
-// to that event, and `pdx migrate` rewrites what it can (packages/cli/tests/migrate-alpha-events.test.ts).
+// a listener on an alpha event as PDX_REMOVED_FORM naming the model's event, and `pdx migrate`
+// rewrites what it can (packages/cli/tests/migrate-alpha-events.test.ts).
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
@@ -136,36 +136,6 @@ describe('an alpha event renamed to a declared event (#481)', () => {
             .warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');
         expect(found[0].message).toContain('`@query-change`');
         expect(found[1].message).toContain('`@value-change`');
-    });
-});
-
-// A form section's named controls (#613 keeps them until a section binds explicitly); inside
-// `<pdx-form :form>` a control binds through its model and nothing is wired by name (#128).
-describe('the form binding of a section', () => {
-    const SETUP = "<script>\n  import { tryUseForm } from '@pdxui/core';\n  tryUseForm();\n</script>";
-    const formCode = (tag: string, modelEventOf?: (tag: string) => { model: string; event: string } | null) =>
-        compile(`<template>\n<${tag} name="agree"></${tag}>\n</template>\n${SETUP}`, 'form.pdx', [], undefined, { modelEventOf }).code;
-
-    it('a control that lists models listens to its first model\'s event and reads detail.value', () => {
-        const code = formCode('pdx-checkbox', (tag) => (tag === 'pdx-checkbox' ? { model: 'checked', event: 'checked-change' } : null));
-        expect(code).toContain('checked-change');
-        expect(code).toContain('e.detail.value');
-        expect(code).not.toContain("'pdx-change'");
-    });
-
-    it('one whose model is not known is bound by the beta convention, not the alpha event (#125)', () => {
-        // No `modelEventOf` names pdx-select's model here; no library control emits pdx-change any more.
-        const code = formCode('pdx-select');
-        expect(code).toContain("'value-change'");
-        expect(code).toContain('e.detail?.value');
-        expect(code).not.toContain("'pdx-change'");
-    });
-
-    it('a text field listens to its model\'s live event and binds no reactive :value (#479)', () => {
-        const code = formCode('pdx-input', (tag) => (tag === 'pdx-input' ? { model: 'value', event: 'value-change' } : null));
-        expect(code).toContain("'value-change'");
-        expect(code).toContain('e.detail.value');
-        expect(code).not.toContain("'pdx-input'");
     });
 });
 

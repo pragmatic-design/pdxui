@@ -45,8 +45,6 @@ export function compileSFC(
         warnings?: import('./validate').ValidationWarning[];
         /** Declared props of known components, so bound names reach them. */
         propsOf?: import('./compile-context').PropsLookup;
-        /** The event of a component's first model, for the form binding (#478). */
-        modelEventOf?: import('./compile-context').ModelEventLookup;
         /** Where a `<pdx-…>` tag's module lives — `@defer` imports what it renders. */
         importPathOf?: (tag: string) => string | null;
         /** The caller reads origin marks into a source map and removes them. */
@@ -76,7 +74,7 @@ export function compileSFC(
             for (const name of directives.keys()) customDirectives.add(name);
         }
     }
-    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, modelEventOf: options?.modelEventOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
+    const ctx = createCompileContext({ production, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
 
     // A scoped block under baseline-2026 stops at nested components (#152): what the template writes
     // inside a child's tag is marked as this component's, so the donut scope still reaches it.

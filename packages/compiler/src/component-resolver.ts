@@ -207,7 +207,7 @@ export class ComponentResolver {
 
     /**
      * A component's first model and the event it dispatches when written (#478), or null when it lists
-     * none: what the form binding listens to on a control that has moved to its model.
+     * none: the event an alpha change listener is rewritten to (`alphaOf`).
      */
     modelEventOf(tag: string): { model: string; event: string } | null {
         const first = this.modelsOf(tag)?.values().next();

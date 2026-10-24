@@ -16,8 +16,8 @@ semver.
   control does, `::value="intake.email"` and `<pdx-form-field :field="intake.email">`. It compiles to
   core's new `inheritedForm(ctx.el)`: each `intake.x` reads the form when asked, so a binding made
   before the form is found — a child connects before its parent, a projected child mounts detached —
-  follows it from the moment `<pdx-form>` provides it. The showcase's intake requester step uses it.
-  A component that only calls `tryUseForm()` keeps its name wiring until #613's second part.
+  follows it from the moment `<pdx-form>` provides it. The showcase's intake wizard and the employee
+  identity group use it.
 - `pdx-button` declares its variants (#512): `variant` and `size` are reflected on the host
   (`<pdx-button variant="ghost" size="sm">`), and `size` defaults to `'md'` instead of `''`. Its rules in
   `@pdxui/design` are written once as `@variant pdx-button …` and compiled for the host and for the
@@ -359,6 +359,20 @@ semver.
 
 ### Changed
 
+- **Breaking:** in a form section, a control is no longer wired to the form above by its `name`, nor a
+  `<pdx-form-field>` by its `name` (#613). A section is a component that declares
+  `@form x: Values from parent;` or calls `useForm()` / `tryUseForm()`. A named control with no binding
+  there is `PDX_REMOVED_FORM`, as inside `<pdx-form :form>` since #128.
+  - `pdx migrate` (`form-name-binding`) rewrites it to the declared form, `::<model>="x.email"` and
+    `:field="x.email"`. A section that only calls `useForm()` / `tryUseForm()` names no values type,
+    so it is flagged: declare `@form x: Values from parent;` and bind to it.
+  - `pdx-form` no longer pushes its values into the controls it finds by `name`. A control shows its
+    field through its binding, so `setValues()` and `reset()` reach every bound control.
+  - With the wiring gone, `registerCompilerFormControl()` is gone from `@pdxui/compiler`, and so are
+    `pdx({ formControls })` and `compile()`'s `modelEventOf` option. `formControls` had stopped
+    reaching the compiler: it registered into a registry nothing read.
+  - The showcase's intake window, details and billing steps and its employee identity group are
+    migrated. The refused-on-another-tab count reads each field's name from its control.
 - **Breaking:** `pdx-button` no longer puts its variant class on its inner `<button>` (#512). The
   variant is the host's attribute, `<pdx-button variant="ghost">`, and the design system styles it
   through `@variant pdx-button` rules; the inner `<button>` carries `data-part="root"`, its base class
@@ -388,9 +402,8 @@ semver.
   model, `::value="f.email"`, and a form field names its field, `:field="f.email"`. `pdx migrate`
   (`form-name-binding`) writes both, the control's model from its manifest, and keeps the control's
   `name` as the full path inside a `<pdx-field-group>`; a control with no manifest entry or with
-  several models (`pdx-checkbox`: `checked`, `indeterminate`) is flagged. A form section — a
-  component that calls `useForm()` / `tryUseForm()` — keeps its named controls wired until #613. The
-  showcase's and the demo pages' forms are migrated. (#128)
+  several models (`pdx-checkbox`: `checked`, `indeterminate`) is flagged. A form section follows in
+  #613, below. The showcase's and the demo pages' forms are migrated. (#128)
 - **Breaking:** a form's fields are its members: `f.email`, a nested one `f['customer.name']`, beside
   `f.valid()` and `f.reset()`. `f.fields` is gone; `f.fields.x` in a `.pdx` is `PDX_REMOVED_FORM`, and
   `pdx migrate` rewrites it to `f.x` in `.pdx` and `.ts` files, for the names a file declares as a form.

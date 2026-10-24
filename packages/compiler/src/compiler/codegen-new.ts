@@ -11,19 +11,11 @@ import { hostDescriptor } from './codegen-host';
 import { liftStoreExports } from './store-exports';
 import { dropScriptExports } from './script-exports';
 import type { CompileContext } from './compile-context';
-import { applyInjectedFormBindings } from './codegen-form-binding';
-import { maskNonCode } from './tokenizer';
 import { navigationIsRouter, templateReadsNavigation, setupReadsNavigation } from './navigation-import';
 import { builtinAttachmentsToImport } from './attach-names';
 import { foldConstantConditions } from './fold-constant-conditions';
 import { literalConstNames } from './codegen-constant-bindings';
 import { delegatedEventTypes } from './inline-event-delegation';
-
-/** The script calls `useForm()` or `tryUseForm()`: the component is a section of a form above it. */
-function declaresFormSection(script: string): boolean {
-    // Match: a call of useForm or tryUseForm — not useFormCoordinator, not a method `x.useForm(`.
-    return /(?<![\w$.])(?:useForm|tryUseForm)\s*\(/.test(maskNonCode(script));
-}
 import { assembleModule, detectDeadSignals, extractTag, renderReturnIndex } from './codegen-shared';
 import { jsQuote } from './js-literal';
 import { coreRuleImports } from './form-rules';
@@ -118,14 +110,6 @@ export function compileNewMode(
     for (const name of builtinAttachmentsToImport(descriptor.template?.content ?? '', (n) => declared.has(n) || ctx.importedNames!.has(n))) {
         imports.add(name);
         ctx.importedNames.add(name);
-    }
-
-    // A file that calls useForm()/tryUseForm() is a SECTION of the form above it, and its named
-    // controls are wired to that form — until #613 gives a section an explicit binding. Read from the
-    // script with comments and strings masked, so a mention is not a call. Inside
-    // `<pdx-form :form>` nothing is wired by name any more (#128): a control binds through its model.
-    if (declaresFormSection(descriptor.script?.content ?? '')) {
-        if (applyInjectedFormBindings(ast, ctx.modelEventOf)) imports.add('tryUseForm');
     }
 
     // One render path, in dev and in a build (#107): the inline path.

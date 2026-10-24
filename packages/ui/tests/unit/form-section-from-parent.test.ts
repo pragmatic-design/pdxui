@@ -8,18 +8,13 @@
 // with the real compiler, run against the real @pdxui/core, mounted in happy-dom.
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import * as core from '@pdxui/core';
-import { join } from 'node:path';
 import { compile } from '../../../compiler/src/plugin';
-import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import { tick, cleanup } from './helpers';
 import '../../src/form/pdx-form';
 import '../../src/input/pdx-input';
 
-const resolver = new ComponentResolver();
-resolver.registerUiManifest(join(__dirname, '../../../showcase'));
-
 function compiled(filename: string, source: string): string {
-    const { code, warnings } = compile(source, filename, [], undefined, { modelEventOf: (t) => resolver.modelEventOf(t) });
+    const { code, warnings } = compile(source, filename);
     expect(warnings.filter((w) => w.severity === 'error'), `${filename}: errors`).toEqual([]);
     return code;
 }

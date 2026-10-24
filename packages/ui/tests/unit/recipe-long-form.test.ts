@@ -1,7 +1,7 @@
 // The "long form" recipe does what it says.
 //
-// The best form path — `<pdx-form :form>` + `<pdx-form-field name>` + a control with the same name — is
-// wired by the compiler (codegen-form-binding.ts), and the recipe teaches it. This takes the recipe's own block out of
+// The best form path — `<pdx-form :form>`, `<pdx-form-field :field="f.x">` and a control bound through
+// its model, `::value="f.x"` (#128) — is what the recipe teaches. This takes the recipe's own block out of
 // recipes.md, compiles it with the real compiler, runs it against the real core and components, and
 // checks each promise the recipe makes: a draft restored into mounted controls, the error shown
 // while typing, the field not recreated as it is typed into.
@@ -10,7 +10,6 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
-import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import '../../src/index';
 import { tick, cleanup } from './helpers';
 
@@ -29,11 +28,7 @@ let tag = '';
 beforeAll(() => {
     const block = recipeBlock();
     if (!block) return;
-    // The controls' models, from the library's manifest, as a build reads them: the form binds a text
-    // field to its model's event (#479).
-    const resolver = new ComponentResolver();
-    resolver.registerUiManifest(join(__dirname, '../../../showcase'));
-    const { code } = compile(block, 'shipment-form.pdx', [], undefined, { modelEventOf: (t) => resolver.modelEventOf(t) });
+    const { code } = compile(block, 'shipment-form.pdx');
     tag = 'app-shipment-form';
     const body = code
         .replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/g, 'const {$1} = __core;')

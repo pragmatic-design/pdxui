@@ -249,12 +249,12 @@ FormDecl ::= "@form" S Word S? ":" S? ( InlineSchema | Word ) ( S? FormOptions )
 
 ### Semantics
 
-As alpha, with **explicit field binding** (#128 — landed; a form section's binding is #613). `@form f: Schema` exposes typed fields — `f.email`
+As alpha, with **explicit field binding** (#128 — landed; a form section's, #613 — landed). `@form f: Schema` exposes typed fields — `f.email`
 with `value()`, `error()`, `touched()`, `dirty()` and `required` (landed: the fields are members of
 the form, and `f.fields` is gone) — and a control binds to one through
 **its own model**: `::value="f.email"` on a text input, `::checked="f.accepted"` on a checkbox or a
 switch, `::pressed="f.bold"` on a toggle (landed) — the model the control's manifest declares, as the alpha
-form binding already distinguished (`codegen-form-binding.ts`, `checked` and `pressed` controls). The
+form binding already distinguished (`checked` and `pressed` controls). The
 binding writes the field, and the control receives the field's error, `aria-invalid` and `required`.
 A field bound through a model whose type differs from the field's (`::checked` on a `string` field)
 is a type error of the strict projection (landed). `<pdx-form-field :field="f.email">` renders the field's label, hint and error (landed). Parse errors
@@ -272,10 +272,11 @@ all of the form's own, `state`, `touched` and `submitting` among them.
   `::pressed` for `pdx-toggle`, `::value` for the others), keeping its `name` as the full path; a
   control with no manifest entry, or with more than one model — `pdx-checkbox`, whose manifest lists
   `checked` and `indeterminate` — is flagged. `name` on `pdx-form-field` becomes `:field`. A form
-  section names the form it inherits, `@form f: Schema from parent;` (landed, #613 part 1): `f.x` reads
-  the form of the `<pdx-form>` above it lazily, and its controls bind as any control does. A component
-  that calls `useForm()` / `tryUseForm()` keeps its named controls wired until #613's second part
-  removes that wiring and migrates it.
+  section names the form it inherits, `@form f: Schema from parent;` (landed, #613): `f.x` reads
+  the form of the `<pdx-form>` above it lazily, and its controls bind as any control does. A named
+  control in a section is `PDX_REMOVED_FORM` too (landed, #613): `pdx migrate` rewrites it to the
+  declared form, and flags a section that only calls `useForm()` / `tryUseForm()`, which names no
+  values type.
 - `required` on the markup of a bound control: `PDX_FORM_REQUIRED_IN_MARKUP` (warning), pointing at
   the schema (landed, #128).
 - The alpha rules stay (`PDX_FORM_FIELD_UNPARSED`, `PDX_FORM_ARRAY_RULES_IGNORED`,

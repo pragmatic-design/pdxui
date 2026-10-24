@@ -15,7 +15,6 @@ toggles only the node clicked).
   not found unless its branch matches.
 - Nodes have a fixed shape, `{ value, label, children?, disabled?, isLeaf? }`: no `idField` / `labelField` as on
   `pdx-tree`.
-- The compiler does not wire it inside `<pdx-form>`: bind `::value` yourself (its model, `value-change`).
 
 **Composes with** — it shares the `loadChildren` shape with `pdx-tree` and `pdx-cascader`.
 

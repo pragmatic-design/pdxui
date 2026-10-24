@@ -32,7 +32,7 @@ paged table → `pdx-relation-picker`.
 - `creatable` makes the typed text both value and label and emits `pdx-create`; storing the new option is yours.
 - Over 100 options the list virtualizes by itself.
 
-**Composes with** `pdx-form` + `pdx-form-field` (wired by `name`; the field's label names it) · `pdx-data-source`
+**Composes with** `pdx-form` + `pdx-form-field` (bound through its model, `::value="f.x"`; the field's label names it) · `pdx-data-source`
 (injected when the select sits inside one).
 
 | Prop | Attr | Type | Default | Notes |

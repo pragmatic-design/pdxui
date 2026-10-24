@@ -1,7 +1,8 @@
 // Form control registry — allows custom components to participate in the form system.
 //
-// By registering a custom control, both the compiler (form-binding pass) and
-// pdx-form-template (JSON schema) will auto-wire the component.
+// By registering a custom control, pdx-form-template (JSON schema) can draw it. In a template, a
+// control binds its field through its model, `::value="f.x"` (#128, #613): the compiler does not read
+// this registry.
 //
 // Usage:
 //   registerFormControl('my-date-picker', {

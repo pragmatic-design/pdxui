@@ -13,6 +13,6 @@ with `editable`, lets it be typed.
   `[start, end]` for a range or a week. `getDate()`, `getRange()` and `getTime()` read the parts.
 - `calendar` changes the display only; the value and its math stay Gregorian ISO.
 
-**Composes with** `pdx-form` + `pdx-form-field` (wired by `name`) · `pdx-auto-form` / `pdx-form-template` (a
+**Composes with** `pdx-form` + `pdx-form-field` (bound through its model, `::value="f.x"`) · `pdx-auto-form` / `pdx-form-template` (a
 schema `date` field is drawn as an editable picker) · `@form` touched state (it emits `pdx-blur` when focus
 leaves both the field and its panel).
