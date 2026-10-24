@@ -159,7 +159,8 @@ test('a rule that reads TWO fields is the field\'s own error, and stops the step
     await fillStepOne(page);
     await next(page).click();
 
-    const endsField = page.locator('pdx-form-field[name="ends"]');
+    // The field wrapping the `ends` control: it binds through `:field` since #613, not by `name`.
+    const endsField = page.locator('pdx-form-field', { has: page.locator('[data-test="ends"]') });
     await fill(page, 'starts', '2026-10-10');
     await fill(page, 'ends', '2026-10-01');
     await expect(endsField, 'the message is not on the field the rule named').toContainText(/before|precede/i);

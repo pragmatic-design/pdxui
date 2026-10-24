@@ -58,6 +58,11 @@ export interface IntakeValues {
     lines: { activity: string; hours: number }[];
 }
 
+/** The values of the page's `billing` form: what the billing step inherits (#613). */
+export interface BillingValues {
+    po: string;
+}
+
 /** What an intake submission looks like once both forms are aggregated. */
 export interface IntakeSubmission {
     intake: Record<string, unknown>;

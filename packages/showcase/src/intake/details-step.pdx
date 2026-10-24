@@ -9,11 +9,11 @@
          controls. -->
     @show (mode === 'onsite') {
       <pdx-field-group name="address" :label="$t('intake.fields.address')" data-test="address">
-        <pdx-form-field name="street" :label="$t('intake.fields.street')">
-          <pdx-input name="street" data-test="street"></pdx-input>
+        <pdx-form-field :field="intake['address.street']" :label="$t('intake.fields.street')">
+          <pdx-input name="address.street" ::value="intake['address.street']" data-test="street"></pdx-input>
         </pdx-form-field>
-        <pdx-form-field name="city" :label="$t('intake.fields.city')">
-          <pdx-input name="city" data-test="city"></pdx-input>
+        <pdx-form-field :field="intake['address.city']" :label="$t('intake.fields.city')">
+          <pdx-input name="address.city" ::value="intake['address.city']" data-test="city"></pdx-input>
         </pdx-form-field>
       </pdx-field-group>
     }
@@ -25,7 +25,6 @@
          the NAME of what it lost, which `draft.ts` collects as it strips it. -->
     <label class="pdx-label">{{ $t('intake.fields.attachment') }}</label>
     <pdx-file-upload
-      name="attachment"
       @pdx-select="e => attach((e.detail?.files ?? [])[0] ?? null)"
       @pdx-remove="detach()"
       data-test="attachment"></pdx-file-upload>
@@ -46,8 +45,10 @@
 
 <script>
 // Intake's third step: what the mode asked for, the attachment, and the lines. A section of the
-// `intake` form. The file goes up to the page, which hands it to the draft.
-import { tryUseForm } from '@pdxui/core';
+// `intake` form, which it inherits (#613). The file goes up to the page, which hands it to the
+// draft: it is not a field of the form, so it has no `name`. The list keeps the page's own form, the
+// `form` prop: it registers each row's fields on it.
+import type { IntakeValues } from '../data/intake';
 
 /** On site or remote, as step 2 set it on the page. */
 @prop mode: string = 'onsite';
@@ -58,7 +59,7 @@ import { tryUseForm } from '@pdxui/core';
 /** The attachment was removed. */
 @event detach: void;
 
-tryUseForm();
+@form intake: IntakeValues from parent;
 
 // `required: true` on a row's field: the schema cannot carry it (a row's path does not exist until
 // the row does, and the compiler says so with PDX_FORM_ARRAY_RULES_IGNORED), so the list registers

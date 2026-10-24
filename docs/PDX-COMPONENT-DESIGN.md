@@ -91,10 +91,10 @@ file does*, and *how many files do the same thing*.
   residence, birth place, document, contacts, emergency, work, consents), each a
   `<fieldset class="group" data-test="group-…">` of `<pdx-form-field>` rows, in the same file as the loading, the per-field save queue, the "refused on
   another tab" logic and the leave guard.
-- **A form's field groups are sections.** A `.pdx` whose script calls `tryUseForm()` or
-  `useForm()` is a section of the form above it, and its whole template is wired to that form, so a
-  group of `<pdx-form-field name>` rows moved into a child keeps its wiring (`recipes.md`, "A long
-  form filled in more than one sitting").
+- **A form's field groups are sections.** A `.pdx` that declares `@form form: Values from parent;`
+  is a section of the form above it (#613), so a group of `<pdx-form-field :field="form.x">` rows
+  moved into a child binds the same fields (`recipes.md`, "A long form filled in more than one
+  sitting").
 - **Check:** *candidate.* A route whose template holds more than N sibling structural blocks
   (`fieldset`, `section`, `[data-wizard-step]`) with no component among them. Template size against
   script size is no signal: both examples here have the larger script. Warning.
@@ -751,8 +751,8 @@ cut, and the cut is done when the before/after test counts are equal.
     leave. The page passes what is the employee's own: `extra` clears the tax code outside Italy,
     and `after` asks for it once the country is Italy.
   - `src/data/refused-tabs.ts` (`createRefusedTabs`) holds the per-tab counts and `goToFirst`.
-  - `src/employee/identity.pdx` is a section of the page's form through `tryUseForm()`,
-    and takes `country` as a prop.
+  - `src/employee/identity.pdx` is a section of the page's form through
+    `@form personal: EmployeeIdentityValues from parent;` (#613), and takes `country` as a prop.
   - The route is 399 lines, from 501: the form and its rule, the option lists, the tabs, the
     other seven groups and the leave guard.
 

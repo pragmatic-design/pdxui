@@ -1,8 +1,8 @@
 <template>
   <!-- ─── 4 · the second form, and one Save for both ─────────────────── -->
   <div data-wizard-step :data-label="$t('intake.steps.billing')">
-    <pdx-form-field name="po" :label="$t('intake.fields.po')">
-      <pdx-input name="po" data-test="po"></pdx-input>
+    <pdx-form-field :field="billing.po" :label="$t('intake.fields.po')">
+      <pdx-input name="po" ::value="billing.po" data-test="po"></pdx-input>
     </pdx-form-field>
 
     <div class="review" data-test="review">
@@ -21,9 +21,9 @@
 
 <script>
 // Intake's last step: the `billing` form's field, the review, and the one Save. A section of the
-// `billing` form. The Save itself is the page's: it is the coordinator's
+// `billing` form, which it inherits (#613). The Save itself is the page's: it is the coordinator's
 // `submitAll` over BOTH forms, so this step only asks for it.
-import { tryUseForm } from '@pdxui/core';
+import type { BillingValues } from '../data/intake';
 
 /** The customers picked in step 1, by name. */
 @prop customerName: string = '';
@@ -38,7 +38,7 @@ import { tryUseForm } from '@pdxui/core';
 /** Save was pressed. */
 @event(bubbles) submit: void;
 
-tryUseForm();
+@form billing: BillingValues from parent;
 </script>
 
 <style scoped>

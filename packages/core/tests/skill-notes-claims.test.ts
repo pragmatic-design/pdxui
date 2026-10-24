@@ -1,10 +1,11 @@
 // The notes on the complex components say when to use them, where they go wrong and what sits around
 // them — and the claims a source can settle are held to that source here.
 //
-// A note is written by hand, so it ages like any prose: the compiler learns to wire a control by
-// `name`, a default changes, and the note goes on saying the opposite. What is checked: which controls
-// the compiler wires inside a <pdx-form> (codegen-form-binding.ts), and the defaults a note quotes
-// (custom-elements.json). The rest of each claim is not re-derived here.
+// A note is written by hand, so it ages like any prose: a control gains or loses a model, a default
+// changes, and the note goes on saying the opposite. What is checked: which controls bind to a form
+// field through their model, and the defaults a note quotes — both from custom-elements.json. Nothing
+// is wired by `name` any more (#128, #613), and no note may say otherwise. The rest of each claim is
+// not re-derived here.
 import { describe, it, expect } from 'vitest';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -16,23 +17,21 @@ const note = (tag: string) => readFileSync(join(NOTES, `${tag}.md`), 'utf-8').re
 const COMPLEX = ['pdx-form', 'pdx-auto-form', 'pdx-entity-grid', 'pdx-edit-drawer', 'pdx-relation-picker', 'pdx-tree',
     'pdx-tree-select', 'pdx-chart', 'pdx-wizard', 'pdx-select', 'pdx-autocomplete', 'pdx-date-picker', 'pdx-field-list', 'pdx-rich-text'];
 
-/** The tags the compiler wires by `name` inside a <pdx-form>: the `tags` set in codegen-form-binding.ts. */
-function wiredTags(): Set<string> {
-    const src = readFileSync(join(REPO, 'packages', 'compiler', 'src', 'compiler', 'codegen-form-binding.ts'), 'utf-8');
-    const block = /this\.tags = new Set\(\[([\s\S]*?)\]\)/.exec(src);
-    expect(block, 'the auto-wired tag list moved: this reader needs to follow it').not.toBeNull();
-    return new Set([...block![1].matchAll(/'(pdx-[a-z-]+)'/g)].map(m => m[1]));
+type Declaration = { tagName?: string; models?: string[]; members?: { name: string; default?: string }[] };
+
+/** A component's declaration in custom-elements.json. */
+function cemDeclaration(tag: string): Declaration | undefined {
+    const cem = JSON.parse(readFileSync(join(REPO, 'packages', 'ui', 'custom-elements.json'), 'utf-8')) as
+        { modules: { declarations?: Declaration[] }[] };
+    for (const m of cem.modules) for (const d of m.declarations ?? []) if (d.tagName === tag) return d;
+    return undefined;
 }
 
 /** A prop's default as custom-elements.json records it. */
-function cemDefault(tag: string, prop: string): string | undefined {
-    const cem = JSON.parse(readFileSync(join(REPO, 'packages', 'ui', 'custom-elements.json'), 'utf-8')) as
-        { modules: { declarations?: { tagName?: string; members?: { name: string; default?: string }[] }[] }[] };
-    for (const m of cem.modules) for (const d of m.declarations ?? []) {
-        if (d.tagName === tag) return d.members?.find(x => x.name === prop)?.default;
-    }
-    return undefined;
-}
+const cemDefault = (tag: string, prop: string): string | undefined => cemDeclaration(tag)?.members?.find(x => x.name === prop)?.default;
+
+/** Whether a component declares a model, which a `::model="f.x"` binding binds to a form field. */
+const hasModel = (tag: string): boolean => (cemDeclaration(tag)?.models?.length ?? 0) > 0;
 
 describe('the notes on the complex components', () => {
     it('each of the fourteen has its three parts', () => {
@@ -47,19 +46,21 @@ describe('the notes on the complex components', () => {
         expect(missing).toEqual([]);
     });
 
-    it('a note that says "not wired by name" is about a control the compiler does not wire', () => {
-        const wired = wiredTags();
-        expect(wired.has('pdx-select'), 'the reader found the list').toBe(true);
-        const says = COMPLEX.filter(t => /compiler does not wire it/.test(note(t)));
-        expect(says.sort()).toEqual(['pdx-relation-picker', 'pdx-rich-text', 'pdx-tree-select']);
-        expect(says.filter(t => wired.has(t)), 'the compiler wires these now: the note is stale').toEqual([]);
+    it('no note says a control is wired, or not wired, by `name`: nothing is (#128, #613)', () => {
+        expect(COMPLEX.filter(t => /wired by `name`|does not wire it/.test(note(t)))).toEqual([]);
     });
 
-    it('a note that says "wired by `name`" is about a control the compiler wires', () => {
-        const wired = wiredTags();
-        const says = COMPLEX.filter(t => /wired by `name`/.test(note(t)));
-        expect(says.length).toBeGreaterThanOrEqual(3);
-        expect(says.filter(t => !wired.has(t)), 'the note promises a wiring the compiler does not do').toEqual([]);
+    it('a note that says a control is "bound through its model" is about one that declares a model', () => {
+        expect(hasModel('pdx-select'), 'the reader found the models').toBe(true);
+        const says = COMPLEX.filter(t => /bound through its model/.test(note(t)));
+        expect(says.sort()).toEqual(['pdx-autocomplete', 'pdx-date-picker', 'pdx-select']);
+        expect(says.filter(t => !hasModel(t)), 'the note promises a model the component does not declare').toEqual([]);
+    });
+
+    it('a note that says a control has "no model to bind" is about one that declares none', () => {
+        const says = COMPLEX.filter(t => /no model to bind/.test(note(t)));
+        expect(says).toEqual(['pdx-relation-picker']);
+        expect(says.filter(t => hasModel(t)), 'the component declares a model now: the note is stale').toEqual([]);
     });
 
     it('the defaults a note quotes are the defaults', () => {

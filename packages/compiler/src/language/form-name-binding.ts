@@ -8,10 +8,13 @@
 // `indeterminate`), is flagged. The control keeps its `name` — what a native form submits and what a
 // test selects — written as the full path inside a `<pdx-field-group>`, as the compiler wrote it.
 //
-// A form SECTION — a component that calls `useForm()` / `tryUseForm()` — keeps its wiring until #613
-// gives it an explicit way to name the form it inherits; so does a `<pdx-form>` without `:form`.
+// A form SECTION is the same (#613): its whole template is inside the form it inherits. One that
+// declares it, `@form intake: Values from parent;`, is rewritten to `::value="intake.email"`; one that
+// still calls `useForm()` / `tryUseForm()` names no values type, and is flagged. A `<pdx-form>`
+// without `:form` was never wired, and is left alone.
 
 import { parseSFC } from '../parser/sfc';
+import { maskNonCode } from '../compiler/tokenizer';
 import type { ValidationWarning } from '../compiler/validate';
 import { formNames } from './form-fields';
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
@@ -39,8 +42,8 @@ interface Use {
     attr: string;
     /** The tag, for a finding. */
     tag: string;
-    /** The form, and the field's full path. */
-    form: string;
+    /** The form, and the field's full path. `null` is a section that names no form. */
+    form: string | null;
     path: string;
     /** `pdx-form-field`, or a control. */
     kind: 'field' | 'control';
@@ -104,23 +107,46 @@ function* tagsOf(markup: string): Generator<Tag> {
     }
 }
 
-/** Every use of the old form in a .pdx file's template, in order. A section's template has none. */
+/** An open form around a tag, with its field-group path. */
+interface OpenForm {
+    /** The form; `null` is a `<pdx-form>` with no `:form`, or a section that names no form. */
+    form: string | null;
+    groups: string[];
+    /** The form a section inherits, around its whole template. */
+    section?: boolean;
+}
+
+/**
+ * The form a SECTION inherits around its whole template (#613), or null when the file is not one:
+ * the form its `@form name: Values from parent;` declares, or none (`form: null`) when it calls
+ * `useForm()` / `tryUseForm()` instead.
+ */
+function sectionForm(script: string): OpenForm | null {
+    // Match: `@form intake: Values from parent;` on a line of its own. Groups: [1]=the form
+    const declared = /^\s*@form\s+(\w+)\s*:\s*\w+\s+from\s+parent\s*;?\s*$/m.exec(script);
+    if (declared) return { form: declared[1], groups: [], section: true };
+    // Match: a call of useForm or tryUseForm, in code — not useFormCoordinator, not a method `x.useForm(`.
+    if (/(?<![\w$.])(?:useForm|tryUseForm)\s*\(/.test(maskNonCode(script))) return { form: null, groups: [], section: true };
+    return null;
+}
+
+/** Every use of the old form in a .pdx file's template, in order. */
 function usesOf(text: string, context?: LanguageChangeContext): Use[] {
     const sfc = parseSFC(text);
     const template = sfc.template;
     if (!template || template.src) return [];
-    // A section keeps its wiring (#613).
-    if (/\b(?:useForm|tryUseForm)\s*\(/.test(sfc.script?.content ?? '')) return [];
     const uses: Use[] = [];
-    /** The forms open around a tag: each with its field-group path. `null` is a form with no `:form`. */
-    const forms: { form: string | null; groups: string[] }[] = [];
+    const section = sectionForm(sfc.script?.content ?? '');
+    /** The forms open around a tag; a section's inherited form is the first, and is never closed. */
+    const forms: OpenForm[] = section ? [section] : [];
+    const base = forms.length;
     for (const t of tagsOf(template.content)) {
         const { closing, tag, attrs } = t;
         const selfClosing = attrs.trimEnd().endsWith('/');
         const top = forms[forms.length - 1];
         if (tag === 'pdx-form') {
-            if (closing) forms.pop();
-            else if (!selfClosing) forms.push({ form: attrValue(attrs, ':form') ?? top?.form ?? null, groups: [] });
+            if (closing) { if (forms.length > base) forms.pop(); }
+            else if (!selfClosing) forms.push({ form: attrValue(attrs, ':form') ?? top?.form ?? null, groups: [], section: !attrValue(attrs, ':form') && top?.section });
             continue;
         }
         if (tag === 'pdx-field-group') {
@@ -129,7 +155,7 @@ function usesOf(text: string, context?: LanguageChangeContext): Use[] {
             else if (!selfClosing) top.groups.push(attrValue(attrs, 'name') ?? '');
             continue;
         }
-        if (closing || !top?.form) continue;
+        if (closing || !top || (!top.form && !top.section)) continue;
         const name = attrValue(attrs, 'name');
         if (!name || /[{}$]/.test(name)) continue;
         const kind = tag === 'pdx-form-field' ? 'field' : isControl(tag, context) ? 'control' : null;
@@ -151,6 +177,7 @@ function usesOf(text: string, context?: LanguageChangeContext): Use[] {
 
 /** What the use is rewritten to, or null when it is a person's to rewrite. */
 function rewrite(use: Use, context?: LanguageChangeContext): string | null {
+    if (use.form === null) return null;
     const expr = fieldExpr(use.form, use.path);
     if (use.kind === 'field') return ` :field="${expr}"`;
     const models = modelsOf(use.tag, context);
@@ -164,15 +191,17 @@ export const formNameBinding: LanguageChange = {
     kind: 'removed',
     scope: 'pdx',
     issue: 128,
-    message: 'a control is bound to its form field through its model, `::value="f.email"`, and `<pdx-form-field>` names its field, `:field="f.email"` — no longer by `name` inside `<pdx-form :form>`.',
+    message: 'a control is bound to its form field through its model, `::value="f.email"`, and `<pdx-form-field>` names its field, `:field="f.email"` — no longer by `name` inside `<pdx-form :form>` or in a form section.',
     detect(text, context) {
         return usesOf(text, context).map((u): LanguageChangeFinding => {
             const models = modelsOf(u.tag, context);
-            const note = u.kind === 'control' && models && models.length > 1
-                ? `\`<${u.tag}>\` has ${models.length} models (${models.join(', ')}): write the one the field holds, \`::<model>="${fieldExpr(u.form, u.path)}"\`.`
-                : u.kind === 'control' && !models
-                    ? `No manifest lists \`<${u.tag}>\`'s model: write \`::<model>="${fieldExpr(u.form, u.path)}"\`.`
-                    : undefined;
+            const note = u.form === null
+                ? `This section names no form: declare the one it inherits, \`@form <name>: <Values> from parent;\`, and bind to it, \`${u.kind === 'field' ? ':field' : '::<model>'}="${fieldExpr('<name>', u.path)}"\`.`
+                : u.kind === 'control' && models && models.length > 1
+                    ? `\`<${u.tag}>\` has ${models.length} models (${models.join(', ')}): write the one the field holds, \`::<model>="${fieldExpr(u.form, u.path)}"\`.`
+                    : u.kind === 'control' && !models
+                        ? `No manifest lists \`<${u.tag}>\`'s model: write \`::<model>="${fieldExpr(u.form, u.path)}"\`.`
+                        : undefined;
             return { line: lineAt(text, u.at), found: `<${u.tag}${u.attr}>`, ...(note ? { note } : {}) };
         });
     },

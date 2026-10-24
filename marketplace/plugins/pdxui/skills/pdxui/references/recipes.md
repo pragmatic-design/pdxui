@@ -105,13 +105,12 @@ No prop passes the form down: `<pdx-form>` provides it. ⚠️ A child can set u
 detached — so `form.firstName` is read when it is asked, not at setup: the binding follows the form
 from the moment it is provided (value shown, typing written, leaving touches, reset reaches it).
 Measured in Chromium on the showcase's intake wizard. A section rendered with no form above it renders
-and writes nowhere. A component that only calls `tryUseForm()` still has its named controls wired by
-name, until #613 finishes removing that wiring.
+and writes nowhere. A named control with no binding, in a section as beside `<pdx-form>`, is
+`PDX_REMOVED_FORM` (#613): nothing wires a control by its name. `pdx migrate` rewrites it to the form
+the section declares, and flags a section that only calls `tryUseForm()`, which names no values type.
 
-A control is wired only in a file that is inside a form or declares itself a section.
-A plain child component that does neither is compiled from another file and is never seen. And
-the boundary is the **component**, not the depth — any nesting of ordinary markup
-(`<div><fieldset><pdx-input name="x">`) is still that template and is wired.
+A control is bound only by its own binding, `::value="form.x"`. A plain child component that has
+none is bound to nothing, however deep it sits.
 
 And when the sections are genuinely separate forms rather than one form
 split up, give each `<pdx-form>` a `name` and put a **coordinator** above them
@@ -121,9 +120,9 @@ them together.
 Passing `form` down as a prop works, and it is not what the framework offers: `provideForm` /
 `useForm` is the designed path, and what `pdx-form` does internally. Without it a long form tends to
 stay one file of several hundred lines.
-Pinned by `compiler/tests/form-binding-boundary.test.ts` (the form's own file) and
-`compiler/tests/form-binding-injected.test.ts` with `ui/tests/unit/form-section-runtime.test.ts` (a
-section).
+Pinned by `compiler/tests/form-name-binding.test.ts` (the removed name wiring, in the form's own file
+and in a section) and `ui/tests/unit/form-section-from-parent.test.ts` with
+`ui/tests/unit/form-section-runtime.test.ts` (a section, mounted).
 
 ### Rows that repeat: `<pdx-field-list>` or `createFieldArray`
 

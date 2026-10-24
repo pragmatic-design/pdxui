@@ -41,7 +41,6 @@ import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImpo
 import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
 import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { writeRouteTypes } from './route-types';
-import { FormControlRegistry } from './compiler/codegen-form-binding';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
 import { injectSplash, type SplashOptions } from './splash';
@@ -49,7 +48,6 @@ import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
 import type { MethodsLookup } from './compiler/validate-commands';
 import type { ModelsLookup } from './compiler/validate-two-way';
-import type { ModelEventLookup } from './compiler/compile-context';
 import type { AlphaLookup } from './language/alpha-events';
 import type { RequiredPropsLookup } from './compiler/validate-required-props';
 import type { RequiredSlotsLookup } from './compiler/validate-required-slots';
@@ -93,18 +91,6 @@ export interface PdxPluginOptions {
     devtools?: boolean;
     /** Auto-discover @pdxui/* packages in workspace. Default: true. */
     autoAlias?: boolean;
-    /**
-     * Register custom form controls for compiler auto-wiring.
-     * Alternative to calling registerCompilerFormControl() at module level.
-     * Each entry maps a tag name to its binding config.
-     *
-     * @example
-     * formControls: {
-     *   'my-date-picker': { valueEvent: 'change' },
-     *   'my-color-input': { valueEvent: 'color-change', valueExpr: 'e.detail?.hex' },
-     * }
-     */
-    formControls?: Record<string, { valueEvent?: string; valueExpr?: string; checked?: boolean; textInput?: boolean }>;
 
     /**
      * Which platform features the compiled output relies on (#121). `'baseline-2026'` by default;
@@ -198,14 +184,6 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
     // Dev only: the @pdxui package directories the auto-alias points at, which the dev server
     // must be allowed to read. Found in `config`, added to Vite's `fs.allow` in `configResolved`.
     let aliasDirs: string[] = [];
-
-    // Per-instance form control registry — avoids cross-contamination between plugin instances
-    const _formRegistry = new FormControlRegistry();
-    if (options?.formControls) {
-        for (const [tag, config] of Object.entries(options.formControls)) {
-            _formRegistry.register(tag, config);
-        }
-    }
 
     // Store registry: tracks @store declarations for auto-import
     const storeRegistry = new Map<string, string>(); // storeName → filePath
@@ -523,7 +501,6 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                     enumValues: (tag, prop) => componentResolver.enumValues(tag, prop),
                     methodsOf: (tag) => componentResolver.methodsOf(tag),
                     modelsOf: (tag) => componentResolver.modelsOf(tag),
-                    modelEventOf: (tag) => componentResolver.modelEventOf(tag),
                     alphaOf: (tag) => componentResolver.alphaOf(tag),
                     requiredPropsOf: (tag) => componentResolver.requiredPropsOf(tag),
                     requiredSlotsOf: (tag) => componentResolver.requiredSlotsOf(tag),
@@ -736,12 +713,6 @@ export interface CompileOptions {
      * manifest). With it, `::x` on a component prop that is not a model is PDX_TWO_WAY_NOT_MODEL (#124).
      */
     modelsOf?: ModelsLookup;
-    /**
-     * The event of a component's first model and the field its value is in (the plugin passes the
-     * resolver's `modelEventOf`, #478). With it, a form control that lists models is bound to that
-     * event instead of the alpha one the compiler knows by hand.
-     */
-    modelEventOf?: ModelEventLookup;
     /**
      * The alpha events library components no longer emit (the plugin passes the resolver's `alphaOf`,
      * #478). With it, a listener on one is PDX_REMOVED_FORM naming the model's event.
@@ -979,7 +950,7 @@ export function compile(
     const beforeCodegen = allWarnings.length;
     let code = compileSFC(
         descriptor, ast, filename, runner,
-        { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, modelEventOf: options?.modelEventOf, importPathOf: options?.importPathOf, mapOrigins: true,
+        { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
           sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.prefix,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.

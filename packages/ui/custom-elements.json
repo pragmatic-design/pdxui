@@ -12862,7 +12862,7 @@
           "tagName": "pdx-form",
           "category": "Forms",
           "order": 42,
-          "description": "A form that binds the named controls inside it and validates them, with save modes and DataSource\nintegration.",
+          "description": "A form that provides its Form to the controls and form fields inside it and validates them, with\nsave modes and DataSource integration.",
           "members": [
             {
               "kind": "field",

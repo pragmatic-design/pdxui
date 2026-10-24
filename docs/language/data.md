@@ -294,10 +294,13 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   is `PDX_REMOVED_FORM` (#128): nothing wires it by its name. `pdx migrate` (`form-name-binding`)
   writes `::<model>="name.x"` from the control's manifest — a control with no manifest entry, or with
   more than one model (`pdx-checkbox`), is flagged — and `:field="name.x"` on the form field; inside a
-  `<pdx-field-group>` the path is the full one, and so is the control's `name`. A form section binds
-  through `@form name: Schema from parent;` (#613); a component whose script calls `useForm()` /
-  `tryUseForm()` still has its named controls wired to the form above it, until #613's second part
-  removes that.
+  `<pdx-field-group>` the path is the full one, and so is the control's `name`.
+- In a form **section** — a component that declares `@form name: Schema from parent;`, or whose
+  script calls `useForm()` / `tryUseForm()` — the same is `PDX_REMOVED_FORM` (#613): its whole
+  template counts as inside the inherited form, and nothing wires a control by its name. `pdx migrate`
+  rewrites it to the declared form, `::<model>="name.x"` and `:field="name.x"`; a section that only
+  calls `useForm()` / `tryUseForm()` names no values type, and is flagged: declare
+  `@form name: Values from parent;` and bind to it.
 - `required` on a control bound to a form field (`::value="name.x" required`, or `:required`) is
   `PDX_FORM_REQUIRED_IN_MARKUP` (warning): the field marks its control required from its rules, and
   the markup is a second place to say it that validation does not read. `pdx migrate` flags it

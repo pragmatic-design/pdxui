@@ -2,40 +2,32 @@
 //
 // recipes.md («A long form filled in more than one sitting») measures it with a probe: a form with
 // two controls, one written beside `<pdx-form>` — bound through its model, `::value="f.here"` (#128) —
-// and one named inside a child component, typed into both. A child that calls `useForm()`/`tryUseForm()` declares itself a section of the form above
-// it, and the compiler wires its template (packages/compiler/tests/form-binding-injected.test.ts);
-// otherwise the child's control is never wired, and the form holds `{ here: 'A', deep: '' }`. This is
-// that probe: both .pdx files compiled with the real compiler, run against the real @pdxui/core,
-// mounted in happy-dom — which connects the child BEFORE its <pdx-form>, the case the lookup has to
-// survive.
+// and one inside a child component, typed into both. The child declares the form it inherits,
+// `@form f: ProbeValues from parent;`, and binds to it the same way, `::value="f.deep"` (#613);
+// without that, the child's control is bound to nothing, and the form holds `{ here: 'A', deep: '' }`.
+// This is that probe: both .pdx files compiled with the real compiler, run against the real
+// @pdxui/core, mounted in happy-dom — which connects the child BEFORE its <pdx-form>, the case the
+// inherited form has to survive.
 import { describe, it, expect, beforeAll, afterEach } from 'vitest';
 import * as core from '@pdxui/core';
-import { join } from 'node:path';
 import { compile } from '../../../compiler/src/plugin';
-import { ComponentResolver } from '../../../compiler/src/component-resolver';
 import { tick, cleanup } from './helpers';
 import '../../src/form/pdx-form';
 import '../../src/input/pdx-input';
 
-// The controls' models, from the library's manifest, as a build reads them: the form binds pdx-input
-// to its model's event (#479).
-const resolver = new ComponentResolver();
-resolver.registerUiManifest(join(__dirname, '../../../showcase'));
-
 /** Compile a .pdx and run the module: the core import becomes the injected namespace. */
 function load(filename: string, source: string): void {
-    const { code } = compile(source, filename, [], undefined, { modelEventOf: (t) => resolver.modelEventOf(t) });
+    const { code } = compile(source, filename);
     const body = code.replace(/import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?/, 'const {$1} = __core;');
     expect(body, `${filename} imports something besides @pdxui/core`).not.toMatch(/^import /m);
     new Function('__core', body)(core);
 }
 
 const SECTION = `<template>
-<pdx-input class="deep" name="deep"></pdx-input>
+<pdx-input class="deep" name="deep" ::value="f.deep"></pdx-input>
 </template>
 <script>
-import { tryUseForm } from '@pdxui/core';
-const form = tryUseForm();
+@form f: ProbeValues from parent;
 </script>`;
 
 const PROBE = `<template>

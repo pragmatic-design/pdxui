@@ -12,4 +12,4 @@ on blur.
 - `remote` filters the source with `contains` on `label-field`: the server has to honour that operator.
 
 **Composes with** `pdx-data-source` (wrap it and the source is injected, no `:source` needed) · `pdx-form`
-(wired by `name`).
+(bound through its model, `::value="f.x"`).

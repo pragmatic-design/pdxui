@@ -65,6 +65,20 @@ export interface Employee extends StoredRow {
     assignments: Assignment[];
 }
 
+/**
+ * The identity fields of the personal page's `personal` form: what the identity group, a section of
+ * that form, inherits (`@form personal: EmployeeIdentityValues from parent;`, #613). A section names
+ * the fields it binds; the form holds the rest.
+ */
+export interface EmployeeIdentityValues {
+    firstName: string;
+    lastName: string;
+    birthDate: string;
+    gender: string;
+    taxCode: string;
+    language: string;
+}
+
 /** A site, a role there, and when it started. `end` is empty while it is current. */
 export interface Assignment {
     id: number;

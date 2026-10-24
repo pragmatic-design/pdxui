@@ -4,6 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { markup } from './static-markup-of';
+import { findTagEnd } from '../src/compiler/codegen-template-rewrite';
 
 describe('#1 loop-invariant hoisting (production)', () => {
     it('hoists a real signal read but never ctx.el or an event handler', () => {
@@ -253,29 +254,14 @@ const shout = label + '!';
     });
 });
 
-describe('form auto-binding — all injected ${} bindings stay live', () => {
-    // Regression: the form auto-binding injects multiple unquoted ${...} bindings into a tag
-    // (:error/:touched/:warning on pdx-form-field; :value/@change/@blur on controls). A findTagEnd
-    // that tracks only quotes stops at the '>' inside the FIRST arrow (=>), truncating the
-    // tag — every binding after the first spills into a text run and gets escaped to \${...},
-    // rendering as literal code under the labels. findTagEnd is brace-aware.
-    it('does not escape the 2nd+ injected binding on a form-field / control', () => {
-        // A form section's, the one place the name wiring stays (#613).
-        const source = `<template>
-  <pdx-form-field name="name" label="Name">
-    <pdx-input name="name" />
-  </pdx-form-field>
-</template>
-<script>
-import { tryUseForm } from '@pdxui/core';
-tryUseForm();
-</script>`;
-        const { code } = compile(source, 'formbind.pdx', [], undefined, { production: false });
-        // The injected bindings are live — bound properties and a listener — never literal text.
-        expect(code).not.toContain('\\${');
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "touched", __b\)/);
-        expect(code).toMatch(/assignBoundProperty\(__el\d+, "warning", __b\)/);
-        expect(code).toContain("addEventListener('pdx-blur', ");
+describe('findTagEnd — several unquoted ${} bindings in one tag', () => {
+    // Regression: the form auto-binding (removed by #613) injected several unquoted ${...} bindings
+    // into a tag. A findTagEnd that tracks only quotes stops at the '>' inside the FIRST arrow (=>),
+    // truncating the tag — every binding after the first spilled into a text run and was escaped to
+    // \${...}, rendering as literal code under the labels. findTagEnd is brace-aware.
+    it('ends the tag at its own >, not at the > of an arrow inside a binding', () => {
+        const tag = '<pdx-form-field :error=${() => f.error()} :touched=${() => f.touched()}>';
+        expect(findTagEnd(`${tag}<span>x</span>`, 0)).toBe(tag.length - 1);
     });
 });
 

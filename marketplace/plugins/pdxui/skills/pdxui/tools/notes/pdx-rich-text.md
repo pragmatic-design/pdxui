@@ -50,7 +50,6 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 **Pitfalls**
 - An HTML string as `value` with the default `output="json"` is not HTML to it: the editor starts EMPTY, and
   only a dev build warns. Set `output="html"`.
-- The compiler does not wire it inside `<pdx-form>` by `name`: bind it yourself, `::value="field"`.
 - `source` and `field` are declared and read by nothing: setting them does nothing.
 - Only the setters wait for the editor. Before `pdx-ready`, `getJSON()` is `null`, `getHTML()` and `getText()`
   are `''`, and `execCommand()` does nothing.

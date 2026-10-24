@@ -48,16 +48,60 @@ describe('form-name-binding', () => {
         expect(fix(text)).toBe(text);
     });
 
-    it('leaves alone what was not wired: outside a form, a native input, a section, a form with no :form', () => {
+    it('leaves alone what was not wired: outside a form, a native input, a form with no :form', () => {
         expect(formNameBinding.detect(page('<pdx-input name="email" />'), context)).toEqual([]);
         expect(formNameBinding.detect(page('<pdx-form :form="f"><input name="email" /></pdx-form>'), context)).toEqual([]);
         expect(formNameBinding.detect(page('<pdx-form><pdx-input name="email" /></pdx-form>'), context)).toEqual([]);
-        expect(formNameBinding.detect(page('<pdx-input name="email" />', "import { tryUseForm } from '@pdxui/core';\ntryUseForm();"), context)).toEqual([]);
     });
 
     it('is a removed form the compiler reports, and no longer wires', () => {
         const r = compile(page('<pdx-form :form="f"><pdx-input name="email" /></pdx-form>'), 'f.pdx');
         expect(r.warnings.map((w) => w.code)).toContain('PDX_REMOVED_FORM');
         expect(r.code, 'the control is still wired by its name').not.toContain('ctx.f.email?.onChange(');
+    });
+});
+
+// A form SECTION (#613): its whole template is inside the form it inherits.
+describe('form-name-binding in a section', () => {
+    const SECTION = page(`<pdx-form-field name="email" label="Email"><pdx-input name="email" /></pdx-form-field>
+<pdx-field-group name="customer">
+  <pdx-input name="city" />
+</pdx-field-group>`, "import type { V } from './v';\n@form intake: V from parent;");
+
+    it('finds each named control and form field of a section that declares its form', () => {
+        expect(formNameBinding.detect(SECTION, context).map((f) => f.line)).toEqual([2, 2, 4]);
+    });
+
+    it('rewrites them to the inherited form', () => {
+        const out = fix(SECTION);
+        expect(out).toContain('<pdx-form-field :field="intake.email" label="Email"><pdx-input name="email" ::value="intake.email" />');
+        expect(out).toContain(`<pdx-input name="customer.city" ::value="intake['customer.city']" />`);
+        expect(formNameBinding.detect(out, context), 'a second run finds something').toEqual([]);
+    });
+
+    it('flags a section that calls tryUseForm() or useForm(), which names no values type, and leaves it as written', () => {
+        for (const call of ['tryUseForm()', 'useForm()']) {
+            const text = page('<pdx-input name="email" />', `import { tryUseForm, useForm } from '@pdxui/core';\nconst form = ${call};`);
+            const [found] = formNameBinding.detect(text, context);
+            expect(found?.note, call).toMatch(/@form <name>: <Values> from parent;/);
+            expect(fix(text)).toBe(text);
+        }
+    });
+
+    it('a mention of useForm in a comment, and useFormCoordinator(), do not make a section', () => {
+        for (const script of ['// this could call useForm() one day', "import { useFormCoordinator } from '@pdxui/core';\nconst c = useFormCoordinator();"]) {
+            expect(formNameBinding.detect(page('<pdx-input name="email" />', script), context), script).toEqual([]);
+        }
+    });
+
+    it('leaves a <pdx-form :form> the section draws to its own form', () => {
+        const text = page('<pdx-form :form="g"><pdx-input name="email" /></pdx-form>', "import type { V } from './v';\n@form intake: V from parent;\n@form g: { email: string };");
+        expect(fix(text)).toContain('<pdx-input name="email" ::value="g.email" />');
+    });
+
+    it('is a removed form the compiler reports, and no longer wires', () => {
+        const r = compile(page('<pdx-input name="email" />', "import { tryUseForm } from '@pdxui/core';\nconst form = tryUseForm();"), 'section.pdx');
+        expect(r.warnings.map((w) => w.code)).toContain('PDX_REMOVED_FORM');
+        expect(r.code, 'the control is still wired by its name').not.toContain('tryUseForm(ctx.el)');
     });
 });

@@ -39,9 +39,12 @@ export function createRefusedTabs(form: Form<Record<string, unknown>>, tabs: () 
             const el = tabs();
             if (!el) return;
             const map: Record<string, string[]> = {};
+            // Each field's name is its control's: a `<pdx-form-field :field>` carries none since #128,
+            // and the control keeps the name the form knows the field by.
             for (const panel of el.querySelectorAll<HTMLElement>('[data-tab-panel]')) {
-                map[panel.dataset.tabPanel ?? ''] = [...panel.querySelectorAll('pdx-form-field[name]')]
-                    .map(f => f.getAttribute('name') ?? '');
+                map[panel.dataset.tabPanel ?? ''] = [...panel.querySelectorAll('pdx-form-field')]
+                    .map(f => f.getAttribute('name') ?? f.querySelector('[name]')?.getAttribute('name') ?? '')
+                    .filter(Boolean);
             }
             tabFields.set(map);
         },
