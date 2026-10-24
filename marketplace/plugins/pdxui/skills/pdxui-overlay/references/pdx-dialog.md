@@ -6,13 +6,13 @@ A modal window with focus trap.
 |---|---|---|---|---|
 | `open` | `open` | boolean | `false` | Whether it is open. |
 | `title` | `title` | string | `''` | The dialog heading. |
-| `size` | `size` | 'sm' \| 'md' \| 'lg' \| 'xl' \| 'full' | `'md'` | Size of the control (e.g. sm, md, lg). |
 | `closeOnBackdrop` | `closeonbackdrop` | boolean | `true` | Close when the backdrop is clicked. |
 | `closeOnEscape` | `closeonescape` | boolean | `true` | Close when the Escape key is pressed. |
 | `showClose` | `showclose` | boolean | `true` | Shows the close (×) button. |
 | `initialfocus` | `initialfocus` | string | `''` | Selector of the element to focus on open. |
 | `preventClose` | `preventclose` | boolean | `false` | Blocks all dismiss paths (must close programmatically). |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' \| 'xl' \| 'full' | `'md'` | sm, md (the default), lg, xl or full. |
 
 **API (via `:ref`)**
 

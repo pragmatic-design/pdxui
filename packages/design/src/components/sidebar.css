@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/sidebar.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-sidebar — Collapsible sidebar container */
 
 pdx-sidebar { display: block; }
@@ -12,9 +13,11 @@ pdx-sidebar { display: block; }
     overflow: hidden;
 }
 
-.pdx-sidebar-right {
-    border-right: none;
-    border-left: 1px solid var(--pdx-color-border);
-}
+/* Keyed on the host's `position` (#633). The host carries `.pdx-sidebar`, which gives the rule the
+   weight the old `.pdx-sidebar-right` class did. */
+:where(pdx-sidebar[position="right"]).pdx-sidebar {
+        border-right: none;
+        border-left: 1px solid var(--pdx-color-border);
+    }
 
 .pdx-sidebar-collapsed:not(.pdx-sidebar-mini) { width: 0 !important; min-width: 0 !important; }

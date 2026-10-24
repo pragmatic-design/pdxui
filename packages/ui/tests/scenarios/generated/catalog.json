@@ -1058,6 +1058,26 @@
         {
           "id": "dialog-open",
           "title": "Dialog — Open (md)"
+        },
+        {
+          "id": "dialog-size-md",
+          "title": "pdx-dialog — size=\"md\""
+        },
+        {
+          "id": "dialog-size-sm",
+          "title": "pdx-dialog — size=\"sm\""
+        },
+        {
+          "id": "dialog-size-lg",
+          "title": "pdx-dialog — size=\"lg\""
+        },
+        {
+          "id": "dialog-size-xl",
+          "title": "pdx-dialog — size=\"xl\""
+        },
+        {
+          "id": "dialog-size-full",
+          "title": "pdx-dialog — size=\"full\""
         }
       ]
     },
@@ -2493,6 +2513,14 @@
         {
           "id": "sidebar-mini",
           "title": "Sidebar — Mini collapsed (icons-only width)"
+        },
+        {
+          "id": "sidebar-position-left",
+          "title": "pdx-sidebar — position=\"left\""
+        },
+        {
+          "id": "sidebar-position-right",
+          "title": "pdx-sidebar — position=\"right\""
         }
       ]
     },

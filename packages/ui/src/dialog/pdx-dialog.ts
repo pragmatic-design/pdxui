@@ -26,10 +26,16 @@ let _dialogCounter = 0;
  * @fires pdx-close - Fired after the dialog closes.
  */
 component('pdx-dialog', {
+    // The axis dialog.css keys by (#633), reflected on the host and drawn on the panel, the root part;
+    // each value maps the class that draws the same panel elsewhere (pdx-alert-dialog, the overlay
+    // outlet, native markup).
+    variants: {
+        /** sm, md (the default), lg, xl or full. */
+        size: { md: '.pdx-dialog-md', sm: '.pdx-dialog-sm', lg: '.pdx-dialog-lg', xl: '.pdx-dialog-xl', full: '.pdx-dialog-full' },
+    },
     props: {
         open: { type: Boolean, default: false },
         title: { type: String, default: '' },
-        size: { type: String, default: 'md', enum: ['sm', 'md', 'lg', 'xl', 'full'] },
         closeOnBackdrop: { type: Boolean, default: true },
         closeOnEscape: { type: Boolean, default: true },
         showClose: { type: Boolean, default: true },
@@ -110,7 +116,6 @@ component('pdx-dialog', {
 
         ctx.track(() => {
             const isOpen = ctx.open();
-            const size = ctx.size() as string || 'md';
 
             if (ctx.loading()) ctx.el.setAttribute('aria-busy', 'true');
             else ctx.el.removeAttribute('aria-busy');
@@ -152,11 +157,6 @@ component('pdx-dialog', {
                 }
                 if (backdropEl && panelEl) holdModalFocus(backdropEl, panelEl);
                 if (isOpen) {
-                    // Set size class
-                    if (panelEl) {
-                        panelEl.className = `pdx-dialog-panel pdx-dialog-${size}`;
-                    }
-
                     overlayId = 'pdx-dialog-' + (++_dialogCounter);
                     const zIndex = overlayStack.push(overlayId, { modal: true });
                     if (backdropEl) backdropEl.style.zIndex = String(zIndex);
@@ -216,7 +216,7 @@ component('pdx-dialog', {
     },
     render: (ctx) => html`
         <div class="pdx-dialog-backdrop">
-            <div class="pdx-dialog-panel pdx-dialog-${ctx.size}" role="dialog" aria-modal="true"
+            <div class="pdx-dialog-panel" data-part="root" role="dialog" aria-modal="true"
                 :aria-label="${() => ctx.title() || uiString('dialog', 'label')}">
                 <div class="pdx-dialog-header">
                     <span>${ctx.title}</span>

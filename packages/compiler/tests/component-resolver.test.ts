@@ -50,7 +50,8 @@ describe('ComponentResolver — manifest-driven resolution', () => {
 
         expect(r.enumValues('pdx-drawer', 'position')).toEqual(['left', 'right', 'top', 'bottom']);
         expect(r.enumValues('pdx-input', 'type')).toContain('email');
-        expect(r.enumValues('pdx-dialog', 'size')).toEqual(['sm', 'md', 'lg', 'xl', 'full']);
+        // An axis since #633: its default first, as `variants` lists it.
+        expect(r.enumValues('pdx-dialog', 'size')).toEqual(['md', 'sm', 'lg', 'xl', 'full']);
     });
 
     it('does NOT treat non-enum props as enums', () => {
