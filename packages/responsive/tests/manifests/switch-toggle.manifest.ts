@@ -17,8 +17,8 @@
  *  - CSS: packages/design/src/surfaces/forms.css (the "Toggle / Switch" block)
  *      .pdx-toggle      → appearance:none; width:2.75rem(44px); height:1.5rem(24px);
  *                         border-radius:full; cursor:pointer; flex-shrink:0.
- *      .pdx-toggle-sm   → 2rem x 1.125rem (32x18px).
- *      .pdx-toggle-lg   → 3.5rem x 2rem (56x32px).
+ *      size="sm"       → 2rem x 1.125rem (32x18px), on the host (#629); natively .pdx-toggle-sm.
+ *      size="lg"       → 3.5rem x 2rem (56x32px), on the host; natively .pdx-toggle-lg.
  *      :disabled        → opacity:var(--pdx-opacity-disabled); cursor:not-allowed.
  *      .pdx-switch-wrap → display:inline-flex; align-items:flex-start; gap:sm; cursor:pointer.
  *      .pdx-switch-wrap.disabled → reduced opacity; cursor:not-allowed.

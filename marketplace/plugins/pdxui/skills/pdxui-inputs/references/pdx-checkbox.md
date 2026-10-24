@@ -10,10 +10,10 @@ On/off box with an indeterminate state.
 | `description` | `description` | string | `''` | Secondary descriptive text. |
 | `value` | `value` | string | `''` | The current value. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `required` | `required` | boolean | `false` | Marks the field as required. |
 | `labelPosition` | `labelposition` | string | `'right'` | Where the label sits relative to the control. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the box's size. |
 | `checked` | `checked` | boolean | `false` | Whether it is checked / on. |
 | `indeterminate` | `indeterminate` | boolean | `false` |  |
 

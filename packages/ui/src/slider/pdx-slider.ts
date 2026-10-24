@@ -19,6 +19,14 @@ component('pdx-slider', {
     // A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
     // still marks the end of a drag. In range mode it holds `[min, max]`.
     models: { value: model<number | number[]>(0, { type: Number, form: true }) },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the track's and thumb's size. */
+        size: { md: '.pdx-slider-md', sm: '.pdx-slider-sm', lg: '.pdx-slider-lg' },
+        /** primary (the default), success or warning: the fill's and thumb's colour. */
+        color: { primary: '.pdx-slider-primary', success: '.pdx-slider-success', warning: '.pdx-slider-warning' },
+    },
     props: {
         min: { type: Number, default: 0 },
         max: { type: Number, default: 100 },
@@ -36,14 +44,11 @@ component('pdx-slider', {
         /** Always show label (not just on drag) */
         labelAlways: { type: Boolean, default: false },
         name: { type: String, default: '' },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         /** Range mode: value is "min,max" */
         range: { type: Boolean, default: false },
         /** Minimum gap between thumbs in range mode */
         minGap: { type: Number, default: 0 },
-        /** Color the fill portion */
-        color: { type: String, default: '' },
     },
     setup(ctx) {
         let _value = 0;
@@ -251,16 +256,12 @@ component('pdx-slider', {
 
         function rootClass(): string {
             let cls = 'pdx-slider';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-slider-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.error()) cls += ' error';
             if ((ctx.orientation() as string) === 'vertical') cls += ' pdx-slider-vertical';
             if (isDragging()) cls += ' pdx-slider-dragging';
             if (ctx.showLabel() || ctx.labelAlways()) cls += ' pdx-slider-has-label';
             if (ctx.labelAlways()) cls += ' pdx-slider-label-always';
-            const c = ctx.color() as string;
-            if (c) cls += ' pdx-slider-' + c;
             return cls;
         }
 
@@ -342,7 +343,7 @@ component('pdx-slider', {
         return { rootClass, isDragging };
     },
     render: (ctx) => html`
-        <div :class="${ctx.rootClass}" style="touch-action:none">
+        <div :class="${ctx.rootClass}" data-part="root" style="touch-action:none">
             <div class="pdx-slider-track">
                 <div class="pdx-slider-fill"></div>
             </div>

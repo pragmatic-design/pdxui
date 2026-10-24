@@ -170,33 +170,34 @@
 /* M3 size variants: the `.pdx-toggle` override (specificity 0,2,0) beat the base variants
    .pdx-toggle-sm/-lg (0,1,0) → sm=md=lg. We redefine the sizes at the same specificity
    (they win on source order), so sm < md < lg holds in the Material theme too.
-   Thumb = height - 6px, gap 3px per lato; translateX = trackWidth - thumb - 6px. */
-[pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    width: 2.75rem;
-    height: 1.65rem;
-}
-[pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
-    width: calc(1.65rem - 6px);
-    height: calc(1.65rem - 6px);
-    top: 3px;
-    left: 3px;
-}
-[pdx-theme="material"] .pdx-toggle-sm:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
-    transform: translateX(1.1rem);
-}
-[pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    width: 3.75rem;
-    height: 2.35rem;
-}
-[pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
-    width: calc(2.35rem - 6px);
-    height: calc(2.35rem - 6px);
-    top: 3px;
-    left: 3px;
-}
-[pdx-theme="material"] .pdx-toggle-lg:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
-    transform: translateX(1.4rem);
-}
+   Thumb = height - 6px, gap 3px per lato; translateX = trackWidth - thumb - 6px.
+   Keyed on pdx-switch's `size` (#629); on native markup `.pdx-toggle-sm`. */
+[pdx-theme="material"] :where(pdx-switch[size="sm"]) > :where(label) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        width: 2.75rem;
+        height: 1.65rem;
+    }
+    [pdx-theme="material"] :where(pdx-switch[size="sm"]) > :where(label) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before, [pdx-theme="material"] .pdx-toggle-sm:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+        width: calc(1.65rem - 6px);
+        height: calc(1.65rem - 6px);
+        top: 3px;
+        left: 3px;
+    }
+    [pdx-theme="material"] :where(pdx-switch[size="sm"]) > :where(label) > [data-part="root"]:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before, [pdx-theme="material"] .pdx-toggle-sm:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+        transform: translateX(1.1rem);
+    }
+[pdx-theme="material"] :where(pdx-switch[size="lg"]) > :where(label) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)), [pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
+        width: 3.75rem;
+        height: 2.35rem;
+    }
+    [pdx-theme="material"] :where(pdx-switch[size="lg"]) > :where(label) > [data-part="root"]:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before, [pdx-theme="material"] .pdx-toggle-lg:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+        width: calc(2.35rem - 6px);
+        height: calc(2.35rem - 6px);
+        top: 3px;
+        left: 3px;
+    }
+    [pdx-theme="material"] :where(pdx-switch[size="lg"]) > :where(label) > [data-part="root"]:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before, [pdx-theme="material"] .pdx-toggle-lg:checked:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *))::before {
+        transform: translateX(1.4rem);
+    }
 
 /* Checkbox: rounder */
 [pdx-theme="material"] .pdx-checkbox:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {

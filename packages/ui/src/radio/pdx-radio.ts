@@ -30,13 +30,18 @@ component('pdx-radio', {
     // Selecting it writes it (#480), and the write dispatches `checked-change`. A sibling the browser
     // unchecks is set from outside, and announces nothing, as it never did. A form resets it (#135).
     models: { checked: model(false, { form: true }) },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the circle's size. */
+        size: { md: '.pdx-radio-md', sm: '.pdx-radio-sm', lg: '.pdx-radio-lg' },
+    },
     props: {
         disabled: { type: Boolean, default: false },
         label: { type: String, default: '' },
         description: { type: String, default: '' },
         value: { type: String, default: '' },
         name: { type: String, default: '' },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         labelPosition: { type: String, default: 'right' },
     },
@@ -74,8 +79,6 @@ component('pdx-radio', {
 
         function boxClass(): string {
             let cls = 'pdx-radio';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-radio-' + s;
             if (ctx.error()) cls += ' pdx-radio-error';
             return cls;
         }
@@ -99,6 +102,7 @@ component('pdx-radio', {
             <input
                 type="radio"
                 :class="${ctx.boxClass}"
+                data-part="root"
                 :checked="${ctx.checked}"
                 :disabled="${ctx.disabled}"
                 form="pdx-radio-no-submit"

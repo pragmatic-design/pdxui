@@ -34,10 +34,15 @@ component('pdx-segmented', {
     // A choice writes it (#480), and the write dispatches `value-change`. A form submits it, nothing
     // with no choice as a native radio group, and resets it (#135).
     models: { value: model('', { form: true }) },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the items' size. */
+        size: { md: '.pdx-segmented-md', sm: '.pdx-segmented-sm', lg: '.pdx-segmented-lg' },
+    },
     props: {
         /** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
         options: { type: Array, default: [] },
-        size: { type: String, default: '' },
         full: { type: Boolean, default: false },
         orientation: { type: String, default: 'horizontal' },
         disabled: { type: Boolean, default: false },
@@ -113,8 +118,6 @@ component('pdx-segmented', {
 
         function rootClass(): string {
             let cls = 'pdx-segmented';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-segmented-' + s;
             if (ctx.orientation() === 'vertical') cls += ' pdx-segmented-vertical';
             return cls;
         }
@@ -148,6 +151,7 @@ component('pdx-segmented', {
     render: (ctx: any) => html`
         <div
             :class="${ctx.rootClass}"
+            data-part="root"
             role="radiogroup"
             :aria-orientation="${ctx.orientation}"
             :aria-disabled="${() => ctx.disabled() ? 'true' : null}"

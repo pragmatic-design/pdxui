@@ -6,7 +6,6 @@ Star rating with halves and tooltips.
 |---|---|---|---|---|
 | `count` | `count` | number | `5` | Number of rating symbols. |
 | `precision` | `precision` | number | `1` | Smallest selectable step (e.g. 0.5 for half stars). |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
@@ -15,6 +14,7 @@ Star rating with halves and tooltips.
 | `colors` | `colors` | string | `''` | Comma-separated threshold:color pairs, e.g. "2:red,3:orange,5:green" |
 | `clearable` | `clearable` | boolean | `false` | Allow clearing to 0 by clicking current value |
 | `label` | `label` | string | `''` | Accessible name. Empty: the rating.label component string, «Rating» in English. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the icons' size. |
 | `value` | `value` | number | `0` | The current value. |
 
 **API (via `:ref`)**

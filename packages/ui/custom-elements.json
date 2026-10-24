@@ -5926,16 +5926,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -5966,6 +5956,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the box's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "checked",
               "description": "Whether it is checked / on.",
               "type": {
@@ -5987,6 +5987,22 @@
           "models": [
             "checked",
             "indeterminate"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-checkbox-md",
+                "sm": ".pdx-checkbox-sm",
+                "lg": ".pdx-checkbox-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -6071,15 +6087,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -6105,6 +6112,15 @@
                 "text": "string"
               },
               "default": "'right'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the box's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "checked",
@@ -19413,16 +19429,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -19443,6 +19449,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the circle's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "checked",
               "description": "Whether it is checked / on.",
               "type": {
@@ -19454,6 +19470,22 @@
           ],
           "models": [
             "checked"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-radio-md",
+                "sm": ".pdx-radio-sm",
+                "lg": ".pdx-radio-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -19518,15 +19550,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -19543,6 +19566,15 @@
                 "text": "string"
               },
               "default": "'right'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the circle's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "checked",
@@ -19605,16 +19637,6 @@
               },
               "default": "1",
               "attribute": "precision"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
             },
             {
               "kind": "field",
@@ -19698,6 +19720,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the icons' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -19727,6 +19759,22 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-rating-md",
+                "sm": ".pdx-rating-sm",
+                "lg": ".pdx-rating-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change",
@@ -19774,15 +19822,6 @@
                 "text": "number"
               },
               "default": "1"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
             },
             {
               "name": "disabled",
@@ -19855,6 +19894,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the icons' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -21350,16 +21398,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "full",
               "description": "Stretches to the full width of its container.",
               "type": {
@@ -21410,6 +21448,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the items' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -21440,6 +21488,22 @@
           "models": [
             "value"
           ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-segmented-md",
+                "sm": ".pdx-segmented-sm",
+                "lg": ".pdx-segmented-lg"
+              }
+            }
+          ],
           "alphaEvents": [
             "pdx-change",
             "change"
@@ -21462,15 +21526,6 @@
             "radiogroup"
           ],
           "attributes": [
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "full",
               "fieldName": "full",
@@ -21515,6 +21570,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the items' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -22441,16 +22505,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -22481,12 +22535,22 @@
             },
             {
               "kind": "field",
-              "name": "color",
-              "description": "Color the fill portion",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the track's and thumb's size.",
               "type": {
-                "text": "string"
+                "text": "'md' | 'sm' | 'lg'"
               },
-              "default": "''",
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "color",
+              "description": "primary (the default), success or warning: the fill's and thumb's colour.",
+              "type": {
+                "text": "'primary' | 'success' | 'warning'"
+              },
+              "default": "'primary'",
               "attribute": "color"
             },
             {
@@ -22520,6 +22584,36 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-slider-md",
+                "sm": ".pdx-slider-sm",
+                "lg": ".pdx-slider-lg"
+              }
+            },
+            {
+              "name": "color",
+              "values": [
+                "primary",
+                "success",
+                "warning"
+              ],
+              "default": "primary",
+              "native": {
+                "primary": ".pdx-slider-primary",
+                "success": ".pdx-slider-success",
+                "warning": ".pdx-slider-warning"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -22651,15 +22745,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -22687,13 +22772,22 @@
               "default": "0"
             },
             {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the track's and thumb's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
+            },
+            {
               "name": "color",
               "fieldName": "color",
-              "description": "Color the fill portion",
+              "description": "primary (the default), success or warning: the fill's and thumb's colour.",
               "type": {
-                "text": "string"
+                "text": "'primary' | 'success' | 'warning'"
               },
-              "default": "''"
+              "default": "'primary'"
             },
             {
               "name": "value",
@@ -23755,16 +23849,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "error",
               "description": "Marks the control as invalid.",
               "type": {
@@ -23792,6 +23876,16 @@
               },
               "default": "''",
               "attribute": "value"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the track's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -23824,6 +23918,22 @@
           ],
           "models": [
             "checked"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-toggle-md",
+                "sm": ".pdx-toggle-sm",
+                "lg": ".pdx-toggle-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -23901,15 +24011,6 @@
               "default": "'right'"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "error",
               "fieldName": "error",
               "description": "Marks the control as invalid.",
@@ -23935,6 +24036,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the track's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "checked",

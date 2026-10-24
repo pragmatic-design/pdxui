@@ -21,10 +21,15 @@ import '@pdxui/design/components/rating';
 component('pdx-rating', {
     // A click or a key writes it (#480), and the write dispatches `value-change`.
     models: { value: model(0, { form: true }) },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the icons' size. */
+        size: { md: '.pdx-rating-md', sm: '.pdx-rating-sm', lg: '.pdx-rating-lg' },
+    },
     props: {
         count: { type: Number, default: 5 },
         precision: { type: Number, default: 1 },
-        size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         name: { type: String, default: '' },
@@ -175,8 +180,6 @@ component('pdx-rating', {
 
         function rootClass(): string {
             let cls = 'pdx-rating';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-rating-' + s;
             if (ctx.disabled()) cls += ' pdx-rating-disabled';
             if (ctx.readonly()) cls += ' pdx-rating-readonly';
             if (isFocused()) cls += ' pdx-rating-focused';
@@ -233,6 +236,7 @@ component('pdx-rating', {
     render: (ctx: any) => html`
         <div
             :class="${ctx.rootClass}"
+            data-part="root"
             role="slider"
             :aria-valuenow="${() => String(ctx._value())}"
             aria-valuemin="0"

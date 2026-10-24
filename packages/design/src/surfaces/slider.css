@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/surfaces/slider.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* ── Slider — track + fill + thumb(s) + marks ── */
 
 .pdx-slider {
@@ -110,21 +111,21 @@
     opacity: 1;
 }
 
-/* Sizes */
-.pdx-slider-sm .pdx-slider-track { height: 0.25rem; }
-.pdx-slider-sm .pdx-slider-thumb { width: 1rem; height: 1rem; }
-.pdx-slider-lg .pdx-slider-track { height: 0.5rem; }
-.pdx-slider-lg .pdx-slider-thumb { width: 1.5rem; height: 1.5rem; }
+/* Sizes, keyed on the host's `size` (#629); on native markup `.pdx-slider-sm` on the root. */
+:where(pdx-slider[size="sm"]) > [data-part="root"] .pdx-slider-track, .pdx-slider-sm .pdx-slider-track { height: 0.25rem; }
+    :where(pdx-slider[size="sm"]) > [data-part="root"] .pdx-slider-thumb, .pdx-slider-sm .pdx-slider-thumb { width: 1rem; height: 1rem; }
+:where(pdx-slider[size="lg"]) > [data-part="root"] .pdx-slider-track, .pdx-slider-lg .pdx-slider-track { height: 0.5rem; }
+    :where(pdx-slider[size="lg"]) > [data-part="root"] .pdx-slider-thumb, .pdx-slider-lg .pdx-slider-thumb { width: 1.5rem; height: 1.5rem; }
 
 /* Error state */
 .pdx-slider.error .pdx-slider-fill { background: var(--pdx-color-danger); }
 .pdx-slider.error .pdx-slider-thumb { background: var(--pdx-color-danger); }
 
-/* Color variants */
-.pdx-slider-success .pdx-slider-fill { background: var(--pdx-color-success); }
-.pdx-slider-success .pdx-slider-thumb { background: var(--pdx-color-success); }
-.pdx-slider-warning .pdx-slider-fill { background: var(--pdx-color-warning); }
-.pdx-slider-warning .pdx-slider-thumb { background: var(--pdx-color-warning); }
+/* Color variants, keyed on the host's `color` (#629); on native markup `.pdx-slider-success`. */
+:where(pdx-slider[color="success"]) > [data-part="root"] .pdx-slider-fill, .pdx-slider-success .pdx-slider-fill { background: var(--pdx-color-success); }
+    :where(pdx-slider[color="success"]) > [data-part="root"] .pdx-slider-thumb, .pdx-slider-success .pdx-slider-thumb { background: var(--pdx-color-success); }
+:where(pdx-slider[color="warning"]) > [data-part="root"] .pdx-slider-fill, .pdx-slider-warning .pdx-slider-fill { background: var(--pdx-color-warning); }
+    :where(pdx-slider[color="warning"]) > [data-part="root"] .pdx-slider-thumb, .pdx-slider-warning .pdx-slider-thumb { background: var(--pdx-color-warning); }
 
 /* Vertical orientation */
 .pdx-slider-vertical {
@@ -163,5 +164,5 @@
     left: calc(100% + 8px);
     transform: translateY(50%);
 }
-.pdx-slider-vertical.pdx-slider-sm .pdx-slider-track { width: 0.25rem; }
-.pdx-slider-vertical.pdx-slider-lg .pdx-slider-track { width: 0.5rem; }
+:where(pdx-slider[size="sm"]) > .pdx-slider-vertical[data-part="root"] .pdx-slider-track, .pdx-slider-vertical.pdx-slider-sm .pdx-slider-track { width: 0.25rem; }
+:where(pdx-slider[size="lg"]) > .pdx-slider-vertical[data-part="root"] .pdx-slider-track, .pdx-slider-vertical.pdx-slider-lg .pdx-slider-track { width: 0.5rem; }

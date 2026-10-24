@@ -17,6 +17,12 @@ import { uiString } from '../shared/i18n';
 component('pdx-switch', {
     // A toggle writes it (#480), and the write dispatches `checked-change`.
     models: { checked: model(false, { form: true }) },
+    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
+    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the track's size. */
+        size: { md: '.pdx-toggle-md', sm: '.pdx-toggle-sm', lg: '.pdx-toggle-lg' },
+    },
     props: {
         disabled: { type: Boolean, default: false },
         loading: { type: Boolean, default: false },
@@ -25,7 +31,6 @@ component('pdx-switch', {
         /** Accessible name when there is no visible label (forwarded to the inner input) */
         ariaLabel: { type: String, default: '' },
         labelPosition: { type: String, default: 'right' },
-        size: { type: String, default: '' },
         error: { type: Boolean, default: false },
         name: { type: String, default: '' },
         value: { type: String, default: '' },
@@ -40,8 +45,6 @@ component('pdx-switch', {
 
         function toggleClass(): string {
             let cls = 'pdx-toggle';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-toggle-' + s;
             if (ctx.error()) cls += ' pdx-toggle-error';
             if (ctx.loading()) cls += ' pdx-toggle-loading';
             return cls;
@@ -76,6 +79,7 @@ component('pdx-switch', {
             <input
                 type="checkbox"
                 :class="${ctx.toggleClass}"
+                data-part="root"
                 role="switch"
                 :checked="${ctx.checked}"
                 :disabled="${() => ctx.disabled() || ctx.loading()}"

@@ -37,6 +37,7 @@
         import '@pdxui/ui/label';
         import '@pdxui/ui/radio';
         import '@pdxui/ui/radio-group';
+        import '@pdxui/ui/switch';
         import '@pdxui/ui/textarea';
 
         const params = new URLSearchParams(location.search);
@@ -63,7 +64,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-button","pdx-checkbox","pdx-checkbox-group","pdx-input","pdx-input-group","pdx-label","pdx-radio","pdx-radio-group","pdx-textarea"];
+        const __tags = ["pdx-button","pdx-checkbox","pdx-checkbox-group","pdx-input","pdx-input-group","pdx-label","pdx-radio","pdx-radio-group","pdx-switch","pdx-textarea"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -113,6 +114,21 @@
     <section data-scenario="checkbox-mixed">
         <h3>Checkbox — Indeterminate</h3>
         <pdx-checkbox indeterminate label="Some selected" data-test="checkbox-mixed"></pdx-checkbox>
+    </section>
+
+    <section data-scenario="checkbox-size-md">
+        <h3>pdx-checkbox — size="md"</h3>
+        <pdx-checkbox data-test="variant" size="md"></pdx-checkbox>
+    </section>
+
+    <section data-scenario="checkbox-size-sm">
+        <h3>pdx-checkbox — size="sm"</h3>
+        <pdx-checkbox data-test="variant" size="sm"></pdx-checkbox>
+    </section>
+
+    <section data-scenario="checkbox-size-lg">
+        <h3>pdx-checkbox — size="lg"</h3>
+        <pdx-checkbox data-test="variant" size="lg"></pdx-checkbox>
     </section>
 
     <section data-scenario="input-group">
@@ -269,6 +285,21 @@
         <pdx-radio data-test="radio-disabled" name="opt" value="x" label="Disabled option" disabled></pdx-radio>
     </section>
 
+    <section data-scenario="radio-size-md">
+        <h3>pdx-radio — size="md"</h3>
+        <pdx-radio data-test="variant" size="md"></pdx-radio>
+    </section>
+
+    <section data-scenario="radio-size-sm">
+        <h3>pdx-radio — size="sm"</h3>
+        <pdx-radio data-test="variant" size="sm"></pdx-radio>
+    </section>
+
+    <section data-scenario="radio-size-lg">
+        <h3>pdx-radio — size="lg"</h3>
+        <pdx-radio data-test="variant" size="lg"></pdx-radio>
+    </section>
+
     <section data-scenario="textarea-basic">
         <h3>Textarea — Basic</h3>
         <pdx-textarea data-test="textarea" aria-label="Message" placeholder="Type your message..."></pdx-textarea>
@@ -321,6 +352,21 @@
                         <span>On</span>
                     </label>
                 </div>
+    </section>
+
+    <section data-scenario="toggle-size-md">
+        <h3>pdx-switch — size="md"</h3>
+        <pdx-switch data-test="variant" size="md"></pdx-switch>
+    </section>
+
+    <section data-scenario="toggle-size-sm">
+        <h3>pdx-switch — size="sm"</h3>
+        <pdx-switch data-test="variant" size="sm"></pdx-switch>
+    </section>
+
+    <section data-scenario="toggle-size-lg">
+        <h3>pdx-switch — size="lg"</h3>
+        <pdx-switch data-test="variant" size="lg"></pdx-switch>
     </section>
 </body>
 </html>
