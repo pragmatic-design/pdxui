@@ -64,6 +64,7 @@ function fieldsMember(scope: LanguageChangeScope): LanguageChange {
         scope,
         issue: 128,
         message: "a form's fields are its members: `f.fields.email` is `f.email`, `f.fields['customer.name']` is `f['customer.name']`.",
+        marker: '.fields',
         detect: (text): LanguageChangeFinding[] => fieldsReads(text, scope).reverse()
             .map(({ index, found }) => ({ line: lineAt(text, index), found: found.replace(/[.[?]+$/, '') })),
         fix: (text) => {

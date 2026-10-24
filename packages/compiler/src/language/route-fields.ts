@@ -259,8 +259,16 @@ function fixIn(text: string, kind: Kind): string {
     return text.slice(0, script.start) + next + text.slice(script.start + script.content.length);
 }
 
+/** The keyword every declaration of a kind opens with, its `PATTERNS` entry's (#648). */
+const MARKERS: Record<Kind, string> = {
+    route: '@route', alias: '@alias', prefetch: '@prefetch', transition: '@transition', meta: '@meta', head: '@head',
+};
+
 function change(kind: Kind, id: string, message: string): LanguageChange {
-    return { id, kind: 'removed', scope: 'pdx', issue: 277, message, detect: (text) => detectIn(text, kind), fix: (text) => fixIn(text, kind) };
+    return {
+        id, kind: 'removed', scope: 'pdx', issue: 277, message, marker: MARKERS[kind],
+        detect: (text) => detectIn(text, kind), fix: (text) => fixIn(text, kind),
+    };
 }
 
 export const routeBlock = change('route', 'route-block',

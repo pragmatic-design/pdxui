@@ -47,6 +47,7 @@ export const loaderAnonymous: LanguageChange = {
     scope: 'pdx',
     issue: 506,
     message: '`@loader` names what it loads: `@loader user: loadUser;` declares `user`, read as `user.data()`, `user.state()`, `user.error()`.',
+    marker: '@loader',
     detect: (text) => anonymousLoaders(text).map(({ index, found }) => ({ line: lineAt(text, index), found })),
     // `@loader loadUser;` → `@loader loadUser: loadUser;` — the name the function already has.
     fix: (text) => {
@@ -87,6 +88,7 @@ export const loaderReaders: LanguageChange = {
     scope: 'pdx',
     issue: 506,
     message: "`currentLoaderData()` and `currentLoaderState()` are gone: the page reads its loader by its name, `user.data()` and `user.state()`; another level's, by `loaderData('/pattern')`.",
+    marker: 'currentLoader',
     detect: (text) => readers(text).map(({ index, found }) => ({ line: lineAt(text, index), found })),
     // Rewritten where the page declares a loader (the anonymous one is named by `loader-anonymous`, which
     // runs first); left for a person where it does not — a component under the page has no name to write.

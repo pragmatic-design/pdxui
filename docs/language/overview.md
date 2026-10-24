@@ -133,7 +133,10 @@ there is one, the mechanical rewrite. Each entry is one of four kinds, `beta/mig
 - `removed` — a language change: the old form is an error, `PDX_REMOVED_FORM`, whose message names
   the beta form and `pdx migrate`. A form that already has a code of its own (an unknown `@defer`
   trigger, `PDX_DEFER_UNKNOWN_TRIGGER`) keeps it. A removed export of a `@pdxui/*` package leaves the
-  package; an import of it in a `.pdx` script is `PDX_REMOVED_FORM`, naming its replacement;
+  package; an import of it in a `.pdx` script is `PDX_REMOVED_FORM`, naming its replacement. Each
+  removed entry also names a `marker`, a substring or regex every instance of the form contains: the
+  compiler looks for the form only in a file that has it (#648), and the compiler's tests fail when a
+  detected fixture lacks it;
 - `changed` — still valid source with a new meaning: the compiler says nothing;
 - `fix` — a behaviour that changed because the old one was a defect: nothing is an error;
 - `target` — compiled output that depends on the browser target, with nothing to rewrite.

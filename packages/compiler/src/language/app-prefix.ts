@@ -59,6 +59,8 @@ export const appPrefix: LanguageChange = {
     scope: 'pdx',
     issue: 136,
     message: "An application's component tags start with its own prefix, `app-` by default: `pdx-` is the @pdxui packages'.",
+    // Every renamed tag is an old `pdx-` one (projectTagRenames).
+    marker: 'pdx-',
     detect: (text, context?: LanguageChangeContext): LanguageChangeFinding[] => {
         const renames = context?.projectTags;
         if (!renames || renames.size === 0) return [];
@@ -91,6 +93,7 @@ export const appPrefixHtml: LanguageChange = {
     scope: 'html',
     issue: 136,
     message: "An application's component tags start with its own prefix, `app-` by default — in the page that mounts the app too.",
+    marker: 'pdx-',
     detect: (text, context?: LanguageChangeContext): LanguageChangeFinding[] => {
         const renames = context?.projectTags;
         if (!renames || renames.size === 0) return [];
@@ -111,6 +114,7 @@ export const appPrefixString: LanguageChange = {
     scope: 'script',
     issue: 136,
     message: "A string names an application tag by its old `pdx-` name: write the `app-` one if it is the tag.",
+    marker: 'pdx-',
     detect: (text, context?: LanguageChangeContext): LanguageChangeFinding[] => {
         const renames = context?.projectTags;
         if (!renames || renames.size === 0) return [];

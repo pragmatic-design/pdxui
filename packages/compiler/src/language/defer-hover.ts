@@ -40,6 +40,7 @@ export const deferHover: LanguageChange = {
     scope: 'pdx',
     issue: 281,
     message: '`@defer (hover)` is removed: write `interaction` — the same trigger, on the first pointer or focus entry into the block.',
+    marker: '@defer',
     detect(text): LanguageChangeFinding[] {
         return defers(text)
             .filter((d) => parseDeferTriggers(d.content).unknown.includes(REMOVED_TRIGGER))

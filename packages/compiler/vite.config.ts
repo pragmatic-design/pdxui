@@ -24,6 +24,8 @@ export default defineConfig({
     },
     test: {
         include: ['tests/**/*.test.ts'],
+        // A removed form found in a text without its marker fails the test that found it (#648).
+        setupFiles: ['tests/setup/marker-guard.ts'],
         // Its share of the machine, not all of it: `test:unit` runs four packages at once.
         maxWorkers: unitTestWorkers(),
         // tests/perf holds the benchmarks, and a benchmark taken inside `pnpm test` is not a

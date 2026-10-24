@@ -234,6 +234,8 @@ export const legacyScript: LanguageChange = {
     issue: 158,
     message: 'the script has one grammar: declare a prop with `@prop name: T = value;` and an event with `@event name: T;`, '
         + 'and drop `return { … }` — every top-level name reaches the template.',
+    // Match: what `markers` finds — a legacy call, or a `return {`.
+    marker: /defineProps|defineEmits|return\s*\{/,
     detect(text): LanguageChangeFinding[] {
         const script = scriptOf(text);
         if (!script) return [];
@@ -259,6 +261,7 @@ export const mixinRemoved: LanguageChange = {
     issue: 158,
     message: '`@mixin` is removed: call an imported function that uses core\'s lifecycle functions — `const thing = useThing();` — '
         + 'and change the module\'s `setup(ctx)` into that function.',
+    marker: '@mixin',
     detect(text): LanguageChangeFinding[] {
         const script = scriptOf(text);
         if (!script) return [];
