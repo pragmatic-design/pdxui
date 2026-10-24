@@ -3,7 +3,7 @@
 // multiple slides per view, dot indicators, keyboard navigation.
 // Slot: "slide" — custom slide template (priority: slot > renderSlide > default)
 
-import { component, html, generatedId } from '@pdxui/core';
+import { component, html, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -30,7 +30,7 @@ export interface CarouselItem {
 /**
  * A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.
  *
- * @slot slide - Scoped — renders one slide. Receives `{ slide, index, isActive }`.
+ * @slot slide - Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.
  */
 component('pdx-carousel', {
     props: {
@@ -48,6 +48,10 @@ component('pdx-carousel', {
         animation: { type: String, default: 'slide' },
         /** The region's accessible name. Empty: the component string `carousel.label` ("Carousel"). */
         label: { type: String, default: '' },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    slots: {
+        slide: slot<(slide: { src?: string; alt?: string; content?: string; caption?: string; [key: string]: unknown }, index: number, active: boolean) => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -78,7 +82,7 @@ component('pdx-carousel', {
 
         // Slot function — read lazily (_projectSlots runs after setup)
         function getSlideSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['slide'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'slide', (s) => [s.slide, s.index, s.isActive]);
         }
 
         function getItems(): CarouselItem[] {

@@ -55,6 +55,11 @@ semver.
   `pdx-pagination`'s `page` slot and `pdx-nav-menu`'s `actions` slot share their names with a prop, so
   their snippets are named apart; the props and the alpha slots keep their names. `snippetOrSlot`
   takes the alpha slot's name as a fourth argument when it differs from the snippet's.
+- So do the remaining inputs and media (#596): `pdx-carousel`'s `slide(slide, index, active)`,
+  `pdx-field-list`'s `row(item, index, remove)`, `pdx-file-upload`'s `file(file, status, progress)`,
+  `pdx-mention`'s `suggestion(item, index, active)` and `pdx-tag-input`'s `tag(tag, index)`.
+  `pdx-nav-menu`'s signatures name every field of its items (`data`, `badgeVariant`, `disabled` and
+  the rest).
 - `@model value: T = d { form };` (`model<T>(d, { form: true })` in a descriptor) makes a component
   form-associated through its model: a native `<form>` submits the model under the host's `name` (a
   string as is, a number as its string, a boolean as a checkbox — its `value` or `on` when true,

@@ -47,7 +47,7 @@ inside a step) · `pdx-select` and other components in the `row` slot.
 
 **Renders:** roles `dialog`
 
-**Slot:** `row` — Scoped — renders one row. Receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the slot's content).
+**Slot:** `row` — Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
 
 **Shapes:** `FieldListItemSchema { name: string; type?: string; label?: string; placeholder?: string; required?: boolean }`
 

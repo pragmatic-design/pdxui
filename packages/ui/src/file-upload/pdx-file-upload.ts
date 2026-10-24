@@ -1,7 +1,7 @@
 // pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
 // Supports accept filter, size/count limits, image thumbnails, progress tracking.
 
-import { component, html, signal, computed, generatedId, model, untracked } from '@pdxui/core';
+import { component, html, signal, computed, generatedId, model, untracked, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
@@ -70,7 +70,7 @@ function acceptHint(accept: string): string {
 /**
  * Drag-and-drop file upload with validation, image preview and size and count limits.
  *
- * @slot file - Scoped — renders one file in the list. Receives `{ file, status, progress }`.
+ * @slot file - Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.
  */
 component('pdx-file-upload', {
     // The files it holds (#482): adding, removing or clearing writes it, and the write dispatches
@@ -89,6 +89,10 @@ component('pdx-file-upload', {
         auto: { type: Boolean, default: false },
         action: { type: String, default: '' },
         size: { type: String, default: '' },
+    },
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    slots: {
+        file: slot<(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number) => Node>(),
     },
     setup(ctx) {
         // The host is the one submitter (#135): its name goes on the host, where the form reads it,
@@ -336,7 +340,7 @@ component('pdx-file-upload', {
         });
 
         function getFileSlot(): SlotFunction | undefined {
-            return (ctx as any).__slots?.['file'] as SlotFunction | undefined;
+            return snippetOrSlot(ctx, 'file', (s) => [s.file, s.status, s.progress]);
         }
 
         /** A remove button's name: "Remove {file name}". */

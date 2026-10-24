@@ -34,7 +34,7 @@ Type @ to mention people.
 
 **Renders:** roles `listbox` · `option` · `status`
 
-**Slot:** `suggestion` — Scoped — renders one suggestion. Receives `{ item, index, active }`.
+**Slot:** `suggestion` — Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.
 
 **Shapes:** `MentionItem { value: string; label: string; description?: string }`
 

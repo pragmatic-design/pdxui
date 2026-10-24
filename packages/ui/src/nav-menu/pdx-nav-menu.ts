@@ -85,8 +85,8 @@ component('pdx-nav-menu', {
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots stay (#595).
     // The `actions` slot shares its name with the prop above, so its snippet is `itemActions`.
     slots: {
-        item: slot<(item: { key: string; label: string; icon?: string; badge?: string; href?: string; children?: unknown[]; [key: string]: unknown }, level: number, expanded: boolean, active: boolean) => Node>(),
-        itemActions: slot<(item: { key: string; label: string; icon?: string; badge?: string; href?: string; [key: string]: unknown }, level: number, active: boolean) => Node>(),
+        item: slot<(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; children?: unknown[]; type?: string; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, expanded: boolean, active: boolean) => Node>(),
+        itemActions: slot<(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; type?: string; href?: string; disabled?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, active: boolean) => Node>(),
     },
     setup(ctx) {
         /** Prefix of this menu's group ids, which the toggles' aria-controls point at. */

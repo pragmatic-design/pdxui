@@ -4599,7 +4599,8 @@
           "slots": [
             {
               "name": "slide",
-              "description": "Scoped — renders one slide. Receives `{ slide, index, isActive }`."
+              "description": "Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.",
+              "signature": "(slide: { src?: string; alt?: string; content?: string; caption?: string; [key: string]: unknown }, index: number, active: boolean)"
             }
           ]
         }
@@ -11460,7 +11461,8 @@
           "slots": [
             {
               "name": "row",
-              "description": "Scoped — renders one row. Receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the slot's content)."
+              "description": "Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).",
+              "signature": "(item: { [field: string]: unknown }, index: number, remove: () => void)"
             }
           ]
         }
@@ -12019,7 +12021,8 @@
           "slots": [
             {
               "name": "file",
-              "description": "Scoped — renders one file in the list. Receives `{ file, status, progress }`."
+              "description": "Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.",
+              "signature": "(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number)"
             }
           ]
         }
@@ -15991,7 +15994,8 @@
           "slots": [
             {
               "name": "suggestion",
-              "description": "Scoped — renders one suggestion. Receives `{ item, index, active }`."
+              "description": "Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.",
+              "signature": "(item: { value: string; label: string; description?: string }, index: number, active: boolean)"
             }
           ]
         }
@@ -16586,12 +16590,12 @@
             {
               "name": "item",
               "description": "Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.",
-              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; href?: string; children?: unknown[]; [key: string]: unknown }, level: number, expanded: boolean, active: boolean)"
+              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; children?: unknown[]; type?: string; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, expanded: boolean, active: boolean)"
             },
             {
               "name": "itemActions",
               "description": "Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.",
-              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; href?: string; [key: string]: unknown }, level: number, active: boolean)"
+              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; type?: string; href?: string; disabled?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, active: boolean)"
             },
             {
               "name": "actions",
@@ -24317,7 +24321,8 @@
           "slots": [
             {
               "name": "tag",
-              "description": "Scoped — renders one tag. Receives `{ tag, index }`."
+              "description": "Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.",
+              "signature": "(tag: string, index: number)"
             }
           ]
         }
