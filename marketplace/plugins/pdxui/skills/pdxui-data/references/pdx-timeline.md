@@ -102,7 +102,7 @@ are checked against the manifest above._
     <pdx-card variant="outline" compact>
       <div class="header">
         <strong>{item.title}</strong>
-        <pdx-chip size="xs" :variant="{item.status}">
+        <pdx-chip size="sm" :variant="{item.status}">
           {item.status}
         </pdx-chip>
       </div>
