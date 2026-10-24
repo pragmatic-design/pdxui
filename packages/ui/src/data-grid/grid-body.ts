@@ -198,15 +198,8 @@ export function renderRows(
                 }
 
                 // Normal display — boolean shows ✓/✗ (read-only)
-                {
-                    const cellSlot = gc.getSlot(`col:${col.field}`);
-                    if (cellSlot) {
-                        const content = cellSlot({ row, value: displayValue, index: i, col });
-                        td.appendChild(content instanceof DocumentFragment ? content : content);
-                    } else {
-                        td.appendChild(renderCellNode(displayValue, col, row));
-                    }
-                }
+                const custom = gc.customCell(row, col, displayValue, i);
+                td.appendChild(custom ?? renderCellNode(displayValue, col, row));
 
                 // Double-click to start cell edit (all editable types including boolean)
                 if (isEditMode && isColEditable && (gc.editMode() === 'cell' || gc.editMode() === 'batch')) {
@@ -218,8 +211,8 @@ export function renderRows(
                     td.style.cursor = 'cell';
                 }
 
-                // Command column: auto-render Edit/Delete if no slot and editable
-                if (col.def.command && isEditMode && !gc.getSlot(`col:${col.field}`)) {
+                // Command column: auto-render Edit/Delete when the page drew nothing there, and editable
+                if (col.def.command && isEditMode && !custom) {
                     const actions = document.createElement('div');
                     actions.className = 'pdx-dg-edit-actions';
                     const editBtn = document.createElement('pdx-button') as any;

@@ -60,6 +60,12 @@ semver.
   `pdx-mention`'s `suggestion(item, index, active)` and `pdx-tag-input`'s `tag(tag, index)`.
   `pdx-nav-menu`'s signatures name every field of its items (`data`, `badgeVariant`, `disabled` and
   the rest).
+- `pdx-data-grid` takes a parent's typed snippet, one for every column (#597): `cell(row, column,
+  value)` and `header(column)` switch on `column.field`, and `detail(row)` draws an expanded row. A
+  column the snippet draws nothing for is drawn by the grid, and a command column it leaves alone keeps
+  its Edit and Delete buttons. The alpha slots `col:{field}`, `header:{field}` and `detail` still
+  render; `col-edit:{field}`, `filter:{field}`, `filter-popover:{field}`, `toolbar-start`,
+  `toolbar-end` and `empty` stay scoped slots for now.
 - `@model value: T = d { form };` (`model<T>(d, { form: true })` in a descriptor) makes a component
   form-associated through its model: a native `<form>` submits the model under the host's `name` (a
   string as is, a number as its string, a boolean as a checkbox — its `value` or `on` when true,

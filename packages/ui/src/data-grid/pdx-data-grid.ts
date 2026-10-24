@@ -10,7 +10,7 @@
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
 
-import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV } from '@pdxui/core';
+import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV, slot } from '@pdxui/core';
 import type { SlotFunction, DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
@@ -68,6 +68,23 @@ function scrollbarWidth(): number {
 /** Grids already told that their rowHeight does nothing: once per element, not once per rebuild. */
 const _warnedRowHeight = new WeakSet<Element>();
 
+/** Whether a node shows anything: an element, or text that is not only whitespace. Comments do not. */
+function showsSomething(node: Node): boolean {
+    if (node.nodeType === Node.ELEMENT_NODE) return true;
+    if (node.nodeType === Node.TEXT_NODE) return (node.textContent ?? '').trim() !== '';
+    if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) return [...node.childNodes].some(showsSomething);
+    return false;
+}
+
+/**
+ * What a snippet drew, or null when it drew nothing (#597). One `cell(row, column)` snippet serves
+ * every column, and a page's `@if (column.field === 'price') { … }` renders an empty fragment for the
+ * others — those columns are the grid's to draw, as if no snippet had been given.
+ */
+function drawn(node: Node | null | undefined): Node | null {
+    return node && showsSomething(node) ? node : null;
+}
+
 /**
  * rowHeight places rows by number, which is what virtualisation needs; a content grid sizes its rows
  * by what they hold and should not clip them. So without virtualScroll it does nothing — and says so,
@@ -85,6 +102,10 @@ function warnRowHeightIgnored(el: Element): void {
 /**
  * A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be
  * replaced with slot templates.
+ *
+ * @slot cell - Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.
+ * @slot header - Draws a column's header: `header(column)`; a column it draws nothing for keeps its title. The alpha scoped slot `header:{field}` still draws one.
+ * @slot detail - Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.
  */
 component('pdx-data-grid', {
     props: {
@@ -144,6 +165,15 @@ component('pdx-data-grid', {
         /** The grid's accessible name (its aria-label). */
         label: { type: String, default: '' },
     },
+    // A parent's `@snippet` sets these (#597): one `cell` and one `header` for every column, rather
+    // than a slot per column, since a snippet's name is an identifier and `cell:price` is not one.
+    // The value is passed because the row does not hold it for a computed column, nor for a batch
+    // edit not yet saved.
+    slots: {
+        cell: slot<(row: Record<string, unknown>, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown) => Node>(),
+        header: slot<(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }) => Node>(),
+        detail: slot<(row: Record<string, unknown>) => Node>(),
+    },
     setup(ctx) {
         let rootEl: HTMLElement | null = null;
         /** The role="grid" element (the scroll area), once the build has put it in the page. */
@@ -179,9 +209,21 @@ component('pdx-data-grid', {
         }
 
         // ─── Shared context for sub-modules ──────────
+        const slotOf = (name: string) => (ctx as any).__slots?.[name] as SlotFunction | undefined;
+        /** The parent's snippet for `name` (#597), when it gave one: the element's declared slot property. */
+        const snippetOf = (name: 'cell' | 'header' | 'detail') => {
+            const fn = (ctx as unknown as Record<string, () => unknown>)[name]?.();
+            return typeof fn === 'function' ? fn as (...args: unknown[]) => Node | null | undefined : null;
+        };
         const gc: GridContext = {
             grid: null,
-            getSlot: (name: string) => (ctx as any).__slots?.[name] as SlotFunction | undefined,
+            getSlot: slotOf,
+            customCell: (row, col, value, index) =>
+                drawn(snippetOf('cell')?.(row, col.def, value)) ?? slotOf(`col:${col.field}`)?.({ row, value, index, col }) ?? null,
+            customHeader: (col) =>
+                drawn(snippetOf('header')?.(col.def)) ?? slotOf(`header:${col.field}`)?.({ col, field: col.field, header: col.header }) ?? null,
+            customDetail: (row, index, id) =>
+                drawn(snippetOf('detail')?.(row)) ?? slotOf('detail')?.({ row, index, id }) ?? null,
             getSelectionMode: () => (ctx.selection() as string) || 'none',
             getRowClass: (row: Record<string, unknown>, index: number) => {
                 const rc = ctx.rowClass() as string | ((r: Record<string, unknown>, i: number) => string) | undefined;
@@ -451,7 +493,6 @@ component('pdx-data-grid', {
                     (ctx.maxHeight() as number) || 400,
                     () => g.rows.peek(),
                     () => g.columns.peek(),
-                    gc.getSlot,
                     ctx.fillHeight() as boolean,
                 );
             } else {
