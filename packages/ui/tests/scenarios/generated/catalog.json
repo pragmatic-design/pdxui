@@ -632,6 +632,62 @@
         {
           "id": "chip-text-colours",
           "title": "Chip — Outline and tonal colours"
+        },
+        {
+          "id": "chip-variant-outline",
+          "title": "pdx-chip — variant=\"outline\""
+        },
+        {
+          "id": "chip-variant-primary",
+          "title": "pdx-chip — variant=\"primary\""
+        },
+        {
+          "id": "chip-variant-success",
+          "title": "pdx-chip — variant=\"success\""
+        },
+        {
+          "id": "chip-variant-danger",
+          "title": "pdx-chip — variant=\"danger\""
+        },
+        {
+          "id": "chip-variant-warning",
+          "title": "pdx-chip — variant=\"warning\""
+        },
+        {
+          "id": "chip-variant-info",
+          "title": "pdx-chip — variant=\"info\""
+        },
+        {
+          "id": "chip-variant-tonal",
+          "title": "pdx-chip — variant=\"tonal\""
+        },
+        {
+          "id": "chip-variant-tonal-primary",
+          "title": "pdx-chip — variant=\"tonal-primary\""
+        },
+        {
+          "id": "chip-variant-tonal-success",
+          "title": "pdx-chip — variant=\"tonal-success\""
+        },
+        {
+          "id": "chip-variant-tonal-danger",
+          "title": "pdx-chip — variant=\"tonal-danger\""
+        },
+        {
+          "id": "chip-variant-tonal-warning",
+          "title": "pdx-chip — variant=\"tonal-warning\""
+        },
+        {
+          "id": "chip-size-md",
+          "title": "pdx-chip — size=\"md\""
+        },
+        {
+          "id": "chip-size-sm",
+          "title": "pdx-chip — size=\"sm\""
+        },
+        {
+          "id": "chip-size-lg",
+          "title": "pdx-chip — size=\"lg\""
         }
       ]
     },
@@ -981,6 +1037,46 @@
         {
           "id": "fab-speed-dial",
           "title": "FAB — Speed dial (keyboard)"
+        },
+        {
+          "id": "fab-variant-primary",
+          "title": "pdx-fab — variant=\"primary\""
+        },
+        {
+          "id": "fab-variant-secondary",
+          "title": "pdx-fab — variant=\"secondary\""
+        },
+        {
+          "id": "fab-variant-danger",
+          "title": "pdx-fab — variant=\"danger\""
+        },
+        {
+          "id": "fab-size-md",
+          "title": "pdx-fab — size=\"md\""
+        },
+        {
+          "id": "fab-size-sm",
+          "title": "pdx-fab — size=\"sm\""
+        },
+        {
+          "id": "fab-size-lg",
+          "title": "pdx-fab — size=\"lg\""
+        },
+        {
+          "id": "fab-position-bottom-right",
+          "title": "pdx-fab — position=\"bottom-right\""
+        },
+        {
+          "id": "fab-position-bottom-left",
+          "title": "pdx-fab — position=\"bottom-left\""
+        },
+        {
+          "id": "fab-position-top-right",
+          "title": "pdx-fab — position=\"top-right\""
+        },
+        {
+          "id": "fab-position-top-left",
+          "title": "pdx-fab — position=\"top-left\""
         }
       ]
     },

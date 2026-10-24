@@ -23,6 +23,16 @@ export interface FabAction {
  * A floating action button that can open a speed dial of actions, in four directions and four layouts.
  */
 component('pdx-fab', {
+    // The axes fab.css keys by (#630), reflected on the host; a variant and a size map the class that
+    // draws the same button on native markup. The position places the host itself.
+    variants: {
+        /** primary (the default), secondary or danger. */
+        variant: { primary: '.pdx-fab-primary', secondary: '.pdx-fab-secondary', danger: '.pdx-fab-danger' },
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-fab-md', sm: '.pdx-fab-sm', lg: '.pdx-fab-lg' },
+        /** bottom-right (the default), bottom-left, top-right or top-left. */
+        position: ['bottom-right', 'bottom-left', 'top-right', 'top-left'],
+    },
     props: {
         /** Main button icon name */
         icon: { type: String, default: 'plus', iconName: true },
@@ -30,12 +40,6 @@ component('pdx-fab', {
         label: { type: String, default: '' },
         /** Speed dial actions */
         actions: { type: Array, default: [] },
-        /** Position: bottom-right (default), bottom-left, top-right, top-left */
-        position: { type: String, default: 'bottom-right' },
-        /** Variant: primary, secondary, danger */
-        variant: { type: String, default: 'primary' },
-        /** Size: sm, md, lg */
-        size: { type: String, default: 'md' },
         /** Speed dial direction: up (default), down, left, right */
         direction: { type: String, default: 'up' },
         /** Speed dial layout: linear (default), circle, semi-circle, quarter-circle */
@@ -202,8 +206,6 @@ component('pdx-fab', {
         ctx.track(() => {
             const iconName = ctx.icon() as string;
             const actions = ctx.actions() as FabAction[];
-            const position = ctx.position() as string;
-            const variant = ctx.variant() as string;
             const size = ctx.size() as string;
             const direction = ctx.direction() as string;
             const layoutType = ctx.type() as string;
@@ -215,7 +217,7 @@ component('pdx-fab', {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-fab-container', 'pdx-fab-' + position);
+                    ctx.el.classList.add('pdx-fab-container');
 
                     // Direction class for linear layout
                     ctx.el.classList.add('pdx-fab-dir-' + direction);
@@ -278,7 +280,8 @@ component('pdx-fab', {
                     // Main FAB button
                     const fab = document.createElement('button');
                     fab.type = 'button';
-                    fab.className = `pdx-fab pdx-fab-${variant} pdx-fab-${size}`;
+                    fab.className = 'pdx-fab';
+                    fab.setAttribute('data-part', 'root');
                     fab.setAttribute('aria-label', fabName());
                     fab.setAttribute('aria-haspopup', actions.length ? 'menu' : 'false');
                     fab.setAttribute('aria-expanded', 'false');

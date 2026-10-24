@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/chip.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Chip / Tag — selectable, removable, inline input.
    Extends badges with interactivity: click to select, X to remove.
 
@@ -60,79 +61,79 @@
     pointer-events: none;
 }
 
-/* ===== Variants ===== */
+/* ===== Variants — keyed on the host's `variant` (#630); on a native chip `.pdx-chip-{variant}` ===== */
 
-.pdx-chip-primary {
-    border-color: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-ink);
-}
-.pdx-chip-primary[selected] {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
-}
+:where(pdx-chip[variant="primary"]) > [data-part="root"], .pdx-chip-primary {
+        border-color: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-ink);
+    }
+    :where(pdx-chip[variant="primary"]) > [data-part="root"][selected], .pdx-chip-primary[selected] {
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+    }
 
-.pdx-chip-success {
-    border-color: var(--pdx-color-success);
-    color: var(--pdx-color-success-ink);
-}
-.pdx-chip-success[selected] {
-    background: var(--pdx-color-success);
-    color: var(--pdx-color-success-text);
-}
+:where(pdx-chip[variant="success"]) > [data-part="root"], .pdx-chip-success {
+        border-color: var(--pdx-color-success);
+        color: var(--pdx-color-success-ink);
+    }
+    :where(pdx-chip[variant="success"]) > [data-part="root"][selected], .pdx-chip-success[selected] {
+        background: var(--pdx-color-success);
+        color: var(--pdx-color-success-text);
+    }
 
-.pdx-chip-danger {
-    border-color: var(--pdx-color-danger);
-    color: var(--pdx-color-danger-ink);
-}
-.pdx-chip-danger[selected] {
-    background: var(--pdx-color-danger);
-    color: var(--pdx-color-danger-text);
-}
+:where(pdx-chip[variant="danger"]) > [data-part="root"], .pdx-chip-danger {
+        border-color: var(--pdx-color-danger);
+        color: var(--pdx-color-danger-ink);
+    }
+    :where(pdx-chip[variant="danger"]) > [data-part="root"][selected], .pdx-chip-danger[selected] {
+        background: var(--pdx-color-danger);
+        color: var(--pdx-color-danger-text);
+    }
 
-.pdx-chip-warning {
-    border-color: var(--pdx-color-warning);
-    color: var(--pdx-color-warning-ink);
-}
-.pdx-chip-warning[selected] {
-    background: var(--pdx-color-warning);
-    color: var(--pdx-color-warning-text);
-}
+:where(pdx-chip[variant="warning"]) > [data-part="root"], .pdx-chip-warning {
+        border-color: var(--pdx-color-warning);
+        color: var(--pdx-color-warning-ink);
+    }
+    :where(pdx-chip[variant="warning"]) > [data-part="root"][selected], .pdx-chip-warning[selected] {
+        background: var(--pdx-color-warning);
+        color: var(--pdx-color-warning-text);
+    }
 
-.pdx-chip-info {
-    border-color: var(--pdx-color-accent);
-    color: var(--pdx-color-accent-ink);
-}
-.pdx-chip-info[selected] {
-    background: var(--pdx-color-accent);
-    color: var(--pdx-color-accent-text);
-}
+:where(pdx-chip[variant="info"]) > [data-part="root"], .pdx-chip-info {
+        border-color: var(--pdx-color-accent);
+        color: var(--pdx-color-accent-ink);
+    }
+    :where(pdx-chip[variant="info"]) > [data-part="root"][selected], .pdx-chip-info[selected] {
+        background: var(--pdx-color-accent);
+        color: var(--pdx-color-accent-text);
+    }
 
 /* Tonal/subtle — muted background, no border, colored text */
-.pdx-chip-tonal {
-    border-color: transparent;
-    background: var(--pdx-color-inset);
-    color: var(--pdx-color-text);
-}
-.pdx-chip-tonal-primary {
-    border-color: transparent;
-    background: var(--pdx-color-primary-soft);
-    color: var(--pdx-color-primary-ink);
-}
-.pdx-chip-tonal-success {
-    border-color: transparent;
-    background: var(--pdx-color-success-soft);
-    color: var(--pdx-color-success-ink);
-}
-.pdx-chip-tonal-danger {
-    border-color: transparent;
-    background: var(--pdx-color-danger-soft);
-    color: var(--pdx-color-danger-ink);
-}
-.pdx-chip-tonal-warning {
-    border-color: transparent;
-    background: var(--pdx-color-warning-soft);
-    color: var(--pdx-color-warning-ink);
-}
+:where(pdx-chip[variant="tonal"]) > [data-part="root"], .pdx-chip-tonal {
+        border-color: transparent;
+        background: var(--pdx-color-inset);
+        color: var(--pdx-color-text);
+    }
+:where(pdx-chip[variant="tonal-primary"]) > [data-part="root"], .pdx-chip-tonal-primary {
+        border-color: transparent;
+        background: var(--pdx-color-primary-soft);
+        color: var(--pdx-color-primary-ink);
+    }
+:where(pdx-chip[variant="tonal-success"]) > [data-part="root"], .pdx-chip-tonal-success {
+        border-color: transparent;
+        background: var(--pdx-color-success-soft);
+        color: var(--pdx-color-success-ink);
+    }
+:where(pdx-chip[variant="tonal-danger"]) > [data-part="root"], .pdx-chip-tonal-danger {
+        border-color: transparent;
+        background: var(--pdx-color-danger-soft);
+        color: var(--pdx-color-danger-ink);
+    }
+:where(pdx-chip[variant="tonal-warning"]) > [data-part="root"], .pdx-chip-tonal-warning {
+        border-color: transparent;
+        background: var(--pdx-color-warning-soft);
+        color: var(--pdx-color-warning-ink);
+    }
 
 /* ===== CE host semantic class forwarding ===== */
 /* When .pdx-success/.pdx-warning/etc. is on the CE host <pdx-chip>,
@@ -248,17 +249,17 @@ pdx-chip.pdx-secondary > .pdx-chip { background: var(--pdx-color-secondary, var(
     padding: 0.1rem 0.5rem;
 }
 
-/* ===== Size variants ===== */
+/* ===== Size variants — keyed on the host's `size` (#630); on a native chip `.pdx-chip-{size}` ===== */
 
-.pdx-chip-sm {
-    font-size: 0.65rem;
-    padding: 0.1rem 0.45rem;
-}
+:where(pdx-chip[size="sm"]) > [data-part="root"], .pdx-chip-sm {
+        font-size: 0.65rem;
+        padding: 0.1rem 0.45rem;
+    }
 
-.pdx-chip-lg {
-    font-size: 0.85rem;
-    padding: 0.3rem 0.75rem;
-}
+:where(pdx-chip[size="lg"]) > [data-part="root"], .pdx-chip-lg {
+        font-size: 0.85rem;
+        padding: 0.3rem 0.75rem;
+    }
 
 /* Summary chip: collapsed multi-select count ("N selected" / "+K") — muted, non-removable. */
 .pdx-chip-summary {

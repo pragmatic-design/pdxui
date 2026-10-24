@@ -7,14 +7,14 @@ A floating action button.
 | `icon` | `icon` | string | `'plus'` | Main button icon name |
 | `label` | `label` | string | `''` | Main button label (screen reader). Empty: the fab.label component string, «Actions». |
 | `actions` | — | array | `[]` | Speed dial actions |
-| `position` | `position` | string | `'bottom-right'` | Position: bottom-right (default), bottom-left, top-right, top-left |
-| `variant` | `variant` | string | `'primary'` | Variant: primary, secondary, danger |
-| `size` | `size` | string | `'md'` | Size: sm, md, lg |
 | `direction` | `direction` | string | `'up'` | Speed dial direction: up (default), down, left, right |
 | `type` | `type` | string | `'linear'` | Speed dial layout: linear (default), circle, semi-circle, quarter-circle |
 | `showTooltip` | `showtooltip` | boolean | `true` | Show tooltip labels next to actions |
 | `mask` | `mask` | boolean | `false` | Show mask overlay when open |
 | `trigger` | `trigger` | string | `'click'` | Trigger mode: click (default), hover |
+| `variant` | `variant` | 'primary' \| 'secondary' \| 'danger' | `'primary'` | primary (the default), secondary or danger. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
+| `position` | `position` | 'bottom-right' \| 'bottom-left' \| 'top-right' \| 'top-left' | `'bottom-right'` | bottom-right (the default), bottom-left, top-right or top-left. |
 
 **API (via `:ref`)**
 

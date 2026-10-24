@@ -367,6 +367,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-chip` and `pdx-fab` declare their axes (#630), reflected on the host with their
+  defaults, and drawn by `@variant` rules that also compile to the native classes.
+  - `pdx-chip`: `variant` — outline (the default, the base look), primary, success, danger, warning,
+    info, tonal, tonal-primary, tonal-success, tonal-danger, tonal-warning — and `size` (sm, md, lg).
+    Its pill no longer carries `.pdx-chip-{variant}` or `.pdx-chip-{size}`; it is `data-part="root"`:
+    `pdx-chip[variant="danger"] > [data-part="root"]`.
+  - `pdx-fab`: `variant` (primary, secondary, danger), `size` (sm, md, lg) and `position` (bottom-right,
+    bottom-left, top-right, top-left). Its button no longer carries `.pdx-fab-{variant}` or
+    `.pdx-fab-{size}`; it is `data-part="root"`. The host no longer carries `.pdx-fab-{position}`: the
+    `position` attribute places it, `pdx-fab[position="top-left"]`.
+  - `pdx-button-group`, `pdx-toggle`, `pdx-split-button` and `pdx-dropdown-menu` keep `variant` and
+    `size` as plain props: they only forward them to a `pdx-button` or to a native button, which draw
+    them.
 - **Breaking:** the choice controls declare `size` as a variant axis, sm, md and lg, and `pdx-slider`
   its `color`, primary, success and warning (#629). Each is reflected on the host, the default
   included, and drawn by `@variant` rules that also compile to the native classes on the element
