@@ -9494,16 +9494,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | 'xl' | 'full'"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "closeOnBackdrop",
               "description": "Close when the backdrop is clicked.",
               "type": {
@@ -9563,6 +9553,16 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default), lg, xl or full.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg' | 'xl' | 'full'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
               "kind": "method",
               "name": "show",
               "parameters": [],
@@ -9585,6 +9585,26 @@
               "name": "isOpen",
               "readonly": true,
               "description": "Read-only, via a ref: `el.isOpen`."
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg",
+                "xl",
+                "full"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-dialog-md",
+                "sm": ".pdx-dialog-sm",
+                "lg": ".pdx-dialog-lg",
+                "xl": ".pdx-dialog-xl",
+                "full": ".pdx-dialog-full"
+              }
             }
           ],
           "events": [
@@ -9624,15 +9644,6 @@
                 "text": "string"
               },
               "default": "''"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "'sm' | 'md' | 'lg' | 'xl' | 'full'"
-              },
-              "default": "'md'"
             },
             {
               "name": "closeonbackdrop",
@@ -9687,6 +9698,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default), lg, xl or full.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg' | 'xl' | 'full'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -22591,16 +22611,6 @@
             },
             {
               "kind": "field",
-              "name": "position",
-              "description": "Position: left (default) or right",
-              "type": {
-                "text": "string"
-              },
-              "default": "'left'",
-              "attribute": "position"
-            },
-            {
-              "kind": "field",
               "name": "width",
               "description": "Width when expanded (px)",
               "type": {
@@ -22618,6 +22628,26 @@
               },
               "default": "60",
               "attribute": "collapsedwidth"
+            },
+            {
+              "kind": "field",
+              "name": "position",
+              "description": "The edge it sits on: left (the default) or right.",
+              "type": {
+                "text": "'left' | 'right'"
+              },
+              "default": "'left'",
+              "attribute": "position"
+            }
+          ],
+          "variants": [
+            {
+              "name": "position",
+              "values": [
+                "left",
+                "right"
+              ],
+              "default": "left"
             }
           ],
           "roles": [
@@ -22643,15 +22673,6 @@
               "default": "false"
             },
             {
-              "name": "position",
-              "fieldName": "position",
-              "description": "Position: left (default) or right",
-              "type": {
-                "text": "string"
-              },
-              "default": "'left'"
-            },
-            {
               "name": "width",
               "fieldName": "width",
               "description": "Width when expanded (px)",
@@ -22668,6 +22689,15 @@
                 "text": "number"
               },
               "default": "60"
+            },
+            {
+              "name": "position",
+              "fieldName": "position",
+              "description": "The edge it sits on: left (the default) or right.",
+              "type": {
+                "text": "'left' | 'right'"
+              },
+              "default": "'left'"
             }
           ],
           "slots": [

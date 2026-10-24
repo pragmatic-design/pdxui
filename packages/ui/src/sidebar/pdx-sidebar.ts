@@ -12,13 +12,17 @@ import '@pdxui/design/components/sidebar';
  * (icon-only).
  */
 component('pdx-sidebar', {
+    // The axis sidebar.css keys by (#633), reflected on the host and drawn from it; the host is the
+    // element the old `.pdx-sidebar-right` class went on, so no native class is kept.
+    variants: {
+        /** The edge it sits on: left (the default) or right. */
+        position: ['left', 'right'],
+    },
     props: {
         /** Sidebar open/expanded state */
         open: { type: Boolean, default: true },
         /** Mini mode: show only icons when collapsed */
         mini: { type: Boolean, default: false },
-        /** Position: left (default) or right */
-        position: { type: String, default: 'left' },
         /** Width when expanded (px) */
         width: { type: Number, default: 260 },
         /** Width when collapsed/mini (px) */
@@ -30,7 +34,6 @@ component('pdx-sidebar', {
         ctx.track(() => {
             const open = ctx.open() as boolean;
             const mini = ctx.mini() as boolean;
-            const position = ctx.position() as string;
             const width = ctx.width() as number;
             const collapsedWidth = ctx.collapsedWidth() as number;
 
@@ -48,7 +51,6 @@ component('pdx-sidebar', {
                 el.classList.toggle('pdx-sidebar-open', open);
                 el.classList.toggle('pdx-sidebar-collapsed', !open);
                 el.classList.toggle('pdx-sidebar-mini', mini && !open);
-                el.classList.toggle('pdx-sidebar-right', position === 'right');
 
                 const currentWidth = open ? width : (mini ? collapsedWidth : 0);
                 el.style.width = currentWidth + 'px';

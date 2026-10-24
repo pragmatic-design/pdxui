@@ -367,6 +367,15 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-dialog` and `pdx-sidebar` declare their axes (#633), reflected on the host with
+  their defaults, and drawn by `@variant` rules.
+  - `pdx-dialog`: `size` (sm, md, lg, xl, full). Its panel, the root part, no longer carries
+    `.pdx-dialog-{size}`; the class stays for pdx-alert-dialog, the overlay outlet and native markup.
+  - `pdx-sidebar`: `position` (left, right). The host no longer carries `.pdx-sidebar-right`, and the
+    class is gone from the CSS: nothing used it on native markup.
+  - These keep their props: `pdx-drawer`'s `position`, `size` and `mode`, drawn on its panel, which
+    an overlay drawer moves to `<body>` where no host rule reaches it, and whose `size` also takes
+    any CSS width; and `pdx-edit-drawer`'s `position` and `size`, passed on to its drawer.
 - **Breaking:** the surfaces, navigation and display components declare their axes (#632), reflected
   on the host with their defaults, and drawn by `@variant` rules; where native markup has a class for
   the same look, the rule compiles to it too.

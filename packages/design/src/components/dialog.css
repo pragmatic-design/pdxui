@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/dialog.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Dialog / Modal — overlay panel with backdrop, focus trap, keyboard.
 
    Usage (WC):
@@ -74,17 +75,20 @@
 /* ===== Size variants ===== */
 
 /* A size is a token with a default value, so an application can state the widths it
-   uses — the reference uses two and no others — without a stylesheet of its own. */
-.pdx-dialog-sm { max-width: var(--pdx-dialog-width-sm); }
-.pdx-dialog-md { max-width: var(--pdx-dialog-width-md); }
-.pdx-dialog-lg { max-width: var(--pdx-dialog-width-lg); }
-.pdx-dialog-xl { max-width: var(--pdx-dialog-width-xl); }
-.pdx-dialog-full {
-    max-width: 95vw;
-    width: 95vw;
-    height: 90vh;
-    border-radius: var(--pdx-radius-md);
-}
+   uses — the reference uses two and no others — without a stylesheet of its own.
+   Keyed on pdx-dialog's `size` (#633) and drawn on its panel, the root part; elsewhere — pdx-alert-
+   dialog, the overlay outlet, native markup — `.pdx-dialog-sm`. The backdrop step is in `:where()`,
+   so a rule weighs the one class it did. */
+:where(pdx-dialog[size="sm"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-sm { max-width: var(--pdx-dialog-width-sm); }
+:where(pdx-dialog[size="md"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-md { max-width: var(--pdx-dialog-width-md); }
+:where(pdx-dialog[size="lg"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-lg { max-width: var(--pdx-dialog-width-lg); }
+:where(pdx-dialog[size="xl"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-xl { max-width: var(--pdx-dialog-width-xl); }
+:where(pdx-dialog[size="full"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-full {
+        max-width: 95vw;
+        width: 95vw;
+        height: 90vh;
+        border-radius: var(--pdx-radius-md);
+    }
 
 /* ===== Sections ===== */
 
@@ -184,10 +188,10 @@ dialog.pdx-dialog[size="full"] { max-width: none; width: calc(100% - var(--pdx-s
         width: calc(100% - 2rem);
         max-height: 90vh;
     }
-    .pdx-dialog-full {
-        width: 100%;
-        height: 100%;
-        max-width: 100%;
-        border-radius: 0;
-    }
+    :where(pdx-dialog[size="full"]) > :where(.pdx-dialog-backdrop) > [data-part="root"], .pdx-dialog-full {
+            width: 100%;
+            height: 100%;
+            max-width: 100%;
+            border-radius: 0;
+        }
 }

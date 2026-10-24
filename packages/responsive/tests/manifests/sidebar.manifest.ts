@@ -12,7 +12,7 @@
  *        - .pdx-sidebar-open       ← open
  *        - .pdx-sidebar-collapsed  ← !open
  *        - .pdx-sidebar-mini       ← mini && !open
- *        - .pdx-sidebar-right      ← position === 'right'
+ *      `position` is the host's own attribute (#633), reflected with its default.
  *      and sets inline on host.style: width/minWidth =
  *        open ? width : (mini ? collapsedWidth : 0)  [px]
  *      Props: open=true, mini=false, position='left', width=260, collapsedWidth=60.
@@ -26,7 +26,7 @@
  *      .pdx-sidebar { display:flex; flex-direction:column; height:100%;
  *                     background:surface; border-right:1px solid border; overflow:hidden;
  *                     transition: width/min-width 0.2s }
- *      .pdx-sidebar-right { border-right:none; border-left:1px solid border }
+ *      pdx-sidebar[position="right"].pdx-sidebar { border-right:none; border-left:1px solid border }
  *      .pdx-sidebar-collapsed:not(.pdx-sidebar-mini) { width:0 !important; min-width:0 !important }
  *
  * MEASUREMENT CHOICES (they matter):

@@ -6,9 +6,9 @@ Collapsible side navigation.
 |---|---|---|---|---|
 | `open` | `open` | boolean | `true` | Sidebar open/expanded state |
 | `mini` | `mini` | boolean | `false` | Mini mode: show only icons when collapsed |
-| `position` | `position` | string | `'left'` | Position: left (default) or right |
 | `width` | `width` | number | `260` | Width when expanded (px) |
 | `collapsedWidth` | `collapsedwidth` | number | `60` | Width when collapsed/mini (px) |
+| `position` | `position` | 'left' \| 'right' | `'left'` | The edge it sits on: left (the default) or right. |
 
 **Renders:** roles `complementary`
 

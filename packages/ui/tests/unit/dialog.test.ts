@@ -78,12 +78,12 @@ describe('pdx-dialog', () => {
         expect(backdrop?.hasAttribute('data-open')).toBe(true);
     });
 
-    it('applies size class from prop', async () => {
+    it('draws its size from the host (#633), on the panel, its root part', async () => {
         const el = await mount('pdx-dialog', { size: 'lg' });
         (el as any).open = true;
         await tick(50);
-        const panel = el.querySelector('.pdx-dialog-panel');
-        expect(panel?.className).toContain('pdx-dialog-lg');
+        expect(el.getAttribute('size')).toBe('lg');
+        expect(el.querySelector('.pdx-dialog-panel')?.getAttribute('data-part')).toBe('root');
     });
 
     it('has role="dialog" and aria-modal="true"', async () => {
