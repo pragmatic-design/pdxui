@@ -8,7 +8,8 @@ import { test, expect } from '@playwright/test';
 
 test('open with Enter: focus in the colour area, arrows move it, Escape returns to the swatch', async ({ page }) => {
     await page.goto('/components/pdx-color-picker', { waitUntil: 'networkidle' });
-    const picker = page.locator('pdx-color-picker[value="#3b82f6"]:not([size])').first();
+    // The picker at the default size: every picker reflects its size on the host since #628, md included.
+    const picker = page.locator('pdx-color-picker[value="#3b82f6"][size="md"]').first();
     const swatch = picker.locator('.pdx-color-swatch');
     await expect(swatch).toHaveAttribute('aria-haspopup', 'dialog');
     await swatch.focus();

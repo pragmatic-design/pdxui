@@ -13,8 +13,8 @@ Drill through nested options.
 | `disabled` | `disabled` | boolean | `false` | Disabled |
 | `changeOnSelect` | `changeonselect` | boolean | `false` | Allow selecting non-leaf nodes |
 | `loadChildren` | — | function | `null` | Lazy load function: (node) => Promise<CascaderNode[]> |
-| `size` | `size` | string | `''` | Component size |
 | `name` | `name` | string | `''` | Form field name |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**

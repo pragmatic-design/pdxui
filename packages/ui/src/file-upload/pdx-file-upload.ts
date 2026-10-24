@@ -77,6 +77,12 @@ component('pdx-file-upload', {
     // `value-change`; a value set from outside replaces the list. A form submits every file it holds —
     // a dropped one too, which the inner input never had — and a reset empties it (#135).
     models: { value: model<File[]>(() => [], { type: Array, form: true }) },
+    // The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
+    // draws the same size on native markup. `md` is the base look, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the dropzone's size. */
+        size: { md: '.pdx-file-upload-md', sm: '.pdx-file-upload-sm', lg: '.pdx-file-upload-lg' },
+    },
     props: {
         accept: { type: String, default: '' },
         multiple: { type: Boolean, default: false },
@@ -88,7 +94,6 @@ component('pdx-file-upload', {
         name: { type: String, default: '' },
         auto: { type: Boolean, default: false },
         action: { type: String, default: '' },
-        size: { type: String, default: '' },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
     slots: {
@@ -123,10 +128,6 @@ component('pdx-file-upload', {
             return cls;
         });
 
-        const rootClass = computed(() => {
-            const s = ctx.size() as string;
-            return s ? 'pdx-file-upload pdx-file-upload-' + s : 'pdx-file-upload';
-        });
 
         /** A file as the list holds it, its thumbnail read in the background for an image. */
         function makeEntry(file: File): FileEntry {
@@ -348,7 +349,7 @@ component('pdx-file-upload', {
         const rejectionText = (r: Rejection): string => format(uiString('file-upload', 'rejected'), { name: r.name, reason: r.reason });
 
         return {
-            entries, dragging, hint, dropzoneClass, rootClass, rejections, removeName, rejectionText,
+            entries, dragging, hint, dropzoneClass, rejections, removeName, rejectionText,
             onDropzoneClick, onDropzoneKeydown,
             onDragOver, onDragLeave, onDrop,
             onInputChange, onFileKeydown, removeFile,
@@ -356,7 +357,7 @@ component('pdx-file-upload', {
         };
     },
     render: (ctx) => html`
-        <div :class="${ctx.rootClass}">
+        <div class="pdx-file-upload" data-part="root">
             <div :class="${ctx.dropzoneClass}"
                 role="button" tabindex="0"
                 :aria-label="${() => (ctx.label() as string) || uiString('file-upload', 'drop')}"

@@ -122,6 +122,26 @@
         {
           "id": "autocomplete-open",
           "title": "Autocomplete — Open (suggestions listbox visible below the input)"
+        },
+        {
+          "id": "autocomplete-size-md",
+          "title": "pdx-autocomplete — size=\"md\""
+        },
+        {
+          "id": "autocomplete-size-xs",
+          "title": "pdx-autocomplete — size=\"xs\""
+        },
+        {
+          "id": "autocomplete-size-sm",
+          "title": "pdx-autocomplete — size=\"sm\""
+        },
+        {
+          "id": "autocomplete-size-lg",
+          "title": "pdx-autocomplete — size=\"lg\""
+        },
+        {
+          "id": "autocomplete-size-xl",
+          "title": "pdx-autocomplete — size=\"xl\""
         }
       ]
     },
@@ -492,6 +512,26 @@
         {
           "id": "cascader-disabled",
           "title": "Cascader — Disabled"
+        },
+        {
+          "id": "cascader-size-md",
+          "title": "pdx-cascader — size=\"md\""
+        },
+        {
+          "id": "cascader-size-xs",
+          "title": "pdx-cascader — size=\"xs\""
+        },
+        {
+          "id": "cascader-size-sm",
+          "title": "pdx-cascader — size=\"sm\""
+        },
+        {
+          "id": "cascader-size-lg",
+          "title": "pdx-cascader — size=\"lg\""
+        },
+        {
+          "id": "cascader-size-xl",
+          "title": "pdx-cascader — size=\"xl\""
         }
       ]
     },
@@ -624,6 +664,18 @@
         {
           "id": "cp-disabled",
           "title": "Color Picker — Disabled swatch"
+        },
+        {
+          "id": "color-picker-size-md",
+          "title": "pdx-color-picker — size=\"md\""
+        },
+        {
+          "id": "color-picker-size-sm",
+          "title": "pdx-color-picker — size=\"sm\""
+        },
+        {
+          "id": "color-picker-size-lg",
+          "title": "pdx-color-picker — size=\"lg\""
         }
       ]
     },
@@ -744,6 +796,26 @@
         {
           "id": "date-picker-disabled",
           "title": "Date Picker — Disabled"
+        },
+        {
+          "id": "date-picker-size-md",
+          "title": "pdx-date-picker — size=\"md\""
+        },
+        {
+          "id": "date-picker-size-xs",
+          "title": "pdx-date-picker — size=\"xs\""
+        },
+        {
+          "id": "date-picker-size-sm",
+          "title": "pdx-date-picker — size=\"sm\""
+        },
+        {
+          "id": "date-picker-size-lg",
+          "title": "pdx-date-picker — size=\"lg\""
+        },
+        {
+          "id": "date-picker-size-xl",
+          "title": "pdx-date-picker — size=\"xl\""
         }
       ]
     },
@@ -973,6 +1045,18 @@
         {
           "id": "file-upload-disabled",
           "title": "File Upload — Disabled dropzone"
+        },
+        {
+          "id": "file-upload-size-md",
+          "title": "pdx-file-upload — size=\"md\""
+        },
+        {
+          "id": "file-upload-size-sm",
+          "title": "pdx-file-upload — size=\"sm\""
+        },
+        {
+          "id": "file-upload-size-lg",
+          "title": "pdx-file-upload — size=\"lg\""
         }
       ]
     },
@@ -2006,6 +2090,26 @@
         {
           "id": "select-disabled",
           "title": "Select — Disabled"
+        },
+        {
+          "id": "select-size-md",
+          "title": "pdx-select — size=\"md\""
+        },
+        {
+          "id": "select-size-xs",
+          "title": "pdx-select — size=\"xs\""
+        },
+        {
+          "id": "select-size-sm",
+          "title": "pdx-select — size=\"sm\""
+        },
+        {
+          "id": "select-size-lg",
+          "title": "pdx-select — size=\"lg\""
+        },
+        {
+          "id": "select-size-xl",
+          "title": "pdx-select — size=\"xl\""
         }
       ]
     },
@@ -2340,6 +2444,18 @@
         {
           "id": "time-picker-default",
           "title": "Time Picker — 24h, value 14:30 (segmented spinbutton input)"
+        },
+        {
+          "id": "time-picker-size-md",
+          "title": "pdx-time-picker — size=\"md\""
+        },
+        {
+          "id": "time-picker-size-sm",
+          "title": "pdx-time-picker — size=\"sm\""
+        },
+        {
+          "id": "time-picker-size-lg",
+          "title": "pdx-time-picker — size=\"lg\""
         }
       ]
     },
@@ -2528,6 +2644,26 @@
         {
           "id": "tree-select-disabled",
           "title": "Tree Select — Disabled"
+        },
+        {
+          "id": "tree-select-size-md",
+          "title": "pdx-tree-select — size=\"md\""
+        },
+        {
+          "id": "tree-select-size-xs",
+          "title": "pdx-tree-select — size=\"xs\""
+        },
+        {
+          "id": "tree-select-size-sm",
+          "title": "pdx-tree-select — size=\"sm\""
+        },
+        {
+          "id": "tree-select-size-lg",
+          "title": "pdx-tree-select — size=\"lg\""
+        },
+        {
+          "id": "tree-select-size-xl",
+          "title": "pdx-tree-select — size=\"xl\""
         }
       ]
     },

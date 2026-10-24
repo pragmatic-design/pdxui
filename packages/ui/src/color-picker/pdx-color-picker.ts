@@ -106,13 +106,18 @@ component('pdx-color-picker', {
     // field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
     // a preset is picked or the colour is cleared.
     models: { value: model<string>('#000000', { form: true }) },
+    // The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
+    // draws the same size on native markup. `md` is the base look, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the swatch's size. */
+        size: { md: '.pdx-color-swatch-md', sm: '.pdx-color-swatch-sm', lg: '.pdx-color-swatch-lg' },
+    },
     props: {
         format:   { type: String, default: 'hex' },
         showAlpha: { type: Boolean, default: false },
         presets:   { type: Array, default: () => [] },
         disabled:  { type: Boolean, default: false },
         readonly:  { type: Boolean, default: false },
-        size:      { type: String, default: '' },
         inline:    { type: Boolean, default: false },
         label:     { type: String, default: '' },
         name:      { type: String, default: '' },
@@ -368,7 +373,7 @@ component('pdx-color-picker', {
     },
     render: (ctx) => html`
         ${() => !ctx.inline() ? html`
-            <button class="pdx-color-swatch ${() => ctx.size() ? 'pdx-color-swatch-' + ctx.size() : ''}${() => ctx.disabled() ? ' disabled' : ''}"
+            <button class="pdx-color-swatch${() => ctx.disabled() ? ' disabled' : ''}" data-part="root"
                 type="button" aria-haspopup="dialog"
                 :aria-label="${() => ctx.label() || uiString('color-picker', 'pick')}"
                 :aria-expanded="${() => String(ctx._open())}"

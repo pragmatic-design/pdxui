@@ -49,6 +49,12 @@ component('pdx-tree-select', {
     // A form submits it, one entry per value when multiple, an empty entry with none as a native
     // select; and resets it (#135).
     models: { value: model<string | string[] | null>(null, { type: Object, form: true }) },
+    // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
@@ -69,7 +75,6 @@ component('pdx-tree-select', {
         /** Lazy load: (node) => Promise<TreeSelectNode[]> */
         loadChildren: { type: Function, default: null },
         /** Size */
-        size: { type: String, default: '' },
         /** Form field name */
         name: { type: String, default: '' },
     },
@@ -450,12 +455,12 @@ component('pdx-tree-select', {
         ctx.frame(() => {
             const el = ctx.el;
             const disabled = ctx.disabled() as boolean;
-            const size = ctx.size() as string;
             const clearable = ctx.clearable() as boolean;
             const ph = (ctx.placeholder() as string) || getComponentString('tree-select', 'placeholder')();
 
             _triggerEl = document.createElement('div');
-            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (size ? ` pdx-input-${size}` : '') + (disabled ? ' disabled' : '');
+            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (disabled ? ' disabled' : '');
+            _triggerEl.setAttribute('data-part', 'root');
             _triggerEl.setAttribute('role', 'combobox');
             _triggerEl.setAttribute('aria-expanded', 'false');
             _triggerEl.setAttribute('aria-haspopup', 'tree');

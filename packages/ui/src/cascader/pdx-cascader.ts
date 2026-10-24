@@ -51,6 +51,12 @@ component('pdx-cascader', {
     // and clear() write it, and the write dispatches `value-change`.
     // A form submits the path, one entry per level, and resets it (#135).
     models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         /** Tree of options */
         options: { type: Array, default: [] },
@@ -70,8 +76,6 @@ component('pdx-cascader', {
         changeOnSelect: { type: Boolean, default: false },
         /** Lazy load function: (node) => Promise<CascaderNode[]> */
         loadChildren: { type: Function, default: null },
-        /** Component size */
-        size: { type: String, default: '' },
         /** Form field name */
         name: { type: String, default: '' },
     },
@@ -376,12 +380,12 @@ component('pdx-cascader', {
         ctx.frame(() => {
             const el = ctx.el;
             const disabled = ctx.disabled() as boolean;
-            const size = ctx.size() as string;
             const clearable = ctx.clearable() as boolean;
             const ph = (ctx.placeholder() as string) || getComponentString('cascader', 'placeholder')();
 
             _triggerEl = document.createElement('div');
-            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (size ? ` pdx-input-${size}` : '') + (disabled ? ' disabled' : '');
+            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (disabled ? ' disabled' : '');
+            _triggerEl.setAttribute('data-part', 'root');
             _triggerEl.setAttribute('role', 'combobox');
             _triggerEl.setAttribute('aria-expanded', 'false');
             _triggerEl.setAttribute('aria-haspopup', 'listbox');

@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/time-picker.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-time-picker — Segmented time input with up/down arrow buttons */
 
 .pdx-time-picker {
@@ -103,35 +104,35 @@
     font-size: var(--pdx-text-base);
 }
 
-/* Size variants */
-.pdx-time-picker-sm {
-    font-size: var(--pdx-text-xs);
-    padding: 2px var(--pdx-space-xs);
-}
+/* Size variants, keyed on the host's `size` (#628); on native markup `.pdx-time-picker-{size}`. */
+:where(pdx-time-picker[size="sm"]) > [data-part="root"], .pdx-time-picker-sm {
+        font-size: var(--pdx-text-xs);
+        padding: 2px var(--pdx-space-xs);
+    }
 
-.pdx-time-picker-sm .pdx-time-value {
-    min-width: 24px;
-    height: 22px;
-}
+    :where(pdx-time-picker[size="sm"]) > [data-part="root"] .pdx-time-value, .pdx-time-picker-sm .pdx-time-value {
+        min-width: 24px;
+        height: 22px;
+    }
 
-.pdx-time-picker-sm .pdx-time-arrow {
-    width: 24px;
-    height: 12px;
-    font-size: 7px;
-}
+    :where(pdx-time-picker[size="sm"]) > [data-part="root"] .pdx-time-arrow, .pdx-time-picker-sm .pdx-time-arrow {
+        width: 24px;
+        height: 12px;
+        font-size: 7px;
+    }
 
-.pdx-time-picker-lg {
-    font-size: var(--pdx-text-base);
-    padding: var(--pdx-space-xs) var(--pdx-space-md);
-}
+:where(pdx-time-picker[size="lg"]) > [data-part="root"], .pdx-time-picker-lg {
+        font-size: var(--pdx-text-base);
+        padding: var(--pdx-space-xs) var(--pdx-space-md);
+    }
 
-.pdx-time-picker-lg .pdx-time-value {
-    min-width: 36px;
-    height: 34px;
-}
+    :where(pdx-time-picker[size="lg"]) > [data-part="root"] .pdx-time-value, .pdx-time-picker-lg .pdx-time-value {
+        min-width: 36px;
+        height: 34px;
+    }
 
-.pdx-time-picker-lg .pdx-time-arrow {
-    width: 36px;
-    height: 20px;
-    font-size: 10px;
-}
+    :where(pdx-time-picker[size="lg"]) > [data-part="root"] .pdx-time-arrow, .pdx-time-picker-lg .pdx-time-arrow {
+        width: 36px;
+        height: 20px;
+        font-size: 10px;
+    }

@@ -79,6 +79,12 @@ component('pdx-date-picker', {
     // mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
     // dispatches `value-change`. A form submits it, a range as two entries, and resets it (#135).
     models: { value: model<string | string[]>('', { form: true }) },
+    // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         /** Range start (ISO). */
         rangeStart: { type: String, default: '' },
@@ -131,7 +137,6 @@ component('pdx-date-picker', {
         /** Name for form participation. */
         name: { type: String, default: '' },
         /** Size variant (sm/md/lg). */
-        size: { type: String, default: '' },
         /** Inline calendar (no popover, always visible). */
         inline: { type: Boolean, default: false },
         /** Fixed weeks in calendar. */
@@ -631,7 +636,6 @@ component('pdx-date-picker', {
             _built = true;
             const disabled = ctx.disabled() as boolean;
             const readonly_ = ctx.readonly() as boolean;
-            const size = ctx.size() as string;
             const isInline = ctx.inline() as boolean;
             const timeOnly = isTimeOnly();
             const showTimePicker = hasTime();
@@ -660,7 +664,8 @@ component('pdx-date-picker', {
 
                 // Trigger input
                 _triggerEl = document.createElement('div');
-                _triggerEl.className = 'pdx-date-picker-trigger pdx-input-wrap' + (size ? ` pdx-input-${size}` : '') + (disabled ? ' disabled' : '') + (readonly_ ? ' readonly' : '');
+                _triggerEl.className = 'pdx-date-picker-trigger pdx-input-wrap' + (disabled ? ' disabled' : '') + (readonly_ ? ' readonly' : '');
+                _triggerEl.setAttribute('data-part', 'root');
                 // Editable: the text is an input, and the input is the combobox.
                 const editable = (ctx.editable() as boolean) && (modeStr() === 'date' || modeStr() === 'datetime');
                 if (editable) {

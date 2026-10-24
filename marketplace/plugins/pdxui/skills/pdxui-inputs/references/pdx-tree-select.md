@@ -29,8 +29,8 @@ toggles only the node clicked).
 | `disabled` | `disabled` | boolean | `false` | Disabled |
 | `expandAll` | `expandall` | boolean | `false` | Expand all nodes initially |
 | `loadChildren` | — | function | `null` | Lazy load: (node) => Promise<TreeSelectNode[]> |
-| `size` | `size` | string | `''` | Size |
 | `name` | `name` | string | `''` | Form field name |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | — | string \| string[] \| null | `null` | The current value. |
 
 **API (via `:ref`)**

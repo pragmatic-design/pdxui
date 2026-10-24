@@ -251,11 +251,13 @@ describe('pdx-time-picker', () => {
         expect(period?.textContent).toBe('PM');
     });
 
-    it('applies size class', async () => {
+    it('reflects its size on the host, which the @variant rules key on (#628)', async () => {
         const el = await mount('pdx-time-picker', { size: 'sm' });
         await tick(100);
-        const wrap = el.querySelector('.pdx-time-picker');
-        expect(wrap?.classList.contains('pdx-time-picker-sm')).toBe(true);
+        expect(el.getAttribute('size')).toBe('sm');
+        const wrap = el.querySelector(':scope > [data-part="root"].pdx-time-picker');
+        expect(wrap, 'the root part the size rules key on').not.toBeNull();
+        expect(wrap?.classList.contains('pdx-time-picker-sm'), 'the size is the host\'s now').toBe(false);
     });
 });
 
@@ -324,11 +326,13 @@ describe('pdx-date-picker', () => {
         expect(trigger?.classList.contains('disabled')).toBe(true);
     });
 
-    it('applies size class', async () => {
+    it('reflects its size on the host, which the @variant rules key on (#628)', async () => {
         const el = await mount('pdx-date-picker', { size: 'lg' });
         await tick(100);
-        const trigger = el.querySelector('.pdx-date-picker-trigger');
-        expect(trigger?.classList.contains('pdx-input-lg')).toBe(true);
+        expect(el.getAttribute('size')).toBe('lg');
+        const trigger = el.querySelector(':scope > [data-part="root"].pdx-date-picker-trigger');
+        expect(trigger, 'the root part the size rules key on').not.toBeNull();
+        expect(trigger?.classList.contains('pdx-input-lg'), 'the size is the host\'s now').toBe(false);
     });
 
     it('submits through the host, with no hidden input (#135)', async () => {

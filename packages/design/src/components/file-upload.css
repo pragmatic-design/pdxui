@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/file-upload.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* ── pdx-file-upload ── */
 
 /* Host */
@@ -55,10 +56,10 @@ pdx-file-upload { display: block; }
     color: var(--pdx-color-muted);
 }
 
-/* Size variants */
-.pdx-file-upload-sm .pdx-file-dropzone { min-height: 80px; padding: var(--pdx-space-sm); }
-.pdx-file-upload-sm .pdx-file-dropzone-icon { font-size: 1.5rem; }
-.pdx-file-upload-lg .pdx-file-dropzone { min-height: 180px; padding: var(--pdx-space-xl); }
+/* Size variants, keyed on the host's `size` (#628); on native markup `.pdx-file-upload-{size}`. */
+:where(pdx-file-upload[size="sm"]) > [data-part="root"] .pdx-file-dropzone, .pdx-file-upload-sm .pdx-file-dropzone { min-height: 80px; padding: var(--pdx-space-sm); }
+    :where(pdx-file-upload[size="sm"]) > [data-part="root"] .pdx-file-dropzone-icon, .pdx-file-upload-sm .pdx-file-dropzone-icon { font-size: 1.5rem; }
+:where(pdx-file-upload[size="lg"]) > [data-part="root"] .pdx-file-dropzone, .pdx-file-upload-lg .pdx-file-dropzone { min-height: 180px; padding: var(--pdx-space-xl); }
 
 /* File list */
 .pdx-file-list {

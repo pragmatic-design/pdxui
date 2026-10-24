@@ -485,12 +485,14 @@ describe('pdx-select', () => {
 
     // ─── CSS Classes ───────────────────────────���────
 
-    it('applies size class', async () => {
+    it('reflects its size on the host, which the @variant rules key on (#628)', async () => {
         const el = await mount('pdx-select', { size: 'lg' });
         await tick(50);
 
-        const trigger = el.querySelector('.pdx-select-trigger');
-        expect(trigger?.classList.contains('pdx-input-lg')).toBe(true);
+        expect(el.getAttribute('size')).toBe('lg');
+        const trigger = el.querySelector(':scope > [data-part="root"].pdx-select-trigger');
+        expect(trigger, 'the root part the size rules key on').not.toBeNull();
+        expect(trigger?.classList.contains('pdx-input-lg'), 'the size is the host\'s now').toBe(false);
     });
 
     it('applies error state class', async () => {
