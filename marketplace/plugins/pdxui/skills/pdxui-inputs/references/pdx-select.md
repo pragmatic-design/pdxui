@@ -51,7 +51,6 @@ paged table → `pdx-relation-picker`.
 | `searchable` | `searchable` | boolean | `false` | Adds a search box to filter options. |
 | `multiple` | `multiple` | boolean | `false` | Allow selecting more than one. |
 | `maxTagCount` | `maxtagcount` | number | `-1` | Multi mode: collapse selected tags in the trigger to keep it compact. -1 = unlimited (default, show all chips); 0 = summary only ("N selected"); N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. |
-| `size` | `size` | '' \| 'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl' | `''` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `groupField` | `groupfield` | string | `''` | Object field used to group options. |
@@ -63,6 +62,7 @@ paged table → `pdx-relation-picker`.
 | `createLabel` | `createlabel` | string | `''` | Label template for the create option. Use {query} as placeholder. Empty: the select.create component string, «Create "{query}"» in English. |
 | `remote` | `remote` | boolean | `false` | Enable debounced server-side filtering for remote DataSource. |
 | `debounce` | `debounce` | number | `200` | Debounce delay in ms for remote search. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | unknown | `null` | The current value. |
 
 **API (via `:ref`)**

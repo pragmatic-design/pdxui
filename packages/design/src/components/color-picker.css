@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/color-picker.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Color Picker — swatch trigger, spectrum area, hue/alpha sliders, hex input, presets.
 
    Usage:
@@ -66,9 +67,9 @@ pdx-color-picker {
     outline-offset: var(--pdx-focus-offset);
 }
 
-/* Sizes */
-.pdx-color-swatch-sm { width: 24px; height: 24px; }
-.pdx-color-swatch-lg { width: 40px; height: 40px; }
+/* Sizes, keyed on the host's `size` (#628); on native markup `.pdx-color-swatch-{size}`. */
+:where(pdx-color-picker[size="sm"]) > [data-part="root"], .pdx-color-swatch-sm { width: 24px; height: 24px; }
+:where(pdx-color-picker[size="lg"]) > [data-part="root"], .pdx-color-swatch-lg { width: 40px; height: 40px; }
 
 /* Disabled */
 .pdx-color-swatch[disabled],

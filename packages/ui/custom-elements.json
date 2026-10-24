@@ -1142,16 +1142,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -1292,6 +1282,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -1333,6 +1333,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -1409,15 +1429,6 @@
               "name": "label",
               "fieldName": "label",
               "description": "Visible label text.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
               "type": {
                 "text": "string"
               },
@@ -1548,6 +1559,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -4719,16 +4739,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Component size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "name",
               "description": "Form field name",
               "type": {
@@ -4736,6 +4746,16 @@
               },
               "default": "''",
               "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -4780,6 +4800,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -4898,15 +4938,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Component size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "name",
               "fieldName": "name",
               "description": "Form field name",
@@ -4914,6 +4945,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "shapes": [
@@ -6566,16 +6606,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "inline",
               "description": "Renders the picker inline instead of in a popover.",
               "type": {
@@ -6613,6 +6643,16 @@
               },
               "default": "false",
               "attribute": "clearable"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the swatch's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -6663,6 +6703,22 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-color-swatch-md",
+                "sm": ".pdx-color-swatch-sm",
+                "lg": ".pdx-color-swatch-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-input",
@@ -6728,15 +6784,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "inline",
               "fieldName": "inline",
               "description": "Renders the picker inline instead of in a popover.",
@@ -6771,6 +6818,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the swatch's size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -8542,16 +8598,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size variant (sm/md/lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "inline",
               "description": "Inline calendar (no popover, always visible).",
               "type": {
@@ -8599,6 +8645,16 @@
               },
               "default": "false",
               "attribute": "editable"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -8655,6 +8711,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -8910,15 +8986,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size variant (sm/md/lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "inline",
               "fieldName": "inline",
               "description": "Inline calendar (no popover, always visible).",
@@ -8962,6 +9029,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -11823,11 +11899,11 @@
             {
               "kind": "field",
               "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
+              "description": "sm, md (the default) or lg: the dropzone's size.",
               "type": {
-                "text": "string"
+                "text": "'md' | 'sm' | 'lg'"
               },
-              "default": "''",
+              "default": "'md'",
               "attribute": "size"
             },
             {
@@ -11880,6 +11956,22 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-file-upload-md",
+                "sm": ".pdx-file-upload-sm",
+                "lg": ".pdx-file-upload-lg"
+              }
+            }
           ],
           "events": [
             {
@@ -12031,11 +12123,11 @@
             {
               "name": "size",
               "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
+              "description": "sm, md (the default) or lg: the dropzone's size.",
               "type": {
-                "text": "string"
+                "text": "'md' | 'sm' | 'lg'"
               },
-              "default": "''"
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -21600,16 +21692,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
-              "type": {
-                "text": "'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "name",
               "description": "Form field name, submitted with the form.",
               "type": {
@@ -21718,6 +21800,16 @@
             },
             {
               "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -21753,6 +21845,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -21927,15 +22039,6 @@
               "default": "-1"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
-              "type": {
-                "text": "'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'"
-              },
-              "default": "''"
-            },
-            {
               "name": "name",
               "fieldName": "name",
               "description": "Form field name, submitted with the form.",
@@ -22015,6 +22118,15 @@
                 "text": "number"
               },
               "default": "200"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -25081,16 +25193,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "locale",
               "description": "Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's.",
               "type": {
@@ -25108,6 +25210,16 @@
               },
               "default": "''",
               "attribute": "arialabel"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the fields' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -25140,6 +25252,22 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-time-picker-md",
+                "sm": ".pdx-time-picker-sm",
+                "lg": ".pdx-time-picker-lg"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change",
@@ -25234,15 +25362,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "locale",
               "fieldName": "locale",
               "description": "Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's.",
@@ -25259,6 +25378,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the fields' size.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             },
             {
               "name": "value",
@@ -26733,16 +26861,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "name",
               "description": "Form field name",
               "type": {
@@ -26750,6 +26868,16 @@
               },
               "default": "''",
               "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -26794,6 +26922,26 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-input-md",
+                "xs": ".pdx-input-xs",
+                "sm": ".pdx-input-sm",
+                "lg": ".pdx-input-lg",
+                "xl": ".pdx-input-xl"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -26911,15 +27059,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "name",
               "fieldName": "name",
               "description": "Form field name",
@@ -26927,6 +27066,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs, sm, md (the default), lg or xl — the same scale as pdx-input.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ],
           "shapes": [

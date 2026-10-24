@@ -362,6 +362,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** the pickers declare `size` as a variant axis (#628), as the text fields do (below). It
+  is reflected on the host, `md` included, and drawn by `@variant` rules that also compile to the
+  native classes, so native markup is styled as before. CSS that reached a picker through the class
+  it put on its own elements must target the host's `size` instead:
+  - `pdx-select`, `pdx-autocomplete`, `pdx-cascader`, `pdx-tree-select` and `pdx-date-picker` no
+    longer put `.pdx-input-{size}` on their trigger, which carries `data-part="root"` and shares the
+    text fields' size rules: `pdx-select[size="sm"] > [data-part="root"]`.
+  - `pdx-time-picker` no longer puts `.pdx-time-picker-{size}` on its fields' group, `pdx-color-picker`
+    `.pdx-color-swatch-{size}` on its swatch, and `pdx-file-upload` `.pdx-file-upload-{size}` on its
+    root: each is `data-part="root"`, and the sizes are sm, md and lg. pdx-time-picker now follows a
+    size set after it is drawn; it read it once.
+  - `pdx-transfer` keeps `size` as a plain prop: its `.pdx-transfer-{size}` class was drawn by no rule.
 - **Breaking:** the text fields declare `size` as a variant axis (#627). It is reflected on the host,
   `md` included (`<pdx-input size="md">`), and drawn by `@variant` rules in `@pdxui/design` keyed on it,
   which also compile to the native classes, so `<input class="pdx-input pdx-input-sm">` is styled as

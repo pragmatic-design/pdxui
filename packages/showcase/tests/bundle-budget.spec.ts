@@ -299,7 +299,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // same `host` bindings a descriptor writes by hand. Every component carries it before any of them
 // declares `variants`. Same machine, same day, the built dist: main blocking 100.0 → this branch
 // 100.1 KB; entry 43.0 and js 467.9 KB stay within theirs.
-const BUDGET_KB = { entry: 43, js: 470, css: 63, blocking: 101 };
+// css 63 → 64, blocking 101 → 102 (owner's OK): the text fields (#627) and the pickers (#628) are
+// drawn by `@variant` rules keyed on the host's `size`, and each rule is a host selector as well as
+// the native class it replaced — `:where(:is(pdx-input, …, pdx-date-picker)[size="sm"]) > [data-part="root"],
+// .pdx-input-sm`. The pre-push build: main (after #627) css 63.0 → this branch 63.3 KB, blocking
+// 100.9 → 101.0 KB. The remaining variant batches (#629–#632) add more of the same.
+const BUDGET_KB = { entry: 43, js: 470, css: 64, blocking: 102 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

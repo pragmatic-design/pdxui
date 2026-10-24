@@ -68,6 +68,12 @@ component('pdx-autocomplete', {
         /** Fired when the clear button empties the field, after its `value-change`. */
         'pdx-clear': event<void>(),
     },
+    // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         suggestions: { type: Array, default: () => [] },
         source: { type: Object, default: null },
@@ -75,7 +81,6 @@ component('pdx-autocomplete', {
         valueField: { type: String, default: 'value' },
         placeholder: { type: String, default: '' },
         label: { type: String, default: '' },
-        size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         readonly: { type: Boolean, default: false },
         minLength: { type: Number, default: 1 },
@@ -377,8 +382,6 @@ component('pdx-autocomplete', {
 
         const wrapClass = computed(() => {
             let cls = 'pdx-autocomplete pdx-input-wrap';
-            const sz = ctx.size();
-            if (sz) cls += ' pdx-input-' + sz;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.readonly()) cls += ' readonly';
             if (ctx.error()) cls += ' pdx-input-error';
@@ -479,7 +482,7 @@ component('pdx-autocomplete', {
         };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}">
+        <div :class="${ctx.wrapClass}" data-part="root">
             <input class="pdx-input pdx-autocomplete-input"
                 type="text"
                 role="combobox"

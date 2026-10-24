@@ -13,7 +13,7 @@ Drag-and-drop or browse to upload.
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `auto` | `auto` | boolean | `false` | Upload immediately on selection. |
 | `action` | `action` | string | `''` | URL to upload files to. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the dropzone's size. |
 | `value` | — | File[] | `() => []` | The current value. |
 
 **API (via `:ref`)**

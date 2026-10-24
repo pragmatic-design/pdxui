@@ -48,12 +48,12 @@ leaves both the field and its panel).
 | `readonly` | `readonly` | boolean | `false` | Readonly state. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text. |
 | `name` | `name` | string | `''` | Name for form participation. |
-| `size` | `size` | string | `''` | Size variant (sm/md/lg). |
 | `inline` | `inline` | boolean | `false` | Inline calendar (no popover, always visible). |
 | `fixedWeeks` | `fixedweeks` | boolean | `true` | Fixed weeks in calendar. |
 | `firstDay` | `firstday` | number | `-1` | First day of week (-1 = auto). |
 | `ariaLabel` | `arialabel` | string | `''` | Aria label. |
 | `editable` | `editable` | boolean | `false` | The date can be typed: the trigger's text is an input (still the combobox), read in the locale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the popup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep the plain trigger. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
 | `value` | `value` | string \| string[] | `''` | The current value. |
 
 **API (via `:ref`)**

@@ -23,9 +23,9 @@ move to the next segment.
 | `max` | `max` | string | `''` | Maximum allowed value. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `locale` | `locale` | string | `''` | Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the fields' size. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**

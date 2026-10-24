@@ -9,11 +9,11 @@ Choose a color visually.
 | `presets` | — | array | `() => []` | Preset swatch colours. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `inline` | `inline` | boolean | `false` | Renders the picker inline instead of in a popover. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `clearable` | `clearable` | boolean | `false` | Shows a clear button to reset the value. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the swatch's size. |
 | `value` | `value` | string | `'#000000'` | The current value. |
 
 **API (via `:ref`)**

@@ -62,6 +62,12 @@ component('pdx-select', {
     // A form submits the selection: the value, an empty entry with none as a native select with an
     // empty placeholder, one entry per value when multiple; and resets it (#135).
     models: { value: model<unknown>(null, { type: String, form: true }) },
+    // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
+    // the same size on a native field. `md` is the base look, which no class adds to.
+    variants: {
+        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+        size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
+    },
     props: {
         options: prop<unknown[]>(() => []),
         /** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
@@ -81,9 +87,6 @@ component('pdx-select', {
          *  -1 = unlimited (default, show all chips); 0 = summary only ("N selected");
          *  N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. */
         maxTagCount: prop(-1),
-        // Five sizes: the trigger is a `.pdx-input-wrap`, sized by inputs.css, and select.css sizes the caret.
-        /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
-        size: prop<'' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'>(''),
         name: prop(''),
         loading: prop(false),
         groupField: prop(''),
@@ -728,8 +731,6 @@ component('pdx-select', {
         // ── CSS classes ──
         function triggerClass(): string {
             let cls = 'pdx-select-trigger pdx-input-wrap';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-input-' + s;
             if (ctx.disabled()) cls += ' disabled';
             if (ctx.readonly()) cls += ' readonly';
             if (ctx.error()) cls += ' error';
@@ -794,7 +795,7 @@ component('pdx-select', {
         };
     },
     render: (ctx) => html`
-        <div :class="${ctx.triggerClass}"
+        <div :class="${ctx.triggerClass}" data-part="root"
             :role="${() => ctx.inputInTrigger() ? null : 'combobox'}"
             :aria-haspopup="${() => ctx.inputInTrigger() ? null : 'listbox'}"
             :aria-expanded="${() => ctx.inputInTrigger() ? null : String(ctx._open())}"

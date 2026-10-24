@@ -42,6 +42,12 @@ component('pdx-time-picker', {
     // typed digit and the AM/PM toggle writes it, and the write dispatches `value-change`.
     // A form submits it as it is, and resets it (#135).
     models: { value: model<string>('', { form: true }) },
+    // The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
+    // draws the same size on native markup. `md` is the base look, which no class adds to.
+    variants: {
+        /** sm, md (the default) or lg: the fields' size. */
+        size: { md: '.pdx-time-picker-md', sm: '.pdx-time-picker-sm', lg: '.pdx-time-picker-lg' },
+    },
     props: {
         format: { type: String, default: 'auto' },
         showSeconds: { type: Boolean, default: false },
@@ -50,7 +56,6 @@ component('pdx-time-picker', {
         max: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         name: { type: String, default: '' },
-        size: { type: String, default: '' },
         /** Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's. */
         locale: { type: String, default: '' },
         ariaLabel: { type: String, default: '' },
@@ -286,10 +291,10 @@ component('pdx-time-picker', {
             const disabled = ctx.disabled() as boolean;
             const showSec = ctx.showSeconds() as boolean;
             const use12h_ = is12h();
-            const size = ctx.size() as string;
 
             const wrap = document.createElement('div');
-            wrap.className = 'pdx-time-picker' + (size ? ` pdx-time-picker-${size}` : '') + (disabled ? ' disabled' : '');
+            wrap.className = 'pdx-time-picker' + (disabled ? ' disabled' : '');
+            wrap.setAttribute('data-part', 'root');
             wrap.setAttribute('role', 'group');
             wrap.setAttribute('aria-label', groupName());
             _groupEl = wrap;

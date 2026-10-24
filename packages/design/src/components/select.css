@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/select.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Select / Combobox / MultiSelect dropdown */
 
 /* Host element */
@@ -69,11 +70,12 @@ pdx-select {
     stroke-linecap: round;
     stroke-linejoin: round;
 }
-/* Size-responsive caret */
-.pdx-input-xs .pdx-select-caret { width: 0.875rem; height: 0.875rem; }
-.pdx-input-sm .pdx-select-caret { width: 1rem; height: 1rem; }
-.pdx-input-lg .pdx-select-caret { width: 1.5rem; height: 1.5rem; }
-.pdx-input-xl .pdx-select-caret { width: 1.75rem; height: 1.75rem; }
+/* Size-responsive caret, keyed on the host's `size` (#628); on native markup the trigger's
+   `.pdx-input-{size}`. */
+:where(pdx-select[size="xs"]) > [data-part="root"] .pdx-select-caret, .pdx-input-xs .pdx-select-caret { width: 0.875rem; height: 0.875rem; }
+:where(pdx-select[size="sm"]) > [data-part="root"] .pdx-select-caret, .pdx-input-sm .pdx-select-caret { width: 1rem; height: 1rem; }
+:where(pdx-select[size="lg"]) > [data-part="root"] .pdx-select-caret, .pdx-input-lg .pdx-select-caret { width: 1.5rem; height: 1.5rem; }
+:where(pdx-select[size="xl"]) > [data-part="root"] .pdx-select-caret, .pdx-input-xl .pdx-select-caret { width: 1.75rem; height: 1.75rem; }
 
 /* Open: the trigger is the combobox, or holds it — with a search field, the input is the combobox and
    carries aria-expanded. */
@@ -97,10 +99,10 @@ pdx-select {
     height: auto;
     min-height: 2.5rem;
 }
-.pdx-select-trigger.multiple.pdx-input-xs { min-height: 1.75rem; }
-.pdx-select-trigger.multiple.pdx-input-sm { min-height: 2.125rem; }
-.pdx-select-trigger.multiple.pdx-input-lg { min-height: 3rem; }
-.pdx-select-trigger.multiple.pdx-input-xl { min-height: 3.5rem; }
+:where(pdx-select[size="xs"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-xs { min-height: 1.75rem; }
+:where(pdx-select[size="sm"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-sm { min-height: 2.125rem; }
+:where(pdx-select[size="lg"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-lg { min-height: 3rem; }
+:where(pdx-select[size="xl"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-xl { min-height: 3.5rem; }
 
 /* Tag search input inline */
 .pdx-select-tag-search {
