@@ -8,8 +8,23 @@
 // 3.10-3.53, counter in production 1.55-1.66, the complex page 3.07-3.21 ms; the batch of 10,
 // 17.8-18.9 ms. The cases used to state «>500 compilations/sec» and assert 100, which a compiler
 // five times slower would pass.
+//
+// The budget is counted in units of a reference workload, not in milliseconds of whatever machine
+// runs it (#643). A wall-clock 5 ms failed the pre-push on a change with no compiler code in it
+// (todo measured 5.17 ms, then 4.25 alone and 2.3 an hour later, on the same code): the number
+// measured the machine. So every iteration runs the case and then the reference — TypeScript
+// transpiling a fixed module, the same kind of work and none of it ours — and the case is held to
+// its median over the reference's. Measured 2026-10-24 with every other core spinning: the times grew
+// 7-8× (todo 3.5 → 27 ms) and the ratio moved under 10% (todo 1.00 → 0.93, counter 0.66 → 0.68),
+// while the compiler of 2026-10-16 still read apart from today's (todo 0.80, counter 0.51).
+//
+// The 5 ms is still the budget: REFERENCE_MS is what the reference takes on the development machine
+// these numbers come from, idle, so a case may take 5 / 4 = 1.25 references. The closest case, todo,
+// read 0.87-1.06 over ten runs, five idle and five loaded, while its time went from 3.9 to 37 ms. A TypeScript upgrade that changes the reference's speed moves
+// every ratio: measure REFERENCE_MS again with it.
 
 import { describe, it, expect } from 'vitest';
+import ts from 'typescript';
 import { compile } from '../../src/plugin';
 
 const counterPdx = `
@@ -68,62 +83,87 @@ const todoPdx = `
   .item:hover { background: #f5f5f5; }
 </style>`;
 
-/** One compile's budget, in ms: the median of a case's runs must be under it. */
+/** One compile's budget, in ms on the development machine. */
 const COMPILE_BUDGET_MS = 5;
+/** The reference's median on that machine, idle: the median of 49 runs' medians, 3.0-5.2 ms (2026-10-24). */
+const REFERENCE_MS = 4.0;
+/** One compile's budget in references: the median ratio of a case must be under it. */
+const COMPILE_BUDGET = COMPILE_BUDGET_MS / REFERENCE_MS;
 
-function measure(label: string, fn: () => void, iterations = 100): { best: number; median: number; avg: number } {
+// The reference: a fixed TypeScript module, transpiled. TypeScript is already the compiler's
+// dependency, and it is parse-and-emit work like a compile, so load slows both alike.
+const REFERENCE_SOURCE = Array.from({ length: 12 }, (_, i) => `
+export interface Item${i} { id: number; text: string; done?: boolean }
+export class Store${i}<T extends Item${i}> {
+    private items: T[] = [];
+    add(item: T): this { this.items = [...this.items, item]; return this; }
+    remove(id: number): void { this.items = this.items.filter((x) => x.id !== id); }
+    get count(): number { return this.items.length; }
+    map<U>(fn: (x: T, i: number) => U): U[] { return this.items.map(fn); }
+}
+export const make${i} = (n: number) => Array.from({ length: n }, (_, k) => ({ id: k, text: \`t\${k}\` }));
+`).join('\n');
+const REFERENCE_OPTIONS = { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext } };
+const reference = () => ts.transpileModule(REFERENCE_SOURCE, REFERENCE_OPTIONS);
+
+const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
+
+/** A case's median, the reference's, measured in turn on every iteration, and their ratio. */
+function measure(label: string, fn: () => void, iterations = 100): { median: number; reference: number; ratio: number } {
     // Warm up: 10 runs left the JIT still settling on the complex page, whose median then read
     // 4.6 ms against 3.3 after 20.
-    for (let i = 0; i < 30; i++) fn();
+    for (let i = 0; i < 30; i++) { fn(); reference(); }
 
     const times: number[] = [];
+    const refs: number[] = [];
     for (let i = 0; i < iterations; i++) {
-        const start = performance.now();
+        let start = performance.now();
         fn();
         times.push(performance.now() - start);
+        start = performance.now();
+        reference();
+        refs.push(performance.now() - start);
     }
 
-    const sorted = [...times].sort((a, b) => a - b);
-    const best = sorted[0];
-    const median = sorted[Math.floor(sorted.length / 2)];
-    const avg = times.reduce((a, b) => a + b, 0) / times.length;
-    console.log(`  ⏱ ${label}: best=${best.toFixed(3)}ms median=${median.toFixed(3)}ms avg=${avg.toFixed(3)}ms`);
-    return { best, median, avg };
+    const m = median(times);
+    const r = median(refs);
+    console.log(`  ⏱ ${label}: median=${m.toFixed(3)}ms reference=${r.toFixed(3)}ms ratio=${(m / r).toFixed(3)} (budget ${COMPILE_BUDGET.toFixed(3)})`);
+    return { median: m, reference: r, ratio: m / r };
 }
 
 describe('compiler benchmarks', () => {
     it('compile counter.pdx — new mode (decorator+rune)', () => {
-        const { median } = measure('counter.pdx compile', () => {
+        const { ratio } = measure('counter.pdx compile', () => {
             compile(counterPdx, 'counter.pdx');
         });
         // A compile under 5 ms: the component saved, compiled again for HMR.
-        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
+        expect(ratio).toBeLessThan(COMPILE_BUDGET);
     });
 
     it('compile todo.pdx — new mode with @for + signals', () => {
-        const { median } = measure('todo.pdx compile', () => {
+        const { ratio } = measure('todo.pdx compile', () => {
             compile(todoPdx, 'todo.pdx');
         });
         // A compile under 5 ms, with a @for and two-way binding.
-        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
+        expect(ratio).toBeLessThan(COMPILE_BUDGET);
     });
 
     it('compile 10 components sequentially', () => {
-        const { median } = measure('10 components batch', () => {
+        const { ratio } = measure('10 components batch', () => {
             for (let i = 0; i < 10; i++) {
                 compile(counterPdx, `comp-${i}.pdx`);
             }
         }, 20);
         // 10 compiles under 50 ms: the same 5 ms each, back to back, as a build does them.
-        expect(median).toBeLessThan(10 * COMPILE_BUDGET_MS);
+        expect(ratio).toBeLessThan(10 * COMPILE_BUDGET);
     });
 
     it('compile counter.pdx — production mode', () => {
-        const { median } = measure('counter.pdx prod', () => {
+        const { ratio } = measure('counter.pdx prod', () => {
             compile(counterPdx, 'counter.pdx', undefined, undefined, { production: true, minify: true });
         });
         // A compile under 5 ms with the production passes (minify, hoisting) on.
-        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
+        expect(ratio).toBeLessThan(COMPILE_BUDGET);
     });
 
     it('compile complex page with @fetch + @form + routing', () => {
@@ -161,10 +201,10 @@ describe('compiler benchmarks', () => {
   .user:hover { background: #f9f9f9; }
 </style>`;
 
-        const { median } = measure('complex page compile', () => {
+        const { ratio } = measure('complex page compile', () => {
             compile(complexPdx, 'users.pdx');
         });
         // A compile under 5 ms for a page with @page, @guard, @fetch, @await and a form.
-        expect(median).toBeLessThan(COMPILE_BUDGET_MS);
+        expect(ratio).toBeLessThan(COMPILE_BUDGET);
     });
 });
