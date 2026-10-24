@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/toast.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Toast / Notification — screen-edge notifications with stacking.
 
    Usage:
@@ -32,7 +33,8 @@
     width: 100%;
 }
 
-/* Positions */
+/* Positions, keyed on the host's `position` (#631); on native markup the container's `position`
+   attribute. top-right is the base look. */
 .pdx-toast-container,
 .pdx-toast-container[position="top-right"] {
     top: 1rem;
@@ -40,47 +42,47 @@
     align-items: flex-end;
 }
 
-.pdx-toast-container[position="top-left"] {
-    top: 1rem;
-    left: 1rem;
-    right: auto;
-    align-items: flex-start;
-}
+:where(pdx-toast[position="top-left"]) > [data-part="root"], .pdx-toast-container[position="top-left"] {
+        top: 1rem;
+        left: 1rem;
+        right: auto;
+        align-items: flex-start;
+    }
 
-.pdx-toast-container[position="bottom-right"] {
-    bottom: 1rem;
-    right: 1rem;
-    top: auto;
-    flex-direction: column-reverse;
-    align-items: flex-end;
-}
+:where(pdx-toast[position="bottom-right"]) > [data-part="root"], .pdx-toast-container[position="bottom-right"] {
+        bottom: 1rem;
+        right: 1rem;
+        top: auto;
+        flex-direction: column-reverse;
+        align-items: flex-end;
+    }
 
-.pdx-toast-container[position="bottom-left"] {
-    bottom: 1rem;
-    left: 1rem;
-    right: auto;
-    top: auto;
-    flex-direction: column-reverse;
-    align-items: flex-start;
-}
+:where(pdx-toast[position="bottom-left"]) > [data-part="root"], .pdx-toast-container[position="bottom-left"] {
+        bottom: 1rem;
+        left: 1rem;
+        right: auto;
+        top: auto;
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
 
-.pdx-toast-container[position="top-center"] {
-    top: 1rem;
-    left: 50%;
-    right: auto;
-    transform: translateX(-50%);
-    align-items: center;
-}
+:where(pdx-toast[position="top-center"]) > [data-part="root"], .pdx-toast-container[position="top-center"] {
+        top: 1rem;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        align-items: center;
+    }
 
-.pdx-toast-container[position="bottom-center"] {
-    bottom: 1rem;
-    left: 50%;
-    right: auto;
-    top: auto;
-    transform: translateX(-50%);
-    flex-direction: column-reverse;
-    align-items: center;
-}
+:where(pdx-toast[position="bottom-center"]) > [data-part="root"], .pdx-toast-container[position="bottom-center"] {
+        bottom: 1rem;
+        left: 50%;
+        right: auto;
+        top: auto;
+        transform: translateX(-50%);
+        flex-direction: column-reverse;
+        align-items: center;
+    }
 
 /* ===== Toast item ===== */
 
@@ -110,28 +112,16 @@
     transform: translateX(0);
 }
 
-/* Slide direction based on container position */
-.pdx-toast-container[position="top-left"] .pdx-toast,
-.pdx-toast-container[position="bottom-left"] .pdx-toast {
-    transform: translateX(-100%);
-}
-.pdx-toast-container[position="top-left"] .pdx-toast[data-open],
-.pdx-toast-container[position="bottom-left"] .pdx-toast[data-open] {
-    transform: translateX(0);
-}
+/* Slide direction based on the position */
+:where(pdx-toast[position="top-left"]) > [data-part="root"] .pdx-toast, .pdx-toast-container[position="top-left"] .pdx-toast { transform: translateX(-100%); }
+    :where(pdx-toast[position="top-left"]) > [data-part="root"] .pdx-toast[data-open], .pdx-toast-container[position="top-left"] .pdx-toast[data-open] { transform: translateX(0); }
+:where(pdx-toast[position="bottom-left"]) > [data-part="root"] .pdx-toast, .pdx-toast-container[position="bottom-left"] .pdx-toast { transform: translateX(-100%); }
+    :where(pdx-toast[position="bottom-left"]) > [data-part="root"] .pdx-toast[data-open], .pdx-toast-container[position="bottom-left"] .pdx-toast[data-open] { transform: translateX(0); }
 
-.pdx-toast-container[position="top-center"] .pdx-toast,
-.pdx-toast-container[position="bottom-center"] .pdx-toast {
-    transform: translateY(-1rem);
-}
-.pdx-toast-container[position="top-center"] .pdx-toast[data-open],
-.pdx-toast-container[position="bottom-center"] .pdx-toast[data-open] {
-    transform: translateY(0);
-}
-
-.pdx-toast-container[position="bottom-center"] .pdx-toast {
-    transform: translateY(1rem);
-}
+:where(pdx-toast[position="top-center"]) > [data-part="root"] .pdx-toast, .pdx-toast-container[position="top-center"] .pdx-toast { transform: translateY(-1rem); }
+    :where(pdx-toast[position="top-center"]) > [data-part="root"] .pdx-toast[data-open], .pdx-toast-container[position="top-center"] .pdx-toast[data-open] { transform: translateY(0); }
+:where(pdx-toast[position="bottom-center"]) > [data-part="root"] .pdx-toast, .pdx-toast-container[position="bottom-center"] .pdx-toast { transform: translateY(1rem); }
+    :where(pdx-toast[position="bottom-center"]) > [data-part="root"] .pdx-toast[data-open], .pdx-toast-container[position="bottom-center"] .pdx-toast[data-open] { transform: translateY(0); }
 
 /* ===== Variants ===== */
 

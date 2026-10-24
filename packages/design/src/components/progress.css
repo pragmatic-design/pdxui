@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/progress.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Progress bar */
 
 .pdx-progress {
@@ -32,9 +33,10 @@
     100% { transform: translateX(400%); }
 }
 
-/* Sizes */
-.pdx-progress-sm { height: 0.25rem; }
-.pdx-progress-lg { height: 0.75rem; }
+/* Sizes, keyed on the host's `size` (#631); on native markup `.pdx-progress-sm`. The linear track is
+   inside the host's progressbar, the ring is the host's child. */
+:where(pdx-progress[size="sm"]) > [data-part="root"], .pdx-progress-sm, :where(pdx-progress[size="sm"]) > :where([role="progressbar"]) > [data-part="root"], .pdx-progress-sm { height: 0.25rem; }
+:where(pdx-progress[size="lg"]) > [data-part="root"], .pdx-progress-lg, :where(pdx-progress[size="lg"]) > :where([role="progressbar"]) > [data-part="root"], .pdx-progress-lg { height: 0.75rem; }
 
 /* Striped */
 .pdx-progress-striped .pdx-progress-bar {
@@ -62,8 +64,8 @@
     width: 3rem;
     height: 3rem;
 }
-.pdx-progress-circular.pdx-progress-sm { width: 2rem; height: 2rem; }
-.pdx-progress-circular.pdx-progress-lg { width: 5rem; height: 5rem; }
+:where(pdx-progress[size="sm"]) > .pdx-progress-circular[data-part="root"], .pdx-progress-circular.pdx-progress-sm { width: 2rem; height: 2rem; }
+:where(pdx-progress[size="lg"]) > .pdx-progress-circular[data-part="root"], .pdx-progress-circular.pdx-progress-lg { width: 5rem; height: 5rem; }
 
 .pdx-progress-ring {
     width: 100%;
@@ -94,5 +96,5 @@
     font-weight: var(--pdx-weight-semibold);
     color: var(--pdx-color-text);
 }
-.pdx-progress-circular.pdx-progress-sm .pdx-progress-circular-label { font-size: 0.5rem; }
-.pdx-progress-circular.pdx-progress-lg .pdx-progress-circular-label { font-size: var(--pdx-text-sm); }
+:where(pdx-progress[size="sm"]) > .pdx-progress-circular[data-part="root"] .pdx-progress-circular-label, .pdx-progress-circular.pdx-progress-sm .pdx-progress-circular-label { font-size: 0.5rem; }
+:where(pdx-progress[size="lg"]) > .pdx-progress-circular[data-part="root"] .pdx-progress-circular-label, .pdx-progress-circular.pdx-progress-lg .pdx-progress-circular-label { font-size: var(--pdx-text-sm); }

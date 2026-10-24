@@ -1933,16 +1933,6 @@
             },
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'primary'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
               "name": "max",
               "description": "Maximum allowed value.",
               "type": {
@@ -1983,26 +1973,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
-              "name": "shape",
-              "description": "Shape: 'pill' (default, full radius) or 'square' (rounded rectangle).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'pill'",
-              "attribute": "shape"
-            },
-            {
-              "kind": "field",
               "name": "label",
               "description": "What the badge means, read instead of its colour or its bare number: \"Online\", \"3 unread messages\". A dot without it is read as its variant (\"success indicator\").",
               "type": {
@@ -2010,6 +1980,96 @@
               },
               "default": "''",
               "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour.",
+              "type": {
+                "text": "'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'muted' | 'outline' | 'outline-primary' | 'outline-success' | 'outline-danger' | 'outline-warning'"
+              },
+              "default": "'primary'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "description": "pill (the default, full radius) or square (a rounded rectangle).",
+              "type": {
+                "text": "'pill' | 'square'"
+              },
+              "default": "'pill'",
+              "attribute": "shape"
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "primary",
+                "secondary",
+                "success",
+                "danger",
+                "warning",
+                "info",
+                "muted",
+                "outline",
+                "outline-primary",
+                "outline-success",
+                "outline-danger",
+                "outline-warning"
+              ],
+              "default": "primary",
+              "native": {
+                "primary": ".pdx-badge-primary",
+                "secondary": ".pdx-badge-secondary",
+                "success": ".pdx-badge-success",
+                "danger": ".pdx-badge-danger",
+                "warning": ".pdx-badge-warning",
+                "info": ".pdx-badge-info",
+                "muted": ".pdx-badge-muted",
+                "outline": ".pdx-badge-outline",
+                "outline-primary": ".pdx-badge-outline-primary",
+                "outline-success": ".pdx-badge-outline-success",
+                "outline-danger": ".pdx-badge-outline-danger",
+                "outline-warning": ".pdx-badge-outline-warning"
+              }
+            },
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-badge-md",
+                "sm": ".pdx-badge-sm",
+                "lg": ".pdx-badge-lg"
+              }
+            },
+            {
+              "name": "shape",
+              "values": [
+                "pill",
+                "square"
+              ],
+              "default": "pill",
+              "native": {
+                "pill": ".pdx-badge-pill",
+                "square": ".pdx-badge-square"
+              }
             }
           ],
           "roles": [
@@ -2024,15 +2084,6 @@
                 "text": "string"
               },
               "default": "''"
-            },
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'primary'"
             },
             {
               "name": "max",
@@ -2071,24 +2122,6 @@
               "default": "true"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "shape",
-              "fieldName": "shape",
-              "description": "Shape: 'pill' (default, full radius) or 'square' (rounded rectangle).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'pill'"
-            },
-            {
               "name": "label",
               "fieldName": "label",
               "description": "What the badge means, read instead of its colour or its bare number: \"Online\", \"3 unread messages\". A dot without it is read as its variant (\"success indicator\").",
@@ -2096,6 +2129,33 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "primary (the default), secondary, success, danger, warning, info, muted (a dot's), outline, or outline with a colour.",
+              "type": {
+                "text": "'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'muted' | 'outline' | 'outline-primary' | 'outline-success' | 'outline-danger' | 'outline-warning'"
+              },
+              "default": "'primary'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
+            },
+            {
+              "name": "shape",
+              "fieldName": "shape",
+              "description": "pill (the default, full radius) or square (a rounded rectangle).",
+              "type": {
+                "text": "'pill' | 'square'"
+              },
+              "default": "'pill'"
             }
           ]
         }
@@ -2124,16 +2184,6 @@
           "order": 94,
           "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
           "members": [
-            {
-              "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'info'",
-              "attribute": "variant"
-            },
             {
               "kind": "field",
               "name": "closable",
@@ -2175,6 +2225,16 @@
               "attribute": "subtle"
             },
             {
+              "kind": "field",
+              "name": "variant",
+              "description": "info (the default), success, warning, danger, or error (danger).",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | 'error'"
+              },
+              "default": "'info'",
+              "attribute": "variant"
+            },
+            {
               "kind": "method",
               "name": "dismiss",
               "parameters": [],
@@ -2193,6 +2253,26 @@
               "description": "Read-only, via a ref: `el.isVisible`."
             }
           ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "info",
+                "success",
+                "warning",
+                "danger",
+                "error"
+              ],
+              "default": "info",
+              "native": {
+                "info": ".pdx-banner-info",
+                "success": ".pdx-banner-success",
+                "warning": ".pdx-banner-warning",
+                "danger": ".pdx-banner-danger",
+                "error": ".pdx-banner-danger"
+              }
+            }
+          ],
           "events": [
             {
               "name": "pdx-close",
@@ -2207,15 +2287,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'info'"
-            },
             {
               "name": "closable",
               "fieldName": "closable",
@@ -2251,6 +2322,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "info (the default), success, warning, danger, or error (danger).",
+              "type": {
+                "text": "'info' | 'success' | 'warning' | 'danger' | 'error'"
+              },
+              "default": "'info'"
             }
           ],
           "slots": [
@@ -19036,16 +19116,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size: sm, md (default), lg",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "showLabel",
               "description": "Show percentage label",
               "type": {
@@ -19093,6 +19163,32 @@
               },
               "default": "''",
               "attribute": "arialabel"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-progress-md",
+                "sm": ".pdx-progress-sm",
+                "lg": ".pdx-progress-lg"
+              }
             }
           ],
           "roles": [
@@ -19121,15 +19217,6 @@
               "name": "variant",
               "fieldName": "variant",
               "description": "Color variant: primary (default), success, warning, danger",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size: sm, md (default), lg",
               "type": {
                 "text": "string"
               },
@@ -19179,6 +19266,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ]
         }
@@ -25825,12 +25921,34 @@
             {
               "kind": "field",
               "name": "position",
-              "description": "Where toasts appear (e.g. 'top-right').",
+              "description": "Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center.",
               "type": {
-                "text": "string"
+                "text": "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'"
               },
               "default": "'top-right'",
               "attribute": "position"
+            }
+          ],
+          "variants": [
+            {
+              "name": "position",
+              "values": [
+                "top-right",
+                "top-left",
+                "bottom-right",
+                "bottom-left",
+                "top-center",
+                "bottom-center"
+              ],
+              "default": "top-right",
+              "native": {
+                "top-right": ".pdx-toast-container[position=\"top-right\"]",
+                "top-left": ".pdx-toast-container[position=\"top-left\"]",
+                "bottom-right": ".pdx-toast-container[position=\"bottom-right\"]",
+                "bottom-left": ".pdx-toast-container[position=\"bottom-left\"]",
+                "top-center": ".pdx-toast-container[position=\"top-center\"]",
+                "bottom-center": ".pdx-toast-container[position=\"bottom-center\"]"
+              }
             }
           ],
           "roles": [
@@ -25841,9 +25959,9 @@
             {
               "name": "position",
               "fieldName": "position",
-              "description": "Where toasts appear (e.g. 'top-right').",
+              "description": "Where the stack sits on the screen: top-right (the default), top-left, bottom-right, bottom-left, top-center or bottom-center.",
               "type": {
-                "text": "string"
+                "text": "'top-right' | 'top-left' | 'bottom-right' | 'bottom-left' | 'top-center' | 'bottom-center'"
               },
               "default": "'top-right'"
             }

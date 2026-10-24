@@ -163,7 +163,7 @@ details.pdx-accordion[open] summary::after {
 
 /* ── Alert/Badge: blue accent ── */
 .pdx-alert-info { border-left-color: var(--pdx-color-primary); }
-.pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+@variant pdx-badge variant(primary) { :scope > :where(:not(.pdx-dot))[data-part="root"] { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); } }
 
 /* ── Table: blue header accent ── */
 .pdx-table th {

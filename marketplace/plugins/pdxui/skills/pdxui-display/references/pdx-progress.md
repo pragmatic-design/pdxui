@@ -7,12 +7,12 @@ Linear progress, determinate or not.
 | `value` | `value` | number | `-1` | Current value (0-100). Omit or -1 for indeterminate. |
 | `max` | `max` | number | `100` | Max value (default 100) |
 | `variant` | `variant` | string | `''` | Color variant: primary (default), success, warning, danger |
-| `size` | `size` | string | `''` | Size: sm, md (default), lg |
 | `showLabel` | `showlabel` | boolean | `false` | Show percentage label |
 | `label` | `label` | string | `''` | Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext). |
 | `striped` | `striped` | boolean | `false` | Striped animation on the bar |
 | `circular` | `circular` | boolean | `false` | Circular/ring mode instead of linear bar |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible label for screen readers. Empty: the progress.label component string. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 **Renders:** roles `progressbar`
 

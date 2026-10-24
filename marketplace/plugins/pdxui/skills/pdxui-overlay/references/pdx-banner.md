@@ -4,11 +4,11 @@ A persistent inline message.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `variant` | `variant` | string | `'info'` | Visual variant. |
 | `closable` | `closable` | boolean | `false` | Shows a close affordance. |
 | `autoDismiss` | `autodismiss` | number | `0` | Auto-dismiss after this many ms. |
 | `showIcon` | `showicon` | boolean | `true` | Shows the leading status icon. |
 | `subtle` | `subtle` | boolean | `false` | Uses the low-emphasis (tinted) style. |
+| `variant` | `variant` | 'info' \| 'success' \| 'warning' \| 'danger' \| 'error' | `'info'` | info (the default), success, warning, danger, or error (danger). |
 
 **API (via `:ref`)**
 

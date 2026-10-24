@@ -154,7 +154,7 @@ details.pdx-accordion[open] summary::after { transform: rotate(90deg); }
 .pdx-step[data-status="done"] .pdx-step-number { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
 .pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
 .pdx-alert-info { border-left-color: var(--pdx-color-primary); }
-.pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
+@variant pdx-badge variant(primary) { :scope > :where(:not(.pdx-dot))[data-part="root"] { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); } }
 .pdx-timeline-item[data-status="done"]::before { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); }
 .pdx-timeline-item[data-status="active"]::before { border-color: var(--pdx-color-primary); }
 }

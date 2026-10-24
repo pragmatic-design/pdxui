@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/banner.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Banner / Announcement — full-width bar for announcements.
    Top or bottom of page, dismissable, semantic variants.
 
@@ -30,27 +31,27 @@
     color: var(--pdx-color-primary-text);
 }
 
-/* ===== Variants ===== */
+/* ===== Variants — keyed on the host's `variant` (#631); on native markup `.pdx-banner-{variant}` ===== */
 
-.pdx-banner-info {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
-}
+:where(pdx-banner[variant="info"]) > [data-part="root"], .pdx-banner-info {
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+    }
 
-.pdx-banner-success {
-    background: var(--pdx-color-success);
-    color: var(--pdx-color-success-text);
-}
+:where(pdx-banner[variant="success"]) > [data-part="root"], .pdx-banner-success {
+        background: var(--pdx-color-success);
+        color: var(--pdx-color-success-text);
+    }
 
-.pdx-banner-warning {
-    background: var(--pdx-color-warning);
-    color: var(--pdx-color-warning-text);
-}
+:where(pdx-banner[variant="warning"]) > [data-part="root"], .pdx-banner-warning {
+        background: var(--pdx-color-warning);
+        color: var(--pdx-color-warning-text);
+    }
 
-.pdx-banner-danger {
-    background: var(--pdx-color-danger);
-    color: var(--pdx-color-danger-text);
-}
+:where(pdx-banner:is([variant="danger"],[variant="error"])) > [data-part="root"], .pdx-banner-danger {
+        background: var(--pdx-color-danger);
+        color: var(--pdx-color-danger-text);
+    }
 
 /* Subtle variant — light background */
 .pdx-banner-subtle {

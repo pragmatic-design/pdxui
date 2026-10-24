@@ -107,11 +107,12 @@
     max-width: 24rem;
 }
 
-.pdx-toast-container[position="top-right"]    { top: 0; right: 0; }
-.pdx-toast-container[position="top-left"]     { top: 0; left: 0; }
-.pdx-toast-container[position="bottom-right"] { bottom: 0; right: 0; }
-.pdx-toast-container[position="bottom-left"]  { bottom: 0; left: 0; }
-.pdx-toast-container[position="top-center"]   { top: 0; left: 50%; transform: translateX(-50%); }
+/* Keyed on pdx-toast's `position` (#631); on native markup the container's `position` attribute. */
+:where(pdx-toast[position="top-right"]) > [data-part="root"], .pdx-toast-container[position="top-right"] { top: 0; right: 0; }
+:where(pdx-toast[position="top-left"]) > [data-part="root"], .pdx-toast-container[position="top-left"] { top: 0; left: 0; }
+:where(pdx-toast[position="bottom-right"]) > [data-part="root"], .pdx-toast-container[position="bottom-right"] { bottom: 0; right: 0; }
+:where(pdx-toast[position="bottom-left"]) > [data-part="root"], .pdx-toast-container[position="bottom-left"] { bottom: 0; left: 0; }
+:where(pdx-toast[position="top-center"]) > [data-part="root"], .pdx-toast-container[position="top-center"] { top: 0; left: 50%; transform: translateX(-50%); }
 
 .pdx-toast-container > * {
     pointer-events: auto;
