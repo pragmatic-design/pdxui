@@ -131,11 +131,12 @@ component('pdx-otp-input', {
             _builtShape = shape;
 
             requestAnimationFrame(() => {
-            const container = ctx.el.querySelector('.pdx-otp-container') as HTMLElement;
+            // Found by its part, which the classes below do not touch (#659).
+            const container = ctx.el.querySelector<HTMLElement>(':scope > [data-part="root"]');
             if (!container) return;
 
-            // Set wrapper classes
-            let cls = 'pdx-otp-wrap';
+            // Set wrapper classes — its own two first, or the next build could not find it by them.
+            let cls = 'pdx-otp-container pdx-otp-wrap';
             if (isError) cls += ' error';
             if (disabled) cls += ' disabled';
             container.className = cls;
