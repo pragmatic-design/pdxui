@@ -9,10 +9,10 @@ A bordered, titled group of fields.
 | `invalid` | `invalid` | boolean | `false` | Marks the group as invalid. |
 | `error` | `error` | string | `''` | Marks the control as invalid. |
 | `description` | `description` | string | `''` | Secondary descriptive text. |
-| `variant` | `variant` | string | `'bordered'` | Visual variant. |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `collapsible` | `collapsible` | boolean | `false` | Allows the group to collapse. |
 | `collapsed` | `collapsed` | boolean | `false` | Whether it starts collapsed. |
+| `variant` | `variant` | 'bordered' \| 'filled' \| 'plain' | `'bordered'` | bordered (the default), filled or plain. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 **Events:** `toggle` → `detail: { collapsed }` — Fired when toggled open or closed.
 

@@ -5,8 +5,8 @@ Render keyboard keys and shortcuts.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `keys` | `keys` | string | `''` | The key combination to render (e.g. 'Ctrl+K'). |
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `symbols` | `symbols` | boolean | `false` | Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 
 #### Examples

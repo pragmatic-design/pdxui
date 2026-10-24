@@ -6,8 +6,8 @@
 // without notice, and every app that reached it breaks in silence (CD-C2).
 //
 // happy-dom loads no stylesheet, so this is the DOM contract the design system's rules hang on: the
-// host's classes and each entry's level and indent. The geometry they produce is measured in every
-// theme by the nav-menu manifest (pnpm certify).
+// host's attributes, which its `@variant` rules key on (#632), and each entry's level and indent. The
+// geometry they produce is measured in every theme by the nav-menu manifest (pnpm certify).
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
@@ -38,28 +38,33 @@ const entry = (el: HTMLElement, key: string) => el.querySelector<HTMLElement>(`[
 describe('pdx-nav-menu looks', () => {
     beforeEach(cleanup);
 
-    it('size, indicator, chevron and actions each put one class on the host', async () => {
+    const LOOKS = ['size', 'indicator', 'chevron', 'actions'];
+    // The values a rule draws; any other value has the default's look.
+    const DRAWN = ['sm', 'border', 'end', 'overlay'];
+
+    it('size, indicator, chevron and actions each reach the host as its attribute', async () => {
         const el = await mount({ size: 'sm', indicator: 'border', chevron: 'end', actions: 'overlay' });
-        for (const cls of ['pdx-nav-size-sm', 'pdx-nav-indicator-border', 'pdx-nav-chevron-end', 'pdx-nav-actions-overlay']) {
-            expect(el.classList.contains(cls), `no ${cls} on the host`).toBe(true);
-        }
+        expect(LOOKS.map(a => el.getAttribute(a))).toEqual(DRAWN);
     });
 
-    it('control — the defaults put none of them, and an unknown value falls back to the default', async () => {
+    it('control — the defaults are reflected as themselves, and an unknown value draws none of the looks', async () => {
         const plain = await mount();
         const odd = await mount({ size: 'huge', indicator: 'glow', chevron: 'middle', actions: 'floating' });
+        expect(LOOKS.map(a => plain.getAttribute(a))).toEqual(['md', 'fill', 'start', 'inline']);
+        LOOKS.forEach((a, i) => expect(odd.getAttribute(a), a).not.toBe(DRAWN[i]));
+        // And no class stands in for an attribute any more.
         for (const el of [plain, odd]) {
             expect([...el.classList].filter(c => /^pdx-nav-(size|indicator|chevron|actions)-/.test(c)), el.outerHTML.slice(0, 80)).toEqual([]);
         }
     });
 
-    it('a change of look after mount moves the class', async () => {
+    it('a change of look after mount moves the attribute', async () => {
         const el = await mount({ indicator: 'border' });
         (el as any).indicator = 'fill';
         (el as any).size = 'sm';
         await tick(50);
-        expect(el.classList.contains('pdx-nav-indicator-border'), 'the border indicator stayed').toBe(false);
-        expect(el.classList.contains('pdx-nav-size-sm'), 'the size did not arrive').toBe(true);
+        expect(el.getAttribute('indicator'), 'the border indicator stayed').toBe('fill');
+        expect(el.getAttribute('size'), 'the size did not arrive').toBe('sm');
     });
 
     it('each entry says its level, 1-based and 3 at most, which the per-level properties select', async () => {

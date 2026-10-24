@@ -12,13 +12,13 @@ A big number with label and trend.
 | `trend` | `trend` | string | `''` | Trend direction: 'up' \| 'down' \| 'flat' \| '' |
 | `trendValue` | `trendvalue` | string | `''` | Trend text e.g. '+12.5%' |
 | `trendColor` | `trendcolor` | boolean | `true` | Auto-color trend (green up, red down) |
-| `size` | `size` | string | `'md'` | Size variant: 'sm' \| 'md' \| 'lg' |
 | `loading` | `loading` | boolean | `false` | Show skeleton placeholder |
 | `precision` | `precision` | number | `-1` | Decimal places for formatting (-1 = no format) |
 | `groupSeparator` | `groupseparator` | string | `','` | Thousands separator |
 | `compareValue` | `comparevalue` | string | `''` | Comparison/previous value (shown muted below main value) |
 | `compareLabel` | `comparelabel` | string | `''` | Compare label (e.g. "vs last month") |
 | `description` | `description` | string | `''` | Description text below value |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 
 #### Examples

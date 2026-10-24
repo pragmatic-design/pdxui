@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/nav.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Vertical nav + breadcrumb */
 
 .pdx-nav {
@@ -266,47 +267,50 @@ pdx-nav-menu {
     color: var(--pdx-color-text);
 }
 
+/* pdx-nav-menu's looks, keyed on its host attributes (#632). The host carries `.pdx-nav-menu-root`,
+   which gives each rule the weight the look's class did. */
+
 /* size="sm": a dense sidebar's menu. */
-.pdx-nav-size-sm {
-    --pdx-nav-font-size: 0.8rem;
-}
-.pdx-nav-size-sm .pdx-nav-item {
-    padding-top: calc(0.3125rem * var(--pdx-density-factor, 1));
-    padding-bottom: calc(0.3125rem * var(--pdx-density-factor, 1));
-    gap: calc(0.375rem * var(--pdx-density-factor, 1));
-}
-.pdx-nav-size-sm .pdx-nav-icon { width: 0.95rem; height: 0.95rem; }
-.pdx-nav-size-sm .pdx-nav-chevron { width: 0.85rem; height: 0.85rem; }
+:where(pdx-nav-menu[size="sm"]).pdx-nav-menu-root {
+        --pdx-nav-font-size: 0.8rem;
+    }
+    :where(pdx-nav-menu[size="sm"]).pdx-nav-menu-root .pdx-nav-item {
+        padding-top: calc(0.3125rem * var(--pdx-density-factor, 1));
+        padding-bottom: calc(0.3125rem * var(--pdx-density-factor, 1));
+        gap: calc(0.375rem * var(--pdx-density-factor, 1));
+    }
+    :where(pdx-nav-menu[size="sm"]).pdx-nav-menu-root .pdx-nav-icon { width: 0.95rem; height: 0.95rem; }
+    :where(pdx-nav-menu[size="sm"]).pdx-nav-menu-root .pdx-nav-chevron { width: 0.85rem; height: 0.85rem; }
 
 /* indicator="border": the current entry also carries a bar on its start edge; every entry keeps
    the bar's width, transparent, so the labels do not move when the current one changes. */
-.pdx-nav-indicator-border .pdx-nav-item {
-    border-radius: 0;
-    border-inline-start: 3px solid transparent;
-}
-.pdx-nav-indicator-border .pdx-nav-item:is(.active, [aria-current="page"]) {
-    border-inline-start-color: var(--pdx-color-primary);
-}
+:where(pdx-nav-menu[indicator="border"]).pdx-nav-menu-root .pdx-nav-item {
+        border-radius: 0;
+        border-inline-start: 3px solid transparent;
+    }
+    :where(pdx-nav-menu[indicator="border"]).pdx-nav-menu-root .pdx-nav-item:is(.active, [aria-current="page"]) {
+        border-inline-start-color: var(--pdx-color-primary);
+    }
 
 /* chevron="end": a group's chevron at the end of its row, its icon in the column of every other. */
-.pdx-nav-chevron-end .pdx-nav-group-trigger > .pdx-nav-chevron {
-    order: 1;
-    margin-inline-start: auto;
-}
+:where(pdx-nav-menu[chevron="end"]).pdx-nav-menu-root .pdx-nav-group-trigger > .pdx-nav-chevron {
+        order: 1;
+        margin-inline-start: auto;
+    }
 
 /* actions="overlay": an entry's controls laid over the row's end, shown when the row is hovered or
    holds the focus — at rest they take no width from the label. */
-.pdx-nav-actions-overlay .pdx-nav-actions {
-    position: absolute;
-    inset-inline-end: var(--pdx-space-2xs);
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0;
-    transition: opacity 0.1s;
-}
-.pdx-nav-actions-overlay .pdx-nav-row:is(:hover, :focus-within) > .pdx-nav-actions {
-    opacity: 1;
-}
+:where(pdx-nav-menu[actions="overlay"]).pdx-nav-menu-root .pdx-nav-actions {
+        position: absolute;
+        inset-inline-end: var(--pdx-space-2xs);
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.1s;
+    }
+    :where(pdx-nav-menu[actions="overlay"]).pdx-nav-menu-root .pdx-nav-row:is(:hover, :focus-within) > .pdx-nav-actions {
+        opacity: 1;
+    }
 
 /* Collapsed mode — icons only */
 .pdx-nav-collapsed .pdx-nav {

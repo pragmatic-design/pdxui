@@ -404,6 +404,46 @@
         <div style="display: flex; gap: 24px; width: 560px"><div style="flex: 1"><pdx-nav-menu data-test="nav-chev-start" items='[{"key":"tickets","label":"Tickets","children":[{"key":"all","label":"All tickets"}]}]'></pdx-nav-menu></div><div style="flex: 1"><pdx-nav-menu data-test="nav-chev-end" chevron="end" items='[{"key":"tickets","label":"Tickets","children":[{"key":"all","label":"All tickets"}]}]'></pdx-nav-menu></div></div>
     </section>
 
+    <section data-scenario="nav-menu-size-md">
+        <h3>pdx-nav-menu — size="md"</h3>
+        <pdx-nav-menu data-test="variant" size="md"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-size-sm">
+        <h3>pdx-nav-menu — size="sm"</h3>
+        <pdx-nav-menu data-test="variant" size="sm"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-indicator-fill">
+        <h3>pdx-nav-menu — indicator="fill"</h3>
+        <pdx-nav-menu data-test="variant" indicator="fill"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-indicator-border">
+        <h3>pdx-nav-menu — indicator="border"</h3>
+        <pdx-nav-menu data-test="variant" indicator="border"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-chevron-start">
+        <h3>pdx-nav-menu — chevron="start"</h3>
+        <pdx-nav-menu data-test="variant" chevron="start"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-chevron-end">
+        <h3>pdx-nav-menu — chevron="end"</h3>
+        <pdx-nav-menu data-test="variant" chevron="end"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-actions-inline">
+        <h3>pdx-nav-menu — actions="inline"</h3>
+        <pdx-nav-menu data-test="variant" actions="inline"></pdx-nav-menu>
+    </section>
+
+    <section data-scenario="nav-menu-actions-overlay">
+        <h3>pdx-nav-menu — actions="overlay"</h3>
+        <pdx-nav-menu data-test="variant" actions="overlay"></pdx-nav-menu>
+    </section>
+
     <section data-scenario="navbar-basic">
         <h3>Navbar — Basic (desktop)</h3>
         <pdx-navbar data-test="navbar" brand="Acme" brand-icon="box" items='[{"key":"home","label":"Home","href":"#","active":true},{"key":"docs","label":"Docs","href":"#"},{"key":"about","label":"About","href":"#"}]'><button class="pdx-navbar-icon-btn" type="button" aria-label="Settings">S</button></pdx-navbar>

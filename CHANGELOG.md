@@ -367,6 +367,31 @@ semver.
 
 ### Changed
 
+- **Breaking:** the surfaces, navigation and display components declare their axes (#632), reflected
+  on the host with their defaults, and drawn by `@variant` rules; where native markup has a class for
+  the same look, the rule compiles to it too.
+  - `pdx-card`: `variant` (default, outline, elevated, flat). Its root no longer carries
+    `.pdx-card-{variant}`; it is `data-part="root"`.
+  - `pdx-fieldset`: `variant` (bordered, filled, plain) and `size` (sm, md, lg). Its fieldset no
+    longer carries `.pdx-fieldset-{variant}` or `.pdx-fieldset-{size}`.
+  - `pdx-tabs`: `variant` (line, card, pills). The host no longer carries `.pdx-tabs-card` or
+    `.pdx-tabs-pills`, and those classes are gone from the CSS: nothing used them on native markup.
+    `[pdx-tab-style="pill"]`, the theme's pill mode, is unchanged. With the class gone, the design
+    reset no longer reaches into a card or pills tabs' panels, as it never did for line tabs.
+  - `pdx-description-list`: `size` (sm, md, lg). Its list no longer carries `.pdx-dl-{size}`.
+  - `pdx-statistic`: `size` (sm, md, lg). The host no longer carries `.pdx-statistic-sm`/`-lg`, and
+    those classes are gone from the CSS.
+  - `pdx-wizard`: `size` (md, sm). Its stepper, its root part, no longer carries `.pdx-stepper-sm`;
+    a native stepper keeps it.
+  - `pdx-nav-menu`: `size` (md, sm), `indicator` (fill, border), `chevron` (start, end) and
+    `actions` (inline, overlay). The host no longer carries `.pdx-nav-{look}-{value}`, and those
+    classes are gone from the CSS.
+  - `pdx-kbd`: `size` (sm, md, lg). Its combo no longer carries `.pdx-kbd-{size}`; a native key keeps it.
+  - `pdx-avatar-group`: `size` (xs, sm, md, lg, xl), still passed to every avatar. Its overflow badge
+    no longer carries `.pdx-avatar-size-{size}`, and those classes are gone from the CSS.
+  - These keep their props, since the CSS does not draw them: `pdx-divider`'s `variant` and
+    `pdx-icon`'s and `pdx-avatar`'s `size` and `shape`, all inline styles (`pdx-icon` also takes a
+    number of pixels).
 - **Breaking:** `pdx-badge`, `pdx-banner`, `pdx-progress` and `pdx-toast` declare their axes (#631),
   reflected on the host with their defaults, and drawn by `@variant` rules that also compile to the
   native classes.

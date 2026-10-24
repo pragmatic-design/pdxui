@@ -16,13 +16,17 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([t
  * mounting and closable tabs.
  */
 component('pdx-tabs', {
+    // The axis tabs.css keys by (#632), reflected on the host and drawn from it; the host is the
+    // element the old `.pdx-tabs-card`/`.pdx-tabs-pills` classes went on, so no native class is kept.
+    variants: {
+        /** line (the default), card (a bordered container) or pills (rounded buttons). */
+        variant: ['line', 'card', 'pills'],
+    },
     props: {
         /** Active tab value (string matching data-tab attribute) */
         value: { type: String, default: '' },
         /** Orientation: horizontal (default) or vertical */
         orientation: { type: String, default: 'horizontal' },
-        /** Visual style: line (default), card (bordered container), pills (rounded buttons) */
-        variant: { type: String, default: 'line' },
         /** Add border around entire tabs + panels */
         bordered: { type: Boolean, default: false },
         /** Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate) */
@@ -255,10 +259,7 @@ component('pdx-tabs', {
                         // Named: a tablist needs an accessible name.
                         const label = ctx.label() as string;
                         if (label) tabList.setAttribute('aria-label', label);
-                        // Apply variant + bordered classes
-                        const variant = ctx.variant() as string;
-                        if (variant === 'card') el.classList.add('pdx-tabs-card');
-                        else if (variant === 'pills') el.classList.add('pdx-tabs-pills');
+                        // The variant is drawn from the host attribute (#632); bordered is a class.
                         if (ctx.bordered()) el.classList.add('pdx-tabs-bordered');
                     }
 

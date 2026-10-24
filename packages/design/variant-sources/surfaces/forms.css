@@ -461,22 +461,30 @@ pdx-form-field:last-child {
     padding-inline: var(--pdx-space-xs);
 }
 
-/* Variants */
-.pdx-fieldset-filled {
-    border: none;
-    background: var(--pdx-color-inset);
+/* Variants and sizes, keyed on pdx-fieldset's `variant` and `size` (#632); on a native fieldset
+   `.pdx-fieldset-filled`, `.pdx-fieldset-sm`. */
+@variant pdx-fieldset variant(filled) {
+    :scope > [data-part="root"] {
+        border: none;
+        background: var(--pdx-color-inset);
+    }
 }
 
-.pdx-fieldset-plain {
-    border: none;
-    padding: 0;
+@variant pdx-fieldset variant(plain) {
+    :scope > [data-part="root"] {
+        border: none;
+        padding: 0;
+    }
 }
 
-/* Sizes */
-.pdx-fieldset-sm { padding: var(--pdx-space-sm); }
-.pdx-fieldset-sm .pdx-legend { font-size: var(--pdx-text-xs); }
-.pdx-fieldset-lg { padding: var(--pdx-space-lg); }
-.pdx-fieldset-lg .pdx-legend { font-size: var(--pdx-text-base); }
+@variant pdx-fieldset size(sm) {
+    :scope > [data-part="root"] { padding: var(--pdx-space-sm); }
+    :scope > [data-part="root"] .pdx-legend { font-size: var(--pdx-text-xs); }
+}
+@variant pdx-fieldset size(lg) {
+    :scope > [data-part="root"] { padding: var(--pdx-space-lg); }
+    :scope > [data-part="root"] .pdx-legend { font-size: var(--pdx-text-base); }
+}
 
 /* Invalid */
 .pdx-fieldset-invalid { border-color: var(--pdx-color-danger); }

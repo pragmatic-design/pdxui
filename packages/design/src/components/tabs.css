@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/tabs.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Tabs — uses --pdx-tab-indicator-size token for indicator thickness */
 
 pdx-tabs { display: block; }
@@ -134,54 +135,81 @@ pdx-tabs [data-tab-panel], pdx-tabs [role="tabpanel"] {
     bottom: calc(-1 * var(--pdx-tab-indicator-size));
 }
 
-/* ── Card variant — bordered container ── */
-.pdx-tabs-card {
-    border: var(--pdx-border-width) solid var(--pdx-color-border);
-    border-radius: var(--pdx-radius-lg);
-    overflow: hidden;
-}
-.pdx-tabs-card .pdx-tabs {
-    background: var(--pdx-color-inset);
-    border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
-    border-radius: 0;
-}
-.pdx-tabs-card .pdx-tab-indicator {
-    bottom: calc(-1 * var(--pdx-tab-indicator-size));
-}
-.pdx-tabs-card [data-tab-panel] {
-    padding: var(--pdx-space-lg);
-}
+/* ── Card variant — bordered container ──
+   Keyed on the host's `variant` (#632). `[data-pdx-root]`, which core sets on every component host,
+   gives each rule the weight the old `.pdx-tabs-card` class did; a `pdx-` class on the host would
+   also bring the reset (`[class*="pdx-"] *`) down on the app's content in the panels. */
+:where(pdx-tabs[variant="card"])[data-pdx-root] {
+        border: var(--pdx-border-width) solid var(--pdx-color-border);
+        border-radius: var(--pdx-radius-lg);
+        overflow: hidden;
+    }
+    :where(pdx-tabs[variant="card"])[data-pdx-root] .pdx-tabs {
+        background: var(--pdx-color-inset);
+        border-bottom: var(--pdx-border-width) solid var(--pdx-color-border);
+        border-radius: 0;
+    }
+    :where(pdx-tabs[variant="card"])[data-pdx-root] .pdx-tab-indicator {
+        bottom: calc(-1 * var(--pdx-tab-indicator-size));
+    }
+    :where(pdx-tabs[variant="card"])[data-pdx-root] [data-tab-panel] {
+        padding: var(--pdx-space-lg);
+    }
 
 /* ── Pills variant — rounded buttons, no underline ──
-   Activated by .pdx-tabs-pills class (per-element) OR
-   [pdx-tab-style="pill"] attribute on ancestor (theme-driven global). */
-:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tabs {
+   Two ways in, the same look: the host's `variant="pills"` (#632), weighed as for card,
+   and the theme-driven [pdx-tab-style="pill"] attribute on an ancestor, which reaches native tabs too. */
+:where(pdx-tabs[variant="pills"])[data-pdx-root] .pdx-tabs {
+        border-bottom: none;
+        gap: var(--pdx-space-xs);
+        background: var(--pdx-color-inset);
+        padding: var(--pdx-space-2xs);
+        border-radius: var(--pdx-radius-md);
+        display: flex;   /* full-width track — the grey spans the content width below */
+    }
+    :where(pdx-tabs[variant="pills"])[data-pdx-root] .pdx-tab {
+        /* reset the enclosed folder look → a flat segment */
+        border: none; margin-bottom: 0;
+        border-radius: var(--pdx-radius-sm);
+        min-height: 2rem;
+        padding: var(--pdx-space-xs) var(--pdx-space-md);
+        font-size: var(--pdx-text-xs);
+    }
+    :where(pdx-tabs[variant="pills"])[data-pdx-root] .pdx-tab[aria-selected="true"] {
+        /* the nice coloured active pill (theme accent) */
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+        box-shadow: var(--pdx-shadow-sm);
+    }
+    /* no bordered panel in pill mode, but DO pad the content (it lines up under the full-width track) */
+    :where(pdx-tabs[variant="pills"])[data-pdx-root] :is([data-tab-panel], [role="tabpanel"]) {
+        border: none; border-radius: 0; padding: var(--pdx-space-lg) var(--pdx-space-md);
+    }
+    :where(pdx-tabs[variant="pills"])[data-pdx-root] .pdx-tab-indicator { display: none; }
+[pdx-tab-style="pill"] .pdx-tabs {
     border-bottom: none;
     gap: var(--pdx-space-xs);
     background: var(--pdx-color-inset);
     padding: var(--pdx-space-2xs);
     border-radius: var(--pdx-radius-md);
-    display: flex;   /* full-width track — the grey spans the content width below */
+    display: flex;
 }
-:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab {
-    /* reset the enclosed folder look → a flat segment */
+[pdx-tab-style="pill"] .pdx-tab {
     border: none; margin-bottom: 0;
     border-radius: var(--pdx-radius-sm);
     min-height: 2rem;
     padding: var(--pdx-space-xs) var(--pdx-space-md);
     font-size: var(--pdx-text-xs);
 }
-:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab[aria-selected="true"] {
-    /* the nice coloured active pill (theme accent) */
+[pdx-tab-style="pill"] .pdx-tab[aria-selected="true"] {
     background: var(--pdx-color-primary);
     color: var(--pdx-color-primary-text);
     box-shadow: var(--pdx-shadow-sm);
 }
-/* no bordered panel in pill mode, but DO pad the content (it lines up under the full-width track) */
-:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) :is([data-tab-panel], [role="tabpanel"]) {
+[pdx-tab-style="pill"] :is([data-tab-panel], [role="tabpanel"]) {
     border: none; border-radius: 0; padding: var(--pdx-space-lg) var(--pdx-space-md);
 }
-:is(.pdx-tabs-pills, [pdx-tab-style="pill"]) .pdx-tab-indicator { display: none; }
+[pdx-tab-style="pill"] .pdx-tab-indicator { display: none; }
 
 /* ── Vertical Tabs ── */
 pdx-tabs[orientation="vertical"] {

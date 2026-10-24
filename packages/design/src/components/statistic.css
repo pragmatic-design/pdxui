@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/statistic.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-statistic — Numeric KPI display */
 pdx-statistic { display: block; }
 
@@ -82,28 +83,27 @@ pdx-statistic { display: block; }
     font-style: italic;
 }
 
-/* ── Size variants ── */
-.pdx-statistic-sm .pdx-statistic-value {
-    font-size: var(--pdx-text-lg);
-}
-.pdx-statistic-sm .pdx-statistic-title {
-    font-size: var(--pdx-text-xs);
-}
-.pdx-statistic-sm .pdx-statistic-prefix,
-.pdx-statistic-sm .pdx-statistic-suffix {
-    font-size: var(--pdx-text-sm);
-}
+/* ── Size variants, keyed on the host's `size` (#632). The host carries `.pdx-statistic-root`, which
+   gives each rule the weight the size class did. ── */
+:where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-value {
+        font-size: var(--pdx-text-lg);
+    }
+    :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-title {
+        font-size: var(--pdx-text-xs);
+    }
+    :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-prefix, :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-suffix {
+        font-size: var(--pdx-text-sm);
+    }
 
-.pdx-statistic-lg .pdx-statistic-value {
-    font-size: var(--pdx-text-display);
-}
-.pdx-statistic-lg .pdx-statistic-title {
-    font-size: var(--pdx-text-base);
-}
-.pdx-statistic-lg .pdx-statistic-prefix,
-.pdx-statistic-lg .pdx-statistic-suffix {
-    font-size: var(--pdx-text-xl);
-}
+:where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-value {
+        font-size: var(--pdx-text-display);
+    }
+    :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-title {
+        font-size: var(--pdx-text-base);
+    }
+    :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-prefix, :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-suffix {
+        font-size: var(--pdx-text-xl);
+    }
 
 /* ── Loading / skeleton ── */
 .pdx-statistic-loading {

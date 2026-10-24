@@ -298,10 +298,10 @@ describe('pdx-wizard', () => {
 
     // ─── Size ────────────────────────────────────────────
 
-    it('adds sm class on stepper', async () => {
+    it('draws sm on its stepper from the host (#632), the stepper being its root part', async () => {
         const el = await mountWizard({ size: 'sm' });
-        const stepper = el.querySelector('.pdx-stepper-sm');
-        expect(stepper).toBeTruthy();
+        expect(el.getAttribute('size')).toBe('sm');
+        expect(el.querySelector(':scope > [data-part="root"].pdx-stepper')).toBeTruthy();
     });
 
     // ─── Disabled ────────────────────────────────────────

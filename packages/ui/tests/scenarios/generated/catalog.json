@@ -184,6 +184,26 @@
         {
           "id": "avatar-group-clickable",
           "title": "Avatar Group — clickable, 4 members, max 3"
+        },
+        {
+          "id": "avatar-group-size-md",
+          "title": "pdx-avatar-group — size=\"md\""
+        },
+        {
+          "id": "avatar-group-size-xs",
+          "title": "pdx-avatar-group — size=\"xs\""
+        },
+        {
+          "id": "avatar-group-size-sm",
+          "title": "pdx-avatar-group — size=\"sm\""
+        },
+        {
+          "id": "avatar-group-size-lg",
+          "title": "pdx-avatar-group — size=\"lg\""
+        },
+        {
+          "id": "avatar-group-size-xl",
+          "title": "pdx-avatar-group — size=\"xl\""
         }
       ]
     },
@@ -562,6 +582,22 @@
         {
           "id": "card-disabled",
           "title": "Card — Disabled"
+        },
+        {
+          "id": "card-variant-default",
+          "title": "pdx-card — variant=\"default\""
+        },
+        {
+          "id": "card-variant-outline",
+          "title": "pdx-card — variant=\"outline\""
+        },
+        {
+          "id": "card-variant-elevated",
+          "title": "pdx-card — variant=\"elevated\""
+        },
+        {
+          "id": "card-variant-flat",
+          "title": "pdx-card — variant=\"flat\""
         }
       ]
     },
@@ -995,6 +1031,18 @@
         {
           "id": "description-list-columns",
           "title": "Description List — Multi-column grid (2)"
+        },
+        {
+          "id": "description-list-size-md",
+          "title": "pdx-description-list — size=\"md\""
+        },
+        {
+          "id": "description-list-size-sm",
+          "title": "pdx-description-list — size=\"sm\""
+        },
+        {
+          "id": "description-list-size-lg",
+          "title": "pdx-description-list — size=\"lg\""
         }
       ]
     },
@@ -1222,6 +1270,30 @@
         {
           "id": "fieldset-disabled",
           "title": "Fieldset — Disabled"
+        },
+        {
+          "id": "fieldset-variant-bordered",
+          "title": "pdx-fieldset — variant=\"bordered\""
+        },
+        {
+          "id": "fieldset-variant-filled",
+          "title": "pdx-fieldset — variant=\"filled\""
+        },
+        {
+          "id": "fieldset-variant-plain",
+          "title": "pdx-fieldset — variant=\"plain\""
+        },
+        {
+          "id": "fieldset-size-md",
+          "title": "pdx-fieldset — size=\"md\""
+        },
+        {
+          "id": "fieldset-size-sm",
+          "title": "pdx-fieldset — size=\"sm\""
+        },
+        {
+          "id": "fieldset-size-lg",
+          "title": "pdx-fieldset — size=\"lg\""
         }
       ]
     },
@@ -1568,6 +1640,18 @@
         {
           "id": "kbd-sizes",
           "title": "Kbd — Sizes"
+        },
+        {
+          "id": "kbd-size-md",
+          "title": "pdx-kbd — size=\"md\""
+        },
+        {
+          "id": "kbd-size-sm",
+          "title": "pdx-kbd — size=\"sm\""
+        },
+        {
+          "id": "kbd-size-lg",
+          "title": "pdx-kbd — size=\"lg\""
         }
       ]
     },
@@ -1790,6 +1874,38 @@
         {
           "id": "nav-menu-chevron",
           "title": "Nav Menu — chevron=\"start\" and chevron=\"end\""
+        },
+        {
+          "id": "nav-menu-size-md",
+          "title": "pdx-nav-menu — size=\"md\""
+        },
+        {
+          "id": "nav-menu-size-sm",
+          "title": "pdx-nav-menu — size=\"sm\""
+        },
+        {
+          "id": "nav-menu-indicator-fill",
+          "title": "pdx-nav-menu — indicator=\"fill\""
+        },
+        {
+          "id": "nav-menu-indicator-border",
+          "title": "pdx-nav-menu — indicator=\"border\""
+        },
+        {
+          "id": "nav-menu-chevron-start",
+          "title": "pdx-nav-menu — chevron=\"start\""
+        },
+        {
+          "id": "nav-menu-chevron-end",
+          "title": "pdx-nav-menu — chevron=\"end\""
+        },
+        {
+          "id": "nav-menu-actions-inline",
+          "title": "pdx-nav-menu — actions=\"inline\""
+        },
+        {
+          "id": "nav-menu-actions-overlay",
+          "title": "pdx-nav-menu — actions=\"overlay\""
         }
       ]
     },
@@ -2527,6 +2643,18 @@
         {
           "id": "statistic-basic",
           "title": "Statistic — KPI with title, value, trend"
+        },
+        {
+          "id": "statistic-size-md",
+          "title": "pdx-statistic — size=\"md\""
+        },
+        {
+          "id": "statistic-size-sm",
+          "title": "pdx-statistic — size=\"sm\""
+        },
+        {
+          "id": "statistic-size-lg",
+          "title": "pdx-statistic — size=\"lg\""
         }
       ]
     },
@@ -2581,6 +2709,18 @@
         {
           "id": "tab-basic",
           "title": "Tabs — Basic"
+        },
+        {
+          "id": "tab-variant-line",
+          "title": "pdx-tabs — variant=\"line\""
+        },
+        {
+          "id": "tab-variant-card",
+          "title": "pdx-tabs — variant=\"card\""
+        },
+        {
+          "id": "tab-variant-pills",
+          "title": "pdx-tabs — variant=\"pills\""
         }
       ]
     },
@@ -2627,6 +2767,18 @@
         {
           "id": "tabs-narrow",
           "title": "Tabs — five tabs in a box narrower than them, the last one active"
+        },
+        {
+          "id": "tabs-variant-line",
+          "title": "pdx-tabs — variant=\"line\""
+        },
+        {
+          "id": "tabs-variant-card",
+          "title": "pdx-tabs — variant=\"card\""
+        },
+        {
+          "id": "tabs-variant-pills",
+          "title": "pdx-tabs — variant=\"pills\""
         }
       ]
     },
@@ -2999,6 +3151,14 @@
         {
           "id": "wizard-vertical",
           "title": "Wizard — vertical orientation"
+        },
+        {
+          "id": "wizard-size-md",
+          "title": "pdx-wizard — size=\"md\""
+        },
+        {
+          "id": "wizard-size-sm",
+          "title": "pdx-wizard — size=\"sm\""
         }
       ]
     }

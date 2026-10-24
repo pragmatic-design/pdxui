@@ -11,7 +11,7 @@
  *           with a decreasing `style.zIndex` and `style.marginLeft = overlap+'px'` (overlap<0,
  *           -8 by default) on ALL but the first → they stack over each other.
  *         · the overflow counter (only when items.length > max) = a <div class="pdx-avatar-group-overflow
- *           pdx-avatar-group-item pdx-avatar-size-{size}"> holding "+N", with the same
+ *           pdx-avatar-group-item"> holding "+N", sized by the host's `size` (#632), with the same
  *           marginLeft negativo.
  *       · `items` is an Array prop: coercible from a JSON attribute (component.ts coerce → JSON.parse).
  *   - CSS: packages/design/src/components/avatar-group.css
@@ -132,7 +132,7 @@ export const avatarGroup: ComponentManifest = {
     isolation: {
         scenario: 'avatar-group-stack',
         targets: [
-            // The +N counter (sized through .pdx-avatar-size-md = 40px) must keep its
+            // The +N counter (sized by size="md" = 40px) must keep its
             // geometry under hostile global CSS. A 10px tolerance.
             { selector: 'pdx-avatar-group[data-test="ag"] .pdx-avatar-group-overflow', tolerancePx: 10 },
         ],

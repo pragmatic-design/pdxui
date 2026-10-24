@@ -6,12 +6,12 @@ Switch between panels.
 |---|---|---|---|---|
 | `value` | `value` | string | `''` | Active tab value (string matching data-tab attribute) |
 | `orientation` | `orientation` | string | `'horizontal'` | Orientation: horizontal (default) or vertical |
-| `variant` | `variant` | string | `'line'` | Visual style: line (default), card (bordered container), pills (rounded buttons) |
 | `bordered` | `bordered` | boolean | `false` | Add border around entire tabs + panels |
 | `mount` | `mount` | string | `'eager'` | Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate) |
 | `activation` | `activation` | string | `'automatic'` | Activation: automatic (activate on focus) or manual (Enter/Space to activate) |
 | `label` | `label` | string | `''` | The tablist's accessible name ("Account settings"). |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `variant` | `variant` | 'line' \| 'card' \| 'pills' | `'line'` | line (the default), card (a bordered container) or pills (rounded buttons). |
 
 **API (via `:ref`)**
 
