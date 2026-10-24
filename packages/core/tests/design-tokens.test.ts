@@ -11,10 +11,11 @@
 // contract checks (side-effects, pack-contents, docs-imports) for the same reason.
 
 import { describe, it, expect, beforeAll } from 'vitest';
-import { lintTokens, scanCss, unreadTokens, tokensNamedIn } from '../../design/scripts/lint-tokens.mjs';
+import { lintTokens, scanCss, unreadTokens, tokensNamedIn, readListed } from '../../design/scripts/lint-tokens.mjs';
 import { generate, renderReference, replaceRegion } from '../../design/scripts/gen-theming-reference.mjs';
 import { foreignTokenReads, lintComponentTokens, componentNames } from '../../design/scripts/component-tokens.mjs';
-import { readFileSync } from 'node:fs';
+import { readFileSync, mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 // Explicit root: the script resolves its own default from import.meta.url, which is not a file: URL
@@ -170,6 +171,48 @@ const THEMING_PAGES = [
     ['site', join(REPO, 'packages', 'site', 'content', 'docs', 'theming.md')],
     ['design', join(REPO, 'packages', 'design', 'THEMING.md')],
 ] as const;
+
+describe('a file the walk listed and then lost (#666)', () => {
+    // The walk lists packages/ while the compiler suite writes and deletes its temp sources there:
+    // a listed file can be gone when its turn to be read comes. Reading it must not throw, and must
+    // not vanish in silence either — it goes into `skipped`, like a directory the walk cannot read.
+    it('is reported in skipped instead of throwing', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'pdx-lint-tokens-'));
+        const gone = join(dir, 'gone.pdx');
+        writeFileSync(gone, 'a { color: var(--pdx-color-text); }');
+        rmSync(gone);
+        const skipped: string[] = [];
+        expect(readListed(gone, skipped)).toBeUndefined();
+        expect(skipped).toEqual([`${gone}: ENOENT`]);
+        rmSync(dir, { recursive: true });
+    });
+
+    it('never walks a test\'s temp directory, which is not a source and comes and goes', () => {
+        // `.tmp-*/` is the repo's name for a test's transient sources (gitignored): reading them
+        // would make the scan's answer depend on which suite happens to be running beside it.
+        const repo = mkdtempSync(join(tmpdir(), 'pdx-lint-tokens-repo-'));
+        for (const d of ['packages/design/src', 'packages/core/src', 'packages/x/tests/.tmp-style-src', 'templates']) {
+            mkdirSync(join(repo, d), { recursive: true });
+        }
+        writeFileSync(join(repo, 'packages/design/src/t.css'), ':root { --pdx-a: 1; --pdx-b: 2; }');
+        writeFileSync(join(repo, 'packages/x/tests/a.css'), 'a { color: var(--pdx-b); }');
+        writeFileSync(join(repo, 'packages/x/tests/.tmp-style-src/s.pdx'), 'a { color: var(--pdx-a); }');
+        const { unread, skipped } = unreadTokens(repo);
+        expect(unread, 'a read inside .tmp-* is not a read').toEqual(['--pdx-a']);
+        expect(skipped).toEqual([]);
+        rmSync(repo, { recursive: true });
+    });
+
+    it('reads a file that is still there', () => {
+        const dir = mkdtempSync(join(tmpdir(), 'pdx-lint-tokens-'));
+        const here = join(dir, 'here.css');
+        writeFileSync(here, 'a { color: var(--pdx-color-text); }');
+        const skipped: string[] = [];
+        expect(readListed(here, skipped)).toBe('a { color: var(--pdx-color-text); }');
+        expect(skipped).toEqual([]);
+        rmSync(dir, { recursive: true });
+    });
+});
 
 describe('every token a theming page names is read by something', () => {
     const { unread, where } = unreadTokens(REPO);

@@ -89,8 +89,13 @@ export function lintTokens(root = defaultSrc()) {
     return { files: files.length, declared: declared.size, phantoms };
 }
 
-/** Files under a directory, recursively, skipping build output and tooling state. */
+/**
+ * Files under a directory, recursively, skipping build output and tooling state — and `.tmp-*`, the
+ * repo's (gitignored) name for a test's transient sources, which a parallel test run writes and
+ * deletes while the scan reads (#666): not a source, and not a stable answer.
+ */
 const SKIP_DIRS = new Set(['node_modules', 'dist', '.git', 'coverage', 'test-results', 'playwright-report']);
+const isSkippedDir = (name) => SKIP_DIRS.has(name) || name.startsWith('.tmp-');
 function walk(dir, out = [], skipped = []) {
     let entries;
     // ⚠️ These two catches are not silent, because a silent one hides this: a subtree the walk
@@ -101,7 +106,7 @@ function walk(dir, out = [], skipped = []) {
     // rebuilt underneath it; it is not INVISIBLE.
     try { entries = readdirSync(dir); } catch (err) { skipped.push(`${dir}: ${err.code ?? err}`); return out; }
     for (const name of entries) {
-        if (SKIP_DIRS.has(name)) continue;
+        if (isSkippedDir(name)) continue;
         const p = join(dir, name);
         let st;
         try { st = statSync(p); } catch (err) { skipped.push(`${p}: ${err.code ?? err}`); continue; }
@@ -109,6 +114,17 @@ function walk(dir, out = [], skipped = []) {
         else out.push(p);
     }
     return out;
+}
+
+/**
+ * A file `walk` listed, read — or, if it is gone by now, recorded in `skipped` and skipped (#666).
+ * Listing and reading are two moments, and between them a parallel test run can delete what was
+ * listed (the compiler suite's temp sources under packages/compiler/tests). The same reasoning as
+ * `walk`'s catches: tolerated, because a scan must survive the tree changing under it; not
+ * invisible, because a short scan has to be distinguishable from a real result.
+ */
+export function readListed(file, skipped) {
+    try { return readFileSync(file, 'utf-8'); } catch (err) { skipped.push(`${file}: ${err.code ?? err}`); return undefined; }
 }
 
 /**
@@ -135,7 +151,9 @@ export function unreadTokens(repoRoot) {
     const declRoot = join(repoRoot, 'packages', 'design', 'src');
     const declared = new Map();
     for (const f of walk(declRoot, [], skipped).filter(f => f.endsWith('.css'))) {
-        const { declared: d } = scanCss(readFileSync(f, 'utf-8'));
+        const css = readListed(f, skipped);
+        if (css === undefined) continue;
+        const { declared: d } = scanCss(css);
         for (const t of d) if (!declared.has(t)) declared.set(t, relative(repoRoot, f).split(sep).join('/'));
     }
 
@@ -146,10 +164,14 @@ export function unreadTokens(repoRoot) {
     ];
     for (const f of sources) {
         if (f.endsWith('.md')) continue;
-        for (const m of readFileSync(f, 'utf-8').matchAll(/var\(\s*(--pdx-[A-Za-z0-9_-]+)/g)) read.add(m[1]);
+        const text = readListed(f, skipped);
+        if (text === undefined) continue;
+        for (const m of text.matchAll(/var\(\s*(--pdx-[A-Za-z0-9_-]+)/g)) read.add(m[1]);
     }
     for (const f of walk(join(repoRoot, 'packages', 'core', 'src'), [], skipped)) {
-        for (const m of readFileSync(f, 'utf-8').matchAll(/['"`](--pdx-[A-Za-z0-9_-]+)['"`]/g)) read.add(m[1]);
+        const text = readListed(f, skipped);
+        if (text === undefined) continue;
+        for (const m of text.matchAll(/['"`](--pdx-[A-Za-z0-9_-]+)['"`]/g)) read.add(m[1]);
     }
 
     const unread = [...declared.keys()].filter(t => !read.has(t)).sort();
