@@ -13,6 +13,23 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const SRC = join(__dirname, '..', '..', 'src');
+const FORM_MODEL = join(__dirname, '..', '..', '..', 'core', 'src', 'form', 'form-model.ts');
+
+/**
+ * The props core's `wireFormModel` reads for a component that declares a model `{ form: true }`
+ * (#135): the host's `name`, which the form submits the value under, and the declared `value`, a
+ * boolean model's checked value. Read there, not in the component's module, so the scan below would
+ * not see them. Each is held to the line of form-model.ts that reads it.
+ */
+const READ_BY_FORM_MODEL: Record<string, RegExp> = {
+    // Match: wireFormModel reading the host's `name` attribute. Groups: none
+    name: /el\.attr\('name'\)/,
+    // Match: wireFormModel reading the declared `value` prop. Groups: none
+    value: /declared\('value'\)/,
+};
+
+/** Whether a module declares a model `{ form: true }`, which core wires to its form. */
+const declaresFormModel = (src: string): boolean => /\bform:\s*(?:true|wireFormModel)\b/.test(src);
 
 /** Props a component declares and deliberately does not read, by `tag.prop`, with the reason. */
 const NOT_READ: Record<string, string> = {
@@ -40,76 +57,111 @@ function skipBlank(src: string, i: number): number {
     }
 }
 
-/** Past a balanced `{ … }` that starts at `i`. */
-function skipBlock(src: string, i: number): number {
+/**
+ * Past one entry of an object literal, from `i` to just after its comma — or to its closing `}`,
+ * where it stops. Brackets are balanced, and strings and comments are stepped over whole.
+ */
+function skipEntry(src: string, i: number): number {
     let depth = 0;
-    for (; i < src.length; i++) {
-        if (src[i] === '{') depth++;
-        else if (src[i] === '}' && --depth === 0) return i + 1;
+    while (i < src.length) {
+        const c = src[i];
+        if (c === '"' || c === "'" || c === '`') {
+            for (i++; i < src.length && src[i] !== c; i++) if (src[i] === '\\') i++;
+            i++;
+        } else if (src.startsWith('//', i)) {
+            const eol = src.indexOf('\n', i);
+            i = eol === -1 ? src.length : eol + 1;
+        } else if (src.startsWith('/*', i)) {
+            const end = src.indexOf('*/', i + 2);
+            i = end === -1 ? src.length : end + 2;
+        } else if ('{[('.includes(c)) { depth++; i++; }
+        else if ('}])'.includes(c)) {
+            if (depth === 0) return i;
+            depth--; i++;
+        } else if (c === ',' && depth === 0) return i + 1;
+        else i++;
     }
     return i;
 }
 
 /**
- * Where a descriptor's props block opens, just past its `{`: `props` first in the descriptor, or after
- * its `variants` (#627). A descriptor that opens with `models` is not read yet. -1 when neither.
+ * Where a descriptor's props block opens, just past its `{`, whatever comes before it — `models`
+ * (#125), `variants` (#627), a comment. -1 when the descriptor declares none.
  */
 function propsStart(src: string, descriptor: number): number {
-    let i = skipBlank(src, descriptor);
-    // Match: `variants: {` at i. Groups: none
-    const variants = /^variants:\s*/.exec(src.slice(i, i + 32));
-    if (variants && src[i + variants[0].length] === '{') {
-        i = skipBlock(src, i + variants[0].length);
-        if (src[i] === ',') i++;
+    let i = descriptor;
+    for (;;) {
         i = skipBlank(src, i);
+        if (i >= src.length || src[i] === '}') return -1;
+        // Match: `props: {` at i. Groups: none
+        const props = /^props:\s*\{/.exec(src.slice(i, i + 32));
+        if (props) return i + props[0].length;
+        i = skipEntry(src, i);
     }
-    // Match: `props: {` at i. Groups: none
-    const props = /^props:\s*\{/.exec(src.slice(i, i + 32));
-    return props ? i + props[0].length : -1;
 }
 
-/** The component a module registers, its top-level prop names, and the module's text outside them. */
-function declaredProps(src: string): { tag: string; names: string[]; rest: string } | null {
-    // The first registration of the module whose descriptor's props are read (a module may register
-    // two, pdx-toggle's does). Match: the registration up to the descriptor's `{`. Groups: [1]=tag
-    let m: RegExpMatchArray | undefined;
-    let start = -1;
-    for (const r of src.matchAll(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{/g)) {
-        start = propsStart(src, r.index! + r[0].length);
-        if (start >= 0) { m = r; break; }
-    }
-    if (!m) return null;
-    let i = start, depth = 1;
-    while (depth > 0 && i < src.length) { if (src[i] === '{') depth++; else if (src[i] === '}') depth--; i++; }
-    const block = src.slice(start, i - 1);
-    const names: string[] = [];
-    let d = 0;
-    for (const line of block.split('\n')) {
-        const key = d === 0 ? /^\s*([A-Za-z_$][\w$]*)\s*:/.exec(line) : null;
-        if (key) names.push(key[1]);
-        for (const ch of line) { if ('{[('.includes(ch)) d++; else if ('}])'.includes(ch)) d--; }
-    }
-    return { tag: m[1], names, rest: src.slice(0, start) + src.slice(i) };
+interface Declared { tag: string; names: string[]; rest: string; formModel: boolean }
+
+/**
+ * Every component a module registers with props — a module may register two, pdx-toggle's does —
+ * with its top-level prop names, the module's text outside that props block, and whether its own
+ * descriptor declares a form model.
+ */
+function declaredProps(src: string): Declared[] {
+    const out: Declared[] = [];
+    // Match: a registration up to its descriptor's `{`. Groups: [1]=tag
+    const registrations = [...src.matchAll(/component\(\s*'(pdx-[a-z0-9-]+)'\s*,\s*\{/g)];
+    registrations.forEach((m, k) => {
+        const start = propsStart(src, m.index! + m[0].length);
+        if (start < 0) return;
+        let i = start, depth = 1;
+        while (depth > 0 && i < src.length) { if (src[i] === '{') depth++; else if (src[i] === '}') depth--; i++; }
+        const block = src.slice(start, i - 1);
+        const names: string[] = [];
+        let d = 0;
+        for (const line of block.split('\n')) {
+            const key = d === 0 ? /^\s*([A-Za-z_$][\w$]*)\s*:/.exec(line) : null;
+            if (key) names.push(key[1]);
+            for (const ch of line) { if ('{[('.includes(ch)) d++; else if ('}])'.includes(ch)) d--; }
+        }
+        const own = src.slice(m.index, registrations[k + 1]?.index ?? src.length);
+        out.push({ tag: m[1], names, rest: src.slice(0, start) + src.slice(i), formModel: declaresFormModel(own) });
+    });
+    return out;
 }
 
 describe('the props a component declares', () => {
-    const components = tsFiles(SRC)
-        .map((f) => ({ file: relative(SRC, f).replace(/\\/g, '/'), found: declaredProps(readFileSync(f, 'utf8')) }))
-        .filter((c): c is { file: string; found: NonNullable<ReturnType<typeof declaredProps>> } => c.found !== null);
+    const components = tsFiles(SRC).flatMap((f) =>
+        declaredProps(readFileSync(f, 'utf8')).map((found) => ({ file: relative(SRC, f).replace(/\\/g, '/'), found })));
 
     it('were found, so the assertion below is not vacuous', () => {
-        expect(components.length, 'no component with props: the scan broke').toBeGreaterThan(80);
+        // Every registration with a props block: 114 on 2026-10-24 (#658), 82 when models-first
+        // descriptors were skipped.
+        expect(components.length, 'no component with props: the scan broke').toBeGreaterThanOrEqual(114);
     });
 
     it('are each read by the component, or listed with a reason', () => {
         const unread: string[] = [];
         for (const { file, found } of components) {
             for (const name of found.names) {
-                const read = new RegExp(`ctx\\.${name}\\b|\\b${name}\\s*\\(\\)|['"]${name}['"]`).test(found.rest);
+                const read = new RegExp(`ctx\\.${name}\\b|\\b${name}\\s*\\(\\)|['"]${name}['"]`).test(found.rest)
+                    || (found.formModel && name in READ_BY_FORM_MODEL);
                 if (!read && !(`${found.tag}.${name}` in NOT_READ)) unread.push(`${found.tag}.${name} (${file})`);
             }
         }
         expect(unread, 'declared and never read: read it, remove it, or list it with a reason').toEqual([]);
+    });
+
+    it('read by core\'s form model are still read there', () => {
+        // The category above outlives its reason the day wireFormModel stops reading one of them.
+        const source = readFileSync(FORM_MODEL, 'utf8');
+        const gone = Object.entries(READ_BY_FORM_MODEL).filter(([, line]) => !line.test(source)).map(([name]) => name);
+        expect(gone, 'wireFormModel no longer reads these: a component that declares them reads them itself, or drops them').toEqual([]);
+    });
+
+    it('reach the components that open their descriptor with models (#658)', () => {
+        // Before, a descriptor whose first entry was `models` was skipped, and none of its props was read.
+        expect(components.map((c) => c.found.tag)).toEqual(expect.arrayContaining(['pdx-switch', 'pdx-select', 'pdx-input']));
     });
 
     it('listed as not read are still declared and still not read', () => {
