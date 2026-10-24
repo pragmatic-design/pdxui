@@ -9,10 +9,10 @@ Key/value pairs, neatly aligned.
 | `layout` | `layout` | string | `'horizontal'` | Layout: 'horizontal' (label beside value) or 'vertical'. |
 | `bordered` | `bordered` | boolean | `false` | Adds a border. |
 | `striped` | `striped` | boolean | `false` | Alternates row backgrounds. |
-| `size` | `size` | string | `'md'` | Size of the control (e.g. sm, md, lg). |
 | `labelWidth` | `labelwidth` | string | `'auto'` | Fixed width for the label column. |
 | `colon` | `colon` | boolean | `true` | Appends a colon after each label. |
 | `renderValue` | — | object | `null` | Render function for a value. |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 **Slot:** `value` — Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
 

@@ -28,6 +28,13 @@ registerComponentStrings('wizard', {
  * validation guard before moving on.
  */
 component('pdx-wizard', {
+    // The axis pagination.css keys by (#632), reflected on the host and drawn on the stepper, the
+    // root part, where `.pdx-stepper-sm` draws the same on a native stepper. The navigation buttons
+    // take it too.
+    variants: {
+        /** The step numbers' size: md (the default) or sm. */
+        size: { md: '.pdx-stepper-md', sm: '.pdx-stepper-sm' },
+    },
     props: {
         /** Current step (0-based index) */
         value: { type: Number, default: 0 },
@@ -35,8 +42,6 @@ component('pdx-wizard', {
         linear: { type: Boolean, default: true },
         /** Stepper orientation */
         orientation: { type: String, default: 'horizontal' },
-        /** Step number circle size */
-        size: { type: String, default: 'md' },
         /** Hide the auto-generated navigation footer */
         hideNav: { type: Boolean, default: false },
         /** Hide the stepper header */
@@ -134,10 +139,10 @@ component('pdx-wizard', {
         // ─── Build stepper header ────────────────────────────
         function buildStepper(): HTMLElement {
             const isVert = (ctx.orientation() as string) === 'vertical';
-            const isSm = (ctx.size() as string) === 'sm';
 
             const nav = document.createElement('nav');
-            nav.className = 'pdx-stepper' + (isVert ? ' pdx-stepper-vertical' : '') + (isSm ? ' pdx-stepper-sm' : '');
+            nav.className = 'pdx-stepper' + (isVert ? ' pdx-stepper-vertical' : '');
+            nav.setAttribute('data-part', 'root');
             nav.setAttribute('role', 'tablist');
             uiAttr(nav, 'aria-label', () => uiString('wizard', 'steps'));
             nav.setAttribute('aria-orientation', isVert ? 'vertical' : 'horizontal');

@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/pagination.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Pagination + Stepper/Wizard */
 
 /* Pagination */
@@ -153,13 +154,14 @@ pdx-pagination { display: block; }
     color: var(--pdx-color-muted);
 }
 
-/* Small variant */
-.pdx-stepper-sm .pdx-step-number {
-    width: 1.5rem;
-    height: 1.5rem;
-    font-size: var(--pdx-text-xs);
-}
-.pdx-stepper-sm .pdx-step-label { font-size: var(--pdx-text-xs); }
+/* Small variant, keyed on pdx-wizard's `size` (#632) and drawn on its stepper, the root part; on a
+   native stepper `.pdx-stepper-sm`. */
+:where(pdx-wizard[size="sm"]) > [data-part="root"] .pdx-step-number, .pdx-stepper-sm .pdx-step-number {
+        width: 1.5rem;
+        height: 1.5rem;
+        font-size: var(--pdx-text-xs);
+    }
+    :where(pdx-wizard[size="sm"]) > [data-part="root"] .pdx-step-label, .pdx-stepper-sm .pdx-step-label { font-size: var(--pdx-text-xs); }
 
 /* ===== Vertical Stepper ===== */
 

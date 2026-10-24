@@ -26,10 +26,10 @@ if you like, grouped under one or more forms. **Not when** the steps are section
 | `value` | `value` | number | `0` | Current step (0-based index) |
 | `linear` | `linear` | boolean | `true` | Sequential navigation — can't skip ahead |
 | `orientation` | `orientation` | string | `'horizontal'` | Stepper orientation |
-| `size` | `size` | string | `'md'` | Step number circle size |
 | `hideNav` | `hidenav` | boolean | `false` | Hide the auto-generated navigation footer |
 | `hideStepper` | `hidestepper` | boolean | `false` | Hide the stepper header |
 | `disabled` | `disabled` | boolean | `false` | Disabled state — no interaction |
+| `size` | `size` | 'md' \| 'sm' | `'md'` | The step numbers' size: md (the default) or sm. |
 
 **API (via `:ref`)**
 

@@ -21,9 +21,14 @@ const SYMBOLS: Record<string, string> = {
  * Shows a keyboard shortcut, written as keys joined by +, optionally with modifier symbols.
  */
 component('pdx-kbd', {
+    // The axis kbd.css keys by (#632), reflected on the host and drawn on the combo, the root part;
+    // each value maps the class that draws the same on a native key. `md` is the base look.
+    variants: {
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-kbd-md', sm: '.pdx-kbd-sm', lg: '.pdx-kbd-lg' },
+    },
     props: {
         keys: { type: String, default: '' },
-        size: { type: String, default: '' },
         /** Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false. */
         symbols: { type: Boolean, default: false },
     },
@@ -38,13 +43,7 @@ component('pdx-kbd', {
             }
             return key;
         }
-        function cssClass(): string {
-            let cls = 'pdx-kbd-combo';
-            const s = ctx.size() as string;
-            if (s) cls += ' pdx-kbd-' + s;
-            return cls;
-        }
-        return { parts, displayKey, cssClass };
+        return { parts, displayKey };
     },
     // ⚠️ Without `keys`, the children are the shortcut.
     //
@@ -57,7 +56,7 @@ component('pdx-kbd', {
     // that keeps the authored children. `keys` still wins when given — it is explicit, and it splits
     // on `+`, which raw children cannot.
     render: (ctx) => html`
-        <kbd :class="${ctx.cssClass}">
+        <kbd class="pdx-kbd-combo" data-part="root">
             ${() => ctx.parts().length
                 ? ctx.parts().map((k: string) => html`<kbd class="pdx-kbd">${() => ctx.displayKey(k)}</kbd>`)
                 : html`<kbd class="pdx-kbd"><slot></slot></kbd>`}

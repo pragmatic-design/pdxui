@@ -62,6 +62,19 @@ function applyData(el: HTMLElement, data: Record<string, string> | undefined): v
  * @slot actions - The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
  */
 component('pdx-nav-menu', {
+    // The looks nav.css keys by (#632), reflected on the host and drawn from it; the host is the
+    // element the old `.pdx-nav-{look}-{value}` classes went on, so no native class is kept. A value
+    // outside a list is the default, as an unknown attribute value is in HTML.
+    variants: {
+        /** `sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar. */
+        size: ['md', 'sm'],
+        /** How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge. */
+        indicator: ['fill', 'border'],
+        /** Where a group's chevron sits: before its icon, or at the end of its row. */
+        chevron: ['start', 'end'],
+        /** `overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest. */
+        actions: ['inline', 'overlay'],
+    },
     props: {
         /** Menu items */
         items: { type: Array, default: [] },
@@ -73,14 +86,6 @@ component('pdx-nav-menu', {
         indent: { type: Number, default: 36 },
         /** Icon set name (for pdx-icon set attribute) */
         iconSet: { type: String, default: '' },
-        /** `sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar. */
-        size: { type: String, default: 'md', enum: ['md', 'sm'] },
-        /** How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge. */
-        indicator: { type: String, default: 'fill', enum: ['fill', 'border'] },
-        /** Where a group's chevron sits: before its icon, or at the end of its row. */
-        chevron: { type: String, default: 'start', enum: ['start', 'end'] },
-        /** `overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest. */
-        actions: { type: String, default: 'inline', enum: ['inline', 'overlay'] },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots stay (#595).
     // The `actions` slot shares its name with the prop above, so its snippet is `itemActions`.
@@ -476,18 +481,6 @@ component('pdx-nav-menu', {
                 else ctx.el.classList.remove('pdx-nav-collapsed');
                 rebuildItems();
             });
-        });
-
-        // The looks: one host class each, for the design system's rules to hang on. A value
-        // outside the list is the default, as an unknown attribute value is in HTML.
-        ctx.track(() => {
-            const looks: [string, string, string][] = [
-                ['size', ctx.size() as string, 'sm'],
-                ['indicator', ctx.indicator() as string, 'border'],
-                ['chevron', ctx.chevron() as string, 'end'],
-                ['actions', ctx.actions() as string, 'overlay'],
-            ];
-            for (const [name, value, other] of looks) ctx.el.classList.toggle(`pdx-nav-${name}-${other}`, value === other);
         });
 
         // Teardown on destroy only: the flyout is on <body> and would outlive the menu.

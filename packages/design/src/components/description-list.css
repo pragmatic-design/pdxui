@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/description-list.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-description-list — Key-value pair display */
 pdx-description-list { display: block; }
 
@@ -86,27 +87,27 @@ pdx-description-list { display: block; }
     background: var(--pdx-color-inset);
 }
 
-/* --- Sizes --- */
-.pdx-dl-sm .pdx-dl-item {
-    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
-    font-size: var(--pdx-text-xs);
-}
-.pdx-dl-sm .pdx-dl-label {
-    font-size: var(--pdx-text-xs);
-}
+/* --- Sizes, keyed on the host's `size` (#632); on a native <dl> `.pdx-dl-sm` --- */
+:where(pdx-description-list[size="sm"]) > [data-part="root"] .pdx-dl-item, .pdx-dl-sm .pdx-dl-item {
+        padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+        font-size: var(--pdx-text-xs);
+    }
+    :where(pdx-description-list[size="sm"]) > [data-part="root"] .pdx-dl-label, .pdx-dl-sm .pdx-dl-label {
+        font-size: var(--pdx-text-xs);
+    }
 
-.pdx-dl-md .pdx-dl-item {
-    padding: var(--pdx-space-sm) var(--pdx-space-md);
-    font-size: var(--pdx-text-sm);
-}
-.pdx-dl-md .pdx-dl-label {
-    font-size: var(--pdx-text-sm);
-}
+:where(pdx-description-list[size="md"]) > [data-part="root"] .pdx-dl-item, .pdx-dl-md .pdx-dl-item {
+        padding: var(--pdx-space-sm) var(--pdx-space-md);
+        font-size: var(--pdx-text-sm);
+    }
+    :where(pdx-description-list[size="md"]) > [data-part="root"] .pdx-dl-label, .pdx-dl-md .pdx-dl-label {
+        font-size: var(--pdx-text-sm);
+    }
 
-.pdx-dl-lg .pdx-dl-item {
-    padding: var(--pdx-space-md) var(--pdx-space-lg);
-    font-size: var(--pdx-text-base);
-}
-.pdx-dl-lg .pdx-dl-label {
-    font-size: var(--pdx-text-base);
-}
+:where(pdx-description-list[size="lg"]) > [data-part="root"] .pdx-dl-item, .pdx-dl-lg .pdx-dl-item {
+        padding: var(--pdx-space-md) var(--pdx-space-lg);
+        font-size: var(--pdx-text-base);
+    }
+    :where(pdx-description-list[size="lg"]) > [data-part="root"] .pdx-dl-label, .pdx-dl-lg .pdx-dl-label {
+        font-size: var(--pdx-text-base);
+    }

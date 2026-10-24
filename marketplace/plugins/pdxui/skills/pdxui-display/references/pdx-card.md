@@ -4,7 +4,6 @@ A surface for grouped content.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `variant` | `variant` | string | `''` | Card variant: default, outline, elevated, flat |
 | `loading` | `loading` | boolean | `false` | Show loading skeleton state |
 | `clickable` | `clickable` | boolean | `false` | Make entire card clickable (emits pdx-click) |
 | `hoverable` | `hoverable` | boolean | `false` | Hoverable elevation effect |
@@ -14,6 +13,7 @@ A surface for grouped content.
 | `disabled` | `disabled` | boolean | `false` | Disabled state |
 | `href` | `href` | string | `''` | Makes the card a link: it renders an `<a>` overlay across the card, so middle-click, open-in-a-new-tab, copy-link-address and the status bar all work, and the address is in the DOM. An interactive element inside the card stays clickable (it sits above the overlay). The URL is sanitised before it is written. |
 | `elevation` | `elevation` | number | `-1` | Shadow elevation: 0 (none), 1 (sm), 2 (md), 3 (lg), 4 (xl) |
+| `variant` | `variant` | 'default' \| 'outline' \| 'elevated' \| 'flat' | `'default'` | default, outline, elevated or flat. |
 
 **Events:** `pdx-click` — Fired on `pdx-click`.
 

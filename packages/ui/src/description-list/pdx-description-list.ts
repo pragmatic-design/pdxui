@@ -34,13 +34,18 @@ export interface DescriptionListItem {
  * @slot value - Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
  */
 component('pdx-description-list', {
+    // The axis description-list.css keys by (#632), reflected on the host; each value maps the class
+    // that draws the same list on a native <dl>.
+    variants: {
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-dl-md', sm: '.pdx-dl-sm', lg: '.pdx-dl-lg' },
+    },
     props: {
         items: { type: Array, default: null },
         columns: { type: Number, default: 1 },
         layout: { type: String, default: 'horizontal' },
         bordered: { type: Boolean, default: false },
         striped: { type: Boolean, default: false },
-        size: { type: String, default: 'md' },
         labelWidth: { type: String, default: 'auto' },
         colon: { type: Boolean, default: true },
         renderValue: { type: Object, default: null },
@@ -129,12 +134,10 @@ component('pdx-description-list', {
             const cols = ctx.columns() as number;
             const isBordered = ctx.bordered() as boolean;
             const isStriped = ctx.striped() as boolean;
-            const size = ctx.size() as string;
             const showColon = ctx.colon() as boolean;
 
             listEl.className = 'pdx-dl';
             listEl.classList.add(`pdx-dl-${layout}`);
-            listEl.classList.add(`pdx-dl-${size}`);
             if (isBordered) listEl.classList.add('pdx-dl-bordered');
             if (isStriped) listEl.classList.add('pdx-dl-striped');
             if (showColon) listEl.classList.add('pdx-dl-colon');
@@ -170,6 +173,7 @@ component('pdx-description-list', {
                     ctx.el.classList.add('pdx-dl-root');
                     listEl = document.createElement('dl');
                     listEl.className = 'pdx-dl';
+                    listEl.setAttribute('data-part', 'root');
                     ctx.el.appendChild(listEl);
                     buildList();
                 });

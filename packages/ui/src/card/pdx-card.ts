@@ -8,9 +8,13 @@ import { component, html, sanitizeUrl } from '@pdxui/core';
  * and be clickable or selectable.
  */
 component('pdx-card', {
+    // The axis base.css keys by (#632), reflected on the host; each value maps the class that draws
+    // the same card on native markup. `default` is the base look.
+    variants: {
+        /** default, outline, elevated or flat. */
+        variant: { default: '.pdx-card-default', outline: '.pdx-card-outline', elevated: '.pdx-card-elevated', flat: '.pdx-card-flat' },
+    },
     props: {
-        /** Card variant: default, outline, elevated, flat */
-        variant: { type: String, default: '' },
         /** Show loading skeleton state */
         loading: { type: Boolean, default: false },
         /** Make entire card clickable (emits pdx-click) */
@@ -38,8 +42,6 @@ component('pdx-card', {
     setup(ctx) {
         function rootClass(): string {
             let cls = 'pdx-surface pdx-surface-card';
-            const v = ctx.variant() as string;
-            if (v) cls += ' pdx-card-' + v;
             if (ctx.horizontal()) cls += ' pdx-card-horizontal';
             if (ctx.compact()) cls += ' pdx-card-compact';
             if (ctx.hoverable() || ctx.clickable() || ctx.href()) cls += ' pdx-card-hoverable';
@@ -139,7 +141,7 @@ component('pdx-card', {
         return { rootClass, onClick, safeHref };
     },
     render: (ctx) => html`
-        <div :class="${ctx.rootClass}">
+        <div :class="${ctx.rootClass}" data-part="root">
             ${() => ctx.safeHref() ? html`<a class="pdx-card-link" :href="${ctx.safeHref}" aria-hidden="true" tabindex="-1"></a>` : ''}
             ${() => ctx.loading() ? html`
                 <div class="pdx-card-body">

@@ -304,7 +304,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // the native class it replaced — `:where(:is(pdx-input, …, pdx-date-picker)[size="sm"]) > [data-part="root"],
 // .pdx-input-sm`. The pre-push build: main (after #627) css 63.0 → this branch 63.3 KB, blocking
 // 100.9 → 101.0 KB. The remaining variant batches (#629–#632) add more of the same.
-const BUDGET_KB = { entry: 43, js: 470, css: 64, blocking: 102 };
+// css 64 → 65 (owner's standing OK for #631–#633, at most +1 KB a batch): the surfaces, navigation
+// and display components (#632) are drawn by `@variant` rules keyed on the host, each a host selector
+// beside the native class it replaced, and tabs' pills rules are written twice, once for the host's
+// `variant` and once for the theme's `[pdx-tab-style="pill"]`, which shared one `:is()` before. Same
+// machine, the built dist: main (after #631) css 63.9 → this branch 64.1 KB; blocking stays 101.4.
+const BUDGET_KB = { entry: 43, js: 470, css: 65, blocking: 102 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

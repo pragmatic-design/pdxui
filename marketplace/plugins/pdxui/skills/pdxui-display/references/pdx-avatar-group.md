@@ -6,11 +6,11 @@ Stacked avatars with an overflow count.
 |---|---|---|---|---|
 | `items` | — | array | `null` | The data items to render. |
 | `max` | `max` | number | `5` | Maximum allowed value. |
-| `size` | `size` | string | `'md'` | Size of the control (e.g. sm, md, lg). |
 | `overlap` | `overlap` | number | `-8` | How much adjacent avatars overlap. |
 | `direction` | `direction` | string | `'row'` | Stacking direction. |
 | `clickable` | `clickable` | boolean | `false` | Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click. |
 | `bordered` | `bordered` | boolean | `true` | Adds a border. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | The avatars' and the badge's size: xs, sm, md (the default), lg or xl. |
 
 **Events:** `pdx-click` → `detail: { item, index }` — Fired on `pdx-click`.; `pdx-overflow-click` → `detail: { count, items }` — Fired when the overflow is clicked.
 

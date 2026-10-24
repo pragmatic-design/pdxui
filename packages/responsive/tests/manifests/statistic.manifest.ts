@@ -6,7 +6,7 @@
  *
  * DOM structure (host vs inner):
  *   - The ROOT class is on the HOST <pdx-statistic> itself: `el.className = 'pdx-statistic-root'`
- *     (plus 'pdx-statistic-sm'/'-lg' for the size). The host's CSS: `display: block`; the root: `display: flex`,
+ *     (the size is the host's `size` attribute, #632). The host's CSS: `display: block`; the root: `display: flex`,
  *     flex-direction column, gap. → the host's effective display = flex.
  *   - Children (inner), built imperatively in an rAF:
  *       · <pdx-icon class="pdx-statistic-icon">          (when icon)

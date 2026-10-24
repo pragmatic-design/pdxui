@@ -14,6 +14,12 @@ function loadIcon(): void {
  * Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.
  */
 component('pdx-statistic', {
+    // The axis statistic.css keys by (#632), reflected on the host and drawn from it; the host is the
+    // element the old `.pdx-statistic-sm`/`-lg` classes went on, so no native class is kept.
+    variants: {
+        /** sm, md (the default) or lg. */
+        size: ['md', 'sm', 'lg'],
+    },
     props: {
         /** Label text above the value */
         title: { type: String, default: '' },
@@ -31,8 +37,6 @@ component('pdx-statistic', {
         trendValue: { type: String, default: '' },
         /** Auto-color trend (green up, red down) */
         trendColor: { type: Boolean, default: true },
-        /** Size variant: 'sm' | 'md' | 'lg' */
-        size: { type: String, default: 'md' },
         /** Show skeleton placeholder */
         loading: { type: Boolean, default: false },
         /** Decimal places for formatting (-1 = no format) */
@@ -88,8 +92,6 @@ component('pdx-statistic', {
 
             // Own classes only, via classList: `className =` would wipe the author's classes.
             el.classList.add('pdx-statistic-root');
-            el.classList.toggle('pdx-statistic-sm', size === 'sm');
-            el.classList.toggle('pdx-statistic-lg', size === 'lg');
             el.classList.toggle('pdx-statistic-loading', !!isLoading);
 
             if (isLoading) {

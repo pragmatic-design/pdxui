@@ -25,10 +25,16 @@ function makeButton(el: HTMLElement, name: string, activate: () => void): void {
  * Stacked, overlapping avatars, up to a maximum count, with an overflow counter for the rest.
  */
 component('pdx-avatar-group', {
+    // The axis avatar-group.css keys by (#632), reflected on the host: it draws the overflow badge
+    // and is passed to every avatar. No native class is kept: the badge is not the root part, and
+    // nothing used `.pdx-avatar-size-*` on native markup.
+    variants: {
+        /** The avatars' and the badge's size: xs, sm, md (the default), lg or xl. */
+        size: ['md', 'xs', 'sm', 'lg', 'xl'],
+    },
     props: {
         items: { type: Array, default: null },
         max: { type: Number, default: 5 },
-        size: { type: String, default: 'md' },
         overlap: { type: Number, default: -8 },
         direction: { type: String, default: 'row' },
         /** Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click. */
@@ -93,7 +99,6 @@ component('pdx-avatar-group', {
                 const badge = document.createElement('div');
                 badge.className = 'pdx-avatar-group-overflow pdx-avatar-group-item';
                 if (isBordered) badge.classList.add('pdx-avatar-group-bordered');
-                badge.classList.add('pdx-avatar-size-' + avatarSize);
                 if (isReverse) {
                     badge.style.marginRight = overlapPx + 'px';
                 } else {

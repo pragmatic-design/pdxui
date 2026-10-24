@@ -9,14 +9,20 @@ import { uiString } from '../shared/i18n';
  * and an error state.
  */
 component('pdx-fieldset', {
+    // The axes forms.css keys by (#632), reflected on the host; each value maps the class that draws
+    // the same fieldset on native markup. `bordered` and `md` are the base look.
+    variants: {
+        /** bordered (the default), filled or plain. */
+        variant: { bordered: '.pdx-fieldset-bordered', filled: '.pdx-fieldset-filled', plain: '.pdx-fieldset-plain' },
+        /** sm, md (the default) or lg. */
+        size: { md: '.pdx-fieldset-md', sm: '.pdx-fieldset-sm', lg: '.pdx-fieldset-lg' },
+    },
     props: {
         legend: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         invalid: { type: Boolean, default: false },
         error: { type: String, default: '' },
         description: { type: String, default: '' },
-        variant: { type: String, default: 'bordered' },
-        size: { type: String, default: '' },
         collapsible: { type: Boolean, default: false },
         collapsed: { type: Boolean, default: false },
     },
@@ -52,8 +58,6 @@ component('pdx-fieldset', {
             const leg = ctx.legend() as string;
             const desc = ctx.description() as string;
             const err = ctx.error() as string;
-            const v = ctx.variant() as string;
-            const s = ctx.size() as string;
             const isInvalid = ctx.invalid() || !!err;
             const isCollapsible = ctx.collapsible();
             const isCollapsed = _collapsed();
@@ -61,8 +65,6 @@ component('pdx-fieldset', {
             const toggleName = uiString('fieldset', 'toggle'); // read here: a locale loaded later reaches it
 
             let cls = 'pdx-fieldset';
-            if (v && v !== 'bordered') cls += ' pdx-fieldset-' + v;
-            if (s) cls += ' pdx-fieldset-' + s;
             if (isInvalid) cls += ' pdx-fieldset-invalid';
             if (isCollapsed) cls += ' pdx-fieldset-collapsed';
             if (isCollapsible) cls += ' pdx-fieldset-collapsible';
@@ -128,7 +130,7 @@ component('pdx-fieldset', {
         return { toggle, _collapsed };
     },
     render: (ctx: any) => html`
-        <fieldset class="pdx-fieldset">
+        <fieldset class="pdx-fieldset" data-part="root">
             <legend class="pdx-legend">
                 <span class="pdx-legend-text"></span>
                 <button type="button" class="pdx-fieldset-toggle" @click="${ctx.toggle}" style="display:none" tabindex="0">

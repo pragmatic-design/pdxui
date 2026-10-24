@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/kbd.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Kbd / Keyboard Shortcut — styled key indicators.
    Single keys, combinations, sequences.
 
@@ -57,21 +58,21 @@
     color: var(--pdx-color-muted);
 }
 
-/* ===== Size variants ===== */
+/* ===== Size variants, keyed on pdx-kbd's `size` (#632); on a native key `.pdx-kbd-sm` ===== */
 
-.pdx-kbd-sm {
-    font-size: 0.65em;
-    min-width: 1.2em;
-    height: 1.3em;
-    padding: 0 0.25em;
-}
+:where(pdx-kbd[size="sm"]) > [data-part="root"], .pdx-kbd-sm {
+        font-size: 0.65em;
+        min-width: 1.2em;
+        height: 1.3em;
+        padding: 0 0.25em;
+    }
 
-.pdx-kbd-lg {
-    font-size: 0.9em;
-    min-width: 1.6em;
-    height: 1.7em;
-    padding: 0 0.45em;
-}
+:where(pdx-kbd[size="lg"]) > [data-part="root"], .pdx-kbd-lg {
+        font-size: 0.9em;
+        min-width: 1.6em;
+        height: 1.7em;
+        padding: 0 0.45em;
+    }
 
 /* ===== Light variant (for dark backgrounds) ===== */
 

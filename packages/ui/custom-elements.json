@@ -1641,16 +1641,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "overlap",
               "description": "How much adjacent avatars overlap.",
               "type": {
@@ -1688,6 +1678,29 @@
               },
               "default": "true",
               "attribute": "bordered"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "The avatars' and the badge's size: xs, sm, md (the default), lg or xl.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md"
             }
           ],
           "events": [
@@ -1721,15 +1734,6 @@
                 "text": "number"
               },
               "default": "5"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
             },
             {
               "name": "overlap",
@@ -1766,6 +1770,15 @@
                 "text": "boolean"
               },
               "default": "true"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "The avatars' and the badge's size: xs, sm, md (the default), lg or xl.",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
             }
           ]
         }
@@ -4117,16 +4130,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Card variant: default, outline, elevated, flat",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
               "name": "loading",
               "description": "Show loading skeleton state",
               "type": {
@@ -4214,6 +4217,34 @@
               },
               "default": "-1",
               "attribute": "elevation"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "default, outline, elevated or flat.",
+              "type": {
+                "text": "'default' | 'outline' | 'elevated' | 'flat'"
+              },
+              "default": "'default'",
+              "attribute": "variant"
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "default",
+                "outline",
+                "elevated",
+                "flat"
+              ],
+              "default": "default",
+              "native": {
+                "default": ".pdx-card-default",
+                "outline": ".pdx-card-outline",
+                "elevated": ".pdx-card-elevated",
+                "flat": ".pdx-card-flat"
+              }
             }
           ],
           "events": [
@@ -4230,15 +4261,6 @@
             "link"
           ],
           "attributes": [
-            {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Card variant: default, outline, elevated, flat",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "loading",
               "fieldName": "loading",
@@ -4319,6 +4341,15 @@
                 "text": "number"
               },
               "default": "-1"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "default, outline, elevated or flat.",
+              "type": {
+                "text": "'default' | 'outline' | 'elevated' | 'flat'"
+              },
+              "default": "'default'"
             }
           ],
           "slots": [
@@ -9277,16 +9308,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "labelWidth",
               "description": "Fixed width for the label column.",
               "type": {
@@ -9313,6 +9334,32 @@
                 "text": "object"
               },
               "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-dl-md",
+                "sm": ".pdx-dl-sm",
+                "lg": ".pdx-dl-lg"
+              }
             }
           ],
           "attributes": [
@@ -9353,15 +9400,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
-            },
-            {
               "name": "labelwidth",
               "fieldName": "labelWidth",
               "description": "Fixed width for the label column.",
@@ -9378,6 +9416,15 @@
                 "text": "boolean"
               },
               "default": "true"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ],
           "shapes": [
@@ -11821,26 +11868,6 @@
             },
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'bordered'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "collapsible",
               "description": "Allows the group to collapse.",
               "type": {
@@ -11858,6 +11885,56 @@
               },
               "default": "false",
               "attribute": "collapsed"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "bordered (the default), filled or plain.",
+              "type": {
+                "text": "'bordered' | 'filled' | 'plain'"
+              },
+              "default": "'bordered'",
+              "attribute": "variant"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "bordered",
+                "filled",
+                "plain"
+              ],
+              "default": "bordered",
+              "native": {
+                "bordered": ".pdx-fieldset-bordered",
+                "filled": ".pdx-fieldset-filled",
+                "plain": ".pdx-fieldset-plain"
+              }
+            },
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-fieldset-md",
+                "sm": ".pdx-fieldset-sm",
+                "lg": ".pdx-fieldset-lg"
+              }
             }
           ],
           "events": [
@@ -11920,24 +11997,6 @@
               "default": "''"
             },
             {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'bordered'"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "collapsible",
               "fieldName": "collapsible",
               "description": "Allows the group to collapse.",
@@ -11954,6 +12013,24 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "bordered (the default), filled or plain.",
+              "type": {
+                "text": "'bordered' | 'filled' | 'plain'"
+              },
+              "default": "'bordered'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -15102,16 +15179,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "symbols",
               "description": "Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false.",
               "type": {
@@ -15119,6 +15186,32 @@
               },
               "default": "false",
               "attribute": "symbols"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-kbd-md",
+                "sm": ".pdx-kbd-sm",
+                "lg": ".pdx-kbd-lg"
+              }
             }
           ],
           "attributes": [
@@ -15132,15 +15225,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "symbols",
               "fieldName": "symbols",
               "description": "Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false.",
@@ -15148,6 +15232,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ],
           "slots": [
@@ -16836,6 +16929,40 @@
               "name": "collapseAll",
               "parameters": [],
               "description": "Collapse every group."
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm"
+              ],
+              "default": "md"
+            },
+            {
+              "name": "indicator",
+              "values": [
+                "fill",
+                "border"
+              ],
+              "default": "fill"
+            },
+            {
+              "name": "chevron",
+              "values": [
+                "start",
+                "end"
+              ],
+              "default": "start"
+            },
+            {
+              "name": "actions",
+              "values": [
+                "inline",
+                "overlay"
+              ],
+              "default": "inline"
             }
           ],
           "events": [
@@ -23737,16 +23864,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size variant: 'sm' | 'md' | 'lg'",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "loading",
               "description": "Show skeleton placeholder",
               "type": {
@@ -23804,6 +23921,27 @@
               },
               "default": "''",
               "attribute": "description"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md"
             }
           ],
           "attributes": [
@@ -23880,15 +24018,6 @@
               "default": "true"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size variant: 'sm' | 'md' | 'lg'",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
-            },
-            {
               "name": "loading",
               "fieldName": "loading",
               "description": "Show skeleton placeholder",
@@ -23941,6 +24070,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ]
         }
@@ -24292,16 +24430,6 @@
             },
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual style: line (default), card (bordered container), pills (rounded buttons)",
-              "type": {
-                "text": "string"
-              },
-              "default": "'line'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
               "name": "bordered",
               "description": "Add border around entire tabs + panels",
               "type": {
@@ -24351,6 +24479,16 @@
               "attribute": "loading"
             },
             {
+              "kind": "field",
+              "name": "variant",
+              "description": "line (the default), card (a bordered container) or pills (rounded buttons).",
+              "type": {
+                "text": "'line' | 'card' | 'pills'"
+              },
+              "default": "'line'",
+              "attribute": "variant"
+            },
+            {
               "kind": "method",
               "name": "select",
               "parameters": [
@@ -24380,6 +24518,17 @@
               "name": "active",
               "readonly": true,
               "description": "Read-only, via a ref: `el.active`."
+            }
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "line",
+                "card",
+                "pills"
+              ],
+              "default": "line"
             }
           ],
           "events": [
@@ -24425,15 +24574,6 @@
               "default": "'horizontal'"
             },
             {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual style: line (default), card (bordered container), pills (rounded buttons)",
-              "type": {
-                "text": "string"
-              },
-              "default": "'line'"
-            },
-            {
               "name": "bordered",
               "fieldName": "bordered",
               "description": "Add border around entire tabs + panels",
@@ -24477,6 +24617,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "line (the default), card (a bordered container) or pills (rounded buttons).",
+              "type": {
+                "text": "'line' | 'card' | 'pills'"
+              },
+              "default": "'line'"
             }
           ],
           "slots": [
@@ -27726,16 +27875,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Step number circle size",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "hideNav",
               "description": "Hide the auto-generated navigation footer",
               "type": {
@@ -27763,6 +27902,16 @@
               },
               "default": "false",
               "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "The step numbers' size: md (the default) or sm.",
+              "type": {
+                "text": "'md' | 'sm'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "method",
@@ -27827,6 +27976,20 @@
               "description": "Read-only, via a ref: `el.step`."
             }
           ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-stepper-md",
+                "sm": ".pdx-stepper-sm"
+              }
+            }
+          ],
           "events": [
             {
               "name": "pdx-before-change",
@@ -27888,15 +28051,6 @@
               "default": "'horizontal'"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Step number circle size",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
-            },
-            {
               "name": "hidenav",
               "fieldName": "hideNav",
               "description": "Hide the auto-generated navigation footer",
@@ -27922,6 +28076,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "The step numbers' size: md (the default) or sm.",
+              "type": {
+                "text": "'md' | 'sm'"
+              },
+              "default": "'md'"
             }
           ],
           "shapes": [

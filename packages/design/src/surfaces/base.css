@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/surfaces/base.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Surface classes — base, card, inset, overlay, glass + interactive states + card sections */
 
 .pdx-surface-base {
@@ -189,10 +190,10 @@ a.pdx-surface-card:focus-visible {
     outline: none;
 }
 
-/* Card — variant modifiers (per-element) */
-.pdx-card-outline { background: transparent; border: 2px solid var(--pdx-color-border); box-shadow: none; }
-.pdx-card-elevated { box-shadow: var(--pdx-shadow-lg); }
-.pdx-card-flat { background: var(--pdx-color-inset); border-color: transparent; box-shadow: none; }
+/* Card — variant modifiers, keyed on pdx-card's `variant` (#632); on native markup `.pdx-card-outline`. */
+:where(pdx-card[variant="outline"]) > [data-part="root"], .pdx-card-outline { background: transparent; border: 2px solid var(--pdx-color-border); box-shadow: none; }
+:where(pdx-card[variant="elevated"]) > [data-part="root"], .pdx-card-elevated { box-shadow: var(--pdx-shadow-lg); }
+:where(pdx-card[variant="flat"]) > [data-part="root"], .pdx-card-flat { background: var(--pdx-color-inset); border-color: transparent; box-shadow: none; }
 
 /* Card — theme-driven global variant via [pdx-card-style="elevated|flat"] on ancestor */
 [pdx-card-style="elevated"] .pdx-surface-card {

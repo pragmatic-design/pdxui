@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/avatar-group.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* avatar-group — stacked avatars with overflow badge */
 
 /* Override media.css legacy .pdx-avatar-group rule */
@@ -36,12 +37,12 @@
     flex-shrink: 0;
 }
 
-/* Size variants for overflow badge (match pdx-avatar sizes) */
-.pdx-avatar-size-xs { width: 24px; height: 24px; font-size: 9px; }
-.pdx-avatar-size-sm { width: 32px; height: 32px; font-size: 11px; }
-.pdx-avatar-size-md { width: 40px; height: 40px; font-size: 13px; }
-.pdx-avatar-size-lg { width: 48px; height: 48px; font-size: 15px; }
-.pdx-avatar-size-xl { width: 64px; height: 64px; font-size: 18px; }
+/* The overflow badge at the group's `size` (#632), matching pdx-avatar's sizes */
+:where(pdx-avatar-group[size="xs"]) > .pdx-avatar-group > .pdx-avatar-group-overflow { width: 24px; height: 24px; font-size: 9px; }
+:where(pdx-avatar-group[size="sm"]) > .pdx-avatar-group > .pdx-avatar-group-overflow { width: 32px; height: 32px; font-size: 11px; }
+:where(pdx-avatar-group[size="md"]) > .pdx-avatar-group > .pdx-avatar-group-overflow { width: 40px; height: 40px; font-size: 13px; }
+:where(pdx-avatar-group[size="lg"]) > .pdx-avatar-group > .pdx-avatar-group-overflow { width: 48px; height: 48px; font-size: 15px; }
+:where(pdx-avatar-group[size="xl"]) > .pdx-avatar-group > .pdx-avatar-group-overflow { width: 64px; height: 64px; font-size: 18px; }
 
 /* Clickable avatars */
 .pdx-avatar-group-clickable {
