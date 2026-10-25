@@ -52,6 +52,16 @@
         <div class="opt-row"><kbd>+/-</kbd><span>Toggle sign (when allowNegative)</span></div>
         <div class="opt-row"><kbd>Scroll wheel</kbd><span>As the arrows, in the same mode (when allowWheel + focused)</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span><code>error</code> / <code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span><code>loading</code> is set; the textbox is <code>aria-busy</code></span></div>
+        <div class="opt-row"><code>:state(negative) / :state(positive)</code><span>With <code>colorBySign</code>, the number is below or above zero</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="field"] / [data-part="input"]</code><span>The group, the frame around the text, the native input</span></div>
+        <div class="opt-row"><code>[data-part="decrement"] / [data-part="increment"] / [data-part="sign"]</code><span>The stepper buttons, the sign button (its <code>aria-pressed</code> is the sign)</span></div>
+      </div>
     </section>
   </div>
 </template>

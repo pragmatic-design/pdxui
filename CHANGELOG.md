@@ -379,6 +379,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-number-input` takes `pdx-input`'s contract (#286).
+  - **States.** They are custom states on the host: `invalid`, `disabled`, `loading`, and with
+    `color-by-sign` `negative` and `positive`. Its group and field no longer carry `disabled`,
+    `error`, `pdx-number-negative` or `pdx-number-positive`.
+  - **Parts.** `root` (the group), `field` (the frame around the text), `input`, `decrement`,
+    `increment` and `sign`.
+  - **Disabled is drawn.** A disabled number input is now dimmed like the other fields. The class
+    used to sit on the group, where no rule drew it.
+  - **Busy.** While `loading`, the textbox is `aria-busy`, not the host.
+  - **The design CSS** reaches a frame that is the `field` part inside the `root`. This is the
+    pickers' structure too.
 - **Breaking:** `pdx-textarea`, `pdx-password-input`, `pdx-search-input` and `pdx-masked-input` take
   `pdx-input`'s contract (#286). Their states are custom states on the host, and their frames no
   longer carry state classes:

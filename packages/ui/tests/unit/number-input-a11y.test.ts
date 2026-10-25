@@ -4,7 +4,7 @@
 // aria-valuenow is the signed number, not the formatted, unsigned display string ("75.50" for
 // −75.5), and an untouched field carries it too; the sign button is a "Negative" toggle, not named
 // by its glyph "−"; colorBySign colours the number; and PageUp/PageDown/Home/End move it.
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
 import '../../src/number-input/pdx-number-input';
@@ -73,16 +73,33 @@ describe('pdx-number-input value to assistive technology', () => {
 });
 
 describe('pdx-number-input colorBySign', () => {
-    beforeEach(cleanup);
+    // The sign is a custom state on the host (#286). happy-dom has no ElementInternals: this stands in
+    // with the one thing the test reads, a CustomStateSet. That `:state()` matches it is measured in
+    // Chromium (responsive/…/text-fields-beta-contract.spec.ts).
+    const states = new WeakMap<HTMLElement, Set<string>>();
+    beforeEach(() => {
+        cleanup();
+        Object.defineProperty(HTMLElement.prototype, 'attachInternals', {
+            configurable: true, writable: true,
+            value(this: HTMLElement) {
+                const s = new Set<string>();
+                states.set(this, s);
+                // The form calls of form-value-live.test.ts's polyfill, and the states.
+                return {
+                    states: s, setFormValue() {}, setValidity() {},
+                    checkValidity() { return true; }, reportValidity() { return true; }, get form() { return null; },
+                };
+            },
+        });
+    });
+    afterEach(() => { delete (HTMLElement.prototype as { attachInternals?: unknown }).attachInternals; });
 
-    it('the wrapper class follows the sign as it changes', async () => {
+    it('the host state follows the sign as it changes', async () => {
         const el = await mountHtml('<pdx-number-input value="-5" allow-negative color-by-sign aria-label="Delta"></pdx-number-input>');
-        const wrap = el.querySelector('.pdx-input-wrap')!;
-        expect(wrap.classList.contains('pdx-number-negative')).toBe(true);
+        expect([...states.get(el)!]).toEqual(['negative']);
         sign(el)!.click();
         await tick(10);
-        expect(wrap.classList.contains('pdx-number-negative')).toBe(false);
-        expect(wrap.classList.contains('pdx-number-positive')).toBe(true);
+        expect([...states.get(el)!]).toEqual(['positive']);
     });
 });
 

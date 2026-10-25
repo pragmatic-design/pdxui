@@ -477,6 +477,7 @@ export const scenarioPage: Record<string, string> = {
     "number-input-sign": "tier-1c",
     "number-input-range": "tier-1c",
     "number-input-caret": "tier-1c",
+    "number-input-disabled": "tier-1c",
     "number-input-sizes": "tier-1c",
     "number-input-size-md": "tier-1c",
     "number-input-size-xs": "tier-1c",

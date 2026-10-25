@@ -1986,6 +1986,10 @@
           "title": "Number Input — Caret step mode"
         },
         {
+          "id": "number-input-disabled",
+          "title": "Number Input — Disabled"
+        },
+        {
           "id": "number-input-sizes",
           "title": "Number Input — Sizes"
         },
