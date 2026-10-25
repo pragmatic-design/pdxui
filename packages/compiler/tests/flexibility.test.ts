@@ -117,7 +117,8 @@ describe('plugin templateDirectives API', () => {
                 animate: {
                     generate(expr, bodyCode, imports) {
                         imports.add('animate');
-                        return `\${animate(() => ${expr}, () => ${bodyCode})}`;
+                        // An expression, as the contract says (#688): no template substitution.
+                        return `animate(() => ${expr}, () => ${bodyCode})`;
                     }
                 }
             }
@@ -125,6 +126,6 @@ describe('plugin templateDirectives API', () => {
 
         const directives = runner.getTemplateDirectives();
         expect(directives.has('animate')).toBe(true);
-        expect(directives.get('animate')!.generate('x', 'html``', new Set())).toContain('animate');
+        expect(directives.get('animate')!.generate('x', '(()=>{})()', new Set())).toContain('animate');
     });
 });

@@ -129,8 +129,12 @@ templateDirectives: {
 
 The parser handles block structure automatically. Your `generate()` receives:
 - `expr` — the expression string from `@analytics (expr) { ... }`
-- `bodyCode` — the already-compiled JS for the body content
+- `bodyCode` — an expression that evaluates to the body's fragment, already compiled
 - `imports` — `Set<string>` to add runtime imports your directive needs
+
+It returns an **expression**: its value is what the directive renders, a `Node`, a fragment or a
+function core's `insert` accepts. A statement — `return …`, or a `${…}` template substitution from the
+removed template path — is not an expression, and the module it makes does not parse.
 
 For simpler transformations, `transformScript` (pre-parse) and `transformOutput` (post-codegen) can also be used.
 

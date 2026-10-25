@@ -1073,7 +1073,9 @@ class InlineGen {
             const bodyCode = `(()=>{${this.sub(node.body)}})()`;
             const generated = handler.generate(node.expr, bodyCode, this.imports);
             const cf = this.v('cf');
-            this.out(`const ${cf}=(()=>{${generated}})();`);
+            // An expression, its value what the directive renders (#688). Placed as a function's body,
+            // an expression rendered nothing and only an undocumented `return` did.
+            this.out(`const ${cf}=(${generated});`);
             this.place(cf, true);
             return;
         }
