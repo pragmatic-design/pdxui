@@ -8,91 +8,124 @@ TypeScript `component()` descriptors. The pilot rewrites three components in `.p
 |---|---|---|---|
 | 1 | `pdx-switch` | a form control: a model, a form value, an imperative API | done |
 | 2 | `pdx-select` | the hardest control: a listbox, a floating panel, keyboard, search | done |
-| 3 | the data grid's filter popover | a piece of a large component, not a whole tag | to do |
+| 3 | the data grid's filter popover | a piece of a large component, heavy and imperative | done |
 
-The rule set by the owner: if `pdx-select` passes with no escape hatch, the library moves to `.pdx`.
-Measured against it below; the decision, and the follow-up issue it opens, close this document when
-the third component is in.
+**The outcome.** The rule was set by the owner: if `pdx-select` passes with no escape hatch, the
+library moves to `.pdx`. It passed every unchanged test, but only by reaching `ctx` in nine places of
+five kinds. **The rule fell on no: the library stays TypeScript.** What a yes would take is #686, for
+the owner to decide; the `.pdx` versions stay here, unexported, as the bench to run the pilot again.
 
 ## How a pilot component is held to the same bar
 
-[`pilot/plugin.ts`](pilot/plugin.ts) redirects the **resolved** TypeScript module to its `.pdx`, so
-every import reaches the rewrite: a unit test's relative import, a sibling component's import (the
-pagination's page-size select, the grid's lazy editors), and a scenario page's `@pdxui/ui/<name>`
-alias alike. The `.pdx` is compiled by `pdx({ prefix: 'pdx' })`, so `select.pdx` registers
-`<pdx-select>`, the tag the tests create.
+[`pilot/plugin.ts`](pilot/plugin.ts) redirects the **resolved** TypeScript module to its rewrite, so
+every import reaches it: a unit test's relative import, a sibling component's import (the pagination's
+page-size select, the grid's filter popover), and a scenario page's `@pdxui/ui/<name>` alias alike. A
+`.pdx` is compiled by `pdx({ prefix: 'pdx' })`, so `select.pdx` registers `<pdx-select>`, the tag the
+tests create.
+
+The filter popover is not a tag but a module of functions. Its rewrite is
+[`pilot/filter-popover.ts`](pilot/filter-popover.ts), which re-exports the shared module and redefines
+what builds the content. The content is now `<pdx-filter-popover>`
+([`pilot/filter-popover.pdx`](pilot/filter-popover.pdx)): the condition rows, the AND/OR switch and
+the value list that `buildConditionRow`, `buildFilterPopoverContent` and `buildEnumContent` built by
+hand. The lifecycle around it stays TypeScript: one open popover per page, the press outside, the
+placement. That is module state, not a component's.
 
 - **Unit tests:** `pnpm --dir packages/ui test:pilot` runs the **whole** unit suite of the package
-  ([`vitest.pilot.config.ts`](vitest.pilot.config.ts)) with every piloted component replaced: a
-  component is held by the tests of the components that compose it too.
+  ([`vitest.pilot.config.ts`](vitest.pilot.config.ts)) with every piloted module replaced: a component
+  is held by the tests of the components that compose it too.
 - **Certification:** `PDX_PILOT=1` puts the same plugin into the scenario server, so
   `PDX_PILOT=1 pnpm --dir packages/responsive exec playwright test --config tests/playwright-ui.config.ts --grep <name>`
-  runs the manifest, axe, isolation, keyboard and guard specs against the `.pdx`.
+  runs the manifest, axe, isolation, keyboard and guard specs against the rewrites.
 
-Neither is part of `pnpm test` or `pnpm certify`: the pilot measures, and the piloted components are
-not exported.
+Neither is part of `pnpm test` or `pnpm certify`: the pilot measures, and nothing it holds is exported.
 
-Each run was checked by removal: a run that stayed green with the `.pdx` broken would have been
-measuring the TypeScript component.
+Each run was checked by removal: a run that stayed green with a rewrite broken would have been
+measuring the TypeScript one.
 
 - **Switch.** With its `role` changed to `checkbox`, two unit tests go red. With the track's class
   removed, the manifest contracts go red across the 13 themes.
-- **Select.** With the listbox's `role` changed to `list`, four unit tests go red, and so do the axe
-  and keyboard specs (16 of 40).
+- **Select.** With the listbox's `role` changed to `list`, four unit tests go red, and so do 16 of 40
+  axe and keyboard specs.
+- **Filter popover.** With the actions row renamed, four unit tests go red. With the title emptied,
+  the grid's filter-menu guard goes red. Before its placement observed its size, the anchor guard was
+  red too, 44 px off the funnel: certification was measuring the `.pdx` content.
 
 ## Measurements
 
 Measured on 2026-10-25.
 
-- **Lines** are the source file.
-- **Weight** is the component's own module, built with Vite in library mode, minified, with every
-  import external.
-- **Mount** is 100 instances appended to a loaded scenario page in Chromium, until each has rendered,
-  with layout read once. The figure is the median of 40 warm runs on the scenario dev server, two runs
-  per side.
+- **Lines** are the source file. For the filter popover, the part the `.pdx` replaces: lines 145–383
+  and 428–582 of `src/shared/filter-popover.ts`.
+- **Weight** is the module, built with Vite in library mode, minified, with every import external.
+- **Mount** is in Chromium on the scenario dev server, the median of 20–40 warm runs, two runs per
+  side. For a component it is 100 instances appended to a page until each has rendered. For the
+  filter popover it is 100 contents built through `buildFilterPopoverContent`.
 
 | | TypeScript | `.pdx` |
 |---|---|---|
-| `pdx-switch`: lines | 96 | 77 |
+| **`pdx-switch`**: lines | 96 | 77 |
 | weight, minified / gzip | 3.05 / 1.12 KB | 4.76 / 1.52 KB |
-| mount, 100 instances (dev) | 8.5 / 8.8 ms | 11.8 / 12.6 ms |
-| `ctx` reached | 3 × `ctx.el.querySelector` | none |
-| `pdx-select`: lines | 1008 | 733, and 17 of types in a `.ts` |
+| mount, 100 | 8.5 / 8.8 ms | 11.8 / 12.6 ms |
+| **`pdx-select`**: lines | 1008 | 733, and 17 of types in a `.ts` |
 | weight, minified / gzip | 27.54 / 7.45 KB | 40.63 / 9.44 KB |
-| mount, 100 instances (dev) | 20.0 / 17.4 ms | 45.8 / 45.6 ms |
-| `ctx` reached | throughout | 9 places, 5 kinds (below) |
-| unit tests, the whole suite | 2393 / 2393, the switch piloted alone | 2392 / 2393, both piloted |
-| certification, `--grep select` | — | 375 / 375 |
-| certification, the components that hold a select | — | 442 / 442 |
-| certification, `--grep switch` | 124 / 124 | 124 / 124 |
+| mount, 100 | 20.0 / 17.4 ms | 45.8 / 45.6 ms |
+| **filter popover**: lines | 394 | 271, and 127 of TypeScript lifecycle |
+| weight, minified / gzip | 15.56 / 5.00 KB, the whole module | 23.00 / 5.43 KB, the content alone |
+| mount, 100, value list | 25.6 / 26.8 ms | 59.6 / 52.0 ms |
+| mount, 100, two conditions | 112.5 / 110.0 ms | 289.3 / 291.6 ms |
+| **unit tests**, the whole suite | 2393 / 2393 | 2393 / 2393, all three piloted, two runs |
+| **certification**, the specs of the three and of the components that hold them | | 959 / 959 |
+
+The concepts in each version are counted the same way in both languages:
+
+- **Effects** are `$effect`, `ctx.track`, `effect()`, `onMount`, `ctx.frame` and `queueMicrotask`.
+- **Manual DOM** is `createElement`, `querySelector`, `appendChild`, `addEventListener`,
+  `setAttribute`, `.style.*`, `.classList.*` and `textContent =`.
+- **`ctx` reached** is `ctx.el`, `ctx.emit`, `ctx.expose`, `ctx.formValue`, `ctx.track` and
+  `ctx.frame`.
+
+Both versions declare the same props, models and slots.
+
+| | TypeScript | `.pdx` |
+|---|---|---|
+| `pdx-switch`: effects / manual DOM / `ctx` reached | 0 / 3 / 4 | 0 / 0 / 0 |
+| `pdx-select` | 9 / 13 / 27 | 8 / 6 / 9 |
+| filter popover content | 0 / 128 / 0 | 0 / 1 / 0 |
 
 What the numbers mean:
 
-- **Lines.** The `.pdx` states the same components in declarations.
+- **Lines and concepts.** The `.pdx` states the same components in declarations.
   - `@model … { form }` declares the model and its form value.
   - `@host { :name }` replaces `reflectNameToHost(ctx)`.
   - `@expose` replaces `ctx.expose`.
   - `:ref` replaces the queries on the component's own element.
   - `@render item?.(…) @else { <slot …> }` replaces `snippetOrSlot(ctx, …)`.
-  - `$derived` replaces `ctx.track` where the value follows from props. The compiler's
+  - `$derived` replaces `ctx.track` where a value follows from props. The compiler's
     `PDX_EFFECT_STATE` said so, correctly, for the select's data source.
-- **Weight.** Not like for like. The TypeScript module hands its markup to `html```, which parses it
-  at run time with code that lives in core. The `.pdx` module carries the compiled render inline: a
-  cloned static block and one binding per dynamic attribute.
-- **Mount.** The `.pdx` switch mounts about 35% slower in dev, the select about 2.5× slower. The
-  switch's render runs one effect per bound attribute, each guarded by `Object.is` and by a generic
-  property-or-attribute branch where the element's tag already says which. The select's gap is larger
-  than that accounts for, and is not explained yet. Production is not measured.
-- **The one red unit test.** `navigation-live-prop`'s page-size test fails with the select piloted. The
-  pagination imports `pdx-select` lazily, and the test clicks the select 50 ms after mounting. A cold
-  `.pdx` select is defined 301 ms after its import, against 69 ms for the TypeScript one (a probe on
-  the same dev transform). Once the select is defined, the test's own steps pass in full, checked by a
-  probe. So the behaviour is right and the load is slow. It stays a red, and it is counted as one.
+
+  The filter popover gains the most. Its 128 hand-written DOM calls become a template, and the one
+  left is the attachment that focuses the first value.
+- **Weight.** Not like for like.
+  - The TypeScript module hands its markup to `html```, which parses it at run time with code that
+    lives in core.
+  - The `.pdx` module carries the compiled render inline: a cloned static block and one binding per
+    dynamic attribute.
+  - The `.pdx` filter popover content alone weighs more than the whole TypeScript module, helpers
+    included.
+- **Mount.** The `.pdx` versions are slower everywhere: 1.4× the switch, 2.5× the select, 2.1–2.6× the
+  popover. Production is not measured. #685 measures it and fixes what it finds; one cause is visible
+  in the switch's module, the generic property-or-attribute branch on each binding.
+- **The one red that went away.** With the switch and the select piloted, `navigation-live-prop`'s
+  page-size test was red. The pagination imports the select lazily and clicks it 50 ms after mounting,
+  and a cold `.pdx` select is defined 301 ms after its import, against 69 ms. With the filter popover
+  piloted too, it is green on two runs: the grid's tests compile a `.pdx` early, and the compiler is
+  warm when the lazy import comes. The cause stands (finding 11).
 
 ## Where the select reaches `ctx`
 
 The rule asks for no escape hatch. The select needs five kinds, each marked `ESCAPE HATCH` in
-[`pilot/select.pdx`](pilot/select.pdx):
+[`pilot/select.pdx`](pilot/select.pdx). The switch and the filter popover need none.
 
 | What the component does | Why no declaration covers it | Places |
 |---|---|---|
@@ -101,47 +134,31 @@ The rule asks for no escape hatch. The select needs five kinds, each marked `ESC
 | Submits an empty entry when nothing is chosen, as a native select does | `@model … { form }` submits the model, and has no option for what the form gets instead | `ctx.formValue` |
 | Exposes `selectedItem` as a read-only value | `@expose` puts a member on the element as it is, and a `$derived` is a function | `ctx.expose` with a getter |
 
-By the owner's rule, then, the answer today is **no**. The library does not move to `.pdx` as the
-language stands. The five rows are what the language would need for the answer to be yes.
-
 ## Findings
 
-What the pilot found that the language or the toolchain does not do yet. The compiler defects (6 to
-9) are issues already: #675, #676, #677, #678. The rest become issues when the pilot closes, unless
-the decision makes them moot.
+What the pilot found that the language or the toolchain does not do yet.
 
-1. **`PDX_VARIANT_UNSTYLED` is wrong for a library component.** A `.pdx` that declares
-   `@variants { size: { md, sm, lg } }` is warned that `sm` and `lg` are unstyled, because the check
-   looks for `@variant` rules in the component's own `<style scoped>`. A library component's variants
-   are drawn by `@pdxui/design`, in `variant-sources/`.
-2. **`@variants` cannot name the native class of a value.** The TypeScript descriptor maps
-   `sm: '.pdx-toggle-sm'`, which is what `gen-variants.mjs` uses to draw the same look on native
-   markup. The `.pdx` form has no place for it.
-3. **The library's generators read TypeScript.** `gen-manifest.mjs` parses `component()` calls with the
-   TypeScript compiler, for props, variants, generics and the doc tags (`@alphaevent`). The catalogue,
-   the variants and the certification registry are all generated from its output. A `.pdx` component
-   is invisible to all of them.
-4. **The compiled render does not use what it knows about the element.** See Mount above.
-5. **Certification does not check a switch's role.** With `role="checkbox"` every certification spec
-   stayed green, axe included; only the unit tests caught it.
-6. **The signal rewrite renames type members, and the failure surfaces far from its cause.** In the
-   script, a member of a type literal or an interface that shares a prop's name is rewritten:
-   `{ source?: unknown }` becomes `{ source()?: unknown }`. `eraseTypes` then finds a module that does
-   not parse and returns it **unerased**, without a word. The error is reported by Rollup, on the
-   first `interface` or `import type` of the module, as `Expression expected`. The pilot's types live
-   in [`pilot/select-types.ts`](pilot/select-types.ts) for that reason.
-7. **A `$derived` has no `.peek()`.** `x.peek()` on a `$signal` reads it untracked. On a `$derived` it
-   is rewritten to `x().peek()`, which throws.
-8. **`@prop xs: T[] = []` shares one array.** The default is emitted as written, one literal in the
-   descriptor, so every instance starts with the same array. The TypeScript form is a factory,
-   `prop(() => [])`. Leaving the default out (`@prop xs?: T[]`) gives each instance its own.
-9. **A `:value` binding does not write back a value the user changed.** The compiled binding compares
-   with the last value it wrote, not with the element's current value. When the user's typing and a
-   reset meet, the input keeps the text while the signal is cleared. `html``` rewrote it. The select
-   opens before it records the query, so that the two never meet; for a person typing, the focus has
-   already opened it.
-10. **A model cannot say its attribute is a string and its value is not.** `model(null, { type: String })`
-    coerces an attribute or a number to a string and still holds an array in multiple mode. In
-    `.pdx` that is `@model value: string = null`: the type is wrong for half the component.
-11. **A cold `.pdx` compiles slowly in the dev transform.** 301 ms for the first select against 69 ms,
-    enough to miss a lazy import that a test or a page waits 50 ms for.
+| # | Finding | Where it went |
+|---|---|---|
+| 1 | `PDX_VARIANT_UNSTYLED` warns a library `.pdx` that its variants are unstyled. They are drawn by `@pdxui/design`, not its own `<style scoped>` | moot while the library is TypeScript |
+| 2 | `@variants` cannot name a value's native class (`sm: '.pdx-toggle-sm'`), which `gen-variants.mjs` draws native markup from | moot, as 1 |
+| 3 | The library's generators read TypeScript. `gen-manifest.mjs` parses `component()` calls, and the catalogue, the variants and the certification registry follow from it. A `.pdx` component is invisible to them | moot, as 1 |
+| 4 | The compiled render runs a generic property-or-attribute branch where the element's tag decides it | #685 |
+| 5 | Certification does not check a switch's role: with `role="checkbox"` every spec stayed green, axe included | #684 |
+| 6 | The signal rewrite renames a type member that shares a prop's name (`{ source?: … }` → `{ source()?: … }`), and the type erasure then gives up without a word | #675 |
+| 7 | `.peek()` on a `$derived` or a prop is rewritten to a call that throws | #676 |
+| 8 | `@prop xs: T[] = []` is one array shared by every instance | #677 |
+| 9 | A `:value` binding does not write back a value the user changed | #678 |
+| 10 | A model cannot say its attribute is a string and its value is not (`@model value: string = null`) | #686, item 5 |
+| 11 | A cold `.pdx` compiles slowly in the dev transform: 301 ms for the first select against 69 ms | #685 |
+| 12 | A script function named `valueOf` is taken for a core function: the lookup reads `Object.prototype` | #681 |
+| 13 | A `$signal` initialiser that reads another `$signal` is left as written, and throws | #682 |
+| 14 | `@defer` renders after its load resolves even when the code is there, so a box measured right after the append is empty | #686, noted |
+| 15 | `PDX_UNUSED_REACTIVE` misses the reads inside a script `@snippet` | #683 |
+
+Two things in the pilot's own wiring are worth knowing for the next run:
+
+- A rewrite that re-exports the module it replaces must reach the original. The plugin lets the
+  rewrite's own import through.
+- The browser asks for a URL the import analysis has already written. A redirect on that request
+  serves the rewrite at the original's URL, so the plugin redirects only imports that have an importer.

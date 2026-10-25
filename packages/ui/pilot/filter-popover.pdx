@@ -1,0 +1,271 @@
+<!--
+  The filter popover's content, written in .pdx for the pilot (#137): what
+  src/shared/filter-popover.ts builds by hand in buildFilterPopoverContent, buildConditionRow and
+  buildEnumContent. The module's lifecycle (one open popover, the press outside, the placement) stays
+  TypeScript, in pilot/filter-popover.ts. Not exported.
+
+  Where the language has no declaration for what the content does, the script reaches `ctx`, and
+  each place says so with ESCAPE HATCH: those are what the pilot counts.
+-->
+<template>
+  <div class="pdx-dg-fp-title">{{ field?.label }}</div>
+  @if (enumMode) {
+    <div class="pdx-dg-fp-enum">
+      @if (showSearch) {
+        <input type="text" class="pdx-dg-fp-enum-search pdx-input" :placeholder="uiString('shared', 'search')" @input="onSearch($event)" />
+      }
+      <div class="pdx-dg-fp-enum-list">
+        @if (!isServer) {
+          <label class="pdx-dg-fp-enum-item pdx-dg-fp-enum-all"><input type="checkbox" :checked="allChecked" @change="onSelectAll($event)" /><span>{{ uiString('shared', 'selectAll') }}</span></label>
+        }
+        @for (listRows as row; track row.key) {
+          @if (row.kind === 'sep') {
+            <div class="pdx-dg-fp-enum-sep" style="border-top:1px solid var(--pdx-color-border,#ddd);margin:4px 0;"></div>
+          } @else if (row.kind === 'empty') {
+            <div class="pdx-dg-fp-enum-empty" style="padding:6px 8px;color:var(--pdx-color-muted,#888);font-size:0.85em;">{{ uiString('shared', loading ? 'loading' : 'noMatches') }}</div>
+          } @else {
+            <label class="pdx-dg-fp-enum-item"><input type="checkbox" :checked="picked.has(row.value)" @change="onPick($event, row.value, row.label)" /><span>{{ row.label }}</span></label>
+          }
+        }
+      </div>
+    </div>
+    <div class="pdx-dg-fp-actions">
+      <pdx-button variant="ghost" size="xs" @click="clear()">{{ uiString('shared', 'clear') }}</pdx-button>
+      <pdx-button variant="primary" size="xs" @click="applyEnum()">{{ uiString('shared', 'apply') }}</pdx-button>
+    </div>
+  } @else {
+    @defer (immediate) {
+      @render condition(1)
+      <button class="pdx-dg-fp-add-cond" type="button" :style="second ? 'display:none' : ''" @click="second = true">{{ uiString('shared', 'addCondition') }}</button>
+      <div :style="second ? '' : 'display:none'">
+        <div class="pdx-dg-fp-logic">
+          <button :class="'pdx-dg-fp-logic-btn' + (logic === 'and' ? ' active' : '')" @click="setLogic('and')">{{ uiString('shared', 'and') }}</button>
+          <button :class="'pdx-dg-fp-logic-btn' + (logic === 'or' ? ' active' : '')" @click="setLogic('or')">{{ uiString('shared', 'or') }}</button>
+        </div>
+        @render condition(2)
+        <button class="pdx-dg-fp-add-cond" type="button" @click="removeSecond()">{{ uiString('shared', 'removeCondition') }}</button>
+      </div>
+      <div class="pdx-dg-fp-actions">
+        <pdx-button variant="ghost" size="xs" @click="clear()">{{ uiString('shared', 'clear') }}</pdx-button>
+        <pdx-button variant="primary" size="xs" @click="applyConditions()">{{ uiString('shared', 'apply') }}</pdx-button>
+      </div>
+    }
+  }
+</template>
+
+<script>
+import { RELATIVE_DATE_OPS } from '@pdxui/core';
+import type { FilterOperator } from '@pdxui/core';
+import { uiString } from '../src/shared/i18n';
+import type { Field, State, OperatorOption, EnumRow } from './filter-popover-types';
+
+/** The field filtered, as the shared module describes it. */
+@prop field?: Field;
+/** The condition state, edited in place, as the TypeScript builder does: the caller keeps the object. */
+@prop state?: State;
+/** The field's operators, worked out by the caller (getFieldOperators). */
+@prop operators?: OperatorOption[];
+
+@event apply: State;
+@event clear;
+
+@snippet condition(n) {
+  <div class="pdx-dg-fp-condition">
+    <pdx-select size="sm" style="flex:1;min-width:0" :options="operatorOptions" :value="opOf(n)" @value-change="setOp(n, $event.detail.value)"></pdx-select>
+    @if (numeric) {
+      <pdx-number-input controls="none" size="sm" :style="valueStyle(n, 1)" :placeholder="placeholderOf(n, 1)" :value="numberOf(n, 1)" @value-change="setVal(n, 1, $event.detail.value)" @keydown="onValueKey($event)" attach:focusFirst="n"></pdx-number-input>
+      <pdx-number-input controls="none" size="sm" :style="valueStyle(n, 2)" :placeholder="uiString('shared', 'to')" :value="numberOf(n, 2)" @value-change="setVal(n, 2, $event.detail.value)" @keydown="onValueKey($event)"></pdx-number-input>
+    } @else if (dateType) {
+      <pdx-date-picker size="sm" :style="valueStyle(n, 1)" :placeholder="placeholderOf(n, 1)" :value="textOf(n, 1)" @value-change="setVal(n, 1, $event.detail.value)" @keydown="onValueKey($event)" attach:focusFirst="n"></pdx-date-picker>
+      <pdx-date-picker size="sm" :style="valueStyle(n, 2)" :placeholder="uiString('shared', 'to')" :value="textOf(n, 2)" @value-change="setVal(n, 2, $event.detail.value)" @keydown="onValueKey($event)"></pdx-date-picker>
+    } @else {
+      <pdx-input size="sm" :style="valueStyle(n, 1)" :placeholder="placeholderOf(n, 1)" :value="textOf(n, 1)" @value-change="setVal(n, 1, $event.detail.value)" @keydown="onValueKey($event)" attach:focusFirst="n"></pdx-input>
+      <pdx-input size="sm" :style="valueStyle(n, 2)" :placeholder="uiString('shared', 'to')" :value="textOf(n, 2)" @value-change="setVal(n, 2, $event.detail.value)" @keydown="onValueKey($event)"></pdx-input>
+    }
+  </div>
+}
+
+/** Operators that take no value: the empties and the relative-date presets. */
+const NO_VALUE = new Set<string>(['isnull', 'isnotnull', ...RELATIVE_DATE_OPS]);
+const noValue = (op: string) => NO_VALUE.has(op);
+
+const enumMode = $derived(!!field && ((!!field.options && field.options.length > 0) || !!field.optionsSource || !!field.setFilter));
+const numeric = $derived(field?.type === 'number' || field?.type === 'currency');
+const dateType = $derived(field?.type === 'date');
+const operatorOptions = $derived((operators ?? []).map(o => ({ label: o.label, value: o.value })));
+
+// ── The two conditions ──
+// Each condition's operator and its one or two values ("min|max" for between), read from the state.
+function split(op: string, val: string): [string, string] {
+  if (op === 'between') { const p = String(val ?? '').split('|'); return [p[0] ?? '', p[1] ?? '']; }
+  return [val === '__null__' ? '' : (val ?? ''), ''];
+}
+const initial = state ? [split(state.op1, state.val1), split(state.op2, state.val2)] : [['', ''], ['', '']];
+let op1 = $signal<string>(state?.op1 ?? 'contains');
+let op2 = $signal<string>(state?.op2 ?? 'contains');
+let values = $signal<string[][]>([[initial[0][0], initial[0][1]], [initial[1][0], initial[1][1]]]);
+let logic = $signal<'and' | 'or'>(state?.logic ?? 'and');
+let second = $signal(!!(state?.val2 && state.val2 !== ''));
+
+function opOf(n: number): string { return n === 1 ? op1 : op2; }
+function textOf(n: number, i: number): string { return values[n - 1][i - 1]; }
+function numberOf(n: number, i: number): number | null {
+  const v = values[n - 1][i - 1];
+  return v === '' ? null : Number(v);
+}
+function valueStyle(n: number, i: number): string {
+  const op = opOf(n);
+  const hidden = i === 1 ? noValue(op) : op !== 'between';
+  return 'flex:1;min-width:0' + (hidden ? ';display:none' : '');
+}
+function placeholderOf(n: number, i: number): string {
+  const op = opOf(n);
+  return uiString('shared', op === 'between' ? 'from' : dateType ? 'date' : 'value');
+}
+
+/** The value a condition commits: the sentinel for a no-value operator, "min|max", or the value.
+ *  Not `valueOf`: the compiler takes that name for a core function (PILOT.md, finding 12). */
+function committedValue(n: number): string {
+  const op = opOf(n);
+  if (noValue(op)) return '__null__';
+  const [a, b] = values[n - 1];
+  return op === 'between' ? `${a}|${b}` : a;
+}
+
+// The state is written on every change, as the TypeScript builder's onChange does.
+function commit(n: number) {
+  if (!state) return;
+  if (n === 1) { state.op1 = op1 as FilterOperator; state.val1 = committedValue(1); }
+  else { state.op2 = op2 as FilterOperator; state.val2 = committedValue(2); }
+}
+
+function setOp(n: number, v: unknown) {
+  const op = String(v ?? opOf(n));
+  if (n === 1) op1 = op; else op2 = op;
+  commit(n);
+}
+
+function setVal(n: number, i: number, v: unknown) {
+  const next = values.map(r => r.slice());
+  next[n - 1][i - 1] = v == null ? '' : String(v);
+  values = next;
+  commit(n);
+}
+
+function setLogic(l: 'and' | 'or') {
+  logic = l;
+  if (state) state.logic = l;
+}
+
+function removeSecond() {
+  second = false;
+  if (state) state.val2 = '';
+}
+
+/** The first condition's value takes the focus once it is in the page, unless its operator takes none. */
+function focusFirst(el: Element, n: () => number) {
+  if (n() !== 1) return;
+  requestAnimationFrame(() => {
+    if (!noValue(op1.peek())) ((el.querySelector('input') ?? el) as HTMLElement).focus?.();
+  });
+}
+
+function onValueKey(e: KeyboardEvent) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  applyConditions();
+}
+
+function applyConditions() {
+  if (!state) return;
+  commit(1);
+  if (second) commit(2);
+  else { state.op2 = (operators?.[0]?.value ?? 'contains') as FilterOperator; state.val2 = ''; }
+  apply(state);
+}
+
+// ── The value list (an enum, a lookup, a set filter) ──
+const isServer = $derived(!!field?.optionsSource);
+const staticOptions = $derived(field?.options ?? []);
+const showSearch = $derived(isServer || !!field?.setFilter || staticOptions.length > 8);
+
+// One constant for both initial values: a $signal initialiser that reads another $signal is left as
+// written, and `picked` is undefined there (PILOT.md, finding 13).
+const initialPicked: string[] = state?.val1 ? String(state.val1).split('|') : [];
+let picked = $signal<Set<string>>(new Set(initialPicked));
+let query = $signal('');
+let loading = $signal(false);
+let pageOptions = $signal<{ label: string; value: unknown }[]>((field?.options ?? []).slice());
+/** The selection the server list was last drawn with: it is pinned at the top, and a box ticked since stays where it is. */
+let pinned = $signal<string[]>(initialPicked.slice());
+/** value → label, so a selected value outside the current server page keeps a readable label. */
+const labels = new Map<string, string>((field?.options ?? []).map(o => [String(o.value), o.label]));
+
+const visibleStatic = $derived(staticOptions.filter(o => !query || o.label.toLowerCase().includes(query)));
+const allChecked = $derived(visibleStatic.length > 0 && visibleStatic.every(o => picked.has(String(o.value))));
+
+const listRows = $derived((): EnumRow[] => {
+  if (!isServer) return visibleStatic.map(o => ({ key: 'o' + String(o.value), kind: 'option', value: String(o.value), label: o.label }));
+  const rows: EnumRow[] = pinned.map(v => ({ key: 'p' + v, kind: 'option', value: v, label: labels.get(v) ?? v }));
+  if (pinned.length) rows.push({ key: 'sep', kind: 'sep', value: '', label: '' });
+  const pinnedSet = new Set(pinned);
+  const rest = pageOptions.filter(o => !pinnedSet.has(String(o.value)));
+  for (const o of rest) rows.push({ key: 'o' + String(o.value), kind: 'option', value: String(o.value), label: o.label });
+  if (rest.length === 0) rows.push({ key: 'empty', kind: 'empty', value: '', label: '' });
+  return rows;
+});
+
+function onPick(e: Event, value: string, label: string) {
+  const next = new Set(picked);
+  if ((e.target as HTMLInputElement).checked) { next.add(value); labels.set(value, label); } else next.delete(value);
+  picked = next;
+}
+
+function onSelectAll(e: Event) {
+  const on = (e.target as HTMLInputElement).checked;
+  const next = new Set(picked);
+  for (const o of visibleStatic) { const v = String(o.value); if (on) next.add(v); else next.delete(v); }
+  picked = next;
+}
+
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function loadServer(q: string) {
+  const src = field?.optionsSource;
+  if (!src) return;
+  loading = true;
+  pinned = Array.from(picked);
+  src(q).then(items => {
+    pageOptions = items.map(o => ({ label: o.label, value: o.value }));
+    for (const o of pageOptions) labels.set(String(o.value), o.label);
+    loading = false;
+    pinned = Array.from(picked);
+  }, () => { loading = false; pinned = Array.from(picked); });
+}
+
+function onSearch(e: Event) {
+  const text = (e.target as HTMLInputElement).value;
+  query = text.toLowerCase();
+  if (isServer) {
+    if (searchTimer) clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadServer(text), 200);
+  }
+}
+
+if (field?.optionsSource) loadServer('');
+
+onDestroy(() => { if (searchTimer) clearTimeout(searchTimer); });
+
+function applyEnum() {
+  if (!state) return;
+  if (picked.size > 0) { state.op1 = 'in' as FilterOperator; state.val1 = Array.from(picked).join('|'); }
+  else state.val1 = '';
+  state.val2 = '';
+  apply(state);
+}
+</script>
+
+<style scoped>
+/* The content's own element is no box: its children lay out in the popover, as the built ones did. */
+:scope { display: contents; }
+</style>
