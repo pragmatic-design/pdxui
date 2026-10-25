@@ -5,13 +5,20 @@
 // And writing the value back is not a second move: no second event, no second rebuild, and the
 // keyboard keeps working.
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
-import { cleanup, tick } from './helpers';
+import { cleanup, tick, whenUpgraded } from './helpers';
 
 import '../../src/tabs/pdx-tabs';
 import '../../src/pagination/pdx-pagination';
 import '../../src/wizard/pdx-wizard';
+
+// The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
+// that reads the select before it is upgraded fails every time instead of once in a while (#692).
+vi.mock('../../src/select/pdx-select', async (importOriginal) => {
+    await new Promise((r) => setTimeout(r, 300));
+    return importOriginal();
+});
 
 type Detail = Record<string, unknown>;
 type Host = HTMLElement & Record<string, unknown>;
@@ -83,7 +90,9 @@ describe('after a user move, the property is the emitted value', () => {
     it('pdx-pagination: a new page size, and page 1 with it', async () => {
         const el = await mount('<pdx-pagination total="100" page-size="10" page="3" show-page-size></pdx-pagination>');
         const seen = record(el, 'pdx-change', ['page', 'pageSize']);
-        // The size control is a pdx-select: opened and picked as a person does.
+        // The size control is a pdx-select, imported lazily: read once it is upgraded (#692).
+        await whenUpgraded(el.querySelector('.pdx-pagination-size'));
+        // Opened and picked as a person does.
         (el.querySelector('.pdx-pagination-size .pdx-select-trigger') as HTMLElement).click();
         await tick();
         [...el.querySelectorAll<HTMLElement>('.pdx-pagination-size [role="option"]')].find(o => o.textContent?.trim() === '50')!.click();

@@ -2,10 +2,17 @@
 //
 // Its pager can draw one — `pdx-pagination` has `show-page-size` and `page-sizes` — and the grid's
 // `pageSizes` prop is what passes them through: without it, no grid could offer one.
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createDataSource } from '@pdxui/core';
-import { cleanup, tick } from './helpers';
+import { cleanup, tick, whenUpgraded } from './helpers';
 import '../../src/data-grid/pdx-data-grid';
+
+// The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
+// that reads the select before it is upgraded fails every time instead of once in a while (#692).
+vi.mock('../../src/select/pdx-select', async (importOriginal) => {
+    await new Promise((r) => setTimeout(r, 300));
+    return importOriginal();
+});
 
 type Grid = HTMLElement & Record<string, any>;
 
@@ -23,6 +30,8 @@ async function mountGrid(pageSizes?: number[]): Promise<{ el: Grid; source: Retu
     document.body.appendChild(el);
     await el.whenReady();
     await tick(40);
+    // The rows-per-page control is the pager's lazily imported pdx-select: read once it is upgraded.
+    await whenUpgraded(sizeSelect(el));
     return { el, source };
 }
 

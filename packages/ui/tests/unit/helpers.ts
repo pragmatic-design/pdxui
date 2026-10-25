@@ -27,6 +27,18 @@ export async function tick(ms = 0): Promise<void> {
     await new Promise(r => setTimeout(r, 0));
 }
 
+/**
+ * Resolve once `el` is defined and has rendered: for a component another one imports lazily, like the
+ * pager's pdx-select (#407). A fixed tick before reading its markup passes only while the module is
+ * quick to arrive, and a contended gate does not wait for it (#692). A null `el` resolves at once, and
+ * the caller's own assertion reports it.
+ */
+export async function whenUpgraded(el: Element | null): Promise<void> {
+    if (!el) return;
+    await customElements.whenDefined(el.localName);
+    await tick();
+}
+
 /** Clean up DOM between tests. */
 export function cleanup(): void {
     document.body.innerHTML = '';
