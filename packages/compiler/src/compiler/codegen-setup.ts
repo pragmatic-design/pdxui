@@ -23,7 +23,7 @@ export function buildPropsObject(props: { name: string; runtimeType: string; def
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const parts = [`type: ${p.runtimeType}`];
-        if (p.default !== undefined) parts.push(`default: ${p.default}`);
+        if (p.default !== undefined) parts.push(`default: ${defaultEntry(p.runtimeType, p.default)}`);
         // Core reports a required prop the host did not set, in development (#123, #130).
         if (p.required) parts.push('required: true');
         // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
@@ -32,6 +32,17 @@ export function buildPropsObject(props: { name: string; runtimeType: string; def
         return `    ${p.name}: { ${parts.join(', ')} }`;
     });
     return `{\n${entries.join(',\n')}\n  }`;
+}
+
+/**
+ * A prop's default as the descriptor holds it. An array or object literal for an Array or Object
+ * prop is a factory, `() => ([])`, which core calls once per instance (resolveDefault): written as it
+ * is, it was one literal every instance shared (#677). Any other default, a name included, is as
+ * written: a name is the author's own value, and a factory would change what it means.
+ */
+function defaultEntry(runtimeType: string, value: string): string {
+    const literal = /^[[{]/.test(value.trim());
+    return (runtimeType === 'Array' || runtimeType === 'Object') && literal ? `() => (${value})` : value;
 }
 
 /** The script code setup() runs: the body, the effects, the lifecycle hooks, the watches, the reactive fetch URLs. */

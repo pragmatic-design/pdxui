@@ -87,7 +87,8 @@ describe('@generic (#490)', () => {
         const { code, warnings } = compile(child('@generic T;\n@prop items: T[] = [];\n@slot row: (item: T);', '<p>@render row(items[0])</p>'), 'list.pdx');
         expect(warnings.filter((w) => w.severity === 'error')).toEqual([]);
         expect(code).not.toContain('@generic');
-        expect(code).toMatch(/items: \{ type: Array, default: \[\] \}/);
+        // The prop as any other `T[] = []`: an array default is a factory, one array per instance (#677).
+        expect(code).toMatch(/items: \{ type: Array, default: \(\) => \(\[\]\) \}/);
     });
 
     it('with no type parameter is PDX_UNKNOWN_DECLARATION', () => {
