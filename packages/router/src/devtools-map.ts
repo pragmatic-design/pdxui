@@ -20,6 +20,18 @@ const isWordChar = (ch: string | undefined): boolean => ch !== undefined && /[A-
  */
 export function paramsOf(path: string): DevtoolsMapParam[] {
     const params: DevtoolsMapParam[] = [];
+    // The next `)` at or after a position, remembered: the scan only moves forward, so a `)` found
+    // ahead stays the answer until it is passed, and none after a position means none after any later
+    // one. Searched afresh for each parameter, a pattern with many `(` and no `)` was read once per
+    // parameter, a quadratic scan the old 200 ms bound hid (#700).
+    let close = -2;
+    let searchedFrom = -1;
+    const nextClose = (from: number): number => {
+        if (searchedFrom >= 0 && from >= searchedFrom && (close === -1 || close >= from)) return close;
+        searchedFrom = from;
+        close = path.indexOf(')', from);
+        return close;
+    };
     let i = 0;
     while (i < path.length) {
         if (path[i] === '*') {
@@ -36,10 +48,10 @@ export function paramsOf(path: string): DevtoolsMapParam[] {
         const name = path.slice(i + 1, end);
         let type = 'string';
         if (path[end] === '(') {
-            const close = path.indexOf(')', end + 1);
-            if (close > end + 1) {
-                type = path.slice(end + 1, close);
-                end = close + 1;
+            const at = nextClose(end + 1);
+            if (at > end + 1) {
+                type = path.slice(end + 1, at);
+                end = at + 1;
             }
         }
         params.push({ name, type });

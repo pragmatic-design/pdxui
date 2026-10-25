@@ -38,18 +38,33 @@ describe('__PDX_DEVTOOLS__.map()', () => {
 
     it('reads a hostile pattern in linear time', () => {
         // `:0(` then `:0((` repeated: what made a regex scan polynomial (#67, CodeQL).
-        const hostile = `/:0(${':0(('.repeat(50_000)}`;
-        // The fastest of five runs (#538): load only ever adds time, so the minimum is the scan's own
-        // cost, and a polynomial scan takes seconds in every run. One run timed the machine's load.
-        let fastest = Infinity;
-        let params: ReturnType<typeof paramsOf> = [];
-        for (let i = 0; i < 5; i++) {
-            const started = performance.now();
-            params = paramsOf(hostile);
-            fastest = Math.min(fastest, performance.now() - started);
-        }
-        expect(fastest).toBeLessThan(200);
-        expect(params.length).toBeGreaterThan(0);
+        const hostile = (n: number) => `/:0(${':0(('.repeat(n)}`;
+        // The fastest of five runs (#538): load only ever adds time, so the minimum is the scan's own cost.
+        const fastest = (n: number): number => {
+            const path = hostile(n);
+            let best = Infinity;
+            for (let i = 0; i < 5; i++) {
+                const started = performance.now();
+                paramsOf(path);
+                best = Math.min(best, performance.now() - started);
+            }
+            return best;
+        };
+        // The GROWTH, not a time (#700): load slows both sizes alike, and an absolute bound measured the
+        // machine. Four times the input: a linear scan takes about four times as long, a quadratic one
+        // about sixteen. Twice the input did not tell them apart: a quadratic scan measured 2.9.
+        const small = fastest(25_000);
+        const large = fastest(100_000);
+        expect(large / small, `25 000 → ${small.toFixed(1)} ms, 100 000 → ${large.toFixed(1)} ms`).toBeLessThan(8);
+        // A loose ceiling, for a scan that became uniformly very slow.
+        expect(large).toBeLessThan(2000);
+        expect(paramsOf(hostile(10)).length).toBe(11);
+    });
+
+    it('each constraint is read to its own `)`, after the remembered one is passed (#700)', () => {
+        expect(paramsOf('/a/:x(n)/b/:y([0-9]+)/:z')).toEqual([
+            { name: 'x', type: 'n' }, { name: 'y', type: '[0-9]+' }, { name: 'z', type: 'string' },
+        ]);
     });
 
     it('a `*` inside a constraint is the constraint\'s, not a rest param', () => {
