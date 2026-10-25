@@ -245,10 +245,15 @@ export const switchToggle: ComponentManifest = {
 
     // ── Dim. 4: keyboard (a native checkbox → 'none') ──
     // No custom keydown handler: the input is tabbable, Space toggles it natively.
+    // The element that takes the focus is announced as a SWITCH, and its aria-checked follows the
+    // toggle (#684): a checkbox role is valid ARIA, so axe passes it and only these steps catch it.
     keyboard: {
         scenario: 'switch-basic',
         steps: [
-            { key: 'Tab', expectFocusWithin: '[data-test="switch-off"]' },
+            { key: 'Tab', expectFocusWithin: '[data-test="switch-off"]',
+                expectAttr: { selector: '[data-test="switch-off"] input', name: 'role', value: 'switch' } },
+            { key: 'Space', expectAttr: { selector: '[data-test="switch-off"] input', name: 'aria-checked', value: 'true' } },
+            { key: 'Space', expectAttr: { selector: '[data-test="switch-off"] input', name: 'aria-checked', value: 'false' } },
         ],
     },
 
