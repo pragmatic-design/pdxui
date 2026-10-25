@@ -906,7 +906,9 @@ The analyzer's form: `let count = $signal(0);`
 Declares a reactive value. The declaration becomes
 `const __count = signal(0, { name: 'file:count' })` (the debug name is dropped in a production build),
 emitted before the setup body — or, when the initialiser reads a variable the body declares, right
-after that declaration. A prop read in the initialiser is `ctx.prop.peek()`. Every other use of the
+after that declaration. A prop read in the initialiser is `ctx.prop.peek()`, and a `$signal` read
+there is `__name.peek()`: its value at setup time, untracked (#682). The same holds in a `$store`
+initialiser, and a parameter of the same name inside the initialiser is the parameter. Every other use of the
 name is rewritten as the table in [The script and its rewrite](#the-script-and-its-rewrite) shows,
 and the template receives the signal itself. `count++` and `count = x` are statements: the value of
 the rewritten expression is `undefined`.
