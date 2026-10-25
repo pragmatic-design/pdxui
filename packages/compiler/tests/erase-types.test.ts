@@ -121,6 +121,42 @@ describe('TypeScript in a .pdx script', () => {
         }
     });
 
+    it('a type member that shares the name of a prop or a signal is left alone (#675)', () => {
+        // `source`, `label` and `value` are a prop, a prop and a $signal. In a type they are member
+        // names: rewritten, `{ source?: unknown }` became `{ source()?: unknown }`, a module that does
+        // not parse, and the erasure gave up on it without a word.
+        const source = `<template><p>{{ label }} {{ value }}</p></template>
+<script>
+@prop source: unknown = null;
+@prop label: string = '';
+let value = $signal(0);
+interface Option { label: string; value: unknown; source(): void }
+type Pair = { label: string; value?: number };
+const fromSource = typeof (source as { source?: unknown }).source === 'function';
+const pick = (o: Option): Pair => ({ label: o.label, value: 1 });
+</script>`;
+        for (const opts of [{}, { production: true }]) {
+            const { code } = compile(source, 'type-members.pdx', [], undefined, opts);
+            parses(code);
+            expect(code).not.toMatch(/label\(\)\s*:|__value\(\)|value\(\)\s*[?:]|source\(\)\s*\??\s*:/);
+            expect(code).not.toMatch(/interface Option|type Pair/);
+            expect(code).toMatch(/typeof \(source\(\)\s*\)\.source === 'function'/);
+        }
+    });
+
+    it('a module the script does not explain stops the compile with its line, instead of reaching the browser unerased (#675)', () => {
+        // The script parsed, so nothing has reported the error: the module is the compiler's own.
+        const broken = "import { a } from './a';\nconst x: number = 1;\nconst y = { source()?: 1 };\n";
+        expect(() => eraseTypes(broken, 'x.pdx', { scriptParses: () => true }))
+            .toThrow(/PDX_TS_UNSUPPORTED.*x\.pdx.*line 3/s);
+    });
+
+    it('control — a module whose script does not parse is left for PDX_SCRIPT_SYNTAX_ERROR to report', () => {
+        const broken = 'const x: number = ;\n';
+        expect(eraseTypes(broken, 'x.pdx', { scriptParses: () => false })).toBe(broken);
+        expect(eraseTypes(broken, 'x.pdx')).toBe(broken);
+    });
+
     it('control — a script with no TypeScript compiles to the module it always did', () => {
         const plain = "<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(1);\nfunction bump() { n++; }\n</script>";
         const { code } = compile(plain, 'plain.pdx');

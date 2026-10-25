@@ -66,7 +66,8 @@ operators) computes the new value from the old one. So a `$signal` holds a funct
 other value: `onSave = () => save()` stores the arrow, and `onSave()` calls it.
 
 A parameter or a local of the same name shadows the signal and is not rewritten; nor is a property
-name (`row.count`) or a declared name. A prop or a `$derived` in callee position (`total(…)`) is left
+name (`row.count`), a declared name, or a name inside a type (`interface Row { count: number }`,
+`x as { count?: number }`), which is the type's and is erased (#675). A prop or a `$derived` in callee position (`total(…)`) is left
 as written.
 
 ## Component declarations

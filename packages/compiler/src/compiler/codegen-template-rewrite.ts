@@ -21,11 +21,13 @@ import { jsQuote } from './js-literal';
 
 // A plain reference: identifier or member access, no operators/calls → passed as a function ref.
 const BARE_REF = /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/;
-// An arrow function: `(a, b) => …`, `e => …`, `() => …`. Groups: [1]=params (with/without parens) [2]=body
+// An arrow function: `(a, b) => …`, `e => …`, `() => …`, each optionally `async` (#675: without it an
+// async handler was taken for a statement and wrapped, so it returned a function nobody called).
+// Groups: [1]=`async ` or nothing [2]=params (with/without parens) [3]=body
 // One level of nested parentheses in the params is supported (a default with a call).
 // The body starts at a non-space, so it cannot share the spaces before it with `\s*` (#461, CodeQL
 // js/polynomial-redos): every caller trims, so the captures are the ones `\s*([\s\S]+)` gave.
-const ARROW = /^(\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*(\S[\s\S]*)$/;
+const ARROW = /^(async\s+)?(\((?:[^()]|\([^()]*\))*\)|[A-Za-z_$][\w$]*)\s*=>\s*(\S[\s\S]*)$/;
 // count++ / ++count / count-- / --count
 const INC_DEC = /^(?:(\+\+|--)\s*([A-Za-z_$][\w$]*)|([A-Za-z_$][\w$]*)\s*(\+\+|--))$/;
 // count = x | count += x | count -= x | count *= x | count /= x | count %= x  (= not ==)
@@ -116,12 +118,12 @@ export function rewriteTwoWayAccessor(expr: string, ctx: CompileContext): string
 function rewriteArrow(expr: string, ctx: CompileContext): string | null {
     const arrow = ARROW.exec(expr);
     if (!arrow) return null;
-    const [, params, body] = arrow;
+    const [, asyncKeyword, params, body] = arrow;
     const names = paramNames(params);
     const block = body.trimStart().startsWith('{');
     const inner = block ? body.trim().slice(1, -1) : body;
     const rewritten = rewriteStatements(inner, ctx, names);
-    return `${params} => ${block ? `{ ${rewritten} }` : rewritten}`;
+    return `${asyncKeyword ? 'async ' : ''}${params} => ${block ? `{ ${rewritten} }` : rewritten}`;
 }
 
 /** Extract identifier names from an arrow param list (`(a, b)` or `a`); destructuring is skipped. */
