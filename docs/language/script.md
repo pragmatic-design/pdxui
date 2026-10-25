@@ -109,7 +109,9 @@ Declares a prop: an attribute-synced signal on the element, with TypeScript's ru
 
 It becomes an entry of the component's `props` object, `name: { type: T, default: d }`, where `T`
 is `String`, `Number` or `Boolean` for `string`, `number`, `boolean`, `Array` for a type ending in
-`[]`, and `Object` for every other type (unions included); the default is emitted as written, and a
+`[]`, and `Object` for every other type (unions included); the default is emitted as written, except
+an array or object literal for an `Array` or `Object` prop, which is emitted as a factory,
+`default: () => ([])`, so that each instance gets its own (#677); and a
 required prop carries `required: true`, which core reports in development when the host does not
 set it. A prop with no default that is absent holds the empty value of `T`: `''`, `0`, `false`,
 `[]`, or `null` for `Object`. Where the setup reads the name, it declares `const name = ctx.name;`
