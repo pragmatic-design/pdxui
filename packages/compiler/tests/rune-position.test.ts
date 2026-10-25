@@ -51,6 +51,20 @@ describe('PDX_RUNE_POSITION', () => {
         expect(compile(source, 'm.pdx').warnings.filter((w) => w.severity !== 'info').map((w) => w.code)).toEqual([]);
     });
 
+    it('a script function named after an Object.prototype member is not taken for a rune (#681)', () => {
+        // The rune table was a plain object: `valueOf`, `toString`, `constructor` were found on its
+        // prototype, and each call was reported with the prototype's function as the hint.
+        const source = pdx([
+            'let n = $signal(1);',
+            'function valueOf(x: number): string { return String(x); }',
+            'function toString(): string { return valueOf(n); }',
+            'function hasOwnProperty(): boolean { return false; }',
+            'const a = valueOf(1);',
+            'function b() { return valueOf(2) + toString() + String(hasOwnProperty()); }',
+        ].join('\n'));
+        expect(findings(source, 'PDX_RUNE_POSITION')).toEqual([]);
+    });
+
     it('control — a rune inside a declaration block or a string is not a call', () => {
         const source = pdx("@raw { const x = $signal(1); }\nconst note = 'write $signal(0) at the top';");
         expect(findings(source, 'PDX_RUNE_POSITION')).toEqual([]);
