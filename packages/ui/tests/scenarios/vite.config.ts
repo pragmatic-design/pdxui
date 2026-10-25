@@ -5,6 +5,7 @@ import { dirname, resolve } from 'node:path';
 import { offlineEndpoint } from './offline-endpoint';
 import { designTargetPlugin } from '../../../compiler/src/design-target';
 import { certifyTarget } from '../../../responsive/tests/certify-target';
+import { pilotPlugins } from '../../pilot/plugin';
 
 // Scenarios don't use .pdx files — just HTML + ES modules importing @pdxui/*
 // The pdx() plugin is not needed here, only aliases for workspace packages — and its design-target
@@ -58,12 +59,16 @@ function uiSubpathAliases(): { find: string; replacement: string }[] {
 // `baseline-2024`, the form with the behaviour attributes on <html>. Read where Dim 1 reads it (#509).
 const target = certifyTarget();
 
+// The pilot (#137): with PDX_PILOT=1 the piloted components are their .pdx rewrites, so the same
+// manifests certify them. Off by default: certify measures the shipped library.
+const pilot = process.env.PDX_PILOT === '1' ? pilotPlugins() : [];
+
 export default defineConfig({
     server: { port: 5220 },
     define: { __PDX_TARGET__: JSON.stringify(target) },
     // A real endpoint for `offline-queue.html`, so that going offline is a network fact and not a
     // redefined `navigator.onLine`. It answers `/__offline/*` and nothing else.
-    plugins: [offlineEndpoint(), designTargetPlugin(target)],
+    plugins: [offlineEndpoint(), designTargetPlugin(target), ...pilot],
     resolve: {
         // An ARRAY, not an object: the design sub-paths need a regex, because each one resolves to
         // a FILE named after the component and a prefix alias would produce `<dir>/button` with no

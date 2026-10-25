@@ -658,7 +658,8 @@
     "icons": "node scripts/gen-icons.mjs",
     "exports": "node scripts/gen-exports.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "test:pilot": "vitest run --config vitest.pilot.config.ts"
   },
   "peerDependencies": {
     "@pdxui/core": "workspace:*",
