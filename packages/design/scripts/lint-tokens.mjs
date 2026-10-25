@@ -104,17 +104,30 @@ function walk(dir, out = [], skipped = []) {
     // is reported as read by nothing. The result is a red on a clean tree, once every few runs,
     // blamed on the runner. The failure is tolerated, because a walk must survive a directory being
     // rebuilt underneath it; it is not INVISIBLE.
-    try { entries = readdirSync(dir); } catch (err) { skipped.push(`${dir}: ${err.code ?? err}`); return out; }
-    for (const name of entries) {
-        if (isSkippedDir(name)) continue;
-        const p = join(dir, name);
-        let st;
-        try { st = statSync(p); } catch (err) { skipped.push(`${p}: ${err.code ?? err}`); continue; }
-        if (st.isDirectory()) walk(p, out, skipped);
+    // With the entries' types, not a statSync per entry: under a full parallel gate that was one
+    // syscall per file of packages/ and the scan went past its 30 s budget (#679). A symbolic link is
+    // still resolved with statSync, so a link to a directory is walked as it was.
+    try { entries = readdirSync(dir, { withFileTypes: true }); } catch (err) { skipped.push(`${dir}: ${err.code ?? err}`); return out; }
+    for (const entry of entries) {
+        if (isSkippedDir(entry.name)) continue;
+        const p = join(dir, entry.name);
+        let isDir = entry.isDirectory();
+        if (entry.isSymbolicLink()) {
+            try { isDir = statSync(p).isDirectory(); } catch (err) { skipped.push(`${p}: ${err.code ?? err}`); continue; }
+        }
+        if (isDir) walk(p, out, skipped);
         else out.push(p);
     }
     return out;
 }
+
+/**
+ * Files whose bytes cannot hold a token read: images, archives, fonts, packaged extensions. They
+ * were a third of what the scan read — 35 MB of PNG, ZIP and VSIX under packages/ (#679). A deny
+ * list, not an allow list: `var(--pdx-…)` is also read from snapshots, JSON and plain text, and a
+ * text format added tomorrow is still scanned.
+ */
+const BINARY = /\.(png|jpe?g|gif|webp|avif|ico|zip|gz|vsix|woff2?|ttf|otf|eot|pdf|mp4|webm)$/i;
 
 /**
  * A file `walk` listed, read — or, if it is gone by now, recorded in `skipped` and skipped (#666).
@@ -163,7 +176,7 @@ export function unreadTokens(repoRoot) {
         ...walk(join(repoRoot, 'templates'), [], skipped),
     ];
     for (const f of sources) {
-        if (f.endsWith('.md')) continue;
+        if (f.endsWith('.md') || BINARY.test(f)) continue;
         const text = readListed(f, skipped);
         if (text === undefined) continue;
         for (const m of text.matchAll(/var\(\s*(--pdx-[A-Za-z0-9_-]+)/g)) read.add(m[1]);
