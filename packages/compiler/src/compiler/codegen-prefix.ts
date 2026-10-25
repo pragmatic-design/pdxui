@@ -374,6 +374,8 @@ const NEVER_PREFIX = new Set([
     'true', 'false', 'null', 'undefined', 'NaN', 'Infinity',
     'if', 'else', 'for', 'while', 'return', 'const', 'let', 'var', 'function',
     'new', 'typeof', 'instanceof', 'void', 'delete', 'in', 'of', 'this',
+    // An async handler's (#675): prefixed, `await go()` was `ctx.await() ctx.go()`.
+    'async', 'await',
     // Template context
     'ctx',
     // Inline event handler: the event is exposed as $event (Vue-style)

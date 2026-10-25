@@ -473,7 +473,9 @@ The quoted value is a `Handler`.
 The handler is built by `buildEventHandler` (both paths):
 
 - a **reference**, `save` or `form.reset`, is passed as the listener: the event is its first argument;
-- an **arrow**, `e => last = e.button`, is kept, its parameters local and its body rewritten;
+- an **arrow**, `e => last = e.button`, is kept, its parameters local and its body rewritten; an
+  `async` one too, `async e => { await save(e.detail) }`, with `async` and `await` left as keywords
+  (#675: it was wrapped as a statement, and returned a function nobody called);
 - **one statement** becomes `() => …`: a signal named bare is updated through `.set` and assigned
   through `.setRaw`, which stores the value as it is, a function too — `count++` is
   `ctx.count.set(v => v + 1)`, `n += 2` is `ctx.n.set(v => v + (2))`, `open = !open` is

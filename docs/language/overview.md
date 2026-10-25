@@ -76,7 +76,9 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
   annotations, `as`, generics, `import type`, `interface` and `type` are erased (replaced by spaces, so
   lines and columns stay where they were). TypeScript with a runtime meaning — `enum`, `namespace`, a
   constructor parameter property, `import x = require()` — stops the compile with
-  `PDX_TS_UNSUPPORTED`.
+  `PDX_TS_UNSUPPORTED`. So does a module generated from a script that parses when the module itself
+  does not: that code is the compiler's, and the error names its line instead of reaching the browser
+  unerased (#675). A script with a syntax error of its own is reported as `PDX_SCRIPT_SYNTAX_ERROR`.
 
 ### The tag
 

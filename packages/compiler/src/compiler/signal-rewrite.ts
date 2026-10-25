@@ -6,6 +6,7 @@ import ts from 'typescript';
 import type { SignalDecl } from './script-analyzer';
 import { skipNonCode } from './tokenizer';
 import { rewriteAst, type WarningSink } from './signal-rewrite-ast';
+import { jsQuote } from './js-literal';
 
 /**
  * Is this fragment, as a whole, an arrow function? The question `$derived(…)` has to answer before
@@ -66,6 +67,15 @@ export function rewritePropPeeks(expr: string, propNames: Set<string>): string {
 }
 
 /**
+ * The file's name without its folders or `.pdx`, as a signal's debug name begins. Split on both
+ * separators: a Windows path split on `/` alone stayed whole, and its `\u` of `packages\ui` written into
+ * the name's string made a module that does not parse (#675). The effects' names already did this.
+ */
+function debugBaseName(filename: string): string {
+    return filename.replace(/\.pdx$/, '').split(/[\\/]/).pop() ?? '';
+}
+
+/**
  * Generate signal declaration code.
  * let count = $signal(0) → const __count = signal(0, { name: 'file:count' });
  */
@@ -79,8 +89,7 @@ export function generateSignalDeclarations(signals: SignalDecl[], filename: stri
         if (production) {
             return `    const __${s.name} = signal(${initExpr});`;
         }
-        const baseName = filename.replace(/\.pdx$/, '').split('/').pop() ?? '';
-        return `    const __${s.name} = signal(${initExpr}, { name: '${baseName}:${s.name}' });`;
+        return `    const __${s.name} = signal(${initExpr}, { name: ${jsQuote(`${debugBaseName(filename)}:${s.name}`)} });`;
     }).join('\n');
 }
 
@@ -105,9 +114,9 @@ export function generateDerivedDeclarations(
     // anonymous function in every reading `__pdx_debug` gives, so «what does this depend on» and
     // «who is subscribed to that» answer with lists of `(anonymous)`. Stripped in production, like
     // the signals'.
-    const baseName = filename.replace(/\.pdx$/, '').split('/').pop() ?? '';
+    const baseName = debugBaseName(filename);
     const debugArg = (name: string): string =>
-        production || !baseName ? '' : `, { name: '${baseName}:${name}' }`;
+        production || !baseName ? '' : `, { name: ${jsQuote(`${baseName}:${name}`)} }`;
     return deriveds.map(d => {
         // Route derived reads through the TS-AST rewriter (same path as the setup body):
         // signals → __name(), other callables (deriveds + props) → name(). The AST natively

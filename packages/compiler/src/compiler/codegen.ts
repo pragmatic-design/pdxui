@@ -13,7 +13,7 @@ import { analyzeScript } from './script-analyzer';
 import type { PluginRunner } from '../plugin-system';
 import { createCompileContext } from './compile-context';
 import { compileNewMode, compileStoreMode } from './codegen-new';
-import { eraseTypes } from './erase-types';
+import { eraseTypes, scriptBodyParses } from './erase-types';
 import { insertModuleHoists } from './codegen-shared';
 import { styleBlocks, hash } from './codegen-styles';
 import { markSlotted } from './slotted-marks';
@@ -94,7 +94,9 @@ export function compileSFC(
 
     // The script is TypeScript unless it says otherwise: its types are erased from the module the
     // runes were lowered into, positions kept. A `lang="js"` script is left as written.
-    const erase = (code: string) => script.lang === 'js' ? code : eraseTypes(code, filename);
+    // A module that does not parse from a script that does is the compiler's error: say so (#675).
+    const erase = (code: string) => script.lang === 'js' ? code
+        : eraseTypes(code, filename, { scriptParses: () => scriptBodyParses(analysis.body) });
     // @store rune: compile as store module (not component)
     if (analysis.globalStore) {
         return erase(compileStoreMode(withScript, filename, analysis, runner));

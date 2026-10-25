@@ -272,7 +272,24 @@ function isReadPosition(id: ts.Identifier): boolean {
         (p.operator === ts.SyntaxKind.PlusPlusToken || p.operator === ts.SyntaxKind.MinusMinusToken)) return false;
     if (ts.isImportSpecifier(p) || ts.isExportSpecifier(p) || ts.isImportClause(p)) return false;
     if (ts.isTypeNode(p) || ts.isTypeReferenceNode(p) || ts.isTypeQueryNode(p)) return false;
+    if (inType(id)) return false;
     return true;
+}
+
+/**
+ * True when `id` sits anywhere inside a type: a member of a type literal or an interface
+ * (`{ source?: unknown }`, `interface O { label: string }`), a type alias, a nested type argument.
+ * Its name is the type's, not a read of the prop or signal it shares a name with (#675); and the
+ * erasure removes it anyway. Only the direct parent was checked before, which a member's name is not.
+ */
+function inType(id: ts.Identifier): boolean {
+    for (let n: ts.Node | undefined = id.parent; n && !ts.isSourceFile(n); n = n.parent) {
+        if (ts.isTypeNode(n) && !ts.isExpressionWithTypeArguments(n)) return true;
+        if (ts.isInterfaceDeclaration(n) || ts.isTypeAliasDeclaration(n)) return true;
+        // A statement or a function body is as far as a type can enclose an expression.
+        if (ts.isStatement(n) || ts.isBlock(n)) return false;
+    }
+    return false;
 }
 
 function isAssignmentOp(kind: ts.SyntaxKind): boolean {

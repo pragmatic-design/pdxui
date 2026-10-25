@@ -144,17 +144,38 @@ function blankOut(code: string, ranges: Range[]): string {
     return chars.join('');
 }
 
+/** Whether a script's setup body parses: the check PDX_SCRIPT_SYNTAX_ERROR reports from (validate.ts). */
+export function scriptBodyParses(body: string | undefined): boolean {
+    if (!body?.trim()) return true;
+    return parseDiagnostics(ts.createSourceFile('__pdx_setup.ts', body, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS)).length === 0;
+}
+
+/** What the caller knows of the script the module was generated from. */
+export interface EraseOptions {
+    /** Whether the author's script parses, asked only when the module does not (#675). */
+    scriptParses?: () => boolean;
+}
+
 /**
  * `code` without its TypeScript, every position kept. A module that does not parse is returned as it
- * is: its syntax error is reported elsewhere (PDX_SCRIPT_SYNTAX_ERROR), not hidden behind this one.
- * Throws `PDX_TS_UNSUPPORTED` for TypeScript that has a runtime, or when the erasure leaves code that
+ * is when its script does not parse either: that syntax error is reported elsewhere
+ * (PDX_SCRIPT_SYNTAX_ERROR), not hidden behind this one. When the script parses, the module's error is
+ * the compiler's own, and nothing else would report it: it throws `PDX_TS_UNSUPPORTED` with the line
+ * (#675). It throws the same for TypeScript that has a runtime, or when the erasure leaves code that
  * does not parse (a return type that broke a line before `=>`).
  */
-export function eraseTypes(code: string, filename: string): string {
+export function eraseTypes(code: string, filename: string, options: EraseOptions = {}): string {
     // No parent links: every position is read with the source file passed, and setting them was a
     // third of the parse (#454).
     const sf = ts.createSourceFile('__pdx_module.ts', code, ts.ScriptTarget.Latest, false, ts.ScriptKind.TS);
-    if (parseDiagnostics(sf).length > 0) return code;
+    const errors = parseDiagnostics(sf);
+    if (errors.length > 0) {
+        if (!options.scriptParses?.()) return code;
+        const first = errors[0];
+        const { line } = sf.getLineAndCharacterOfPosition(first.start ?? 0);
+        const text = code.split('\n')[line]?.trim() ?? '';
+        throw new Error(`[PDX_TS_UNSUPPORTED] ${filename} — the module generated from this script does not parse, at line ${line + 1} of the module: ${ts.flattenDiagnosticMessageText(first.messageText, ' ')} (\`${text}\`). The script itself parses, so the compiler wrote this code.\n  Hint: report it with the script; meanwhile, the construct on that line written another way avoids it.`);
+    }
     const { ranges, unsupported } = collect(code, sf);
     if (unsupported.length > 0) {
         const what = unsupported.map(n => `\`${n.getText(sf).split('\n')[0].trim()}\``).join(', ');

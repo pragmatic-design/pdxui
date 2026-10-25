@@ -28,7 +28,9 @@ describe('PDX_UNKNOWN_DIRECTIVE', () => {
     it('control — a directive a plugin registers is not reported', () => {
         const tooltip: CompilerPlugin = {
             name: 'tooltip-plugin',
-            templateDirectives: { tooltip: { generate: (_expr, body) => `\${${body}}` } },
+            // A body the inline path can run: it places what `generate` returns as a function's body.
+            // `\${body}`, the removed template path's form, was a module that did not parse (#675).
+            templateDirectives: { tooltip: { generate: (_expr, body) => `return ${body};` } },
         };
         const { warnings } = compile(sfc("<p>@tooltip ('a') { x }</p>"), 'tip.pdx', [tooltip]);
         expect(unknownOf(warnings)).toEqual([]);
