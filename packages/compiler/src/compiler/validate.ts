@@ -30,6 +30,7 @@ import { checkBubblesUnused, type EventHeardLookup } from './validate-event-bubb
 import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
 import { checkAwaitTiming } from './validate-await';
+import { snippetReads } from './validate-snippet-reads';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -391,11 +392,13 @@ export function validate(
 
     // ─── Check 4: Unused declared variables ────────────────────────
 
+    // A script @snippet's body is a template too: what it reads is read (#683).
+    const snippetIds = snippetReads(analysis, (nodes) => collectTemplateIdentifiers(nodes, declaredNames));
     for (const e of analysis.exports) {
         if (e.name.startsWith('_')) continue; // underscore = intentionally unused
         // A @part's ref (#134) is public by declaration: the element is the use, not a read.
         if (analysis.parts.includes(e.name)) continue;
-        if (!templateIds.has(e.name) && e.kind !== 'function') {
+        if (!templateIds.has(e.name) && !snippetIds.has(e.name) && e.kind !== 'function') {
             // Only warn for signals/derived that are never in template.
             if (e.kind === 'signal' || e.kind === 'derived') {
                 // Indirect use: read/written in a body function (idiomatic .pdx wrapper, e.g.
