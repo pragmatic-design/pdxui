@@ -60,6 +60,7 @@ every `@provide` value. A `$signal` named `count` lives in the module as `__coun
 | `handler(a)` (a `$signal` called) | `__handler()(a)` — the value is read, then called |
 | `{ count }` (shorthand property) | `{ count: __count() }` |
 | `total` (a prop or a `$derived`, read) | `total()` |
+| `total.peek()` (a prop or a `$derived`) | `total.peek()` — its own `peek`, the value untracked, as on a `$signal` (#676) |
 
 An assignment stores its value; an update (`++`, `--` and the arithmetic and bitwise compound
 operators) computes the new value from the old one. So a `$signal` holds a function as it holds any
