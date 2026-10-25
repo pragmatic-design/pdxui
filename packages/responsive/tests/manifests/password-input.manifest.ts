@@ -51,17 +51,17 @@ export const passwordInput: ComponentManifest = {
                     {
                         // Aligned with the input/button minimum (>=28): the dense themes stay valid
                         // (input-min-height × the density can fall below 32).
-                        selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="password"] [data-part="root"]',
                         description: 'input wrapper height >= 28px',
                         height: { op: '>=', value: 28 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="password"] [data-part="root"]',
                         description: 'wrapper radius >= 0 (mai negativo)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="password"] input.pdx-input',
+                        selector: 'section:not([hidden]) [data-test="password"] [data-part="input"]',
                         description: 'inner input has no visible own border',
                         border: {
                             top: { style: { op: 'is', value: 'none' } },
@@ -78,7 +78,7 @@ export const passwordInput: ComponentManifest = {
                 composition: [
                     {
                         description: 'toggle button contained within the wrapper',
-                        parent: '[data-test="password"] .pdx-input-wrap',
+                        parent: '[data-test="password"] [data-part="root"]',
                         children: {
                             toggle: '[data-test="password"] .pdx-password-toggle',
                         },
@@ -92,9 +92,18 @@ export const passwordInput: ComponentManifest = {
             'password-input-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="password"] [data-part="root"]',
                         description: 'disabled wrapper is dimmed (opacity < 1)',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="password"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="password"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },
@@ -104,9 +113,9 @@ export const passwordInput: ComponentManifest = {
                         description: 'size hierarchy: sm < md < lg heights',
                         parent: 'body',
                         children: {
-                            sm: '[data-test="password-sm"] .pdx-input-wrap',
-                            md: '[data-test="password-md"] .pdx-input-wrap',
-                            lg: '[data-test="password-lg"] .pdx-input-wrap',
+                            sm: '[data-test="password-sm"] [data-part="root"]',
+                            md: '[data-test="password-md"] [data-part="root"]',
+                            lg: '[data-test="password-lg"] [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
@@ -127,7 +136,7 @@ export const passwordInput: ComponentManifest = {
     isolation: {
         scenario: 'password-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="password"] .pdx-input-wrap', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="password"] [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
@@ -136,7 +145,7 @@ export const passwordInput: ComponentManifest = {
         scenario: 'password-input-basic',
         steps: [
             // Tab lands INSIDE the component (the input, then the toggle): what is checked is the containment.
-            { key: 'Tab', expectFocusWithin: '[data-test="password"] .pdx-input-wrap' },
+            { key: 'Tab', expectFocusWithin: '[data-test="password"] [data-part="root"]' },
         ],
     },
 

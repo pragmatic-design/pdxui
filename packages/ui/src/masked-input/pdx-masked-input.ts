@@ -1,8 +1,7 @@
 // pdx-masked-input — Input with pattern mask (phone, credit card, date, custom).
 // Auto-formats as user types, manages cursor position around mask chars.
 
-import { component, html, signal, model } from '@pdxui/core';
-import { reflectNameToHost } from '../shared/own-prop';
+import { component, event, html, signal, model } from '@pdxui/core';
 import { dispatchCommit } from '../shared/commit-change';
 
 /**
@@ -64,6 +63,12 @@ function outOfRange(preset: string, digits: string): boolean {
  * An input that formats what the user types to a pattern, a built-in preset such as phone, card or
  * date, or a custom one.
  *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input>` that shows the masked text.
+ *
+ * @cssstate invalid - `error` is set, or a complete date or time preset value is out of range.
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
@@ -77,6 +82,15 @@ component('pdx-masked-input', {
     // also carried, the formatted text and whether it is in range, the element answers itself:
     // `getFormatted()` and `isValid()`.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** The textbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The textbox lost focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's.
+    states: ['invalid', 'disabled'],
+    parts: ['root', 'input'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -184,12 +198,10 @@ component('pdx-masked-input', {
         function onFocus() { ctx.emit('pdx-focus'); }
         function onBlur() { ctx.emit('pdx-blur'); }
 
-        function wrapClass(): string {
-            let cls = 'pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.error() || !isValid()) cls += ' error';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error() || !isValid());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         function getPlaceholder(): string {
             if (ctx.placeholder()) return ctx.placeholder() as string;
@@ -211,10 +223,6 @@ component('pdx-masked-input', {
             const propVal = ctx.value() as string;
             if (propVal) displayValue.set(applyMask(propVal));
         });
-
-        // The host is the one submitter: the unmasked value, under the host's name. The inner input
-        // does not carry the name, or it would send the masked text a second time.
-        reflectNameToHost(ctx);
 
         // Imperative API: focus/blur/clear
         ctx.expose({
@@ -239,12 +247,18 @@ component('pdx-masked-input', {
             isValid(): boolean { return isValid(); },
         });
 
-        return { displayValue, wrapClass, getPlaceholder, getInputmode, onInput, onFocus, onBlur, isValid };
+        return { displayValue, getPlaceholder, getInputmode, onInput, onFocus, onBlur, isValid };
     },
+    // The host is the one submitter: the unmasked value, under the host's name. A form-associated
+    // element is in FormData under its `name` ATTRIBUTE, so a `:name` binding that sets the property
+    // must reach the attribute. The inner input carries no name, or it would send the masked text too.
+    // After `setup`: TypeScript infers setup's return before it types this function's context.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root">
+        <div class="pdx-input-wrap" data-part="root">
             <input
                 class="pdx-input"
+                data-part="input"
                 type="text"
                 autocomplete="off"
                 data-lpignore="true"

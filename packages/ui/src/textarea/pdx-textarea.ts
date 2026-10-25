@@ -1,12 +1,26 @@
 // pdx-textarea — Multi-line input with auto-resize, char/word count, sizes, states.
 // Uses .pdx-input-wrap pattern for consistency with pdx-input.
 
-import { component, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * A multi-line text input with auto-resize, a character or word count and validation states.
+ *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<textarea>`, the textbox a form submits.
+ * @csspart footer - The row under the frame that holds the counts, with `show-count` or `word-count`.
+ * @csspart count - The character count, with `show-count`.
+ * @csspart word-count - The word count, with `word-count`.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set.
+ * @cssstate over-limit - The text is longer than `maxlength`; the character count shows it.
  *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
@@ -17,6 +31,16 @@ component('pdx-textarea', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur, is the
     // inner textarea's native `change`, which bubbles to the host.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** The textbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The textbox lost focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's: the frame carries no
+    // state class of its own.
+    states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading', 'over-limit'],
+    parts: ['root', 'input', 'footer', 'count', 'word-count'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -52,15 +76,15 @@ component('pdx-textarea', {
         // Line height in px — measured once for autoresize calculations
         let lineHeight = 0;
 
-        function wrapClass(): string {
-            let cls = 'pdx-input-wrap pdx-textarea-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.readonly()) cls += ' readonly';
-            if (ctx.error()) cls += ' error';
-            if (ctx.success()) cls += ' success';
-            if (ctx.warning()) cls += ' warning';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('success', !!ctx.success());
+            ctx.state('warning', !!ctx.warning());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('loading', !!ctx.loading());
+            ctx.state('over-limit', isOverCount());
+        });
 
         function getResize(): string {
             // Auto-resize mode disables manual resize handle
@@ -118,11 +142,6 @@ component('pdx-textarea', {
         }
 
         ctx.track(() => {
-            const el = ctx.el;
-
-            if (ctx.loading()) el.setAttribute('aria-busy', 'true');
-            else el.removeAttribute('aria-busy');
-
             const propVal = ctx.value() as string;
             // '' is a legitimate reset: a truthy guard would ignore it and leave the char/word count
             // stale while the DOM empties.
@@ -177,12 +196,13 @@ component('pdx-textarea', {
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { wrapClass, getResize, onInput, onFocus, onBlur, onWrapClick, charCountText, wordCountText, isOverCount };
+        return { getResize, onInput, onFocus, onBlur, onWrapClick, charCountText, wordCountText };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}" style="height:auto;min-height:auto">
+        <div class="pdx-input-wrap pdx-textarea-wrap" data-part="root" @click="${ctx.onWrapClick}" style="height:auto;min-height:auto">
             <textarea
                 class="pdx-input"
+                data-part="input"
                 :value="${ctx.value}"
                 placeholder="${ctx.placeholder}"
                 :disabled="${ctx.disabled}"
@@ -197,6 +217,7 @@ component('pdx-textarea', {
                 :aria-label="${() => ctx.ariaLabel() || null}"
                 :aria-invalid="${() => ctx.error() ? 'true' : null}"
                 :aria-required="${() => ctx.required() ? 'true' : null}"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}"
                 :style="${() => 'resize:' + ctx.getResize() + ';width:100%'}"
                 @input="${ctx.onInput}"
                 @focus="${ctx.onFocus}"
@@ -207,9 +228,9 @@ component('pdx-textarea', {
             const show = ctx.showCount();
             const word = ctx.wordCount();
             if (!show && !word) return '';
-            return html`<div class="pdx-textarea-footer">
-                ${() => word ? html`<span class="pdx-input-count">${ctx.wordCountText}</span>` : html`<span></span>`}
-                ${() => show ? html`<span class="${() => 'pdx-input-count' + (ctx.isOverCount() ? ' over' : '')}">${ctx.charCountText}</span>` : ''}
+            return html`<div class="pdx-textarea-footer" data-part="footer">
+                ${() => word ? html`<span class="pdx-input-count" data-part="word-count">${ctx.wordCountText}</span>` : html`<span></span>`}
+                ${() => show ? html`<span class="pdx-input-count" data-part="count">${ctx.charCountText}</span>` : ''}
             </div>`;
         }}
     `,

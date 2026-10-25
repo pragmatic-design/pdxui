@@ -379,6 +379,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-textarea`, `pdx-password-input`, `pdx-search-input` and `pdx-masked-input` take
+  `pdx-input`'s contract (#286). Their states are custom states on the host, and their frames no
+  longer carry state classes:
+  - textarea: `invalid`, `success`, `warning`, `disabled`, `readonly`, `loading`, `over-limit`;
+  - password: `invalid`, `disabled`, `loading`;
+  - search: `disabled`, `loading`;
+  - masked: `invalid`, which is also set when a complete date or time is out of range, and `disabled`.
+
+  Their pieces are named parts: `root`, `input`, and the textarea's `footer`, `count`, `word-count`,
+  the password's `toggle`, `strength`, the search's `prefix`, `spinner`, `clear`, `shortcut`. While
+  `loading`, the textarea and the password input mark their textbox `aria-busy` rather than the host;
+  the search input marks its searchbox, which nothing marked before. The over-limit colour reaches
+  the character count by its part, so a textarea's word count is never coloured.
 - **Breaking:** `pdx-input` shows its states as custom states on the host (#286): `:state(invalid)`,
   `success`, `warning`, `disabled`, `readonly`, `loading` and `over-limit`. Its frame no longer carries
   the `error`, `success`, `warning`, `disabled` and `readonly` classes, nor its count `over`. A

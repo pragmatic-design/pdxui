@@ -3,7 +3,7 @@
  *
  * A specialised input (the same wrapper pattern as pdx-input): the host renders
  * a `.pdx-input-wrap` with an inner `input.pdx-input`. It formats itself with the mask as
- * you type; the state classes (`disabled`/`error`) are applied to the wrapper.
+ * you type; its states (`disabled`/`invalid`) are custom states on the host, `:state()` (#286).
  *
  * Conservative contracts: true on every theme. No exact px.
  *
@@ -55,17 +55,17 @@ export const maskedInput: ComponentManifest = {
                 standalone: [
                     {
                         // Aligned with the input/button minimum (>=28): the dense themes stay valid.
-                        selector: 'section:not([hidden]) [data-test="masked"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="masked"] [data-part="root"]',
                         description: 'input wrapper height >= 28px',
                         height: { op: '>=', value: 28 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="masked"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="masked"] [data-part="root"]',
                         description: 'wrapper radius >= 0 (mai negativo)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="masked"] input.pdx-input',
+                        selector: 'section:not([hidden]) [data-test="masked"] [data-part="input"]',
                         description: 'inner input has no visible own border',
                         border: {
                             top: { style: { op: 'is', value: 'none' } },
@@ -79,9 +79,18 @@ export const maskedInput: ComponentManifest = {
                 standalone: [
                     {
                         // A state already in the markup: a standalone rule (NOT states/trigger) → no flake.
-                        selector: 'section:not([hidden]) [data-test="masked"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="masked"] [data-part="root"]',
                         description: 'disabled wrapper is dimmed (opacity < 1)',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="masked"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="masked"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },
@@ -91,9 +100,9 @@ export const maskedInput: ComponentManifest = {
                         description: 'size hierarchy: sm < md < lg heights',
                         parent: 'body',
                         children: {
-                            sm: '[data-test="masked-sm"] .pdx-input-wrap',
-                            md: '[data-test="masked-md"] .pdx-input-wrap',
-                            lg: '[data-test="masked-lg"] .pdx-input-wrap',
+                            sm: '[data-test="masked-sm"] [data-part="root"]',
+                            md: '[data-test="masked-md"] [data-part="root"]',
+                            lg: '[data-test="masked-lg"] [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
@@ -114,7 +123,7 @@ export const maskedInput: ComponentManifest = {
     isolation: {
         scenario: 'masked-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="masked"] .pdx-input-wrap', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="masked"] [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
@@ -123,7 +132,7 @@ export const maskedInput: ComponentManifest = {
         scenario: 'masked-input-basic',
         steps: [
             // Tab lands INSIDE the component (the inner input): what is checked is the containment.
-            { key: 'Tab', expectFocusWithin: '[data-test="masked"] .pdx-input-wrap' },
+            { key: 'Tab', expectFocusWithin: '[data-test="masked"] [data-part="root"]' },
         ],
     },
 

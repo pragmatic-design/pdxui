@@ -25,7 +25,11 @@ Input that enforces a fixed format.
 | `getFormatted()` | The value as shown, with the mask's literals: `(555) 123-4567` for `5551234567`. |
 | `isValid()` | False while a complete date or time preset value is out of range. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The textbox lost focus.; `pdx-focus` — The textbox received focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+
+**States:** `:state(invalid)` — `error` is set, or a complete date or time preset value is out of range.; `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>` that shows the masked text.
 
 
 #### Examples

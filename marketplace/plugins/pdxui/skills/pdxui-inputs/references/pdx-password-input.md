@@ -25,7 +25,11 @@ Password field with reveal and strength.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The textbox lost focus.; `pdx-focus` — The textbox received focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+
+**States:** `:state(invalid)` — `error` is set.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — `loading` is set.
+
+**Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>`, the textbox a form submits.; `[data-part="toggle"]` — The button that reveals or hides the password.; `[data-part="strength"]` — The strength meter under the frame, with `show-strength` and something typed.
 
 
 #### Examples

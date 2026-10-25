@@ -576,8 +576,9 @@ pdx-row > .pdx-input {
     text-align: right;
     margin-top: var(--pdx-space-2xs);
 }
+/* The character count, not a word count beside it: pdx-textarea's sits in its footer. */
 .pdx-input-count.over,
-:state(over-limit) > .pdx-input-count { color: var(--pdx-color-danger-ink); }
+:state(over-limit) [data-part="count"] { color: var(--pdx-color-danger-ink); }
 
 /* ==========================================================================
    Input Style Variants — Filled & Underlined

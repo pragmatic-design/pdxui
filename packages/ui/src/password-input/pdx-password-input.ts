@@ -1,13 +1,22 @@
 // pdx-password-input — Input with toggle visibility and optional strength meter.
 // Uses pdx-input wrapper pattern. Toggle button in suffix position.
 
-import { component, html, signal, generatedId, model } from '@pdxui/core';
+import { component, event, html, signal, generatedId, model } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
 
 /**
  * A password field the user can reveal or hide, with an optional strength meter below it.
+ *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input>`, the textbox a form submits.
+ * @csspart toggle - The button that reveals or hides the password.
+ * @csspart strength - The strength meter under the frame, with `show-strength` and something typed.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set.
  *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
@@ -18,6 +27,15 @@ component('pdx-password-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** The textbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The textbox lost focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's.
+    states: ['invalid', 'disabled', 'loading'],
+    parts: ['root', 'input', 'toggle', 'strength'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -48,12 +66,11 @@ component('pdx-password-input', {
             visible.set(!visible.peek());
         }
 
-        function wrapClass(): string {
-            let cls = 'pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.error()) cls += ' error';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', !!ctx.loading());
+        });
 
         function onInput(e: Event) {
             const val = (e.target as HTMLInputElement).value;
@@ -107,9 +124,6 @@ component('pdx-password-input', {
         }
 
         ctx.track(() => {
-            if (ctx.loading()) ctx.el.setAttribute('aria-busy', 'true');
-            else ctx.el.removeAttribute('aria-busy');
-
             const propVal = ctx.value() as string;
             if (propVal) liveValue.set(propVal);
         });
@@ -133,12 +147,13 @@ component('pdx-password-input', {
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { visible, toggleVisibility, wrapClass, onInput, onFocus, onBlur, onWrapClick, strength, strengthLabel, strengthColor, strengthId, describedBy };
+        return { visible, toggleVisibility, onInput, onFocus, onBlur, onWrapClick, strength, strengthLabel, strengthColor, strengthId, describedBy };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
+        <div class="pdx-input-wrap" data-part="root" @click="${ctx.onWrapClick}">
             <input
                 class="pdx-input"
+                data-part="input"
                 :type="${() => ctx.visible() ? 'text' : 'password'}"
                 :value="${ctx.value}"
                 placeholder="${ctx.placeholder}"
@@ -149,12 +164,13 @@ component('pdx-password-input', {
                 :aria-label="${() => ctx.ariaLabel() || null}"
                 :aria-invalid="${() => ctx.error() ? 'true' : null}"
                 :aria-describedby="${ctx.describedBy}"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}"
                 autocomplete="current-password"
                 @input="${ctx.onInput}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             />
-            <button class="pdx-input-suffix-interactive pdx-password-toggle" type="button"
+            <button class="pdx-input-suffix-interactive pdx-password-toggle" data-part="toggle" type="button"
                     :aria-label="${() => uiString('password-input', ctx.visible() ? 'hide' : 'show')}"
                     :disabled="${ctx.disabled}"
                     @click="${ctx.toggleVisibility}">
@@ -162,7 +178,7 @@ component('pdx-password-input', {
             </button>
         </div>
         ${() => ctx.showStrength() && ctx.strength() > 0 ? html`
-            <div class="pdx-password-strength" aria-hidden="true">
+            <div class="pdx-password-strength" data-part="strength" aria-hidden="true">
                 <div class="pdx-password-strength-track">
                     <div class="pdx-password-strength-fill" :style="${() => 'width:' + (ctx.strength() * 25) + '%;background:' + ctx.strengthColor()}"></div>
                 </div>
