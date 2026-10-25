@@ -13,10 +13,12 @@ import type { ValidationWarning } from './validate';
 import { maskNonCode } from './tokenizer';
 import { declarationEnd } from './statement-extent';
 
+// Maps, not object literals: a name is looked up here for every call of the script, and an object
+// answered for `valueOf`, `toString` and the rest of Object.prototype (#681).
 /** The runes read as the initialiser of a top-level declaration, with the core function for elsewhere. */
-const DECLARED: Record<string, string> = { $signal: 'signal', $derived: 'computed', $store: 'store' };
+const DECLARED = new Map<string, string>([['$signal', 'signal'], ['$derived', 'computed'], ['$store', 'store']]);
 /** The runes read as a top-level statement, with the core function for elsewhere. */
-const STATEMENT: Record<string, string> = { $effect: 'effect', $watch: 'watch' };
+const STATEMENT = new Map<string, string>([['$effect', 'effect'], ['$watch', 'watch']]);
 
 // Match: a declaration opening its line, `@name`. Read on the masked script.
 const DECLARATION = /^[ \t]*@[A-Za-z]/gm;
@@ -90,9 +92,9 @@ export function misplacedRunes(code: string): MisplacedRune[] {
     const visit = (node: ts.Node): void => {
         if (ts.isCallExpression(node) && ts.isIdentifier(node.expression)) {
             const rune = node.expression.text;
-            const known = !!(DECLARED[rune] || STATEMENT[rune]);
+            const known = DECLARED.has(rune) || STATEMENT.has(rune);
             const wrong = known && inValue(node.getStart(sf)) ? true
-                : DECLARED[rune] ? !declaredInPosition(node, sf) : STATEMENT[rune] ? !statementInPosition(node, sf) : false;
+                : DECLARED.has(rune) ? !declaredInPosition(node, sf) : STATEMENT.has(rune) ? !statementInPosition(node, sf) : false;
             if (wrong) out.push({ at: node.getStart(sf), rune, text: node.getText(sf) });
         }
         ts.forEachChild(node, visit);
@@ -108,14 +110,14 @@ export function validateRunePosition(descriptor: SFCDescriptor, source: string):
     return misplacedRunes(script.content).map(({ at: offset, rune }) => {
         const at = script.start + offset;
         const before = source.slice(0, at);
-        const declared = DECLARED[rune];
+        const declared = DECLARED.get(rune);
         return {
             code: 'PDX_RUNE_POSITION',
             severity: 'error' as const,
             message: declared
                 ? `\`${rune}(…)\` is read only as the whole initialiser of a top-level \`let\` or \`const\`: here it is left as written, and \`${rune}\` is not defined when it runs.`
                 : `\`${rune}(…)\` is read only as a top-level statement of the script: here it is not, and \`${rune}\` is not defined when it runs.`,
-            hint: `Here, call the core function: \`${declared ?? STATEMENT[rune]}(…)\`, imported from '@pdxui/core'.`,
+            hint: `Here, call the core function: \`${declared ?? STATEMENT.get(rune)}(…)\`, imported from '@pdxui/core'.`,
             line: before.split('\n').length,
             column: at - before.lastIndexOf('\n'),
         };
