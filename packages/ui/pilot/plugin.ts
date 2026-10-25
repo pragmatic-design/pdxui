@@ -16,6 +16,7 @@ const here = (p: string) => resolve(__dirname, '..', p).replace(/\\/g, '/');
 /** TypeScript component → its .pdx rewrite. */
 export const PILOT: Record<string, string> = {
     [here('src/switch-toggle/pdx-switch.ts')]: here('pilot/switch.pdx'),
+    [here('src/select/pdx-select.ts')]: here('pilot/select.pdx'),
 };
 
 /** Redirects each piloted module, however it is imported, to its .pdx. */

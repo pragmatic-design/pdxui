@@ -1,0 +1,733 @@
+<!--
+  pdx-select, written in .pdx for the pilot (#137): the same component as src/select/pdx-select.ts,
+  held to the same unit tests and certification manifest. Not exported.
+
+  Where the language has no declaration for what the component does, the script reaches `ctx`, and
+  each place says so with ESCAPE HATCH: those are what the pilot counts.
+-->
+<template>
+  <div :class="triggerClass" data-part="root" :ref="triggerEl"
+    :role="inputInTrigger ? null : 'combobox'"
+    :aria-haspopup="inputInTrigger ? null : 'listbox'"
+    :aria-expanded="inputInTrigger ? null : String(isOpen)"
+    :aria-controls="inputInTrigger ? null : listboxId"
+    :aria-activedescendant="inputInTrigger ? null : activeId"
+    :aria-label="inputInTrigger ? null : (label || null)"
+    :aria-disabled="!inputInTrigger && disabled ? 'true' : null"
+    :tabindex="inputInTrigger ? '-1' : '0'"
+    @click="onTriggerClick"
+    @keydown="onTriggerKeydown">
+    @if (multiple) {
+      <div class="pdx-select-tags">
+        @if (tagSummary) {
+          <span class="pdx-chip pdx-chip-sm pdx-chip-summary">{{ format(uiString('select', 'selected'), { n: selectedItems.length }) }}</span>
+        } @else {
+          @for (shownTags as tag; track tag.value) {
+            <span class="pdx-chip pdx-chip-sm">
+              <span>{{ tag.label }}</span>
+              <button class="pdx-chip-remove" type="button" tabindex="-1"
+                :aria-label="format(uiString('select', 'remove'), { label: tag.label })"
+                @click.stop="removeTag(tag.value)">×</button>
+            </span>
+          }
+          @if (tagOverflow > 0) {
+            <span class="pdx-chip pdx-chip-sm pdx-chip-summary">+{{ tagOverflow }}</span>
+          }
+        }
+        @if (searchable) {
+          <input class="pdx-select-tag-search" :ref="triggerSearchEl"
+            type="text"
+            autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+            role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+            :aria-expanded="String(isOpen)"
+            :aria-controls="listboxId"
+            :aria-activedescendant="activeId"
+            :aria-label="label || null"
+            :value="query"
+            :placeholder="selectedValues.size === 0 ? placeholder : ''"
+            :disabled="disabled"
+            @input="onSearchInput"
+            tabindex="0" />
+        } @else if (selectedValues.size === 0) {
+          <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
+        }
+      </div>
+    } @else if (searchable && searchPosition !== 'dropdown') {
+      <!-- Its keys reach onTriggerKeydown by bubbling to the trigger: a handler of its own ran every key twice. -->
+      <input class="pdx-select-search" :ref="triggerSearchEl"
+        type="text"
+        autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+        role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+        :aria-expanded="String(isOpen)"
+        :aria-controls="listboxId"
+        :aria-activedescendant="activeId"
+        :aria-label="label || null"
+        :value="searchValue"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        @input="onSearchInput"
+        @focus="onSearchFocus"
+        tabindex="0" />
+    } @else if (selectedItem) {
+      <span class="pdx-select-value">@render selected?.(optionOf(selectedItem)) @else {<slot name="selected" :label="selectedItem.label" :value="selectedItem.value" :raw="selectedItem._raw">{{ selectedFallback(selectedItem) }}</slot>}</span>
+    } @else {
+      <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
+    }
+
+    @if (clearable && !disabled && !readonly && selectedValues.size > 0) {
+      <button class="pdx-input-clear pdx-input-suffix-interactive" type="button" :aria-label="uiString('select', 'clear')" tabindex="-1"
+        @click.stop="clearSelection()">×</button>
+    }
+    @if (isLoading) {
+      <span class="pdx-input-loading" role="status" :aria-label="uiString('select', 'loading')"></span>
+    }
+    <span class="pdx-select-caret"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
+  </div>
+
+  <div :class="'pdx-select-dropdown' + (isOpen ? ' open' : '')" :ref="dropdownEl">
+    @if (searchable && searchPosition === 'dropdown') {
+      <div class="pdx-select-search-wrap">
+        <input class="pdx-select-dropdown-search" :ref="dropdownSearchEl"
+          type="text"
+          autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
+          :aria-controls="listboxId"
+          :aria-activedescendant="activeId"
+          :value="query"
+          :placeholder="uiString('select', 'search')"
+          @input="onSearchInput"
+          @keydown="onTriggerKeydown" />
+      </div>
+    }
+    <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }}</span>
+    <div :class="'pdx-select-list' + (useVirtual ? ' virtual' : '')" :ref="listEl"
+      role="listbox"
+      :id="listboxId"
+      :aria-label="label || uiString('select', 'listbox')"
+      :aria-multiselectable="multiple ? 'true' : null"
+      @mousedown="onListMousedown"
+      :style="useVirtual ? 'height:' + Math.min(virtualTotalSize, 240) + 'px' : ''">
+      @if (displayItems.length === 0) {
+        <div class="pdx-select-empty">{{ uiString('select', 'noResults') }}</div>
+      } @else {
+        @for (rows as row; track row.key) {
+          @if (row.header) {
+            <div class="pdx-select-group-header" role="presentation">{{ row.name }}</div>
+          } @else {
+            <div :class="'pdx-select-option' + (activeIndex === row.index ? ' active' : '')"
+              role="option"
+              :id="uid + '-opt-' + row.index"
+              :data-option-index="row.index"
+              :aria-selected="isItemSelected(row.item.value) ? 'true' : 'false'"
+              :style="row.style"
+              @click="onOptionClick($event, row.item)"
+              @mouseenter="activeIndex = row.index">
+              @if (multiple) {
+                <span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>
+              }
+              @render item?.(optionOf(row.item), row.index) @else {
+                <slot name="item" :label="row.item.label" :value="row.item.value" :raw="row.item._raw" :index="row.index">{{ itemFallback(row.item, row.index) }}</slot>
+              }
+            </div>
+          }
+        }
+      }
+      @if (showCreateOption) {
+        <div class="pdx-select-option pdx-select-create" role="option" @click="createOption()">
+          <span class="pdx-select-create-icon">+</span>
+          {{ (createLabel || uiString('select', 'create')).replace('{query}', query) }}
+        </div>
+      }
+    </div>
+  </div>
+</template>
+
+<script>
+import { createDataSource, isDataSource, usePopover, overlayStack, createVirtualizer, effect, generatedId } from '@pdxui/core';
+import type { DataSource, PopoverPlacement } from '@pdxui/core';
+import { DataSourceContext } from '../src/data-source/data-source-context';
+import { uiString, format } from '../src/shared/i18n';
+import '@pdxui/design/components/select';
+import '@pdxui/design/components/chip';
+import type { Option, Template, Row, SourceElement } from './select-types';
+
+/** The selection (#481): the option's value, or null; in multiple mode the array of values. */
+@model value: string = null { form };
+/** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
+@variants { size: { md, xs, sm, lg, xl } = md; }
+@part root;
+// No `= []`: that default is one array literal in the descriptor, shared by every instance; with
+// none, core gives each instance its own (packages/ui/PILOT.md, finding 8).
+@prop options?: unknown[];
+/** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
+@prop source: DataSource<unknown> | null = null;
+@prop labelField: string = 'label';
+@prop valueField: string = 'value';
+@prop placeholder: string = '';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+@prop error: boolean = false;
+@prop success: boolean = false;
+@prop warning: boolean = false;
+@prop clearable: boolean = false;
+@prop searchable: boolean = false;
+@prop multiple: boolean = false;
+/** Multi mode: -1 shows every chip, 0 a summary only, N>0 N chips and a "+K" chip. */
+@prop maxTagCount: number = -1;
+@prop name: string = '';
+@prop loading: boolean = false;
+@prop groupField: string = '';
+/** The combobox's accessible name, and its listbox's. */
+@prop label: string = '';
+/** Custom render for each option. */
+@prop itemTemplate: Template | null = null;
+/** Custom render for the selected value in the trigger. */
+@prop selectedTemplate: Template | null = null;
+/** Where the search input sits: 'trigger' (default) or 'dropdown'. */
+@prop searchPosition: 'trigger' | 'dropdown' = 'trigger';
+/** Allow creating new options when the search has no match. Emits pdx-create. */
+@prop creatable: boolean = false;
+/** Label template for the create option; {query} is the search text. */
+@prop createLabel: string = '';
+/** Debounced server-side filtering for a remote DataSource. */
+@prop remote: boolean = false;
+/** Debounce delay in ms for remote search. */
+@prop debounce: number = 200;
+
+/** Renders one option in the list. */
+@slot item?: (option: { label: string; value: unknown; raw: unknown }, index: number);
+/** Renders the selected value in the trigger. */
+@slot selected?: (option: { label: string; value: unknown; raw: unknown });
+
+@inject injectedSource from DataSourceContext = null;
+
+// The host is the one submitter; an inner field carrying the name too would send the value twice.
+@host { :name="name || null" }
+
+@expose focus, blur, clear, openSelect, closeSelect, toggleSelect;
+
+const uid = generatedId('pdx-sel');
+const listboxId = uid + '-lb';
+
+let isOpen = $signal(false);
+let query = $signal('');
+let activeIndex = $signal(-1);
+let selectedValues = $signal<Set<unknown>>(new Set());
+/** Whether the user has typed in the search input since it opened. */
+let userTyped = $signal(false);
+
+let triggerEl = $signal<HTMLElement | null>(null);
+let dropdownEl = $signal<HTMLElement | null>(null);
+let listEl = $signal<HTMLElement | null>(null);
+let triggerSearchEl = $signal<HTMLInputElement | null>(null);
+let dropdownSearchEl = $signal<HTMLInputElement | null>(null);
+
+function normalise(raw: unknown[], lf: string, vf: string): Option[] {
+  if (!raw || raw.length === 0) return [];
+  const first = raw[0];
+  if (typeof first === 'string' || typeof first === 'number') return raw.map(v => ({ label: String(v), value: v, _raw: v }));
+  return raw.map(item => {
+    const obj = item as Record<string, unknown>;
+    return { label: String(obj[lf] ?? ''), value: obj[vf] ?? item, _raw: item };
+  });
+}
+
+// The data: the source prop, then an ancestor <pdx-data-source>, then the options (an array or a
+// DataSource). An array becomes a source of its own, which is not "external".
+const resolvedSource = $derived((): { ds: DataSource<Record<string, unknown>>; external: boolean } => {
+  const src = source as unknown;
+  const opts = options as unknown;
+  if (src) {
+    if (isDataSource(src)) return { ds: src as DataSource<Record<string, unknown>>, external: true };
+    if (src instanceof HTMLElement && typeof (src as unknown as Partial<SourceElement>).source === 'function') {
+      const ds = (src as unknown as SourceElement).source();
+      if (ds) return { ds, external: true };
+    }
+  }
+  if (injectedSource && isDataSource(injectedSource)) return { ds: injectedSource as DataSource<Record<string, unknown>>, external: true };
+  if (isDataSource(opts)) return { ds: opts as DataSource<Record<string, unknown>>, external: true };
+  const ds = createDataSource({
+    data: normalise(Array.isArray(opts) ? opts : [], labelField || 'label', valueField || 'value') as unknown as Record<string, unknown>[],
+    pageSize: 0, idField: 'value', autoLoad: true,
+  });
+  return { ds, external: false };
+});
+const dataSource = $derived(resolvedSource.ds);
+const externalSource = $derived(resolvedSource.external);
+
+const filteredItems = $derived((): Option[] => {
+  const ds = dataSource;
+  if (!ds) return [];
+  if (externalSource) {
+    const lf = labelField || 'label';
+    const vf = valueField || 'value';
+    return ds.data().map(item => ({ label: String(item[lf] ?? ''), value: item[vf] ?? item, _raw: item }));
+  }
+  return ds.data() as unknown as Option[];
+});
+
+const groupedItems = $derived(() => {
+  const gf = groupField;
+  if (!gf) return null;
+  const groups = new Map<string, Option[]>();
+  for (const item of filteredItems) {
+    const key = String((item._raw as Record<string, unknown>)[gf] ?? '');
+    let bucket = groups.get(key);
+    if (!bucket) { bucket = []; groups.set(key, bucket); }
+    bucket.push(item);
+  }
+  return groups;
+});
+
+/** The options in keyboard order, which follows the grouping. */
+const flatItems = $derived((): Option[] => {
+  const grouped = groupedItems;
+  if (!grouped) return filteredItems;
+  const result: Option[] = [];
+  for (const items of grouped.values()) result.push(...items);
+  return result;
+});
+
+/** The client-side filter of an array. */
+const displayItems = $derived((): Option[] => {
+  const q = query.toLowerCase();
+  if (!q || externalSource) return flatItems;
+  return flatItems.filter(i => i.label.toLowerCase().includes(q));
+});
+
+// ── Selection ──
+// True while reflectValue() writes the model, so the sync below does not rebuild the set from it.
+let reflecting = false;
+
+// The value from outside → the selection (null or empty clears it).
+$effect(() => {
+  const v = value;
+  if (reflecting) return;
+  if (v === null || v === undefined || v === '') { selectedValues = new Set(); return; }
+  const mul = multiple;
+  if (mul && Array.isArray(v)) selectedValues = new Set(v);
+  else if (mul && typeof v === 'string') selectedValues = new Set(v.split(',').filter(s => s !== ''));
+  else if (!mul) selectedValues = new Set([v]);
+});
+
+/** Writes the selection to the model, which dispatches `value-change`. */
+function reflectValue(): void {
+  const sel = selectedValues;
+  const next = multiple ? Array.from(sel) : (sel.size > 0 ? (sel.values().next().value ?? null) : null);
+  reflecting = true;
+  try { value = next; } finally { reflecting = false; }
+}
+
+const selectedItems = $derived(flatItems.filter(i => selectedValues.has(i.value)));
+const selectedItem = $derived((): Option | null => {
+  const sel = selectedValues;
+  if (sel.size === 0) return null;
+  const val = sel.values().next().value;
+  return flatItems.find(i => i.value === val) ?? null;
+});
+const selectedLabel = $derived((): string => {
+  const sel = selectedValues;
+  if (sel.size === 0) return '';
+  const val = sel.values().next().value;
+  return flatItems.find(i => i.value === val)?.label ?? String(val);
+});
+
+function isItemSelected(val: unknown): boolean { return selectedValues.has(val); }
+
+// The trigger's tags in multiple mode: all of them, a summary (cap 0), or N and a "+K".
+const tagSummary = $derived(maxTagCount === 0 && selectedItems.length > 0);
+const shownTags = $derived(maxTagCount > 0 && selectedItems.length > maxTagCount ? selectedItems.slice(0, maxTagCount) : selectedItems);
+const tagOverflow = $derived(maxTagCount > 0 && selectedItems.length > maxTagCount ? selectedItems.length - maxTagCount : 0);
+
+// Priority: the parent's snippet (#491), then the alpha scoped slot, then the function prop, then the label.
+function optionOf(item: Option) { return { label: item.label, value: item.value, raw: item._raw }; }
+function itemFallback(item: Option, index: number): unknown {
+  return itemTemplate ? itemTemplate({ label: item.label, value: item.value, raw: item._raw, index }) : item.label;
+}
+function selectedFallback(item: Option): unknown {
+  return selectedTemplate ? selectedTemplate(optionOf(item)) : item.label;
+}
+
+// ── The combobox ──
+// One element has role="combobox", the one that takes focus: the search input when it sits in the
+// trigger, else the trigger itself.
+const inputInTrigger = $derived(!!searchable && (!!multiple || searchPosition !== 'dropdown'));
+
+/** The highlighted option's id, while the list is open. */
+const activeId = $derived(isOpen && activeIndex >= 0 ? uid + '-opt-' + activeIndex : null);
+
+const searchValue = $derived(!isOpen ? selectedLabel : (userTyped ? query : selectedLabel));
+
+const announcement = $derived(isOpen
+  ? (displayItems.length === 0 ? uiString('select', 'noResults') : format(uiString('select', 'optionsAvailable'), { n: displayItems.length }))
+  : '');
+
+function selectedIndex(): number {
+  // Called from handlers only, where a read subscribes nothing. ($derived has no .peek(): finding 7.)
+  const sel = selectedValues;
+  return sel.size === 0 ? -1 : displayItems.findIndex(i => sel.has(i.value));
+}
+
+function openOnOption(fallback: number): void {
+  open();
+  if (!isOpen) return;
+  const sel = selectedIndex();
+  activeIndex = sel >= 0 ? sel : fallback;
+  scrollActiveIntoView();
+}
+
+// A <label for="{host id}"> names the host, not the combobox inside it: its id goes on the combobox.
+onMount(() => {
+  // ESCAPE HATCH: the host's id. No declaration gives a .pdx its own element.
+  const id = ctx.el.id;
+  if (!id) return;
+  const lab = document.querySelector<HTMLLabelElement>(`label[for="${id.replace(/["\\]/g, '\\$&')}"]`);
+  const cb = (inputInTrigger ? triggerSearchEl : triggerEl) as HTMLElement | null;
+  if (!lab || !cb || cb.hasAttribute('aria-labelledby') || cb.hasAttribute('aria-label')) return;
+  if (!lab.id) lab.id = uid + '-label';
+  cb.setAttribute('aria-labelledby', lab.id);
+});
+
+// ── Type-ahead (APG listbox) ──
+const TYPE_AHEAD_TIMEOUT = 500;
+let typeBuffer = '';
+let typeTimer: ReturnType<typeof setTimeout> | null = null;
+
+function typeAhead(char: string): void {
+  typeBuffer += char.toLowerCase();
+  if (typeTimer) clearTimeout(typeTimer);
+  typeTimer = setTimeout(() => { typeBuffer = ''; typeTimer = null; }, TYPE_AHEAD_TIMEOUT);
+  const items = displayItems;
+  if (items.length === 0) return;
+  const current = isOpen ? activeIndex : selectedIndex();
+  const find = (needle: string): number => {
+    for (let i = 1; i <= items.length; i++) {
+      const idx = (current + i + items.length) % items.length;
+      if (items[idx].label.toLowerCase().startsWith(needle)) return idx;
+    }
+    return -1;
+  };
+  let idx = find(typeBuffer);
+  if (idx < 0 && [...typeBuffer].every(c => c === typeBuffer[0])) idx = find(typeBuffer[0]);
+  if (idx < 0) return;
+  if (!isOpen && !multiple) {
+    if (!isItemSelected(items[idx].value)) selectItem(items[idx]);
+    return;
+  }
+  if (!isOpen) open();
+  activeIndex = idx;
+  scrollActiveIntoView();
+}
+
+// ── Open / close ──
+function open() {
+  if (disabled || readonly || isOpen) return;
+  isOpen = true;
+  query = '';
+  userTyped = false;
+  activeIndex = -1;
+  const ds = dataSource;
+  if (ds && externalSource && ds.data().length === 0 && !ds.isLoading()) ds.refresh();
+  // ESCAPE HATCH: `pdx-open` has a hyphen, which no @event can declare.
+  ctx.emit('pdx-open', undefined, { bubbles: false });
+}
+
+function close() {
+  if (!isOpen) return;
+  isOpen = false;
+  query = '';
+  if (externalSource && dataSource && query.peek()) dataSource!.setFilter([]);
+  // ESCAPE HATCH: as pdx-open.
+  ctx.emit('pdx-close', undefined, { bubbles: false });
+}
+
+function toggle() { if (isOpen) close(); else open(); }
+
+const openSelect = open;
+const closeSelect = close;
+const toggleSelect = toggle;
+
+// ── Selection actions ──
+function selectItem(item: Option) {
+  if (multiple) {
+    const set = new Set(selectedValues);
+    if (set.has(item.value)) set.delete(item.value); else set.add(item.value);
+    selectedValues = set;
+    reflectValue();
+  } else {
+    selectedValues = new Set([item.value]);
+    reflectValue();
+    close();
+  }
+}
+
+function removeTag(val: unknown) {
+  const set = new Set(selectedValues);
+  set.delete(val);
+  selectedValues = set;
+  reflectValue();
+}
+
+function clearSelection() {
+  selectedValues = new Set();
+  reflectValue();
+  // ESCAPE HATCH: as pdx-open.
+  ctx.emit('pdx-clear');
+}
+
+// ── Search ──
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function onSearchInput(e: Event) {
+  const val = (e.target as HTMLInputElement).value;
+  // Open first: open() clears the query, and a :value binding does not write the input back when
+  // its value has not changed, so the text typed would stay with the query cleared (finding 9).
+  if (!isOpen) open();
+  userTyped = true;
+  query = val;
+  activeIndex = -1;
+  // ESCAPE HATCH: as pdx-open.
+  ctx.emit('pdx-search', { query: val });
+  const ds = dataSource;
+  if (externalSource && ds) {
+    const lf = labelField || 'label';
+    const apply = () => ds.setFilter(val ? [{ field: lf, operator: 'contains', value: val }] : []);
+    if (remote) {
+      if (searchTimer) clearTimeout(searchTimer);
+      searchTimer = setTimeout(apply, debounce);
+    } else {
+      apply();
+    }
+  }
+}
+
+function onSearchFocus(e: Event) {
+  open();
+  const inp = e.target as HTMLInputElement;
+  if (inp.value) requestAnimationFrame(() => inp.select());
+}
+
+// Creatable: «Create X» when the query matches no option exactly.
+const showCreateOption = $derived((): boolean => {
+  if (!creatable) return false;
+  const q = query.trim();
+  if (!q) return false;
+  return !displayItems.some(i => i.label.toLowerCase() === q.toLowerCase());
+});
+
+function createOption() {
+  const q = query.trim();
+  if (!q) return;
+  // ESCAPE HATCH: as pdx-open.
+  ctx.emit('pdx-create', { value: q, label: q });
+  selectItem({ label: q, value: q, _raw: q });
+  query = '';
+}
+
+// ── Keyboard ──
+function onTriggerKeydown(e: KeyboardEvent) {
+  if (disabled || readonly) return;
+  switch (e.key) {
+    case 'ArrowDown':
+      e.preventDefault();
+      if (!isOpen) openOnOption(0); else moveActive(1);
+      break;
+    case 'ArrowUp':
+      e.preventDefault();
+      if (!isOpen) openOnOption(displayItems.length - 1); else moveActive(-1);
+      break;
+    case 'Enter':
+    case ' ':
+      if (searchable && e.key === ' ') return;
+      // A space inside a type-ahead run is part of the name ("New York").
+      if (e.key === ' ' && typeBuffer) { e.preventDefault(); typeAhead(' '); break; }
+      e.preventDefault();
+      if (isOpen) {
+        const idx = activeIndex;
+        const items = displayItems;
+        if (idx >= 0 && idx < items.length) selectItem(items[idx]);
+        else if (showCreateOption) createOption();
+      } else {
+        openOnOption(0);
+      }
+      break;
+    case 'Escape':
+      if (isOpen) { e.preventDefault(); e.stopPropagation(); close(); }
+      break;
+    case 'Home':
+      if (isOpen) { e.preventDefault(); activeIndex = 0; }
+      break;
+    case 'End':
+      if (isOpen) { e.preventDefault(); activeIndex = displayItems.length - 1; }
+      break;
+    case 'Backspace':
+      if (multiple && searchable && query === '') {
+        const sel = Array.from(selectedValues);
+        if (sel.length > 0) removeTag(sel[sel.length - 1]);
+      }
+      break;
+    default:
+      if (!searchable && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        typeAhead(e.key);
+      }
+  }
+}
+
+function moveActive(delta: number) {
+  const items = displayItems;
+  if (items.length === 0) return;
+  let idx = activeIndex + delta;
+  if (idx < 0) idx = items.length - 1;
+  else if (idx >= items.length) idx = 0;
+  activeIndex = idx;
+  scrollActiveIntoView();
+}
+
+function scrollActiveIntoView() {
+  const el = listEl?.querySelector(`[data-option-index="${activeIndex}"]`) as HTMLElement | null;
+  el?.scrollIntoView({ block: 'nearest' });
+}
+
+// A mousedown in the list would move focus out of the select, and Escape would no longer reach the
+// trigger (#379). Focus stays on the trigger.
+function onListMousedown(e: Event) { e.preventDefault(); }
+
+function onOptionClick(e: Event, item: Option) {
+  e.preventDefault();
+  e.stopPropagation();
+  selectItem(item);
+}
+
+function onTriggerClick(e: Event) {
+  const target = e.target as HTMLElement;
+  if (target.closest('.pdx-input-clear') || target.closest('.pdx-chip-remove')) return;
+  // A click in the search field opens and never closes: its focus has just opened the list.
+  if (target.closest('.pdx-select-search')) { open(); return; }
+  toggle();
+}
+
+// ── The floating list ──
+onMount(() => {
+  const trigger = triggerEl;
+  const dropdown = dropdownEl;
+  if (!trigger || !dropdown) return;
+  const popover = usePopover({
+    trigger: 'manual',
+    placement: 'bottom-start' as PopoverPlacement,
+    flip: true,
+    dismissOnOutside: true,
+    dismissOnEscape: false,
+    // ESCAPE HATCH: the host, which holds the trigger and the list side by side in the light DOM.
+    container: ctx.el,
+    onOpenChange: (opened) => { if (!opened && isOpen.peek()) close(); },
+  });
+  popover.setTrigger(trigger);
+  popover.setContent(dropdown);
+  let overlayId = '';
+  const stopSync = effect(() => {
+    if (isOpen) {
+      dropdown.style.width = trigger.offsetWidth + 'px';
+      popover.open();
+      overlayId = uid;
+      dropdown.style.zIndex = String(overlayStack.push(overlayId));
+      requestAnimationFrame(() => (triggerSearchEl.peek() ?? dropdownSearchEl.peek())?.focus());
+    } else {
+      popover.close();
+      dropdown.style.zIndex = '';
+      if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+    }
+  });
+  onDestroy(() => {
+    stopSync();
+    popover.dispose();
+    if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
+  });
+});
+
+// ── Virtual scroll, past 100 options ──
+const VIRTUAL_THRESHOLD = 100;
+const ITEM_HEIGHT = 36;
+
+const useVirtual = $derived(displayItems.length > VIRTUAL_THRESHOLD);
+let virtualItems = $signal<{ index: number; offsetStart: number; size: number }[]>([]);
+let virtualTotalSize = $signal(0);
+
+$effect(() => {
+  const list = listEl;
+  if (!useVirtual || !isOpen || !list) {
+    virtualItems = [];
+    virtualTotalSize = 0;
+    return;
+  }
+  const virt = createVirtualizer({
+    count: () => displayItems.length,
+    estimateSize: () => ITEM_HEIGHT,
+    overscan: 5,
+    getScrollElement: () => list,
+  });
+  const stopItems = effect(() => {
+    virtualItems = virt.items();
+    virtualTotalSize = virt.totalSize();
+  });
+  return () => { stopItems(); virt.dispose(); };
+});
+
+/** The list's rows: group headers and options, or the virtual window of the options. */
+const rows = $derived(() => {
+  const items = displayItems;
+  if (useVirtual) {
+    return virtualItems.filter(vi => !!items[vi.index]).map(vi => ({
+      key: 'o' + vi.index, header: false, name: '', item: items[vi.index], index: vi.index,
+      style: 'position:absolute;top:0;left:0;right:0;height:' + vi.size + 'px;transform:translateY(' + vi.offsetStart + 'px)',
+    }));
+  }
+  const out: Row[] = [];
+  const grouped = groupedItems;
+  if (grouped) {
+    let idx = 0;
+    for (const [groupName, groupItems] of grouped) {
+      out.push({ key: 'h' + groupName, header: true, name: groupName, item: groupItems[0], index: -1, style: '' });
+      for (const item of groupItems) { out.push({ key: 'o' + idx, header: false, name: '', item, index: idx, style: '' }); idx++; }
+    }
+    return out;
+  }
+  items.forEach((item, idx) => out.push({ key: 'o' + idx, header: false, name: '', item, index: idx, style: '' }));
+  return out;
+});
+
+const triggerClass = $derived('pdx-select-trigger pdx-input-wrap'
+  + (disabled ? ' disabled' : '') + (readonly ? ' readonly' : '') + (error ? ' error' : '')
+  + (success ? ' success' : '') + (warning ? ' warning' : '') + (multiple ? ' multiple' : ''));
+
+const isLoading = $derived(loading || (dataSource ? dataSource.isLoading() : false));
+
+onDestroy(() => {
+  if (searchTimer) clearTimeout(searchTimer);
+  if (typeTimer) clearTimeout(typeTimer);
+});
+
+// ── Imperative API ──
+function focusTarget(): HTMLElement | null {
+  return (inputInTrigger ? triggerSearchEl : triggerEl) as HTMLElement | null;
+}
+function focus() { focusTarget()?.focus(); }
+function blur() { focusTarget()?.blur(); }
+function clear() { clearSelection(); }
+
+// ESCAPE HATCH: what the form submits is not the model. With nothing chosen a native select with an
+// empty placeholder submits an empty entry, and the model (null) submits none; `{ form }` has no
+// option for it.
+ctx.formValue?.(() => {
+  const sel = Array.from(selectedValues);
+  return multiple ? sel : (sel.length > 0 ? sel[0] : '');
+});
+
+// ESCAPE HATCH: a read-only getter on the host. @expose puts a member there as it is, and a
+// $derived is a function, not the value `el.selectedItem` reads.
+ctx.expose({
+  get selectedItem(): unknown {
+    const items = selectedItems.map(i => i._raw);
+    return multiple ? items : (items.length > 0 ? items[0] : null);
+  },
+});
+</script>
