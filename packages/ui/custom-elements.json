@@ -15997,26 +15997,26 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string }"
-            },
-            {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The textbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The textbox lost focus."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "attributes": [
@@ -16100,6 +16100,26 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input>` that shows the masked text."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set, or a complete date or time preset value is out of range."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ]
         }
@@ -18785,26 +18805,26 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string }"
-            },
-            {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The textbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The textbox lost focus."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "attributes": [
@@ -18906,6 +18926,38 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input>`, the textbox a form submits."
+            },
+            {
+              "name": "toggle",
+              "description": "The button that reveals or hides the password."
+            },
+            {
+              "name": "strength",
+              "description": "The strength meter under the frame, with `show-strength` and something typed."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set."
             }
           ]
         }
@@ -21464,41 +21516,41 @@
           },
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string }"
-            },
-            {
               "name": "pdx-search",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when a search is performed.",
-              "detail": "{ value }"
+              "description": "The query, after the debounce or on Enter; not repeated for the same text.",
+              "detail": "{ value: string }"
             },
             {
               "name": "pdx-clear",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value is cleared."
+              "description": "The clear button or Escape emptied the field, after its `value-change`."
             },
             {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The searchbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The searchbox lost focus."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
@@ -21586,6 +21638,42 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input type=\"search\">`, the searchbox a form submits."
+            },
+            {
+              "name": "prefix",
+              "description": "The space before the text: the search icon, or the spinner while `loading`."
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner, a `role=\"status\"`, while `loading`."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while there is text."
+            },
+            {
+              "name": "shortcut",
+              "description": "The `shortcut` hint, while the field is empty."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set."
             }
           ]
         }
@@ -25272,26 +25360,26 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string }"
-            },
-            {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The textbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The textbox lost focus."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "attributes": [
@@ -25465,6 +25553,58 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<textarea>`, the textbox a form submits."
+            },
+            {
+              "name": "footer",
+              "description": "The row under the frame that holds the counts, with `show-count` or `word-count`."
+            },
+            {
+              "name": "count",
+              "description": "The character count, with `show-count`."
+            },
+            {
+              "name": "word-count",
+              "description": "The word count, with `word-count`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "success",
+              "description": "`success` is set."
+            },
+            {
+              "name": "warning",
+              "description": "`warning` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set."
+            },
+            {
+              "name": "over-limit",
+              "description": "The text is longer than `maxlength`; the character count shows it."
             }
           ]
         }

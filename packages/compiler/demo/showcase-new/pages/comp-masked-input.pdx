@@ -37,6 +37,14 @@
         <div class="opt-row"><code>time</code><span>##:##</span></div>
         <div class="opt-row"><code>ssn</code><span>###-##-####</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid)</code><span><code>error</code> is set, or a complete date or time is out of range</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span><code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="input"]</code><span>The frame, the native input</span></div>
+      </div>
     </section>
   </div>
 </template>

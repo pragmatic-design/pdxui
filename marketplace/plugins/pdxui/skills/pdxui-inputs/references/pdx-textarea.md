@@ -33,7 +33,11 @@ Multi-line text input that can auto-grow.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The textbox lost focus.; `pdx-focus` — The textbox received focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+
+**States:** `:state(invalid)` — `error` is set.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set.; `:state(over-limit)` — The text is longer than `maxlength`; the character count shows it.
+
+**Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<textarea>`, the textbox a form submits.; `[data-part="footer"]` — The row under the frame that holds the counts, with `show-count` or `word-count`.; `[data-part="count"]` — The character count, with `show-count`.; `[data-part="word-count"]` — The word count, with `word-count`.
 
 
 #### Examples

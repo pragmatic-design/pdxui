@@ -23,9 +23,13 @@ Search box with clear and shortcuts.
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-focus` — Fired when it receives focus.; `pdx-search` → `detail: { value }` — Fired when a search is performed.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The searchbox lost focus.; `pdx-clear` — The clear button or Escape emptied the field, after its `value-change`.; `pdx-focus` — The searchbox received focus.; `pdx-search` → `detail: { value: string }` — The query, after the debounce or on Enter; not repeated for the same text.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `searchbox` · `status`
+
+**States:** `:state(disabled)` — `disabled` is set.; `:state(loading)` — `loading` is set.
+
+**Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input type="search">`, the searchbox a form submits.; `[data-part="prefix"]` — The space before the text: the search icon, or the spinner while `loading`.; `[data-part="spinner"]` — The loading spinner, a `role="status"`, while `loading`.; `[data-part="clear"]` — The clear button, while there is text.; `[data-part="shortcut"]` — The `shortcut` hint, while the field is empty.
 
 
 #### Examples

@@ -1,7 +1,7 @@
 // pdx-search-input — Input with search icon, clear, debounce, Escape to clear.
 // Uses pdx-input wrapper pattern. Emits pdx-search after debounce.
 
-import { component, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 // The search glyph is a <pdx-icon> in this component's own template, so it is registered
 // here: on a page that does not import the whole library the tag would never upgrade and the
@@ -18,6 +18,16 @@ import { dispatchCommit } from '../shared/commit-change';
  * A search field with a search icon, a clear button and Escape to clear, that emits the search after
  * a debounce or on Enter.
  *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input type="search">`, the searchbox a form submits.
+ * @csspart prefix - The space before the text: the search icon, or the spinner while `loading`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while `loading`.
+ * @csspart clear - The clear button, while there is text.
+ * @csspart shortcut - The `shortcut` hint, while the field is empty.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set.
+ *
  * @alphaevent pdx-input
  * @alphadetail value $event.currentTarget.value
  */
@@ -25,6 +35,19 @@ component('pdx-search-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. `pdx-search` stays: it is
     // the debounced query, not the value.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** The query, after the debounce or on Enter; not repeated for the same text. */
+        'pdx-search': event<{ value: string }>(),
+        /** The clear button or Escape emptied the field, after its `value-change`. */
+        'pdx-clear': event<void>(),
+        /** The searchbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The searchbox lost focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's.
+    states: ['disabled', 'loading'],
+    parts: ['root', 'input', 'prefix', 'spinner', 'clear', 'shortcut'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -51,11 +74,10 @@ component('pdx-search-input', {
         // The debounce must not emit pdx-search after the unmount
         ctx.track(() => () => { if (debounceTimer) { clearTimeout(debounceTimer); debounceTimer = null; } });
 
-        function wrapClass(): string {
-            let cls = 'pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', !!ctx.loading());
+        });
 
         /**
          * One pdx-search per search: a value that was just searched is not searched again: Enter after
@@ -132,18 +154,19 @@ component('pdx-search-input', {
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { liveValue, wrapClass, onInput, onKeydown, clear, onWrapClick, onFocus, onBlur };
+        return { liveValue, onInput, onKeydown, clear, onWrapClick, onFocus, onBlur };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
-            <span class="pdx-input-prefix">
+        <div class="pdx-input-wrap" data-part="root" @click="${ctx.onWrapClick}">
+            <span class="pdx-input-prefix" data-part="prefix">
                 ${() => ctx.loading()
-                    ? html`<span class="pdx-input-loading" role="status" :aria-label="${() => uiString('search-input', 'searching')}"></span>`
+                    ? html`<span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="${() => uiString('search-input', 'searching')}"></span>`
                     : html`<pdx-icon name="search" size="sm"></pdx-icon>`
                 }
             </span>
             <input
                 class="pdx-input"
+                data-part="input"
                 type="search"
                 :value="${ctx.value}"
                 :placeholder="${() => (ctx.placeholder() as string) || uiString('search-input', 'placeholder')}"
@@ -151,6 +174,7 @@ component('pdx-search-input', {
                 :name="${ctx.name}"
                 :aria-label="${() => ctx.ariaLabel() || null}"
                 role="searchbox"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}"
                 autocomplete="off"
                 data-lpignore="true"
                 data-1p-ignore=""
@@ -161,9 +185,9 @@ component('pdx-search-input', {
                 @blur="${ctx.onBlur}"
             />
             ${() => ctx.liveValue() ? html`
-                <button class="pdx-input-clear pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('search-input', 'clear')}" tabindex="-1" @click="${ctx.clear}">\u00d7</button>
+                <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="${() => uiString('search-input', 'clear')}" tabindex="-1" @click="${ctx.clear}">\u00d7</button>
             ` : ctx.shortcut() ? html`
-                <span class="pdx-input-suffix" style="font-size:var(--pdx-text-xs);opacity:0.5"><kbd style="font-family:var(--pdx-font-mono)">${ctx.shortcut}</kbd></span>
+                <span class="pdx-input-suffix" data-part="shortcut" style="font-size:var(--pdx-text-xs);opacity:0.5"><kbd style="font-family:var(--pdx-font-mono)">${ctx.shortcut}</kbd></span>
             ` : ''}
         </div>
     `,

@@ -59,17 +59,17 @@ export const searchInput: ComponentManifest = {
                 standalone: [
                     {
                         // Aligned with the input/button minimum (>=28): the dense themes stay valid.
-                        selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="search"] [data-part="root"]',
                         description: 'input wrapper height >= 28px',
                         height: { op: '>=', value: 28 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="search"] [data-part="root"]',
                         description: 'wrapper radius >= 0 (mai negativo)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="search"] input.pdx-input',
+                        selector: 'section:not([hidden]) [data-test="search"] [data-part="input"]',
                         description: 'inner input has no visible own border',
                         border: {
                             top: { style: { op: 'is', value: 'none' } },
@@ -86,7 +86,7 @@ export const searchInput: ComponentManifest = {
                 composition: [
                     {
                         description: 'search prefix contained at the start of the wrapper',
-                        parent: '[data-test="search"] .pdx-input-wrap',
+                        parent: '[data-test="search"] [data-part="root"]',
                         children: {
                             prefix: '[data-test="search"] .pdx-input-prefix',
                         },
@@ -111,9 +111,18 @@ export const searchInput: ComponentManifest = {
             'search-input-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="search"] [data-part="root"]',
                         description: 'disabled wrapper is dimmed (opacity < 1)',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="search"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="search"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },
@@ -123,9 +132,9 @@ export const searchInput: ComponentManifest = {
                         description: 'size hierarchy: sm < md < lg heights',
                         parent: 'body',
                         children: {
-                            sm: '[data-test="search-sm"] .pdx-input-wrap',
-                            md: '[data-test="search-md"] .pdx-input-wrap',
-                            lg: '[data-test="search-lg"] .pdx-input-wrap',
+                            sm: '[data-test="search-sm"] [data-part="root"]',
+                            md: '[data-test="search-md"] [data-part="root"]',
+                            lg: '[data-test="search-lg"] [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
@@ -146,7 +155,7 @@ export const searchInput: ComponentManifest = {
     isolation: {
         scenario: 'search-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="search"] .pdx-input-wrap', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="search"] [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
@@ -155,7 +164,7 @@ export const searchInput: ComponentManifest = {
         scenario: 'search-input-basic',
         steps: [
             // Tab lands INSIDE the component (the clear has tabindex=-1): what is checked is the containment.
-            { key: 'Tab', expectFocusWithin: '[data-test="search"] .pdx-input-wrap' },
+            { key: 'Tab', expectFocusWithin: '[data-test="search"] [data-part="root"]' },
         ],
     },
 

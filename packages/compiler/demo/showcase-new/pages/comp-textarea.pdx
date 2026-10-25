@@ -48,6 +48,18 @@
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div>
         <div class="opt-row"><code>readonly</code><span>boolean</span><span>Readonly</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid)</code><span><code>error</code> is set</span></div>
+        <div class="opt-row"><code>:state(success) / :state(warning)</code><span><code>success</code> / <code>warning</code> is set</span></div>
+        <div class="opt-row"><code>:state(disabled) / :state(readonly)</code><span><code>disabled</code> / <code>readonly</code> is set</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span><code>loading</code> is set; the textbox is <code>aria-busy</code></span></div>
+        <div class="opt-row"><code>:state(over-limit)</code><span>The text is longer than <code>maxlength</code></span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="input"]</code><span>The frame, the native textarea</span></div>
+        <div class="opt-row"><code>[data-part="footer"] / [data-part="count"] / [data-part="word-count"]</code><span>The counts row, the character count, the word count</span></div>
+      </div>
     </section>
   </div>
 </template>

@@ -4,7 +4,7 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/textarea/pdx-textarea.ts
  *      the HOST <pdx-textarea> → render:
- *        <div class="pdx-input-wrap pdx-textarea-wrap [disabled|readonly|error|success|warning]" data-part="root"  ← sized by the host's size (#627)
+ *        <div class="pdx-input-wrap pdx-textarea-wrap" data-part="root"  ← sized by the host's size (#627); its states are the host's :state() (#286)
  *             style="height:auto;min-height:auto">
  *          <textarea class="pdx-input" ... :aria-label :aria-invalid :style="resize:...;width:100%"></textarea>
  *        </div>
@@ -64,25 +64,25 @@ export const textarea: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-textarea-wrap riusa .pdx-input-wrap: display flex.
-                        selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
                         description: 'textarea wrapper is flex',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
                         // min-height: 4.5em on the textarea → the wrapper is well taller than an input.
-                        selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
                         description: 'textarea wrapper height >= 40px (multi-line, taller than input)',
                         height: { op: '>=', value: 40 },
                     },
                     {
                         // The wrapper's border-radius: metro/cyberpunk may zero it → >= 0.
-                        selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
                         description: 'textarea wrapper radius >= 0',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // Inner <textarea>: border:none (the border is on the wrapper).
-                        selector: 'section:not([hidden]) [data-test="textarea"] textarea.pdx-input',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="input"]',
                         description: 'inner textarea has no visible own border',
                         border: {
                             top: { style: { op: 'is', value: 'none' } },
@@ -98,8 +98,8 @@ export const textarea: ComponentManifest = {
                         description: 'inner textarea contained in wrapper',
                         parent: 'body',
                         children: {
-                            wrap: '[data-test="textarea"] .pdx-input-wrap',
-                            ta: '[data-test="textarea"] textarea.pdx-input',
+                            wrap: '[data-test="textarea"] [data-part="root"]',
+                            ta: '[data-test="textarea"] [data-part="input"]',
                         },
                         relations: [
                             {
@@ -116,13 +116,33 @@ export const textarea: ComponentManifest = {
             'textarea-disabled': {
                 // Standalone (not a state rule): the textarea is disabled in the markup, so
                 // there is no before→after transition; we measure the final state after it settles
-                // (robust to the timing with which the .disabled class is applied).
+                // (robust to the timing with which the state is set).
                 standalone: [
                     {
-                        // .pdx-input-wrap.disabled → opacity: var(--pdx-opacity-disabled) (≈0.5).
-                        selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap',
+                        // :state(disabled) > .pdx-input-wrap → opacity: var(--pdx-opacity-disabled) (≈0.5).
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
                         description: 'disabled textarea wrapper has reduced opacity',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="textarea"]', name: 'disabled' },
+                        changes: {},
+                    },
+                ],
+            },
+            'textarea-error': {
+                states: [
+                    {
+                        description: 'error is the custom state :state(invalid)',
+                        selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="textarea"]', name: 'invalid' },
+                        changes: {},
                     },
                 ],
             },
@@ -141,7 +161,7 @@ export const textarea: ComponentManifest = {
         targets: [
             // A tolerance of 24: the textarea has height:auto (multi-line, content-driven) → under a
             // pathological host that alters line-height/font the height varies by nature. Width/radius stay stable.
-            { selector: 'section:not([hidden]) [data-test="textarea"] .pdx-input-wrap', tolerancePx: 24 },
+            { selector: 'section:not([hidden]) [data-test="textarea"] [data-part="root"]', tolerancePx: 24 },
         ],
     },
 

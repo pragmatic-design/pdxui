@@ -22,6 +22,30 @@ const DONE: Row[] = [
         states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading', 'over-limit'],
         parts: ['root', 'input', 'prefix', 'suffix', 'clear', 'spinner', 'count'],
     },
+    {
+        tag: 'pdx-textarea',
+        model: 'value',
+        states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading', 'over-limit'],
+        parts: ['root', 'input', 'footer', 'count', 'word-count'],
+    },
+    {
+        tag: 'pdx-password-input',
+        model: 'value',
+        states: ['invalid', 'disabled', 'loading'],
+        parts: ['root', 'input', 'toggle', 'strength'],
+    },
+    {
+        tag: 'pdx-search-input',
+        model: 'value',
+        states: ['disabled', 'loading'],
+        parts: ['root', 'input', 'prefix', 'spinner', 'clear', 'shortcut'],
+    },
+    {
+        tag: 'pdx-masked-input',
+        model: 'value',
+        states: ['invalid', 'disabled'],
+        parts: ['root', 'input'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
