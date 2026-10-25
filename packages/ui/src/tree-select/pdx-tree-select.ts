@@ -78,9 +78,13 @@ component('pdx-tree-select', {
         /** Form field name */
         name: { type: String, default: '' },
     },
+    // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
     slots: {
-        node: slot<(node: { value: string; label: string; [key: string]: unknown }, level: number, expanded: boolean) => Node>(),
+        // A root, or a child or grandchild of one, written out because the editor pastes the
+        // signature where no alias is in scope. A recursive node type collapses to `T`.
+        node: slot<(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean) => Node>(),
     },
     setup(ctx) {
         const _open = signal(false);
@@ -715,3 +719,6 @@ component('pdx-tree-select', {
     },
     render: () => html``,
 });
+
+/** The node a snippet receives, the app's (#651): the editor infers it from `:options`. */
+type T = { value: string; label: string };

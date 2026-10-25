@@ -39,12 +39,12 @@
         actions="overlay"
         @pdx-select="onCatalogSelect"
         data-test="catalog-nav">
-        <slot name="item" let:item>
+        @snippet item(item) {
           <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
           <span class="pdx-nav-label rail-label">{{ item.label }}</span>
-        </slot>
+        }
         <!-- The pin, beside the entry's link and not inside it. -->
-        <slot name="actions" let:item>
+        @snippet itemActions(item) {
           @if (item.href) {
             <span class="rail-tools catalog-tools">
               <button
@@ -56,7 +56,7 @@
                 @click.prevent.stop="favourites?.togglePin(item.pin)"><svg class="pushpin" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pushpin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
             </span>
           }
-        </slot>
+        }
       </pdx-nav-menu>
     </aside>
   }
@@ -111,7 +111,8 @@ function onCatalogSelect(e) {
  *  when it is pinned there. The search keeps the entries whose name has it, and a group with none
  *  left goes with them. */
 const catalogItems = $derived(CATALOG.map(h => ({
-    type: 'header', key: 'cat-' + h.key, label: h.label(), data: { test: 'cat-' + h.key },
+    // `as const`: the menu draws a header itself, and the snippets' type leaves it out by this word.
+    type: 'header' as const, key: 'cat-' + h.key, label: h.label(), data: { test: 'cat-' + h.key },
     children: h.children.map(i => ({
         ...i, key: 'cat-' + i.key, pin: i.key, nested: false,
         label: i.label(), data: { test: 'cat-' + i.key },

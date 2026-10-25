@@ -7,7 +7,7 @@ move, so the array it owns stays the one source of truth.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | T[] | `[]` | The data items to render. |
 | `idField` | `idfield` | string | `'id'` | How a row is identified. Empty: the row's index. |
 | `labelField` | `labelfield` | string | `'label'` | What a row shows without an `item` slot, and what names its handle either way. |
 | `axis` | `axis` | string | `'vertical'` | 'vertical' \| 'horizontal' — decides which arrows move, and which way rows shift. |

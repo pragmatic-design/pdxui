@@ -98,8 +98,10 @@ component('pdx-autocomplete', {
         warning: { type: Boolean, default: false },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // `raw` is the app's suggestion, an element of `suggestions` (#651): the editor infers `T`.
+    generics: { T: { from: 'suggestions' } },
     slots: {
-        option: slot<(option: { label: string; value: unknown; raw: unknown }, index: number, highlighted: boolean) => Node>(),
+        option: slot<(option: { label: string; value: unknown; raw: T }, index: number, highlighted: boolean) => Node>(),
     },
     setup(ctx) {
         const uid = generatedId('pdx-ac');
@@ -564,3 +566,6 @@ component('pdx-autocomplete', {
         </div>
     `,
 });
+
+/** The suggestion an option's `raw` holds, the app's (#651): the editor infers it from `:suggestions`. */
+type T = unknown;

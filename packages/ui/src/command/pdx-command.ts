@@ -48,8 +48,10 @@ component('pdx-command', {
         hotkey: { type: Boolean, default: true },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ label: string }', from: 'items' } },
     slots: {
-        item: slot<(item: { label: string; value?: unknown; [key: string]: unknown }, index: number, active: boolean) => Node>(),
+        item: slot<(item: T, index: number, active: boolean) => Node>(),
     },
     setup(ctx) {
         const _open = signal(false);
@@ -347,3 +349,6 @@ component('pdx-command', {
         </div>
     `,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { label: string };

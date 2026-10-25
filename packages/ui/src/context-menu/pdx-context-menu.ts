@@ -33,9 +33,12 @@ component('pdx-context-menu', {
         /** Min width of the menu panel */
         minWidth: { type: Number, default: 180 },
     },
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
     slots: {
-        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+        // Less the separators and labels the menu draws itself (`type: 'separator' as const`).
+        item: slot<(item: Exclude<T, { type: 'separator' | 'label' }>) => Node>(),
     },
     setup(ctx) {
         const _open = signal(false);
@@ -310,3 +313,6 @@ component('pdx-context-menu', {
     },
     render: () => html`<slot></slot>`,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { key?: string; label?: string; type?: string };

@@ -6,7 +6,7 @@ Data-driven list with custom rows.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `null` | The data items to render. |
+| `items` | — | T[] | `null` | The data items to render. |
 | `source` | — | object | `null` | The data source to render from. |
 | `renderItem` | — | object | `null` | Render function for each item. |
 | `idField` | `idfield` | string | `'id'` | Item field used as a unique key. |

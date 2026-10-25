@@ -52,8 +52,10 @@ component('pdx-timeline', {
         dotAlign: { type: String, default: 'start' },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ title: string }', from: 'items' } },
     slots: {
-        content: slot<(item: { title: string; description?: string; date?: string; icon?: string; color?: string; status?: 'default' | 'success' | 'warning' | 'error' | 'info'; statusLabel?: string }, index: number) => Node>(),
+        content: slot<(item: T, index: number) => Node>(),
     },
     setup(ctx) {
         let _built = false;
@@ -243,3 +245,6 @@ component('pdx-timeline', {
     },
     render: () => html``,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { title: string };

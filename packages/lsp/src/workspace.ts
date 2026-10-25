@@ -108,7 +108,11 @@ export function resolveSnippetType(registry: Pick<ProjectRegistry, 'describe'>, 
     // Match: the name a type parameter declares, `T` in `T extends { id: string }`. Groups: [1]=the name
     const names = generics.map(g => /^\s*([A-Za-z_$][\w$]*)/.exec(g)?.[1]).filter((n): n is string => !!n);
     const uses = (type: string) => names.some(n => new RegExp(`(?<![\\w$])${n}(?![\\w$])`).test(type));
-    const props = comp.attributes.filter(a => a.type && uses(a.type)).map(a => ({ name: a.name, type: a.type }));
+    // A library component's array prop is a field of its manifest and no attribute (#651), the very
+    // prop `T` is inferred from: the fields first, by their own name, then the attributes they lack.
+    const fields = (comp.members ?? []).filter(m => m.kind === 'field');
+    const candidates = [...fields, ...comp.attributes.filter(a => !fields.some(f => f.name.toLowerCase() === a.name.toLowerCase()))];
+    const props = candidates.filter(a => a.type && uses(a.type)).map(a => ({ name: a.name, type: a.type }));
     return { generics, props, signature };
 }
 

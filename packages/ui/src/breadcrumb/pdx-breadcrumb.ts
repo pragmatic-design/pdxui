@@ -37,8 +37,10 @@ component('pdx-breadcrumb', {
         maxItems: { type: Number, default: 0 },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // The crumb a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },
     slots: {
-        item: slot<(item: { key: string; label: string; href?: string; icon?: string }, index: number, isLast: boolean) => Node>(),
+        item: slot<(item: T, index: number, isLast: boolean) => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -196,3 +198,6 @@ component('pdx-breadcrumb', {
     },
     render: () => html``,
 });
+
+/** The crumb a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { key: string; label: string };

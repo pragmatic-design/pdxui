@@ -37,18 +37,18 @@
         @pointerover="onNavPrefetch"
         @focusin="onNavPrefetch"
         data-test="nav">
-        <slot name="item" let:item>
+        @snippet item(item) {
           <span class="pdx-nav-icon rail-icon" aria-hidden="true">{{ item.glyph }}</span>
           <span class="pdx-nav-label rail-label">{{ item.label }}</span>
           @if (item.count) {
             <span class="rail-count pdx-badge" :data-test="item.data.test + '-count'">{{ item.count }}</span>
           }
-        </slot>
+        }
         <!-- The two affordances the reference puts on an expanded item: pin it near the top, and
-             open it in a new tab. BESIDE the entry's link, in the menu's `actions` slot: inside it
-             they would make the link hold a button and a second link. Shown with the label,
-             hidden with it. -->
-        <slot name="actions" let:item>
+             open it in a new tab. BESIDE the entry's link, in the menu's `itemActions` snippet:
+             inside it they would make the link hold a button and a second link. Shown with the
+             label, hidden with it. -->
+        @snippet itemActions(item) {
           @if (item.href && !item.fixed) {
             <span class="rail-tools">
               <button
@@ -68,7 +68,7 @@
                 @click.stop>↗</a>
             </span>
           }
-        </slot>
+        }
       </pdx-nav-menu>
 
       <!-- The catalogue's opener, as a row that SAYS what it opens. An unlabelled ≡ beside the logo

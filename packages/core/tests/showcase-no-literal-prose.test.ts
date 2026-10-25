@@ -49,6 +49,8 @@ function literalProse(template: string): string[] {
         // are documented in CONTRIBUTING.md and sit between the parenthesis and the brace. Without the
         // middle group this guard reports the board's `@for` as untranslated prose.
         .replace(/@[a-z]+\s*\([^)]*\)(?:\s*@[a-z]+\s*\([^)]*\))*\s*\{/gi, '\u0000')
+        // A snippet names itself before its parameters (#651): `@snippet item(item, level) {`.
+        .replace(/@snippet\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{/g, '\u0000')
         .replace(/@(?:else|catch|placeholder|loading|error|then)\b[^{]*\{/gi, '\u0000')
         .replace(/[{}]/g, '\u0000')
         .replace(/&[a-zA-Z#0-9]+;/g, ' ');
@@ -61,6 +63,13 @@ function literalProse(template: string): string[] {
 
 /** Attribute values a user reads or hears, written as a literal rather than bound. */
 const READABLE_ATTRS = /\s(?:aria-label|placeholder|title|label|alt)="([^"{}$]*[A-Za-z]{2,}\s+[A-Za-z]{2,}[^"{}$]*)"/g;
+
+describe('what the guard reads as code, not prose', () => {
+    it('`@snippet name(params) {` is a directive, and a sentence written after it is still prose (#651)', () => {
+        expect(literalProse('<pdx-nav-menu>@snippet item(item, level) { <b>{{ item.label }}</b> }</pdx-nav-menu>')).toEqual([]);
+        expect(literalProse('<pdx-nav-menu>@snippet itemActions(item) { Pin this entry }</pdx-nav-menu>')).toEqual(['Pin this entry']);
+    });
+});
 
 describe('the showcase writes no prose a locale cannot move', () => {
     const files = pdxFiles(SHOWCASE_SRC);

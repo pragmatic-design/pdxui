@@ -65,9 +65,14 @@ component('pdx-tree', {
         label: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
     },
+    // The node a snippet receives is the app's, from `nodes` (#651): the editor infers `T`.
+    generics: { T: { from: 'nodes' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
     slots: {
-        node: slot<(node: { [key: string]: unknown; isBranch?: boolean }, level: number, expanded: boolean) => Node>(),
+        // A root, or a child or grandchild of one through `children` (the default `childrenField`),
+        // written out because the editor pastes the signature where no alias is in scope. A
+        // recursive node type collapses to `T`.
+        node: slot<(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean) => Node>(),
     },
     setup(ctx) {
         let rootEl: HTMLElement | null = null;
@@ -438,3 +443,6 @@ component('pdx-tree', {
     // the whole — which is a thing to compute once per rebuild, not per binding.
     render: () => html`<div class="pdx-tree"></div>`,
 });
+
+/** The node a snippet receives, the app's (#651): the editor infers it from `:nodes`. */
+type T = unknown;

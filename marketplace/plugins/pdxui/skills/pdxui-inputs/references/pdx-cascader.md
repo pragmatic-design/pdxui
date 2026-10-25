@@ -4,7 +4,7 @@ Drill through nested options.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `options` | — | array | `[]` | Tree of options |
+| `options` | — | T[] | `[]` | Tree of options |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text |
 | `label` | `label` | string | `''` | Accessible name (aria-label) for the trigger; falls back to placeholder |
 | `searchable` | `searchable` | boolean | `false` | Show search input for filtering |

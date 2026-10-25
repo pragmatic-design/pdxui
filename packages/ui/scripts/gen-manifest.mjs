@@ -346,6 +346,27 @@ function extractVariants(optionsObj, sourceFile) {
 }
 
 /**
+ * The type parameters a descriptor declares (#651), metadata for the editor only:
+ * `generics: { T: { extends: '{ key: string }', from: 'items' } }` → { name, extends?, from? }. `from`
+ * names the array prop the parameter is inferred from, which the manifest then types `T[]`.
+ */
+function extractGenerics(optionsObj, sourceFile) {
+    const genericsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'generics');
+    if (!genericsProp || !ts.isObjectLiteralExpression(genericsProp.initializer)) return [];
+    const out = [];
+    for (const decl of genericsProp.initializer.properties) {
+        if (!ts.isPropertyAssignment(decl) || !ts.isObjectLiteralExpression(decl.initializer)) continue;
+        const field = (key) => {
+            const p = decl.initializer.properties.find(e => ts.isPropertyAssignment(e) && e.name.getText(sourceFile) === key);
+            return p && ts.isStringLiteralLike(p.initializer) ? p.initializer.text : undefined;
+        };
+        out.push({ name: decl.name.getText(sourceFile), extends: field('extends'), from: field('from') });
+    }
+    return out;
+}
+
+/**
  * The states a descriptor declares, `states: ['open', 'invalid']` (#132) → { name, description }, the
  * description from a `@cssstate name - text` tag on the component, as for `@csspart`.
  */
@@ -874,6 +895,13 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         ...extractProps(optionsObj, sourceFile, tag).filter(p => !variants.some(v => v.name === p.name)),
         ...variantProps, ...models,
     ];
+    // A type parameter (#651) types the array prop it is inferred from as `T[]`: what the editor infers
+    // `T` from, at a parent's `:items`, to type the snippets that use it.
+    const generics = extractGenerics(optionsObj, sourceFile);
+    for (const g of generics) {
+        const from = g.from && props.find(p => p.name === g.from);
+        if (from) from.type = `${g.name}[]`;
+    }
     const tags = jsdocTags(statement);
 
     // Events: JSDoc @fires (authoritative) merged with heuristic emit() scan.
@@ -1017,6 +1045,9 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             kind: 'class', customElement: true, name: className, tagName: tag,
             category: cat.category, order: cat.order,
             ...(summary ? { summary } : {}), ...(description ? { description } : {}),
+            // Its type parameters (#651), as a .pdx's `@generic` records them: the editor types a
+            // parent's snippet with them, inferred from the props that use them.
+            ...(generics.length ? { generics: generics.map(g => (g.extends ? `${g.name} extends ${g.extends}` : g.name)) } : {}),
             members,
             // The props `::x` may bind (#124): the compiler's resolver reads them from here.
             ...(models.length ? { models: models.map(m => m.name) } : {}),

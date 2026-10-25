@@ -4,7 +4,7 @@ A button that opens an action menu.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | T[] | `[]` | The data items to render. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `variant` | `variant` | string | `'outline'` | Visual variant. |
 | `size` | `size` | string | `'sm'` | Size of the control (e.g. sm, md, lg). |

@@ -162,8 +162,12 @@ export type ComponentContext = ComponentContextBase & Record<string, unknown>;
  * element holds as properties, which a `.pdx`'s `@render` calls. `variants` (#512) are the axes the
  * design CSS keys its `@variant` rules on: a prop per axis, typed with its values and reflected on the
  * host as an attribute. `expose` is part of the descriptor's type now and gets its behaviour in #140.
+ * `generics` (#651) are the component's type parameters, the TypeScript form of a `.pdx`'s `@generic`:
+ * metadata for the editor only, never read at run time. Each names its constraint and the array prop
+ * it is inferred from; the manifest types that prop `T[]`, and a slot's signature may use `T`.
  */
 export interface ComponentDeclarations<E extends EventMap = EventMap, M extends ModelMap = ModelMap, V extends VariantMap = VariantMap> {
+    generics?: Record<string, { extends?: string; from?: string }>;
     events?: E;
     models?: M;
     slots?: Record<string, SlotSpec<unknown>>;

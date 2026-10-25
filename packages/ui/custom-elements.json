@@ -1081,13 +1081,16 @@
           "category": "Data-bound",
           "order": 98,
           "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "suggestions",
               "description": "The list of suggestions to match against.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "() => []"
             },
@@ -1583,7 +1586,7 @@
             {
               "name": "option",
               "description": "Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).",
-              "signature": "(option: { label: string; value: unknown; raw: unknown }, index: number, highlighted: boolean)"
+              "signature": "(option: { label: string; value: unknown; raw: T }, index: number, highlighted: boolean)"
             }
           ],
           "x-pdx-context": {
@@ -2915,13 +2918,16 @@
           "category": "Navigation",
           "order": 59,
           "description": "Navigation breadcrumbs, with overflow collapse and custom separators.",
+          "generics": [
+            "T extends { key: string; label: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -2994,7 +3000,7 @@
             {
               "name": "item",
               "description": "Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.",
-              "signature": "(item: { key: string; label: string; href?: string; icon?: string }, index: number, isLast: boolean)"
+              "signature": "(item: T, index: number, isLast: boolean)"
             }
           ],
           "cssProperties": [
@@ -4397,13 +4403,16 @@
           "category": "Data Display",
           "order": 82,
           "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "null"
             },
@@ -4731,7 +4740,7 @@
             {
               "name": "slide",
               "description": "Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.",
-              "signature": "(slide: { src?: string; alt?: string; content?: string; caption?: string; [key: string]: unknown }, index: number, active: boolean)"
+              "signature": "(slide: T, index: number, active: boolean)"
             }
           ]
         }
@@ -4759,13 +4768,16 @@
           "category": "Specialized Inputs",
           "order": 38,
           "description": "A multi-level drill-down selector: each choice opens the next column of children, as in Country,\nthen Region, then City.",
+          "generics": [
+            "T extends { value: string; label: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "options",
               "description": "Tree of options",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -5083,7 +5095,7 @@
             {
               "name": "option",
               "description": "Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.",
-              "signature": "(node: { value: string; label: string; [key: string]: unknown }, level: number, selected: boolean)"
+              "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean)"
             }
           ]
         }
@@ -7036,6 +7048,9 @@
           "category": "Overlay + Containers",
           "order": 96,
           "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`); `openPalette()` / `closePalette()` are\ndeprecated aliases of those two. Focus stays in the input, and the highlighted command is its\n`aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is announced as\n`aria-keyshortcuts`.",
+          "generics": [
+            "T extends { label: string }"
+          ],
           "members": [
             {
               "kind": "field",
@@ -7062,7 +7077,7 @@
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -7212,7 +7227,7 @@
             {
               "name": "item",
               "description": "Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.",
-              "signature": "(item: { label: string; value?: unknown; [key: string]: unknown }, index: number, active: boolean)"
+              "signature": "(item: T, index: number, active: boolean)"
             }
           ]
         }
@@ -7240,13 +7255,16 @@
           "category": "Navigation",
           "order": 58,
           "description": "A right-click menu that opens at the cursor, and also on a long press on mobile or Shift+F10 from\nthe keyboard.",
+          "generics": [
+            "T extends { key?: string; label?: string; type?: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "Menu items (static array or function returning items)",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -7338,7 +7356,7 @@
             {
               "name": "item",
               "description": "Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).",
-              "signature": "(item: { key?: string; label?: string; type?: string; [key: string]: unknown })"
+              "signature": "(item: Exclude<T, { type: 'separator' | 'label' }>)"
             },
             {
               "name": "",
@@ -7370,6 +7388,9 @@
           "category": "Data-bound",
           "order": 100,
           "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
@@ -7394,7 +7415,7 @@
               "name": "data",
               "description": "The row data to display.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "null"
             },
@@ -8307,7 +8328,7 @@
             {
               "name": "cell",
               "description": "Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.",
-              "signature": "(row: Record<string, unknown>, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown)"
+              "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown)"
             },
             {
               "name": "header",
@@ -8317,7 +8338,7 @@
             {
               "name": "detail",
               "description": "Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.",
-              "signature": "(row: Record<string, unknown>)"
+              "signature": "(row: T)"
             }
           ]
         }
@@ -9256,13 +9277,16 @@
           "category": "Data Display",
           "order": 77,
           "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
+          "generics": [
+            "T extends { label: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "null"
             },
@@ -9442,7 +9466,7 @@
             {
               "name": "value",
               "description": "Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.",
-              "signature": "(item: { label: string; value: string | HTMLElement; span?: number; icon?: string }, index: number)"
+              "signature": "(item: T, index: number)"
             }
           ]
         }
@@ -10165,13 +10189,16 @@
           "category": "Navigation",
           "order": 57,
           "description": "A button that opens a floating menu built from an `items` array, navigable from the keyboard and\nclosed by an outside click or Escape.",
+          "generics": [
+            "T extends { key?: string; label?: string; type?: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -10367,7 +10394,7 @@
             {
               "name": "item",
               "description": "Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).",
-              "signature": "(item: { key?: string; label?: string; type?: string; [key: string]: unknown })"
+              "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
             },
             {
               "name": "",
@@ -15501,13 +15528,16 @@
           "category": "Data Display",
           "order": 75,
           "description": "A list bound to data, an array or a DataSource, with custom item templates, a loading overlay\nand an empty state.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "null"
             },
@@ -15690,7 +15720,7 @@
             {
               "name": "item",
               "description": "Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).",
-              "signature": "(item: { [key: string]: unknown }, index: number)"
+              "signature": "(item: T, index: number)"
             },
             {
               "name": "empty",
@@ -16503,13 +16533,16 @@
           "category": "Navigation",
           "order": 56,
           "description": "A menu drawn in place from a list of items, with checkbox and radio items, submenus and keyboard\nnavigation, shown while it is open.",
+          "generics": [
+            "T extends { key?: string; label?: string; type?: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "Menu items (data-driven)",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -16670,7 +16703,7 @@
             {
               "name": "item",
               "description": "Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).",
-              "signature": "(item: { key?: string; label?: string; type?: string; [key: string]: unknown })"
+              "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
             }
           ]
         }
@@ -16835,13 +16868,16 @@
           "category": "Navigation",
           "order": 54,
           "description": "A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a\ncollapsed icon-only mode.",
+          "generics": [
+            "T extends { key: string; label: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "Menu items",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -17104,12 +17140,12 @@
             {
               "name": "item",
               "description": "Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.",
-              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; children?: unknown[]; type?: string; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, expanded: boolean, active: boolean)"
+              "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, expanded: boolean, active: boolean)"
             },
             {
               "name": "itemActions",
               "description": "Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.",
-              "signature": "(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; type?: string; href?: string; disabled?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, active: boolean)"
+              "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, active: boolean)"
             },
             {
               "name": "actions",
@@ -23163,13 +23199,16 @@
           "category": "Data Display",
           "order": 76,
           "description": "A list the user can put in another order, by dragging a row's handle or from the keyboard alone.\n\nIt emits `pdx-reorder` with the indices and never writes to `items`: the application applies the\nmove, so the array it owns stays the one source of truth.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -23288,7 +23327,7 @@
             {
               "name": "item",
               "description": "Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which\nreceives `{ item, index }`. Without either the row shows the item's `label-field`.",
-              "signature": "(item: unknown, index: number)"
+              "signature": "(item: T, index: number)"
             }
           ]
         }
@@ -25894,13 +25933,16 @@
           "category": "Data Display",
           "order": 78,
           "description": "A vertical or horizontal sequence of events, with status colors, icons and clickable items.",
+          "generics": [
+            "T extends { title: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -26068,7 +26110,7 @@
             {
               "name": "content",
               "description": "Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).",
-              "signature": "(item: { title: string; description?: string; date?: string; icon?: string; color?: string; status?: 'default' | 'success' | 'warning' | 'error' | 'info'; statusLabel?: string }, index: number)"
+              "signature": "(item: T, index: number)"
             }
           ]
         }
@@ -27263,13 +27305,16 @@
           "category": "Specialized Inputs",
           "order": 40,
           "description": "A select whose dropdown is a tree the user can search and expand, picking one node or several,\nwith children loaded lazily.",
+          "generics": [
+            "T extends { value: string; label: string }"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "options",
               "description": "Tree of options",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "[]"
             },
@@ -27586,7 +27631,7 @@
             {
               "name": "node",
               "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
-              "signature": "(node: { value: string; label: string; [key: string]: unknown }, level: number, expanded: boolean)"
+              "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
             }
           ]
         }
@@ -27614,13 +27659,16 @@
           "category": "Specialized Inputs",
           "order": 39,
           "description": "A hierarchy the user navigates.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "nodes",
               "description": "The roots. Children are read from `childrenField`.",
               "type": {
-                "text": "array"
+                "text": "T[]"
               },
               "default": "() => []"
             },
@@ -27839,7 +27887,7 @@
             {
               "name": "node",
               "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
-              "signature": "(node: { [key: string]: unknown; isBranch?: boolean }, level: number, expanded: boolean)"
+              "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
             }
           ],
           "cssProperties": [

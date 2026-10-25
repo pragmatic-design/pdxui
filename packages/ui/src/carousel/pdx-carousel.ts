@@ -50,8 +50,10 @@ component('pdx-carousel', {
         label: { type: String, default: '' },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    // The slide a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { from: 'items' } },
     slots: {
-        slide: slot<(slide: { src?: string; alt?: string; content?: string; caption?: string; [key: string]: unknown }, index: number, active: boolean) => Node>(),
+        slide: slot<(slide: T, index: number, active: boolean) => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -568,3 +570,6 @@ component('pdx-carousel', {
     },
     render: () => html``,
 });
+
+/** The slide a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = unknown;

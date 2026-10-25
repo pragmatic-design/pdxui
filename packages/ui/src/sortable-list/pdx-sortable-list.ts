@@ -52,8 +52,10 @@ component('pdx-sortable-list', {
         disabled: { type: Boolean, default: false },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { from: 'items' } },
     slots: {
-        item: slot<(item: unknown, index: number) => Node>(),
+        item: slot<(item: T, index: number) => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -220,3 +222,6 @@ component('pdx-sortable-list', {
     },
     render: () => html``,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = unknown;

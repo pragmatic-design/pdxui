@@ -4,7 +4,7 @@ A vertical sequence of events.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | T[] | `[]` | The data items to render. |
 | `mode` | `mode` | string | `'left'` | Alignment: 'left', 'right' or 'alternate'. |
 | `reverse` | `reverse` | boolean | `false` | Renders items newest-first. |
 | `pending` | `pending` | boolean | `false` | Shows a pending node at the end. |

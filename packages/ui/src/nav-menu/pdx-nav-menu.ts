@@ -54,6 +54,12 @@ function applyData(el: HTMLElement, data: Record<string, string> | undefined): v
 }
 
 /**
+ * The item a snippet receives: the app's own, an element of `:items` (#651). The descriptor's
+ * `generics` tells the editor to infer it from there; for TypeScript here it is its constraint.
+ */
+type T = { key: string; label: string };
+
+/**
  * A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a
  * collapsed icon-only mode.
  *
@@ -75,6 +81,8 @@ component('pdx-nav-menu', {
         /** `overlay`: the `actions` slot is laid over the row's end and shown on hover and focus, taking no width at rest. */
         actions: ['inline', 'overlay'],
     },
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },
     props: {
         /** Menu items */
         items: { type: Array, default: [] },
@@ -90,8 +98,13 @@ component('pdx-nav-menu', {
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots stay (#595).
     // The `actions` slot shares its name with the prop above, so its snippet is `itemActions`.
     slots: {
-        item: slot<(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; children?: unknown[]; type?: string; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, expanded: boolean, active: boolean) => Node>(),
-        itemActions: slot<(item: { key: string; label: string; icon?: string; badge?: string; badgeVariant?: string; type?: string; href?: string; disabled?: boolean; data?: Record<string, string>; [key: string]: unknown }, level: number, active: boolean) => Node>(),
+        // Any entry of the tree the menu renders through the snippet: an element of `items`, or a
+        // child or grandchild of one through `children`, less the headers and separators it draws
+        // itself (`type: 'header' as const` on the app's side). Written out, because the editor
+        // pastes the signature where no alias is in scope. Three levels, the menu's own
+        // (`data-level` stops at 3); a recursive item type collapses to `T`.
+        item: slot<(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, expanded: boolean, active: boolean) => Node>(),
+        itemActions: slot<(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'header' | 'separator' }>, level: number, active: boolean) => Node>(),
     },
     setup(ctx) {
         /** Prefix of this menu's group ids, which the toggles' aria-controls point at. */
