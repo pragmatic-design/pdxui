@@ -17,6 +17,7 @@ const here = (p: string) => resolve(__dirname, '..', p).replace(/\\/g, '/');
 export const PILOT: Record<string, string> = {
     [here('src/switch-toggle/pdx-switch.ts')]: here('pilot/switch.pdx'),
     [here('src/select/pdx-select.ts')]: here('pilot/select.pdx'),
+    [here('src/shared/filter-popover.ts')]: here('pilot/filter-popover.ts'),
 };
 
 /** Redirects each piloted module, however it is imported, to its .pdx. */
@@ -25,9 +26,15 @@ function pilotRedirect(): Plugin {
         name: 'pdx-pilot-redirect',
         enforce: 'pre',
         async resolveId(source, importer, options) {
+            // No importer: the browser asking for a URL the import analysis has already written. It
+            // names the module it means, and redirecting it again would serve the rewrite at the
+            // original's URL, which the rewrite imports.
+            if (!importer) return null;
             const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
             const target = resolved && PILOT[resolved.id.replace(/\\/g, '/').replace(/\?.*$/, '')];
-            return target ?? null;
+            // A rewrite that re-exports the module it replaces reaches the original.
+            if (!target || target === importer?.replace(/\\/g, '/').replace(/\?.*$/, '')) return null;
+            return target;
         },
     };
 }
