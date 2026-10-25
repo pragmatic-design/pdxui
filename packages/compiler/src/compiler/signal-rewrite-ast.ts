@@ -167,6 +167,13 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
             return true;
         }
 
+        // `x.peek()` on a $derived or a prop: the signal's own `peek`, left as written (#676). Read
+        // first, it was `x().peek()`, asked of the value, which throws.
+        if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.expression) && node.name.text === 'peek' &&
+            callableNames.has(node.expression.text) && !shadowed(node.expression.text)) {
+            return true;
+        }
+
         // `x(args)` with `x` a $signal: read the value, then call it (decision 17, #187).
         if (ts.isCallExpression(node) && isSignal(node.expression)) {
             const name = (node.expression as ts.Identifier).text;
