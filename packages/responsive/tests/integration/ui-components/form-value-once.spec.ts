@@ -246,7 +246,7 @@ test.describe('the form model: a reset gives back the value each control mounted
         ['<pdx-tag-input name="n"></pdx-tag-input>', 'value', ['a', 'b'], [], ['a', 'b']],
         ['<pdx-autocomplete name="n" value="IT"></pdx-autocomplete>', 'value', 'FR', ['IT'], ['FR']],
         ['<pdx-rating name="n" value="2"></pdx-rating>', 'value', 4, ['2'], ['4']],
-        ['<pdx-pin-input name="n" value="1234"></pdx-pin-input>', 'value', '9876', ['1234'], ['9876']],
+        ['<pdx-otp-input name="n" mask length="4" value="1234"></pdx-otp-input>', 'value', '9876', ['1234'], ['9876']],
         ['<pdx-otp-input name="n" value="123456"></pdx-otp-input>', 'value', '654321', ['123456'], ['654321']],
         ['<pdx-masked-input name="n" mask="phone" value="5551234567"></pdx-masked-input>', 'value', '5559876543', ['5551234567'], ['5559876543']],
         ['<pdx-color-picker name="n" value="#ff0000"></pdx-color-picker>', 'value', '#00ff00', ['#ff0000'], ['#00ff00']],
@@ -260,7 +260,8 @@ test.describe('the form model: a reset gives back the value each control mounted
 
     for (const [markup, model, next, atMount, afterWrite] of CASES) {
         const tag = markup.match(/^<([a-z-]+)/)![1];
-        test(tag, async ({ page }) => {
+        // The masked otp-input is the PIN entry, a case of its own beside the plain one (#286).
+        test(/\smask\s/.test(markup) && tag === 'pdx-otp-input' ? `${tag} mask` : tag, async ({ page }) => {
             await form(page, markup);
             const host = page.locator(`#f > ${tag}`);
             const modelValue = () => host.evaluate((el, m) => (el as unknown as Record<string, unknown>)[m], model);
@@ -483,9 +484,9 @@ test.describe('the form model: what is submitted, entry by entry (#135)', () => 
         expect(await submitted(page, 't')).toEqual(['100']);
     });
 
-    for (const tag of ['pdx-pin-input', 'pdx-otp-input']) {
-        test(`an empty ${tag} submits an empty entry, as a native text input does`, async ({ page }) => {
-            await form(page, `<${tag} name="p"></${tag}>`);
+    for (const attrs of ['', ' mask']) {
+        test(`an empty pdx-otp-input${attrs} submits an empty entry, as a native text input does`, async ({ page }) => {
+            await form(page, `<pdx-otp-input name="p"${attrs}></pdx-otp-input>`);
             expect(await submitted(page, 'p')).toEqual(['']);
         });
     }

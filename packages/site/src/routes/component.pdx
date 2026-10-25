@@ -102,7 +102,7 @@ const _PFX = '../demos/comp-';
 // Some component tags don't match their showcase page name 1:1 — map them.
 const _galleryAlias = {
   'password-input': 'password', 'search-input': 'search', 'otp-input': 'otp',
-  'pin-input': 'pin', 'radio-group': 'radio',
+  'radio-group': 'radio',
   'col': 'row-col', 'row': 'row-col',
 };
 

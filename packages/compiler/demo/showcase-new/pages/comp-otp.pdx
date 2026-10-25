@@ -15,6 +15,9 @@
     <!-- States -->
     <app-demo-comp-otp-states class="demo-section"></app-demo-comp-otp-states>
 
+    <!-- Masked PIN -->
+    <app-demo-comp-otp-mask class="demo-section"></app-demo-comp-otp-mask>
+
     <!-- Sizes -->
     <app-demo-comp-otp-sizes class="demo-section"></app-demo-comp-otp-sizes>
 
@@ -27,6 +30,7 @@
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
         <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div>
         <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div>
+        <div class="opt-row"><code>mask</code><span>boolean</span><span>Dots instead of digits, for a PIN: the group is named «PIN», autocomplete off</span></div>
         <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
         <div class="opt-row"><code>error</code><span>boolean</span><span>Red border styling</span></div>

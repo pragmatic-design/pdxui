@@ -2029,6 +2029,18 @@
           "title": "OTP Input — Sizes"
         },
         {
+          "id": "pin-basic",
+          "title": "OTP Input — Masked PIN (4 cells)"
+        },
+        {
+          "id": "pin-disabled",
+          "title": "OTP Input — Masked PIN, disabled"
+        },
+        {
+          "id": "pin-sizes",
+          "title": "OTP Input — Masked PIN, sizes"
+        },
+        {
           "id": "otp-input-size-md",
           "title": "pdx-otp-input — size=\"md\""
         },
@@ -2101,29 +2113,6 @@
         {
           "id": "password-input-size-xl",
           "title": "pdx-password-input — size=\"xl\""
-        }
-      ]
-    },
-    {
-      "name": "pin-input",
-      "tags": [
-        "pdx-pin-input"
-      ],
-      "tier": "1C",
-      "status": "wip",
-      "page": "tier-1c",
-      "scenarios": [
-        {
-          "id": "pin-basic",
-          "title": "PIN Input — Basic (4 cells, masked)"
-        },
-        {
-          "id": "pin-disabled",
-          "title": "PIN Input — Disabled"
-        },
-        {
-          "id": "pin-sizes",
-          "title": "PIN Input — Sizes"
         }
       ]
     },

@@ -78,7 +78,6 @@ export const LOADERS = new Map([
     ['pdx-page-header', () => import('@pdxui/ui/page-header')],
     ['pdx-pagination', () => import('@pdxui/ui/pagination')],
     ['pdx-password-input', () => import('@pdxui/ui/password-input')],
-    ['pdx-pin-input', () => import('@pdxui/ui/pin-input')],
     ['pdx-popover', () => import('@pdxui/ui/popover')],
     ['pdx-progress', () => import('@pdxui/ui/progress')],
     ['pdx-provide', () => import('@pdxui/ui/provide')],

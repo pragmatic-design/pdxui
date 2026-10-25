@@ -2,20 +2,21 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">PIN Input</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Masked code entry — shows dots instead of digits. Same behavior as OTP but for passwords/PINs.
+      Masked code entry — <code>mask</code> shows dots instead of digits. The group is named «PIN» and the
+      browser offers no one-time code.
     </p>
 
     <div class="demo-stack">
       <pdx-form-field label="4-digit PIN">
-        <pdx-pin-input length="4"></pdx-pin-input>
+        <pdx-otp-input mask length="4"></pdx-otp-input>
       </pdx-form-field>
 
       <pdx-form-field label="6-digit PIN">
-        <pdx-pin-input length="6"></pdx-pin-input>
+        <pdx-otp-input mask length="6"></pdx-otp-input>
       </pdx-form-field>
 
       <pdx-form-field label="Error" error="Wrong PIN" showError>
-        <pdx-pin-input length="4" error></pdx-pin-input>
+        <pdx-otp-input mask length="4" error></pdx-otp-input>
       </pdx-form-field>
     </div>
   </section>
@@ -26,4 +27,5 @@
   .section-heading { margin-bottom: var(--pdx-space-sm); }
   section { margin-bottom: var(--pdx-space-3xl); }
   .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
 </style>

@@ -26,7 +26,7 @@ import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } fro
 const VALUE_CONTROLS = new Set([
     'pdx-input', 'pdx-textarea', 'pdx-checkbox', 'pdx-switch', 'pdx-radio', 'pdx-radio-group',
     'pdx-checkbox-group', 'pdx-select', 'pdx-slider', 'pdx-rating', 'pdx-number-input',
-    'pdx-password-input', 'pdx-search-input', 'pdx-masked-input', 'pdx-otp-input', 'pdx-pin-input',
+    'pdx-password-input', 'pdx-search-input', 'pdx-masked-input', 'pdx-otp-input',
     'pdx-segmented', 'pdx-tag-input', 'pdx-color-picker', 'pdx-autocomplete', 'pdx-toggle',
     'pdx-date-picker', 'pdx-time-picker',
 ]);

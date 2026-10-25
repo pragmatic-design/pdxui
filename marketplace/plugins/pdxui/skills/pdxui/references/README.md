@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 117 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 116 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -98,9 +98,8 @@ Every input and selection control.
 - `<pdx-masked-input>` — Input that enforces a fixed format.
 - `<pdx-mention>` — Type @ to mention people.
 - `<pdx-number-input>` — Numeric field with steppers and formatting.
-- `<pdx-otp-input>` — One-time-code entry boxes.
+- `<pdx-otp-input>` — One-time-code entry boxes, masked for a PIN.
 - `<pdx-password-input>` — Password field with reveal and strength.
-- `<pdx-pin-input>` — Segmented PIN entry.
 - `<pdx-radio>` — Pick a single option from a set.
 - `<pdx-radio-group>` — A managed set of radios.
 - `<pdx-rating>` — Star rating with halves and tooltips.

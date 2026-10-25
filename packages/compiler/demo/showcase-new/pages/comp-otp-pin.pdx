@@ -2,8 +2,8 @@
   <div class="page">
     <h1 class="pdx-txt-title">OTP & PIN Input</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
-      Code entry inputs: <code>&lt;pdx-otp-input&gt;</code> for verification codes,
-      <code>&lt;pdx-pin-input&gt;</code> for masked PIN entry.
+      Code entry: <code>&lt;pdx-otp-input&gt;</code> for verification codes, and
+      <code>&lt;pdx-otp-input mask&gt;</code> for masked PIN entry.
     </p>
 
     <!-- ═══ OTP ═══ -->
@@ -19,12 +19,12 @@
     <section>
       <h2 class="pdx-txt-heading section-heading">Reference</h2>
 
-      <h3 class="pdx-txt-subheading">pdx-otp-input / pdx-pin-input</h3>
+      <h3 class="pdx-txt-subheading">pdx-otp-input</h3>
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
-        <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6 OTP, 4 PIN)</span></div>
+        <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div>
         <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div>
-        <div class="opt-row"><code>mask</code><span>boolean</span><span>Show dots instead of chars (PIN mode)</span></div>
+        <div class="opt-row"><code>mask</code><span>boolean</span><span>Show dots instead of chars (PIN mode): the group is named «PIN», autocomplete off</span></div>
         <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
         <div class="opt-row"><code>error</code><span>boolean</span><span>Red borders</span></div>

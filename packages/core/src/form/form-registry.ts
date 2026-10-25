@@ -51,7 +51,7 @@ const BUILT_IN_CONTROLS: [string, FormControlConfig][] = [
     // reactive `:value` is skipped while the user types.
     ...['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']
         .map((tag): [string, FormControlConfig] => [tag, { textInput: true, valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
-    ...['pdx-number-input', 'pdx-otp-input', 'pdx-pin-input']
+    ...['pdx-number-input', 'pdx-otp-input']
         .map((tag): [string, FormControlConfig] => [tag, { valueEvent: 'value-change', valueExpr: 'e.detail?.value' }]),
     // The controls that declare a model (#480): its event, `<model>-change`, with the value in
     // `detail.value`, and the model as the prop.

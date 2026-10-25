@@ -1,0 +1,21 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Masked PIN</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>mask</code> shows dots instead of digits, for a PIN. The group is named «PIN» unless
+      <code>label</code> says otherwise, and the browser offers no one-time code.
+    </p>
+    <div class="demo-stack">
+      <pdx-form-field label="4-digit PIN">
+        <pdx-otp-input mask length="4"></pdx-otp-input>
+      </pdx-form-field>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .section-heading { margin-bottom: var(--pdx-space-sm); }
+  section { margin-bottom: var(--pdx-space-3xl); }
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }
+  code { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }
+</style>

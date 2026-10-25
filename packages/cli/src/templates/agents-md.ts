@@ -13,7 +13,7 @@
 /** The rules, as the `pdxui` skill lists them. */
 export const AGENTS_RULES: readonly string[] = [
     'Bind with `:attr="expr"`, never `${expr}` inside an attribute: `pdx check` flags it as `PDX_RAW_INTERPOLATION` and offers the rewrite.',
-    'Do not import library components in a `.pdx`: the compiler imports each `<pdx-*>` the template uses, and `import \'@pdxui/ui\'` registers all 115 of them.',
+    'Do not import library components in a `.pdx`: the compiler imports each `<pdx-*>` the template uses, and `import \'@pdxui/ui\'` registers all 114 of them.',
     'Search the catalog before building a component: one almost always exists (the area skills, or `components` in `pdx mcp`).',
     'Style with the design tokens (`--pdx-color-*`, `--pdx-space-*`, `--pdx-radius-*`), never hard-coded colours; the scales are named (`--pdx-space-md`), and `--pdx-space-4` resolves to nothing, silently.',
     '`onMount` runs once: anything that must follow a signal is a `$derived` or an `$effect`.',

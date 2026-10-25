@@ -24,7 +24,7 @@ const MAP: Record<string, string> = {
   'masked-input': 'type', masonry: 'grid', mention: 'at-sign', menu: 'menu', menubar: 'menu',
   'nav-menu': 'menu', navbar: 'menu', 'number-input': 'calculator', 'otp-input': 'key',
   'overlay-outlet': 'box', 'page-header': 'columns', pagination: 'chevrons-right',
-  'password-input': 'lock', 'pin-input': 'key', popover: 'message-circle', progress: 'activity',
+  'password-input': 'lock', popover: 'message-circle', progress: 'activity',
   provide: 'package', radio: 'circle-dot', 'radio-group': 'circle-dot', rating: 'star',
   'relation-picker': 'link', 'relative-time': 'clock', 'rich-text': 'type', row: 'rows-3',
   'scroll-area': 'rows-3', 'scroll-spy': 'list', 'search-input': 'search', segmented: 'columns',

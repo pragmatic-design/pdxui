@@ -1,6 +1,6 @@
 # The component library under the beta
 
-`@pdxui/ui` (115 components today, `packages/ui/custom-elements.json`) is the first consumer of the
+`@pdxui/ui` (114 components today, `packages/ui/custom-elements.json`) is the first consumer of the
 beta contract, and it is brought to it in the same refactoring as the compiler and the language
 (decisions.md 44). This page says what «brought to the beta» means for one component, so that each
 can be done, measured and closed on its own. Everything here is **proposed** unless it names an
@@ -12,10 +12,10 @@ issue.
 `@model`; a prop only the parent writes stays a `@prop`; a read-only output (an affix's state, the
 open items of an accordion) emits `<name>-change` with `{ value }` without being a model. Overlays
 emit `open-change`, and share `show()`, `close()`, `toggle()`; navigation shares `next()`, `prev()`,
-`goTo(n)`. One component per job: `pdx-pin-input` is gone (`pdx-otp-input mask numeric`), and a
+`goTo(n)`. One component per job: `pdx-pin-input` is gone (`pdx-otp-input mask`, landed in #286), and a
 pressed button is `pdx-toggle`, not a mode of `pdx-button`, and selecting among buttons is
 `pdx-toggle-group`, not a mode of `pdx-button-group` (decisions.md 48, 49, 51). A masked
-`pdx-otp-input` is a PIN: `autocomplete="off"`, accessible name «PIN» (decisions.md 52). The families and
+`pdx-otp-input` is a PIN: `autocomplete="off"`, accessible name «PIN» (decisions.md 52, landed). The families and
 their issues are #286–#293.
 
 | Area | The component | Source |

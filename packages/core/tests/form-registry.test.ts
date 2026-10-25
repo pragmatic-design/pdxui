@@ -21,7 +21,7 @@ describe('form registry', () => {
         for (const tag of ['pdx-input', 'pdx-textarea', 'pdx-password-input', 'pdx-search-input', 'pdx-masked-input']) {
             expect(getFormControlConfig(tag), tag).toMatchObject({ textInput: true, valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
         }
-        for (const tag of ['pdx-number-input', 'pdx-otp-input', 'pdx-pin-input']) {
+        for (const tag of ['pdx-number-input', 'pdx-otp-input']) {
             expect(getFormControlConfig(tag), tag).toMatchObject({ valueEvent: 'value-change', valueExpr: 'e.detail?.value' });
         }
     });

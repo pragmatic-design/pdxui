@@ -1,14 +1,13 @@
 // Small accessibility guarantees, batch 3.
 //
 // Pagination re-renders its buttons without dropping focus to <body> on a page change; OTP/PIN
-// cells sit in a group and carry a count ("Digit 1 of 6"), and PIN cells do not offer SMS codes
-// (autocomplete one-time-code); pdx-page-header's heading level is configurable, not always an h1.
+// cells sit in a group and carry a count ("Digit 1 of 6"), and masked PIN cells do not offer SMS
+// codes (autocomplete one-time-code); pdx-page-header's heading level is configurable, not always an h1.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 
 import '../../src/pagination/pdx-pagination';
 import '../../src/otp-input/pdx-otp-input';
-import '../../src/pin-input/pdx-pin-input';
 import '../../src/page-header/pdx-page-header';
 
 const frame = () => new Promise<void>((r) => requestAnimationFrame(() => r()));
@@ -90,8 +89,8 @@ describe('OTP and PIN cells', () => {
         expect(document.querySelector('[role="group"]')?.getAttribute('aria-label')).toBe('Login code');
     });
 
-    it('PIN cells are a "PIN" group and do not offer one-time codes', async () => {
-        document.body.innerHTML = '<pdx-pin-input length="4"></pdx-pin-input>';
+    it('masked PIN cells are a "PIN" group and do not offer one-time codes', async () => {
+        document.body.innerHTML = '<pdx-otp-input mask length="4"></pdx-otp-input>';
         await tick(40);
         const group = document.querySelector('[role="group"]')!;
         expect(group.getAttribute('aria-label')).toBe('PIN');

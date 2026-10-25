@@ -19,7 +19,7 @@
 // silently. The manifest is the component list; this file is its consumer, and derives the missing
 // subpaths from it instead of waiting for someone to notice.
 
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { pathToFileURL } from 'url';
 
 const PKG = new URL('../package.json', import.meta.url);
@@ -64,20 +64,26 @@ function normalizeModulePath(p) {
 }
 
 /**
- * Rewrite every src entry to its dist mirror, then add an entry for any manifest component that no
- * export points at. Pure so it can be tested without writing package.json.
+ * Rewrite every src entry to its dist mirror, drop one whose source file is gone (a removed
+ * component), then add an entry for any manifest component that no export points at. Pure so it can
+ * be tested without writing package.json: `exists` is asked about a `./src/…` path, relative to the
+ * package.
  *
- * @returns {{ exports: object, rewritten: number, added: string[], collisions: string[] }}
+ * @returns {{ exports: object, rewritten: number, added: string[], removed: string[], collisions: string[] }}
  */
-export function computeExports(currentExports, manifestModules) {
+export function computeExports(currentExports, manifestModules, exists = () => true) {
     let rewritten = 0;
     const out = {};
+    const removed = [];
     for (const [key, value] of Object.entries(currentExports)) {
         if (key === './package.json') continue; // re-added last, so it stays at the end
         if (key === '.' || key === './all') { out[key] = BARREL; rewritten++; continue; }
         // Find a ./src/*.ts target in the current entry (string or any condition value).
         const targets = typeof value === 'string' ? [value] : Object.values(value);
         const src = targets.find((t) => typeof t === 'string' && /^\.\/src\/.*\.ts$/.test(t));
+        // A source that is gone was removed with its component: the export would resolve to nothing.
+        // The icon pattern is a pattern, not a file, and is re-added below.
+        if (src && !src.includes('*') && !exists(src)) { removed.push(`${key} ← ${src}`); continue; }
         if (src) { out[key] = distConditions(src); rewritten++; }
         else out[key] = value; // ./manifest and any already-dist entry pass through
     }
@@ -115,13 +121,14 @@ export function computeExports(currentExports, manifestModules) {
     // `require.resolve('@pdxui/ui/package.json')` from a consuming app to read these exports.
     out['./package.json'] = './package.json';
 
-    return { exports: out, rewritten, added, collisions };
+    return { exports: out, rewritten, added, removed, collisions };
 }
 
 function main() {
     const pkg = JSON.parse(readFileSync(PKG, 'utf-8'));
     const manifest = JSON.parse(readFileSync(MANIFEST, 'utf-8'));
-    const { exports, rewritten, added, collisions } = computeExports(pkg.exports, manifest.modules ?? []);
+    const exists = (src) => existsSync(new URL(`../${src.replace(/^\.\//, '')}`, import.meta.url));
+    const { exports, rewritten, added, removed, collisions } = computeExports(pkg.exports, manifest.modules ?? [], exists);
 
     if (collisions.length) {
         // Two components cannot share a subpath, and picking one silently would leave the other
@@ -134,6 +141,7 @@ function main() {
     writeFileSync(PKG, JSON.stringify(pkg, null, 2) + '\n');
     console.log(`[gen-exports] rewrote ${rewritten}/${Object.keys(exports).length} export entries → dist (development → src).`);
     if (added.length) console.log(`[gen-exports] added ${added.length} missing entry/entries from the manifest:` + '\n  ' + added.join('\n  '));
+    if (removed.length) console.log(`[gen-exports] removed ${removed.length} entry/entries whose source is gone:` + '\n  ' + removed.join('\n  '));
 }
 
 // Only when run as a script: importing this file (the unit test does) must not rewrite package.json.

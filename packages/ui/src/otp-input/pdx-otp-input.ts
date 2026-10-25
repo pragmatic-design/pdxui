@@ -26,12 +26,19 @@ component('pdx-otp-input', {
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
         numeric: { type: Boolean, default: true },
+        /** Cells shown as dots, for a PIN: the label and autocomplete defaults become the PIN ones. */
         mask: { type: Boolean, default: false },
         separator: { type: Number, default: 0 },
-        /** The cells' group name. Empty: the otp-input.label component string, «Verification code». */
+        /**
+         * The cells' group name. Empty: the otp-input.label component string, «Verification code»; with
+         * `mask`, otp-input.maskedLabel, «PIN».
+         */
         label: { type: String, default: '' },
-        /** The cells' autocomplete: 'one-time-code' lets the browser offer a code it received by SMS. */
-        autocomplete: { type: String, default: 'one-time-code' },
+        /**
+         * The cells' autocomplete. Empty: 'one-time-code', which lets the browser offer a code it received
+         * by SMS; with `mask`, 'off' — a PIN is not a code the browser has.
+         */
+        autocomplete: { type: String, default: '' },
     },
     setup(ctx) {
         let cells: string[] = [];
@@ -124,8 +131,9 @@ component('pdx-otp-input', {
             const isError = ctx.error();
             const isMask = ctx.mask();
             const isNumeric = ctx.numeric();
-            const groupName = (ctx.label() as string) || uiString('otp-input', 'label');
-            const autocomplete = (ctx.autocomplete() as string) || 'one-time-code';
+            // The PIN defaults under `mask` (#286): what pdx-pin-input, removed, set on this element.
+            const groupName = (ctx.label() as string) || uiString('otp-input', isMask ? 'maskedLabel' : 'label');
+            const autocomplete = (ctx.autocomplete() as string) || (isMask ? 'off' : 'one-time-code');
             const shape = JSON.stringify([len, sep, disabled, isError, isMask, isNumeric, groupName, autocomplete]);
             if (val === _reflected && shape === _builtShape) return;
             _builtShape = shape;

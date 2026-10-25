@@ -149,7 +149,6 @@ const componentItems = [
       { key: '/components/number-input', label: 'NumberInput' },
       { key: '/components/masked-input', label: 'MaskedInput' },
       { key: '/components/otp', label: 'OTP' },
-      { key: '/components/pin', label: 'PIN' },
       { key: '/components/slider', label: 'Slider' },
       { key: '/components/rating', label: 'Rating' },
     ]},

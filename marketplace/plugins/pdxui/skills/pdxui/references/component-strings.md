@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 430 keys in 78 components.
+> Generated from the sources. 430 keys in 77 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -292,6 +292,7 @@ placeholders, filled at render: keep them in the translation.
 | `number-input` | `negative` | `Negative` | `@pdxui/ui/src/shared/i18n.ts` |
 | `otp-input` | `digit` | `Digit {n} of {total}` | `@pdxui/ui/src/shared/i18n.ts` |
 | `otp-input` | `label` | `Verification code` | `@pdxui/ui/src/shared/i18n.ts` |
+| `otp-input` | `maskedLabel` | `PIN` | `@pdxui/ui/src/shared/i18n.ts` |
 | `overlay` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
 | `overlay` | `ok` | `OK` | `@pdxui/ui/src/shared/i18n.ts` |
 | `page-header` | `breadcrumb` | `Breadcrumb` | `@pdxui/ui/src/shared/i18n.ts` |
@@ -310,7 +311,6 @@ placeholders, filled at render: keep them in the translation.
 | `password-input` | `show` | `Show password` | `@pdxui/ui/src/shared/i18n.ts` |
 | `password-input` | `strong` | `Strong` | `@pdxui/ui/src/shared/i18n.ts` |
 | `password-input` | `weak` | `Weak` | `@pdxui/ui/src/shared/i18n.ts` |
-| `pin-input` | `label` | `PIN` | `@pdxui/ui/src/shared/i18n.ts` |
 | `popover` | `label` | `Popover` | `@pdxui/ui/src/shared/i18n.ts` |
 | `progress` | `label` | `Progress` | `@pdxui/ui/src/shared/i18n.ts` |
 | `rating` | `label` | `Rating` | `@pdxui/ui/src/shared/i18n.ts` |
