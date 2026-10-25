@@ -28,6 +28,7 @@
     // `"*.ts"` is the package ROOT: `vite.config.ts` and friends. A build config that does
     // not typecheck is a build that breaks on a rename nobody sees, as `builder` and `showcase`
     // also hold.
-    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts", "../router/src/pdx-globals.d.ts"],
+    // `pilot/` is the .pdx pilot's tooling (#137), run by its own vitest config and the scenario server.
+    "include": ["*.ts", "src/**/*.ts", "tests/**/*.ts", "pilot/**/*.ts", "../router/src/pdx-globals.d.ts"],
     "exclude": ["node_modules", "dist"]
 }

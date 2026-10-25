@@ -1,0 +1,77 @@
+<!--
+  pdx-switch, written in .pdx for the pilot (#137): the same component as
+  src/switch-toggle/pdx-switch.ts, held to the same unit tests and certification manifest.
+  Not exported: the follow-up the pilot opens decides.
+-->
+<template>
+  <label :class="wrapClass">
+    <input
+      type="checkbox"
+      :class="toggleClass"
+      data-part="root"
+      role="switch"
+      :ref="inputEl"
+      :checked="checked"
+      :disabled="disabled || loading"
+      :aria-checked="String(!!checked)"
+      :aria-label="ariaLabel || (label ? null : uiString('switch', 'label'))"
+      @change="onChange" />
+    @if (label || description) {
+      <span class="pdx-switch-content">
+        @if (label) {
+          <span class="pdx-switch-label">{{ label }}</span>
+        } @else {
+          <slot></slot>
+        }
+        @if (description) {
+          <span class="pdx-switch-desc">{{ description }}</span>
+        }
+      </span>
+    } @else {
+      <slot></slot>
+    }
+  </label>
+</template>
+
+<script>
+import { uiString } from '../src/shared/i18n';
+
+/** A toggle writes it (#480), and the write dispatches `checked-change`. */
+@model checked: boolean = false { form };
+/** sm, md (the default) or lg: the track's size. */
+@variants { size: { md, sm, lg } = md; }
+@part root;
+@prop disabled: boolean = false;
+@prop loading: boolean = false;
+@prop label: string = '';
+@prop description: string = '';
+/** Accessible name when there is no visible label (forwarded to the inner input) */
+@prop ariaLabel: string = '';
+@prop labelPosition: string = 'right';
+@prop error: boolean = false;
+@prop name: string = '';
+@prop value: string = '';
+
+// The host is the one submitter; an inner checkbox carrying the name too would send the value a
+// second time.
+@host { :name="name || null" }
+
+@expose focus, blur, clear;
+
+let inputEl = $signal<HTMLInputElement | null>(null);
+
+const toggleClass = $derived('pdx-toggle' + (error ? ' pdx-toggle-error' : '') + (loading ? ' pdx-toggle-loading' : ''));
+const wrapClass = $derived('pdx-switch-wrap' + (labelPosition === 'left' ? ' pdx-switch-label-left' : '') + (disabled || loading ? ' disabled' : ''));
+
+function onChange(e: Event) {
+  if (disabled || loading) return;
+  checked = (e.target as HTMLInputElement).checked;
+}
+
+function focus() { inputEl?.focus(); }
+function blur() { inputEl?.blur(); }
+function clear() {
+  if (inputEl) inputEl.checked = false;
+  checked = false;
+}
+</script>
