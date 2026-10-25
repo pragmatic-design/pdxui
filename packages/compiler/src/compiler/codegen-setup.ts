@@ -7,7 +7,7 @@ import type { SFCDescriptor } from '../parser/sfc';
 import type { ScriptAnalysis } from './script-analyzer';
 import { extractCSSBindings, hash, styleBlocks, generateShadowStyles } from './codegen-styles';
 import { escapeForReactiveTemplate } from './codegen-shared';
-import { generateSignalDeclarations, generateDerivedDeclarations, generateAutoReturn, rewritePropPeeks } from './signal-rewrite';
+import { generateSignalDeclarations, generateDerivedDeclarations, generateAutoReturn, rewriteInitialiser } from './signal-rewrite';
 import { rewriteAst, parsesCleanly, type WarningSink } from './signal-rewrite-ast';
 import { emitWatchSource } from './watch-source';
 import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSignalMarkers } from './setup-signal-placement';
@@ -67,6 +67,8 @@ export function buildSetupBody(
     sink?: WarningSink,
 ): string {
     const propNames = new Set(analysis.props.map(p => p.name));
+    // The $signals an initialiser may read (#682): a model is read through ctx like a prop.
+    const initSignalNames = new Set(analysis.signals.map(s => s.name));
     const parts: string[] = [];
 
     // i18n initialization (before props — runs once in app root)
@@ -134,7 +136,7 @@ export function buildSetupBody(
         ? markEach(analysis.body, analysis.bodyOrigins, true)
         : analysis.body;
     const declareSignal = (sig: (typeof analysis.signals)[number]) =>
-        markFirst(generateSignalDeclarations([sig], filename, propNames, production), sig.origin);
+        markFirst(generateSignalDeclarations([sig], filename, propNames, production, initSignalNames), sig.origin);
     const declareDerived = (d: (typeof analysis.deriveds)[number]) =>
         markFirst(generateDerivedDeclarations([d], signalNames, allCallableInDerived, filename, production, sink), d.origin);
 
@@ -146,7 +148,7 @@ export function buildSetupBody(
     // Store declarations ($store → store()) — rewrite prop references with .peek()
     // (string/object-key-aware so keys and string contents aren't touched).
     for (const s of analysis.stores) {
-        const storeExpr = rewritePropPeeks(s.initialExpr, propNames);
+        const storeExpr = rewriteInitialiser(s.initialExpr, propNames, initSignalNames, filename);
         // The keyword as written: `let state = $store(…)` emitted as `const` threw on `state = …` (#202).
         parts.push(markFirst(`    ${s.keyword ?? 'const'} ${s.name} = store(${storeExpr});`, s.origin));
     }

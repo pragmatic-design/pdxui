@@ -67,6 +67,19 @@ export function rewritePropPeeks(expr: string, propNames: Set<string>): string {
 }
 
 /**
+ * A `$signal` or `$store` initialiser, its reads taken at setup time: a prop is `ctx.name.peek()`, and
+ * a `$signal` is `__name.peek()` (#682). Left as written, a signal read named a variable the module
+ * does not have — it lives as `__name` — and setup threw. The signals go through the AST rewrite, in
+ * parentheses so an object literal is an expression: a parameter of the same name inside stays the
+ * parameter.
+ */
+export function rewriteInitialiser(expr: string, propNames: Set<string>, signalNames: Set<string>, filename: string): string {
+    const withProps = rewritePropPeeks(expr, propNames);
+    if (signalNames.size === 0) return withProps;
+    return rewriteAst(`(${withProps})`, signalNames, new Set(), filename, undefined, undefined, true).slice(1, -1);
+}
+
+/**
  * The file's name without its folders or `.pdx`, as a signal's debug name begins. Split on both
  * separators: a Windows path split on `/` alone stayed whole, and its `\u` of `packages\ui` written into
  * the name's string made a module that does not parse (#675). The effects' names already did this.
@@ -79,12 +92,12 @@ function debugBaseName(filename: string): string {
  * Generate signal declaration code.
  * let count = $signal(0) → const __count = signal(0, { name: 'file:count' });
  */
-export function generateSignalDeclarations(signals: SignalDecl[], filename: string, propNames: Set<string>, production = false): string {
+export function generateSignalDeclarations(signals: SignalDecl[], filename: string, propNames: Set<string>, production = false, signalNames: Set<string> = new Set()): string {
     return signals.map(s => {
-        // If initial expr references a prop, read it with .peek() (string/key-aware)
+        // A prop or a $signal the initial expression reads is read with .peek(), its value at setup.
         // `$signal()` starts at undefined. Left empty, the debug name after it became
         // `signal(, { name })`, a module that does not parse (#186).
-        const initExpr = s.initialExpr.trim() === '' ? 'undefined' : rewritePropPeeks(s.initialExpr, propNames);
+        const initExpr = s.initialExpr.trim() === '' ? 'undefined' : rewriteInitialiser(s.initialExpr, propNames, signalNames, filename);
         // Production: strip debug name for smaller output
         if (production) {
             return `    const __${s.name} = signal(${initExpr});`;

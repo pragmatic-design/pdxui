@@ -69,7 +69,11 @@ function reportFallback(filename: string, reason: string, fragment: string, sink
     });
 }
 
-export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink): string {
+/**
+ * @param untracked every read of a $signal is `__name.peek()`: its value now, subscribing nothing.
+ *   For an initialiser, which runs once at setup and whose reads are its starting values (#682).
+ */
+export function rewriteAst(code: string, signalNames: Set<string>, callableNames: Set<string>, _filename: string, protectedRanges?: [number, number][], sink?: WarningSink, untracked = false): string {
     if (signalNames.size === 0 && callableNames.size === 0) return code;
     // Edits whose start falls inside a protected [start,end) range are dropped — used to skip
     // @raw regions while still parsing the WHOLE body as one unit (so multiline statements
@@ -92,7 +96,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         const wrapped = `(${code})`;
         if (parsesCleanly(wrapped)) {
             const shifted = protectedRanges?.map(([s, e]): [number, number] => [s + 1, e + 1]);
-            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink).slice(1, -1);
+            return rewriteAst(wrapped, signalNames, callableNames, _filename, shifted, sink, untracked).slice(1, -1);
         }
         if (mentionsAnyName(code, signalNames)) {
             reportFallback(_filename, 'unparseable fragment that names a signal', withoutOrigins(code).slice(0, 80), sink);
@@ -177,7 +181,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         // `x(args)` with `x` a $signal: read the value, then call it (decision 17, #187).
         if (ts.isCallExpression(node) && isSignal(node.expression)) {
             const name = (node.expression as ts.Identifier).text;
-            edits.push({ start: node.expression.getStart(sf), end: node.expression.getEnd(), text: `__${name}()` });
+            edits.push({ start: node.expression.getStart(sf), end: node.expression.getEnd(), text: untracked ? `__${name}.peek()` : `__${name}()` });
             for (const arg of node.arguments) visit(arg, peekName);
             return true;
         }
@@ -187,7 +191,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         // where rewriting the key to a call produces an invalid assignment LHS.
         if (ts.isShorthandPropertyAssignment(node) && signalNames.has(node.name.text) && !shadowed(node.name.text) &&
             !isDestructuringAssignmentTarget(node.name)) {
-            edits.push({ start: node.name.getEnd(), end: node.name.getEnd(), text: `: __${node.name.text}()` });
+            edits.push({ start: node.name.getEnd(), end: node.name.getEnd(), text: untracked ? `: __${node.name.text}.peek()` : `: __${node.name.text}()` });
             return true;
         }
         // { productId } → { productId: productId() } for a prop / derived / route param. A shorthand
@@ -202,7 +206,7 @@ export function rewriteAst(code: string, signalNames: Set<string>, callableNames
         // reads: signal → __count(), callable → total()
         if (ts.isIdentifier(node) && isReadPosition(node) && !shadowed(node.text)) {
             if (signalNames.has(node.text)) {
-                edits.push({ start: node.getStart(sf), end: node.getEnd(), text: peekName === node.text ? `__${node.text}.peek()` : `__${node.text}()` });
+                edits.push({ start: node.getStart(sf), end: node.getEnd(), text: untracked || peekName === node.text ? `__${node.text}.peek()` : `__${node.text}()` });
                 return true;
             }
             if (callableNames.has(node.text)) {
