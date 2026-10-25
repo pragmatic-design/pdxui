@@ -51,6 +51,26 @@ describe('a reactive variable read inside a slot template', () => {
         expect(unused.join(' '), 'the one read in the slot is reported too').not.toContain("'used'");
     });
 
+    it('a $derived read only by a script @snippet is not reported as unused (#683)', () => {
+        // The snippet's body is a template the component's own template renders with @render: what
+        // it reads is read.
+        const code = src(
+            '@render row(1)',
+            "let items = $signal(['a']);\nconst shown = $derived(items.map(s => s.toUpperCase()));\n@snippet row(n) { <p>{{ n }}: {{ shown }}</p> }",
+        );
+        expect(warningsOf(code).filter(w => w.includes('PDX_UNUSED_REACTIVE'))).toEqual([]);
+    });
+
+    it('control — a $derived neither the template nor a snippet reads is still reported', () => {
+        const code = src(
+            '@render row(1)',
+            "let items = $signal(['a']);\nconst shown = $derived(items.length);\nconst unread = $derived(items.length * 2);\n@snippet row(n) { <p>{{ n }}: {{ shown }}</p> }",
+        );
+        const unused = warningsOf(code).filter(w => w.includes('PDX_UNUSED_REACTIVE')).join(' ');
+        expect(unused).toContain("'unread'");
+        expect(unused).not.toContain("'shown'");
+    });
+
     it('control — the slot’s own scope variables are not counted as page identifiers', () => {
         // `let:row` names a variable the CHILD supplies. It is not the page's, and a page that
         // declares nothing by that name must not be told it is using one.
