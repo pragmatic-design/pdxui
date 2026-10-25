@@ -6,7 +6,7 @@ A ⌘K command palette.
 |---|---|---|---|---|
 | `open` | `open` | boolean | `false` | Whether it is open. |
 | `placeholder` | `placeholder` | string | `''` | The search input's placeholder. Empty: the command.placeholder component string, «Type a command...». |
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | T[] | `[]` | The data items to render. |
 | `emptyText` | `emptytext` | string | `''` | The message when nothing matches. Empty: the command.empty component string, «No results found.». |
 | `hotkey` | `hotkey` | boolean | `true` | Global keyboard shortcut to open (default: Ctrl+K / Cmd+K) |
 

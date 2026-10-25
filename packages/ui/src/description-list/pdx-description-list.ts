@@ -51,8 +51,10 @@ component('pdx-description-list', {
         renderValue: { type: Object, default: null },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ label: string }', from: 'items' } },
     slots: {
-        value: slot<(item: { label: string; value: string | HTMLElement; span?: number; icon?: string }, index: number) => Node>(),
+        value: slot<(item: T, index: number) => Node>(),
     },
     setup(ctx) {
         let built = false;
@@ -187,3 +189,6 @@ component('pdx-description-list', {
     },
     render: () => html``,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { label: string };

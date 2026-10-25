@@ -19,7 +19,7 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `nodes` | — | array | `() => []` | The roots. Children are read from `childrenField`. |
+| `nodes` | — | T[] | `() => []` | The roots. Children are read from `childrenField`. |
 | `idField` | `idfield` | string | `'id'` | The field that identifies a node. |
 | `labelField` | `labelfield` | string | `'label'` | The field rendered as the node's text, when there is no `node` slot. |
 | `childrenField` | `childrenfield` | string | `'children'` | The field holding a node's children. |

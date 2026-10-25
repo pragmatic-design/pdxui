@@ -11,6 +11,18 @@ semver.
 
 ### Features
 
+- A snippet of a library list or menu reads the app's own item (#651). A TypeScript descriptor declares
+  a type parameter, `generics: { T: { extends: '{ key: string; label: string }', from: 'items' } }`, the
+  manifest records it and types `items` as `T[]`, and the editor infers `T` from `:items`: an invented
+  field (`it.lable`) is an error, and a field the app's items carry reads with its type. Declared by
+  `pdx-nav-menu`, `pdx-list`, `pdx-sortable-list`, `pdx-breadcrumb`, `pdx-carousel`, `pdx-command`,
+  `pdx-timeline`, `pdx-description-list`, `pdx-menu`, `pdx-dropdown-menu`, `pdx-context-menu`,
+  `pdx-tree`, `pdx-tree-select`, `pdx-cascader`, `pdx-data-grid` (its rows) and `pdx-autocomplete`
+  (an option's `raw`). A menu or a tree types its snippet over the children too, and leaves out what
+  it draws itself: a header or a separator is left out when the app writes its `type` as a literal
+  (`type: 'header' as const`). Before, every signature carried `[key: string]: unknown`, so an
+  invented field was not an error and an app's field read as `unknown`. `pdx-select`, whose created
+  option's `raw` is the typed text, and the components whose item is not the app's keep theirs.
 - In a library `@variant` rule whose root part is further down a child chain,
   `:scope > .pdx-checkbox-wrap > [data-part="root"]`, the native form is the root part's own compound,
   `.pdx-checkbox-sm`, and the steps before it are dropped (#629). They are the component's markup

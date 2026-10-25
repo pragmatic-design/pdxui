@@ -22,7 +22,7 @@ on blur.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `suggestions` | — | array | `() => []` | The list of suggestions to match against. |
+| `suggestions` | — | T[] | `() => []` | The list of suggestions to match against. |
 | `source` | — | object | `null` | The data source to render from. |
 | `labelField` | `labelfield` | string | `'label'` | Object field used as the visible label. |
 | `valueField` | `valuefield` | string | `'value'` | Object field used as the value. |

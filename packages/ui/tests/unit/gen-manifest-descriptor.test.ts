@@ -209,6 +209,41 @@ describe('gen-manifest reads the descriptor\'s slots (#491)', () => {
     });
 });
 
+describe('gen-manifest reads the descriptor\'s generics (#651)', () => {
+    const source = [
+        '/** A list. */',
+        "component('pdx-widget', {",
+        "    generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },",
+        '    props: {',
+        '        items: { type: Array, default: [] },',
+        "        label: { type: String, default: '' },",
+        '    },',
+        '    slots: {',
+        '        item: slot<(item: T, index: number) => Node>(),',
+        '    },',
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+    const decl = (src = source) => analyzeFile('src/widget/pdx-widget.ts', src, {})[0].declarations[0];
+    const field = (name: string, src?: string) => decl(src).members.find((m: { name: string }) => m.name === name);
+
+    it('records each type parameter with its constraint, as a .pdx @generic reads', () => {
+        expect(decl().generics).toEqual(['T extends { key: string; label: string }']);
+    });
+
+    it('types the prop it is inferred from as an array of it, and the slot uses it', () => {
+        expect(field('items').type).toEqual({ text: 'T[]' });
+        expect(decl().slots).toContainEqual(expect.objectContaining({ name: 'item', signature: '(item: T, index: number)' }));
+    });
+
+    it('the control: the other props keep their type, and a descriptor without generics records none', () => {
+        expect(field('label').type).toEqual({ text: 'string' });
+        const plain = source.replace(/ {4}generics: .*\n/, '');
+        expect(decl(plain).generics).toBeUndefined();
+        expect(field('items', plain).type).not.toEqual({ text: 'T[]' });
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {
     const source = [
         '/**',

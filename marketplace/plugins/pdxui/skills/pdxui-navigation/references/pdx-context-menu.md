@@ -4,7 +4,7 @@ A right-click menu.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | Menu items (static array or function returning items) |
+| `items` | — | T[] | `[]` | Menu items (static array or function returning items) |
 | `disabled` | `disabled` | boolean | `false` | Disabled — prevents context menu from opening |
 | `minWidth` | `minwidth` | number | `180` | Min width of the menu panel |
 

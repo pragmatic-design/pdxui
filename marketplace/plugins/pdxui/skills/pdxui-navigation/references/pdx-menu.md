@@ -4,7 +4,7 @@ A list of actions.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | Menu items (data-driven) |
+| `items` | — | T[] | `[]` | Menu items (data-driven) |
 | `open` | `open` | boolean | `false` | Open state |
 | `minWidth` | `minwidth` | number | `180` | Minimum width |
 | `menuId` | `menuid` | string | `''` | The id of the element that is `role="menu"`, for a trigger's `aria-controls`. |

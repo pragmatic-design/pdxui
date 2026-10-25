@@ -4,7 +4,7 @@ A multi-level navigation menu.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | Menu items |
+| `items` | — | T[] | `[]` | Menu items |
 | `activeKey` | `activekey` | string | `''` | Currently active item key |
 | `collapsed` | `collapsed` | boolean | `false` | Collapsed mode (show only icons, hide labels) |
 | `indent` | `indent` | number | `36` | Indent per nesting level (px) |

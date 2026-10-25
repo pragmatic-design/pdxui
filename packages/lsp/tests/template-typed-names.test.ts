@@ -226,13 +226,29 @@ describe("a library component's snippet, from the real manifest (#595)", () => {
     const fromManifest: ResolveSnippet = (tag, name) => resolveSnippetType(registry, tag, name);
     const NAV = "let nav = $signal([{ key: 'home', label: 'Home' }]);";
 
-    it('the manifest is the one read: pdx-nav-menu records its signatures', () => {
-        expect(fromManifest('pdx-nav-menu', 'item')?.signature).toMatch(/^\(item: \{ key: string; label: string;/);
+    it('the manifest is the one read: pdx-nav-menu records its signatures, generic in its items (#651)', () => {
+        expect(fromManifest('pdx-nav-menu', 'item')?.signature).toMatch(/^\(item: Exclude<T \|/);
         expect(fromManifest('pdx-nav-menu', 'itemActions')?.signature).toMatch(/level: number, active: boolean\)$/);
+        expect(fromManifest('pdx-nav-menu', 'item')?.props).toEqual([{ name: 'items', type: 'T[]' }]);
     });
 
-    // The entry carries `[key: string]: unknown`, for the fields an app adds to its own items: a member
-    // the signature does not name reads as `unknown`, not as an error. What it names is typed.
+    // #651: the item is the app's own, `T` inferred from `:items`. An invented member is an error; a
+    // field the app's items carry reads, with the type they give it — `data` present on every item is
+    // not "possibly undefined", as the library's optional `data` made it in the showcase's rail.
+    it("an app's own field reads with its type, and an invented one is an error (#651)", () => {
+        const ITEMS = "let nav = $signal([{ key: 'home', label: 'Home', glyph: '★', data: { pin: 'x' } }]);";
+        const found = diagnose(ITEMS, '<pdx-nav-menu :items="nav">@snippet item(it) { <b>{{ it.glyph.length }} {{ it.data.pin.length }} {{ it.lable }}</b> }</pdx-nav-menu>', undefined, fromManifest);
+        expect(found.map((f) => f.at)).toEqual(['lable']);
+    });
+
+    // The menu hands its snippet the children too, and draws a header itself (#651): under a header
+    // the snippet's item is the child, with the child's own fields.
+    it("a child's own field reads under a header, which the snippet never receives (#651)", () => {
+        const TREE = "let nav = $signal([{ type: 'header' as const, key: 'g', label: 'G', children: [{ key: 'a', label: 'A', pin: 'p' }] }]);";
+        const found = diagnose(TREE, '<pdx-nav-menu :items="nav">@snippet itemActions(it) { <i>{{ it.pin.length }} {{ it.pni }}</i> }</pdx-nav-menu>', undefined, fromManifest);
+        expect(found.map((f) => f.at)).toEqual(['pni']);
+    });
+
     it('a misspelt member of a typed field is an error at the member, and so is a wrong use of the level', () => {
         const found = diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet item(it, level) { <b>{{ it.label.lenght }} {{ level.toUpperCase() }}</b> }</pdx-nav-menu>', undefined, fromManifest);
         expect(found.map((f) => f.at)).toEqual(['lenght', 'toUpperCase']);
@@ -285,6 +301,20 @@ describe('what the workspace answers for a snippet', () => {
 
     it('a library component, from what its manifest records', () => {
         expect(resolveSnippetType(registry, 'pdx-lib-list', 'item')).toEqual({ generics: ['T'], props: [{ name: 'items', type: 'T[]' }], signature: '(item: T)' });
+    });
+
+    it('a library component whose array prop is a field, not an attribute, as an Array prop is (#651)', () => {
+        const fields = {
+            describe: (tag: string) => (tag === 'pdx-lib-menu' ? {
+                tag, description: '', filePath: '/lib/pdx-lib-menu.ts', generics: ['T extends { key: string }'],
+                attributes: [{ name: 'dense', type: 'boolean', description: '' }],
+                members: [{ name: 'items', type: 'T[]', description: '', kind: 'field' }, { name: 'dense', type: 'boolean', description: '', kind: 'field' }],
+                events: [], slots: [{ name: 'item', description: '', signature: '(item: T, level: number)' }],
+            } : undefined),
+        } as unknown as Parameters<typeof resolveSnippetType>[0];
+        expect(resolveSnippetType(fields, 'pdx-lib-menu', 'item')).toEqual({
+            generics: ['T extends { key: string }'], props: [{ name: 'items', type: 'T[]' }], signature: '(item: T, level: number)',
+        });
     });
 
     it('nothing for a slot with no signature, or a tag it does not know', () => {

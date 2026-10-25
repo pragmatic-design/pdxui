@@ -67,9 +67,15 @@ component('pdx-menu', {
          */
         renderItem: { type: Function, default: null },
     },
+    // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
     slots: {
-        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+        // Any entry the menu renders through the snippet (#651): an element of `items`, or a child or
+        // grandchild of one in a submenu, less the separators, labels and submenu triggers it draws
+        // itself (`type: 'separator' as const` on the app's side). Written out, because the editor
+        // pastes the signature where no alias is in scope.
+        item: slot<(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>) => Node>(),
     },
     setup(ctx) {
         const _menuEl = signal<HTMLElement | null>(null);
@@ -620,3 +626,6 @@ component('pdx-menu', {
     },
     render: () => html``,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { key?: string; label?: string; type?: string };

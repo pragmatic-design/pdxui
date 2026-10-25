@@ -47,9 +47,12 @@ component('pdx-dropdown-menu', {
         disabled: { type: Boolean, default: false },
         minWidth: { type: Number, default: 200 },
     },
+    // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
     slots: {
-        item: slot<(item: { key?: string; label?: string; type?: string; [key: string]: unknown }) => Node>(),
+        // pdx-menu's, which draws it: an entry or a submenu's, less what the menu draws itself.
+        item: slot<(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>) => Node>(),
     },
     setup(ctx) {
         const _open = signal(false);
@@ -339,3 +342,6 @@ component('pdx-dropdown-menu', {
 function isNativeButton(el: HTMLElement | null): el is HTMLButtonElement {
     return el instanceof HTMLButtonElement;
 }
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = { key?: string; label?: string; type?: string };

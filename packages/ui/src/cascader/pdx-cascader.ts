@@ -79,9 +79,13 @@ component('pdx-cascader', {
         /** Form field name */
         name: { type: String, default: '' },
     },
+    // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
+    generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
     slots: {
-        option: slot<(node: { value: string; label: string; [key: string]: unknown }, level: number, selected: boolean) => Node>(),
+        // A first-column node, or one of a later column through `children`, written out because the
+        // editor pastes the signature where no alias is in scope. A recursive node type collapses to `T`.
+        option: slot<(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean) => Node>(),
     },
     setup(ctx) {
         const _open = signal(false);
@@ -662,3 +666,6 @@ component('pdx-cascader', {
     },
     render: () => html``,
 });
+
+/** The node a snippet receives, the app's (#651): the editor infers it from `:options`. */
+type T = { value: string; label: string };

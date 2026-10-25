@@ -94,7 +94,7 @@ nothing on a narrow viewport.
 |---|---|---|---|---|
 | `source` | — | object | `null` | The data source to render from. |
 | `columns` | — | array | `null` | Column definitions: field, header, width, sortable, render, etc. |
-| `data` | — | array | `null` | The row data to display. |
+| `data` | — | T[] | `null` | The row data to display. |
 | `striped` | `striped` | boolean | `false` | Alternates row background colours. |
 | `hover` | `hover` | boolean | `true` | Highlights the row under the pointer. |
 | `rowClickable` | `rowclickable` | boolean | `false` | The rows open something: a click on a row is handled (`pdx-row-click`), so the row takes a pointer, so a page does not write its own `.pdx-dg-row { cursor: pointer }`, reaching into this component's internal class. Enter on a row is unchanged: it edits a cell in an editable grid and does nothing otherwise, so give a keyboard reader a way in of its own (an `actions()` column). |

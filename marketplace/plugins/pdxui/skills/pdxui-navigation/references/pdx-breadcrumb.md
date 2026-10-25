@@ -22,7 +22,7 @@ that is a real URL; use the event for a crumb that changes state without a route
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | T[] | `[]` | The data items to render. |
 | `separator` | `separator` | string | `''` | The separator between items. |
 | `maxItems` | `maxitems` | number | `0` | Collapse to this many items with an ellipsis. |
 

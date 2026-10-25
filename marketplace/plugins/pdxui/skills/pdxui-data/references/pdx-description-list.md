@@ -4,7 +4,7 @@ Key/value pairs, neatly aligned.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `null` | The data items to render. |
+| `items` | — | T[] | `null` | The data items to render. |
 | `columns` | `columns` | number | `1` | Number of key/value columns to lay out. |
 | `layout` | `layout` | string | `'horizontal'` | Layout: 'horizontal' (label beside value) or 'vertical'. |
 | `bordered` | `bordered` | boolean | `false` | Adds a border. |

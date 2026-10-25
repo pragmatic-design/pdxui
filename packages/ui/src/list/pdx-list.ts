@@ -61,8 +61,10 @@ component('pdx-list', {
         emptyIcon: { type: String, default: 'inbox', iconName: true },
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
+    generics: { T: { from: 'items' } },
     slots: {
-        item: slot<(item: { [key: string]: unknown }, index: number) => Node>(),
+        item: slot<(item: T, index: number) => Node>(),
         empty: slot<() => Node>(),
     },
     setup(ctx) {
@@ -382,3 +384,6 @@ component('pdx-list', {
     },
     render: () => html``,
 });
+
+/** The item a snippet receives, the app's (#651): the editor infers it from `:items`. */
+type T = unknown;

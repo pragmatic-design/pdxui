@@ -20,7 +20,7 @@ toggles only the node clicked).
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `options` | — | array | `[]` | Tree of options |
+| `options` | — | T[] | `[]` | Tree of options |
 | `multiple` | `multiple` | boolean | `false` | Allow multiple selection |
 | `placeholder` | `placeholder` | string | `''` | Placeholder |
 | `label` | `label` | string | `''` | Accessible name (aria-label) for the trigger; falls back to placeholder |
