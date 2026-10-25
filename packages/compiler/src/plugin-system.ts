@@ -41,11 +41,12 @@ export interface CompilerPlugin {
 
 /** Handler for a custom template directive. */
 export interface TemplateDirectiveHandler {
-    /** Generate JS code for this directive usage.
-     *  @param expr — the expression inside @directive (expr) { ... }
-     *  @param bodyCode — the generated html`` for the body block
-     *  @param imports — Set to add required imports
-     *  @returns JS code string to embed in the template */
+    /** Generate JS code for this directive usage (#688).
+     *  @param expr — the expression inside @directive (expr) { ... }, as written
+     *  @param bodyCode — an expression that evaluates to the body block's fragment
+     *  @param imports — Set to add the @pdxui/core names the returned code calls
+     *  @returns an EXPRESSION whose value is what the directive renders: a Node, a fragment, or a
+     *           function core's insert accepts — `wrapIn(${expr}, ${bodyCode})` */
     generate(expr: string, bodyCode: string, imports: Set<string>): string;
 }
 

@@ -80,6 +80,8 @@ describe('gap 8: custom plugin directives in parser + codegen', () => {
 
         expect(code).toContain('animate(');
         expect(code).toContain("'fadeIn'");
+        // The expression's value is what is placed (#688): not the body of a function returning nothing.
+        expect(code).toMatch(/const __cf\d+=\(animate\('fadeIn', \(\) => /);
         expect(code).toContain('Animated!');
         // animate should be in the import
         expect(code).toMatch(/import.*animate.*from.*@pdxui\/core/);
