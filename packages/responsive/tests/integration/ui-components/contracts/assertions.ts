@@ -159,6 +159,11 @@ export async function assertState(page: Page, rule: StateRule) {
     await settle(page);
     const after = await measureElement(page, rule.selector);
     expect(after, `Element not found after state: ${rule.selector}`).not.toBeNull();
+    if (rule.customState) {
+        const { host, name } = rule.customState;
+        const inState = await page.locator(host).first().evaluate((el, n) => el.matches(`:state(${n})`), name);
+        expect(inState, `${rule.description}: ${host} is not :state(${name})`).toBe(true);
+    }
     if (rule.changes.opacity) assertNumeric(after!.opacity, rule.changes.opacity, `${rule.description} opacity`);
     if (rule.changes.backgroundColor) assertString(after!.backgroundColor, rule.changes.backgroundColor, `${rule.description} bg`);
     if (rule.changes.boxShadow) assertString(after!.boxShadow, rule.changes.boxShadow, `${rule.description} shadow`);

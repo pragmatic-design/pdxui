@@ -171,7 +171,10 @@ for (const mod of PACKAGES.flatMap(p => JSON.parse(readFileSync(p.manifest, 'utf
     const slots = (d.slots || []).filter(s => s.name).map(s => ({ name: s.name, desc: s.description || '' }));
     // The site's one-liner first; then the manifest's own `summary`, which a package outside the
     // library brings (the router's elements); then its description.
-    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, shapes: d.shapes || [], roles: d.roles || [], context: d['x-pdx-context'], area: areaOf(tag, d.category) });
+    // The public styling surface beside the tokens (#132, #134): what a theme or a test selects.
+    const states = (d.cssStates || []).map(s => ({ name: s.name, desc: s.description || '' }));
+    const parts = (d.cssParts || []).map(p => ({ name: p.name, desc: p.description || '' }));
+    comps.push({ tag, summary: summaries[tag] || d.summary || (d.description || ''), props, api, events, slots, states, parts, shapes: d.shapes || [], roles: d.roles || [], context: d['x-pdx-context'], area: areaOf(tag, d.category) });
   }
 }
 comps.sort((a, b) => a.tag.localeCompare(b.tag));
@@ -256,6 +259,10 @@ function renderComp(c) {
   // Slots not printed here do not exist for an agent, which then finds pdx-drawer's header/footer by
   // measuring the DOM.
   if (c.slots && c.slots.length) lines.push('**Slot:** ' + c.slots.map(s => '`' + s.name + '`' + (s.desc ? ' — ' + esc(s.desc) : '')).join('; '), '');
+  // Its states and parts are how a page styles it; its inner classes are not public, and a selector
+  // written against one breaks when the component changes them.
+  if (c.states && c.states.length) lines.push('**States:** ' + c.states.map(s => '`:state(' + s.name + ')`' + (s.desc ? ' — ' + esc(s.desc) : '')).join('; '), '');
+  if (c.parts && c.parts.length) lines.push('**Parts:** ' + c.parts.map(p => '`[data-part="' + p.name + '"]`' + (p.desc ? ' — ' + esc(p.desc) : '')).join('; '), '');
   // The shape of an `array`/`object` prop. Without it, "items · array · The data items to render" is
   // unusable: the consumer guesses the fields, the component renders, and the field they missed is
   // silent: a breadcrumb given `[{ label }]` never tells its author about `href`.

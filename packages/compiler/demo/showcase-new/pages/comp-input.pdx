@@ -84,9 +84,28 @@
       <p class="pdx-txt-small pdx-ink-muted">
         Native <code>&lt;input&gt;</code> inside wrapper — screen readers see the real input, not the wrapper.
         <code>aria-invalid</code> auto-set on error. <code>aria-required</code> from required prop.
+        <code>aria-busy</code> while <code>loading</code>.
         Clear button has <code>aria-label="Clear"</code> and <code>tabindex="-1"</code> (not in tab order — use Escape or backspace instead).
         Mobile: <code>inputmode</code> triggers correct keyboard. Font ≥16px prevents iOS auto-zoom.
       </p>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        What a theme or a page styles on <code>&lt;pdx-input&gt;</code>: its custom states on the host and its
+        parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid)</code><span><code>error</code> is set</span></div>
+        <div class="opt-row"><code>:state(success) / :state(warning)</code><span><code>success</code> / <code>warning</code> is set</span></div>
+        <div class="opt-row"><code>:state(disabled) / :state(readonly)</code><span><code>disabled</code> / <code>readonly</code> is set</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span><code>loading</code> is set</span></div>
+        <div class="opt-row"><code>:state(over-limit)</code><span>The text is longer than <code>maxlength</code></span></div>
+        <div class="opt-row"><code>[data-part="root"]</code><span>The frame</span></div>
+        <div class="opt-row"><code>[data-part="input"]</code><span>The native input</span></div>
+        <div class="opt-row"><code>[data-part="prefix"] / [data-part="suffix"]</code><span>The prefix and suffix text</span></div>
+        <div class="opt-row"><code>[data-part="clear"] / [data-part="spinner"] / [data-part="count"]</code><span>The clear button, the loading spinner, the character count</span></div>
+      </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">CSS Classes</h3>
       <div class="options-table">
@@ -97,8 +116,8 @@
         <div class="opt-row"><code>.pdx-input-prefix/suffix</code><span>Prefix/suffix container inside wrapper</span></div>
         <div class="opt-row"><code>.pdx-input-clear</code><span>Clear button (× circle)</span></div>
         <div class="opt-row"><code>.pdx-input-count</code><span>Character counter below input</span></div>
-        <div class="opt-row"><code>.error / .success / .warning</code><span>State classes on .pdx-input-wrap</span></div>
-        <div class="opt-row"><code>.disabled / .readonly</code><span>State classes on .pdx-input-wrap</span></div>
+        <div class="opt-row"><code>.error / .success / .warning</code><span>State classes on a native field's .pdx-input-wrap; &lt;pdx-input&gt; uses its custom states</span></div>
+        <div class="opt-row"><code>.disabled / .readonly</code><span>State classes on a native field's .pdx-input-wrap; &lt;pdx-input&gt; uses its custom states</span></div>
         <div class="opt-row"><code>.pdx-input-group</code><span>External addon group (joins inputs + addons)</span></div>
         <div class="opt-row"><code>.pdx-input-addon</code><span>External addon (text/icon outside border)</span></div>
       </div>

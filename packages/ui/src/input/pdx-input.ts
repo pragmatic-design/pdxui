@@ -2,7 +2,7 @@
 // Uses .pdx-input-wrap pattern: border on wrapper, not on input.
 // Foundation for all specialized inputs (number, password, search, masked, date).
 
-import { component, html, model } from '@pdxui/core';
+import { component, event, html, model } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
@@ -25,6 +25,22 @@ function allowsPasswordManager(type: string, autocomplete: string): boolean {
  * @slot prefix - Content inside the input's frame, before the text (an icon, a unit, a currency sign).
  * @slot suffix - Content inside the input's frame, after the text.
  *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input>`, the textbox a form submits.
+ * @csspart prefix - The `prefix` text, when set.
+ * @csspart suffix - The `suffix` text, when set.
+ * @csspart clear - The clear button, while `clearable` and neither `disabled` nor `readonly`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while `loading`.
+ * @csspart count - The character count, with `show-count`.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set.
+ * @cssstate over-limit - The text is longer than `maxlength`; the count shows it.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
@@ -34,6 +50,18 @@ component('pdx-input', {
     // Typing writes it (#479), and the write dispatches `value-change`, live. The commit, on blur or
     // Enter, is the inner input's native `change`, which bubbles to the host.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** The textbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The textbox lost focus. */
+        'pdx-blur': event<void>(),
+        /** The clear button emptied the field, after its `value-change`. */
+        'pdx-clear': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132): a theme styles `pdx-input:state(invalid)`,
+    // and the design CSS draws the frame from them. The frame carries no state class of its own.
+    states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading', 'over-limit'],
+    parts: ['root', 'input', 'prefix', 'suffix', 'clear', 'spinner', 'count'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -77,15 +105,15 @@ component('pdx-input', {
         // `value` is the live value and the model: the user's typing is written to it, so the
         // count, the clear button and FormData read it — there is no private copy to drift.
 
-        function wrapClass(): string {
-            let cls = 'pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.readonly()) cls += ' readonly';
-            if (ctx.error()) cls += ' error';
-            if (ctx.success()) cls += ' success';
-            if (ctx.warning()) cls += ' warning';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('success', !!ctx.success());
+            ctx.state('warning', !!ctx.warning());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('loading', !!ctx.loading());
+            ctx.state('over-limit', isOverCount());
+        });
 
         function onInput(e: Event) {
             ctx.value.set((e.target as HTMLInputElement).value);
@@ -145,14 +173,15 @@ component('pdx-input', {
             selectText() { (ctx.el.querySelector('input,textarea') as HTMLInputElement)?.select(); },
         });
 
-        return { wrapClass, onInput, onFocus, onBlur, onClear, onWrapClick, countText, isOverCount };
+        return { onInput, onFocus, onBlur, onClear, onWrapClick, countText };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root" @click="${ctx.onWrapClick}">
-            ${() => ctx.prefix() ? html`<span class="pdx-input-prefix">${ctx.prefix}</span>` : ''}
+        <div class="pdx-input-wrap" data-part="root" @click="${ctx.onWrapClick}">
+            ${() => ctx.prefix() ? html`<span class="pdx-input-prefix" data-part="prefix">${ctx.prefix}</span>` : ''}
             <slot name="prefix"></slot>
             <input
                 class="pdx-input"
+                data-part="input"
                 type="${ctx.type}"
                 :value="${ctx.value}"
                 placeholder="${ctx.placeholder}"
@@ -178,21 +207,22 @@ component('pdx-input', {
                 :aria-label="${() => ctx.ariaLabel() || undefined}"
                 :aria-invalid="${() => ctx.error() ? 'true' : null}"
                 :aria-required="${() => ctx.required() ? 'true' : null}"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}"
                 @input="${ctx.onInput}"
                 @focus="${ctx.onFocus}"
                 @blur="${ctx.onBlur}"
             />
             ${() => ctx.clearable() && !ctx.disabled() && !ctx.readonly()
-                ? html`<button class="pdx-input-clear pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('input', 'clear')}" tabindex="-1" @click="${ctx.onClear}">\u00d7</button>`
+                ? html`<button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="${() => uiString('input', 'clear')}" tabindex="-1" @click="${ctx.onClear}">\u00d7</button>`
                 : ''}
             ${() => ctx.loading()
-                ? html`<span class="pdx-input-loading" role="status" :aria-label="${() => uiString('input', 'loading')}"></span>`
+                ? html`<span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="${() => uiString('input', 'loading')}"></span>`
                 : ''}
             <slot name="suffix"></slot>
-            ${() => ctx.suffix() ? html`<span class="pdx-input-suffix">${ctx.suffix}</span>` : ''}
+            ${() => ctx.suffix() ? html`<span class="pdx-input-suffix" data-part="suffix">${ctx.suffix}</span>` : ''}
         </div>
         ${() => ctx.showCount()
-            ? html`<div class="${() => 'pdx-input-count' + (ctx.isOverCount() ? ' over' : '')}">${ctx.countText}</div>`
+            ? html`<div class="pdx-input-count" data-part="count">${ctx.countText}</div>`
             : ''}
     `,
 });

@@ -14869,33 +14869,33 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string }"
-            },
-            {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The textbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The textbox lost focus."
             },
             {
               "name": "pdx-clear",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value is cleared."
+              "description": "The clear button emptied the field, after its `value-change`."
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
@@ -15102,12 +15102,81 @@
               "description": "Content inside the input's frame, after the text."
             }
           ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input>`, the textbox a form submits."
+            },
+            {
+              "name": "prefix",
+              "description": "The `prefix` text, when set."
+            },
+            {
+              "name": "suffix",
+              "description": "The `suffix` text, when set."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable` and neither `disabled` nor `readonly`."
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner, a `role=\"status\"`, while `loading`."
+            },
+            {
+              "name": "count",
+              "description": "The character count, with `show-count`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "success",
+              "description": "`success` is set."
+            },
+            {
+              "name": "warning",
+              "description": "`warning` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set."
+            },
+            {
+              "name": "over-limit",
+              "description": "The text is longer than `maxlength`; the count shows it."
+            }
+          ],
           "cssProperties": [
             {
               "name": "--pdx-input-border-color"
             },
             {
               "name": "--pdx-input-border-color-focus"
+            },
+            {
+              "name": "--pdx-input-border-color-invalid"
+            },
+            {
+              "name": "--pdx-input-border-color-success"
+            },
+            {
+              "name": "--pdx-input-border-color-warning"
             },
             {
               "name": "--pdx-input-border-width",

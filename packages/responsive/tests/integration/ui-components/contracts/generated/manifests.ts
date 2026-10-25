@@ -415,6 +415,7 @@ export const scenarioPage: Record<string, string> = {
     "input-basic": "tier-1b",
     "input-disabled": "tier-1b",
     "input-error": "tier-1b",
+    "input-states": "tier-1b",
     "input-sizes": "tier-1b",
     "input-nested-theme": "tier-1b",
     "input-size-md": "tier-1b",

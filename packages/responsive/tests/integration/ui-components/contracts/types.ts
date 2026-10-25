@@ -277,6 +277,11 @@ export interface StateRule {
     trigger: 'hover' | 'focus' | 'click' | 'attribute';
     /** For attribute trigger: attribute name + value */
     attribute?: { name: string; value: string };
+    /**
+     * The custom state the component is in once triggered (#132, #286): `host` matches `:state(name)`.
+     * What a theme selects is the state, so the contract reads it as well as what it draws.
+     */
+    customState?: { host: string; name: string };
     /** Properties that CHANGE in this state (relative to default) */
     changes: Partial<{
         opacity: NumericRule;

@@ -379,6 +379,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-input` shows its states as custom states on the host (#286): `:state(invalid)`,
+  `success`, `warning`, `disabled`, `readonly`, `loading` and `over-limit`. Its frame no longer carries
+  the `error`, `success`, `warning`, `disabled` and `readonly` classes, nor its count `over`. A
+  stylesheet that selected them inside the component selects the state and the part instead,
+  `pdx-input:state(invalid) [data-part="root"]`. Its parts are `root`, `input`, `prefix`, `suffix`,
+  `clear`, `spinner` and `count`. A native `.pdx-input-wrap` keeps the classes. While `loading`, the
+  textbox is `aria-busy`. The frame's state colours read `--pdx-input-border-color-invalid`,
+  `-success` and `-warning`, which default to the semantic colours.
 - **Breaking:** `pdx-pin-input` is removed (#286): a masked PIN is `<pdx-otp-input mask>`. With `mask`,
   the otp-input takes the two defaults the pin-input added: `autocomplete="off"`, and the group name
   «PIN», the new component string `otp-input.maskedLabel` (the `pin-input` strings are gone). Without
