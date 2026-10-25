@@ -52,9 +52,13 @@ Test for empty with `el.value === null`, never with a falsy check: `0` is a valu
 | `clear()` | Clears the value. |
 | `selectText()` | Select the whole text, so the next keystroke replaces it. Does not focus first. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `value-change` → `detail: { value: number | null }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The textbox lost focus.; `pdx-focus` — The textbox received focus.; `value-change` → `detail: { value: number | null }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `spinbutton`
+
+**States:** `:state(invalid)` — `error` is set.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — `loading` is set.; `:state(negative)` — With `color-by-sign`, the number is below zero.; `:state(positive)` — With `color-by-sign`, the number is above zero.
+
+**Parts:** `[data-part="root"]` — The group: the field and its stepper buttons.; `[data-part="field"]` — The frame around the text: border, background and the states' colours.; `[data-part="input"]` — The native `<input>` that shows the formatted number.; `[data-part="decrement"]` — The button that steps down.; `[data-part="increment"]` — The button that steps up.; `[data-part="sign"]` — The sign button, with `allow-negative`.
 
 
 #### Examples

@@ -54,6 +54,13 @@ export const numberInput: ComponentManifest = {
             html: `<pdx-number-input data-test="number-caret" value="99" step-mode="caret" controls="right" locale="en-US" aria-label="Amount"></pdx-number-input>`,
         },
         {
+            // Its frame is the group's `field` part, not the host's child: before #286 the
+            // disabled class sat on the group, where no rule drew it, and the field looked enabled.
+            id: 'number-input-disabled',
+            title: 'Number Input — Disabled',
+            html: `<pdx-number-input data-test="number-off" value="42" disabled aria-label="Quantity"></pdx-number-input>`,
+        },
+        {
             id: 'number-input-sizes',
             title: 'Number Input — Sizes',
             html: `
@@ -72,11 +79,11 @@ export const numberInput: ComponentManifest = {
                 composition: [
                     {
                         description: 'stepper buttons same height as input',
-                        parent: '[data-test="number-both"] .pdx-number-group',
+                        parent: '[data-test="number-both"] [data-part="root"]',
                         children: {
-                            input: '[data-test="number-both"] .pdx-input-wrap',
-                            decBtn: '[data-test="number-both"] .pdx-input-addon:first-child',
-                            incBtn: '[data-test="number-both"] .pdx-input-addon:last-child',
+                            input: '[data-test="number-both"] [data-part="field"]',
+                            decBtn: '[data-test="number-both"] [data-part="decrement"]',
+                            incBtn: '[data-test="number-both"] [data-part="increment"]',
                         },
                         relations: [
                             {
@@ -97,10 +104,10 @@ export const numberInput: ComponentManifest = {
                     },
                     {
                         description: 'elements contained in group',
-                        parent: '[data-test="number-both"] .pdx-number-group',
+                        parent: '[data-test="number-both"] [data-part="root"]',
                         children: {
-                            decBtn: '[data-test="number-both"] .pdx-input-addon:first-child',
-                            incBtn: '[data-test="number-both"] .pdx-input-addon:last-child',
+                            decBtn: '[data-test="number-both"] [data-part="decrement"]',
+                            incBtn: '[data-test="number-both"] [data-part="increment"]',
                         },
                         relations: [
                             {
@@ -124,14 +131,48 @@ export const numberInput: ComponentManifest = {
             'number-input-sign': {
                 standalone: [
                     {
-                        selector: '[data-test="number-neg"] input',
+                        selector: '[data-test="number-neg"] [data-part="input"]',
                         description: 'colorBySign: a negative number is in the danger ink',
                         colorVar: '--pdx-color-danger-ink',
                     },
                     {
-                        selector: '[data-test="number-pos"] input',
+                        selector: '[data-test="number-pos"] [data-part="input"]',
                         description: 'colorBySign: a positive number is in the success ink',
                         colorVar: '--pdx-color-success-ink',
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a negative number is the custom state :state(negative)',
+                        selector: '[data-test="number-neg"] [data-part="field"]',
+                        trigger: 'attribute',
+                        customState: { host: '[data-test="number-neg"]', name: 'negative' },
+                        changes: {},
+                    },
+                    {
+                        description: 'a positive number is the custom state :state(positive)',
+                        selector: '[data-test="number-pos"] [data-part="field"]',
+                        trigger: 'attribute',
+                        customState: { host: '[data-test="number-pos"]', name: 'positive' },
+                        changes: {},
+                    },
+                ],
+            },
+            'number-input-disabled': {
+                standalone: [
+                    {
+                        selector: '[data-test="number-off"] [data-part="field"]',
+                        description: 'a disabled field is dimmed (opacity < 1)',
+                        opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: '[data-test="number-off"] [data-part="field"]',
+                        trigger: 'attribute',
+                        customState: { host: '[data-test="number-off"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -141,9 +182,9 @@ export const numberInput: ComponentManifest = {
                         description: 'number input size hierarchy: sm < md < lg',
                         parent: 'body',
                         children: {
-                            sm: '[data-test="number-sm"] .pdx-number-group',
-                            md: '[data-test="number-md"] .pdx-number-group',
-                            lg: '[data-test="number-lg"] .pdx-number-group',
+                            sm: '[data-test="number-sm"] [data-part="root"]',
+                            md: '[data-test="number-md"] [data-part="root"]',
+                            lg: '[data-test="number-lg"] [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
@@ -164,7 +205,7 @@ export const numberInput: ComponentManifest = {
     isolation: {
         scenario: 'number-input-both',
         targets: [
-            { selector: '[data-test="number-both"] .pdx-input-wrap', tolerancePx: 6 },
+            { selector: '[data-test="number-both"] [data-part="field"]', tolerancePx: 6 },
         ],
     },
 
@@ -174,11 +215,11 @@ export const numberInput: ComponentManifest = {
     keyboard: {
         scenario: 'number-input-range',
         steps: [
-            { key: 'Tab', expectFocus: '[data-test="number-range"] input' },
-            { key: 'PageUp', expectAttr: { selector: '[data-test="number-range"] input', name: 'aria-valuenow', value: '52' } },
-            { key: 'End', expectAttr: { selector: '[data-test="number-range"] input', name: 'aria-valuenow', value: '100' } },
-            { key: 'Home', expectAttr: { selector: '[data-test="number-range"] input', name: 'aria-valuenow', value: '0' } },
-            { key: 'ArrowUp', expectAttr: { selector: '[data-test="number-range"] input', name: 'aria-valuenow', value: '1' } },
+            { key: 'Tab', expectFocus: '[data-test="number-range"] [data-part="input"]' },
+            { key: 'PageUp', expectAttr: { selector: '[data-test="number-range"] [data-part="input"]', name: 'aria-valuenow', value: '52' } },
+            { key: 'End', expectAttr: { selector: '[data-test="number-range"] [data-part="input"]', name: 'aria-valuenow', value: '100' } },
+            { key: 'Home', expectAttr: { selector: '[data-test="number-range"] [data-part="input"]', name: 'aria-valuenow', value: '0' } },
+            { key: 'ArrowUp', expectAttr: { selector: '[data-test="number-range"] [data-part="input"]', name: 'aria-valuenow', value: '1' } },
         ],
     },
 

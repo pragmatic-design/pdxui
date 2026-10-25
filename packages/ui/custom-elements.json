@@ -17707,26 +17707,26 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
-              "name": "value-change",
+              "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: number | null }"
+              "description": "The textbox received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The textbox lost focus."
             },
             {
-              "name": "pdx-focus",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: number | null }"
             }
           ],
           "roles": [
@@ -17921,6 +17921,54 @@
                 "text": "number | null"
               },
               "default": "null"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The group: the field and its stepper buttons."
+            },
+            {
+              "name": "field",
+              "description": "The frame around the text: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input>` that shows the formatted number."
+            },
+            {
+              "name": "decrement",
+              "description": "The button that steps down."
+            },
+            {
+              "name": "increment",
+              "description": "The button that steps up."
+            },
+            {
+              "name": "sign",
+              "description": "The sign button, with `allow-negative`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set."
+            },
+            {
+              "name": "negative",
+              "description": "With `color-by-sign`, the number is below zero."
+            },
+            {
+              "name": "positive",
+              "description": "With `color-by-sign`, the number is above zero."
             }
           ]
         }

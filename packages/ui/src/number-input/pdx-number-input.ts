@@ -2,10 +2,9 @@
 // Cursor-position-aware step, sign toggle, locale formatting.
 // Stepper buttons rendered OUTSIDE the input wrap (input-group style).
 
-import { component, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { resolveLocale, numberSeparators } from '../shared/locale';
-import { reflectNameToHost } from '../shared/own-prop';
 import { dispatchCommit } from '../shared/commit-change';
 import { placeBeforeCaret, caretAfterPlace } from './caret-digit';
 
@@ -22,6 +21,19 @@ function isEmptyValue(v: unknown): boolean {
  * A number input the user steps by a step, or on the digit before the caret, with a sign toggle
  * and locale formatting.
  *
+ * @csspart root - The group: the field and its stepper buttons.
+ * @csspart field - The frame around the text: border, background and the states' colours.
+ * @csspart input - The native `<input>` that shows the formatted number.
+ * @csspart decrement - The button that steps down.
+ * @csspart increment - The button that steps up.
+ * @csspart sign - The sign button, with `allow-negative`.
+ *
+ * @cssstate invalid - `error` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set.
+ * @cssstate negative - With `color-by-sign`, the number is below zero.
+ * @cssstate positive - With `color-by-sign`, the number is above zero.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
@@ -35,6 +47,16 @@ component('pdx-number-input', {
         /** The number, or `null` when the field is empty. A form submits it clamped, and resets it (#135). */
         value: model<number | null>(null, { type: Number, form: true }),
     },
+    events: {
+        /** The textbox received focus. */
+        'pdx-focus': event<void>(),
+        /** The textbox lost focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's. The frame is the group's
+    // `field` part, not the host's child: the design CSS reaches it through the `root` part.
+    states: ['invalid', 'disabled', 'loading', 'negative', 'positive'],
+    parts: ['root', 'field', 'input', 'decrement', 'increment', 'sign'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -364,18 +386,21 @@ component('pdx-number-input', {
             ctx.emit('pdx-focus');
         }
 
+        // A layout class, not a state: the sign button sits inside the field.
         function inputWrapClass(): string {
-            let cls = 'pdx-input-wrap';
-            if (ctx.error()) cls += ' error';
-            if (ctx.allowNegative()) cls += ' pdx-has-sign';
-            if (ctx.colorBySign()) {
-                // The live value, a signal: `_value` is not, and the class would stay on the sign
-                // the field was first rendered with.
-                const v = _liveValue();
-                cls += v !== null && v < 0 ? ' pdx-number-negative' : v !== null && v > 0 ? ' pdx-number-positive' : '';
-            }
-            return cls;
+            return ctx.allowNegative() ? 'pdx-input-wrap pdx-has-sign' : 'pdx-input-wrap';
         }
+
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', !!ctx.loading());
+            // The live value, a signal: `_value` is not, and the state would stay on the sign the
+            // field was first rendered with.
+            const v = ctx.colorBySign() ? _liveValue() : null;
+            ctx.state('negative', v !== null && v < 0);
+            ctx.state('positive', v !== null && v > 0);
+        });
 
         /** A spinbutton: every layout with stepper controls. controls="none" is a plain text field. */
         function isSpin(): boolean { return (ctx.controls() as string || 'both') !== 'none'; }
@@ -390,12 +415,6 @@ component('pdx-number-input', {
             return isSpin() && v !== null ? formatValue(v) : null;
         }
 
-        function groupClass(): string {
-            let cls = 'pdx-input-group pdx-number-group';
-            if (ctx.disabled()) cls += ' disabled';
-            return cls;
-        }
-
         function controlsLayout(): string { return ctx.controls() as string || 'both'; }
         function isNeg(): boolean { return _value !== null && _value < 0; }
 
@@ -404,9 +423,6 @@ component('pdx-number-input', {
 
         ctx.track(() => {
             const el = ctx.el;
-
-            if (ctx.loading()) el.setAttribute('aria-busy', 'true');
-            else el.removeAttribute('aria-busy');
 
             // Subscribe to value/min/max so changes after mount re-sync the display.
             const propVal = ctx.value() as unknown;
@@ -447,6 +463,7 @@ component('pdx-number-input', {
                         if (slot) {
                             const signBtn = document.createElement('button');
                             signBtn.type = 'button';
+                            signBtn.dataset.part = 'sign';
                             uiAttr(signBtn, 'aria-label', () => uiString('number-input', 'negative'));
                             signBtn.onclick = () => {
                                 toggleSign();
@@ -465,9 +482,6 @@ component('pdx-number-input', {
         });
 
         ctx.formValue?.(() => _liveValue());
-        // The host is the one submitter, with the number unformatted. The inner input does not carry
-        // the name, or it would send the grouped text ("12,345") a second time.
-        reflectNameToHost(ctx);
 
         // Imperative API: focus/blur/clear
         ctx.expose({
@@ -493,17 +507,22 @@ component('pdx-number-input', {
             return caretMode() ? uiString('number-input', 'caretHint') : null;
         }
 
-        return { displayValue, inputWrapClass, groupClass, controlsLayout, isNeg, isNegativeAllowed, increment, decrement, toggleSign, onInput, onKeydown, onBlur, onFocus, ariaValueNow, ariaValueText, caretHint };
+        return { displayValue, inputWrapClass, controlsLayout, isNeg, isNegativeAllowed, increment, decrement, toggleSign, onInput, onKeydown, onBlur, onFocus, ariaValueNow, ariaValueText, caretHint };
     },
+    // The host is the one submitter, with the number unformatted. The inner input does not carry the
+    // name, or it would send the grouped text ("12,345") a second time. After `setup`: TypeScript
+    // infers setup's return before it types this function's context.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
-        <div :class="${ctx.groupClass}" data-part="root">
+        <div class="pdx-input-group pdx-number-group" data-part="root">
             ${() => ctx.controlsLayout() === 'both'
-                ? html`<button class="pdx-input-addon pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('number-input', 'decrease')}" :disabled="${ctx.disabled}" @click="${ctx.decrement}">−</button>`
+                ? html`<button class="pdx-input-addon pdx-input-suffix-interactive" data-part="decrement" type="button" :aria-label="${() => uiString('number-input', 'decrease')}" :disabled="${ctx.disabled}" @click="${ctx.decrement}">−</button>`
                 : ''}
             <div :class="${ctx.inputWrapClass}" data-part="field">
                 <span class="pdx-number-sign-slot"></span>
                 <input
                     class="pdx-input"
+                    data-part="input"
                     type="text"
                     autocomplete="off"
                     data-lpignore="true"
@@ -522,15 +541,16 @@ component('pdx-number-input', {
                     :aria-valuenow="${ctx.ariaValueNow}"
                     :aria-valuetext="${ctx.ariaValueText}"
                     :aria-description="${ctx.caretHint}"
+                    :aria-busy="${() => ctx.loading() ? 'true' : null}"
                     style="text-align:center"
                 />
             </div>
             ${() => ctx.controlsLayout() === 'both'
-                ? html`<button class="pdx-input-addon pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('number-input', 'increase')}" :disabled="${ctx.disabled}" @click="${ctx.increment}">+</button>`
+                ? html`<button class="pdx-input-addon pdx-input-suffix-interactive" data-part="increment" type="button" :aria-label="${() => uiString('number-input', 'increase')}" :disabled="${ctx.disabled}" @click="${ctx.increment}">+</button>`
                 : ctx.controlsLayout() === 'right'
                 ? html`<div class="pdx-number-btn-stack">
-                    <button class="pdx-number-btn-sm pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('number-input', 'increase')}" :disabled="${ctx.disabled}" @click="${ctx.increment}">▲</button>
-                    <button class="pdx-number-btn-sm pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('number-input', 'decrease')}" :disabled="${ctx.disabled}" @click="${ctx.decrement}">▼</button>
+                    <button class="pdx-number-btn-sm pdx-input-suffix-interactive" data-part="increment" type="button" :aria-label="${() => uiString('number-input', 'increase')}" :disabled="${ctx.disabled}" @click="${ctx.increment}">▲</button>
+                    <button class="pdx-number-btn-sm pdx-input-suffix-interactive" data-part="decrement" type="button" :aria-label="${() => uiString('number-input', 'decrease')}" :disabled="${ctx.disabled}" @click="${ctx.decrement}">▼</button>
                   </div>`
                 : ''}
         </div>

@@ -41,6 +41,12 @@ const DONE: Row[] = [
         parts: ['root', 'input', 'prefix', 'spinner', 'clear', 'shortcut'],
     },
     {
+        tag: 'pdx-number-input',
+        model: 'value',
+        states: ['invalid', 'disabled', 'loading', 'negative', 'positive'],
+        parts: ['root', 'field', 'input', 'decrement', 'increment', 'sign'],
+    },
+    {
         tag: 'pdx-masked-input',
         model: 'value',
         states: ['invalid', 'disabled'],

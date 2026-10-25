@@ -73,44 +73,54 @@
 
 /* The states. A native field takes them as classes on its frame (`.pdx-input-wrap.error`); a
    component that declares them takes them as custom states on its host (#132, #286), with the same
-   weight: `:state(invalid) > .pdx-input-wrap` is (0,2,0), as `.pdx-input-wrap.error` is. */
+   weight: `:state(invalid) > .pdx-input-wrap` is (0,2,0), as `.pdx-input-wrap.error` is. A component
+   whose frame is the `field` part inside its `root` (pdx-number-input's group) is reached through
+   it, at the same weight: `:where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]`. */
 
 /* Disabled */
 .pdx-input-wrap.disabled,
-:state(disabled) > .pdx-input-wrap {
+:state(disabled) > .pdx-input-wrap,
+:where(:state(disabled) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
     background: var(--pdx-color-inset);
 }
 .pdx-input-wrap.disabled > input,
 .pdx-input-wrap.disabled > textarea,
-:state(disabled) > .pdx-input-wrap > :is(input, textarea) { cursor: not-allowed; }
+:state(disabled) > .pdx-input-wrap > :is(input, textarea),
+:where(:state(disabled) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] > input { cursor: not-allowed; }
 
 /* Error state */
 .pdx-input-wrap.error,
 :state(invalid) > .pdx-input-wrap,
+:where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"],
 .pdx-input-wrap:has([aria-invalid="true"]) {
     border-color: var(--pdx-input-border-color-invalid, var(--pdx-color-danger));
 }
 .pdx-input-wrap.error:focus-within,
 :state(invalid) > .pdx-input-wrap:focus-within,
+:where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within,
 .pdx-input-wrap:has([aria-invalid="true"]):focus-within {
     box-shadow: 0 0 0 2px oklch(from var(--pdx-input-border-color-invalid, var(--pdx-color-danger)) l c h / 0.15);
 }
 
 /* Success state */
 .pdx-input-wrap.success,
-:state(success) > .pdx-input-wrap { border-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
+:state(success) > .pdx-input-wrap,
+:where(:state(success) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
 .pdx-input-wrap.success:focus-within,
-:state(success) > .pdx-input-wrap:focus-within {
+:state(success) > .pdx-input-wrap:focus-within,
+:where(:state(success) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within {
     box-shadow: 0 0 0 2px oklch(from var(--pdx-input-border-color-success, var(--pdx-color-success)) l c h / 0.15);
 }
 
 /* Warning state */
 .pdx-input-wrap.warning,
-:state(warning) > .pdx-input-wrap { border-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
+:state(warning) > .pdx-input-wrap,
+:where(:state(warning) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
 .pdx-input-wrap.warning:focus-within,
-:state(warning) > .pdx-input-wrap:focus-within {
+:state(warning) > .pdx-input-wrap:focus-within,
+:where(:state(warning) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within {
     box-shadow: 0 0 0 2px oklch(from var(--pdx-input-border-color-warning, var(--pdx-color-warning)) l c h / 0.15);
 }
 
@@ -515,9 +525,12 @@ pdx-row > .pdx-input {
 
 /* Number color by sign — on the wrapper, which the inner input inherits (`color: inherit` above).
    `.pdx-number-negative > input` would lose to `.pdx-input-wrap > input.pdx-input` (0,1,1 against
-   0,2,1), and the number would stay in the text colour. */
-.pdx-input-wrap.pdx-number-positive { color: var(--pdx-color-success-ink); }
-.pdx-input-wrap.pdx-number-negative { color: var(--pdx-color-danger-ink); }
+   0,2,1), and the number would stay in the text colour. On pdx-number-input the sign is a custom
+   state of the host, `:state(positive)` / `:state(negative)`, reaching its `field` part (#286). */
+.pdx-input-wrap.pdx-number-positive,
+:where(:state(positive) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { color: var(--pdx-color-success-ink); }
+.pdx-input-wrap.pdx-number-negative,
+:where(:state(negative) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { color: var(--pdx-color-danger-ink); }
 
 /* Stacked stepper buttons (controls="right") */
 .pdx-number-btn-stack {
@@ -625,21 +638,26 @@ pdx-row > .pdx-input {
 
 [pdx-input-style="filled"] .pdx-input-wrap.error,
 [pdx-input-style="filled"] :state(invalid) > .pdx-input-wrap,
+[pdx-input-style="filled"] :where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"],
 [pdx-input-style="filled"] .pdx-input-wrap:has([aria-invalid="true"]) {
     border-bottom-color: var(--pdx-input-border-color-invalid, var(--pdx-color-danger));
 }
 [pdx-input-style="filled"] .pdx-input-wrap.error:focus-within,
 [pdx-input-style="filled"] :state(invalid) > .pdx-input-wrap:focus-within,
+[pdx-input-style="filled"] :where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within,
 [pdx-input-style="filled"] .pdx-input-wrap:has([aria-invalid="true"]):focus-within {
     box-shadow: none;
 }
 
 [pdx-input-style="filled"] .pdx-input-wrap.success,
-[pdx-input-style="filled"] :state(success) > .pdx-input-wrap { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
+[pdx-input-style="filled"] :state(success) > .pdx-input-wrap,
+[pdx-input-style="filled"] :where(:state(success) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
 [pdx-input-style="filled"] .pdx-input-wrap.warning,
-[pdx-input-style="filled"] :state(warning) > .pdx-input-wrap { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
+[pdx-input-style="filled"] :state(warning) > .pdx-input-wrap,
+[pdx-input-style="filled"] :where(:state(warning) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
 [pdx-input-style="filled"] :is(.pdx-input-wrap.success, .pdx-input-wrap.warning):focus-within,
-[pdx-input-style="filled"] :is(:state(success), :state(warning)) > .pdx-input-wrap:focus-within { box-shadow: none; }
+[pdx-input-style="filled"] :is(:state(success), :state(warning)) > .pdx-input-wrap:focus-within,
+[pdx-input-style="filled"] :where(:is(:state(success), :state(warning)) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within { box-shadow: none; }
 
 /* Standalone input (no wrapper) */
 [pdx-input-style="filled"] .pdx-input:not(.pdx-input-wrap > *) {
@@ -732,21 +750,26 @@ pdx-row > .pdx-input {
 
 [pdx-input-style="underlined"] .pdx-input-wrap.error,
 [pdx-input-style="underlined"] :state(invalid) > .pdx-input-wrap,
+[pdx-input-style="underlined"] :where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"],
 [pdx-input-style="underlined"] .pdx-input-wrap:has([aria-invalid="true"]) {
     border-bottom-color: var(--pdx-input-border-color-invalid, var(--pdx-color-danger));
 }
 [pdx-input-style="underlined"] .pdx-input-wrap.error:focus-within,
 [pdx-input-style="underlined"] :state(invalid) > .pdx-input-wrap:focus-within,
+[pdx-input-style="underlined"] :where(:state(invalid) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within,
 [pdx-input-style="underlined"] .pdx-input-wrap:has([aria-invalid="true"]):focus-within {
     box-shadow: none;
 }
 
 [pdx-input-style="underlined"] .pdx-input-wrap.success,
-[pdx-input-style="underlined"] :state(success) > .pdx-input-wrap { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
+[pdx-input-style="underlined"] :state(success) > .pdx-input-wrap,
+[pdx-input-style="underlined"] :where(:state(success) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
 [pdx-input-style="underlined"] .pdx-input-wrap.warning,
-[pdx-input-style="underlined"] :state(warning) > .pdx-input-wrap { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
+[pdx-input-style="underlined"] :state(warning) > .pdx-input-wrap,
+[pdx-input-style="underlined"] :where(:state(warning) > [data-part="root"]) > .pdx-input-wrap[data-part="field"] { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
 [pdx-input-style="underlined"] :is(.pdx-input-wrap.success, .pdx-input-wrap.warning):focus-within,
-[pdx-input-style="underlined"] :is(:state(success), :state(warning)) > .pdx-input-wrap:focus-within { box-shadow: none; }
+[pdx-input-style="underlined"] :is(:state(success), :state(warning)) > .pdx-input-wrap:focus-within,
+[pdx-input-style="underlined"] :where(:is(:state(success), :state(warning)) > [data-part="root"]) > .pdx-input-wrap[data-part="field"]:focus-within { box-shadow: none; }
 
 /* Standalone input (no wrapper) */
 [pdx-input-style="underlined"] .pdx-input:not(.pdx-input-wrap > *) {
