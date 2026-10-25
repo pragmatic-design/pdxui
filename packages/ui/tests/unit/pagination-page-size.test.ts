@@ -6,9 +6,16 @@
 //
 // The selector is a `pdx-select`, not the browser's `<select>`: turned on in a list, it would be the
 // one native dropdown on a page otherwise kept free of them.
-import { describe, it, expect, afterEach } from 'vitest';
-import { tick } from './helpers';
+import { describe, it, expect, afterEach, vi } from 'vitest';
+import { tick, whenUpgraded } from './helpers';
 import '../../src/pagination/pdx-pagination';
+
+// The pager imports pdx-select lazily (#407). Held back here, as a contended gate holds it, so a test
+// that reads the select before it is upgraded fails every time instead of once in a while (#692).
+vi.mock('../../src/select/pdx-select', async (importOriginal) => {
+    await new Promise((r) => setTimeout(r, 300));
+    return importOriginal();
+});
 
 type SizeSelect = HTMLElement & { value: string | null; options: { value: string; label: string }[] };
 
@@ -20,6 +27,8 @@ async function mount(attrs: string): Promise<HTMLElement> {
     host.innerHTML = `<pdx-pagination total="100" page="1" page-size="10" ${attrs}></pdx-pagination>`;
     document.body.appendChild(host);
     await tick(20);
+    // The selector is a lazily imported pdx-select: read once it is upgraded (#692).
+    await whenUpgraded(host.querySelector('.pdx-pagination-size'));
     return host;
 }
 
