@@ -136,8 +136,8 @@ describe('the props a component declares', () => {
 
     it('were found, so the assertion below is not vacuous', () => {
         // Every registration with a props block: 114 on 2026-10-24 (#658), 82 when models-first
-        // descriptors were skipped.
-        expect(components.length, 'no component with props: the scan broke').toBeGreaterThanOrEqual(114);
+        // descriptors were skipped; 113 since pdx-pin-input was removed (#286).
+        expect(components.length, 'no component with props: the scan broke').toBeGreaterThanOrEqual(113);
     });
 
     it('are each read by the component, or listed with a reason', () => {

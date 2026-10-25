@@ -137,7 +137,7 @@ describe('the resolver knows the models', () => {
         r.registerUiManifest(process.cwd());
         expect([...r.modelsOf('pdx-input')!]).toEqual(['value']);
         expect([...r.modelsOf('pdx-select')!]).toEqual(['value']);
-        expect([...r.modelsOf('pdx-pin-input')!]).toEqual(['value']);
+        expect([...r.modelsOf('pdx-otp-input')!]).toEqual(['value']);
         // A navigation component announces a page, not a value it holds for a parent (#289): no model,
         // and that is known — so `::page` on it is refused, not left to a listening that is gone.
         expect(r.has('pdx-pagination')).toBe(true);

@@ -187,11 +187,6 @@
       "types": "./dist/otp-input/pdx-otp-input.d.ts",
       "import": "./dist/otp-input/pdx-otp-input.js"
     },
-    "./pin-input": {
-      "development": "./src/pin-input/pdx-pin-input.ts",
-      "types": "./dist/pin-input/pdx-pin-input.d.ts",
-      "import": "./dist/pin-input/pdx-pin-input.js"
-    },
     "./slider": {
       "development": "./src/slider/pdx-slider.ts",
       "types": "./dist/slider/pdx-slider.d.ts",

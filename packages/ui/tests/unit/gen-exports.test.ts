@@ -62,6 +62,23 @@ describe('gen-exports adds what the manifest has and the exports map does not', 
         });
     });
 
+    it('drops an entry whose source file is gone, and says so (#286)', () => {
+        // A removed component's folder leaves an export that resolves to nothing: an import of it
+        // fails in a consumer's build, not here.
+        const exists = (p: string) => p !== './src/pin-input/pdx-pin-input.ts';
+        const { exports, removed } = computeExports(
+            {
+                './otp-input': { development: './src/otp-input/pdx-otp-input.ts' },
+                './pin-input': { development: './src/pin-input/pdx-pin-input.ts' },
+                './manifest': './custom-elements.json',
+            },
+            [mod('src/otp-input/pdx-otp-input.ts', 'pdx-otp-input')],
+            exists,
+        );
+        expect(Object.keys(exports)).toEqual(['./otp-input', './manifest', './icons/*', './package.json']);
+        expect(removed).toEqual(['./pin-input ← ./src/pin-input/pdx-pin-input.ts']);
+    });
+
     it('keeps ./package.json last so the manifest stays resolvable', () => {
         const { exports } = computeExports({ './package.json': './package.json', './a': './dist/a.js' }, []);
         expect(Object.keys(exports).at(-1)).toBe('./package.json');

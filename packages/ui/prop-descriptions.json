@@ -197,9 +197,6 @@
   "pdx-chip:removable": "Shows a remove (×) affordance.",
   "pdx-chip:selectable": "Toggles a selected state on click.",
 
-  "pdx-pin-input:length": "Number of PIN cells.",
-  "pdx-pin-input:numeric": "Restrict input to digits.",
-
   "pdx-rating:count": "Number of rating symbols.",
   "pdx-rating:precision": "Smallest selectable step (e.g. 0.5 for half stars).",
 

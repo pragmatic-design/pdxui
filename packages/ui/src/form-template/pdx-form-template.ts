@@ -42,7 +42,6 @@ import '../color-picker/pdx-color-picker';
 import '../file-upload/pdx-file-upload';
 import '../tag-input/pdx-tag-input';
 import '../otp-input/pdx-otp-input';
-import '../pin-input/pdx-pin-input';
 import { uiString, format, uiAttr} from '../shared/i18n';
 import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the

@@ -30,7 +30,6 @@ import './textarea/pdx-textarea';
 import './input-group/pdx-input-group';
 import './masked-input/pdx-masked-input';
 import './otp-input/pdx-otp-input';
-import './pin-input/pdx-pin-input';
 import './radio-group/pdx-radio-group';
 import './checkbox-group/pdx-checkbox-group';
 import './tag-input/pdx-tag-input';

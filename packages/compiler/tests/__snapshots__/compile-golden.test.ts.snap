@@ -3749,7 +3749,6 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/number-input', label: 'NumberInput' },
           { key: '/components/masked-input', label: 'MaskedInput' },
           { key: '/components/otp', label: 'OTP' },
-          { key: '/components/pin', label: 'PIN' },
           { key: '/components/slider', label: 'Slider' },
           { key: '/components/rating', label: 'Rating' },
         ]},
@@ -3973,7 +3972,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:305" });
+}, { name: "app.pdx:304" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -6695,7 +6694,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-91v1cz]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">OTP Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-otp-input&gt;</code> — N-cell code entry for verification codes.\\n      Auto-advance on type, paste spreads across cells, backspace navigates back.\\n    </p>  <app-demo-comp-otp-basic class="demo-section"></app-demo-comp-otp-basic>  <app-demo-comp-otp-separator class="demo-section"></app-demo-comp-otp-separator>  <app-demo-comp-otp-states class="demo-section"></app-demo-comp-otp-states>  <app-demo-comp-otp-sizes class="demo-section"></app-demo-comp-otp-sizes>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <h3 class="pdx-txt-subheading">Props</h3> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div> <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div> <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red border styling</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Description</span></div> <div class="opt-row"><code>pdx-input</code><span>On every cell change</span></div> <div class="opt-row"><code>pdx-complete</code><span>All cells filled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Key</span><span>Action</span></div> <div class="opt-row"><kbd>0-9</kbd><span>Enter digit, auto-advance</span></div> <div class="opt-row"><kbd>Backspace</kbd><span>Clear current, move to previous</span></div> <div class="opt-row"><kbd>Arrow Left/Right</kbd><span>Navigate between cells</span></div> <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">OTP Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-otp-input&gt;</code> — N-cell code entry for verification codes.\\n      Auto-advance on type, paste spreads across cells, backspace navigates back.\\n    </p>  <app-demo-comp-otp-basic class="demo-section"></app-demo-comp-otp-basic>  <app-demo-comp-otp-separator class="demo-section"></app-demo-comp-otp-separator>  <app-demo-comp-otp-states class="demo-section"></app-demo-comp-otp-states>  <app-demo-comp-otp-mask class="demo-section"></app-demo-comp-otp-mask>  <app-demo-comp-otp-sizes class="demo-section"></app-demo-comp-otp-sizes>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <h3 class="pdx-txt-subheading">Props</h3> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div> <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div> <div class="opt-row"><code>mask</code><span>boolean</span><span>Dots instead of digits, for a PIN: the group is named «PIN», autocomplete off</span></div> <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red border styling</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Description</span></div> <div class="opt-row"><code>pdx-input</code><span>On every cell change</span></div> <div class="opt-row"><code>pdx-complete</code><span>All cells filled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Key</span><span>Action</span></div> <div class="opt-row"><kbd>0-9</kbd><span>Enter digit, auto-advance</span></div> <div class="opt-row"><kbd>Backspace</kbd><span>Clear current, move to previous</span></div> <div class="opt-row"><kbd>Arrow Left/Right</kbd><span>Navigate between cells</span></div> <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells</span></div> </div> </section> </div> '));
 component('app-comp-otp', {
   props: {},
   setup(ctx) {
@@ -6728,7 +6727,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-xrc2j]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n  :scope .intro { margin-bottom: var(--pdx-space-xl); }\\n  :scope .section-heading { margin-bottom: var(--pdx-space-sm); }\\n  :scope section { margin-bottom: var(--pdx-space-3xl); }\\n  :scope .options-table { margin-top: var(--pdx-space-md); }\\n  :scope .opt-header, :scope .opt-row { display: grid; grid-template-columns: 200px 1fr; gap: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); font-size: var(--pdx-text-sm); align-items: center; }\\n  :scope .opt-header { font-weight: var(--pdx-weight-semibold); border-bottom: 2px solid var(--pdx-color-border); color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); text-transform: uppercase; letter-spacing: 0.04em; }\\n  :scope .opt-row { border-bottom: 1px solid var(--pdx-color-border); }\\n  :scope .opt-row span { color: var(--pdx-color-muted); }\\n  :scope code, :scope kbd { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">OTP &amp; PIN Input</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Code entry inputs: <code>&lt;pdx-otp-input&gt;</code> for verification codes,\\n      <code>&lt;pdx-pin-input&gt;</code> for masked PIN entry.\\n    </p>  <app-demo-comp-otp-pin-otp class="demo-section"></app-demo-comp-otp-pin-otp>  <app-demo-comp-otp-pin-pin class="demo-section"></app-demo-comp-otp-pin-pin>  <app-demo-comp-otp-pin-sizes class="demo-section"></app-demo-comp-otp-pin-sizes>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <h3 class="pdx-txt-subheading">pdx-otp-input / pdx-pin-input</h3> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6 OTP, 4 PIN)</span></div> <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div> <div class="opt-row"><code>mask</code><span>boolean</span><span>Show dots instead of chars (PIN mode)</span></div> <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red borders</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every cell change</span></div> <div class="opt-row"><code>pdx-complete</code><span>{ value }</span><span>All cells filled (auto-submit trigger)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Key</span><span>Action</span></div> <div class="opt-row"><kbd>0-9</kbd><span>Enter digit, auto-advance to next cell</span></div> <div class="opt-row"><kbd>Backspace</kbd><span>Clear current cell, move to previous</span></div> <div class="opt-row"><kbd>← →</kbd><span>Navigate between cells</span></div> <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells from cursor</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">OTP &amp; PIN Input</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Code entry: <code>&lt;pdx-otp-input&gt;</code> for verification codes, and\\n      <code>&lt;pdx-otp-input mask&gt;</code> for masked PIN entry.\\n    </p>  <app-demo-comp-otp-pin-otp class="demo-section"></app-demo-comp-otp-pin-otp>  <app-demo-comp-otp-pin-pin class="demo-section"></app-demo-comp-otp-pin-pin>  <app-demo-comp-otp-pin-sizes class="demo-section"></app-demo-comp-otp-pin-sizes>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <h3 class="pdx-txt-subheading">pdx-otp-input</h3> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 6)</span></div> <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div> <div class="opt-row"><code>mask</code><span>boolean</span><span>Show dots instead of chars (PIN mode): the group is named «PIN», autocomplete off</span></div> <div class="opt-row"><code>separator</code><span>number</span><span>Add "-" separator every N cells</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red borders</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every cell change</span></div> <div class="opt-row"><code>pdx-complete</code><span>{ value }</span><span>All cells filled (auto-submit trigger)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Key</span><span>Action</span></div> <div class="opt-row"><kbd>0-9</kbd><span>Enter digit, auto-advance to next cell</span></div> <div class="opt-row"><kbd>Backspace</kbd><span>Clear current cell, move to previous</span></div> <div class="opt-row"><kbd>← →</kbd><span>Navigate between cells</span></div> <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells from cursor</span></div> </div> </section> </div> '));
 component('app-comp-otp-pin', {
   props: {},
   setup(ctx) {
@@ -6911,39 +6910,6 @@ component('app-comp-password-search', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/password-search",tag:"app-comp-password-search",title:"Password & Search Input",lazy:true,file:'./comp-password-search.pdx'});
-"
-`;
-
-exports[`compile golden — demo corpus > showcase-new/pages/comp-pin.pdx 1`] = `
-"// 0 warning(s)
-
-============================================================
-import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
-
-{
-  let __pdx_style = document.getElementById("pdx-s-dxtc7");
-  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-dxtc7"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  @scope ([data-pdx-dxtc7]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
-}
-
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">PIN Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-pin-input&gt;</code> — masked code entry for passwords/PINs.\\n      Shows dots instead of digits. Same interaction model as OTP.\\n    </p>  <app-demo-comp-pin-basic class="demo-section"></app-demo-comp-pin-basic>  <app-demo-comp-pin-states class="demo-section"></app-demo-comp-pin-states>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <h3 class="pdx-txt-subheading">Props</h3> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>length</code><span>number</span><span>Number of cells (default 4)</span></div> <div class="opt-row"><code>numeric</code><span>boolean</span><span>Digits only (default true)</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> <div class="opt-row"><code>error</code><span>boolean</span><span>Red border styling</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Description</span></div> <div class="opt-row"><code>pdx-input</code><span>On every cell change</span></div> <div class="opt-row"><code>pdx-complete</code><span>All cells filled</span></div> </div> </section> </div> '));
-component('app-comp-pin', {
-  props: {},
-  setup(ctx) {
-    useHead({ title: "PIN Input" });
-    ctx.el.setAttribute('data-pdx-dxtc7', '');
-
-  },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    return __frag;
-  })(),
-});
-
-// Auto-route: @page '/components/pin'
-if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
-const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
-__pdx_pushRoute({path:"/components/pin",tag:"app-comp-pin",title:"PIN Input",lazy:true,file:'./comp-pin.pdx'});
 "
 `;
 
@@ -25187,6 +25153,33 @@ component('app-demo-comp-otp-basic', {
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-otp/demo-comp-otp-mask.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-uqsuvn");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-uqsuvn"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-uqsuvn], [data-pdx-uqsuvn-in]) to ([data-pdx-root] \\u003E *) {:scope .section-heading, :where(:not([data-pdx-uqsuvn])):scope:is(.section-heading) { margin-bottom: var(--pdx-space-sm); }\\n  :scope section, :where(:not([data-pdx-uqsuvn])):scope:is(section) { margin-bottom: var(--pdx-space-3xl); }\\n  :scope .demo-stack, :where(:not([data-pdx-uqsuvn])):scope:is(.demo-stack) { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }\\n  :scope code, :where(:not([data-pdx-uqsuvn])):scope:is(code) { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Masked PIN</h2> <p class="pdx-txt-small pdx-ink-muted"> <code>mask</code> shows dots instead of digits, for a PIN. The group is named «PIN» unless\\n      <code>label</code> says otherwise, and the browser offers no one-time code.\\n    </p> <div class="demo-stack"> <pdx-form-field label="4-digit PIN"> <pdx-otp-input mask length="4" data-pdx-uqsuvn-in></pdx-otp-input> </pdx-form-field> </div> </section> '));
+component('app-demo-comp-otp-mask', {
+  props: {},
+  setup(ctx) {
+    ctx.el.setAttribute('data-pdx-uqsuvn', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-otp/demo-comp-otp-separator.pdx 1`] = `
 "// 0 warning(s)
 
@@ -25283,10 +25276,10 @@ import { component, staticBlock, staticMarkup } from '@pdxui/core';
 {
   let __pdx_style = document.getElementById("pdx-s-o1nbka");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-o1nbka"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-o1nbka], [data-pdx-o1nbka-in]) to ([data-pdx-root] \\u003E *) {:scope .section-heading, :where(:not([data-pdx-o1nbka])):scope:is(.section-heading) { margin-bottom: var(--pdx-space-sm); }\\n  :scope section, :where(:not([data-pdx-o1nbka])):scope:is(section) { margin-bottom: var(--pdx-space-3xl); }\\n  :scope .demo-stack, :where(:not([data-pdx-o1nbka])):scope:is(.demo-stack) { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }\\n}";
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-o1nbka], [data-pdx-o1nbka-in]) to ([data-pdx-root] \\u003E *) {:scope .section-heading, :where(:not([data-pdx-o1nbka])):scope:is(.section-heading) { margin-bottom: var(--pdx-space-sm); }\\n  :scope section, :where(:not([data-pdx-o1nbka])):scope:is(section) { margin-bottom: var(--pdx-space-3xl); }\\n  :scope .demo-stack, :where(:not([data-pdx-o1nbka])):scope:is(.demo-stack) { display: flex; flex-direction: column; gap: var(--pdx-space-lg); margin-top: var(--pdx-space-lg); padding: var(--pdx-space-md) 0; }\\n  :scope code, :where(:not([data-pdx-o1nbka])):scope:is(code) { font-family: var(--pdx-font-mono); font-size: 0.85em; padding: 1px 5px; background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); color: var(--pdx-color-text); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">PIN Input</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Masked code entry — shows dots instead of digits. Same behavior as OTP but for passwords/PINs.\\n    </p> <div class="demo-stack"> <pdx-form-field label="4-digit PIN"> <pdx-pin-input length="4" data-pdx-o1nbka-in></pdx-pin-input> </pdx-form-field> <pdx-form-field label="6-digit PIN"> <pdx-pin-input length="6" data-pdx-o1nbka-in></pdx-pin-input> </pdx-form-field> <pdx-form-field label="Error" error="Wrong PIN" showError> <pdx-pin-input length="4" error data-pdx-o1nbka-in></pdx-pin-input> </pdx-form-field> </div> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">PIN Input</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Masked code entry — <code>mask</code> shows dots instead of digits. The group is named «PIN» and the\\n      browser offers no one-time code.\\n    </p> <div class="demo-stack"> <pdx-form-field label="4-digit PIN"> <pdx-otp-input mask length="4" data-pdx-o1nbka-in></pdx-otp-input> </pdx-form-field> <pdx-form-field label="6-digit PIN"> <pdx-otp-input mask length="6" data-pdx-o1nbka-in></pdx-otp-input> </pdx-form-field> <pdx-form-field label="Error" error="Wrong PIN" showError> <pdx-otp-input mask length="4" error data-pdx-o1nbka-in></pdx-otp-input> </pdx-form-field> </div> </section> '));
 component('app-demo-comp-otp-pin-pin', {
   props: {},
   setup(ctx) {
@@ -26043,46 +26036,6 @@ component('app-demo-comp-password-search-search', {
   props: {},
   setup(ctx) {
     ctx.el.setAttribute('data-pdx-rwr569', '');
-
-  },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    return __frag;
-  })(),
-});
-"
-`;
-
-exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-pin/demo-comp-pin-basic.pdx 1`] = `
-"// 0 warning(s)
-
-============================================================
-import { component, staticBlock, staticMarkup } from '@pdxui/core';
-
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <div class="demo-stack"> <pdx-form-field label="4-digit PIN"> <pdx-pin-input length="4"></pdx-pin-input> </pdx-form-field> <pdx-form-field label="6-digit PIN"> <pdx-pin-input length="6"></pdx-pin-input> </pdx-form-field> </div> </section> '));
-component('app-demo-comp-pin-basic', {
-  props: {},
-  setup(ctx) {
-
-  },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    return __frag;
-  })(),
-});
-"
-`;
-
-exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-pin/demo-comp-pin-states.pdx 1`] = `
-"// 0 warning(s)
-
-============================================================
-import { component, staticBlock, staticMarkup } from '@pdxui/core';
-
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">States</h2> <div class="demo-stack"> <pdx-form-field label="Error" error="Wrong PIN" showError> <pdx-pin-input length="4" error></pdx-pin-input> </pdx-form-field> </div> </section> '));
-component('app-demo-comp-pin-states', {
-  props: {},
-  setup(ctx) {
 
   },
   render: (ctx) => (() => {
@@ -29896,7 +29849,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"> <div class="pdx-tabs" role="tablist"> <button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button> </div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p> </div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 115 components.</p> </div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p> </div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p> </div> </pdx-tabs> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"> <div class="pdx-tabs" role="tablist"> <button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button> </div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p> </div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 114 components.</p> </div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p> </div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"> <h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p> </div> </pdx-tabs> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre> </details> </section> '));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

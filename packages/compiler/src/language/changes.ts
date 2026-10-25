@@ -39,6 +39,7 @@ import { contextStringProvide, contextStringInject, type ContextTokenRef } from 
 import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
 import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './form-fields';
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
+import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -394,6 +395,11 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     formNameBinding,
     // #128: `required` is the schema's, not a bound control's markup (./form-name-binding).
     formRequiredInMarkup,
+    // #286: `<pdx-pin-input>` is `<pdx-otp-input mask>` (./pin-input). The defaults change first: the
+    // removal writes masked otp-inputs, and the same run must not flag its own rewrite.
+    otpInputMaskDefaults,
+    pinInputRemoved,
+    pinInputStrings,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

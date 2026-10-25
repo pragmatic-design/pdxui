@@ -141,10 +141,9 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     mention: { label: 'Mentions' },
     menubar: { label: 'Menu' },
     'nav-menu': { label: 'Navigation', badge: '{label}, {badge} new' },
-    // `label` names the group of cells; a cell says its place in it.
-    'otp-input': { digit: 'Digit {n} of {total}', label: 'Verification code' },
-    // A PIN is not a one-time code: its own group name, and no SMS autofill.
-    'pin-input': { label: 'PIN' },
+    // `label` names the group of cells; a cell says its place in it. A masked entry is a PIN, not a
+    // one-time code: its own group name, `maskedLabel`.
+    'otp-input': { digit: 'Digit {n} of {total}', label: 'Verification code', maskedLabel: 'PIN' },
     navbar: { mainNav: 'Main navigation', toggle: 'Toggle menu' },
     // `negative` names the sign toggle, pressed while the value is negative.
     'number-input': { increase: 'Increase', decrease: 'Decrease', negative: 'Negative', caretHint: 'The arrow keys change the digit before the cursor' },

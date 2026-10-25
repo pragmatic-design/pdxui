@@ -379,6 +379,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-pin-input` is removed (#286): a masked PIN is `<pdx-otp-input mask>`. With `mask`,
+  the otp-input takes the two defaults the pin-input added: `autocomplete="off"`, and the group name
+  «PIN», the new component string `otp-input.maskedLabel` (the `pin-input` strings are gone). Without
+  `mask` nothing changes. `pdx migrate` rewrites `<pdx-pin-input>` to `<pdx-otp-input mask>` with
+  `length="4"` where none was written (pin-input had 4 cells, otp-input has 6), and flags an override of
+  the `pin-input` strings and an existing `<pdx-otp-input mask>` that leaves its label or autocomplete to
+  the new defaults. The `@pdxui/ui/pin-input` subpath is gone.
 - **Breaking:** `pdx-dialog` and `pdx-sidebar` declare their axes (#633), reflected on the host with
   their defaults, and drawn by `@variant` rules.
   - `pdx-dialog`: `size` (sm, md, lg, xl, full). Its panel, the root part, no longer carries

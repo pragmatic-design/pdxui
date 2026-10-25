@@ -194,18 +194,18 @@ are checked against the manifest above._
 </div>
 ```
 
-**PIN Input** — Masked code entry — shows dots instead of digits. Same behavior as OTP but for passwords/PINs. _(from the live demo)_
+**PIN Input** — Masked code entry — `mask` shows dots instead of digits. The group is named «PIN» and the browser offers no one-time code. _(from the live demo)_
 
 ```html
 <div class="demo-stack">
   <pdx-form-field label="4-digit PIN">
-    <pdx-pin-input length="4"></pdx-pin-input>
+    <pdx-otp-input mask length="4"></pdx-otp-input>
   </pdx-form-field>
   <pdx-form-field label="6-digit PIN">
-    <pdx-pin-input length="6"></pdx-pin-input>
+    <pdx-otp-input mask length="6"></pdx-otp-input>
   </pdx-form-field>
   <pdx-form-field label="Error" error="Wrong PIN" showError>
-    <pdx-pin-input length="4" error></pdx-pin-input>
+    <pdx-otp-input mask length="4" error></pdx-otp-input>
   </pdx-form-field>
 </div>
 ```
@@ -230,6 +230,16 @@ are checked against the manifest above._
 </div>
 ```
 
+**Masked PIN** — `mask` shows dots instead of digits, for a PIN. The group is named «PIN» unless `label` says otherwise, and the browser offers no one-time code. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  <pdx-form-field label="4-digit PIN">
+    <pdx-otp-input mask length="4"></pdx-otp-input>
+  </pdx-form-field>
+</div>
+```
+
 **States** _(from the live demo)_
 
 ```html
@@ -239,29 +249,6 @@ are checked against the manifest above._
   </pdx-form-field>
   <pdx-form-field label="Disabled" disabled>
     <pdx-password-input value="hidden" disabled></pdx-password-input>
-  </pdx-form-field>
-</div>
-```
-
-**Basic** _(from the live demo)_
-
-```html
-<div class="demo-stack">
-  <pdx-form-field label="4-digit PIN">
-    <pdx-pin-input length="4"></pdx-pin-input>
-  </pdx-form-field>
-  <pdx-form-field label="6-digit PIN">
-    <pdx-pin-input length="6"></pdx-pin-input>
-  </pdx-form-field>
-</div>
-```
-
-**States** _(from the live demo)_
-
-```html
-<div class="demo-stack">
-  <pdx-form-field label="Error" error="Wrong PIN" showError>
-    <pdx-pin-input length="4" error></pdx-pin-input>
   </pdx-form-field>
 </div>
 ```

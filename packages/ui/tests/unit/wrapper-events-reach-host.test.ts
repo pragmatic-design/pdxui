@@ -1,15 +1,13 @@
 // A component that wraps another one carries the inner component's events on its own host (#138).
 //
-// Events stay on the element that emits them unless declared to bubble. Three components counted on
+// Events stay on the element that emits them unless declared to bubble. Two components counted on
 // the inner element's event bubbling up through them: pdx-form-template's pdx-submit was the inner
-// pdx-form's, pdx-pin-input's pdx-input and pdx-change were the inner pdx-otp-input's (its value is
-// now its own model, written from the inner one's, #125), and
-// pdx-toggle-group heard its toggles' pressedchange on its own host. Each now listens to the inner
-// element and dispatches from its host, so a listener on the wrapper hears it and nothing above does.
+// pdx-form's, and pdx-toggle-group heard its toggles' pressedchange on its own host. Each now listens
+// to the inner element and dispatches from its host, so a listener on the wrapper hears it and nothing
+// above does. (A third, pdx-pin-input, was removed for `<pdx-otp-input mask>`, #286.)
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/form-template/pdx-form-template';
-import '../../src/pin-input/pdx-pin-input';
 import '../../src/toggle/pdx-toggle';
 
 beforeEach(cleanup);
@@ -36,23 +34,6 @@ describe('a wrapper dispatches its inner component\'s events from its own host',
         expect(onTemplate.map((e) => e.detail), 'the template\'s listener did not hear the submit').toEqual([{ values: { name: 'Ada' } }]);
         expect(onTemplate[0].target, 'the event is the template\'s, not the inner form\'s').toBe(template);
         expect(aboveTemplate, 'the submit climbed past the template').toHaveLength(0);
-    });
-
-    it('pdx-pin-input: a typed digit is the pin-input\'s own model event, value-change (#125)', async () => {
-        const pin = document.createElement('pdx-pin-input');
-        pin.setAttribute('length', '4');
-        document.body.appendChild(pin);
-        await tick(50);
-        const onPin = heard(pin, 'value-change');
-
-        const cell = pin.querySelector<HTMLInputElement>('.pdx-otp-cell')!;
-        cell.value = '7';
-        cell.dispatchEvent(new Event('input', { bubbles: true }));
-        await tick();
-
-        expect(onPin.length, 'the pin-input\'s listener did not hear the digit').toBeGreaterThan(0);
-        expect(onPin.at(-1)!.target).toBe(pin);
-        expect(onPin.at(-1)!.detail?.value).toBe('7');
     });
 
     it('pdx-toggle-group: pressing a toggle is a pdx-change on the group', async () => {

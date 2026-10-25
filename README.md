@@ -16,7 +16,7 @@ PDX UI is a framework for the front end of line-of-business software: lists, rec
 dashboards. You write `.pdx` single-file components and declare what is specific to the screen:
 its route, its data, its state, its events. The compiler writes what is not: component
 registration, the route table, lazy loading, reactive bindings, scoped CSS, types. The output is
-standard Web Components, and it ships with **115 components** built for that kind of software and a
+standard Web Components, and it ships with **114 components** built for that kind of software and a
 design system with **13 themes**.
 
 It is the front-end half of the same idea as [Pragmatic.Design](https://github.com/pragmatic-design/Pragmatic.Design):
@@ -234,7 +234,7 @@ You still read what the agent wrote. There is less of it, and none of it is plum
 | **Routing** | `@page` routes, nested routes, guards, lazy loading, scroll restoration, keep-alive pages |
 | **Data** | Data sources with paging, sorting, filtering and search; resources with cache and retry; mutations; an HTTP client |
 | **Forms** | Schema-driven forms, validation, field arrays, auto-forms from a schema |
-| **Components** | 115 custom elements: a data grid with views, filters, grouping and CSV/Excel export; inputs, pickers, overlays, navigation, layout, feedback, charts |
+| **Components** | 114 custom elements: a data grid with views, filters, grouping and CSV/Excel export; inputs, pickers, overlays, navigation, layout, feedback, charts |
 | **Design system** | Tokens, 13 themes, light and dark, density, a theme engine whose colours are checked against WCAG contrast, and a [theme builder](https://themebuilder.pdxui.com) |
 | **i18n** | Translations with ICU plurals, and dates and numbers in the user's locale |
 | **Tooling** | `pdx dev · build · check · new · theme · mcp`; a language server and a [VS Code extension](packages/vscode-pdx); devtools; test utilities |
@@ -344,7 +344,7 @@ Then pick your way in:
 | [`@pdxui/core`](packages/core) | Signals, templates, components, forms, data, i18n, with no dependencies |
 | [`@pdxui/compiler`](packages/compiler) | The Vite plugin: `.pdx` → Web Components |
 | [`@pdxui/router`](packages/router) | `@page` routing, guards, lazy routes |
-| [`@pdxui/ui`](packages/ui) | 115 components for line-of-business applications |
+| [`@pdxui/ui`](packages/ui) | 114 components for line-of-business applications |
 | [`@pdxui/design`](packages/design) | The CSS design system: tokens, 13 themes, a WCAG-checked theme engine |
 | [`@pdxui/cli`](packages/cli) | `pdx dev · build · check · new · theme · mcp` |
 | [`@pdxui/lsp`](packages/lsp) | The `.pdx` language server; the [VS Code extension](packages/vscode-pdx) uses it |

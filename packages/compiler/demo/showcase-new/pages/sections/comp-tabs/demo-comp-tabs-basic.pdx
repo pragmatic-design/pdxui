@@ -16,7 +16,7 @@
       </div>
       <div data-tab-panel="features" style="padding:var(--pdx-space-lg)">
         <h3 class="pdx-txt-subheading">Features</h3>
-        <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 115 components.</p>
+        <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 114 components.</p>
       </div>
       <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)">
         <h3 class="pdx-txt-subheading">Pricing</h3>

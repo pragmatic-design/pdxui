@@ -33,7 +33,6 @@
         import '@pdxui/ui/number-input';
         import '@pdxui/ui/otp-input';
         import '@pdxui/ui/password-input';
-        import '@pdxui/ui/pin-input';
         import '@pdxui/ui/progress';
         import '@pdxui/ui/search-input';
         import '@pdxui/ui/slider';
@@ -62,7 +61,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-masked-input","pdx-number-input","pdx-otp-input","pdx-password-input","pdx-pin-input","pdx-progress","pdx-search-input","pdx-slider"];
+        const __tags = ["pdx-masked-input","pdx-number-input","pdx-otp-input","pdx-password-input","pdx-progress","pdx-search-input","pdx-slider"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -202,6 +201,25 @@
                 </div>
     </section>
 
+    <section data-scenario="pin-basic">
+        <h3>OTP Input — Masked PIN (4 cells)</h3>
+        <pdx-otp-input data-test="pin" mask length="4"></pdx-otp-input>
+    </section>
+
+    <section data-scenario="pin-disabled">
+        <h3>OTP Input — Masked PIN, disabled</h3>
+        <pdx-otp-input data-test="pin" mask length="4" disabled></pdx-otp-input>
+    </section>
+
+    <section data-scenario="pin-sizes">
+        <h3>OTP Input — Masked PIN, sizes</h3>
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <pdx-otp-input data-test="pin-sm" mask length="4" size="sm"></pdx-otp-input>
+                    <pdx-otp-input data-test="pin-md" mask length="4"></pdx-otp-input>
+                    <pdx-otp-input data-test="pin-lg" mask length="4" size="lg"></pdx-otp-input>
+                </div>
+    </section>
+
     <section data-scenario="otp-input-size-md">
         <h3>pdx-otp-input — size="md"</h3>
         <pdx-otp-input data-test="variant" size="md"></pdx-otp-input>
@@ -259,25 +277,6 @@
     <section data-scenario="password-input-size-xl">
         <h3>pdx-password-input — size="xl"</h3>
         <pdx-password-input data-test="variant" size="xl"></pdx-password-input>
-    </section>
-
-    <section data-scenario="pin-basic">
-        <h3>PIN Input — Basic (4 cells, masked)</h3>
-        <pdx-pin-input data-test="pin" length="4"></pdx-pin-input>
-    </section>
-
-    <section data-scenario="pin-disabled">
-        <h3>PIN Input — Disabled</h3>
-        <pdx-pin-input data-test="pin" length="4" disabled></pdx-pin-input>
-    </section>
-
-    <section data-scenario="pin-sizes">
-        <h3>PIN Input — Sizes</h3>
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <pdx-pin-input data-test="pin-sm" length="4" size="sm"></pdx-pin-input>
-                    <pdx-pin-input data-test="pin-md" length="4"></pdx-pin-input>
-                    <pdx-pin-input data-test="pin-lg" length="4" size="lg"></pdx-pin-input>
-                </div>
     </section>
 
     <section data-scenario="progress-determinate">

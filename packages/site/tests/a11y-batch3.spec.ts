@@ -24,11 +24,12 @@ test('OTP and PIN: the cells are a named group', async ({ page }) => {
     const group = page.getByRole('group', { name: 'Verification code' }).first();
     await expect(group.getByRole('textbox').first()).toHaveAccessibleName(/^Digit 1 of \d$/);
 
-    await page.goto('/components/pdx-pin-input', { waitUntil: 'networkidle' });
-    const pin = page.locator('pdx-pin-input').first().getByRole('group');
-    await expect(pin).toHaveAccessibleName(/.+/);
-    const cell = pin.locator('input').first();
-    await expect(cell).toHaveAttribute('autocomplete', 'off');
+    // The masked PIN entry is the same page's `mask` section (#286). Its form field's label names the
+    // group, over the «PIN» default (measured without a field in responsive's otp-input-mask.spec.ts).
+    const section = page.locator('section').filter({ has: page.getByRole('heading', { name: 'Masked PIN' }) });
+    const pin = section.getByRole('group', { name: '4-digit PIN', exact: true });
+    await expect(pin.locator('input').first()).toHaveAttribute('autocomplete', 'off');
+    await expect(pin.locator('input').first()).toHaveAttribute('type', 'password');
 });
 
 test('page header: the examples are h3s under the page sections, not more h1s', async ({ page }) => {

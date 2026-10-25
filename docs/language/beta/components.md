@@ -204,7 +204,7 @@ parent listens with `@saved="…"`, and the editor types `$event` as `CustomEven
   `PDX_EVENT_BUBBLES_UNUSED` (info) then lists the events marked `bubbles` that no ancestor in the
   project listens to. "Listens" is read off the project's templates: a listener written on any element
   other than the component's own tag. One added with `addEventListener` in a `.ts` is not read.
-- Library components wrapping another one (`pdx-form-template`, `pdx-pin-input`, `pdx-toggle-group`)
+- Library components wrapping another one (`pdx-form-template`, `pdx-toggle-group`)
   listen to the inner element and dispatch its events again from their host; no library event is
   declared `bubbles`. Consumers that listened above a library component — a form or a section hearing
   every field's `pdx-change` — listen on the component itself.
