@@ -104,6 +104,8 @@ export interface MeasuredElement {
     minWidth: number;
     boxShadow: string;
     pointerEvents: string;
+    /** The computed `transform`: "none", or the matrix it resolves to ("matrix(1, 0, 0, 1, 0, -3)"). */
+    transform: string;
     /** The computed `overflow` shorthand ("hidden", "visible", "auto hidden"…). */
     overflow: string;
     /**

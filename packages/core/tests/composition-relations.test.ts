@@ -28,7 +28,7 @@ function box(left: number, top: number, width: number, height: number): Measured
         backgroundColor: 'rgb(0, 0, 0)', color: 'rgb(0, 0, 0)', opacity: 1, fontSize: 14,
         fontFamily: 'x', fontWeight: '400', letterSpacing: 'normal', textTransform: 'none',
         cursor: 'auto', display: 'block', minHeight: 0, maxWidth: 0, minWidth: 0,
-        boxShadow: 'none', pointerEvents: 'auto',
+        boxShadow: 'none', pointerEvents: 'auto', transform: 'none',
     };
 }
 
