@@ -5,12 +5,13 @@
  *  - source: packages/ui/src/switch-toggle/pdx-switch.ts
  *      the HOST <pdx-switch> (light DOM, formAssociated) renders an INNER
  *      <label class="pdx-switch-wrap">:
- *        - <input type="checkbox" role="switch" class="pdx-toggle[ pdx-toggle-<size>][ pdx-toggle-error][ pdx-toggle-loading]">
- *          with :checked, :disabled (= disabled || loading), :aria-checked="String(!!checked)", :name.
+ *        - <input type="checkbox" role="switch" class="pdx-toggle" data-part="root">
+ *          with :checked, :disabled (= disabled || loading), :aria-checked, :aria-invalid, :aria-busy.
+ *          error, disabled and loading are the host's :state(invalid|disabled|loading) (#286).
  *        - with label/description: <span class="pdx-switch-content"> holding
  *            <span class="pdx-switch-label"> (the label text) and/or <span class="pdx-switch-desc"> (description).
  *          otherwise a <slot>.
- *      wrapClass: + " pdx-switch-label-left" when labelPosition='left'; + " disabled" when disabled||loading.
+ *      wrapClass: + " pdx-switch-label-left" when labelPosition='left'.
  *      onChange writes the `checked` model, which announces checked-change { value } (#480; gated on disabled/loading).
  *      No custom keydown handler: the native checkbox input is tabbable and toggles with Space → keyboard 'none'.
  *
@@ -21,7 +22,7 @@
  *      size="lg"       → 3.5rem x 2rem (56x32px), on the host; natively .pdx-toggle-lg.
  *      :disabled        → opacity:var(--pdx-opacity-disabled); cursor:not-allowed.
  *      .pdx-switch-wrap → display:inline-flex; align-items:flex-start; gap:sm; cursor:pointer.
- *      .pdx-switch-wrap.disabled → reduced opacity; cursor:not-allowed.
+ *      :is(:state(disabled), :state(loading)) > .pdx-switch-wrap → reduced opacity; cursor:not-allowed.
  *      .pdx-switch-label-left    → flex-direction:row-reverse.
  *      .pdx-switch-content       → flex column; .pdx-switch-label / .pdx-switch-desc texts.
  *      Theme-dependent tokens: --pdx-toggle-width/height vary (cupertino 3rem/1.75rem,
@@ -210,7 +211,7 @@ export const switchToggle: ComponentManifest = {
             'switch-disabled': {
                 standalone: [
                     {
-                        // A disabled wrapper → reduced opacity (.pdx-switch-wrap.disabled).
+                        // A disabled wrapper → reduced opacity (:state(disabled) > .pdx-switch-wrap).
                         selector: 'section:not([hidden]) [data-test="switch-disabled"] .pdx-switch-wrap',
                         description: 'disabled switch wrap has reduced opacity',
                         opacity: { op: '<', value: 1 },
@@ -220,6 +221,22 @@ export const switchToggle: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="switch-disabled"] .pdx-toggle',
                         description: 'disabled switch track cursor = not-allowed',
                         cursor: { op: 'is', value: 'not-allowed' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled switch is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="switch-disabled"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="switch-disabled"]', name: 'disabled' },
+                        changes: {},
+                    },
+                    {
+                        description: 'a checked switch is the custom state :state(checked)',
+                        selector: 'section:not([hidden]) [data-test="switch-disabled"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="switch-disabled"]', name: 'checked' },
+                        changes: {},
                     },
                 ],
             },

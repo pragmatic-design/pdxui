@@ -40,7 +40,16 @@
         <div class="opt-row"><code>loading</code><span>boolean</span><span>Spinner in thumb, disabled during load</span></div>
         <div class="opt-row"><code>error</code><span>boolean</span><span>Red track color</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
-        <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>What a form submits under <code>name</code> while it is on (default <code>on</code>); nothing while off</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(checked)</code><span></span><span>It is on</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span></span><span><code>error</code> / <code>disabled</code> is set; with <code>error</code> the switch is <code>aria-invalid</code></span></div>
+        <div class="opt-row"><code>:state(loading)</code><span></span><span><code>loading</code> is set; the switch is <code>aria-busy</code> and takes no toggle</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="label"] / [data-part="description"]</code><span></span><span>The track (the native <code>role="switch"</code>), the label, the description</span></div>
       </div>
     </section>
   </div>

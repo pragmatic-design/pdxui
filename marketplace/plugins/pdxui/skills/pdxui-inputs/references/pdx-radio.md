@@ -16,6 +16,10 @@ Pick a single option from a set.
 
 **Events:** `checked-change` → `detail: { value: boolean }` — Fired when the component writes `checked`. Does not bubble.
 
+**States:** `:state(checked)` — It is the one selected.; `:state(invalid)` — `error` is set; the radio is aria-invalid.; `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The native radio, the circle drawn; the size variants key by it.; `[data-part="label"]` — The `label` text, when set.; `[data-part="description"]` — The `description` text, when set.
+
 
 #### Examples
 

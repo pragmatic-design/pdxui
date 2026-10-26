@@ -13,7 +13,8 @@ type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
-interface Row { tag: string; model: string; states: string[]; parts: string[] }
+/** `model`: its one model, or all of them in declaration order (pdx-checkbox has two). */
+interface Row { tag: string; model: string | string[]; states: string[]; parts: string[] }
 
 const DONE: Row[] = [
     {
@@ -89,13 +90,31 @@ const DONE: Row[] = [
         states: [],
         parts: ['entry', 'branch', 'dialog'],
     },
+    {
+        tag: 'pdx-checkbox',
+        model: ['checked', 'indeterminate'],
+        states: ['checked', 'indeterminate', 'invalid', 'disabled'],
+        parts: ['root', 'label', 'description'],
+    },
+    {
+        tag: 'pdx-radio',
+        model: 'checked',
+        states: ['checked', 'invalid', 'disabled'],
+        parts: ['root', 'label', 'description'],
+    },
+    {
+        tag: 'pdx-switch',
+        model: 'checked',
+        states: ['checked', 'invalid', 'disabled', 'loading'],
+        parts: ['root', 'label', 'description'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
     const decl = decls.find((d) => d.tagName === row.tag);
 
     it('declares its model', () => {
-        expect(decl?.models).toEqual([row.model]);
+        expect(decl?.models).toEqual([row.model].flat());
     });
 
     it('lists its states as custom states', () => {

@@ -53,6 +53,14 @@
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Propagated to children</span></div>
         <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-radio: states and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(checked)</code><span></span><span>It is the one selected</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span></span><span><code>error</code> / <code>disabled</code> is set; with <code>error</code> the radio is <code>aria-invalid</code></span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="label"] / [data-part="description"]</code><span></span><span>The circle (the native radio), the label, the description</span></div>
+      </div>
     </section>
   </div>
 </template>

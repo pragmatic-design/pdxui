@@ -6268,6 +6268,38 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native checkbox, the box drawn; the size variants key by it."
+            },
+            {
+              "name": "label",
+              "description": "The `label` text, when set."
+            },
+            {
+              "name": "description",
+              "description": "The `description` text, when set."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "checked",
+              "description": "It is checked."
+            },
+            {
+              "name": "indeterminate",
+              "description": "It is indeterminate; the box is aria-checked=\"mixed\"."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set; the box is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            }
           ]
         }
       ],
@@ -20062,6 +20094,34 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native radio, the circle drawn; the size variants key by it."
+            },
+            {
+              "name": "label",
+              "description": "The `label` text, when set."
+            },
+            {
+              "name": "description",
+              "description": "The `description` text, when set."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "checked",
+              "description": "It is the one selected."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set; the radio is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            }
           ]
         }
       ],
@@ -24612,6 +24672,38 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native checkbox with role=\"switch\", the track drawn; the size variants key by it."
+            },
+            {
+              "name": "label",
+              "description": "The `label` text, when set."
+            },
+            {
+              "name": "description",
+              "description": "The `description` text, when set."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "checked",
+              "description": "It is on."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set; the switch is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set; the switch is aria-busy and takes no toggle."
             }
           ]
         }

@@ -3,7 +3,7 @@
 // Use inside <pdx-radio-group> for managed selection + keyboard nav.
 
 import { component, html, untracked, model } from '@pdxui/core';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { setOwnProp } from '../shared/own-prop';
 
 // One submitter per radio: the host. The inner <input type="radio"> stays, because the
 // browser's radio group is what gives one tab stop and arrow keys that move and check,
@@ -23,6 +23,14 @@ type RadioHost = HTMLElement & { form: HTMLFormElement | null; name: string; che
  * A radio button: one option of a single selection, grouped by `<pdx-radio-group>` and navigated
  * with the arrow keys.
  *
+ * @csspart root - The native radio, the circle drawn; the size variants key by it.
+ * @csspart label - The `label` text, when set.
+ * @csspart description - The `description` text, when set.
+ *
+ * @cssstate checked - It is the one selected.
+ * @cssstate invalid - `error` is set; the radio is aria-invalid.
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
  */
@@ -30,6 +38,9 @@ component('pdx-radio', {
     // Selecting it writes it (#480), and the write dispatches `checked-change`. A sibling the browser
     // unchecks is set from outside, and announces nothing, as it never did. A form resets it (#135).
     models: { checked: model(false, { form: true }) },
+    // On the host as custom states (#132); the circle and its label carry no state class.
+    states: ['checked', 'invalid', 'disabled'],
+    parts: ['root', 'label', 'description'],
     // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
     // draws the same look on native markup. `md` is the base size, which no class adds to.
     variants: {
@@ -48,6 +59,12 @@ component('pdx-radio', {
     setup(ctx) {
         // `checked` is the live state: selecting this radio writes it.
         const host = ctx.el as RadioHost;
+
+        ctx.track(() => {
+            ctx.state('checked', !!ctx.checked());
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         function innerName(): string | null {
             const n = ctx.name() as string;
@@ -77,31 +94,25 @@ component('pdx-radio', {
             ctx.checked.set(true);
         }
 
-        function boxClass(): string {
-            let cls = 'pdx-radio';
-            if (ctx.error()) cls += ' pdx-radio-error';
-            return cls;
-        }
-
         function wrapClass(): string {
             let cls = 'pdx-radio-wrap';
             if (ctx.labelPosition() === 'left') cls += ' pdx-radio-label-left';
-            if (ctx.disabled()) cls += ' disabled';
             return cls;
         }
 
         // Inside a pdx-radio-group the group is the field and submits the value; the radio submits
         // nothing, or the choice went out twice.
         ctx.formValue?.(() => ctx.checked() && !host.closest('pdx-radio-group') ? ((ctx.value() as string) || 'on') : null);
-        reflectNameToHost(ctx);
 
-        return { onChange, boxClass, wrapClass, innerName };
+        return { onChange, wrapClass, innerName };
     },
+    // The host is the one submitter, under its name (#133). Written after `setup`, so its type is read.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
         <label :class="${ctx.wrapClass}">
             <input
                 type="radio"
-                :class="${ctx.boxClass}"
+                class="pdx-radio"
                 data-part="root"
                 :checked="${ctx.checked}"
                 :disabled="${ctx.disabled}"
@@ -112,8 +123,8 @@ component('pdx-radio', {
                 @change="${ctx.onChange}"
             />
             ${() => (ctx.label() || ctx.description()) ? html`<span class="pdx-radio-content">
-                ${() => ctx.label() ? html`<span class="pdx-radio-label">${ctx.label}</span>` : html`<slot></slot>`}
-                ${() => ctx.description() ? html`<span class="pdx-radio-desc">${ctx.description}</span>` : ''}
+                ${() => ctx.label() ? html`<span class="pdx-radio-label" data-part="label">${ctx.label}</span>` : html`<slot></slot>`}
+                ${() => ctx.description() ? html`<span class="pdx-radio-desc" data-part="description">${ctx.description}</span>` : ''}
             </span>` : html`<slot></slot>`}
         </label>
     `,

@@ -3,7 +3,6 @@
 // tristate=true: click cycles unchecked → checked → indeterminate → unchecked.
 
 import { component, html, model } from '@pdxui/core';
-import { reflectNameToHost } from '../shared/own-prop';
 // A container rule in form.css (`.has-warning .pdx-checkbox`) styles this element, and it owns
 // no stylesheet of its own, so nothing else would carry it.
 import '@pdxui/design/components/form';
@@ -11,6 +10,15 @@ import '@pdxui/design/components/form';
 /**
  * A checkbox with a label and a description, which can be indeterminate or, as a tristate, cycle
  * through unchecked, checked and indeterminate.
+ *
+ * @csspart root - The native checkbox, the box drawn; the size variants key by it.
+ * @csspart label - The `label` text, when set.
+ * @csspart description - The `description` text, when set.
+ *
+ * @cssstate checked - It is checked.
+ * @cssstate indeterminate - It is indeterminate; the box is aria-checked="mixed".
+ * @cssstate invalid - `error` is set; the box is aria-invalid.
+ * @cssstate disabled - `disabled` is set.
  *
  * @alphaevent pdx-change
  * @alphadetail checked $event.detail.value
@@ -25,6 +33,9 @@ component('pdx-checkbox', {
         checked: model(false, { form: true }),
         indeterminate: model(false),
     },
+    // On the host as custom states (#132); the box and its label carry no state class.
+    states: ['checked', 'indeterminate', 'invalid', 'disabled'],
+    parts: ['root', 'label', 'description'],
     // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
     // draws the same look on native markup. `md` is the base size, which no class adds to.
     variants: {
@@ -47,6 +58,13 @@ component('pdx-checkbox', {
         // Tristate cycle: unchecked(0) → checked(1) → indeterminate(2) → unchecked(0)
         // state: 0=unchecked, 1=checked, 2=indeterminate
         let tristatePhase = 0;
+
+        ctx.track(() => {
+            ctx.state('checked', !!ctx.checked());
+            ctx.state('indeterminate', !!ctx.indeterminate());
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         // `checked` and `indeterminate` are the live state, and models: a click writes them, and each
         // write dispatches its event. `indeterminate` first, so a `checked-change` listener reading the
@@ -89,30 +107,22 @@ component('pdx-checkbox', {
             });
         });
 
-        function boxClass(): string {
-            let cls = 'pdx-checkbox';
-            if (ctx.error()) cls += ' pdx-checkbox-error';
-            return cls;
-        }
-
         function wrapClass(): string {
             let cls = 'pdx-checkbox-wrap';
             if (ctx.labelPosition() === 'left') cls += ' pdx-checkbox-label-left';
-            if (ctx.disabled()) cls += ' disabled';
             return cls;
         }
 
-        // The host is the one submitter; an inner checkbox carrying the name too would send the value
-        // a second time.
-        reflectNameToHost(ctx);
-
-        return { onChange, boxClass, wrapClass };
+        return { onChange, wrapClass };
     },
+    // The host is the one submitter, under its name (#133); an inner checkbox carrying the name too
+    // would send the value a second time. Written after `setup`, so its type is read.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
         <label :class="${ctx.wrapClass}">
             <input
                 type="checkbox"
-                :class="${ctx.boxClass}"
+                class="pdx-checkbox"
                 data-part="root"
                 :checked="${ctx.checked}"
                 :disabled="${ctx.disabled}"
@@ -124,8 +134,8 @@ component('pdx-checkbox', {
                 @change="${ctx.onChange}"
             />
             ${() => (ctx.label() || ctx.description()) ? html`<span class="pdx-checkbox-content">
-                ${() => ctx.label() ? html`<span class="pdx-checkbox-label">${ctx.label}</span>` : html`<slot></slot>`}
-                ${() => ctx.description() ? html`<span class="pdx-checkbox-desc">${ctx.description}</span>` : ''}
+                ${() => ctx.label() ? html`<span class="pdx-checkbox-label" data-part="label">${ctx.label}</span>` : html`<slot></slot>`}
+                ${() => ctx.description() ? html`<span class="pdx-checkbox-desc" data-part="description">${ctx.description}</span>` : ''}
             </span>` : html`<slot></slot>`}
         </label>
     `,

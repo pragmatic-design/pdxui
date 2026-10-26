@@ -5,8 +5,8 @@
  *  - source: packages/ui/src/radio/pdx-radio.ts
  *      render → <label class="pdx-radio-wrap ..."> holding:
  *        - <input type="radio" class="pdx-radio ..."> (:checked, :disabled, :name, :value, :aria-invalid)
- *        - size → ".pdx-radio-{size}"; error → ".pdx-radio-error"
- *        - labelPosition="left" → ".pdx-radio-label-left"; disabled → wrapper ".disabled"
+ *        - size → the host's [size]; error and disabled → the host's :state(invalid) and :state(disabled) (#286)
+ *        - labelPosition="left" → ".pdx-radio-label-left"
  *        - <span class="pdx-radio-content"> with .pdx-radio-label and .pdx-radio-desc
  *      An INTERACTIVE component (a native input, focusable). formAssociated.
  *  - source: packages/ui/src/radio-group/pdx-radio-group.ts
@@ -18,7 +18,7 @@
  *                   border: 2px solid var(--pdx-color-border-strong);
  *      .pdx-radio:disabled → opacity: var(--pdx-opacity-disabled) (< 1); cursor: not-allowed;
  *      .pdx-radio-wrap → display:inline-flex; cursor:pointer;
- *      .pdx-radio-wrap.disabled → opacity: var(--pdx-opacity-disabled) (< 1);
+ *      :state(disabled) > .pdx-radio-wrap → opacity: var(--pdx-opacity-disabled) (< 1);
  *      .pdx-choice-group → display:flex; flex-direction:column (vertical).
  *
  * Conservative rules: only invariants true on ALL 13 themes. No exact px value.
