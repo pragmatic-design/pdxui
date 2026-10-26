@@ -70,6 +70,12 @@ const DONE: Row[] = [
         states: ['disabled', 'readonly'],
         parts: ['root', 'input', 'list', 'option'],
     },
+    {
+        tag: 'pdx-inline-edit',
+        model: 'value',
+        states: ['disabled', 'readonly', 'editing'],
+        parts: ['root', 'display', 'editor', 'save', 'cancel'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

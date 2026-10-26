@@ -30,9 +30,23 @@ numbers). The number editor shows the value with that many decimals while you ed
 | `label` | `label` | string | `''` | The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}». |
 | `value` | — | unknown | `null` | Current value |
 
-**Events:** `pdx-cancel` — Fired when cancelled.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
+**API (via `:ref`)**
+
+| Call | Notes |
+|---|---|
+| `startEdit()` | Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`. |
+| `confirmEdit()` | Save the edited value and close the editor. |
+| `cancelEdit()` | Close the editor and keep the value; emits `pdx-cancel`. |
+| `focus()` | Moves focus to it. |
+| `blur()` | Removes focus from it. |
+
+**Events:** `pdx-cancel` — The edit was cancelled: Escape, or the cancel button. The value is unchanged.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `button`
+
+**States:** `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(editing)` — The editor is open.
+
+**Parts:** `[data-part="root"]` — The frame around the display and the editor.; `[data-part="display"]` — The value at rest, a `role="button"` that opens the editor.; `[data-part="editor"]` — The editor's container, shown while editing.; `[data-part="save"]` — The save button, with `save-on="action"`, while editing.; `[data-part="cancel"]` — The cancel button, with `save-on="action"`, while editing.
 
 
 #### Examples

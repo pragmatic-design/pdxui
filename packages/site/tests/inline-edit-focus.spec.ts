@@ -72,7 +72,7 @@ test('Tab out of the editor saves it and closes it: one editor open at a time', 
     await page.keyboard.type('Tabbed away');
     await page.keyboard.press('Tab');
 
-    await expect(page.locator('pdx-inline-edit .pdx-inline-edit.editing')).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => document.querySelectorAll('pdx-inline-edit:state(editing)').length)).toBe(0);
     await expect(first.getByRole('button', { name: 'Tabbed away', exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'john@example.com', exact: true })).toBeFocused();
 });

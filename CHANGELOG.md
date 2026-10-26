@@ -379,6 +379,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-inline-edit` takes `pdx-input`'s contract (#286).
+  - **States.** `disabled`, `readonly` and `editing` are custom states on the host; its root no
+    longer carries them as classes.
+  - **Parts.** `root`, `display` (the value at rest, `role="button"`), `editor`, `save`, `cancel`.
+  - **Methods and events.** `startEdit()`, `confirmEdit()` and `cancelEdit()` are exposed through
+    the declaration, no longer assigned to the element by hand; `focus()` and `blur()` join them.
+    `pdx-cancel` is declared. `name` is a host binding.
+- **`pdx-form-field` wires an inline edit at rest** (#286). Its display, a `role="button"`, was no
+  control the field knew: it got neither the label nor the error. It is now named by the label and
+  its value and described by the hint and the error; while the editor is open, the editor's text box
+  takes the field's usual wiring.
 - **Breaking:** `pdx-tag-input` takes `pdx-input`'s contract (#286).
   - **States.** `invalid`, `success`, `warning`, `disabled`, `readonly` and `loading` are custom
     states on the host; its frame no longer carries them as classes.
