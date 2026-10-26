@@ -12,7 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const SRC = join(here, '../../compiler/demo/showcase-new/pages');
 const OUT = join(here, '../src/demos');
 // Pages written FOR the site, because the component has no showcase page to port — pdx-calendar,
-// pdx-json-editor, pdx-page-header, pdx-relation-picker. They live in a committed directory of
+// pdx-page-header, pdx-relation-picker. They live in a committed directory of
 // their own, not in OUT: a hand-written file inside a generated, uncommitted directory is
 // distinguishable only by a banner and is easily lost. The routes read them from it, and this
 // script is the ONLY writer of OUT.
@@ -61,7 +61,7 @@ for (const f of files) {
 }
 
 // NOT copied: the site's routes load them from their own directory. A copy in OUT would put a
-// second file claiming `app-comp-calendar` (and the other three) under src/, and the component
+// second file claiming `app-comp-calendar` (and the others) under src/, and the component
 // resolver would print PDX_TAG_COLLISION_RESOLVER for each at every build. They are listed in the
 // index; a stale copy left in OUT is removed.
 let authored = 0;

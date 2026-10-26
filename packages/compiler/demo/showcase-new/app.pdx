@@ -217,6 +217,7 @@ const componentItems = [
       { key: '/components/chart-advanced', label: 'Advanced' },
     ]},
     { key: '/components/rich-text', label: 'Rich Text', icon: 'text' },
+    { key: '/components/json-editor', label: 'JSON Editor', icon: 'braces' },
   ]},
   // ─── Containers (7) ───
   { key: 'containers', label: 'Containers', icon: 'square', expanded: true, children: [

@@ -379,6 +379,10 @@ semver.
 
 ### Changed
 
+- `pdx-json-editor` has a certification manifest and a showcase page (#286): its contract,
+  axe, hostile CSS and keyboard in all 13 themes, and visual baselines of the editor and of its
+  open sub-modal. The site's gallery is ported from the showcase page, like the others; the page
+  written for the site is gone.
 - `pdx-json-editor` takes the beta contract (#286): its host is a `role="group"` named by its
   schema's `label`; its parts are `entry` (a scalar field), `branch` (an object or list of objects)
   and `dialog` (the sub-modal a branch opens).

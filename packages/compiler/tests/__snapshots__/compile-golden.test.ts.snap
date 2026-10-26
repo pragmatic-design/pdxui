@@ -3817,6 +3817,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/chart-advanced', label: 'Advanced' },
         ]},
         { key: '/components/rich-text', label: 'Rich Text', icon: 'text' },
+        { key: '/components/json-editor', label: 'JSON Editor', icon: 'braces' },
       ]},
       // ─── Containers (7) ───
       { key: 'containers', label: 'Containers', icon: 'square', expanded: true, children: [
@@ -3972,7 +3973,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:304" });
+}, { name: "app.pdx:305" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -6282,6 +6283,39 @@ component('app-comp-input-group', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/input-group",tag:"app-comp-input-group",title:"Input Group Component",lazy:true,file:'./comp-input-group.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-json-editor.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-eycvqc");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-eycvqc"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-eycvqc]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">JSON Editor</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-json-editor&gt;</code> — a form drawn from a schema, for a nested JSON value: objects, lists of\\n      objects and scalars. Scalars are edited inline; each object or list opens in a sub-modal of its own, so the\\n      form stays uncluttered. Its model is <code>value</code>, announced with <code>value-change</code>.\\n    </p>  <app-demo-comp-json-editor-object class="demo-section"></app-demo-comp-json-editor-object>  <app-demo-comp-json-editor-field class="demo-section"></app-demo-comp-json-editor-field>  <section> <h2 class="pdx-txt-heading section-heading">Props Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>schema</code><span>object</span><span><code>{ label, fields }</code> for an object, or <code>{ label, kind: \\'list\\', item }</code> for a list of objects</span></div> <div class="opt-row"><code>value</code><span>object | array</span><span>The document; its model, so <code>::value</code> binds it both ways. A form submits it as JSON under <code>name</code></span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Field types</h3> <div class="options-table"> <div class="opt-header"><span>type</span><span>Editor</span><span>Notes</span></div> <div class="opt-row"><code>text</code> (default)<span>pdx-input</span><span><code>req</code> marks the caption</span></div> <div class="opt-row"><code>number</code><span>pdx-number-input</span><span>—</span></div> <div class="opt-row"><code>bool</code><span>pdx-switch</span><span>Named by its own label</span></div> <div class="opt-row"><code>enum</code><span>pdx-select</span><span>Options from <code>values</code> or <code>options</code> (an array, or an async function)</span></div> <div class="opt-row"><code>taglist</code><span>pdx-tag-input</span><span>—</span></div> <div class="opt-row"><code>date</code> / <code>time</code><span>native input</span><span>—</span></div> <div class="opt-row"><code>object</code> / <code>objectList</code><span>a branch</span><span>Its <code>fields</code>, edited in a sub-modal</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Every edit, and a sub-modal applied; does not bubble</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Parts</h3> <div class="options-table"> <div class="opt-header"><span>Selector</span><span>—</span><span>What</span></div> <div class="opt-row"><code>[data-part="entry"]</code><span></span><span>One scalar field: its caption and its control</span></div> <div class="opt-row"><code>[data-part="branch"]</code><span></span><span>One object or list: caption, summary and the Edit button</span></div> <div class="opt-row"><code>[data-part="dialog"]</code><span></span><span>The sub-modal a branch opens (<code>role="dialog"</code>, appended to the body)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div> <div class="opt-row"><kbd>Tab</kbd><span></span><span>Moves through the fields and the Edit buttons; inside a sub-modal it stays there</span></div> <div class="opt-row"><kbd>Enter</kbd> on Edit<span></span><span>Opens the sub-modal, focus on its first field</span></div> <div class="opt-row"><kbd>Escape</kbd><span></span><span>Closes the sub-modal unapplied; focus returns to Edit</span></div> </div> </section> </div> '));
+component('app-comp-json-editor', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "JSON Editor" });
+    ctx.el.setAttribute('data-pdx-eycvqc', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/json-editor'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/json-editor",tag:"app-comp-json-editor",title:"JSON Editor",lazy:true,file:'./comp-json-editor.pdx'});
 "
 `;
 
@@ -22690,6 +22724,95 @@ component('app-demo-comp-input-group-with-addons', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-json-editor/demo-comp-json-editor-field.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">In a form field</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Inside <code>&lt;pdx-form-field&gt;</code> the editor is one group, named by the field\\'s label and described by its\\n      hint and error. Its sub-fields keep their own names: the requirement and the error are the document\\'s.\\n    </p> <pdx-form-field label="Shipping profile" hint="Where the order goes" required> <pdx-json-editor></pdx-json-editor> </pdx-form-field> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-form-field label="Shipping profile" hint="Where the order goes" required&gt;\\n  &lt;pdx-json-editor :schema="schema" ::value="profile"&gt;&lt;/pdx-json-editor&gt;\\n&lt;/pdx-form-field&gt;</code></pre> </details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;return [__el5];};
+component('app-demo-comp-json-editor-field', {
+  props: {},
+  setup(ctx) {
+const value = { recipient: 'Ada Lovelace', address: { city: 'London' } };
+    
+    
+    const schema = {
+      label: 'Shipping profile',
+      fields: [
+        { k: 'recipient', label: 'Recipient', req: true },
+        { k: 'phone', label: 'Phone' },
+        { k: 'address', label: 'Address', type: 'object', fields: [
+          { k: 'street', label: 'Street' },
+          { k: 'city', label: 'City' },
+          { k: 'zip', label: 'ZIP' },
+        ] },
+      ],
+    };
+    return { value, schema };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el5]=__walk0(__frag);
+    let __el5w_schema = {}; effect(() => { const __b = ctx.schema; if (Object.is(__b, __el5w_schema)) return; __el5w_schema = __b; assignBoundProperty(__el5, "schema", __b); });
+    let __el5w_value = {}; effect(() => { const __b = ctx.value; if (Object.is(__b, __el5w_value)) return; __el5w_value = __b; assignBoundProperty(__el5, "value", __b); });
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-json-editor/demo-comp-json-editor-object.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-uoqbx4");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-uoqbx4"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-uoqbx4]) to ([data-pdx-root] \\u003E *) {:scope .json-out { background: var(--pdx-color-bg); padding: .75rem; border-radius: 8px; overflow: auto; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Object with a nested list</h2> <p class="pdx-txt-small pdx-ink-muted">Edit the fields; the "Contacts" branch (a list of objects) opens a sub-modal. The live value is shown below.</p> <pdx-json-editor></pdx-json-editor> <pre class="pdx-txt-small json-out"><!----></pre> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-json-editor :schema="schema" ::value="config"&gt;&lt;/pdx-json-editor&gt;</code></pre> </details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;const __t5=__el4.firstChild;return [__el3,__t5];};
+component('app-demo-comp-json-editor-object', {
+  props: {},
+  setup(ctx) {
+    const __value = signal({ name: 'Acme', active: true, tags: ['vip', 'eu'], contacts: [{ label: 'Email', value: 'a@b.com' }] }, { name: 'demo-comp-json-editor-object:value' });
+    const __output = signal('{\\n  "name": "Acme",\\n  "active": true,\\n  "tags": ["vip", "eu"],\\n  "contacts": [{ "label": "Email", "value": "a@b.com" }]\\n}', { name: 'demo-comp-json-editor-object:output' });
+const schema = {
+      label: 'Config',
+      fields: [
+        { k: 'name', label: 'Name', type: 'text', req: true },
+        { k: 'active', label: 'Active', type: 'bool' },
+        { k: 'tags', label: 'Tags', type: 'taglist' },
+        { k: 'contacts', label: 'Contacts', type: 'objectList', fields: [
+          { k: 'label', label: 'Label', type: 'text' },
+          { k: 'value', label: 'Value', type: 'text' },
+        ] },
+      ],
+    };
+    
+    
+    function onChange(e) { __output.setRaw(JSON.stringify(e.detail.value, null, 2)); }
+    ctx.el.setAttribute('data-pdx-uoqbx4', '');
+    return { value: __value, output: __output, schema, onChange };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el3,__t5]=__walk0(__frag);
+    let __el3w_schema = {}; effect(() => { const __b = ctx.schema; if (Object.is(__b, __el3w_schema)) return; __el3w_schema = __b; assignBoundProperty(__el3, "schema", __b); });
+    let __el3w_value = {}; effect(() => { const __b = ctx.value(); if (Object.is(__b, __el3w_value)) return; __el3w_value = __b; assignBoundProperty(__el3, "value", __b); });
+    __el3.addEventListener('value-change', safeHandler(batchHandler(ctx.onChange), ctx.el?.tagName?.toLowerCase(), 'value-change'));
+    bindInterpolation(__t5,()=>ctx.output());
     return __frag;
   })(),
 });
