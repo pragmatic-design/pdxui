@@ -4,17 +4,16 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/tag-input/pdx-tag-input.ts
  *      the HOST <pdx-tag-input> (CSS host: display:block) → render: an inner
- *        <div class="pdx-tag-input pdx-input-wrap [disabled|readonly|error|success|warning]" data-part="root"  ← sized by the host's size (#627)
- *             role="group" :aria-label="label || 'Tag input'" @click=onWrapClick>
- *          <span class="pdx-chip pdx-chip-sm">
+ *        <div class="pdx-tag-input pdx-input-wrap" data-part="root"  ← sized by the host's size (#627)
+ *             role="group" :aria-label="label || 'Tag input'" :aria-busy @click=onWrapClick>
+ *          <span class="pdx-chip pdx-chip-sm" data-part="tag">
  *            <span>{tag}</span>
- *            [<button class="pdx-chip-remove" aria-label="Remove {tag}">×</button>]  // when !disabled && !readonly
+ *            [<button class="pdx-chip-remove" data-part="remove" aria-label="Remove {tag}">×</button>]  // when !disabled && !readonly
  *          </span> × tags
- *          [<input class="pdx-tag-input-field" type="text" :aria-label="label || 'Add tag'"
- *                  :disabled :readonly @input @keydown @paste>]  // when !disabled && !readonly && !atLimit
- *          [<input type="hidden">]  // when name
- *      The styled class .pdx-tag-input.pdx-input-wrap is on the INNER div, NOT on the host.
- *      Scope to "... .pdx-input-wrap" (it reuses the design system's input wrapper).
+ *          [<input class="pdx-tag-input-field" data-part="input" type="text" :aria-label="label || 'Add tag'"
+ *                  :aria-invalid @input @keydown @paste>]  // when !disabled && !readonly && !atLimit
+ *      The states are custom states on the host (#286): :state(invalid|success|warning|disabled|readonly|loading).
+ *      The frame is the INNER div, NOT the host: scope to "... [data-part=root]".
  *      aria-label IS forwarded to the inner input (label || 'Add tag') → NO a11y bug.
  *      Keyboard: Enter/Tab/separator commit, Backspace removes the last one, Escape clears.
  *      The focus enters the input field with Tab.
@@ -22,7 +21,7 @@
  *      .pdx-tag-input → flex-wrap: wrap; gap: 4px; min-height: calc(--pdx-input-height(2.5rem) - 2px) ≈ 38px;
  *                       cursor: text. (it inherits .pdx-input-wrap: border, radius, focus, display:flex)
  *      .pdx-tag-input-field → flex:1; min-width:60px; border:none; outline:none; background:transparent.
- *      .pdx-tag-input.disabled → opacity: var(--pdx-opacity-disabled) (< 1); pointer-events: none.
+ *      :state(disabled) > .pdx-tag-input → opacity: var(--pdx-opacity-disabled) (< 1); pointer-events: none.
  *      @media (pointer: coarse) → min-height: 44px (mobile touch target).
  *
  * a11y: container role="group" + aria-label (a token field is NOT a listbox: a listbox admits
@@ -64,31 +63,31 @@ export const tagInput: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-input-wrap → display: flex (the wrapper is flex; .pdx-tag-input adds wrap).
-                        selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
                         description: 'tag-input wrapper is flex',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
                         // min-height calc(2.5rem - 2px) ≈ 38px; a conservative threshold aligned with input (>=28).
-                        selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
                         description: 'tag-input wrapper height >= 28px',
                         height: { op: '>=', value: 28 },
                     },
                     {
                         // .pdx-tag-input → cursor: text (clicking the wrapper focuses the input).
-                        selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
                         description: 'tag-input wrapper cursor = text',
                         cursor: { op: 'is', value: 'text' },
                     },
                     {
                         // Not disabled → opaque.
-                        selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
                         description: 'tag-input wrapper opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
                         // The inner input has no border of its own (the wrapper provides it).
-                        selector: 'section:not([hidden]) [data-test="tag-input"] input.pdx-tag-input-field',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="input"]',
                         description: 'inner field has no visible own border',
                         border: {
                             top: { style: { op: 'is', value: 'none' } },
@@ -103,8 +102,8 @@ export const tagInput: ComponentManifest = {
                         description: 'tag chip contained in wrapper',
                         parent: 'body',
                         children: {
-                            wrap: '[data-test="tag-input"] .pdx-input-wrap',
-                            chip: '[data-test="tag-input"] .pdx-chip',
+                            wrap: '[data-test="tag-input"] [data-part="root"]',
+                            chip: '[data-test="tag-input"] [data-part="tag"]',
                         },
                         relations: [
                             {
@@ -119,13 +118,24 @@ export const tagInput: ComponentManifest = {
                 ],
             },
             'tag-input-disabled': {
-                // The state is already in the markup → standalone (no StateRule: the reactive .disabled class would flake).
+                // The state is already in the markup → standalone for the look.
                 standalone: [
                     {
-                        // .pdx-tag-input.disabled → opacity: var(--pdx-opacity-disabled) (< 1).
-                        selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap',
+                        // :state(disabled) > .pdx-input-wrap → opacity: var(--pdx-opacity-disabled) (< 1).
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
                         description: 'disabled tag-input has reduced opacity',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled tag-input is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="tag-input"]', name: 'disabled' },
+                        // Not `pointerEvents` here: a state rule does not assert it yet (#704). The spec
+                        // editor-fields-beta-contract measures it.
+                        changes: {},
                     },
                 ],
             },
@@ -145,7 +155,7 @@ export const tagInput: ComponentManifest = {
     isolation: {
         scenario: 'tag-input-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tag-input"] .pdx-input-wrap', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tag-input"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 

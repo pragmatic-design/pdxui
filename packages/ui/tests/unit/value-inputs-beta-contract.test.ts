@@ -58,6 +58,18 @@ const DONE: Row[] = [
         states: ['invalid', 'disabled'],
         parts: ['root', 'input'],
     },
+    {
+        tag: 'pdx-tag-input',
+        model: 'value',
+        states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading'],
+        parts: ['root', 'input', 'tag', 'remove'],
+    },
+    {
+        tag: 'pdx-mention',
+        model: 'value',
+        states: ['disabled', 'readonly'],
+        parts: ['root', 'input', 'list', 'option'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

@@ -3,12 +3,11 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, event, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 import { dispatchCommit } from '../shared/commit-change';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -41,6 +40,14 @@ interface MentionRange {
  *
  * @slot suggestion - Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.
  *
+ * @csspart root - The frame around the textarea and its highlight layer.
+ * @csspart input - The native `<textarea>` the text is typed into.
+ * @csspart list - The floating suggestion list, `role="listbox"`.
+ * @csspart option - One suggestion, `role="option"`; the active one is `aria-selected="true"`.
+ *
+ * @cssstate disabled - `disabled` is set; the textarea is disabled.
+ * @cssstate readonly - `readonly` is set; the textarea is read-only.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
@@ -54,6 +61,13 @@ component('pdx-mention', {
     // blur after typing, and dispatched by the component when a mention is picked. A form submits the
     // markup, which keeps whom each mention names, and resets the text (#135).
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** A suggestion was picked and inserted, after its `value-change`. */
+        'pdx-select': event<{ item: MentionItem; trigger: string; query: string }>(),
+    },
+    // On the host as custom states (#132). The textarea draws them natively (`:disabled`).
+    states: ['disabled', 'readonly'],
+    parts: ['root', 'input', 'list', 'option'],
     props: {
         /** Trigger character(s) — comma-separated for multiple (default: '@') */
         trigger: { type: String, default: '@' },
@@ -444,13 +458,12 @@ component('pdx-mention', {
         // ── Build DOM ── (ctx.frame: a setup a move destroyed does not build again)
         ctx.frame(() => {
             const el = ctx.el;
-            const disabled = ctx.disabled() as boolean;
-            const readonly_ = ctx.readonly() as boolean;
             const ph = (ctx.placeholder() as string) || getComponentString('mention', 'placeholder')();
             const rows = ctx.rows() as number;
 
             const wrap = document.createElement('div');
             wrap.className = 'pdx-mention-wrap';
+            wrap.dataset.part = 'root';
 
             _mirrorEl = document.createElement('div');
             _mirrorEl.className = 'pdx-mention-mirror';
@@ -458,6 +471,7 @@ component('pdx-mention', {
 
             _textareaEl = document.createElement('textarea');
             _textareaEl.className = 'pdx-mention-textarea';
+            _textareaEl.dataset.part = 'input';
             // An accessible name (the placeholder does not count as a label for axe).
             _textareaEl.setAttribute('aria-label', (ctx.label?.() as string) || ph);
             // Wired to its suggestion list: without it the list is invisible to a screen reader.
@@ -470,8 +484,6 @@ component('pdx-mention', {
             _textareaEl.setAttribute('aria-controls', _listId);
             _textareaEl.placeholder = ph;
             _textareaEl.rows = rows;
-            _textareaEl.disabled = disabled;
-            _textareaEl.readOnly = readonly_;
             _textareaEl.setAttribute('spellcheck', 'false');
             if (ctx.value()) {
                 _textareaEl.value = ctx.value() as string;
@@ -492,6 +504,7 @@ component('pdx-mention', {
 
             _dropdownEl = document.createElement('div');
             _dropdownEl.className = 'pdx-mention-dropdown';
+            _dropdownEl.dataset.part = 'list';
             // role=listbox: the children have role=option → without a listbox parent they would be orphans (axe).
             _dropdownEl.setAttribute('role', 'listbox');
             uiAttr(_dropdownEl, 'aria-label', () => uiString('mention', 'label'));
@@ -510,6 +523,17 @@ component('pdx-mention', {
             el.appendChild(wrap);
             syncMirror();
             _domReady.set(true);
+        });
+
+        // Read on every change, not once at the build: a field disabled after mount was left editable.
+        ctx.track(() => {
+            const disabled = !!ctx.disabled();
+            const readonly_ = !!ctx.readonly();
+            ctx.state('disabled', disabled);
+            ctx.state('readonly', readonly_);
+            if (!_domReady() || !_textareaEl) return;
+            _textareaEl.disabled = disabled;
+            _textareaEl.readOnly = readonly_;
         });
 
         // Sync external value
@@ -574,6 +598,7 @@ component('pdx-mention', {
             sugg.forEach((item, i) => {
                 const row = document.createElement('div');
                 row.className = 'pdx-mention-item' + (i === idx ? ' active' : '');
+                row.dataset.part = 'option';
                 row.id = `${_listId}-${i}`;
                 row.setAttribute('role', 'option');
                 row.setAttribute('aria-selected', i === idx ? 'true' : 'false');
@@ -634,11 +659,10 @@ component('pdx-mention', {
         }
 
         ctx.formValue?.(() => _markup() || null);
-        // The host is the one submitter, the markup. No hidden input carries the name: filled only by
-        // the suggestion list, it would send "" beside the value.
-        reflectNameToHost(ctx);
 
         ctx.expose({
+            focus() { _textareaEl?.focus(); },
+            blur() { _textareaEl?.blur(); },
             /** The text with each mention as `@[Label](id)`: the form to persist. */
             getMentionMarkup,
             /** The mentions in the text: `{ value, label, trigger }` each. */
@@ -647,5 +671,9 @@ component('pdx-mention', {
 
         return { getMentionMarkup };
     },
+    // The host is the one submitter, the markup, under its name (#133). No hidden input carries the
+    // name: filled only by the suggestion list, it would send "" beside the value. Written after
+    // `setup`, so its type is read.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

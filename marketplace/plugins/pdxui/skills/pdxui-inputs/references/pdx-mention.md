@@ -27,14 +27,20 @@ Type @ to mention people.
 
 | Call | Notes |
 |---|---|
+| `focus()` | Moves focus to it. |
+| `blur()` | Removes focus from it. |
 | `getMentionMarkup()` | The text with each mention as `@[Label](id)`: the form to persist. |
 | `getMentions()` | The mentions in the text: `{ value, label, trigger }` each. |
 
-**Events:** `pdx-select` → `detail: { item, trigger, query }` — Fired when an item is selected.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-select` → `detail: { item: MentionItem; trigger: string; query: string }` — A suggestion was picked and inserted, after its `value-change`.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `listbox` · `option` · `status`
 
 **Slot:** `suggestion` — Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.
+
+**States:** `:state(disabled)` — `disabled` is set; the textarea is disabled.; `:state(readonly)` — `readonly` is set; the textarea is read-only.
+
+**Parts:** `[data-part="root"]` — The frame around the textarea and its highlight layer.; `[data-part="input"]` — The native `<textarea>` the text is typed into.; `[data-part="list"]` — The floating suggestion list, `role="listbox"`.; `[data-part="option"]` — One suggestion, `role="option"`; the active one is `aria-selected="true"`.
 
 **Shapes:** `MentionItem { value: string; label: string; description?: string }`
 

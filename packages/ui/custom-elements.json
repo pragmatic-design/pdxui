@@ -16405,6 +16405,18 @@
             },
             {
               "kind": "method",
+              "name": "focus",
+              "parameters": [],
+              "description": "Moves focus to it."
+            },
+            {
+              "kind": "method",
+              "name": "blur",
+              "parameters": [],
+              "description": "Removes focus from it."
+            },
+            {
+              "kind": "method",
               "name": "getMentionMarkup",
               "parameters": [],
               "description": "The text with each mention as `@[Label](id)`: the form to persist."
@@ -16431,20 +16443,20 @@
           "alphaCommit": "pdx-change",
           "events": [
             {
+              "name": "pdx-select",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A suggestion was picked and inserted, after its `value-change`.",
+              "detail": "{ item: MentionItem; trigger: string; query: string }"
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
-            },
-            {
-              "name": "pdx-select",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when an item is selected.",
-              "detail": "{ item, trigger, query }"
             }
           ],
           "roles": [
@@ -16595,6 +16607,34 @@
               "name": "suggestion",
               "description": "Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.",
               "signature": "(item: { value: string; label: string; description?: string }, index: number, active: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame around the textarea and its highlight layer."
+            },
+            {
+              "name": "input",
+              "description": "The native `<textarea>` the text is typed into."
+            },
+            {
+              "name": "list",
+              "description": "The floating suggestion list, `role=\"listbox\"`."
+            },
+            {
+              "name": "option",
+              "description": "One suggestion, `role=\"option\"`; the active one is `aria-selected=\"true\"`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set; the textarea is disabled."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set; the textarea is read-only."
             }
           ]
         }
@@ -25156,6 +25196,50 @@
               "name": "tag",
               "description": "Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.",
               "signature": "(tag: string, index: number)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, `role=\"group\"`: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`."
+            },
+            {
+              "name": "tag",
+              "description": "One tag, a chip."
+            },
+            {
+              "name": "remove",
+              "description": "A tag's remove button, while neither `disabled` nor `readonly`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set; the text box is aria-invalid."
+            },
+            {
+              "name": "success",
+              "description": "`success` is set."
+            },
+            {
+              "name": "warning",
+              "description": "`warning` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set; the group is aria-busy."
             }
           ]
         }

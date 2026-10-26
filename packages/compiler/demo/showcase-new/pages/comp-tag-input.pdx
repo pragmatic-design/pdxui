@@ -112,6 +112,16 @@
         <div class="opt-row kbd-row"><code>clear()</code><span>Remove all tags and clear input</span></div>
         <div class="opt-row kbd-row"><code>getTags()</code><span>Returns current tags array</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row kbd-row"><code>:state(invalid) / :state(success) / :state(warning)</code><span><code>error</code> / <code>success</code> / <code>warning</code> is set; with <code>error</code> the text box is <code>aria-invalid</code></span></div>
+        <div class="opt-row kbd-row"><code>:state(disabled) / :state(readonly)</code><span><code>disabled</code> / <code>readonly</code> is set</span></div>
+        <div class="opt-row kbd-row"><code>:state(loading)</code><span><code>loading</code> is set; the group is <code>aria-busy</code></span></div>
+        <div class="opt-row kbd-row"><code>[data-part="root"] / [data-part="input"]</code><span>The frame (<code>role="group"</code>), the text box</span></div>
+        <div class="opt-row kbd-row"><code>[data-part="tag"] / [data-part="remove"]</code><span>One tag, its remove button</span></div>
+      </div>
     </section>
   </div>
 </template>

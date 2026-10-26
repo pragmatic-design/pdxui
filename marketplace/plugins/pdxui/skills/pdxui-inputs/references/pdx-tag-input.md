@@ -37,6 +37,10 @@ Type to add removable tags.
 
 **Slot:** `tag` — Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.
 
+**States:** `:state(invalid)` — `error` is set; the text box is aria-invalid.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set; the group is aria-busy.
+
+**Parts:** `[data-part="root"]` — The frame, `role="group"`: border, background and the states' colours.; `[data-part="input"]` — The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`.; `[data-part="tag"]` — One tag, a chip.; `[data-part="remove"]` — A tag's remove button, while neither `disabled` nor `readonly`.
+
 
 #### Examples
 
