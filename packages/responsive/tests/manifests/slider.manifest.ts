@@ -67,38 +67,38 @@ export const slider: ComponentManifest = {
             'slider-basic': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="track"]',
                         description: 'slider track is wide (spans the control)',
                         width: { op: '>=', value: 100 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="track"]',
                         description: 'slider track has a height (thin rail)',
                         height: { op: '>=', value: 2 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="track"]',
                         description: 'slider track radius >= 0',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                         description: 'slider thumb has a usable width',
                         width: { op: '>=', value: 10 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                         description: 'slider thumb has a usable height',
                         height: { op: '>=', value: 10 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                         description: 'slider thumb radius >= 0',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // The inner .pdx-slider has cursor:pointer (the custom element host is 'auto').
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="root"]',
                         description: 'slider inner cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
@@ -110,8 +110,8 @@ export const slider: ComponentManifest = {
                         description: 'fill is no wider than the track',
                         parent: 'section:not([hidden]) [data-test="slider"]',
                         children: {
-                            track: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track',
-                            fill: 'section:not([hidden]) [data-test="slider"] .pdx-slider-fill',
+                            track: 'section:not([hidden]) [data-test="slider"] [data-part="track"]',
+                            fill: 'section:not([hidden]) [data-test="slider"] [data-part="fill"]',
                         },
                         relations: [
                             {
@@ -129,7 +129,7 @@ export const slider: ComponentManifest = {
                 states: [
                     {
                         description: 'disabled slider has reduced opacity',
-                        selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider',
+                        selector: 'section:not([hidden]) [data-test="slider"] [data-part="root"]',
                         trigger: 'attribute',
                         attribute: { name: 'disabled', value: '' },
                         changes: { opacity: { op: '<', value: 1 } },
@@ -152,7 +152,7 @@ export const slider: ComponentManifest = {
     isolation: {
         scenario: 'slider-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-track', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="slider"] [data-part="track"]', tolerancePx: 10 },
         ],
     },
 
@@ -165,20 +165,20 @@ export const slider: ComponentManifest = {
     keyboard: {
         scenario: 'slider-basic',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]' },
             {
                 key: 'ArrowRight',
                 expectAttr: {
-                    selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                    selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                     name: 'aria-valuenow',
                     value: '41',
                 },
-                expectGeometryChange: 'section:not([hidden]) [data-test="slider"] .pdx-slider-fill',
+                expectGeometryChange: 'section:not([hidden]) [data-test="slider"] [data-part="fill"]',
             },
             {
                 key: 'ArrowLeft',
                 expectAttr: {
-                    selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                    selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                     name: 'aria-valuenow',
                     value: '40',
                 },
@@ -186,7 +186,7 @@ export const slider: ComponentManifest = {
             {
                 key: 'Home',
                 expectAttr: {
-                    selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                    selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                     name: 'aria-valuenow',
                     value: '0',
                 },
@@ -194,7 +194,7 @@ export const slider: ComponentManifest = {
             {
                 key: 'End',
                 expectAttr: {
-                    selector: 'section:not([hidden]) [data-test="slider"] .pdx-slider-thumb',
+                    selector: 'section:not([hidden]) [data-test="slider"] [data-part="thumb"]',
                     name: 'aria-valuenow',
                     value: '100',
                 },

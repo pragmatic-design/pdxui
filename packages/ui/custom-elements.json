@@ -23065,16 +23065,6 @@
             },
             {
               "kind": "field",
-              "name": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'horizontal'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
               "name": "marks",
               "description": "Comma-separated mark values, or \"step\" to show all steps",
               "type": {
@@ -23165,6 +23155,16 @@
             },
             {
               "kind": "field",
+              "name": "orientation",
+              "description": "horizontal (the default) or vertical.",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "attribute": "orientation"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -23222,6 +23222,18 @@
                 "primary": ".pdx-slider-primary",
                 "success": ".pdx-slider-success",
                 "warning": ".pdx-slider-warning"
+              }
+            },
+            {
+              "name": "orientation",
+              "values": [
+                "horizontal",
+                "vertical"
+              ],
+              "default": "horizontal",
+              "native": {
+                "horizontal": ".pdx-slider-horizontal",
+                "vertical": ".pdx-slider-vertical"
               }
             }
           ],
@@ -23310,15 +23322,6 @@
               "default": "''"
             },
             {
-              "name": "orientation",
-              "fieldName": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'horizontal'"
-            },
-            {
               "name": "marks",
               "fieldName": "marks",
               "description": "Comma-separated mark values, or \"step\" to show all steps",
@@ -23400,6 +23403,15 @@
               "default": "'primary'"
             },
             {
+              "name": "orientation",
+              "fieldName": "orientation",
+              "description": "horizontal (the default) or vertical.",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "The current value.",
@@ -23407,6 +23419,42 @@
                 "text": "number | number[]"
               },
               "default": "0"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame the pointer acts on."
+            },
+            {
+              "name": "track",
+              "description": "The rail."
+            },
+            {
+              "name": "fill",
+              "description": "The coloured portion: from the minimum to the value, or between the thumbs."
+            },
+            {
+              "name": "thumb",
+              "description": "A thumb, `role=\"slider\"`: one, or two in range mode; aria-invalid with `error`."
+            },
+            {
+              "name": "mark",
+              "description": "One of `marks`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set; every thumb is aria-invalid."
+            },
+            {
+              "name": "dragging",
+              "description": "A pointer is dragging a thumb."
             }
           ]
         }

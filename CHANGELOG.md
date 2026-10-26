@@ -379,6 +379,15 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-slider` takes the beta contract (#286).
+  - **States.** `disabled`, `invalid` and `dragging` are custom states on the host. The frame no longer
+    carries `disabled`, `error` or `pdx-slider-dragging`; native markup keeps the first two.
+  - **Parts.** `root`, `track`, `fill`, `thumb` and `mark`.
+  - **Orientation.** A variant axis reflected on the host, where `slider.css` draws the column; the
+    frame no longer carries `pdx-slider-vertical`, which native markup keeps.
+  - **A2.** With `error`, every thumb is `aria-invalid`. Inside a `pdx-form-field`, the thumbs were
+    named by the label and nothing more: they are now described by the hint and the error, and
+    `aria-invalid` with it. A `slider` may not carry `aria-required`: the label's marker says it.
 - **Breaking:** `pdx-segmented` takes the beta contract (#286).
   - **States and parts.** `disabled` is a custom state on the host. The frame is the `root` part, and
     each segment an `item` part.

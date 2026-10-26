@@ -10,6 +10,16 @@ import { reflectNameToHost } from '../shared/own-prop';
  * A slider the user drags or moves from the keyboard to pick a value, or a range with two thumbs,
  * with marks and value labels.
  *
+ * @csspart root - The frame the pointer acts on.
+ * @csspart track - The rail.
+ * @csspart fill - The coloured portion: from the minimum to the value, or between the thumbs.
+ * @csspart thumb - A thumb, `role="slider"`: one, or two in range mode; aria-invalid with `error`.
+ * @csspart mark - One of `marks`.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate invalid - `error` is set; every thumb is aria-invalid.
+ * @cssstate dragging - A pointer is dragging a thumb.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail min $event.detail.value[0]
@@ -19,13 +29,19 @@ component('pdx-slider', {
     // A drag or a key writes it (#480), and each write dispatches `value-change`; `pdx-change-end`
     // still marks the end of a drag. In range mode it holds `[min, max]`.
     models: { value: model<number | number[]>(0, { type: Number, form: true }) },
-    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
-    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    // On the host as custom states (#132); the root carries no state class.
+    states: ['disabled', 'invalid', 'dragging'],
+    parts: ['root', 'track', 'fill', 'thumb', 'mark'],
+    // The axes its stylesheet keys by (#629, #286), reflected on the host; each value maps the class
+    // that draws the same look on native markup. `md` and `horizontal` are the base, which no class
+    // adds to.
     variants: {
         /** sm, md (the default) or lg: the track's and thumb's size. */
         size: { md: '.pdx-slider-md', sm: '.pdx-slider-sm', lg: '.pdx-slider-lg' },
         /** primary (the default), success or warning: the fill's and thumb's colour. */
         color: { primary: '.pdx-slider-primary', success: '.pdx-slider-success', warning: '.pdx-slider-warning' },
+        /** horizontal (the default) or vertical. */
+        orientation: { horizontal: '.pdx-slider-horizontal', vertical: '.pdx-slider-vertical' },
     },
     props: {
         min: { type: Number, default: 0 },
@@ -36,7 +52,6 @@ component('pdx-slider', {
         /** What the slider sets ("Volume"): the thumb's name, and in range mode "{label}, minimum" /
          *  "{label}, maximum". Not needed after a pdx-label, which names it. */
         label: { type: String, default: '' },
-        orientation: { type: String, default: 'horizontal' },
         /** Comma-separated mark values, or "step" to show all steps */
         marks: { type: String, default: '' },
         /** Show value label on thumb while dragging */
@@ -254,16 +269,23 @@ component('pdx-slider', {
             }
         }
 
+        // The states (#132). The value label's two classes stay: they follow `showLabel` and
+        // `labelAlways`, two settings, not states of the control.
         function rootClass(): string {
             let cls = 'pdx-slider';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.error()) cls += ' error';
-            if ((ctx.orientation() as string) === 'vertical') cls += ' pdx-slider-vertical';
-            if (isDragging()) cls += ' pdx-slider-dragging';
             if (ctx.showLabel() || ctx.labelAlways()) cls += ' pdx-slider-has-label';
             if (ctx.labelAlways()) cls += ' pdx-slider-label-always';
             return cls;
         }
+
+        ctx.track(() => {
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('dragging', isDragging());
+        });
+
+        /** A thumb's aria-invalid: `error` set, or nothing. */
+        const invalid = () => (ctx.error() ? 'true' : null);
 
         // Init + sync
         let _bound = false;
@@ -308,6 +330,7 @@ component('pdx-slider', {
                             for (const v of values) {
                                 const mark = document.createElement('span');
                                 mark.className = 'pdx-slider-mark';
+                                mark.dataset.part = 'mark';
                                 const isVert = (ctx.orientation() as string) === 'vertical';
                                 if (isVert) mark.style.bottom = percent(v) + '%';
                                 else mark.style.left = percent(v) + '%';
@@ -340,16 +363,17 @@ component('pdx-slider', {
             },
         });
 
-        return { rootClass, isDragging };
+        return { rootClass, isDragging, invalid };
     },
     render: (ctx) => html`
         <div :class="${ctx.rootClass}" data-part="root" style="touch-action:none">
-            <div class="pdx-slider-track">
-                <div class="pdx-slider-fill"></div>
+            <div class="pdx-slider-track" data-part="track">
+                <div class="pdx-slider-fill" data-part="fill"></div>
             </div>
             <div class="pdx-slider-marks"></div>
             ${() => ctx.range() ? html`
-                <div class="pdx-slider-thumb pdx-slider-thumb-min" role="slider"
+                <div class="pdx-slider-thumb pdx-slider-thumb-min" data-part="thumb" role="slider"
+                    :aria-invalid="${ctx.invalid}"
                     tabindex="0" :aria-label="${() => ctx.label()
                         ? format(uiString('slider', 'minimumOf'), { label: ctx.label() as string })
                         : uiString('slider', 'minimum')}"
@@ -357,7 +381,8 @@ component('pdx-slider', {
                     :aria-orientation="${ctx.orientation}">
                     <span class="pdx-slider-label"></span>
                 </div>
-                <div class="pdx-slider-thumb pdx-slider-thumb-max" role="slider"
+                <div class="pdx-slider-thumb pdx-slider-thumb-max" data-part="thumb" role="slider"
+                    :aria-invalid="${ctx.invalid}"
                     tabindex="0" :aria-label="${() => ctx.label()
                         ? format(uiString('slider', 'maximumOf'), { label: ctx.label() as string })
                         : uiString('slider', 'maximum')}"
@@ -366,7 +391,8 @@ component('pdx-slider', {
                     <span class="pdx-slider-label"></span>
                 </div>
             ` : html`
-                <div class="pdx-slider-thumb" role="slider"
+                <div class="pdx-slider-thumb" data-part="thumb" role="slider"
+                    :aria-invalid="${ctx.invalid}"
                     tabindex="0" :aria-label="${() => ctx.ariaLabel() || ctx.label() || uiString('slider', 'value')}"
                     :aria-valuemin="${ctx.min}" :aria-valuemax="${ctx.max}" aria-valuenow="0"
                     :aria-orientation="${ctx.orientation}">

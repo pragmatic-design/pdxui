@@ -2608,6 +2608,14 @@
         {
           "id": "slider-color-warning",
           "title": "pdx-slider — color=\"warning\""
+        },
+        {
+          "id": "slider-orientation-horizontal",
+          "title": "pdx-slider — orientation=\"horizontal\""
+        },
+        {
+          "id": "slider-orientation-vertical",
+          "title": "pdx-slider — orientation=\"vertical\""
         }
       ]
     },
