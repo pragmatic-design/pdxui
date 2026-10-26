@@ -21980,16 +21980,6 @@
             },
             {
               "kind": "field",
-              "name": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'horizontal'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -22027,6 +22017,16 @@
               },
               "default": "'md'",
               "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "orientation",
+              "description": "horizontal (the default) or vertical: the segments in a row or a column.",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'",
+              "attribute": "orientation"
             },
             {
               "kind": "field",
@@ -22074,6 +22074,18 @@
                 "sm": ".pdx-segmented-sm",
                 "lg": ".pdx-segmented-lg"
               }
+            },
+            {
+              "name": "orientation",
+              "values": [
+                "horizontal",
+                "vertical"
+              ],
+              "default": "horizontal",
+              "native": {
+                "horizontal": ".pdx-segmented-horizontal",
+                "vertical": ".pdx-segmented-vertical"
+              }
             }
           ],
           "alphaEvents": [
@@ -22106,15 +22118,6 @@
                 "text": "boolean"
               },
               "default": "false"
-            },
-            {
-              "name": "orientation",
-              "fieldName": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'horizontal'"
             },
             {
               "name": "disabled",
@@ -22153,6 +22156,15 @@
               "default": "'md'"
             },
             {
+              "name": "orientation",
+              "fieldName": "orientation",
+              "description": "horizontal (the default) or vertical: the segments in a row or a column.",
+              "type": {
+                "text": "'horizontal' | 'vertical'"
+              },
+              "default": "'horizontal'"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "The current value.",
@@ -22160,6 +22172,22 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, the `radiogroup`."
+            },
+            {
+              "name": "item",
+              "description": "One segment, a `radio` button; the chosen one is `aria-checked`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set; every segment is disabled."
             }
           ]
         }

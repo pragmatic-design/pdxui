@@ -33,9 +33,22 @@
         <div class="opt-row"><code>options</code><span>string</span><span>JSON array: string[] or {label,value}[]</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
         <div class="opt-row"><code>full</code><span>boolean</span><span>Full width (stretch to container)</span></div>
-        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default), vertical</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default), vertical; reflected on the host</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
         <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value: string }</span><span>A choice wrote <code>value</code>; <code>::value</code> binds it both ways</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span></span><span><code>disabled</code> is set; every segment is disabled</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="item"]</code><span></span><span>The frame (<code>role="radiogroup"</code>), one segment (<code>role="radio"</code>, the chosen one <code>aria-checked</code>)</span></div>
       </div>
     </section>
   </div>

@@ -128,6 +128,9 @@
 
 /* ===== Vertical ===== */
 
-.pdx-segmented-vertical {
-    flex-direction: column;
+/* Keyed on pdx-segmented's `orientation` (#286); on native markup `.pdx-segmented-vertical`. */
+@variant orientation(vertical) {
+    :scope > [data-part="root"] {
+        flex-direction: column;
+    }
 }

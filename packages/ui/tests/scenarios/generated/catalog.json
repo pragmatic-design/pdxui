@@ -2475,6 +2475,14 @@
         {
           "id": "segmented-size-lg",
           "title": "pdx-segmented — size=\"lg\""
+        },
+        {
+          "id": "segmented-orientation-horizontal",
+          "title": "pdx-segmented — orientation=\"horizontal\""
+        },
+        {
+          "id": "segmented-orientation-vertical",
+          "title": "pdx-segmented — orientation=\"vertical\""
         }
       ]
     },

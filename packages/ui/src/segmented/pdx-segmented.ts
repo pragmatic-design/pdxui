@@ -26,6 +26,11 @@ interface SegmentOption {
 /**
  * A radio-group style selector: the user picks one of its segments, marked by a sliding indicator.
  *
+ * @csspart root - The frame, the `radiogroup`.
+ * @csspart item - One segment, a `radio` button; the chosen one is `aria-checked`.
+ *
+ * @cssstate disabled - `disabled` is set; every segment is disabled.
+ *
  * @alphaevent pdx-change
  * @alphaevent change
  * @alphadetail value $event.detail.value
@@ -34,17 +39,22 @@ component('pdx-segmented', {
     // A choice writes it (#480), and the write dispatches `value-change`. A form submits it, nothing
     // with no choice as a native radio group, and resets it (#135).
     models: { value: model('', { form: true }) },
-    // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
-    // draws the same look on native markup. `md` is the base size, which no class adds to.
+    // On the host as a custom state (#132).
+    states: ['disabled'],
+    parts: ['root', 'item'],
+    // The axes its stylesheet keys by (#629, #286), reflected on the host; each value maps the class
+    // that draws the same look on native markup. `md` and `horizontal` are the base, which no class
+    // adds to.
     variants: {
         /** sm, md (the default) or lg: the items' size. */
         size: { md: '.pdx-segmented-md', sm: '.pdx-segmented-sm', lg: '.pdx-segmented-lg' },
+        /** horizontal (the default) or vertical: the segments in a row or a column. */
+        orientation: { horizontal: '.pdx-segmented-horizontal', vertical: '.pdx-segmented-vertical' },
     },
     props: {
         /** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
         options: { type: Array, default: [] },
         full: { type: Boolean, default: false },
-        orientation: { type: String, default: 'horizontal' },
         disabled: { type: Boolean, default: false },
         name: { type: String, default: '' },
         label: { type: String, default: '' },
@@ -80,10 +90,14 @@ component('pdx-segmented', {
         function onKeydown(e: KeyboardEvent) {
             if (ctx.disabled()) return;
             const isVert = ctx.orientation() === 'vertical';
-            const items = ctx.el.querySelectorAll('.pdx-segmented-item:not([disabled])') as NodeListOf<HTMLElement>;
+            const items = ctx.el.querySelectorAll('[data-part="item"]:not([disabled])') as NodeListOf<HTMLElement>;
             if (!items || items.length === 0) return;
 
-            const current = Array.from(items).findIndex(el => el.getAttribute('aria-checked') === 'true');
+            // From the focused segment: with no choice made, the tab stop is the first enabled one, and
+            // the arrows move on from where the focus is.
+            const list = Array.from(items);
+            const focused = list.indexOf(document.activeElement as HTMLElement);
+            const current = focused !== -1 ? focused : list.findIndex(el => el.getAttribute('aria-checked') === 'true');
             let next = current;
 
             switch (e.key) {
@@ -116,11 +130,18 @@ component('pdx-segmented', {
             }
         }
 
-        function rootClass(): string {
-            let cls = 'pdx-segmented';
-            if (ctx.orientation() === 'vertical') cls += ' pdx-segmented-vertical';
-            return cls;
+        /**
+         * The segment that holds the tab stop: the chosen one, or the first enabled one when nothing
+         * is chosen — or the radio group could not be reached with Tab at all.
+         */
+        function tabStop(): string | undefined {
+            const opts = getOptions();
+            const enabled = ctx.disabled() ? [] : opts.filter((o) => !o.disabled);
+            const chosen = enabled.find((o) => o.value === ctx.value());
+            return (chosen ?? enabled[0])?.value;
         }
+
+        ctx.track(() => { ctx.state('disabled', !!ctx.disabled()); });
 
         // The radiogroup's name: `label`, or a pdx-label right before the host. Not bound as
         // :aria-label, which writes aria-label="" with no label.
@@ -146,11 +167,11 @@ component('pdx-segmented', {
             },
         });
 
-        return { getOptions, selectValue, onKeydown, rootClass };
+        return { getOptions, selectValue, onKeydown, tabStop };
     },
     render: (ctx: any) => html`
         <div
-            :class="${ctx.rootClass}"
+            class="pdx-segmented"
             data-part="root"
             role="radiogroup"
             :aria-orientation="${ctx.orientation}"
@@ -167,9 +188,10 @@ component('pdx-segmented', {
                         <button
                             type="button"
                             class="pdx-segmented-item"
+                            data-part="item"
                             role="radio"
                             :aria-checked="${() => isActive() ? 'true' : 'false'}"
-                            :tabindex="${() => isActive() ? '0' : '-1'}"
+                            :tabindex="${() => ctx.tabStop() === opt.value ? '0' : '-1'}"
                             :disabled="${isDisabled}"
                             data-value="${opt.value}"
                             @click="${() => !isDisabled() && ctx.selectValue(opt.value)}"
