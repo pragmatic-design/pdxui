@@ -73,7 +73,7 @@ describe('pdx-inline-edit focus', () => {
         await tick(20);
 
         expect(input(el)).toBeNull();
-        expect(el.querySelector('.pdx-inline-edit')?.classList.contains('editing')).toBe(false);
+        expect(el.querySelector<HTMLElement>('[data-part="editor"]')?.style.display).toBe('none');
         expect(el.querySelector('.pdx-inline-edit-display .pdx-inline-edit-text')?.textContent).toBe('Tabbed away');
         expect(changes).toEqual(['Tabbed away']);
         expect(document.activeElement).toBe(next);

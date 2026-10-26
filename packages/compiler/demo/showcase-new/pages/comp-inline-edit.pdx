@@ -60,6 +60,23 @@
         <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Value confirmed (Enter, blur, or button); <code>::value</code> binds it both ways</span></div>
         <div class="opt-row"><code>pdx-cancel</code><span>—</span><span>Edit cancelled (Escape or cancel button)</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Method</span><span>—</span><span>Description</span></div>
+        <div class="opt-row"><code>startEdit()</code><span></span><span>Open the editor, as a click does; nothing while disabled or readonly</span></div>
+        <div class="opt-row"><code>confirmEdit() / cancelEdit()</code><span></span><span>Save and close / close and keep the value (emits <code>pdx-cancel</code>)</span></div>
+        <div class="opt-row"><code>focus() / blur()</code><span></span><span>Focus or blur the display</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(disabled) / :state(readonly)</code><span></span><span><code>disabled</code> / <code>readonly</code> is set</span></div>
+        <div class="opt-row"><code>:state(editing)</code><span></span><span>The editor is open</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="display"] / [data-part="editor"]</code><span></span><span>The frame, the value at rest (<code>role="button"</code>), the editor's container</span></div>
+        <div class="opt-row"><code>[data-part="save"] / [data-part="cancel"]</code><span></span><span>The buttons of <code>saveOn="action"</code></span></div>
+      </div>
     </section>
   </div>
 </template>

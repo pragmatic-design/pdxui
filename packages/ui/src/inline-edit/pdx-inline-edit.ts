@@ -3,12 +3,11 @@
 // Supports: text, number, currency, date, datetime, boolean, select, multiselect,
 // color, rating, textarea.
 
-import { component, html, signal, untracked, model } from '@pdxui/core';
+import { component, event, html, signal, untracked, model } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 import { onControlValue } from '../shared/model-event';
 import { onPressOutside } from '../shared/press-outside';
-import { reflectNameToHost } from '../shared/own-prop';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -40,6 +39,16 @@ registerFormControl('pdx-inline-edit', {
 /**
  * A value the user clicks to edit in place, in the editor its `type` calls for.
  *
+ * @csspart root - The frame around the display and the editor.
+ * @csspart display - The value at rest, a `role="button"` that opens the editor.
+ * @csspart editor - The editor's container, shown while editing.
+ * @csspart save - The save button, with `save-on="action"`, while editing.
+ * @csspart cancel - The cancel button, with `save-on="action"`, while editing.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate editing - The editor is open.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  */
@@ -49,6 +58,13 @@ component('pdx-inline-edit', {
         /** Current value */
         value: model<unknown>(null, { type: Object, form: true }),
     },
+    events: {
+        /** The edit was cancelled: Escape, or the cancel button. The value is unchanged. */
+        'pdx-cancel': event<void>(),
+    },
+    // On the host as custom states (#132); the root carries no state class of its own.
+    states: ['disabled', 'readonly', 'editing'],
+    parts: ['root', 'display', 'editor', 'save', 'cancel'],
     props: {
         /** Data type — determines which editor to show */
         type: { type: String, default: 'text' },
@@ -97,7 +113,6 @@ component('pdx-inline-edit', {
             if (v === null || v === undefined) return null;
             return typeof v === 'object' ? JSON.stringify(v) : String(v);
         });
-        reflectNameToHost(ctx);
         let _rootEl: HTMLElement | null = null;
         /** Removes the press-outside listener, added when editing starts (#427). */
         let _outsideDispose: (() => void) | null = null;
@@ -419,12 +434,14 @@ component('pdx-inline-edit', {
                 const saveBtn = document.createElement('button');
                 saveBtn.type = 'button';
                 saveBtn.className = 'pdx-inline-edit-save';
+                saveBtn.dataset.part = 'save';
                 saveBtn.textContent = '✓';
                 saveBtn.setAttribute('aria-label', getComponentString('inline-edit', 'save')());
                 saveBtn.addEventListener('click', confirmEdit);
                 const cancelBtn = document.createElement('button');
                 cancelBtn.type = 'button';
                 cancelBtn.className = 'pdx-inline-edit-cancel';
+                cancelBtn.dataset.part = 'cancel';
                 cancelBtn.textContent = '✕';
                 cancelBtn.setAttribute('aria-label', getComponentString('inline-edit', 'cancel')());
                 cancelBtn.addEventListener('click', cancelEdit);
@@ -458,10 +475,12 @@ component('pdx-inline-edit', {
             const el = ctx.el;
             _rootEl = document.createElement('div');
             _rootEl.className = 'pdx-inline-edit';
+            _rootEl.dataset.part = 'root';
 
             // Display element (visible when not editing)
             _displayEl = document.createElement('div');
             _displayEl.className = 'pdx-inline-edit-display';
+            _displayEl.dataset.part = 'display';
             _displayEl.setAttribute('role', 'button');
             _displayEl.setAttribute('tabindex', '0');
 
@@ -480,6 +499,7 @@ component('pdx-inline-edit', {
             // Editor container (visible when editing)
             _editorEl = document.createElement('div');
             _editorEl.className = 'pdx-inline-edit-editor';
+            _editorEl.dataset.part = 'editor';
             _editorEl.style.display = 'none';
             // Focus leaving the editor saves it, as save-on="blur" says: otherwise Tab would move on
             // and leave it open, two editors at once. Only a move to somewhere else — the editor's own
@@ -496,6 +516,12 @@ component('pdx-inline-edit', {
             _domReady.set(true);
         });
 
+        ctx.track(() => {
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('editing', _editing());
+        });
+
         // ── Reactive update ──
         ctx.track(() => {
             if (!_domReady()) return;
@@ -508,10 +534,6 @@ component('pdx-inline-edit', {
 
             if (!_displayEl || !_editorEl || !_rootEl) return;
 
-            _rootEl.className = 'pdx-inline-edit'
-                + (disabled ? ' disabled' : '')
-                + (readonly_ ? ' readonly' : '')
-                + (editing ? ' editing' : '');
             // The type is an attribute: as a class, `pdx-inline-edit-${type}`, "text" and "textarea"
             // would be the value span's and the editor's own classes, and their styles would land on
             // the root.
@@ -564,13 +586,20 @@ component('pdx-inline-edit', {
 
         });
 
-        // Exposes the methods on the host: the setup's `return {}` gives them only to the render context,
-        // NOT to the DOM element. Without it, host.startEdit() (the imperative API) is undefined.
-        (ctx.el as unknown as Record<string, unknown>).startEdit = startEdit;
-        (ctx.el as unknown as Record<string, unknown>).confirmEdit = confirmEdit;
-        (ctx.el as unknown as Record<string, unknown>).cancelEdit = cancelEdit;
+        ctx.expose({
+            /** Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`. */
+            startEdit,
+            /** Save the edited value and close the editor. */
+            confirmEdit,
+            /** Close the editor and keep the value; emits `pdx-cancel`. */
+            cancelEdit,
+            focus() { _displayEl?.focus(); },
+            blur() { _displayEl?.blur(); },
+        });
 
         return { startEdit, confirmEdit, cancelEdit };
     },
+    // The host is the one submitter, under its name (#133). Written after `setup`, so its type is read.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

@@ -9,7 +9,7 @@
  *
  * ── DOM structure (built in a requestAnimationFrame, then filled by ctx.track) ──
  *   host <pdx-inline-edit>
- *     └── div.pdx-inline-edit[data-type=<type>]             (root, + .editing/.disabled/.readonly)
+ *     └── div.pdx-inline-edit[data-type=<type>]             (root; the states are the host's :state(editing|disabled|readonly), #286)
  *           The type is an attribute: as a class, `pdx-inline-edit-text`/`-textarea` would be the classes
  *           of the inner span and <textarea>, and their styles would end up on the root.
  *           ├── div.pdx-inline-edit-display[role=button][tabindex=0]   (visible while NOT editing)
@@ -105,7 +105,7 @@ export const inlineEdit: ComponentManifest = {
                     const host = document.querySelector('section:not([hidden]) [data-test="ie"]');
                     let tries = 0;
                     (function attempt() {
-                        if (host && typeof host.startEdit === 'function' && host.querySelector('.pdx-inline-edit-display')) {
+                        if (host && typeof host.startEdit === 'function' && host.querySelector('[data-part="display"]')) {
                             host.startEdit();
                         } else if (tries++ < 30) {
                             requestAnimationFrame(attempt);
@@ -122,17 +122,17 @@ export const inlineEdit: ComponentManifest = {
             'inline-edit-display': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                         description: 'display is clickable (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                         description: 'display is tall enough to be a touch/click target',
                         height: { op: '>=', value: 24 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                         description: 'display has non-negative border radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -145,7 +145,7 @@ export const inlineEdit: ComponentManifest = {
                     {
                         // The root must not take overflow:hidden from the value's span: in edit mode
                         // it would cut the input's focus ring.
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'the root does not clip (the editor focus ring shows)',
                         overflow: { op: 'is', value: 'visible' },
                     },
@@ -154,9 +154,9 @@ export const inlineEdit: ComponentManifest = {
                 composition: [
                     {
                         description: 'display text is contained within the display box',
-                        parent: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                        parent: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                         children: {
-                            display: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                            display: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                             text: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-text',
                         },
                         relations: [
@@ -175,17 +175,17 @@ export const inlineEdit: ComponentManifest = {
             'inline-edit-textarea-display': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'textarea root in display mode draws no field border',
                         border: { all: { width: { op: '==', value: 0 } } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'textarea root in display mode draws no focus ring',
                         boxShadow: { op: 'is', value: 'none' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'textarea root in display mode has no editor min-height',
                         minHeight: { op: '<', value: 60 },
                     },
@@ -194,14 +194,23 @@ export const inlineEdit: ComponentManifest = {
             'inline-edit-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'disabled inline-edit has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
                         description: 'disabled inline-edit disables pointer events',
                         pointerEvents: { op: 'is', value: 'none' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled inline-edit is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ie"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },
@@ -209,23 +218,41 @@ export const inlineEdit: ComponentManifest = {
                 standalone: [
                     {
                         // While readonly the display must not suggest it is editable (the default cursor).
-                        selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="display"]',
                         description: 'readonly display uses default cursor (not editable)',
                         cursor: { op: 'is', value: 'default' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a readonly inline-edit is the custom state :state(readonly)',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ie"]', name: 'readonly' },
+                        changes: {},
                     },
                 ],
             },
             'inline-edit-editing': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] input.pdx-inline-edit-input',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="editor"] input',
                         description: 'edit mode renders a text input',
                         width: { op: '>', value: 0 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="ie"] input.pdx-inline-edit-input',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="editor"] input',
                         description: 'edit input is tall enough to be usable',
                         height: { op: '>=', value: 20 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'an open editor is the custom state :state(editing)',
+                        selector: 'section:not([hidden]) [data-test="ie"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ie"]', name: 'editing' },
+                        changes: {},
                     },
                 ],
             },
@@ -246,20 +273,20 @@ export const inlineEdit: ComponentManifest = {
     isolation: {
         scenario: 'inline-edit-display',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ie"] [data-part="display"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA) ──
     // The display is a focusable role=button (tabindex=0). Tab → focus; Enter enters edit mode
-    // (the keydown handler for Enter and Space → startEdit), and the expectation is that the root gains the .editing class.
+    // (the keydown handler for Enter and Space → startEdit), and the expectation is that the editor's input takes the focus.
     // Escape cancels and the focus returns to the display, not to <body>.
     keyboard: {
         scenario: 'inline-edit-display',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display' },
-            { key: 'Enter', expectFocus: 'section:not([hidden]) [data-test="ie"] input.pdx-inline-edit-input' },
-            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="ie"] .pdx-inline-edit-display' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="ie"] [data-part="display"]' },
+            { key: 'Enter', expectFocus: 'section:not([hidden]) [data-test="ie"] [data-part="editor"] input' },
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="ie"] [data-part="display"]' },
         ],
     },
 
@@ -268,7 +295,7 @@ export const inlineEdit: ComponentManifest = {
     visual: {
         scenarios: ['inline-edit-display', 'inline-edit-editing', 'inline-edit-textarea-display'],
         // The editor's input shows a blinking caret (input.focus() in edit mode) → masked.
-        mask: ['section:not([hidden]) [data-test="ie"] input.pdx-inline-edit-input'],
+        mask: ['section:not([hidden]) [data-test="ie"] [data-part="editor"] input'],
     },
 };
 

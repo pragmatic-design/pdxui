@@ -113,7 +113,7 @@
                     const host = document.querySelector('section:not([hidden]) [data-test="ie"]');
                     let tries = 0;
                     (function attempt() {
-                        if (host && typeof host.startEdit === 'function' && host.querySelector('.pdx-inline-edit-display')) {
+                        if (host && typeof host.startEdit === 'function' && host.querySelector('[data-part="display"]')) {
                             host.startEdit();
                         } else if (tries++ < 30) {
                             requestAnimationFrame(attempt);

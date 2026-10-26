@@ -5,8 +5,10 @@ pdx-inline-edit {
     min-width: 60px;
 }
 
-/* When editing, expand to give editors room */
-pdx-inline-edit:has(.editing) {
+/* When editing, expand to give editors room: the host's custom state (#286), or a native
+   `.pdx-inline-edit.editing` inside it. */
+pdx-inline-edit:has(.editing),
+pdx-inline-edit:state(editing) {
     min-width: 200px;
 }
 
@@ -16,12 +18,16 @@ pdx-inline-edit:has(.editing) {
     font-size: var(--pdx-text-sm);
 }
 
-.pdx-inline-edit.disabled {
+/* A native class, or pdx-inline-edit's custom state on its host (#286), at the same weight:
+   `:state(disabled) > .pdx-inline-edit` is (0,2,0), as `.pdx-inline-edit.disabled` is. */
+.pdx-inline-edit.disabled,
+:state(disabled) > .pdx-inline-edit {
     opacity: 0.5;
     pointer-events: none;
 }
 
-.pdx-inline-edit.readonly .pdx-inline-edit-display {
+.pdx-inline-edit.readonly .pdx-inline-edit-display,
+:state(readonly) > .pdx-inline-edit .pdx-inline-edit-display {
     cursor: default;
 }
 

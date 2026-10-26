@@ -14352,6 +14352,36 @@
                 "text": "unknown"
               },
               "default": "null"
+            },
+            {
+              "kind": "method",
+              "name": "startEdit",
+              "parameters": [],
+              "description": "Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`."
+            },
+            {
+              "kind": "method",
+              "name": "confirmEdit",
+              "parameters": [],
+              "description": "Save the edited value and close the editor."
+            },
+            {
+              "kind": "method",
+              "name": "cancelEdit",
+              "parameters": [],
+              "description": "Close the editor and keep the value; emits `pdx-cancel`."
+            },
+            {
+              "kind": "method",
+              "name": "focus",
+              "parameters": [],
+              "description": "Moves focus to it."
+            },
+            {
+              "kind": "method",
+              "name": "blur",
+              "parameters": [],
+              "description": "Removes focus from it."
             }
           ],
           "models": [
@@ -14365,19 +14395,19 @@
           },
           "events": [
             {
+              "name": "pdx-cancel",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The edit was cancelled: Escape, or the cancel button. The value is unchanged."
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: unknown }"
-            },
-            {
-              "name": "pdx-cancel",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when cancelled."
             }
           ],
           "roles": [
@@ -14500,6 +14530,42 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame around the display and the editor."
+            },
+            {
+              "name": "display",
+              "description": "The value at rest, a `role=\"button\"` that opens the editor."
+            },
+            {
+              "name": "editor",
+              "description": "The editor's container, shown while editing."
+            },
+            {
+              "name": "save",
+              "description": "The save button, with `save-on=\"action\"`, while editing."
+            },
+            {
+              "name": "cancel",
+              "description": "The cancel button, with `save-on=\"action\"`, while editing."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "editing",
+              "description": "The editor is open."
             }
           ]
         }

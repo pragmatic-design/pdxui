@@ -131,10 +131,12 @@ describe('pdx-inline-edit', () => {
         expect(swatch).toBeTruthy();
     });
 
-    it('applies disabled class', async () => {
+    // Disabled is the host's custom state now (#286), which happy-dom does not match: the browser spec
+    // inline-edit-beta-contract measures it. The root keeps no class for it.
+    it('carries no disabled class on its root', async () => {
         const el = await mountInlineEdit({ disabled: true, value: 'X' });
-        const root = el.querySelector('.pdx-inline-edit');
-        expect(root?.classList.contains('disabled')).toBe(true);
+        const root = el.querySelector('[data-part="root"]');
+        expect(root?.classList.contains('disabled')).toBe(false);
     });
 
     it('does not enter edit mode when disabled', async () => {

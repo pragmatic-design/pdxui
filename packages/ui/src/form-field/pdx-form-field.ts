@@ -239,9 +239,11 @@ component('pdx-form-field', {
                 // Find the first focusable input element. Never a hidden input: it is what a
                 // component submits, not what a person reaches — the time picker's is the only
                 // input in its group, and the label's `for` would name it.
-                const input = el.querySelector(
+                // Last, pdx-inline-edit at rest: its display is the control until the editor opens, and
+                // the editor's text box, found first, takes over while it is open (#286).
+                const input = (el.querySelector(
                     'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"]'
-                ) as HTMLElement | null;
+                ) ?? el.querySelector('pdx-inline-edit [data-part="display"]')) as HTMLElement | null;
                 if (!input) {
                     nameSliders(el, hasLabel);
                     return;
@@ -349,6 +351,15 @@ component('pdx-form-field', {
                     const radiogroup = group.matches('[role="radiogroup"]');
                     for (const target of radiogroup ? [group] : boxes) markAttr(target, 'aria-invalid', err, _markedInvalid);
                     if (!radiogroup) for (const box of boxes) markAttr(box, 'aria-required', required, _markedRequired);
+                }
+
+                // An inline edit's display is a role="button" holding the value. It may carry neither
+                // aria-invalid nor aria-required, so it is named by the label and its own value — "Name,
+                // Ada", the label's marker read with it — and described by the hint and the error (#286).
+                if (input.matches('pdx-inline-edit [data-part="display"]')) {
+                    if (!input.id) input.id = inputId + '-display';
+                    markAttr(input, 'aria-labelledby', hasLabel, _labelledByField, `${labelId} ${input.id}`);
+                    markAttr(input, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
                 }
 
                 // Propagate disabled/error/size to WC children
