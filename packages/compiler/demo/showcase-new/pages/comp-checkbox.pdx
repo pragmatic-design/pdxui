@@ -44,7 +44,7 @@
         <div class="opt-row"><code>labelPosition</code><span>string</span><span>right (default), left</span></div>
         <div class="opt-row"><code>error</code><span>boolean</span><span>Red border for validation</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
-        <div class="opt-row"><code>value</code><span>string</span><span>Value in event detail</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>What a form submits under <code>name</code> while it is checked (default <code>on</code>); nothing while unchecked</span></div>
         <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
       </div>
 
@@ -53,6 +53,14 @@
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>checked-change</code><span>{ value: boolean }</span><span>A click wrote <code>checked</code>; <code>::checked</code> binds it both ways</span></div>
         <div class="opt-row"><code>indeterminate-change</code><span>{ value: boolean }</span><span>A click wrote <code>indeterminate</code> (a tristate cycle, or settling a mixed box)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(checked) / :state(indeterminate)</code><span></span><span>Checked / mixed (the box is <code>aria-checked="mixed"</code>)</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span></span><span><code>error</code> / <code>disabled</code> is set; with <code>error</code> the box is <code>aria-invalid</code></span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="label"] / [data-part="description"]</code><span></span><span>The box (the native checkbox), the label, the description</span></div>
       </div>
     </section>
   </div>

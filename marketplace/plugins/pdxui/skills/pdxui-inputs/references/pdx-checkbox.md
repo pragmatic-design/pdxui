@@ -19,6 +19,10 @@ On/off box with an indeterminate state.
 
 **Events:** `checked-change` → `detail: { value: boolean }` — Fired when the component writes `checked`. Does not bubble.; `indeterminate-change` → `detail: { value: boolean }` — Fired when the component writes `indeterminate`. Does not bubble.
 
+**States:** `:state(checked)` — It is checked.; `:state(indeterminate)` — It is indeterminate; the box is aria-checked="mixed".; `:state(invalid)` — `error` is set; the box is aria-invalid.; `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The native checkbox, the box drawn; the size variants key by it.; `[data-part="label"]` — The `label` text, when set.; `[data-part="description"]` — The `description` text, when set.
+
 
 #### Examples
 

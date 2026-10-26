@@ -379,6 +379,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-checkbox`, `pdx-radio` and `pdx-switch` take the beta contract (#286).
+  - **States.** `checked`, `invalid` and `disabled` are custom states on the host, with
+    `indeterminate` on the checkbox and `loading` on the switch. The controls no longer carry
+    `pdx-checkbox-error`, `pdx-radio-error`, `pdx-toggle-error` or `pdx-toggle-loading`, nor their
+    wrappers `disabled`.
+  - **Parts.** `root` stays the native control (the size variants key by it, #664); `label` and
+    `description` join it.
+  - **pdx-switch's A-rules.** With `error` it is `aria-invalid`, and while `loading` it is
+    `aria-busy`: neither was marked before.
+  - **Form value.** Unchanged and now measured: the element's `value` (or `on`) when checked, no
+    entry otherwise. `name` is a host binding on all three.
 - `pdx-json-editor` has a certification manifest and a showcase page (#286): its contract,
   axe, hostile CSS and keyboard in all 13 themes, and visual baselines of the editor and of its
   open sub-modal. The site's gallery is ported from the showcase page, like the others; the page

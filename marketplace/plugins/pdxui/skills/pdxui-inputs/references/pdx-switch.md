@@ -28,6 +28,10 @@ Toggle a setting on or off.
 
 **Renders:** roles `switch`
 
+**States:** `:state(checked)` — It is on.; `:state(invalid)` — `error` is set; the switch is aria-invalid.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — `loading` is set; the switch is aria-busy and takes no toggle.
+
+**Parts:** `[data-part="root"]` — The native checkbox with role="switch", the track drawn; the size variants key by it.; `[data-part="label"]` — The `label` text, when set.; `[data-part="description"]` — The `description` text, when set.
+
 
 #### Examples
 

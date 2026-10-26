@@ -47,8 +47,10 @@
 @variant pdx-checkbox size(sm) { :scope > :where(label) > [data-part="root"] { width: 1rem; height: 1rem; } }
 @variant pdx-checkbox size(lg) { :scope > :where(label) > [data-part="root"] { width: 1.5rem; height: 1.5rem; } }
 
-/* Checkbox error */
-.pdx-checkbox-error { border-color: var(--pdx-color-danger); }
+/* Checkbox error: a native `.pdx-checkbox-error`, or pdx-checkbox's custom state (#286), at the same
+   weight — (0,1,0). The same pairing for the radio and the switch below. */
+.pdx-checkbox-error,
+:where(:state(invalid) > label) > .pdx-checkbox { border-color: var(--pdx-color-danger); }
 
 /* Checkbox wrapper — label + description layout */
 .pdx-checkbox-wrap {
@@ -58,7 +60,8 @@
     cursor: pointer;
     user-select: none;
 }
-.pdx-checkbox-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-checkbox-wrap.disabled,
+:state(disabled) > .pdx-checkbox-wrap { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 .pdx-checkbox-wrap.pdx-checkbox-label-left { flex-direction: row-reverse; }
 
 .pdx-checkbox-content {
@@ -115,7 +118,8 @@
 }
 
 /* Radio error */
-.pdx-radio-error { border-color: var(--pdx-color-danger); }
+.pdx-radio-error,
+:where(:state(invalid) > label) > .pdx-radio { border-color: var(--pdx-color-danger); }
 
 /* Radio wrapper — same pattern as checkbox */
 .pdx-radio-wrap {
@@ -125,7 +129,8 @@
     cursor: pointer;
     user-select: none;
 }
-.pdx-radio-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+.pdx-radio-wrap.disabled,
+:state(disabled) > .pdx-radio-wrap { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 .pdx-radio-wrap.pdx-radio-label-left { flex-direction: row-reverse; }
 
 .pdx-radio-content {
@@ -216,17 +221,21 @@
 }
 
 /* Toggle error */
-.pdx-toggle-error { background: oklch(from var(--pdx-color-danger) l c h / 0.3); }
-.pdx-toggle-error:checked { background: var(--pdx-color-danger); }
+.pdx-toggle-error,
+:where(:state(invalid) > label) > .pdx-toggle { background: oklch(from var(--pdx-color-danger) l c h / 0.3); }
+.pdx-toggle-error:checked,
+:where(:state(invalid) > label) > .pdx-toggle:checked { background: var(--pdx-color-danger); }
 
 /* Toggle loading — spinner replaces thumb dot */
-.pdx-toggle-loading::before {
+.pdx-toggle-loading::before,
+:where(:state(loading) > label) > .pdx-toggle::before {
     border: 2px solid oklch(0 0 0 / 0.15);
     border-top-color: var(--pdx-color-primary);
     background: white;
     animation: pdx-input-spin 0.6s linear infinite;
 }
-.pdx-toggle-loading:checked::before {
+.pdx-toggle-loading:checked::before,
+:where(:state(loading) > label) > .pdx-toggle:checked::before {
     border-color: oklch(1 0 0 / 0.3);
     border-top-color: white;
 }
@@ -239,7 +248,9 @@
     cursor: pointer;
     user-select: none;
 }
-.pdx-switch-wrap.disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
+/* A loading switch takes no toggle, and is dimmed as a disabled one. */
+.pdx-switch-wrap.disabled,
+:is(:state(disabled), :state(loading)) > .pdx-switch-wrap { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 .pdx-switch-wrap.pdx-switch-label-left { flex-direction: row-reverse; }
 
 /* In a form field, the switch is a control beside text fields: its box is as tall as theirs, at the
