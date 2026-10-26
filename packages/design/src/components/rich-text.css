@@ -109,8 +109,8 @@
   opacity: 0.6;
 }
 
-/* Read-only */
-.pdx-rt-readonly { cursor: default; user-select: text; }
+/* Read-only: the host's custom state (#286). */
+pdx-rich-text:state(readonly) .pdx-rt-content { cursor: default; user-select: text; }
 
 /* ── Typography ────────────────────────────────────────────────── */
 

@@ -241,8 +241,9 @@ component('pdx-form-field', {
                 // input in its group, and the label's `for` would name it.
                 // Last, pdx-inline-edit at rest: its display is the control until the editor opens, and
                 // the editor's text box, found first, takes over while it is open (#286).
+                // A contenteditable `role="textbox"` — pdx-rich-text's editing area — is a control too.
                 const input = (el.querySelector(
-                    'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"]'
+                    'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"], [role="textbox"]'
                 ) ?? el.querySelector('pdx-inline-edit [data-part="display"]')) as HTMLElement | null;
                 if (!input) {
                     nameSliders(el, hasLabel);
@@ -253,9 +254,12 @@ component('pdx-form-field', {
                 // reaches: taken as the control, the label's `for` would name the first radio «Gender
                 // Female» and leave the group unnamed.
                 const group = input.matches('[role="radiogroup"], [role="group"]') ? input : null;
+                // A textbox is the control itself: an <input> inside it is content — a rich text's
+                // task-list checkbox — not the field.
+                const textbox = input.matches('[role="textbox"]') ? input : null;
 
                 // Set input ID for label htmlFor
-                const nativeInput = group ? null : input.matches('input, textarea, select')
+                const nativeInput = group || textbox ? null : input.matches('input, textarea, select')
                     ? input
                     : input.querySelector<HTMLElement>('input:not([type="hidden"]), textarea, select');
                 if (nativeInput && !nativeInput.id) {
@@ -263,9 +267,9 @@ component('pdx-form-field', {
                 }
 
                 // A control that is no labelable element — pdx-select's trigger, a role="combobox"
-                // <div> — cannot be reached by the label's `for`: it is named by the label's id, and
-                // takes the rest of the wiring where an input would.
-                const combobox = !nativeInput && input.matches('[role="combobox"]') ? input : null;
+                // <div>, a contenteditable textbox — cannot be reached by the label's `for`: it is named
+                // by the label's id, and takes the rest of the wiring where an input would.
+                const combobox = nativeInput ? null : textbox ?? (input.matches('[role="combobox"]') ? input : null);
                 const control = nativeInput ?? combobox;
 
                 // Named by the label's id — `aria-labelledby` outranks both an aria-label and a

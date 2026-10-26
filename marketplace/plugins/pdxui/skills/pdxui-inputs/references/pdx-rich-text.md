@@ -98,7 +98,11 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 | `setHTML(markup)` | Replace the document with this HTML, waiting for the editor when it is not built yet. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-focus` — Fired when it receives focus.; `pdx-ready` — Fired on `pdx-ready`.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — The editing area lost focus.; `pdx-focus` — The editing area received focus.; `pdx-ready` → `detail: { editor: EditorView }` — The editor is built; the imperative API has been there since setup.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
+
+**States:** `:state(readonly)` — `readonly` is set; the text is not editable and the textbox is aria-readonly.
+
+**Parts:** `[data-part="toolbar"]` — The formatting toolbar, with `toolbar-mode="top"`.; `[data-part="field"]` — The frame around the text: its height and scrolling.; `[data-part="input"]` — The editing area, a contenteditable `role="textbox"`.
 
 
 #### Examples
