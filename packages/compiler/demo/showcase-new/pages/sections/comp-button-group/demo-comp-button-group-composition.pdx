@@ -6,19 +6,19 @@
     <div class="comp-card">
       <div class="comp-toolbar">
         <h3 class="pdx-txt-subheading" style="flex:1">Document Editor</h3>
-        <pdx-button-group mode="multiple" label="Formatting" :value="formatting" variant="ghost" size="sm" @pdx-change="onFormatting">
-          <pdx-button value="bold"><strong>B</strong></pdx-button>
-          <pdx-button value="italic"><em>I</em></pdx-button>
-          <pdx-button value="underline"><u>U</u></pdx-button>
+        <pdx-button-group label="History" variant="ghost" size="sm">
+          <pdx-button aria-label="Undo" @click="act('Undo')"><pdx-icon name="undo" size="sm"></pdx-icon></pdx-button>
+          <pdx-button aria-label="Redo" @click="act('Redo')"><pdx-icon name="redo" size="sm"></pdx-icon></pdx-button>
         </pdx-button-group>
-        <pdx-button-group mode="single" label="Alignment" :value="alignment" variant="ghost" size="sm" @pdx-change="onAlignment">
-          <pdx-button value="left" aria-label="Align left"><pdx-icon name="align-left" size="sm"></pdx-icon></pdx-button>
-          <pdx-button value="center" aria-label="Align center"><pdx-icon name="align-center" size="sm"></pdx-icon></pdx-button>
-          <pdx-button value="right" aria-label="Align right"><pdx-icon name="align-right" size="sm"></pdx-icon></pdx-button>
+        <pdx-button-group label="Clipboard" variant="ghost" size="sm">
+          <pdx-button aria-label="Cut" @click="act('Cut')"><pdx-icon name="scissors" size="sm"></pdx-icon></pdx-button>
+          <pdx-button aria-label="Copy" @click="act('Copy')"><pdx-icon name="copy" size="sm"></pdx-icon></pdx-button>
+          <pdx-button aria-label="Paste" @click="act('Paste')"><pdx-icon name="clipboard" size="sm"></pdx-icon></pdx-button>
         </pdx-button-group>
       </div>
       <div class="comp-body pdx-txt-small pdx-ink-muted">
-        Formatting: {{ formatting || 'none' }} | Alignment: {{ alignment || 'none' }}
+        Last action: {{ last || 'none' }}. Formatting and alignment, which select, are a
+        <code>&lt;pdx-toggle-group&gt;</code>.
       </div>
     </div>
 
@@ -36,15 +36,9 @@
 </template>
 
 <script>
-import { useButtonGroupDemo } from './state.pdx';
+let last = $signal('');
 
-// The same alignment and formatting the toggle sections above set.
-const demo = useButtonGroupDemo();
-const formatting = $derived(demo.formatting());
-const alignment = $derived(demo.alignment());
-
-function onFormatting(e) { demo.onFormatting(e); }
-function onAlignment(e) { demo.onAlignment(e); }
+function act(name) { last = name; }
 </script>
 
 <style scoped>

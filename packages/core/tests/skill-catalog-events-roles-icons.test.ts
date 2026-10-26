@@ -32,8 +32,9 @@ describe('events carry their detail', () => {
         expect(page).toContain('`pdx-add` → `detail: { tag: string; tags: string[] }`');
     });
 
-    it('a detail declared with a typed @fires shows up too — pdx-button-group passes a string', () => {
-        expect(entry('display', 'pdx-button-group')).toContain('`pdx-change` → `detail: string`');
+    // pdx-button-group's string detail was the example until its selection modes left it (#286).
+    it('a detail declared with a typed @fires shows up too — pdx-command passes the item', () => {
+        expect(entry('navigation', 'pdx-command')).toContain('`pdx-select` → `detail: CommandItem`');
     });
 });
 

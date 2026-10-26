@@ -229,7 +229,6 @@ export const scenarioPage: Record<string, string> = {
     "bottom-sheet-open": "tier-2a",
     "breadcrumb-basic": "tier-6",
     "button-group-basic": "tier-1a",
-    "button-group-single": "tier-1a",
     "button-variants": "tier-1a",
     "button-sizes": "tier-1a",
     "button-disabled": "tier-1a",

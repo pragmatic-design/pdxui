@@ -6,7 +6,9 @@
  *       · the styled class is on the HOST <pdx-button-group>, set in ctx.track:
  *         `el.classList.toggle('pdx-btn-group', …)` (or 'pdx-btn-group-vertical' when orientation=vertical).
  *       · render() = <slot></slot>: the <pdx-button> elements are projected as direct children of the host.
- *       · An action group (mode="none", the default): visual grouping only, role="group".
+ *       · An action group: visual grouping only, role="group". Its selection modes left it in #286
+ *         (decision 51): selecting among buttons is pdx-toggle-group, whose radio group the
+ *         toggle-group manifest's keyboard block measures.
  *   - CSS: packages/design/src/surfaces/buttons.css
  *       · `.pdx-btn-group { display: inline-flex }` (host).
  *       · `.pdx-btn-group > pdx-button { display: contents }` → the REAL flex child is each
@@ -44,18 +46,6 @@ export const buttonGroup: ComponentManifest = {
                     <pdx-button data-test="bg-first" value="left">Left</pdx-button>
                     <pdx-button data-test="bg-mid" value="center">Center</pdx-button>
                     <pdx-button data-test="bg-last" value="right">Right</pdx-button>
-                </pdx-button-group>`,
-        },
-        {
-            // mode="single" is an APG radio group: radios with aria-checked inside the
-            // radiogroup, the tab stop on the selected one, and the arrows moving both focus AND selection.
-            id: 'button-group-single',
-            title: 'Button Group — single selection (radio group)',
-            html: `
-                <pdx-button-group data-test="bgs" mode="single" value="center" label="Text alignment">
-                    <pdx-button data-test="bgs-left" value="left">Left</pdx-button>
-                    <pdx-button data-test="bgs-center" value="center">Center</pdx-button>
-                    <pdx-button data-test="bgs-right" value="right">Right</pdx-button>
                 </pdx-button-group>`,
         },
     ],
@@ -151,9 +141,7 @@ export const buttonGroup: ComponentManifest = {
     // ── Dim. 2: axe-core ──
     a11y: {
         // role="group" plus aria-label on the host; every button has a text label → WCAG clean.
-        // single: a radiogroup holding radios, not buttons with aria-pressed
-        // (aria-required-children).
-        scenarios: ['button-group-basic', 'button-group-single'],
+        scenarios: ['button-group-basic'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -167,25 +155,8 @@ export const buttonGroup: ComponentManifest = {
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA) ──
-    // The pattern with a keyboard to check is the radio group (mode="single"): from the
-    // selected radio, ArrowRight moves the focus and aria-checked to the next one, and from the last
-    // one it wraps to the first. The action group (mode="none") has no keyboard of its own: native Tab.
-    keyboard: {
-        scenario: 'button-group-single',
-        initialFocus: 'pdx-button-group[data-test="bgs"] [data-test="bgs-center"] button',
-        steps: [
-            {
-                key: 'ArrowRight',
-                expectFocus: 'pdx-button-group[data-test="bgs"] [data-test="bgs-right"] button',
-                expectAttr: { selector: 'pdx-button-group[data-test="bgs"] [data-test="bgs-right"] button', name: 'aria-checked', value: 'true' },
-            },
-            {
-                key: 'ArrowRight',
-                expectFocus: 'pdx-button-group[data-test="bgs"] [data-test="bgs-left"] button',
-                expectAttr: { selector: 'pdx-button-group[data-test="bgs"] [data-test="bgs-left"] button', name: 'aria-checked', value: 'true' },
-            },
-        ],
-    },
+    // None: an action group has no keyboard of its own, its buttons take native Tab. The radio group
+    // the selection mode had is pdx-toggle-group's now, measured by its manifest (#286).
 
     // ── Dim. 5: visual regression (Docker) ──
     visual: {

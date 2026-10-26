@@ -379,6 +379,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-button-group` loses its selection modes (#286, decision 51): selecting among
+  buttons is `pdx-toggle-group`. `mode`, `value` and `pdx-change` are gone; the button group is the
+  action group, `role="group"`, with no state on its buttons.
+  - `pdx migrate` rewrites `<pdx-button-group mode="single|multiple">` whose children are plain
+    buttons holding text to `<pdx-toggle-group type="…">` with `pdx-toggle` items. Each item keeps its
+    `value` or takes its text as one. The group's `variant` stays when outline or ghost; any other is
+    `solid`.
+  - An inline `@pdx-change` handler becomes `@value-change`, its `detail` read as `detail.value`.
+  - A group it cannot rewrite is flagged with the reason: an icon child, a binding on a button, a
+    handler that is a reference, a bound mode or variant. In a `.pdx`, `mode` on the group is
+    `PDX_REMOVED_FORM`. `mode="none"` is dropped.
+  - A migrated single group differs in one way: a click on the checked toggle clears the value.
 - `pdx-toggle-group type="single"` is an APG radio group (#286), the pattern `pdx-button-group`'s
   `mode="single"` has, so that mode can move here: the host is a `radiogroup` with
   `aria-orientation`, each toggle a `radio` with `aria-checked`. It has one tab stop, on the checked

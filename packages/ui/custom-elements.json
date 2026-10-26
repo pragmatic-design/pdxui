@@ -3162,18 +3162,8 @@
           "tagName": "pdx-button-group",
           "category": "Atoms",
           "order": 2,
-          "description": "Groups buttons, either visually as an action group or as a toggle group with single or multiple\nselection, and passes variant, size and disabled on to its buttons.",
+          "description": "Groups action buttons visually, and passes variant, size and disabled on to its buttons. To select\namong buttons, use `pdx-toggle-group`.",
           "members": [
-            {
-              "kind": "field",
-              "name": "mode",
-              "description": "Selection behaviour: 'none', 'single' or 'multiple'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'none'",
-              "attribute": "mode"
-            },
             {
               "kind": "field",
               "name": "orientation",
@@ -3206,16 +3196,6 @@
             },
             {
               "kind": "field",
-              "name": "value",
-              "description": "The selection. `single`: the checked button's `value`. `multiple`: every pressed button's\n`value`, joined by `,` — `\"bold,italic\"`. A button without `value` is identified by its text.",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "disabled",
               "description": "Disables interaction and dims the control.",
               "type": {
@@ -3235,31 +3215,10 @@
               "attribute": "label"
             }
           ],
-          "events": [
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "The detail is the value itself, not an object: the pressed button's `value` in single mode, every pressed value joined by `,` in multiple mode.",
-              "detail": "string"
-            }
-          ],
           "roles": [
-            "group",
-            "radio",
-            "radiogroup"
+            "group"
           ],
           "attributes": [
-            {
-              "name": "mode",
-              "fieldName": "mode",
-              "description": "Selection behaviour: 'none', 'single' or 'multiple'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'none'"
-            },
             {
               "name": "orientation",
               "fieldName": "orientation",
@@ -3282,15 +3241,6 @@
               "name": "size",
               "fieldName": "size",
               "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "The selection. `single`: the checked button's `value`. `multiple`: every pressed button's\n`value`, joined by `,` — `\"bold,italic\"`. A button without `value` is identified by its text.",
               "type": {
                 "text": "string"
               },

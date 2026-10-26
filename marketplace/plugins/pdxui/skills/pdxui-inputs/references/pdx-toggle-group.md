@@ -36,7 +36,7 @@ are checked against the manifest above._
 </pdx-toggle-group>
 ```
 
-**Multiple** — Any number pressed. The event carries both forms: `detail.value` (`"bold,italic"`) and `detail.values` (an array). _(from the live demo)_
+**Multiple** — Any number pressed. `value-change` carries the comma-separated selection in `detail.value` (`"bold,italic"`); `value.split(',')` is the list. _(from the live demo)_
 
 ```html
 <div class="demo-row">

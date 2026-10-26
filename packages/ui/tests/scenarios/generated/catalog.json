@@ -520,10 +520,6 @@
         {
           "id": "button-group-basic",
           "title": "Button Group — 3 connected buttons"
-        },
-        {
-          "id": "button-group-single",
-          "title": "Button Group — single selection (radio group)"
         }
       ]
     },

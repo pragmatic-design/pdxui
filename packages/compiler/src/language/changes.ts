@@ -40,6 +40,7 @@ import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-for
 import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './form-fields';
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
+import { buttonGroupModes } from './button-group-modes';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -400,6 +401,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     otpInputMaskDefaults,
     pinInputRemoved,
     pinInputStrings,
+    // #286: `pdx-button-group`'s selection modes are `pdx-toggle-group` (./button-group-modes).
+    buttonGroupModes,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
