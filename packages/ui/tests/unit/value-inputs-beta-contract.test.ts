@@ -76,6 +76,12 @@ const DONE: Row[] = [
         states: ['disabled', 'readonly', 'editing'],
         parts: ['root', 'display', 'editor', 'save', 'cancel'],
     },
+    {
+        tag: 'pdx-rich-text',
+        model: 'value',
+        states: ['readonly'],
+        parts: ['toolbar', 'field', 'input'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

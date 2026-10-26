@@ -8,7 +8,7 @@
 // setup — before `pdx-ready` and before anything can call it — so it shadows the platform's own
 // Element.prototype.setHTML from the start; calls made before the editor exists are queued.
 
-import { component, html, untracked, DEV, isDataSource, model } from '@pdxui/core';
+import { component, event, html, untracked, DEV, isDataSource, model } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 import { EditorView, type EditorViewConfig } from './view/view.js';
@@ -30,6 +30,12 @@ import '@pdxui/design/components/menu';
 /**
  * A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.
  *
+ * @csspart toolbar - The formatting toolbar, with `toolbar-mode="top"`.
+ * @csspart field - The frame around the text: its height and scrolling.
+ * @csspart input - The editing area, a contenteditable `role="textbox"`.
+ *
+ * @cssstate readonly - `readonly` is set; the text is not editable and the textbox is aria-readonly.
+ *
  * @alphaevent pdx-change
  * @alphadetail doc $event.detail.value
  * @alphadetail html $event.detail.value
@@ -40,6 +46,18 @@ component('pdx-rich-text', {
   // A form submits it under the host's `name` — HTML or text as it is, a JSON document as JSON — and
   // resets it (#135).
   models: { value: model<unknown>(null, { type: Object, form: true }) },
+  // Declared, so they do not bubble (#138): a listener goes on the element.
+  events: {
+    /** The editing area received focus. */
+    'pdx-focus': event<void>(),
+    /** The editing area lost focus. */
+    'pdx-blur': event<void>(),
+    /** The editor is built; the imperative API has been there since setup. */
+    'pdx-ready': event<{ editor: EditorView }>(),
+  },
+  // On the host as a custom state (#132); the editing area carries no class for it.
+  states: ['readonly'],
+  parts: ['toolbar', 'field', 'input'],
   props: {
     output: { type: String, default: 'json' },
     extensions: { type: Array, default: null },
@@ -165,6 +183,8 @@ component('pdx-rich-text', {
       clear: () => whenBuilt(view => replaceDoc(view, emptyDoc())),
     });
 
+    ctx.track(() => { ctx.state('readonly', !!ctx.readonly?.()); });
+
     // ── Build: the editor and its DOM, rebuilt when a configuration prop changes ──
     ctx.track(() => {
       // Read the configuration props to subscribe. `value` is NOT read here: it has its own track
@@ -189,6 +209,7 @@ component('pdx-rich-text', {
         // Create wrapper
         const wrapper = document.createElement('div');
         wrapper.classList.add('pdx-rt-wrapper');
+        wrapper.dataset.part = 'field';
         if (heightCfg !== 'auto') wrapper.style.height = heightCfg;
         if (minHeightCfg) wrapper.style.minHeight = minHeightCfg;
         if (maxHeightCfg !== 'none') {
@@ -200,6 +221,7 @@ component('pdx-rich-text', {
         // Top toolbar
         if (toolbarModeCfg === 'top' && toolbarCfg !== 'false' && toolbarCfg !== false) {
           toolbarEl = document.createElement('div');
+          toolbarEl.dataset.part = 'toolbar';
           el.appendChild(toolbarEl);
         }
 
@@ -240,8 +262,8 @@ component('pdx-rich-text', {
             reflected = out;
             ctx.value.set(out);
           },
-          onFocus: () => el.dispatchEvent(new CustomEvent('pdx-focus', { bubbles: true })),
-          onBlur: () => el.dispatchEvent(new CustomEvent('pdx-blur', { bubbles: true })),
+          onFocus: () => ctx.emit('pdx-focus'),
+          onBlur: () => ctx.emit('pdx-blur'),
         };
 
         const view = new EditorView(config);
@@ -253,8 +275,9 @@ component('pdx-rich-text', {
 
         // The accessible name of the editable area (role=textbox): the placeholder does not count as a label
         // for axe (aria-input-field-name / WCAG 4.1.2). Order: label, placeholder, registered string.
-        const _content = el.querySelector('.pdx-rt-content');
-        if (_content) uiAttr(_content, 'aria-label', () => labelCfg || placeholderCfg || uiString('rich-text', 'label'));
+        const _content = view.contentDOM;
+        _content.dataset.part = 'input';
+        uiAttr(_content, 'aria-label', () => labelCfg || placeholderCfg || uiString('rich-text', 'label'));
 
         // Render toolbar
         if (toolbarEl) {
@@ -273,10 +296,11 @@ component('pdx-rich-text', {
           wrapper.classList.toggle('pdx-rt-empty', textLength(view.state.doc) === 0);
         }
 
-        // Readonly
+        // Readonly: not editable, and said so — a textbox with no contenteditable is still heard as one
+        // a person could type into.
         if (readonlyCfg) {
           view.contentDOM.removeAttribute('contenteditable');
-          view.contentDOM.classList.add('pdx-rt-readonly');
+          view.contentDOM.setAttribute('aria-readonly', 'true');
         }
 
         // Autofocus
@@ -288,7 +312,7 @@ component('pdx-rich-text', {
         for (const fn of pending.splice(0)) fn(view);
 
         // Ready: the API has been there since setup, and the editor exists now.
-        el.dispatchEvent(new CustomEvent('pdx-ready', { detail: { editor: view }, bubbles: true }));
+        ctx.emit('pdx-ready', { editor: view });
       });
 
       // Cleanup: a configuration change (or a disconnect) tears the editor AND its DOM down —

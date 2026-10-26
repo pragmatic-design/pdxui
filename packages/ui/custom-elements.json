@@ -20940,33 +20940,34 @@
           },
           "events": [
             {
-              "name": "value-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: unknown }"
-            },
-            {
               "name": "pdx-focus",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it receives focus."
+              "description": "The editing area received focus."
             },
             {
               "name": "pdx-blur",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it loses focus."
+              "description": "The editing area lost focus."
             },
             {
               "name": "pdx-ready",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-ready`."
+              "description": "The editor is built; the imperative API has been there since setup.",
+              "detail": "{ editor: EditorView }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: unknown }"
             }
           ],
           "attributes": [
@@ -21092,6 +21093,26 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "toolbar",
+              "description": "The formatting toolbar, with `toolbar-mode=\"top\"`."
+            },
+            {
+              "name": "field",
+              "description": "The frame around the text: its height and scrolling."
+            },
+            {
+              "name": "input",
+              "description": "The editing area, a contenteditable `role=\"textbox\"`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "readonly",
+              "description": "`readonly` is set; the text is not editable and the textbox is aria-readonly."
             }
           ]
         }

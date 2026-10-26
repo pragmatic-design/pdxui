@@ -379,6 +379,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-rich-text` takes `pdx-input`'s contract (#286).
+  - **Events.** `pdx-focus`, `pdx-blur` and `pdx-ready` are declared and no longer bubble (#138): a
+    listener goes on the element.
+  - **States.** `readonly` is a custom state on the host; the editing area no longer carries
+    `pdx-rt-readonly`, and is `aria-readonly` while read-only.
+  - **Parts.** `toolbar`, `field` (the frame around the text) and `input` (the editing area).
+- **`pdx-form-field` wires a contenteditable textbox** (#286): `pdx-rich-text`'s editing area was no
+  control the field knew, and got neither the label nor the error. It is now named by the label and
+  takes `aria-required`, `aria-invalid` and the description; a task list's checkbox inside it is
+  content, not the field's control.
 - **Breaking:** `pdx-inline-edit` takes `pdx-input`'s contract (#286).
   - **States.** `disabled`, `readonly` and `editing` are custom states on the host; its root no
     longer carries them as classes.

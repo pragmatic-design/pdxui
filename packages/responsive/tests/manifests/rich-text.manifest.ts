@@ -153,26 +153,26 @@ export const richText: ComponentManifest = {
                     },
                     {
                         // The toolbar is there and has a height (min-height:36px → >=20, conservative).
-                        selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar',
+                        selector: 'section:not([hidden]) [data-test="rt"] [data-part="toolbar"]',
                         description: 'toolbar is present with a measurable height',
                         height: { op: '>=', value: 20 },
                     },
                     {
                         // The toolbar is a flex container (a row of buttons).
-                        selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar',
+                        selector: 'section:not([hidden]) [data-test="rt"] [data-part="toolbar"]',
                         description: 'toolbar renders as flex',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
                         // Area editabile dimensionata (wrapper min-height:120px → conservativo >=80
                         // to absorb the font and line-height differences across themes).
-                        selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content',
+                        selector: 'section:not([hidden]) [data-test="rt"] [data-part="input"]',
                         description: 'editable content area has a usable height',
                         height: { op: '>=', value: 80 },
                     },
                     {
                         // The editable area takes the component's full width.
-                        selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content',
+                        selector: 'section:not([hidden]) [data-test="rt"] [data-part="input"]',
                         description: 'editable content area has a measurable width',
                         width: { op: '>', value: 100 },
                     },
@@ -183,8 +183,8 @@ export const richText: ComponentManifest = {
                         description: 'toolbar sits above the editable content area',
                         parent: 'section:not([hidden]) [data-test="rt"]',
                         children: {
-                            toolbar: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar',
-                            content: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content',
+                            toolbar: 'section:not([hidden]) [data-test="rt"] [data-part="toolbar"]',
+                            content: 'section:not([hidden]) [data-test="rt"] [data-part="input"]',
                         },
                         relations: [
                             {
@@ -202,7 +202,7 @@ export const richText: ComponentManifest = {
                         parent: 'section:not([hidden]) [data-test="rt"]',
                         children: {
                             host: 'section:not([hidden]) [data-test="rt"]',
-                            content: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content',
+                            content: 'section:not([hidden]) [data-test="rt"] [data-part="input"]',
                         },
                         relations: [
                             { description: 'content within host', left: 'content', op: 'contained-in', right: 'host' },
@@ -212,9 +212,9 @@ export const richText: ComponentManifest = {
                         // The format buttons are aligned on the toolbar's row
                         // (align-items:center, one row). The first two buttons are compared.
                         description: 'toolbar format buttons are aligned on the same row',
-                        parent: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar',
+                        parent: 'section:not([hidden]) [data-test="rt"] [data-part="toolbar"]',
                         children: {
-                            toolbar: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar',
+                            toolbar: 'section:not([hidden]) [data-test="rt"] [data-part="toolbar"]',
                             first: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn:nth-of-type(1)',
                             second: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn:nth-of-type(2)',
                         },
@@ -244,7 +244,7 @@ export const richText: ComponentManifest = {
     isolation: {
         scenario: 'rich-text-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="rt"] [data-part="input"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -262,9 +262,9 @@ export const richText: ComponentManifest = {
             { key: 'ArrowRight', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn[data-command="toggleItalic"]' },
             { key: 'End', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn[data-command="toggleCode"]' },
             { key: 'ArrowRight', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn[data-command="toggleBold"]' },
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="rt"] [data-part="input"]' },
             { key: 'Shift+Tab', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-toolbar-btn[data-command="toggleBold"]' },
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="rt"] .pdx-rt-content' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="rt"] [data-part="input"]' },
             { key: 'Tab', expectFocus: 'body' },
         ],
     },
@@ -274,7 +274,7 @@ export const richText: ComponentManifest = {
     // A MASK on the editable area: the contenteditable caret blinks → not deterministic.
     visual: {
         scenarios: ['rich-text-basic', 'rich-text-menu'],
-        mask: ['section:not([hidden]) [data-test="rt"] .pdx-rt-content'],
+        mask: ['section:not([hidden]) [data-test="rt"] [data-part="input"]'],
     },
 };
 

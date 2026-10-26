@@ -52,7 +52,7 @@
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
         <div class="opt-row"><code>value</code><span>object</span><span>null</span><span>Document content (JSON or string)</span></div>
-        <div class="opt-row"><code>output</code><span>string</span><span>"json"</span><span>json, html, markdown, text</span></div>
+        <div class="opt-row"><code>output</code><span>string</span><span>"json"</span><span>json, html, text</span></div>
         <div class="opt-row"><code>toolbar</code><span>string|bool</span><span>"standard"</span><span>Toolbar config DSL or preset name</span></div>
         <div class="opt-row"><code>toolbar-mode</code><span>string</span><span>"top"</span><span>top, bubble, none</span></div>
         <div class="opt-row"><code>preset</code><span>string</span><span>"starter"</span><span>starter, minimal, document</span></div>
@@ -62,6 +62,22 @@
         <div class="opt-row"><code>min-height</code><span>string</span><span>"120px"</span><span>Minimum height</span></div>
         <div class="opt-row"><code>max-height</code><span>string</span><span>"none"</span><span>Maximum height (scrolls)</span></div>
         <div class="opt-row"><code>source</code><span>DataSource</span><span>null</span><span>DataSource for auto-load/save</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Bubbles</span><span>When</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>no</span><span>Its model: the content changed, per <code>output</code></span></div>
+        <div class="opt-row"><code>pdx-focus / pdx-blur</code><span>—</span><span>no</span><span>The editing area received or lost focus</span></div>
+        <div class="opt-row"><code>pdx-ready</code><span>{ editor }</span><span>no</span><span>The editor is built</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(readonly)</code><span></span><span></span><span><code>readonly</code> is set; the textbox is <code>aria-readonly</code></span></div>
+        <div class="opt-row"><code>[data-part="toolbar"]</code><span></span><span></span><span>The formatting toolbar</span></div>
+        <div class="opt-row"><code>[data-part="field"] / [data-part="input"]</code><span></span><span></span><span>The frame around the text, the editing area (<code>role="textbox"</code>)</span></div>
       </div>
     </section>
 
