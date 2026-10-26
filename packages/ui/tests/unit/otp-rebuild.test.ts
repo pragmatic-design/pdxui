@@ -39,12 +39,14 @@ describe('pdx-otp-input after its first build', () => {
         expect(cells(el).map((c) => c.value)).toEqual(['1', '2', '3', '4']);
     });
 
-    it('an error set after mount marks the wrapper, which keeps the size rules\' root', async () => {
+    // The error is a state of the host now (#286), not a class on the wrapper: the rebuild it causes
+    // marks each cell aria-invalid, and the wrapper keeps the size rules' root.
+    it('an error set after mount rebuilds the cells aria-invalid, and keeps the size rules\' root', async () => {
         const el = await mountOtp(4);
         el.setAttribute('error', '');
         await tick(50); await tick(50);
         const root = el.querySelector(':scope > [data-part="root"]');
-        expect(root?.classList.contains('error')).toBe(true);
+        expect(cells(el).map((c) => c.getAttribute('aria-invalid'))).toEqual(['true', 'true', 'true', 'true']);
         expect(root?.classList.contains('pdx-otp-wrap')).toBe(true);
     });
 });

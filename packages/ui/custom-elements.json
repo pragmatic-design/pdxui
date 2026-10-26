@@ -18143,20 +18143,20 @@
           },
           "events": [
             {
+              "name": "pdx-complete",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Every cell is filled: the whole code.",
+              "detail": "{ value: string }"
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
-            },
-            {
-              "name": "pdx-complete",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on `pdx-complete`.",
-              "detail": "{ value }"
             }
           ],
           "roles": [
@@ -18252,6 +18252,30 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The cells' group, `role=\"group\"`."
+            },
+            {
+              "name": "cell",
+              "description": "One cell: a native `<input>`, one per character."
+            },
+            {
+              "name": "separator",
+              "description": "The dash between groups of cells, with `separator`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set; each cell is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set; each cell is disabled."
             }
           ]
         }

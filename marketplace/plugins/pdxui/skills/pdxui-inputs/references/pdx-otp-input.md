@@ -23,9 +23,13 @@ One-time-code entry boxes, masked for a PIN.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-complete` → `detail: { value }` — Fired on `pdx-complete`.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-complete` → `detail: { value: string }` — Every cell is filled: the whole code.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group`
+
+**States:** `:state(invalid)` — `error` is set; each cell is aria-invalid.; `:state(disabled)` — `disabled` is set; each cell is disabled.
+
+**Parts:** `[data-part="root"]` — The cells' group, `role="group"`.; `[data-part="cell"]` — One cell: a native `<input>`, one per character.; `[data-part="separator"]` — The dash between groups of cells, with `separator`.
 
 
 #### Examples

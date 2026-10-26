@@ -34,7 +34,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-input</code><span>{ value }</span><span>On every cell change</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>On every cell change</span></div>
         <div class="opt-row"><code>pdx-complete</code><span>{ value }</span><span>All cells filled (auto-submit trigger)</span></div>
       </div>
 

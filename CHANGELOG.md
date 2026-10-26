@@ -379,6 +379,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-otp-input` takes `pdx-input`'s contract (#286).
+  - **States.** `invalid` and `disabled` are custom states on the host; its group no longer carries
+    `error` or `disabled`.
+  - **Parts.** `root` (the cells' group), `cell` and `separator`.
+  - **A2.** With `error`, each cell is `aria-invalid`: the group's role may not carry it.
+  - **Events.** `pdx-complete` is declared, with `detail: { value }`.
+- **`pdx-form-field` wires a group control** (#286). Around a `role="group"` or `role="radiogroup"`
+  (`pdx-otp-input`, `pdx-radio-group`, a time picker's segments, …) it now points the group's
+  `aria-describedby` at the hint and the error. The error's `aria-invalid` goes on a radiogroup
+  itself; in a `group`, whose role may carry neither, the text boxes inside take `aria-invalid` and
+  `aria-required`. It marked none of them before.
 - **Breaking:** `pdx-number-input` takes `pdx-input`'s contract (#286).
   - **States.** They are custom states on the host: `invalid`, `disabled`, `loading`, and with
     `color-by-sign` `negative` and `positive`. Its group and field no longer carry `disabled`,
