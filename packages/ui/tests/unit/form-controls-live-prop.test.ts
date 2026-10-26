@@ -204,13 +204,6 @@ const CASES: Case[] = [
         props: { value: (d) => d.value },
     },
     {
-        name: 'pdx-button-group (the detail is the value itself)',
-        html: '<pdx-button-group mode="single"><button value="x">X</button><button value="y">Y</button></pdx-button-group>',
-        event: 'pdx-change',
-        act: (el) => q<HTMLButtonElement>(el, 'button[value="y"]').click(),
-        props: { value: (d) => d },
-    },
-    {
         name: 'pdx-inline-edit (boolean)', html: '<pdx-inline-edit type="boolean"></pdx-inline-edit>', event: 'value-change',
         setup: (el) => { el.value = false; },
         act: (el) => q<HTMLElement>(el, '.pdx-inline-edit-display').click(),

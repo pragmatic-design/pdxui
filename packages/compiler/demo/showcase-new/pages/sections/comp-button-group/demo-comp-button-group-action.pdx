@@ -1,7 +1,7 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Action Group</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Default mode (<code>mode="none"</code>): visual grouping only. No selection logic.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Visual grouping only, no selection logic: each button does its own action.</p>
 
     <div class="demo-row">
       <pdx-button-group>

@@ -202,7 +202,6 @@
 
   "pdx-bottom-nav:activeKey": "Key of the active item.",
   "pdx-breadcrumb:maxItems": "Collapse to this many items with an ellipsis.",
-  "pdx-button-group:mode": "Selection behaviour: 'none', 'single' or 'multiple'.",
   "pdx-command:emptyText": "Text shown when no command matches.",
   "pdx-dropdown-menu:minWidth": "Minimum width of the menu panel.",
   "pdx-kbd:keys": "The key combination to render (e.g. 'Ctrl+K').",

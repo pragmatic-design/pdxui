@@ -4,17 +4,13 @@ Joined buttons that read as one control.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `mode` | `mode` | string | `'none'` | Selection behaviour: 'none', 'single' or 'multiple'. |
 | `orientation` | `orientation` | string | `'horizontal'` | Layout orientation — horizontal or vertical. |
 | `variant` | `variant` | string | `''` | Visual variant. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
-| `value` | `value` | string | `''` | The selection. `single`: the checked button's `value`. `multiple`: every pressed button's `value`, joined by `,` — `"bold,italic"`. A button without `value` is identified by its text. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `label` | `label` | string | `''` | The group's accessible name ("Text alignment"), set as `aria-label` on the group. |
 
-**Events:** `pdx-change` → `detail: string` — The detail is the value itself, not an object: the pressed button's `value` in single mode, every pressed value joined by `,` in multiple mode.
-
-**Renders:** roles `group` · `radio` · `radiogroup`
+**Renders:** roles `group`
 
 
 #### Examples
@@ -23,7 +19,7 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Action Group** — Default mode (`mode="none"`): visual grouping only. No selection logic.
+**Action Group** — Visual grouping only, no selection logic: each button does its own action.
 
 ```html
 <pdx-button-group>
@@ -33,39 +29,14 @@ are checked against the manifest above._
 </pdx-button-group>
 ```
 
-**Single Toggle (Radio)** — `mode="single"` — only one button selected at a time. It is a radio group: each button is a radio, and the arrow keys move the selection. Name the group with `label`.
-
-```html
-<pdx-button-group mode="single" label="Text alignment" :value="alignment" @pdx-change="onAlignment">
-  <pdx-button variant="outline" value="left">Left</pdx-button>
-  <pdx-button variant="outline" value="center">Center</pdx-button>
-  <pdx-button variant="outline" value="right">Right</pdx-button>
-</pdx-button-group>
-```
-
-**Multiple Toggle** — `mode="multiple"` — multiple buttons can be selected simultaneously: toggle buttons with `aria-pressed`. The value is every pressed value joined by commas, `"bold,italic"`.
-
-```html
-<pdx-button-group mode="multiple" label="Formatting" :value="formatting" @pdx-change="onFormatting">
-  <pdx-button value="bold"><strong>B</strong></pdx-button>
-  <pdx-button value="italic"><em>I</em></pdx-button>
-  <pdx-button value="underline"><u>U</u></pdx-button>
-</pdx-button-group>
-```
-
 **Orientation** — `orientation="vertical"` stacks buttons vertically. _(from the live demo)_
 
 ```html
 <div class="demo-row align-start">
-  <pdx-button-group orientation="vertical">
+  <pdx-button-group orientation="vertical" label="Position">
     <pdx-button variant="outline">Top</pdx-button>
     <pdx-button variant="outline">Middle</pdx-button>
     <pdx-button variant="outline">Bottom</pdx-button>
-  </pdx-button-group>
-  <pdx-button-group orientation="vertical" mode="single" label="Priority" :value="priority" variant="outline" @pdx-change="onPriority">
-    <pdx-button value="high">High</pdx-button>
-    <pdx-button value="medium">Medium</pdx-button>
-    <pdx-button value="low">Low</pdx-button>
   </pdx-button-group>
 </div>
 ```
@@ -126,19 +97,19 @@ are checked against the manifest above._
 <div class="comp-card">
   <div class="comp-toolbar">
     <h3 class="pdx-txt-subheading" style="flex:1">Document Editor</h3>
-    <pdx-button-group mode="multiple" label="Formatting" :value="formatting" variant="ghost" size="sm" @pdx-change="onFormatting">
-      <pdx-button value="bold"><strong>B</strong></pdx-button>
-      <pdx-button value="italic"><em>I</em></pdx-button>
-      <pdx-button value="underline"><u>U</u></pdx-button>
+    <pdx-button-group label="History" variant="ghost" size="sm">
+      <pdx-button aria-label="Undo" @click="act('Undo')"><pdx-icon name="undo" size="sm"></pdx-icon></pdx-button>
+      <pdx-button aria-label="Redo" @click="act('Redo')"><pdx-icon name="redo" size="sm"></pdx-icon></pdx-button>
     </pdx-button-group>
-    <pdx-button-group mode="single" label="Alignment" :value="alignment" variant="ghost" size="sm" @pdx-change="onAlignment">
-      <pdx-button value="left" aria-label="Align left"><pdx-icon name="align-left" size="sm"></pdx-icon></pdx-button>
-      <pdx-button value="center" aria-label="Align center"><pdx-icon name="align-center" size="sm"></pdx-icon></pdx-button>
-      <pdx-button value="right" aria-label="Align right"><pdx-icon name="align-right" size="sm"></pdx-icon></pdx-button>
+    <pdx-button-group label="Clipboard" variant="ghost" size="sm">
+      <pdx-button aria-label="Cut" @click="act('Cut')"><pdx-icon name="scissors" size="sm"></pdx-icon></pdx-button>
+      <pdx-button aria-label="Copy" @click="act('Copy')"><pdx-icon name="copy" size="sm"></pdx-icon></pdx-button>
+      <pdx-button aria-label="Paste" @click="act('Paste')"><pdx-icon name="clipboard" size="sm"></pdx-icon></pdx-button>
     </pdx-button-group>
   </div>
   <div class="comp-body pdx-txt-small pdx-ink-muted">
-    Formatting: {{ formatting || 'none' }} | Alignment: {{ alignment || 'none' }}
+    Last action: {{ last || 'none' }}. Formatting and alignment, which select, are a
+    <code>&lt;pdx-toggle-group&gt;</code>.
   </div>
 </div>
 <div class="comp-card">

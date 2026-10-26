@@ -4596,44 +4596,24 @@ exports[`compile golden — demo corpus > showcase-new/pages/comp-button-group.p
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, computed, eachRow, safeHandler, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
-import { useButtonGroupDemo } from './sections/comp-button-group/state.pdx';
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-1gdzvm");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-1gdzvm"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  @scope ([data-pdx-1gdzvm]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n\\n  \\n  :scope .console-panel {\\n    margin-bottom: var(--pdx-space-xl);\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-md);\\n    overflow: hidden;\\n  }\\n  :scope .console-header {\\n    display: flex;\\n    align-items: center;\\n    justify-content: space-between;\\n    padding: var(--pdx-space-xs) var(--pdx-space-md);\\n    background: var(--pdx-color-inset);\\n    border-bottom: 1px solid var(--pdx-color-border);\\n  }\\n  :scope .console-body {\\n    padding: var(--pdx-space-sm) var(--pdx-space-md);\\n    max-height: 140px;\\n    overflow-y: auto;\\n    font-size: var(--pdx-text-xs);\\n    background: var(--pdx-color-surface);\\n  }\\n  :scope .log-entry {\\n    display: flex;\\n    gap: var(--pdx-space-sm);\\n    padding: 2px 0;\\n    line-height: 1.5;\\n  }\\n  :scope .log-time { color: var(--pdx-color-muted); min-width: 90px; }\\n  :scope .log-label { color: var(--pdx-color-primary); min-width: 80px; font-weight: var(--pdx-weight-medium); }\\n\\n  :scope .opt-header, :scope .opt-row { grid-template-columns: 120px 120px 1fr; }\\n}";
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-1gdzvm]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n\\n  :scope .opt-header, :scope .opt-row { grid-template-columns: 120px 120px 1fr; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <span class="pdx-ink-muted">Interact with toggle groups below...</span> '));
-const __blk1=staticBlock(staticMarkup(' <div class="log-entry"> <span class="log-time"><!----></span> <span class="log-label"><!----></span> <span><!----></span> </div> '));
-const __walk1=(r)=>{const __el13=r.firstChild.nextSibling;const __el14=__el13.firstChild.nextSibling;const __t15=__el14.firstChild;const __el16=__el14.nextSibling.nextSibling;const __t17=__el16.firstChild;const __el18=__el16.nextSibling.nextSibling;const __t19=__el18.firstChild;return [__t15,__t17,__t19];};
-const __blk2=staticBlock(staticMarkup(' <!---->'));
-const __walk2=(r)=>{const __m21=r.firstChild.nextSibling;return [__m21];};
-const __blk3=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">ButtonGroup</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-button-group&gt;</code> — groups buttons visually (action) or with toggle selection (single/multiple).\\n      Propagates <code>variant</code>, <code>size</code>, <code>disabled</code> to children.\\n    </p>  <div class="console-panel"> <div class="console-header"> <span class="pdx-txt-caption pdx-ink-muted">Event Console</span> <button class="pdx-ghost" size="sm">Clear</button> </div> <div class="console-body pdx-txt-mono"> <!----> </div> </div>  <app-demo-comp-button-group-action class="demo-section"></app-demo-comp-button-group-action>  <app-demo-comp-button-group-single-toggle class="demo-section"></app-demo-comp-button-group-single-toggle>  <app-demo-comp-button-group-multiple-toggle class="demo-section"></app-demo-comp-button-group-multiple-toggle>  <app-demo-comp-button-group-orientation class="demo-section"></app-demo-comp-button-group-orientation>  <app-demo-comp-button-group-propagation class="demo-section"></app-demo-comp-button-group-propagation>  <app-demo-comp-button-group-disabled class="demo-section"></app-demo-comp-button-group-disabled>  <app-demo-comp-button-group-composition class="demo-section"></app-demo-comp-button-group-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"> <span>Prop</span><span>Type</span><span>Description</span> </div> <div class="opt-row"> <code>mode</code><span>string</span><span>none (action group), single (radio group: radios, arrows select), multiple (toggle buttons, aria-pressed)</span> </div> <div class="opt-row"> <code>orientation</code><span>string</span><span>horizontal (default), vertical</span> </div> <div class="opt-row"> <code>variant</code><span>string</span><span>Propagated to all child buttons</span> </div> <div class="opt-row"> <code>size</code><span>string</span><span>Propagated: sm, (default), lg</span> </div> <div class="opt-row"> <code>value</code><span>string</span><span>Selected value(s). Comma-separated for multiple: "bold,italic".</span> </div> <div class="opt-row"> <code>label</code><span>string</span><span>The group\\'s accessible name, set as aria-label on the group</span> </div> <div class="opt-row"> <code>disabled</code><span>boolean</span><span>Disables all buttons in group</span> </div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"> <span>Event</span><span>Detail</span><span>When</span> </div> <div class="opt-row"> <code>pdx-change</code><span>string</span><span>Selection changes (single: value, multiple: comma-separated)</span> </div> </div> </section> </div> '));
-const __walk3=(r)=>{const __el0=r.firstChild.nextSibling;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild.nextSibling;const __el10=__el8.firstChild.nextSibling.nextSibling.nextSibling;const __el11=__el8.nextSibling.nextSibling;const __m23=__el11.firstChild.nextSibling;return [__el10,__m23];};
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">ButtonGroup</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-button-group&gt;</code> — groups action buttons visually.\\n      Propagates <code>variant</code>, <code>size</code>, <code>disabled</code> to children.\\n      To select among buttons, one or several, use <code>&lt;pdx-toggle-group&gt;</code>.\\n    </p>  <app-demo-comp-button-group-action class="demo-section"></app-demo-comp-button-group-action>  <app-demo-comp-button-group-orientation class="demo-section"></app-demo-comp-button-group-orientation>  <app-demo-comp-button-group-propagation class="demo-section"></app-demo-comp-button-group-propagation>  <app-demo-comp-button-group-disabled class="demo-section"></app-demo-comp-button-group-disabled>  <app-demo-comp-button-group-composition class="demo-section"></app-demo-comp-button-group-composition>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"> <span>Prop</span><span>Type</span><span>Description</span> </div> <div class="opt-row"> <code>orientation</code><span>string</span><span>horizontal (default), vertical</span> </div> <div class="opt-row"> <code>variant</code><span>string</span><span>Propagated to all child buttons</span> </div> <div class="opt-row"> <code>size</code><span>string</span><span>Propagated: sm, (default), lg</span> </div> <div class="opt-row"> <code>label</code><span>string</span><span>The group\\'s accessible name, set as aria-label on the group</span> </div> <div class="opt-row"> <code>disabled</code><span>boolean</span><span>Disables all buttons in group</span> </div> </div> </section> </div> '));
 component('app-comp-button-group', {
   props: {},
   setup(ctx) {
-// Event console: the toggle sections write to it, the page shows it (sections/comp-button-group/state.pdx.ts).
-    const demo = useButtonGroupDemo();
-    const logs = computed(() => demo.logs(), { name: 'comp-button-group:logs' });
-    
-    
-    
-    function clearLog() {
-        demo.clearLog();
-    }
     useHead({ title: "ButtonGroup Component" });
     ctx.el.setAttribute('data-pdx-1gdzvm', '');
-    return { demo, logs, clearLog };
+
   },
   render: (ctx) => (() => {
-    const __frag=__blk3();
-    const [__el10,__m23]=__walk3(__frag);
-    __el10.addEventListener('click', safeHandler(batchHandler(ctx.clearLog), ctx.el?.tagName?.toLowerCase(), 'click'));
-    const __cf22=when(()=>ctx.logs().length === 0,()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk2();const [__m21]=__walk2(__frag);const __cf20=eachRow(()=>ctx.logs(),'id',(entry)=>{const __frag=__blk1();const [__t15,__t17,__t19]=__walk1(__frag);bindInterpolation(__t15,()=>entry().time);bindInterpolation(__t17,()=>entry().label);bindInterpolation(__t19,()=>entry().text);return __frag;});__m21.replaceWith(__cf20);return __frag;});
-    __m23.replaceWith(__cf22);
+    const __frag=__blk0();
     return __frag;
   })(),
 });
@@ -12068,7 +12048,7 @@ import { component, staticBlock, staticMarkup } from '@pdxui/core';
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-i7b7eb], [data-pdx-i7b7eb-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-row, :where(:not([data-pdx-i7b7eb])):scope:is(.demo-row) { gap: var(--pdx-space-sm); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Action Group</h2> <p class="pdx-txt-small pdx-ink-muted">Default mode (<code>mode="none"</code>): visual grouping only. No selection logic.</p> <div class="demo-row"> <pdx-button-group> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Left</pdx-button> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Center</pdx-button> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Right</pdx-button> </pdx-button-group> </div> <div class="demo-row"> <pdx-button-group> <pdx-button variant="primary" data-pdx-i7b7eb-in>Save</pdx-button> <pdx-button variant="outline" data-pdx-i7b7eb-in>Cancel</pdx-button> </pdx-button-group> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-button-group&gt;\\n  &lt;pdx-button variant="secondary"&gt;Left&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="secondary"&gt;Center&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="secondary"&gt;Right&lt;/pdx-button&gt;\\n&lt;/pdx-button-group&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Action Group</h2> <p class="pdx-txt-small pdx-ink-muted">Visual grouping only, no selection logic: each button does its own action.</p> <div class="demo-row"> <pdx-button-group> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Left</pdx-button> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Center</pdx-button> <pdx-button variant="secondary" data-pdx-i7b7eb-in>Right</pdx-button> </pdx-button-group> </div> <div class="demo-row"> <pdx-button-group> <pdx-button variant="primary" data-pdx-i7b7eb-in>Save</pdx-button> <pdx-button variant="outline" data-pdx-i7b7eb-in>Cancel</pdx-button> </pdx-button-group> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-button-group&gt;\\n  &lt;pdx-button variant="secondary"&gt;Left&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="secondary"&gt;Center&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="secondary"&gt;Right&lt;/pdx-button&gt;\\n&lt;/pdx-button-group&gt;</code></pre> </details> </section> '));
 component('app-demo-comp-button-group-action', {
   props: {},
   setup(ctx) {
@@ -12087,8 +12067,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-butto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, effect, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
-import { useButtonGroupDemo } from './state.pdx';
+import { batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-5o7bj5");
@@ -12096,33 +12075,25 @@ import { useButtonGroupDemo } from './state.pdx';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-5o7bj5], [data-pdx-5o7bj5-in]) to ([data-pdx-root] \\u003E *) {:scope .comp-card p, :where(:not([data-pdx-5o7bj5])):scope:is(.comp-card p) { margin: 0 0 var(--pdx-space-md); }\\n  :scope .comp-actions, :where(:not([data-pdx-5o7bj5])):scope:is(.comp-actions) {\\n    display: flex;\\n    gap: var(--pdx-space-sm);\\n    justify-content: flex-end;\\n  }\\n  :scope .comp-toolbar, :where(:not([data-pdx-5o7bj5])):scope:is(.comp-toolbar) {\\n    display: flex;\\n    flex-wrap: wrap;\\n    align-items: center;\\n    gap: var(--pdx-space-sm);\\n    padding-bottom: var(--pdx-space-sm);\\n    border-bottom: 1px solid var(--pdx-color-border);\\n    margin-bottom: var(--pdx-space-sm);\\n  }\\n  :scope .comp-body, :where(:not([data-pdx-5o7bj5])):scope:is(.comp-body) {\\n    padding: var(--pdx-space-sm) 0;\\n  }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Composition</h2> <p class="pdx-txt-small pdx-ink-muted">Button groups in realistic UI contexts.</p> <div class="comp-card"> <div class="comp-toolbar"> <h3 class="pdx-txt-subheading" style="flex:1">Document Editor</h3> <pdx-button-group mode="multiple" label="Formatting" variant="ghost" size="sm"> <pdx-button value="bold" data-pdx-5o7bj5-in><strong data-pdx-5o7bj5-in>B</strong></pdx-button> <pdx-button value="italic" data-pdx-5o7bj5-in><em data-pdx-5o7bj5-in>I</em></pdx-button> <pdx-button value="underline" data-pdx-5o7bj5-in><u data-pdx-5o7bj5-in>U</u></pdx-button> </pdx-button-group> <pdx-button-group mode="single" label="Alignment" variant="ghost" size="sm"> <pdx-button value="left" aria-label="Align left" data-pdx-5o7bj5-in><pdx-icon name="align-left" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> <pdx-button value="center" aria-label="Align center" data-pdx-5o7bj5-in><pdx-icon name="align-center" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> <pdx-button value="right" aria-label="Align right" data-pdx-5o7bj5-in><pdx-icon name="align-right" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> </pdx-button-group> </div> <div class="comp-body pdx-txt-small pdx-ink-muted">\\n        Formatting: <!----> | Alignment: <!----> </div> </div> <div class="comp-card"> <h3 class="pdx-txt-subheading">Split Action</h3> <p class="pdx-txt-small pdx-ink-muted">Primary action + secondary options grouped together.</p> <div class="comp-actions"> <pdx-button-group> <pdx-button variant="primary" data-pdx-5o7bj5-in><pdx-icon name="download" size="sm" data-pdx-5o7bj5-in></pdx-icon> Download</pdx-button> <pdx-button variant="primary" aria-label="More options" data-pdx-5o7bj5-in><pdx-icon name="chevron-down" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> </pdx-button-group> </div> </div> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el6=__el4.firstChild.nextSibling.nextSibling.nextSibling;const __el13=__el6.nextSibling.nextSibling;const __el20=__el4.nextSibling.nextSibling;const __t21=__el20.firstChild.nextSibling;const __t22=__t21.nextSibling.nextSibling;return [__el6,__el13,__t21,__t22];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Composition</h2> <p class="pdx-txt-small pdx-ink-muted">Button groups in realistic UI contexts.</p> <div class="comp-card"> <div class="comp-toolbar"> <h3 class="pdx-txt-subheading" style="flex:1">Document Editor</h3> <pdx-button-group label="History" variant="ghost" size="sm"> <pdx-button aria-label="Undo" data-pdx-5o7bj5-in><pdx-icon name="undo" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> <pdx-button aria-label="Redo" data-pdx-5o7bj5-in><pdx-icon name="redo" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> </pdx-button-group> <pdx-button-group label="Clipboard" variant="ghost" size="sm"> <pdx-button aria-label="Cut" data-pdx-5o7bj5-in><pdx-icon name="scissors" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> <pdx-button aria-label="Copy" data-pdx-5o7bj5-in><pdx-icon name="copy" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> <pdx-button aria-label="Paste" data-pdx-5o7bj5-in><pdx-icon name="clipboard" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> </pdx-button-group> </div> <div class="comp-body pdx-txt-small pdx-ink-muted">\\n        Last action: <!---->. Formatting and alignment, which select, are a\\n        <code>&lt;pdx-toggle-group&gt;</code>.\\n      </div> </div> <div class="comp-card"> <h3 class="pdx-txt-subheading">Split Action</h3> <p class="pdx-txt-small pdx-ink-muted">Primary action + secondary options grouped together.</p> <div class="comp-actions"> <pdx-button-group> <pdx-button variant="primary" data-pdx-5o7bj5-in><pdx-icon name="download" size="sm" data-pdx-5o7bj5-in></pdx-icon> Download</pdx-button> <pdx-button variant="primary" aria-label="More options" data-pdx-5o7bj5-in><pdx-icon name="chevron-down" size="sm" data-pdx-5o7bj5-in></pdx-icon></pdx-button> </pdx-button-group> </div> </div> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el6=__el4.firstChild.nextSibling.nextSibling.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el9=__el7.nextSibling.nextSibling;const __el11=__el6.nextSibling.nextSibling;const __el12=__el11.firstChild.nextSibling;const __el14=__el12.nextSibling.nextSibling;const __el16=__el14.nextSibling.nextSibling;const __el18=__el4.nextSibling.nextSibling;const __t19=__el18.firstChild.nextSibling;return [__el7,__el9,__el12,__el14,__el16,__t19];};
 component('app-demo-comp-button-group-composition', {
   props: {},
   setup(ctx) {
-// The same alignment and formatting the toggle sections above set.
-    const demo = useButtonGroupDemo();
-    const formatting = computed(() => demo.formatting(), { name: 'demo-comp-button-group-composition:formatting' });
-    const alignment = computed(() => demo.alignment(), { name: 'demo-comp-button-group-composition:alignment' });
-    
-    
-    
-    
-    function onFormatting(e) { demo.onFormatting(e); }
-    function onAlignment(e) { demo.onAlignment(e); }
+    const __last = signal('', { name: 'demo-comp-button-group-composition:last' });
+function act(name) { __last.setRaw(name); }
     ctx.el.setAttribute('data-pdx-5o7bj5', '');
-    return { demo, formatting, alignment, onFormatting, onAlignment };
+    return { last: __last, act };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el6,__el13,__t21,__t22]=__walk0(__frag);
-    let __el6w_value = {}; effect(() => { const __b = ctx.formatting(); if (Object.is(__b, __el6w_value)) return; __el6w_value = __b; assignBoundProperty(__el6, "value", __b); });
-    __el6.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onFormatting), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    let __el13w_value = {}; effect(() => { const __b = ctx.alignment(); if (Object.is(__b, __el13w_value)) return; __el13w_value = __b; assignBoundProperty(__el13, "value", __b); });
-    __el13.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onAlignment), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t21,()=>ctx.formatting() || 'none');
-    bindInterpolation(__t22,()=>ctx.alignment() || 'none');
+    const [__el7,__el9,__el12,__el14,__el16,__t19]=__walk0(__frag);
+    __el7.addEventListener('click', safeHandler(batchHandler(() => ctx.act('Undo')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __el9.addEventListener('click', safeHandler(batchHandler(() => ctx.act('Redo')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __el12.addEventListener('click', safeHandler(batchHandler(() => ctx.act('Cut')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __el14.addEventListener('click', safeHandler(batchHandler(() => ctx.act('Copy')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __el16.addEventListener('click', safeHandler(batchHandler(() => ctx.act('Paste')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    bindInterpolation(__t19,()=>ctx.last() || 'none');
     return __frag;
   })(),
 });
@@ -12156,57 +12127,11 @@ component('app-demo-comp-button-group-disabled', {
 "
 `;
 
-exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-button-group/demo-comp-button-group-multiple-toggle.pdx 1`] = `
-"// 0 warning(s)
-
-============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, effect, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
-import { useButtonGroupDemo } from './state.pdx';
-
-{
-  let __pdx_style = document.getElementById("pdx-s-siniu2");
-  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-siniu2"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-siniu2], [data-pdx-siniu2-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-row, :where(:not([data-pdx-siniu2])):scope:is(.demo-row) { gap: var(--pdx-space-sm); }\\n}";
-}
-
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Multiple Toggle</h2> <p class="pdx-txt-small pdx-ink-muted"><code>mode="multiple"</code> — multiple buttons can be selected simultaneously: toggle buttons with <code>aria-pressed</code>. The value is every pressed value joined by commas, <code>"bold,italic"</code>.</p> <div class="demo-row"> <span class="pdx-txt-caption pdx-ink-muted">Formatting:</span> <pdx-button-group mode="multiple" label="Formatting" variant="ghost"> <pdx-button value="bold" data-pdx-siniu2-in><strong data-pdx-siniu2-in>B</strong></pdx-button> <pdx-button value="italic" data-pdx-siniu2-in><em data-pdx-siniu2-in>I</em></pdx-button> <pdx-button value="underline" data-pdx-siniu2-in><u data-pdx-siniu2-in>U</u></pdx-button> <pdx-button value="strike" data-pdx-siniu2-in><s data-pdx-siniu2-in>S</s></pdx-button> </pdx-button-group> <span class="pdx-txt-small pdx-ink-muted"><!----></span> </div> <div class="demo-row"> <span class="pdx-txt-caption pdx-ink-muted">Filters:</span> <pdx-button-group mode="multiple" label="Status filter" variant="outline" size="sm"> <pdx-button value="active" data-pdx-siniu2-in>Active</pdx-button> <pdx-button value="pending" data-pdx-siniu2-in>Pending</pdx-button> <pdx-button value="archived" data-pdx-siniu2-in>Archived</pdx-button> </pdx-button-group> <span class="pdx-txt-small pdx-ink-muted"><!----></span> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-button-group mode="multiple" label="Formatting" :value="formatting" @pdx-change="onFormatting"&gt;\\n  &lt;pdx-button value="bold"&gt;&lt;strong&gt;B&lt;/strong&gt;&lt;/pdx-button&gt;\\n  &lt;pdx-button value="italic"&gt;&lt;em&gt;I&lt;/em&gt;&lt;/pdx-button&gt;\\n  &lt;pdx-button value="underline"&gt;&lt;u&gt;U&lt;/u&gt;&lt;/pdx-button&gt;\\n&lt;/pdx-button-group&gt;</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el6.firstChild.nextSibling.nextSibling.nextSibling;const __el17=__el8.nextSibling.nextSibling;const __t18=__el17.firstChild;const __el19=__el6.nextSibling.nextSibling;const __el21=__el19.firstChild.nextSibling.nextSibling.nextSibling;const __el25=__el21.nextSibling.nextSibling;const __t26=__el25.firstChild;return [__el8,__t18,__el21,__t26];};
-component('app-demo-comp-button-group-multiple-toggle', {
-  props: {},
-  setup(ctx) {
-const demo = useButtonGroupDemo();
-    const formatting = computed(() => demo.formatting(), { name: 'demo-comp-button-group-multiple-toggle:formatting' });
-    const filters = computed(() => demo.filters(), { name: 'demo-comp-button-group-multiple-toggle:filters' });
-    
-    
-    
-    
-    function onFormatting(e) { demo.onFormatting(e); }
-    function onFilters(e) { demo.onFilters(e); }
-    ctx.el.setAttribute('data-pdx-siniu2', '');
-    return { demo, formatting, filters, onFormatting, onFilters };
-  },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el8,__t18,__el21,__t26]=__walk0(__frag);
-    let __el8w_value = {}; effect(() => { const __b = ctx.formatting(); if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });
-    __el8.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onFormatting), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t18,()=>ctx.formatting() || 'none');
-    let __el21w_value = {}; effect(() => { const __b = ctx.filters(); if (Object.is(__b, __el21w_value)) return; __el21w_value = __b; assignBoundProperty(__el21, "value", __b); });
-    __el21.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onFilters), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t26,()=>ctx.filters() || 'none');
-    return __frag;
-  })(),
-});
-"
-`;
-
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-button-group/demo-comp-button-group-orientation.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, computed, effect, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
-import { useButtonGroupDemo } from './state.pdx';
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-wqtkhx");
@@ -12214,25 +12139,15 @@ import { useButtonGroupDemo } from './state.pdx';
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-wqtkhx], [data-pdx-wqtkhx-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-row, :where(:not([data-pdx-wqtkhx])):scope:is(.demo-row) { gap: var(--pdx-space-sm); }\\n  :scope .demo-row.align-start, :where(:not([data-pdx-wqtkhx])):scope:is(.demo-row.align-start) { align-items: flex-start; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Orientation</h2> <p class="pdx-txt-small pdx-ink-muted"><code>orientation="vertical"</code> stacks buttons vertically.</p> <div class="demo-row align-start"> <pdx-button-group orientation="vertical"> <pdx-button variant="outline" data-pdx-wqtkhx-in>Top</pdx-button> <pdx-button variant="outline" data-pdx-wqtkhx-in>Middle</pdx-button> <pdx-button variant="outline" data-pdx-wqtkhx-in>Bottom</pdx-button> </pdx-button-group> <pdx-button-group orientation="vertical" mode="single" label="Priority" variant="outline"> <pdx-button value="high" data-pdx-wqtkhx-in>High</pdx-button> <pdx-button value="medium" data-pdx-wqtkhx-in>Medium</pdx-button> <pdx-button value="low" data-pdx-wqtkhx-in>Low</pdx-button> </pdx-button-group> </div> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el9=__el4.firstChild.nextSibling.nextSibling.nextSibling;return [__el9];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Orientation</h2> <p class="pdx-txt-small pdx-ink-muted"><code>orientation="vertical"</code> stacks buttons vertically.</p> <div class="demo-row align-start"> <pdx-button-group orientation="vertical" label="Position"> <pdx-button variant="outline" data-pdx-wqtkhx-in>Top</pdx-button> <pdx-button variant="outline" data-pdx-wqtkhx-in>Middle</pdx-button> <pdx-button variant="outline" data-pdx-wqtkhx-in>Bottom</pdx-button> </pdx-button-group> </div> </section> '));
 component('app-demo-comp-button-group-orientation', {
   props: {},
   setup(ctx) {
-const demo = useButtonGroupDemo();
-    const priority = computed(() => demo.priority(), { name: 'demo-comp-button-group-orientation:priority' });
-    
-    
-    
-    function onPriority(e) { demo.onPriority(e); }
     ctx.el.setAttribute('data-pdx-wqtkhx', '');
-    return { demo, priority, onPriority };
+
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el9]=__walk0(__frag);
-    let __el9w_value = {}; effect(() => { const __b = ctx.priority(); if (Object.is(__b, __el9w_value)) return; __el9w_value = __b; assignBoundProperty(__el9, "value", __b); });
-    __el9.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onPriority), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
     return __frag;
   })(),
 });
@@ -12260,51 +12175,6 @@ component('app-demo-comp-button-group-propagation', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    return __frag;
-  })(),
-});
-"
-`;
-
-exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-button-group/demo-comp-button-group-single-toggle.pdx 1`] = `
-"// 0 warning(s)
-
-============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, effect, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
-import { useButtonGroupDemo } from './state.pdx';
-
-{
-  let __pdx_style = document.getElementById("pdx-s-zbt576");
-  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-zbt576"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-zbt576], [data-pdx-zbt576-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-row, :where(:not([data-pdx-zbt576])):scope:is(.demo-row) { gap: var(--pdx-space-sm); }\\n}";
-}
-
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Single Toggle (Radio)</h2> <p class="pdx-txt-small pdx-ink-muted"><code>mode="single"</code> — only one button selected at a time. It is a radio group: each button is a radio, and the arrow keys move the selection. Name the group with <code>label</code>.</p> <div class="demo-row"> <span class="pdx-txt-caption pdx-ink-muted">Alignment:</span> <pdx-button-group mode="single" label="Text alignment"> <pdx-button variant="outline" value="left" data-pdx-zbt576-in>Left</pdx-button> <pdx-button variant="outline" value="center" data-pdx-zbt576-in>Center</pdx-button> <pdx-button variant="outline" value="right" data-pdx-zbt576-in>Right</pdx-button> </pdx-button-group> <span class="pdx-txt-small pdx-ink-muted">Selected: <!----></span> </div> <div class="demo-row"> <span class="pdx-txt-caption pdx-ink-muted">View:</span> <pdx-button-group mode="single" label="View" variant="ghost"> <pdx-button value="list" aria-label="List view" data-pdx-zbt576-in><pdx-icon name="list" size="sm" data-pdx-zbt576-in></pdx-icon></pdx-button> <pdx-button value="grid" aria-label="Grid view" data-pdx-zbt576-in><pdx-icon name="grid" size="sm" data-pdx-zbt576-in></pdx-icon></pdx-button> <pdx-button value="kanban" aria-label="Kanban view" data-pdx-zbt576-in><pdx-icon name="columns" size="sm" data-pdx-zbt576-in></pdx-icon></pdx-button> </pdx-button-group> <span class="pdx-txt-small pdx-ink-muted"><!----></span> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-button-group mode="single" label="Text alignment" :value="alignment" @pdx-change="onAlignment"&gt;\\n  &lt;pdx-button variant="outline" value="left"&gt;Left&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="outline" value="center"&gt;Center&lt;/pdx-button&gt;\\n  &lt;pdx-button variant="outline" value="right"&gt;Right&lt;/pdx-button&gt;\\n&lt;/pdx-button-group&gt;</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el7=__el5.firstChild.nextSibling.nextSibling.nextSibling;const __el11=__el7.nextSibling.nextSibling;const __t12=__el11.firstChild.nextSibling;const __el13=__el5.nextSibling.nextSibling;const __el15=__el13.firstChild.nextSibling.nextSibling.nextSibling;const __el22=__el15.nextSibling.nextSibling;const __t23=__el22.firstChild;return [__el7,__t12,__el15,__t23];};
-component('app-demo-comp-button-group-single-toggle', {
-  props: {},
-  setup(ctx) {
-const demo = useButtonGroupDemo();
-    const alignment = computed(() => demo.alignment(), { name: 'demo-comp-button-group-single-toggle:alignment' });
-    const viewMode = computed(() => demo.viewMode(), { name: 'demo-comp-button-group-single-toggle:viewMode' });
-    
-    
-    
-    
-    function onAlignment(e) { demo.onAlignment(e); }
-    function onViewMode(e) { demo.onViewMode(e); }
-    ctx.el.setAttribute('data-pdx-zbt576', '');
-    return { demo, alignment, viewMode, onAlignment, onViewMode };
-  },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el7,__t12,__el15,__t23]=__walk0(__frag);
-    let __el7w_value = {}; effect(() => { const __b = ctx.alignment(); if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });
-    __el7.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onAlignment), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t12,()=>ctx.alignment() || 'none');
-    let __el15w_value = {}; effect(() => { const __b = ctx.viewMode(); if (Object.is(__b, __el15w_value)) return; __el15w_value = __b; assignBoundProperty(__el15, "value", __b); });
-    __el15.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onViewMode), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t23,()=>ctx.viewMode() || 'none');
     return __frag;
   })(),
 });
@@ -31641,8 +31511,8 @@ import { useToggleGroupDemo } from './state.pdx';
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-8xnxw9], [data-pdx-8xnxw9-in]) to ([data-pdx-root] \\u003E *) {:scope .aligned, :where(:not([data-pdx-8xnxw9])):scope:is(.aligned), :scope .sample, :where(:not([data-pdx-8xnxw9])):scope:is(.sample) {\\n    margin-top: var(--pdx-space-md);\\n    padding: var(--pdx-space-md);\\n    border: 1px dashed var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-md);\\n  }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Multiple</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Any number pressed. The event carries both forms: <code>detail.value</code> (<code>"bold,italic"</code>)\\n      and <code>detail.values</code> (an array).\\n    </p> <div class="demo-row"> <pdx-toggle-group type="multiple" label="Formatting"> <pdx-toggle value="bold" aria-label="Bold" data-pdx-8xnxw9-in><strong data-pdx-8xnxw9-in>B</strong></pdx-toggle> <pdx-toggle value="italic" aria-label="Italic" data-pdx-8xnxw9-in><em data-pdx-8xnxw9-in>I</em></pdx-toggle> <pdx-toggle value="underline" aria-label="Underline" data-pdx-8xnxw9-in><u data-pdx-8xnxw9-in>U</u></pdx-toggle> <pdx-toggle value="strike" aria-label="Strikethrough" data-pdx-8xnxw9-in><s data-pdx-8xnxw9-in>S</s></pdx-toggle> </pdx-toggle-group> <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value"><!----></code></span> </div> <p class="pdx-txt-small sample">Formatted sample text</p> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el16=__el7.nextSibling.nextSibling;const __el17=__el16.firstChild.nextSibling;const __t18=__el17.firstChild;const __el19=__el6.nextSibling.nextSibling;return [__el7,__t18,__el19];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Multiple</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Any number pressed. <code>value-change</code> carries the comma-separated selection in <code>detail.value</code>\\n      (<code>"bold,italic"</code>); <code>value.split(\\',\\')</code> is the list.\\n    </p> <div class="demo-row"> <pdx-toggle-group type="multiple" label="Formatting"> <pdx-toggle value="bold" aria-label="Bold" data-pdx-8xnxw9-in><strong data-pdx-8xnxw9-in>B</strong></pdx-toggle> <pdx-toggle value="italic" aria-label="Italic" data-pdx-8xnxw9-in><em data-pdx-8xnxw9-in>I</em></pdx-toggle> <pdx-toggle value="underline" aria-label="Underline" data-pdx-8xnxw9-in><u data-pdx-8xnxw9-in>U</u></pdx-toggle> <pdx-toggle value="strike" aria-label="Strikethrough" data-pdx-8xnxw9-in><s data-pdx-8xnxw9-in>S</s></pdx-toggle> </pdx-toggle-group> <span class="pdx-txt-small pdx-ink-muted">value: <code class="live-value"><!----></code></span> </div> <p class="pdx-txt-small sample">Formatted sample text</p> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild.nextSibling;const __el17=__el8.nextSibling.nextSibling;const __el18=__el17.firstChild.nextSibling;const __t19=__el18.firstChild;const __el20=__el7.nextSibling.nextSibling;return [__el8,__t19,__el20];};
 component('app-demo-comp-toggle-group-multiple', {
   props: {},
   setup(ctx) {
@@ -31658,11 +31528,11 @@ component('app-demo-comp-toggle-group-multiple', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el7,__t18,__el19]=__walk0(__frag);
-    let __el7w_value = {}; effect(() => { const __b = ctx.formatting(); if (Object.is(__b, __el7w_value)) return; __el7w_value = __b; assignBoundProperty(__el7, "value", __b); });
-    __el7.addEventListener('value-change', safeHandler(batchHandler(e => ctx.setFormatting(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'value-change'));
-    bindInterpolation(__t18,()=>ctx.formatting() || '(none)');
-    let __el19w_style = {}; effect(() => { const __b = ctx.sampleStyle(); if (Object.is(__b, __el19w_style)) return; __el19w_style = __b; if ("style" in __el19) { const __v = __b; if (__v == null) clearBoundProperty(__el19, "style", "style"); else __el19["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el19.removeAttribute("style"); else { __el19.setAttribute("style", __v === true ? '' : String(__v)); } } });
+    const [__el8,__t19,__el20]=__walk0(__frag);
+    let __el8w_value = {}; effect(() => { const __b = ctx.formatting(); if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });
+    __el8.addEventListener('value-change', safeHandler(batchHandler(e => ctx.setFormatting(e.detail.value)), ctx.el?.tagName?.toLowerCase(), 'value-change'));
+    bindInterpolation(__t19,()=>ctx.formatting() || '(none)');
+    let __el20w_style = {}; effect(() => { const __b = ctx.sampleStyle(); if (Object.is(__b, __el20w_style)) return; __el20w_style = __b; if ("style" in __el20) { const __v = __b; if (__v == null) clearBoundProperty(__el20, "style", "style"); else __el20["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el20.removeAttribute("style"); else { __el20.setAttribute("style", __v === true ? '' : String(__v)); } } });
     return __frag;
   })(),
 });

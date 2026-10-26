@@ -2,8 +2,8 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">Multiple</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Any number pressed. The event carries both forms: <code>detail.value</code> (<code>"bold,italic"</code>)
-      and <code>detail.values</code> (an array).
+      Any number pressed. <code>value-change</code> carries the comma-separated selection in <code>detail.value</code>
+      (<code>"bold,italic"</code>); <code>value.split(',')</code> is the list.
     </p>
     <div class="demo-row">
       <pdx-toggle-group type="multiple" label="Formatting" :value="formatting" @value-change="e => setFormatting(e.detail.value)">
