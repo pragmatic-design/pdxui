@@ -360,6 +360,7 @@ export async function measureElement(page: Page, selector: string): Promise<Meas
             minWidth: parseFloat(cs.minWidth) || 0,
             boxShadow: cs.boxShadow,
             pointerEvents: cs.pointerEvents,
+            transform: cs.transform,
             overflow: cs.overflow,
             contentOverflowX: Math.max(0, el.scrollWidth - el.clientWidth),
         };
@@ -422,6 +423,7 @@ export async function measureMultiple(
                 minWidth: parseFloat(cs.minWidth) || 0,
                 boxShadow: cs.boxShadow,
                 pointerEvents: cs.pointerEvents,
+                transform: cs.transform,
                 overflow: cs.overflow,
                 contentOverflowX: Math.max(0, el.scrollWidth - el.clientWidth),
             };

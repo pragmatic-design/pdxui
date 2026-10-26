@@ -146,6 +146,31 @@ export async function assertComposition(page: Page, rule: CompositionRule) {
 
 // ── State (hover/focus/click/attribute) ──
 
+type StateChanges = Required<StateRule['changes']>;
+
+/**
+ * One assertion per key of `StateRule['changes']` (#704), against the element measured before the state
+ * and after it. Typed as a full record: a key added to `changes` with no assertion here is a compile
+ * error, so a rule can no longer declare a change that nothing measures. A border colour is read on
+ * every side, as the standalone `border` rules read it.
+ */
+const STATE_CHANGES: { [K in keyof StateChanges]: (before: MeasuredElement, after: MeasuredElement, rule: StateChanges[K], label: string) => void } = {
+    opacity: (_b, a, r, l) => assertNumeric(a.opacity, r, `${l} opacity`),
+    backgroundColor: (_b, a, r, l) => assertString(a.backgroundColor, r, `${l} bg`),
+    borderColor: (_b, a, r, l) => {
+        for (const side of ['top', 'right', 'bottom', 'left'] as const) {
+            assertString(a[`border${cap(side)}Color` as keyof MeasuredElement] as string, r, `${l} ${side} border color`);
+        }
+    },
+    boxShadow: (_b, a, r, l) => assertString(a.boxShadow, r, `${l} shadow`),
+    cursor: (_b, a, r, l) => assertString(a.cursor, r, `${l} cursor`),
+    transform: (_b, a, r, l) => assertString(a.transform, r, `${l} transform`),
+    pointerEvents: (_b, a, r, l) => assertString(a.pointerEvents, r, `${l} pointerEvents`),
+    mustDiffer: (b, a, props, l) => {
+        for (const prop of props) expect(a[prop], `${l}: ${prop} must differ`).not.toBe(b[prop]);
+    },
+};
+
 export async function assertState(page: Page, rule: StateRule) {
     const before = await measureElement(page, rule.selector);
     expect(before, `Element not found: ${rule.selector}`).not.toBeNull();
@@ -164,14 +189,12 @@ export async function assertState(page: Page, rule: StateRule) {
         const inState = await page.locator(host).first().evaluate((el, n) => el.matches(`:state(${n})`), name);
         expect(inState, `${rule.description}: ${host} is not :state(${name})`).toBe(true);
     }
-    if (rule.changes.opacity) assertNumeric(after!.opacity, rule.changes.opacity, `${rule.description} opacity`);
-    if (rule.changes.backgroundColor) assertString(after!.backgroundColor, rule.changes.backgroundColor, `${rule.description} bg`);
-    if (rule.changes.boxShadow) assertString(after!.boxShadow, rule.changes.boxShadow, `${rule.description} shadow`);
-    if (rule.changes.cursor) assertString(after!.cursor, rule.changes.cursor, `${rule.description} cursor`);
-    if (rule.changes.mustDiffer) {
-        for (const prop of rule.changes.mustDiffer) {
-            expect(after![prop], `${rule.description}: ${prop} must differ`).not.toBe(before![prop]);
-        }
+    for (const [key, value] of Object.entries(rule.changes)) {
+        if (value === undefined) continue;
+        // A key the type does not know — a manifest written in JS, or a misspelling — fails rather than pass.
+        const check = (STATE_CHANGES as Record<string, ((b: MeasuredElement, a: MeasuredElement, r: unknown, l: string) => void) | undefined>)[key];
+        expect(check, `${rule.description}: no assertion for changes.${key}`).toBeDefined();
+        check!(before!, after!, value, rule.description);
     }
 }
 

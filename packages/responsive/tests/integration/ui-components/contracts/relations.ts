@@ -23,7 +23,7 @@ export const MEASURED_KINDS: Record<keyof MeasuredElement, 'number' | 'string'> 
     backgroundColor: 'string', color: 'string', opacity: 'number', fontSize: 'number',
     fontFamily: 'string', fontWeight: 'string', letterSpacing: 'string', textTransform: 'string',
     cursor: 'string', display: 'string', minHeight: 'number', maxWidth: 'number', minWidth: 'number',
-    boxShadow: 'string', pointerEvents: 'string', overflow: 'string',
+    boxShadow: 'string', pointerEvents: 'string', transform: 'string', overflow: 'string',
     contentOverflowX: 'number',
 };
 
