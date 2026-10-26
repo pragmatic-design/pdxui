@@ -258,6 +258,8 @@ export const autocomplete: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) — the open state only (what the maths does not catch: the list's style) ──
     visual: {
         scenarios: ['autocomplete-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['autocomplete-open'],
         // The text input can show a blinking caret → masked, for stability.
         mask: ['section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input'],
     },

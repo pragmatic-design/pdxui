@@ -246,6 +246,8 @@ export const toast: ComponentManifest = {
     // The 4 variants cover colours/accent borders per theme; rich covers the title+message layout.
     visual: {
         scenarios: ['toast-variants', 'toast-rich'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['toast-variants', 'toast-rich'],
     },
 };
 

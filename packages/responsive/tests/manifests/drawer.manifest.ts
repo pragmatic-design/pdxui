@@ -181,6 +181,8 @@ export const drawer: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker), the open scenario ──
     visual: {
         scenarios: ['drawer-right'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['drawer-right'],
         // Measured floor, not a guess. At maxDiffPixelRatio 0 the whole visual
         // dimension has 25 failures out of 1591, and they are not spread across the suite — they
         // come from FOUR scenarios that carry state or movement. This is one of them: the drawer animates as it opens.

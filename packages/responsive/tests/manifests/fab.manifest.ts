@@ -171,6 +171,8 @@ export const fab: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) ──
     visual: {
         scenarios: ['fab-basic'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['fab-basic'],
     },
 };
 

@@ -8,16 +8,42 @@
  * Keep manifest.visual.scenarios to 1-2 per component: the geometry is covered by the
  * contracts (text, not PNGs); only purely visual regressions belong here.
  */
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext, type PageAssertionsToHaveScreenshotOptions } from '@playwright/test';
 import { goToScenario, applyTheme } from '../ui-components/contracts/measure';
 import { freezeAnimations } from '../ui-components/contracts/assertions';
 import { manifests, scenarioPage } from '../ui-components/contracts/generated/manifests';
 import { THEMES, schemeFor } from '../../manifests/_themes';
 import { PIXEL_THRESHOLD, pixelTolerance } from './pixel-threshold';
+import { overlaysOutsideShot } from './overlay-shot-area';
+
+// section[data-scenario] (the scenario's wrapper), NOT just any `section`: some scenarios
+// (scroll-spy, for one) hold nested content <section>s with no [hidden], which .first() would
+// otherwise capture.
+const SECTION = 'section[data-scenario]:not([hidden])';
+
+/**
+ * Shoots the scenario's section, or the viewport for a scenario the manifest lists in
+ * `viewportScenarios` — after measuring that the area holds every fixed overlay on the page (#714).
+ */
+async function shootArea(page: Page, viewport: boolean, name: string, options: PageAssertionsToHaveScreenshotOptions) {
+    const section = page.locator(SECTION).first();
+    // Measured where the screenshot will be taken: a section shot scrolls it into view first.
+    if (!viewport) await section.scrollIntoViewIfNeeded();
+    expect(await overlaysOutsideShot(page, viewport ? 'viewport' : SECTION),
+        'a fixed overlay the baseline would not hold — list the scenario in visual.viewportScenarios').toEqual([]);
+    return viewport
+        ? expect(page).toHaveScreenshot(name, options)
+        : expect(section).toHaveScreenshot(name, options);
+}
 
 for (const m of manifests) {
     if (!m.visual) continue;
     const themes = m.themes ?? THEMES;
+    for (const id of m.visual.viewportScenarios ?? []) {
+        if (!m.visual.scenarios.includes(id)) {
+            throw new Error(`${m.name}: visual.viewportScenarios names "${id}", which visual.scenarios does not shoot`);
+        }
+    }
 
     // ── Focus: one EXTRA screenshot, with an element focused ──
     //
@@ -53,8 +79,8 @@ for (const m of manifests) {
                 // at anything — which is the defect this runner exists because of.
                 await expect(target, `${f.selector} is not focused`).toBeFocused();
 
-                const section = page.locator('section[data-scenario]:not([hidden])').first();
-                await expect(section).toHaveScreenshot(`${f.scenario}${suffix}-${theme}.png`, {
+                const viewport = m.visual!.viewportScenarios?.includes(f.scenario) ?? false;
+                await shootArea(page, viewport, `${f.scenario}${suffix}-${theme}.png`, {
                     // A TIGHTER threshold than the resting screenshots, and this is the difference
                     // between a gate and a decoration. A focus ring is a thin outline around one
                     // small control: widening it by a pixel changes a few hundred pixels out of a
@@ -81,12 +107,10 @@ for (const m of manifests) {
         // that is not the picture the baseline describes. Those keep a fresh page each.
         const reusable = !scen?.setup;
 
+        const viewport = m.visual.viewportScenarios?.includes(scenarioId) ?? false;
+
         function shoot(page: Page, theme: string) {
-            // section[data-scenario] (the scenario's wrapper), NOT just any `section`: some
-            // scenarios (scroll-spy, for one) hold nested content <section>s with no [hidden],
-            // which .first() would otherwise capture.
-            const target = page.locator('section[data-scenario]:not([hidden])').first();
-            return expect(target).toHaveScreenshot(`${scenarioId}-${theme}.png`, {
+            return shootArea(page, viewport, `${scenarioId}-${theme}.png`, {
                 // A few pixels by default (pixel-threshold.ts: what a CPU rasterises differently), and
                 // that is a measurement rather than a preference. Exact, the whole visual dimension had
                 // 25 failures of 1591, NOT spread across the suite: they came from four scenarios

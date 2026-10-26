@@ -243,6 +243,8 @@ export const command: ComponentManifest = {
     // The input is masked (a blinking caret), to avoid a spurious diff.
     visual: {
         scenarios: ['command-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['command-open'],
         mask: ['section:not([hidden]) [data-test="cmd"] .pdx-command-input input'],
     },
 };

@@ -343,6 +343,8 @@ export const select: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) — closed + open ──
     visual: {
         scenarios: ['select-closed', 'select-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['select-open'],
     },
 };
 

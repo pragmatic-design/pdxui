@@ -278,6 +278,8 @@ export const mention: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) — the open state only (what the maths does not catch: the list's style) ──
     visual: {
         scenarios: ['mention-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['mention-open'],
         // The blinking caret in the textarea is masked, for a stable screenshot.
         mask: ['section:not([hidden]) [data-test="mn-open"] [data-part="input"]'],
     },
