@@ -37,8 +37,12 @@
         <div class="opt-row"><code>↑ / ↓</code><span>Previous / next toggle (vertical)</span></div>
         <div class="opt-row"><code>Home / End</code><span>First / last enabled toggle</span></div>
         <div class="opt-row"><code>Space / Enter</code><span>Press or release the focused toggle</span></div>
+        <div class="opt-row"><code>Tab</code><span><code>single</code>: one stop, the checked toggle (or the first enabled); <code>multiple</code>: every toggle</span></div>
       </div>
-      <p class="pdx-txt-small pdx-ink-muted">With <code>loop</code> (the default) the arrows wrap from the last toggle to the first.</p>
+      <p class="pdx-txt-small pdx-ink-muted">With <code>loop</code> (the default) the arrows wrap from the last toggle to the first.
+        A <code>single</code> group is a radio group (<code>role="radiogroup"</code>, its toggles <code>role="radio"</code> with
+        <code>aria-checked</code>): the arrows select the toggle they reach. In a <code>multiple</code> group, a <code>group</code>
+        of <code>aria-pressed</code> buttons, they move the focus only.</p>
     </section>
 
     <!-- ═══ Reference ═══ -->

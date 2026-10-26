@@ -23,7 +23,8 @@
 
 /* The variants, keyed on pdx-toggle's `variant` (#286); on a native button `.pdx-toggle-btn.pdx-outline`
    and its siblings. The pressed look keys by the button's aria-pressed, which a native toggle carries
-   too. Each rule follows the base one, so it wins at the same weight. */
+   too, or its aria-checked as the radio of a single toggle group. Each rule follows the base one, so it
+   wins at the same weight. */
 
 /* Outline variant (default) */
 @variant variant(outline) {
@@ -36,7 +37,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :scope > [data-part="root"][aria-pressed="true"] {
+    :scope > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-inset);
         border-color: var(--pdx-color-primary);
         color: var(--pdx-color-primary-ink);
@@ -53,7 +54,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :scope > [data-part="root"][aria-pressed="true"] {
+    :scope > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-inset);
         color: var(--pdx-color-primary-ink);
     }
@@ -69,7 +70,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :scope > [data-part="root"][aria-pressed="true"] {
+    :scope > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-primary);
         color: var(--pdx-color-primary-text);
     }

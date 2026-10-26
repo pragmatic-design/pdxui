@@ -3093,6 +3093,10 @@
           "title": "Toggle group — multiple, two pressed"
         },
         {
+          "id": "toggle-group-single",
+          "title": "Toggle group — single, a radio group, one checked"
+        },
+        {
           "id": "toggle-group-vertical",
           "title": "Toggle group — vertical, one pressed"
         },

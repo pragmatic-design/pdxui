@@ -379,6 +379,16 @@ semver.
 
 ### Changed
 
+- `pdx-toggle-group type="single"` is an APG radio group (#286), the pattern `pdx-button-group`'s
+  `mode="single"` has, so that mode can move here: the host is a `radiogroup` with
+  `aria-orientation`, each toggle a `radio` with `aria-checked`. It has one tab stop, on the checked
+  toggle or else the first enabled one, and the arrows select the toggle they reach and wrap at the
+  ends. A click on the checked toggle still clears the value. `multiple` is unchanged: a `group` of
+  `aria-pressed` buttons, each in the tab order, the arrows moving the focus only.
+  - `pdx-toggle` gains `radio`, which the group sets on its toggles: the button is a `radio` with
+    `aria-checked` instead of `aria-pressed`. The pressed look follows either attribute.
+  - Inside a `pdx-form-field`, a single group takes `aria-required` and `aria-invalid` itself, as
+    `pdx-radio-group` does.
 - **Breaking:** `pdx-toggle-group` takes the beta contract (#286).
   - **Model.** `value` is a model, announced with `value-change` and `{ value }`: `::value` binds it
     both ways. The group no longer emits `pdx-change` or `valuechange`; a listener on one is

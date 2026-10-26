@@ -26640,6 +26640,16 @@
             },
             {
               "kind": "field",
+              "name": "radio",
+              "description": "Set by a `pdx-toggle-group type=\"single\"` on its toggles: the button is a `radio` with\n`aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.\nNot for a toggle on its own: a radio belongs in a radiogroup.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "radio"
+            },
+            {
+              "kind": "field",
               "name": "variant",
               "description": "outline (the default), ghost or solid.",
               "type": {
@@ -26712,6 +26722,9 @@
               "detail": "{ value: boolean }"
             }
           ],
+          "roles": [
+            "radio"
+          ],
           "attributes": [
             {
               "name": "disabled",
@@ -26750,6 +26763,15 @@
               "default": "''"
             },
             {
+              "name": "radio",
+              "fieldName": "radio",
+              "description": "Set by a `pdx-toggle-group type=\"single\"` on its toggles: the button is a `radio` with\n`aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.\nNot for a toggle on its own: a radio belongs in a radiogroup.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
               "name": "variant",
               "fieldName": "variant",
               "description": "outline (the default), ghost or solid.",
@@ -26776,7 +26798,7 @@
           "cssParts": [
             {
               "name": "root",
-              "description": "The native `<button>`, aria-pressed; the pressed look keys by that attribute."
+              "description": "The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute."
             }
           ],
           "cssStates": [

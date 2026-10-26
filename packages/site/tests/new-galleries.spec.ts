@@ -47,13 +47,14 @@ test.describe('pdx-time-picker', () => {
 });
 
 test.describe('pdx-toggle-group', () => {
+    // A single group is a radio group (#286): its toggles are radios with aria-checked.
     test('single: a press changes the value and the paragraph it aligns', async ({ page }) => {
         await gallery(page, 'pdx-toggle-group');
         const s = section(page, 'Single');
-        await s.getByRole('button', { name: 'Center' }).click();
+        await s.getByRole('radio', { name: 'Center' }).click();
         await expect(s.getByText('value: center')).toBeVisible();
-        await expect(s.getByRole('button', { name: 'Center' })).toHaveAttribute('aria-pressed', 'true');
-        await expect(s.getByRole('button', { name: 'Left' })).toHaveAttribute('aria-pressed', 'false');
+        await expect(s.getByRole('radio', { name: 'Center' })).toHaveAttribute('aria-checked', 'true');
+        await expect(s.getByRole('radio', { name: 'Left' })).toHaveAttribute('aria-checked', 'false');
         await expect(s.locator('p.aligned')).toHaveCSS('text-align', 'center');
     });
 
@@ -69,13 +70,14 @@ test.describe('pdx-toggle-group', () => {
         await expect(s.getByText('value: bold,italic')).toBeVisible();
     });
 
-    test('the arrow keys step over a disabled item', async ({ page }) => {
+    test('the arrow keys step over a disabled item, and select what they reach', async ({ page }) => {
         await gallery(page, 'pdx-toggle-group');
         const s = section(page, 'Disabled item');
-        await expect(s.getByRole('button', { name: 'Week' })).toBeDisabled();
-        await s.getByRole('button', { name: 'Day' }).focus();
+        await expect(s.getByRole('radio', { name: 'Week' })).toBeDisabled();
+        await s.getByRole('radio', { name: 'Day' }).focus();
         await page.keyboard.press('ArrowRight');
-        await expect(s.getByRole('button', { name: 'Month' })).toBeFocused();
+        await expect(s.getByRole('radio', { name: 'Month' })).toBeFocused();
+        await expect(s.getByRole('radio', { name: 'Month' })).toHaveAttribute('aria-checked', 'true');
     });
 });
 

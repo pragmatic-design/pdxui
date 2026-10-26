@@ -2,9 +2,10 @@
  * MANIFEST — pdx-toggle-group
  *
  * Source: packages/ui/src/toggle/pdx-toggle.ts
- *   HOST <pdx-toggle-group class="pdx-toggle-group" role="group" orientation="horizontal|vertical">
- *        :state(disabled)
+ *   HOST <pdx-toggle-group class="pdx-toggle-group" role="radiogroup|group" orientation="horizontal|vertical">
+ *        :state(disabled)                       (radiogroup for type="single", group for "multiple")
  *     └── <pdx-toggle> … (display: contents) └── <button class="pdx-toggle-btn" data-part="root">
+ *                                               (role="radio" aria-checked | aria-pressed)
  * CSS: packages/design/src/components/toggle.css, generated from variant-sources: the toggles joined in
  * a row, in a column under the host's `orientation="vertical"`.
  *
@@ -33,6 +34,11 @@ export const toggleGroup: ComponentManifest = {
             id: 'toggle-group-basic',
             title: 'Toggle group — multiple, two pressed',
             html: `<pdx-toggle-group data-test="group" type="multiple" label="Formatting" value="a,c">${ITEMS}</pdx-toggle-group>`,
+        },
+        {
+            id: 'toggle-group-single',
+            title: 'Toggle group — single, a radio group, one checked',
+            html: `<pdx-toggle-group data-test="group" type="single" label="Alignment" value="b">${ITEMS}</pdx-toggle-group>`,
         },
         {
             id: 'toggle-group-vertical',
@@ -106,10 +112,10 @@ export const toggleGroup: ComponentManifest = {
     },
 
     // ── Dim. 2: axe-core ──
-    // The host is a `group` named by `label`; each toggle a <button> named by its text, its state in
-    // aria-pressed.
+    // `multiple`: the host is a `group` named by `label`, each toggle a <button> named by its text, its
+    // state in aria-pressed. `single`: a `radiogroup` of `radio` buttons with aria-checked.
     a11y: {
-        scenarios: ['toggle-group-basic', 'toggle-group-vertical', 'toggle-group-disabled'],
+        scenarios: ['toggle-group-basic', 'toggle-group-single', 'toggle-group-vertical', 'toggle-group-disabled'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -121,22 +127,24 @@ export const toggleGroup: ComponentManifest = {
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA) ──
-    // Tab reaches the first toggle; the arrows move between them, Home and End to the ends; Space
-    // presses the focused one.
+    // The pattern with a keyboard of its own is the radio group (`single`, the one pdx-button-group's
+    // mode="single" measured until #286 moved it here): Tab reaches the checked radio, the one tab stop;
+    // the arrows move the focus and aria-checked together and wrap at the ends; Home and End select the
+    // first and the last. `multiple`'s arrows move focus only: toggle-group-beta-contract.spec.ts.
     keyboard: {
-        scenario: 'toggle-group-basic',
+        scenario: 'toggle-group-single',
         steps: [
-            { key: 'Tab', expectFocus: FIRST },
-            { key: 'ArrowRight', expectFocus: SECOND },
-            { key: 'End', expectFocus: LAST },
-            { key: 'ArrowRight', expectFocus: FIRST },
-            { key: 'Space', expectAttr: { selector: FIRST, name: 'aria-pressed', value: 'false' } },
+            { key: 'Tab', expectFocus: SECOND },
+            { key: 'ArrowRight', expectFocus: LAST, expectAttr: { selector: LAST, name: 'aria-checked', value: 'true' } },
+            { key: 'ArrowRight', expectFocus: FIRST, expectAttr: { selector: FIRST, name: 'aria-checked', value: 'true' } },
+            { key: 'End', expectFocus: LAST, expectAttr: { selector: LAST, name: 'aria-checked', value: 'true' } },
+            { key: 'Home', expectFocus: FIRST, expectAttr: { selector: SECOND, name: 'aria-checked', value: 'false' } },
         ],
     },
 
     // ── Dim. 5: visual regression (Docker) ──
     visual: {
-        scenarios: ['toggle-group-basic', 'toggle-group-vertical', 'toggle-group-disabled'],
+        scenarios: ['toggle-group-basic', 'toggle-group-single', 'toggle-group-vertical', 'toggle-group-disabled'],
     },
 };
 
