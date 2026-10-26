@@ -5,16 +5,16 @@ A managed set of radios.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
-| `orientation` | `orientation` | string | `'vertical'` | Layout orientation — horizontal or vertical. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `error` | `error` | boolean | `false` | Marks the control as invalid. |
 | `label` | `label` | string | `''` | Accessible name of the group. Without it, a <pdx-label> right before the group names it. |
+| `orientation` | `orientation` | 'vertical' \| 'horizontal' | `'vertical'` | vertical (the default) or horizontal: the radios in a column or a row. |
 | `value` | `value` | string | `''` | The current value. |
 
 **Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
-**Renders:** roles `radiogroup`
+**States:** `:state(invalid)` — `error` is set; every radio is aria-invalid.; `:state(disabled)` — `disabled` is set; the group is aria-disabled and every radio disabled.
 
 
 #### Examples

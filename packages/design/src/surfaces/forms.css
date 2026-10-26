@@ -155,11 +155,13 @@
     flex-direction: column;
     gap: var(--pdx-space-sm);
 }
-.pdx-choice-group.horizontal {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: var(--pdx-space-md);
-}
+/* Horizontal, keyed on the groups' `orientation` (#286). The host class `horizontal` is gone; the base
+   class in the selector keeps the rule above the column it overrides. */
+:where(:is(pdx-radio-group,pdx-checkbox-group)[orientation="horizontal"]).pdx-choice-group {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--pdx-space-md);
+    }
 
 /* Toggle / Switch */
 .pdx-toggle {

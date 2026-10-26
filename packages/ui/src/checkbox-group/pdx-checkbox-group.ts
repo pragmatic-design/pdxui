@@ -16,6 +16,9 @@ import '../checkbox/pdx-checkbox'; // rendered by this component, and registered
 /**
  * A multi-selection across child `pdx-checkbox` elements, with one value for the form.
  *
+ * @cssstate invalid - `error` is set; every checkbox is aria-invalid.
+ * @cssstate disabled - `disabled` is set; the group is aria-disabled and every checkbox disabled.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail values $event.detail.value.split(',').filter(Boolean)
@@ -25,8 +28,14 @@ component('pdx-checkbox-group', {
         /** Comma-separated selected values. A form submits one entry per value, and resets it (#135). */
         value: model('', { form: true }),
     },
+    // On the host as custom states (#132).
+    states: ['invalid', 'disabled'],
+    // Its layout axis (#286), reflected on the host, where forms.css draws the row; no class for it.
+    variants: {
+        /** vertical (the default) or horizontal: the checkboxes in a column or a row. */
+        orientation: ['vertical', 'horizontal'],
+    },
     props: {
-        orientation: { type: String, default: 'vertical' },
         size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
@@ -91,12 +100,17 @@ component('pdx-checkbox-group', {
             if (!authored) requestAnimationFrame(() => nameGroup(ctx.el, ctx.el, label));
         });
 
-        // Host attributes + a value set from outside.
         ctx.track(() => {
-            const el = ctx.el;
-            const disabled = ctx.disabled();
-            const orient = ctx.orientation() as string;
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
+        // Its own class only, via classList: the author's classes survive. The base look of a choice
+        // group; the orientation is the host's attribute.
+        ctx.el.classList.add('pdx-choice-group');
+
+        // A value set from outside.
+        ctx.track(() => {
             const propVal = ctx.value() as string;
             if (propVal !== undefined && propVal !== null && propVal !== _reflected) {
                 const propSet = parseValue(propVal);
@@ -108,12 +122,6 @@ component('pdx-checkbox-group', {
                     _syncing = false;
                 }
             }
-
-            el.classList.add('pdx-choice-group');
-            el.classList.toggle('horizontal', orient === 'horizontal');
-            el.setAttribute('role', 'group');
-            if (disabled) el.setAttribute('aria-disabled', 'true');
-            else el.removeAttribute('aria-disabled');
         });
 
         // Children follow the selection and the shared props.
@@ -138,6 +146,12 @@ component('pdx-checkbox-group', {
         ctx.formValue?.(() => Array.from(selection.selected()));
 
         return {};
+    },
+    // Its role and ARIA (#133). No aria-orientation: a `group` may not carry it (axe's
+    // aria-allowed-attr), unlike the radio group's `radiogroup`. Written after `setup`, so its type is read.
+    host: {
+        role: 'group',
+        ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
     },
     render: () => html`<slot></slot>`,
 });

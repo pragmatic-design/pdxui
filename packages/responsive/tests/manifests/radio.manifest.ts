@@ -10,7 +10,7 @@
  *        - <span class="pdx-radio-content"> with .pdx-radio-label and .pdx-radio-desc
  *      An INTERACTIVE component (a native input, focusable). formAssociated.
  *  - source: packages/ui/src/radio-group/pdx-radio-group.ts
- *      el.className = 'pdx-choice-group' (+' horizontal'); role="radiogroup";
+ *      the class 'pdx-choice-group'; role="radiogroup" and [orientation] are host bindings (#286);
  *      aria-orientation; it passes name/size/disabled/error to the <pdx-radio> children.
  *      focusGroup() → arrows + Home/End + wrap (roving) over the <pdx-radio>s.
  *  - CSS: packages/design/src/surfaces/forms.css

@@ -36,6 +36,13 @@
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Once per change, the comma-separated selection; the children's own events stop at them</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span></span><span><code>error</code> / <code>disabled</code> is set; every checkbox follows</span></div>
+        <div class="opt-row"><code>[orientation="horizontal"]</code><span></span><span>The host's attribute: the boxes in a row</span></div>
+      </div>
     </section>
   </div>
 </template>

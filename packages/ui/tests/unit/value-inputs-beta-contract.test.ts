@@ -103,6 +103,19 @@ const DONE: Row[] = [
         parts: ['root', 'label', 'description'],
     },
     {
+        tag: 'pdx-radio-group',
+        model: 'value',
+        // No inner element of its own: it holds the author's radios.
+        states: ['invalid', 'disabled'],
+        parts: [],
+    },
+    {
+        tag: 'pdx-checkbox-group',
+        model: 'value',
+        states: ['invalid', 'disabled'],
+        parts: [],
+    },
+    {
         tag: 'pdx-switch',
         model: 'checked',
         states: ['checked', 'invalid', 'disabled', 'loading'],
@@ -122,6 +135,6 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     });
 
     it('lists its public parts', () => {
-        expect(decl?.cssParts?.map((p) => p.name).sort()).toEqual([...row.parts].sort());
+        expect((decl?.cssParts ?? []).map((p) => p.name).sort()).toEqual([...row.parts].sort());
     });
 });

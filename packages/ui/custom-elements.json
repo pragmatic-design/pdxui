@@ -5817,16 +5817,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
               "name": "size",
               "description": "Size of the control (e.g. sm, md, lg).",
               "type": {
@@ -5867,6 +5857,16 @@
             },
             {
               "kind": "field",
+              "name": "orientation",
+              "description": "vertical (the default) or horizontal: the checkboxes in a column or a row.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "orientation"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "Comma-separated selected values. A form submits one entry per value, and resets it (#135).",
               "type": {
@@ -5878,6 +5878,16 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "orientation",
+              "values": [
+                "vertical",
+                "horizontal"
+              ],
+              "default": "vertical"
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -5896,19 +5906,7 @@
               "detail": "{ value: string }"
             }
           ],
-          "roles": [
-            "group"
-          ],
           "attributes": [
-            {
-              "name": "orientation",
-              "fieldName": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'"
-            },
             {
               "name": "size",
               "fieldName": "size",
@@ -5946,6 +5944,15 @@
               "default": "''"
             },
             {
+              "name": "orientation",
+              "fieldName": "orientation",
+              "description": "vertical (the default) or horizontal: the checkboxes in a column or a row.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "Comma-separated selected values. A form submits one entry per value, and resets it (#135).",
@@ -5959,6 +5966,16 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set; every checkbox is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set; the group is aria-disabled and every checkbox disabled."
             }
           ]
         }
@@ -19702,16 +19719,6 @@
             },
             {
               "kind": "field",
-              "name": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'",
-              "attribute": "orientation"
-            },
-            {
-              "kind": "field",
               "name": "size",
               "description": "Size of the control (e.g. sm, md, lg).",
               "type": {
@@ -19752,6 +19759,16 @@
             },
             {
               "kind": "field",
+              "name": "orientation",
+              "description": "vertical (the default) or horizontal: the radios in a column or a row.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "orientation"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -19763,6 +19780,16 @@
           ],
           "models": [
             "value"
+          ],
+          "variants": [
+            {
+              "name": "orientation",
+              "values": [
+                "vertical",
+                "horizontal"
+              ],
+              "default": "vertical"
+            }
           ],
           "alphaEvents": [
             "pdx-change"
@@ -19780,9 +19807,6 @@
               "detail": "{ value: string }"
             }
           ],
-          "roles": [
-            "radiogroup"
-          ],
           "attributes": [
             {
               "name": "name",
@@ -19792,15 +19816,6 @@
                 "text": "string"
               },
               "default": "''"
-            },
-            {
-              "name": "orientation",
-              "fieldName": "orientation",
-              "description": "Layout orientation — horizontal or vertical.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'"
             },
             {
               "name": "size",
@@ -19839,6 +19854,15 @@
               "default": "''"
             },
             {
+              "name": "orientation",
+              "fieldName": "orientation",
+              "description": "vertical (the default) or horizontal: the radios in a column or a row.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "The current value.",
@@ -19852,6 +19876,16 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`error` is set; every radio is aria-invalid."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set; the group is aria-disabled and every radio disabled."
             }
           ]
         }
