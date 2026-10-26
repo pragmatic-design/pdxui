@@ -11,6 +11,8 @@ Edit nested JSON through a schema.
 
 **Renders:** roles `dialog`
 
+**Parts:** `[data-part="entry"]` — One scalar field: its caption and its control.; `[data-part="branch"]` — One object or list of objects: its caption, a summary and the button that opens it.; `[data-part="dialog"]` — The sub-modal a branch opens, `role="dialog"`, appended to the page's body.
+
 
 #### Examples
 

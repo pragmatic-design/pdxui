@@ -60,7 +60,7 @@ const isEmpty = (v: unknown): boolean =>
  * nothing. Those are named through their own prop instead.
  */
 function labeled(text: string, req?: boolean, native = false): HTMLElement {
-    const wrap = document.createElement(native ? 'label' : 'div'); wrap.className = 'jfld';
+    const wrap = document.createElement(native ? 'label' : 'div'); wrap.className = 'jfld'; wrap.dataset.part = 'entry';
     const span = document.createElement('span'); span.textContent = text + (req ? ' *' : ''); wrap.appendChild(span);
     return wrap;
 }
@@ -73,7 +73,7 @@ function labeled(text: string, req?: boolean, native = false): HTMLElement {
 function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLElement): Promise<unknown> {
     return new Promise((resolve) => {
         const back = document.createElement('div'); back.className = 'jed-back';
-        const box = document.createElement('div'); box.className = 'jed-box';
+        const box = document.createElement('div'); box.className = 'jed-box'; box.dataset.part = 'dialog';
         const headId = generatedId('jed-head');
         box.setAttribute('role', 'dialog');
         box.setAttribute('aria-modal', 'true');
@@ -117,7 +117,7 @@ function runModal(title: string, buildRoot: () => Promise<Ctrl>, opener: HTMLEle
 
 function makeComplex(f: FieldDef, val: unknown, onEdit: OnEdit): Ctrl {
     let state: unknown = f.type === 'objectList' ? (Array.isArray(val) ? val : []) : (val || null);
-    const wrap = document.createElement('div'); wrap.className = 'jcomplex';
+    const wrap = document.createElement('div'); wrap.className = 'jcomplex'; wrap.dataset.part = 'branch';
     const lab = document.createElement('span'); lab.className = 'jcomplex-l'; lab.textContent = f.label;
     const summary = document.createElement('span'); summary.className = 'jcomplex-s';
     const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'jcomplex-b'; btn.textContent = uiString('json-editor', 'edit');
@@ -200,7 +200,7 @@ async function makeField(f: FieldDef, val: unknown, onEdit: OnEdit): Promise<Ctr
     if (f.type === 'bool') {
         // The switch's own label: its text beside the switch, the switch's name, and a click on it
         // toggles. A caption above it would name nothing, and a click on it would change nothing.
-        const wrap = document.createElement('div'); wrap.className = 'jfld jfld-bool';
+        const wrap = document.createElement('div'); wrap.className = 'jfld jfld-bool'; wrap.dataset.part = 'entry';
         const sw = document.createElement('pdx-switch') as HTMLElement & { checked: boolean };
         sw.setAttribute('label', f.label);
         queueMicrotask(() => { sw.checked = !!val; }); wrap.appendChild(sw);
@@ -234,12 +234,17 @@ async function buildRoot(schema: FieldDef & { kind?: 'object' | 'list'; item?: F
  * A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each
  * object or list of objects in a sub-modal of its own.
  *
+ * @csspart entry - One scalar field: its caption and its control.
+ * @csspart branch - One object or list of objects: its caption, a summary and the button that opens it.
+ * @csspart dialog - The sub-modal a branch opens, `role="dialog"`, appended to the page's body.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  */
 component('pdx-json-editor', {
     // A form submits the document as JSON under the host's `name`, and resets it (#135).
     models: { value: model<unknown>(null, { type: Object, form: true }) },
+    parts: ['entry', 'branch', 'dialog'],
     props: {
         schema: { type: Object, default: null },
     },
@@ -299,6 +304,12 @@ component('pdx-json-editor', {
         });
 
         return { read: () => (root ? root.read() : null) };
+    },
+    // A group of fields, named by its schema's label (#133); inside a pdx-form-field the field's label
+    // names it instead (aria-labelledby outranks it). Written after `setup`, so its type is read.
+    host: {
+        role: 'group',
+        ':aria-label': (ctx) => (ctx.schema() as { label?: string } | null)?.label || null,
     },
     render: () => html``,
 });

@@ -82,6 +82,13 @@ const DONE: Row[] = [
         states: ['readonly'],
         parts: ['toolbar', 'field', 'input'],
     },
+    {
+        tag: 'pdx-json-editor',
+        model: 'value',
+        // No visual state: it has no disabled, readonly or error of its own.
+        states: [],
+        parts: ['entry', 'branch', 'dialog'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -92,7 +99,7 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     });
 
     it('lists its states as custom states', () => {
-        expect(decl?.cssStates?.map((s) => s.name).sort()).toEqual([...row.states].sort());
+        expect((decl?.cssStates ?? []).map((s) => s.name).sort()).toEqual([...row.states].sort());
     });
 
     it('lists its public parts', () => {
