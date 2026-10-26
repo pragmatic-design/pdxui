@@ -3,8 +3,8 @@
  *
  * An input of N cells (PIN/OTP): the host renders `.pdx-otp-container.pdx-otp-wrap`
  * and builds N `input.pdx-otp-cell` elements IMPERATIVELY (one per digit) inside a
- * requestAnimationFrame. The state classes (`error`/`disabled`) are on the wrapper;
- * the disabled cells get the native `:disabled`.
+ * requestAnimationFrame. The states are the host's custom states, `:state(invalid)` and
+ * `:state(disabled)` (#286); the disabled cells get the native `:disabled`.
  *
  * Contracts: the cells share a height and are aligned (composition); the size hierarchy is on the
  * wrapper. No exact px.
@@ -56,7 +56,7 @@ export const otpInput: ComponentManifest = {
         {
             id: 'pin-disabled',
             // A state already in the markup → a standalone rule, NOT a triggered state
-            // (the reactive .disabled class is applied in an rAF: using states here would be flaky).
+            // (the cells are rebuilt in an rAF: a triggered state here would be flaky).
             title: 'OTP Input — Masked PIN, disabled',
             html: `<pdx-otp-input data-test="pin" mask length="4" disabled></pdx-otp-input>`,
         },
@@ -118,6 +118,16 @@ export const otpInput: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="otp"] .pdx-otp-cell:first-of-type',
                         description: 'disabled cell is dimmed (opacity < 1)',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled otp-input is the custom state :state(disabled)',
+                        // The tier page holds every scenario, and `otp` is basic's host too.
+                        selector: 'section:not([hidden]) [data-test="otp"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="otp"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },

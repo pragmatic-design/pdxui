@@ -1,12 +1,19 @@
 // pdx-otp-input — N-cell code input with auto-advance, paste spread, backspace nav.
 // Uses imperative DOM for dynamic cell count. Each cell is a native <input>.
 
-import { component, html, model } from '@pdxui/core';
+import { component, event, html, model } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 
 /**
  * A one-time code input, one character per cell, that advances as the user types, spreads a pasted
  * code across the cells and steps back on Backspace.
+ *
+ * @csspart root - The cells' group, `role="group"`.
+ * @csspart cell - One cell: a native `<input>`, one per character.
+ * @csspart separator - The dash between groups of cells, with `separator`.
+ *
+ * @cssstate invalid - `error` is set; each cell is aria-invalid.
+ * @cssstate disabled - `disabled` is set; each cell is disabled.
  *
  * @alphaevent pdx-input
  * @alphadetail value $event.currentTarget.value
@@ -15,6 +22,14 @@ component('pdx-otp-input', {
     // Every digit writes it (#479), and the write dispatches `value-change`. `pdx-complete` stays: it is
     // the moment every cell is filled, not the value.
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** Every cell is filled: the whole code. */
+        'pdx-complete': event<{ value: string }>(),
+    },
+    // The visual states, on the host as custom states (#132), as pdx-input's: the container carries
+    // no state class of its own.
+    states: ['invalid', 'disabled'],
+    parts: ['root', 'cell', 'separator'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same cells on native markup. `md` is the base look, which no class adds to.
     variants: {
@@ -121,6 +136,11 @@ component('pdx-otp-input', {
             (e.target as HTMLInputElement).select();
         }
 
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+        });
+
         // Build cells imperatively (after render)
         ctx.track(() => {
             // Read all reactive props to subscribe
@@ -143,11 +163,8 @@ component('pdx-otp-input', {
             const container = ctx.el.querySelector<HTMLElement>(':scope > [data-part="root"]');
             if (!container) return;
 
-            // Set wrapper classes — its own two first, or the next build could not find it by them.
-            let cls = 'pdx-otp-container pdx-otp-wrap';
-            if (isError) cls += ' error';
-            if (disabled) cls += ' disabled';
-            container.className = cls;
+            // Its own two classes; the states are the host's (#286).
+            container.className = 'pdx-otp-container pdx-otp-wrap';
             // One named group around the cells: without it a screen reader hears "Digit 1, edit text"
             // with no idea what code it is entering.
             container.setAttribute('role', 'group');
@@ -163,12 +180,14 @@ component('pdx-otp-input', {
                 if (sep > 0 && i > 0 && i % sep === 0) {
                     const sepEl = document.createElement('span');
                     sepEl.className = 'pdx-otp-separator';
+                    sepEl.dataset.part = 'separator';
                     sepEl.textContent = '-';
                     container.appendChild(sepEl);
                 }
 
                 const input = document.createElement('input');
                 input.className = 'pdx-otp-cell';
+                input.dataset.part = 'cell';
                 input.type = isMask ? 'password' : 'text';
                 input.inputMode = isNumeric ? 'numeric' : 'text';
                 input.maxLength = 2; // Allow typing to trigger input event
@@ -177,6 +196,8 @@ component('pdx-otp-input', {
                 uiAttr(input, 'aria-label', () => format(uiString('otp-input', 'digit'), { n: i + 1, total: len })); // an accessible name per cell (axe label)
                 input.value = val[i] || '';
                 if (disabled) input.disabled = true;
+                // A2: the element with the role is the cell; the group may not carry aria-invalid.
+                if (isError) input.setAttribute('aria-invalid', 'true');
 
                 cells.push(val[i] || '');
                 inputs.push(input);

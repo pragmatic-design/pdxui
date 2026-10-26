@@ -40,7 +40,7 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-input</code><span>On every cell change</span></div>
+        <div class="opt-row"><code>value-change</code><span>On every cell change: <code>detail.value</code></span></div>
         <div class="opt-row"><code>pdx-complete</code><span>All cells filled</span></div>
       </div>
 
@@ -51,6 +51,14 @@
         <div class="opt-row"><kbd>Backspace</kbd><span>Clear current, move to previous</span></div>
         <div class="opt-row"><kbd>Arrow Left/Right</kbd><span>Navigate between cells</span></div>
         <div class="opt-row"><kbd>Ctrl+V</kbd><span>Paste spreads across cells</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid)</code><span><code>error</code> is set; each cell is <code>aria-invalid</code></span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span><code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="cell"] / [data-part="separator"]</code><span>The cells' group, one cell, the dash between groups</span></div>
       </div>
     </section>
   </div>

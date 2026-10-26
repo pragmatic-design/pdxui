@@ -569,8 +569,11 @@ pdx-row > .pdx-input {
 }
 .pdx-otp-cell:disabled { opacity: var(--pdx-opacity-disabled); cursor: not-allowed; }
 
-.pdx-otp-wrap.error .pdx-otp-cell { border-color: var(--pdx-color-danger); }
-.pdx-otp-wrap.error .pdx-otp-cell:focus { box-shadow: 0 0 0 2px oklch(from var(--pdx-color-danger) l c h / 0.15); }
+/* A native `.pdx-otp-wrap.error`, or pdx-otp-input's custom state (#286), at the same weight. */
+.pdx-otp-wrap.error .pdx-otp-cell,
+:state(invalid) > .pdx-otp-wrap .pdx-otp-cell { border-color: var(--pdx-color-danger); }
+.pdx-otp-wrap.error .pdx-otp-cell:focus,
+:state(invalid) > .pdx-otp-wrap .pdx-otp-cell:focus { box-shadow: 0 0 0 2px oklch(from var(--pdx-color-danger) l c h / 0.15); }
 
 /* OTP sizes, keyed on pdx-otp-input's `size` (#627); on native markup, `.pdx-otp-sm` on the wrap. */
 :where(pdx-otp-input[size="sm"]) > [data-part="root"] .pdx-otp-cell, .pdx-otp-sm .pdx-otp-cell { width: 2rem; height: 2rem; font-size: var(--pdx-text-base); }

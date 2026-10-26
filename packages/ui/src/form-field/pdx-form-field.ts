@@ -15,6 +15,22 @@ const _markedRequired = new WeakSet<Element>();
 const _labelledByField = new WeakSet<Element>();
 /** The controls a field named with its a11yLabel, unnamed again when it goes or a label shows. */
 const _namedByField = new WeakSet<Element>();
+/** The elements of a group a field marked aria-invalid: only those are unmarked when the error goes,
+ *  so a cell its own component marked keeps it. */
+const _markedInvalid = new WeakSet<Element>();
+/** The groups a field described by its hint and error, undescribed again when there is neither. */
+const _describedByField = new WeakSet<Element>();
+
+/** Set `name` on `el` while `on`, and take it back only if this field set it. */
+function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Element>, value = 'true'): void {
+    if (on) {
+        el.setAttribute(name, value);
+        marked.add(el);
+    } else if (marked.has(el)) {
+        el.removeAttribute(name);
+        marked.delete(el);
+    }
+}
 
 /**
  * Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA
@@ -324,8 +340,19 @@ component('pdx-form-field', {
                     }
                 }
 
+                // A group is described by the message too: aria-describedby is global. Its error
+                // (A2) goes where the role allows it (#286): a radiogroup takes aria-invalid itself; a
+                // `group` may carry neither aria-invalid nor aria-required (axe's aria-allowed-attr),
+                // so its text boxes take both — the otp input's cells, the time picker's segments.
+                if (group) {
+                    markAttr(group, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
+                    const radiogroup = group.matches('[role="radiogroup"]');
+                    for (const target of radiogroup ? [group] : boxes) markAttr(target, 'aria-invalid', err, _markedInvalid);
+                    if (!radiogroup) for (const box of boxes) markAttr(box, 'aria-required', required, _markedRequired);
+                }
+
                 // Propagate disabled/error/size to WC children
-                const wcInputs = el.querySelectorAll('pdx-input, pdx-textarea, pdx-checkbox, pdx-radio, pdx-switch, pdx-radio-group, pdx-checkbox-group');
+                const wcInputs = el.querySelectorAll('pdx-input, pdx-textarea, pdx-otp-input, pdx-checkbox, pdx-radio, pdx-switch, pdx-radio-group, pdx-checkbox-group');
                 for (const wc of wcInputs) {
                     if (disabled) wc.setAttribute('disabled', '');
                     if (err) wc.setAttribute('error', '');
