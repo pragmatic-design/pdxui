@@ -379,6 +379,15 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-segmented` takes the beta contract (#286).
+  - **States and parts.** `disabled` is a custom state on the host. The frame is the `root` part, and
+    each segment an `item` part.
+  - **Orientation.** A variant axis reflected on the host, where `segmented.css` draws the column; the
+    frame no longer carries `pdx-segmented-vertical`, which a native segmented control keeps.
+  - **Fixed:** with no value chosen, every segment had `tabindex="-1"`, so Tab never reached the
+    control; the first enabled segment now holds the tab stop. The arrows also started from the chosen
+    segment rather than the focused one, so with nothing chosen ArrowRight went to the first segment.
+    They now move on from the focus.
 - **Breaking:** `pdx-button-group` loses its selection modes (#286, decision 51): selecting among
   buttons is `pdx-toggle-group`. `mode`, `value` and `pdx-change` are gone; the button group is the
   action group, `role="group"`, with no state on its buttons.

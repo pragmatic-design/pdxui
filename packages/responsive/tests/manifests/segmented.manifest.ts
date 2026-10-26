@@ -3,15 +3,16 @@
  *
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/segmented/pdx-segmented.ts
- *      HOST <pdx-segmented> → render:
- *        <div class="pdx-segmented [pdx-segmented-{size}] [pdx-segmented-vertical]"
+ *      HOST <pdx-segmented size="sm|md|lg" orientation="horizontal|vertical"> :state(disabled)
+ *        → render:
+ *        <div class="pdx-segmented" data-part="root"
  *             role="radiogroup" :aria-label="label" :aria-orientation :aria-disabled [full]>
- *          [<input type="hidden">]  // only with a name
- *          <button class="pdx-segmented-item" role="radio" :aria-checked :tabindex :disabled
- *                  data-value=...>label</button> × N
+ *          <button class="pdx-segmented-item" data-part="item" role="radio" :aria-checked :tabindex
+ *                  :disabled data-value=...>label</button> × N
  *        </div>
  *      Radio-group semantics (exactly one selected). JSON-driven options.
- *      A roving tabindex: the active item has tabindex=0, the others -1.
+ *      A roving tabindex: the chosen item has tabindex=0, the others -1; with nothing chosen, the
+ *      first enabled one (#286).
  *      Keyboard: onKeydown custom → ArrowLeft/Right (horizontal) o Up/Down (vertical) +
  *      Home/End, wrapping modulo the count. The selection follows the focus (it writes its model, value-change, #480).
  *      aria-label from the `label` prop. formAssociated.
@@ -34,6 +35,9 @@
  * role="radio" with aria-checked. No disableRules: the scenario is accessible by design.
  */
 import type { ComponentManifest } from './_types';
+
+/** One segment of the basic scenario, by its value. */
+const SEG = (value: string) => `section:not([hidden]) [data-test="segmented"] [data-part="item"][data-value="${value}"]`;
 
 export const segmented: ComponentManifest = {
     name: 'segmented',
@@ -64,25 +68,25 @@ export const segmented: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-segmented → display inline-flex (flex with [full]).
-                        selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented',
+                        selector: 'section:not([hidden]) [data-test="segmented"] [data-part="root"]',
                         description: 'segmented container is flex',
                         display: { op: 'oneOf', value: ['inline-flex', 'flex'] },
                     },
                     {
                         // The container's border-radius: metro and cyberpunk may zero it → >= 0.
-                        selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented',
+                        selector: 'section:not([hidden]) [data-test="segmented"] [data-part="root"]',
                         description: 'segmented container radius >= 0',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // .pdx-segmented-item → cursor: pointer (an interactive control).
-                        selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented-item[aria-checked="true"]',
+                        selector: 'section:not([hidden]) [data-test="segmented"] [data-part="item"][aria-checked="true"]',
                         description: 'active item cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // An item that is not disabled → opaque.
-                        selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented-item[aria-checked="true"]',
+                        selector: 'section:not([hidden]) [data-test="segmented"] [data-part="item"][aria-checked="true"]',
                         description: 'active item opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
@@ -91,10 +95,10 @@ export const segmented: ComponentManifest = {
                     {
                         // The items share the flex row → the same height.
                         description: 'segmented items have consistent height',
-                        parent: '[data-test="segmented"] .pdx-segmented',
+                        parent: '[data-test="segmented"] [data-part="root"]',
                         children: {
-                            active: '[data-test="segmented"] .pdx-segmented-item[aria-checked="true"]',
-                            inactive: '[data-test="segmented"] .pdx-segmented-item[aria-checked="false"]',
+                            active: '[data-test="segmented"] [data-part="item"][aria-checked="true"]',
+                            inactive: '[data-test="segmented"] [data-part="item"][aria-checked="false"]',
                         },
                         relations: [
                             {
@@ -111,8 +115,8 @@ export const segmented: ComponentManifest = {
                         description: 'item contained in group',
                         parent: 'body',
                         children: {
-                            group: '[data-test="segmented"] .pdx-segmented',
-                            item: '[data-test="segmented"] .pdx-segmented-item[aria-checked="true"]',
+                            group: '[data-test="segmented"] [data-part="root"]',
+                            item: '[data-test="segmented"] [data-part="item"][aria-checked="true"]',
                         },
                         relations: [
                             {
@@ -132,7 +136,7 @@ export const segmented: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-segmented-item:disabled → opacity: var(--pdx-opacity-disabled) (≈0.5).
-                        selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented-item[aria-checked="true"]',
+                        selector: 'section:not([hidden]) [data-test="segmented"] [data-part="item"][aria-checked="true"]',
                         description: 'disabled segmented item has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
@@ -151,22 +155,22 @@ export const segmented: ComponentManifest = {
     isolation: {
         scenario: 'segmented-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="segmented"] .pdx-segmented', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="segmented"] [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA radiogroup → roving) ──
-    // A roving tabindex: the active item has tabindex=0. Tab enters the group; the arrows
-    // (Arrow plus Home/End) move the focus and the selection, staying inside the group.
-    // expectFocusWithin on the group: robust to the timing of the value/checked propagation.
+    // A roving tabindex: the chosen segment has tabindex=0. Tab lands on it; the arrows move the focus
+    // and the choice together and wrap at the ends; Home and End choose the first and the last (#286
+    // measures which segment, where it measured only that the focus stayed inside).
     keyboard: {
         scenario: 'segmented-basic',
         steps: [
-            { key: 'Tab', expectFocusWithin: '[data-test="segmented"]' },
-            { key: 'ArrowRight', expectFocusWithin: '[data-test="segmented"]' },
-            { key: 'ArrowLeft', expectFocusWithin: '[data-test="segmented"]' },
-            { key: 'Home', expectFocusWithin: '[data-test="segmented"]' },
-            { key: 'End', expectFocusWithin: '[data-test="segmented"]' },
+            { key: 'Tab', expectFocus: SEG('Week') },
+            { key: 'ArrowRight', expectFocus: SEG('Month'), expectAttr: { selector: SEG('Month'), name: 'aria-checked', value: 'true' } },
+            { key: 'ArrowRight', expectFocus: SEG('Day'), expectAttr: { selector: SEG('Day'), name: 'aria-checked', value: 'true' } },
+            { key: 'End', expectFocus: SEG('Month'), expectAttr: { selector: SEG('Month'), name: 'aria-checked', value: 'true' } },
+            { key: 'Home', expectFocus: SEG('Day'), expectAttr: { selector: SEG('Month'), name: 'aria-checked', value: 'false' } },
         ],
     },
 

@@ -6,11 +6,11 @@ A compact set of exclusive options.
 |---|---|---|---|---|
 | `options` | — | array | `[]` | Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. |
 | `full` | `full` | boolean | `false` | Stretches to the full width of its container. |
-| `orientation` | `orientation` | string | `'horizontal'` | Layout orientation — horizontal or vertical. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |
 | `label` | `label` | string | `''` | Visible label text. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the items' size. |
+| `orientation` | `orientation` | 'horizontal' \| 'vertical' | `'horizontal'` | horizontal (the default) or vertical: the segments in a row or a column. |
 | `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
@@ -24,6 +24,10 @@ A compact set of exclusive options.
 **Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `radio` · `radiogroup`
+
+**States:** `:state(disabled)` — `disabled` is set; every segment is disabled.
+
+**Parts:** `[data-part="root"]` — The frame, the `radiogroup`.; `[data-part="item"]` — One segment, a `radio` button; the chosen one is `aria-checked`.
 
 
 #### Examples

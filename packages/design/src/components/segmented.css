@@ -125,6 +125,7 @@
 
 /* ===== Vertical ===== */
 
-.pdx-segmented-vertical {
-    flex-direction: column;
-}
+/* Keyed on pdx-segmented's `orientation` (#286); on native markup `.pdx-segmented-vertical`. */
+:where(pdx-segmented[orientation="vertical"]) > [data-part="root"], .pdx-segmented-vertical {
+        flex-direction: column;
+    }
