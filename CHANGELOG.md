@@ -379,6 +379,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-rating` takes the beta contract (#286).
+  - **States and parts.** `disabled`, `readonly` and `focused` are custom states on the host; the frame
+    no longer carries `pdx-rating-disabled`, `pdx-rating-readonly` or `pdx-rating-focused` (native
+    markup keeps the first two). The frame is the `root` part, and each star a `star` part.
+  - **A1/A2.** Inside a `pdx-form-field` its slider is named by the label, described by the hint and
+    the error, and `aria-invalid` with it — the wiring `pdx-slider`'s thumbs got. A `slider` may not
+    carry `aria-required`: the label's marker says it.
 - **Breaking:** `pdx-slider` takes the beta contract (#286).
   - **States.** `disabled`, `invalid` and `dragging` are custom states on the host. The frame no longer
     carries `disabled`, `error` or `pdx-slider-dragging`; native markup keeps the first two.

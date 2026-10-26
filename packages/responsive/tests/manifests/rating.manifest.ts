@@ -3,13 +3,12 @@
  *
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/rating/pdx-rating.ts
- *      the HOST <pdx-rating> → render: an inner <div class="pdx-rating [pdx-rating-{size}]
- *        [pdx-rating-disabled] [pdx-rating-readonly] [pdx-rating-focused]"
+ *      the HOST <pdx-rating size="sm|md|lg"> :state(disabled|readonly|focused) → render: an inner
+ *        <div class="pdx-rating" data-part="root"
  *        role="slider" :aria-valuenow :aria-valuemin="0" :aria-valuemax="count"
  *        :aria-label="label" (default 'Rating') :aria-disabled :aria-readonly
  *        :tabindex="disabled ? -1 : 0">
- *          <span class="pdx-rating-star pdx-rating-star-{full|half|empty}"> ... <svg class="pdx-rating-icon"/> </span> × count
- *          [<input type="hidden">]  // only with a name
+ *          <span class="pdx-rating-star pdx-rating-star-{full|half|empty}" data-part="star"> ... <svg class="pdx-rating-icon"/> </span> × count
  *      The styled class .pdx-rating is on the INNER div, NOT on the host. Scope to "... .pdx-rating".
  *      Keyboard: onKeydown on the slider div → ArrowRight/Up (+precision), ArrowLeft/Down (-precision),
  *      Home (0), End (max). It is NOT roving over the stars: the focus stays on the single role="slider" div.
@@ -69,25 +68,25 @@ export const rating: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-rating → display: inline-flex (the inner div, not the host).
-                        selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating',
+                        selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]',
                         description: 'rating is inline-flex',
                         display: { op: 'oneOf', value: ['inline-flex', 'flex'] },
                     },
                     {
                         // An atom with 1.25rem icons → a cautious minimum.
-                        selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating',
+                        selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]',
                         description: 'rating height >= 14px',
                         height: { op: '>=', value: 14 },
                     },
                     {
                         // .pdx-rating → cursor: pointer (interactive).
-                        selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating',
+                        selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]',
                         description: 'rating cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // Not disabled → opaque.
-                        selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating',
+                        selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]',
                         description: 'rating opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
@@ -98,8 +97,8 @@ export const rating: ComponentManifest = {
                         description: 'star contained in rating (height <= rating height)',
                         parent: 'body',
                         children: {
-                            rating: '[data-test="rating"] .pdx-rating',
-                            star: '[data-test="rating"] .pdx-rating-star',
+                            rating: '[data-test="rating"] [data-part="root"]',
+                            star: '[data-test="rating"] [data-part="star"]',
                         },
                         relations: [
                             {
@@ -138,7 +137,7 @@ export const rating: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-rating-disabled → opacity: var(--pdx-opacity-disabled) (< 1).
-                        selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating',
+                        selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]',
                         description: 'disabled rating has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
@@ -158,7 +157,7 @@ export const rating: ComponentManifest = {
         scenario: 'rating-basic',
         targets: [
             // An atom with SVG icons: a generous tolerance for a pathological host.
-            { selector: 'section:not([hidden]) [data-test="rating"] .pdx-rating', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="rating"] [data-part="root"]', tolerancePx: 12 },
         ],
     },
 
@@ -169,7 +168,7 @@ export const rating: ComponentManifest = {
     keyboard: {
         scenario: 'rating-basic',
         steps: [
-            { key: 'Tab', expectFocus: '[data-test="rating"] .pdx-rating' },
+            { key: 'Tab', expectFocus: '[data-test="rating"] [data-part="root"]' },
             { key: 'ArrowRight', expectFocusWithin: '[data-test="rating"]' },
             { key: 'ArrowLeft', expectFocusWithin: '[data-test="rating"]' },
             { key: 'Home', expectFocusWithin: '[data-test="rating"]' },

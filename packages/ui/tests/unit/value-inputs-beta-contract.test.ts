@@ -122,6 +122,12 @@ const DONE: Row[] = [
         parts: ['root'],
     },
     {
+        tag: 'pdx-rating',
+        model: 'value',
+        states: ['disabled', 'readonly', 'focused'],
+        parts: ['root', 'star'],
+    },
+    {
         tag: 'pdx-slider',
         model: 'value',
         states: ['disabled', 'invalid', 'dragging'],
