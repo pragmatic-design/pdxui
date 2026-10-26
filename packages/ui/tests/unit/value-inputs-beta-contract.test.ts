@@ -9,7 +9,7 @@ import { join } from 'path';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
-type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts?: Named[]; events?: Named[] };
+type Decl = { tagName?: string; models?: string[]; formAssociated?: boolean; cssStates?: Named[]; cssParts?: Named[]; events?: Named[] };
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
@@ -167,5 +167,33 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
 
     it('lists its public parts', () => {
         expect((decl?.cssParts ?? []).map((p) => p.name).sort()).toEqual([...row.parts].sort());
+    });
+
+    // Every row of the table takes part in a form through its model's `{ form }` (#135) — the three the
+    // issue marked «no», pdx-toggle-group, pdx-rich-text and pdx-json-editor, among them.
+    it('is form-associated, through its model', () => {
+        expect(decl?.formAssociated).toBe(true);
+    });
+
+    // No name the migration removed for these components is still declared: the alpha events (#125,
+    // docs/language/beta/migration.md). pdx-pin-input's absence is pin-input-removed.test.ts's.
+    it('declares no alpha event', () => {
+        expect((decl?.events ?? []).map((e) => e.name).filter((n) => ALPHA.includes(n))).toEqual([]);
+    });
+});
+
+/** The alpha change events the migration removed (#125). */
+const ALPHA = ['pdx-change', 'change', 'valuechange', 'pressedchange', 'pdx-pressed-change', 'pdx-input'];
+
+describe('the family', () => {
+    it('is the issue\'s table: 23 rows, pdx-button-group gone to the action group (decision 51)', () => {
+        expect(DONE.map((r) => r.tag).sort()).toEqual([
+            'pdx-checkbox', 'pdx-checkbox-group', 'pdx-inline-edit', 'pdx-input', 'pdx-json-editor',
+            'pdx-masked-input', 'pdx-mention', 'pdx-number-input', 'pdx-otp-input', 'pdx-password-input',
+            'pdx-radio', 'pdx-radio-group', 'pdx-rating', 'pdx-rich-text', 'pdx-search-input',
+            'pdx-segmented', 'pdx-slider', 'pdx-switch', 'pdx-tag-input', 'pdx-textarea',
+            'pdx-toggle', 'pdx-toggle-group',
+        ]);
+        expect(decls.find((d) => d.tagName === 'pdx-button-group')?.models).toBeUndefined();
     });
 });

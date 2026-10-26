@@ -1337,6 +1337,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -4874,6 +4875,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -5829,6 +5831,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "orientation",
@@ -6078,6 +6081,7 @@
             "checked",
             "indeterminate"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -6888,6 +6892,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -8905,6 +8910,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -12262,6 +12268,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -14386,6 +14393,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-change"
           ],
@@ -14904,6 +14912,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -15302,6 +15311,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-change"
           ],
@@ -16044,6 +16054,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -16510,6 +16521,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-input",
             "pdx-change"
@@ -17796,6 +17808,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -18238,6 +18251,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -18966,6 +18980,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -19731,6 +19746,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "orientation",
@@ -19958,6 +19974,7 @@
           "models": [
             "checked"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -20275,6 +20292,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -21011,6 +21029,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-change"
           ],
@@ -21769,6 +21788,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -22084,6 +22104,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -22534,6 +22555,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -23219,6 +23241,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -24615,6 +24638,7 @@
           "models": [
             "checked"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -25271,6 +25295,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -25763,6 +25788,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -26198,6 +26224,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
@@ -26739,6 +26766,7 @@
           "models": [
             "pressed"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "variant",
@@ -26979,6 +27007,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "orientation",
@@ -27624,6 +27653,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-change"
           ],
@@ -27966,6 +27996,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "variants": [
             {
               "name": "size",
