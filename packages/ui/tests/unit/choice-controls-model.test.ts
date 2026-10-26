@@ -10,6 +10,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import * as core from '@pdxui/core';
 import { compile } from '../../../compiler/src/plugin';
+import { alphaChangeEvent, type AlphaLookup } from '../../../compiler/src/language/alpha-events';
 import { tick, cleanup } from './helpers';
 import '../../src/checkbox/pdx-checkbox';
 import '../../src/switch-toggle/pdx-switch';
@@ -29,6 +30,7 @@ const MODELS: Record<string, string[]> = {
     'pdx-toggle': ['pressed'],
     'pdx-radio-group': ['value'],
     'pdx-checkbox-group': ['value'],
+    'pdx-toggle-group': ['value'],
     'pdx-segmented': ['value'],
     'pdx-rating': ['value'],
     'pdx-slider': ['value'],
@@ -55,6 +57,29 @@ describe('the manifest', () => {
             expect(d?.alphaEvents?.length, `${tag} records no alpha event`).toBeGreaterThan(0);
         });
     }
+
+    // pdx-toggle-group's alpha `detail` carried `values`, a list; the manifest says how it reads now.
+    // The lookup is built as the resolver builds it from this entry (compiler's alpha-events.test.ts).
+    describe('pdx-toggle-group\'s alpha listeners, through its manifest entry', () => {
+        const d = decl('pdx-toggle-group') as { alphaEvents?: string[]; alphaDetail?: Record<string, string> } | undefined;
+        const alphaOf: AlphaLookup = (tag) => (tag === 'pdx-toggle-group'
+            ? { events: d?.alphaEvents ?? [], detail: d?.alphaDetail ?? {}, modelEvent: 'value-change' } : null);
+        const fix = (text: string) => (alphaChangeEvent.fix as (t: string, c: object) => string)(text, { alphaOf });
+
+        it('pdx migrate rewrites an inline handler on either alpha name, values read from the value', () => {
+            expect(fix('<pdx-toggle-group @pdx-change="e => pick(e.detail.values)"></pdx-toggle-group>'))
+                .toBe('<pdx-toggle-group @value-change="e => pick(e.detail.value.split(\',\').filter(Boolean))"></pdx-toggle-group>');
+            expect(fix('<pdx-toggle-group @valuechange="save($event.detail.value)"></pdx-toggle-group>'))
+                .toBe('<pdx-toggle-group @value-change="save($event.detail.value)"></pdx-toggle-group>');
+        });
+
+        it('a listener on either alpha name is PDX_REMOVED_FORM naming value-change', () => {
+            const source = '<template>\n<pdx-toggle-group @pdx-change="e => x = 1"></pdx-toggle-group>\n<pdx-toggle-group @valuechange="e => x = 2"></pdx-toggle-group>\n</template>\n<script>\nlet x = $signal(0);\n</script>\n';
+            const found = compile(source, 'groups.pdx', [], undefined, { alphaOf }).warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');
+            expect(found.map((w) => w.line)).toEqual([2, 3]);
+            for (const w of found) expect(w.message).toContain('`@value-change`');
+        });
+    });
 });
 
 /**
@@ -124,6 +149,14 @@ describe('an interaction announces the model\'s event, and no alpha event', () =
         expect(seen).toEqual([['value-change', { value: 'a' }]]);
     });
 
+    it('pdx-toggle-group: pressing a toggle is value-change on the group, and its toggle\'s event stops there', async () => {
+        const el = await mount('<pdx-toggle-group type="multiple" value="a"><pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle></pdx-toggle-group>');
+        const seen = record(el);
+        el.querySelectorAll('button')[1].click();
+        await tick();
+        expect(seen).toEqual([['value-change', { value: 'a,b' }]]);
+    });
+
     it('pdx-segmented: choosing a segment is value-change', async () => {
         const el = await mount(`<pdx-segmented options='["a","b"]' value="a"></pdx-segmented>`);
         const seen = record(el);
@@ -162,8 +195,9 @@ describe('::<model> binds each both ways', () => {
 <pdx-segmented class="sg" options='["a","b"]' ::value="seg"></pdx-segmented>
 <pdx-rating class="rt" ::value="stars"></pdx-rating>
 <pdx-slider class="sl" ::value="level"></pdx-slider>
-<p class="out">{{ String(agree) }} {{ String(on) }} {{ String(bold) }} {{ seg }} {{ stars }} {{ level }}</p>
-<button class="set" @click="agree = true; on = true; bold = true; seg = 'b'; stars = 3; level = 40">set</button>
+<pdx-toggle-group class="tgg" type="single" ::value="align"><pdx-toggle value="l">L</pdx-toggle><pdx-toggle value="r">R</pdx-toggle></pdx-toggle-group>
+<p class="out">{{ String(agree) }} {{ String(on) }} {{ String(bold) }} {{ seg }} {{ stars }} {{ level }} {{ align }}</p>
+<button class="set" @click="agree = true; on = true; bold = true; seg = 'b'; stars = 3; level = 40; align = 'r'">set</button>
 </template>
 <script>
 @tag 'pdx-choice-parent';
@@ -173,6 +207,7 @@ let bold = $signal(false);
 let seg = $signal('a');
 let stars = $signal(0);
 let level = $signal(0);
+let align = $signal('');
 </script>`);
     });
 
@@ -188,8 +223,8 @@ let level = $signal(0);
         const el = await parent();
         el.querySelector<HTMLButtonElement>('.set')!.click();
         await tick(20);
-        expect([prop(el, '.cb', 'checked'), prop(el, '.sw', 'checked'), prop(el, '.tg', 'pressed'), prop(el, '.sg', 'value'), prop(el, '.rt', 'value'), prop(el, '.sl', 'value')])
-            .toEqual([true, true, true, 'b', 3, 40]);
+        expect([prop(el, '.cb', 'checked'), prop(el, '.sw', 'checked'), prop(el, '.tg', 'pressed'), prop(el, '.sg', 'value'), prop(el, '.rt', 'value'), prop(el, '.sl', 'value'), prop(el, '.tgg', 'value')])
+            .toEqual([true, true, true, 'b', 3, 40, 'r']);
     });
 
     it('the component\'s own interaction sets the signal', async () => {
@@ -200,7 +235,8 @@ let level = $signal(0);
         el.querySelectorAll<HTMLButtonElement>('.sg .pdx-segmented-item')[1].click();
         key(el.querySelector('.rt [role="slider"]')!, 'ArrowRight');
         key(el.querySelector('.sl [role="slider"]')!, 'ArrowRight');
+        el.querySelectorAll<HTMLButtonElement>('.tgg button')[1].click();
         await tick(20);
-        expect(el.querySelector('.out')!.textContent).toBe('true true true b 1 1');
+        expect(el.querySelector('.out')!.textContent).toBe('true true true b 1 1 r');
     });
 });

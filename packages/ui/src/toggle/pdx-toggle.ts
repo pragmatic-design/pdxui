@@ -3,9 +3,8 @@
 // Uses focusGroup from core for roving tabindex in group mode.
 // Distinct from Segmented: toggle = action state (0..N), segmented = exclusive selection (1).
 
-import { component, html, prop, event, model } from '@pdxui/core';
+import { component, html, prop, model } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/toggle';
@@ -93,24 +92,38 @@ component('pdx-toggle', {
 /**
  * A set of toggle buttons that share one value, keeping at most one pressed or any number as a
  * comma-separated value, with the arrow keys moving between them.
+ *
+ * @cssstate disabled - `disabled` is set; the group is aria-disabled and every toggle disabled.
+ *
+ * @alphaevent pdx-change
+ * @alphaevent valuechange
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value.split(',').filter(Boolean)
  */
 component('pdx-toggle-group', {
+    models: {
+        /** The pressed toggles' values: one for `single`, comma-separated for `multiple`. A form submits
+         *  one entry per value, and resets it (#135). A press writes it, and the write dispatches
+         *  `value-change`. */
+        value: model('', { form: true }),
+    },
+    // On the host as a custom state (#132).
+    states: ['disabled'],
+    // Its layout axis (#286), reflected on the host, where toggle.css joins the toggles in a column;
+    // no class for it.
+    variants: {
+        /** horizontal (the default) or vertical: the toggles joined in a row or a column. */
+        orientation: ['horizontal', 'vertical'],
+    },
     props: {
         type: prop('single'),
-        /** For single: string. For multiple: comma-separated string of values. */
-        value: prop(''),
         disabled: prop(false),
-        orientation: prop('horizontal'),
+        /** Passed to every toggle. */
         variant: prop('outline'),
+        /** Passed to every toggle. */
         size: prop(''),
         loop: prop(true),
         label: prop(''),
-    },
-    events: {
-        /** Fired when the group's value changes: `value` as the attribute holds it, `values` as a list. */
-        'pdx-change': event<{ value: string; values: string[] }>(),
-        /** The legacy name of `pdx-change`, kept as an alias. */
-        'valuechange': event<{ value: string; values: string[] }>(),
     },
     setup(ctx) {
         function getValues(): string[] {
@@ -139,10 +152,7 @@ component('pdx-toggle-group', {
                     : [...current, val];
             }
 
-            const nextStr = isSingle ? (nextValues[0] || '') : nextValues.join(',');
-            setOwnProp(ctx.el, 'value', nextStr);
-            ctx.emit('pdx-change', { value: nextStr, values: nextValues });
-            ctx.emit('valuechange', { value: nextStr, values: nextValues });
+            ctx.value.set(isSingle ? (nextValues[0] || '') : nextValues.join(','));
         }
 
         // Wire child toggles
@@ -223,24 +233,24 @@ component('pdx-toggle-group', {
             }
         }
 
-        function groupClass(): string {
-            let cls = 'pdx-toggle-group';
-            if (ctx.orientation() === 'vertical') cls += ' pdx-toggle-group-vertical';
-            return cls;
-        }
+        ctx.track(() => { ctx.state('disabled', !!ctx.disabled()); });
 
-        return { groupClass, onKeydown };
+        // Its own class only, via classList: the author's classes survive. The joined row; the
+        // orientation is the host's attribute.
+        ctx.el.classList.add('pdx-toggle-group');
+
+        // One entry per pressed toggle, or none.
+        ctx.formValue?.(() => getValues());
+
+        return { onKeydown };
     },
-    render: (ctx) => html`
-        <div
-            :class="${ctx.groupClass}"
-            role="group"
-            :aria-label="${ctx.label}"
-            :aria-orientation="${ctx.orientation}"
-            :aria-disabled="${() => ctx.disabled() ? 'true' : null}"
-            @keydown="${ctx.onKeydown}"
-        >
-            <slot></slot>
-        </div>
-    `,
+    // Its role, ARIA and keys (#133). No aria-orientation: a `group` may not carry it (axe's
+    // aria-allowed-attr). Written after `setup`, so its type is read.
+    host: {
+        role: 'group',
+        ':aria-label': (ctx) => (ctx.label() as string) || null,
+        ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
+        '@keydown': (ctx, e) => ctx.onKeydown(e as KeyboardEvent),
+    },
+    render: () => html`<slot></slot>`,
 });

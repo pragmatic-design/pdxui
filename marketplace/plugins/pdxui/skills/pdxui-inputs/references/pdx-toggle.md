@@ -44,7 +44,7 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-row">
-  <pdx-toggle-group type="multiple" :value="formatting" @valuechange="onFormatting" label="Formatting">
+  <pdx-toggle-group type="multiple" :value="formatting" @value-change="onFormatting" label="Formatting">
     <pdx-toggle value="bold" aria-label="Bold"><strong>B</strong></pdx-toggle>
     <pdx-toggle value="italic" aria-label="Italic"><em>I</em></pdx-toggle>
     <pdx-toggle value="underline" aria-label="Underline"><u>U</u></pdx-toggle>
@@ -57,7 +57,7 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-row">
-  <pdx-toggle-group type="single" :value="align" @valuechange="onAlign" label="Alignment">
+  <pdx-toggle-group type="single" :value="align" @value-change="onAlign" label="Alignment">
     <pdx-toggle value="left">Left</pdx-toggle>
     <pdx-toggle value="center">Center</pdx-toggle>
     <pdx-toggle value="right">Right</pdx-toggle>

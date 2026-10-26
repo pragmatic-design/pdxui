@@ -47,14 +47,26 @@
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
         <div class="opt-row"><code>type</code><span>string</span><span>single (default) or multiple</span></div>
-        <div class="opt-row"><code>value</code><span>string</span><span>Pressed value; comma-separated for multiple</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Pressed value; comma-separated for multiple. The model: <code>::value</code> binds it both ways, and a form submits one entry per pressed toggle under <code>name</code></span></div>
         <div class="opt-row"><code>label</code><span>string</span><span>Accessible name of the group</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables every toggle</span></div>
-        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default) or vertical</span></div>
+        <div class="opt-row"><code>orientation</code><span>string</span><span>horizontal (default) or vertical; reflected on the host</span></div>
         <div class="opt-row"><code>variant</code><span>string</span><span>outline (default), ghost, solid — passed to the toggles</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg — passed to the toggles</span></div>
         <div class="opt-row"><code>loop</code><span>boolean</span><span>Arrow keys wrap around (default true)</span></div>
-        <div class="opt-row"><code>pdx-change</code><span>event</span><span><code>detail.value</code> and <code>detail.values</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value: string }</span><span>A press wrote <code>value</code>; the list is <code>value.split(',')</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span></span><span><code>disabled</code> is set; the group is <code>aria-disabled</code> and every toggle disabled</span></div>
+        <div class="opt-row"><code>[orientation="vertical"]</code><span></span><span>The toggles joined in a column</span></div>
       </div>
     </section>
   </div>

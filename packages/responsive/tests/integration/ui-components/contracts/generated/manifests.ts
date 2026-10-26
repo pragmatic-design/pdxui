@@ -101,6 +101,7 @@ import { timePicker } from '../../../../manifests/time-picker.manifest';
 import { timeline } from '../../../../manifests/timeline.manifest';
 import { toast } from '../../../../manifests/toast.manifest';
 import { toggleButton } from '../../../../manifests/toggle-button.manifest';
+import { toggleGroup } from '../../../../manifests/toggle-group.manifest';
 import { toggle } from '../../../../manifests/toggle.manifest';
 import { toolbar } from '../../../../manifests/toolbar.manifest';
 import { tooltip } from '../../../../manifests/tooltip.manifest';
@@ -155,13 +156,14 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
     "time-picker": [{"name":"size","values":["md","sm","lg"],"default":"md","native":{"md":".pdx-time-picker-md","sm":".pdx-time-picker-sm","lg":".pdx-time-picker-lg"}}],
     "toast": [{"name":"position","values":["top-right","top-left","bottom-right","bottom-left","top-center","bottom-center"],"default":"top-right","native":{"top-right":".pdx-toast-container[position=\"top-right\"]","top-left":".pdx-toast-container[position=\"top-left\"]","bottom-right":".pdx-toast-container[position=\"bottom-right\"]","bottom-left":".pdx-toast-container[position=\"bottom-left\"]","top-center":".pdx-toast-container[position=\"top-center\"]","bottom-center":".pdx-toast-container[position=\"bottom-center\"]"}}],
     "toggle-button": [{"name":"variant","values":["outline","ghost","solid"],"default":"outline","native":{"outline":".pdx-toggle-btn.pdx-outline","ghost":".pdx-toggle-btn.pdx-ghost","solid":".pdx-toggle-btn.pdx-solid"}}],
+    "toggle-group": [{"name":"orientation","values":["horizontal","vertical"],"default":"horizontal"}],
     "toggle": [{"name":"size","values":["md","sm","lg"],"default":"md","native":{"md":".pdx-toggle-md","sm":".pdx-toggle-sm","lg":".pdx-toggle-lg"}}],
     "tree-select": [{"name":"size","values":["md","xs","sm","lg","xl"],"default":"md","native":{"md":".pdx-input-md","xs":".pdx-input-xs","sm":".pdx-input-sm","lg":".pdx-input-lg","xl":".pdx-input-xl"}}],
     "wizard": [{"name":"size","values":["md","sm"],"default":"md","native":{"md":".pdx-stepper-md","sm":".pdx-stepper-sm"}}],
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, pagination, passwordInput, popover, progress, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, pagination, passwordInput, popover, progress, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -652,6 +654,11 @@ export const scenarioPage: Record<string, string> = {
     "toggle-button-variant-outline": "tier-1b",
     "toggle-button-variant-ghost": "tier-1b",
     "toggle-button-variant-solid": "tier-1b",
+    "toggle-group-basic": "tier-1b",
+    "toggle-group-vertical": "tier-1b",
+    "toggle-group-disabled": "tier-1b",
+    "toggle-group-orientation-horizontal": "tier-1b",
+    "toggle-group-orientation-vertical": "tier-1b",
     "toggle-basic": "tier-1b",
     "toggle-size-md": "tier-1b",
     "toggle-size-sm": "tier-1b",

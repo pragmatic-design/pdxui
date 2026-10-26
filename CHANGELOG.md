@@ -379,6 +379,21 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-toggle-group` takes the beta contract (#286).
+  - **Model.** `value` is a model, announced with `value-change` and `{ value }`: `::value` binds it
+    both ways. The group no longer emits `pdx-change` or `valuechange`; a listener on one is
+    `PDX_REMOVED_FORM`, and `pdx migrate` rewrites an inline handler (`detail.values` becomes
+    `$event.detail.value.split(',').filter(Boolean)`).
+  - **Form.** It is form-associated: a form submits one entry per pressed toggle under its `name`,
+    and `form.reset()` restores the value it mounted with. It was outside the form.
+  - **Host.** The element is the group: `role="group"`, `aria-label` and `aria-disabled` are host
+    bindings, the `pdx-toggle-group` class is on the host, and the inner `<div>` is gone. It no longer
+    carries `aria-orientation`, which a `group` may not.
+  - **States and orientation.** `disabled` is a custom state; `orientation` is a variant axis
+    reflected on the host, where `toggle.css` draws the column; the `pdx-toggle-group-vertical` class
+    is gone.
+  - **Fixed:** a vertical group squared its inner corners only in part: the first toggle kept its
+    bottom-left corner rounded and the last its top-right, from the row's rules.
 - **Breaking:** `pdx-toggle` takes the beta contract (#286).
   - **States.** `pressed` and `disabled` are custom states on the host.
   - **Variant.** `variant` (outline, ghost, solid) is a variant axis reflected on the host, where

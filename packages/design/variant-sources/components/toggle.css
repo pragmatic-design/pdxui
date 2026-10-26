@@ -122,26 +122,39 @@
     margin-left: calc(-1 * var(--pdx-border-width));
 }
 
-/* Vertical group */
-.pdx-toggle-group-vertical {
-    flex-direction: column;
-}
+/* Vertical group, keyed on pdx-toggle-group's `orientation` (#286). `:scope.pdx-toggle-group` keeps
+   the weight the vertical class had, so each rule still beats the horizontal one it follows. */
+@variant pdx-toggle-group orientation(vertical) {
+    :scope.pdx-toggle-group {
+        flex-direction: column;
+    }
 
-.pdx-toggle-group-vertical .pdx-toggle-btn {
-    border-radius: 0;
-}
+    :scope.pdx-toggle-group .pdx-toggle-btn {
+        border-radius: 0;
+    }
 
-.pdx-toggle-group-vertical > pdx-toggle:first-child .pdx-toggle-btn {
-    border-top-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
-    border-top-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
-}
+    :scope.pdx-toggle-group > pdx-toggle:first-child .pdx-toggle-btn {
+        border-top-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+        border-top-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    }
 
-.pdx-toggle-group-vertical > pdx-toggle:last-child .pdx-toggle-btn {
-    border-bottom-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
-    border-bottom-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
-}
+    :scope.pdx-toggle-group > pdx-toggle:last-child .pdx-toggle-btn {
+        border-bottom-left-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+        border-bottom-right-radius: var(--pdx-control-radius, var(--pdx-button-radius, var(--pdx-radius-md)));
+    }
 
-.pdx-toggle-group-vertical > pdx-toggle:not(:first-child) .pdx-toggle-btn {
-    margin-left: 0;
-    margin-top: calc(-1 * var(--pdx-border-width));
+    /* The row's outer corners are inner ones in a column: the first toggle's bottom-left and the
+       last's top-right, which the row rules above round, go square. A lone toggle keeps all four. */
+    :scope.pdx-toggle-group > pdx-toggle:first-child:not(:last-child) .pdx-toggle-btn {
+        border-bottom-left-radius: 0;
+    }
+
+    :scope.pdx-toggle-group > pdx-toggle:last-child:not(:first-child) .pdx-toggle-btn {
+        border-top-right-radius: 0;
+    }
+
+    :scope.pdx-toggle-group > pdx-toggle:not(:first-child) .pdx-toggle-btn {
+        margin-left: 0;
+        margin-top: calc(-1 * var(--pdx-border-width));
+    }
 }
