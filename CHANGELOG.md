@@ -11,6 +11,10 @@ semver.
 
 ### Features
 
+- `custom-elements.json` records `formAssociated: true` on a component whose model is declared
+  `{ form: true }` (#135): a reader learns that it takes part in a form without running it. All 22
+  value inputs of #286 carry it, among them `pdx-toggle-group`, `pdx-rich-text` and `pdx-json-editor`,
+  which took no part in a form before.
 - A snippet of a library list or menu reads the app's own item (#651). A TypeScript descriptor declares
   a type parameter, `generics: { T: { extends: '{ key: string; label: string }', from: 'items' } }`, the
   manifest records it and types `items` as `T[]`, and the editor infers `T` from `:items`: an invented

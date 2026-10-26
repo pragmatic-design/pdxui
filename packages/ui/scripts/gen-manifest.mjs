@@ -218,6 +218,23 @@ function extractModels(optionsObj, sourceFile) {
 }
 
 /**
+ * Whether a model is declared `{ form: true }` (#135): `model(default, { form: true })` makes the
+ * component form-associated, its model the form's value. The manifest records it, so a reader — the
+ * value-input family's test (#286), an agent's page card — need not run the component to know.
+ */
+function hasFormModel(optionsObj, sourceFile) {
+    const modelsProp = optionsObj.properties.find(
+        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'models');
+    if (!modelsProp || !ts.isObjectLiteralExpression(modelsProp.initializer)) return false;
+    return modelsProp.initializer.properties.some((decl) => {
+        if (!ts.isPropertyAssignment(decl) || !ts.isCallExpression(decl.initializer)) return false;
+        const options = decl.initializer.arguments[1];
+        return !!options && ts.isObjectLiteralExpression(options) && options.properties.some((p) =>
+            ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'form' && p.initializer.kind === ts.SyntaxKind.TrueKeyword);
+    });
+}
+
+/**
  * The slots a typed descriptor declares, `slots: { item: slot<(item: T, index: number) => Node>() }`
  * (#491) → name → signature, the parameter list the editor types a parent's `@snippet` from. A
  * `slot()` with no type argument takes no arguments, `()`.
@@ -1051,6 +1068,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             members,
             // The props `::x` may bind (#124): the compiler's resolver reads them from here.
             ...(models.length ? { models: models.map(m => m.name) } : {}),
+            // Takes part in a form through a model declared `{ form: true }` (#135).
+            ...(hasFormModel(optionsObj, sourceFile) ? { formAssociated: true } : {}),
             // The variant axes (#512): the design build checks its `@variant` rules against them, and
             // certification generates one scenario per value.
             ...(variants.length ? { variants } : {}),
