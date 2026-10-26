@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/toggle.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Toggle Button & Toggle Group — action state buttons (bold/italic/underline).
    Distinct from Segmented: toggle = 0..N active, segmented = exactly 1.
 */
@@ -21,55 +22,53 @@
     border: var(--pdx-border-width) solid transparent;
 }
 
+/* The variants, keyed on pdx-toggle's `variant` (#286); on a native button `.pdx-toggle-btn.pdx-outline`
+   and its siblings. The pressed look keys by the button's aria-pressed, which a native toggle carries
+   too. Each rule follows the base one, so it wins at the same weight. */
+
 /* Outline variant (default) */
-.pdx-toggle-btn.pdx-outline {
-    background: transparent;
-    border-color: var(--pdx-color-border);
-    color: var(--pdx-color-muted);
-}
-
-.pdx-toggle-btn.pdx-outline:hover {
-    background: var(--pdx-color-inset);
-    color: var(--pdx-color-text);
-}
-
-.pdx-toggle-btn.pdx-outline.pdx-toggle-on {
-    background: var(--pdx-color-inset);
-    border-color: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-ink);
-}
+:where(pdx-toggle[variant="outline"]) > [data-part="root"], .pdx-toggle-btn.pdx-outline {
+        background: transparent;
+        border-color: var(--pdx-color-border);
+        color: var(--pdx-color-muted);
+    }
+    :where(pdx-toggle[variant="outline"]) > [data-part="root"]:hover, .pdx-toggle-btn.pdx-outline:hover {
+        background: var(--pdx-color-inset);
+        color: var(--pdx-color-text);
+    }
+    :where(pdx-toggle[variant="outline"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-outline[aria-pressed="true"] {
+        background: var(--pdx-color-inset);
+        border-color: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-ink);
+    }
 
 /* Ghost variant */
-.pdx-toggle-btn.pdx-ghost {
-    background: transparent;
-    color: var(--pdx-color-muted);
-}
-
-.pdx-toggle-btn.pdx-ghost:hover {
-    background: var(--pdx-color-inset);
-    color: var(--pdx-color-text);
-}
-
-.pdx-toggle-btn.pdx-ghost.pdx-toggle-on {
-    background: var(--pdx-color-inset);
-    color: var(--pdx-color-primary-ink);
-}
+:where(pdx-toggle[variant="ghost"]) > [data-part="root"], .pdx-toggle-btn.pdx-ghost {
+        background: transparent;
+        color: var(--pdx-color-muted);
+    }
+    :where(pdx-toggle[variant="ghost"]) > [data-part="root"]:hover, .pdx-toggle-btn.pdx-ghost:hover {
+        background: var(--pdx-color-inset);
+        color: var(--pdx-color-text);
+    }
+    :where(pdx-toggle[variant="ghost"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-ghost[aria-pressed="true"] {
+        background: var(--pdx-color-inset);
+        color: var(--pdx-color-primary-ink);
+    }
 
 /* Solid variant */
-.pdx-toggle-btn.pdx-solid {
-    background: transparent;
-    color: var(--pdx-color-muted);
-}
-
-.pdx-toggle-btn.pdx-solid:hover {
-    background: var(--pdx-color-inset);
-    color: var(--pdx-color-text);
-}
-
-.pdx-toggle-btn.pdx-solid.pdx-toggle-on {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
-}
+:where(pdx-toggle[variant="solid"]) > [data-part="root"], .pdx-toggle-btn.pdx-solid {
+        background: transparent;
+        color: var(--pdx-color-muted);
+    }
+    :where(pdx-toggle[variant="solid"]) > [data-part="root"]:hover, .pdx-toggle-btn.pdx-solid:hover {
+        background: var(--pdx-color-inset);
+        color: var(--pdx-color-text);
+    }
+    :where(pdx-toggle[variant="solid"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-solid[aria-pressed="true"] {
+        background: var(--pdx-color-primary);
+        color: var(--pdx-color-primary-text);
+    }
 
 /* Disabled */
 .pdx-toggle-btn:disabled {

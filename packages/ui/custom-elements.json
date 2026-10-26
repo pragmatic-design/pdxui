@@ -26620,16 +26620,6 @@
             },
             {
               "kind": "field",
-              "name": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'outline'",
-              "attribute": "variant"
-            },
-            {
-              "kind": "field",
               "name": "size",
               "description": "Size of the control (e.g. sm, md, lg).",
               "type": {
@@ -26647,6 +26637,16 @@
               },
               "default": "''",
               "attribute": "arialabel"
+            },
+            {
+              "kind": "field",
+              "name": "variant",
+              "description": "outline (the default), ghost or solid.",
+              "type": {
+                "text": "'outline' | 'ghost' | 'solid'"
+              },
+              "default": "'outline'",
+              "attribute": "variant"
             },
             {
               "kind": "field",
@@ -26678,6 +26678,22 @@
           ],
           "models": [
             "pressed"
+          ],
+          "variants": [
+            {
+              "name": "variant",
+              "values": [
+                "outline",
+                "ghost",
+                "solid"
+              ],
+              "default": "outline",
+              "native": {
+                "outline": ".pdx-toggle-btn.pdx-outline",
+                "ghost": ".pdx-toggle-btn.pdx-ghost",
+                "solid": ".pdx-toggle-btn.pdx-solid"
+              }
+            }
           ],
           "alphaEvents": [
             "pdx-pressed-change",
@@ -26716,15 +26732,6 @@
               "default": "''"
             },
             {
-              "name": "variant",
-              "fieldName": "variant",
-              "description": "Visual variant.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'outline'"
-            },
-            {
               "name": "size",
               "fieldName": "size",
               "description": "Size of the control (e.g. sm, md, lg).",
@@ -26743,6 +26750,15 @@
               "default": "''"
             },
             {
+              "name": "variant",
+              "fieldName": "variant",
+              "description": "outline (the default), ghost or solid.",
+              "type": {
+                "text": "'outline' | 'ghost' | 'solid'"
+              },
+              "default": "'outline'"
+            },
+            {
               "name": "pressed",
               "fieldName": "pressed",
               "type": {
@@ -26755,6 +26771,22 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native `<button>`, aria-pressed; the pressed look keys by that attribute."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "pressed",
+              "description": "It is pressed."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ],
           "cssProperties": [

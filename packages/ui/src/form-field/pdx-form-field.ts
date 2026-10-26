@@ -21,6 +21,13 @@ const _markedInvalid = new WeakSet<Element>();
 /** The groups a field described by its hint and error, undescribed again when there is neither. */
 const _describedByField = new WeakSet<Element>();
 
+/**
+ * The library controls that are a button holding their own value: an inline edit's display at rest,
+ * a toggle's button (#286). A field takes one as its control when nothing else is there; a button may
+ * carry neither aria-required nor aria-invalid, so it is named and described only.
+ */
+const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"]';
+
 /** Set `name` on `el` while `on`, and take it back only if this field set it. */
 function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Element>, value = 'true'): void {
     if (on) {
@@ -239,12 +246,13 @@ component('pdx-form-field', {
                 // Find the first focusable input element. Never a hidden input: it is what a
                 // component submits, not what a person reaches — the time picker's is the only
                 // input in its group, and the label's `for` would name it.
-                // Last, pdx-inline-edit at rest: its display is the control until the editor opens, and
-                // the editor's text box, found first, takes over while it is open (#286).
+                // Last, a button control (BUTTON_CONTROLS): pdx-inline-edit at rest — its display is the
+                // control until the editor opens, and the editor's text box, found first, takes over
+                // while it is open — and pdx-toggle (#286).
                 // A contenteditable `role="textbox"` — pdx-rich-text's editing area — is a control too.
                 const input = (el.querySelector(
                     'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"], [role="textbox"]'
-                ) ?? el.querySelector('pdx-inline-edit [data-part="display"]')) as HTMLElement | null;
+                ) ?? el.querySelector(BUTTON_CONTROLS)) as HTMLElement | null;
                 if (!input) {
                     nameSliders(el, hasLabel);
                     return;
@@ -360,10 +368,11 @@ component('pdx-form-field', {
                     if (!radiogroup) for (const box of boxes) markAttr(box, 'aria-required', required, _markedRequired);
                 }
 
-                // An inline edit's display is a role="button" holding the value. It may carry neither
-                // aria-invalid nor aria-required, so it is named by the label and its own value — "Name,
-                // Ada", the label's marker read with it — and described by the hint and the error (#286).
-                if (input.matches('pdx-inline-edit [data-part="display"]')) {
+                // A button control — an inline edit's display, a toggle's button — holds its own value.
+                // It may carry neither aria-invalid nor aria-required, so it is named by the label and
+                // its own text — "Name, Ada", the label's marker read with it — and described by the hint
+                // and the error (#286).
+                if (input.matches(BUTTON_CONTROLS)) {
                     if (!input.id) input.id = inputId + '-display';
                     markAttr(input, 'aria-labelledby', hasLabel, _labelledByField, `${labelId} ${input.id}`);
                     markAttr(input, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));

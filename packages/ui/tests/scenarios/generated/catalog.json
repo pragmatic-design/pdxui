@@ -3049,6 +3049,37 @@
       ]
     },
     {
+      "name": "toggle-button",
+      "tags": [
+        "pdx-toggle"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "toggle-button-variants",
+          "title": "Toggle button — outline, ghost and solid, off and pressed"
+        },
+        {
+          "id": "toggle-button-disabled",
+          "title": "Toggle button — disabled, off and pressed"
+        },
+        {
+          "id": "toggle-button-variant-outline",
+          "title": "pdx-toggle — variant=\"outline\""
+        },
+        {
+          "id": "toggle-button-variant-ghost",
+          "title": "pdx-toggle — variant=\"ghost\""
+        },
+        {
+          "id": "toggle-button-variant-solid",
+          "title": "pdx-toggle — variant=\"solid\""
+        }
+      ]
+    },
+    {
       "name": "toolbar",
       "tags": [
         "pdx-toolbar"
