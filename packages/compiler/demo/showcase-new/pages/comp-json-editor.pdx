@@ -1,0 +1,69 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">JSON Editor</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-json-editor&gt;</code> — a form drawn from a schema, for a nested JSON value: objects, lists of
+      objects and scalars. Scalars are edited inline; each object or list opens in a sub-modal of its own, so the
+      form stays uncluttered. Its model is <code>value</code>, announced with <code>value-change</code>.
+    </p>
+
+    <!-- ═══ 1. Object with a nested list ═══ -->
+    <app-demo-comp-json-editor-object class="demo-section"></app-demo-comp-json-editor-object>
+
+    <!-- ═══ 2. In a form field ═══ -->
+    <app-demo-comp-json-editor-field class="demo-section"></app-demo-comp-json-editor-field>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>schema</code><span>object</span><span><code>{ label, fields }</code> for an object, or <code>{ label, kind: 'list', item }</code> for a list of objects</span></div>
+        <div class="opt-row"><code>value</code><span>object | array</span><span>The document; its model, so <code>::value</code> binds it both ways. A form submits it as JSON under <code>name</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Field types</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>type</span><span>Editor</span><span>Notes</span></div>
+        <div class="opt-row"><code>text</code> (default)<span>pdx-input</span><span><code>req</code> marks the caption</span></div>
+        <div class="opt-row"><code>number</code><span>pdx-number-input</span><span>—</span></div>
+        <div class="opt-row"><code>bool</code><span>pdx-switch</span><span>Named by its own label</span></div>
+        <div class="opt-row"><code>enum</code><span>pdx-select</span><span>Options from <code>values</code> or <code>options</code> (an array, or an async function)</span></div>
+        <div class="opt-row"><code>taglist</code><span>pdx-tag-input</span><span>—</span></div>
+        <div class="opt-row"><code>date</code> / <code>time</code><span>native input</span><span>—</span></div>
+        <div class="opt-row"><code>object</code> / <code>objectList</code><span>a branch</span><span>Its <code>fields</code>, edited in a sub-modal</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Every edit, and a sub-modal applied; does not bubble</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>What</span></div>
+        <div class="opt-row"><code>[data-part="entry"]</code><span></span><span>One scalar field: its caption and its control</span></div>
+        <div class="opt-row"><code>[data-part="branch"]</code><span></span><span>One object or list: caption, summary and the Edit button</span></div>
+        <div class="opt-row"><code>[data-part="dialog"]</code><span></span><span>The sub-modal a branch opens (<code>role="dialog"</code>, appended to the body)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div>
+        <div class="opt-row"><kbd>Tab</kbd><span></span><span>Moves through the fields and the Edit buttons; inside a sub-modal it stays there</span></div>
+        <div class="opt-row"><kbd>Enter</kbd> on Edit<span></span><span>Opens the sub-modal, focus on its first field</span></div>
+        <div class="opt-row"><kbd>Escape</kbd><span></span><span>Closes the sub-modal unapplied; focus returns to Edit</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/json-editor';
+@title 'JSON Editor';
+</script>
+
+<style scoped>
+  .page { }
+</style>

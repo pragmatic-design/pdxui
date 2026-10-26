@@ -40,6 +40,7 @@
         import '@pdxui/ui/file-upload';
         import '@pdxui/ui/filter-builder';
         import '@pdxui/ui/inline-edit';
+        import '@pdxui/ui/json-editor';
         import '@pdxui/ui/masonry';
         import '@pdxui/ui/menubar';
         import '@pdxui/ui/rich-text';
@@ -121,6 +122,39 @@
                     })();
                 })();
              },
+        "json-editor-basic": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="je"]');
+    if (host) {
+        Object.assign(host, { schema: {"label":"Profile","fields":[{"k":"name","label":"Name","req":true},{"k":"age","label":"Age","type":"number"},{"k":"active","label":"Active","type":"bool"},{"k":"address","label":"Address","type":"object","fields":[{"k":"city","label":"City"},{"k":"zip","label":"ZIP"}]}]}, value: {"name":"Ada Lovelace","age":36,"active":true,"address":{"city":"London"}} });
+        for (let i = 0; i < 60 && !host.querySelector('[data-part="entry"]'); i++) {
+            await new Promise((r) => requestAnimationFrame(r));
+        }
+        
+    }
+ },
+        "json-editor-dialog": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="je"]');
+    if (host) {
+        Object.assign(host, { schema: {"label":"Profile","fields":[{"k":"name","label":"Name","req":true},{"k":"age","label":"Age","type":"number"},{"k":"active","label":"Active","type":"bool"},{"k":"address","label":"Address","type":"object","fields":[{"k":"city","label":"City"},{"k":"zip","label":"ZIP"}]}]}, value: {"name":"Ada Lovelace","age":36,"active":true,"address":{"city":"London"}} });
+        for (let i = 0; i < 60 && !host.querySelector('[data-part="entry"]'); i++) {
+            await new Promise((r) => requestAnimationFrame(r));
+        }
+        host.querySelector('[data-part="branch"] button')?.click();
+        for (let i = 0; i < 60 && !document.querySelector('[data-part="dialog"] [data-part="entry"]'); i++) {
+            await new Promise((r) => requestAnimationFrame(r));
+        }
+    }
+ },
+        "json-editor-keyboard": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="je"]');
+    if (host) {
+        Object.assign(host, { schema: {"label":"Profile","fields":[{"k":"name","label":"Name"},{"k":"address","label":"Address","type":"object","fields":[{"k":"city","label":"City"}]}]}, value: {"name":"Ada"} });
+        for (let i = 0; i < 60 && !host.querySelector('[data-part="entry"]'); i++) {
+            await new Promise((r) => requestAnimationFrame(r));
+        }
+        
+    }
+ },
         "menubar-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="mb-open"]');
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
@@ -153,7 +187,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-block-ui","pdx-calendar","pdx-carousel","pdx-cascader","pdx-col","pdx-color-picker","pdx-command","pdx-date-picker","pdx-file-upload","pdx-filter-builder","pdx-inline-edit","pdx-masonry","pdx-menubar","pdx-rich-text","pdx-row","pdx-splitter","pdx-tabs","pdx-toolbar","pdx-tree-select","pdx-wizard"];
+        const __tags = ["pdx-block-ui","pdx-calendar","pdx-carousel","pdx-cascader","pdx-col","pdx-color-picker","pdx-command","pdx-date-picker","pdx-file-upload","pdx-filter-builder","pdx-inline-edit","pdx-json-editor","pdx-masonry","pdx-menubar","pdx-rich-text","pdx-row","pdx-splitter","pdx-tabs","pdx-toolbar","pdx-tree-select","pdx-wizard"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -520,6 +554,27 @@
         <h3>Inline Edit — Editing (text input visible)</h3>
         <div style="max-width: 360px;">
                     <pdx-inline-edit data-test="ie" type="text" value="Editable text"></pdx-inline-edit>
+                </div>
+    </section>
+
+    <section data-scenario="json-editor-basic">
+        <h3>JSON Editor — An object: scalars and a branch</h3>
+        <div style="max-width: 420px;">
+                    <pdx-json-editor data-test="je"></pdx-json-editor>
+                </div>
+    </section>
+
+    <section data-scenario="json-editor-dialog">
+        <h3>JSON Editor — A branch open in its sub-modal</h3>
+        <div style="max-width: 420px; min-height: 600px;">
+                    <pdx-json-editor data-test="je"></pdx-json-editor>
+                </div>
+    </section>
+
+    <section data-scenario="json-editor-keyboard">
+        <h3>JSON Editor — A field and a branch, for the keyboard</h3>
+        <div style="max-width: 420px;">
+                    <pdx-json-editor data-test="je"></pdx-json-editor>
                 </div>
     </section>
 

@@ -1,0 +1,36 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">In a form field</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Inside <code>&lt;pdx-form-field&gt;</code> the editor is one group, named by the field's label and described by its
+      hint and error. Its sub-fields keep their own names: the requirement and the error are the document's.
+    </p>
+    <pdx-form-field label="Shipping profile" hint="Where the order goes" required>
+      <pdx-json-editor :schema="schema" :value="value"></pdx-json-editor>
+    </pdx-form-field>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-form-field label="Shipping profile" hint="Where the order goes" required&gt;
+  &lt;pdx-json-editor :schema="schema" ::value="profile"&gt;&lt;/pdx-json-editor&gt;
+&lt;/pdx-form-field&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+const value = { recipient: 'Ada Lovelace', address: { city: 'London' } };
+
+const schema = {
+  label: 'Shipping profile',
+  fields: [
+    { k: 'recipient', label: 'Recipient', req: true },
+    { k: 'phone', label: 'Phone' },
+    { k: 'address', label: 'Address', type: 'object', fields: [
+      { k: 'street', label: 'Street' },
+      { k: 'city', label: 'City' },
+      { k: 'zip', label: 'ZIP' },
+    ] },
+  ],
+};
+</script>

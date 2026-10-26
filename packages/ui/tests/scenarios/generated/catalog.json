@@ -1649,6 +1649,29 @@
       ]
     },
     {
+      "name": "json-editor",
+      "tags": [
+        "pdx-json-editor"
+      ],
+      "tier": "3",
+      "status": "wip",
+      "page": "tier-3",
+      "scenarios": [
+        {
+          "id": "json-editor-basic",
+          "title": "JSON Editor — An object: scalars and a branch"
+        },
+        {
+          "id": "json-editor-dialog",
+          "title": "JSON Editor — A branch open in its sub-modal"
+        },
+        {
+          "id": "json-editor-keyboard",
+          "title": "JSON Editor — A field and a branch, for the keyboard"
+        }
+      ]
+    },
+    {
       "name": "kbd",
       "tags": [
         "pdx-kbd"

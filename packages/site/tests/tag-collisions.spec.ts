@@ -16,9 +16,10 @@ import { ComponentResolver } from '../../compiler/src/component-resolver';
 
 const siteRoot = fileURLToPath(new URL('..', import.meta.url));
 
-// The four pages are read from src/demos-authored/, not from a copy: each still renders as its
-// component's gallery — the element itself, not the "being finalized" placeholder.
-for (const name of ['calendar', 'json-editor', 'page-header', 'relation-picker']) {
+// The pages are read from src/demos-authored/, not from a copy: each still renders as its
+// component's gallery — the element itself, not the "being finalized" placeholder. pdx-json-editor
+// left the list when it got a showcase page (#286): the site ports it like the others.
+for (const name of ['calendar', 'page-header', 'relation-picker']) {
     test(`/components/pdx-${name} renders its site-authored gallery`, async ({ page }) => {
         await page.goto(`/components/pdx-${name}`, { waitUntil: 'domcontentloaded' });
         await expect(page.locator(`.cmp-gallery app-comp-${name} section`).first()).toBeVisible();
