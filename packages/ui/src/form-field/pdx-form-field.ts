@@ -212,8 +212,10 @@ component('pdx-form-field', {
          * A pdx-slider's thumbs are <div>s with the slider role: `for` cannot reach them, and every slider would
          * be "Value" under its field's visible label. One thumb is named by
          * the label; the two of a range by the label AND their own name ("Price range Minimum").
+         * Each is described by the hint and the error, and is aria-invalid with it (A2, #286). A `slider`
+         * may not carry aria-required: the label's marker says it.
          */
-        function nameSliders(root: HTMLElement, hasLabel: boolean): void {
+        function wireSliders(root: HTMLElement, hasLabel: boolean, describedBy: string[], err: boolean): void {
             const thumbs = Array.from(root.querySelectorAll<HTMLElement>('[role="slider"]'));
             thumbs.forEach((thumb, i) => {
                 if (hasLabel) {
@@ -224,6 +226,8 @@ component('pdx-form-field', {
                     thumb.removeAttribute('aria-labelledby');
                     _labelledByField.delete(thumb);
                 }
+                markAttr(thumb, 'aria-describedby', describedBy.length > 0, _describedByField, describedBy.join(' '));
+                markAttr(thumb, 'aria-invalid', err, _markedInvalid);
             });
         }
 
@@ -254,7 +258,8 @@ component('pdx-form-field', {
                     'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"], [role="textbox"]'
                 ) ?? el.querySelector(BUTTON_CONTROLS)) as HTMLElement | null;
                 if (!input) {
-                    nameSliders(el, hasLabel);
+                    const sliderDescribedBy = [hasDesc && descId, hasHint && hintId, err && errorId].filter((id): id is string => !!id);
+                    wireSliders(el, hasLabel, sliderDescribedBy, err);
                     return;
                 }
 

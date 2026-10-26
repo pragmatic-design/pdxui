@@ -122,6 +122,12 @@ const DONE: Row[] = [
         parts: ['root'],
     },
     {
+        tag: 'pdx-slider',
+        model: 'value',
+        states: ['disabled', 'invalid', 'dragging'],
+        parts: ['root', 'track', 'fill', 'thumb', 'mark'],
+    },
+    {
         tag: 'pdx-segmented',
         model: 'value',
         states: ['disabled'],

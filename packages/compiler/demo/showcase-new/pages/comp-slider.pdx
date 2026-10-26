@@ -21,9 +21,19 @@
         <div class="opt-row"><code>marks</code><span>Comma-separated values or "step" for all steps</span></div>
         <div class="opt-row"><code>showLabel</code><span>Show value label on drag</span></div>
         <div class="opt-row"><code>labelAlways</code><span>Always show value label</span></div>
-        <div class="opt-row"><code>orientation</code><span>"horizontal" (default) or "vertical"</span></div>
+        <div class="opt-row"><code>orientation</code><span>"horizontal" (default) or "vertical"; reflected on the host</span></div>
         <div class="opt-row"><code>color</code><span>"success", "warning" — fill/thumb color</span></div>
         <div class="opt-row"><code>size</code><span>"sm", "lg"</span></div>
+        <div class="opt-row"><code>error</code><span>Danger colour; every thumb is <code>aria-invalid</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(disabled) / :state(invalid)</code><span><code>disabled</code> / <code>error</code> is set</span></div>
+        <div class="opt-row"><code>:state(dragging)</code><span>A pointer is dragging a thumb</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="track"] / [data-part="fill"]</code><span>The frame, the rail, the coloured portion</span></div>
+        <div class="opt-row"><code>[data-part="thumb"] / [data-part="mark"]</code><span>A thumb (<code>role="slider"</code>), one of <code>marks</code></span></div>
       </div>
     </section>
   </div>

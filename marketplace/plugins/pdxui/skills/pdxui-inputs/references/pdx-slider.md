@@ -10,7 +10,6 @@ Pick a number by dragging.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `ariaLabel` | `arialabel` | string | `''` | Accessible name when there is no visible label. |
 | `label` | `label` | string | `''` | What the slider sets ("Volume"): the thumb's name, and in range mode "{label}, minimum" / "{label}, maximum". Not needed after a pdx-label, which names it. |
-| `orientation` | `orientation` | string | `'horizontal'` | Layout orientation — horizontal or vertical. |
 | `marks` | `marks` | string | `''` | Comma-separated mark values, or "step" to show all steps |
 | `showLabel` | `showlabel` | boolean | `false` | Show value label on thumb while dragging |
 | `labelAlways` | `labelalways` | boolean | `false` | Always show label (not just on drag) |
@@ -20,6 +19,7 @@ Pick a number by dragging.
 | `minGap` | `mingap` | number | `0` | Minimum gap between thumbs in range mode |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the track's and thumb's size. |
 | `color` | `color` | 'primary' \| 'success' \| 'warning' | `'primary'` | primary (the default), success or warning: the fill's and thumb's colour. |
+| `orientation` | `orientation` | 'horizontal' \| 'vertical' | `'horizontal'` | horizontal (the default) or vertical. |
 | `value` | `value` | number \| number[] | `0` | The current value. |
 
 **API (via `:ref`)**
@@ -33,6 +33,10 @@ Pick a number by dragging.
 **Events:** `pdx-change-end` → `detail: { value }` — Fired on `pdx-change-end`.; `value-change` → `detail: { value: number | number[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `slider`
+
+**States:** `:state(disabled)` — `disabled` is set.; `:state(invalid)` — `error` is set; every thumb is aria-invalid.; `:state(dragging)` — A pointer is dragging a thumb.
+
+**Parts:** `[data-part="root"]` — The frame the pointer acts on.; `[data-part="track"]` — The rail.; `[data-part="fill"]` — The coloured portion: from the minimum to the value, or between the thumbs.; `[data-part="thumb"]` — A thumb, `role="slider"`: one, or two in range mode; aria-invalid with `error`.; `[data-part="mark"]` — One of `marks`.
 
 
 #### Examples
