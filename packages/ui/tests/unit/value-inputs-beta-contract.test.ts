@@ -116,6 +116,12 @@ const DONE: Row[] = [
         parts: [],
     },
     {
+        tag: 'pdx-toggle',
+        model: 'pressed',
+        states: ['pressed', 'disabled'],
+        parts: ['root'],
+    },
+    {
         tag: 'pdx-switch',
         model: 'checked',
         states: ['checked', 'invalid', 'disabled', 'loading'],

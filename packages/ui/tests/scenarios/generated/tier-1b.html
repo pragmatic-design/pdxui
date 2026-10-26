@@ -39,6 +39,7 @@
         import '@pdxui/ui/radio-group';
         import '@pdxui/ui/switch';
         import '@pdxui/ui/textarea';
+        import '@pdxui/ui/toggle';
 
         const params = new URLSearchParams(location.search);
         const theme = params.get('theme');
@@ -64,7 +65,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-button","pdx-checkbox","pdx-checkbox-group","pdx-input","pdx-input-group","pdx-label","pdx-radio","pdx-radio-group","pdx-switch","pdx-textarea"];
+        const __tags = ["pdx-button","pdx-checkbox","pdx-checkbox-group","pdx-input","pdx-input-group","pdx-label","pdx-radio","pdx-radio-group","pdx-switch","pdx-textarea","pdx-toggle"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -368,6 +369,42 @@
     <section data-scenario="textarea-size-xl">
         <h3>pdx-textarea — size="xl"</h3>
         <pdx-textarea data-test="variant" size="xl"></pdx-textarea>
+    </section>
+
+    <section data-scenario="toggle-button-variants">
+        <h3>Toggle button — outline, ghost and solid, off and pressed</h3>
+        <div style="display: flex; gap: 8px; align-items: center;">
+                    
+    <pdx-toggle data-test="o-off" variant="outline">outline</pdx-toggle>
+    <pdx-toggle data-test="o-on" variant="outline" pressed>outline</pdx-toggle>
+    <pdx-toggle data-test="g-off" variant="ghost">ghost</pdx-toggle>
+    <pdx-toggle data-test="g-on" variant="ghost" pressed>ghost</pdx-toggle>
+    <pdx-toggle data-test="s-off" variant="solid">solid</pdx-toggle>
+    <pdx-toggle data-test="s-on" variant="solid" pressed>solid</pdx-toggle>
+                </div>
+    </section>
+
+    <section data-scenario="toggle-button-disabled">
+        <h3>Toggle button — disabled, off and pressed</h3>
+        <div style="display: flex; gap: 8px; align-items: center;">
+                    <pdx-toggle data-test="d-off" disabled>Off</pdx-toggle>
+                    <pdx-toggle data-test="d-on" disabled pressed>On</pdx-toggle>
+                </div>
+    </section>
+
+    <section data-scenario="toggle-button-variant-outline">
+        <h3>pdx-toggle — variant="outline"</h3>
+        <pdx-toggle data-test="variant" variant="outline"></pdx-toggle>
+    </section>
+
+    <section data-scenario="toggle-button-variant-ghost">
+        <h3>pdx-toggle — variant="ghost"</h3>
+        <pdx-toggle data-test="variant" variant="ghost"></pdx-toggle>
+    </section>
+
+    <section data-scenario="toggle-button-variant-solid">
+        <h3>pdx-toggle — variant="solid"</h3>
+        <pdx-toggle data-test="variant" variant="solid"></pdx-toggle>
     </section>
 
     <section data-scenario="toggle-basic">

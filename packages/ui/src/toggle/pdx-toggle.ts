@@ -15,6 +15,11 @@ import '@pdxui/design/components/toggle';
 /**
  * A button the user presses on and off, its state exposed with `aria-pressed`.
  *
+ * @csspart root - The native `<button>`, aria-pressed; the pressed look keys by that attribute.
+ *
+ * @cssstate pressed - It is pressed.
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-pressed-change
  * @alphaevent pressedchange
  * @alphadetail pressed $event.detail.value
@@ -22,10 +27,18 @@ import '@pdxui/design/components/toggle';
 component('pdx-toggle', {
     // A click writes it (#480), and the write dispatches `pressed-change`.
     models: { pressed: model(false, { form: true }) },
+    // On the host as custom states (#132); the button carries no state class.
+    states: ['pressed', 'disabled'],
+    parts: ['root'],
+    // The axis toggle.css keys by (#286), reflected on the host; each value maps the classes that draw
+    // the same look on a native button. Compound, so pdx-button's own `.pdx-ghost` is not reached.
+    variants: {
+        /** outline (the default), ghost or solid. */
+        variant: { outline: '.pdx-toggle-btn.pdx-outline', ghost: '.pdx-toggle-btn.pdx-ghost', solid: '.pdx-toggle-btn.pdx-solid' },
+    },
     props: {
         disabled: prop(false),
         value: prop(''),
-        variant: prop('outline'),
         size: prop(''),
         /** The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
         ariaLabel: prop(''),
@@ -42,13 +55,10 @@ component('pdx-toggle', {
             ctx.pressed.set(!ctx.pressed());
         }
 
-        function btnClass(): string {
-            const v = ctx.variant() as string || 'outline';
-            let cls = 'pdx-toggle-btn pdx-' + v;
-            if (ctx.pressed()) cls += ' pdx-toggle-on';
-            return cls;
-        }
-
+        ctx.track(() => {
+            ctx.state('pressed', !!ctx.pressed());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         // Imperative API: focus/blur/clear
         ctx.expose({
@@ -59,12 +69,13 @@ component('pdx-toggle', {
             },
         });
 
-        return { toggle, btnClass };
+        return { toggle };
     },
     render: (ctx) => html`
         <button
             type="button"
-            :class="${ctx.btnClass}"
+            class="pdx-toggle-btn"
+            data-part="root"
             :size="${ctx.size}"
             :aria-pressed="${() => ctx.pressed() ? 'true' : 'false'}"
             :aria-label="${() => (ctx.ariaLabel() as string) || null}"

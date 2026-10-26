@@ -6,9 +6,9 @@ A pressable on/off button.
 |---|---|---|---|---|
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `value` | `value` | string | `''` | The current value. |
-| `variant` | `variant` | string | `'outline'` | Visual variant. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `ariaLabel` | `arialabel` | string | `''` | The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
+| `variant` | `variant` | 'outline' \| 'ghost' \| 'solid' | `'outline'` | outline (the default), ghost or solid. |
 | `pressed` | `pressed` | boolean | `false` |  |
 
 **API (via `:ref`)**
@@ -20,6 +20,10 @@ A pressable on/off button.
 | `clear()` | Clears the value. |
 
 **Events:** `pressed-change` → `detail: { value: boolean }` — Fired when the component writes `pressed`. Does not bubble.
+
+**States:** `:state(pressed)` — It is pressed.; `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The native `<button>`, aria-pressed; the pressed look keys by that attribute.
 
 
 #### Examples

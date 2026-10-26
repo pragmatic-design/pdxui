@@ -379,6 +379,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-toggle` takes the beta contract (#286).
+  - **States.** `pressed` and `disabled` are custom states on the host.
+  - **Variant.** `variant` (outline, ghost, solid) is a variant axis reflected on the host, where
+    `toggle.css` draws it; the button no longer carries `pdx-outline`, `pdx-ghost`, `pdx-solid` or
+    `pdx-toggle-on`. The pressed look keys by the button's `aria-pressed`, on a native
+    `.pdx-toggle-btn` too.
+  - **Parts.** The native button is `root`.
+  - **In a form field.** `pdx-form-field` names the button with its label and describes it with its
+    hint and error: before, the toggle had no control the field could find.
+  - **Form value.** Unchanged and now measured: the element's `value` (or `on`) while pressed, no
+    entry otherwise.
 - **Breaking:** `pdx-radio-group` and `pdx-checkbox-group` take the beta contract (#286).
   - **States.** `invalid` and `disabled` are custom states on the host.
   - **Orientation.** A variant axis reflected on the host, `[orientation]`, where `forms.css` draws
