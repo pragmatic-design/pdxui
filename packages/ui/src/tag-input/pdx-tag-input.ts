@@ -4,7 +4,6 @@
 import { component, html, signal, computed, model, event, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tag-input';
@@ -16,6 +15,18 @@ import '@pdxui/design/components/chip';
  * duplicates prevented.
  *
  * @slot tag - Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.
+ *
+ * @csspart root - The frame, `role="group"`: border, background and the states' colours.
+ * @csspart input - The text box where a tag is typed; gone while `disabled`, `readonly` or at `max-tags`.
+ * @csspart tag - One tag, a chip.
+ * @csspart remove - A tag's remove button, while neither `disabled` nor `readonly`.
+ *
+ * @cssstate invalid - `error` is set; the text box is aria-invalid.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set; the group is aria-busy.
  *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
@@ -35,6 +46,10 @@ component('pdx-tag-input', {
         /** A tag was removed. */
         'pdx-remove': event<{ tag: string; index: number; tags: string[] }>(),
     },
+    // The visual states, on the host as custom states (#132), as pdx-input's: the frame is the host's
+    // child `.pdx-input-wrap`, which inputs.css draws from them. It carries no state class of its own.
+    states: ['invalid', 'success', 'warning', 'disabled', 'readonly', 'loading'],
+    parts: ['root', 'input', 'tag', 'remove'],
     // The axis inputs.css keys by (#627), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -67,11 +82,17 @@ component('pdx-tag-input', {
         // "{tag} added" / "{tag} removed", politely: a tag does not come and go in silence.
         const announcement = signal('');
 
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('success', !!ctx.success());
+            ctx.state('warning', !!ctx.warning());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('loading', !!ctx.loading());
+        });
+
         // Sync external value prop into internal tags
         ctx.track(() => {
-            if (ctx.loading()) ctx.el.setAttribute('aria-busy', 'true');
-            else ctx.el.removeAttribute('aria-busy');
-
             const v = ctx.value();
             if (Array.isArray(v)) tags.set([...v]);
         });
@@ -80,16 +101,6 @@ component('pdx-tag-input', {
             const max = ctx.maxTags() as number;
             return max > 0 && tags().length >= max;
         });
-
-        function wrapClass(): string {
-            let cls = 'pdx-tag-input pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.readonly()) cls += ' readonly';
-            if (ctx.error()) cls += ' error';
-            if (ctx.success()) cls += ' success';
-            if (ctx.warning()) cls += ' warning';
-            return cls;
-        }
 
         function validate(tag: string): boolean {
             if (!tag) return false;
@@ -226,47 +237,48 @@ component('pdx-tag-input', {
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
         });
 
-        // The host is the one submitter, the tags as JSON. A hidden input carrying the name would send
-        // them a second time, comma-joined.
-        reflectNameToHost(ctx);
-
         function getTagSlot(): SlotFunction | undefined {
             return snippetOrSlot(ctx, 'tag', (s) => [s.tag, s.index]);
         }
 
         return {
-            tags, inputValue, isAtLimit, wrapClass, announcement,
+            tags, inputValue, isAtLimit, announcement,
             onKeydown, onInput, onPaste, onRemoveClick, onWrapClick,
             getTagSlot,
         };
     },
+    // The host is the one submitter, the tags as JSON, under its name (#133). A hidden input carrying
+    // the name would send them a second time, comma-joined. Written after `setup`, so its type is read.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
         <div
-            :class="${ctx.wrapClass}" data-part="root"
+            class="pdx-tag-input pdx-input-wrap" data-part="root"
             role="group"
             :aria-label="${() => (ctx.label() as string) || uiString('tag-input', 'label')}"
+            :aria-busy="${() => ctx.loading() ? 'true' : null}"
             @click="${ctx.onWrapClick}"
         >
             ${() => ctx.tags().map((tag: string, i: number) => {
                 const tagSlot = ctx.getTagSlot();
                 if (tagSlot) {
-                    return html`<span class="pdx-chip pdx-chip-sm">
+                    return html`<span class="pdx-chip pdx-chip-sm" data-part="tag">
                         ${() => tagSlot({ tag, index: i })}
                         ${() => !ctx.disabled() && !ctx.readonly()
-                            ? html`<button class="pdx-chip-remove" :aria-label="${() => format(uiString('tag-input', 'remove'), { tag })}" @click="${ctx.onRemoveClick(i)}">\u00d7</button>`
+                            ? html`<button class="pdx-chip-remove" data-part="remove" :aria-label="${() => format(uiString('tag-input', 'remove'), { tag })}" @click="${ctx.onRemoveClick(i)}">\u00d7</button>`
                             : ''}
                     </span>`;
                 }
-                return html`<span class="pdx-chip pdx-chip-sm">
+                return html`<span class="pdx-chip pdx-chip-sm" data-part="tag">
                     <span>${() => tag}</span>
                     ${() => !ctx.disabled() && !ctx.readonly()
-                        ? html`<button class="pdx-chip-remove" :aria-label="${() => format(uiString('tag-input', 'remove'), { tag })}" @click="${ctx.onRemoveClick(i)}">\u00d7</button>`
+                        ? html`<button class="pdx-chip-remove" data-part="remove" :aria-label="${() => format(uiString('tag-input', 'remove'), { tag })}" @click="${ctx.onRemoveClick(i)}">\u00d7</button>`
                         : ''}
                 </span>`;
             })}
             ${() => !ctx.disabled() && !ctx.readonly() && !ctx.isAtLimit()
                 ? html`<input
                     class="pdx-tag-input-field"
+                    data-part="input"
                     type="text"
                     autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                     :value="${ctx.inputValue}"
@@ -274,6 +286,7 @@ component('pdx-tag-input', {
                     :disabled="${ctx.disabled}"
                     :readonly="${ctx.readonly}"
                     :aria-label="${() => (ctx.label() as string) || uiString('tag-input', 'add')}"
+                    :aria-invalid="${() => ctx.error() ? 'true' : null}"
                     @input="${ctx.onInput}"
                     @keydown="${ctx.onKeydown}"
                     @paste="${ctx.onPaste}"

@@ -55,13 +55,17 @@ pdx-tag-input { display: block; }
     text-overflow: ellipsis;
 }
 
-/* ===== States ===== */
+/* ===== States =====
+   A native `.pdx-tag-input.disabled`, or pdx-tag-input's custom state on its host (#286), at the same
+   weight: `:state(disabled) > .pdx-tag-input` is (0,2,0), as the class rule is. */
 
-.pdx-tag-input.disabled {
+.pdx-tag-input.disabled,
+:state(disabled) > .pdx-tag-input {
     opacity: var(--pdx-opacity-disabled);
     pointer-events: none;
 }
 
+/* Native markup only: pdx-tag-input does not render these while readonly. */
 .pdx-tag-input.readonly .pdx-chip-remove,
 .pdx-tag-input.readonly .pdx-tag-input-field {
     display: none;

@@ -379,6 +379,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-tag-input` takes `pdx-input`'s contract (#286).
+  - **States.** `invalid`, `success`, `warning`, `disabled`, `readonly` and `loading` are custom
+    states on the host; its frame no longer carries them as classes.
+  - **Parts.** `root` (the frame, `role="group"`), `input` (the text box), `tag` and `remove`.
+  - **A2 and A4.** With `error` the text box is `aria-invalid`; while `loading` the group is
+    `aria-busy`, no longer the host.
+  - **Host.** `name` is a host binding (#133).
+- `pdx-mention` takes the same contract (#286): custom states `disabled` and `readonly`; parts
+  `root`, `input` (the textarea), `list` and `option`; `pdx-select` declared; `focus()` and `blur()`
+  exposed; `name` a host binding.
+  - **Fixed:** `disabled` or `readonly` set after mount now reach the textarea. They were read once,
+    when it was built, so a field disabled later stayed editable.
 - **Breaking:** `pdx-otp-input` takes `pdx-input`'s contract (#286).
   - **States.** `invalid` and `disabled` are custom states on the host; its group no longer carries
     `error` or `disabled`.

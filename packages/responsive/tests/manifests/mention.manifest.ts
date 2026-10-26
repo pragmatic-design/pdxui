@@ -115,7 +115,7 @@ export const mention: ComponentManifest = {
             setup: `
                 await new Promise(r => requestAnimationFrame(r));
                 const host = document.querySelector('section:not([hidden]) [data-test="mn-open"]');
-                const ta = host && host.querySelector('textarea.pdx-mention-textarea');
+                const ta = host && host.querySelector('[data-part="input"]');
                 if (ta) {
                     ta.focus();
                     ta.value = '@al';
@@ -133,25 +133,25 @@ export const mention: ComponentManifest = {
                 standalone: [
                     {
                         // The textarea is the editable box → visible.
-                        selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-textarea',
+                        selector: 'section:not([hidden]) [data-test="mn"] [data-part="input"]',
                         description: 'editable textarea is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // It is a text field → cursor text.
-                        selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-textarea',
+                        selector: 'section:not([hidden]) [data-test="mn"] [data-part="input"]',
                         description: 'textarea shows a text cursor (editable)',
                         cursor: { op: 'is', value: 'text' },
                     },
                     {
                         // min-height 80px in the CSS → a noticeable height. Conservative (>=40) for the density and the theme.
-                        selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-textarea',
+                        selector: 'section:not([hidden]) [data-test="mn"] [data-part="input"]',
                         description: 'textarea has an appreciable multi-line height',
                         height: { op: '>=', value: 40 },
                     },
                     {
                         // A non-negative radius (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-textarea',
+                        selector: 'section:not([hidden]) [data-test="mn"] [data-part="input"]',
                         description: 'textarea radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -162,7 +162,7 @@ export const mention: ComponentManifest = {
                     },
                     {
                         // Closed: the dropdown is display:none (an inline style, ts:399 / ts:437).
-                        selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-dropdown',
+                        selector: 'section:not([hidden]) [data-test="mn"] [data-part="list"]',
                         description: 'closed suggestions panel is hidden',
                         display: { op: 'is', value: 'none' },
                     },
@@ -171,10 +171,11 @@ export const mention: ComponentManifest = {
                     {
                         // The mirror (the highlight overlay) is on top of, and contained in, the wrap, like the textarea.
                         description: 'mirror overlay is contained within the wrap',
-                        parent: 'section:not([hidden]) [data-test="mn"] .pdx-mention-wrap',
+                        parent: 'section:not([hidden]) [data-test="mn"] [data-part="root"]',
                         children: {
-                            wrap: '.pdx-mention-wrap',
-                            mirror: '.pdx-mention-mirror',
+                            // Scoped like the parent: a bare part is the first of any component on the page.
+                            wrap: 'section:not([hidden]) [data-test="mn"] [data-part="root"]',
+                            mirror: 'section:not([hidden]) [data-test="mn"] .pdx-mention-mirror',
                         },
                         relations: [
                             { description: 'mirror contained in wrap', left: 'mirror', op: 'contained-in', right: 'wrap' },
@@ -182,10 +183,10 @@ export const mention: ComponentManifest = {
                     },
                     {
                         description: 'textarea is contained within the wrap',
-                        parent: 'section:not([hidden]) [data-test="mn"] .pdx-mention-wrap',
+                        parent: 'section:not([hidden]) [data-test="mn"] [data-part="root"]',
                         children: {
-                            wrap: '.pdx-mention-wrap',
-                            textarea: '.pdx-mention-textarea',
+                            wrap: 'section:not([hidden]) [data-test="mn"] [data-part="root"]',
+                            textarea: 'section:not([hidden]) [data-test="mn"] [data-part="input"]',
                         },
                         relations: [
                             { description: 'textarea contained in wrap', left: 'textarea', op: 'contained-in', right: 'wrap' },
@@ -199,13 +200,13 @@ export const mention: ComponentManifest = {
             'mention-open': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-dropdown',
+                        selector: 'section:not([hidden]) [data-test="mn-open"] [data-part="list"]',
                         description: 'open suggestions panel is displayed',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // min-width 180px in the CSS → a noticeable width.
-                        selector: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-dropdown',
+                        selector: 'section:not([hidden]) [data-test="mn-open"] [data-part="list"]',
                         description: 'open suggestions panel has an appreciable width',
                         width: { op: '>=', value: 80 },
                     },
@@ -213,8 +214,8 @@ export const mention: ComponentManifest = {
                 overlay: [
                     {
                         description: 'open mention shows the suggestions panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-textarea', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-dropdown',
+                        trigger: { selector: 'section:not([hidden]) [data-test="mn-open"] [data-part="input"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="mn-open"] [data-part="list"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -222,12 +223,12 @@ export const mention: ComponentManifest = {
                     {
                         // The filtered options live inside the dropdown.
                         description: 'suggestion items are contained within the dropdown panel',
-                        parent: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-dropdown',
+                        parent: 'section:not([hidden]) [data-test="mn-open"] [data-part="list"]',
                         // Scoped like the parent: bare classes find the first dropdown in the
                         // document, in a hidden scenario (0×0).
                         children: {
-                            panel: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-dropdown',
-                            item: 'section:not([hidden]) [data-test="mn-open"] .pdx-mention-item',
+                            panel: 'section:not([hidden]) [data-test="mn-open"] [data-part="list"]',
+                            item: 'section:not([hidden]) [data-test="mn-open"] [data-part="option"]',
                         },
                         relations: [
                             { description: 'first item within panel', left: 'item', op: 'contained-in', right: 'panel' },
@@ -252,7 +253,7 @@ export const mention: ComponentManifest = {
     isolation: {
         scenario: 'mention-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="mn"] .pdx-mention-textarea', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="mn"] [data-part="input"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -266,11 +267,11 @@ export const mention: ComponentManifest = {
     keyboard: {
         scenario: 'mention-type',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="mn-type"] .pdx-mention-textarea' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="mn-type"] [data-part="input"]' },
             { key: '@' },
             { key: 'a' },
-            { key: 'l', expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="mn-type"] .pdx-mention-textarea', target: '.pdx-mention-item:nth-child(1)' } },
-            { key: 'ArrowDown', expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="mn-type"] .pdx-mention-textarea', target: '.pdx-mention-item:nth-child(2)' } },
+            { key: 'l', expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="mn-type"] [data-part="input"]', target: '[data-part="option"]:nth-child(1)' } },
+            { key: 'ArrowDown', expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="mn-type"] [data-part="input"]', target: '[data-part="option"]:nth-child(2)' } },
         ],
     },
 
@@ -278,7 +279,7 @@ export const mention: ComponentManifest = {
     visual: {
         scenarios: ['mention-open'],
         // The blinking caret in the textarea is masked, for a stable screenshot.
-        mask: ['section:not([hidden]) [data-test="mn-open"] .pdx-mention-textarea'],
+        mask: ['section:not([hidden]) [data-test="mn-open"] [data-part="input"]'],
     },
 };
 

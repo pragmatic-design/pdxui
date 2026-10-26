@@ -136,7 +136,7 @@
         "mention-open": async function () { 
                 await new Promise(r => requestAnimationFrame(r));
                 const host = document.querySelector('section:not([hidden]) [data-test="mn-open"]');
-                const ta = host && host.querySelector('textarea.pdx-mention-textarea');
+                const ta = host && host.querySelector('[data-part="input"]');
                 if (ta) {
                     ta.focus();
                     ta.value = '@al';
