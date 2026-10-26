@@ -199,7 +199,7 @@ const CASES: Case[] = [
     {
         name: 'pdx-toggle-group',
         html: '<pdx-toggle-group><pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle></pdx-toggle-group>',
-        event: 'pdx-change',
+        event: 'value-change',
         act: (el) => q<HTMLButtonElement>(el, 'pdx-toggle[value="b"] button').click(),
         props: { value: (d) => d.value },
     },

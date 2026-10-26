@@ -36,11 +36,11 @@ describe('a wrapper dispatches its inner component\'s events from its own host',
         expect(aboveTemplate, 'the submit climbed past the template').toHaveLength(0);
     });
 
-    it('pdx-toggle-group: pressing a toggle is a pdx-change on the group', async () => {
+    it('pdx-toggle-group: pressing a toggle is a value-change on the group', async () => {
         document.body.innerHTML = '<pdx-toggle-group><pdx-toggle value="a">A</pdx-toggle><pdx-toggle value="b">B</pdx-toggle></pdx-toggle-group>';
         await tick(50);
         const group = document.querySelector('pdx-toggle-group')!;
-        const onGroup = heard(group, 'pdx-change');
+        const onGroup = heard(group, 'value-change');
 
         group.querySelector<HTMLButtonElement>('pdx-toggle[value="b"] button')!.click();
         await tick();

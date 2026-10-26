@@ -3080,6 +3080,37 @@
       ]
     },
     {
+      "name": "toggle-group",
+      "tags": [
+        "pdx-toggle-group"
+      ],
+      "tier": "1B",
+      "status": "wip",
+      "page": "tier-1b",
+      "scenarios": [
+        {
+          "id": "toggle-group-basic",
+          "title": "Toggle group — multiple, two pressed"
+        },
+        {
+          "id": "toggle-group-vertical",
+          "title": "Toggle group — vertical, one pressed"
+        },
+        {
+          "id": "toggle-group-disabled",
+          "title": "Toggle group — disabled"
+        },
+        {
+          "id": "toggle-group-orientation-horizontal",
+          "title": "pdx-toggle-group — orientation=\"horizontal\""
+        },
+        {
+          "id": "toggle-group-orientation-vertical",
+          "title": "pdx-toggle-group — orientation=\"vertical\""
+        }
+      ]
+    },
+    {
       "name": "toolbar",
       "tags": [
         "pdx-toolbar"

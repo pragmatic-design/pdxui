@@ -122,6 +122,13 @@ const DONE: Row[] = [
         parts: ['root'],
     },
     {
+        tag: 'pdx-toggle-group',
+        model: 'value',
+        // No inner element of its own: it holds the author's toggles.
+        states: ['disabled'],
+        parts: [],
+    },
+    {
         tag: 'pdx-switch',
         model: 'checked',
         states: ['checked', 'invalid', 'disabled', 'loading'],
