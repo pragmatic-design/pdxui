@@ -4,7 +4,7 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/radio-group/pdx-radio-group.ts
  *      the HOST <pdx-radio-group> → renders `<slot></slot>` (light DOM); in ctx.track():
- *        el.className = 'pdx-choice-group' (+' horizontal' when orientation==='horizontal');
+ *        the class 'pdx-choice-group'; orientation is the host's attribute, a variant axis (#286);
  *        el.setAttribute('role', 'radiogroup');     // single-select → radiogroup
  *        el.setAttribute('aria-orientation', orient); // VALID on role="radiogroup"
  *        aria-disabled='true' only when disabled.
@@ -18,7 +18,7 @@
  *      The accessible name comes from the `label` prop (the text inside the <label> wrapper).
  *  - CSS: packages/design/src/surfaces/forms.css
  *      .pdx-choice-group → display:flex; flex-direction:column (vertical); gap.
- *      .pdx-choice-group.horizontal → flex-direction:row; flex-wrap:wrap.
+ *      [orientation=horizontal] → flex-direction:row; flex-wrap:wrap (@variant, #286).
  *      .pdx-radio → appearance:none; ~1.25rem; border-radius:50%; cursor:pointer; border 2px;
  *      .pdx-radio:disabled → opacity: var(--pdx-opacity-disabled) (< 1); cursor:not-allowed;
  *      .pdx-radio-wrap → display:inline-flex; cursor:pointer.
@@ -160,6 +160,15 @@ export const radioGroup: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="rg-free"] input.pdx-radio',
                         description: 'disabled group radio has reduced opacity',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled radio group is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="rg"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="rg"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },

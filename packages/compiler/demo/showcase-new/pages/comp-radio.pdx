@@ -54,6 +54,13 @@
         <div class="opt-row"><code>error</code><span>boolean</span><span>Propagated to children</span></div>
       </div>
 
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-radio-group: states</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(invalid) / :state(disabled)</code><span></span><span><code>error</code> / <code>disabled</code> is set; every radio follows</span></div>
+        <div class="opt-row"><code>[orientation="horizontal"]</code><span></span><span>The host's attribute, and its <code>aria-orientation</code>: the radios in a row</span></div>
+      </div>
+
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">pdx-radio: states and parts</h3>
       <div class="options-table">
         <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>

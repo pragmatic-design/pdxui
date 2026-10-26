@@ -18,15 +18,24 @@ import { nameGroup, authoredName } from '../shared/group-name';
  * Single selection across the `<pdx-radio>` elements it holds, with one tab stop and arrow keys that
  * move and check, and the chosen value takes part in a form.
  *
+ * @cssstate invalid - `error` is set; every radio is aria-invalid.
+ * @cssstate disabled - `disabled` is set; the group is aria-disabled and every radio disabled.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  */
 component('pdx-radio-group', {
     // A form submits the chosen value, nothing with no choice as a native radio group, and resets it (#135).
     models: { value: model('', { form: true }) },
+    // On the host as custom states (#132).
+    states: ['invalid', 'disabled'],
+    // Its layout axis (#286), reflected on the host, where forms.css draws the row; no class for it.
+    variants: {
+        /** vertical (the default) or horizontal: the radios in a column or a row. */
+        orientation: ['vertical', 'horizontal'],
+    },
     props: {
         name: { type: String, default: '' },
-        orientation: { type: String, default: 'vertical' },
         size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
         error: { type: Boolean, default: false },
@@ -60,20 +69,19 @@ component('pdx-radio-group', {
         });
 
         ctx.track(() => {
-            const el = ctx.el;
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('disabled', !!ctx.disabled());
+        });
+
+        // Its own class only, via classList: `className =` would wipe the author's classes. The base
+        // look of a choice group; the orientation is the host's attribute.
+        ctx.el.classList.add('pdx-choice-group');
+
+        ctx.track(() => {
             const size = ctx.size() as string;
             const disabled = ctx.disabled();
             const error = ctx.error();
             const val = ctx.value() as string;
-            const orient = ctx.orientation() as string;
-
-            // Own classes only, via classList: `className =` would wipe the author's classes.
-            el.classList.add('pdx-choice-group');
-            el.classList.toggle('horizontal', orient === 'horizontal');
-            el.setAttribute('role', 'radiogroup');
-            if (orient) el.setAttribute('aria-orientation', orient);
-            if (disabled) el.setAttribute('aria-disabled', 'true');
-            else el.removeAttribute('aria-disabled');
 
             requestAnimationFrame(() => {
                 const radios = getRadios();
@@ -93,6 +101,12 @@ component('pdx-radio-group', {
         ctx.formValue?.(() => (ctx.value() as string) || null);
 
         return {};
+    },
+    // Its role and ARIA (#133). Written after `setup`, so its type is read.
+    host: {
+        role: 'radiogroup',
+        ':aria-orientation': (ctx) => ctx.orientation(),
+        ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
     },
     render: () => html`<slot></slot>`,
 });

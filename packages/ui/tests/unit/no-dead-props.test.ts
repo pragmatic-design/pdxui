@@ -154,8 +154,10 @@ describe('every prop @pdxui/ui declares is read by the component that declares i
     it('actually reached the components', () => {
         // Without this, a broken path or regex reports zero dead props for the best of reasons.
         expect(files.length).toBeGreaterThan(80);
+        // 850, not 900: the library's axes move from props to `variants` (#286, #287), which this scan
+        // does not count. The floor is for a scan that found nothing, not a count to keep.
         expect(checked, 'the scan found almost no props, which means it found almost no components')
-            .toBeGreaterThan(900);
+            .toBeGreaterThan(850);
     });
 
     it('leaves nothing declared and unread', () => {

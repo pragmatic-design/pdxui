@@ -4,7 +4,7 @@
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/checkbox-group/pdx-checkbox-group.ts
  *      the HOST <pdx-checkbox-group> → renders `<slot></slot>` (light DOM); in ctx.track():
- *        el.className = 'pdx-choice-group' (+' horizontal' when orientation==='horizontal');
+ *        the class 'pdx-choice-group'; orientation is the host's attribute, a variant axis (#286);
  *        el.setAttribute('role', 'group');  // multi-selection → group, NOT radiogroup
  *        aria-disabled='true' only when disabled.
  *      Note: it does NOT set aria-orientation on role="group" → which is right (no aria-allowed-attr bug).
@@ -18,7 +18,7 @@
  *      The accessible name comes from the `label` prop (the text inside the <label> wrapper).
  *  - CSS: packages/design/src/surfaces/forms.css
  *      .pdx-choice-group → display:flex; flex-direction:column (vertical); gap.
- *      .pdx-choice-group.horizontal → flex-direction:row; flex-wrap:wrap.
+ *      [orientation=horizontal] → flex-direction:row; flex-wrap:wrap (@variant, #286).
  *      .pdx-checkbox → appearance:none; ~1.25rem; cursor:pointer; border 2px;
  *      .pdx-checkbox:disabled → opacity: var(--pdx-opacity-disabled) (< 1); cursor:not-allowed;
  *      .pdx-checkbox-wrap → display:inline-flex; cursor:pointer.
@@ -158,6 +158,15 @@ export const checkboxGroup: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="cbg-email"] input.pdx-checkbox',
                         description: 'disabled group checkbox has reduced opacity',
                         opacity: { op: '<', value: 1 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'a disabled checkbox group is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="cbg"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="cbg"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },

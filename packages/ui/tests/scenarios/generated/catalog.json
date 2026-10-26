@@ -729,6 +729,14 @@
         {
           "id": "checkbox-group-disabled",
           "title": "Checkbox Group — Disabled"
+        },
+        {
+          "id": "checkbox-group-orientation-vertical",
+          "title": "pdx-checkbox-group — orientation=\"vertical\""
+        },
+        {
+          "id": "checkbox-group-orientation-horizontal",
+          "title": "pdx-checkbox-group — orientation=\"horizontal\""
         }
       ]
     },
@@ -2252,6 +2260,14 @@
         {
           "id": "radio-group-disabled",
           "title": "Radio Group — Disabled"
+        },
+        {
+          "id": "radio-group-orientation-vertical",
+          "title": "pdx-radio-group — orientation=\"vertical\""
+        },
+        {
+          "id": "radio-group-orientation-horizontal",
+          "title": "pdx-radio-group — orientation=\"horizontal\""
         }
       ]
     },

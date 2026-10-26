@@ -379,6 +379,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-radio-group` and `pdx-checkbox-group` take the beta contract (#286).
+  - **States.** `invalid` and `disabled` are custom states on the host.
+  - **Orientation.** A variant axis reflected on the host, `[orientation]`, where `forms.css` draws
+    the row; the host's `horizontal` class is gone.
+  - **Host.** `role`, `aria-disabled` and the radio group's `aria-orientation` are host bindings. The
+    checkbox group carries no `aria-orientation`: a `group` may not.
 - **Breaking:** `pdx-checkbox`, `pdx-radio` and `pdx-switch` take the beta contract (#286).
   - **States.** `checked`, `invalid` and `disabled` are custom states on the host, with
     `indeterminate` on the checkbox and `loading` on the switch. The controls no longer carry
