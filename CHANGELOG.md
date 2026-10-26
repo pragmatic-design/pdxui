@@ -941,6 +941,9 @@ semver.
 
 ### Fixes
 
+- In a single `pdx-toggle-group`, an arrow pressed before the next frame could leave the toggle it
+  reached unchosen: it decided from the toggles' `pressed` attributes, which follow the group's value
+  a frame later. It decides from the value. (#286)
 - `pdx-otp-input` follows a change after it is first drawn: a new `length`, `separator`, `error`,
   `disabled` or `mask`, and a value set from outside, reach the cells. The first build wrote over the
   class it found its container by, and every later build found none and did nothing. (#659)

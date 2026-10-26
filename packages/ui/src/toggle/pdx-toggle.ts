@@ -251,7 +251,9 @@ component('pdx-toggle-group', {
                 const btn = items[next].querySelector('button') as HTMLElement;
                 btn?.focus();
                 // In a radio group the arrows select what they reach, through the path a click takes.
-                if (ctx.type() !== 'multiple' && !items[next].hasAttribute('pressed')) btn?.click();
+                // Whether it is chosen is the group's value, written now: the toggle's `pressed`
+                // attribute follows it a frame later, and keys can come faster than frames.
+                if (ctx.type() !== 'multiple' && !isPressed(items[next].getAttribute('value') || '')) btn?.click();
             }
         }
 

@@ -186,6 +186,27 @@ test('single: the arrows move focus and selection, and wrap at the ends', async 
     await expect.poll(() => radios(page).then((r) => r.map((x) => x[3]))).toEqual(['-1', '-1', '0']);
 });
 
+// Keys faster than frames: the toggles' `pressed` attributes are written in the frame after a value
+// change, so an arrow that decides from them reads a stale selection. CI's runner was slow enough to
+// hit it (#723's run): a frame after the first key marked Right pressed, and the third key came before
+// the frame that unmarked it. Here that order is forced.
+test('single: arrows pressed faster than a frame still select what they reach', async ({ page }) => {
+    await mount(page, `<pdx-toggle-group type="single" label="Align" value="c">${THREE}</pdx-toggle-group>`);
+    await page.getByRole('radio', { name: 'Center' }).focus();
+    await page.evaluate(async () => {
+        const press = (key: string) => document.activeElement!.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+        press('ArrowRight');
+        // One frame: the group marks Right pressed.
+        await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+        // Two keys in one task: Left is chosen, and Right is reached before a frame unmarks it.
+        press('ArrowRight');
+        press('ArrowLeft');
+    });
+    await expect(page.getByRole('radio', { name: 'Right' })).toBeFocused();
+    await expect.poll(() => page.locator('#f pdx-toggle-group').evaluate((g) => (g as unknown as { value: string }).value)).toBe('r');
+    await expect(page.getByRole('radio', { name: 'Right' })).toHaveAttribute('aria-checked', 'true');
+});
+
 test('multiple: the arrows move focus only, and every toggle keeps its aria-pressed', async ({ page }) => {
     await mount(page, `<pdx-toggle-group type="multiple" label="Style" value="c">${THREE}</pdx-toggle-group>`);
     await page.getByRole('button', { name: 'Center' }).focus();
