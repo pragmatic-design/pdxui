@@ -283,7 +283,10 @@ component('pdx-form-field', {
                 // A group whose ONE text box is where a person types — the tag input's «Add tag» —
                 // names that box too: the field is what is typed into. A time picker's segments and a
                 // group's radios are several, and keep their own names («Hour», «Female»).
-                const boxes = group
+                // pdx-json-editor's group is a form of its own: each sub-field has its own name, and the
+                // field's requirement and error are the document's, not each sub-field's (#286). Its
+                // text boxes are neither renamed nor marked.
+                const boxes = group && !group.matches('pdx-json-editor')
                     ? Array.from(group.querySelectorAll<HTMLElement>('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]), textarea'))
                     : [];
                 const soleBox = boxes.length === 1 && boxes[0].hasAttribute('aria-label') ? boxes[0] : null;
@@ -370,8 +373,11 @@ component('pdx-form-field', {
                 const wcInputs = el.querySelectorAll('pdx-input, pdx-textarea, pdx-otp-input, pdx-checkbox, pdx-radio, pdx-switch, pdx-radio-group, pdx-checkbox-group');
                 for (const wc of wcInputs) {
                     if (disabled) wc.setAttribute('disabled', '');
-                    if (err) wc.setAttribute('error', '');
-                    else wc.removeAttribute('error');
+                    // A json editor's sub-fields are not in error: its document is (#286).
+                    if (!wc.closest('pdx-json-editor')) {
+                        if (err) wc.setAttribute('error', '');
+                        else wc.removeAttribute('error');
+                    }
                     // `md` is the axis's default, which every field reflects: only a size the author
                     // gave the field is passed on, as before the axis (#627), when it was empty.
                     if (size && size !== 'md') wc.setAttribute('size', size);

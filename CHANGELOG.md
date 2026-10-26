@@ -379,6 +379,14 @@ semver.
 
 ### Changed
 
+- `pdx-json-editor` takes the beta contract (#286): its host is a `role="group"` named by its
+  schema's `label`; its parts are `entry` (a scalar field), `branch` (an object or list of objects)
+  and `dialog` (the sub-modal a branch opens).
+- **`pdx-form-field` around a json editor** (#286): it took the editor's first sub-field as its
+  control, so the field's label named that one sub-field and its error described it alone; and it
+  passed `error` to every `pdx-input` inside, so every sub-field turned red. The editor's group is the
+  control now, named by the label and described by the hint and the error; its sub-fields keep their
+  own names and are neither required nor in error. `disabled` still reaches them.
 - **Breaking:** `pdx-rich-text` takes `pdx-input`'s contract (#286).
   - **Events.** `pdx-focus`, `pdx-blur` and `pdx-ready` are declared and no longer bubble (#138): a
     listener goes on the element.

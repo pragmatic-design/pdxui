@@ -15322,7 +15322,21 @@
           "roles": [
             "dialog"
           ],
-          "attributes": []
+          "attributes": [],
+          "cssParts": [
+            {
+              "name": "entry",
+              "description": "One scalar field: its caption and its control."
+            },
+            {
+              "name": "branch",
+              "description": "One object or list of objects: its caption, a summary and the button that opens it."
+            },
+            {
+              "name": "dialog",
+              "description": "The sub-modal a branch opens, `role=\"dialog\"`, appended to the page's body."
+            }
+          ]
         }
       ],
       "exports": [
