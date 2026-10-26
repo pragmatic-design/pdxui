@@ -20428,6 +20428,30 @@
               },
               "default": "0"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, `role=\"slider\"`."
+            },
+            {
+              "name": "star",
+              "description": "One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "focused",
+              "description": "The slider has focus."
+            }
           ]
         }
       ],

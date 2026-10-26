@@ -69,15 +69,21 @@
 
 /* ===== States ===== */
 
-.pdx-rating-readonly {
+/* On pdx-rating's host (#286); `.pdx-rating-readonly` and `.pdx-rating-disabled` on native markup. The
+   host form is one class heavier than the class it replaces, which no other rule here contests. */
+
+.pdx-rating-readonly,
+:state(readonly) > .pdx-rating {
     cursor: default;
 }
 
-.pdx-rating-readonly .pdx-rating-star:hover {
+.pdx-rating-readonly .pdx-rating-star:hover,
+:state(readonly) > .pdx-rating .pdx-rating-star:hover {
     transform: none;
 }
 
-.pdx-rating-disabled {
+.pdx-rating-disabled,
+:state(disabled) > .pdx-rating {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
     pointer-events: none;

@@ -14,6 +14,13 @@ import '@pdxui/design/components/rating';
  * A star rating the user sets with the pointer or the keyboard, with a hover preview, and the value
  * takes part in a form.
  *
+ * @csspart root - The frame, `role="slider"`.
+ * @csspart star - One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate focused - The slider has focus.
+ *
  * @alphaevent pdx-change
  * @alphaevent change
  * @alphadetail value $event.detail.value
@@ -21,6 +28,9 @@ import '@pdxui/design/components/rating';
 component('pdx-rating', {
     // A click or a key writes it (#480), and the write dispatches `value-change`.
     models: { value: model(0, { form: true }) },
+    // On the host as custom states (#132); the frame carries no state class.
+    states: ['disabled', 'readonly', 'focused'],
+    parts: ['root', 'star'],
     // The axes its stylesheet keys by (#629), reflected on the host; each value maps the class that
     // draws the same look on native markup. `md` is the base size, which no class adds to.
     variants: {
@@ -178,13 +188,11 @@ component('pdx-rating', {
             if (next !== current) writeValue(next);
         }
 
-        function rootClass(): string {
-            let cls = 'pdx-rating';
-            if (ctx.disabled()) cls += ' pdx-rating-disabled';
-            if (ctx.readonly()) cls += ' pdx-rating-readonly';
-            if (isFocused()) cls += ' pdx-rating-focused';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('focused', isFocused());
+        });
 
         function renderStars(): ReturnType<typeof html> {
             const cnt = ctx.count() as number;
@@ -198,6 +206,7 @@ component('pdx-rating', {
                 stars.push(html`
                     <span
                         class="${'pdx-rating-star pdx-rating-star-' + fill}"
+                        data-part="star"
                         :title="${() => tip}"
                         :style="${() => col ? 'color:' + col : ''}"
                         @click="${(e: MouseEvent) => onStarClick(i, e)}"
@@ -231,11 +240,11 @@ component('pdx-rating', {
             },
         });
 
-        return { hoverValue, isFocused, _value, getDisplayValue, rootClass, renderStars, onMouseLeave, onKeydown };
+        return { hoverValue, isFocused, _value, getDisplayValue, renderStars, onMouseLeave, onKeydown };
     },
     render: (ctx: any) => html`
         <div
-            :class="${ctx.rootClass}"
+            class="pdx-rating"
             data-part="root"
             role="slider"
             :aria-valuenow="${() => String(ctx._value())}"

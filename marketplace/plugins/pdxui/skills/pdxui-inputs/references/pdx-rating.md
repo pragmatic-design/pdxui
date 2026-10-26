@@ -29,6 +29,10 @@ Star rating with halves and tooltips.
 
 **Renders:** roles `slider`
 
+**States:** `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(focused)` — The slider has focus.
+
+**Parts:** `[data-part="root"]` — The frame, `role="slider"`.; `[data-part="star"]` — One star; `pdx-rating-star-full`, `-half` or `-empty` says how much it is filled.
+
 
 #### Examples
 
