@@ -8,6 +8,7 @@ A pressable on/off button.
 | `value` | `value` | string | `''` | The current value. |
 | `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
 | `ariaLabel` | `arialabel` | string | `''` | The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
+| `radio` | `radio` | boolean | `false` | Set by a `pdx-toggle-group type="single"` on its toggles: the button is a `radio` with `aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`. Not for a toggle on its own: a radio belongs in a radiogroup. |
 | `variant` | `variant` | 'outline' \| 'ghost' \| 'solid' | `'outline'` | outline (the default), ghost or solid. |
 | `pressed` | `pressed` | boolean | `false` |  |
 
@@ -21,9 +22,11 @@ A pressable on/off button.
 
 **Events:** `pressed-change` → `detail: { value: boolean }` — Fired when the component writes `pressed`. Does not bubble.
 
+**Renders:** roles `radio`
+
 **States:** `:state(pressed)` — It is pressed.; `:state(disabled)` — `disabled` is set.
 
-**Parts:** `[data-part="root"]` — The native `<button>`, aria-pressed; the pressed look keys by that attribute.
+**Parts:** `[data-part="root"]` — The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute.
 
 
 #### Examples

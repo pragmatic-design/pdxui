@@ -24,7 +24,8 @@
 
 /* The variants, keyed on pdx-toggle's `variant` (#286); on a native button `.pdx-toggle-btn.pdx-outline`
    and its siblings. The pressed look keys by the button's aria-pressed, which a native toggle carries
-   too. Each rule follows the base one, so it wins at the same weight. */
+   too, or its aria-checked as the radio of a single toggle group. Each rule follows the base one, so it
+   wins at the same weight. */
 
 /* Outline variant (default) */
 :where(pdx-toggle[variant="outline"]) > [data-part="root"], .pdx-toggle-btn.pdx-outline {
@@ -36,7 +37,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :where(pdx-toggle[variant="outline"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-outline[aria-pressed="true"] {
+    :where(pdx-toggle[variant="outline"]) > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]), .pdx-toggle-btn.pdx-outline:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-inset);
         border-color: var(--pdx-color-primary);
         color: var(--pdx-color-primary-ink);
@@ -51,7 +52,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :where(pdx-toggle[variant="ghost"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-ghost[aria-pressed="true"] {
+    :where(pdx-toggle[variant="ghost"]) > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]), .pdx-toggle-btn.pdx-ghost:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-inset);
         color: var(--pdx-color-primary-ink);
     }
@@ -65,7 +66,7 @@
         background: var(--pdx-color-inset);
         color: var(--pdx-color-text);
     }
-    :where(pdx-toggle[variant="solid"]) > [data-part="root"][aria-pressed="true"], .pdx-toggle-btn.pdx-solid[aria-pressed="true"] {
+    :where(pdx-toggle[variant="solid"]) > [data-part="root"]:is([aria-pressed="true"], [aria-checked="true"]), .pdx-toggle-btn.pdx-solid:is([aria-pressed="true"], [aria-checked="true"]) {
         background: var(--pdx-color-primary);
         color: var(--pdx-color-primary-text);
     }

@@ -655,6 +655,7 @@ export const scenarioPage: Record<string, string> = {
     "toggle-button-variant-ghost": "tier-1b",
     "toggle-button-variant-solid": "tier-1b",
     "toggle-group-basic": "tier-1b",
+    "toggle-group-single": "tier-1b",
     "toggle-group-vertical": "tier-1b",
     "toggle-group-disabled": "tier-1b",
     "toggle-group-orientation-horizontal": "tier-1b",

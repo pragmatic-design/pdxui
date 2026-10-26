@@ -14,7 +14,7 @@ import '@pdxui/design/components/toggle';
 /**
  * A button the user presses on and off, its state exposed with `aria-pressed`.
  *
- * @csspart root - The native `<button>`, aria-pressed; the pressed look keys by that attribute.
+ * @csspart root - The native `<button>`, aria-pressed (aria-checked as a group's radio); the pressed look keys by that attribute.
  *
  * @cssstate pressed - It is pressed.
  * @cssstate disabled - `disabled` is set.
@@ -41,6 +41,12 @@ component('pdx-toggle', {
         size: prop(''),
         /** The toggle's name when its content does not say it ("B" is Bold), forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
         ariaLabel: prop(''),
+        /**
+         * Set by a `pdx-toggle-group type="single"` on its toggles: the button is a `radio` with
+         * `aria-checked` in the group's `radiogroup`, instead of a toggle button with `aria-pressed`.
+         * Not for a toggle on its own: a radio belongs in a radiogroup.
+         */
+        radio: prop(false),
     },
     setup(ctx) {
         // Disabled: the click stops at the host, before the app's @click.
@@ -76,7 +82,9 @@ component('pdx-toggle', {
             class="pdx-toggle-btn"
             data-part="root"
             :size="${ctx.size}"
-            :aria-pressed="${() => ctx.pressed() ? 'true' : 'false'}"
+            :role="${() => ctx.radio() ? 'radio' : null}"
+            :aria-pressed="${() => ctx.radio() ? null : ctx.pressed() ? 'true' : 'false'}"
+            :aria-checked="${() => ctx.radio() ? (ctx.pressed() ? 'true' : 'false') : null}"
             :aria-label="${() => (ctx.ariaLabel() as string) || null}"
             :disabled="${ctx.disabled}"
             :data-state="${() => ctx.pressed() ? 'on' : 'off'}"
@@ -155,16 +163,19 @@ component('pdx-toggle-group', {
             ctx.value.set(isSingle ? (nextValues[0] || '') : nextValues.join(','));
         }
 
-        // Wire child toggles
+        // Wire child toggles. One ARIA pattern per type, in full: `single` is an APG radio group — each
+        // toggle a radio (its `radio` prop), the tab stop on the checked one or else the first enabled;
+        // `multiple` is a group of aria-pressed toggle buttons, each in the tab order.
         ctx.track(() => {
             const el = ctx.el;
             const vals = getValues();
             const dis = ctx.disabled();
             const variant = ctx.variant() as string;
             const size = ctx.size() as string;
+            const single = ctx.type() !== 'multiple';
 
             requestAnimationFrame(() => {
-                const toggles = el.querySelectorAll('pdx-toggle');
+                const toggles = Array.from(el.querySelectorAll('pdx-toggle'));
                 for (const t of toggles) {
                     const tVal = t.getAttribute('value') || '';
                     // Set pressed state
@@ -173,10 +184,19 @@ component('pdx-toggle-group', {
                     } else {
                         t.removeAttribute('pressed');
                     }
-                    // Propagate disabled, variant, size
+                    // Propagate disabled, variant, size, and the radio role of a single group
                     if (dis) t.setAttribute('disabled', '');
                     if (variant) t.setAttribute('variant', variant);
                     if (size) t.setAttribute('size', size);
+                    t.toggleAttribute('radio', single);
+                }
+                const enabled = toggles.filter((t) => !t.hasAttribute('disabled'));
+                const stop = single ? (enabled.find((t) => vals.includes(t.getAttribute('value') || '')) ?? enabled[0]) : undefined;
+                for (const t of toggles) {
+                    const btn = t.querySelector('button');
+                    if (!btn) continue;
+                    if (single) btn.tabIndex = t === stop ? 0 : -1;
+                    else btn.removeAttribute('tabindex');
                 }
             });
         });
@@ -230,6 +250,8 @@ component('pdx-toggle-group', {
             if (next !== idx && items[next]) {
                 const btn = items[next].querySelector('button') as HTMLElement;
                 btn?.focus();
+                // In a radio group the arrows select what they reach, through the path a click takes.
+                if (ctx.type() !== 'multiple' && !items[next].hasAttribute('pressed')) btn?.click();
             }
         }
 
@@ -244,10 +266,12 @@ component('pdx-toggle-group', {
 
         return { onKeydown };
     },
-    // Its role, ARIA and keys (#133). No aria-orientation: a `group` may not carry it (axe's
-    // aria-allowed-attr). Written after `setup`, so its type is read.
+    // Its role, ARIA and keys (#133): a `radiogroup` for `single`, a `group` for `multiple`.
+    // aria-orientation only on the radiogroup: a `group` may not carry it (axe's aria-allowed-attr).
+    // Written after `setup`, so its type is read.
     host: {
-        role: 'group',
+        ':role': (ctx) => ctx.type() === 'multiple' ? 'group' : 'radiogroup',
+        ':aria-orientation': (ctx) => ctx.type() === 'multiple' ? null : ctx.orientation(),
         ':aria-label': (ctx) => (ctx.label() as string) || null,
         ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
         '@keydown': (ctx, e) => ctx.onKeydown(e as KeyboardEvent),
