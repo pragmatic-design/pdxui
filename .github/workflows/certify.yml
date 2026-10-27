@@ -27,7 +27,7 @@ jobs:
   # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
   contracts:
     name: contracts (dim 1-4) (${{ matrix.project }} ${{ matrix.shard }}/${{ matrix.of }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -82,7 +82,7 @@ jobs:
   # in its manifest (`onlyOn`), with the reason, and is left out here.
   contracts-2024:
     name: contracts (dim 1, baseline-2024)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       PDX_TARGET: baseline-2024
@@ -111,7 +111,7 @@ jobs:
   # Dimension 5: visual regression in the pinned Docker image (bit-for-bit determinism).
   visual:
     name: visual (dim 5, docker)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
