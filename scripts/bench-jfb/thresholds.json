@@ -1,11 +1,11 @@
 {
-  "measured": "2026-10-14, the first three runs of bench-nightly.yml (pull request #403, ubuntu-latest, Google Chrome 155.0.8059.39, three runs against vanillajs each); each threshold is the highest of the three medians + 15%, rounded up. A ratio over a vanillajs script of a millisecond or two moves a lot from one run to the next: update10th 5.46, 4.88, 6.20; swap 8.40, 5.20, 8.40. select1k raised from 1.44 to 1.90 on 2026-10-28 (#733): after 2026-10-19 the nightly read 1.20 to 1.86 on main, PDX's script is about 1 ms measured in steps of 0.1 ms, and two same-runner A/B runs over six rotating rounds put about 0.2-0.3 ms (CPU throttled 4x) between a1a8994 and #529 without isolating its cause; 1.90 is just over the highest reading",
+  "measured": "2026-10-14, the first three runs of bench-nightly.yml (pull request #403, ubuntu-latest, Google Chrome 155.0.8059.39, three runs against vanillajs each); each threshold is the highest of the three medians + 15%, rounded up. A ratio over a vanillajs script of a millisecond or two moves a lot from one run to the next: update10th 5.46, 4.88, 6.20; swap 8.40, 5.20, 8.40. select1k raised from 1.44 to 1.90 on 2026-10-28 (#733): after 2026-10-19 the nightly read 1.20 to 1.86 on main, PDX's script is about 1 ms measured in steps of 0.1 ms, and two same-runner A/B runs over six rotating rounds put about 0.2-0.3 ms (CPU throttled 4x) between a1a8994 and #529 without isolating its cause; 1.90 is just over the highest reading. swap1k raised from 9.66 to 13 the same day: vanillajs swaps in 0.2 to 0.8 ms, read in steps of 0.1 ms, so the ratio read 5.0 to 12.5 over 38 runs and crossed 9.66 in 7 of them, a1a8994 at 12.5 among them; 13 is just over the highest reading",
   "ratio": {
     "01_run1k script": 4.27,
     "02_replace1k script": 3.82,
     "03_update10th1k_x16 script": 7.14,
     "04_select1k script": 1.90,
-    "05_swap1k script": 9.66,
+    "05_swap1k script": 13,
     "06_remove-one-1k script": 2.95,
     "07_create10k script": 0.51,
     "08_create1k-after1k_x2 script": 4.09,
