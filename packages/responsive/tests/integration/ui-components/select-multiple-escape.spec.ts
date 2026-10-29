@@ -23,7 +23,7 @@ async function mountMultiple(page: Page): Promise<void> {
 }
 
 const isOpen = (page: Page): Promise<boolean> =>
-    page.evaluate(() => !!document.querySelector('[data-test="multiple"] .pdx-select-dropdown')?.classList.contains('open'));
+    page.evaluate(() => !!document.querySelector('[data-test="multiple"]')?.matches(':state(open)'));
 
 const focusInSelect = (page: Page): Promise<string> =>
     page.evaluate(() => {

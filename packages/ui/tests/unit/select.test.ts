@@ -46,8 +46,8 @@ describe('pdx-select', () => {
         trigger.click();
         await tick(50);
 
-        const dropdown = el.querySelector('.pdx-select-dropdown') as HTMLElement;
-        expect(dropdown?.classList.contains('open')).toBe(true);
+        // Open is the combobox's aria-expanded and the host's :state(open) (#287), no class.
+        expect(el.querySelector('[role="combobox"]')?.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('shows options in dropdown', async () => {
@@ -291,8 +291,8 @@ describe('pdx-select', () => {
         (el.querySelector('.pdx-select-option') as HTMLElement).click();
         await tick(50);
 
-        const dropdown = el.querySelector('.pdx-select-dropdown') as HTMLElement;
-        expect(dropdown?.classList.contains('open')).toBe(true);
+        // Open is the combobox's aria-expanded and the host's :state(open) (#287), no class.
+        expect(el.querySelector('[role="combobox"]')?.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('emits values array in multiple mode', async () => {
@@ -325,8 +325,8 @@ describe('pdx-select', () => {
         trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
         await tick(50);
 
-        const dropdown = el.querySelector('.pdx-select-dropdown') as HTMLElement;
-        expect(dropdown?.classList.contains('open')).toBe(true);
+        // Open is the combobox's aria-expanded and the host's :state(open) (#287), no class.
+        expect(el.querySelector('[role="combobox"]')?.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('opens on ArrowDown key', async () => {
@@ -338,8 +338,8 @@ describe('pdx-select', () => {
         trigger.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true }));
         await tick(50);
 
-        const dropdown = el.querySelector('.pdx-select-dropdown') as HTMLElement;
-        expect(dropdown?.classList.contains('open')).toBe(true);
+        // Open is the combobox's aria-expanded and the host's :state(open) (#287), no class.
+        expect(el.querySelector('[role="combobox"]')?.getAttribute('aria-expanded')).toBe('true');
     });
 
     it('closes on Escape key', async () => {
@@ -495,20 +495,24 @@ describe('pdx-select', () => {
         expect(trigger?.classList.contains('pdx-input-lg'), 'the size is the host\'s now').toBe(false);
     });
 
-    it('applies error state class', async () => {
+    // The states are the host's custom states (#287), measured in Chromium by
+    // select-beta-contract.spec.ts; here, what the combobox says of them.
+    it('error marks the combobox aria-invalid, and the trigger carries no state class', async () => {
         const el = await mount('pdx-select', { error: '' });
         await tick(50);
 
         const trigger = el.querySelector('.pdx-select-trigger');
-        expect(trigger?.classList.contains('error')).toBe(true);
+        expect(trigger?.getAttribute('aria-invalid')).toBe('true');
+        expect(trigger?.classList.contains('error')).toBe(false);
     });
 
-    it('applies disabled state class', async () => {
+    it('disabled marks the combobox aria-disabled, and the trigger carries no state class', async () => {
         const el = await mount('pdx-select', { disabled: '' });
         await tick(50);
 
         const trigger = el.querySelector('.pdx-select-trigger');
-        expect(trigger?.classList.contains('disabled')).toBe(true);
+        expect(trigger?.getAttribute('aria-disabled')).toBe('true');
+        expect(trigger?.classList.contains('disabled')).toBe(false);
     });
 
     // ─── Empty state ─────────────��──────────────────

@@ -22550,6 +22550,24 @@
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "parameters": [],
+              "description": "Open the popup."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "parameters": [],
+              "description": "Close the popup."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Open the popup when closed, close it when open."
             }
           ],
           "models": [
@@ -22587,18 +22605,12 @@
           },
           "events": [
             {
-              "name": "pdx-open",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the list opens. Does not bubble."
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the list closes. Does not bubble."
+              "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+              "detail": "{ value: boolean }"
             },
             {
               "name": "pdx-clear",
@@ -22862,6 +22874,74 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The trigger: the frame, its border, background and the states' colours."
+            },
+            {
+              "name": "search",
+              "description": "The search field, while `searchable`: in the trigger, or atop the list with `search-position=\"dropdown\"`."
+            },
+            {
+              "name": "tag",
+              "description": "A chosen option in the trigger, while `multiple`."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`."
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner, a `role=\"status\"`, while loading."
+            },
+            {
+              "name": "popup",
+              "description": "The floating panel that holds the list."
+            },
+            {
+              "name": "list",
+              "description": "The `role=\"listbox\"`."
+            },
+            {
+              "name": "option",
+              "description": "An option of the list."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "The popup is open."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "success",
+              "description": "`success` is set."
+            },
+            {
+              "name": "warning",
+              "description": "`warning` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set, or the DataSource is loading."
+            },
+            {
+              "name": "multiple",
+              "description": "`multiple` is set: the trigger holds tags."
             }
           ],
           "x-pdx-context": {

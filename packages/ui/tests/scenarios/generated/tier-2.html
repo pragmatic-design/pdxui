@@ -146,7 +146,7 @@
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "select-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="sel-open"]');
-                if (host && typeof host.openSelect === 'function') host.openSelect(); },
+                if (host && typeof host.show === 'function') host.show(); },
         "toast-stack": async function () { 
     const { toast } = await import('@pdxui/ui/toast');
     toast.clear();

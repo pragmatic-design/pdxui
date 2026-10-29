@@ -15,8 +15,9 @@ async function read(page: Page): Promise<Rects> {
     await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
     return page.evaluate(() => {
         const host = document.querySelector('section:not([hidden]) [data-test="sel-open"]')!;
-        const trigger = host.querySelector('.pdx-select-trigger')!.getBoundingClientRect();
-        const panel = host.querySelector('.pdx-select-dropdown.open')!.getBoundingClientRect();
+        const trigger = host.querySelector('[data-part="root"]')!.getBoundingClientRect();
+        // The open panel: the host's :state(open) and its popup part (#287).
+        const panel = host.querySelector(':scope:state(open) > [data-part="popup"]')!.getBoundingClientRect();
         return { trigger: { bottom: trigger.bottom }, panel: { top: panel.top } };
     });
 }

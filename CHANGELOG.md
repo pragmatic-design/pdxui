@@ -383,6 +383,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-select` takes the beta contract (#287), the first of the pickers.
+  - **The popup is announced as an overlay's.** `open-change` with `{ value }`, `true` on open and
+    `false` on close, replaces `pdx-open` and `pdx-close`, and does not bubble. The popup is driven by
+    `show()`, `close()` and `toggle()`, which replace `openSelect()`, `closeSelect()` and
+    `toggleSelect()`. `pdx migrate` rewrites both (`open-change-event`, `select-overlay-verbs`).
+  - **States and parts.** `open`, `invalid`, `success`, `warning`, `disabled`, `readonly`, `loading`
+    and `multiple` are custom states on the host; the trigger no longer carries the `error`,
+    `success`, `warning`, `disabled`, `readonly` and `multiple` classes, nor the panel `open` (native
+    markup keeps them). The parts are `root` (the trigger), `search`, `tag`, `clear`, `spinner`,
+    `popup`, `list` and `option`.
+  - **A-rules.** With `error` the combobox is `aria-invalid`; while loading the list is `aria-busy`;
+    the options of a virtualized list carry `aria-setsize` and `aria-posinset`, so a screen reader
+    hears an option's place among all of them, not among those rendered.
 - **Breaking:** `pdx-rating` takes the beta contract (#286).
   - **States and parts.** `disabled`, `readonly` and `focused` are custom states on the host; the frame
     no longer carries `pdx-rating-disabled`, `pdx-rating-readonly` or `pdx-rating-focused` (native

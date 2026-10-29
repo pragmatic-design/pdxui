@@ -41,6 +41,7 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript } from './open-change';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -403,6 +404,11 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     pinInputStrings,
     // #286: `pdx-button-group`'s selection modes are `pdx-toggle-group` (./button-group-modes).
     buttonGroupModes,
+    // #287: a popup announces `open-change`, not `pdx-open`/`pdx-close`; pdx-select's popup methods are
+    // the overlay verbs (./open-change).
+    openChangeEvent,
+    selectOverlayVerbs,
+    selectOverlayVerbsScript,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
