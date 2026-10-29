@@ -100,11 +100,14 @@ describe('pdx-calendar', () => {
         expect(outsideCells).toBeDefined();
     });
 
-    it('has disabled class when disabled prop is set', async () => {
+    it('disabled puts no state class on the frame', async () => {
+        // `disabled` is the host's :state(disabled) (#287), measured in Chromium by
+        // calendar-beta-contract.spec.ts; here, no class on the frame for it.
         const el = await mount('pdx-calendar', { disabled: '' });
         await tick(100);
         const root = el.querySelector('.pdx-calendar');
-        expect(root?.classList.contains('disabled')).toBe(true);
+        expect(root).not.toBeNull();
+        expect(root?.classList.contains('disabled')).toBe(false);
     });
 
     it('emits value-change on cell click', async () => {

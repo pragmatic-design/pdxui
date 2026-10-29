@@ -97,6 +97,21 @@
         <div class="opt-row"><code>[data-part="popup"] / [data-part="preset"] / [data-part="calendar"]</code><span></span><span>The panel, a dialog; a preset button; the calendar it draws</span></div>
       </div>
 
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">&lt;pdx-calendar&gt;: form, state and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        A standalone calendar takes part in a form when it has a <code>name</code>: it submits its model, a range or several
+        dates one entry each, and a reset restores it. Its parts are its own: inside a date picker, address the picker's with
+        <code>pdx-date-picker &gt; [data-part="root"]</code>.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>name</code><span></span><span>The form entry's name; without one it submits nothing</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span></span><span><code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="nav"]</code><span></span><span>The frame, a group; the navigation bar</span></div>
+        <div class="opt-row"><code>[data-part="prev"] / [data-part="title"] / [data-part="next"]</code><span></span><span>The arrows and the month or year shown</span></div>
+        <div class="opt-row"><code>[data-part="grid"] / [data-part="cell"]</code><span></span><span>A month's days, or the months or years; a day, month or year to pick</span></div>
+      </div>
+
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard Shortcuts</h3>
       <div class="options-table">
         <div class="opt-header"><span>Key</span><span>Action</span><span>Scope</span></div>

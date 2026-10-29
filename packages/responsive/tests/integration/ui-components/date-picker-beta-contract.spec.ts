@@ -26,7 +26,8 @@ async function mount(page: Page, html: string, props: Record<string, unknown> = 
 async function read(page: Page, names: string[]): Promise<{ states: string[]; trigger: string[] }> {
     return page.locator('#f pdx-date-picker').first().evaluate((host, ns) => ({
         states: ns.filter((n) => host.matches(`:state(${n})`)),
-        trigger: [...(host.querySelector('[data-part="root"]')?.classList ?? [])],
+        // `:scope >`: the picker's own root, not its calendar's, which is a `root` of its own.
+        trigger: [...(host.querySelector(':scope > [data-part="root"]')?.classList ?? [])],
     }), names);
 }
 
@@ -56,7 +57,7 @@ test.describe('states', () => {
         const r = await read(page, STATES);
         expect(r.states).toEqual(['disabled']);
         expect(r.trigger).not.toContain('disabled');
-        const style = await page.locator('#f pdx-date-picker [data-part="root"]').evaluate((t) => ({ cursor: getComputedStyle(t).cursor, opacity: getComputedStyle(t).opacity }));
+        const style = await page.locator('#f pdx-date-picker > [data-part="root"]').evaluate((t) => ({ cursor: getComputedStyle(t).cursor, opacity: getComputedStyle(t).opacity }));
         expect(style).toEqual({ cursor: 'not-allowed', opacity: '0.5' });
     });
 

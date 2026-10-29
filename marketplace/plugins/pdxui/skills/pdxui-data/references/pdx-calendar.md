@@ -22,6 +22,7 @@ A month calendar surface.
 | `firstDay` | `firstday` | number | `-1` | First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1. |
 | `inline` | `inline` | boolean | `false` | Inline mode (no external popover wrapper). |
 | `disabled` | `disabled` | boolean | `false` | Disabled state. |
+| `name` | `name` | string | `''` | Name for form participation: with one, a form submits the value under it. |
 | `value` | `value` | string \| string[] | `''` | The current value. |
 
 **API (via `:ref`)**
@@ -35,6 +36,10 @@ A month calendar surface.
 **Events:** `pdx-navigate` → `detail: { year, month }` — Fired on navigation.; `pdx-view-change` → `detail: { view }` — Fired when the view changes.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row`
+
+**States:** `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The frame, a `role="group"`: the navigation above the grid.; `[data-part="nav"]` — The navigation bar: the two arrows and the title.; `[data-part="prev"]` — The arrow to the previous month, year or twelve years.; `[data-part="title"]` — The month or year shown; in the day view, the button that opens the month view.; `[data-part="next"]` — The arrow to the next month, year or twelve years.; `[data-part="grid"]` — A month's grid of days (`role="grid"`), or the months or years to pick from.; `[data-part="cell"]` — A day, a month or a year to pick.
 
 
 #### Examples

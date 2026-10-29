@@ -15,7 +15,9 @@
     min-width: 280px;
 }
 
-.pdx-calendar.disabled {
+/* The component marks it with the host's :state(disabled) (#287); the class is native markup's. */
+.pdx-calendar.disabled,
+:state(disabled) > .pdx-calendar {
     opacity: 0.5;
     pointer-events: none;
 }

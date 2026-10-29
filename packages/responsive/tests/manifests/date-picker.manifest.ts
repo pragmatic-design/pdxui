@@ -188,19 +188,19 @@ export const datePicker: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-date-picker-trigger { display: inline-flex } → box visibile (CSS:4-9).
-                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]',
                         description: 'trigger is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:5 → cursor: pointer → interactive.
-                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]',
                         description: 'trigger is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The trigger's radius (from .pdx-input-wrap) is non-negative (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]',
                         description: 'trigger radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -228,7 +228,7 @@ export const datePicker: ComponentManifest = {
                 positioning: [
                     {
                         description: 'date picker calendar opens below the trigger, one float-offset away',
-                        trigger: { selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]', action: 'click' },
+                        trigger: { selector: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]', action: 'click' },
                         floating: 'section:not([hidden]) [data-test="dp"] [data-part="popup"]',
                         placement: 'bottom',
                         gap: { op: '==', value: 4, tolerance: 1 },
@@ -240,7 +240,7 @@ export const datePicker: ComponentManifest = {
                     {
                         // The icon and the text are contained in the trigger (the layout holds).
                         description: 'icon and text are contained within the trigger box',
-                        parent: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
+                        parent: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]',
                         children: {
                             trigger: '.pdx-date-picker-trigger',
                             icon: '.pdx-date-picker-icon',
@@ -291,7 +291,7 @@ export const datePicker: ComponentManifest = {
                     {
                         // Dropdown-style: a floating panel, no backdrop. action:'call' → already opened by the setup.
                         description: 'open date picker shows the calendar panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', action: 'call' },
+                        trigger: { selector: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]', action: 'call' },
                         panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         hasBackdrop: false,
                     },
@@ -305,7 +305,7 @@ export const datePicker: ComponentManifest = {
                         // Scoped like the parent: the bare trigger class finds a hidden scenario's
                         // trigger (0×0), and `0 <= panel.top` would hold without measuring.
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]',
+                            trigger: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]',
                             panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         },
                         relations: [
@@ -334,7 +334,7 @@ export const datePicker: ComponentManifest = {
                 standalone: [
                     {
                         // :state(disabled) > .pdx-date-picker-trigger → the cursor is not pointer.
-                        selector: 'section:not([hidden]) [data-test="dp-dis"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="dp-dis"] > [data-part="root"]',
                         description: 'disabled trigger is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
                     },
@@ -342,7 +342,7 @@ export const datePicker: ComponentManifest = {
                 states: [
                     {
                         description: 'disabled is the custom state :state(disabled)',
-                        selector: 'section:not([hidden]) [data-test="dp-dis"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="dp-dis"] > [data-part="root"]',
                         trigger: 'attribute',
                         customState: { host: 'section:not([hidden]) [data-test="dp-dis"]', name: 'disabled' },
                         changes: { cursor: { op: 'is', value: 'not-allowed' } },
@@ -368,7 +368,7 @@ export const datePicker: ComponentManifest = {
     isolation: {
         scenario: 'date-picker-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dp"] > [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -380,20 +380,20 @@ export const datePicker: ComponentManifest = {
     //   first the open state is asserted, then the close through Escape.
     keyboard: {
         scenario: 'date-picker-open',
-        initialFocus: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]',
+        initialFocus: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]',
         steps: [
             // Open (through the setup): aria-expanded must be true.
-            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'true' } },
+            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]', name: 'aria-expanded', value: 'true' } },
             // Escape closes → aria-expanded goes back to false (onOpenChange sets aria-expanded=String(open)).
-            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' } },
+            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]', name: 'aria-expanded', value: 'false' } },
             // Reopened from the keyboard: the focus enters the dialog, on the chosen day.
             { key: 'ArrowDown',
                 expectFocus: 'section:not([hidden]) [data-test="dp-open"] [role="dialog"] [data-iso="2024-06-15"]' },
             { key: 'ArrowRight', expectFocus: 'section:not([hidden]) [data-test="dp-open"] [data-iso="2024-06-16"]' },
             // Enter chooses and closes; the focus returns to the trigger, not to <body>.
             { key: 'Enter',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' },
-                expectFocus: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]', name: 'aria-expanded', value: 'false' },
+                expectFocus: 'section:not([hidden]) [data-test="dp-open"] > [data-part="root"]' },
         ],
     },
 
