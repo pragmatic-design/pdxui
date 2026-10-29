@@ -61,9 +61,25 @@
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Its model, the path: selection changed; <code>getLabels()</code> gives the labels</span></div>
-        <div class="opt-row"><code>pdx-open</code><span>—</span><span>Panel opened</span></div>
-        <div class="opt-row"><code>pdx-close</code><span>—</span><span>Panel closed</span></div>
+        <div class="opt-row"><code>open-change</code><span>{ value }</span><span>The panel opened (<code>true</code>) or closed (<code>false</code>)</span></div>
         <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>
+        <div class="opt-row"><code>pdx-load-error</code><span>{ node, error }</span><span><code>loadChildren</code> rejected; the branch can be clicked again</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The panel is driven by the overlay verbs; the path is the model, <code>value</code>. What a theme or a page
+        styles on <code>&lt;pdx-cascader&gt;</code>: its custom states on the host and its parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Method, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>show() / close() / toggle()</code><span></span><span>Open, close, or flip the panel</span></div>
+        <div class="opt-row"><code>clear() / getLabels()</code><span></span><span>Empty the path; the labels of the path</span></div>
+        <div class="opt-row"><code>:state(open) / :state(disabled)</code><span></span><span>The panel is open; <code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span></span><span>A branch's children are being fetched</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="clear"]</code><span></span><span>The trigger; the clear button</span></div>
+        <div class="opt-row"><code>[data-part="popup"] / [data-part="search"]</code><span></span><span>The panel; its search field</span></div>
+        <div class="opt-row"><code>[data-part="list"] / [data-part="option"] / [data-part="spinner"]</code><span></span><span>A column or the results; an option; a branch's spinner</span></div>
       </div>
     </section>
   </div>

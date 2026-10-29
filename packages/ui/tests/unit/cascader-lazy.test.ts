@@ -21,7 +21,7 @@ async function mountLazy(loadChildren: Loader) {
     el.options = structuredClone(LAZY);
     el.loadChildren = loadChildren;
     await tick(50);
-    el.openCascader();
+    el.show();
     await tick(50);
     return el as HTMLElement;
 }
@@ -31,9 +31,9 @@ const itemOf = (el: HTMLElement, label: string): HTMLElement =>
         .find(i => i.querySelector('.pdx-cascader-item-label')?.textContent === label)!;
 
 const status = (el: HTMLElement): HTMLElement | null => el.querySelector('.pdx-cascader-panel [role="status"]');
-// aria-busy sits on the option whose branch is loading, as the tree-select sets it on its row — not
-// on an ancestor of the status row: a busy region may hold back its own announcements until it is
-// no longer busy, which here is when the row is gone.
+// aria-busy sits on the option whose branch is loading, as the tree-select sets it on its row, and on
+// the list that holds it (A4, #287) — not on an ancestor of the status row: a busy region may hold back
+// its own announcements until it is no longer busy, which here is when the row is gone.
 const busyItems = (el: HTMLElement): Element[] => [...el.querySelectorAll('.pdx-cascader-panel [aria-busy="true"]')];
 const columnLabels = (el: HTMLElement): string[][] =>
     [...el.querySelectorAll('.pdx-cascader-column')].map(c =>
@@ -67,7 +67,8 @@ describe('pdx-cascader, a branch fetched by loadChildren', () => {
         expect(s!.closest('.pdx-cascader-column'), 'the row is not in a column of its own').not.toBeNull();
         expect(s!.closest('.pdx-cascader-column')!.contains(itemOf(el, 'Mammals')), 'the row is not in the next column').toBe(false);
         expect(s!.querySelector('.pdx-cascader-spinner'), 'the row has no spinner').not.toBeNull();
-        expect(busyItems(el), 'the option being fetched is not aria-busy').toEqual([itemOf(el, 'Mammals')]);
+        expect(busyItems(el), 'the option being fetched and its list are not aria-busy')
+            .toEqual([itemOf(el, 'Mammals').closest('[role="listbox"]'), itemOf(el, 'Mammals')]);
         expect(s!.closest('[aria-busy="true"]'), 'the status row sits inside a busy region').toBeNull();
 
         p.resolve([{ value: 'cat', label: 'Cat' }, { value: 'dog', label: 'Dog' }]);
@@ -124,7 +125,7 @@ describe('pdx-cascader, a lazy branch that settles after the user moved on', () 
         el.options = structuredClone(WITH_PLAIN);
         el.loadChildren = loadChildren;
         await tick(50);
-        el.openCascader();
+        el.show();
         await tick(50);
         return el as HTMLElement;
     }

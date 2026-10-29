@@ -324,7 +324,8 @@ let path = $signal(['a']);
         expect([...el.querySelectorAll('.tags .pdx-chip')].map((c) => c.textContent?.replace('×', '').trim())).toEqual(['a', 'b']);
         expect(el.querySelectorAll('.time [role="spinbutton"]')[0].getAttribute('aria-valuenow')).toBe('7');
         expect(el.querySelector('.cal [data-iso="2026-09-20"]')!.getAttribute('aria-selected')).toBe('true');
-        expect((el.querySelector('.cas') as unknown as { getValue(): string[] }).getValue()).toEqual(['b']);
+        // The path the cascader holds inside, read through its labels: `getValue()` is gone (#287).
+        expect((el.querySelector('.cas') as unknown as { getLabels(): string[] }).getLabels()).toEqual(['B']);
     });
 
     it('the component\'s own interaction sets the signal', async () => {

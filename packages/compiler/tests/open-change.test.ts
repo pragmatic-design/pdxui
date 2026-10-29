@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -92,6 +92,20 @@ describe('select-overlay-verbs: pdx-select\'s popup methods are the overlay verb
     });
 });
 
+describe('cascader: its popup events and its undeclared methods', () => {
+    it('`@pdx-open` on a pdx-cascader is rewritten too', () => {
+        expect(fix('<pdx-cascader @pdx-close="saved = true"></pdx-cascader>'))
+            .toBe('<pdx-cascader @open-change="if ($event.detail.value) return; saved = true"></pdx-cascader>');
+    });
+
+    it('`openCascader()` and `closeCascader()` are `show()` and `close()`, wherever they are written', () => {
+        const script = cascaderOverlayVerbsScript.fix as (text: string) => string;
+        expect(script('el.openCascader(); el?.closeCascader();')).toBe('el.show(); el?.close();');
+        const template = cascaderOverlayVerbs.fix as (text: string) => string;
+        expect(template('<template><button @click="c.openCascader()">x</button></template>')).toBe('<template><button @click="c.show()">x</button></template>');
+    });
+});
+
 describe('autocomplete-open-show: pdx-autocomplete\'s open() is show()', () => {
     const fix = autocompleteOpenShow.fix as (text: string) => string;
 
@@ -132,7 +146,7 @@ describe('autocomplete-open-unbound: a call the text cannot tie to the tag is fl
 
 describe('the registry', () => {
     it('holds the #287 entries, each removed', () => {
-        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script', 'autocomplete-open-show', 'autocomplete-open-unbound']) {
+        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script', 'cascader-overlay-verbs', 'cascader-overlay-verbs-script', 'autocomplete-open-show', 'autocomplete-open-unbound']) {
             const entry = languageChanges().find((c) => c.id === id);
             expect(entry?.kind, id).toBe('removed');
             expect(entry?.issue).toBe(287);

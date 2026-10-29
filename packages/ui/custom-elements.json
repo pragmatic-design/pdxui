@@ -4916,34 +4916,33 @@
             },
             {
               "kind": "method",
-              "name": "getValue",
-              "parameters": [],
-              "description": "The current path, as the keys from the root down."
-            },
-            {
-              "kind": "method",
               "name": "getLabels",
               "parameters": [],
               "description": "The labels of the current path, from the root down."
             },
             {
               "kind": "method",
-              "name": "setValue",
-              "parameters": [
-                {
-                  "name": "v",
-                  "type": {
-                    "text": "string[]"
-                  }
-                }
-              ],
-              "description": "Set the path, which dispatches `value-change`."
-            },
-            {
-              "kind": "method",
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "parameters": [],
+              "description": "Open the popup."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "parameters": [],
+              "description": "Close the popup."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Open the popup when closed, close it when open."
             }
           ],
           "models": [
@@ -4979,12 +4978,19 @@
           },
           "events": [
             {
-              "name": "value-change",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string[] }"
+              "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+              "detail": "{ value: boolean }"
+            },
+            {
+              "name": "pdx-clear",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the clear button or `clear()` empties the path, after its `value-change`."
             },
             {
               "name": "pdx-load-error",
@@ -4992,28 +4998,15 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.",
-              "detail": "{ node, error }"
+              "detail": "{ node: CascaderNode; error: unknown }"
             },
             {
-              "name": "pdx-open",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it opens. Does not bubble."
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it closes. Does not bubble."
-            },
-            {
-              "name": "pdx-clear",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value is cleared."
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string[] }"
             }
           ],
           "roles": [
@@ -5122,6 +5115,50 @@
               "name": "option",
               "description": "Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.",
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The trigger, the combobox: the frame, its border and background."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable`, something is chosen and not `disabled`."
+            },
+            {
+              "name": "popup",
+              "description": "The floating panel that holds the columns, or the search results."
+            },
+            {
+              "name": "search",
+              "description": "The search field atop the panel, while `searchable`."
+            },
+            {
+              "name": "list",
+              "description": "A column, or the list of search results: a `role=\"listbox\"`."
+            },
+            {
+              "name": "option",
+              "description": "An option of a column, or a search result."
+            },
+            {
+              "name": "spinner",
+              "description": "The spinner of a branch being fetched by `loadChildren`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "The popup is open."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "A branch's children are being fetched by `loadChildren`."
             }
           ]
         }
