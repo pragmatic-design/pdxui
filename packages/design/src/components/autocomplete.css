@@ -64,7 +64,10 @@ pdx-autocomplete {
     overflow: hidden;
     display: none;
 }
-.pdx-autocomplete-dropdown.open {
+/* The component's open state is a custom state of the host (#287); native markup keeps the class.
+   Both forms weigh (0,2,0). */
+.pdx-autocomplete-dropdown.open,
+:state(open) > .pdx-autocomplete-dropdown {
     display: block;
 }
 

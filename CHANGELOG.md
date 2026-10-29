@@ -383,6 +383,20 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-autocomplete` takes the beta contract (#287).
+  - **The popup is announced as an overlay's.** `open-change` with `{ value }`, once per change: a
+    keystroke that keeps it open announces nothing. `show()` replaces `open()`; `close()` stays and
+    `toggle()` is new. `pdx migrate` rewrites `ac.open()` on a `:ref` of the file and flags a call on
+    a lookup of the tag (`autocomplete-open-show`, `autocomplete-open-unbound`).
+  - **States and parts.** `open`, `invalid`, `success`, `warning`, `disabled`, `readonly` and
+    `loading` are custom states on the host; the frame no longer carries `pdx-input-error`,
+    `pdx-input-success`, `pdx-input-warning`, `disabled`, `readonly` or `focused`, nor the panel
+    `open`. The parts are `root`, `input`, `clear`, `spinner`, `popup`, `list` and `option`.
+  - **Fixed with it:** `error`, `success` and `warning` coloured nothing — no rule read the classes
+    the frame carried. They draw from the custom states now, as `pdx-input`'s do.
+  - **A-rules.** With `error` the combobox is `aria-invalid`; while loading the list is `aria-busy`;
+    the options carry `aria-setsize` and `aria-posinset` among all the matches, `max-items` showing
+    part of them.
 - **Breaking:** `pdx-select` takes the beta contract (#287), the first of the pickers.
   - **The popup is announced as an overlay's.** `open-change` with `{ value }`, `true` on open and
     `false` on close, replaces `pdx-open` and `pdx-close`, and does not bubble. The popup is driven by

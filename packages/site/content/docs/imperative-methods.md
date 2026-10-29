@@ -81,7 +81,7 @@ floating list, uploading a queue, clearing entries. A component declares them wi
 
 ```ts
 // inside the component
-ctx.expose({ open, close, clear });
+ctx.expose({ show, close, clear });
 ```
 
 …and you call them straight off the ref:
@@ -89,7 +89,7 @@ ctx.expose({ open, close, clear });
 ```pdx
 <template>
   <pdx-autocomplete :ref="ac" />
-  <pdx-button @click="ac.open()">Suggest</pdx-button>
+  <pdx-button @click="ac.show()">Suggest</pdx-button>
   <pdx-button @click="ac.clear()">Clear</pdx-button>
 </template>
 
@@ -104,7 +104,7 @@ ships today:
 
 | Component | Methods |
 |-----------|---------|
-| `pdx-autocomplete` | `open()`, `close()`, `clear()` |
+| `pdx-autocomplete` | `show()`, `close()`, `toggle()`, `clear()` |
 | `pdx-file-upload`  | `addFiles()`, `removeFile()`, `uploadAll()`, `clear()` |
 | `pdx-tag-input`    | `addTag()`, `removeTag()`, `clear()`, `getTags()` |
 | `pdx-dialog` | `show()`, `close()`, `toggle()` — or the `open` prop |

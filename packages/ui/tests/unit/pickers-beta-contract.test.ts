@@ -10,6 +10,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { cleanup, mount } from './helpers';
 import '../../src/select/pdx-select';
+import '../../src/autocomplete/pdx-autocomplete';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -43,6 +44,16 @@ const DONE: Row[] = [
         popup: true,
         methods: ['focus', 'blur', 'clear', 'show', 'close', 'toggle'],
         removedMethods: ['openSelect', 'closeSelect', 'toggleSelect'],
+    },
+    {
+        tag: 'pdx-autocomplete',
+        model: 'value',
+        states: ['open', 'invalid', 'success', 'warning', 'disabled', 'readonly', 'loading'],
+        parts: ['root', 'input', 'clear', 'spinner', 'popup', 'list', 'option'],
+        popup: true,
+        methods: ['clear', 'getText', 'getSelectedItem', 'show', 'close', 'toggle'],
+        // `open()` is the overlay verb `show()` (#287, decision 50).
+        removedMethods: ['open'],
     },
 ];
 

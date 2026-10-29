@@ -5,9 +5,10 @@
  * and the CSS (packages/design/src/components/autocomplete.css).
  *
  * ── DOM structure (light DOM, render() in pdx-autocomplete.ts:375) ──
- *   <pdx-autocomplete>                                  ← host, display:block, position:relative (CSS autocomplete.css:4)
- *     <div class="pdx-autocomplete pdx-input-wrap [pdx-input-{size}] [state] [focused]">  ← wrap = trigger; box/height from .pdx-input-wrap
- *       <input class="pdx-input pdx-autocomplete-input"  ← FREE TEXT input
+ *   <pdx-autocomplete>                                  ← host, display:block, position:relative (CSS autocomplete.css:4);
+ *                                                         its states are custom states, :state(open), :state(invalid)… (#287)
+ *     <div class="pdx-autocomplete pdx-input-wrap" data-part="root">  ← wrap = trigger; box/height from .pdx-input-wrap; no state class
+ *       <input class="pdx-input pdx-autocomplete-input" data-part="input"  ← FREE TEXT input
  *              type="text"
  *              role="combobox"                            ← ALWAYS a combobox (render:379)
  *              autocomplete="off"
@@ -21,10 +22,10 @@
  *       <button class="pdx-input-clear">×</button>        ← only when clearable && _query
  *       <span class="pdx-input-spinner"></span>           ← only when isLoading
  *       <input type="hidden" name value>                  ← form participation (formAssociated)
- *     <div class="pdx-autocomplete-dropdown [open]">       ← THE PANEL: display:none → .open makes it display:block (CSS:65-69)
+ *     <div class="pdx-autocomplete-dropdown" data-part="popup">  ← THE PANEL: display:none → the host's :state(open) makes it display:block
  *       <span class="pdx-sr-only" role="status" aria-live="polite">N results available</span>
- *       <div class="pdx-autocomplete-list" role="listbox" id="{uid}-lb">  ← ALWAYS in the DOM (parent display:none when closed)
- *         <div class="pdx-autocomplete-option [active]" role="option"
+ *       <div class="pdx-autocomplete-list" data-part="list" role="listbox" id="{uid}-lb">  ← ALWAYS in the DOM (parent display:none when closed)
+ *         <div class="pdx-autocomplete-option [active]" data-part="option" role="option"
  *              id="{uid}-sug-{i}" data-suggestion-index="{i}"
  *              aria-selected="true|false">…</div>          ← one per filtered item (at most maxItems, 10 by default)
  *
@@ -39,11 +40,11 @@
  *   A PRECAUTION: a SINGLE "open" scenario is used (autocomplete-open), so there are never two open
  *   dropdowns fighting over selectors and positioning.
  *
- * ── Opening it (CRITICAL — calling open() is not enough) ──
- *   `open()` is exposed (ctx.expose, pdx-autocomplete.ts:357) but only sets _open=true. The listbox
+ * ── Opening it (CRITICAL — calling show() is not enough) ──
+ *   `show()` is exposed (ctx.expose, the overlay verb, #287) but only sets _open=true. The listbox
  *   is EMPTY until filteredItems() has items: it needs _query.length >= minLength (1 by default) AND
- *   a match in the suggestions (filteredItems, :144). And the dropdown's CSS .open is driven by
- *   `_open()`. The REALISTIC and reliable path is the user's own:
+ *   a match in the suggestions (filteredItems). And the dropdown's display is driven by the host's
+ *   :state(open). The REALISTIC and reliable path is the user's own:
  *     1. set the value on the native input,
  *     2. dispatch an 'input' event → onInput (:177) updates _query, evaluates filteredItems,
  *        and when length>=min && matches>0 calls open() (:205) → the panel opens with its options.
@@ -98,7 +99,7 @@ export const autocomplete: ComponentManifest = {
         },
         {
             // The ONE open scenario: the floating panel is made visible by the setup.
-            // The exposed open() only sets _open; the realistic path is setting the input and
+            // The exposed show() only sets _open; the realistic path is setting the input and
             // dispatching 'input' (onInput → filteredItems>0 → open()). Then it waits for the popover
             // (initialised in queueMicrotask) and for the list's reactive render.
             id: 'autocomplete-open',
@@ -111,7 +112,7 @@ export const autocomplete: ComponentManifest = {
                 </pdx-autocomplete>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="ac-open"]');
-                const input = host && host.querySelector('input.pdx-autocomplete-input');
+                const input = host && host.querySelector('input[data-part="input"]');
                 if (input) {
                     input.focus();
                     input.value = 'It';
@@ -128,19 +129,19 @@ export const autocomplete: ComponentManifest = {
                 standalone: [
                     {
                         // The wrap reuses .pdx-input-wrap → a visible box (display is not 'none').
-                        selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete',
+                        selector: 'section:not([hidden]) [data-test="ac"] [data-part="root"]',
                         description: 'input wrap is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // It is a text field → cursor text on the input.
-                        selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete-input',
+                        selector: 'section:not([hidden]) [data-test="ac"] [data-part="input"]',
                         description: 'text input shows a text cursor',
                         cursor: { op: 'is', value: 'text' },
                     },
                     {
                         // The wrap's radius is non-negative (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete',
+                        selector: 'section:not([hidden]) [data-test="ac"] [data-part="root"]',
                         description: 'input wrap radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -150,37 +151,47 @@ export const autocomplete: ComponentManifest = {
                         },
                     },
                     {
-                        // Closed: the panel is display:none (CSS:65) — not visible until .open is there.
-                        selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete-dropdown',
+                        // Closed: the panel is display:none (CSS:65) — not visible until the host is :state(open).
+                        selector: 'section:not([hidden]) [data-test="ac"] [data-part="popup"]',
                         description: 'closed dropdown panel is hidden',
                         display: { op: 'is', value: 'none' },
                     },
                 ],
             },
 
-            // Open: the panel (display:block through .open) sits UNDER the trigger. An overlay with no backdrop.
+            // Open: the panel (display:block through :state(open)) sits UNDER the trigger. An overlay with no backdrop.
             // The panel is ALREADY open from the setup → action:'call' = the state is already on, and the runner
             // measures without interacting further. OverlayRule has no 'placement' (that belongs to
             // PositioningRule), so "under the trigger" is checked by the composition.
             'autocomplete-open': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-dropdown.open',
+                        selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="popup"]',
                         description: 'open dropdown panel is displayed as a block',
                         display: { op: 'oneOf', value: ['block', 'flex'] },
                     },
                     {
                         // open() sets width = wrap.offsetWidth inline → a measurable width.
-                        selector: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-dropdown.open',
+                        selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="popup"]',
                         description: 'open dropdown panel has an appreciable width (matches the input)',
                         width: { op: '>=', value: 80 },
+                    },
+                ],
+                // Open is a custom state of the host (#287), what a theme selects; the panel has no class for it.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="popup"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ac-open"]', name: 'open' },
+                        changes: {},
                     },
                 ],
                 overlay: [
                     {
                         description: 'open autocomplete shows the suggestions panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-dropdown.open',
+                        trigger: { selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="root"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="ac-open"] [data-part="popup"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -193,8 +204,8 @@ export const autocomplete: ComponentManifest = {
                         // Scoped like the parent: the bare trigger class finds a hidden scenario's
                         // input (0×0), and `0 <= panel.top` holds without measuring anything.
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete',
-                            panel: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-dropdown.open',
+                            trigger: 'section:not([hidden]) [data-test="ac-open"] [data-part="root"]',
+                            panel: 'section:not([hidden]) [data-test="ac-open"] [data-part="popup"]',
                         },
                         relations: [
                             { description: 'panel.top >= input.bottom (below)', left: 'trigger.bottom', op: '<=', right: 'panel.top', tolerance: 2 },
@@ -203,12 +214,12 @@ export const autocomplete: ComponentManifest = {
                     {
                         // The filtered options live inside the listbox.
                         description: 'options are contained within the listbox',
-                        parent: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-list',
+                        parent: 'section:not([hidden]) [data-test="ac-open"] [data-part="list"]',
                         // Scoped like the parent: bare classes find the first list in the document,
                         // in a hidden scenario (0×0).
                         children: {
-                            list: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-list',
-                            option: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-option',
+                            list: 'section:not([hidden]) [data-test="ac-open"] [data-part="list"]',
+                            option: 'section:not([hidden]) [data-test="ac-open"] [data-part="option"]',
                         },
                         relations: [
                             { description: 'first option within listbox', left: 'option', op: 'contained-in', right: 'list' },
@@ -234,7 +245,7 @@ export const autocomplete: ComponentManifest = {
     isolation: {
         scenario: 'autocomplete-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="ac"] .pdx-autocomplete', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ac"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -245,13 +256,13 @@ export const autocomplete: ComponentManifest = {
     // aria-expanded is checked with expectAttr. Escape closes (aria-expanded → false), and the focus stays on the input.
     keyboard: {
         scenario: 'autocomplete-open',
-        initialFocus: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input',
+        initialFocus: 'section:not([hidden]) [data-test="ac-open"] [data-part="input"]',
         steps: [
             // Open (through the setup): aria-expanded must be true.
-            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input', name: 'aria-expanded', value: 'true' } },
+            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="input"]', name: 'aria-expanded', value: 'true' } },
             // Escape closes it → aria-expanded goes back to false; the focus stays on the input (the combobox).
-            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input', name: 'aria-expanded', value: 'false' } },
-            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input' },
+            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="ac-open"] [data-part="input"]', name: 'aria-expanded', value: 'false' } },
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="ac-open"] [data-part="input"]' },
         ],
     },
 
@@ -261,7 +272,7 @@ export const autocomplete: ComponentManifest = {
         // Drawn position: fixed, outside its section: shot as the viewport (#714).
         viewportScenarios: ['autocomplete-open'],
         // The text input can show a blinking caret → masked, for stability.
-        mask: ['section:not([hidden]) [data-test="ac-open"] .pdx-autocomplete-input'],
+        mask: ['section:not([hidden]) [data-test="ac-open"] [data-part="input"]'],
     },
 };
 
