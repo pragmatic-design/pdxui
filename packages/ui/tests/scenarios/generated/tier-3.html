@@ -84,14 +84,14 @@
                 if (host && typeof host.openPalette === 'function') host.openPalette(); },
         "date-picker-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-open"]');
-                if (host && typeof host.openPopover === 'function') {
+                if (host && typeof host.show === 'function') {
                     const focused = new Promise((resolve) => host.addEventListener('focusin', resolve, { once: true }));
-                    host.openPopover();
+                    host.show();
                     await focused;
                 } },
         "date-picker-month-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-month"]');
-                if (host && typeof host.openPopover === 'function') host.openPopover(); },
+                if (host && typeof host.show === 'function') host.show(); },
         "date-picker-editable": async function () { 
                 const find = () => document.querySelector('section:not([hidden]) [data-test="dp-edit-bad"] input.pdx-date-picker-input');
                 let el = find();

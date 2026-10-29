@@ -319,11 +319,15 @@ describe('pdx-date-picker', () => {
         expect(!clear || clear.style.display === 'none').toBe(true);
     });
 
-    it('applies disabled class', async () => {
+    it('disabled takes the trigger out of the tab order, with no state class on it', async () => {
+        // `disabled` is the host's :state(disabled) (#287), measured in Chromium by
+        // date-picker-beta-contract.spec.ts; here, the trigger out of the tab order and with no class for it.
         const el = await mount('pdx-date-picker', { disabled: '' });
         await tick(100);
         const trigger = el.querySelector('.pdx-date-picker-trigger');
-        expect(trigger?.classList.contains('disabled')).toBe(true);
+        expect(trigger).not.toBeNull();
+        expect(trigger?.getAttribute('tabindex')).toBe('-1');
+        expect(trigger?.classList.contains('disabled')).toBe(false);
     });
 
     it('reflects its size on the host, which the @variant rules key on (#628)', async () => {

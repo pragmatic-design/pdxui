@@ -13,8 +13,10 @@
     outline-offset: -2px;
 }
 
-/* Disabled: not clickable → cursor not-allowed + reduced opacity (the state is marked with .disabled). */
-.pdx-date-picker-trigger.disabled {
+/* Disabled: not clickable → cursor not-allowed + reduced opacity. The component marks it with the
+   host's :state(disabled) (#287); the class is native markup's. */
+.pdx-date-picker-trigger.disabled,
+:state(disabled) > .pdx-date-picker-trigger {
     cursor: not-allowed;
     opacity: var(--pdx-opacity-disabled);
 }

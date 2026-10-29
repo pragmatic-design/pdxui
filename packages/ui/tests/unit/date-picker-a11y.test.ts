@@ -78,15 +78,15 @@ describe('focus', () => {
     });
 
     it('opened before the calendar has drawn, focus still lands on the day — not on Today', async () => {
-        // The certify scenario opens with host.openPopover() right after mount: the panel exists,
+        // The certify scenario opens with host.show() right after mount: the panel exists,
         // the calendar has not drawn its first view, so the first button found is the wrong one.
-        const el = document.createElement('pdx-date-picker') as HTMLElement & { value: string; openPopover(): void };
+        const el = document.createElement('pdx-date-picker') as HTMLElement & { value: string; show(): void };
         el.value = '2024-06-15';
         document.body.appendChild(el);
         await new Promise(r => requestAnimationFrame(r));
         expect(el.querySelector('.pdx-date-picker-panel'), 'the panel is built').toBeTruthy();
         expect(el.querySelector('[data-iso]'), 'the calendar has not drawn yet').toBeNull();
-        el.openPopover();
+        el.show();
         // Until the calendar has drawn — it keeps the focus pending and gives it then — not a fixed
         // 60 ms, which the full gate's load outruns.
         await vi.waitFor(() => expect(document.activeElement).toBe(cell(el, '2024-06-15')));
@@ -103,11 +103,11 @@ describe('focus', () => {
             return realSetTimeout(fn, ms, ...args);
         }) as typeof window.setTimeout);
         try {
-            const el = document.createElement('pdx-date-picker') as HTMLElement & { value: string; openPopover(): void };
+            const el = document.createElement('pdx-date-picker') as HTMLElement & { value: string; show(): void };
             el.value = '2024-06-15';
             document.body.appendChild(el);
             await vi.waitFor(() => expect(cell(el, '2024-06-15'), 'June 2024 is drawn').toBeTruthy());
-            el.openPopover();
+            el.show();
             spy.mockRestore();
             for (const fn of held.splice(0)) fn();
             await vi.waitFor(() => expect(document.activeElement).toBe(cell(el, '2024-06-15')));
