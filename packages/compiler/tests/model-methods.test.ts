@@ -26,8 +26,13 @@ describe('model-get-value: getValue() on a ref\'d picker is its model', () => {
         expect(fix(source)).toBe(source);
     });
 
-    it('holds the pickers the issue names, pdx-cascader first', () => {
-        expect(MODEL_METHOD_TAGS.has('pdx-cascader')).toBe(true);
+    it('holds the pickers the issue names that have moved: pdx-cascader, pdx-tree-select', () => {
+        expect([...MODEL_METHOD_TAGS].sort()).toEqual(['pdx-cascader', 'pdx-tree-select']);
+    });
+
+    it('a ref on a pdx-tree-select', () => {
+        expect(fix('<template><pdx-tree-select :ref="t"></pdx-tree-select><p>{{ t.getValue() }}</p></template>'))
+            .toBe('<template><pdx-tree-select :ref="t"></pdx-tree-select><p>{{ t.value }}</p></template>');
     });
 });
 

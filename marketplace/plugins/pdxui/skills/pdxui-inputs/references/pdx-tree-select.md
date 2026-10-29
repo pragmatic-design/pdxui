@@ -37,16 +37,21 @@ toggles only the node clicked).
 
 | Call | Notes |
 |---|---|
-| `getValue()` | The current selection: one key, the array of keys when `multiple`, or null. |
 | `getLabel()` | The label of the selected node, or the labels joined with ', ' when `multiple`. |
-| `setValue(v)` | Set the selection, which dispatches `value-change`, as a click on the tree would. |
 | `clear()` | Clears the value. |
+| `show()` | Open the popup. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 
-**Events:** `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be reopened.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string | string[] | null }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `pdx-clear` — Fired when the clear button or `clear()` empties the selection, after its `value-change`.; `pdx-load-error` → `detail: { node: TreeSelectNode; error: unknown }` — Fired when `loadChildren` rejects; the branch stays askable and can be reopened.; `value-change` → `detail: { value: string | string[] | null }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `tree` · `treeitem`
 
 **Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+
+**States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — A branch's children are being fetched by `loadChildren`.
+
+**Parts:** `[data-part="root"]` — The trigger, the combobox: the frame, its border and background.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and not `disabled`.; `[data-part="popup"]` — The floating panel that holds the tree.; `[data-part="search"]` — The search field atop the panel, while `searchable`.; `[data-part="tree"]` — The `role="tree"`.; `[data-part="node"]` — A node of the tree, a `role="treeitem"` row.; `[data-part="toggle"]` — A node's expand button; a leaf's is there, hidden, to keep the labels aligned.
 
 **Shapes:** `TreeSelectNode { value: string; label: string; children?: TreeSelectNode[]; disabled?: boolean; isLeaf?: boolean }`
 

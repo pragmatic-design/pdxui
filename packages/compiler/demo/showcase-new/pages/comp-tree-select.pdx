@@ -41,6 +41,23 @@
         <div class="opt-row"><code>clearable</code><span>boolean</span><span>Show clear button (default: true)</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The panel is driven by the overlay verbs; the selection is the model, <code>value</code>. What a theme or a page
+        styles on <code>&lt;pdx-tree-select&gt;</code>: its custom states on the host and its parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Event, method, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>@value-change / @open-change</code><span>{ value }</span><span>The selection changed; the panel opened or closed</span></div>
+        <div class="opt-row"><code>@pdx-clear / @pdx-load-error</code><span></span><span>Cleared; <code>loadChildren</code> rejected</span></div>
+        <div class="opt-row"><code>show() / close() / toggle()</code><span></span><span>Open, close, or flip the panel</span></div>
+        <div class="opt-row"><code>clear() / getLabel()</code><span></span><span>Empty the selection; the selected labels</span></div>
+        <div class="opt-row"><code>:state(open) / :state(disabled) / :state(loading)</code><span></span><span>The panel is open; <code>disabled</code> is set; a branch is being fetched</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="clear"]</code><span></span><span>The trigger; the clear button</span></div>
+        <div class="opt-row"><code>[data-part="popup"] / [data-part="search"]</code><span></span><span>The panel; its search field</span></div>
+        <div class="opt-row"><code>[data-part="tree"] / [data-part="node"] / [data-part="toggle"]</code><span></span><span>The tree; a node; a node's expand button</span></div>
+      </div>
     </section>
   </div>
 </template>

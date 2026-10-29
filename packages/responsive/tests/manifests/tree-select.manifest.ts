@@ -7,7 +7,7 @@
  *
  * ── DOM structure (light DOM, built imperatively in a rAF, pdx-tree-select.ts:209) ──
  *   <pdx-tree-select>                                       ← the host, display:inline-block, position:relative (tree-select.css:3)
- *     <div class="pdx-cascader-trigger pdx-input-wrap [pdx-input-{size}] [disabled]"   ← TRIGGER (it reuses the cascader classes)
+ *     <div class="pdx-cascader-trigger pdx-input-wrap" data-part="root"   ← TRIGGER (it reuses the cascader classes); disabled is the host's :state(disabled) (#287)
  *          role="combobox"                                  ← (src:219)
  *          aria-haspopup="tree"                             ← (src:221)
  *          aria-expanded="false|true"                       ← kept in sync in ctx.track (src:309)
@@ -121,7 +121,7 @@ export const treeSelect: ComponentManifest = {
                 </div>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="ts-open"]');
-                const trigger = host && host.querySelector('.pdx-cascader-trigger');
+                const trigger = host && host.querySelector('[data-part="root"]');
                 if (trigger) trigger.click();
                 await new Promise((r) => setTimeout(r, 0));`,
         },
@@ -144,19 +144,19 @@ export const treeSelect: ComponentManifest = {
                 standalone: [
                     {
                         // The trigger reuses .pdx-input-wrap + .pdx-cascader-trigger → a visible box.
-                        selector: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="ts"] [data-part="root"]',
                         description: 'trigger is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // cascader.css:9 → .pdx-cascader-trigger { cursor: pointer } → interactive.
-                        selector: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="ts"] [data-part="root"]',
                         description: 'trigger is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The trigger's radius is non-negative (zero-radius themes zero it, never < 0).
-                        selector: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="ts"] [data-part="root"]',
                         description: 'trigger radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -170,11 +170,11 @@ export const treeSelect: ComponentManifest = {
                     {
                         // The value text and the chevron are contained in the trigger (the layout holds).
                         description: 'value text and chevron are contained within the trigger box',
-                        parent: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger',
+                        parent: 'section:not([hidden]) [data-test="ts"] [data-part="root"]',
                         // Scoped like the parent: bare classes find the first cascader trigger in the
                         // document, in a hidden scenario (0×0).
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger',
+                            trigger: 'section:not([hidden]) [data-test="ts"] [data-part="root"]',
                             text: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-text',
                             icon: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-icon',
                         },
@@ -194,23 +194,33 @@ export const treeSelect: ComponentManifest = {
                 standalone: [
                     {
                         // tree-select.css:19 → .pdx-tree-select-panel { display:flex } when style.display=''.
-                        selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-panel',
+                        selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="popup"]',
                         description: 'open tree panel is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // tree-select.css:16 → min-width:240px → an appreciable width at a 1280 viewport.
-                        selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-panel',
+                        selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="popup"]',
                         description: 'open tree panel has an appreciable width',
                         width: { op: '>=', value: 200 },
+                    },
+                ],
+                // Open is a custom state of the host (#287), what a theme selects.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="popup"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ts-open"]', name: 'open' },
+                        changes: {},
                     },
                 ],
                 overlay: [
                     {
                         // A floating panel (CSS absolute), no backdrop in the source.
                         description: 'open tree-select shows the tree panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-panel',
+                        trigger: { selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="ts-open"] [data-part="popup"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -222,8 +232,8 @@ export const treeSelect: ComponentManifest = {
                         // Scoped like the parent: the bare trigger class finds a hidden scenario's
                         // trigger (0×0), and `0 <= panel.top` holds without measuring.
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
-                            panel: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-panel',
+                            trigger: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
+                            panel: 'section:not([hidden]) [data-test="ts-open"] [data-part="popup"]',
                         },
                         relations: [
                             { description: 'panel.top >= trigger.bottom (below)', left: 'trigger.bottom', op: '<=', right: 'panel.top', tolerance: 2 },
@@ -232,12 +242,12 @@ export const treeSelect: ComponentManifest = {
                     {
                         // The treeitems live inside the role="tree" container.
                         description: 'tree items are contained within the tree container',
-                        parent: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-tree',
+                        parent: 'section:not([hidden]) [data-test="ts-open"] [data-part="tree"]',
                         // Scoped like the parent: bare classes find the first tree in the document,
                         // in a hidden scenario (0×0).
                         children: {
-                            tree: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-select-tree',
-                            item: 'section:not([hidden]) [data-test="ts-open"] .pdx-tree-node',
+                            tree: 'section:not([hidden]) [data-test="ts-open"] [data-part="tree"]',
+                            item: 'section:not([hidden]) [data-test="ts-open"] [data-part="node"]',
                         },
                         relations: [
                             { description: 'first tree item within tree', left: 'item', op: 'contained-in', right: 'tree' },
@@ -250,10 +260,19 @@ export const treeSelect: ComponentManifest = {
             'tree-select-disabled': {
                 standalone: [
                     {
-                        // cascader.css:21-24 → .pdx-cascader-trigger.disabled { cursor: not-allowed }.
-                        selector: 'section:not([hidden]) [data-test="ts-dis"] .pdx-cascader-trigger',
+                        // cascader.css → :state(disabled) > .pdx-cascader-trigger { cursor: not-allowed } (#287).
+                        selector: 'section:not([hidden]) [data-test="ts-dis"] [data-part="root"]',
                         description: 'disabled trigger is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="ts-dis"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="ts-dis"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -276,7 +295,7 @@ export const treeSelect: ComponentManifest = {
     isolation: {
         scenario: 'tree-select-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="ts"] .pdx-cascader-trigger', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="ts"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -287,27 +306,27 @@ export const treeSelect: ComponentManifest = {
     // parent, ← → closes Fruits, End → Carrot, Enter → chooses Carrot and closes, focus on the trigger.
     keyboard: {
         scenario: 'tree-select-open',
-        initialFocus: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+        initialFocus: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
         steps: [
             {
                 key: 'Home',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger', name: 'aria-expanded', value: 'true' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]', name: 'aria-expanded', value: 'true' },
                 expectActiveDescendant: {
-                    selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+                    selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
                     target: 'section:not([hidden]) [data-test="ts-open"] [role="treeitem"][aria-level="1"][aria-posinset="1"]',
                 },
             },
             {
                 key: 'ArrowDown',
                 expectActiveDescendant: {
-                    selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+                    selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
                     target: 'section:not([hidden]) [data-test="ts-open"] [role="treeitem"][aria-level="2"][aria-posinset="1"]',
                 },
             },
             {
                 key: 'ArrowLeft',
                 expectActiveDescendant: {
-                    selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+                    selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
                     target: 'section:not([hidden]) [data-test="ts-open"] [role="treeitem"][aria-level="1"][aria-posinset="1"]',
                 },
             },
@@ -318,14 +337,14 @@ export const treeSelect: ComponentManifest = {
             {
                 key: 'End',
                 expectActiveDescendant: {
-                    selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+                    selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
                     target: 'section:not([hidden]) [data-test="ts-open"] [role="treeitem"][aria-level="2"][aria-posinset="1"]',
                 },
             },
             {
                 key: 'Enter',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger', name: 'aria-expanded', value: 'false' },
-                expectFocus: 'section:not([hidden]) [data-test="ts-open"] .pdx-cascader-trigger',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' },
+                expectFocus: 'section:not([hidden]) [data-test="ts-open"] [data-part="root"]',
             },
         ],
     },

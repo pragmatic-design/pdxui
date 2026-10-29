@@ -383,6 +383,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-tree-select` takes the beta contract (#287), as `pdx-cascader` did.
+  - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
+    `pdx-close`, once per change. `show()`, `close()` and `toggle()` replace the undeclared
+    `openTreeSelect()` and `closeTreeSelect()`. `pdx migrate` rewrites the listeners and the calls.
+  - **The model is the way.** `getValue()` and `setValue()` are gone: read and set `value`.
+    `pdx migrate` rewrites `getValue()` on a `:ref` to `.value` and flags `setValue()`.
+  - **States and parts.** `open`, `disabled` and `loading` (a branch being fetched) are custom states
+    on the host; the trigger no longer carries `disabled`. The parts are `root`, `clear`, `popup`,
+    `search`, `tree`, `node` and `toggle`.
+  - **Fixed with it:** `disabled` set after the mount left the trigger in the tab order and
+    enabled-looking. Both follow the prop now.
+  - **A4.** While a branch is fetched the tree is `aria-busy`, beside the row. The rows already carry
+    `aria-level`, `aria-setsize` and `aria-posinset` (A3), now held by a browser test.
 - **Breaking:** `pdx-cascader` takes the beta contract (#287).
   - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
     `pdx-close`, once per change: the clear button no longer announces a close of a panel that was not

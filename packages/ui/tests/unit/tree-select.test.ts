@@ -78,10 +78,13 @@ describe('pdx-tree-select', () => {
         expect(panel?.style.display).toBe('none');
     });
 
-    it('applies disabled class', async () => {
+    // `disabled` is the host's :state(disabled) (#287), measured in Chromium by
+    // tree-select-beta-contract.spec.ts; here, the trigger out of the tab order and with no class for it.
+    it('disabled takes the trigger out of the tab order, with no state class', async () => {
         const el = await mountTreeSelect({ disabled: true });
         const trigger = el.querySelector('[role="combobox"]');
-        expect(trigger?.classList.contains('disabled')).toBe(true);
+        expect(trigger?.getAttribute('tabindex')).toBe('-1');
+        expect(trigger?.classList.contains('disabled')).toBe(false);
     });
 
     it('submits through the host, with no hidden input (#135)', async () => {

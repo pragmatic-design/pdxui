@@ -184,7 +184,7 @@
                 outer.select('general'); },
         "tree-select-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="ts-open"]');
-                const trigger = host && host.querySelector('.pdx-cascader-trigger');
+                const trigger = host && host.querySelector('[data-part="root"]');
                 if (trigger) trigger.click();
                 await new Promise((r) => setTimeout(r, 0)); },
         };

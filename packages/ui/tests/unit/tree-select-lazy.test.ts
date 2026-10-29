@@ -23,7 +23,7 @@ async function mountLazy(loadChildren?: (n: any) => Promise<any[]>) {
     if (loadChildren) el.loadChildren = loadChildren;
     await tick(50);
     // The rows exist only once the panel is open — that is where the tree is rendered.
-    el.openTreeSelect();
+    el.show();
     await tick(50);
     return el;
 }

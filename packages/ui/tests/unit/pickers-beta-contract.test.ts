@@ -12,6 +12,7 @@ import { cleanup, mount } from './helpers';
 import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
+import '../../src/tree-select/pdx-tree-select';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -67,6 +68,16 @@ const DONE: Row[] = [
         // getValue/setValue duplicated the model, which is the way (#287); openCascader/closeCascader
         // were set on the element undeclared, and are the overlay verbs.
         removedMethods: ['getValue', 'setValue', 'openCascader', 'closeCascader'],
+    },
+    {
+        tag: 'pdx-tree-select',
+        model: 'value',
+        states: ['open', 'disabled', 'loading'],
+        // A tree, so its parts are named by its roles: the `tree` and a `node`, with a node's `toggle`.
+        parts: ['root', 'clear', 'popup', 'search', 'tree', 'node', 'toggle'],
+        popup: true,
+        methods: ['getLabel', 'clear', 'show', 'close', 'toggle'],
+        removedMethods: ['getValue', 'setValue', 'openTreeSelect', 'closeTreeSelect'],
     },
 ];
 

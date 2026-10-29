@@ -28154,34 +28154,33 @@
             },
             {
               "kind": "method",
-              "name": "getValue",
-              "parameters": [],
-              "description": "The current selection: one key, the array of keys when `multiple`, or null."
-            },
-            {
-              "kind": "method",
               "name": "getLabel",
               "parameters": [],
               "description": "The label of the selected node, or the labels joined with ', ' when `multiple`."
             },
             {
               "kind": "method",
-              "name": "setValue",
-              "parameters": [
-                {
-                  "name": "v",
-                  "type": {
-                    "text": "string | string[] | null"
-                  }
-                }
-              ],
-              "description": "Set the selection, which dispatches `value-change`, as a click on the tree would."
-            },
-            {
-              "kind": "method",
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
+            },
+            {
+              "kind": "method",
+              "name": "show",
+              "parameters": [],
+              "description": "Open the popup."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "parameters": [],
+              "description": "Close the popup."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Open the popup when closed, close it when open."
             }
           ],
           "models": [
@@ -28217,12 +28216,19 @@
           },
           "events": [
             {
-              "name": "value-change",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the component writes `value`. Does not bubble.",
-              "detail": "{ value: string | string[] | null }"
+              "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+              "detail": "{ value: boolean }"
+            },
+            {
+              "name": "pdx-clear",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the clear button or `clear()` empties the selection, after its `value-change`."
             },
             {
               "name": "pdx-load-error",
@@ -28230,28 +28236,15 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when `loadChildren` rejects; the branch stays askable and can be reopened.",
-              "detail": "{ node, error }"
+              "detail": "{ node: TreeSelectNode; error: unknown }"
             },
             {
-              "name": "pdx-open",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it opens. Does not bubble."
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it closes. Does not bubble."
-            },
-            {
-              "name": "pdx-clear",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value is cleared."
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string | string[] | null }"
             }
           ],
           "roles": [
@@ -28359,6 +28352,50 @@
               "name": "node",
               "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The trigger, the combobox: the frame, its border and background."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable`, something is chosen and not `disabled`."
+            },
+            {
+              "name": "popup",
+              "description": "The floating panel that holds the tree."
+            },
+            {
+              "name": "search",
+              "description": "The search field atop the panel, while `searchable`."
+            },
+            {
+              "name": "tree",
+              "description": "The `role=\"tree\"`."
+            },
+            {
+              "name": "node",
+              "description": "A node of the tree, a `role=\"treeitem\"` row."
+            },
+            {
+              "name": "toggle",
+              "description": "A node's expand button; a leaf's is there, hidden, to keep the labels aligned."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "The popup is open."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "A branch's children are being fetched by `loadChildren`."
             }
           ]
         }

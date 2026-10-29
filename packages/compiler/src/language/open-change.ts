@@ -21,14 +21,15 @@
 // `closeSelect()` and `toggleSelect()` are `show()`, `close()` and `toggle()` (#287). The three names
 // are pdx-select's alone — a DataSource's `toggleSelect(id)` takes an argument, a call with none is the
 // select's — so the rewrite is mechanical wherever the call is written. `pdx-cascader`'s undeclared
-// `openCascader()` and `closeCascader()` are `show()` and `close()` the same way.
+// `openCascader()` and `closeCascader()`, and `pdx-tree-select`'s `openTreeSelect()` and
+// `closeTreeSelect()`, are `show()` and `close()` the same way.
 
 import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from './changes';
 import { parseSFC } from '../parser/sfc';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
-export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader']);
+export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -200,8 +201,16 @@ const CASCADER_VERBS: AliasVerbs = {
 
 export const selectOverlayVerbs = aliasVerbs(SELECT_VERBS, 'pdx');
 export const selectOverlayVerbsScript = aliasVerbs(SELECT_VERBS, 'script');
+const TREE_SELECT_VERBS: AliasVerbs = {
+    id: 'tree-select-overlay-verbs',
+    message: '`pdx-tree-select` drives its popup with the overlay verbs: `openTreeSelect()` is `show()`, `closeTreeSelect()` is `close()`.',
+    verbs: { openTreeSelect: 'show', closeTreeSelect: 'close' },
+};
+
 export const cascaderOverlayVerbs = aliasVerbs(CASCADER_VERBS, 'pdx');
 export const cascaderOverlayVerbsScript = aliasVerbs(CASCADER_VERBS, 'script');
+export const treeSelectOverlayVerbs = aliasVerbs(TREE_SELECT_VERBS, 'pdx');
+export const treeSelectOverlayVerbsScript = aliasVerbs(TREE_SELECT_VERBS, 'script');
 
 // `pdx-autocomplete`'s `open()` is `show()`; its `close()` stays (#287). `open()` is a common name — a
 // dialog has one — so the call is rewritten only where its receiver is tied to the tag by the text:
