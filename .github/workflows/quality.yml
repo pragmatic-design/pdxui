@@ -47,7 +47,7 @@ jobs:
   # and router publish (dist/*.d.ts), not their sources, and a fresh runner has no dist.
   static:
     name: build · typecheck · lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -67,7 +67,7 @@ jobs:
   # suite. `--no-bail`, in the script, so one package's failure cannot hide another's.
   coverage:
     name: coverage (core · compiler · router · lsp)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v7
@@ -94,7 +94,7 @@ jobs:
   # EXCLUDES, so a package added tomorrow lands here.
   unit:
     name: unit (every other vitest suite)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
@@ -114,7 +114,7 @@ jobs:
   # other suites keep their config's single CI worker.
   browser:
     name: browser (${{ matrix.suite }}${{ matrix.shard && format(' {0}', matrix.shard) || '' }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -163,7 +163,7 @@ jobs:
   # 200 is exactly what a missing file looks like behind an SPA fallback.
   builder:
     name: builder · e2e + static build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
@@ -196,7 +196,7 @@ jobs:
   # scripts/time-budgets/budgets.json and run.mjs.
   time-budgets:
     name: time budgets
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
@@ -223,7 +223,7 @@ jobs:
   # red, not skip it — a skipped required check reads as passed.
   quality:
     name: build · typecheck · lint · test · coverage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [static, coverage, unit, browser, builder, time-budgets]
     if: always()
     timeout-minutes: 5
