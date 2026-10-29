@@ -36,9 +36,13 @@ move to the next segment.
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `pdx-blur` — Fired when a segment loses the focus.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group` · `spinbutton`
+
+**States:** `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The frame, a `role="group"` that holds the segments.; `[data-part="segment"]` — A segment, a `role="spinbutton"`: the hour, the minute, the second or AM/PM.; `[data-part="arrow"]` — An arrow above or below a segment, which steps it.; `[data-part="separator"]` — The `:` between two segments.
 
 
 #### Examples

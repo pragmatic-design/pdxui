@@ -56,6 +56,20 @@
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disabled state</span></div>
         <div class="opt-row"><code>name</code><span>string</span><span>Form field name (form-associated)</span></div>
         <div class="opt-row"><code>value-change</code><span>event</span><span>Its model: <code>detail.value</code>, the new value</span></div>
+        <div class="opt-row"><code>pdx-blur</code><span>event</span><span>A segment lost the focus</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        What a theme or a page styles on <code>&lt;pdx-time-picker&gt;</code>: its custom state on the host and its parts.
+        It has no popup. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Method, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>focus() / blur() / clear()</code><span></span><span>Focus the first segment, leave it, empty the time (<code>--</code>)</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span></span><span><code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="segment"]</code><span></span><span>The frame, a group; a segment, a spinbutton</span></div>
+        <div class="opt-row"><code>[data-part="arrow"] / [data-part="separator"]</code><span></span><span>An arrow that steps a segment; the <code>:</code> between two</span></div>
       </div>
     </section>
   </div>

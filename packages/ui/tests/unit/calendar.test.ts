@@ -216,11 +216,17 @@ describe('pdx-time-picker', () => {
         }
     });
 
-    it('applies disabled class when disabled', async () => {
+    it('disabled takes every segment out of the tab order, with no state class on the frame', async () => {
+        // `disabled` is the host's :state(disabled) (#287), measured in Chromium by
+        // time-picker-beta-contract.spec.ts; here, the segments out of the tab order and no class.
         const el = await mount('pdx-time-picker', { disabled: '' });
         await tick(100);
         const wrap = el.querySelector('.pdx-time-picker');
-        expect(wrap?.classList.contains('disabled')).toBe(true);
+        expect(wrap).not.toBeNull();
+        expect(wrap?.classList.contains('disabled')).toBe(false);
+        const segments = [...el.querySelectorAll('[role="spinbutton"]')];
+        expect(segments.length).toBeGreaterThan(0);
+        expect(segments.every((s) => s.getAttribute('tabindex') === '-1')).toBe(true);
     });
 
     it('submits through the host, with no hidden input (#135)', async () => {

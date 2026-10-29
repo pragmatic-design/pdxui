@@ -2,10 +2,9 @@
 // Each segment has visible up/down arrow buttons + keyboard + mouse wheel.
 // 12h/24h auto-detected from locale via Intl.DateTimeFormat.
 
-import { component, html, signal, model, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
+import { component, html, signal, model, event, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { is12HourClock } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/time-picker';
@@ -33,6 +32,13 @@ registerFormControl('pdx-time-picker', {
  * A segmented time input: the user sets the hour, minute, optional seconds and AM/PM with the
  * keyboard, the mouse wheel or typed digits, and the value is always `HH:mm` on the 24-hour clock.
  *
+ * @csspart root - The frame, a `role="group"` that holds the segments.
+ * @csspart segment - A segment, a `role="spinbutton"`: the hour, the minute, the second or AM/PM.
+ * @csspart arrow - An arrow above or below a segment, which steps it.
+ * @csspart separator - The `:` between two segments.
+ *
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-change
  * @alphaevent pdx-input
  * @alphadetail value $event.detail.value
@@ -42,6 +48,14 @@ component('pdx-time-picker', {
     // typed digit and the AM/PM toggle writes it, and the write dispatches `value-change`.
     // A form submits it as it is, and resets it (#135).
     models: { value: model<string>('', { form: true }) },
+    events: {
+        /** Fired when a segment loses the focus. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual state, on the host as a custom state (#132, #287): the design CSS draws the frame from
+    // it. The frame carries no state class. It has no popup, so no `open`.
+    states: ['disabled'],
+    parts: ['root', 'segment', 'arrow', 'separator'],
     // The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
     // draws the same size on native markup. `md` is the base look, which no class adds to.
     variants: {
@@ -271,8 +285,6 @@ component('pdx-time-picker', {
         let _minuteEl: HTMLElement | null = null;
         let _secondEl: HTMLElement | null = null;
         let _periodEl: HTMLElement | null = null;
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        reflectNameToHost(ctx);
         let _groupEl: HTMLElement | null = null;
         let _built = false;
 
@@ -288,12 +300,12 @@ component('pdx-time-picker', {
             if (_built) return;
             _built = true;
             const el = ctx.el;
-            const disabled = ctx.disabled() as boolean;
             const showSec = ctx.showSeconds() as boolean;
             const use12h_ = is12h();
 
             const wrap = document.createElement('div');
-            wrap.className = 'pdx-time-picker' + (disabled ? ' disabled' : '');
+            // No state class: `disabled` is the host's :state(disabled) (#287).
+            wrap.className = 'pdx-time-picker';
             wrap.setAttribute('data-part', 'root');
             wrap.setAttribute('role', 'group');
             wrap.setAttribute('aria-label', groupName());
@@ -320,6 +332,16 @@ component('pdx-time-picker', {
                 wrap.appendChild(perCol);
             }
             el.appendChild(wrap);
+        });
+
+        // `disabled`, set before or after the build: the host's state, and every segment out of the tab
+        // order while it holds (#287). Read first, so the track subscribes before the frame builds.
+        ctx.track(() => {
+            const disabled = !!ctx.disabled();
+            ctx.state('disabled', disabled);
+            requestAnimationFrame(() => {
+                for (const seg of [_hourEl, _minuteEl, _secondEl, _periodEl]) seg?.setAttribute('tabindex', disabled ? '-1' : '0');
+            });
         });
 
         // Update track: only change textContent (preserves focus)
@@ -361,6 +383,7 @@ component('pdx-time-picker', {
             const upBtn = document.createElement('button');
             upBtn.type = 'button';
             upBtn.className = 'pdx-time-arrow pdx-time-arrow-up';
+            upBtn.setAttribute('data-part', 'arrow');
             upBtn.setAttribute('tabindex', '-1');
             upBtn.setAttribute('aria-hidden', 'true');
             upBtn.textContent = '▲';
@@ -371,6 +394,7 @@ component('pdx-time-picker', {
             const val = document.createElement('div');
             val.className = 'pdx-time-value' + (segment === 'period' ? ' pdx-time-period' : '');
             val.setAttribute('role', 'spinbutton');
+            val.setAttribute('data-part', 'segment');
             val.setAttribute('tabindex', ctx.disabled() ? '-1' : '0');
             val.setAttribute('aria-label', label);
             val.setAttribute('aria-valuenow', display);
@@ -393,6 +417,7 @@ component('pdx-time-picker', {
             const downBtn = document.createElement('button');
             downBtn.type = 'button';
             downBtn.className = 'pdx-time-arrow pdx-time-arrow-down';
+            downBtn.setAttribute('data-part', 'arrow');
             downBtn.setAttribute('tabindex', '-1');
             downBtn.setAttribute('aria-hidden', 'true');
             downBtn.textContent = '▼';
@@ -405,6 +430,7 @@ component('pdx-time-picker', {
         function buildSeparator(char: string): HTMLElement {
             const sep = document.createElement('span');
             sep.className = 'pdx-time-separator';
+            sep.setAttribute('data-part', 'separator');
             sep.textContent = char;
             sep.setAttribute('aria-hidden', 'true');
             return sep;
@@ -426,5 +452,7 @@ component('pdx-time-picker', {
 
         return { formatOutput };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

@@ -12,7 +12,9 @@
     font-size: var(--pdx-text-sm);
 }
 
-.pdx-time-picker.disabled {
+/* The component marks it with the host's :state(disabled) (#287); the class is native markup's. */
+.pdx-time-picker.disabled,
+:state(disabled) > .pdx-time-picker {
     opacity: 0.5;
     pointer-events: none;
     background: var(--pdx-color-inset);

@@ -638,6 +638,7 @@ export const scenarioPage: Record<string, string> = {
     "textarea-size-lg": "tier-1b",
     "textarea-size-xl": "tier-1b",
     "time-picker-default": "tier-4",
+    "time-picker-disabled": "tier-4",
     "time-picker-size-md": "tier-4",
     "time-picker-size-sm": "tier-4",
     "time-picker-size-lg": "tier-4",
