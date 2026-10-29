@@ -18,7 +18,10 @@ pdx-transfer {
     font-size: var(--pdx-text-sm);
 }
 
-.pdx-transfer.disabled {
+/* The component's state is a custom state of the host (#287); native markup keeps the class. Both
+   forms weigh (0,2,0). */
+.pdx-transfer.disabled,
+:state(disabled) > .pdx-transfer {
     opacity: 0.5;
     pointer-events: none;
 }

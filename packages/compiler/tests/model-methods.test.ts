@@ -26,8 +26,8 @@ describe('model-get-value: getValue() on a ref\'d picker is its model', () => {
         expect(fix(source)).toBe(source);
     });
 
-    it('holds the pickers the issue names that have moved: pdx-cascader, pdx-tree-select', () => {
-        expect([...MODEL_METHOD_TAGS].sort()).toEqual(['pdx-cascader', 'pdx-tree-select']);
+    it('holds the three pickers the issue names: pdx-cascader, pdx-transfer, pdx-tree-select', () => {
+        expect([...MODEL_METHOD_TAGS].sort()).toEqual(['pdx-cascader', 'pdx-transfer', 'pdx-tree-select']);
     });
 
     it('a ref on a pdx-tree-select', () => {

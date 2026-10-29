@@ -33,8 +33,6 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 
 | Call | Notes |
 |---|---|
-| `getValue()` | The keys currently on the target side. |
-| `setValue(v)` | Replace the target side, which dispatches `value-change`, dropping any move not yet committed. |
 | `clear()` | Clears the value. |
 | `getChanges()` | In DataSource mode, the last move's diff to persist: `{ value, [assignedField] }` per item; else []. |
 | `getDirection()` | The last move's direction, 'right' (to the target) or 'left'; null before any move. |
@@ -42,6 +40,10 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 **Events:** `pdx-clear` — Fired when the value is cleared.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `group` · `listbox` · `option`
+
+**States:** `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The frame, a `role="group"` holding the two panels and the move buttons.; `[data-part="panel"]` — A side, the source or the target: its header, its filter and its list.; `[data-part="search"]` — A side's filter, while `searchable`; it filters, it is not the value.; `[data-part="list"]` — A side's `role="listbox"`.; `[data-part="option"]` — An item of a list.; `[data-part="move"]` — A button that moves the chosen items, or all of them, to the other side.
 
 **Shapes:** `TransferItem { value: string; label: string; disabled?: boolean; _raw?: any }`
 
