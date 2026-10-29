@@ -92,7 +92,7 @@ const TARGETS: Target[] = [
         name: 'pdx-tree-select', press: 'mousedown',
         mount: async () => {
             const el = await mounted('pdx-tree-select', (e) => { (e as unknown as { data: unknown[] }).data = tree; });
-            return () => el.openTreeSelect();
+            return () => el.show();
         },
     },
     {

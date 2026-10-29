@@ -52,10 +52,11 @@ describe('the global listeners are torn down on a destroy-while-open', () => {
     });
 
     it('tree-select: destroyed with its popover open, it leaves no mousedown on the document', async () => {
-        const el = await mount<HTMLElement & { openTreeSelect?: () => void }>('pdx-tree-select');
+        const el = await mount<HTMLElement & { show: () => void }>('pdx-tree-select');
         (el as unknown as { options?: unknown }).options = [{ value: 'a', label: 'A' }];
         await tick();
-        el.openTreeSelect?.();
+        // Called, not optional-called: a missing method would leave nothing open and the test measuring nothing.
+        el.show();
         await tick(10);
 
         el.remove();

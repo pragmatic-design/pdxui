@@ -2,11 +2,10 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tree-select';
@@ -36,8 +35,19 @@ export interface TreeSelectNode {
  * A select whose dropdown is a tree the user can search and expand, picking one node or several,
  * with children loaded lazily.
  *
- * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be reopened.
  * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+ *
+ * @csspart root - The trigger, the combobox: the frame, its border and background.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel that holds the tree.
+ * @csspart search - The search field atop the panel, while `searchable`.
+ * @csspart tree - The `role="tree"`.
+ * @csspart node - A node of the tree, a `role="treeitem"` row.
+ * @csspart toggle - A node's expand button; a leaf's is there, hidden, to keep the labels aligned.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - A branch's children are being fetched by `loadChildren`.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -45,10 +55,23 @@ export interface TreeSelectNode {
  */
 component('pdx-tree-select', {
     // The selection (#481): one node's value, or the array of values when `multiple`. A click on the
-    // tree, the clear button, setValue() and clear() write it, and the write dispatches `value-change`.
+    // tree, the clear button and clear() write it, and the write dispatches `value-change`; so does
+    // setting `value`, the way to set it.
     // A form submits it, one entry per value when multiple, an empty entry with none as a native
     // select; and resets it (#135).
     models: { value: model<string | string[] | null>(null, { type: Object, form: true }) },
+    events: {
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
+        /** Fired when the clear button or `clear()` empties the selection, after its `value-change`. */
+        'pdx-clear': event<void>(),
+        /** Fired when `loadChildren` rejects; the branch stays askable and can be reopened. */
+        'pdx-load-error': event<{ node: TreeSelectNode; error: unknown }>(),
+    },
+    // The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+    // from them. The trigger carries no state class.
+    states: ['open', 'disabled', 'loading'],
+    parts: ['root', 'clear', 'popup', 'search', 'tree', 'node', 'toggle'],
     // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -104,8 +127,6 @@ component('pdx-tree-select', {
         let _treeContainerEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;
         let _clearEl: HTMLButtonElement | null = null;
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        reflectNameToHost(ctx);
         ctx.formValue?.(() => {
             const v = ctx.value();
             return isMultiple() ? (Array.isArray(v) ? v : []) : (v ?? '');
@@ -176,6 +197,7 @@ component('pdx-tree-select', {
 
         function openPopover(): void {
             if (ctx.disabled()) return;
+            const wasOpen = _open.peek();
             _open.set(true);
             if (ctx.expandAll()) {
                 const all = new Set<string>();
@@ -196,7 +218,8 @@ component('pdx-tree-select', {
                 inside: (t) => ctx.el.contains(t),
                 outside: () => closePopover(),
             });
-            ctx.emit('pdx-open', undefined, { bubbles: false });
+            // Announced when it changes (#287): opening an open panel again only resets it.
+            if (!wasOpen) ctx.emit('open-change', { value: true });
         }
 
         // Teardown on destroy: without it, an unmount with the popover open would leave the
@@ -210,6 +233,7 @@ component('pdx-tree-select', {
         });
 
         function closePopover(): void {
+            const wasOpen = _open.peek();
             _open.set(false);
             _search.set('');
             if (_searchInputEl) _searchInputEl.value = '';
@@ -218,7 +242,12 @@ component('pdx-tree-select', {
             applyActive();
             // The search field goes away with the panel: focus back on the trigger, not <body>.
             if (_panelEl && _panelEl.contains(document.activeElement)) _triggerEl?.focus();
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            // Announced when it changes (#287): a press outside a closed panel announces nothing.
+            if (wasOpen) ctx.emit('open-change', { value: false });
+        }
+
+        function togglePopover(): void {
+            if (_open.peek()) closePopover(); else openPopover();
         }
 
         /** Mark the highlighted row, and point aria-activedescendant at it while the tree is open. */
@@ -463,7 +492,8 @@ component('pdx-tree-select', {
             const ph = (ctx.placeholder() as string) || getComponentString('tree-select', 'placeholder')();
 
             _triggerEl = document.createElement('div');
-            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (disabled ? ' disabled' : '');
+            // No state class: `disabled` is the host's :state(disabled) (#287).
+            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap';
             _triggerEl.setAttribute('data-part', 'root');
             _triggerEl.setAttribute('role', 'combobox');
             _triggerEl.setAttribute('aria-expanded', 'false');
@@ -486,6 +516,7 @@ component('pdx-tree-select', {
                 _clearEl = document.createElement('button') as HTMLButtonElement;
                 _clearEl.type = 'button';
                 _clearEl.className = 'pdx-input-clear';
+                _clearEl.setAttribute('data-part', 'clear');
                 _clearEl.textContent = '×';
                 _clearEl.style.display = 'none';
                 _clearEl.addEventListener('click', onClear);
@@ -500,6 +531,7 @@ component('pdx-tree-select', {
 
             _panelEl = document.createElement('div');
             _panelEl.className = 'pdx-tree-select-panel';
+            _panelEl.setAttribute('data-part', 'popup');
             _panelEl.style.display = 'none';
 
             if (ctx.searchable()) {
@@ -507,6 +539,7 @@ component('pdx-tree-select', {
                 searchWrap.className = 'pdx-tree-select-search';
                 _searchInputEl = document.createElement('input');
                 _searchInputEl.type = 'text';
+                _searchInputEl.setAttribute('data-part', 'search');
                 _searchInputEl.placeholder = getComponentString('tree-select', 'search')();
                 // Named, and tied to the tree it filters: the highlight is announced from here too.
                 _searchInputEl.setAttribute('aria-label', getComponentString('tree-select', 'search')());
@@ -521,6 +554,7 @@ component('pdx-tree-select', {
             _treeContainerEl.className = 'pdx-tree-select-tree';
             _treeContainerEl.id = _treeId;
             _treeContainerEl.setAttribute('role', 'tree');
+            _treeContainerEl.setAttribute('data-part', 'tree');
             // The tree has the trigger's name; it had none.
             _treeContainerEl.setAttribute('aria-label', (ctx.label?.() as string) || ph);
             if (ctx.multiple()) _treeContainerEl.setAttribute('aria-multiselectable', 'true');
@@ -546,6 +580,12 @@ component('pdx-tree-select', {
             _popover.setContent(_panelEl);
 
             _domReady.set(true);
+        });
+
+        ctx.track(() => {
+            ctx.state('open', _open());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', _loading().size > 0);
         });
 
         // Reactive update
@@ -574,7 +614,11 @@ component('pdx-tree-select', {
             if (_clearEl) {
                 _clearEl.style.display = (clearable && display && !disabled) ? '' : 'none';
             }
-            if (_triggerEl) _triggerEl.setAttribute('aria-expanded', String(open));
+            if (_triggerEl) {
+                _triggerEl.setAttribute('aria-expanded', String(open));
+                // Out of the tab order while disabled — set after the mount too, as the state is.
+                _triggerEl.setAttribute('tabindex', disabled ? '-1' : '0');
+            }
 
 
             if (!_panelEl || !_treeContainerEl) return;
@@ -588,6 +632,10 @@ component('pdx-tree-select', {
             if (_searchInputEl && justOpened) {
                 setTimeout(() => _searchInputEl!.focus(), 0);
             }
+
+            // A4 (#287): the tree is busy while a branch of it is being fetched; the row is, too.
+            if (_loading.peek().size > 0) _treeContainerEl.setAttribute('aria-busy', 'true');
+            else _treeContainerEl.removeAttribute('aria-busy');
 
             // Rebuild only the tree content (search input is persistent)
             _treeContainerEl.innerHTML = '';
@@ -634,6 +682,7 @@ component('pdx-tree-select', {
                 row.style.paddingLeft = `${8 + depth * 20}px`;
                 row.id = rowId(node.value);
                 row.setAttribute('role', 'treeitem');
+                row.setAttribute('data-part', 'node');
                 row.setAttribute('aria-selected', String(isSelected));
                 // The rows are flat siblings, indented by padding: level, set size and position say
                 // what the indentation shows.
@@ -654,6 +703,7 @@ component('pdx-tree-select', {
                 toggle.className = 'pdx-tree-toggle' + (isExpanded ? ' expanded' : '') + (expandable ? '' : ' leaf')
                     + (isLoading ? ' loading' : '');
                 toggle.textContent = '›';
+                toggle.setAttribute('data-part', 'toggle');
                 toggle.setAttribute('tabindex', '-1');
                 if (expandable) {
                     toggle.addEventListener('click', (e) => { e.stopPropagation(); onToggle(node); });
@@ -691,32 +741,34 @@ component('pdx-tree-select', {
             });
         }
 
-        // Exposes the methods on the host (the return goes only to the render context, not to the DOM element).
-        (ctx.el as unknown as Record<string, unknown>).openTreeSelect = openPopover;
-        (ctx.el as unknown as Record<string, unknown>).closeTreeSelect = closePopover;
-
-        // Imperative API: el.getValue() / el.setValue(v) / el.clear()
+        // Imperative API (#287): the popup is driven by the overlay verbs, which replace the undeclared
+        // openTreeSelect/closeTreeSelect; the selection is the model, `el.value`, which replaces
+        // getValue/setValue.
         ctx.expose({
-            /** The current selection: one key, the array of keys when `multiple`, or null. */
-            getValue() { return _internalValue(); },
             /** The label of the selected node, or the labels joined with ', ' when `multiple`. */
             getLabel(): string {
                 const v = _internalValue.peek();
                 const values = Array.isArray(v) ? v : v ? [v] : [];
                 return values.map((x) => findNode(x)?.label ?? x).join(', ');
             },
-            /** Set the selection, which dispatches `value-change`, as a click on the tree would. */
-            setValue(v: string | string[] | null) { _internalValue.set(v); ctx.value.set(v); },
             clear() {
                 const empty = Array.isArray(_internalValue.peek()) ? [] : null;
                 _internalValue.set(empty as string[] | null);
                 ctx.value.set(empty);
                 ctx.emit('pdx-clear');
             },
+            /** Open the popup. */
+            show() { openPopover(); },
+            /** Close the popup. */
+            close() { closePopover(); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { togglePopover(); },
         });
 
         return { openPopover, closePopover };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });
 
