@@ -84,7 +84,11 @@
                 if (host && typeof host.openPalette === 'function') host.openPalette(); },
         "date-picker-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-open"]');
-                if (host && typeof host.openPopover === 'function') host.openPopover(); },
+                if (host && typeof host.openPopover === 'function') {
+                    const focused = new Promise((resolve) => host.addEventListener('focusin', resolve, { once: true }));
+                    host.openPopover();
+                    await focused;
+                } },
         "date-picker-month-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-month"]');
                 if (host && typeof host.openPopover === 'function') host.openPopover(); },

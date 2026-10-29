@@ -92,6 +92,30 @@ describe('focus', () => {
         await vi.waitFor(() => expect(document.activeElement).toBe(cell(el, '2024-06-15')));
     });
 
+    it('opened after the month is drawn but before the calendar is ready, focus still lands on the day', async () => {
+        // A loaded runner's order (#737): the picker hands the calendar its month, so June 2024 is
+        // drawn, while the calendar's own first view (a zero-delay timer) has not run. The request
+        // waits for the view; the view is the one already drawn, so no draw follows to honour it.
+        const realSetTimeout = window.setTimeout;
+        const held: Array<() => void> = [];
+        const spy = vi.spyOn(window, 'setTimeout').mockImplementation(((fn: () => void, ms?: number, ...args: unknown[]) => {
+            if (!ms) { held.push(fn); return 0; }
+            return realSetTimeout(fn, ms, ...args);
+        }) as typeof window.setTimeout);
+        try {
+            const el = document.createElement('pdx-date-picker') as HTMLElement & { value: string; openPopover(): void };
+            el.value = '2024-06-15';
+            document.body.appendChild(el);
+            await vi.waitFor(() => expect(cell(el, '2024-06-15'), 'June 2024 is drawn').toBeTruthy());
+            el.openPopover();
+            spy.mockRestore();
+            for (const fn of held.splice(0)) fn();
+            await vi.waitFor(() => expect(document.activeElement).toBe(cell(el, '2024-06-15')));
+        } finally {
+            spy.mockRestore();
+        }
+    });
+
     it('a keyboard pick closes the popup and returns focus to the trigger', async () => {
         const el = await mount('pdx-date-picker', { value: '2024-06-15' });
         await tick(50);

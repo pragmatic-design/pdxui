@@ -151,15 +151,22 @@ component('pdx-calendar', {
             else if (mode === 'year') _viewMode.set('years');
             else _viewMode.set('days');
             _viewReady = true;
+            // A focus request made before now waits for a draw. When the view set here is the one
+            // already drawn (the picker handed over the month first), no draw follows: honour it on
+            // that view, whose tab stop the style track has just moved (#737).
+            if (_focusPending && _drawsQueued === 0) _focusPending = !focusActiveCell();
         }
         setTimeout(initView, 0);
 
         // ─── Focus into the view ───────────────────────────
         // A popup that opens on the calendar puts focus on the day it holds its tab stop on (or the
         // month / year shown). The picker may open it before the calendar has drawn its first view, so
-        // a request made early is kept and honoured by the first draw after initView.
+        // a request made early is kept and honoured by the first draw after initView, or by initView
+        // itself when no draw follows.
         let _viewReady = false;
         let _focusPending = false;
+        /** Draws the structure track has scheduled and not yet run. */
+        let _drawsQueued = 0;
         function focusActiveCell(): boolean {
             const target = ctx.el.querySelector<HTMLElement>(
                 '.pdx-cal-grid [tabindex="0"], .pdx-cal-month-cell.pdx-cal-selected, .pdx-cal-year-cell.pdx-cal-selected');
@@ -484,7 +491,9 @@ component('pdx-calendar', {
             const disabled = ctx.disabled() as boolean;
             const isInline = ctx.inline() as boolean;
 
+            _drawsQueued++;
             requestAnimationFrame(() => {
+                _drawsQueued--;
                 const el = ctx.el;
                 el.innerHTML = '';
                 _cellMap.clear();
