@@ -271,6 +271,8 @@ export const colorPicker: ComponentManifest = {
     // A fixed value (#4a6fa5) → a deterministic swatch and spectrum gradient. The hex input is masked (it may show a caret).
     visual: {
         scenarios: ['cp-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['cp-open'],
         mask: ['section:not([hidden]) [data-test="cp-open"] .pdx-color-hex-input'],
     },
 };

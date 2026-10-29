@@ -163,6 +163,8 @@ export const bottomSheet: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker), the open scenario ──
     visual: {
         scenarios: ['bottom-sheet-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['bottom-sheet-open'],
     },
 };
 

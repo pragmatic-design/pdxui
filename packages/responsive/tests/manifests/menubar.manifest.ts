@@ -259,6 +259,8 @@ export const menubar: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) — closed (the bar) + open (the panel) ──
     visual: {
         scenarios: ['menubar-closed', 'menubar-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['menubar-open'],
     },
 };
 

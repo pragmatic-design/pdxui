@@ -193,6 +193,16 @@ export interface VisualSpec {
     /** Override the diff threshold (the default comes from the Docker config: 0.01) */
     maxDiffPixelRatio?: number;
     /**
+     * The scenarios whose subject is drawn against the viewport — `position: fixed`: a modal, a
+     * drawer, a sheet, a toast, a popover portalled to <body>, a bar pinned to an edge. They are shot
+     * as the whole viewport (1280×800) instead of their section, which the subject lies outside of.
+     *
+     * The runner measures it rather than trusting the list: before every shot it fails when a
+     * visible fixed element lies outside the area shot (#714), so a scenario missing from here is
+     * red, not a baseline of an empty section.
+     */
+    viewportScenarios?: string[];
+    /**
      * EXTRA screenshots with one element focused, saved as `<scenario>-focused`.
      *
      * The visual dimension photographs components at rest and never interacts: without these no

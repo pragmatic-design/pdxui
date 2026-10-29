@@ -222,6 +222,8 @@ export const contextMenu: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) — the open state only (the maths does not catch the icons, shortcuts and separators) ──
     visual: {
         scenarios: ['ctxmenu-open'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['ctxmenu-open'],
     },
 };
 

@@ -143,6 +143,8 @@ export const bottomNav: ComponentManifest = {
     // ── Dim. 5: visual regression (Docker) ──
     visual: {
         scenarios: ['bottom-nav-basic'],
+        // Drawn position: fixed, outside its section: shot as the viewport (#714).
+        viewportScenarios: ['bottom-nav-basic'],
     },
 };
 
