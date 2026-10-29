@@ -2954,6 +2954,10 @@
           "title": "Time Picker — 24h, value 14:30 (segmented spinbutton input)"
         },
         {
+          "id": "time-picker-disabled",
+          "title": "Time Picker — Disabled"
+        },
+        {
           "id": "time-picker-size-md",
           "title": "pdx-time-picker — size=\"md\""
         },

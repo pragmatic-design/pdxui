@@ -26493,19 +26493,19 @@
           },
           "events": [
             {
+              "name": "pdx-blur",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when a segment loses the focus."
+            },
+            {
               "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `value`. Does not bubble.",
               "detail": "{ value: string }"
-            },
-            {
-              "name": "pdx-blur",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it loses focus."
             }
           ],
           "roles": [
@@ -26611,6 +26611,30 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, a `role=\"group\"` that holds the segments."
+            },
+            {
+              "name": "segment",
+              "description": "A segment, a `role=\"spinbutton\"`: the hour, the minute, the second or AM/PM."
+            },
+            {
+              "name": "arrow",
+              "description": "An arrow above or below a segment, which steps it."
+            },
+            {
+              "name": "separator",
+              "description": "The `:` between two segments."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ]
         }

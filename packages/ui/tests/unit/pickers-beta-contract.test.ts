@@ -15,6 +15,7 @@ import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer';
 import '../../src/date-picker/pdx-date-picker';
+import '../../src/time-picker/pdx-time-picker';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -102,6 +103,16 @@ const DONE: Row[] = [
         methods: ['getDate', 'getRange', 'getTime', 'getEndTime', 'focus', 'blur', 'clear', 'show', 'close', 'toggle'],
         // openPopover/closePopover were set on the element undeclared, and are the overlay verbs.
         removedMethods: ['openPopover', 'closePopover'],
+    },
+    {
+        tag: 'pdx-time-picker',
+        model: 'value',
+        // Spinbuttons in a group, no popup.
+        states: ['disabled'],
+        parts: ['root', 'segment', 'arrow', 'separator'],
+        popup: false,
+        methods: ['focus', 'blur', 'clear'],
+        removedMethods: [],
     },
 ];
 

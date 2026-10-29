@@ -383,6 +383,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-time-picker` takes the beta contract (#287). It has no popup, so no
+  `open-change`.
+  - **States and parts.** `disabled` is a custom state on the host; the frame no longer carries the
+    `disabled` class. `disabled` set after the mount now takes every segment out of the tab order;
+    before, it was read once, when the segments were built. The parts are `root` (the frame, a
+    `group`), `segment` (a `spinbutton`), `arrow` and `separator`.
 - **Breaking:** `pdx-date-picker` takes the beta contract (#287), as `pdx-cascader` did.
   - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
     `pdx-close`, once per change, and the host is in `:state(open)` while it is open. `pdx migrate`

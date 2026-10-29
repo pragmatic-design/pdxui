@@ -14,7 +14,9 @@
  *
  * ── DOM structure (light DOM; built ONCE in a requestAnimationFrame, src:177-220) ──
  *   <pdx-time-picker>                                       ← the host (render: () => html``, empty)
- *     <div class="pdx-time-picker [pdx-time-picker-{size}] [disabled]"  ← WRAP: inline-flex, border, radius (CSS:3-13)
+ *     <div class="pdx-time-picker" data-part="root"         ← WRAP: inline-flex, border, radius (CSS:3-13); size and
+ *                                                             disabled are the host's (attribute, :state()), #287.
+ *                                                             The segments are data-part="segment", the arrows "arrow"
  *          role="group" aria-label="{ariaLabel|'Time picker'}">          ← the group's accessible name (src:190-191)
  *       <div class="pdx-time-col">                          ← the hours SEGMENT column
  *         <button class="pdx-time-arrow pdx-time-arrow-up"  ← up arrow: tabindex=-1, aria-hidden=true (src:243-250)
@@ -84,6 +86,18 @@ export const timePicker: ComponentManifest = {
                     aria-label="Meeting time">
                 </pdx-time-picker>`,
         },
+        {
+            // DISABLED: the host's :state(disabled) (#287), drawn faded and inert.
+            id: 'time-picker-disabled',
+            title: 'Time Picker — Disabled',
+            html: `
+                <pdx-time-picker data-test="tp-dis"
+                    value="14:30"
+                    format="24h"
+                    aria-label="Meeting time"
+                    disabled>
+                </pdx-time-picker>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
@@ -93,13 +107,13 @@ export const timePicker: ComponentManifest = {
                 standalone: [
                     {
                         // CSS:4 → .pdx-time-picker { display: inline-flex } → box visibile.
-                        selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker',
+                        selector: 'section:not([hidden]) [data-test="tp"] [data-part="root"]',
                         description: 'time picker wrap is a visible inline-flex box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:8 → border-radius: var(--pdx-radius-md). Non-negative (metro zeroes it, never < 0).
-                        selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker',
+                        selector: 'section:not([hidden]) [data-test="tp"] [data-part="root"]',
                         description: 'time picker wrap radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -110,7 +124,7 @@ export const timePicker: ComponentManifest = {
                     },
                     {
                         // CSS:75 → .pdx-time-value { cursor: text } → an editable segment (interactive).
-                        selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-value',
+                        selector: 'section:not([hidden]) [data-test="tp"] [data-part="segment"]',
                         description: 'segment is an editable interactive field (cursor text)',
                         cursor: { op: 'is', value: 'text' },
                     },
@@ -120,17 +134,29 @@ export const timePicker: ComponentManifest = {
                         // The segments (spinbuttons) and the separators live inside the wrap, in a row.
                         // first = segmento ORE, last = segmento MINUTI (format 24h → 2 segmenti).
                         description: 'segments are contained in the wrap and laid out left-to-right',
-                        parent: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker',
+                        parent: 'section:not([hidden]) [data-test="tp"] [data-part="root"]',
                         children: {
-                            wrap: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker',
-                            hour: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(1) .pdx-time-value',
-                            minute: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(2) .pdx-time-value',
+                            wrap: 'section:not([hidden]) [data-test="tp"] [data-part="root"]',
+                            hour: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Hour"]',
+                            minute: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Minute"]',
                         },
                         relations: [
                             { description: 'hour segment within wrap', left: 'hour', op: 'contained-in', right: 'wrap' },
                             { description: 'minute segment within wrap', left: 'minute', op: 'contained-in', right: 'wrap' },
                             { description: 'hour is to the left of minute', left: 'hour.left', op: '<=', right: 'minute.left' },
                         ],
+                    },
+                ],
+            },
+
+            'time-picker-disabled': {
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="tp-dis"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="tp-dis"]', name: 'disabled' },
+                        changes: { pointerEvents: { op: 'is', value: 'none' } },
                     },
                 ],
             },
@@ -152,7 +178,7 @@ export const timePicker: ComponentManifest = {
     isolation: {
         scenario: 'time-picker-default',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-picker', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tp"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -162,14 +188,14 @@ export const timePicker: ComponentManifest = {
     // The steps check aria-valuenow.
     keyboard: {
         scenario: 'time-picker-default',
-        initialFocus: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(1) .pdx-time-value',
+        initialFocus: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Hour"]',
         steps: [
             // ArrowUp: ore 14 → 15.
-            { key: 'ArrowUp', expectAttr: { selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(1) .pdx-time-value', name: 'aria-valuenow', value: '15' } },
+            { key: 'ArrowUp', expectAttr: { selector: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Hour"]', name: 'aria-valuenow', value: '15' } },
             // ArrowDown: hours 15 → 14 (back to the initial value).
-            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(1) .pdx-time-value', name: 'aria-valuenow', value: '14' } },
+            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Hour"]', name: 'aria-valuenow', value: '14' } },
             // The focus stays on the hours segment after the arrows (the arrows do not move it).
-            { key: 'ArrowUp', expectFocus: 'section:not([hidden]) [data-test="tp"] .pdx-time-col:nth-of-type(1) .pdx-time-value' },
+            { key: 'ArrowUp', expectFocus: 'section:not([hidden]) [data-test="tp"] [data-part="segment"][aria-label="Hour"]' },
         ],
     },
 
