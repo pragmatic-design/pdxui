@@ -17,6 +17,7 @@ import '../../src/transfer/pdx-transfer';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/calendar/pdx-calendar';
+import '../../src/color-picker/pdx-color-picker';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -124,6 +125,17 @@ const DONE: Row[] = [
         popup: false,
         methods: ['focusView', 'getRange', 'getQuarter'],
         removedMethods: [],
+    },
+    {
+        tag: 'pdx-color-picker',
+        model: 'value',
+        states: ['open', 'disabled', 'readonly'],
+        // The popup is the panel in place when `inline`.
+        parts: ['root', 'popup', 'area', 'hue', 'alpha', 'input', 'clear', 'preset'],
+        popup: true,
+        methods: ['focus', 'blur', 'clear', 'getHex', 'getRgb', 'getHsl', 'show', 'close', 'toggle'],
+        // `open()` was set on the element undeclared, and is the overlay verb `show()`; `close()` stays.
+        removedMethods: ['open'],
     },
 ];
 

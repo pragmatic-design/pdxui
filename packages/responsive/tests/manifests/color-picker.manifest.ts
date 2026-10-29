@@ -46,9 +46,9 @@
  *   floating panels open at once, fighting over selectors and positioning.
  *
  * ── Opening (CRITICAL — deterministic through the setup) ──
- *   togglePopup() on a click on the swatch (render:256) → _open toggles. The host also exposes TWO methods
- *   programmatic ones: `el.open()` and `el.close()` (pdx-color-picker.ts:236-237). The cp-open scenario is opened
- *   by calling `host.open()` in the setup (a method VERIFIED on the host) → _open=true → the effect (render:216)
+ *   togglePopup() on a click on the swatch (render:256) → _open toggles. The host exposes the overlay verbs
+ *   (#287): `show()`, `close()`, `toggle()`. The cp-open scenario is opened
+ *   by calling `host.show()` in the setup → _open=true → the effect (render:216)
  *   calls popover.open() and clears the inline display:none → the panel is visible under the trigger.
  *   dismissOnOutside:true + dismissOnEscape:true (pdx-color-picker.ts:209-210).
  *
@@ -92,7 +92,7 @@ export const colorPicker: ComponentManifest = {
         },
         {
             // The ONE open scenario: the floating panel is made visible by the setup (opened programmatically).
-            // el.open() is exposed on the host (pdx-color-picker.ts:236). Called after the mount.
+            // show() is exposed on the host, an overlay verb (#287). Called after the mount.
             // presets are set, to exercise the preset grid (role="group").
             id: 'cp-open',
             title: 'Color Picker — Open (spectrum + hue slider + hex input panel below trigger)',
@@ -103,7 +103,7 @@ export const colorPicker: ComponentManifest = {
                     presets='["#ef4444","#f59e0b","#10b981","#3b82f6","#8b5cf6","#ec4899"]'></pdx-color-picker>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="cp-open"]');
-                if (host && typeof host.open === 'function') host.open();`,
+                if (host && typeof host.show === 'function') host.show();`,
         },
         {
             id: 'cp-disabled',
@@ -123,25 +123,25 @@ export const colorPicker: ComponentManifest = {
                 standalone: [
                     {
                         // CSS:32 → display:inline-block → a visible box (not 'none').
-                        selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch',
+                        selector: 'section:not([hidden]) [data-test="cp"] > [data-part="root"]',
                         description: 'swatch trigger is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:40 → cursor:pointer → interactive.
-                        selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch',
+                        selector: 'section:not([hidden]) [data-test="cp"] > [data-part="root"]',
                         description: 'swatch trigger is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // CSS:35-36 → 32×32 (the default size). A noticeable box, not collapsed.
-                        selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch',
+                        selector: 'section:not([hidden]) [data-test="cp"] > [data-part="root"]',
                         description: 'swatch has an appreciable width',
                         width: { op: '>=', value: 16 },
                     },
                     {
                         // CSS:39 → a border-radius from a token; the radius-zero themes zero it, never below 0.
-                        selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch',
+                        selector: 'section:not([hidden]) [data-test="cp"] > [data-part="root"]',
                         description: 'swatch radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -149,25 +149,35 @@ export const colorPicker: ComponentManifest = {
             },
 
             // Open: the panel (display:block, the inline display:none emptied) sits UNDER the trigger.
-            // An overlay with no backdrop (a popover, not a modal). The panel is ALREADY open from the setup (el.open) →
+            // An overlay with no backdrop (a popover, not a modal). The panel is ALREADY open from the setup (show()) →
             // action:'call' = the state is on, and the runner measures without interacting further.
             'cp-open': {
+                // Open is a custom state of the host (#287), what a theme selects.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="cp-open"]', name: 'open' },
+                        changes: {},
+                    },
+                ],
                 standalone: [
                     {
                         // The inline display:none is emptied on opening → the .pdx-color-panel CSS goes back to display:block.
-                        selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
+                        selector: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
                         description: 'open panel is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:84 → width:240px → a measurable width.
-                        selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
+                        selector: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
                         description: 'open panel has an appreciable width',
                         width: { op: '>=', value: 120 },
                     },
                     {
                         // Spectrum visibile (area 2D saturazione/valore).
-                        selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-spectrum',
+                        selector: 'section:not([hidden]) [data-test="cp-open"] [data-part="area"]',
                         description: 'saturation/value spectrum area is displayed',
                         display: { op: 'isNot', value: 'none' },
                     },
@@ -175,9 +185,9 @@ export const colorPicker: ComponentManifest = {
                 overlay: [
                     {
                         description: 'open color picker shows the floating panel without a backdrop',
-                        // action:'call' → the state is already on from the setup (el.open); the runner does NOT click.
-                        trigger: { selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-swatch', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
+                        // action:'call' → the state is already on from the setup (show()); the runner does NOT click.
+                        trigger: { selector: 'section:not([hidden]) [data-test="cp-open"] > [data-part="root"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -190,8 +200,8 @@ export const colorPicker: ComponentManifest = {
                         // Scoped like the parent: the bare swatch class finds a hidden scenario's
                         // swatch (0×0), and `0 <= panel.top` would hold without measuring.
                         children: {
-                            swatch: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-swatch',
-                            panel: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
+                            swatch: 'section:not([hidden]) [data-test="cp-open"] > [data-part="root"]',
+                            panel: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
                         },
                         relations: [
                             { description: 'panel.top >= swatch.bottom (below)', left: 'swatch.bottom', op: '<=', right: 'panel.top', tolerance: 2 },
@@ -200,11 +210,11 @@ export const colorPicker: ComponentManifest = {
                     {
                         // The spectrum and the hue slider live inside the panel.
                         description: 'spectrum and hue slider are contained within the panel',
-                        parent: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
+                        parent: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-panel',
-                            spectrum: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-spectrum',
-                            hue: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-hue-slider',
+                            panel: 'section:not([hidden]) [data-test="cp-open"] > [data-part="popup"]',
+                            spectrum: 'section:not([hidden]) [data-test="cp-open"] [data-part="area"]',
+                            hue: 'section:not([hidden]) [data-test="cp-open"] [data-part="hue"]',
                         },
                         relations: [
                             { description: 'spectrum within panel', left: 'spectrum', op: 'contained-in', right: 'panel' },
@@ -219,9 +229,18 @@ export const colorPicker: ComponentManifest = {
             'cp-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="cp-dis"] .pdx-color-swatch',
+                        selector: 'section:not([hidden]) [data-test="cp-dis"] > [data-part="root"]',
                         description: 'disabled swatch is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="cp-dis"] > [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="cp-dis"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -244,7 +263,7 @@ export const colorPicker: ComponentManifest = {
     isolation: {
         scenario: 'cp-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="cp"] .pdx-color-swatch', tolerancePx: 4, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="cp"] > [data-part="root"]', tolerancePx: 4, skipHeight: true },
         ],
     },
 
@@ -256,14 +275,14 @@ export const colorPicker: ComponentManifest = {
     // Not modal, no trap → pattern 'none' with custom steps.
     keyboard: {
         scenario: 'cp-open',
-        initialFocus: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-spectrum',
+        initialFocus: 'section:not([hidden]) [data-test="cp-open"] [data-part="area"]',
         steps: [
-            { key: 'ArrowRight', expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-spectrum', name: 'aria-valuenow', value: '56' } },
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-hue-slider' },
-            { key: 'ArrowRight', expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-hue-slider', name: 'aria-valuenow', value: '217' } },
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-hex-input' },
-            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-swatch',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] .pdx-color-swatch', name: 'aria-expanded', value: 'false' } },
+            { key: 'ArrowRight', expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] [data-part="area"]', name: 'aria-valuenow', value: '56' } },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cp-open"] [data-part="hue"]' },
+            { key: 'ArrowRight', expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] [data-part="hue"]', name: 'aria-valuenow', value: '217' } },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cp-open"] [data-part="input"]' },
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="cp-open"] > [data-part="root"]',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="cp-open"] > [data-part="root"]', name: 'aria-expanded', value: 'false' } },
         ],
     },
 
@@ -273,7 +292,7 @@ export const colorPicker: ComponentManifest = {
         scenarios: ['cp-open'],
         // Drawn position: fixed, outside its section: shot as the viewport (#714).
         viewportScenarios: ['cp-open'],
-        mask: ['section:not([hidden]) [data-test="cp-open"] .pdx-color-hex-input'],
+        mask: ['section:not([hidden]) [data-test="cp-open"] [data-part="input"]'],
     },
 };
 

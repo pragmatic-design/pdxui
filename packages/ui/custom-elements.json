@@ -7021,6 +7021,24 @@
             },
             {
               "kind": "method",
+              "name": "show",
+              "parameters": [],
+              "description": "Open the popup; open already, or inline, nothing changes."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "parameters": [],
+              "description": "Close the popup."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Open the popup when closed, close it when open."
+            },
+            {
+              "kind": "method",
               "name": "focus",
               "parameters": [],
               "description": "Moves focus to it."
@@ -7088,6 +7106,14 @@
           },
           "alphaCommit": "pdx-change",
           "events": [
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+              "detail": "{ value: boolean }"
+            },
             {
               "name": "value-change",
               "type": {
@@ -7192,6 +7218,54 @@
                 "text": "string"
               },
               "default": "'#000000'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The swatch, the button that opens the popup; absent when `inline`."
+            },
+            {
+              "name": "popup",
+              "description": "The panel: a floating `role=\"dialog\"`, or in place when `inline`."
+            },
+            {
+              "name": "area",
+              "description": "The colour area, a two-dimensional `role=\"slider\"`: saturation and brightness."
+            },
+            {
+              "name": "hue",
+              "description": "The hue slider."
+            },
+            {
+              "name": "alpha",
+              "description": "The opacity slider, while `showAlpha`."
+            },
+            {
+              "name": "input",
+              "description": "The text field that reads and writes the colour."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable`."
+            },
+            {
+              "name": "preset",
+              "description": "A preset colour's button."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "The popup is open."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
             }
           ]
         }

@@ -24,6 +24,7 @@
 // `openCascader()` and `closeCascader()`, and `pdx-tree-select`'s `openTreeSelect()` and
 // `closeTreeSelect()`, are `show()` and `close()` the same way, and so are `pdx-date-picker`'s
 // `openPopover()` and `closePopover()` — no other component set those names on its element.
+// `pdx-autocomplete`'s and `pdx-color-picker`'s `open()` are tied to the tag by a `:ref` (below).
 
 import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from './changes';
 import { parseSFC } from '../parser/sfc';
@@ -221,58 +222,66 @@ export const treeSelectOverlayVerbsScript = aliasVerbs(TREE_SELECT_VERBS, 'scrip
 export const datePickerOverlayVerbs = aliasVerbs(DATE_PICKER_VERBS, 'pdx');
 export const datePickerOverlayVerbsScript = aliasVerbs(DATE_PICKER_VERBS, 'script');
 
-// `pdx-autocomplete`'s `open()` is `show()`; its `close()` stays (#287). `open()` is a common name — a
-// dialog has one — so the call is rewritten only where its receiver is tied to the tag by the text:
-// the name a `:ref` binds on a `<pdx-autocomplete>` of the same file, called in its template or its
-// script. A call on a lookup of the tag (`querySelector('pdx-autocomplete')`) is flagged; anything
-// else cannot be told from any other `open()`, and is left.
+// `pdx-autocomplete`'s and `pdx-color-picker`'s `open()` is `show()`; their `close()` stays (#287).
+// `open()` is a common name — a dialog has one — so the call is rewritten only where its receiver is
+// tied to the tag by the text: the name a `:ref` binds on that tag in the same file, called in its
+// template or its script. A call on a lookup of the tag (`querySelector('pdx-autocomplete')`) is
+// flagged; anything else cannot be told from any other `open()`, and is left.
 
-// Match: a `:ref` on a pdx-autocomplete's opening tag. Groups: [1]=the bound name
-const AUTOCOMPLETE_REF = /<pdx-autocomplete\b(?:[^>"']|"[^"]*"|'[^']*')*?\s:ref\s*=\s*["']\s*([A-Za-z_$][\w$]*)\s*["']/gi;
-
-/** The names a `:ref` binds on a `<pdx-autocomplete>` of `text`. */
-const autocompleteRefs = (text: string): string[] => [...new Set([...text.matchAll(AUTOCOMPLETE_REF)].map((m) => m[1]))];
-
-/** Every `name.open()` / `name?.open()` of a ref'd autocomplete. Groups: [1]=the name [2]=the access */
-function autocompleteOpenCalls(text: string): RegExpMatchArray[] {
-    const names = autocompleteRefs(text);
+/** Every `name.open()` / `name?.open()` of a name a `:ref` binds on `tag`. Groups: [1]=the name [2]=the access */
+function refOpenCalls(text: string, tag: string): RegExpMatchArray[] {
+    // Match: a `:ref` on the tag's opening tag, quoted values read whole. Groups: [1]=the bound name
+    const ref = new RegExp(`<${escapeForRegExp(tag)}\\b(?:[^>"']|"[^"]*"|'[^']*')*?\\s:ref\\s*=\\s*["']\\s*([A-Za-z_$][\\w$]*)\\s*["']`, 'gi');
+    const names = [...new Set([...text.matchAll(ref)].map((m) => m[1]))];
     if (names.length === 0) return [];
     // Match: the name standing alone, its member access and `open()`. Groups: [1]=the name [2]=`.` or `?.`
     const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*open\\s*\\(\\s*\\)`, 'g');
     return [...text.matchAll(call)];
 }
 
-export const autocompleteOpenShow: LanguageChange = {
-    id: 'autocomplete-open-show',
-    kind: 'removed',
-    scope: 'pdx',
-    issue: 287,
-    message: '`pdx-autocomplete` opens its popup with the overlay verb: `open()` is `show()`; `close()` is unchanged.',
-    marker: 'pdx-autocomplete',
-    detect: (text) => autocompleteOpenCalls(text).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${m[1]}${m[2]}show()\`.` })),
-    fix: (text) => {
-        let out = text;
-        for (const m of autocompleteOpenCalls(text).reverse()) {
-            out = out.slice(0, m.index!) + `${m[1]}${m[2]}show()` + out.slice(m.index! + m[0].length);
-        }
-        return out;
-    },
-};
+/** The pair of entries for a tag whose undeclared `open()` is `show()`: the ref'd calls, and the lookups. */
+function openShow(tag: string, id: string): { ref: LanguageChange; unbound: LanguageChange } {
+    // Match: `.open()` on a lookup of the tag, `querySelector('<tag>')` or `('#f <tag>')`, with an
+    // optional `!` or index. Groups: [1]=the quote
+    const lookup = (): RegExp => new RegExp(
+        `querySelector(?:All)?\\s*\\(\\s*(['"\`])[^'"\`]*${escapeForRegExp(tag)}[^'"\`]*\\1\\s*\\)\\s*(?:\\[\\s*\\d+\\s*\\])?\\s*!?\\s*\\??\\.\\s*open\\s*\\(\\s*\\)`, 'g');
+    return {
+        ref: {
+            id: `${id}-open-show`,
+            kind: 'removed',
+            scope: 'pdx',
+            issue: 287,
+            message: `\`${tag}\` opens its popup with the overlay verb: \`open()\` is \`show()\`; \`close()\` is unchanged.`,
+            marker: tag,
+            detect: (text) => refOpenCalls(text, tag).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${m[1]}${m[2]}show()\`.` })),
+            fix: (text) => {
+                let out = text;
+                for (const m of refOpenCalls(text, tag).reverse()) {
+                    out = out.slice(0, m.index!) + `${m[1]}${m[2]}show()` + out.slice(m.index! + m[0].length);
+                }
+                return out;
+            },
+        },
+        unbound: {
+            id: `${id}-open-unbound`,
+            kind: 'removed',
+            scope: 'script',
+            issue: 287,
+            message: `\`${tag}\`'s \`open()\` is \`show()\`.`,
+            marker: tag,
+            detect: (text) => [...text.matchAll(lookup())].map((m) => ({
+                line: lineAt(text, m.index!), found: m[0],
+                note: `Not rewritten: the call is on a lookup, not a \`:ref\` of this file; write \`show()\` if it is a ${tag}.`,
+            })),
+            fix: 'flag',
+        },
+    };
+}
 
-// Match: `.open()` on a lookup of the tag, `querySelector('pdx-autocomplete')` or `('#f pdx-autocomplete')`,
-// with an optional `!` or index. Groups: none
-const LOOKUP_OPEN = /querySelector(?:All)?\s*\(\s*(['"`])[^'"`]*pdx-autocomplete[^'"`]*\1\s*\)\s*(?:\[\s*\d+\s*\])?\s*!?\s*\??\.\s*open\s*\(\s*\)/g;
+const AUTOCOMPLETE_OPEN = openShow('pdx-autocomplete', 'autocomplete');
+const COLOR_PICKER_OPEN = openShow('pdx-color-picker', 'color-picker');
 
-export const autocompleteOpenUnbound: LanguageChange = {
-    id: 'autocomplete-open-unbound',
-    kind: 'removed',
-    scope: 'script',
-    issue: 287,
-    message: '`pdx-autocomplete`\'s `open()` is `show()`.',
-    marker: 'pdx-autocomplete',
-    detect: (text) => [...text.matchAll(LOOKUP_OPEN)].map((m) => ({
-        line: lineAt(text, m.index!), found: m[0],
-        note: 'Not rewritten: the call is on a lookup, not a `:ref` of this file; write `show()` if it is a pdx-autocomplete.',
-    })),
-    fix: 'flag',
-};
+export const autocompleteOpenShow = AUTOCOMPLETE_OPEN.ref;
+export const autocompleteOpenUnbound = AUTOCOMPLETE_OPEN.unbound;
+export const colorPickerOpenShow = COLOR_PICKER_OPEN.ref;
+export const colorPickerOpenUnbound = COLOR_PICKER_OPEN.unbound;
