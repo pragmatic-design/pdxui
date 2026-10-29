@@ -15,7 +15,7 @@ async function mount(attrs: string, mode = 'datetime'): Promise<HTMLElement> {
     document.body.appendChild(host);
     await tick(30);
     // The panel — and with it the time picker — is built on open.
-    (host.querySelector('pdx-date-picker') as any).openPopover();
+    (host.querySelector('pdx-date-picker') as any).show();
     await tick(30);
     return host;
 }

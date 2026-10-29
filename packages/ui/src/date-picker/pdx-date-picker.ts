@@ -2,13 +2,13 @@
 // Modes: date | datetime | daterange | datetimerange | time | week | month | year | quarter
 // Structure: input trigger + popover → calendar panel + optional time + presets sidebar.
 
-import { component, html, signal, model, untracked, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
+import { component, html, signal, model, event, untracked, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
 import type { PopoverReturn } from '@pdxui/core';
 import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, getFiscalYear } from '@pdxui/core';
 import type { CalendarSystem } from '@pdxui/core';
 
 import { resolveLocale } from '../shared/locale';
-import { setOwnProp, reflectNameToHost } from '../shared/own-prop';
+import { setOwnProp } from '../shared/own-prop';
 import { parseTypedDateTime, formatTypedDate, dateAllowed } from './typed-date';
 import '../calendar/pdx-calendar';
 import '../time-picker/pdx-time-picker';
@@ -63,6 +63,17 @@ export interface DatePreset {
  * A date picker composed of a calendar and a time picker, with several selection modes, calendar
  * systems and presets.
  *
+ * @csspart root - The trigger, the combobox unless `editable`: the frame, its border and background.
+ * @csspart input - The text field inside the trigger, while `editable`: the combobox then.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel, a `role="dialog"`, that holds the calendar, the time and the presets.
+ * @csspart preset - A preset button in the panel's sidebar.
+ * @csspart calendar - The `pdx-calendar` the picker draws, in the panel or `inline`.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.getDate()
  * @alphadetail values $event.detail.value
@@ -79,6 +90,18 @@ component('pdx-date-picker', {
     // mode. A choice, a typed date, a preset, Today and the clear button write it, and the write
     // dispatches `value-change`. A form submits it, a range as two entries, and resets it (#135).
     models: { value: model<string | string[]>('', { form: true }) },
+    events: {
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
+        /** Fired when the clear button or `clear()` empties the value, after its `value-change`. */
+        'pdx-clear': event<void>(),
+        /** Fired when the focus leaves the component: the trigger, the panel and what they hold. */
+        'pdx-blur': event<void>(),
+    },
+    // The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+    // from them. The trigger carries no state class.
+    states: ['open', 'disabled', 'readonly'],
+    parts: ['root', 'input', 'clear', 'popup', 'preset', 'calendar'],
     // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -366,6 +389,7 @@ component('pdx-date-picker', {
         function makeCalendar(): HTMLElement {
             const cal = document.createElement('pdx-calendar');
             cal.setAttribute('inline', '');
+            cal.setAttribute('data-part', 'calendar');
             initCalendarStructuralProps(cal);
             cal.addEventListener('value-change', onCalendarChange as EventListener);
             return cal;
@@ -475,19 +499,19 @@ component('pdx-date-picker', {
             _panelEl?.querySelector<HTMLElement>('button:not([disabled]), input:not([type="hidden"]), [tabindex="0"]')?.focus();
         }
 
-        // `pdx-open` / `pdx-close` are announced from `onOpenChange` and nowhere else, because that
-        // is the one place that runs only when the state actually CHANGES: `usePopover.setOpen`
-        // opens with `if (_isOpen.peek() === open) return`. Emitting here instead would announce
-        // work that has not happened — a second `openPopover()` on an open picker would re-fire
-        // `pdx-open`, and `closePopover()` would fire `pdx-close` twice, once itself and once
-        // through the callback it has just triggered: the Done button would emit two.
+        // `open-change` is announced from `onOpenChange` and nowhere else, because that is the one
+        // place that runs only when the state actually CHANGES: `usePopover.setOpen` opens with
+        // `if (_isOpen.peek() === open) return`. Emitting here instead would announce work that has
+        // not happened — a second `show()` on an open picker would re-fire it, and `closePopover()`
+        // would fire it twice, once itself and once through the callback it has just triggered: the
+        // Done button would emit two.
         function closePopover(): void {
             popover?.close();
         }
 
-        /** Imperative API, deliberately open-only and idempotent: `host.openPopover()` is what the
-         *  contract scenario `date-picker-open` calls to reach its state. A toggle here would make
-         *  that scenario open and immediately close on a second call. */
+        /** Open-only and idempotent: `show()`, which the contract scenario `date-picker-open` calls to
+         *  reach its state. A toggle here would make that scenario open and immediately close on a
+         *  second call. */
         function openPopover(): void {
             if (ctx.disabled() || ctx.readonly()) return;
             popover?.open();
@@ -562,8 +586,13 @@ component('pdx-date-picker', {
         let _timeEl: (HTMLElement & { value: string }) | null = null;
         let _calendarEl: any = null;
         let _built = false;
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        reflectNameToHost(ctx);
+        /** The popup is open: the host's :state(open), set where the popover reports a change. */
+        const _open = signal(false);
+        ctx.track(() => {
+            ctx.state('open', _open());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+        });
 
         /** The trigger's name: aria-label, else the placeholder, else date-picker.choose — a string a
          *  locale can reach, not a literal 'Choose date'. */
@@ -664,7 +693,8 @@ component('pdx-date-picker', {
 
                 // Trigger input
                 _triggerEl = document.createElement('div');
-                _triggerEl.className = 'pdx-date-picker-trigger pdx-input-wrap' + (disabled ? ' disabled' : '') + (readonly_ ? ' readonly' : '');
+                // No state class: `disabled` and `readonly` are the host's :state() (#287).
+                _triggerEl.className = 'pdx-date-picker-trigger pdx-input-wrap';
                 _triggerEl.setAttribute('data-part', 'root');
                 // Editable: the text is an input, and the input is the combobox.
                 const editable = (ctx.editable() as boolean) && (modeStr() === 'date' || modeStr() === 'datetime');
@@ -672,6 +702,7 @@ component('pdx-date-picker', {
                     _inputEl = document.createElement('input');
                     _inputEl.type = 'text';
                     _inputEl.className = 'pdx-date-picker-input';
+                    _inputEl.setAttribute('data-part', 'input');
                     _inputEl.autocomplete = 'off';
                     _inputEl.disabled = disabled;
                     _inputEl.readOnly = readonly_;
@@ -719,6 +750,7 @@ component('pdx-date-picker', {
                 _clearEl = document.createElement('button') as HTMLButtonElement;
                 _clearEl.type = 'button';
                 _clearEl.className = 'pdx-input-clear pdx-input-suffix-interactive';
+                _clearEl.setAttribute('data-part', 'clear');
                 _clearEl.textContent = '×';
                 _clearEl.setAttribute('aria-label', getComponentString('date-picker', 'clear')());
                 _clearEl.setAttribute('tabindex', '-1');
@@ -749,6 +781,7 @@ component('pdx-date-picker', {
                 // Panel
                 _panelEl = document.createElement('div');
                 _panelEl.className = 'pdx-date-picker-panel';
+                _panelEl.setAttribute('data-part', 'popup');
                 _panelEl.id = generatedId('pdx-dp-panel');
                 _panelEl.style.display = 'none';
                 // The dialog the trigger's aria-haspopup announces, with a role and a name.
@@ -772,6 +805,7 @@ component('pdx-date-picker', {
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.className = 'pdx-date-picker-preset-btn';
+                        btn.setAttribute('data-part', 'preset');
                         btn.textContent = preset.label;
                         const p = preset;
                         btn.addEventListener('click', () => onPresetClick(p));
@@ -845,9 +879,10 @@ component('pdx-date-picker', {
                         const focusWasInside = !open && !!_panelEl?.contains(document.activeElement);
                         if (_panelEl) _panelEl.style.display = open ? '' : 'none';
                         if (_comboEl) _comboEl.setAttribute('aria-expanded', String(open));
+                        _open.set(open);
                         if (open) {
                             focusIntoPanel();
-                            ctx.emit('pdx-open', undefined, { bubbles: false });
+                            ctx.emit('open-change', { value: true });
                         }
                         if (focusWasInside) _comboEl?.focus();
                         if (!open) {
@@ -855,7 +890,7 @@ component('pdx-date-picker', {
                             // dangling start lingers as a selection that was never committed as a value
                             // ("the pre-order is left dangling outside"). Reverts to the committed rangeStart prop.
                             if (_internalRangeStart() && !_internalRangeEnd()) _internalRangeStart.set('');
-                            ctx.emit('pdx-close', undefined, { bubbles: false });
+                            ctx.emit('open-change', { value: false });
                         }
                     },
                 });
@@ -900,6 +935,10 @@ component('pdx-date-picker', {
                     _inputEl.placeholder = ph;
                     if (!_typing) _inputEl.value = display ? typedText() : '';
                 }
+                // `disabled` and `readonly` set after the build: the combobox leaves the tab order, the
+                // editable input follows (#287).
+                if (_comboEl && _comboEl === _triggerEl) _comboEl.setAttribute('tabindex', disabled ? '-1' : '0');
+                if (_inputEl) { _inputEl.disabled = disabled; _inputEl.readOnly = readonly_; }
                 // Toggle clear button
                 if (_clearEl) {
                     _clearEl.style.display = (clearable && display && !disabled && !readonly_) ? '' : 'none';
@@ -915,12 +954,8 @@ component('pdx-date-picker', {
             });
         });
 
-        // Exposes the methods on the host: the setup's `return {}` gives them only to the render context,
-        // NOT to the DOM element. Without it, host.openPopover() (the imperative API) is undefined.
-        (ctx.el as unknown as Record<string, unknown>).openPopover = openPopover;
-        (ctx.el as unknown as Record<string, unknown>).closePopover = closePopover;
-
-        // Imperative API: focus/blur/clear, and the parts of the value
+        // Imperative API: focus/blur/clear, the parts of the value, and the popup driven by the overlay
+        // verbs (#287), which replace the undeclared openPopover/closePopover.
         ctx.expose({
             /** The date chosen, ISO: the range's start in a range or week mode; '' with none. */
             getDate(): string { return holdsRange() ? _internalRangeStart.peek() : _internalValue.peek(); },
@@ -933,9 +968,17 @@ component('pdx-date-picker', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() { onClear(); },
+            /** Open the popup; open already, it stays open. */
+            show() { openPopover(); },
+            /** Close the popup. */
+            close() { closePopover(); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { togglePopover(); },
         });
 
         return { openPopover, closePopover, onClear };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

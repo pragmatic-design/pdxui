@@ -383,6 +383,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-date-picker` takes the beta contract (#287), as `pdx-cascader` did.
+  - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
+    `pdx-close`, once per change, and the host is in `:state(open)` while it is open. `pdx migrate`
+    rewrites the listeners.
+  - **The overlay verbs.** `show()`, `close()` and `toggle()` drive the panel. `openPopover()` and
+    `closePopover()`, set on the element undeclared, are gone; `pdx migrate` rewrites the calls.
+  - **States and parts.** `disabled` and `readonly` are custom states on the host; the trigger no
+    longer carries their classes. `disabled` and `readonly` set after the mount now reach the trigger,
+    which leaves the tab order, and the editable input. The parts are `root` (the trigger), `input`
+    (`editable`), `clear`, `popup`, `preset` and `calendar`.
 - **Breaking:** `pdx-transfer` takes the beta contract (#287).
   - **The model is the way.** `getValue()` and `setValue()` are gone: read and set `value`, the
     target values. `pdx migrate` rewrites `getValue()` on a `:ref` to `.value` and flags `setValue()`.
@@ -393,8 +403,8 @@ semver.
     `aria-required` and `aria-invalid` with the field, though they filter and are not the value. The
     field leaves them alone now, as it does `pdx-json-editor`'s sub-fields; the group is named by the
     label and described by the hint and the error (A1, A2).
-  - **Not done:** `size` sets a class no stylesheet reads, so it draws nothing today; whether it gets
-    sizes or goes is left to a decision on #287.
+  - **Not done:** `size` sets a class no stylesheet reads, so it draws nothing today; it becomes a
+    real sm/md/lg axis in #748.
 - **Breaking:** `pdx-tree-select` takes the beta contract (#287), as `pdx-cascader` did.
   - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
     `pdx-close`, once per change. `show()`, `close()` and `toggle()` replace the undeclared

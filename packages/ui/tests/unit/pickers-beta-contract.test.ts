@@ -14,6 +14,7 @@ import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer';
+import '../../src/date-picker/pdx-date-picker';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -89,6 +90,18 @@ const DONE: Row[] = [
         popup: false,
         methods: ['clear', 'getChanges', 'getDirection'],
         removedMethods: ['getValue', 'setValue'],
+    },
+    {
+        tag: 'pdx-date-picker',
+        model: 'value',
+        // The trigger's `aria-invalid` on a typed date that cannot be read is the input's own, not a state.
+        states: ['open', 'disabled', 'readonly'],
+        // The calendar inside the popup is a part: its own parts are pdx-calendar's row.
+        parts: ['root', 'input', 'clear', 'popup', 'preset', 'calendar'],
+        popup: true,
+        methods: ['getDate', 'getRange', 'getTime', 'getEndTime', 'focus', 'blur', 'clear', 'show', 'close', 'toggle'],
+        // openPopover/closePopover were set on the element undeclared, and are the overlay verbs.
+        removedMethods: ['openPopover', 'closePopover'],
     },
 ];
 

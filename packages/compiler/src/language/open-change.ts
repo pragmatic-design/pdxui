@@ -22,14 +22,15 @@
 // are pdx-select's alone — a DataSource's `toggleSelect(id)` takes an argument, a call with none is the
 // select's — so the rewrite is mechanical wherever the call is written. `pdx-cascader`'s undeclared
 // `openCascader()` and `closeCascader()`, and `pdx-tree-select`'s `openTreeSelect()` and
-// `closeTreeSelect()`, are `show()` and `close()` the same way.
+// `closeTreeSelect()`, are `show()` and `close()` the same way, and so are `pdx-date-picker`'s
+// `openPopover()` and `closePopover()` — no other component set those names on its element.
 
 import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from './changes';
 import { parseSFC } from '../parser/sfc';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
-export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select']);
+export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select', 'pdx-date-picker']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -207,10 +208,18 @@ const TREE_SELECT_VERBS: AliasVerbs = {
     verbs: { openTreeSelect: 'show', closeTreeSelect: 'close' },
 };
 
+const DATE_PICKER_VERBS: AliasVerbs = {
+    id: 'date-picker-overlay-verbs',
+    message: '`pdx-date-picker` drives its popup with the overlay verbs: `openPopover()` is `show()`, `closePopover()` is `close()`.',
+    verbs: { openPopover: 'show', closePopover: 'close' },
+};
+
 export const cascaderOverlayVerbs = aliasVerbs(CASCADER_VERBS, 'pdx');
 export const cascaderOverlayVerbsScript = aliasVerbs(CASCADER_VERBS, 'script');
 export const treeSelectOverlayVerbs = aliasVerbs(TREE_SELECT_VERBS, 'pdx');
 export const treeSelectOverlayVerbsScript = aliasVerbs(TREE_SELECT_VERBS, 'script');
+export const datePickerOverlayVerbs = aliasVerbs(DATE_PICKER_VERBS, 'pdx');
+export const datePickerOverlayVerbsScript = aliasVerbs(DATE_PICKER_VERBS, 'script');
 
 // `pdx-autocomplete`'s `open()` is `show()`; its `close()` stays (#287). `open()` is a common name — a
 // dialog has one — so the call is rewritten only where its receiver is tied to the tag by the text:

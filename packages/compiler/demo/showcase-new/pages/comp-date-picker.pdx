@@ -77,9 +77,24 @@
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>value-change</code><span>{ value }</span><span>Its model: the date, the date and its time, or <code>[start, end]</code> for a range</span></div>
-        <div class="opt-row"><code>pdx-open</code><span>—</span><span>Popover opened</span></div>
-        <div class="opt-row"><code>pdx-close</code><span>—</span><span>Popover closed</span></div>
+        <div class="opt-row"><code>open-change</code><span>{ value: boolean }</span><span>The popup opened (<code>true</code>) or closed (<code>false</code>)</span></div>
         <div class="opt-row"><code>pdx-clear</code><span>—</span><span>Value cleared</span></div>
+        <div class="opt-row"><code>pdx-blur</code><span>—</span><span>The focus left the picker and its panel</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The popup is an overlay: driven by its verbs, announced by <code>open-change</code>. What a theme or a page
+        styles on <code>&lt;pdx-date-picker&gt;</code>: its custom states on the host and its parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Method, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>show() / close() / toggle()</code><span></span><span>Open, close or toggle the popup</span></div>
+        <div class="opt-row"><code>getDate() / getRange() / getTime() / getEndTime()</code><span></span><span>The parts of the value: the date, the range a mode covers, the times</span></div>
+        <div class="opt-row"><code>focus() / blur() / clear()</code><span></span><span>Focus the trigger, leave it, empty the value</span></div>
+        <div class="opt-row"><code>:state(open) / :state(disabled) / :state(readonly)</code><span></span><span>The popup is open; <code>disabled</code> or <code>readonly</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="input"] / [data-part="clear"]</code><span></span><span>The trigger; its text field when <code>editable</code>; the clear button</span></div>
+        <div class="opt-row"><code>[data-part="popup"] / [data-part="preset"] / [data-part="calendar"]</code><span></span><span>The panel, a dialog; a preset button; the calendar it draws</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard Shortcuts</h3>

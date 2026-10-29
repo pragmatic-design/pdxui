@@ -7,7 +7,8 @@
  *
  * ── DOM structure (light DOM, built imperatively in an rAF, pdx-date-picker.ts:325) ──
  *   <pdx-date-picker>                                       ← host
- *     <div class="pdx-date-picker-trigger pdx-input-wrap [pdx-input-{size}] [disabled] [readonly]"  ← box from .pdx-input-wrap
+ *     <div class="pdx-date-picker-trigger pdx-input-wrap" data-part="root"  ← box from .pdx-input-wrap; size, disabled,
+ *                                                       readonly and open are the host's (attribute, :state()), #287
  *          role="combobox"                                  ← trigger (date-picker.ts:355)
  *          aria-expanded="false|true"
  *          aria-haspopup="dialog"
@@ -48,8 +49,8 @@
  *   dismissOnEscape:true). ONE open scenario → no two popovers fighting over the selectors.
  *
  * ── HOW IT OPENS (CRITICAL — verified in the source) ──
- *   `openPopover` IS exposed on the host: it is in the setup's return (date-picker.ts:566) → it becomes a method of the
- *   custom element → `host.openPopover()`. The open scenario calls it in the setup (opened programmatically, NOT through an attribute).
+ *   The overlay verbs are exposed on the host (#287): `host.show()`, `close()`, `toggle()`. The open scenario
+ *   calls `show()` in the setup (opened programmatically, NOT through an attribute).
  *   The alternatives in the source: a click on the trigger (date-picker.ts:387) or an Enter/Space/ArrowDown keydown
  *   (date-picker.ts:388). There is NO `open` prop → opening through the setup is the only clean declarative way.
  *   Note: the popover does NOT use a focus trap (it is dropdown-style, not a modal dialog) → no risk of aria-hidden
@@ -62,7 +63,7 @@
  *   on June 2024 (calendar initView: parseISO(value) → viewYear=2024, viewMonth=6, date-picker.ts:147
  *   synchronises _internalValue, calendar.ts:92-98). A fixed month → the title "June 2024", a stable grid.
  *   The DOM is built in an rAF (the host) plus a setTimeout/rAF (the calendar): the runner waits for networkidle and the
- *   standard timeout before measuring; the open scenario calls openPopover in the post-mount setup.
+ *   standard timeout before measuring; the open scenario calls show() in the post-mount setup.
  *
  * ── a11y (verified) ──
  *   The trigger is role="combobox" + aria-haspopup="dialog" + aria-expanded. Its ACCESSIBLE NAME comes ONLY
@@ -101,7 +102,7 @@ export const datePicker: ComponentManifest = {
         },
         {
             // The ONE open scenario: the floating panel made visible through the setup (a programmatic opening).
-            // openPopover() is exposed on the host (the setup's return, date-picker.ts:566). Called after the mount.
+            // show() is exposed on the host, an overlay verb (#287). Called after the mount.
             // a fixed value → the calendar on June 2024 (the title "June 2024", a stable grid).
             id: 'date-picker-open',
             title: 'Date Picker — Open (calendar popover below the input)',
@@ -124,9 +125,9 @@ export const datePicker: ComponentManifest = {
             // ring (#737): the setup waits for the focus to enter the panel, an event, not a delay.
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-open"]');
-                if (host && typeof host.openPopover === 'function') {
+                if (host && typeof host.show === 'function') {
                     const focused = new Promise((resolve) => host.addEventListener('focusin', resolve, { once: true }));
-                    host.openPopover();
+                    host.show();
                     await focused;
                 }`,
         },
@@ -145,7 +146,7 @@ export const datePicker: ComponentManifest = {
                 </div>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-month"]');
-                if (host && typeof host.openPopover === 'function') host.openPopover();`,
+                if (host && typeof host.show === 'function') host.show();`,
         },
         {
             // Editable: the text is an input with the combobox role, the icon the "Choose
@@ -187,19 +188,19 @@ export const datePicker: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-date-picker-trigger { display: inline-flex } → box visibile (CSS:4-9).
-                        selector: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger',
+                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
                         description: 'trigger is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:5 → cursor: pointer → interactive.
-                        selector: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger',
+                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
                         description: 'trigger is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The trigger's radius (from .pdx-input-wrap) is non-negative (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger',
+                        selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
                         description: 'trigger radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -227,8 +228,8 @@ export const datePicker: ComponentManifest = {
                 positioning: [
                     {
                         description: 'date picker calendar opens below the trigger, one float-offset away',
-                        trigger: { selector: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger', action: 'click' },
-                        floating: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-panel',
+                        trigger: { selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]', action: 'click' },
+                        floating: 'section:not([hidden]) [data-test="dp"] [data-part="popup"]',
                         placement: 'bottom',
                         gap: { op: '==', value: 4, tolerance: 1 },
                         withinViewport: true,
@@ -239,7 +240,7 @@ export const datePicker: ComponentManifest = {
                     {
                         // The icon and the text are contained in the trigger (the layout holds).
                         description: 'icon and text are contained within the trigger box',
-                        parent: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger',
+                        parent: 'section:not([hidden]) [data-test="dp"] [data-part="root"]',
                         children: {
                             trigger: '.pdx-date-picker-trigger',
                             icon: '.pdx-date-picker-icon',
@@ -255,23 +256,33 @@ export const datePicker: ComponentManifest = {
             },
 
             // Open: the panel (display:'' through onOpenChange) sits UNDER the trigger. An overlay with no backdrop.
-            // The panel is ALREADY open from the setup (openPopover) → action:'call' = the state is on.
+            // The panel is ALREADY open from the setup (show()) → action:'call' = the state is on.
             'date-picker-open': {
+                // Open is a custom state of the host (#287), what a theme selects.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="dp-open"]', name: 'open' },
+                        changes: {},
+                    },
+                ],
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                        selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         description: 'open calendar panel is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:54 → min-width: 300px → a measurable width at a 1280 viewport.
-                        selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                        selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         description: 'open calendar panel has an appreciable width',
                         width: { op: '>=', value: 200 },
                     },
                     {
                         // CSS:51 → border-radius: var(--pdx-radius-lg) → non-negative (the radius-zero themes zero it).
-                        selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                        selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         description: 'open calendar panel has non-negative radius',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -280,8 +291,8 @@ export const datePicker: ComponentManifest = {
                     {
                         // Dropdown-style: a floating panel, no backdrop. action:'call' → already opened by the setup.
                         description: 'open date picker shows the calendar panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                        trigger: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -294,8 +305,8 @@ export const datePicker: ComponentManifest = {
                         // Scoped like the parent: the bare trigger class finds a hidden scenario's
                         // trigger (0×0), and `0 <= panel.top` would hold without measuring.
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger',
-                            panel: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                            trigger: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]',
+                            panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         },
                         relations: [
                             { description: 'panel.top >= trigger.bottom (below)', left: 'trigger.bottom', op: '<=', right: 'panel.top', tolerance: 2 },
@@ -304,11 +315,11 @@ export const datePicker: ComponentManifest = {
                     {
                         // The calendar (the grid) is contained in the panel.
                         description: 'the calendar grid is contained within the panel',
-                        parent: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                        parent: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                         // Scoped like the parent: bare classes find the first calendar in the
                         // document, in a hidden scenario (0×0).
                         children: {
-                            panel: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-panel',
+                            panel: 'section:not([hidden]) [data-test="dp-open"] [data-part="popup"]',
                             grid: 'section:not([hidden]) [data-test="dp-open"] .pdx-cal-grid',
                         },
                         relations: [
@@ -322,10 +333,19 @@ export const datePicker: ComponentManifest = {
             'date-picker-disabled': {
                 standalone: [
                     {
-                        // .pdx-date-picker-trigger.disabled → the cursor is not pointer (it reuses the .pdx-input-wrap.disabled pattern).
-                        selector: 'section:not([hidden]) [data-test="dp-dis"] .pdx-date-picker-trigger',
+                        // :state(disabled) > .pdx-date-picker-trigger → the cursor is not pointer.
+                        selector: 'section:not([hidden]) [data-test="dp-dis"] [data-part="root"]',
                         description: 'disabled trigger is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="dp-dis"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="dp-dis"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -348,7 +368,7 @@ export const datePicker: ComponentManifest = {
     isolation: {
         scenario: 'date-picker-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="dp"] .pdx-date-picker-trigger', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dp"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -356,24 +376,24 @@ export const datePicker: ComponentManifest = {
     // The combobox trigger is tabindex="0" and focusable. onKeydown on the trigger (date-picker.ts:388): Enter/Space/ArrowDown
     //   open → aria-expanded="true". usePopover dismissOnEscape:true → Escape closes → aria-expanded goes back to "false".
     // Pattern 'dialog' (a popover with Esc). initialFocus = the trigger. aria-expanded is checked through expectAttr
-    //   (deterministic and readable from the DOM). It starts from the open scenario (openPopover in the setup):
+    //   (deterministic and readable from the DOM). It starts from the open scenario (show() in the setup):
     //   first the open state is asserted, then the close through Escape.
     keyboard: {
         scenario: 'date-picker-open',
-        initialFocus: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger',
+        initialFocus: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]',
         steps: [
             // Open (through the setup): aria-expanded must be true.
-            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger', name: 'aria-expanded', value: 'true' } },
+            { key: 'ArrowDown', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'true' } },
             // Escape closes → aria-expanded goes back to false (onOpenChange sets aria-expanded=String(open)).
-            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger', name: 'aria-expanded', value: 'false' } },
+            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' } },
             // Reopened from the keyboard: the focus enters the dialog, on the chosen day.
             { key: 'ArrowDown',
                 expectFocus: 'section:not([hidden]) [data-test="dp-open"] [role="dialog"] [data-iso="2024-06-15"]' },
             { key: 'ArrowRight', expectFocus: 'section:not([hidden]) [data-test="dp-open"] [data-iso="2024-06-16"]' },
             // Enter chooses and closes; the focus returns to the trigger, not to <body>.
             { key: 'Enter',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger', name: 'aria-expanded', value: 'false' },
-                expectFocus: 'section:not([hidden]) [data-test="dp-open"] .pdx-date-picker-trigger' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' },
+                expectFocus: 'section:not([hidden]) [data-test="dp-open"] [data-part="root"]' },
         ],
     },
 

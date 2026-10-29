@@ -67,10 +67,17 @@ leaves both the field and its panel).
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
+| `show()` | Open the popup; open already, it stays open. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 
-**Events:** `pdx-blur` — Fired when it loses focus.; `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `pdx-blur` — Fired when the focus leaves the component: the trigger, the panel and what they hold.; `pdx-clear` — Fired when the clear button or `clear()` empties the value, after its `value-change`.; `value-change` → `detail: { value: string | string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `dialog`
+
+**States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.
+
+**Parts:** `[data-part="root"]` — The trigger, the combobox unless `editable`: the frame, its border and background.; `[data-part="input"]` — The text field inside the trigger, while `editable`: the combobox then.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and not `disabled`.; `[data-part="popup"]` — The floating panel, a `role="dialog"`, that holds the calendar, the time and the presets.; `[data-part="preset"]` — A preset button in the panel's sidebar.; `[data-part="calendar"]` — The `pdx-calendar` the picker draws, in the panel or `inline`.
 
 **Shapes:** `DatePreset { label: string; value: string | [string, string] }`
 

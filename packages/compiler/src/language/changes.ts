@@ -41,7 +41,7 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from './open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from './open-change';
 import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
 
 /** What a change is, by `migration.md`'s classes. */
@@ -416,6 +416,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     cascaderOverlayVerbsScript,
     treeSelectOverlayVerbs,
     treeSelectOverlayVerbsScript,
+    datePickerOverlayVerbs,
+    datePickerOverlayVerbsScript,
     // #287: getValue()/setValue() duplicated a picker's model (./model-methods).
     modelGetValue,
     modelSetValue,
