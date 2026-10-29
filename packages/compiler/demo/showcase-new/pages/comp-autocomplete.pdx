@@ -75,6 +75,28 @@
             <tr><td><code>value-change</code></td><td><code>{ value }</code></td><td>Its model: fired when a value is committed — a suggestion chosen, free text confirmed, or the field cleared. <code>value</code> is the suggestion's value field, the string itself for string suggestions; <code>getText()</code> is the text shown and <code>getSelectedItem()</code> the suggestion.</td></tr>
             <tr><td><code>query-change</code></td><td><code>{ value }</code></td><td>Fired on every keystroke, with the text typed: the query, which is not the value.</td></tr>
             <tr><td><code>pdx-clear</code></td><td>—</td><td>Fired when clear button is clicked.</td></tr>
+            <tr><td><code>open-change</code></td><td><code>{ value }</code></td><td>The suggestions popup opened (<code>true</code>) or closed (<code>false</code>), once per change.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The popup is driven by the overlay verbs. What a theme or a page styles on <code>&lt;pdx-autocomplete&gt;</code>:
+        its custom states on the host and its parts. The classes inside are not public.
+      </p>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Method, state or part</th><th>What it is</th></tr></thead>
+          <tbody>
+            <tr><td><code>show() / close() / toggle()</code></td><td>Open, close, or flip the popup</td></tr>
+            <tr><td><code>clear() / getText() / getSelectedItem()</code></td><td>Empty the field; the text shown; the suggestion picked</td></tr>
+            <tr><td><code>:state(open)</code></td><td>The popup is open</td></tr>
+            <tr><td><code>:state(invalid) / :state(success) / :state(warning)</code></td><td><code>error</code> / <code>success</code> / <code>warning</code> is set</td></tr>
+            <tr><td><code>:state(disabled) / :state(readonly) / :state(loading)</code></td><td><code>disabled</code> / <code>readonly</code> is set; loading</td></tr>
+            <tr><td><code>[data-part="root"] / [data-part="input"]</code></td><td>The frame; the text input, the combobox</td></tr>
+            <tr><td><code>[data-part="clear"] / [data-part="spinner"]</code></td><td>The clear button; the loading spinner</td></tr>
+            <tr><td><code>[data-part="popup"] / [data-part="list"] / [data-part="option"]</code></td><td>The floating panel, the listbox, a suggestion</td></tr>
           </tbody>
         </table>
       </div>

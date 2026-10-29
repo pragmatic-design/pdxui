@@ -6,7 +6,6 @@ import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/autocomplete';
@@ -49,6 +48,22 @@ function buildHighlight(label: string, query: string): HTMLSpanElement {
  *
  * @slot option - Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
  *
+ * @csspart root - The frame: border, background and the states' colours.
+ * @csspart input - The native `<input>`, the combobox.
+ * @csspart clear - The clear button, while `clearable` and something is typed.
+ * @csspart spinner - The loading spinner, while loading.
+ * @csspart popup - The floating panel that holds the list.
+ * @csspart list - The `role="listbox"`.
+ * @csspart option - A suggestion of the list.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set, or the DataSource is loading.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
@@ -67,7 +82,13 @@ component('pdx-autocomplete', {
         'query-change': event<{ value: string }>(),
         /** Fired when the clear button empties the field, after its `value-change`. */
         'pdx-clear': event<void>(),
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
     },
+    // The visual states, on the host as custom states (#132, #287): the design CSS draws the frame and
+    // the popup from them. Neither carries a state class.
+    states: ['open', 'invalid', 'success', 'warning', 'disabled', 'readonly', 'loading'],
+    parts: ['root', 'input', 'clear', 'spinner', 'popup', 'list', 'option'],
     // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -212,21 +233,22 @@ component('pdx-autocomplete', {
             }
         });
 
-        const filteredItems = computed((): NormalisedOption[] => {
+        /** Every suggestion that matches the query, before `maxItems` cuts the list. */
+        const matches = computed((): NormalisedOption[] => {
             const q = _query().toLowerCase().trim();
             const min = ctx.minLength() as number;
             if (!q || q.length < min) return [];
-            const max = ctx.maxItems() as number;
             const items = allItems();
-            // Remote mode: DS already filtered server-side, just slice
+            // Remote mode: DS already filtered server-side
             // But don't show stale results while debounce/loading is in flight
             if (ctx.remote() && _externalDS()) {
                 if (_pendingRemote()) return [];
-                return items.slice(0, max);
+                return items;
             }
             // Default: client-side filter
-            return items.filter(i => i.label.toLowerCase().includes(q)).slice(0, max);
+            return items.filter(i => i.label.toLowerCase().includes(q));
         });
+        const filteredItems = computed((): NormalisedOption[] => matches().slice(0, ctx.maxItems() as number));
 
         // ── Actions ──
         function open() {
@@ -237,6 +259,9 @@ component('pdx-autocomplete', {
         function close() {
             _open.set(false);
             _activeIndex.set(-1);
+        }
+        function toggle() {
+            if (_open()) close(); else open();
         }
 
         function selectSuggestion(item: NormalisedOption) {
@@ -382,15 +407,25 @@ component('pdx-autocomplete', {
             return ds ? ds.isLoading() : false;
         });
 
-        const wrapClass = computed(() => {
-            let cls = 'pdx-autocomplete pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.readonly()) cls += ' readonly';
-            if (ctx.error()) cls += ' pdx-input-error';
-            if (ctx.success()) cls += ' pdx-input-success';
-            if (ctx.warning()) cls += ' pdx-input-warning';
-            if (_focused()) cls += ' focused';
-            return cls;
+        ctx.track(() => {
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('success', !!ctx.success());
+            ctx.state('warning', !!ctx.warning());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('loading', isLoading());
+        });
+
+        // The popup's open state, announced when it changes (#287) — `_open` is written from the keys,
+        // the input, the remote results and the methods alike, and a keystroke that keeps it open
+        // announces nothing. Untracked: a handler's reads do not subscribe this effect.
+        let _announced = false;
+        ctx.track(() => {
+            const isOpen = _open();
+            ctx.state('open', isOpen);
+            if (isOpen === _announced) return;
+            _announced = isOpen;
+            untracked(() => ctx.emit('open-change', { value: isOpen }));
         });
 
         // Popover setup: deferred to after mount (querySelector needs rendered DOM)
@@ -449,8 +484,15 @@ component('pdx-autocomplete', {
             if (_blurTimer) clearTimeout(_blurTimer);
         });
 
+        // The popup is driven with the overlay verbs (#287): `show()` is the alpha `open()`.
         ctx.expose({
-            open, close, clear,
+            /** Open the popup. */
+            show() { open(); },
+            /** Close the popup. */
+            close() { close(); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { toggle(); },
+            clear,
             /** The text the field shows: the picked suggestion's label, or the free text. */
             getText(): string { return _query.peek(); },
             /** The suggestion last picked, as given; null when the value is free text or set from outside. */
@@ -465,9 +507,6 @@ component('pdx-autocomplete', {
             const v = ctx.value();
             return q === _committed || ctx.forceSelection() ? v : q;
         });
-        // The host is the one submitter. A hidden input carrying the name would send the value a
-        // second time.
-        reflectNameToHost(ctx);
 
         // Slot — read lazily (_projectSlots runs after setup)
         function getOptionSlot(): SlotFunction | undefined {
@@ -477,17 +516,21 @@ component('pdx-autocomplete', {
         return {
             uid, listboxId,
             _open, _query, _activeIndex, _focused,
-            filteredItems, isLoading, wrapClass,
+            filteredItems, matches, isLoading,
             onInput, onFocus, onBlur, onKeydown,
             selectSuggestion, clear,
             getOptionSlot,
         };
     },
+    // The host is the one submitter, in FormData under its `name` (#133). A hidden input carrying the
+    // name would send the value a second time.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root">
-            <input class="pdx-input pdx-autocomplete-input"
+        <div class="pdx-autocomplete pdx-input-wrap" data-part="root">
+            <input class="pdx-input pdx-autocomplete-input" data-part="input"
                 type="text"
                 role="combobox"
+                :aria-invalid="${() => ctx.error() ? 'true' : null}"
                 autocomplete="off"
                 data-lpignore="true" data-1p-ignore="" data-form-type="other"
                 :value="${ctx._query}"
@@ -509,19 +552,19 @@ component('pdx-autocomplete', {
                 @keydown="${ctx.onKeydown}" />
 
             ${() => ctx.clearable() && ctx._query()
-                ? html`<button class="pdx-input-clear" type="button" tabindex="-1"
+                ? html`<button class="pdx-input-clear" data-part="clear" type="button" tabindex="-1"
                     :aria-label="${() => uiString('autocomplete', 'clear')}"
                     @mousedown="${(e: Event) => { e.preventDefault(); ctx.clear(); }}">×</button>`
                 : ''
             }
 
             ${() => ctx.isLoading()
-                ? html`<span class="pdx-input-spinner"></span>`
+                ? html`<span class="pdx-input-spinner" data-part="spinner"></span>`
                 : ''
             }
         </div>
 
-        <div :class="${() => 'pdx-autocomplete-dropdown' + (ctx._open() ? ' open' : '')}">
+        <div class="pdx-autocomplete-dropdown" data-part="popup">
             <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">
                 ${() => {
                     const items = ctx.filteredItems();
@@ -530,8 +573,9 @@ component('pdx-autocomplete', {
                     return n === 0 ? uiString('autocomplete', 'noResults') : format(uiString('autocomplete', 'resultsAvailable'), { n });
                 }}
             </span>
-            <div class="pdx-autocomplete-list"
+            <div class="pdx-autocomplete-list" data-part="list"
                 role="listbox"
+                :aria-busy="${() => ctx.isLoading() ? 'true' : null}"
                 :id="${() => ctx.listboxId}">
                 ${() => {
                     const items = ctx.filteredItems();
@@ -542,8 +586,12 @@ component('pdx-autocomplete', {
                             : '';
                     }
                     return items.map((item: NormalisedOption, idx: number) =>
+                        // `maxItems` shows part of the matches: each says where it stands among all of
+                        // them, or a screen reader counts the rendered ones (A3, #287).
                         html`<div class="${() => 'pdx-autocomplete-option' + (ctx._activeIndex() === idx ? ' active' : '')}"
-                            role="option"
+                            role="option" data-part="option"
+                            :aria-setsize="${() => String(ctx.matches().length)}"
+                            :aria-posinset="${() => String(idx + 1)}"
                             :id="${() => ctx.uid + '-sug-' + idx}"
                             data-suggestion-index="${() => idx}"
                             :aria-selected="${() => ctx._activeIndex() === idx ? 'true' : 'false'}"

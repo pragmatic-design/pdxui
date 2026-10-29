@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -92,9 +92,47 @@ describe('select-overlay-verbs: pdx-select\'s popup methods are the overlay verb
     });
 });
 
+describe('autocomplete-open-show: pdx-autocomplete\'s open() is show()', () => {
+    const fix = autocompleteOpenShow.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-autocomplete of the file, in its template and its script (the issue\'s case)', () => {
+        const source = '<template><pdx-autocomplete :ref="ac"></pdx-autocomplete><button @click="ac.open()">Find</button></template>\n<script>\nlet ac = $signal(null);\nfunction focusFind() { ac?.open(); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="ac.show()"');
+        expect(out).toContain('ac?.show();');
+        expect(autocompleteOpenShow.detect(out)).toEqual([]);
+        expect(fix(out)).toBe(out);
+    });
+
+    it('a ref on another component, or a name the file does not bind to a pdx-autocomplete, is left', () => {
+        const source = '<template><pdx-dialog :ref="dlg"></pdx-dialog><pdx-autocomplete :ref="ac"></pdx-autocomplete></template>\n<script>\nfunction f() { dlg.open(); other.open(); }\n</script>';
+        expect(autocompleteOpenShow.detect(source)).toEqual([]);
+        expect(fix(source)).toBe(source);
+    });
+
+    it('`close()` stays', () => {
+        const source = '<template><pdx-autocomplete :ref="ac"></pdx-autocomplete><button @click="ac.close()">x</button></template>';
+        expect(fix(source)).toBe(source);
+    });
+});
+
+describe('autocomplete-open-unbound: a call the text cannot tie to the tag is flagged', () => {
+    it('`document.querySelector(\'pdx-autocomplete\').open()` is flagged and left (the issue\'s case)', () => {
+        const source = "document.querySelector('pdx-autocomplete').open();";
+        const found = autocompleteOpenUnbound.detect(source);
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('show()');
+        expect(autocompleteOpenUnbound.fix).toBe('flag');
+    });
+
+    it('a querySelector of another tag is not reported', () => {
+        expect(autocompleteOpenUnbound.detect("document.querySelector('pdx-dialog').open();")).toEqual([]);
+    });
+});
+
 describe('the registry', () => {
-    it('holds the three entries, each removed, for #287', () => {
-        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script']) {
+    it('holds the #287 entries, each removed', () => {
+        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script', 'autocomplete-open-show', 'autocomplete-open-unbound']) {
             const entry = languageChanges().find((c) => c.id === id);
             expect(entry?.kind, id).toBe('removed');
             expect(entry?.issue).toBe(287);

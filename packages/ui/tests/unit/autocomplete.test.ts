@@ -50,18 +50,22 @@ describe('pdx-autocomplete', () => {
         expect(input?.getAttribute('aria-autocomplete')).toBe('list');
     });
 
-    it('applies disabled state', async () => {
+    // The states are the host's custom states (#287), measured in Chromium by
+    // autocomplete-beta-contract.spec.ts; here, what the input says of it, and no class on the frame.
+    it('disabled disables the input, and the frame carries no state class', async () => {
         const el = create({ disabled: '' });
         await tick();
-        const wrap = el.querySelector('.pdx-autocomplete');
-        expect(wrap?.classList.contains('disabled')).toBe(true);
+        expect((el.querySelector('input[role="combobox"]') as HTMLInputElement).disabled).toBe(true);
+        expect(el.querySelector('.pdx-autocomplete')?.classList.contains('disabled')).toBe(false);
     });
 
-    it('exposes open/close/clear API', async () => {
+    it('exposes the overlay verbs show/close/toggle and clear; open() is gone', async () => {
         const el = create();
         await tick();
-        expect(typeof el.open).toBe('function');
+        expect(typeof el.show).toBe('function');
         expect(typeof el.close).toBe('function');
+        expect(typeof el.toggle).toBe('function');
         expect(typeof el.clear).toBe('function');
+        expect('open' in el).toBe(false);
     });
 });

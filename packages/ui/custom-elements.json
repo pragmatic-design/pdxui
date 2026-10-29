@@ -1305,15 +1305,21 @@
             },
             {
               "kind": "method",
-              "name": "open",
+              "name": "show",
               "parameters": [],
-              "description": "Opens it."
+              "description": "Open the popup."
             },
             {
               "kind": "method",
               "name": "close",
               "parameters": [],
-              "description": "Closes it."
+              "description": "Close the popup."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Open the popup when closed, close it when open."
             },
             {
               "kind": "method",
@@ -1385,6 +1391,14 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the clear button empties the field, after its `value-change`."
+            },
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).",
+              "detail": "{ value: boolean }"
             },
             {
               "name": "value-change",
@@ -1588,6 +1602,66 @@
               "name": "option",
               "description": "Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).",
               "signature": "(option: { label: string; value: unknown; raw: T }, index: number, highlighted: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: border, background and the states' colours."
+            },
+            {
+              "name": "input",
+              "description": "The native `<input>`, the combobox."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable` and something is typed."
+            },
+            {
+              "name": "spinner",
+              "description": "The loading spinner, while loading."
+            },
+            {
+              "name": "popup",
+              "description": "The floating panel that holds the list."
+            },
+            {
+              "name": "list",
+              "description": "The `role=\"listbox\"`."
+            },
+            {
+              "name": "option",
+              "description": "A suggestion of the list."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "The popup is open."
+            },
+            {
+              "name": "invalid",
+              "description": "`error` is set."
+            },
+            {
+              "name": "success",
+              "description": "`success` is set."
+            },
+            {
+              "name": "warning",
+              "description": "`warning` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set, or the DataSource is loading."
             }
           ],
           "x-pdx-context": {

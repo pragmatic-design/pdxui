@@ -41,7 +41,7 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript } from './open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from './open-change';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -409,6 +409,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     openChangeEvent,
     selectOverlayVerbs,
     selectOverlayVerbsScript,
+    autocompleteOpenShow,
+    autocompleteOpenUnbound,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

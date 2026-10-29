@@ -83,7 +83,7 @@
         }); },
         "autocomplete-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="ac-open"]');
-                const input = host && host.querySelector('input.pdx-autocomplete-input');
+                const input = host && host.querySelector('input[data-part="input"]');
                 if (input) {
                     input.focus();
                     input.value = 'It';

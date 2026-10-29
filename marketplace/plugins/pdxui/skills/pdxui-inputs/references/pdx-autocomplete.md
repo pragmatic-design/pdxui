@@ -49,19 +49,24 @@ on blur.
 
 | Call | Notes |
 |---|---|
-| `open()` | Opens it. |
-| `close()` | Closes it. |
+| `show()` | Open the popup. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 | `clear()` | Clears the value. |
 | `getText()` | The text the field shows: the picked suggestion's label, or the free text. |
 | `getSelectedItem()` | The suggestion last picked, as given; null when the value is free text or set from outside. |
 
-**Events:** `pdx-clear` — Fired when the clear button empties the field, after its `value-change`.; `query-change` → `detail: { value: string }` — The text typed, on each keystroke: the query the suggestions are filtered by.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `pdx-clear` — Fired when the clear button empties the field, after its `value-change`.; `query-change` → `detail: { value: string }` — The text typed, on each keystroke: the query the suggestions are filtered by.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
 **Injects:** `DataSourceContext` (optional)
 
 **Slot:** `option` — Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+
+**States:** `:state(open)` — The popup is open.; `:state(invalid)` — `error` is set.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set, or the DataSource is loading.
+
+**Parts:** `[data-part="root"]` — The frame: border, background and the states' colours.; `[data-part="input"]` — The native `<input>`, the combobox.; `[data-part="clear"]` — The clear button, while `clearable` and something is typed.; `[data-part="spinner"]` — The loading spinner, while loading.; `[data-part="popup"]` — The floating panel that holds the list.; `[data-part="list"]` — The `role="listbox"`.; `[data-part="option"]` — A suggestion of the list.
 
 
 #### Examples
