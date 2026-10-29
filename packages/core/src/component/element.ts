@@ -7,7 +7,7 @@ import type { Signal, Dispose } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
 import { registerComponent, unregisterComponent, emitDevTools } from '../debug/inspector';
 import { trackInstance, untrackInstance } from './define';
-import { isPartNode } from '../renderer/part-nodes';
+import { watchPartNodes, unwatchPartNodes } from '../renderer/part-nodes';
 import { componentLabel, componentFile } from './global-error';
 import { devInstanceId, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
@@ -601,18 +601,21 @@ export abstract class PdxElement extends HTMLElementBase {
             slot.parentNode.insertBefore(node, slot);
             if (!this._lightChildren.includes(node)) this._lightChildren.push(node);
         };
+        // The nodes template parts placed on this host since the last batch of records.
+        const placed = watchPartNodes(this);
         const obs = new MutationObserver((records) => {
             for (const r of records) {
                 for (const node of Array.from(r.addedNodes)) {
                     // A node a template part placed — this component's own redraw, most often — is
                     // where its template wants it: only foreign late children go to the slot. Moving
                     // a redraw into a hidden slot, with a redraw following it, freezes the page.
-                    if (node.parentNode === this && !isPartNode(node)) relocate(node);
+                    if (node.parentNode === this && !placed.has(node)) relocate(node);
                 }
             }
+            placed.clear();
         });
         obs.observe(this, { childList: true });
-        this._disposers.push(() => obs.disconnect());
+        this._disposers.push(() => { obs.disconnect(); unwatchPartNodes(this); });
     }
 }
 
