@@ -6,17 +6,37 @@
 // Unmarked, it cannot tell those from the nodes its own template redraws on the host, and moves them
 // too — into a hidden slot, and in Chromium a redraw that follows them freezes the page. A node a
 // part placed is where its template wants it.
+//
+// Only that watcher asks, only about the nodes placed directly on its host, and only about those
+// placed since its last batch of records. So a watching host collects exactly those, and the watcher
+// empties the set at every batch; a node placed anywhere else is left as it was. Two marks were
+// measured and dropped: a WeakSet of every node a part ever placed is a hash table V8 sizes to the
+// nodes created between two full collections and never shrinks (a page mounted and destroyed 100
+// times grew the heap 14–20%, #243, `packages/showcase/tests/scenario-memory.spec.ts`); a symbol
+// property on every placed node cost select1k 0.3 ms, 1.30 → 1.65, under a 4x CPU throttle (#734).
 
-// The mark is a property on the node, not a WeakSet: a WeakSet holding every node a part ever placed
-// is a hash table V8 sizes to the nodes created between two full collections and never shrinks. A
-// page mounted and destroyed 100 times grew the heap 14–20% that way, with no node retained (#243,
-// `packages/showcase/tests/scenario-memory.spec.ts`). A property goes with its node.
-const PART_NODE = Symbol('pdx.partNode');
-type MarkedNode = Node & { [PART_NODE]?: true };
+const watched = new WeakMap<Node, Set<Node>>();
+/** Hosts watching now: while none is, a placement does not even look a host up. */
+let watching = 0;
+
+/**
+ * Start collecting the nodes parts place directly on `host`. The caller empties the set after each
+ * batch of mutation records it reads, and stops with `unwatchPartNodes` when its observer does.
+ */
+export function watchPartNodes(host: Node): Set<Node> {
+    let placed = watched.get(host);
+    if (!placed) { placed = new Set(); watched.set(host, placed); watching++; }
+    return placed;
+}
+
+/** Stop collecting for `host` (see watchPartNodes). */
+export function unwatchPartNodes(host: Node): void {
+    if (watched.delete(host)) watching--;
+}
 
 /** Insert `node` before `before` on behalf of a template part, and remember that a part placed it. */
 export function placePartNode(parent: Node, node: Node, before: Node | null): void {
-    (node as MarkedNode)[PART_NODE] = true;
+    if (watching !== 0) watched.get(parent)?.add(node);
     parent.insertBefore(node, before);
 }
 
@@ -26,12 +46,8 @@ export function placePartNode(parent: Node, node: Node, before: Node | null): vo
  */
 export function placePartNodes(parent: Node, nodes: readonly Node[], before: Node | null): void {
     if (nodes.length === 1) { placePartNode(parent, nodes[0], before); return; }
+    const placed = watching !== 0 ? watched.get(parent) : undefined;
     const frag = (parent.ownerDocument ?? document).createDocumentFragment();
-    for (const n of nodes) { (n as MarkedNode)[PART_NODE] = true; frag.appendChild(n); }
+    for (const n of nodes) { placed?.add(n); frag.appendChild(n); }
     parent.insertBefore(frag, before);
-}
-
-/** Whether a template part placed `node` (see placePartNode). */
-export function isPartNode(node: Node): boolean {
-    return (node as MarkedNode)[PART_NODE] === true;
 }

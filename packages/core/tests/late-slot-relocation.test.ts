@@ -149,4 +149,29 @@ describe('late-slot relocation leaves the component\'s own redrawn nodes alone',
             expect(moves, 'insertBefore calls: a relocation loop').toBeLessThan(LIMIT);
         });
     }
+
+    // The watcher keeps the nodes placed since its last batch, not every node a part ever placed: a
+    // set that kept them would grow with every redraw (#734). A node the part has dropped and
+    // foreign code appends again is a late child like any other.
+    it('forgets a redrawn node once it has read its batch', async () => {
+        const tag = uniqueTag();
+        const flag = signal(true);
+        component(tag, { render: () => shapes['a reactive part'](flag) });
+
+        const host = document.createElement(tag);
+        document.body.appendChild(host);
+        flag.set(false);                             // the part places <i> on the host
+        await settle();
+        await settle();
+        const redrawn = host.querySelector('i')!;
+        expect(redrawn.parentNode, 'the redrawn <i> stays on the host').toBe(host);
+
+        flag.set(true);                              // the part drops it
+        await settle();
+        host.appendChild(redrawn);                   // and foreign code appends it again
+        await settle();
+        await settle();
+
+        expect(host.querySelector('[data-holder]')!.contains(redrawn), 'the re-appended node is projected').toBe(true);
+    });
 });
