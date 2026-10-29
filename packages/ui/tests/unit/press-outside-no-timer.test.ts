@@ -85,7 +85,7 @@ const TARGETS: Target[] = [
         name: 'pdx-cascader', press: 'mousedown',
         mount: async () => {
             const el = await mounted('pdx-cascader', (e) => { (e as unknown as { options: unknown[] }).options = tree; });
-            return () => el.openCascader();
+            return () => el.show();
         },
     },
     {

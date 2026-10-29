@@ -18,7 +18,10 @@ pdx-cascader {
     outline-offset: -2px;
 }
 
-.pdx-cascader-trigger.disabled {
+/* The component's states are custom states of the host (#287); native markup keeps the classes.
+   Both forms weigh (0,2,0). */
+.pdx-cascader-trigger.disabled,
+:state(disabled) > .pdx-cascader-trigger {
     opacity: 0.5;
     cursor: not-allowed;
 }
@@ -44,7 +47,8 @@ pdx-cascader {
     transition: transform 0.2s;
 }
 
-.pdx-cascader-icon.open {
+.pdx-cascader-icon.open,
+:state(open) > .pdx-cascader-trigger > .pdx-cascader-icon {
     transform: rotate(180deg);
 }
 

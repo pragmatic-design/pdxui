@@ -2,12 +2,11 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 import { onPressOutside } from '../shared/press-outside';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/cascader';
@@ -39,18 +38,41 @@ export interface CascaderNode {
  * A multi-level drill-down selector: each choice opens the next column of children, as in Country,
  * then Region, then City.
  *
- * @fires pdx-load-error - Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.
  * @slot option - Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
+ *
+ * @csspart root - The trigger, the combobox: the frame, its border and background.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
+ * @csspart popup - The floating panel that holds the columns, or the search results.
+ * @csspart search - The search field atop the panel, while `searchable`.
+ * @csspart list - A column, or the list of search results: a `role="listbox"`.
+ * @csspart option - An option of a column, or a search result.
+ * @csspart spinner - The spinner of a branch being fetched by `loadChildren`.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - A branch's children are being fetched by `loadChildren`.
  *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail labels $event.currentTarget.getLabels()
  */
 component('pdx-cascader', {
-    // The selected path, the values from the root down (#481). A choice, the clear button, setValue()
-    // and clear() write it, and the write dispatches `value-change`.
+    // The selected path, the values from the root down (#481). A choice, the clear button and clear()
+    // write it, and the write dispatches `value-change`; so does setting `value`, the way to set it.
     // A form submits the path, one entry per level, and resets it (#135).
     models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    events: {
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
+        /** Fired when the clear button or `clear()` empties the path, after its `value-change`. */
+        'pdx-clear': event<void>(),
+        /** Fired when `loadChildren` rejects; the branch stays askable and can be clicked again. */
+        'pdx-load-error': event<{ node: CascaderNode; error: unknown }>(),
+    },
+    // The visual states, on the host as custom states (#132, #287): the design CSS draws the trigger
+    // from them. The trigger carries no state class.
+    states: ['open', 'disabled', 'loading'],
+    parts: ['root', 'clear', 'popup', 'search', 'list', 'option', 'spinner'],
     // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -113,8 +135,6 @@ component('pdx-cascader', {
         let _searchInputEl: HTMLInputElement | null = null;
         let _clearEl: HTMLButtonElement | null = null;
         let _iconEl: HTMLElement | null = null;
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        reflectNameToHost(ctx);
         let _popover: ReturnType<typeof usePopover> | null = null;
         /** Removes the press-outside listener, added when the panel opens (#427). */
         let _outsideDispose: (() => void) | null = null;
@@ -273,6 +293,7 @@ component('pdx-cascader', {
 
         function openPopover(fromKeyboard = false): void {
             if (ctx.disabled()) return;
+            const wasOpen = _open.peek();
             const path = [...getValuePath()];
             // From the keyboard, an empty cascader opens on its first option, so there is one to move from.
             if (fromKeyboard && path.length === 0) {
@@ -290,7 +311,8 @@ component('pdx-cascader', {
                 inside: (t) => ctx.el.contains(t),
                 outside: () => closePopover(),
             });
-            ctx.emit('pdx-open', undefined, { bubbles: false });
+            // Announced when it changes (#287): opening an open panel again only resets it.
+            if (!wasOpen) ctx.emit('open-change', { value: true });
         }
 
         // Teardown on destroy: otherwise an unmount with the popover open would
@@ -303,12 +325,24 @@ component('pdx-cascader', {
         });
 
         function closePopover(): void {
+            const wasOpen = _open.peek();
             _open.set(false);
             _search.set('');
             if (_searchInputEl) _searchInputEl.value = '';
             _outsideDispose?.(); _outsideDispose = null;
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            // Announced when it changes (#287): the clear button closes a panel that may not be open.
+            if (wasOpen) ctx.emit('open-change', { value: false });
         }
+
+        function togglePopover(): void {
+            if (_open.peek()) closePopover(); else openPopover();
+        }
+
+        ctx.track(() => {
+            ctx.state('open', _open());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', _loading().size > 0);
+        });
 
         function selectValue(path: string[]): void {
             _internalValue.set([...path]);
@@ -388,7 +422,8 @@ component('pdx-cascader', {
             const ph = (ctx.placeholder() as string) || getComponentString('cascader', 'placeholder')();
 
             _triggerEl = document.createElement('div');
-            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap' + (disabled ? ' disabled' : '');
+            // No state class: `disabled` is the host's :state(disabled) (#287).
+            _triggerEl.className = 'pdx-cascader-trigger pdx-input-wrap';
             _triggerEl.setAttribute('data-part', 'root');
             _triggerEl.setAttribute('role', 'combobox');
             _triggerEl.setAttribute('aria-expanded', 'false');
@@ -420,6 +455,7 @@ component('pdx-cascader', {
                 _clearEl = document.createElement('button') as HTMLButtonElement;
                 _clearEl.type = 'button';
                 _clearEl.className = 'pdx-input-clear';
+                _clearEl.setAttribute('data-part', 'clear');
                 _clearEl.textContent = '×';
                 uiAttr(_clearEl, 'aria-label', () => uiString('cascader', 'clear'));
                 _clearEl.style.display = 'none';
@@ -436,6 +472,7 @@ component('pdx-cascader', {
 
             _panelEl = document.createElement('div');
             _panelEl.className = 'pdx-cascader-panel';
+            _panelEl.setAttribute('data-part', 'popup');
             _panelEl.id = _panelId;
             _panelEl.style.display = 'none';
 
@@ -444,6 +481,7 @@ component('pdx-cascader', {
                 searchWrap.className = 'pdx-cascader-search';
                 _searchInputEl = document.createElement('input');
                 _searchInputEl.type = 'text';
+                _searchInputEl.setAttribute('data-part', 'search');
                 _searchInputEl.placeholder = getComponentString('cascader', 'search')();
                 // A name, not only a placeholder; the arrows walk the results or the columns from here.
                 uiAttr(_searchInputEl, 'aria-label', () => uiString('cascader', 'searchLabel'));
@@ -507,10 +545,11 @@ component('pdx-cascader', {
             if (_clearEl) {
                 _clearEl.style.display = (clearable && display && !disabled) ? '' : 'none';
             }
-            if (_iconEl) {
-                _iconEl.className = 'pdx-cascader-icon' + (open ? ' open' : '');
+            if (_triggerEl) {
+                _triggerEl.setAttribute('aria-expanded', String(open));
+                // Out of the tab order while disabled — set after the mount too, as the state is.
+                _triggerEl.setAttribute('tabindex', disabled ? '-1' : '0');
             }
-            if (_triggerEl) _triggerEl.setAttribute('aria-expanded', String(open));
 
             if (!_panelEl || !_panelContentEl) return;
             _panelEl.style.display = open ? '' : 'none';
@@ -541,6 +580,7 @@ component('pdx-cascader', {
                 const list = document.createElement('div');
                 list.className = 'pdx-cascader-flat-list';
                 list.setAttribute('role', 'listbox');
+                list.setAttribute('data-part', 'list');
                 uiAttr(list, 'aria-label', () => uiString('cascader', 'results'));
                 let activeId: string | null = null;
                 if (filtered.length === 0) {
@@ -556,6 +596,7 @@ component('pdx-cascader', {
                         row.id = `${_panelId}-r-${i}`;
                         row.className = 'pdx-cascader-flat-item' + (i === searchCursor && kbd ? ' focus' : '');
                         row.setAttribute('role', 'option');
+                        row.setAttribute('data-part', 'option');
                         row.setAttribute('aria-selected', 'false');
                         if (off) row.setAttribute('aria-disabled', 'true');
                         if (i === searchCursor) activeId = row.id;
@@ -579,6 +620,10 @@ component('pdx-cascader', {
                 const colEl = document.createElement('div');
                 colEl.className = 'pdx-cascader-column';
                 colEl.setAttribute('role', 'listbox');
+                colEl.setAttribute('data-part', 'list');
+                // A4 (#287): the list holding a branch being fetched is busy. The status row that says so
+                // is in a column of its own, so this does not hold its announcement back.
+                if (col.items.some((n) => loading.has(n.value))) colEl.setAttribute('aria-busy', 'true');
                 // The column's accessible name (role=listbox requires it — axe aria-input-field-name).
                 uiAttr(colEl, 'aria-label', () => format(uiString('cascader', 'level'), { n: level + 1 }));
 
@@ -591,6 +636,7 @@ component('pdx-cascader', {
                     item.id = `${_panelId}-o-${level}-${index}`;
                     item.className = 'pdx-cascader-item' + (isActive ? ' active' : '') + (isCursor && kbd ? ' focus' : '') + (node.disabled ? ' disabled' : '');
                     item.setAttribute('role', 'option');
+                    item.setAttribute('data-part', 'option');
                     item.setAttribute('aria-selected', String(isActive));
                     // A class alone would offer disabled options as normal ones.
                     if (node.disabled) item.setAttribute('aria-disabled', 'true');
@@ -637,6 +683,7 @@ component('pdx-cascader', {
                 row.setAttribute('role', 'status');
                 const spinner = document.createElement('span');
                 spinner.className = 'pdx-cascader-spinner';
+                spinner.setAttribute('data-part', 'spinner');
                 spinner.setAttribute('aria-hidden', 'true');
                 const text = document.createElement('span');
                 row.append(spinner, text);
@@ -647,23 +694,24 @@ component('pdx-cascader', {
             _panelContentEl.appendChild(columnsWrap);
         });
 
-        // Exposes the methods on the host (the return goes only to the render context, not to the DOM element).
-        (ctx.el as unknown as Record<string, unknown>).openCascader = openPopover;
-        (ctx.el as unknown as Record<string, unknown>).closeCascader = closePopover;
-
-        // Imperative API: el.getValue() / el.setValue(path) / el.clear()
+        // Imperative API (#287): the popup is driven by the overlay verbs, which replace the undeclared
+        // openCascader/closeCascader; the path is the model, `el.value`, which replaces getValue/setValue.
         ctx.expose({
-            /** The current path, as the keys from the root down. */
-            getValue() { return _internalValue(); },
             /** The labels of the current path, from the root down. */
             getLabels(): string[] { return resolvePathNodes(_internalValue.peek()).map(n => n.label); },
-            /** Set the path, which dispatches `value-change`. */
-            setValue(v: string[]) { _internalValue.set(Array.isArray(v) ? v : []); ctx.value.set([..._internalValue.peek()]); },
             clear() { _internalValue.set([]); ctx.value.set([]); ctx.emit('pdx-clear'); },
+            /** Open the popup. */
+            show() { openPopover(); },
+            /** Close the popup. */
+            close() { closePopover(); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { togglePopover(); },
         });
 
         return { openPopover, closePopover };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });
 

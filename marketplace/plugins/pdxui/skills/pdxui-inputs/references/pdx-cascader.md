@@ -21,16 +21,21 @@ Drill through nested options.
 
 | Call | Notes |
 |---|---|
-| `getValue()` | The current path, as the keys from the root down. |
 | `getLabels()` | The labels of the current path, from the root down. |
-| `setValue(v)` | Set the path, which dispatches `value-change`. |
 | `clear()` | Clears the value. |
+| `show()` | Open the popup. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 
-**Events:** `pdx-clear` — Fired when the value is cleared.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-load-error` → `detail: { node, error }` — Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.; `pdx-open` — Fired when it opens. Does not bubble.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `pdx-clear` — Fired when the clear button or `clear()` empties the path, after its `value-change`.; `pdx-load-error` → `detail: { node: CascaderNode; error: unknown }` — Fired when `loadChildren` rejects; the branch stays askable and can be clicked again.; `value-change` → `detail: { value: string[] }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
 **Slot:** `option` — Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
+
+**States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — A branch's children are being fetched by `loadChildren`.
+
+**Parts:** `[data-part="root"]` — The trigger, the combobox: the frame, its border and background.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and not `disabled`.; `[data-part="popup"]` — The floating panel that holds the columns, or the search results.; `[data-part="search"]` — The search field atop the panel, while `searchable`.; `[data-part="list"]` — A column, or the list of search results: a `role="listbox"`.; `[data-part="option"]` — An option of a column, or a search result.; `[data-part="spinner"]` — The spinner of a branch being fetched by `loadChildren`.
 
 **Shapes:** `CascaderNode { value: string; label: string; children?: CascaderNode[]; isLeaf?: boolean; disabled?: boolean }`
 

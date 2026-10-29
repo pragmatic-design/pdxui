@@ -39,10 +39,11 @@ afterEach(() => {
 
 describe('the global listeners are torn down on a destroy-while-open', () => {
     it('cascader: destroyed with its popover open, it leaves no mousedown on the document', async () => {
-        const el = await mount<HTMLElement & { openCascader?: () => void }>('pdx-cascader');
+        const el = await mount<HTMLElement & { show: () => void }>('pdx-cascader');
         (el as unknown as { options?: unknown }).options = [{ value: 'a', label: 'A' }];
         await tick();
-        el.openCascader?.();
+        // Called, not optional-called: a missing method would leave nothing open and the test measuring nothing.
+        el.show();
         await tick(10); // the listener is added inside a setTimeout(0)
 
         el.remove(); // destroy while open

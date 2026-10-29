@@ -39,7 +39,7 @@
  *
  * ── HOW IT OPENS (CRITICAL — verified in the source) ──
  *   The setup's return `{ openPopover, closePopover }` lands on the INTERNAL `ctx` object, NOT on
- *   `ctx.el` (the host): the host carries `openCascader`/`closeCascader`, assigned explicitly.
+ *   `ctx.el` (the host): the host exposes the overlay verbs `show()`/`close()`/`toggle()` (#287).
  *   The ways a user opens it, in the source:
  *     · a click on the trigger → toggle open/close (pdx-cascader.ts:239-241);
  *     · Enter or Space keydown on the trigger → openPopover (pdx-cascader.ts:243).
@@ -120,7 +120,7 @@ export const cascader: ComponentManifest = {
                 </div>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="casc-open"]');
-                const trigger = host && host.querySelector('.pdx-cascader-trigger');
+                const trigger = host && host.querySelector('[data-part="root"]');
                 if (trigger) trigger.click();
                 await new Promise(r => requestAnimationFrame(r));`,
         },
@@ -144,19 +144,19 @@ export const cascader: ComponentManifest = {
                 standalone: [
                     {
                         // .pdx-cascader-trigger { display: inline-flex } (CSS:11) → box visibile.
-                        selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="casc"] [data-part="root"]',
                         description: 'trigger is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:10 → cursor: pointer → interactive.
-                        selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="casc"] [data-part="root"]',
                         description: 'trigger is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The trigger's radius (from .pdx-input-wrap) is non-negative (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger',
+                        selector: 'section:not([hidden]) [data-test="casc"] [data-part="root"]',
                         description: 'trigger radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -165,7 +165,7 @@ export const cascader: ComponentManifest = {
                     {
                         // The text and the chevron are contained in the trigger (the layout holds), the chevron to the right of the text.
                         description: 'text and chevron are contained within the trigger box',
-                        parent: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger',
+                        parent: 'section:not([hidden]) [data-test="casc"] [data-part="root"]',
                         children: {
                             trigger: '.pdx-cascader-trigger',
                             text: '.pdx-cascader-text',
@@ -186,29 +186,39 @@ export const cascader: ComponentManifest = {
                 standalone: [
                     {
                         // _panelEl.style.display='' (ts:332) → torna al display CSS .pdx-cascader-panel { display:flex } (CSS:55).
-                        selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-panel',
+                        selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="popup"]',
                         description: 'open columns panel is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS:61 → min-width: 180px → a measurable width at a 1280 viewport.
-                        selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-panel',
+                        selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="popup"]',
                         description: 'open columns panel has an appreciable width',
                         width: { op: '>=', value: 120 },
                     },
                     {
                         // CSS:58 → border-radius: var(--pdx-radius-md) → non-negative (the radius-zero themes zero it).
-                        selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-panel',
+                        selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="popup"]',
                         description: 'open columns panel has non-negative radius',
                         radius: { all: { op: '>=', value: 0 } },
+                    },
+                ],
+                // Open is a custom state of the host (#287), what a theme selects.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="popup"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="casc-open"]', name: 'open' },
+                        changes: {},
                     },
                 ],
                 overlay: [
                     {
                         // A dropdown-style CSS absolute: a floating panel, no backdrop. action:'call' → already opened by the setup.
                         description: 'open cascader shows the columns panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-panel',
+                        trigger: { selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="root"]', action: 'call' },
+                        panel: 'section:not([hidden]) [data-test="casc-open"] [data-part="popup"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -218,10 +228,12 @@ export const cascader: ComponentManifest = {
                         // Scoped to the first .pdx-cascader-column / the first .pdx-cascader-item, to avoid any ambiguity
                         // with the second column (the children) rendered beside it.
                         description: 'first-column options are contained within the column (listbox)',
-                        parent: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-column:first-child',
+                        parent: 'section:not([hidden]) [data-test="casc-open"] [data-part="list"]:first-child',
+                        // Scoped like the parent: `[data-part="list"]` is pdx-select's part too, and a bare
+                        // selector would find the first list of any component in the document.
                         children: {
-                            column: '.pdx-cascader-column:first-child',
-                            option: '.pdx-cascader-column:first-child .pdx-cascader-item:first-child',
+                            column: 'section:not([hidden]) [data-test="casc-open"] [data-part="list"]:first-child',
+                            option: 'section:not([hidden]) [data-test="casc-open"] [data-part="list"]:first-child [data-part="option"]:first-child',
                         },
                         relations: [
                             { description: 'first option within the first column', left: 'option', op: 'contained-in', right: 'column' },
@@ -234,10 +246,19 @@ export const cascader: ComponentManifest = {
             'cascader-disabled': {
                 standalone: [
                     {
-                        // .pdx-cascader-trigger.disabled { cursor: not-allowed } (CSS:22).
-                        selector: 'section:not([hidden]) [data-test="casc-dis"] .pdx-cascader-trigger',
+                        // :state(disabled) > .pdx-cascader-trigger { cursor: not-allowed } (CSS:23).
+                        selector: 'section:not([hidden]) [data-test="casc-dis"] [data-part="root"]',
                         description: 'disabled trigger is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="casc-dis"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="casc-dis"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -258,7 +279,7 @@ export const cascader: ComponentManifest = {
     isolation: {
         scenario: 'cascader-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="casc"] .pdx-cascader-trigger', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="casc"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -274,24 +295,24 @@ export const cascader: ComponentManifest = {
     //   The arrows are what this checks: Enter/Space/Escape alone would leave the columns unreachable.
     keyboard: {
         scenario: 'cascader-open',
-        initialFocus: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger',
+        initialFocus: 'section:not([hidden]) [data-test="casc-open"] [data-part="root"]',
         steps: [
             {
                 key: 'ArrowDown',
-                expectFocus: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-column:nth-child(1) [role="option"]:nth-child(2)', name: 'aria-selected', value: 'true' },
+                expectFocus: 'section:not([hidden]) [data-test="casc-open"] [data-part="root"]',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="list"]:nth-child(1) [role="option"]:nth-child(2)', name: 'aria-selected', value: 'true' },
             },
             {
                 key: 'ArrowRight',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-column:nth-child(2) [role="option"]:nth-child(1)', name: 'aria-selected', value: 'true' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="list"]:nth-child(2) [role="option"]:nth-child(1)', name: 'aria-selected', value: 'true' },
             },
             {
                 // Enter on the leaf: one value-change (its model, #481), the panel closes, the focus
                 // stays on the trigger.
                 key: 'Enter',
                 expectEvent: { selector: 'section:not([hidden]) [data-test="casc-open"]', name: 'value-change' },
-                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger', name: 'aria-expanded', value: 'false' },
-                expectFocus: 'section:not([hidden]) [data-test="casc-open"] .pdx-cascader-trigger',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="casc-open"] [data-part="root"]', name: 'aria-expanded', value: 'false' },
+                expectFocus: 'section:not([hidden]) [data-test="casc-open"] [data-part="root"]',
             },
         ],
     },

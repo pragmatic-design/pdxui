@@ -383,6 +383,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-cascader` takes the beta contract (#287).
+  - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
+    `pdx-close`, once per change: the clear button no longer announces a close of a panel that was not
+    open. `show()`, `close()` and `toggle()` replace the undeclared `openCascader()` and
+    `closeCascader()`. `pdx migrate` rewrites the listeners and the calls.
+  - **The model is the way.** `getValue()` and `setValue()` are gone: read and set `value`.
+    `pdx migrate` rewrites `getValue()` on a `:ref` to `.value` and flags `setValue()`.
+  - **States and parts.** `open`, `disabled` and `loading` (a branch being fetched) are custom states
+    on the host; the trigger no longer carries `disabled`, nor the chevron `open`. The parts are
+    `root`, `clear`, `popup`, `search`, `list`, `option` and `spinner`.
+  - **Fixed with it:** `disabled` set after the mount left the trigger looking and tabbing as enabled —
+    its class and its `tabindex` were written once. Both follow the prop now.
+  - **A4.** The list holding a branch being fetched is `aria-busy`, beside the option.
 - **Breaking:** `pdx-autocomplete` takes the beta contract (#287).
   - **The popup is announced as an overlay's.** `open-change` with `{ value }`, once per change: a
     keystroke that keeps it open announces nothing. `show()` replaces `open()`; `close()` stays and

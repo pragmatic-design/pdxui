@@ -20,14 +20,15 @@
 // The same components drive the popup with the overlay verbs: `pdx-select`'s `openSelect()`,
 // `closeSelect()` and `toggleSelect()` are `show()`, `close()` and `toggle()` (#287). The three names
 // are pdx-select's alone — a DataSource's `toggleSelect(id)` takes an argument, a call with none is the
-// select's — so the rewrite is mechanical wherever the call is written.
+// select's — so the rewrite is mechanical wherever the call is written. `pdx-cascader`'s undeclared
+// `openCascader()` and `closeCascader()` are `show()` and `close()` the same way.
 
 import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from './changes';
 import { parseSFC } from '../parser/sfc';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
-export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select']);
+export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -145,14 +146,11 @@ export const openChangeEvent: LanguageChange = {
     },
 };
 
-/** pdx-select's alpha popup methods, and the overlay verb each is. */
-const SELECT_VERBS: Record<string, string> = { openSelect: 'show', closeSelect: 'close', toggleSelect: 'toggle' };
-// Match: a call of one of the three, with no argument — a DataSource's `toggleSelect(id)` has one.
-// Groups: [1]=the method
-const SELECT_CALL = /\.\s*(openSelect|closeSelect|toggleSelect)\s*\(\s*\)/g;
+/** A component's alpha popup methods, each a name no other component has, and the verb each is. */
+interface AliasVerbs { id: string; message: string; verbs: Record<string, string> }
 
-/** Every alpha select method call in `text`, the template's alone in the `pdx` scope. */
-function selectCalls(text: string, scope: LanguageChangeScope): RegExpMatchArray[] {
+/** Every call of one of `verbs`, with no argument, in `text`; the template's alone in the `pdx` scope. */
+function aliasCalls(text: string, verbs: Record<string, string>, scope: LanguageChangeScope): RegExpMatchArray[] {
     let from = 0;
     let to = text.length;
     if (scope === 'pdx') {
@@ -161,33 +159,49 @@ function selectCalls(text: string, scope: LanguageChangeScope): RegExpMatchArray
         from = template.start;
         to = template.start + template.content.length;
     }
-    return [...text.matchAll(SELECT_CALL)].filter((m) => m.index! >= from && m.index! < to);
+    // Match: a call of one of the names, with no argument — a DataSource's `toggleSelect(id)` has one.
+    // Groups: [1]=the method
+    const call = new RegExp(`\\.\\s*(${Object.keys(verbs).map(escapeForRegExp).join('|')})\\s*\\(\\s*\\)`, 'g');
+    return [...text.matchAll(call)].filter((m) => m.index! >= from && m.index! < to);
 }
 
-/** `openSelect()` → `show()`, `closeSelect()` → `close()`, `toggleSelect()` → `toggle()`, in a scope. */
-function selectVerbs(scope: LanguageChangeScope): LanguageChange {
+/** The entry that rewrites `alias`'s calls to the overlay verbs, in a scope. */
+function aliasVerbs(alias: AliasVerbs, scope: LanguageChangeScope): LanguageChange {
     return {
-        id: scope === 'pdx' ? 'select-overlay-verbs' : 'select-overlay-verbs-script',
+        id: scope === 'pdx' ? alias.id : `${alias.id}-script`,
         kind: 'removed',
         scope,
         issue: 287,
-        message: '`pdx-select` drives its popup with the overlay verbs: `openSelect()` is `show()`, `closeSelect()` is `close()`, `toggleSelect()` is `toggle()`.',
-        marker: /(?:open|close|toggle)Select\s*\(/,
-        detect: (text) => selectCalls(text, scope).map((m) => ({
-            line: lineAt(text, m.index!), found: m[0], note: `Here, write \`.${SELECT_VERBS[m[1]]}()\`.`,
+        message: alias.message,
+        marker: new RegExp(`(?:${Object.keys(alias.verbs).map(escapeForRegExp).join('|')})\\s*\\(`),
+        detect: (text) => aliasCalls(text, alias.verbs, scope).map((m) => ({
+            line: lineAt(text, m.index!), found: m[0], note: `Here, write \`.${alias.verbs[m[1]]}()\`.`,
         })),
         fix: (text) => {
             let out = text;
-            for (const m of selectCalls(text, scope).reverse()) {
-                out = out.slice(0, m.index!) + `.${SELECT_VERBS[m[1]]}()` + out.slice(m.index! + m[0].length);
+            for (const m of aliasCalls(text, alias.verbs, scope).reverse()) {
+                out = out.slice(0, m.index!) + `.${alias.verbs[m[1]]}()` + out.slice(m.index! + m[0].length);
             }
             return out;
         },
     };
 }
 
-export const selectOverlayVerbs = selectVerbs('pdx');
-export const selectOverlayVerbsScript = selectVerbs('script');
+const SELECT_VERBS: AliasVerbs = {
+    id: 'select-overlay-verbs',
+    message: '`pdx-select` drives its popup with the overlay verbs: `openSelect()` is `show()`, `closeSelect()` is `close()`, `toggleSelect()` is `toggle()`.',
+    verbs: { openSelect: 'show', closeSelect: 'close', toggleSelect: 'toggle' },
+};
+const CASCADER_VERBS: AliasVerbs = {
+    id: 'cascader-overlay-verbs',
+    message: '`pdx-cascader` drives its popup with the overlay verbs: `openCascader()` is `show()`, `closeCascader()` is `close()`.',
+    verbs: { openCascader: 'show', closeCascader: 'close' },
+};
+
+export const selectOverlayVerbs = aliasVerbs(SELECT_VERBS, 'pdx');
+export const selectOverlayVerbsScript = aliasVerbs(SELECT_VERBS, 'script');
+export const cascaderOverlayVerbs = aliasVerbs(CASCADER_VERBS, 'pdx');
+export const cascaderOverlayVerbsScript = aliasVerbs(CASCADER_VERBS, 'script');
 
 // `pdx-autocomplete`'s `open()` is `show()`; its `close()` stays (#287). `open()` is a common name — a
 // dialog has one — so the call is rewritten only where its receiver is tied to the tag by the text:

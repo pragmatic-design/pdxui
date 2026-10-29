@@ -11,6 +11,7 @@ import { join } from 'path';
 import { cleanup, mount } from './helpers';
 import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
+import '../../src/cascader/pdx-cascader';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -54,6 +55,18 @@ const DONE: Row[] = [
         methods: ['clear', 'getText', 'getSelectedItem', 'show', 'close', 'toggle'],
         // `open()` is the overlay verb `show()` (#287, decision 50).
         removedMethods: ['open'],
+    },
+    {
+        tag: 'pdx-cascader',
+        model: 'value',
+        // `loading` while a lazy branch is fetched; it has no error, success or readonly of its own.
+        states: ['open', 'disabled', 'loading'],
+        parts: ['root', 'clear', 'popup', 'search', 'list', 'option', 'spinner'],
+        popup: true,
+        methods: ['getLabels', 'clear', 'show', 'close', 'toggle'],
+        // getValue/setValue duplicated the model, which is the way (#287); openCascader/closeCascader
+        // were set on the element undeclared, and are the overlay verbs.
+        removedMethods: ['getValue', 'setValue', 'openCascader', 'closeCascader'],
     },
 ];
 

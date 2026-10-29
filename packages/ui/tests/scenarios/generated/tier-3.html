@@ -73,7 +73,7 @@
         "block-ui-fullscreen": async function () { document.querySelector('section:not([hidden]) [data-test="full"]').blocked = true; },
         "cascader-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="casc-open"]');
-                const trigger = host && host.querySelector('.pdx-cascader-trigger');
+                const trigger = host && host.querySelector('[data-part="root"]');
                 if (trigger) trigger.click();
                 await new Promise(r => requestAnimationFrame(r)); },
         "cp-open": async function () { 

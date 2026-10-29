@@ -41,7 +41,8 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from './open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from './open-change';
+import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -411,6 +412,12 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     selectOverlayVerbsScript,
     autocompleteOpenShow,
     autocompleteOpenUnbound,
+    cascaderOverlayVerbs,
+    cascaderOverlayVerbsScript,
+    // #287: getValue()/setValue() duplicated a picker's model (./model-methods).
+    modelGetValue,
+    modelSetValue,
+    modelMethodsUnbound,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
