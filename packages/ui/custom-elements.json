@@ -3904,6 +3904,16 @@
             },
             {
               "kind": "field",
+              "name": "name",
+              "description": "Name for form participation: with one, a form submits the value under it.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "name"
+            },
+            {
+              "kind": "field",
               "name": "value",
               "description": "The current value.",
               "type": {
@@ -3934,6 +3944,7 @@
           "models": [
             "value"
           ],
+          "formAssociated": true,
           "alphaEvents": [
             "pdx-change"
           ],
@@ -4124,6 +4135,15 @@
               "default": "false"
             },
             {
+              "name": "name",
+              "fieldName": "name",
+              "description": "Name for form participation: with one, a form submits the value under it.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
               "name": "value",
               "fieldName": "value",
               "description": "The current value.",
@@ -4131,6 +4151,42 @@
                 "text": "string | string[]"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, a `role=\"group\"`: the navigation above the grid."
+            },
+            {
+              "name": "nav",
+              "description": "The navigation bar: the two arrows and the title."
+            },
+            {
+              "name": "prev",
+              "description": "The arrow to the previous month, year or twelve years."
+            },
+            {
+              "name": "title",
+              "description": "The month or year shown; in the day view, the button that opens the month view."
+            },
+            {
+              "name": "next",
+              "description": "The arrow to the next month, year or twelve years."
+            },
+            {
+              "name": "grid",
+              "description": "A month's grid of days (`role=\"grid\"`), or the months or years to pick from."
+            },
+            {
+              "name": "cell",
+              "description": "A day, a month or a year to pick."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ]
         }

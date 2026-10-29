@@ -52,6 +52,16 @@ type SelectionMode = 'date' | 'range' | 'multi' | 'week' | 'month' | 'year' | 'q
  * A standalone calendar grid in which the user selects a date, a range of dates or several dates,
  * also from the keyboard alone.
  *
+ * @csspart root - The frame, a `role="group"`: the navigation above the grid.
+ * @csspart nav - The navigation bar: the two arrows and the title.
+ * @csspart prev - The arrow to the previous month, year or twelve years.
+ * @csspart title - The month or year shown; in the day view, the button that opens the month view.
+ * @csspart next - The arrow to the next month, year or twelve years.
+ * @csspart grid - A month's grid of days (`role="grid"`), or the months or years to pick from.
+ * @csspart cell - A day, a month or a year to pick.
+ *
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail values $event.detail.value
@@ -64,7 +74,13 @@ component('pdx-calendar', {
     // The selection, as the mode holds it (#481): the ISO date in `date`, `month`, `year` and `quarter`
     // mode; `[start, end]` in `range` and `week` mode (`end` is '' while a range is being built); the
     // array of ISO dates in `multi` mode. A choice writes it, and the write dispatches `value-change`.
-    models: { value: model<string | string[]>('') },
+    // With a `name`, a form submits it, a range or several dates one entry each, and resets it (#135,
+    // #287); without one it submits nothing — the date picker's own calendar has none.
+    models: { value: model<string | string[]>('', { form: true }) },
+    // The visual state, on the host as a custom state (#132, #287): the design CSS draws the frame from
+    // it. The frame carries no state class. It has no popup, so no `open`.
+    states: ['disabled'],
+    parts: ['root', 'nav', 'prev', 'title', 'next', 'grid', 'cell'],
     props: {
         /** Range start (ISO). */
         rangeStart: { type: String, default: '' },
@@ -102,6 +118,8 @@ component('pdx-calendar', {
         inline: { type: Boolean, default: false },
         /** Disabled state. */
         disabled: { type: Boolean, default: false },
+        /** Name for form participation: with one, a form submits the value under it. */
+        name: { type: String, default: '' },
     },
     setup(ctx) {
         const _viewYear = signal(0);
@@ -478,6 +496,10 @@ component('pdx-calendar', {
 
         let _cellMap = new Map<string, HTMLElement>(); // iso → button element
 
+        // `disabled`, on the host as a custom state (#287): the frame is drawn from it, and it needs no
+        // rebuild of the grid.
+        ctx.track(() => { ctx.state('disabled', !!ctx.disabled()); });
+
         // Structure track: rebuild grid on navigation/view changes
         ctx.track(() => {
             const year = _viewYear();
@@ -488,7 +510,6 @@ component('pdx-calendar', {
             const numMonths = Math.min(3, Math.max(1, ctx.numberOfMonths() as number));
             const showWeekNums = ctx.weekNumbers() as boolean;
             const fd = firstDayOfWeek();
-            const disabled = ctx.disabled() as boolean;
             const isInline = ctx.inline() as boolean;
 
             _drawsQueued++;
@@ -499,7 +520,9 @@ component('pdx-calendar', {
                 _cellMap.clear();
 
                 const root = document.createElement('div');
-                root.className = 'pdx-calendar' + (isInline ? ' pdx-calendar-inline' : '') + (disabled ? ' disabled' : '');
+                // No state class: `disabled` is the host's :state(disabled) (#287).
+                root.className = 'pdx-calendar' + (isInline ? ' pdx-calendar-inline' : '');
+                root.setAttribute('data-part', 'root');
                 // A named group, not role="application", which switches a screen reader's browse mode
                 // off for the whole widget, header buttons included; the grid role gives the keys.
                 root.setAttribute('role', 'group');
@@ -568,10 +591,12 @@ component('pdx-calendar', {
             // Navigation header
             const nav = document.createElement('div');
             nav.className = 'pdx-cal-nav';
+            nav.setAttribute('data-part', 'nav');
 
             const prevBtn = document.createElement('button');
             prevBtn.type = 'button';
             prevBtn.className = 'pdx-cal-nav-btn';
+            prevBtn.setAttribute('data-part', 'prev');
             prevBtn.setAttribute('aria-label', getComponentString('calendar', 'prevMonth')());
             prevBtn.textContent = '‹';
             prevBtn.addEventListener('click', () => navigate(-1, 'month'));
@@ -579,6 +604,7 @@ component('pdx-calendar', {
             const titleBtn = document.createElement('button');
             titleBtn.type = 'button';
             titleBtn.className = 'pdx-cal-title';
+            titleBtn.setAttribute('data-part', 'title');
 
             if (numMonths > 1) {
                 // The span on screen, "June – July 2026", not only the first month.
@@ -597,6 +623,7 @@ component('pdx-calendar', {
             const nextBtn = document.createElement('button');
             nextBtn.type = 'button';
             nextBtn.className = 'pdx-cal-nav-btn';
+            nextBtn.setAttribute('data-part', 'next');
             nextBtn.setAttribute('aria-label', getComponentString('calendar', 'nextMonth')());
             nextBtn.textContent = '›';
             nextBtn.addEventListener('click', () => navigate(1, 'month'));
@@ -636,6 +663,7 @@ component('pdx-calendar', {
 
                 const table = document.createElement('div');
                 table.className = 'pdx-cal-grid';
+                table.setAttribute('data-part', 'grid');
                 table.setAttribute('role', 'grid');
                 table.setAttribute('aria-label', `${getMonthNames(loc, cal, 'long')[gridMonth - 1]} ${gridYear}`);
 
@@ -679,6 +707,7 @@ component('pdx-calendar', {
                         cellEl.type = 'button';
                         cellEl.className = cellClass(cell);
                         cellEl.setAttribute('role', 'gridcell');
+                        cellEl.setAttribute('data-part', 'cell');
                         cellEl.setAttribute('tabindex', isSameDay(cell.iso, _focusedDate.peek()) ? '0' : '-1');
                         // Store metadata for style-only updates
                         cellEl.dataset.iso = cell.iso;
@@ -726,10 +755,12 @@ component('pdx-calendar', {
         function renderMonthView(root: HTMLElement, year: number, loc: string, cal: CalendarSystem): void {
             const nav = document.createElement('div');
             nav.className = 'pdx-cal-nav';
+            nav.setAttribute('data-part', 'nav');
 
             const prevBtn = document.createElement('button');
             prevBtn.type = 'button';
             prevBtn.className = 'pdx-cal-nav-btn';
+            prevBtn.setAttribute('data-part', 'prev');
             prevBtn.setAttribute('aria-label', getComponentString('calendar', 'prevYear')());
             prevBtn.textContent = '‹';
             prevBtn.addEventListener('click', () => { _viewYear.set(year - 1); });
@@ -740,12 +771,14 @@ component('pdx-calendar', {
             const titleBtn = document.createElement(canDrillToYears ? 'button' : 'span');
             if (canDrillToYears) (titleBtn as HTMLButtonElement).type = 'button';
             titleBtn.className = 'pdx-cal-title' + (canDrillToYears ? '' : ' pdx-cal-title-static');
+            titleBtn.setAttribute('data-part', 'title');
             titleBtn.textContent = String(year);
             if (canDrillToYears) titleBtn.addEventListener('click', () => switchView('years'));
 
             const nextBtn = document.createElement('button');
             nextBtn.type = 'button';
             nextBtn.className = 'pdx-cal-nav-btn';
+            nextBtn.setAttribute('data-part', 'next');
             nextBtn.setAttribute('aria-label', getComponentString('calendar', 'nextYear')());
             nextBtn.textContent = '›';
             nextBtn.addEventListener('click', () => { _viewYear.set(year + 1); });
@@ -759,6 +792,7 @@ component('pdx-calendar', {
             // rows and no arrow keys: the buttons are what a user reaches.
             const grid = document.createElement('div');
             grid.className = 'pdx-cal-month-grid';
+            grid.setAttribute('data-part', 'grid');
             grid.setAttribute('role', 'group');
             grid.setAttribute('aria-label', String(year));
 
@@ -767,6 +801,7 @@ component('pdx-calendar', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-cal-month-cell';
+                btn.setAttribute('data-part', 'cell');
                 if (m + 1 === _viewMonth.peek()) btn.className += ' pdx-cal-selected';
                 btn.textContent = monthNames[m];
                 const monthNum = m + 1;
@@ -783,21 +818,25 @@ component('pdx-calendar', {
 
             const nav = document.createElement('div');
             nav.className = 'pdx-cal-nav';
+            nav.setAttribute('data-part', 'nav');
 
             const prevBtn = document.createElement('button');
             prevBtn.type = 'button';
             prevBtn.className = 'pdx-cal-nav-btn';
+            prevBtn.setAttribute('data-part', 'prev');
             prevBtn.setAttribute('aria-label', getComponentString('calendar', 'prevYears')());
             prevBtn.textContent = '‹';
             prevBtn.addEventListener('click', () => { _viewYear.set(year - 12); });
 
             const titleEl = document.createElement('span');
             titleEl.className = 'pdx-cal-title pdx-cal-title-static';
+            titleEl.setAttribute('data-part', 'title');
             titleEl.textContent = `${startYear} – ${endYear}`;
 
             const nextBtn = document.createElement('button');
             nextBtn.type = 'button';
             nextBtn.className = 'pdx-cal-nav-btn';
+            nextBtn.setAttribute('data-part', 'next');
             nextBtn.setAttribute('aria-label', getComponentString('calendar', 'nextYears')());
             nextBtn.textContent = '›';
             nextBtn.addEventListener('click', () => { _viewYear.set(year + 12); });
@@ -809,6 +848,7 @@ component('pdx-calendar', {
 
             const grid = document.createElement('div');
             grid.className = 'pdx-cal-year-grid';
+            grid.setAttribute('data-part', 'grid');
             grid.setAttribute('role', 'group');
             grid.setAttribute('aria-label', titleEl.textContent);
 
@@ -816,6 +856,7 @@ component('pdx-calendar', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-cal-year-cell';
+                btn.setAttribute('data-part', 'cell');
                 if (y === _viewYear.peek()) btn.className += ' pdx-cal-selected';
                 btn.textContent = String(y);
                 const yr = y;
@@ -840,5 +881,7 @@ component('pdx-calendar', {
 
         return { navigate, goToday, switchView, selectDate };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

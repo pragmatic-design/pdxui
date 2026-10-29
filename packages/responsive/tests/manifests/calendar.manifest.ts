@@ -144,13 +144,13 @@ export const calendar: ComponentManifest = {
                 standalone: [
                     {
                         // Container visibile (CSS: .pdx-calendar { display: inline-flex }).
-                        selector: `${ROOT} .pdx-calendar`,
+                        selector: `${ROOT} [data-part="root"]`,
                         description: 'calendar container is a visible flex box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS: .pdx-cal-row { display: grid; grid-template-columns: repeat(7,1fr) }.
-                        selector: `${ROOT} .pdx-cal-grid`,
+                        selector: `${ROOT} [data-part="grid"]`,
                         description: 'day grid is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
@@ -162,21 +162,21 @@ export const calendar: ComponentManifest = {
                     },
                     {
                         // CSS: .pdx-cal-cell { cursor: pointer } → celle interattive.
-                        selector: `${ROOT} .pdx-cal-cell`,
+                        selector: `${ROOT} [data-part="cell"]`,
                         description: 'day cell is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The cell is a box of a noticeable size (36×36 in the base CSS; themes may vary
                         // but it stays a clickable square that has not collapsed).
-                        selector: `${ROOT} .pdx-cal-cell`,
+                        selector: `${ROOT} [data-part="cell"]`,
                         description: 'day cell has an appreciable clickable size',
                         width: { op: '>=', value: 20 },
                         height: { op: '>=', value: 20 },
                     },
                     {
                         // A non-negative radius (metro and cyberpunk zero it, never below 0).
-                        selector: `${ROOT} .pdx-cal-cell`,
+                        selector: `${ROOT} [data-part="cell"]`,
                         description: 'day cell radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -186,9 +186,9 @@ export const calendar: ComponentManifest = {
                         // 7 column headers plus the grid: the first and the last header sit INSIDE the grid
                         // (the 7-column grid lines them up on one row). This checks the week's structure.
                         description: 'weekday column headers are contained within the day grid',
-                        parent: `${ROOT} .pdx-cal-grid`,
+                        parent: `${ROOT} [data-part="grid"]`,
                         children: {
-                            grid: `${ROOT} .pdx-cal-grid`,
+                            grid: `${ROOT} [data-part="grid"]`,
                             firstHeader: `${ROOT} .pdx-cal-header-row .pdx-cal-day-header:first-child`,
                             lastHeader: `${ROOT} .pdx-cal-header-row .pdx-cal-day-header:last-child`,
                         },
@@ -219,9 +219,9 @@ export const calendar: ComponentManifest = {
                     {
                         // The selected cell (value=2024-06-15 → .pdx-cal-selected) sits INSIDE the grid.
                         description: 'the selected day cell is contained within the day grid',
-                        parent: `${ROOT} .pdx-cal-grid`,
+                        parent: `${ROOT} [data-part="grid"]`,
                         children: {
-                            grid: `${ROOT} .pdx-cal-grid`,
+                            grid: `${ROOT} [data-part="grid"]`,
                             selected: `${ROOT} .pdx-cal-cell.pdx-cal-selected`,
                         },
                         relations: [
@@ -231,11 +231,11 @@ export const calendar: ComponentManifest = {
                     {
                         // The nav header and the grid are both contained in the calendar's container.
                         description: 'nav header and grid are contained within the calendar container',
-                        parent: `${ROOT} .pdx-calendar`,
+                        parent: `${ROOT} [data-part="root"]`,
                         children: {
-                            container: `${ROOT} .pdx-calendar`,
+                            container: `${ROOT} [data-part="root"]`,
                             nav: `${ROOT} .pdx-cal-nav`,
-                            grid: `${ROOT} .pdx-cal-grid`,
+                            grid: `${ROOT} [data-part="grid"]`,
                         },
                         relations: [
                             { description: 'nav within container', left: 'nav', op: 'contained-in', right: 'container' },
@@ -278,7 +278,7 @@ export const calendar: ComponentManifest = {
                             box: 'section:not([hidden]) [data-test="cal-box"]',
                             grid1: `${ROOT} .pdx-cal-month:nth-child(1) .pdx-cal-grid`,
                             grid2: `${ROOT} .pdx-cal-month:nth-child(2) .pdx-cal-grid`,
-                            calendar: `${ROOT} .pdx-calendar`,
+                            calendar: `${ROOT} [data-part="root"]`,
                         },
                         relations: [
                             { description: 'the calendar ends inside the box', left: 'calendar.right', op: '<=', right: 'box.right', tolerance: 1 },
@@ -289,16 +289,25 @@ export const calendar: ComponentManifest = {
                 ],
             },
 
-            // Disabled: prop statica → standalone (CSS: .pdx-calendar.disabled { opacity:.5; pointer-events:none }).
+            // Disabled: the host's :state(disabled) (#287) → CSS :state(disabled) > .pdx-calendar { opacity:.5; pointer-events:none }.
             'calendar-disabled': {
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: `${ROOT} [data-part="root"]`,
+                        trigger: 'attribute',
+                        customState: { host: ROOT, name: 'disabled' },
+                        changes: { pointerEvents: { op: 'is', value: 'none' } },
+                    },
+                ],
                 standalone: [
                     {
-                        selector: `${ROOT} .pdx-calendar`,
+                        selector: `${ROOT} [data-part="root"]`,
                         description: 'disabled calendar has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
                     {
-                        selector: `${ROOT} .pdx-calendar`,
+                        selector: `${ROOT} [data-part="root"]`,
                         description: 'disabled calendar disables pointer events',
                         pointerEvents: { op: 'is', value: 'none' },
                     },
@@ -323,7 +332,7 @@ export const calendar: ComponentManifest = {
     isolation: {
         scenario: 'calendar-month',
         targets: [
-            { selector: `${ROOT} .pdx-calendar`, tolerancePx: 10, skipHeight: true },
+            { selector: `${ROOT} [data-part="root"]`, tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -333,12 +342,12 @@ export const calendar: ComponentManifest = {
     // is on data-iso="2024-06-16". So: expectFocus on the new cell plus expectAttr tabindex="0".
     keyboard: {
         scenario: 'calendar-month',
-        initialFocus: `${ROOT} .pdx-cal-cell[data-iso="2024-06-15"]`,
+        initialFocus: `${ROOT} [data-part="cell"][data-iso="2024-06-15"]`,
         steps: [
             {
                 key: 'ArrowRight',
-                expectFocus: `${ROOT} .pdx-cal-cell[data-iso="2024-06-16"]`,
-                expectAttr: { selector: `${ROOT} .pdx-cal-cell[data-iso="2024-06-16"]`, name: 'tabindex', value: '0' },
+                expectFocus: `${ROOT} [data-part="cell"][data-iso="2024-06-16"]`,
+                expectAttr: { selector: `${ROOT} [data-part="cell"][data-iso="2024-06-16"]`, name: 'tabindex', value: '0' },
             },
         ],
     },
@@ -349,7 +358,7 @@ export const calendar: ComponentManifest = {
     //   mask is a second guarantee, not the only defence against non-determinism.
     visual: {
         scenarios: ['calendar-month'],
-        mask: [`${ROOT} .pdx-cal-grid`],
+        mask: [`${ROOT} [data-part="grid"]`],
     },
 };
 

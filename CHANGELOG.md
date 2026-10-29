@@ -383,6 +383,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-calendar` takes the beta contract (#287). It has no popup, so no
+  `open-change`.
+  - **It takes part in a form.** With a `name`, a form submits its value, a range or several dates
+    one entry each, and a reset restores it. Without one it submits nothing, which is the calendar a
+    `pdx-date-picker` draws.
+  - **States and parts.** `disabled` is a custom state on the host; the frame no longer carries the
+    `disabled` class. The parts are `root` (the frame, a `group`), `nav`, `prev`, `title`, `next`,
+    `grid` and `cell`. Inside a date picker, the picker's own parts are its children: select them
+    with `pdx-date-picker > [data-part="root"]`, as a bare descendant selector also finds the
+    calendar's.
 - **Breaking:** `pdx-time-picker` takes the beta contract (#287). It has no popup, so no
   `open-change`.
   - **States and parts.** `disabled` is a custom state on the host; the frame no longer carries the

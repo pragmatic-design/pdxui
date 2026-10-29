@@ -16,6 +16,7 @@ import '../../src/tree-select/pdx-tree-select';
 import '../../src/transfer/pdx-transfer';
 import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
+import '../../src/calendar/pdx-calendar';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -112,6 +113,16 @@ const DONE: Row[] = [
         parts: ['root', 'segment', 'arrow', 'separator'],
         popup: false,
         methods: ['focus', 'blur', 'clear'],
+        removedMethods: [],
+    },
+    {
+        tag: 'pdx-calendar',
+        model: 'value',
+        // A grid in a group, no popup.
+        states: ['disabled'],
+        parts: ['root', 'nav', 'prev', 'title', 'next', 'grid', 'cell'],
+        popup: false,
+        methods: ['focusView', 'getRange', 'getQuarter'],
         removedMethods: [],
     },
 ];
