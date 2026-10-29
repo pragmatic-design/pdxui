@@ -8,7 +8,7 @@
  *
  * ── DOM structure (light DOM, built in a rAF — pdx-transfer.ts:350) ──
  *   <pdx-transfer>                                          ← host
- *     <div class="pdx-transfer [pdx-transfer-{size}] [disabled] [pdx-transfer-draggable]"
+ *     <div class="pdx-transfer [pdx-transfer-{size}] [pdx-transfer-draggable]" data-part="root"   ← disabled is the host's :state(disabled) (#287)
  *          role="group" aria-label="Transfer">              ← ROOT: display inline-flex (CSS:4), align stretch
  *
  *       <!-- SOURCE PANEL (left) -->
@@ -131,19 +131,19 @@ export const transfer: ComponentManifest = {
                 standalone: [
                     {
                         // ROOT: display inline-flex (CSS:4) → a flex box, not 'none'.
-                        selector: 'section:not([hidden]) [data-test="tr"] .pdx-transfer',
+                        selector: 'section:not([hidden]) [data-test="tr"] [data-part="root"]',
                         description: 'transfer root is a flex box',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
                         // The two panels are flex column boxes (CSS:17). I assert on the first one (source).
-                        selector: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel',
+                        selector: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]',
                         description: 'panel is a flex column box',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
                         // A content-driven panel, but with min-height 280 + min-width 220 (CSS:23-24).
-                        selector: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel',
+                        selector: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]',
                         description: 'panel is tall enough to hold the list (min-height)',
                         height: { op: '>=', value: 100 },
                     },
@@ -156,7 +156,7 @@ export const transfer: ComponentManifest = {
                     },
                     {
                         // The panel's radius is non-negative (metro/cyberpunk zero it, never < 0).
-                        selector: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel',
+                        selector: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]',
                         description: 'panel radius is non-negative',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -168,11 +168,11 @@ export const transfer: ComponentManifest = {
                         // the buttons left of the target. The two panels share the same height
                         // (align-items: stretch on the inline-flex root, CSS:6).
                         description: 'source panel is left of the move buttons, buttons left of target panel; panels same height',
-                        parent: 'section:not([hidden]) [data-test="tr"] .pdx-transfer',
+                        parent: 'section:not([hidden]) [data-test="tr"] [data-part="root"]',
                         children: {
                             source: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel:nth-of-type(1)',
                             actions: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-actions',
-                            target: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-actions + .pdx-transfer-panel',
+                            target: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]:last-child',
                         },
                         relations: [
                             { description: 'source panel ends at/left of the actions column', left: 'source.right', op: '<=', right: 'actions.left', tolerance: 2 },
@@ -183,9 +183,9 @@ export const transfer: ComponentManifest = {
                     {
                         // The source items (3: apple/cherry/date) are contained in the source list.
                         description: 'source items are contained within the source list',
-                        parent: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel:nth-of-type(1) .pdx-transfer-list',
+                        parent: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]:first-child [data-part="list"]',
                         children: {
-                            list: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel:nth-of-type(1) .pdx-transfer-list',
+                            list: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]:first-child [data-part="list"]',
                             item: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel:nth-of-type(1) .pdx-transfer-item:first-child',
                         },
                         relations: [
@@ -195,9 +195,9 @@ export const transfer: ComponentManifest = {
                     {
                         // The target item ('banana') is contained in the target list.
                         description: 'target item is contained within the target list',
-                        parent: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-actions + .pdx-transfer-panel .pdx-transfer-list',
+                        parent: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]:last-child [data-part="list"]',
                         children: {
-                            list: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-actions + .pdx-transfer-panel .pdx-transfer-list',
+                            list: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]:last-child [data-part="list"]',
                             item: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-actions + .pdx-transfer-panel .pdx-transfer-item:first-child',
                         },
                         relations: [
@@ -218,7 +218,7 @@ export const transfer: ComponentManifest = {
                             box: 'section:not([hidden]) [data-test="trn-box"]',
                             source: 'section:not([hidden]) [data-test="trn"] .pdx-transfer-panel:nth-of-type(1)',
                             actions: 'section:not([hidden]) [data-test="trn"] .pdx-transfer-actions',
-                            target: 'section:not([hidden]) [data-test="trn"] .pdx-transfer-actions + .pdx-transfer-panel',
+                            target: 'section:not([hidden]) [data-test="trn"] [data-part="panel"]:last-child',
                         },
                         relations: [
                             { description: 'source right edge within the box', left: 'source.right', op: '<=', right: 'box.right', tolerance: 1 },
@@ -247,7 +247,7 @@ export const transfer: ComponentManifest = {
     isolation: {
         scenario: 'transfer-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="tr"] .pdx-transfer-panel', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="tr"] [data-part="panel"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 

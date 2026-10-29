@@ -14,7 +14,6 @@
 import { component, html, signal, model } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/transfer';
@@ -46,6 +45,15 @@ export interface TransferItem {
  * A dual-list shuttle: the user moves items between a source list and a target list, with search,
  * select-all and disabled items, and the chosen values take part in a form.
  *
+ * @csspart root - The frame, a `role="group"` holding the two panels and the move buttons.
+ * @csspart panel - A side, the source or the target: its header, its filter and its list.
+ * @csspart search - A side's filter, while `searchable`; it filters, it is not the value.
+ * @csspart list - A side's `role="listbox"`.
+ * @csspart option - An item of a list.
+ * @csspart move - A button that moves the chosen items, or all of them, to the other side.
+ *
+ * @cssstate disabled - `disabled` is set.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail targetValues $event.detail.value
@@ -53,11 +61,14 @@ export interface TransferItem {
  * @alphadetail direction $event.currentTarget.getDirection()
  */
 component('pdx-transfer', {
-    // The values on the target (right) side (#481). A move, setValue() and clear() write it, and the
-    // write dispatches `value-change`. In DataSource mode the partition comes from the source, and a
-    // move writes the target values it leaves; the diff to persist is getChanges(). A form submits the
-    // target values, one entry each, and resets them (#135).
+    // The values on the target (right) side (#481). A move and clear() write it, and the write
+    // dispatches `value-change`; setting `value` is the way to set it (#287). In DataSource mode the
+    // partition comes from the source, and a move writes the target values it leaves; the diff to
+    // persist is getChanges(). A form submits the target values, one entry each, and resets them (#135).
     models: { value: model<string[]>(() => [], { type: Array, form: true }) },
+    // The visual state, on the host as a custom state (#132, #287): the frame carries no class for it.
+    states: ['disabled'],
+    parts: ['root', 'panel', 'search', 'list', 'option', 'move'],
     props: {
         // ── Model 1: Simple (items + value) ──
         /** All items — array of { value, label, disabled? } */
@@ -116,8 +127,7 @@ component('pdx-transfer', {
         let _moveLeftBtn: HTMLButtonElement | null = null;
         let _moveAllRightBtn: HTMLButtonElement | null = null;
         let _moveAllLeftBtn: HTMLButtonElement | null = null;
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it.
-        reflectNameToHost(ctx);
+        ctx.track(() => { ctx.state('disabled', !!ctx.disabled()); });
 
         // Drag state
         let _dragValue: string | null = null;
@@ -387,7 +397,6 @@ component('pdx-transfer', {
         // destroyed does not build again) ──
         ctx.frame(() => {
             const el = ctx.el;
-            const disabled = ctx.disabled() as boolean;
             const searchable = ctx.searchable() as boolean;
             const showAll = ctx.showAllButtons() as boolean;
             const size = ctx.size() as string;
@@ -397,8 +406,10 @@ component('pdx-transfer', {
             const tgtTitle = (ctx.targetTitle() as string) || getComponentString('transfer', 'target')();
 
             const root = document.createElement('div');
-            root.className = 'pdx-transfer' + (size ? ` pdx-transfer-${size}` : '') + (disabled ? ' disabled' : '') + (isDraggable ? ' pdx-transfer-draggable' : '');
+            // No state class: `disabled` is the host's :state(disabled) (#287).
+            root.className = 'pdx-transfer' + (size ? ` pdx-transfer-${size}` : '') + (isDraggable ? ' pdx-transfer-draggable' : '');
             root.setAttribute('role', 'group');
+            root.setAttribute('data-part', 'root');
             uiAttr(root, 'aria-label', () => uiString('transfer', 'label'));
 
             // Source panel
@@ -532,6 +543,7 @@ component('pdx-transfer', {
                     + (item.disabled ? ' disabled' : '')
                     + (mode === 'direct' ? ' clickable' : '');
                 row.setAttribute('role', 'option');
+                row.setAttribute('data-part', 'option');
                 row.setAttribute('aria-selected', isChecked ? 'true' : 'false');
                 // Disabled options expose aria-disabled (the presentational check is a <span>, so the
                 // disabled state must be programmatic for assistive tech, not just the .disabled class).
@@ -609,6 +621,7 @@ component('pdx-transfer', {
         function buildPanel(side: 'source' | 'target', title: string, searchable: boolean, mode: string): HTMLElement {
             const panel = document.createElement('div');
             panel.className = 'pdx-transfer-panel';
+            panel.setAttribute('data-part', 'panel');
             // role=group (NOT listbox): the real listbox is the inner .pdx-transfer-list; two nested
             // listboxes are invalid (axe aria-required-children/parent).
             panel.setAttribute('role', 'group');
@@ -646,6 +659,7 @@ component('pdx-transfer', {
                 searchWrap.className = 'pdx-transfer-search';
                 const input = document.createElement('input');
                 input.type = 'text';
+                input.setAttribute('data-part', 'search');
                 input.placeholder = getComponentString('transfer', 'search')();
                 // Named after its list: two fields both called "Search" were told apart by nothing.
                 input.setAttribute('aria-label', getComponentString('transfer', 'searchIn')().replace('{list}', title));
@@ -660,6 +674,7 @@ component('pdx-transfer', {
             const list = document.createElement('div');
             list.className = 'pdx-transfer-list';
             list.setAttribute('role', 'listbox');
+            list.setAttribute('data-part', 'list');
             list.setAttribute('aria-label', title);
             if (mode !== 'direct') list.setAttribute('aria-multiselectable', 'true');
             panel.appendChild(list);
@@ -670,21 +685,15 @@ component('pdx-transfer', {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'pdx-transfer-btn';
+            btn.setAttribute('data-part', 'move');
             btn.setAttribute('aria-label', label);
             btn.textContent = icon;
             return btn;
         }
 
-        // Imperative API: el.getValue() / el.setValue(v) / el.clear() (value = target values)
+        // Imperative API (#287): the target values are the model, `el.value`, which replaces
+        // getValue/setValue.
         ctx.expose({
-            /** The keys currently on the target side. */
-            getValue() { return _internalValue(); },
-            /** Replace the target side, which dispatches `value-change`, dropping any move not yet committed. */
-            setValue(v: string[]) {
-                _localOverrides.clear(); _overridesVersion.set(x => x + 1);
-                _internalValue.set(Array.isArray(v) ? v : []);
-                ctx.value.set([..._internalValue.peek()]);
-            },
             clear() {
                 _localOverrides.clear(); _overridesVersion.set(x => x + 1);
                 _internalValue.set([]);
@@ -703,5 +712,7 @@ component('pdx-transfer', {
 
         return {};
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: () => html``,
 });

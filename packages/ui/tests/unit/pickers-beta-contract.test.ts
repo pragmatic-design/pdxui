@@ -13,6 +13,7 @@ import '../../src/select/pdx-select';
 import '../../src/autocomplete/pdx-autocomplete';
 import '../../src/cascader/pdx-cascader';
 import '../../src/tree-select/pdx-tree-select';
+import '../../src/transfer/pdx-transfer';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -78,6 +79,16 @@ const DONE: Row[] = [
         popup: true,
         methods: ['getLabel', 'clear', 'show', 'close', 'toggle'],
         removedMethods: ['getValue', 'setValue', 'openTreeSelect', 'closeTreeSelect'],
+    },
+    {
+        tag: 'pdx-transfer',
+        model: 'value',
+        // Two lists side by side, no popup.
+        states: ['disabled'],
+        parts: ['root', 'panel', 'search', 'list', 'option', 'move'],
+        popup: false,
+        methods: ['clear', 'getChanges', 'getDirection'],
+        removedMethods: ['getValue', 'setValue'],
     },
 ];
 

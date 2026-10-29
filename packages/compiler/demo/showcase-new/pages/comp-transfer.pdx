@@ -62,6 +62,21 @@
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>value-change</code><span>{ value: string[] }</span><span>Its model: target values changed</span></div>
+        <div class="opt-row"><code>pdx-clear</code><span>—</span><span>The target side was emptied by <code>clear()</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The target values are the model, <code>value</code>: read it and set it. What a theme or a page styles on
+        <code>&lt;pdx-transfer&gt;</code>: its custom state on the host and its parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Method, state or part</span><span></span><span>What it is</span></div>
+        <div class="opt-row"><code>clear() / getChanges() / getDirection()</code><span></span><span>Empty the target; in DataSource mode, the last move's diff and direction</span></div>
+        <div class="opt-row"><code>:state(disabled)</code><span></span><span><code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"] / [data-part="panel"]</code><span></span><span>The frame, a group; a side</span></div>
+        <div class="opt-row"><code>[data-part="search"] / [data-part="list"] / [data-part="option"]</code><span></span><span>A side's filter; its listbox; an item</span></div>
+        <div class="opt-row"><code>[data-part="move"]</code><span></span><span>A button that moves items to the other side</span></div>
       </div>
     </section>
   </div>

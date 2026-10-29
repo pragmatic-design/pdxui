@@ -126,10 +126,13 @@ describe('pdx-transfer', () => {
         expect(disabledItem?.getAttribute('aria-disabled')).toBe('true');
     });
 
-    it('applies disabled class on root when disabled', async () => {
+    it('disabled puts no state class on the frame', async () => {
+        // `disabled` is the host's :state(disabled) (#287), measured in Chromium by
+        // transfer-beta-contract.spec.ts; here, no class on the frame for it.
         const el = await mountTransfer({ disabled: true });
         const root = el.querySelector('.pdx-transfer');
-        expect(root?.classList.contains('disabled')).toBe(true);
+        expect(root).not.toBeNull();
+        expect(root?.classList.contains('disabled')).toBe(false);
     });
 
     it('submits through the host, with no hidden input (#135)', async () => {

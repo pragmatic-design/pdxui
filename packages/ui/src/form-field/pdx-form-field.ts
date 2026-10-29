@@ -298,8 +298,10 @@ component('pdx-form-field', {
                 // group's radios are several, and keep their own names («Hour», «Female»).
                 // pdx-json-editor's group is a form of its own: each sub-field has its own name, and the
                 // field's requirement and error are the document's, not each sub-field's (#286). Its
-                // text boxes are neither renamed nor marked.
-                const boxes = group && !group.matches('pdx-json-editor')
+                // text boxes are neither renamed nor marked. pdx-transfer's text boxes are its two
+                // search filters, which are not the value (#287): neither is marked either. Its group
+                // is an element inside the host, so the test is `closest`, not `matches`.
+                const boxes = group && !group.closest('pdx-json-editor, pdx-transfer')
                     ? Array.from(group.querySelectorAll<HTMLElement>('input:not([type="hidden"]):not([type="radio"]):not([type="checkbox"]), textarea'))
                     : [];
                 const soleBox = boxes.length === 1 && boxes[0].hasAttribute('aria-label') ? boxes[0] : null;

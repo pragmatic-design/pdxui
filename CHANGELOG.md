@@ -383,6 +383,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-transfer` takes the beta contract (#287).
+  - **The model is the way.** `getValue()` and `setValue()` are gone: read and set `value`, the
+    target values. `pdx migrate` rewrites `getValue()` on a `:ref` to `.value` and flags `setValue()`.
+  - **States and parts.** `disabled` is a custom state on the host; the frame no longer carries the
+    `disabled` class. The parts are `root` (the frame, a `group`), `panel`, `search`, `list`,
+    `option` and `move`.
+  - **Fixed with it:** inside a `pdx-form-field`, the transfer's two search filters were marked
+    `aria-required` and `aria-invalid` with the field, though they filter and are not the value. The
+    field leaves them alone now, as it does `pdx-json-editor`'s sub-fields; the group is named by the
+    label and described by the hint and the error (A1, A2).
+  - **Not done:** `size` sets a class no stylesheet reads, so it draws nothing today; whether it gets
+    sizes or goes is left to a decision on #287.
 - **Breaking:** `pdx-tree-select` takes the beta contract (#287), as `pdx-cascader` did.
   - **The panel is announced as an overlay's.** `open-change` with `{ value }` replaces `pdx-open` and
     `pdx-close`, once per change. `show()`, `close()` and `toggle()` replace the undeclared

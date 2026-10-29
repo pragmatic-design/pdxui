@@ -27805,25 +27805,6 @@
             },
             {
               "kind": "method",
-              "name": "getValue",
-              "parameters": [],
-              "description": "The keys currently on the target side."
-            },
-            {
-              "kind": "method",
-              "name": "setValue",
-              "parameters": [
-                {
-                  "name": "v",
-                  "type": {
-                    "text": "string[]"
-                  }
-                }
-              ],
-              "description": "Replace the target side, which dispatches `value-change`, dropping any move not yet committed."
-            },
-            {
-              "kind": "method",
               "name": "clear",
               "parameters": [],
               "description": "Clears the value."
@@ -28004,6 +27985,38 @@
                 "disabled?: boolean",
                 "_raw?: any"
               ]
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame, a `role=\"group\"` holding the two panels and the move buttons."
+            },
+            {
+              "name": "panel",
+              "description": "A side, the source or the target: its header, its filter and its list."
+            },
+            {
+              "name": "search",
+              "description": "A side's filter, while `searchable`; it filters, it is not the value."
+            },
+            {
+              "name": "list",
+              "description": "A side's `role=\"listbox\"`."
+            },
+            {
+              "name": "option",
+              "description": "An item of a list."
+            },
+            {
+              "name": "move",
+              "description": "A button that moves the chosen items, or all of them, to the other side."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ]
         }

@@ -5,8 +5,9 @@
 // `:ref` binds on one of `MODEL_METHOD_TAGS` in the same file, called in its template or its script.
 //
 //   ref.getValue()  → ref.value      mechanical: an expression for an expression
-//   ref.setValue(v) → flagged        a call where `ref.value = v` is a statement; and on pdx-cascader it
-//                                    turned anything but an array into `[]`, which `ref.value = v` does not
+//   ref.setValue(v) → flagged        a call where `ref.value = v` is a statement; and on pdx-cascader and
+//                                    pdx-transfer it turned anything but an array into `[]`, which
+//                                    `ref.value = v` does not
 //   a lookup of the tag (`querySelector('pdx-cascader').getValue()`) → flagged
 //
 // Each picker that drops the pair adds its tag in the pull request that brings it over.
@@ -15,7 +16,7 @@ import type { LanguageChange, LanguageChangeFinding } from './changes';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The pickers whose `getValue()`/`setValue()` are removed in favour of the model. */
-export const MODEL_METHOD_TAGS: ReadonlySet<string> = new Set(['pdx-cascader', 'pdx-tree-select']);
+export const MODEL_METHOD_TAGS: ReadonlySet<string> = new Set(['pdx-cascader', 'pdx-tree-select', 'pdx-transfer']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -67,7 +68,7 @@ export const modelSetValue: LanguageChange = {
     marker: 'setValue',
     detect: (text): LanguageChangeFinding[] => refCalls(text, 'setValue').map((m) => ({
         line: lineAt(text, m.index!), found: m[0],
-        note: `Not rewritten: write \`${m[1]}.value = …\` as a statement; on pdx-cascader setValue turned anything but an array into \`[]\`.`,
+        note: `Not rewritten: write \`${m[1]}.value = …\` as a statement; on pdx-cascader and pdx-transfer setValue turned anything but an array into \`[]\`.`,
     })),
     fix: 'flag',
 };
