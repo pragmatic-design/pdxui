@@ -10,7 +10,6 @@ import { usePopover, overlayStack } from '@pdxui/core';
 import { createVirtualizer } from '@pdxui/core';
 import type { DataSource, PopoverPlacement } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/select';
@@ -50,6 +49,24 @@ function normaliseOptions(
  * @slot item - Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).
  * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
  *
+ * @csspart root - The trigger: the frame, its border, background and the states' colours.
+ * @csspart search - The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.
+ * @csspart tag - A chosen option in the trigger, while `multiple`.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while loading.
+ * @csspart popup - The floating panel that holds the list.
+ * @csspart list - The `role="listbox"`.
+ * @csspart option - An option of the list.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set, or the DataSource is loading.
+ * @cssstate multiple - `multiple` is set: the trigger holds tags.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail values $event.detail.value
@@ -62,6 +79,10 @@ component('pdx-select', {
     // A form submits the selection: the value, an empty entry with none as a native select with an
     // empty placeholder, one entry per value when multiple; and resets it (#135).
     models: { value: model<unknown>(null, { type: String, form: true }) },
+    // The visual states, on the host as custom states (#132, #287): a theme styles `pdx-select:state(open)`,
+    // and the design CSS draws the trigger and the popup from them. Neither carries a state class.
+    states: ['open', 'invalid', 'success', 'warning', 'disabled', 'readonly', 'loading', 'multiple'],
+    parts: ['root', 'search', 'tag', 'clear', 'spinner', 'popup', 'list', 'option'],
     // The axis inputs.css keys by (#628), reflected on the host; each value maps the class that draws
     // the same size on a native field. `md` is the base look, which no class adds to.
     variants: {
@@ -110,10 +131,8 @@ component('pdx-select', {
         debounce: prop(200),
     },
     events: {
-        /** Fired when the list opens. */
-        'pdx-open': event<void>({ bubbles: false }),
-        /** Fired when the list closes. */
-        'pdx-close': event<void>({ bubbles: false }),
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
         /** Fired when the clear button empties the selection, after its `value-change`. */
         'pdx-clear': event<void>(),
         /** Fired as the user types in the search input. */
@@ -419,7 +438,7 @@ component('pdx-select', {
             if (ds && _isExternalDS() && ds.data().length === 0 && !ds.isLoading()) {
                 ds.refresh();
             }
-            ctx.emit('pdx-open', undefined, { bubbles: false });
+            ctx.emit('open-change', { value: true });
         }
 
         function close() {
@@ -430,7 +449,7 @@ component('pdx-select', {
             if (_isExternalDS() && _dsRef() && _query.peek()) {
                 _dsRef()!.setFilter([]);
             }
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            ctx.emit('open-change', { value: false });
         }
 
         function toggle() {
@@ -622,7 +641,6 @@ component('pdx-select', {
             if (ctx.multiple()) return sel;
             return sel.length > 0 ? sel[0] : '';
         });
-        reflectNameToHost(ctx);
 
         // ── Popover setup ──
         // Popover setup: deferred to after mount (querySelector needs rendered DOM)
@@ -728,17 +746,6 @@ component('pdx-select', {
             };
         });
 
-        // ── CSS classes ──
-        function triggerClass(): string {
-            let cls = 'pdx-select-trigger pdx-input-wrap';
-            if (ctx.disabled()) cls += ' disabled';
-            if (ctx.readonly()) cls += ' readonly';
-            if (ctx.error()) cls += ' error';
-            if (ctx.success()) cls += ' success';
-            if (ctx.warning()) cls += ' warning';
-            if (ctx.multiple()) cls += ' multiple';
-            return cls;
-        }
 
         // ── Click handling ──
         function onTriggerClick(e: Event) {
@@ -757,20 +764,28 @@ component('pdx-select', {
             return ds ? ds.isLoading() : false;
         });
 
+        ctx.track(() => {
+            ctx.state('open', _open());
+            ctx.state('invalid', !!ctx.error());
+            ctx.state('success', !!ctx.success());
+            ctx.state('warning', !!ctx.warning());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+            ctx.state('loading', isLoading());
+            ctx.state('multiple', !!ctx.multiple());
+        });
+
         // Cleanup debounce and type-ahead timers on disconnect
         ctx.track(() => () => {
             if (_searchDebounceTimer) clearTimeout(_searchDebounceTimer);
             if (_typeTimer) clearTimeout(_typeTimer);
         });
 
-        // Expose programmatic API on the host element
-        (ctx.el as any).openSelect = open;
-        (ctx.el as any).closeSelect = close;
-        (ctx.el as any).toggleSelect = toggle;
         // UI-03: read-only `selectedItem` getter returning the raw selected record(s).
         // (`value` is reflected onto the host prop by reflectValue() — see above — so
         // `el.value` is already readable; `selectedItem` exposes the full object.)
-        // Imperative API: focus/blur/clear (merged with selectedItem getter)
+        // Imperative API: focus/blur/clear, and the popup driven with the overlay verbs (#287), which
+        // replace the alpha openSelect/closeSelect/toggleSelect.
         ctx.expose({
             get selectedItem(): unknown {
                 const items = getSelectedItems().map(i => i._raw);
@@ -780,13 +795,19 @@ component('pdx-select', {
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() { clearSelection(); },
+            /** Open the popup. */
+            show() { open(); },
+            /** Close the popup. */
+            close() { close(); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { toggle(); },
         });
 
         return {
             uid, listboxId,
             _open, _query, _activeIndex, _selectedValues, _userTyped,
             displayItems, groupedItems, useVirtual, virtualItems, virtualTotalSize,
-            triggerClass, getSelectedLabel, getSelectedItems, getSelectedItem, isItemSelected, isLoading,
+            getSelectedLabel, getSelectedItems, getSelectedItem, isItemSelected, isLoading,
             inputInTrigger, activeId,
             renderItemContent, renderSelectedContent,
             onTriggerClick, onTriggerKeydown, onSearchInput, onOptionClick, onListMousedown,
@@ -794,9 +815,12 @@ component('pdx-select', {
             showCreateOption, createOption,
         };
     },
+    // A form-associated element is in FormData under its `name` attribute (#133).
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
-        <div :class="${ctx.triggerClass}" data-part="root"
+        <div class="pdx-select-trigger pdx-input-wrap" data-part="root"
             :role="${() => ctx.inputInTrigger() ? null : 'combobox'}"
+            :aria-invalid="${() => !ctx.inputInTrigger() && ctx.error() ? 'true' : null}"
             :aria-haspopup="${() => ctx.inputInTrigger() ? null : 'listbox'}"
             :aria-expanded="${() => ctx.inputInTrigger() ? null : String(ctx._open())}"
             :aria-controls="${() => ctx.inputInTrigger() ? null : ctx.listboxId}"
@@ -820,27 +844,28 @@ component('pdx-select', {
                                 const cap = ctx.maxTagCount() as number;
                                 // Summary mode (cap 0): single "N selected" chip, no per-tag removal.
                                 if (cap === 0 && items.length > 0) {
-                                    return html`<span class="pdx-chip pdx-chip-sm pdx-chip-summary">${() => format(uiString('select', 'selected'), { n: items.length })}</span>`;
+                                    return html`<span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">${() => format(uiString('select', 'selected'), { n: items.length })}</span>`;
                                 }
                                 const capped = cap > 0 && items.length > cap;
                                 const shown = capped ? items.slice(0, cap) : items;
                                 const overflow = capped ? items.length - cap : 0;
                                 return html`
                                     ${shown.map((item: NormalisedOption) => html`
-                                        <span class="pdx-chip pdx-chip-sm">
+                                        <span class="pdx-chip pdx-chip-sm" data-part="tag">
                                             <span>${() => item.label}</span>
                                             <button class="pdx-chip-remove" type="button" tabindex="-1"
                                                 :aria-label="${() => format(uiString('select', 'remove'), { label: item.label })}"
                                                 @click="${(e: Event) => { e.stopPropagation(); ctx.removeTag(item.value); }}">×</button>
                                         </span>
                                     `)}
-                                    ${overflow > 0 ? html`<span class="pdx-chip pdx-chip-sm pdx-chip-summary">+${overflow}</span>` : ''}`;
+                                    ${overflow > 0 ? html`<span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">+${overflow}</span>` : ''}`;
                             }}
                             ${() => searchable
-                                ? html`<input class="pdx-select-tag-search"
+                                ? html`<input class="pdx-select-tag-search" data-part="search"
                                     type="text"
                                     autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                                     role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+                                    :aria-invalid="${() => ctx.error() ? 'true' : null}"
                                     :aria-expanded="${() => String(ctx._open())}"
                                     :aria-controls="${() => ctx.listboxId}"
                                     :aria-activedescendant="${ctx.activeId}"
@@ -862,10 +887,11 @@ component('pdx-select', {
                     // Its keys reach onTriggerKeydown by bubbling to the trigger. It had its own
                     // handler as well, so every key ran twice: ↓ skipped an option, and the Enter
                     // that picked one reopened the list.
-                    return html`<input class="pdx-select-search"
+                    return html`<input class="pdx-select-search" data-part="search"
                         type="text"
                         autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                         role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+                        :aria-invalid="${() => ctx.error() ? 'true' : null}"
                         :aria-expanded="${() => String(ctx._open())}"
                         :aria-controls="${() => ctx.listboxId}"
                         :aria-activedescendant="${ctx.activeId}"
@@ -896,19 +922,19 @@ component('pdx-select', {
             }}
 
             ${() => ctx.clearable() && !ctx.disabled() && !ctx.readonly() && ctx._selectedValues().size > 0
-                ? html`<button class="pdx-input-clear pdx-input-suffix-interactive" type="button" :aria-label="${() => uiString('select', 'clear')}" tabindex="-1"
+                ? html`<button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="${() => uiString('select', 'clear')}" tabindex="-1"
                     @click="${(e: Event) => { e.stopPropagation(); ctx.clearSelection(); }}">×</button>`
                 : ''}
             ${() => ctx.isLoading()
-                ? html`<span class="pdx-input-loading" role="status" :aria-label="${() => uiString('select', 'loading')}"></span>`
+                ? html`<span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="${() => uiString('select', 'loading')}"></span>`
                 : ''}
             <span class="pdx-select-caret"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
         </div>
 
-        <div :class="${() => 'pdx-select-dropdown' + (ctx._open() ? ' open' : '')}">
+        <div class="pdx-select-dropdown" data-part="popup">
             ${() => ctx.searchable() && ctx.searchPosition() === 'dropdown'
                 ? html`<div class="pdx-select-search-wrap">
-                    <input class="pdx-select-dropdown-search"
+                    <input class="pdx-select-dropdown-search" data-part="search"
                         type="text"
                         autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                         :aria-controls="${() => ctx.listboxId}"
@@ -927,7 +953,8 @@ component('pdx-select', {
                 }}
             </span>
             <div class="${() => 'pdx-select-list' + (ctx.useVirtual() ? ' virtual' : '')}"
-                role="listbox"
+                role="listbox" data-part="list"
+                :aria-busy="${() => ctx.isLoading() ? 'true' : null}"
                 :id="${() => ctx.listboxId}"
                 :aria-label="${() => (ctx.label() as string) || uiString('select', 'listbox')}"
                 :aria-multiselectable="${() => ctx.multiple() ? 'true' : null}"
@@ -944,8 +971,12 @@ component('pdx-select', {
                         return ctx.virtualItems().map((vi: { index: number; offsetStart: number; size: number }) => {
                             const item = items[vi.index];
                             if (!item) return '';
+                            // Only part of the options is in the DOM: each says where it stands among
+                            // all of them, or a screen reader counts the rendered ones (A3, #287).
                             return html`<div class="${() => 'pdx-select-option' + (ctx._activeIndex() === vi.index ? ' active' : '')}"
-                                role="option"
+                                role="option" data-part="option"
+                                :aria-setsize="${() => String(items.length)}"
+                                :aria-posinset="${() => String(vi.index + 1)}"
                                 :id="${() => ctx.uid + '-opt-' + vi.index}"
                                 data-option-index="${() => vi.index}"
                                 :aria-selected="${() => ctx.isItemSelected(item.value) ? 'true' : 'false'}"
@@ -967,7 +998,7 @@ component('pdx-select', {
                             for (const item of groupItems) {
                                 const idx = globalIdx++;
                                 result.push(html`<div class="${() => 'pdx-select-option' + (ctx._activeIndex() === idx ? ' active' : '')}"
-                                    role="option"
+                                    role="option" data-part="option"
                                     :id="${() => ctx.uid + '-opt-' + idx}"
                                     data-option-index="${() => idx}"
                                     :aria-selected="${() => ctx.isItemSelected(item.value) ? 'true' : 'false'}"
@@ -983,7 +1014,7 @@ component('pdx-select', {
                     // Flat mode
                     return items.map((item: NormalisedOption, idx: number) =>
                         html`<div class="${() => 'pdx-select-option' + (ctx._activeIndex() === idx ? ' active' : '')}"
-                            role="option"
+                            role="option" data-part="option"
                             :id="${() => ctx.uid + '-opt-' + idx}"
                             data-option-index="${() => idx}"
                             :aria-selected="${() => ctx.isItemSelected(item.value) ? 'true' : 'false'}"
@@ -995,7 +1026,7 @@ component('pdx-select', {
                 }}
                 ${() => ctx.showCreateOption()
                     ? html`<div class="pdx-select-option pdx-select-create"
-                        role="option"
+                        role="option" data-part="option"
                         @click="${() => ctx.createOption()}">
                         <span class="pdx-select-create-icon">+</span>
                         ${() => ((ctx.createLabel() as unknown as string) || uiString('select', 'create')).replace('{query}', ctx._query())}

@@ -13,8 +13,12 @@ pdx-select {
     user-select: none;
     position: relative;
 }
-.pdx-select-trigger.disabled { cursor: not-allowed; }
-.pdx-select-trigger.readonly { cursor: default; }
+/* The component's states are custom states of the host (#287); native markup keeps the classes. Both
+   forms weigh (0,2,0). */
+.pdx-select-trigger.disabled,
+:state(disabled) > .pdx-select-trigger { cursor: not-allowed; }
+.pdx-select-trigger.readonly,
+:state(readonly) > .pdx-select-trigger { cursor: default; }
 
 /* Value display (non-searchable) */
 .pdx-select-value {
@@ -95,14 +99,21 @@ pdx-select {
 }
 
 /* Multiple mode: auto-height trigger */
-.pdx-select-trigger.multiple {
+.pdx-select-trigger.multiple,
+:state(multiple) > .pdx-select-trigger {
     height: auto;
     min-height: 2.5rem;
 }
-:where(pdx-select[size="xs"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-xs { min-height: 1.75rem; }
-:where(pdx-select[size="sm"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-sm { min-height: 2.125rem; }
-:where(pdx-select[size="lg"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-lg { min-height: 3rem; }
-:where(pdx-select[size="xl"]) > .pdx-select-trigger.multiple[data-part="root"], .pdx-select-trigger.multiple.pdx-input-xl { min-height: 3.5rem; }
+/* The component: the host's size and its `multiple` state, (0,3,0). */
+:where(pdx-select[size="xs"]):state(multiple) > .pdx-select-trigger[data-part="root"] { min-height: 1.75rem; }
+:where(pdx-select[size="sm"]):state(multiple) > .pdx-select-trigger[data-part="root"] { min-height: 2.125rem; }
+:where(pdx-select[size="lg"]):state(multiple) > .pdx-select-trigger[data-part="root"] { min-height: 3rem; }
+:where(pdx-select[size="xl"]):state(multiple) > .pdx-select-trigger[data-part="root"] { min-height: 3.5rem; }
+/* Native markup: the trigger's own size class, (0,3,0) as well. */
+.pdx-select-trigger.multiple.pdx-input-xs { min-height: 1.75rem; }
+.pdx-select-trigger.multiple.pdx-input-sm { min-height: 2.125rem; }
+.pdx-select-trigger.multiple.pdx-input-lg { min-height: 3rem; }
+.pdx-select-trigger.multiple.pdx-input-xl { min-height: 3.5rem; }
 
 /* Tag search input inline */
 .pdx-select-tag-search {
@@ -128,7 +139,8 @@ pdx-select {
     overflow: hidden;
     display: none;
 }
-.pdx-select-dropdown.open {
+.pdx-select-dropdown.open,
+:state(open) > .pdx-select-dropdown {
     display: block;
 }
 

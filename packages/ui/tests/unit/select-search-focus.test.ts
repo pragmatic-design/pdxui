@@ -25,8 +25,9 @@ async function searchableSelect(attrs: Record<string, string> = {}): Promise<HTM
     return el;
 }
 
+// Open is the combobox's aria-expanded and the host's :state(open) (#287), no class.
 const isOpen = (el: HTMLElement): boolean =>
-    !!el.querySelector('.pdx-select-dropdown')?.classList.contains('open');
+    el.querySelector('[role="combobox"]')?.getAttribute('aria-expanded') === 'true';
 
 describe('pdx-select searchable — focusing the search field', () => {
     it('opens the list, and nothing is thrown', async () => {

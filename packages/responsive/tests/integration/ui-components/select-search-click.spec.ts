@@ -29,7 +29,7 @@ async function mountSearchable(page: Page): Promise<string[]> {
 }
 
 const isOpen = (page: Page): Promise<boolean> =>
-    page.evaluate(() => !!document.querySelector('[data-test="searchable"] .pdx-select-dropdown')?.classList.contains('open'));
+    page.evaluate(() => !!document.querySelector('[data-test="searchable"]')?.matches(':state(open)'));
 
 test.describe('pdx-select searchable — the search field', () => {
     test('a mouse click opens the list, and no error reaches the page', async ({ page }) => {

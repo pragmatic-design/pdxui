@@ -41,13 +41,14 @@ function count(el: HTMLElement, type: string): () => number {
 describe('a popup inside a popup: the inner one\'s events stay on it', () => {
     beforeEach(cleanup);
 
+    // The select announces its popup with open-change (#287), which no more bubbles than pdx-close did.
     it('pdx-select in pdx-dialog: the select\'s open and close do not reach the dialog', async () => {
         const { outer, inner } = await nest('pdx-dialog', 'pdx-select', (s) => {
             (s as HTMLElement & { options: unknown[] }).options = [{ value: 'rossi', label: 'Dr. Rossi' }];
         });
         const dialogCloses = count(outer, 'pdx-close');
-        const dialogOpens = count(outer, 'pdx-open');
-        const selectCloses = count(inner, 'pdx-close');
+        const dialogChanges = count(outer, 'open-change');
+        const selectChanges = count(inner, 'open-change');
 
         const trigger = inner.querySelector('.pdx-select-trigger') as HTMLElement;
         trigger.click();
@@ -55,9 +56,9 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         trigger.click();
         await tick(20);
 
-        expect(selectCloses(), 'the select did not announce its own close').toBe(1);
+        expect(selectChanges(), 'the select did not announce its own open and close').toBe(2);
         expect(dialogCloses(), 'the dialog heard the select close, and an app would close the dialog').toBe(0);
-        expect(dialogOpens()).toBe(0);
+        expect(dialogChanges(), 'the select\'s open-change bubbled to the dialog').toBe(0);
     });
 
     it('pdx-date-picker in pdx-drawer: the picker\'s close does not reach the drawer', async () => {

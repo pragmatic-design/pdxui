@@ -73,14 +73,21 @@ paged table → `pdx-relation-picker`.
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
+| `show()` | Open the popup. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 
-**Events:** `pdx-clear` — Fired when the clear button empties the selection, after its `value-change`.; `pdx-close` — Fired when the list closes. Does not bubble.; `pdx-create` → `detail: { value: string; label: string }` — Fired when the user creates an option from the search text.; `pdx-open` — Fired when the list opens. Does not bubble.; `pdx-search` → `detail: { query: string }` — Fired as the user types in the search input.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `pdx-clear` — Fired when the clear button empties the selection, after its `value-change`.; `pdx-create` → `detail: { value: string; label: string }` — Fired when the user creates an option from the search text.; `pdx-search` → `detail: { query: string }` — Fired as the user types in the search input.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `presentation` · `status`
 
 **Injects:** `DataSourceContext` (optional)
 
 **Slot:** `item` — Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).; `selected` — Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
+
+**States:** `:state(open)` — The popup is open.; `:state(invalid)` — `error` is set.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set, or the DataSource is loading.; `:state(multiple)` — `multiple` is set: the trigger holds tags.
+
+**Parts:** `[data-part="root"]` — The trigger: the frame, its border, background and the states' colours.; `[data-part="search"]` — The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.; `[data-part="tag"]` — A chosen option in the trigger, while `multiple`.; `[data-part="clear"]` — The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`.; `[data-part="spinner"]` — The loading spinner, a `role="status"`, while loading.; `[data-part="popup"]` — The floating panel that holds the list.; `[data-part="list"]` — The `role="listbox"`.; `[data-part="option"]` — An option of the list.
 
 
 #### Examples

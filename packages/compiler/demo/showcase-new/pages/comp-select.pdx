@@ -60,6 +60,39 @@
     <!-- ═══ Composition ═══ -->
     <app-demo-comp-select-composition class="demo-section"></app-demo-comp-select-composition>
 
+    <!-- ═══ The popup, states and parts ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading">The popup, states and parts</h2>
+      <p class="pdx-txt-small pdx-ink-muted">
+        The list is a popup, announced as an overlay's: <code>open-change</code> with <code>{ value }</code>,
+        <code>true</code> when it opens and <code>false</code> when it closes, and driven by the overlay verbs.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Event or method</span><span>What it does</span></div>
+        <div class="opt-row"><code>@open-change</code><span>The popup opened or closed: <code>$event.detail.value</code> is <code>true</code> or <code>false</code></span></div>
+        <div class="opt-row"><code>show() / close() / toggle()</code><span>Open, close, or flip the popup</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        What a theme or a page styles on <code>&lt;pdx-select&gt;</code>: its custom states on the host and its
+        parts. The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>When</span></div>
+        <div class="opt-row"><code>:state(open)</code><span>The popup is open</span></div>
+        <div class="opt-row"><code>:state(invalid)</code><span><code>error</code> is set</span></div>
+        <div class="opt-row"><code>:state(success) / :state(warning)</code><span><code>success</code> / <code>warning</code> is set</span></div>
+        <div class="opt-row"><code>:state(disabled) / :state(readonly)</code><span><code>disabled</code> / <code>readonly</code> is set</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span><code>loading</code> is set, or the DataSource is loading</span></div>
+        <div class="opt-row"><code>:state(multiple)</code><span><code>multiple</code> is set</span></div>
+        <div class="opt-row"><code>[data-part="root"]</code><span>The trigger</span></div>
+        <div class="opt-row"><code>[data-part="search"] / [data-part="tag"]</code><span>The search field; a chosen option in a multiple trigger</span></div>
+        <div class="opt-row"><code>[data-part="clear"] / [data-part="spinner"]</code><span>The clear button, the loading spinner</span></div>
+        <div class="opt-row"><code>[data-part="popup"] / [data-part="list"] / [data-part="option"]</code><span>The floating panel, the listbox, an option</span></div>
+      </div>
+    </section>
+
   </div>
 </template>
 
