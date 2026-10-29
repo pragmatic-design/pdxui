@@ -91,26 +91,27 @@ async function sweep(page: Page, opts: SweepOptions = { selector: TEXT }): Promi
     }, opts);
 }
 
-for (const theme of THEMES) {
-    for (const scheme of ['light', 'dark'] as const) {
-        test(`${theme} · ${scheme}: coloured and muted text reaches AA`, async ({ page }) => {
-            await page.addInitScript((t) => localStorage.setItem('pdx-theme', t), theme);
-            const all: string[] = [];
-            let measured = 0;
-            for (const path of PAGES) {
-                await page.goto(path, { waitUntil: 'networkidle' });
-                await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
-                await page.evaluate((s) => document.documentElement.setAttribute('pdx-scheme', s), scheme);
-                await expect(page.locator('html')).toHaveAttribute('pdx-theme', theme);
-                await expect.poll(async () => (await sweep(page)).count, `${path}: nothing to measure`).toBeGreaterThan(0);
-                const { count, failures } = await sweep(page);
-                measured += count;
-                all.push(...failures.map((f) => `${path}: ${f}`));
-            }
-            expect(measured).toBeGreaterThan(50);
-            expect(all, `text under 4.5:1 in ${theme}/${scheme}`).toEqual([]);
-        });
-    }
+// One test per (theme, scheme, page): a test that visited all ten pages used 11 to 18 s of its 30 at
+// rest, and timed out under the full gate (#730).
+const SWEEPS = THEMES.flatMap((theme) => (['light', 'dark'] as const).flatMap((scheme) =>
+    PAGES.map((path) => ({ theme, scheme, path }))));
+
+test('the sweep covers every theme, scheme and page', () => {
+    expect(SWEEPS.length, '3 themes × 2 schemes × 10 pages').toBe(60);
+    expect(new Set(SWEEPS.map((s) => `${s.theme}|${s.scheme}|${s.path}`)).size).toBe(60);
+});
+
+for (const { theme, scheme, path } of SWEEPS) {
+    test(`${theme} · ${scheme} · ${path}: coloured and muted text reaches AA`, async ({ page }) => {
+        await page.addInitScript((t) => localStorage.setItem('pdx-theme', t), theme);
+        await page.goto(path, { waitUntil: 'networkidle' });
+        await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' });
+        await page.evaluate((s) => document.documentElement.setAttribute('pdx-scheme', s), scheme);
+        await expect(page.locator('html')).toHaveAttribute('pdx-theme', theme);
+        await expect.poll(async () => (await sweep(page)).count, `${path}: nothing to measure`).toBeGreaterThan(0);
+        const { failures } = await sweep(page);
+        expect(failures, `text under 4.5:1 in ${theme}/${scheme} on ${path}`).toEqual([]);
+    });
 }
 
 /**
