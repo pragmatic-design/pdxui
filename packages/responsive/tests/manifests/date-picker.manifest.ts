@@ -118,9 +118,17 @@ export const datePicker: ComponentManifest = {
                         ariaLabel="Event date">
                     </pdx-date-picker>
                 </div>`,
+            // The open state includes the focus on the chosen day, and it lands only once the
+            // calendar has drawn its first view (a zero-delay timer, then a frame), which nothing
+            // orders before the page's ready signal. A loaded runner shot day 15 without its focus
+            // ring (#737): the setup waits for the focus to enter the panel, an event, not a delay.
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-open"]');
-                if (host && typeof host.openPopover === 'function') host.openPopover();`,
+                if (host && typeof host.openPopover === 'function') {
+                    const focused = new Promise((resolve) => host.addEventListener('focusin', resolve, { once: true }));
+                    host.openPopover();
+                    await focused;
+                }`,
         },
         {
             // The month view open (mode="month"): the months grid is a group named by the year and the
