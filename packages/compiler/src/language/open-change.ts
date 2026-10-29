@@ -24,6 +24,7 @@
 
 import type { LanguageChange, LanguageChangeFinding, LanguageChangeScope } from './changes';
 import { parseSFC } from '../parser/sfc';
+import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
 export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select']);
@@ -205,7 +206,7 @@ function autocompleteOpenCalls(text: string): RegExpMatchArray[] {
     const names = autocompleteRefs(text);
     if (names.length === 0) return [];
     // Match: the name standing alone, its member access and `open()`. Groups: [1]=the name [2]=`.` or `?.`
-    const call = new RegExp(`(?<![\\w$.])(${names.map((n) => n.replace(/\$/g, '\\$')).join('|')})\\s*(\\??\\.)\\s*open\\s*\\(\\s*\\)`, 'g');
+    const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*open\\s*\\(\\s*\\)`, 'g');
     return [...text.matchAll(call)];
 }
 
