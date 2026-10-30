@@ -215,6 +215,20 @@
                 api.readOpen = () => open();
             },
 
+            // pdx-alert-dialog on the beta contract (#288), the same way.
+            'alert-dialog-beta-contract': () => {
+                const open = signal(false);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="opener" commandfor="bound-alert" command="--show">Delete</button>
+                        <pdx-alert-dialog id="bound-alert" ::open=${open} title="Delete it?" close-on-escape></pdx-alert-dialog>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
+            },
+
             // A crumb with no href has to be reachable from the keyboard.
             'breadcrumb-no-href': () => {
                 const sec = show('case-breadcrumb-no-href');

@@ -394,6 +394,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-alert-dialog` takes the beta contract (#288).
+  - **`open` is a model.** Confirm, Cancel and Escape (with `close-on-escape`) write it and announce
+    `open-change` `{ value }`, so `::open="x"` follows them. `pdx-confirm` and `pdx-cancel` stay, and
+    are declared.
+  - **States and parts.** `open` and `loading` are custom states on the host; the backdrop no longer
+    carries `data-open`. The parts are `root` (the panel), `backdrop`, `header`, `body`, `footer`,
+    `cancel`, `confirm` and `confirm-input`.
+  - **Fixed with it:** nothing said the dialog was busy while `loading`. The panel is now
+    `aria-busy="true"` while `loading` (A4).
+
 - **Breaking:** `pdx-dialog` takes the beta contract (#288).
   - **`open` is a model.** The dialog writes it when it closes itself — Escape, the backdrop, its close
     button — and announces it with `open-change` `{ value }`, so `::open="x"` follows it. `pdx-close`
@@ -401,7 +411,7 @@ semver.
   - **States and parts.** `open`, `loading`, `scroll-top` and `scroll-bottom` are custom states on the
     host; the backdrop no longer carries `data-open`, nor the body `pdx-scroll-top` or
     `pdx-scroll-bottom`. The parts are `root` (the panel), `backdrop`, `header`, `close`, `body` and
-    `footer`. `pdx-alert-dialog`, the overlay outlet and native markup keep `[data-open]`.
+    `footer`. The overlay outlet and native markup keep `[data-open]`.
   - **Busy while loading.** The panel is `aria-busy="true"` while `loading`, not the host (A4).
   - **`pdx-before-close` stays on the dialog**: it no longer bubbles, as no undeclared event does (#138).
 

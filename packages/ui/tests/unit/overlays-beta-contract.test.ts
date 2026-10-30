@@ -35,6 +35,15 @@ const DONE: Row[] = [
         parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer'],
         removed: ['pdx-close'],
     },
+    {
+        tag: 'pdx-alert-dialog',
+        models: ['open'],
+        // `loading` holds the confirm back and busies the panel.
+        states: ['open', 'loading'],
+        // The dialog's panel and sections, its two buttons, and the field a type-to-confirm asks for.
+        parts: ['root', 'backdrop', 'header', 'body', 'footer', 'cancel', 'confirm', 'confirm-input'],
+        removed: [],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */
