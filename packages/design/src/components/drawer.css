@@ -36,8 +36,7 @@
 
 /* Visible at once, not transitioned: for the first frame of a `visibility` transition the value is
  * still `hidden`, so a click on the backdrop went through to the page (#472). */
-.pdx-drawer-backdrop[data-open],
-pdx-drawer:state(open) > .pdx-drawer-backdrop {
+.pdx-drawer-backdrop:is([data-open], pdx-drawer:state(open) > *) {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-base) ease-out, visibility 0ms;
@@ -64,8 +63,7 @@ pdx-drawer:state(open) > .pdx-drawer-backdrop {
     visibility: hidden;
 }
 
-.pdx-drawer[data-open],
-pdx-drawer:state(open) > .pdx-drawer {
+.pdx-drawer:is([data-open], pdx-drawer:state(open) > *) {
     visibility: visible;
 }
 
@@ -96,10 +94,9 @@ pdx-drawer:state(open) > .pdx-drawer {
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
 }
 
-.pdx-drawer[data-open],
-.pdx-drawer[position="left"][data-open],
-pdx-drawer:state(open) > .pdx-drawer,
-pdx-drawer:state(open) > .pdx-drawer[position="left"] {
+/* Open, at any position: one rule, which weighs more than each position's closed rule below. */
+.pdx-drawer:is([data-open], pdx-drawer:state(open) > *),
+.pdx-drawer[position]:is([data-open], pdx-drawer:state(open) > *) {
     transform: none;
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
@@ -118,12 +115,6 @@ pdx-drawer:state(open) > .pdx-drawer[position="left"] {
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
 }
 
-.pdx-drawer[position="right"][data-open],
-pdx-drawer:state(open) > .pdx-drawer[position="right"] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
-}
-
 /* Top */
 .pdx-drawer[position="top"] {
     top: 0;
@@ -136,12 +127,6 @@ pdx-drawer:state(open) > .pdx-drawer[position="right"] {
     border-right: none;
     transform: translateY(-100%);
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
-}
-
-.pdx-drawer[position="top"][data-open],
-pdx-drawer:state(open) > .pdx-drawer[position="top"] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
 
 /* Bottom */
@@ -157,12 +142,6 @@ pdx-drawer:state(open) > .pdx-drawer[position="top"] {
     border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
     transform: translateY(100%);
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
-}
-
-.pdx-drawer[position="bottom"][data-open],
-pdx-drawer:state(open) > .pdx-drawer[position="bottom"] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
 
 /* ===== Sizes ===== */
