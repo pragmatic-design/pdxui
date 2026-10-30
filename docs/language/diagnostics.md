@@ -47,6 +47,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_ATTACH_UNKNOWN` | error | `attach:name` whose name is neither in the script nor one of core's attachments (#143). | `attach:`, [template.md](template.md) |
 | `PDX_PIPE_SINGLE` | info | A template interpolation with exactly one pipe; its fix is the call (#129). | `{{ }}` pipes, [template.md](template.md) |
 | `PDX_BINDING_MODIFIER` | error | A binding modifier outside the closed list (#126). | `::name`, `:name`, [template.md](template.md) |
+| `PDX_ONE_WAY_EDITED_FIELD` | warn | A one-way `:value`/`:checked` on a native field whose own `@input`/`@change` handler writes the bound signal; the field wants `::value` (#678). | `:name`, `::name`, [template.md](template.md) |
 | `PDX_PROP_REQUIRED` | error | A component used without a prop it requires (#130). | `@prop`, [script.md](script.md) |
 | `PDX_NAME_RESERVED` | error | A `@prop`, `@model` or typed `@slot` named after a member of the element (#542, #545). | `@prop`, `@model`, `@slot`, [script.md](script.md) |
 | `PDX_SLOT_REQUIRED` | error | A component used without a snippet it requires (#489). | `@slot`, [script.md](script.md); `@snippet`, [template.md](template.md) |

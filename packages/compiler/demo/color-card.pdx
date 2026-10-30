@@ -7,13 +7,13 @@
     </div>
     <div class="controls">
       <label>Color
-        <input type="color" :value="color" @input="onColor" />
+        <input type="color" ::value="color" />
       </label>
       <label>Radius: {{ radius }}px
-        <input type="range" min="0" max="50" :value="radius" @input="onRadius" />
+        <input type="range" min="0" max="50" ::value.number="radius" />
       </label>
       <label>Scale: {{ scale }}
-        <input type="range" min="50" max="200" :value="scalePercent" @input="onScale" />
+        <input type="range" min="50" max="200" ::value.number="scalePercent" />
       </label>
     </div>
   </div>
@@ -30,10 +30,6 @@
   const previewStyle = $derived(
     `background: ${color}; border-radius: ${radius}px; transform: scale(${scale})`
   );
-
-  function onColor(e) { color = e.target.value; }
-  function onRadius(e) { radius = parseInt(e.target.value); }
-  function onScale(e) { scalePercent = parseInt(e.target.value); }
 </script>
 
 <style scoped>

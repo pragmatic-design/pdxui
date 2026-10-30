@@ -15,6 +15,7 @@ specifies it, or this specification (a proposal the implementing issue may renam
 | `PDX_PROP_REQUIRED` | error | A required prop the parent does not give. | `@prop` | #130 (landed) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not a `@model`. | `::name`, `@model` | #124 |
 | `PDX_BINDING_MODIFIER` | error | A binding modifier outside the closed list. | `::name`, `:name.once` | #126 |
+| `PDX_ONE_WAY_EDITED_FIELD` | warn | A one-way `:value`/`:checked` on a native field whose own handler writes the bound signal; the field wants `::value`. | `:name`, `::name` | #678 (landed) |
 | `PDX_FORM_REQUIRED_IN_MARKUP` | warn | `required` on a control bound to a form field; it belongs in the schema. | `@form` | #128 (landed) |
 | `PDX_SLOT_REQUIRED` | error | A required slot the parent does not fill. | `@slot` | #131 — landed, #489 |
 | `PDX_STATE_NOT_BOOLEAN` | error | An `@state` expression that is not boolean. | `@state` | #132 |

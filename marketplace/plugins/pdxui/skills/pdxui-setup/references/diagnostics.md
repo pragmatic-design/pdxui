@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 106 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 107 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -915,6 +915,36 @@ Each becomes a property of the element, defined over the member of the same name
 Only `$signal` and `$derived` are tracked. A plain variable is read once: the template keeps showing its first value.
 
 **Fix.** Declare it with `$signal`: `let count = $signal(0);`. `pdx check --fix` and the editor apply it.
+
+### PDX_ONE_WAY_EDITED_FIELD
+
+*warn* — A one-way `:value` or `:checked` on a native field whose own `@input`/`@change` handler writes the bound signal (#678).
+
+A one-way binding writes when its value changes, not when the field differs from it (#44): a re-run for another reason must not overwrite what is being typed. So a handler that writes the signal and puts it back — the user types `a`, the handler clears it to `''`, the value the binding last wrote — leaves `a` in the field while the signal is empty, without a word. A field whose state must win over what is in it is the two-way form, `::value`.
+
+**Fix.** Bind it two-way, `::value="x"` (or `::checked`, `::value.number`), and keep in the handler only what it does besides writing `x` from the field. When the handler is nothing but `x = $event.target.value`, the fix does it. `pdx check --fix` and the editor apply it.
+
+Instead of:
+
+```html
+<template>
+  <input :value="query" @input="query = $event.target.value" />
+</template>
+<script>
+let query = $signal('');
+</script>
+```
+
+write:
+
+```html
+<template>
+  <input ::value="query" />
+</template>
+<script>
+let query = $signal('');
+</script>
+```
 
 ### PDX_PAGE_EMPTY_CONSTRAINT
 

@@ -65,6 +65,14 @@ field, `change` on a `<select>` and on `::checked`, and on a component its `<nam
 component prop that is not a model is an error, `PDX_TWO_WAY_NOT_MODEL` — `::page` on `pdx-pagination`,
 say, which announces a page but holds no model.
 
+A one-way `:value` is not the controlled form: it writes the field when its value *changes*, so that a
+re-render for another reason never overwrites what is being typed. A handler that writes the signal
+and puts it back — the user types `a`, `@input` sets `query` to `'a'` and then clears it — leaves `a`
+in the field while `query` is `''`, since the value the binding last wrote is `''` again. When a field's
+own `@input` or `@change` writes the signal its `:value` (or `:checked`) reads, the compiler warns,
+`PDX_ONE_WAY_EDITED_FIELD`: bind it `::value`, and keep in the handler only what it does besides that
+write.
+
 Modifiers shape the value on its way back — the list is closed, and anything else is the error
 `PDX_BINDING_MODIFIER`:
 

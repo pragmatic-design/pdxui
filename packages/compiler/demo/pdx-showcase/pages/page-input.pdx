@@ -7,7 +7,7 @@
       <h3>Text Input</h3>
       <div class="field">
         <label class="pdx-field-label">Name <span class="pdx-field-required">*</span></label>
-        <input class="pdx-input" placeholder="Type your name..." @input="onNameInput" :value="name" />
+        <input class="pdx-input" placeholder="Type your name..." ::value="name" />
         <span class="pdx-field-hint">You typed: {{ name }}</span>
       </div>
     </section>
@@ -30,7 +30,7 @@
       <div class="field">
         <div class="input-with-action">
           <span class="input-icon">🔍</span>
-          <input class="pdx-input" style="padding-left:2rem" placeholder="Search..." @input="onSearchInput" :value="search" />
+          <input class="pdx-input" style="padding-left:2rem" placeholder="Search..." ::value="search" />
           @if (search) {
             <button class="toggle-btn" @click="clearSearch">✕</button>
           }
@@ -47,7 +47,7 @@
         <label class="pdx-field-label">Quantity (0–100)</label>
         <div class="stepper">
           <button class="pdx-secondary" @click="decNum" :disabled="num <= 0">−</button>
-          <input class="pdx-input stepper-input" type="number" :value="num" @input="onNumInput" min="0" max="100" />
+          <input class="pdx-input stepper-input" type="number" ::value.number="num" @input="clampNum" min="0" max="100" />
           <button class="pdx-secondary" @click="incNum" :disabled="num >= 100">+</button>
         </div>
         <span class="pdx-field-hint">Value: {{ num }}</span>
@@ -88,16 +88,11 @@ let showPw = $signal(false);
 let num = $signal(5);
 let descLen = $signal(0);
 
-function onNameInput(e) { name = e.target.value; }
-function onSearchInput(e) { search = e.target.value; }
 function clearSearch() { search = ''; }
 function togglePw() { showPw = !showPw; }
 function incNum() { if (num < 100) num++; }
 function decNum() { if (num > 0) num--; }
-function onNumInput(e) {
-    var v = parseInt(e.target.value);
-    if (!isNaN(v)) num = Math.max(0, Math.min(100, v));
-}
+function clampNum() { if (num !== null) num = Math.max(0, Math.min(100, num)); }
 function onDescInput(e) { descLen = e.target.value.length; }
 </script>
 

@@ -16,10 +16,10 @@
       <h3>Colors</h3>
       <div class="color-row">
         <label>Primary
-          <input type="color" :value="primary" @input="onPrimary" />
+          <input type="color" ::value="primary" />
         </label>
         <label>Accent
-          <input type="color" :value="accent" @input="onAccent" />
+          <input type="color" ::value="accent" />
         </label>
       </div>
       <div class="preview" :style="previewStyle">
@@ -29,7 +29,7 @@
 
     <div class="section">
       <h3>Debounced Search</h3>
-      <input type="text" :value="searchRaw" @input="onSearch" placeholder="Type to search (300ms debounce)..." class="search-input" />
+      <input type="text" ::value="searchRaw" placeholder="Type to search (300ms debounce)..." class="search-input" />
       <div class="search-info">
         Raw: <code>{{ searchRaw }}</code> | Debounced: <code>{{ searchDebounced }}</code>
       </div>
@@ -59,9 +59,6 @@ const previewStyle = $derived(
 function setLight() { setTheme('light'); }
 function setDark() { setTheme('dark'); }
 function doToggle() { toggleDarkMode(); }
-function onPrimary(e) { primary = e.target.value; }
-function onAccent(e) { accent = e.target.value; }
-function onSearch(e) { searchRaw = e.target.value; }
 </script>
 
 <style scoped>

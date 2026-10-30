@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- `PDX_ONE_WAY_EDITED_FIELD` (warning, #678): a one-way `:value` or `:checked` on an `<input>`,
+  `<textarea>` or `<select>` whose own `@input`/`@change` handler — inline, or a script function it
+  reaches — writes the bound signal. A one-way binding writes when its value changes (#44, which stays),
+  so a handler that writes the signal and puts it back left the typed text in the field without a word.
+  The field wants `::value`; when the handler is nothing but `x = $event.target.value`, the fix binds it
+  two-way and removes the handler. The showcase demos and the reference examples that wrote a field's
+  signal by hand now bind it two-way; `page-input`'s stepper keeps its clamp as an `@input` beside
+  `::value.number`.
 - `custom-elements.json` records `formAssociated: true` on a component whose model is declared
   `{ form: true }` (#135): a reader learns that it takes part in a form without running it. All 22
   value inputs of #286 carry it, among them `pdx-toggle-group`, `pdx-rich-text` and `pdx-json-editor`,

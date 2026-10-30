@@ -62,6 +62,15 @@ As alpha (`PDX_UNKNOWN_PROP`, `PDX_PROP_NAME_CASE`, `PDX_INVALID_ENUM_VALUE`), p
 `PDX_PROP_REQUIRED` from the component's side (#130). A modifier other than `.once` on `:name` is
 `PDX_BINDING_MODIFIER`.
 
+A one-way `:value` writes when its value changes, not when the field differs from it (#44), and that
+stays (#678). So a field whose own handler writes the bound signal and puts it back —
+`<input :value="query" @input="onInput">` with `function onInput(e) { query = e.target.value; reset(); }`
+and `function reset() { query = ''; }` — keeps `a` after the user types `a`, while `query` is `''`: the
+binding last wrote `''` and the value is `''` again. A field whose state must win over what is typed is
+the two-way form, `::value`. `PDX_ONE_WAY_EDITED_FIELD` (warning) finds the trap: a `:value` or
+`:checked` on a native field whose `@input`/`@change` handler writes the bound signal; its fix, when the
+handler is the plain `query = $event.target.value`, binds `::value` and removes the handler.
+
 #### Since
 
 alpha → beta (#126)
