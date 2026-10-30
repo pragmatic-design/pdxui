@@ -7,6 +7,11 @@
 // Those that refuse are named in the error, with the child processes this process runs — a process
 // started inside the project, esbuild's service above all, holds its working directory for its whole
 // life (#543) — so the next failure says what to look at.
+//
+// When nothing in the tree refuses — every file and directory, the root included, renames — the handle
+// is outside this process tree: on Windows an on-access scan or the indexer opening what a build has just
+// written (#699). A test's subject is its output, not its cleanup, so that leftover directory is a
+// warning, with the same report, and not a failure. A held file or directory still fails the test.
 
 import { readdirSync, renameSync, rmSync } from 'node:fs';
 import { join, relative } from 'node:path';
@@ -22,6 +27,8 @@ export interface TreeFs {
     rename(from: string, to: string): void;
     /** This process's child processes, `<pid> <name>` each. */
     children(): string[];
+    /** Where a directory left behind by a holder outside the tree is reported. */
+    warn(message: string): void;
 }
 
 /**
@@ -51,11 +58,15 @@ const realFs: TreeFs = {
     ],
     rename: renameSync,
     children: childProcesses,
+    warn: (message) => console.warn(message),
 };
 
 const PROBE = '.pdx-probe';
 
-/** Remove `root`; if it cannot be, throw its error with what refuses a rename, and the child processes. */
+/**
+ * Remove `root`; if it cannot be, throw its error with what refuses a rename, and the child processes.
+ * When nothing in the tree refuses, the same report is a warning that `root` was left behind.
+ */
 export function removeTree(root: string, fs: TreeFs = realFs): void {
     try {
         fs.rm(root);
@@ -80,7 +91,12 @@ export function removeTree(root: string, fs: TreeFs = realFs): void {
         try { children = fs.children().join(', ') || 'none'; } catch (listing) { children = `not listed (${codeOf(listing)})`; }
         const named = held.length > 0 ? held.join(', ') : 'nothing in the tree refused a rename, so the holder is outside it';
         const err = error as Error & { code?: string };
-        throw Object.assign(new Error(`${err.message}\nheld: ${named}\nchildren: ${children}`, { cause: error }), { code: err.code });
+        const report = `${err.message}\nheld: ${named}\nchildren: ${children}`;
+        if (held.length === 0) {
+            fs.warn(`[remove-tree] left '${root}' behind: ${report}`);
+            return;
+        }
+        throw Object.assign(new Error(report, { cause: error }), { code: err.code });
     }
 }
 
