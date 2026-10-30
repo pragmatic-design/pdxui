@@ -22,7 +22,12 @@ export type LazyTag = keyof typeof LOADERS;
 /** Resolves once `tag` is defined, loading its module the first time it is asked for. */
 export function loadTag(tag: LazyTag): Promise<void> {
     if (customElements.get(tag)) return Promise.resolve();
-    return LOADERS[tag]().then(() => customElements.whenDefined(tag)).then(() => undefined);
+    // Kept until it settles, for `settlePrefetches()`: a load `createLazy()` started is one nobody
+    // awaits either (#745). `finally` passes a failed load on to the caller, as before.
+    const load: Promise<void> = LOADERS[tag]().then(() => customElements.whenDefined(tag))
+        .then(() => undefined).finally(() => loading.delete(load));
+    loading.add(load);
+    return load;
 }
 
 /** `document.createElement(tag)`, with the module that defines it asked for. */
@@ -31,8 +36,8 @@ export function createLazy<T extends HTMLElement = HTMLElement>(tag: LazyTag): T
     return document.createElement(tag) as T;
 }
 
-// The prefetches waiting for idle time, and the loads they started: nobody awaits either, so a test
-// environment torn down under them failed its run (#603). `settlePrefetches()` is what waits.
+// The prefetches waiting for idle time, and every load `loadTag()` started: nobody awaits either, so
+// a test environment torn down under them failed its run (#603, #745). `settlePrefetches()` waits.
 const scheduled = new Set<() => void>();
 const loading = new Set<Promise<void>>();
 
@@ -40,11 +45,8 @@ const loading = new Set<Promise<void>>();
 export function prefetchTags(tags: readonly LazyTag[]): void {
     const run = () => {
         if (!scheduled.delete(run)) return;
-        for (const tag of tags) {
-            // `finally` passes a failed load on, unhandled, as the bare `loadTag()` did.
-            const load: Promise<void> = loadTag(tag).finally(() => loading.delete(load));
-            loading.add(load);
-        }
+        // A failed load is passed on unhandled, as the bare `loadTag()` did.
+        for (const tag of tags) void loadTag(tag);
     };
     scheduled.add(run);
     if (typeof requestIdleCallback === 'function') requestIdleCallback(run, { timeout: 2000 });
@@ -52,8 +54,8 @@ export function prefetchTags(tags: readonly LazyTag[]): void {
 }
 
 /**
- * Starts every prefetch still waiting for idle time, and resolves once every prefetched load has
- * settled. For a test environment, which must not be torn down while a module is still loading.
+ * Starts every prefetch still waiting for idle time, and resolves once every load — prefetched, or
+ * started by `createLazy()` — has settled. For a test environment, which must not be torn down while a module is still loading.
  */
 export async function settlePrefetches(): Promise<void> {
     for (const run of [...scheduled]) run();
