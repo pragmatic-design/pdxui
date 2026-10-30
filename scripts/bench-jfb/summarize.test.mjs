@@ -33,6 +33,31 @@ test('readRun takes the total and the script median of a CPU result, the DEFAULT
     }
 });
 
+// #736: the mean of jfb's samples is the steadier statistic on a sub-millisecond script; a run records
+// it beside the median, read from the same files.
+test('readRun with "mean" takes the mean of each result, with the same metric names', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'jfb-summary-'));
+    try {
+        writeFileSync(join(dir, 'pdx-v1.0.0-alpha.1-keyed_04_select1k.json'), JSON.stringify({
+            framework: 'pdx-v1.0.0-alpha.1-keyed', benchmark: '04_select1k', type: 'cpu',
+            values: { total: { median: 13.6, mean: 14.1 }, script: { median: 1.2, mean: 1.37 } },
+        }));
+        writeFileSync(join(dir, 'pdx-v1.0.0-alpha.1-keyed_22_run-memory.json'), JSON.stringify({
+            framework: 'pdx-v1.0.0-alpha.1-keyed', benchmark: '22_run-memory', type: 'memory',
+            values: { DEFAULT: { median: 2.5, mean: 2.5 } },
+        }));
+        assert.deepEqual(readRun(dir, 'mean'), {
+            pdx: { '04_select1k': 14.1, '04_select1k script': 1.37, '22_run-memory': 2.5 },
+        });
+        // The control: the default is still the median.
+        assert.deepEqual(readRun(dir), {
+            pdx: { '04_select1k': 13.6, '04_select1k script': 1.2, '22_run-memory': 2.5 },
+        });
+    } finally {
+        rmSync(dir, { recursive: true, force: true });
+    }
+});
+
 test('combineRuns keeps the median of the per-run medians', () => {
     const runs = [
         { pdx: { '01_run1k': 50 } },

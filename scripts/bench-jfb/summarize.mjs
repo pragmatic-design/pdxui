@@ -14,8 +14,10 @@ export function frameworkName(resultName) {
 /**
  * One run's results: `{ [framework]: { [metric]: median } }`. A CPU benchmark gives two metrics,
  * its total (`07_create10k`) and its script time (`07_create10k script`); memory and size give one.
+ * `stat` picks the statistic of the samples: the median, or the mean (#736), which the benchmark
+ * writes beside it.
  */
-export function readRun(resultsDir) {
+export function readRun(resultsDir, stat = 'median') {
     const run = {};
     for (const file of readdirSync(resultsDir)) {
         if (!file.endsWith('.json')) continue;
@@ -23,8 +25,8 @@ export function readRun(resultsDir) {
         const metrics = (run[frameworkName(result.framework)] ??= {});
         const values = result.values ?? {};
         const main = values.total ?? values.DEFAULT;
-        if (main) metrics[result.benchmark] = main.median;
-        if (values.script) metrics[`${result.benchmark} script`] = values.script.median;
+        if (main) metrics[result.benchmark] = main[stat];
+        if (values.script) metrics[`${result.benchmark} script`] = values.script[stat];
     }
     return run;
 }
