@@ -6,7 +6,8 @@
  *
  * ── DOM structure (light DOM) ──
  *   <pdx-file-upload>                       host, display:block, rootClass = .pdx-file-upload[(-sm|-lg)]
- *     <div class="pdx-file-dropzone"        ← THE DROPZONE AREA (dragover/disabled added dynamically)
+ *     <div class="pdx-file-dropzone"        ← THE DROPZONE AREA, data-part="dropzone"; a drag over it and
+ *          data-part="dropzone"               disabled are the host's :state(dragover) and :state(disabled) (#287)
  *          role="button" tabindex="0"       ← operable from the keyboard (Enter/Space → opens the file dialog)
  *          aria-label="<label>"             ← accessible name from the `label` prop
  *          aria-disabled="true"|absent>      ← null when it is not disabled (removed, which is right)
@@ -15,7 +16,7 @@
  *       <span class="pdx-file-dropzone-hint">…</span>   ← only when hint() is not empty (maxSize/accept)
  *     </div>
  *     <input type="file" hidden …>          ← a HIDDEN native input (see the a11y note below)
- *     <div class="pdx-file-list" role="list"> … </div>  ← there ONLY with files selected
+ *     <div class="pdx-file-list" data-part="list" role="list"> … </div>  ← there ONLY with files selected
  *
  * ── DETERMINISMO ──
  *   The EMPTY state (the dropzone alone, no files) is the only deterministic one: the file list
@@ -83,32 +84,32 @@ export const fileUpload: ComponentManifest = {
             'file-upload-empty': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone is a flex box',
                         display: { op: 'oneOf', value: ['flex', 'block', 'grid'] },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone has a generous drop area (min-height honored)',
                         height: { op: '>=', value: 100 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone is the full width of its container',
                         width: { op: '>=', value: 200 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone invites clicking (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone has a visible border (2px in base; > 0 cross-theme)',
                         border: { all: { width: { op: '>', value: 0 } } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         description: 'dropzone has non-negative radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -117,9 +118,9 @@ export const fileUpload: ComponentManifest = {
                 composition: [
                     {
                         description: 'dropzone affordances are contained within the drop area',
-                        parent: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                        parent: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                         children: {
-                            zone: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone',
+                            zone: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]',
                             icon: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone-icon',
                             label: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone-label',
                         },
@@ -150,19 +151,29 @@ export const fileUpload: ComponentManifest = {
             'file-upload-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="fu-disabled"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu-disabled"] [data-part="dropzone"]',
                         description: 'disabled dropzone has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu-disabled"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu-disabled"] [data-part="dropzone"]',
                         description: 'disabled dropzone blocks pointer events',
                         pointerEvents: { op: 'is', value: 'none' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fu-disabled"] .pdx-file-dropzone',
+                        selector: 'section:not([hidden]) [data-test="fu-disabled"] [data-part="dropzone"]',
                         description: 'disabled dropzone shows not-allowed cursor',
                         cursor: { op: 'is', value: 'not-allowed' },
+                    },
+                ],
+                // Disabled is a custom state of the host (#287), what a theme selects.
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="fu-disabled"] [data-part="dropzone"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="fu-disabled"]', name: 'disabled' },
+                        changes: { cursor: { op: 'is', value: 'not-allowed' } },
                     },
                 ],
             },
@@ -184,7 +195,7 @@ export const fileUpload: ComponentManifest = {
     isolation: {
         scenario: 'file-upload-empty',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -195,7 +206,7 @@ export const fileUpload: ComponentManifest = {
     keyboard: {
         scenario: 'file-upload-empty',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fu"] .pdx-file-dropzone' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fu"] [data-part="dropzone"]' },
         ],
     },
 

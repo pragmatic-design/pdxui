@@ -12741,6 +12741,42 @@
               "description": "Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.",
               "signature": "(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number)"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The frame: the drop zone, the refusals and the list."
+            },
+            {
+              "name": "dropzone",
+              "description": "The `role=\"button\"` area a file is dropped on, or clicked to browse."
+            },
+            {
+              "name": "list",
+              "description": "The `role=\"list\"` of the files it holds; busy while one uploads."
+            },
+            {
+              "name": "file",
+              "description": "A file of the list."
+            },
+            {
+              "name": "remove",
+              "description": "A file's remove button."
+            },
+            {
+              "name": "progress",
+              "description": "A file's `role=\"progressbar\"`, while it uploads."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "dragover",
+              "description": "A drag is over the drop zone."
+            }
           ]
         }
       ],

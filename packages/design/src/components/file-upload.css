@@ -26,7 +26,10 @@ pdx-file-upload { display: block; }
     border-color: var(--pdx-color-primary);
     background: color-mix(in srgb, var(--pdx-color-primary) 5%, transparent);
 }
-.pdx-file-dropzone.dragover {
+/* A drag over it, and disabled: the component marks them with the host's :state(dragover) and
+   :state(disabled) (#287); the classes are native markup's. */
+.pdx-file-dropzone.dragover,
+:state(dragover) > [data-part="root"] > .pdx-file-dropzone {
     border-color: var(--pdx-color-primary);
     background: color-mix(in srgb, var(--pdx-color-primary) 10%, transparent);
     border-style: solid;
@@ -35,7 +38,8 @@ pdx-file-upload { display: block; }
     outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
     outline-offset: var(--pdx-focus-offset);
 }
-.pdx-file-dropzone.disabled {
+.pdx-file-dropzone.disabled,
+:state(disabled) > [data-part="root"] > .pdx-file-dropzone {
     opacity: var(--pdx-opacity-disabled);
     pointer-events: none;
     cursor: not-allowed;

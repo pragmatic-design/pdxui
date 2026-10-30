@@ -18,6 +18,7 @@ import '../../src/date-picker/pdx-date-picker';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/calendar/pdx-calendar';
 import '../../src/color-picker/pdx-color-picker';
+import '../../src/file-upload/pdx-file-upload';
 
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
@@ -136,6 +137,16 @@ const DONE: Row[] = [
         methods: ['focus', 'blur', 'clear', 'getHex', 'getRgb', 'getHsl', 'show', 'close', 'toggle'],
         // `open()` was set on the element undeclared, and is the overlay verb `show()`; `close()` stays.
         removedMethods: ['open'],
+    },
+    {
+        tag: 'pdx-file-upload',
+        model: 'value',
+        // A drop zone and a list, no popup; busy while a file uploads is the list's aria-busy.
+        states: ['disabled', 'dragover'],
+        parts: ['root', 'dropzone', 'list', 'file', 'remove', 'progress'],
+        popup: false,
+        methods: ['addFiles', 'removeFile', 'uploadAll', 'clear'],
+        removedMethods: [],
     },
 ];
 
