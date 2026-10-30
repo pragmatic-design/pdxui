@@ -8,7 +8,7 @@
  * close it (close-on-backdrop="false"), and for the dialogs pdx-overlay-outlet draws: same backdrop,
  * same panel. Focus is layout and user input, so it is measured in Chromium, on the galleries.
  */
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from './fixture';
 
 async function gallery(page: Page, tag: string): Promise<void> {
     await page.goto(`/components/${tag}`, { waitUntil: 'domcontentloaded' });

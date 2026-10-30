@@ -6,7 +6,7 @@
  * rgb(NaN,NaN,NaN), the canvas ignores it, and every cell keeps the previous fill — white or black.
  * The row labels are not clipped to their last letter.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** Samples each of the 9 × 7 cells a quarter of the way down (clear of its value text). */
 async function sampleCells(page: Page) {

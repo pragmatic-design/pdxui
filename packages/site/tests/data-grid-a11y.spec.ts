@@ -4,7 +4,7 @@
  * sorts and aria-sort reports (not a div with a click handler), a paginated grid that counts all its
  * rows, and an empty grid that says so rather than reading "1–0 of 0" with an active page 1.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the arrows move the one tab stop, and Enter on a header sorts it', async ({ page }) => {
     await page.goto('/components/pdx-data-grid', { waitUntil: 'networkidle' });

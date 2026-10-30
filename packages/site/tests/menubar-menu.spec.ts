@@ -4,7 +4,7 @@
  * A click on a menubar item leaves open the menu its own hover has just opened; the pdx-menu page
  * shows a pdx-menu; and ArrowLeft in a submenu closes the submenu and leaves its parent open.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 // The default is `click`: the first bar on the page is the default one, the second
 // the one that sets trigger="hover".

@@ -3,7 +3,7 @@
  * demo's "touch/pointer swipe" promises; the region has a name; and autoplay can be stopped from a
  * control.
  */
-import { test, expect, type Locator } from '@playwright/test';
+import { test, expect, type Locator } from './fixture';
 
 const activeDot = (c: Locator) => c.locator('.pdx-carousel-dot[aria-selected="true"]');
 

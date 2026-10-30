@@ -16,7 +16,7 @@
  * are different code paths, and this defect lives only in the second — a `goto` of every page
  * says the site is healthy while it is not.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /**
  * A WALK, not a list of URLs.

@@ -5,7 +5,7 @@
  * which a viewport media query cannot do. Escape closes the mobile menu, and each navbar on the page
  * names its own landmark rather than all being "Main navigation".
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/components/pdx-navbar', { waitUntil: 'networkidle' });

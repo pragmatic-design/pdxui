@@ -5,7 +5,7 @@
  * editor moves on to the next field and closes the first one. Each editor is named after its value
  * or its label, not "Edit value".
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /**
  * The gallery, WAITED FOR rather than assumed.

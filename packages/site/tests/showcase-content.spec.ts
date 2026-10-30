@@ -10,7 +10,7 @@
  * The file-level checks (competitor tables, reference tables, Italian) are in
  * `packages/core/tests/showcase-content.test.ts` and `docs-language.test.ts`.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the auto-dismiss banner can be shown again, and dismisses itself again', async ({ page }) => {
     await page.clock.install();

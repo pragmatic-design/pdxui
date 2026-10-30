@@ -3,7 +3,7 @@
  * described by its data, the legend is buttons, the arrow keys walk and announce the points, and a
  * gauge is named with its reading. The unit test mocks the engine; this runs it.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the device chart: a described figure, a legend of buttons, points announced from the keyboard', async ({ page }) => {
     const errors: string[] = [];

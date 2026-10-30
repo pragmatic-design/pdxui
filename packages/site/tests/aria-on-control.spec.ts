@@ -5,7 +5,7 @@
  * panel; pdx-tooltip describes the button and answers keyboard focus and Escape; pdx-progress writes
  * aria-valuenow on its progressbar — off it, every bar reads no value.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('popover: the button says expanded, and focus goes in and comes back', async ({ page }) => {
     await page.goto('/components/pdx-popover', { waitUntil: 'networkidle' });

@@ -6,7 +6,7 @@
  * setting a lowercase attribute by id; not items that are a div with a pointer cursor — not
  * focusable, not operable, and a click that does nothing.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** The gallery section a heading heads — its parent. */
 const section = (page: Page, heading: string) =>

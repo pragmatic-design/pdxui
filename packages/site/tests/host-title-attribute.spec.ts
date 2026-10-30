@@ -5,7 +5,7 @@
  * The prop reads `title="Revenue"`; if the attribute stayed, it would be a native tooltip over the
  * whole statistic card and the whole entity grid, repeating the heading wherever the pointer went.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('no pdx-statistic keeps a title attribute, and the cards still show their titles', async ({ page }) => {
     await page.goto('/components/pdx-statistic', { waitUntil: 'networkidle' });

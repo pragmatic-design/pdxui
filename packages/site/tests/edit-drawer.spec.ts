@@ -3,7 +3,7 @@
  * Johnson" / "Engineer" under the title "New"; a failed save puts focus on the invalid field, not on
  * the Save button; and Cancel returns focus to the opener.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('Edit Alice, Cancel, New: the form is empty', async ({ page }) => {
     await page.goto('/components/pdx-edit-drawer', { waitUntil: 'networkidle' });

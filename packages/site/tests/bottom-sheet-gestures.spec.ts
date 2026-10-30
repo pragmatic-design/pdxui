@@ -10,7 +10,7 @@
  * The gestures go through CDP with their own timestamps: the component reads the events' time, so
  * the speed of a gesture is what the test says it is, not what a loaded machine makes of it.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const SHEET = 'pdx-bottom-sheet[label="Basic bottom sheet"]';
 

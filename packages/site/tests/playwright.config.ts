@@ -51,7 +51,9 @@ export default defineConfig({
     // 112 component pages: the failure of one must not hide the other 111.
     fullyParallel: true,
     workers: WORKERS,
-    reporter: [['list']],
+    // A failed test's fixtures over 5 s go to slow-fixtures.txt, kept with its trace (#758).
+    reporter: [['list'], ['./slow-fixtures-reporter.ts']],
+    // The test's own: page creation has a timeout of its own, in fixture.ts (#758).
     timeout: 30_000,
     // The next run empties test-results/: a failed test's trace is copied out first.
     globalTeardown: './global-teardown.ts',

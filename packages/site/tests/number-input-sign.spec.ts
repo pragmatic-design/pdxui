@@ -5,7 +5,7 @@
  * number, not the unsigned display string; the sign button is named "Negative", not "−"; and the
  * number is drawn in the danger ink, not the text colour.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('a negative value is negative to assistive technology, and drawn in the danger ink', async ({ page }) => {
     await page.goto('/components/pdx-number-input', { waitUntil: 'networkidle' });

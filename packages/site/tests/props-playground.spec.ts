@@ -6,7 +6,7 @@
  * And the source carries no child text such as "badge", which the badge would ignore — it renders
  * its value, and has no slot to put children in.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const control = (page: Page, name: string) =>
     page.locator('.pp-control').filter({ has: page.locator('.pp-label', { hasText: new RegExp(`^${name}$`) }) });

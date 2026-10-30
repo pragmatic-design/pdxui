@@ -6,7 +6,7 @@
  * Q1 bar shows Tablet only.
  * This counts the distinct saturated colours stacked in one column of pixels through the Q1 bar.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the stacked Q1 bar shows its three segments', async ({ page }) => {
     await page.goto('/components/pdx-chart', { waitUntil: 'networkidle' });

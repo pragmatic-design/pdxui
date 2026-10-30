@@ -4,7 +4,7 @@
  * through the options, a disabled command is listed and skipped, and the custom palette draws its
  * items through the slot and shows its empty text.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** The option the combobox's aria-activedescendant names, as its label text. */
 async function highlighted(page: Page): Promise<string | null> {

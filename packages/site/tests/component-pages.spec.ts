@@ -11,7 +11,7 @@
  * The page list comes from `packages/ui/custom-elements.json`, so it cannot drift from the library:
  * a component added tomorrow is tested tomorrow, with no fixture to remember to update.
  */
-import { test, expect, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect, type ConsoleMessage, type Page } from './fixture';
 import { unstyledScaffolding } from './scaffolding';
 import { LIBRARY_TAGS } from './library-tags';
 import { PHONE, expectFitsPhone, settledAtPhone } from './phone-checks';

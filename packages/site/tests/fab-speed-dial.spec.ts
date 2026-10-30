@@ -4,7 +4,7 @@
  * A closed dial keeps no action as an invisible tab stop: Shift+Tab from a closed FAB does not land on
  * "Share". Enter moves focus into the dial, and the arrows move it between actions.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('closed dials offer no action to Tab; Enter opens into the dial and an action returns to the FAB', async ({ page }) => {
     await page.goto('/components/pdx-fab', { waitUntil: 'networkidle' });

@@ -11,7 +11,7 @@
  *
  * Two same-URL navigations in one task give two resolutions of the route at once, deterministically.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** Let `n` animation frames pass: the gallery's own check gives up after 20. */
 function frames(page: Page, n: number): Promise<void> {

@@ -3,7 +3,7 @@
  * not an empty month; the two-month demo stacks each title above its grid, not beside it; and a day
  * cell is named by its full date, not "15".
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/components/pdx-calendar', { waitUntil: 'networkidle' });

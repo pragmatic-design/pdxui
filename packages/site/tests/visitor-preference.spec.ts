@@ -5,7 +5,7 @@
  * again. The theme was kept in localStorage, which themebuilder.pdxui.com cannot read. Both now go
  * through brand/preference.ts; the cookie is read on load and written on every change.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { PREFERENCE_COOKIE } from '../../../brand/preference';
 
 const cookieOf = async (page: import('@playwright/test').Page): Promise<string> =>

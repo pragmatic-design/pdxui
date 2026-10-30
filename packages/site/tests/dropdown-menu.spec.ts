@@ -6,7 +6,7 @@
  * four plain menuitems that close the menu on click. Tab closes the menu, ArrowUp on the trigger opens
  * it on the last item, and the trigger has aria-controls.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const openOptions = async (page: Page) => {
     await page.goto('/components/pdx-dropdown-menu', { waitUntil: 'networkidle' });

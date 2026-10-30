@@ -12,7 +12,7 @@
  * asked of the browser is which one is on top. It needs a real browser — happy-dom computes no
  * stacking — and the site is the suite that runs the router on a production build.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('a fixed element inside a routed page paints above a lower z-index outside the outlet', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });

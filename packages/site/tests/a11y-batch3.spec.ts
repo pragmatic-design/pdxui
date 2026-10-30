@@ -4,7 +4,7 @@
  * Pagination keeps focus on every page change instead of dropping it to <body>; the OTP/PIN cells
  * are a group; the page header demo puts no more h1s on a page that has its own.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('pagination: paging from the keyboard keeps focus on Next', async ({ page }) => {
     await page.goto('/components/pdx-pagination', { waitUntil: 'networkidle' });

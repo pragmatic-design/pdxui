@@ -11,7 +11,7 @@
  * ancestors', down to the first opaque one. Colours are read back from a canvas, so relative
  * colours and light-dark() arrive as the sRGB on screen.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const PAGES = [
     '/components/pdx-badge', '/components/pdx-chip', '/components/pdx-banner',

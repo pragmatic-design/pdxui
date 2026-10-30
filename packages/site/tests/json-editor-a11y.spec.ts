@@ -5,7 +5,7 @@
  * "Edit…" sub-modal is a named modal dialog: focus moves into it, Tab stays in it, and Apply returns
  * focus to "Edit…" instead of <body>. Its delete button is named in words, not by an emoji.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/components/pdx-json-editor', { waitUntil: 'networkidle' });

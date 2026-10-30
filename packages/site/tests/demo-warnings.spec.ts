@@ -9,7 +9,7 @@
  * site-authored pages — as the build compiles them: compile() with the UI manifest's props and enum
  * values. Node-side: no browser.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';

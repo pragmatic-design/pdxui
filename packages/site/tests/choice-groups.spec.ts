@@ -6,7 +6,7 @@
  * - checkbox groups, radio groups and segmented controls are named, not anonymous groups, and
  *   pdx-segmented writes no aria-label="".
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the checkbox-group page is its own gallery, and its group reports one change per click', async ({ page }) => {
     const errors: string[] = [];

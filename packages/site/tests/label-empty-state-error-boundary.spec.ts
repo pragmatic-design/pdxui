@@ -6,7 +6,7 @@
  * - The error-boundary "Component Wrapper" demo can be made to throw, and its Retry brings the
  *   widget back, not an empty boundary.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('pdx-label: no empty for, and the labels name their controls', async ({ page }) => {
     await page.goto('/components/pdx-label', { waitUntil: 'networkidle' });

@@ -4,7 +4,7 @@
  * "+ Add Filter" opens a named dialog and moves focus into it; the value popover (shared with the
  * grid) is named too; Escape closes either; after Apply focus lands on the new chip, not on <body>.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('Enter opens a named dialog with focus inside; Escape returns to the button', async ({ page }) => {
     await page.goto('/components/pdx-filter-builder', { waitUntil: 'networkidle' });

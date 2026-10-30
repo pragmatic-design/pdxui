@@ -5,7 +5,7 @@
  * fires, `pdx-affix-fixed` is added, and the selector is queried (not just any non-empty string
  * accepted). Sticky state is layout, so it is measured here, in Chromium, on the gallery itself.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 async function openGallery(page: Page): Promise<void> {
     await page.goto('/components/pdx-affix', { waitUntil: 'domcontentloaded' });

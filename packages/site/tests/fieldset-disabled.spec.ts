@@ -5,7 +5,7 @@
  * leaves the "Disabled Section" demo's input taking typing. The native attribute disables every
  * control inside it, a pdx-input's inner <input> included.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the Disabled Section refuses typing', async ({ page }) => {
     await page.goto('/components/pdx-fieldset', { waitUntil: 'networkidle' });

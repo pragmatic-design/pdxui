@@ -6,7 +6,7 @@
  * types what they see. Measured as the computed `font-variant-ligatures` of every kind of code block
  * the site has: a gallery sample, a pdx-code block (demos, props playground), a docs block (Shiki).
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 async function ligatures(page: Page, selector: string): Promise<{ variant: string; features: string }> {
     const el = page.locator(selector).first();

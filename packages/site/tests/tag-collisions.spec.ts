@@ -10,7 +10,7 @@
  * It runs after the suite's web server has built the site, so src/demos/ is what the build just
  * generated. Node-side: no browser.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { fileURLToPath } from 'node:url';
 import { ComponentResolver } from '../../compiler/src/component-resolver';
 

@@ -10,7 +10,7 @@
  * decorative number that drifts the first time a token moves. So this recomputes each printed
  * figure from the page's own custom properties, using the engine's own `wcagContrast`.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { wcagContrast, parseColorToken } from '../../design/src/engine/color';
 
 const DOCS = ['/docs/design-theory', '/docs/making-a-theme', '/docs/theming'];

@@ -5,7 +5,7 @@
  * playground's compiler loads with the playground. Each is a place a lazy load could come back
  * empty or late: this checks the page, not the chunk.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('a docs page renders its own body and table of contents', async ({ page }) => {
     await page.goto('/docs/router', { waitUntil: 'domcontentloaded' });
