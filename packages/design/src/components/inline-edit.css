@@ -89,6 +89,34 @@ pdx-inline-edit:state(editing) {
     opacity: 0.7;
 }
 
+/* With `edit-on="icon"` the display only shows the value, with no role (#710): it invites no click.
+   The pencil is a real button and the only way in, so it is always there, with a focus ring of its own. */
+.pdx-inline-edit-display:not([role="button"]) {
+    cursor: default;
+}
+.pdx-inline-edit-display:not([role="button"]):hover {
+    background: transparent;
+    border-color: transparent;
+}
+.pdx-inline-edit-display:not([role="button"]) > .pdx-inline-edit-icon {
+    opacity: 1;
+    padding: 0 2px;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: none;
+    color: var(--pdx-color-muted);
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    cursor: pointer;
+}
+.pdx-inline-edit-display:not([role="button"]) > .pdx-inline-edit-icon:hover {
+    color: var(--pdx-color-text);
+}
+.pdx-inline-edit-display:not([role="button"]) > .pdx-inline-edit-icon:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
+    outline-offset: 1px;
+}
+
 /* Color swatch */
 .pdx-inline-edit-swatch {
     width: 16px;

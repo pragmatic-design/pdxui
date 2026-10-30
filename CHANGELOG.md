@@ -1095,6 +1095,12 @@ semver.
 
 ### Fixes
 
+- `pdx-inline-edit`'s `edit-on="icon"` was documented and behaved as `click`. It now does what it
+  says: the pencil is a real button, the `edit` part, named «Edit {value}», and the only thing that
+  opens the editor; the value is then no button and no tab stop, the pencil is always shown, and
+  closing the editor puts focus back on it. Inside a `pdx-form-field` the pencil is the field's
+  control, named by its label. `edit-on` set after mount takes effect for all three values, and the
+  prop is declared with its enum. (#710)
 - In a single `pdx-toggle-group`, an arrow pressed before the next frame could leave the toggle it
   reached unchosen: it decided from the toggles' `pressed` attributes, which follow the group's value
   a frame later. It decides from the value. (#286)

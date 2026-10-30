@@ -146,6 +146,82 @@ test('A2 control — when the error goes, the display is no longer described by 
     await expect(display).toHaveAccessibleDescription('');
 });
 
+// #710: `edit-on="icon"` was documented and behaved as `click`; the prop was also read once, at build.
+test.describe('edit-on', () => {
+    const editor = (page: Page) => page.locator('#f [data-part="editor"] input');
+
+    test('icon: a click on the value does not open the editor, a click on the edit button does', async ({ page }) => {
+        await mount(page, '<pdx-inline-edit value="Ada" label="Name" edit-on="icon"></pdx-inline-edit>');
+        await page.locator('#f .pdx-inline-edit-text').click();
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
+        await expect(editor(page)).toHaveCount(0);
+        const button = page.locator('#f [data-part="edit"]');
+        await expect(button).toHaveRole('button');
+        await expect(button).toHaveAccessibleName('Edit Ada');
+        // The only way in is always shown, and the value invites no click.
+        expect(await button.evaluate((b) => getComputedStyle(b).opacity)).toBe('1');
+        expect(await page.locator('#f [data-part="display"]').evaluate((d) => getComputedStyle(d).cursor)).toBe('default');
+        await button.click();
+        await expect(editor(page)).toBeVisible();
+    });
+
+    test('icon: the display is not a tab stop; Tab reaches the edit button and Enter opens the editor', async ({ page }) => {
+        await mount(page, '<button id="before">before</button><pdx-inline-edit value="Ada" label="Name" edit-on="icon"></pdx-inline-edit>');
+        const display = page.locator('#f [data-part="display"]');
+        await expect(display).not.toHaveAttribute('tabindex', /.*/);
+        await expect(display).not.toHaveAttribute('role', /.*/);
+        await page.locator('#before').focus();
+        await page.keyboard.press('Tab');
+        await expect(page.locator('#f [data-part="edit"]')).toBeFocused();
+        await page.keyboard.press('Enter');
+        await expect(editor(page)).toBeVisible();
+    });
+
+    test('icon: Escape closes the editor with focus back on the edit button, not on <body>', async ({ page }) => {
+        await mount(page, '<pdx-inline-edit value="Ada" label="Name" edit-on="icon"></pdx-inline-edit>');
+        await page.locator('#f [data-part="edit"]').click();
+        await expect(editor(page)).toBeFocused();
+        await page.keyboard.press('Escape');
+        await expect(page.locator('#f [data-part="edit"]')).toBeFocused();
+    });
+
+    test('icon: axe finds nothing, alone and inside a required pdx-form-field, where the edit button is named by the label', async ({ page }) => {
+        await mount(page, `
+            <pdx-inline-edit value="Ada" label="Name" edit-on="icon"></pdx-inline-edit>
+            <pdx-form-field label="City" required><pdx-inline-edit value="Rome" edit-on="icon"></pdx-inline-edit></pdx-form-field>`);
+        expect(await axe(page)).toEqual([]);
+        await expect(page.locator('#f pdx-form-field [data-part="edit"]')).toHaveAccessibleName(/^City\b.*Rome/);
+    });
+
+    test('control — click: a click on the value opens the editor, and there is no edit button', async ({ page }) => {
+        await mount(page, '<pdx-inline-edit value="Ada" label="Name"></pdx-inline-edit>');
+        await expect(page.locator('#f [data-part="edit"]')).toHaveCount(0);
+        await page.locator('#f .pdx-inline-edit-text').click();
+        await expect(editor(page)).toBeVisible();
+    });
+
+    test('set after mount: dblclick makes a single click do nothing, and a double click opens', async ({ page }) => {
+        await mount(page, '<pdx-inline-edit value="Ada" label="Name"></pdx-inline-edit>');
+        await page.locator('#f pdx-inline-edit').evaluate((el) => el.setAttribute('edit-on', 'dblclick'));
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
+        await page.locator('#f .pdx-inline-edit-text').click();
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(r)));
+        await expect(editor(page)).toHaveCount(0);
+        await page.locator('#f .pdx-inline-edit-text').dblclick();
+        await expect(editor(page)).toBeVisible();
+    });
+
+    test('set after mount: icon puts the edit button in, and back to click takes it out', async ({ page }) => {
+        await mount(page, '<pdx-inline-edit value="Ada" label="Name"></pdx-inline-edit>');
+        const host = page.locator('#f pdx-inline-edit');
+        await host.evaluate((el) => el.setAttribute('edit-on', 'icon'));
+        await expect(page.locator('#f [data-part="edit"]')).toHaveCount(1);
+        await host.evaluate((el) => el.setAttribute('edit-on', 'click'));
+        await expect(page.locator('#f [data-part="edit"]')).toHaveCount(0);
+        await expect(page.locator('#f [data-part="display"]')).toHaveAttribute('tabindex', '0');
+    });
+});
+
 test('the host carries `name`, and loses it when the prop is emptied', async ({ page }) => {
     await mount(page, '<pdx-inline-edit value="Ada" name="first"></pdx-inline-edit>');
     const host = page.locator('#f pdx-inline-edit');

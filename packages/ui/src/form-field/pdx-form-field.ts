@@ -22,11 +22,12 @@ const _markedInvalid = new WeakSet<Element>();
 const _describedByField = new WeakSet<Element>();
 
 /**
- * The library controls that are a button holding their own value: an inline edit's display at rest,
- * a toggle's button (#286). A field takes one as its control when nothing else is there; a button may
- * carry neither aria-required nor aria-invalid, so it is named and described only.
+ * The library controls that are a button holding their own value: an inline edit's display at rest —
+ * or, with `edit-on="icon"`, where the display is no button, its pencil button (#710) — a toggle's
+ * button (#286). A field takes one as its control when nothing else is there; a button may carry
+ * neither aria-required nor aria-invalid, so it is named and described only.
  */
-const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
+const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"][role="button"], pdx-inline-edit [data-part="edit"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
 /**
  * A button control found before any text box: pdx-color-picker's swatch, whose panel holds a hex field
  * that is there, hidden, while the panel is closed; pdx-file-upload's drop zone, beside the hidden file

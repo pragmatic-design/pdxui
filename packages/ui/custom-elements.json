@@ -14572,9 +14572,9 @@
             {
               "kind": "field",
               "name": "editOn",
-              "description": "When to enter edit mode: 'click' | 'dblclick' | 'icon'",
+              "description": "What opens the editor: a click on the value, a double click, or only the pencil button ('icon').",
               "type": {
-                "text": "string"
+                "text": "'click' | 'dblclick' | 'icon'"
               },
               "default": "'click'",
               "attribute": "editon"
@@ -14710,7 +14710,7 @@
               "kind": "method",
               "name": "focus",
               "parameters": [],
-              "description": "Moves focus to it."
+              "description": "Focus what opens the editor: the value, or with `edit-on=\"icon\"` the pencil button."
             },
             {
               "kind": "method",
@@ -14771,9 +14771,9 @@
             {
               "name": "editon",
               "fieldName": "editOn",
-              "description": "When to enter edit mode: 'click' | 'dblclick' | 'icon'",
+              "description": "What opens the editor: a click on the value, a double click, or only the pencil button ('icon').",
               "type": {
-                "text": "string"
+                "text": "'click' | 'dblclick' | 'icon'"
               },
               "default": "'click'"
             },
@@ -14875,7 +14875,11 @@
             },
             {
               "name": "display",
-              "description": "The value at rest, a `role=\"button\"` that opens the editor."
+              "description": "The value at rest, a `role=\"button\"` that opens the editor; with `edit-on=\"icon\"` it only shows the value."
+            },
+            {
+              "name": "edit",
+              "description": "With `edit-on=\"icon\"`, the pencil button that opens the editor, and the only thing that does."
             },
             {
               "name": "editor",
