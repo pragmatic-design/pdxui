@@ -4,7 +4,6 @@ A panel that slides in from an edge.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `position` | `position` | 'left' \| 'right' \| 'top' \| 'bottom' | `'right'` | Position: left, right (default), top, bottom |
 | `size` | `size` | string | `'md'` | Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. "640px"). Open-ended on purpose → NOT declared as a closed enum. |
 | `mode` | `mode` | 'overlay' \| 'push' | `'overlay'` | Mode: overlay (default) or push (shifts page content) |
@@ -14,6 +13,7 @@ A panel that slides in from an edge.
 | `resizable` | `resizable` | boolean | `false` | Show resize handle on edge |
 | `label` | `label` | string | `''` | Label for screen readers |
 | `loading` | `loading` | boolean | `false` | Show loading state |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
@@ -24,11 +24,15 @@ A panel that slides in from an edge.
 | `toggle()` | Toggles it open/closed. |
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
-**Events:** `pdx-before-close` — Fired on `pdx-before-close`.; `pdx-close` — Fired when it closes. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-before-close` — Fired (cancelable) before the drawer closes itself; call preventDefault() to keep it open.
 
 **Renders:** roles `dialog`
 
 **Slot:** `header` — Title area at the top of the panel, beside the close button.; `footer` — Action area at the bottom of the panel (e.g. Save / Cancel).
+
+**States:** `:state(open)` — Matched with `:state(open)`.; `:state(loading)` — Matched with `:state(loading)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.; `[data-part="resize"]` — The element reached as `[data-part="resize"]`.
 
 
 #### Examples
@@ -46,7 +50,7 @@ are checked against the manifest above._
   <pdx-button variant="outline" @click="openDrawer('top')">Top</pdx-button>
   <pdx-button variant="outline" @click="openDrawer('bottom')">Bottom</pdx-button>
 </div>
-<pdx-drawer :open="drawerOpen" :position="drawerPos" label="Demo drawer" @pdx-close="closeDrawer">
+<pdx-drawer ::open="drawerOpen" :position="drawerPos" label="Demo drawer">
   <span slot="header">Drawer — {{ drawerPos }}</span>
   <p>This drawer slides in from the <strong>{{ drawerPos }}</strong>.</p>
   <p class="pdx-txt-small pdx-ink-muted">Press Escape or click the backdrop to close. On mobile, swipe to dismiss.</p>
@@ -68,7 +72,7 @@ are checked against the manifest above._
   <pdx-button variant="outline" size="sm" @click="openSized('md')">Medium</pdx-button>
   <pdx-button variant="outline" size="sm" @click="openSized('lg')">Large</pdx-button>
 </div>
-<pdx-drawer :open="sizedOpen" :size="sizedSize" label="Sized drawer" @pdx-close="closeSized">
+<pdx-drawer ::open="sizedOpen" :size="sizedSize" label="Sized drawer">
   <span slot="header">Size: {{ sizedSize }}</span>
   <p>This drawer is <strong>{{ sizedSize }}</strong> width.</p>
   <span slot="footer">
@@ -81,7 +85,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="primary" @click="openForm">Edit Profile</pdx-button>
-<pdx-drawer :open="formOpen" size="md" label="Edit Profile" @pdx-close="closeForm">
+<pdx-drawer ::open="formOpen" size="md" label="Edit Profile">
   <span slot="header">
     <pdx-icon name="user" size="sm"></pdx-icon> Edit Profile
   </span>

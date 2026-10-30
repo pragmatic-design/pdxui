@@ -34,7 +34,9 @@ test.describe('entity-grid (CRUD composition)', () => {
         await mount(page, 'pdx-entity-grid', { attrs: { columns: COLS, data: DATA, schema: SCHEMA } });
         await page.locator(NEW).click();
         await page.waitForTimeout(300);
-        expect(await page.$eval('.pdx-drawer-backdrop', (e) => e.hasAttribute('data-open'))).toBe(true);
+        // Open as the drawer draws it (#288): its custom state in place, data-open once moved under <body>.
+        expect(await page.$eval('pdx-drawer', (d) => d.matches(':state(open)')
+            || !!document.querySelector('.pdx-drawer-backdrop[data-open]'))).toBe(true);
         expect(await page.locator('.pdx-drawer input[name="name"]').count()).toBe(1);
     });
 

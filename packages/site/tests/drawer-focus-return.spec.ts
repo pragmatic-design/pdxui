@@ -30,17 +30,23 @@ test('the backdrop takes a click from the moment it opens (#472)', async ({ page
     // The backdrop's `visibility` was transitioned with the opacity: for the first frame of the
     // transition it is still `hidden`, so a click there went through to the page. In CI, under load,
     // that frame outlasted the 10 ms between the drawer taking focus and the click. Measured here in
-    // the same task that sees `data-open` appear, before any frame can pass.
+    // the same task that the drawer enters its open state: since #288 that is the host's custom state
+    // `open`, which no mutation observer sees, so the measurement is taken as the state is added.
     await page.goto('/components/pdx-drawer', { waitUntil: 'networkidle' });
     const hit = await page.evaluate(() => new Promise<string>((resolve) => {
         const host = document.querySelector('pdx-drawer[label="Demo drawer"]') as HTMLElement & { open: boolean };
         const backdrop = host.querySelector('.pdx-drawer-backdrop')!;
-        new MutationObserver((_, obs) => {
-            if (!backdrop.hasAttribute('data-open')) return;
-            obs.disconnect();
-            const at = document.elementFromPoint(10, 300);
-            resolve(at === backdrop ? 'backdrop' : `${at?.tagName.toLowerCase()}.${at?.className}`);
-        }).observe(backdrop, { attributes: true, attributeFilter: ['data-open'] });
+        const proto = CustomStateSet.prototype;
+        const add = proto.add;
+        proto.add = function (this: CustomStateSet, value: string) {
+            const result = add.call(this, value);
+            if (value === 'open' && host.matches(':state(open)')) {
+                proto.add = add;
+                const at = document.elementFromPoint(10, 300);
+                resolve(at === backdrop ? 'backdrop' : `${at?.tagName.toLowerCase()}.${at?.className}`);
+            }
+            return result;
+        };
         host.open = true;
     }));
     expect(hit).toBe('backdrop');

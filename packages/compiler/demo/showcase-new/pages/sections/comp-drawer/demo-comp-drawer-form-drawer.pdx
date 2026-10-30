@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Real-world example: settings form in a drawer with header, body (scrollable), and footer actions.</p>
     <pdx-button variant="primary" @click="openForm">Edit Profile</pdx-button>
 
-    <pdx-drawer :open="formOpen" size="md" label="Edit Profile" @pdx-close="closeForm">
+    <pdx-drawer ::open="formOpen" size="md" label="Edit Profile">
       <span slot="header">
         <pdx-icon name="user" size="sm"></pdx-icon> Edit Profile
       </span>

@@ -8,14 +8,20 @@
  * (light DOM, ctx.el), TWO direct children:
  *   - <div class="pdx-drawer-backdrop">
  *   - <div class="pdx-drawer" role="dialog" aria-modal="true" :aria-label>
- * → the selectors stay scoped to `section:not([hidden]) [data-test="drw"] .pdx-drawer`.
+ * → the selectors stay scoped to `section:not([hidden]) [data-test="drw"] [data-part=…]`: the parts
+ * (#288) are `backdrop`, `root` (the panel, class `.pdx-drawer`), `header`, `close`, `body`, `footer`,
+ * `resize`.
  *
- * CAREFUL: the PANEL's class is `.pdx-drawer` (NOT `.pdx-drawer-panel`). The backdrop is `.pdx-drawer-backdrop`.
+ * OPENING through the attribute: the scenario mounts the host with `open`, its model. On open the
+ * custom element's ctx.track() puts the host in the custom state :state(open) and copies the
+ * position/size attributes onto the panel → the panel becomes visible (visibility:visible,
+ * transform:none) and opaque. `assertOverlay` with `action:'call'` does NOT click: it waits for the
+ * settle (2 rAF) and measures the panel already open.
  *
- * OPENING through the attribute: the scenario mounts the host with `open`. On open=true the custom element's
- * ctx.track() applies `[data-open]` (and the position/size attributes) to the backdrop and the panel → the panel
- * becomes visible (visibility:visible, transform:translateX(0)) and opaque. `assertOverlay` with
- * `action:'call'` does NOT click: it waits for the settle (2 rAF) and measures the panel already open.
+ * THE EXCEPTION (owner's decision A, #288): when an ancestor traps fixed positioning the drawer moves its
+ * panel and backdrop under <body>, where a host :state() cannot reach them; there they carry
+ * `[data-open]` while open. The scenarios here have no such ancestor: it is measured in
+ * drawer-beta-contract.spec.ts.
  *
  * GEOMETRY (a right drawer, the scenario's default position):
  *  - anchored to the RIGHT, NOT centred → no centering 'both'. What is checked:
@@ -64,35 +70,46 @@ export const drawer: ComponentManifest = {
     contracts: {
         scenarios: {
             'drawer-right': {
+                // Open is a custom state of the host (#288), what a theme selects; in place the panel
+                // has no attribute for it.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open), and the panel is drawn from it',
+                        selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="drw"]', name: 'open' },
+                        changes: { opacity: { op: '>=', value: 0.99 } },
+                    },
+                ],
                 // overlay: the panel is already open through the attribute (action:'call' → no click, just the measurement).
                 overlay: [
                     {
                         description: 'drawer right: panel open with backdrop, width constrained',
                         trigger: { selector: 'section:not([hidden]) [data-test="drw"]', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
-                        backdrop: 'section:not([hidden]) [data-test="drw"] .pdx-drawer-backdrop',
+                        panel: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
+                        backdrop: 'section:not([hidden]) [data-test="drw"] [data-part="backdrop"]',
                         hasBackdrop: true,
                         width: { op: '>=', value: 200 },
                     },
                 ],
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         description: 'open drawer panel is fully opaque',
                         opacity: { op: '==', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         description: 'drawer panel has non-negative border radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         description: 'drawer panel is a flex column container',
                         display: { op: 'oneOf', value: ['flex', 'block', 'grid'] },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         description: 'drawer panel spans full viewport height',
                         height: { op: '>=', value: 400 },
                     },
@@ -101,10 +118,10 @@ export const drawer: ComponentManifest = {
                 composition: [
                     {
                         description: 'right drawer is flush to the right viewport edge',
-                        parent: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        parent: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
-                            backdrop: 'section:not([hidden]) [data-test="drw"] .pdx-drawer-backdrop',
+                            panel: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
+                            backdrop: 'section:not([hidden]) [data-test="drw"] [data-part="backdrop"]',
                         },
                         relations: [
                             {
@@ -130,10 +147,10 @@ export const drawer: ComponentManifest = {
                 composition: [
                     {
                         description: 'left drawer is flush to the left viewport edge',
-                        parent: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+                        parent: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
-                            backdrop: 'section:not([hidden]) [data-test="drw"] .pdx-drawer-backdrop',
+                            panel: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
+                            backdrop: 'section:not([hidden]) [data-test="drw"] [data-part="backdrop"]',
                         },
                         relations: [
                             {
@@ -161,7 +178,7 @@ export const drawer: ComponentManifest = {
         scenario: 'drawer-right',
         targets: [
             // The panel: a box of a fixed size (a width per size) → a generous overlay tolerance.
-            { selector: 'section:not([hidden]) [data-test="drw"] .pdx-drawer', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="drw"] [data-part="root"]', tolerancePx: 12 },
         ],
     },
 
@@ -172,9 +189,9 @@ export const drawer: ComponentManifest = {
         // trapContainer: after the steps, 10 Tabs and 10 Shift+Tabs stay in the drawer.
         scenario: 'drawer-right',
         initialFocus: 'section:not([hidden]) [data-test="drw-action"]',
-        trapContainer: 'section:not([hidden]) [data-test="drw"] .pdx-drawer',
+        trapContainer: 'section:not([hidden]) [data-test="drw"] [data-part="root"]',
         steps: [
-            { key: 'Tab', expectFocusWithin: 'section:not([hidden]) [data-test="drw"] .pdx-drawer' },
+            { key: 'Tab', expectFocusWithin: 'section:not([hidden]) [data-test="drw"] [data-part="root"]' },
         ],
     },
 

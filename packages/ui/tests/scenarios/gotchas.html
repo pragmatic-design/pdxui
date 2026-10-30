@@ -156,7 +156,9 @@
                     const r = panel.getBoundingClientRect();
                     return {
                         panel: true,
-                        dataOpen: panel.hasAttribute('data-open'),
+                        // Open as the drawer draws it: its custom state in place, `data-open` once moved
+                        // under <body> (#288).
+                        opened: el.matches(':state(open)') || panel.hasAttribute('data-open'),
                         // On screen means: it has width and its left edge is inside the viewport.
                         onScreen: r.width > 50 && r.left < window.innerWidth - 10 && r.right > 0,
                         left: r.left, right: r.right, width: r.width,
@@ -223,6 +225,22 @@
                     document.body.appendChild(html`<div id="bound">
                         <button type="button" data-test="opener" commandfor="bound-alert" command="--show">Delete</button>
                         <pdx-alert-dialog id="bound-alert" ::open=${open} title="Delete it?" close-on-escape></pdx-alert-dialog>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
+            },
+
+            // pdx-drawer on the beta contract (#288): `::open` bound to a signal, an opener with an invoker
+            // command, and a drawer inside a transformed box, which traps fixed positioning, so the drawer
+            // moves its panel under <body> — where it keeps `data-open` (owner's decision A).
+            'drawer-beta-contract': () => {
+                const open = signal(false);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="opener" commandfor="bound-drawer" command="--show">Edit</button>
+                        <pdx-drawer id="bound-drawer" ::open=${open} label="Bound"><p>body</p><button type="button" data-test="inside">Inside</button></pdx-drawer>
                     </div>`);
                 };
                 api.setOpen = (v) => open.set(v);
@@ -642,19 +660,20 @@
                 };
             },
 
-            // gotchas.md:87 — "the drawer's own X emits pdx-close but does not close it"
+            // gotchas.md:87 — "the drawer's own X emits pdx-close but does not close it". Its close is
+            // announced by `open-change` `{ value: false }` since #288.
             'drawer-close-x': () => {
                 const s = show('case-drawer-close-x');
                 const el = s.querySelector('pdx-drawer');
                 api._closes = 0;
-                el.addEventListener('pdx-close', () => { api._closes++; });
+                el.addEventListener('open-change', (e) => { if (e.detail?.value === false) api._closes++; });
                 api.openIt = () => { el.open = true; };
                 api.read = () => {
                     const panel = document.querySelector('.pdx-drawer');
                     return {
                         closeEvents: api._closes,
                         openProp: el.open,
-                        dataOpen: panel ? panel.hasAttribute('data-open') : null,
+                        opened: panel ? el.matches(':state(open)') || panel.hasAttribute('data-open') : null,
                     };
                 };
             },

@@ -394,6 +394,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-drawer` takes the beta contract (#288).
+  - **`open` is a model.** The drawer writes it when it closes itself — Escape, the ✕, the backdrop, a
+    swipe — and announces it with `open-change` `{ value }`, so `::open="x"` follows it. `pdx-close`
+    is gone; `pdx migrate` turns `@pdx-close` on a `pdx-drawer` into `@open-change`.
+  - **States and parts.** `open` and `loading` are custom states on the host; in place, the panel and
+    backdrop no longer carry `data-open`. Moved under `<body>` because an ancestor traps fixed
+    positioning, they still do while open: a host state cannot reach them there. The parts are `root`
+    (the panel), `backdrop`, `header`, `close`, `body`, `footer` and `resize`.
+  - **Busy while loading.** The panel is `aria-busy="true"` while `loading`, not the host (A4).
+  - **`pdx-before-close` stays on the drawer**: it no longer bubbles, as no undeclared event does
+    (#138).
+
 - **Breaking:** `pdx-alert-dialog` takes the beta contract (#288).
   - **`open` is a model.** Confirm, Cancel and Escape (with `close-on-escape`) write it and announce
     `open-change` `{ value }`, so `::open="x"` follows them. `pdx-confirm` and `pdx-cancel` stay, and

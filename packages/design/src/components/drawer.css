@@ -11,6 +11,10 @@
 
    Toggle: add/remove [data-open] attribute on both backdrop and drawer.
 
+   pdx-drawer draws the same from its custom state, pdx-drawer:state(open) (#288). The panel and
+   backdrop it moves under <body> (an ancestor traps fixed positioning) carry [data-open] instead: a
+   host state cannot reach them there.
+
    Positions: left (default), right, top, bottom
    Sizes: sm (280px), md (380px), lg (520px), custom via --pdx-drawer-width
    Modes: overlay (default), push (shifts page content)
@@ -32,7 +36,7 @@
 
 /* Visible at once, not transitioned: for the first frame of a `visibility` transition the value is
  * still `hidden`, so a click on the backdrop went through to the page (#472). */
-.pdx-drawer-backdrop[data-open] {
+.pdx-drawer-backdrop:is([data-open], pdx-drawer:state(open) > *) {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-base) ease-out, visibility 0ms;
@@ -59,7 +63,7 @@
     visibility: hidden;
 }
 
-.pdx-drawer[data-open] {
+.pdx-drawer:is([data-open], pdx-drawer:state(open) > *) {
     visibility: visible;
 }
 
@@ -90,8 +94,9 @@
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
 }
 
-.pdx-drawer[data-open],
-.pdx-drawer[position="left"][data-open] {
+/* Open, at any position: one rule, which weighs more than each position's closed rule below. */
+.pdx-drawer:is([data-open], pdx-drawer:state(open) > *),
+.pdx-drawer[position]:is([data-open], pdx-drawer:state(open) > *) {
     transform: none;
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
@@ -110,11 +115,6 @@
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
 }
 
-.pdx-drawer[position="right"][data-open] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
-}
-
 /* Top */
 .pdx-drawer[position="top"] {
     top: 0;
@@ -127,11 +127,6 @@
     border-right: none;
     transform: translateY(-100%);
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
-}
-
-.pdx-drawer[position="top"][data-open] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
 
 /* Bottom */
@@ -147,11 +142,6 @@
     border-radius: var(--pdx-radius-lg) var(--pdx-radius-lg) 0 0;
     transform: translateY(100%);
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms var(--pdx-duration-base);
-}
-
-.pdx-drawer[position="bottom"][data-open] {
-    transform: none;
-    transition: transform var(--pdx-duration-base) var(--pdx-ease, ease), visibility 0ms;
 }
 
 /* ===== Sizes ===== */

@@ -82,15 +82,14 @@ test.describe('reactivity', () => {
     });
 
     // ── drawer / dialog (overlay open state) ─────────────────────────────────
-    test('drawer: open prop toggles panel visibility (data-open)', async ({ page }) => {
+    // Its open state is the host's :state(open) (#288). The harness has no ancestor that would trap the
+    // panel (needsPortal), so it stays in place and carries no data-open. SUBJECT is the drawer itself.
+    test('drawer: open prop toggles panel visibility (:state(open))', async ({ page }) => {
         await mountRaw(page, 'pdx-drawer');
-        // The backdrop is found wherever the drawer put it: under the host, or in <body> when an
-        // ancestor would trap the panel (needsPortal) — the harness has none.
-        const backdrop = page.locator('.pdx-drawer-backdrop');
-        await expect(backdrop).toHaveCount(1);
-        await expect(backdrop).not.toHaveAttribute('data-open');
+        expect(await page.$eval(SUBJECT, (e) => e.matches(':state(open)'))).toBe(false);
         await setProp(page, 'open', true);
-        await expect(backdrop).toHaveAttribute('data-open');
+        await expect.poll(() => page.$eval(SUBJECT, (e) => e.matches(':state(open)'))).toBe(true);
+        await expect(page.locator('.pdx-drawer')).toBeVisible();
     });
 
     // Its open state is the host's :state(open) (#288), not an attribute on the backdrop.

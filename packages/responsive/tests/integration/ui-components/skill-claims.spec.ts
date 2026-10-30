@@ -68,9 +68,9 @@ test.describe('claims that are no longer true — the skill must not teach these
         // `position`/`size` across, or the panel landed on the left.
         const errors = await openCase(page, 'drawer-open');
         await openDrawer(page);
-        const m = await expect.poll(async () => read<{ dataOpen: boolean; onScreen: boolean; left: number; viewport: number }>(page),
+        const m = await expect.poll(async () => read<{ opened: boolean; onScreen: boolean; left: number; viewport: number }>(page),
             { message: 'the drawer opens from the property alone' })
-            .toMatchObject({ dataOpen: true, onScreen: true }).then(() => read<{ left: number; viewport: number }>(page));
+            .toMatchObject({ opened: true, onScreen: true }).then(() => read<{ left: number; viewport: number }>(page));
         // `position="right"` honoured: the panel sits in the right half, not on the left.
         expect(m.left, 'a right-positioned drawer must not land on the left').toBeGreaterThan(m.viewport / 2);
         expect(errors).toEqual([]);
@@ -86,18 +86,18 @@ test.describe('claims that are no longer true — the skill must not teach these
         expect(errors).toEqual([]);
     });
 
-    test('gotchas.md:87 — "the drawer\'s own X emits pdx-close but does not close it" — it closes now', async ({ page }) => {
-        // The workaround was to wire your own pdx-close listener with a loop guard.
+    test('gotchas.md:87 — "the drawer\'s own X emits pdx-close but does not close it" — it closes now, and says so with open-change', async ({ page }) => {
+        // The workaround was to wire your own pdx-close listener with a loop guard; the close is now announced by open-change (#288).
         const errors = await openCase(page, 'drawer-close-x');
         await openDrawer(page);
-        await expect.poll(async () => (await read<{ dataOpen: boolean }>(page)).dataOpen).toBe(true);
+        await expect.poll(async () => (await read<{ opened: boolean }>(page)).opened).toBe(true);
         await page.locator('.pdx-drawer [aria-label="Close"]').click();
         // Polled, not read once: closing is animated, so a single read right after the click races the
         // slide-out under the full parallel suite. The assertion is exact all the same — it has to
         // reach exactly this state, or the poll times out.
-        await expect.poll(async () => read<{ closeEvents: number; openProp: boolean; dataOpen: boolean }>(page),
+        await expect.poll(async () => read<{ closeEvents: number; openProp: boolean; opened: boolean }>(page),
             { message: 'the X closes it AND still emits the event' })
-            .toMatchObject({ closeEvents: 1, openProp: false, dataOpen: false });
+            .toMatchObject({ closeEvents: 1, openProp: false, opened: false });
         expect(errors).toEqual([]);
     });
 
@@ -128,7 +128,7 @@ test.describe('claims that are no longer true — the skill must not teach these
         // Wait for the panel to actually BE open before reading its computed style. Without this the
         // read races the open under a full parallel run and picks up the initial values — a failure of
         // this assertion, not of the framework.
-        await expect.poll(async () => (await read<{ dataOpen: boolean }>(page)).dataOpen).toBe(true);
+        await expect.poll(async () => (await read<{ opened: boolean }>(page)).opened).toBe(true);
         const anim = await page.evaluate(() => {
             const panel = document.querySelector('.pdx-drawer') as HTMLElement;
             const cs = getComputedStyle(panel);

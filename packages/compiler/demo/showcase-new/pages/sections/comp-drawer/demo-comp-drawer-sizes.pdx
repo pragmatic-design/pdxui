@@ -8,7 +8,7 @@
       <pdx-button variant="outline" size="sm" @click="openSized('lg')">Large</pdx-button>
     </div>
 
-    <pdx-drawer :open="sizedOpen" :size="sizedSize" label="Sized drawer" @pdx-close="closeSized">
+    <pdx-drawer ::open="sizedOpen" :size="sizedSize" label="Sized drawer">
       <span slot="header">Size: {{ sizedSize }}</span>
       <p>This drawer is <strong>{{ sizedSize }}</strong> width.</p>
       <span slot="footer">

@@ -9,6 +9,10 @@
 //
 // The drawer does what `pdx-dialog` does: a cancelable `pdx-before-close`, fired either way,
 // because «an app that wants "you have unsaved changes" needs to know the attempt happened».
+//
+// Since #288 `open` is a model: the close the host allows writes it and announces `open-change`
+// `{ value: false }`, and the drawer draws its open state from the host's :state(open), measured in
+// Chromium (responsive/…/drawer-beta-contract.spec.ts) — happy-dom has no custom states.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/drawer/pdx-drawer';
@@ -25,8 +29,15 @@ async function open(): Promise<Drawer> {
     return el;
 }
 
-/** The panel the CSS opens and closes: `[data-open]` is what makes it visible. */
+/** The panel. In place it carries no `[data-open]`: only one moved under <body> does (#288). */
 const panel = () => document.querySelector('.pdx-drawer') as HTMLElement | null;
+
+/** Every `open-change` value the drawer announces, from now on. */
+function closes(el: Drawer): unknown[] {
+    const seen: unknown[] = [];
+    el.addEventListener('open-change', (e: Event) => seen.push((e as CustomEvent).detail?.value));
+    return seen;
+}
 
 beforeEach(cleanup);
 
@@ -46,30 +57,26 @@ describe('pdx-before-close', () => {
     it('a host that prevents it keeps the drawer OPEN — the prop and the panel', async () => {
         const el = await open();
         el.addEventListener('pdx-before-close', (e: Event) => e.preventDefault());
-        const closed: Event[] = [];
-        el.addEventListener('pdx-close', (e: Event) => closed.push(e));
+        const closed = closes(el);
 
         el.close();
         await tick(20);
 
         expect(el.open, 'the drawer wrote its own open prop over the host\'s answer').toBe(true);
-        expect(panel()!.hasAttribute('data-open'),
-            'the panel lost the attribute the CSS opens it with, so it is invisible while `open` says true')
-            .toBe(true);
-        expect(closed, 'it announced a close that did not happen').toHaveLength(0);
+        expect(el.isOpen, 'the drawer is open by its own account').toBe(true);
+        expect(closed, 'it announced a close that did not happen').toEqual([]);
     });
 
     it('and it closes normally when nobody objects', async () => {
         const el = await open();
-        const closed: Event[] = [];
-        el.addEventListener('pdx-close', (e: Event) => closed.push(e));
+        const closed = closes(el);
 
         el.close();
         await tick(20);
 
         expect(el.open).toBe(false);
         expect(panel()!.hasAttribute('data-open')).toBe(false);
-        expect(closed, 'the host was never told it closed').toHaveLength(1);
+        expect(closed, 'the host was never told it closed').toEqual([false]);
     });
 
     it('Escape asks too', async () => {

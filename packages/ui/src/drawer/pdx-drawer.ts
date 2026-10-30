@@ -3,7 +3,7 @@
 // Positions: left/right/top/bottom. Modes: overlay/push. Sizes: sm/md/lg/custom.
 // CSS classes from @pdxui/design (drawer.css). Resizable via drag handle.
 
-import { component, html } from '@pdxui/core';
+import { component, event, html, model } from '@pdxui/core';
 import { overlayStack, focusTrap } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -24,8 +24,15 @@ let _drawerCounter = 0;
  * @slot footer - Action area at the bottom of the panel (e.g. Save / Cancel).
  */
 component('pdx-drawer', {
+    // `open` is a model (#288): the drawer closes itself — Escape, the ✕, the backdrop, a swipe — and
+    // its own writes announce `open-change` `{ value }`, which `::open` follows. It replaced `pdx-close`.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as custom states (#132, #288): drawer.css draws the panel and backdrop from them. The
+    // one exception (the owner's decision A): moved under <body> (portalToBody), where a host state
+    // cannot reach them, the panel and backdrop carry `data-open` while open.
+    states: ['open', 'loading'],
+    parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer', 'resize'],
     props: {
-        open: { type: Boolean, default: false },
         /** Position: left, right (default), top, bottom */
         position: { type: String, default: 'right', enum: ['left', 'right', 'top', 'bottom'] },
         /** Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. "640px").
@@ -45,6 +52,10 @@ component('pdx-drawer', {
         label: { type: String, default: '' },
         /** Show loading state */
         loading: { type: Boolean, default: false },
+    },
+    events: {
+        /** Fired (cancelable) before the drawer closes itself; call preventDefault() to keep it open. */
+        'pdx-before-close': event<void>(),
     },
     setup(ctx) {
         let trapDispose: Dispose | null = null;
@@ -108,11 +119,9 @@ component('pdx-drawer', {
          * answer, and asking would be asking it to confirm its own decision.
          */
         function close() {
-            const before = new CustomEvent('pdx-before-close', { bubbles: true, cancelable: true });
-            ctx.el.dispatchEvent(before);
-            if (before.defaultPrevented) return;
-            (ctx.el as any).open = false;
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            // It stays on the drawer, as no undeclared event bubbles (#138).
+            if (!ctx.emit('pdx-before-close', undefined, { cancelable: true })) return;
+            ctx.open.set(false);
         }
 
         /** The element focused when the drawer opened — a button, a row, a menu item. */
@@ -207,8 +216,8 @@ component('pdx-drawer', {
             const mode = ctx.mode() as string || 'overlay';
             const el = ctx.el;
 
-            if (ctx.loading()) el.setAttribute('aria-busy', 'true');
-            else el.removeAttribute('aria-busy');
+            // The panel says it is busy (A4), in the template.
+            ctx.state('loading', !!ctx.loading());
 
             if (!_bound) {
                 _bound = true;
@@ -270,8 +279,13 @@ component('pdx-drawer', {
                     // 2. Next frame: re-enable transitions and open
                     requestAnimationFrame(() => {
                         if (drawerEl) drawerEl.style.transition = '';
-                        if (backdropEl) backdropEl.setAttribute('data-open', '');
-                        if (drawerEl) drawerEl.setAttribute('data-open', '');
+                        ctx.state('open', true);
+                        // Moved under <body>, where `:state(open)` on the host cannot reach them: the
+                        // panel and backdrop say it themselves (decision A, #288).
+                        if (portaled) {
+                            backdropEl?.setAttribute('data-open', '');
+                            drawerEl?.setAttribute('data-open', '');
+                        }
                         // Move focus INTO the drawer so the (now aria-hidden) background trigger doesn't
                         // retain focus — otherwise AT users are stranded on a hidden element. Focus the PANEL
                         // itself (tabindex=-1), NOT the first focusable: focusing the close button would paint a
@@ -301,6 +315,7 @@ component('pdx-drawer', {
                 } else {
                     // Close drawer
                     const focusWasInside = !!drawerEl && drawerEl.contains(document.activeElement);
+                    ctx.state('open', false);
                     if (backdropEl) backdropEl.removeAttribute('data-open');
                     if (drawerEl) {
                         drawerEl.removeAttribute('data-open');
@@ -327,32 +342,34 @@ component('pdx-drawer', {
         });
 
         // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen (`show` avoids the `open` prop).
+        // Each writes the model, so each announces `open-change`.
         ctx.expose({
-            show() { (ctx.el as any).open = true; },
+            show() { ctx.open.set(true); },
             close,
-            toggle() { if (ctx.open()) close(); else (ctx.el as any).open = true; },
+            toggle() { if (ctx.open()) close(); else ctx.open.set(true); },
             get isOpen() { return ctx.open() as boolean; },
         });
 
         return { close };
     },
     render: (ctx) => html`
-        <div class="pdx-drawer-backdrop"></div>
-        <div class="pdx-drawer" role="dialog" aria-modal="true"
-            :aria-label="${() => ctx.label() || uiString('drawer', 'label')}">
-            <div class="pdx-drawer-header">
+        <div class="pdx-drawer-backdrop" data-part="backdrop"></div>
+        <div class="pdx-drawer" data-part="root" role="dialog" aria-modal="true"
+            :aria-label="${() => ctx.label() || uiString('drawer', 'label')}"
+            :aria-busy="${() => ctx.loading() ? 'true' : null}">
+            <div class="pdx-drawer-header" data-part="header">
                 <slot name="header"><span></span></slot>
                 ${() => ctx.showClose() ? html`
-                    <button class="pdx-drawer-close pdx-dialog-close" type="button" :aria-label="${() => uiString('drawer', 'close')}">\u2715</button>
+                    <button class="pdx-drawer-close pdx-dialog-close" data-part="close" type="button" :aria-label="${() => uiString('drawer', 'close')}">\u2715</button>
                 ` : ''}
             </div>
-            <div class="pdx-drawer-body">
+            <div class="pdx-drawer-body" data-part="body">
                 <slot></slot>
             </div>
-            <div class="pdx-drawer-footer">
+            <div class="pdx-drawer-footer" data-part="footer">
                 <slot name="footer"></slot>
             </div>
-            ${() => ctx.resizable() ? html`<div class="pdx-drawer-resize"></div>` : ''}
+            ${() => ctx.resizable() ? html`<div class="pdx-drawer-resize" data-part="resize"></div>` : ''}
         </div>
     `,
 });
