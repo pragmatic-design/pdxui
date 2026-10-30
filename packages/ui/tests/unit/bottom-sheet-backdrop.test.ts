@@ -8,7 +8,14 @@ import { describe, it, expect, afterEach } from 'vitest';
 import { tick } from './helpers';
 import '../../src/bottom-sheet/pdx-bottom-sheet';
 
-type Sheet = HTMLElement & { open: boolean };
+type Sheet = HTMLElement & { open: boolean; isOpen: boolean };
+
+/** Whether the sheet announced a close: `open-change` `{ value: false }` since #288. */
+function closes(el: Sheet): { value: boolean } {
+    const state = { value: false };
+    el.addEventListener('open-change', (e: Event) => { if ((e as CustomEvent).detail?.value === false) state.value = true; });
+    return state;
+}
 
 async function mountOpen(attrs = ''): Promise<Sheet> {
     const host = document.createElement('div');
@@ -27,25 +34,24 @@ describe('pdx-bottom-sheet backdrop', () => {
     it('backdrop="false" shows no backdrop, and the sheet still opens', async () => {
         const el = await mountOpen('backdrop="false"');
         expect(shown(backdropOf(el)), 'a backdrop is shown although backdrop="false"').toBe(false);
-        expect(el.querySelector('.pdx-bottom-sheet')!.hasAttribute('data-open')).toBe(true);
+        // Its drawn state is the host's :state(open), measured in Chromium (bottom-sheet-beta-contract.spec.ts).
+        expect(el.isOpen).toBe(true);
     });
 
     it('and Escape still closes it', async () => {
         const el = await mountOpen('backdrop="false"');
-        let closed = false;
-        el.addEventListener('pdx-close', () => { closed = true; });
+        const closed = closes(el);
         document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
         await tick(50);
-        expect(closed).toBe(true);
+        expect(closed.value).toBe(true);
     });
 
     it('the control: by default the backdrop is shown, and a click on it closes the sheet', async () => {
         const el = await mountOpen();
         expect(shown(backdropOf(el))).toBe(true);
-        let closed = false;
-        el.addEventListener('pdx-close', () => { closed = true; });
+        const closed = closes(el);
         backdropOf(el)!.click();
         await tick(50);
-        expect(closed).toBe(true);
+        expect(closed.value).toBe(true);
     });
 });

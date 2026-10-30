@@ -41,9 +41,10 @@ function drag(el: Sheet, moves: [number, number][], releaseAt: number): void {
     document.dispatchEvent(pointer('pointerup', moves[moves.length - 1][0], 1000 + releaseAt));
 }
 
+/** Whether the sheet announced a close: `open-change` `{ value: false }` since #288. */
 function closed(el: Sheet): { value: boolean } {
     const state = { value: false };
-    el.addEventListener('pdx-close', () => { state.value = true; });
+    el.addEventListener('open-change', (e: Event) => { if ((e as CustomEvent).detail?.value === false) state.value = true; });
     return state;
 }
 

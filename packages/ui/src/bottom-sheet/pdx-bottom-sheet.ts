@@ -3,7 +3,7 @@
 // Detents: array of fractions (0-1) of viewport height. Default: [0.4, 0.85].
 // CSS from @pdxui/design (bottom-sheet.css).
 
-import { component, html, signal } from '@pdxui/core';
+import { component, event, html, model, signal } from '@pdxui/core';
 import { overlayStack, focusTrap } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
@@ -23,8 +23,14 @@ let _sheetCounter = 0;
  * @slot footer - Content at the bottom of the sheet, below the body (e.g. actions).
  */
 component('pdx-bottom-sheet', {
+    // `open` is a model (#288): the sheet closes itself — Escape, the ✕, the backdrop, a swipe down —
+    // and its own writes announce `open-change` `{ value }`, which `::open` follows. It replaced
+    // `pdx-close`.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as custom states (#132, #288): bottom-sheet.css draws the sheet and backdrop from them.
+    states: ['open', 'dragging'],
+    parts: ['root', 'backdrop', 'handle', 'header', 'close', 'body', 'footer'],
     props: {
-        open: { type: Boolean, default: false },
         /** Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] */
         detents: { type: Array, default: () => [0.4, 0.85] },
         /** Initial detent index. Default: 0 (smallest) */
@@ -43,6 +49,12 @@ component('pdx-bottom-sheet', {
         showClose: { type: Boolean, default: false },
         /** Label for accessibility. */
         label: { type: String, default: '' },
+    },
+    events: {
+        /** Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open. */
+        'pdx-before-close': event<void>(),
+        /** The sheet came to rest at a detent: its fraction of the viewport height, and its index. */
+        'pdx-detent-change': event<{ detent: number; index: number }>(),
     },
     setup(ctx) {
         let trapDispose: Dispose | null = null;
@@ -100,17 +112,13 @@ component('pdx-bottom-sheet', {
         }
 
         function tryClose() {
-            const event = new CustomEvent('pdx-before-close', {
-                bubbles: true, cancelable: true,
-            });
-            ctx.el.dispatchEvent(event);
-            if (event.defaultPrevented) return;
+            // It stays on the sheet, as no undeclared event bubbles (#138).
+            if (!ctx.emit('pdx-before-close', undefined, { cancelable: true })) return;
             doClose();
         }
 
         function doClose() {
-            (ctx.el as any).open = false;
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            ctx.open.set(false);
         }
 
         function applyHeight(h: number, animate: boolean) {
@@ -119,11 +127,7 @@ component('pdx-bottom-sheet', {
             const maxH = getVh() * 0.95;
             const clamped = Math.max(0, Math.min(h, maxH));
             sheetEl.style.height = `${clamped}px`;
-            if (animate) {
-                sheetEl.removeAttribute('data-dragging');
-            } else {
-                sheetEl.setAttribute('data-dragging', '');
-            }
+            ctx.state('dragging', !animate);
             // Sync backdrop opacity with sheet position
             if (backdropEl) {
                 const detents = getDetents();
@@ -218,10 +222,8 @@ component('pdx-bottom-sheet', {
         }
 
         function animateOut() {
-            if (sheetEl) {
-                sheetEl.removeAttribute('data-dragging');
-                sheetEl.style.height = '0px';
-            }
+            ctx.state('dragging', false);
+            if (sheetEl) sheetEl.style.height = '0px';
             // Wait for animation then actually close
             setTimeout(() => doClose(), 300);
         }
@@ -321,7 +323,7 @@ component('pdx-bottom-sheet', {
                 _rafId = 0;
                 // Lazy (re)resolve: the once-on-mount capture above runs in a rAF and can miss the sheet if the
                 // render hasn't painted it yet (render timing in a real browser differs from jsdom) — leaving
-                // sheetEl/backdropEl null forever so data-open is never set and the sheet never opens.
+                // sheetEl/backdropEl null forever so the sheet is never sized and never opens.
                 if (!sheetEl) sheetEl = ctx.el.querySelector('.pdx-bottom-sheet');
                 if (!backdropEl) {
                     backdropEl = ctx.el.querySelector('.pdx-bottom-sheet-backdrop');
@@ -342,9 +344,8 @@ component('pdx-bottom-sheet', {
 
                     _innerRafId = requestAnimationFrame(() => {
                         _innerRafId = 0;
-                        if (backdropEl) backdropEl.setAttribute('data-open', '');
+                        ctx.state('open', true);
                         if (sheetEl) {
-                            sheetEl.setAttribute('data-open', '');
                             // Animate to initial detent
                             const idx = (ctx.initialDetent() as number) || 0;
                             snapTo(idx);
@@ -369,15 +370,10 @@ component('pdx-bottom-sheet', {
                     }
                 } else {
                     // Close
-                    if (backdropEl) {
-                        backdropEl.removeAttribute('data-open');
-                        backdropEl.style.opacity = '';
-                    }
-                    if (sheetEl) {
-                        sheetEl.removeAttribute('data-open');
-                        sheetEl.removeAttribute('data-dragging');
-                        sheetEl.style.height = '';
-                    }
+                    ctx.state('open', false);
+                    ctx.state('dragging', false);
+                    if (backdropEl) backdropEl.style.opacity = '';
+                    if (sheetEl) sheetEl.style.height = '';
                     if (trapDispose) { trapDispose(); trapDispose = null; }
                     if (dismissDispose) { dismissDispose(); dismissDispose = null; }
                     if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
@@ -393,11 +389,12 @@ component('pdx-bottom-sheet', {
             };
         });
 
-        // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen + snapTo(index)
+        // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen + snapTo(index). Each writes
+        // the model, so each announces `open-change`.
         ctx.expose({
-            show() { (ctx.el as any).open = true; },
+            show() { ctx.open.set(true); },
             close: tryClose,
-            toggle() { if (ctx.open()) tryClose(); else (ctx.el as any).open = true; },
+            toggle() { if (ctx.open()) tryClose(); else ctx.open.set(true); },
             get isOpen() { return ctx.open() as boolean; },
             /** Move the sheet to a detent by index, clamped to the detents declared, and emit `pdx-detent-change`. */
             snapTo,
@@ -410,13 +407,13 @@ component('pdx-bottom-sheet', {
         return { tryClose, snapTo, currentDetent, detentMax, detentText, onHandleKey };
     },
     // `backdrop="false"`: the backdrop stays in the tree, hidden, so the reference the lifecycle keeps
-    // to it (z-index, opacity, data-open, its click) stays valid when the prop changes.
+    // to it (z-index, opacity, its click) stays valid when the prop changes.
     render: (ctx) => html`
-        <div class="pdx-bottom-sheet-backdrop" :hidden="${() => !ctx.backdrop()}"></div>
-        <div class="pdx-bottom-sheet" role="dialog" aria-modal="true"
+        <div class="pdx-bottom-sheet-backdrop" data-part="backdrop" :hidden="${() => !ctx.backdrop()}"></div>
+        <div class="pdx-bottom-sheet" data-part="root" role="dialog" aria-modal="true"
             :aria-label="${() => ctx.label() || uiString('bottom-sheet', 'label')}">
             ${() => ctx.showHandle() ? html`
-                <div class="pdx-bottom-sheet-handle" role="slider" tabindex="0"
+                <div class="pdx-bottom-sheet-handle" data-part="handle" role="slider" tabindex="0"
                     :aria-label="${() => uiString('bottom-sheet', 'handle')}"
                     aria-valuemin="0" :aria-valuemax="${ctx.detentMax}"
                     :aria-valuenow="${() => String(ctx.currentDetent())}"
@@ -425,16 +422,16 @@ component('pdx-bottom-sheet', {
                     <div class="pdx-bottom-sheet-bar"></div>
                 </div>
             ` : ''}
-            <div class="pdx-bottom-sheet-header">
+            <div class="pdx-bottom-sheet-header" data-part="header">
                 <slot name="header"></slot>
                 ${() => ctx.showClose() ? html`
-                    <button type="button" class="pdx-bottom-sheet-close pdx-dialog-close" :aria-label="${() => uiString('bottom-sheet', 'close')}">&#x2715;</button>
+                    <button type="button" class="pdx-bottom-sheet-close pdx-dialog-close" data-part="close" :aria-label="${() => uiString('bottom-sheet', 'close')}">&#x2715;</button>
                 ` : ''}
             </div>
-            <div class="pdx-bottom-sheet-body">
+            <div class="pdx-bottom-sheet-body" data-part="body">
                 <slot></slot>
             </div>
-            <div class="pdx-bottom-sheet-footer">
+            <div class="pdx-bottom-sheet-footer" data-part="footer">
                 <slot name="footer"></slot>
             </div>
         </div>

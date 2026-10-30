@@ -394,6 +394,16 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-bottom-sheet` takes the beta contract (#288).
+  - **`open` is a model.** The sheet writes it when it closes itself — Escape, the ✕, the backdrop, a
+    swipe down — and announces it with `open-change` `{ value }`, so `::open="x"` follows it.
+    `pdx-close` is gone; `pdx migrate` turns `@pdx-close` on a `pdx-bottom-sheet` into
+    `@open-change`.
+  - **States and parts.** `open` and `dragging` are custom states on the host; the sheet and backdrop
+    no longer carry `data-open` or `data-dragging`. The parts are `root` (the sheet), `backdrop`,
+    `handle`, `header`, `close`, `body` and `footer`.
+  - **`pdx-before-close` and `pdx-detent-change` are declared** and do not bubble.
+
 - **Breaking:** `pdx-drawer` takes the beta contract (#288).
   - **`open` is a model.** The drawer writes it when it closes itself — Escape, the ✕, the backdrop, a
     swipe — and announces it with `open-change` `{ value }`, so `::open="x"` follows it. `pdx-close`

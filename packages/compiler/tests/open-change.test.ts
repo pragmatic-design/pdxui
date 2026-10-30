@@ -127,6 +127,11 @@ describe('the overlays of #288', () => {
             .toBe('<pdx-dialog :open="editing" @open-change="if ($event.detail.value) return; editing = false"></pdx-dialog>');
     });
 
+    it('`@pdx-close` on a pdx-bottom-sheet is rewritten the same way', () => {
+        expect(fix('<pdx-bottom-sheet :open="sheet" @pdx-close="sheet = false"></pdx-bottom-sheet>'))
+            .toBe('<pdx-bottom-sheet :open="sheet" @open-change="if ($event.detail.value) return; sheet = false"></pdx-bottom-sheet>');
+    });
+
     it('`@pdx-close` on a pdx-drawer is rewritten the same way', () => {
         expect(fix('<pdx-drawer :open="panel" @pdx-close="panel = false"></pdx-drawer>'))
             .toBe('<pdx-drawer :open="panel" @open-change="if ($event.detail.value) return; panel = false"></pdx-drawer>');

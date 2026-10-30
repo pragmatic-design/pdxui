@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Open a dialog from within a bottom sheet. overlayStack manages z-index and Escape order.</p>
     <pdx-button variant="outline" @click="openNested">Open Sheet → Dialog</pdx-button>
 
-    <pdx-bottom-sheet :open="nestedOpen" label="Nested sheet" @pdx-close="closeNested">
+    <pdx-bottom-sheet ::open="nestedOpen" label="Nested sheet">
       <span slot="header"><strong>Sheet with nested dialog</strong></span>
       <p>Click the button below to open a dialog on top of this sheet.</p>
       <pdx-button variant="primary" size="sm" @click="openNestedDialog">Open Dialog</pdx-button>
@@ -28,7 +28,6 @@ let nestedOpen = $signal(false);
 let nestedDialogOpen = $signal(false);
 
 function openNested() { nestedOpen = true; }
-function closeNested() { nestedOpen = false; }
 function openNestedDialog() { nestedDialogOpen = true; }
 function closeNestedDialog() { nestedDialogOpen = false; }
 </script>

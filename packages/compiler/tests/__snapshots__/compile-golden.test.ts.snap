@@ -4434,7 +4434,7 @@ import '@pdxui/ui/input';
   __pdx_style.textContent = ".page { max-width: 800px; margin: 0 auto; padding: var(--pdx-space-lg); }\\n.intro { margin-bottom: var(--pdx-space-xl); }\\nsection { margin-bottom: var(--pdx-space-2xl); }\\nh2 { margin-bottom: var(--pdx-space-sm); }\\n.btn-row { display: flex; flex-wrap: wrap; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }\\n\\n.action-list {\\n    display: flex;\\n    flex-direction: column;\\n    gap: 2px;\\n}\\n.action-item {\\n    display: flex;\\n    align-items: center;\\n    gap: var(--pdx-space-md);\\n    padding: var(--pdx-space-md) var(--pdx-space-lg);\\n    background: none;\\n    border: none;\\n    font: inherit;\\n    color: var(--pdx-color-text);\\n    cursor: pointer;\\n    border-radius: var(--pdx-radius-sm);\\n    transition: background var(--pdx-duration-fast);\\n}\\n.action-item:hover {\\n    background: var(--pdx-color-inset);\\n}\\n.action-item.danger {\\n    color: var(--pdx-color-danger-ink);\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Bottom Sheet</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Draggable sheet from the bottom edge with snap points (detents). Gesture-driven: drag the handle to resize,\\n      swipe down to dismiss. Focus trap, Escape close, backdrop click. Mobile-first with desktop max-width.\\n    </p>  <app-demo-comp-bottom-sheet-basic class="demo-section"></app-demo-comp-bottom-sheet-basic>  <app-demo-comp-bottom-sheet-detents class="demo-section"></app-demo-comp-bottom-sheet-detents>  <app-demo-comp-bottom-sheet-scrollable class="demo-section"></app-demo-comp-bottom-sheet-scrollable>  <app-demo-comp-bottom-sheet-close-button class="demo-section"></app-demo-comp-bottom-sheet-close-button>  <app-demo-comp-bottom-sheet-no-handle class="demo-section"></app-demo-comp-bottom-sheet-no-handle>  <app-demo-comp-bottom-sheet-action-sheet class="demo-section"></app-demo-comp-bottom-sheet-action-sheet>  <app-demo-comp-bottom-sheet-stacking class="demo-section"></app-demo-comp-bottom-sheet-stacking>  <section> <h2 class="pdx-txt-heading">Props Reference</h2> <div class="pdx-table-responsive"> <table class="pdx-table"><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Open/close state (two-way bindable)</td></tr><tr><td><code>detents</code></td><td>Number[]</td><td>[0.4, 0.85]</td><td>Snap points as viewport height fractions (0-1)</td></tr><tr><td><code>initialDetent</code></td><td>Number</td><td>0</td><td>Index of initial detent on open</td></tr><tr><td><code>backdrop</code></td><td>Boolean</td><td>true</td><td>Show backdrop overlay</td></tr><tr><td><code>closeOnBackdrop</code></td><td>Boolean</td><td>true</td><td>Close when backdrop is clicked</td></tr><tr><td><code>closeOnEscape</code></td><td>Boolean</td><td>true</td><td>Close on Escape key (via overlayStack)</td></tr><tr><td><code>closeOnSwipeDown</code></td><td>Boolean</td><td>true</td><td>Close when swiped below minimum detent</td></tr><tr><td><code>showHandle</code></td><td>Boolean</td><td>true</td><td>Show the drag handle bar</td></tr><tr><td><code>showClose</code></td><td>Boolean</td><td>false</td><td>Show close button in header</td></tr><tr><td><code>label</code></td><td>String</td><td>\\'\\'</td><td>Accessible label (aria-label)</td></tr></tbody></table> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Bottom Sheet</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Draggable sheet from the bottom edge with snap points (detents). Gesture-driven: drag the handle to resize,\\n      swipe down to dismiss. Focus trap, Escape close, backdrop click. Mobile-first with desktop max-width.\\n    </p>  <app-demo-comp-bottom-sheet-basic class="demo-section"></app-demo-comp-bottom-sheet-basic>  <app-demo-comp-bottom-sheet-detents class="demo-section"></app-demo-comp-bottom-sheet-detents>  <app-demo-comp-bottom-sheet-scrollable class="demo-section"></app-demo-comp-bottom-sheet-scrollable>  <app-demo-comp-bottom-sheet-close-button class="demo-section"></app-demo-comp-bottom-sheet-close-button>  <app-demo-comp-bottom-sheet-no-handle class="demo-section"></app-demo-comp-bottom-sheet-no-handle>  <app-demo-comp-bottom-sheet-action-sheet class="demo-section"></app-demo-comp-bottom-sheet-action-sheet>  <app-demo-comp-bottom-sheet-stacking class="demo-section"></app-demo-comp-bottom-sheet-stacking>  <section> <h2 class="pdx-txt-heading">Props Reference</h2> <div class="pdx-table-responsive"> <table class="pdx-table"><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Open/close state. A model: <code>::open</code> follows Escape, the ✕, the backdrop and a swipe down</td></tr><tr><td><code>detents</code></td><td>Number[]</td><td>[0.4, 0.85]</td><td>Snap points as viewport height fractions (0-1)</td></tr><tr><td><code>initialDetent</code></td><td>Number</td><td>0</td><td>Index of initial detent on open</td></tr><tr><td><code>backdrop</code></td><td>Boolean</td><td>true</td><td>Show backdrop overlay</td></tr><tr><td><code>closeOnBackdrop</code></td><td>Boolean</td><td>true</td><td>Close when backdrop is clicked</td></tr><tr><td><code>closeOnEscape</code></td><td>Boolean</td><td>true</td><td>Close on Escape key (via overlayStack)</td></tr><tr><td><code>closeOnSwipeDown</code></td><td>Boolean</td><td>true</td><td>Close when swiped below minimum detent</td></tr><tr><td><code>showHandle</code></td><td>Boolean</td><td>true</td><td>Show the drag handle bar</td></tr><tr><td><code>showClose</code></td><td>Boolean</td><td>false</td><td>Show close button in header</td></tr><tr><td><code>label</code></td><td>String</td><td>\\'\\'</td><td>Accessible label (aria-label)</td></tr></tbody></table> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3> <div class="pdx-table-responsive"> <table class="pdx-table"><tbody><tr><td><code>open-change</code></td><td><code>{ value }</code>: it opened, or closed itself</td></tr><tr><td><code>pdx-before-close</code></td><td>Cancelable — call preventDefault() to keep it open</td></tr><tr><td><code>pdx-detent-change</code></td><td><code>{ detent, index }</code>: it came to rest at a detent</td></tr><tr><td><code>:state(open)</code>, <code>:state(dragging)</code></td><td>Open; being dragged (no transition)</td></tr><tr><td><code>[data-part]</code></td><td><code>root</code> (the sheet), <code>backdrop</code>, <code>handle</code>, <code>header</code>, <code>close</code>, <code>body</code>, <code>footer</code></td></tr></tbody></table> </div> </section> </div> '));
 component('app-comp-bottom-sheet', {
   props: {},
   setup(ctx) {
@@ -11198,7 +11198,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Action Sheet Pattern</h2> <p class="pdx-txt-small pdx-ink-muted">iOS-style action list. Small detent, list of actions, cancel at bottom.</p> <pdx-button variant="outline">Show Actions</pdx-button> <pdx-bottom-sheet label="Actions"> <span slot="header"><strong>Choose Action</strong></span> <div class="action-list"> <button class="action-item"> <span>📤</span> Share\\n        </button> <button class="action-item"> <span>🔗</span> Copy Link\\n        </button> <button class="action-item"> <span>✏️</span> Edit\\n        </button> <button class="action-item danger"> <span>🗑️</span> Delete\\n        </button> </div> <span slot="footer"> <pdx-button variant="ghost" style="width:100%">Cancel</pdx-button> </span> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;const __el7=__el4.firstChild.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild.nextSibling;const __el10=__el8.nextSibling.nextSibling;const __el12=__el10.nextSibling.nextSibling;const __el14=__el12.nextSibling.nextSibling;const __el16=__el7.nextSibling.nextSibling;const __el17=__el16.firstChild.nextSibling;return [__el3,__el4,__el8,__el10,__el12,__el14,__el17];};
@@ -11224,9 +11224,8 @@ component('app-demo-comp-bottom-sheet-action-sheet', {
     const __frag=__blk0();
     const [__el3,__el4,__el8,__el10,__el12,__el14,__el17]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openAction), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.actionOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.actionOpen);
     let __el4w_detents = {}; effect(() => { const __b = ctx.actionDetents; if (Object.is(__b, __el4w_detents)) return; __el4w_detents = __b; assignBoundProperty(__el4, "detents", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeAction), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     __el8.addEventListener('click', safeHandler(batchHandler(() => ctx.pickAction('Share')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el10.addEventListener('click', safeHandler(batchHandler(() => ctx.pickAction('Copy Link')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el12.addEventListener('click', safeHandler(batchHandler(() => ctx.pickAction('Edit')), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -11242,7 +11241,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Default detents: 40% and 85% of viewport. Drag the handle or swipe down to dismiss.</p> <pdx-button variant="outline">Open Bottom Sheet</pdx-button> <pdx-bottom-sheet label="Basic bottom sheet"> <span slot="header"><strong>Basic Sheet</strong></span> <p>Drag the handle to resize between detent snap points.</p> <p class="pdx-txt-small pdx-ink-muted">Swipe down quickly to dismiss, or tap the backdrop.</p> <p>This sheet has two detents: <strong>40%</strong> (half) and <strong>85%</strong> (expanded).</p> <span slot="footer"> <pdx-button variant="ghost" size="sm">Cancel</pdx-button> <pdx-button variant="primary" size="sm">Done</pdx-button> </span> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;const __el12=__el4.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el13=__el12.firstChild.nextSibling;const __el14=__el13.nextSibling.nextSibling;return [__el3,__el4,__el13,__el14];};
@@ -11261,8 +11260,7 @@ component('app-demo-comp-bottom-sheet-basic', {
     const __frag=__blk0();
     const [__el3,__el4,__el13,__el14]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openBasic), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.basicOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeBasic), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
+    bindTwoWay(__el4, 'open', ctx.basicOpen);
     __el13.addEventListener('click', safeHandler(batchHandler(ctx.closeBasic), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el14.addEventListener('click', safeHandler(batchHandler(ctx.closeBasic), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
@@ -11275,7 +11273,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Close Button</h2> <p class="pdx-txt-small pdx-ink-muted">Optional close button in the header, useful when the handle is hidden.</p> <pdx-button variant="outline">Open with Close Button</pdx-button> <pdx-bottom-sheet showClose label="Sheet with close button"> <span slot="header"><strong>With Close Button</strong></span> <p>This sheet has both a drag handle and a close button.</p> <p>The close button provides an explicit close affordance for mouse/keyboard users.</p> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -11287,15 +11285,13 @@ component('app-demo-comp-bottom-sheet-close-button', {
     
     
     function openClose() { __closeOpen.setRaw(true); }
-    function closeCloseSheet() { __closeOpen.setRaw(false); }
-    return { closeOpen: __closeOpen, openClose, closeCloseSheet };
+    return { closeOpen: __closeOpen, openClose };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openClose), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.closeOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeCloseSheet), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
+    bindTwoWay(__el4, 'open', ctx.closeOpen);
     return __frag;
   })(),
 });
@@ -11306,7 +11302,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Three Detents</h2> <p class="pdx-txt-small pdx-ink-muted">Three snap points: 25%, 50%, 90%. Apple-style peek → half → full.</p> <pdx-button variant="outline">Open 3-Detent Sheet</pdx-button> <pdx-bottom-sheet label="Three detent sheet"> <span slot="header"><strong>Three Detents</strong></span> <p>This sheet snaps to <strong>25%</strong>, <strong>50%</strong>, or <strong>90%</strong> of viewport.</p> <p>Drag slowly to snap to the nearest detent. Swipe fast to jump to the next one.</p> <ul> <li><strong>25%</strong> — Peek: just the title and summary</li> <li><strong>50%</strong> — Half: comfortable reading</li> <li><strong>90%</strong> — Full: maximum content</li> </ul> <p class="pdx-txt-small pdx-ink-muted">Swipe down past 25% to dismiss entirely.</p> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -11321,16 +11317,14 @@ component('app-demo-comp-bottom-sheet-detents', {
     
     
     function openThree() { __threeOpen.setRaw(true); }
-    function closeThree() { __threeOpen.setRaw(false); }
-    return { threeOpen: __threeOpen, threeDetents, openThree, closeThree };
+    return { threeOpen: __threeOpen, threeDetents, openThree };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openThree), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.threeOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.threeOpen);
     let __el4w_detents = {}; effect(() => { const __b = ctx.threeDetents; if (Object.is(__b, __el4w_detents)) return; __el4w_detents = __b; assignBoundProperty(__el4, "detents", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeThree), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     return __frag;
   })(),
 });
@@ -11341,7 +11335,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">No Handle</h2> <p class="pdx-txt-small pdx-ink-muted">Handle hidden — close via backdrop, Escape, or close button only. Fixed height.</p> <pdx-button variant="outline">Open Without Handle</pdx-button> <pdx-bottom-sheet showClose label="Fixed sheet"> <span slot="header"><strong>Fixed Sheet</strong></span> <p>No drag handle — this sheet stays at its initial detent.</p> <p>Use the close button, backdrop click, or Escape to dismiss.</p> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -11358,17 +11352,15 @@ component('app-demo-comp-bottom-sheet-no-handle', {
     
     
     function openNoHandle() { __noHandleOpen.setRaw(true); }
-    function closeNoHandle() { __noHandleOpen.setRaw(false); }
-    return { noHandleOpen: __noHandleOpen, noHandle: __noHandle, noSwipe: __noSwipe, openNoHandle, closeNoHandle };
+    return { noHandleOpen: __noHandleOpen, noHandle: __noHandle, noSwipe: __noSwipe, openNoHandle };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openNoHandle), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.noHandleOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.noHandleOpen);
     let __el4w_showHandle = {}; effect(() => { const __b = ctx.noHandle(); if (Object.is(__b, __el4w_showHandle)) return; __el4w_showHandle = __b; assignBoundProperty(__el4, "showHandle", __b); });
     let __el4w_closeOnSwipeDown = {}; effect(() => { const __b = ctx.noSwipe(); if (Object.is(__b, __el4w_closeOnSwipeDown)) return; __el4w_closeOnSwipeDown = __b; assignBoundProperty(__el4, "closeOnSwipeDown", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeNoHandle), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     return __frag;
   })(),
 });
@@ -11379,7 +11371,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Scrollable Content</h2> <p class="pdx-txt-small pdx-ink-muted">When content overflows, the body scrolls internally. Drag the handle (not the body) to resize.</p> <pdx-button variant="outline">Open Scrollable Sheet</pdx-button> <pdx-bottom-sheet label="Scrollable content"> <span slot="header"><strong>Long Content</strong></span> <div> <p>This sheet has more content than fits in the viewport. Scroll inside the body area.</p> <p>When the body is scrolled to the top, dragging down on the body will resize the sheet instead of scrolling.</p> <hr style="margin: 1rem 0; border-color: var(--pdx-color-border);"> <h3 class="pdx-txt-subtitle">Section 1</h3> <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation.</p> <h3 class="pdx-txt-subtitle">Section 2</h3> <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident.</p> <h3 class="pdx-txt-subtitle">Section 3</h3> <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p> <h3 class="pdx-txt-subtitle">Section 4</h3> <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p> <h3 class="pdx-txt-subtitle">Section 5</h3> <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti.</p> </div> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;return [__el3,__el4];};
@@ -11394,17 +11386,15 @@ component('app-demo-comp-bottom-sheet-scrollable', {
     
     
     function openScroll() { __scrollOpen.setRaw(true); }
-    function closeScroll() { __scrollOpen.setRaw(false); }
-    return { scrollOpen: __scrollOpen, scrollDetents, openScroll, closeScroll };
+    return { scrollOpen: __scrollOpen, scrollDetents, openScroll };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openScroll), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.scrollOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
+    bindTwoWay(__el4, 'open', ctx.scrollOpen);
     let __el4w_detents = {}; effect(() => { const __b = ctx.scrollDetents; if (Object.is(__b, __el4w_detents)) return; __el4w_detents = __b; assignBoundProperty(__el4, "detents", __b); });
     { assignBoundProperty(__el4, "initialDetent", 1); }
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeScroll), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     return __frag;
   })(),
 });
@@ -11415,7 +11405,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-botto
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading">Stacking: Sheet + Dialog</h2> <p class="pdx-txt-small pdx-ink-muted">Open a dialog from within a bottom sheet. overlayStack manages z-index and Escape order.</p> <pdx-button variant="outline">Open Sheet → Dialog</pdx-button> <pdx-bottom-sheet label="Nested sheet"> <span slot="header"><strong>Sheet with nested dialog</strong></span> <p>Click the button below to open a dialog on top of this sheet.</p> <pdx-button variant="primary" size="sm">Open Dialog</pdx-button> <pdx-dialog title="Confirm" size="sm"> <p>This dialog is stacked above the bottom sheet.</p> <p class="pdx-txt-small pdx-ink-muted">Escape closes this dialog first, then the sheet.</p> <span slot="footer"> <pdx-button variant="ghost" size="sm">Cancel</pdx-button> <pdx-button variant="primary" size="sm">OK</pdx-button> </span> </pdx-dialog> </pdx-bottom-sheet> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.nextSibling.nextSibling;const __el8=__el4.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el9=__el8.nextSibling.nextSibling;const __el12=__el9.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el13=__el12.firstChild.nextSibling;const __el14=__el13.nextSibling.nextSibling;return [__el3,__el4,__el8,__el9,__el13,__el14];};
@@ -11430,17 +11420,15 @@ component('app-demo-comp-bottom-sheet-stacking', {
     
     
     function openNested() { __nestedOpen.setRaw(true); }
-    function closeNested() { __nestedOpen.setRaw(false); }
     function openNestedDialog() { __nestedDialogOpen.setRaw(true); }
     function closeNestedDialog() { __nestedDialogOpen.setRaw(false); }
-    return { nestedOpen: __nestedOpen, nestedDialogOpen: __nestedDialogOpen, openNested, closeNested, openNestedDialog, closeNestedDialog };
+    return { nestedOpen: __nestedOpen, nestedDialogOpen: __nestedDialogOpen, openNested, openNestedDialog, closeNestedDialog };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el3,__el4,__el8,__el9,__el13,__el14]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openNested), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.nestedOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeNested), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
+    bindTwoWay(__el4, 'open', ctx.nestedOpen);
     __el8.addEventListener('click', safeHandler(batchHandler(ctx.openNestedDialog), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindTwoWay(__el9, 'open', ctx.nestedDialogOpen);
     __el13.addEventListener('click', safeHandler(batchHandler(ctx.closeNestedDialog), ctx.el?.tagName?.toLowerCase(), 'click'));

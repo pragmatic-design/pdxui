@@ -52,6 +52,15 @@ const DONE: Row[] = [
         parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer', 'resize'],
         removed: ['pdx-close'],
     },
+    {
+        tag: 'pdx-bottom-sheet',
+        models: ['open'],
+        // `dragging` while a finger or a pointer moves it: the height follows without a transition.
+        states: ['open', 'dragging'],
+        // The sheet and its sections, the handle that is its detent slider, and its close button.
+        parts: ['root', 'backdrop', 'handle', 'header', 'close', 'body', 'footer'],
+        removed: ['pdx-close'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

@@ -2763,16 +2763,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "open"
-            },
-            {
-              "kind": "field",
               "name": "detents",
               "description": "Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85]",
               "type": {
@@ -2861,6 +2851,16 @@
               "attribute": "label"
             },
             {
+              "kind": "field",
+              "name": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open"
+            },
+            {
               "kind": "method",
               "name": "show",
               "parameters": [],
@@ -2898,28 +2898,32 @@
               "description": "Move the sheet to a detent by index, clamped to the detents declared, and emit `pdx-detent-change`."
             }
           ],
+          "models": [
+            "open"
+          ],
           "events": [
             {
               "name": "pdx-before-close",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-before-close`."
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it closes. Does not bubble."
+              "description": "Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open."
             },
             {
               "name": "pdx-detent-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the detent changes.",
-              "detail": "{ detent, index }"
+              "description": "The sheet came to rest at a detent: its fraction of the viewport height, and its index.",
+              "detail": "{ detent: number; index: number }"
+            },
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -2927,15 +2931,6 @@
             "slider"
           ],
           "attributes": [
-            {
-              "name": "open",
-              "fieldName": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "initialdetent",
               "fieldName": "initialDetent",
@@ -3007,6 +3002,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "open",
+              "fieldName": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -3021,6 +3025,46 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "backdrop",
+              "description": "The element reached as `[data-part=\"backdrop\"]`."
+            },
+            {
+              "name": "handle",
+              "description": "The element reached as `[data-part=\"handle\"]`."
+            },
+            {
+              "name": "header",
+              "description": "The element reached as `[data-part=\"header\"]`."
+            },
+            {
+              "name": "close",
+              "description": "The element reached as `[data-part=\"close\"]`."
+            },
+            {
+              "name": "body",
+              "description": "The element reached as `[data-part=\"body\"]`."
+            },
+            {
+              "name": "footer",
+              "description": "The element reached as `[data-part=\"footer\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
+            },
+            {
+              "name": "dragging",
+              "description": "Matched with `:state(dragging)`."
             }
           ]
         }

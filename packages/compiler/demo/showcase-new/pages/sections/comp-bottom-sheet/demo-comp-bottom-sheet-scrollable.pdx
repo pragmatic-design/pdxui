@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">When content overflows, the body scrolls internally. Drag the handle (not the body) to resize.</p>
     <pdx-button variant="outline" @click="openScroll">Open Scrollable Sheet</pdx-button>
 
-    <pdx-bottom-sheet :open="scrollOpen" :detents="scrollDetents" :initialDetent="1" label="Scrollable content" @pdx-close="closeScroll">
+    <pdx-bottom-sheet ::open="scrollOpen" :detents="scrollDetents" :initialDetent="1" label="Scrollable content">
       <span slot="header"><strong>Long Content</strong></span>
       <div>
         <p>This sheet has more content than fits in the viewport. Scroll inside the body area.</p>
@@ -32,5 +32,4 @@ let scrollOpen = $signal(false);
 const scrollDetents = [0.4, 0.85];
 
 function openScroll() { scrollOpen = true; }
-function closeScroll() { scrollOpen = false; }
 </script>

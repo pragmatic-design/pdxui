@@ -10,7 +10,8 @@
        <div class="pdx-bottom-sheet-footer">Actions</div>
      </div>
 
-   Toggle: add/remove [data-open] attribute.
+   Toggle: add/remove [data-open] attribute. pdx-bottom-sheet draws the same from its custom states,
+   :state(open) and :state(dragging) (#288).
    Height: controlled via inline style (JS drag) or --pdx-sheet-height custom property.
 */
 
@@ -30,7 +31,7 @@
 
 /* Visible at once, not transitioned: for the first frame of a `visibility` transition the value is
  * still `hidden`, so a click on the backdrop went through to the page (#474, as #472 on the drawer). */
-.pdx-bottom-sheet-backdrop[data-open] {
+.pdx-bottom-sheet-backdrop:is([data-open], pdx-bottom-sheet:state(open) > *) {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-base) ease-out, visibility 0ms;
@@ -65,7 +66,7 @@
         visibility 0ms 300ms;
 }
 
-.pdx-bottom-sheet[data-open] {
+.pdx-bottom-sheet:is([data-open], pdx-bottom-sheet:state(open) > *) {
     transform: translateY(0);
     visibility: visible;
     transition:
@@ -73,8 +74,8 @@
         visibility 0ms;
 }
 
-/* When JS controls height during drag, skip CSS transitions */
-.pdx-bottom-sheet[data-dragging] {
+/* When JS controls height during drag, skip CSS transitions. As heavy as the open rule, and after it. */
+.pdx-bottom-sheet:is([data-dragging], pdx-bottom-sheet:state(dragging) > *) {
     transition: none;
 }
 
@@ -172,7 +173,7 @@
         border-radius: var(--pdx-radius-xl) var(--pdx-radius-xl) 0 0;
     }
 
-    .pdx-bottom-sheet[data-open] {
+    .pdx-bottom-sheet:is([data-open], pdx-bottom-sheet:state(open) > *) {
         transform: translateX(-50%) translateY(0);
     }
 }

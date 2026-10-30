@@ -14,11 +14,14 @@ import { test, expect, type Page } from './fixture';
 
 const SHEET = 'pdx-bottom-sheet[label="Basic bottom sheet"]';
 
+/** Whether the demo's sheet is open: its custom state `open` (#288). */
+const isOpen = (page: Page) => page.locator(SHEET).evaluate((h) => h.matches(':state(open)'));
+
 async function openBasic(page: Page) {
     await page.goto('/components/pdx-bottom-sheet', { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: 'Open Bottom Sheet' }).first().click();
     const sheet = page.locator(`${SHEET} .pdx-bottom-sheet`);
-    await expect(sheet).toHaveAttribute('data-open', '');
+    await expect.poll(() => isOpen(page)).toBe(true);
     // Settled at its first detent (40% of the viewport) AND arrived: its bottom edge on the viewport's.
     // The height is set at once, but the sheet slides in with a 300 ms transform whose curve ends
     // slowly, so a sheet of the right height can still be 20 px low. Waiting for the height only, the
@@ -59,18 +62,25 @@ async function dragHandle(page: Page, moves: [number, number][], releaseAt: numb
 test('the backdrop takes a click from the moment it opens (#474)', async ({ page }) => {
     // The backdrop's `visibility` was transitioned with the opacity: for the first frame of the
     // transition it is still `hidden`, so a click there went through to the page (#472 measured it on
-    // pdx-drawer). Measured in the same task that sees `data-open` appear, before any frame can pass.
+    // pdx-drawer). Measured in the same task that the sheet enters its open state: since #288 that is
+    // the host's custom state `open`, which no mutation observer sees, so the measurement is taken as
+    // the state is added.
     await page.goto('/components/pdx-bottom-sheet', { waitUntil: 'networkidle' });
     const hit = await page.evaluate((sel) => new Promise<string>((resolve) => {
         const host = document.querySelector(sel) as HTMLElement & { open: boolean };
         const backdrop = host.querySelector('.pdx-bottom-sheet-backdrop')!;
-        new MutationObserver((_, obs) => {
-            if (!backdrop.hasAttribute('data-open')) return;
-            obs.disconnect();
-            // High on the page, away from the sheet, which rises from the bottom.
-            const at = document.elementFromPoint(10, 100);
-            resolve(at === backdrop ? 'backdrop' : `${at?.tagName.toLowerCase()}.${at?.className}`);
-        }).observe(backdrop, { attributes: true, attributeFilter: ['data-open'] });
+        const proto = CustomStateSet.prototype;
+        const add = proto.add;
+        proto.add = function (this: CustomStateSet, value: string) {
+            const result = add.call(this, value);
+            if (value === 'open' && host.matches(':state(open)')) {
+                proto.add = add;
+                // High on the page, away from the sheet, which rises from the bottom.
+                const at = document.elementFromPoint(10, 100);
+                resolve(at === backdrop ? 'backdrop' : `${at?.tagName.toLowerCase()}.${at?.className}`);
+            }
+            return result;
+        };
         host.open = true;
     }), SHEET);
     expect(hit).toBe('backdrop');
@@ -80,7 +90,7 @@ test('a fast swipe down from the smallest detent dismisses the sheet', async ({ 
     const sheet = await openBasic(page);
     // 120 px in 64 ms: about 1900 px/s, released as the finger moves.
     await dragHandle(page, [[30, 16], [60, 32], [90, 48], [120, 64]], 64);
-    await expect(sheet).not.toHaveAttribute('data-open');
+    await expect.poll(() => isOpen(page)).toBe(false);
 });
 
 test('the same swipe, rested before lifting, snaps back to the smallest detent', async ({ page }) => {
@@ -90,7 +100,7 @@ test('the same swipe, rested before lifting, snaps back to the smallest detent',
     await dragHandle(page, [[30, 16], [60, 32], [90, 48], [120, 64]], 400);
     const vh = page.viewportSize()!.height;
     await expect.poll(async () => Math.round((await sheet.boundingBox())!.height)).toBe(Math.round(vh * 0.4));
-    await expect(sheet).toHaveAttribute('data-open', '');
+    await expect.poll(() => isOpen(page)).toBe(true);
 });
 
 test('a slow drag to the bottom closes the sheet', async ({ page }) => {
@@ -100,7 +110,7 @@ test('a slow drag to the bottom closes the sheet', async ({ page }) => {
     // Down to the bottom edge over 1.2 s, then a 300 ms rest: a slow release, below half the smallest detent.
     const moves: [number, number][] = Array.from({ length: 12 }, (_, i) => [toBottom * (i + 1) / 12, 100 * (i + 1)]);
     await dragHandle(page, moves, 1500);
-    await expect(sheet).not.toHaveAttribute('data-open');
+    await expect.poll(() => isOpen(page)).toBe(false);
 });
 
 test('the handle is a named slider: ArrowUp raises the sheet to the next detent', async ({ page }) => {
@@ -118,5 +128,5 @@ test('the handle is a named slider: ArrowUp raises the sheet to the next detent'
     await expect.poll(async () => Math.round((await sheet.boundingBox())!.height)).toBe(Math.round(vh * 0.4));
     // Escape from the handle closes the sheet, through the overlay stack.
     await page.keyboard.press('Escape');
-    await expect(sheet).not.toHaveAttribute('data-open');
+    await expect.poll(() => isOpen(page)).toBe(false);
 });

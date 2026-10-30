@@ -4,7 +4,6 @@ A panel that rises from the bottom.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `detents` | — | array | `() => [0.4, 0.85]` | Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] |
 | `initialDetent` | `initialdetent` | number | `0` | Initial detent index. Default: 0 (smallest) |
 | `backdrop` | `backdrop` | boolean | `true` | Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it. |
@@ -14,6 +13,7 @@ A panel that rises from the bottom.
 | `showHandle` | `showhandle` | boolean | `true` | Show drag handle bar. Default: true |
 | `showClose` | `showclose` | boolean | `false` | Show close button. Default: false |
 | `label` | `label` | string | `''` | Label for accessibility. |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
@@ -25,11 +25,15 @@ A panel that rises from the bottom.
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 | `snapTo(detentIndex)` | Move the sheet to a detent by index, clamped to the detents declared, and emit `pdx-detent-change`. |
 
-**Events:** `pdx-before-close` — Fired on `pdx-before-close`.; `pdx-close` — Fired when it closes. Does not bubble.; `pdx-detent-change` → `detail: { detent, index }` — Fired when the detent changes.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-before-close` — Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open.; `pdx-detent-change` → `detail: { detent: number; index: number }` — The sheet came to rest at a detent: its fraction of the viewport height, and its index.
 
 **Renders:** roles `dialog` · `slider`
 
 **Slot:** `header` — Content of the sheet's header, above the body.; `footer` — Content at the bottom of the sheet, below the body (e.g. actions).
+
+**States:** `:state(open)` — Matched with `:state(open)`.; `:state(dragging)` — Matched with `:state(dragging)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="handle"]` — The element reached as `[data-part="handle"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.
 
 
 #### Examples
@@ -42,7 +46,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openBasic">Open Bottom Sheet</pdx-button>
-<pdx-bottom-sheet :open="basicOpen" label="Basic bottom sheet" @pdx-close="closeBasic">
+<pdx-bottom-sheet ::open="basicOpen" label="Basic bottom sheet">
   <span slot="header"><strong>Basic Sheet</strong></span>
   <p>Drag the handle to resize between detent snap points.</p>
   <p class="pdx-txt-small pdx-ink-muted">Swipe down quickly to dismiss, or tap the backdrop.</p>
@@ -58,7 +62,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openThree">Open 3-Detent Sheet</pdx-button>
-<pdx-bottom-sheet :open="threeOpen" :detents="threeDetents" label="Three detent sheet" @pdx-close="closeThree">
+<pdx-bottom-sheet ::open="threeOpen" :detents="threeDetents" label="Three detent sheet">
   <span slot="header"><strong>Three Detents</strong></span>
   <p>This sheet snaps to <strong>25%</strong>, <strong>50%</strong>, or <strong>90%</strong> of viewport.</p>
   <p>Drag slowly to snap to the nearest detent. Swipe fast to jump to the next one.</p>
@@ -75,7 +79,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openScroll">Open Scrollable Sheet</pdx-button>
-<pdx-bottom-sheet :open="scrollOpen" :detents="scrollDetents" :initialDetent="1" label="Scrollable content" @pdx-close="closeScroll">
+<pdx-bottom-sheet ::open="scrollOpen" :detents="scrollDetents" :initialDetent="1" label="Scrollable content">
   <span slot="header"><strong>Long Content</strong></span>
   <div>
     <p>This sheet has more content than fits in the viewport. Scroll inside the body area.</p>
@@ -99,7 +103,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openClose">Open with Close Button</pdx-button>
-<pdx-bottom-sheet :open="closeOpen" showClose label="Sheet with close button" @pdx-close="closeCloseSheet">
+<pdx-bottom-sheet ::open="closeOpen" showClose label="Sheet with close button">
   <span slot="header"><strong>With Close Button</strong></span>
   <p>This sheet has both a drag handle and a close button.</p>
   <p>The close button provides an explicit close affordance for mouse/keyboard users.</p>
@@ -110,7 +114,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openNoHandle">Open Without Handle</pdx-button>
-<pdx-bottom-sheet :open="noHandleOpen" :showHandle="noHandle" showClose :closeOnSwipeDown="noSwipe" label="Fixed sheet" @pdx-close="closeNoHandle">
+<pdx-bottom-sheet ::open="noHandleOpen" :showHandle="noHandle" showClose :closeOnSwipeDown="noSwipe" label="Fixed sheet">
   <span slot="header"><strong>Fixed Sheet</strong></span>
   <p>No drag handle — this sheet stays at its initial detent.</p>
   <p>Use the close button, backdrop click, or Escape to dismiss.</p>
@@ -121,7 +125,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openAction">Show Actions</pdx-button>
-<pdx-bottom-sheet :open="actionOpen" :detents="actionDetents" label="Actions" @pdx-close="closeAction">
+<pdx-bottom-sheet ::open="actionOpen" :detents="actionDetents" label="Actions">
   <span slot="header"><strong>Choose Action</strong></span>
   <div class="action-list">
     <button class="action-item" @click="pickAction('Share')">
@@ -147,7 +151,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-button variant="outline" @click="openNested">Open Sheet → Dialog</pdx-button>
-<pdx-bottom-sheet :open="nestedOpen" label="Nested sheet" @pdx-close="closeNested">
+<pdx-bottom-sheet ::open="nestedOpen" label="Nested sheet">
   <span slot="header"><strong>Sheet with nested dialog</strong></span>
   <p>Click the button below to open a dialog on top of this sheet.</p>
   <pdx-button variant="primary" size="sm" @click="openNestedDialog">Open Dialog</pdx-button>
