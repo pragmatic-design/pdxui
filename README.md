@@ -61,7 +61,8 @@ measure the framework against real screens (abridged, imports left out; the comm
                    show-toolbar search row-clickable
                    @pdx-row-click="e => openRecord(e.detail.row)"></pdx-data-grid>
 
-    <pdx-dialog :open="createOpen" :title="$t('employees.new')" @pdx-close="creating.open.set(false)">
+    <pdx-dialog :open="createOpen" :title="$t('employees.new')"
+                @open-change="if ($event.detail.value) return; creating.open.set(false)">
       <pdx-auto-form :schema="schema" @pdx-submit="e => creating.create(e.detail?.values ?? {})"></pdx-auto-form>
     </pdx-dialog>
   </section>

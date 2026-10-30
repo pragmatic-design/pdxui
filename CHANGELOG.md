@@ -394,6 +394,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-dialog` takes the beta contract (#288).
+  - **`open` is a model.** The dialog writes it when it closes itself — Escape, the backdrop, its close
+    button — and announces it with `open-change` `{ value }`, so `::open="x"` follows it. `pdx-close`
+    is gone; `pdx migrate` turns `@pdx-close` on a `pdx-dialog` into `@open-change`.
+  - **States and parts.** `open`, `loading`, `scroll-top` and `scroll-bottom` are custom states on the
+    host; the backdrop no longer carries `data-open`, nor the body `pdx-scroll-top` or
+    `pdx-scroll-bottom`. The parts are `root` (the panel), `backdrop`, `header`, `close`, `body` and
+    `footer`. `pdx-alert-dialog`, the overlay outlet and native markup keep `[data-open]`.
+  - **Busy while loading.** The panel is `aria-busy="true"` while `loading`, not the host (A4).
+  - **`pdx-before-close` stays on the dialog**: it no longer bubbles, as no undeclared event does (#138).
+
 - **Breaking:** `pdx-file-upload` takes the beta contract (#287).
   - **States and parts.** `disabled` and `dragover` are custom states on the host; the drop zone no
     longer carries the `disabled` or `dragover` class. The parts are `root` (the frame), `dropzone`,

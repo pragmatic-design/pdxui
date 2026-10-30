@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading">Scrollable Content</h2>
     <p class="pdx-txt-small pdx-ink-muted">Long content scrolls within the body — header and footer stay fixed. Scroll shadows appear at edges.</p>
     <pdx-button variant="outline" size="sm" @click="openScroll">Open Scrollable</pdx-button>
-    <pdx-dialog :open="scrollOpen" title="Terms of Service" size="md" @pdx-close="closeScroll">
+    <pdx-dialog ::open="scrollOpen" title="Terms of Service" size="md">
       <div class="long-content">
         <h3>1. Acceptance of Terms</h3>
         <p>By accessing and using this service, you accept and agree to be bound by the terms and provision of this agreement. In addition, when using this service, you shall be subject to any posted guidelines or rules applicable to such services.</p>
@@ -30,7 +30,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="scrollOpen" title="Terms of Service" size="md" @pdx-close="closeScroll"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog ::open="scrollOpen" title="Terms of Service" size="md"&gt;
   &lt;div class="long-content"&gt;
     &lt;h3&gt;1. Acceptance of Terms&lt;/h3&gt;
     &lt;p&gt;Long scrollable content...&lt;/p&gt;

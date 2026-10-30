@@ -116,10 +116,9 @@
 
     <!-- ADD, in a modal: an active service the customer does not have now, and the day it starts. -->
     <pdx-dialog
-      :open="subscribeOpen"
+      ::open="subscribeOpen"
       size="md"
       :title="$t('customers.services.dialogTitle')"
-      @pdx-close="subscribeOpen = false"
       data-test="subscription-dialog">
       <pdx-form :form="subscribing" @pdx-submit="onSubscribe" data-test="subscription-form">
         <div class="grid">

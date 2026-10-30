@@ -9796,16 +9796,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "open"
-            },
-            {
-              "kind": "field",
               "name": "title",
               "description": "The dialog heading.",
               "type": {
@@ -9885,6 +9875,16 @@
               "attribute": "size"
             },
             {
+              "kind": "field",
+              "name": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open"
+            },
+            {
               "kind": "method",
               "name": "show",
               "parameters": [],
@@ -9908,6 +9908,9 @@
               "readonly": true,
               "description": "Read-only, via a ref: `el.isOpen`."
             }
+          ],
+          "models": [
+            "open"
           ],
           "variants": [
             {
@@ -9938,26 +9941,18 @@
               "description": "Fired (cancelable) before closing; call preventDefault() to block it."
             },
             {
-              "name": "pdx-close",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired after the dialog closes. Does not bubble."
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
             "dialog"
           ],
           "attributes": [
-            {
-              "name": "open",
-              "fieldName": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "title",
               "fieldName": "title",
@@ -10029,6 +10024,15 @@
                 "text": "'md' | 'sm' | 'lg' | 'xl' | 'full'"
               },
               "default": "'md'"
+            },
+            {
+              "name": "open",
+              "fieldName": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -10039,6 +10043,50 @@
             {
               "name": "footer",
               "description": "Action area at the bottom (e.g. Confirm/Cancel); hidden automatically when empty."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "backdrop",
+              "description": "The element reached as `[data-part=\"backdrop\"]`."
+            },
+            {
+              "name": "header",
+              "description": "The element reached as `[data-part=\"header\"]`."
+            },
+            {
+              "name": "close",
+              "description": "The element reached as `[data-part=\"close\"]`."
+            },
+            {
+              "name": "body",
+              "description": "The element reached as `[data-part=\"body\"]`."
+            },
+            {
+              "name": "footer",
+              "description": "The element reached as `[data-part=\"footer\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
+            },
+            {
+              "name": "loading",
+              "description": "Matched with `:state(loading)`."
+            },
+            {
+              "name": "scroll-top",
+              "description": "Matched with `:state(scroll-top)`."
+            },
+            {
+              "name": "scroll-bottom",
+              "description": "Matched with `:state(scroll-bottom)`."
             }
           ],
           "cssProperties": [

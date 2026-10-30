@@ -36,7 +36,7 @@
       <h3 class="pdx-txt-subheading">Props</h3>
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Default</span><span>Description</span></div>
-        <div class="opt-row"><code>open</code><span>boolean</span><span>false</span><span>Controls visibility</span></div>
+        <div class="opt-row"><code>open</code><span>boolean</span><span>false</span><span>Controls visibility. A model: <code>::open</code> follows Escape, the backdrop and the close button</span></div>
         <div class="opt-row"><code>title</code><span>string</span><span>''</span><span>Dialog header title</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>'md'</span><span>sm | md | lg | xl | full</span></div>
         <div class="opt-row"><code>close-on-backdrop</code><span>boolean</span><span>true</span><span>Close on backdrop click</span></div>
@@ -49,8 +49,18 @@
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3>
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Description</span></div>
-        <div class="opt-row"><code>pdx-close</code><span>Emitted when dialog closes</span></div>
+        <div class="opt-row"><code>open-change</code><span><code>{ value }</code>: the dialog opened (<code>true</code>) or closed itself (<code>false</code>)</span></div>
         <div class="opt-row"><code>pdx-before-close</code><span>Cancelable — call preventDefault() to prevent close</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Description</span></div>
+        <div class="opt-row"><code>:state(open)</code><span>The dialog is open</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span>Loading: the panel is <code>aria-busy</code></span></div>
+        <div class="opt-row"><code>:state(scroll-top)</code><span>The body has more above</span></div>
+        <div class="opt-row"><code>:state(scroll-bottom)</code><span>The body has more below</span></div>
+        <div class="opt-row"><code>[data-part]</code><span><code>root</code> (the panel), <code>backdrop</code>, <code>header</code>, <code>close</code>, <code>body</code>, <code>footer</code></span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots</h3>
@@ -61,7 +71,7 @@
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Imperative API</h3>
-      <pre class="pdx-txt-mono source-code"><code>&lt;pdx-dialog :open="isOpen" title="Confirm" @pdx-close="close"&gt;
+      <pre class="pdx-txt-mono source-code"><code>&lt;pdx-dialog ::open="isOpen" title="Confirm"&gt;
   &lt;p&gt;Are you sure?&lt;/p&gt;
   &lt;div slot="footer"&gt;
     &lt;pdx-button variant="ghost" @click="close"&gt;Cancel&lt;/pdx-button&gt;

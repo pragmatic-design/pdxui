@@ -5,7 +5,7 @@
     <div class="btn-row">
       <pdx-button variant="primary" size="sm" @click="openFooter">Edit Profile</pdx-button>
     </div>
-    <pdx-dialog :open="footerOpen" title="Edit Profile" size="md" @pdx-close="closeFooter">
+    <pdx-dialog ::open="footerOpen" title="Edit Profile" size="md">
       <div class="form-fields">
         <label class="pdx-txt-small pdx-ink-muted">Full Name</label>
         <input type="text" class="pdx-input" value="Jane Smith" />
@@ -22,7 +22,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="footerOpen" title="Edit Profile" size="md" @pdx-close="closeFooter"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog ::open="footerOpen" title="Edit Profile" size="md"&gt;
   &lt;div class="form-fields"&gt;
     &lt;label&gt;Full Name&lt;/label&gt;
     &lt;input type="text" class="pdx-input" value="Jane Smith" /&gt;

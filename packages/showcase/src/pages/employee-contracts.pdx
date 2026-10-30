@@ -67,10 +67,9 @@
     <!-- ADD, in a modal, from a schema — as the lists create. The schema carries the same rule the
          page's form does: a schema takes a form-level `validate` since this story. -->
     <pdx-dialog
-      :open="addOpen"
+      ::open="addOpen"
       size="md"
       :title="$t('employees.contracts.add')"
-      @pdx-close="addOpen = false"
       data-test="contract-dialog">
       <pdx-auto-form
         :schema="schema"

@@ -31,7 +31,7 @@
       :open="createOpen"
       size="md"
       :title="$t('sites.new')"
-      @pdx-close="creating.open.set(false)"
+      @open-change="if ($event.detail.value) return; creating.open.set(false)"
       data-test="create-dialog">
       <pdx-auto-form
         :schema="schema"

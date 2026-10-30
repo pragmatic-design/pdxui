@@ -28,7 +28,7 @@
 
     <!-- NEW, in a modal: what it is, whose it is, where it is. The customer and the site
          come from their own paged sources, as the intake picks a customer; then the asset opens. -->
-    <pdx-dialog :open="createOpen" size="lg" :title="$t('assets.new')" @pdx-close="createOpen = false" data-test="create-dialog">
+    <pdx-dialog ::open="createOpen" size="lg" :title="$t('assets.new')" data-test="create-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
         <div class="grid">
           <pdx-form-field :field="draft.name" :label="$t('assets.fields.name')">

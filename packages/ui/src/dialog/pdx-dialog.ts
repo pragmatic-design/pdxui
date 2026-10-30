@@ -2,7 +2,7 @@
 // Uses overlayStack for z-index management and Escape coordination.
 // Same pattern as pdx-drawer: backdrop + panel in render template, CSS visibility.
 
-import { component, html } from '@pdxui/core';
+import { component, event, html, model } from '@pdxui/core';
 import { focusTrap, overlayStack } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -22,10 +22,15 @@ let _dialogCounter = 0;
  * @summary Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.
  * @slot - The dialog body (main content).
  * @slot footer - Action area at the bottom (e.g. Confirm/Cancel); hidden automatically when empty.
- * @fires pdx-before-close - Fired (cancelable) before closing; call preventDefault() to block it.
- * @fires pdx-close - Fired after the dialog closes.
  */
 component('pdx-dialog', {
+    // `open` is a model (#288): the dialog closes itself — Escape, the backdrop, its close button — and
+    // its own writes announce `open-change` `{ value }`, which `::open` follows. It replaced `pdx-close`.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as custom states (#132, #288): the design CSS draws the backdrop and the body's scroll
+    // shadows from them, and neither carries an attribute or a class for it.
+    states: ['open', 'loading', 'scroll-top', 'scroll-bottom'],
+    parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer'],
     // The axis dialog.css keys by (#633), reflected on the host and drawn on the panel, the root part;
     // each value maps the class that draws the same panel elsewhere (pdx-alert-dialog, the overlay
     // outlet, native markup).
@@ -34,7 +39,6 @@ component('pdx-dialog', {
         size: { md: '.pdx-dialog-md', sm: '.pdx-dialog-sm', lg: '.pdx-dialog-lg', xl: '.pdx-dialog-xl', full: '.pdx-dialog-full' },
     },
     props: {
-        open: { type: Boolean, default: false },
         title: { type: String, default: '' },
         closeOnBackdrop: { type: Boolean, default: true },
         closeOnEscape: { type: Boolean, default: true },
@@ -43,6 +47,10 @@ component('pdx-dialog', {
         preventClose: { type: Boolean, default: false },
         /** Show loading state */
         loading: { type: Boolean, default: false },
+    },
+    events: {
+        /** Fired (cancelable) before closing; call preventDefault() to block it. */
+        'pdx-before-close': event<void>(),
     },
     setup(ctx) {
         let trapDispose: Dispose | null = null;
@@ -67,30 +75,26 @@ component('pdx-dialog', {
          * because an app that wants "you have unsaved changes" needs to know the attempt happened.
          */
         function tryClose(byUser = true) {
-            // Always emit cancelable before-close — consumer decides whether to block
-            const event = new CustomEvent('pdx-before-close', {
-                bubbles: true, cancelable: true,
-            });
-            ctx.el.dispatchEvent(event);
-            if (event.defaultPrevented) return;
+            // Always emit cancelable before-close — consumer decides whether to block. It stays on the
+            // dialog, as no undeclared event bubbles (#138).
+            if (!ctx.emit('pdx-before-close', undefined, { cancelable: true })) return;
             if (byUser && ctx.preventClose() as boolean) return;
-            doClose();
-        }
-
-        function doClose() {
-            (ctx.el as any).open = false;
-            ctx.emit('pdx-close', undefined, { bubbles: false });
+            ctx.open.set(false);
         }
 
         function setupScrollShadow(el: HTMLElement) {
             function update() {
                 const { scrollTop, scrollHeight, clientHeight } = el;
-                el.classList.toggle('pdx-scroll-top', scrollTop > 4);
-                el.classList.toggle('pdx-scroll-bottom', scrollTop + clientHeight < scrollHeight - 4);
+                ctx.state('scroll-top', scrollTop > 4);
+                ctx.state('scroll-bottom', scrollTop + clientHeight < scrollHeight - 4);
             }
             el.addEventListener('scroll', update, { passive: true });
             requestAnimationFrame(update);
-            return () => el.removeEventListener('scroll', update);
+            return () => {
+                el.removeEventListener('scroll', update);
+                ctx.state('scroll-top', false);
+                ctx.state('scroll-bottom', false);
+            };
         }
 
         function focusInitial() {
@@ -116,9 +120,8 @@ component('pdx-dialog', {
 
         ctx.track(() => {
             const isOpen = ctx.open();
-
-            if (ctx.loading()) ctx.el.setAttribute('aria-busy', 'true');
-            else ctx.el.removeAttribute('aria-busy');
+            // The panel says it is busy (A4), in the template.
+            ctx.state('loading', !!ctx.loading());
 
             // Bind DOM refs once
             if (!_bound) {
@@ -147,7 +150,7 @@ component('pdx-dialog', {
                 _rafId = 0;
                 // Lazy (re)resolve: the once-on-mount capture above runs in a rAF and can miss the panel if the
                 // render hasn't painted it yet (render timing in a real browser differs from jsdom) — leaving
-                // panelEl/backdropEl null forever so data-open is never set and the dialog never opens.
+                // panelEl/backdropEl null forever so the open state is never set and the dialog never opens.
                 if (!panelEl) panelEl = ctx.el.querySelector('.pdx-dialog-panel');
                 if (!backdropEl) {
                     backdropEl = ctx.el.querySelector('.pdx-dialog-backdrop');
@@ -164,7 +167,8 @@ component('pdx-dialog', {
                     // Animate in next frame (tracked for cancellation)
                     _innerRafId = requestAnimationFrame(() => {
                         _innerRafId = 0;
-                        if (backdropEl) backdropEl.setAttribute('data-open', '');
+                        // A frame after the backdrop is placed, so the design CSS animates it in.
+                        ctx.state('open', true);
                         if (panelEl) {
                             trapDispose = focusTrap(panelEl, { restoreFocus: true });
                             // Focus after trap initializes (next microtask)
@@ -186,7 +190,7 @@ component('pdx-dialog', {
                     }
                 } else {
                     // Close
-                    if (backdropEl) backdropEl.removeAttribute('data-open');
+                    ctx.state('open', false);
                     if (trapDispose) { trapDispose(); trapDispose = null; }
                     if (dismissDispose) { dismissDispose(); dismissDispose = null; }
                     if (scrollCleanup) { scrollCleanup(); scrollCleanup = null; }
@@ -204,30 +208,32 @@ component('pdx-dialog', {
 
         // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen.
         // `show` (not `open`) to avoid shadowing the boolean `open` prop — mirrors native <dialog>.
+        // Each writes the model, so each announces `open-change`.
         ctx.expose({
-            show() { (ctx.el as any).open = true; },
+            show() { ctx.open.set(true); },
             // The author asking, so it is not blocked by prevent-close (see tryClose).
             close: () => tryClose(false),
-            toggle() { if (ctx.open()) tryClose(false); else (ctx.el as any).open = true; },
+            toggle() { if (ctx.open()) tryClose(false); else ctx.open.set(true); },
             get isOpen() { return ctx.open() as boolean; },
         });
 
         return { tryClose };
     },
     render: (ctx) => html`
-        <div class="pdx-dialog-backdrop">
+        <div class="pdx-dialog-backdrop" data-part="backdrop">
             <div class="pdx-dialog-panel" data-part="root" role="dialog" aria-modal="true"
-                :aria-label="${() => ctx.title() || uiString('dialog', 'label')}">
-                <div class="pdx-dialog-header">
+                :aria-label="${() => ctx.title() || uiString('dialog', 'label')}"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}">
+                <div class="pdx-dialog-header" data-part="header">
                     <span>${ctx.title}</span>
                     ${() => ctx.showClose() ? html`
-                        <button type="button" class="pdx-dialog-close" :aria-label="${() => uiString('dialog', 'close')}">\u2715</button>
+                        <button type="button" class="pdx-dialog-close" data-part="close" :aria-label="${() => uiString('dialog', 'close')}">\u2715</button>
                     ` : ''}
                 </div>
-                <div class="pdx-dialog-body">
+                <div class="pdx-dialog-body" data-part="body">
                     <slot></slot>
                 </div>
-                <div class="pdx-dialog-footer">
+                <div class="pdx-dialog-footer" data-part="footer">
                     <slot name="footer"></slot>
                 </div>
             </div>

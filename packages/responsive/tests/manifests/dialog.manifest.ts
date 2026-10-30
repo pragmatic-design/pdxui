@@ -4,24 +4,24 @@
  * Contracts written by inspecting the source (packages/ui/src/dialog/pdx-dialog.ts) and the CSS
  * (packages/design/src/components/dialog.css, the .pdx-dialog-backdrop / .pdx-dialog-panel block).
  *
- * DOM structure: the custom element <pdx-dialog> renders inside the HOST's own render (NOT portalled to the body):
- *   <div class="pdx-dialog-backdrop">              ← fixed inset:0, flex center, bg var(--pdx-color-backdrop)
- *     <div class="pdx-dialog-panel pdx-dialog-{size}" role="dialog" aria-modal="true" :aria-label="title|'Dialog'">
- *       <div class="pdx-dialog-header"><span>{title}</span><button.pdx-dialog-close></button></div>
- *       <div class="pdx-dialog-body"><slot></slot></div>
- *       <div class="pdx-dialog-footer"><slot name="footer"></slot></div>
+ * DOM structure: the custom element <pdx-dialog> renders inside the HOST's own render (NOT portalled to
+ * the body). Its pieces are parts (#288), and the contracts select them by part:
+ *   backdrop  ← fixed inset:0, flex center, bg var(--pdx-color-backdrop)
+ *     root    ← the panel: role="dialog" aria-modal="true" :aria-label="title|'Dialog'"
+ *       header (title, then the close part), body (the default slot), footer (slot "footer")
  *
  * Centring: the backdrop is a flex container with align and justify center → the panel is centred
  * horizontally and vertically in the viewport (the backdrop is fixed inset:0). centering:'both'.
  *
- * Base geometry (.pdx-dialog-panel): radius lg, padding 0 (the sections carry their own padding),
+ * Base geometry (the root part): radius lg, padding 0 (the sections carry their own padding),
  * box-shadow xl, max-width 480px (md) / 360px (sm), width 90%, display flex column, max-height 85vh.
- * When it is open the backdrop gets [data-open] (an rAF in the setup) → the panel transitions to opacity 1.
+ * When it is open the host is in the custom state :state(open) (an rAF in the setup) → the panel
+ * transitions to opacity 1.
  *
- * THE OPEN SCENARIO: the host carries the `open` attribute so the backdrop and the panel are rendered,
- * the setup applies [data-open] to the backdrop and the panel becomes measurable (opacity 1).
- * Selectors scoped to section:not([hidden]) [data-test="dlg"] .pdx-dialog-* (host-scoping OK,
- * nothing is portalled). action:'call' in the overlay rule → the runner does NOT click, the overlay is already open.
+ * THE OPEN SCENARIO: the host carries the `open` attribute, its model, so the setup puts it in
+ * :state(open) and the panel becomes measurable (opacity 1). Selectors scoped to
+ * section:not([hidden]) [data-test="dlg"] [data-part=…] (host-scoping OK, nothing is portalled).
+ * action:'call' in the overlay rule → the runner does NOT click, the overlay is already open.
  */
 import type { ComponentManifest } from './_types';
 
@@ -56,27 +56,27 @@ export const dialog: ComponentManifest = {
                 // Standalone rules on the panel: open (opacity 1), a flex column box, radius >= 0, max-width md.
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'open dialog panel is fully visible (opacity 1)',
                         opacity: { op: '>=', value: 0.99 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'dialog panel is a flex column box',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'dialog panel has non-negative radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'dialog panel (md) constrained to a sensible max-width',
                         maxWidth: { op: '<=', value: 480 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'dialog panel is tall enough to hold header/body/footer',
                         height: { op: '>=', value: 80 },
                     },
@@ -88,7 +88,7 @@ export const dialog: ComponentManifest = {
                         // size classes read `--pdx-dialog-width-*`, whose defaults are exactly what
                         // each size measures without one. This is the default, asserted per
                         // theme so that a theme cannot quietly invent a sixth width.
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         description: 'a md dialog is exactly the width its token states (480)',
                         width: { op: '==', value: 480, tolerance: 1 },
                     },
@@ -96,9 +96,20 @@ export const dialog: ComponentManifest = {
                         // The close is in the HEADER, on the right — the reference's 36px icon
                         // button at the end of a 64px header. Measured as "inside the header",
                         // because where it is matters and how big it is per theme does not.
-                        selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-header .pdx-dialog-close',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="header"] [data-part="close"]',
                         description: 'the close button is in the header',
                         width: { op: '>', value: 0 },
+                    },
+                ],
+                // Open is a custom state of the host (#288), what a theme selects; the backdrop has no
+                // attribute for it.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open), and the backdrop is drawn from it',
+                        selector: 'section:not([hidden]) [data-test="dlg"] [data-part="backdrop"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="dlg"]', name: 'open' },
+                        changes: { opacity: { op: '>=', value: 0.99 } },
                     },
                 ],
                 // Overlay: the panel is centred both ways in the viewport, with a backdrop.
@@ -106,8 +117,8 @@ export const dialog: ComponentManifest = {
                     {
                         description: 'open dialog is centered in the viewport over a backdrop',
                         trigger: { selector: 'section:not([hidden]) [data-test="dlg"]', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
-                        backdrop: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-backdrop',
+                        panel: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
+                        backdrop: 'section:not([hidden]) [data-test="dlg"] [data-part="backdrop"]',
                         centering: 'both',
                         hasBackdrop: true,
                         maxWidth: { op: '<=', value: 480 },
@@ -122,10 +133,10 @@ export const dialog: ComponentManifest = {
                         // Measured as geometry, per theme, because a theme may restyle both
                         // buttons and must not reorder them.
                         description: 'the confirming action is last in the footer',
-                        parent: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-footer',
+                        parent: 'section:not([hidden]) [data-test="dlg"] [data-part="footer"]',
                         children: {
-                            cancel: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-footer .pdx-ghost',
-                            ok: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-footer .pdx-primary',
+                            cancel: 'section:not([hidden]) [data-test="dlg"] [data-part="footer"] .pdx-ghost',
+                            ok: 'section:not([hidden]) [data-test="dlg"] [data-part="footer"] .pdx-primary',
                         },
                         relations: [
                             { description: 'cancel sits before the confirm', left: 'cancel.right', op: '<=', right: 'ok.left' },
@@ -134,12 +145,12 @@ export const dialog: ComponentManifest = {
                     },
                     {
                         description: 'dialog sections are contained within the panel box',
-                        parent: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                        parent: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
-                            header: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-header',
-                            body: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-body',
-                            footer: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-footer',
+                            panel: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
+                            header: 'section:not([hidden]) [data-test="dlg"] [data-part="header"]',
+                            body: 'section:not([hidden]) [data-test="dlg"] [data-part="body"]',
+                            footer: 'section:not([hidden]) [data-test="dlg"] [data-part="footer"]',
                         },
                         relations: [
                             { description: 'header within panel box', left: 'header', op: 'contained-in', right: 'panel' },
@@ -179,7 +190,7 @@ export const dialog: ComponentManifest = {
         targets: [
             // A modal panel: it has transform:scale() (so getBoundingClientRect is scaled) and it is
             // content-driven → the height is NOT a clean invariant (skipHeight). The radius stays asserted (it is stable).
-            { selector: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]', tolerancePx: 2, skipHeight: true },
         ],
     },
 
@@ -190,11 +201,11 @@ export const dialog: ComponentManifest = {
         // trapContainer: after the steps, 10 Tabs and 10 Shift+Tabs stay in the panel.
         scenario: 'dialog-open',
         initialFocus: 'section:not([hidden]) [data-test="dlg-action"]',
-        trapContainer: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+        trapContainer: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
         steps: [
             {
                 key: 'Tab',
-                expectFocusWithin: 'section:not([hidden]) [data-test="dlg"] .pdx-dialog-panel',
+                expectFocusWithin: 'section:not([hidden]) [data-test="dlg"] [data-part="root"]',
             },
         ],
     },

@@ -93,10 +93,11 @@ test.describe('reactivity', () => {
         await expect(backdrop).toHaveAttribute('data-open');
     });
 
-    test('dialog: open prop toggles panel visibility (data-open)', async ({ page }) => {
+    // Its open state is the host's :state(open) (#288), not an attribute on the backdrop.
+    test('dialog: open prop toggles panel visibility (:state(open))', async ({ page }) => {
         await mountRaw(page, 'pdx-dialog', { attrs: { title: 'T' } });
-        expect(await page.$eval(`${SUBJECT} .pdx-dialog-backdrop`, (e) => e.hasAttribute('data-open'))).toBe(false);
+        expect(await page.$eval(`${SUBJECT} pdx-dialog`, (e) => e.matches(':state(open)'))).toBe(false);
         await setProp(page, 'open', true);
-        expect(await page.$eval(`${SUBJECT} .pdx-dialog-backdrop`, (e) => e.hasAttribute('data-open'))).toBe(true);
+        await expect.poll(() => page.$eval(`${SUBJECT} pdx-dialog`, (e) => e.matches(':state(open)'))).toBe(true);
     });
 });

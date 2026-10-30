@@ -243,7 +243,7 @@ core's `html` tag) expands it to `<pdx-autocomplete …></pdx-autocomplete>`. Th
 would open the element and swallow what follows. Void elements (`<input />`, `<br />`) stay as written.
 
 **A component's events stay on it.** No `@pdxui/ui` event bubbles — `pdx-change` included — and
-neither does an `@event` without `(bubbles)`: a `@pdx-close` on a `pdx-dialog` hears the dialog, not
+neither does an `@event` without `(bubbles)`: an `@open-change` on a `pdx-dialog` hears the dialog, not
 the select or date picker inside it, and a `@pdx-change` on a `<form>` or a section hears none of the
 fields inside. Listen on the component itself. Native events (`input`, `change`, `click`) still bubble
 as the browser makes them.

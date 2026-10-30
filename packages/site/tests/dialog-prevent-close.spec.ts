@@ -12,13 +12,13 @@
 import { test, expect, type Page } from './fixture';
 
 /**
- * Whether the demo's own dialog is open: pdx-dialog marks its backdrop with data-open. Found by its
+ * Whether the demo's own dialog is open: pdx-dialog is in its custom state `open` (#288). Found by its
  * `title` prop: the host keeps no title attribute.
  */
 function editorOpen(page: Page) {
     return page.evaluate(() => {
         const el = [...document.querySelectorAll<HTMLElement>('pdx-dialog')].find(d => d.title === 'Edit Document');
-        return el?.querySelector('.pdx-dialog-backdrop')?.hasAttribute('data-open') ?? null;
+        return el ? el.matches(':state(open)') : null;
     });
 }
 

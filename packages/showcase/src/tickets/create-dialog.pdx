@@ -6,7 +6,7 @@
     :open="open"
     size="md"
     :title="$t('tickets.new')"
-    @pdx-close="close()"
+    @open-change="if ($event.detail.value) return; close()"
     data-test="create-dialog">
     <!-- The fields are `<pdx-auto-form>`'s; the submit is this component's, because the asset picker
          sits between the fields and it. The form is reached through what it exposes —

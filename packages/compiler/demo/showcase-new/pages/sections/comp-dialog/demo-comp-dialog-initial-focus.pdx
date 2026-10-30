@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading">Initial Focus</h2>
     <p class="pdx-txt-small pdx-ink-muted">Control which element receives focus when the dialog opens via <code>initial-focus</code> selector.</p>
     <pdx-button variant="outline" size="sm" @click="openFocus">Open (focus on email)</pdx-button>
-    <pdx-dialog :open="focusOpen" title="Login" size="sm" :initialfocus="focusSelector" @pdx-close="closeFocus">
+    <pdx-dialog ::open="focusOpen" title="Login" size="sm" :initialfocus="focusSelector">
       <div class="form-fields">
         <label class="pdx-txt-small pdx-ink-muted">Username</label>
         <input type="text" class="pdx-input" placeholder="username" />
@@ -18,8 +18,8 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="focusOpen" title="Login" size="sm"
-  :initialfocus="'.focus-email'" @pdx-close="closeFocus"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog ::open="focusOpen" title="Login" size="sm"
+  :initialfocus="'.focus-email'"&gt;
   &lt;input type="text" class="pdx-input" placeholder="username" /&gt;
   &lt;input type="email" class="pdx-input focus-email" placeholder="email" /&gt;
   &lt;span slot="footer"&gt;

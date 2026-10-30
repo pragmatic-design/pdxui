@@ -48,7 +48,7 @@
       :open="createOpen"
       size="md"
       :title="$t('customers.new')"
-      @pdx-close="list.closeCreate()"
+      @open-change="if ($event.detail.value) return; list.closeCreate()"
       data-test="create-dialog">
       <pdx-auto-form
         :schema="schema"
