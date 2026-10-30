@@ -9,7 +9,7 @@
       <pdx-button variant="outline" @click="openDrawer('bottom')">Bottom</pdx-button>
     </div>
 
-    <pdx-drawer :open="drawerOpen" :position="drawerPos" label="Demo drawer" @pdx-close="closeDrawer">
+    <pdx-drawer ::open="drawerOpen" :position="drawerPos" label="Demo drawer">
       <span slot="header">Drawer — {{ drawerPos }}</span>
       <p>This drawer slides in from the <strong>{{ drawerPos }}</strong>.</p>
       <p class="pdx-txt-small pdx-ink-muted">Press Escape or click the backdrop to close. On mobile, swipe to dismiss.</p>

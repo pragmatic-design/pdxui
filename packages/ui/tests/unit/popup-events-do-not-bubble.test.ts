@@ -60,10 +60,9 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         expect(dialogChanges(), 'the select\'s open-change bubbled to the dialog, and an app would close the dialog').toBe(0);
     });
 
-    // The picker announces its popup with open-change too (#287).
+    // The picker announces its popup with open-change too (#287), and so does the drawer its own (#288).
     it('pdx-date-picker in pdx-drawer: the picker\'s open and close do not reach the drawer', async () => {
         const { outer, inner } = await nest('pdx-drawer', 'pdx-date-picker', (d) => d.setAttribute('value', '2026-09-11'));
-        const drawerCloses = count(outer, 'pdx-close');
         const drawerChanges = count(outer, 'open-change');
         const pickerChanges = count(inner, 'open-change');
 
@@ -74,8 +73,7 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         await tick(50);
 
         expect(pickerChanges(), 'the picker did not announce its own open and close').toBe(2);
-        expect(drawerCloses(), 'the drawer heard the picker close').toBe(0);
-        expect(drawerChanges(), 'the picker\'s open-change bubbled to the drawer').toBe(0);
+        expect(drawerChanges(), 'the picker\'s open-change bubbled to the drawer, and an app would close the drawer').toBe(0);
     });
 
     it('a pdx-input\'s value-change stays on the input: the pdx-form around it does not hear it (#138, #479)', async () => {

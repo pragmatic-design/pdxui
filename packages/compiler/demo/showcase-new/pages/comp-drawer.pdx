@@ -23,7 +23,7 @@
       <h2 class="pdx-txt-heading">Reference</h2>
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Description</span></div>
-        <div class="opt-row"><code>open</code><span>Open/close state</span></div>
+        <div class="opt-row"><code>open</code><span>Open/close state. A model: <code>::open</code> follows Escape, the ✕, the backdrop and a swipe</span></div>
         <div class="opt-row"><code>position</code><span>"left", "right" (default), "top", "bottom"</span></div>
         <div class="opt-row"><code>size</code><span>"sm" (280px), "md" (380px), "lg" (520px), or CSS value</span></div>
         <div class="opt-row"><code>mode</code><span>"overlay" (default) or "push"</span></div>
@@ -40,6 +40,16 @@
         <div class="opt-row"><code>header</code><span>Title area (left of close button)</span></div>
         <div class="opt-row"><code>default</code><span>Body content (scrollable)</span></div>
         <div class="opt-row"><code>footer</code><span>Actions area (bottom)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Description</span></div>
+        <div class="opt-row"><code>open-change</code><span><code>{ value }</code>: it opened, or closed itself</span></div>
+        <div class="opt-row"><code>pdx-before-close</code><span>Cancelable — call preventDefault() to keep it open</span></div>
+        <div class="opt-row"><code>:state(open)</code><span>The drawer is open. Moved under <code>&lt;body&gt;</code> by a trapping ancestor, its panel and backdrop carry <code>[data-open]</code> instead</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span>Loading: the panel is <code>aria-busy</code></span></div>
+        <div class="opt-row"><code>[data-part]</code><span><code>root</code> (the panel), <code>backdrop</code>, <code>header</code>, <code>close</code>, <code>body</code>, <code>footer</code>, <code>resize</code></span></div>
       </div>
     </section>
   </div>

@@ -44,6 +44,14 @@ const DONE: Row[] = [
         parts: ['root', 'backdrop', 'header', 'body', 'footer', 'cancel', 'confirm', 'confirm-input'],
         removed: [],
     },
+    {
+        tag: 'pdx-drawer',
+        models: ['open'],
+        states: ['open', 'loading'],
+        // The panel and its sections, its close button, and the resize handle `resizable` adds.
+        parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer', 'resize'],
+        removed: ['pdx-close'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

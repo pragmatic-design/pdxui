@@ -126,6 +126,11 @@ describe('the overlays of #288', () => {
         expect(fix('<pdx-dialog :open="editing" @pdx-close="editing = false"></pdx-dialog>'))
             .toBe('<pdx-dialog :open="editing" @open-change="if ($event.detail.value) return; editing = false"></pdx-dialog>');
     });
+
+    it('`@pdx-close` on a pdx-drawer is rewritten the same way', () => {
+        expect(fix('<pdx-drawer :open="panel" @pdx-close="panel = false"></pdx-drawer>'))
+            .toBe('<pdx-drawer :open="panel" @open-change="if ($event.detail.value) return; panel = false"></pdx-drawer>');
+    });
 });
 
 describe('date-picker: its popup events and its undeclared methods', () => {

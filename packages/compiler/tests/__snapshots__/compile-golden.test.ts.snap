@@ -5430,7 +5430,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-7cfa8l]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Drawer</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Slide-in panel from any edge. Overlay or push mode, swipe-to-close, resize handle, focus trap, keyboard nav.\\n      4 positions, 3 sizes, mobile responsive.\\n    </p>  <app-demo-comp-drawer-positions class="demo-section"></app-demo-comp-drawer-positions>  <app-demo-comp-drawer-sizes class="demo-section"></app-demo-comp-drawer-sizes>  <app-demo-comp-drawer-form-drawer class="demo-section"></app-demo-comp-drawer-form-drawer>  <app-demo-comp-drawer-keyboard class="demo-section"></app-demo-comp-drawer-keyboard>  <section> <h2 class="pdx-txt-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Description</span></div> <div class="opt-row"><code>open</code><span>Open/close state</span></div> <div class="opt-row"><code>position</code><span>"left", "right" (default), "top", "bottom"</span></div> <div class="opt-row"><code>size</code><span>"sm" (280px), "md" (380px), "lg" (520px), or CSS value</span></div> <div class="opt-row"><code>mode</code><span>"overlay" (default) or "push"</span></div> <div class="opt-row"><code>closeOnBackdrop</code><span>Close on backdrop click (default true)</span></div> <div class="opt-row"><code>closeOnEscape</code><span>Close on Escape key (default true)</span></div> <div class="opt-row"><code>showClose</code><span>Show close button in header (default true)</span></div> <div class="opt-row"><code>resizable</code><span>Show resize handle on edge</span></div> <div class="opt-row"><code>label</code><span>Accessible label (aria-label)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots</h3> <div class="options-table"> <div class="opt-header"><span>Slot</span><span>Description</span></div> <div class="opt-row"><code>header</code><span>Title area (left of close button)</span></div> <div class="opt-row"><code>default</code><span>Body content (scrollable)</span></div> <div class="opt-row"><code>footer</code><span>Actions area (bottom)</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Drawer</h1> <p class="pdx-txt-body pdx-ink-muted intro">\\n      Slide-in panel from any edge. Overlay or push mode, swipe-to-close, resize handle, focus trap, keyboard nav.\\n      4 positions, 3 sizes, mobile responsive.\\n    </p>  <app-demo-comp-drawer-positions class="demo-section"></app-demo-comp-drawer-positions>  <app-demo-comp-drawer-sizes class="demo-section"></app-demo-comp-drawer-sizes>  <app-demo-comp-drawer-form-drawer class="demo-section"></app-demo-comp-drawer-form-drawer>  <app-demo-comp-drawer-keyboard class="demo-section"></app-demo-comp-drawer-keyboard>  <section> <h2 class="pdx-txt-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Description</span></div> <div class="opt-row"><code>open</code><span>Open/close state. A model: <code>::open</code> follows Escape, the ✕, the backdrop and a swipe</span></div> <div class="opt-row"><code>position</code><span>"left", "right" (default), "top", "bottom"</span></div> <div class="opt-row"><code>size</code><span>"sm" (280px), "md" (380px), "lg" (520px), or CSS value</span></div> <div class="opt-row"><code>mode</code><span>"overlay" (default) or "push"</span></div> <div class="opt-row"><code>closeOnBackdrop</code><span>Close on backdrop click (default true)</span></div> <div class="opt-row"><code>closeOnEscape</code><span>Close on Escape key (default true)</span></div> <div class="opt-row"><code>showClose</code><span>Show close button in header (default true)</span></div> <div class="opt-row"><code>resizable</code><span>Show resize handle on edge</span></div> <div class="opt-row"><code>label</code><span>Accessible label (aria-label)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots</h3> <div class="options-table"> <div class="opt-header"><span>Slot</span><span>Description</span></div> <div class="opt-row"><code>header</code><span>Title area (left of close button)</span></div> <div class="opt-row"><code>default</code><span>Body content (scrollable)</span></div> <div class="opt-row"><code>footer</code><span>Actions area (bottom)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3> <div class="options-table"> <div class="opt-header"><span>Name</span><span>Description</span></div> <div class="opt-row"><code>open-change</code><span><code>{ value }</code>: it opened, or closed itself</span></div> <div class="opt-row"><code>pdx-before-close</code><span>Cancelable — call preventDefault() to keep it open</span></div> <div class="opt-row"><code>:state(open)</code><span>The drawer is open. Moved under <code>&lt;body&gt;</code> by a trapping ancestor, its panel and backdrop carry <code>[data-open]</code> instead</span></div> <div class="opt-row"><code>:state(loading)</code><span>Loading: the panel is <code>aria-busy</code></span></div> <div class="opt-row"><code>[data-part]</code><span><code>root</code> (the panel), <code>backdrop</code>, <code>header</code>, <code>close</code>, <code>body</code>, <code>footer</code>, <code>resize</code></span></div> </div> </section> </div> '));
 component('app-comp-drawer', {
   props: {},
   setup(ctx) {
@@ -17515,7 +17515,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-drawe
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindTwoWay, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-xx71yn");
@@ -17541,8 +17541,7 @@ component('app-demo-comp-drawer-form-drawer', {
     const __frag=__blk0();
     const [__el3,__el4,__el19,__el20]=__walk0(__frag);
     __el3.addEventListener('click', safeHandler(batchHandler(ctx.openForm), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el4w_open = {}; effect(() => { const __b = ctx.formOpen(); if (Object.is(__b, __el4w_open)) return; __el4w_open = __b; assignBoundProperty(__el4, "open", __b); });
-    __el4.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeForm), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
+    bindTwoWay(__el4, 'open', ctx.formOpen);
     __el19.addEventListener('click', safeHandler(batchHandler(ctx.closeForm), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el20.addEventListener('click', safeHandler(batchHandler(ctx.closeForm), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
@@ -17582,7 +17581,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-drawe
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ygj3jz");
@@ -17614,9 +17613,8 @@ component('app-demo-comp-drawer-positions', {
     __el5.addEventListener('click', safeHandler(batchHandler(() => ctx.openDrawer('left')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el6.addEventListener('click', safeHandler(batchHandler(() => ctx.openDrawer('top')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el7.addEventListener('click', safeHandler(batchHandler(() => ctx.openDrawer('bottom')), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el8w_open = {}; effect(() => { const __b = ctx.drawerOpen(); if (Object.is(__b, __el8w_open)) return; __el8w_open = __b; assignBoundProperty(__el8, "open", __b); });
+    bindTwoWay(__el8, 'open', ctx.drawerOpen);
     let __el8w_position = {}; effect(() => { const __b = ctx.drawerPos(); if (Object.is(__b, __el8w_position)) return; __el8w_position = __b; assignBoundProperty(__el8, "position", __b); });
-    __el8.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeDrawer), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     bindInterpolation(__t10,()=>ctx.drawerPos());
     bindInterpolation(__t13,()=>ctx.drawerPos());
     __el18.addEventListener('click', safeHandler(batchHandler(ctx.closeDrawer), ctx.el?.tagName?.toLowerCase(), 'click'));
@@ -17631,7 +17629,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-drawe
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-ogvwx3");
@@ -17662,9 +17660,8 @@ component('app-demo-comp-drawer-sizes', {
     __el4.addEventListener('click', safeHandler(batchHandler(() => ctx.openSized('sm')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el5.addEventListener('click', safeHandler(batchHandler(() => ctx.openSized('md')), ctx.el?.tagName?.toLowerCase(), 'click'));
     __el6.addEventListener('click', safeHandler(batchHandler(() => ctx.openSized('lg')), ctx.el?.tagName?.toLowerCase(), 'click'));
-    let __el7w_open = {}; effect(() => { const __b = ctx.sizedOpen(); if (Object.is(__b, __el7w_open)) return; __el7w_open = __b; assignBoundProperty(__el7, "open", __b); });
+    bindTwoWay(__el7, 'open', ctx.sizedOpen);
     let __el7w_size = {}; effect(() => { const __b = ctx.sizedSize(); if (Object.is(__b, __el7w_size)) return; __el7w_size = __b; assignBoundProperty(__el7, "size", __b); });
-    __el7.addEventListener('pdx-close', safeHandler(batchHandler(ctx.closeSized), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     bindInterpolation(__t9,()=>ctx.sizedSize());
     bindInterpolation(__t12,()=>ctx.sizedSize());
     __el14.addEventListener('click', safeHandler(batchHandler(ctx.closeSized), ctx.el?.tagName?.toLowerCase(), 'click'));

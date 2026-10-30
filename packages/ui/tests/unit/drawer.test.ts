@@ -12,27 +12,31 @@ describe('pdx-drawer', () => {
         expect(backdrop?.hasAttribute('data-open')).toBe(false);
     });
 
+    // Open is the model `open` (#288); the state it draws, the host's :state(open), is measured in
+    // Chromium (responsive/…/drawer-beta-contract.spec.ts): happy-dom has no custom states.
     it('opens when open prop set to true', async () => {
         const el = await mount('pdx-drawer');
         (el as any).open = true;
         await tick(50);
-        // overlay mode portals the backdrop to <body> on open → query globally.
-        const backdrop = document.querySelector('.pdx-drawer-backdrop');
-        expect(backdrop?.hasAttribute('data-open')).toBe(true);
+        expect((el as any).isOpen).toBe(true);
     });
 
-    it('closes and emits pdx-close', async () => {
+    it('its close button closes it: open-change false, and no pdx-close', async () => {
         const el = await mount('pdx-drawer');
         (el as any).open = true;
         await tick(50);
 
-        let closed = false;
-        el.addEventListener('pdx-close', () => { closed = true; });
+        const seen: unknown[] = [];
+        let alpha = 0;
+        el.addEventListener('open-change', (e: Event) => seen.push((e as CustomEvent).detail?.value));
+        el.addEventListener('pdx-close', () => { alpha++; });
 
         const closeBtn = document.querySelector('.pdx-drawer-close') as HTMLElement;
         closeBtn?.click();
         await tick();
-        expect(closed).toBe(true);
+        expect((el as any).open).toBe(false);
+        expect(seen).toEqual([false]);
+        expect(alpha).toBe(0);
     });
 
     it('applies position attribute on drawer element', async () => {

@@ -160,15 +160,17 @@ framework. Each line below is measured; the assertions live in `skill-claims.spe
   picking, `el.value` IS the chosen value (single → scalar, `multiple` → an **array**). Read `el.value`; do not
   keep it in `el.__val` yourself. Do **not** copy `select-fix.ts` from the profiler app: it works around a bug
   that does not exist. The event carries it too: `e.detail.value` single, `e.detail.values` with `multiple`.
-- **A `pdx-drawer` opens when you set `.open = true` from JS**: `el.open = true` sets `[data-open]` on the panel
-  and the backdrop and slides it in at the `position` you asked for. Do not drive `[data-open]` by hand and do
-  not copy `position`/`size` onto the panel yourself.
+- **A `pdx-drawer` opens when you set `.open = true` from JS**: `el.open = true` puts the host in
+  `:state(open)` and slides the panel in at the `position` you asked for. Do not drive `[data-open]` by hand
+  and do not copy `position`/`size` onto the panel yourself. `open` is a model: `::open="x"` follows the
+  drawer when it closes itself.
 - **Inside an app-layout, do not reparent the drawer onto `<body>`.** The component portals itself, and only
   when an ancestor actually traps fixed positioning (a transform, a filter, `contain`). Measured inside
   `pdx-app-layout`: nothing paints over the open panel. Reparenting by hand is actively harmful — it detaches
   slotted content from its scoped styles and reconnects child components.
-- **The drawer's own X closes it** — measured: clicking the X sets `open` to false, drops `[data-open]`, and
-  emits `pdx-close` once. Listen to the event if you need to know; you do not need to close it yourself.
+- **The drawer's own X closes it** — measured: clicking the X sets `open` to false and emits `open-change`
+  `{ value: false }` once. Bind `::open`, or listen to `open-change`, if you need to know; you do not need to
+  close it yourself.
 - **A static `createDataSource({data})` renders its rows** — measured: three rows in, six cells rendered. Use a
   transport when the data comes from a server, not as a workaround.
 - **The 'No data' message does not end up at the bottom** — measured on a 420px grid, the empty block sits
