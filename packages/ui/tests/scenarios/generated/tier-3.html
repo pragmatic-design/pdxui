@@ -78,7 +78,7 @@
                 await new Promise(r => requestAnimationFrame(r)); },
         "cp-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="cp-open"]');
-                if (host && typeof host.open === 'function') host.open(); },
+                if (host && typeof host.show === 'function') host.show(); },
         "command-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="cmd"]');
                 if (host && typeof host.openPalette === 'function') host.openPalette(); },

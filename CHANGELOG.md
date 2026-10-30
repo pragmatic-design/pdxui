@@ -383,6 +383,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-color-picker` takes the beta contract (#287).
+  - **The popup is announced as an overlay's.** `open-change` with `{ value }`, once per change, and
+    the host is in `:state(open)` while it is open. Inline, there is no popup to open.
+  - **The overlay verbs.** `show()`, `close()` and `toggle()` drive the popup. `open()`, set on the
+    element undeclared, is gone; `pdx migrate` rewrites it to `show()` on a `:ref` of the picker and
+    flags it on a lookup.
+  - **States and parts.** `disabled` and `readonly` are custom states on the host; the swatch no
+    longer carries the `disabled` class. The parts are `root` (the swatch), `popup`, `area`, `hue`,
+    `alpha`, `input`, `clear` and `preset`.
+  - **Fixed with it:** inside a `pdx-form-field` the swatch kept its own name, «Pick color», and no
+    description: the field took the hex field of the closed panel for its control. The swatch is now
+    named by the label and described by the hint and the error (A1, A2).
 - **Breaking:** `pdx-calendar` takes the beta contract (#287). It has no popup, so no
   `open-change`.
   - **It takes part in a form.** With a `name`, a form submits its value, a range or several dates

@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -158,6 +158,32 @@ describe('autocomplete-open-show: pdx-autocomplete\'s open() is show()', () => {
     });
 });
 
+describe('color-picker: its undeclared open() is show(), tied to the tag as the autocomplete\'s', () => {
+    const fix = colorPickerOpenShow.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-color-picker of the file is rewritten; close() stays', () => {
+        const source = '<template><pdx-color-picker :ref="cp"></pdx-color-picker><button @click="cp.open()">Pick</button><button @click="cp.close()">x</button></template>\n<script>\nlet cp = $signal(null);\nfunction pick() { cp?.open(); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="cp.show()"');
+        expect(out).toContain('cp?.show();');
+        expect(out).toContain('@click="cp.close()"');
+        expect(fix(out)).toBe(out);
+    });
+
+    it('an autocomplete\'s ref is not the colour picker\'s, and the reverse', () => {
+        const source = '<template><pdx-autocomplete :ref="ac"></pdx-autocomplete><pdx-color-picker :ref="cp"></pdx-color-picker></template>\n<script>\nfunction f() { ac.open(); }\n</script>';
+        expect(colorPickerOpenShow.detect(source)).toEqual([]);
+        expect(autocompleteOpenShow.detect('<template><pdx-color-picker :ref="cp"></pdx-color-picker></template>\n<script>\ncp.open();\n</script>')).toEqual([]);
+    });
+
+    it('`document.querySelector(\'pdx-color-picker\').open()` is flagged and left', () => {
+        const found = colorPickerOpenUnbound.detect("document.querySelector('pdx-color-picker').open();");
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('show()');
+        expect(colorPickerOpenUnbound.fix).toBe('flag');
+    });
+});
+
 describe('autocomplete-open-unbound: a call the text cannot tie to the tag is flagged', () => {
     it('`document.querySelector(\'pdx-autocomplete\').open()` is flagged and left (the issue\'s case)', () => {
         const source = "document.querySelector('pdx-autocomplete').open();";
@@ -174,7 +200,7 @@ describe('autocomplete-open-unbound: a call the text cannot tie to the tag is fl
 
 describe('the registry', () => {
     it('holds the #287 entries, each removed', () => {
-        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script', 'cascader-overlay-verbs', 'cascader-overlay-verbs-script', 'tree-select-overlay-verbs', 'tree-select-overlay-verbs-script', 'date-picker-overlay-verbs', 'date-picker-overlay-verbs-script', 'autocomplete-open-show', 'autocomplete-open-unbound']) {
+        for (const id of ['open-change-event', 'select-overlay-verbs', 'select-overlay-verbs-script', 'cascader-overlay-verbs', 'cascader-overlay-verbs-script', 'tree-select-overlay-verbs', 'tree-select-overlay-verbs-script', 'date-picker-overlay-verbs', 'date-picker-overlay-verbs-script', 'autocomplete-open-show', 'autocomplete-open-unbound', 'color-picker-open-show', 'color-picker-open-unbound']) {
             const entry = languageChanges().find((c) => c.id === id);
             expect(entry?.kind, id).toBe('removed');
             expect(entry?.issue).toBe(287);

@@ -20,6 +20,9 @@ Choose a color visually.
 
 | Call | Notes |
 |---|---|
+| `show()` | Open the popup; open already, or inline, nothing changes. |
+| `close()` | Close the popup. |
+| `toggle()` | Open the popup when closed, close it when open. |
 | `focus()` | Moves focus to it. |
 | `blur()` | Removes focus from it. |
 | `clear()` | Clears the value. |
@@ -27,9 +30,13 @@ Choose a color visually.
 | `getRgb()` | The colour as `{ r, g, b, a }`. |
 | `getHsl()` | The colour as `{ h, s, l, a }`. |
 
-**Events:** `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287).; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `dialog` · `group` · `slider`
+
+**States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.
+
+**Parts:** `[data-part="root"]` — The swatch, the button that opens the popup; absent when `inline`.; `[data-part="popup"]` — The panel: a floating `role="dialog"`, or in place when `inline`.; `[data-part="area"]` — The colour area, a two-dimensional `role="slider"`: saturation and brightness.; `[data-part="hue"]` — The hue slider.; `[data-part="alpha"]` — The opacity slider, while `showAlpha`.; `[data-part="input"]` — The text field that reads and writes the colour.; `[data-part="clear"]` — The clear button, while `clearable`.; `[data-part="preset"]` — A preset colour's button.
 
 
 #### Examples

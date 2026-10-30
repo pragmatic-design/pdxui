@@ -70,9 +70,11 @@ pdx-color-picker {
 @variant size(sm) { :scope > [data-part="root"] { width: 24px; height: 24px; } }
 @variant size(lg) { :scope > [data-part="root"] { width: 40px; height: 40px; } }
 
-/* Disabled */
+/* Disabled: the component marks it with the host's :state(disabled) (#287); the class and the
+   attribute are native markup's. */
 .pdx-color-swatch[disabled],
-.pdx-color-swatch.disabled {
+.pdx-color-swatch.disabled,
+:state(disabled) > .pdx-color-swatch {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
     pointer-events: none;

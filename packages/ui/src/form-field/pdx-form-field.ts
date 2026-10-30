@@ -26,7 +26,12 @@ const _describedByField = new WeakSet<Element>();
  * a toggle's button (#286). A field takes one as its control when nothing else is there; a button may
  * carry neither aria-required nor aria-invalid, so it is named and described only.
  */
-const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"]';
+const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"]';
+/**
+ * A button control found before any text box: pdx-color-picker's swatch. Its panel holds a hex field
+ * that is there, hidden, while the panel is closed, and would be taken for the control (#287).
+ */
+const FIRST_BUTTON_CONTROLS = 'pdx-color-picker > [data-part="root"]';
 
 /** Set `name` on `el` while `on`, and take it back only if this field set it. */
 function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Element>, value = 'true'): void {
@@ -254,7 +259,8 @@ component('pdx-form-field', {
                 // control until the editor opens, and the editor's text box, found first, takes over
                 // while it is open — and pdx-toggle (#286).
                 // A contenteditable `role="textbox"` — pdx-rich-text's editing area — is a control too.
-                const input = (el.querySelector(
+                // First of all, a colour picker's swatch (FIRST_BUTTON_CONTROLS).
+                const input = (el.querySelector(FIRST_BUTTON_CONTROLS) ?? el.querySelector(
                     'input:not([type="hidden"]), textarea, select, .pdx-input-wrap, [role="radiogroup"], [role="group"], [role="textbox"]'
                 ) ?? el.querySelector(BUTTON_CONTROLS)) as HTMLElement | null;
                 if (!input) {

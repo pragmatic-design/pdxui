@@ -2,10 +2,9 @@
 // Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
 // Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
 
-import { component, html, signal, computed, effect, model, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, model, event, generatedId } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 import { dispatchCommit } from '../shared/commit-change';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -92,6 +91,19 @@ function parseColor(input: string): { h: number; s: number; v: number; a: number
  * Colour selection from a swatch trigger or an inline panel, with alpha channel and preset palettes,
  * output as hex, rgb or hsl.
  *
+ * @csspart root - The swatch, the button that opens the popup; absent when `inline`.
+ * @csspart popup - The panel: a floating `role="dialog"`, or in place when `inline`.
+ * @csspart area - The colour area, a two-dimensional `role="slider"`: saturation and brightness.
+ * @csspart hue - The hue slider.
+ * @csspart alpha - The opacity slider, while `showAlpha`.
+ * @csspart input - The text field that reads and writes the colour.
+ * @csspart clear - The clear button, while `clearable`.
+ * @csspart preset - A preset colour's button.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ *
  * @alphaevent pdx-input
  * @alphaevent pdx-change
  * @alphadetail value $event.currentTarget.value
@@ -106,6 +118,14 @@ component('pdx-color-picker', {
     // field's own when it is typed in, and one the component dispatches when a drag or a key step ends,
     // a preset is picked or the colour is cleared.
     models: { value: model<string>('#000000', { form: true }) },
+    events: {
+        /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+        'open-change': event<{ value: boolean }>(),
+    },
+    // The visual states, on the host as custom states (#132, #287): the design CSS draws the swatch from
+    // them. The swatch carries no state class.
+    states: ['open', 'disabled', 'readonly'],
+    parts: ['root', 'popup', 'area', 'hue', 'alpha', 'input', 'clear', 'preset'],
     // The axis its stylesheet keys by (#628), reflected on the host; each value maps the class that
     // draws the same size on native markup. `md` is the base look, which no class adds to.
     variants: {
@@ -291,6 +311,14 @@ component('pdx-color-picker', {
         }
 
         function togglePopup() { if (!ctx.disabled() && !ctx.inline()) _open.set(!_open()); }
+        /** Open the popup; inline or disabled, there is none to open. */
+        function showPopup() { if (!ctx.disabled() && !ctx.inline()) _open.set(true); }
+
+        ctx.track(() => {
+            ctx.state('open', _open());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('readonly', !!ctx.readonly());
+        });
 
         // ── Popover (deferred to after first render) ────────
         let popover: ReturnType<typeof usePopover> | null = null;
@@ -332,6 +360,8 @@ component('pdx-color-picker', {
                     // Escape already returns it (usePopover).
                     if (wasOpen && panelEl.contains(document.activeElement)) triggerEl.focus();
                 }
+                // Announced when it changes (#287): this effect runs on every write of `_open`.
+                if (isOpen !== wasOpen) ctx.emit('open-change', { value: isOpen });
                 wasOpen = isOpen;
             });
 
@@ -342,12 +372,15 @@ component('pdx-color-picker', {
         });
         ctx.track(() => () => { _popoverDispose?.(); });
 
-        // Expose programmatic open/close on host element
-        (ctx.el as any).open = () => _open.set(true);
-        (ctx.el as any).close = () => _open.set(false);
-
-        // Imperative API: focus/blur/clear
+        // Imperative API: focus/blur/clear, the colour in each format, and the popup driven by the overlay
+        // verbs (#287), which replace the undeclared open()/close().
         ctx.expose({
+            /** Open the popup; open already, or inline, nothing changes. */
+            show() { showPopup(); },
+            /** Close the popup. */
+            close() { _open.set(false); },
+            /** Open the popup when closed, close it when open. */
+            toggle() { togglePopup(); },
             focus() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.focus(); },
             blur() { (ctx.el.querySelector('input, textarea, [tabindex]:not([tabindex="-1"]), button') as HTMLElement | null)?.blur(); },
             clear() { onClear(); },
@@ -359,10 +392,6 @@ component('pdx-color-picker', {
             getHsl(): { h: number; s: number; l: number; a: number } { return { ...hslColor.peek(), a: alpha.peek() }; },
         });
 
-        // The host is the one submitter. A hidden input carrying the name would send the value a
-        // second time.
-        reflectNameToHost(ctx);
-
         return {
             uid, _open, hue, sat, val, alpha,
             hexColor, rgbColor, hslColor, displayValue,
@@ -371,9 +400,12 @@ component('pdx-color-picker', {
             onHexInput, onPresetClick, onClear, togglePopup,
         };
     },
+    // The host is the one submitter (#135), in FormData under its `name` (#133). A hidden input carrying
+    // the name would send the value a second time.
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
         ${() => !ctx.inline() ? html`
-            <button class="pdx-color-swatch${() => ctx.disabled() ? ' disabled' : ''}" data-part="root"
+            <button class="pdx-color-swatch" data-part="root"
                 type="button" aria-haspopup="dialog"
                 :aria-label="${() => ctx.label() || uiString('color-picker', 'pick')}"
                 :aria-expanded="${() => String(ctx._open())}"
@@ -381,13 +413,13 @@ component('pdx-color-picker', {
                 :style="${() => `--pdx-cp-current: ${ctx.hexColor()}`}"
                 @click="${ctx.togglePopup}"></button>
         ` : ''}
-        <div class="pdx-color-panel ${() => ctx.inline() ? 'pdx-color-panel-inline' : ''}"
+        <div class="pdx-color-panel ${() => ctx.inline() ? 'pdx-color-panel-inline' : ''}" data-part="popup"
             :role="${() => ctx.inline() ? null : 'dialog'}"
             :aria-label="${() => ctx.inline() ? null : (ctx.label() || uiString('color-picker', 'dialog'))}"
             :style="${() => !ctx.inline() && !ctx._open() ? 'display:none' : ''}">
             <!-- Two dimensions on one slider: the value is the saturation, the text carries both and the
                  colour (the APG 2D pattern). It had aria-valuetext only (axe aria-required-attr). -->
-            <div class="pdx-color-spectrum" role="slider" :aria-label="${() => uiString('color-picker', 'color')}"
+            <div class="pdx-color-spectrum" data-part="area" role="slider" :aria-label="${() => uiString('color-picker', 'color')}"
                 aria-valuemin="0" aria-valuemax="100"
                 :aria-valuenow="${() => String(Math.round(ctx.sat()))}"
                 :aria-valuetext="${ctx.spectrumText}"
@@ -399,7 +431,7 @@ component('pdx-color-picker', {
                 <div class="pdx-color-spectrum-black"></div>
                 <div class="pdx-color-spectrum-thumb" :style="${() => `left:${ctx.sat()}%;top:${100 - ctx.val()}%`}"></div>
             </div>
-            <div class="pdx-color-hue-slider" role="slider" :aria-label="${() => uiString('color-picker', 'hue')}"
+            <div class="pdx-color-hue-slider" data-part="hue" role="slider" :aria-label="${() => uiString('color-picker', 'hue')}"
                 aria-valuemin="0" aria-valuemax="360"
                 :aria-valuenow="${() => String(Math.round(ctx.hue()))}"
                 :tabindex="${() => ctx.interactive() ? '0' : '-1'}"
@@ -408,7 +440,7 @@ component('pdx-color-picker', {
                 <div class="pdx-color-slider-thumb" :style="${() => `left:${(ctx.hue() / 360) * 100}%`}"></div>
             </div>
             ${() => ctx.showAlpha() ? html`
-                <div class="pdx-color-alpha-slider" role="slider" :aria-label="${() => uiString('color-picker', 'opacity')}"
+                <div class="pdx-color-alpha-slider" data-part="alpha" role="slider" :aria-label="${() => uiString('color-picker', 'opacity')}"
                     aria-valuemin="0" aria-valuemax="1"
                     :aria-valuenow="${() => ctx.alpha().toFixed(2)}"
                     :aria-valuetext="${() => `${Math.round(ctx.alpha() * 100)}%`}"
@@ -421,20 +453,20 @@ component('pdx-color-picker', {
                 </div>
             ` : ''}
             <div class="pdx-color-controls">
-                <input class="pdx-color-hex-input pdx-input" type="text"
+                <input class="pdx-color-hex-input pdx-input" data-part="input" type="text"
                     :aria-label="${() => uiString('color-picker', 'hex')}"
                     autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                     :value="${ctx.displayValue}"
                     :disabled="${() => ctx.disabled() || ctx.readonly() ? true : null}"
                     @change="${ctx.onHexInput}" />
                 ${() => ctx.clearable() ? html`
-                    <button class="pdx-color-clear" type="button" :aria-label="${() => uiString('color-picker', 'clear')}"
+                    <button class="pdx-color-clear" data-part="clear" type="button" :aria-label="${() => uiString('color-picker', 'clear')}"
                         @click="${ctx.onClear}">&#215;</button>
                 ` : ''}
             </div>
             ${() => { const p = ctx.presets() as string[]; return p?.length ? html`
                 <div class="pdx-color-presets" role="group" :aria-label="${() => uiString('color-picker', 'presets')}">
-                    ${p.map(c => html`<button class="pdx-color-preset" type="button"
+                    ${p.map(c => html`<button class="pdx-color-preset" data-part="preset" type="button"
                         :style="${() => `background:${c}`}" :aria-label="${() => c}"
                         @click="${() => ctx.onPresetClick(c)}"></button>`)}
                 </div>` : ''; }}

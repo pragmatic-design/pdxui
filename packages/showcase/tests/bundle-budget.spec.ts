@@ -309,7 +309,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // beside the native class it replaced, and tabs' pills rules are written twice, once for the host's
 // `variant` and once for the theme's `[pdx-tab-style="pill"]`, which shared one `:is()` before. Same
 // machine, the built dist: main (after #631) css 63.9 → this branch 64.1 KB; blocking stays 101.4.
-const BUDGET_KB = { entry: 43, js: 470, css: 65, blocking: 102 };
+// js 470 → 471 (owner's OK): the pickers' beta contract (#287) — pdx-color-picker's states, parts,
+// `open-change` and overlay verbs, and pdx-form-field's rule that finds its swatch first. Same machine,
+// the built dist: main js 469.7 → this branch 470.2 KB (+466 bytes).
+const BUDGET_KB = { entry: 43, js: 471, css: 65, blocking: 102 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
