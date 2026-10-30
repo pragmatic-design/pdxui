@@ -31,6 +31,10 @@ Drag-and-drop or browse to upload.
 
 **Slot:** `file` — Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.
 
+**States:** `:state(disabled)` — `disabled` is set.; `:state(dragover)` — A drag is over the drop zone.
+
+**Parts:** `[data-part="root"]` — The frame: the drop zone, the refusals and the list.; `[data-part="dropzone"]` — The `role="button"` area a file is dropped on, or clicked to browse.; `[data-part="list"]` — The `role="list"` of the files it holds; busy while one uploads.; `[data-part="file"]` — A file of the list.; `[data-part="remove"]` — A file's remove button.; `[data-part="progress"]` — A file's `role="progressbar"`, while it uploads.
+
 
 #### Examples
 

@@ -383,6 +383,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-file-upload` takes the beta contract (#287).
+  - **States and parts.** `disabled` and `dragover` are custom states on the host; the drop zone no
+    longer carries the `disabled` or `dragover` class. The parts are `root` (the frame), `dropzone`,
+    `list`, `file`, `remove` and `progress`.
+  - **Busy while uploading.** The file list is `aria-busy="true"` while a file uploads (A4).
+  - **Fixed with it:** inside a `pdx-form-field` the drop zone kept its own name, «Drop files here or
+    click to browse», and no description: the field took the hidden file input for its control. The
+    drop zone is now named by the label and described by the hint and the error (A1, A2).
+  - Its form value was already right: one `File` entry per file under its name, and a reset empties
+    it. A browser test now holds it, in one form with `pdx-transfer` and `pdx-calendar`.
+
 - **Breaking:** `pdx-color-picker` takes the beta contract (#287).
   - **The popup is announced as an overlay's.** `open-change` with `{ value }`, once per change, and
     the host is in `:state(open)` while it is open. Inline, there is no popup to open.

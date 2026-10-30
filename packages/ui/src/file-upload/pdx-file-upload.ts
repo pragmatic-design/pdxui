@@ -4,7 +4,6 @@
 import { component, html, signal, computed, generatedId, model, untracked, slot, snippetOrSlot } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/file-upload';
@@ -71,6 +70,16 @@ function acceptHint(accept: string): string {
  * Drag-and-drop file upload with validation, image preview and size and count limits.
  *
  * @slot file - Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.
+ *
+ * @csspart root - The frame: the drop zone, the refusals and the list.
+ * @csspart dropzone - The `role="button"` area a file is dropped on, or clicked to browse.
+ * @csspart list - The `role="list"` of the files it holds; busy while one uploads.
+ * @csspart file - A file of the list.
+ * @csspart remove - A file's remove button.
+ * @csspart progress - A file's `role="progressbar"`, while it uploads.
+ *
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate dragover - A drag is over the drop zone.
  */
 component('pdx-file-upload', {
     // The files it holds (#482): adding, removing or clearing writes it, and the write dispatches
@@ -83,6 +92,8 @@ component('pdx-file-upload', {
         /** sm, md (the default) or lg: the dropzone's size. */
         size: { md: '.pdx-file-upload-md', sm: '.pdx-file-upload-sm', lg: '.pdx-file-upload-lg' },
     },
+    states: ['disabled', 'dragover'],
+    parts: ['root', 'dropzone', 'list', 'file', 'remove', 'progress'],
     props: {
         accept: { type: String, default: '' },
         multiple: { type: Boolean, default: false },
@@ -100,9 +111,8 @@ component('pdx-file-upload', {
         file: slot<(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number) => Node>(),
     },
     setup(ctx) {
-        // The host is the one submitter (#135): its name goes on the host, where the form reads it,
-        // and the inner input is kept out of the form, or a picked file would go twice.
-        reflectNameToHost(ctx);
+        // The host is the one submitter (#135): its name goes on the host (`host` below), where the form
+        // reads it, and the inner input is kept out of the form, or a picked file would go twice.
         // With no file, the entry a native file input sends: an empty file with no name.
         ctx.formValue?.(() => {
             const files = ctx.value() as File[];
@@ -121,13 +131,10 @@ component('pdx-file-upload', {
             return parts.join(', ');
         });
 
-        const dropzoneClass = computed(() => {
-            let cls = 'pdx-file-dropzone';
-            if (dragging()) cls += ' dragover';
-            if (ctx.disabled()) cls += ' disabled';
-            return cls;
+        ctx.track(() => {
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('dragover', dragging());
         });
-
 
         /** A file as the list holds it, its thumbnail read in the background for an image. */
         function makeEntry(file: File): FileEntry {
@@ -349,16 +356,17 @@ component('pdx-file-upload', {
         const rejectionText = (r: Rejection): string => format(uiString('file-upload', 'rejected'), { name: r.name, reason: r.reason });
 
         return {
-            entries, dragging, hint, dropzoneClass, rejections, removeName, rejectionText,
+            entries, dragging, hint, rejections, removeName, rejectionText,
             onDropzoneClick, onDropzoneKeydown,
             onDragOver, onDragLeave, onDrop,
             onInputChange, onFileKeydown, removeFile,
             getFileSlot,
         };
     },
+    host: { ':name': (ctx) => ctx.name() || null },
     render: (ctx) => html`
         <div class="pdx-file-upload" data-part="root">
-            <div :class="${ctx.dropzoneClass}"
+            <div class="pdx-file-dropzone" data-part="dropzone"
                 role="button" tabindex="0"
                 :aria-label="${() => (ctx.label() as string) || uiString('file-upload', 'drop')}"
                 :aria-disabled=${() => ctx.disabled() ? 'true' : null}
@@ -385,20 +393,22 @@ component('pdx-file-upload', {
             ${() => {
                 const list = ctx.entries();
                 if (list.length === 0) return '';
-                return html`<div class="pdx-file-list" role="list">
+                // Busy while a file uploads (A4): the list is redrawn on every change of an upload.
+                const busy = list.some((entry: FileEntry) => entry.status === 'uploading');
+                return html`<div class="pdx-file-list" data-part="list" role="list" :aria-busy=${busy ? 'true' : null}>
                     ${() => list.map((entry: any, i: number) => {
                         const fileSlot = ctx.getFileSlot();
                         if (fileSlot) {
-                            return html`<div class=${() => 'pdx-file-item pdx-file-' + entry.status}
+                            return html`<div class=${() => 'pdx-file-item pdx-file-' + entry.status} data-part="file"
                                 role="listitem" tabindex="0"
                                 @keydown=${(e: KeyboardEvent) => ctx.onFileKeydown(e, i)}>
                                 ${() => fileSlot({ file: entry.file, status: entry.status, progress: entry.progress })}
-                                <button class="pdx-file-remove" :aria-label="${() => ctx.removeName(entry)}"
+                                <button class="pdx-file-remove" data-part="remove" :aria-label="${() => ctx.removeName(entry)}"
                                     :disabled=${() => ctx.disabled()}
                                     @click=${() => ctx.removeFile(i)}>\u00d7</button>
                             </div>`;
                         }
-                        return html`<div class=${() => 'pdx-file-item pdx-file-' + entry.status}
+                        return html`<div class=${() => 'pdx-file-item pdx-file-' + entry.status} data-part="file"
                             role="listitem" tabindex="0"
                             @keydown=${(e: KeyboardEvent) => ctx.onFileKeydown(e, i)}>
                             ${entry.preview
@@ -410,7 +420,7 @@ component('pdx-file-upload', {
                                 ${() => entry.error ? html`<span class="pdx-file-error">${() => entry.error}</span>` : ''}
                             </div>
                             ${() => entry.status === 'uploading'
-                                ? html`<div class="pdx-file-progress"
+                                ? html`<div class="pdx-file-progress" data-part="progress"
                                     role="progressbar"
                                     :aria-valuenow=${() => entry.progress}
                                     aria-valuemin="0" aria-valuemax="100">
@@ -420,7 +430,7 @@ component('pdx-file-upload', {
                             ${() => entry.status === 'success'
                                 ? html`<span class="pdx-file-status"><pdx-icon name="check" size="sm"></pdx-icon></span>`
                                 : ''}
-                            <button class="pdx-file-remove" :aria-label="${() => ctx.removeName(entry)}"
+                            <button class="pdx-file-remove" data-part="remove" :aria-label="${() => ctx.removeName(entry)}"
                                 :disabled=${() => ctx.disabled()}
                                 @click=${() => ctx.removeFile(i)}>\u00d7</button>
                         </div>`;

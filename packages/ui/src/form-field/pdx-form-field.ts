@@ -26,12 +26,13 @@ const _describedByField = new WeakSet<Element>();
  * a toggle's button (#286). A field takes one as its control when nothing else is there; a button may
  * carry neither aria-required nor aria-invalid, so it is named and described only.
  */
-const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"]';
+const BUTTON_CONTROLS = 'pdx-inline-edit [data-part="display"], pdx-toggle [data-part="root"], pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
 /**
- * A button control found before any text box: pdx-color-picker's swatch. Its panel holds a hex field
- * that is there, hidden, while the panel is closed, and would be taken for the control (#287).
+ * A button control found before any text box: pdx-color-picker's swatch, whose panel holds a hex field
+ * that is there, hidden, while the panel is closed; pdx-file-upload's drop zone, beside the hidden file
+ * input it opens. Either input would be taken for the control (#287).
  */
-const FIRST_BUTTON_CONTROLS = 'pdx-color-picker > [data-part="root"]';
+const FIRST_BUTTON_CONTROLS = 'pdx-color-picker > [data-part="root"], pdx-file-upload [data-part="dropzone"]';
 
 /** Set `name` on `el` while `on`, and take it back only if this field set it. */
 function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Element>, value = 'true'): void {

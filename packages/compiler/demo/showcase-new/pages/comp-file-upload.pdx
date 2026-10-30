@@ -51,7 +51,8 @@
         <div class="opt-row"><code>maxFiles</code><span>number</span><span>Max number of files (0 = no limit)</span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disable interaction</span></div>
         <div class="opt-row"><code>label</code><span>string</span><span>Drop zone text (default: "Drop files here or click to browse")</span></div>
-        <div class="opt-row"><code>name</code><span>string</span><span>Form field name for upload (default: "file")</span></div>
+        <div class="opt-row"><code>value</code><span>File[]</span><span>The files it holds, the model: <code>value-change</code> when they change; a form submits one <code>File</code> entry for each</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>The name its files are submitted under, in a form and by the upload (upload default: "file")</span></div>
         <div class="opt-row"><code>auto</code><span>boolean</span><span>Auto-upload on select (requires action URL)</span></div>
         <div class="opt-row"><code>action</code><span>string</span><span>Upload endpoint URL</span></div>
         <div class="opt-row"><code>size</code><span>string</span><span>Drop zone size: sm, (default), lg</span></div>
@@ -80,6 +81,19 @@
         <div class="opt-row-2"><code>clear()</code><span>Remove all files and abort uploads</span></div>
       </div>
 
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <p class="pdx-txt-small pdx-ink-muted">
+        What a theme or a page styles on <code>&lt;pdx-file-upload&gt;</code>: its custom states on the host and its parts.
+        The classes inside are not public.
+      </p>
+      <div class="options-table">
+        <div class="opt-header"><span>State or part</span><span>What it is</span></div>
+        <div class="opt-row-2"><code>:state(disabled) / :state(dragover)</code><span><code>disabled</code> is set; a drag is over the drop zone</span></div>
+        <div class="opt-row-2"><code>[data-part="root"] / [data-part="dropzone"]</code><span>The frame; the area a file is dropped on or clicked to browse</span></div>
+        <div class="opt-row-2"><code>[data-part="list"] / [data-part="file"]</code><span>The list of files, busy while one uploads; a file of it</span></div>
+        <div class="opt-row-2"><code>[data-part="remove"] / [data-part="progress"]</code><span>A file's remove button; its progress bar while it uploads</span></div>
+      </div>
+
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
       <div class="shortcut-list">
         <div><kbd>Enter</kbd> / <kbd>Space</kbd> Open file browser (when drop zone focused)</div>
@@ -90,7 +104,9 @@
       <p class="pdx-txt-small pdx-ink-muted">
         Drop zone has <code>role="button"</code> with <code>tabindex="0"</code> and <code>aria-label</code>
         matching the label prop. <code>aria-disabled</code> is set when disabled.
-        File list uses <code>role="list"</code> with <code>role="listitem"</code> on each entry.
+        File list uses <code>role="list"</code> with <code>role="listitem"</code> on each entry, and is
+        <code>aria-busy="true"</code> while a file uploads. Inside a <code>pdx-form-field</code> the drop zone is named by the
+        field's label and described by its hint and error.
         Remove buttons have <code>aria-label="Remove"</code>. Progress bars use <code>role="progressbar"</code>
         with <code>aria-valuenow</code>.
       </p>
