@@ -5,7 +5,7 @@
  * controls, each toolbar has its own name rather than "Toolbar", and its icon-only buttons are named.
  * On /components/pdx-toggle the formatting toggles are named by what they do, not "B", "I", "U", "S".
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('each demo toolbar is named, one tab stop, and every control has a name', async ({ page }) => {
     await page.goto('/components/pdx-toolbar', { waitUntil: 'networkidle' });

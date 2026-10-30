@@ -9,7 +9,7 @@
  * Stay and Leave are both exercised, because a handler that always closes and one that never does
  * would each pass half of this.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /**
  * Whether the demo's own dialog is open: pdx-dialog marks its backdrop with data-open. Found by its

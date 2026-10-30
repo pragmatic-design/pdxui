@@ -6,7 +6,7 @@
  * reads "24.500" and the funnel "10.000 (100%)". A funnel value is not written in the background
  * colour over the slice fill, and a slice narrower than 60 px still shows one.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 interface TextRecord { text: string; x: number; y: number; w: number; align: string; fill: string }
 declare global {

@@ -4,7 +4,7 @@
  * that can be picked, a keyboard pick is one value-change, not two, and focus comes back to the trigger
  * rather than dropping to <body>.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('"2024 only" opens a named dialog on the last allowed month, and a pick is one event', async ({ page }) => {
     await page.goto('/components/pdx-date-picker', { waitUntil: 'networkidle' });

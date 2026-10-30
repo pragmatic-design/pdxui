@@ -4,7 +4,7 @@
  * keyboard removal leaves focus on the next × rather than on <body>, and the avatar chips really go
  * away instead of only logging.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('Space presses a selectable chip', async ({ page }) => {
     await page.goto('/components/pdx-chip', { waitUntil: 'networkidle' });

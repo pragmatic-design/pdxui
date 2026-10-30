@@ -3,7 +3,7 @@
  * parent sets every child, and a child makes the parent all / none / mixed — not a static
  * indeterminate box that does nothing and that nothing updates.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('"Select all items" checks A, B and C; unchecking B makes it mixed; unchecking all clears it', async ({ page }) => {
     await page.goto('/components/pdx-checkbox', { waitUntil: 'networkidle' });

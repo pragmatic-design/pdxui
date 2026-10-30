@@ -5,7 +5,7 @@
  * aria-controls and aria-activedescendant; the suggestion count is announced, "@zzzz" announces
  * "No results" instead of closing silently, and the field is named by a label, not its placeholder.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the textarea points at the active suggestion, and the list is announced', async ({ page }) => {
     await page.goto('/components/pdx-mention', { waitUntil: 'networkidle' });

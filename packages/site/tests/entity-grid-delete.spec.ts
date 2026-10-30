@@ -5,7 +5,7 @@
  * undo, and a second click meant for one deletes a second row. Each row's buttons are named after
  * the row, not just "Edit" and "Delete", and the actions column has no filter button.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('Delete asks first, names the row, and Escape keeps it', async ({ page }) => {
     await page.goto('/components/pdx-entity-grid', { waitUntil: 'networkidle' });

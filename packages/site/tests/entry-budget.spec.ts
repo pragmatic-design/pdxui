@@ -9,7 +9,7 @@
  * The budget is on the gzipped size, which is what a first visit downloads. It runs on the dist the
  * suite's web server just built. Node-side: no browser.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';

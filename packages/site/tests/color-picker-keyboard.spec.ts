@@ -4,7 +4,7 @@
  * reaches hue, and Escape brings focus back to the swatch. Each of the three sliders, opacity
  * included, is a tab stop with its own keys.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('open with Enter: focus in the colour area, arrows move it, Escape returns to the swatch', async ({ page }) => {
     await page.goto('/components/pdx-color-picker', { waitUntil: 'networkidle' });

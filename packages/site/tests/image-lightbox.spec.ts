@@ -4,7 +4,7 @@
  * The trigger is a named button, not the <img> itself; the overlay is a named modal dialog with a
  * close button; focus moves into it, and after Escape it returns to the trigger, not the page host.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the lightbox opens from the keyboard as a named modal dialog, and Escape returns to the image', async ({ page }) => {
     // Not networkidle: the page's images come from an external host, and the lightbox needs only

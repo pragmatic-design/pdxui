@@ -7,7 +7,7 @@
  * bound-URL sanitiser on purpose), and the avatars are the site's portraits. `component-pages.spec.ts` fails any page that asks another host for an
  * image; this checks that the pictures really load.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';

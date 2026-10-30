@@ -9,7 +9,7 @@
  * Every component page is checked by component-pages.spec.ts, in the same visit it already makes;
  * the design galleries are checked here.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { unstyledScaffolding } from './scaffolding';

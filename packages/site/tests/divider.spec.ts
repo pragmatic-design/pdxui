@@ -5,7 +5,7 @@
  * row: the Vertical demo would draw "Home | Products | About | Contact" as four stacked lines. On
  * /design/layout each divider keeps its text — "OR", "Section", "Dashed" — rather than a bare line.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the Vertical demo is one line of items', async ({ page }) => {
     await page.goto('/components/pdx-divider', { waitUntil: 'networkidle' });

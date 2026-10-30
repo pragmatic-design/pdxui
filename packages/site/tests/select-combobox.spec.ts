@@ -5,7 +5,7 @@
  * highlight that aria-activedescendant announces; the searchable selects are named comboboxes; and a
  * letter typed on a closed select picks an option. pdx-form-template's Role field is named too.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 // The playground's stage is left out: it renders the component with whatever props the reader
 // toggles, and `label` starts empty there. Its controls — a select per enum prop — are counted.

@@ -8,7 +8,7 @@
  * This suite runs the BUILT site, where the inline render path writes the word `false` either way:
  * it guards the build, not the dev reading.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('pdx-provide: the Multiple Values box names the value of debug', async ({ page }) => {
     await page.goto('/components/pdx-provide', { waitUntil: 'networkidle' });

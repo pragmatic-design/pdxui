@@ -7,7 +7,7 @@
  * renders an empty form when it is wired to no record, or when `record-id="1"` finds nothing because
  * getById compares strictly and the prop is a string.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 const section = (page: Page, heading: string) =>
     page.locator('.cmp-gallery').getByRole('heading', { name: heading, exact: true }).locator('xpath=..');

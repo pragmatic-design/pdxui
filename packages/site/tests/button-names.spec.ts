@@ -5,7 +5,7 @@
  * buttons of the button, button-group and badge galleries are announced "button". The galleries give
  * a name, and a button with neither text nor name warns — which these pages must not do.
  */
-import { test, expect, type ConsoleMessage } from '@playwright/test';
+import { test, expect, type ConsoleMessage } from './fixture';
 
 test('the button gallery\'s icon-only buttons are named', async ({ page }) => {
     await page.goto('/components/pdx-button', { waitUntil: 'domcontentloaded' });

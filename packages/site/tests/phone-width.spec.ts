@@ -15,7 +15,7 @@
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 import { discoverComponentPackages } from '../../compiler/src/discover-component-packages.mjs';
 import { LIBRARY_TAGS } from './library-tags';
 import { PHONE, expectFitsPhone, settledAtPhone } from './phone-checks';

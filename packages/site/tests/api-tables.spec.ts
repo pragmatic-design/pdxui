@@ -8,7 +8,7 @@
  * without JSDoc does not say "Imperative `expand()` method (call via a ref).", and events show
  * their detail.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 async function openApi(page: Page, tag: string): Promise<void> {
     await page.goto(`/components/${tag}`, { waitUntil: 'domcontentloaded' });

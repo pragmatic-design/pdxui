@@ -3,7 +3,7 @@
  * pattern is committed on Enter and on Tab, one that is not a date is marked invalid with the danger
  * border and keeps the value, and Alt+ArrowDown opens the calendar.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('typed dates: en-US on Enter, it-IT on Tab, an impossible date marked invalid, Alt+ArrowDown opens', async ({ page }) => {
     await page.goto('/components/pdx-date-picker', { waitUntil: 'networkidle' });

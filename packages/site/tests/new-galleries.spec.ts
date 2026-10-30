@@ -6,7 +6,7 @@
  * placeholder or a bare element. Each is driven here the way a reader would: a key, a click, a typed
  * value — and the page's own readout is what is measured.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 async function gallery(page: Page, tag: string): Promise<void> {
     await page.goto(`/components/${tag}`, { waitUntil: 'domcontentloaded' });

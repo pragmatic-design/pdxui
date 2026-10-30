@@ -5,7 +5,7 @@
  * "+15 (551) 234-567"); the time preset opens a numeric keyboard; the date preset marks month 13
  * invalid.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/components/pdx-masked-input', { waitUntil: 'networkidle' });

@@ -6,7 +6,7 @@
  * never ""; transfer has one tab stop per list, keeps focus on the option after a click instead of
  * <body>, and names its search fields.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('tree-select: Enter, ↓, →, ↓, Enter picks Frontend from the keyboard', async ({ page }) => {
     await page.goto('/components/pdx-tree-select', { waitUntil: 'networkidle' });

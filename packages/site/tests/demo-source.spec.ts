@@ -6,7 +6,7 @@
  * accordion both empty, and in dev warns `<app-demo> src: dropped a bound URL with a control
  * character`. HTML source is not a URL: the prop is `code`.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 const MULTI_LINE = '<pdx-button variant="primary">One</pdx-button>\n<pdx-button>Two</pdx-button>';
 

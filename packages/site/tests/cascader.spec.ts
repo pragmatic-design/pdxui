@@ -2,7 +2,7 @@
  * pdx-cascader on its gallery page, measured in Chromium: the keyboard reaches a leaf through the
  * columns, not just opens the panel; the lazy-loading demo loads; and the search input is named.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test.beforeEach(async ({ page }) => {
     await page.goto('/components/pdx-cascader', { waitUntil: 'networkidle' });

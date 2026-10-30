@@ -4,7 +4,7 @@
  * check. type="multiple" is a group of toggle buttons, not radios. The pattern pdx-button-group's
  * mode="single" had until #286 moved selection here, measured where it now lives.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('the alignment group is a named radio group whose arrows move the selection', async ({ page }) => {
     await page.goto('/components/pdx-toggle-group', { waitUntil: 'networkidle' });

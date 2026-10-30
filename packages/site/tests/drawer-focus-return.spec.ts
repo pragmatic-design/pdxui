@@ -4,7 +4,7 @@
  * drawer's own Cancel. Focus left on <body> or on the page host sends a keyboard user back to the top
  * of the page.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 async function openWith(page: Page, name: string) {
     const opener = page.getByRole('button', { name, exact: true });

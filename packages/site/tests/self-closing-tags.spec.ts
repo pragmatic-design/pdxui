@@ -6,7 +6,7 @@
  * its child, and the component — rendering its own content — drops it. The compiler expands the form
  * to an open + close pair.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('each autocomplete demo keeps the result line after the component, outside it', async ({ page }) => {
     await page.goto('/components/pdx-autocomplete', { waitUntil: 'domcontentloaded' });

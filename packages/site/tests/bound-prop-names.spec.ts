@@ -6,7 +6,7 @@
  * the header and beside the navbar, under a heading that says there is none. The compiler resolves a
  * bound name against the component's declared props; the gallery is also written with the prop's name.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 /** The pdx-app-layout under the gallery heading `name` — its section is the heading's parent. */
 function layoutUnder(page: import('@playwright/test').Page, name: string) {

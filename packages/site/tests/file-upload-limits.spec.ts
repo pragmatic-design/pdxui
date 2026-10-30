@@ -4,7 +4,7 @@
  * "Max Files" (max-files 3) keeps 3 of 5 and says why the others are refused; "Image Only" shows a
  * refused PDF in the component; after a file's "×" focus moves to the next file, not to <body>.
  */
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './fixture';
 
 /** The demo block the site built from the gallery section headed `heading`: `#g{n}-{slug}`. */
 const section = (page: Page, heading: string) =>

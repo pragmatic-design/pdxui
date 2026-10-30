@@ -6,7 +6,7 @@
  * does not exist. A presence dot is not colour only, and "Offline" is not red, as if being away were
  * an error. A clickable avatar group works from the keyboard, not only with a mouse.
  */
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './fixture';
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';

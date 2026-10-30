@@ -10,7 +10,7 @@
  * changes license, or a new one that is published, makes this red instead of leaving the page
  * quietly wrong.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';

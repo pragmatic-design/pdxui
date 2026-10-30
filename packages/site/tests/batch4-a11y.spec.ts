@@ -2,7 +2,7 @@
  * Small accessibility defects, on the site in Chromium. Each is measured on its component page; the
  * unit tests cover the logic, these the pages people use.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('time-picker: ↑ on the empty "Unset time" picker sets an hour', async ({ page }) => {
     await page.goto('/components/pdx-time-picker', { waitUntil: 'networkidle' });

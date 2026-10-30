@@ -5,7 +5,7 @@
  * remove buttons are named after their line, not "×", and a removal keeps focus in the list instead
  * of dropping it to <body>.
  */
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixture';
 
 test('every required form field tells its control', async ({ page }) => {
     await page.goto('/components/pdx-form-field', { waitUntil: 'networkidle' });
