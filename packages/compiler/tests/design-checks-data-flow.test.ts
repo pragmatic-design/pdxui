@@ -169,6 +169,18 @@ describe('CD-D2 — PDX_EFFECT_STATE', () => {
         expect(warningsOf(source, 'PDX_EFFECT_STATE')).toHaveLength(0);
     });
 
+    it('control — the catalog bound two-way: `::value` is the field writing what the reader chose (#678)', () => {
+        const source = [
+            '<template><input ::value="query"><p>{{ query }}</p></template>',
+            '<script>',
+            '@prop open: boolean = false;',
+            "let query = $signal('');",
+            "$watch(open, (isOpen) => { if (!isOpen) return; query = ''; });",
+            '</script>',
+        ].join('\n');
+        expect(warningsOf(source, 'PDX_EFFECT_STATE')).toHaveLength(0);
+    });
+
     it('control — the documents list: a write after an await runs on the answer, not in the effect', () => {
         expect(warningsOf(sfc([
             'let id = $signal(0);',

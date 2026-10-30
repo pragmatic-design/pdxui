@@ -16,9 +16,12 @@ semver.
   reaches — writes the bound signal. A one-way binding writes when its value changes (#44, which stays),
   so a handler that writes the signal and puts it back left the typed text in the field without a word.
   The field wants `::value`; when the handler is nothing but `x = $event.target.value`, the fix binds it
-  two-way and removes the handler. The showcase demos and the reference examples that wrote a field's
-  signal by hand now bind it two-way; `page-input`'s stepper keeps its clamp as an `@input` beside
-  `::value.number`.
+  two-way and removes the handler. The demos, the reference examples, the showcase's catalog search and
+  the builder's brand and theme fields that wrote a field's signal by hand now bind it two-way;
+  `page-input`'s stepper keeps its clamp as an `@input` beside `::value.number`, and the builder's
+  filter, which nothing else writes, drops a `:value` that only ever wrote its first `''`. With it,
+  `PDX_EFFECT_STATE` (CD-D2) counts a `::x="name"` binding as the template's write of `name`, as it
+  counted an `@input` handler: a watch that resets what the field chose is not a second copy of state.
 - `custom-elements.json` records `formAssociated: true` on a component whose model is declared
   `{ form: true }` (#135): a reader learns that it takes part in a form without running it. All 22
   value inputs of #286 carry it, among them `pdx-toggle-group`, `pdx-rich-text` and `pdx-json-editor`,

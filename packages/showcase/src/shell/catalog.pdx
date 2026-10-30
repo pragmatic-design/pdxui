@@ -20,10 +20,9 @@
         <input
           class="pdx-input catalog-search"
           type="search"
-          :value="catalogQuery"
+          ::value="catalogQuery"
           :placeholder="$t('app.rail.search')"
           :aria-label="$t('app.rail.search')"
-          @input="e => catalogQuery = e.target.value"
           @keydown="onCatalogSearchKey"
           :ref="catalogSearchEl"
           data-test="catalog-search" />
