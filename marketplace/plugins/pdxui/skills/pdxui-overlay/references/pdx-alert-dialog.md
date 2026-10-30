@@ -4,7 +4,6 @@ A confirm / cancel modal.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `title` | `title` | string | `''` | The dialog's title. Empty: the alert-dialog.title component string, «Are you sure?». |
 | `message` | `message` | string | `''` | The body message. |
 | `variant` | `variant` | string | `'default'` | Visual variant. |
@@ -14,6 +13,7 @@ A confirm / cancel modal.
 | `confirmDelay` | `confirmdelay` | number | `0` | Seconds the confirm button stays disabled (accidental-click guard). |
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `closeOnEscape` | `closeonescape` | boolean | `false` | Close when the Escape key is pressed. |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
@@ -26,9 +26,13 @@ A confirm / cancel modal.
 | `confirm()` | Confirm and close, as the confirm button does. Does nothing while that button is held back — loading, a countdown running, or a confirmation phrase not yet typed. |
 | `cancel()` | Close and emit `pdx-cancel`. |
 
-**Events:** `pdx-cancel` — Fired when cancelled.; `pdx-confirm` — Fired when confirmed.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-cancel` — The user cancelled — Cancel, or Escape with `close-on-escape`; the dialog has closed.; `pdx-confirm` — The user confirmed; the dialog has closed.
 
 **Renders:** roles `alertdialog`
+
+**States:** `:state(open)` — Matched with `:state(open)`.; `:state(loading)` — Matched with `:state(loading)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.; `[data-part="cancel"]` — The element reached as `[data-part="cancel"]`.; `[data-part="confirm"]` — The element reached as `[data-part="confirm"]`.; `[data-part="confirm-input"]` — The element reached as `[data-part="confirm-input"]`.
 
 
 #### Examples

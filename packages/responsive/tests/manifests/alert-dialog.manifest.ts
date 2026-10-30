@@ -20,8 +20,11 @@
  * confirm, and closeOnEscape false by default (Esc and the backdrop do not close it). The centring
  * is identical (the backdrop is a flex centre).
  *
- * THE OPEN SCENARIO: a host with `open` → the backdrop gets [data-open] (rAF setup), the panel is at
- * opacity 1 and measurable. The selectors are host-scoped (nothing is portalled). overlay
+ * Its pieces are parts (#288), and the contracts select them by part: `backdrop`, `root` (the panel),
+ * `header`, `body`, `footer`, `cancel`, `confirm`, and `confirm-input` with `confirm-text`.
+ *
+ * THE OPEN SCENARIO: a host with `open`, its model → the host is in :state(open) (rAF setup), the
+ * panel is at opacity 1 and measurable. The selectors are host-scoped (nothing is portalled). overlay
  * action:'call' → the runner does NOT click.
  */
 import type { ComponentManifest } from './_types';
@@ -69,40 +72,51 @@ export const alertDialog: ComponentManifest = {
                 // Standalone rules on the panel: open (opacity 1), a flex column box, radius >= 0, max-width sm (360px).
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         description: 'open alert-dialog panel is fully visible (opacity 1)',
                         opacity: { op: '>=', value: 0.99 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         description: 'alert-dialog panel is a flex column box',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         description: 'alert-dialog panel has non-negative radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         description: 'alert-dialog panel is fixed to the small size (<=360px)',
                         maxWidth: { op: '<=', value: 360 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         description: 'alert-dialog panel is tall enough to hold header/body/footer',
                         height: { op: '>=', value: 80 },
                     },
                     // The footer's two action buttons have cursor: pointer.
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-alert-confirm',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="confirm"]',
                         description: 'confirm button has cursor pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="alert"] .pdx-alert-cancel',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="cancel"]',
                         description: 'cancel button has cursor pointer',
                         cursor: { op: 'is', value: 'pointer' },
+                    },
+                ],
+                // Open is a custom state of the host (#288), what a theme selects; the backdrop has no
+                // attribute for it.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open), and the backdrop is drawn from it',
+                        selector: 'section:not([hidden]) [data-test="alert"] [data-part="backdrop"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="alert"]', name: 'open' },
+                        changes: { opacity: { op: '>=', value: 0.99 } },
                     },
                 ],
                 // Overlay: the panel is centred both ways in the viewport, the backdrop is there, max-width sm.
@@ -110,8 +124,8 @@ export const alertDialog: ComponentManifest = {
                     {
                         description: 'open alert-dialog is centered in the viewport over a backdrop',
                         trigger: { selector: 'section:not([hidden]) [data-test="alert"]', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
-                        backdrop: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-backdrop',
+                        panel: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
+                        backdrop: 'section:not([hidden]) [data-test="alert"] [data-part="backdrop"]',
                         centering: 'both',
                         hasBackdrop: true,
                         maxWidth: { op: '<=', value: 360 },
@@ -122,13 +136,13 @@ export const alertDialog: ComponentManifest = {
                 composition: [
                     {
                         description: 'alert-dialog action buttons are contained within the panel footer',
-                        parent: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                        parent: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
-                            body: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-body',
-                            footer: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-footer',
-                            cancel: 'section:not([hidden]) [data-test="alert"] .pdx-alert-cancel',
-                            confirm: 'section:not([hidden]) [data-test="alert"] .pdx-alert-confirm',
+                            panel: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
+                            body: 'section:not([hidden]) [data-test="alert"] [data-part="body"]',
+                            footer: 'section:not([hidden]) [data-test="alert"] [data-part="footer"]',
+                            cancel: 'section:not([hidden]) [data-test="alert"] [data-part="cancel"]',
+                            confirm: 'section:not([hidden]) [data-test="alert"] [data-part="confirm"]',
                         },
                         relations: [
                             { description: 'cancel within panel box', left: 'cancel', op: 'contained-in', right: 'panel' },
@@ -159,7 +173,7 @@ export const alertDialog: ComponentManifest = {
             'alert-danger': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="alert-danger"] .pdx-dialog-panel',
+                        selector: 'section:not([hidden]) [data-test="alert-danger"] [data-part="root"]',
                         description: 'danger alert-dialog panel is fully visible (opacity 1)',
                         opacity: { op: '>=', value: 0.99 },
                     },
@@ -180,7 +194,7 @@ export const alertDialog: ComponentManifest = {
         scenario: 'alert-open',
         targets: [
             // A scaled, content-driven modal panel (see dialog) → skipHeight; the radius is asserted.
-            { selector: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel', tolerancePx: 2, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="alert"] [data-part="root"]', tolerancePx: 2, skipHeight: true },
         ],
     },
 
@@ -191,12 +205,12 @@ export const alertDialog: ComponentManifest = {
         // default anyway, and this keeps the test free of that dependency.
         // trapContainer: after the steps, 10 Tabs and 10 Shift+Tabs stay in the panel.
         scenario: 'alert-open',
-        initialFocus: 'section:not([hidden]) [data-test="alert"] .pdx-alert-cancel',
-        trapContainer: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+        initialFocus: 'section:not([hidden]) [data-test="alert"] [data-part="cancel"]',
+        trapContainer: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
         steps: [
             {
                 key: 'Tab',
-                expectFocusWithin: 'section:not([hidden]) [data-test="alert"] .pdx-dialog-panel',
+                expectFocusWithin: 'section:not([hidden]) [data-test="alert"] [data-part="root"]',
             },
         ],
     },

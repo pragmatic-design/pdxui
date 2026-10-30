@@ -2,22 +2,24 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/alert-dialog/pdx-alert-dialog';
 
+// Open is the model `open` (#288). The state it draws, the host's :state(open), is measured in Chromium
+// (responsive/…/alert-dialog-beta-contract.spec.ts): happy-dom has no custom states.
 describe('pdx-alert-dialog', () => {
     beforeEach(cleanup);
 
     it('renders with backdrop hidden by default', async () => {
-        const el = await mount('pdx-alert-dialog');
+        const el = await mount('pdx-alert-dialog') as any;
         const backdrop = el.querySelector('.pdx-dialog-backdrop');
         expect(backdrop).toBeTruthy();
+        expect(el.isOpen).toBe(false);
         expect(backdrop?.hasAttribute('data-open')).toBe(false);
     });
 
     it('opens when open prop set to true', async () => {
-        const el = await mount('pdx-alert-dialog');
-        (el as any).open = true;
+        const el = await mount('pdx-alert-dialog') as any;
+        el.open = true;
         await tick(50);
-        const backdrop = el.querySelector('.pdx-dialog-backdrop');
-        expect(backdrop?.hasAttribute('data-open')).toBe(true);
+        expect(el.isOpen).toBe(true);
     });
 
     it('has role="alertdialog"', async () => {

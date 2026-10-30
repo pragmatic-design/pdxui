@@ -34,7 +34,8 @@ async function mount(props: Record<string, unknown> = {}): Promise<{ el: Host; d
 
 const deleteButtons = (el: Element) => [...el.querySelectorAll<HTMLButtonElement>('.pdx-dg-actions button.pdx-dg-action-danger')];
 const dialog = (el: Element) => el.querySelector('pdx-alert-dialog') as (HTMLElement & { open?: boolean }) | null;
-const dialogOpen = (el: Element) => !!dialog(el)?.querySelector('.pdx-dialog-backdrop[data-open]');
+// Its model (#288); the state it draws, :state(open), is measured in Chromium.
+const dialogOpen = (el: Element) => !!dialog(el)?.open;
 const dialogTitle = (el: Element) => dialog(el)?.querySelector('[role="alertdialog"]')?.getAttribute('aria-label');
 
 beforeEach(cleanup);

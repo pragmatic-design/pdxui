@@ -1,9 +1,9 @@
 // pdx-alert-dialog — Confirmation dialog requiring user action.
-// Same pattern as pdx-dialog: CSS backdrop + data-open, overlayStack, focusTrap.
+// Same pattern as pdx-dialog: CSS backdrop + :state(open), overlayStack, focusTrap.
 // Cannot close via backdrop or Escape by default. Auto-focuses cancel button.
 // Supports: danger variant, type-to-confirm, timer-gated confirm, loading state.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, event, html, model, signal, generatedId } from '@pdxui/core';
 // The stylesheet of the dialog classes this renders, as pdx-dialog imports it. Without it, a page
 // with no pdx-dialog of its own would draw a CLOSED confirmation inline.
 import '@pdxui/design/components/dialog';
@@ -19,8 +19,14 @@ let _alertCounter = 0;
  * Cancel takes the focus first.
  */
 component('pdx-alert-dialog', {
+    // `open` is a model (#288): Confirm, Cancel and Escape close it, and its own writes announce
+    // `open-change` `{ value }`, which `::open` follows. `pdx-confirm` and `pdx-cancel` stay: they are
+    // the answer, not the open state.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as custom states (#132, #288): the dialog CSS draws the backdrop from `open`.
+    states: ['open', 'loading'],
+    parts: ['root', 'backdrop', 'header', 'body', 'footer', 'cancel', 'confirm', 'confirm-input'],
     props: {
-        open: { type: Boolean, default: false },
         /** The dialog's title. Empty: the alert-dialog.title component string, «Are you sure?». */
         title: { type: String, default: '' },
         message: { type: String, default: '' },
@@ -33,6 +39,12 @@ component('pdx-alert-dialog', {
         confirmDelay: { type: Number, default: 0 },
         loading: { type: Boolean, default: false },
         closeOnEscape: { type: Boolean, default: false },
+    },
+    events: {
+        /** The user confirmed; the dialog has closed. */
+        'pdx-confirm': event<void>(),
+        /** The user cancelled — Cancel, or Escape with `close-on-escape`; the dialog has closed. */
+        'pdx-cancel': event<void>(),
     },
     setup(ctx) {
         let trapDispose: Dispose | null = null;
@@ -50,12 +62,12 @@ component('pdx-alert-dialog', {
 
         function confirm() {
             if (!isConfirmEnabled()) return;
-            (ctx.el as any).open = false;
+            ctx.open.set(false);
             ctx.emit('pdx-confirm');
         }
 
         function cancel() {
-            (ctx.el as any).open = false;
+            ctx.open.set(false);
             ctx.emit('pdx-cancel');
         }
 
@@ -73,6 +85,8 @@ component('pdx-alert-dialog', {
 
         ctx.track(() => {
             const isOpen = ctx.open();
+            // The panel says it is busy (A4), in the template.
+            ctx.state('loading', !!ctx.loading());
 
             // Bind DOM refs once
             if (!_bound) {
@@ -95,10 +109,8 @@ component('pdx-alert-dialog', {
                 if (isOpen) {
                     overlayId = 'pdx-alert-' + (++_alertCounter);
                     const zIndex = overlayStack.push(overlayId, { modal: true });
-                    if (backdropEl) {
-                        backdropEl.style.zIndex = String(zIndex);
-                        backdropEl.setAttribute('data-open', '');
-                    }
+                    if (backdropEl) backdropEl.style.zIndex = String(zIndex);
+                    ctx.state('open', true);
 
                     // Reset state — the typed text in the field too: otherwise, reopened, it would still
                     // show the text of the last time while confirm, gated on the cleared signal, is disabled.
@@ -133,7 +145,7 @@ component('pdx-alert-dialog', {
                         if (cancelBtn) setTimeout(() => cancelBtn.focus(), 0);
                     });
                 } else {
-                    if (backdropEl) backdropEl.removeAttribute('data-open');
+                    ctx.state('open', false);
                     if (trapDispose) { trapDispose(); trapDispose = null; }
                     if (dismissDispose) { dismissDispose(); dismissDispose = null; }
                     if (overlayId) { overlayStack.pop(overlayId); overlayId = ''; }
@@ -149,11 +161,12 @@ component('pdx-alert-dialog', {
             };
         });
 
-        // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen + confirm()/cancel()
+        // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen + confirm()/cancel(). Each
+        // writes the model, so each announces `open-change`.
         ctx.expose({
-            show() { (ctx.el as any).open = true; },
+            show() { ctx.open.set(true); },
             close: cancel,
-            toggle() { if (ctx.open()) cancel(); else (ctx.el as any).open = true; },
+            toggle() { if (ctx.open()) cancel(); else ctx.open.set(true); },
             get isOpen() { return ctx.open() as boolean; },
             /** Confirm and close, as the confirm button does. Does nothing while that button is held back — loading, a countdown running, or a confirmation phrase not yet typed. */
             confirm,
@@ -169,26 +182,27 @@ component('pdx-alert-dialog', {
         return { confirm, cancel, isConfirmEnabled, typedText, countdown, resolvedTitle, typeToConfirm, onTypedInput, messageId };
     },
     render: (ctx) => html`
-        <div class="pdx-dialog-backdrop">
-            <div class="pdx-dialog-panel pdx-dialog-sm" role="alertdialog" aria-modal="true"
+        <div class="pdx-dialog-backdrop" data-part="backdrop">
+            <div class="pdx-dialog-panel pdx-dialog-sm" data-part="root" role="alertdialog" aria-modal="true"
                 :aria-label="${ctx.resolvedTitle}"
-                :aria-describedby="${() => ctx.message() ? ctx.messageId : null}">
-                <div class="pdx-dialog-header">
+                :aria-describedby="${() => ctx.message() ? ctx.messageId : null}"
+                :aria-busy="${() => ctx.loading() ? 'true' : null}">
+                <div class="pdx-dialog-header" data-part="header">
                     <span>${ctx.resolvedTitle}</span>
                 </div>
-                <div class="pdx-dialog-body">
+                <div class="pdx-dialog-body" data-part="body">
                     ${() => ctx.message() ? html`<p :id="${() => ctx.messageId}" style="margin:0 0 var(--pdx-space-md);color:var(--pdx-color-muted)">${ctx.message}</p>` : ''}
                     <slot></slot>
                     ${() => ctx.confirmText() ? html`
                         <div style="margin-top:var(--pdx-space-md)">
                             <p class="pdx-txt-small pdx-ink-muted" style="margin-bottom:var(--pdx-space-xs)">${() => ctx.typeToConfirm()[0]}<strong>${ctx.confirmText}</strong>${() => ctx.typeToConfirm()[1]}</p>
-                            <input class="pdx-alert-type-input pdx-input" type="text" @input="${ctx.onTypedInput}" />
+                            <input class="pdx-alert-type-input pdx-input" data-part="confirm-input" type="text" @input="${ctx.onTypedInput}" />
                         </div>
                     ` : ''}
                 </div>
-                <div class="pdx-dialog-footer">
-                    <button class="pdx-alert-cancel pdx-ghost" type="button" size="sm">${() => (ctx.cancelLabel() as string) || uiString('alert-dialog', 'cancel')}</button>
-                    <button class="pdx-alert-confirm ${() => (ctx.variant() as string) === 'danger' ? 'pdx-danger' : 'pdx-primary'}" type="button" size="sm"
+                <div class="pdx-dialog-footer" data-part="footer">
+                    <button class="pdx-alert-cancel pdx-ghost" data-part="cancel" type="button" size="sm">${() => (ctx.cancelLabel() as string) || uiString('alert-dialog', 'cancel')}</button>
+                    <button class="pdx-alert-confirm ${() => (ctx.variant() as string) === 'danger' ? 'pdx-danger' : 'pdx-primary'}" data-part="confirm" type="button" size="sm"
                         :disabled="${() => !ctx.isConfirmEnabled()}">${() => {
                             const c = ctx.countdown();
                             const label = (ctx.confirmLabel() as string) || uiString('alert-dialog', 'confirm');

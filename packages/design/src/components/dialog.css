@@ -26,10 +26,11 @@
                 visibility 0s linear var(--pdx-duration-base, 200ms);
 }
 
-/* Open: pdx-dialog's custom state (#288); `[data-open]` is the alert dialog's, the overlay outlet's and
-   native markup's, which draw the same backdrop. */
+/* Open: pdx-dialog's and pdx-alert-dialog's custom state (#288); `[data-open]` is the overlay outlet's
+   and native markup's, which draw the same backdrop. */
 .pdx-dialog-backdrop[data-open],
-pdx-dialog:state(open) > .pdx-dialog-backdrop {
+pdx-dialog:state(open) > .pdx-dialog-backdrop,
+pdx-alert-dialog:state(open) > .pdx-dialog-backdrop {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-base, 200ms) ease,
@@ -71,7 +72,8 @@ pdx-dialog:state(open) > .pdx-dialog-backdrop {
  * needs this too.
  */
 .pdx-dialog-backdrop[data-open] .pdx-dialog-panel,
-pdx-dialog:state(open) > .pdx-dialog-backdrop > .pdx-dialog-panel {
+pdx-dialog:state(open) > .pdx-dialog-backdrop > .pdx-dialog-panel,
+pdx-alert-dialog:state(open) > .pdx-dialog-backdrop > .pdx-dialog-panel {
     transform: none;
     opacity: 1;
 }
