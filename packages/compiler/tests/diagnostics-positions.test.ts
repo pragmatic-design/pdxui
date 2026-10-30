@@ -53,6 +53,7 @@ const ROWS: Record<string, Row> = {
     PDX_COMMAND_UNKNOWN: { src: pdx('<p>{{ a }}</p>\n<button commandfor="d" command="show">x</button><dialog id="d"></dialog>', 'let a = $signal(1);'), at: 'command="show"' },
     PDX_PIPE_SINGLE: { src: pdx('<p>{{ a }}</p>\n<p>{{ a | up }}</p>', 'let a = $signal(1);\nfunction up(v) { return v; }'), at: '{{ a | up }}' },
     PDX_BINDING_MODIFIER: { src: pdx('<p>{{ a }}</p>\n<input ::value.lazzy="a" />', 'let a = $signal(1);'), at: '::value.lazzy' },
+    PDX_ONE_WAY_EDITED_FIELD: { src: pdx('<p>{{ a }}</p>\n<input :value="a" />\n<input\n  :value="a" @input="a = $event.target.value" />', 'let a = $signal(1);'), at: ':value="a" @input' },
     PDX_TWO_WAY_NOT_MODEL: { src: pdx('<p>{{ a }}</p>\n<app-field\n  ::label="a"></app-field>', 'let a = $signal(1);'), at: '::label="a"' },
     PDX_TAG_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@tag \'pdx-badge\';'), at: "@tag 'pdx-badge';" },
     PDX_PROP_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-card :id="a"></app-card>\n  <app-card></app-card>', 'let a = $signal(1);'), at: '<app-card></app-card>' },

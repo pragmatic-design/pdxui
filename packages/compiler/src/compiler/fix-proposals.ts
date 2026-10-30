@@ -10,6 +10,7 @@ import {
     offsetOf, rawInterpolationFix, interpolationInBindingFix, boundNameFix, eventNameFix, tagRenameFix,
     undeclaredRefFix, fetchTypeColonFix, routeFieldQuotedFix, singlePipeFix,
 } from './fix-builders';
+import { oneWayEditedFieldFix } from './validate-one-way-field';
 
 /**
  * Where the initialiser of `name = …` ends: the first `;` or newline outside brackets and strings.
@@ -71,6 +72,7 @@ const BUILDERS: Record<string, (source: string, w: ValidationWarning) => FixProp
     PDX_FETCH_TYPE_COLON: fetchTypeColonFix,
     PDX_ROUTE_FIELD_INVALID: routeFieldQuotedFix,
     PDX_PIPE_SINGLE: singlePipeFix,
+    PDX_ONE_WAY_EDITED_FIELD: oneWayEditedFieldFix,
 };
 
 /**

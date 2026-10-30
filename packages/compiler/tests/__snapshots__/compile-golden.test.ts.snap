@@ -4,7 +4,7 @@ exports[`compile golden — demo corpus > color-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindTwoWay, clearBoundProperty, component, computed, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tdfsr4");
@@ -22,27 +22,21 @@ component('app-color-card', {
     const __color = signal('#3b82f6', { name: 'color-card:color' });
     const __radius = signal(12, { name: 'color-card:radius' });
     const __scalePercent = signal(100, { name: 'color-card:scalePercent' });
-function onColor(e) { __color.setRaw(e.target.value); }
-      function onRadius(e) { __radius.setRaw(parseInt(e.target.value)); }
-      function onScale(e) { __scalePercent.setRaw(parseInt(e.target.value)); }
     const scale = computed(() => (__scalePercent() / 100).toFixed(2), { name: 'color-card:scale' });
     const previewStyle = computed(() => \`background: \${__color()}; border-radius: \${__radius()}px; transform: scale(\${scale()})\`, { name: 'color-card:previewStyle' });
     ctx.el.setAttribute('data-pdx-tdfsr4', '');
-    return { color: __color, radius: __radius, scalePercent: __scalePercent, scale, previewStyle, onColor, onRadius, onScale };
+    return { color: __color, radius: __radius, scalePercent: __scalePercent, scale, previewStyle };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el2,__t4,__el8,__t10,__el11,__t13,__el14]=__walk0(__frag);
     let __el2w_style = {}; effect(() => { const __b = ctx.previewStyle(); if (Object.is(__b, __el2w_style)) return; __el2w_style = __b; if ("style" in __el2) { const __v = __b; if (__v == null) clearBoundProperty(__el2, "style", "style"); else __el2["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el2.removeAttribute("style"); else { __el2.setAttribute("style", __v === true ? '' : String(__v)); } } });
     bindInterpolation(__t4,()=>ctx.emoji());
-    let __el8w_value = {}; effect(() => { const __b = ctx.color(); if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; if ("value" in __el8) { const __v = __b; if (__v == null) clearBoundProperty(__el8, "value", "value"); else __el8["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el8.removeAttribute("value"); else { __el8.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el8.addEventListener('input', safeHandler(batchHandler(ctx.onColor), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el8, 'value', ctx.color);
     bindInterpolation(__t10,()=>ctx.radius());
-    let __el11w_value = {}; effect(() => { const __b = ctx.radius(); if (Object.is(__b, __el11w_value)) return; __el11w_value = __b; if ("value" in __el11) { const __v = __b; if (__v == null) clearBoundProperty(__el11, "value", "value"); else __el11["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el11.removeAttribute("value"); else { __el11.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el11.addEventListener('input', safeHandler(batchHandler(ctx.onRadius), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el11, 'value.number', ctx.radius);
     bindInterpolation(__t13,()=>ctx.scale());
-    let __el14w_value = {}; effect(() => { const __b = ctx.scalePercent(); if (Object.is(__b, __el14w_value)) return; __el14w_value = __b; if ("value" in __el14) { const __v = __b; if (__v == null) clearBoundProperty(__el14, "value", "value"); else __el14["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el14.removeAttribute("value"); else { __el14.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el14.addEventListener('input', safeHandler(batchHandler(ctx.onScale), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el14, 'value.number', ctx.scalePercent);
     return __frag;
   })(),
 });
@@ -2781,7 +2775,7 @@ exports[`compile golden — demo corpus > pdx-showcase/pages/page-input.pdx 1`] 
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, effect, safeHandler, signal, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindTwoWay, clearBoundProperty, component, effect, safeHandler, signal, staticBlock, staticMarkup, useHead, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-1yonx6");
@@ -2805,41 +2799,34 @@ component('app-page-input', {
     const __showPw = signal(false, { name: 'page-input:showPw' });
     const __num = signal(5, { name: 'page-input:num' });
     const __descLen = signal(0, { name: 'page-input:descLen' });
-function onNameInput(e) { __name.setRaw(e.target.value); }
-    function onSearchInput(e) { __search.setRaw(e.target.value); }
-    function clearSearch() { __search.setRaw(''); }
+function clearSearch() { __search.setRaw(''); }
     function togglePw() { __showPw.setRaw(!__showPw.peek()); }
     function incNum() { if (__num() < 100) __num.set(__v => __v + 1); }
     function decNum() { if (__num() > 0) __num.set(__v => __v - 1); }
-    function onNumInput(e) {
-        var v = parseInt(e.target.value);
-        if (!isNaN(v)) __num.setRaw(Math.max(0, Math.min(100, v)));
-    }
+    function clampNum() { if (__num() !== null) __num.setRaw(Math.max(0, Math.min(100, __num.peek()))); }
     function onDescInput(e) { __descLen.setRaw(e.target.value.length); }
     useHead({ title: "Input — PDX Components" });
     ctx.el.setAttribute('data-pdx-1yonx6', '');
-    return { name: __name, search: __search, showPw: __showPw, num: __num, descLen: __descLen, onNameInput, onSearchInput, clearSearch, togglePw, incNum, decNum, onNumInput, onDescInput };
+    return { name: __name, search: __search, showPw: __showPw, num: __num, descLen: __descLen, clearSearch, togglePw, incNum, decNum, clampNum, onDescInput };
   },
   render: (ctx) => (() => {
     const __frag=__blk4();
     const [__el8,__t10,__el16,__el17,__m19,__el25,__m28,__m32,__el38,__el39,__el40,__t42,__el47,__t49]=__walk4(__frag);
-    __el8.addEventListener('input', safeHandler(batchHandler(ctx.onNameInput), ctx.el?.tagName?.toLowerCase(), 'input'));
-    let __el8w_value = {}; effect(() => { const __b = ctx.name(); if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; if ("value" in __el8) { const __v = __b; if (__v == null) clearBoundProperty(__el8, "value", "value"); else __el8["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el8.removeAttribute("value"); else { __el8.setAttribute("value", __v === true ? '' : String(__v)); } } });
+    bindTwoWay(__el8, 'value', ctx.name);
     bindInterpolation(__t10,()=>ctx.name());
     let __el16w_type = {}; effect(() => { const __b = ctx.showPw() ? 'text' : 'password'; if (Object.is(__b, __el16w_type)) return; __el16w_type = __b; if ("type" in __el16) { const __v = __b; if (__v == null) clearBoundProperty(__el16, "type", "type"); else __el16["type"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el16.removeAttribute("type"); else { __el16.setAttribute("type", __v === true ? '' : String(__v)); } } });
     __el17.addEventListener('click', safeHandler(batchHandler(ctx.togglePw), ctx.el?.tagName?.toLowerCase(), 'click'));
     const __cf18=when(()=>ctx.showPw(),()=>{const __frag=__blk0();return __frag;},()=>{const __frag=__blk1();return __frag;});
     __m19.replaceWith(__cf18);
-    __el25.addEventListener('input', safeHandler(batchHandler(ctx.onSearchInput), ctx.el?.tagName?.toLowerCase(), 'input'));
-    let __el25w_value = {}; effect(() => { const __b = ctx.search(); if (Object.is(__b, __el25w_value)) return; __el25w_value = __b; if ("value" in __el25) { const __v = __b; if (__v == null) clearBoundProperty(__el25, "value", "value"); else __el25["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el25.removeAttribute("value"); else { __el25.setAttribute("value", __v === true ? '' : String(__v)); } } });
+    bindTwoWay(__el25, 'value', ctx.search);
     const __cf27=when(()=>ctx.search(),()=>{const __frag=__blk2();const [__el26]=__walk2(__frag);__el26.addEventListener('click', safeHandler(batchHandler(ctx.clearSearch), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;},null);
     __m28.replaceWith(__cf27);
     const __cf31=when(()=>ctx.search(),()=>{const __frag=__blk3();const [__t30]=__walk3(__frag);bindInterpolation(__t30,()=>ctx.search());return __frag;},null);
     __m32.replaceWith(__cf31);
     __el38.addEventListener('click', safeHandler(batchHandler(ctx.decNum), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el38w_disabled = {}; effect(() => { const __b = ctx.num() <= 0; if (Object.is(__b, __el38w_disabled)) return; __el38w_disabled = __b; if ("disabled" in __el38) { const __v = __b; if (__v == null) clearBoundProperty(__el38, "disabled", "disabled"); else __el38["disabled"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el38.removeAttribute("disabled"); else { __el38.setAttribute("disabled", __v === true ? '' : String(__v)); } } });
-    let __el39w_value = {}; effect(() => { const __b = ctx.num(); if (Object.is(__b, __el39w_value)) return; __el39w_value = __b; if ("value" in __el39) { const __v = __b; if (__v == null) clearBoundProperty(__el39, "value", "value"); else __el39["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el39.removeAttribute("value"); else { __el39.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el39.addEventListener('input', safeHandler(batchHandler(ctx.onNumInput), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el39, 'value.number', ctx.num);
+    __el39.addEventListener('input', safeHandler(batchHandler(ctx.clampNum), ctx.el?.tagName?.toLowerCase(), 'input'));
     __el40.addEventListener('click', safeHandler(batchHandler(ctx.incNum), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el40w_disabled = {}; effect(() => { const __b = ctx.num() >= 100; if (Object.is(__b, __el40w_disabled)) return; __el40w_disabled = __b; if ("disabled" in __el40) { const __v = __b; if (__v == null) clearBoundProperty(__el40, "disabled", "disabled"); else __el40["disabled"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el40.removeAttribute("disabled"); else { __el40.setAttribute("disabled", __v === true ? '' : String(__v)); } } });
     bindInterpolation(__t42,()=>ctx.num());
@@ -3503,7 +3490,7 @@ exports[`compile golden — demo corpus > showcase/theme-picker.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, currentTheme, debounced, effect, safeHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindTwoWay, clearBoundProperty, component, computed, currentTheme, debounced, effect, safeHandler, setTheme, signal, staticBlock, staticMarkup, toggleDarkMode, useHead } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7pjpe2");
@@ -3529,14 +3516,11 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
     function setLight() { setTheme('light'); }
     function setDark() { setTheme('dark'); }
     function doToggle() { toggleDarkMode(); }
-    function onPrimary(e) { __primary.setRaw(e.target.value); }
-    function onAccent(e) { __accent.setRaw(e.target.value); }
-    function onSearch(e) { __searchRaw.setRaw(e.target.value); }
     const theme = computed(() => currentTheme(), { name: 'theme-picker:theme' });
     const previewStyle = computed(() => \`background: linear-gradient(135deg, \${__primary()}, \${__accent()}); color: white; padding: 12px; border-radius: 8px; text-align: center; font-family: monospace; font-size: 0.8rem;\`, { name: 'theme-picker:previewStyle' });
     useHead({ title: "Settings — TaskMgr" });
     ctx.el.setAttribute('data-pdx-7pjpe2', '');
-    return { theme, primary: __primary, accent: __accent, searchRaw: __searchRaw, searchDebounced, previewStyle, setLight, setDark, doToggle, onPrimary, onAccent, onSearch };
+    return { theme, primary: __primary, accent: __accent, searchRaw: __searchRaw, searchDebounced, previewStyle, setLight, setDark, doToggle };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
@@ -3547,15 +3531,12 @@ const _debouncedSearch = debounced(() => __searchRaw(), 300);
     effect(()=>{const __c=!!(ctx.theme() === 'dark');__el6.classList.toggle("active",__c);});
     __el7.addEventListener('click', safeHandler(batchHandler(ctx.doToggle), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t10,()=>ctx.theme());
-    let __el15w_value = {}; effect(() => { const __b = ctx.primary(); if (Object.is(__b, __el15w_value)) return; __el15w_value = __b; if ("value" in __el15) { const __v = __b; if (__v == null) clearBoundProperty(__el15, "value", "value"); else __el15["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("value"); else { __el15.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el15.addEventListener('input', safeHandler(batchHandler(ctx.onPrimary), ctx.el?.tagName?.toLowerCase(), 'input'));
-    let __el17w_value = {}; effect(() => { const __b = ctx.accent(); if (Object.is(__b, __el17w_value)) return; __el17w_value = __b; if ("value" in __el17) { const __v = __b; if (__v == null) clearBoundProperty(__el17, "value", "value"); else __el17["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el17.removeAttribute("value"); else { __el17.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el17.addEventListener('input', safeHandler(batchHandler(ctx.onAccent), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el15, 'value', ctx.primary);
+    bindTwoWay(__el17, 'value', ctx.accent);
     let __el18w_style = {}; effect(() => { const __b = ctx.previewStyle(); if (Object.is(__b, __el18w_style)) return; __el18w_style = __b; if ("style" in __el18) { const __v = __b; if (__v == null) clearBoundProperty(__el18, "style", "style"); else __el18["style"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el18.removeAttribute("style"); else { __el18.setAttribute("style", __v === true ? '' : String(__v)); } } });
     bindInterpolation(__t20,()=>ctx.primary());
     bindInterpolation(__t21,()=>ctx.accent());
-    let __el24w_value = {}; effect(() => { const __b = ctx.searchRaw(); if (Object.is(__b, __el24w_value)) return; __el24w_value = __b; if ("value" in __el24) { const __v = __b; if (__v == null) clearBoundProperty(__el24, "value", "value"); else __el24["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el24.removeAttribute("value"); else { __el24.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el24.addEventListener('input', safeHandler(batchHandler(ctx.onSearch), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el24, 'value', ctx.searchRaw);
     bindInterpolation(__t27,()=>ctx.searchRaw());
     bindInterpolation(__t29,()=>ctx.searchDebounced());
     return __frag;
@@ -27165,7 +27146,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-row-c
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, clearBoundProperty, component, computed, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindTwoWay, component, computed, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qfo1fq");
@@ -27179,20 +27160,16 @@ component('app-demo-comp-row-col-animated', {
   props: {},
   setup(ctx) {
     const __sidebarSpan = signal(3, { name: 'demo-comp-row-col-animated:sidebarSpan' });
-function onSliderChange(e) {
-        __sidebarSpan.setRaw(Number(e.target.value));
-    }
     const contentSpan = computed(() => 12 - __sidebarSpan(), { name: 'demo-comp-row-col-animated:contentSpan' });
     ctx.el.setAttribute('data-pdx-qfo1fq', '');
-    return { sidebarSpan: __sidebarSpan, contentSpan, onSliderChange };
+    return { sidebarSpan: __sidebarSpan, contentSpan };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
     const [__el5,__el7,__el11]=__walk0(__frag);
     let __el5w_span = {}; effect(() => { const __b = ctx.sidebarSpan(); if (Object.is(__b, __el5w_span)) return; __el5w_span = __b; assignBoundProperty(__el5, "span", __b); });
     let __el7w_span = {}; effect(() => { const __b = ctx.contentSpan(); if (Object.is(__b, __el7w_span)) return; __el7w_span = __b; assignBoundProperty(__el7, "span", __b); });
-    let __el11w_value = {}; effect(() => { const __b = ctx.sidebarSpan(); if (Object.is(__b, __el11w_value)) return; __el11w_value = __b; if ("value" in __el11) { const __v = __b; if (__v == null) clearBoundProperty(__el11, "value", "value"); else __el11["value"] = __v; } else { const __v = __b; if (__v == null || __v === false) __el11.removeAttribute("value"); else { __el11.setAttribute("value", __v === true ? '' : String(__v)); } } });
-    __el11.addEventListener('input', safeHandler(batchHandler(ctx.onSliderChange), ctx.el?.tagName?.toLowerCase(), 'input'));
+    bindTwoWay(__el11, 'value.number', ctx.sidebarSpan);
     return __frag;
   })(),
 });

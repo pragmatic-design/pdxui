@@ -759,7 +759,7 @@ title follows them. On a page with `keepAlive` the title is written again in `on
 
 ```pdx
 <template>
-  <input :value="person" @input="e => person = e.target.value" />
+  <input ::value="person" />
 </template>
 
 <script>

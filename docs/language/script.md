@@ -1090,7 +1090,7 @@ The options (`immediate`, `once`) are an expression rewritten like the body; a d
 
 ```pdx
 <template>
-  <input :value="query" @input="query = $event.target.value" />
+  <input ::value="query" />
 </template>
 
 <script>

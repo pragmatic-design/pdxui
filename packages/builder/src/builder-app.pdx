@@ -27,7 +27,7 @@
           <button :class="mode === 'component' ? 'mode-btn active' : 'mode-btn'" @click="setMode('component')" data-test="mode-component">Components</button>
           <button :class="mode === 'theme' ? 'mode-btn active' : 'mode-btn'" @click="setMode('theme')" data-test="mode-theme">Theme</button>
         </div>
-        <input class="search" type="search" placeholder="Filter components…" :value="query" @input="onFilter" data-test="filter" />
+        <input class="search" type="search" placeholder="Filter components…" @input="onFilter" data-test="filter" />
       </div>
 
       @if (mode === 'theme') {
@@ -39,7 +39,7 @@
           <label class="knob">
             <span class="knob-label">Brand</span>
             <div class="knob-row">
-              <input class="knob-swatch" type="color" :value="brandHex" @input="setDraft('brand', $event.target.value)" data-test="knob-brand-picker" title="Pick a brand colour" />
+              <input class="knob-swatch" type="color" ::value="brandHex" @input="setDraft('brand', $event.target.value)" data-test="knob-brand-picker" title="Pick a brand colour" />
               <input class="knob-in" type="text" :value="draft.brand" @input="setDraft('brand', $event.target.value)" placeholder="#3b5bdb or oklch(L C H)" id="pdx-knob-brand" name="brand" aria-label="Brand colour" data-test="knob-brand" />
             </div>
           </label>
@@ -167,7 +167,7 @@
         } @else {
           <label class="ctl">
             <span class="ctl-label" id="lbl-theme">Theme</span>
-            <select class="ctl-select" id="pdx-theme-select" aria-labelledby="lbl-theme" :value="theme" @change="onTheme" data-test="theme">
+            <select class="ctl-select" id="pdx-theme-select" aria-labelledby="lbl-theme" ::value="theme" @change="onTheme" data-test="theme">
               @for (allThemes as t; track t) {
                 <option :value="t" :selected="t === theme">{{ t }}</option>
               }
@@ -568,9 +568,9 @@ function onFilter(e) {
     query = e.target.value.toLowerCase();
 }
 
-function onTheme(e) {
+// `::value` has written `theme` from the select; what follows a change of theme.
+function onTheme() {
     frameReady = false;
-    theme = e.target.value;
     writePreference({ theme });
     syncUrl();
 }

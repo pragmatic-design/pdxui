@@ -22,6 +22,7 @@ import { checkParts } from './validate-parts';
 import { checkVirtualFor } from './validate-virtual';
 import { checkCommands, type MethodsLookup } from './validate-commands';
 import { checkTwoWay, checkBindingModifiers, type ModelsLookup } from './validate-two-way';
+import { checkOneWayEditedField } from './validate-one-way-field';
 import { checkSinglePipes } from './validate-pipes';
 import { checkRequiredProps, type RequiredPropsLookup } from './validate-required-props';
 import { checkRequiredSlots, type RequiredSlotsLookup } from './validate-required-slots';
@@ -555,6 +556,7 @@ export function validate(
     warnings.push(...checkBubblesUnused(analysis.events, options?.eventHeardAbove));
     warnings.push(...checkAttachments(ast, analysis));
     warnings.push(...checkBindingModifiers(ast));
+    warnings.push(...checkOneWayEditedField(ast, analysis.body));
     warnings.push(...checkSinglePipes(ast));
 
     // ─── Check 10f: a @for … @virtual has the shape it needs (#283) ──

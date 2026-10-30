@@ -152,10 +152,17 @@ function writesChoice(n: ts.Node, signals: Set<string>): boolean {
 
 /**
  * The $signals the template's event handlers write with a value that reads something:
- * `@input="e => query = e.target.value"` is the reader's choice, as much as a script handler's.
+ * `@input="e => query = e.target.value"` is the reader's choice, as much as a script handler's. A
+ * two-way binding, `::value="query"`, is the same write made by the field (#678).
  */
 function writtenByTemplateHandlers(template: string, signals: Set<string>): Set<string> {
     const out = new Set<string>();
+    // Match: a two-way binding on a bare name, `::value="query"`, with its modifiers.
+    // Groups: [1]=double-quoted name [2]=single-quoted name
+    for (const m of template.matchAll(/\s::[\w-]+(?:\.[\w()]+)*\s*=\s*(?:"\s*([A-Za-z_$][\w$]*)\s*"|'\s*([A-Za-z_$][\w$]*)\s*')/g)) {
+        const name = m[1] ?? m[2];
+        if (signals.has(name)) out.add(name);
+    }
     // Match: an event attribute and its quoted handler, `@input="…"` or `@click='…'`.
     // Groups: [1]=double-quoted handler [2]=single-quoted handler
     for (const m of template.matchAll(/\s@[\w:.-]+\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) {

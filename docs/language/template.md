@@ -197,6 +197,14 @@ the same way, and has no `effect`: a later change of what it read does not reach
   `<input :value="value">`.
 - A modifier other than `.once` on `:name` raises `PDX_BINDING_MODIFIER` (error). `:class.x` and
   `:style.x` are not modifiers: they are removed forms (#129), `PDX_REMOVED_FORM`.
+- A one-way `:value` or `:checked` on an `<input>`, `<textarea>` or `<select>` whose own `@input` or
+  `@change` handler — inline, or a script function it reaches — writes the bound signal raises
+  `PDX_ONE_WAY_EDITED_FIELD` (warning, #678). Because the binding writes only when its value changes
+  (#44: a re-run for another reason must not overwrite what is being typed), a handler that writes the
+  signal and puts it back leaves the typed text in the field: with `<input :value="query"
+  @input="onInput">` and `function onInput(e) { query = e.target.value; query = ''; }`, typing `a`
+  leaves `a` in the field while `query` is `''`. The field wants `::value`, whose state always wins over
+  the field; the fix makes the change when the handler is nothing but `query = $event.target.value`.
 
 #### Examples
 

@@ -11,6 +11,7 @@ import ts from 'typescript';
 import { parseSFC } from '../parser/sfc';
 import { skipNonCode } from './tokenizer';
 import { proposeFixes } from './fix-proposals';
+import { locateOneWayEditedField } from './validate-one-way-field';
 import type { ValidationWarning } from './validate';
 
 interface Region { from: number; to: number }
@@ -156,6 +157,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const m = /^'\.([\w()]+)' on '(::?[\w-]+)'/.exec(w.message);
             return m ? find(source, template, new RegExp(`${escape(m[2])}(?:\\.[\\w()]+)*\\.${escape(m[1])}(?=[.=])`)) : undefined;
         }
+        case 'PDX_ONE_WAY_EDITED_FIELD':
+            return locateOneWayEditedField(w.message, (re, nth) => find(source, template, re, nth));
         case 'PDX_TWO_WAY_NOT_MODEL': {
             // Match: the binding the message names (`'::label' on <app-field>: …`), in that tag.
             const m = /^'::([\w-]+)' on <([\w-]+)>/.exec(w.message);

@@ -311,6 +311,14 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use a listed modifier, or the general form `::x="{ get: () => …, set: (v) => … }"` for anything else.',
         example: { bad: pdx('<input ::value.lazzy="name" />', "let name = $signal('');"), good: pdx('<input ::value.lazy="name" />', "let name = $signal('');") },
     },
+    PDX_ONE_WAY_EDITED_FIELD: {
+        severity: 'warn', category: 'defect',
+        summary: 'A one-way `:value` or `:checked` on a native field whose own `@input`/`@change` handler writes the bound signal (#678).',
+        explanation: 'A one-way binding writes when its value changes, not when the field differs from it (#44): a re-run for another reason must not overwrite what is being typed. So a handler that writes the signal and puts it back — the user types `a`, the handler clears it to `\'\'`, the value the binding last wrote — leaves `a` in the field while the signal is empty, without a word. A field whose state must win over what is in it is the two-way form, `::value`.',
+        fix: 'Bind it two-way, `::value="x"` (or `::checked`, `::value.number`), and keep in the handler only what it does besides writing `x` from the field. When the handler is nothing but `x = $event.target.value`, the fix does it.',
+        fixable: true,
+        example: { bad: pdx('<input :value="query" @input="query = $event.target.value" />', "let query = $signal('');"), good: pdx('<input ::value="query" />', "let query = $signal('');") },
+    },
     PDX_PART_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A declared `@part` that no element of the template carries.',
