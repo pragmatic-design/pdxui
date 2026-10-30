@@ -96,8 +96,9 @@ test.describe('reactivity', () => {
     // Its open state is the host's :state(open) (#288), not an attribute on the backdrop.
     test('dialog: open prop toggles panel visibility (:state(open))', async ({ page }) => {
         await mountRaw(page, 'pdx-dialog', { attrs: { title: 'T' } });
-        expect(await page.$eval(`${SUBJECT} pdx-dialog`, (e) => e.matches(':state(open)'))).toBe(false);
+        // SUBJECT is the dialog itself.
+        expect(await page.$eval(SUBJECT, (e) => e.matches(':state(open)'))).toBe(false);
         await setProp(page, 'open', true);
-        await expect.poll(() => page.$eval(`${SUBJECT} pdx-dialog`, (e) => e.matches(':state(open)'))).toBe(true);
+        await expect.poll(() => page.$eval(SUBJECT, (e) => e.matches(':state(open)'))).toBe(true);
     });
 });
