@@ -21,6 +21,7 @@ const busy = (path: string) => Object.assign(new Error(`EBUSY: resource busy or 
  */
 function fakeFs(held: string[], removable = held.length === 0, children: string[] = []) {
     const calls: string[] = [];
+    const warnings: string[] = [];
     const fs: TreeFs = {
         rm: (path) => { calls.push(`rm ${path}`); if (!removable) throw busy(path); },
         files: () => ['/p/dist/assets/app.js', '/p/dist/index.html', '/p/src/App.pdx'],
@@ -30,8 +31,9 @@ function fakeFs(held: string[], removable = held.length === 0, children: string[
             if (held.includes(from)) throw Object.assign(new Error('EBUSY'), { code: 'EBUSY' });
         },
         children: () => children,
+        warn: (message) => { warnings.push(message); },
     };
-    return { fs, calls };
+    return { fs, calls, warnings };
 }
 
 describe('removeTree', () => {
@@ -67,9 +69,30 @@ describe('removeTree', () => {
         expect(renames).toContain('rename /p/dist/index.html.pdx-probe -> /p/dist/index.html');
     });
 
-    it('when no file refuses, says the holder is outside the tree', () => {
-        const { fs } = fakeFs([], false);
-        expect(() => removeTree('/p', fs)).toThrow(/held: nothing in the tree refused a rename/);
+    // #699: the gate's failure, where every file and directory, the root included, could be renamed: the
+    // handle was outside this process tree, an on-access scan or the indexer. The test's subject is its
+    // output, not its cleanup, so the leftover directory is a warning, with the error and the children.
+    it('when nothing in the tree refuses a rename, warns with the directory and the error, and does not throw', () => {
+        const { fs, warnings } = fakeFs([], false, ['23644 esbuild.exe']);
+        expect(() => removeTree('/p', fs)).not.toThrow();
+        expect(warnings).toHaveLength(1);
+        expect(warnings[0]).toContain("left '/p' behind");
+        expect(warnings[0]).toContain("EBUSY: resource busy or locked, rmdir '/p'");
+        expect(warnings[0]).toContain('held: nothing in the tree refused a rename, so the holder is outside it');
+        expect(warnings[0]).toContain('children: 23644 esbuild.exe');
+    });
+
+    it('control: a held file still throws, and warns nothing', () => {
+        const { fs, warnings } = fakeFs(['/p/dist/index.html'], false, ['23644 esbuild.exe']);
+        expect(() => removeTree('/p', fs)).toThrow(/held: dist\/index\.html \(EBUSY\)/);
+        expect(warnings).toEqual([]);
+    });
+
+    it('control: a tree that cannot be listed still throws: nothing says the holder is outside it', () => {
+        const { fs, warnings } = fakeFs([], false);
+        fs.files = () => { throw Object.assign(new Error('EPERM'), { code: 'EPERM' }); };
+        expect(() => removeTree('/p', fs)).toThrow(/the tree could not be listed \(EPERM\)/);
+        expect(warnings).toEqual([]);
     });
 
     // #543: the gate's failure said no file was held. The directories are tried too, the root last.
