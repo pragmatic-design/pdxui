@@ -41,7 +41,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Open/close state (two-way bindable)</td></tr>
+            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Open/close state. A model: <code>::open</code> follows Escape, the ✕, the backdrop and a swipe down</td></tr>
             <tr><td><code>detents</code></td><td>Number[]</td><td>[0.4, 0.85]</td><td>Snap points as viewport height fractions (0-1)</td></tr>
             <tr><td><code>initialDetent</code></td><td>Number</td><td>0</td><td>Index of initial detent on open</td></tr>
             <tr><td><code>backdrop</code></td><td>Boolean</td><td>true</td><td>Show backdrop overlay</td></tr>
@@ -51,6 +51,18 @@
             <tr><td><code>showHandle</code></td><td>Boolean</td><td>true</td><td>Show the drag handle bar</td></tr>
             <tr><td><code>showClose</code></td><td>Boolean</td><td>false</td><td>Show close button in header</td></tr>
             <tr><td><code>label</code></td><td>String</td><td>''</td><td>Accessible label (aria-label)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3>
+      <div class="pdx-table-responsive">
+        <table class="pdx-table">
+          <tbody>
+            <tr><td><code>open-change</code></td><td><code>{ value }</code>: it opened, or closed itself</td></tr>
+            <tr><td><code>pdx-before-close</code></td><td>Cancelable — call preventDefault() to keep it open</td></tr>
+            <tr><td><code>pdx-detent-change</code></td><td><code>{ detent, index }</code>: it came to rest at a detent</td></tr>
+            <tr><td><code>:state(open)</code>, <code>:state(dragging)</code></td><td>Open; being dragged (no transition)</td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>root</code> (the sheet), <code>backdrop</code>, <code>handle</code>, <code>header</code>, <code>close</code>, <code>body</code>, <code>footer</code></td></tr>
           </tbody>
         </table>
       </div>

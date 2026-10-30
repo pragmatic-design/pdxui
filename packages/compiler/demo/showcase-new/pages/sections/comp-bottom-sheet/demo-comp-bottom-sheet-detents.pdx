@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Three snap points: 25%, 50%, 90%. Apple-style peek → half → full.</p>
     <pdx-button variant="outline" @click="openThree">Open 3-Detent Sheet</pdx-button>
 
-    <pdx-bottom-sheet :open="threeOpen" :detents="threeDetents" label="Three detent sheet" @pdx-close="closeThree">
+    <pdx-bottom-sheet ::open="threeOpen" :detents="threeDetents" label="Three detent sheet">
       <span slot="header"><strong>Three Detents</strong></span>
       <p>This sheet snaps to <strong>25%</strong>, <strong>50%</strong>, or <strong>90%</strong> of viewport.</p>
       <p>Drag slowly to snap to the nearest detent. Swipe fast to jump to the next one.</p>
@@ -25,5 +25,4 @@ let threeOpen = $signal(false);
 const threeDetents = [0.25, 0.5, 0.9];
 
 function openThree() { threeOpen = true; }
-function closeThree() { threeOpen = false; }
 </script>

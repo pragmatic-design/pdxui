@@ -247,6 +247,20 @@
                 api.readOpen = () => open();
             },
 
+            // pdx-bottom-sheet on the beta contract (#288), the same way.
+            'bottom-sheet-beta-contract': () => {
+                const open = signal(false);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="opener" commandfor="bound-sheet" command="--show">Actions</button>
+                        <pdx-bottom-sheet id="bound-sheet" ::open=${open} label="Bound" show-close><p>body</p><button type="button" data-test="inside">Inside</button></pdx-bottom-sheet>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
+            },
+
             // A crumb with no href has to be reachable from the keyboard.
             'breadcrumb-no-href': () => {
                 const sec = show('case-breadcrumb-no-href');

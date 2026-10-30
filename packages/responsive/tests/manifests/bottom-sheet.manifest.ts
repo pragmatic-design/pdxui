@@ -8,12 +8,12 @@
  * (light DOM, ctx.el), TWO direct children:
  *   - <div class="pdx-bottom-sheet-backdrop">
  *   - <div class="pdx-bottom-sheet" role="dialog" aria-modal="true" :aria-label>
- * → the selectors stay scoped to `section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet`.
- *
- * CAREFUL: the PANEL's class is `.pdx-bottom-sheet` (NOT `...-panel`). The backdrop is `.pdx-bottom-sheet-backdrop`.
+ * → the selectors stay scoped to `section:not([hidden]) [data-test="sheet"] [data-part=…]`: the parts
+ * (#288) are `backdrop`, `root` (the sheet, class `.pdx-bottom-sheet`), `handle`, `header`, `close`,
+ * `body`, `footer`.
  *
  * OPENING through the attribute: the scenario mounts the host with `open`. On open=true the custom element's
- * ctx.track() applies `[data-open]` (visibility:visible, transform:translateY(0)) and calls snapTo(initialDetent),
+ * ctx.track() puts the host in :state(open) (#288) (visibility:visible, transform:translateY(0)) and calls snapTo(initialDetent),
  * setting an inline height in px. `assertOverlay` with `action:'call'` does NOT click: it settles (2 rAF) and measures.
  *
  * GEOMETRY: anchored at the BOTTOM.
@@ -55,13 +55,24 @@ export const bottomSheet: ComponentManifest = {
     contracts: {
         scenarios: {
             'bottom-sheet-open': {
+                // Open is a custom state of the host (#288), what a theme selects; the sheet has no
+                // attribute for it.
+                states: [
+                    {
+                        description: 'open is the custom state :state(open), and the sheet is drawn from it',
+                        selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="sheet"]', name: 'open' },
+                        changes: { opacity: { op: '>=', value: 0.99 } },
+                    },
+                ],
                 // overlay: the panel is already open through the attribute (action:'call' → no click, just the measurement).
                 overlay: [
                     {
                         description: 'bottom sheet open with backdrop, horizontally centered (desktop)',
                         trigger: { selector: 'section:not([hidden]) [data-test="sheet"]', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
-                        backdrop: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet-backdrop',
+                        panel: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
+                        backdrop: 'section:not([hidden]) [data-test="sheet"] [data-part="backdrop"]',
                         hasBackdrop: true,
                         centering: 'horizontal',
                         maxWidth: { op: '<=', value: 640, tolerance: 1 },
@@ -69,22 +80,22 @@ export const bottomSheet: ComponentManifest = {
                 ],
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+                        selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
                         description: 'open bottom sheet panel is fully opaque',
                         opacity: { op: '==', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+                        selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
                         description: 'bottom sheet panel has non-negative border radius (top corners; metro may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+                        selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
                         description: 'bottom sheet panel is a flex column container',
                         display: { op: 'oneOf', value: ['flex', 'block', 'grid'] },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+                        selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
                         description: 'bottom sheet panel has measurable height (snapped to detent)',
                         height: { op: '>=', value: 100 },
                     },
@@ -93,10 +104,10 @@ export const bottomSheet: ComponentManifest = {
                 composition: [
                     {
                         description: 'bottom sheet is flush to the bottom viewport edge',
-                        parent: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+                        parent: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
-                            backdrop: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet-backdrop',
+                            panel: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
+                            backdrop: 'section:not([hidden]) [data-test="sheet"] [data-part="backdrop"]',
                         },
                         relations: [
                             {
@@ -131,7 +142,7 @@ export const bottomSheet: ComponentManifest = {
         scenario: 'bottom-sheet-open',
         targets: [
             // The panel: a JS-driven height + max-width 640 → a generous overlay tolerance.
-            { selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet', tolerancePx: 12 },
+            { selector: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]', tolerancePx: 12 },
         ],
     },
 
@@ -144,18 +155,18 @@ export const bottomSheet: ComponentManifest = {
         // trapContainer: after the steps, 10 Tabs and 10 Shift+Tabs stay in the sheet.
         scenario: 'bottom-sheet-open',
         initialFocus: 'section:not([hidden]) [data-test="sheet-action"]',
-        trapContainer: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet',
+        trapContainer: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]',
         steps: [
-            { key: 'Tab', expectFocusWithin: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet' },
-            { key: 'Shift+Tab', expectFocusWithin: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet' },
-            { key: 'Shift+Tab', expectFocus: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet-handle' },
+            { key: 'Tab', expectFocusWithin: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]' },
+            { key: 'Shift+Tab', expectFocusWithin: 'section:not([hidden]) [data-test="sheet"] [data-part="root"]' },
+            { key: 'Shift+Tab', expectFocus: 'section:not([hidden]) [data-test="sheet"] [data-part="handle"]' },
             {
                 key: 'ArrowUp',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet-handle', name: 'aria-valuenow', value: '1' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="sheet"] [data-part="handle"]', name: 'aria-valuenow', value: '1' },
             },
             {
                 key: 'Home',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="sheet"] .pdx-bottom-sheet-handle', name: 'aria-valuenow', value: '0' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="sheet"] [data-part="handle"]', name: 'aria-valuenow', value: '0' },
             },
         ],
     },

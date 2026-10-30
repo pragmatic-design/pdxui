@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Default detents: 40% and 85% of viewport. Drag the handle or swipe down to dismiss.</p>
     <pdx-button variant="outline" @click="openBasic">Open Bottom Sheet</pdx-button>
 
-    <pdx-bottom-sheet :open="basicOpen" label="Basic bottom sheet" @pdx-close="closeBasic">
+    <pdx-bottom-sheet ::open="basicOpen" label="Basic bottom sheet">
       <span slot="header"><strong>Basic Sheet</strong></span>
       <p>Drag the handle to resize between detent snap points.</p>
       <p class="pdx-txt-small pdx-ink-muted">Swipe down quickly to dismiss, or tap the backdrop.</p>

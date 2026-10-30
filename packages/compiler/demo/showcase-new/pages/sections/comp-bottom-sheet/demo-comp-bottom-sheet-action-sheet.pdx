@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">iOS-style action list. Small detent, list of actions, cancel at bottom.</p>
     <pdx-button variant="outline" @click="openAction">Show Actions</pdx-button>
 
-    <pdx-bottom-sheet :open="actionOpen" :detents="actionDetents" label="Actions" @pdx-close="closeAction">
+    <pdx-bottom-sheet ::open="actionOpen" :detents="actionDetents" label="Actions">
       <span slot="header"><strong>Choose Action</strong></span>
       <div class="action-list">
         <button class="action-item" @click="pickAction('Share')">
