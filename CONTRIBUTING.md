@@ -208,6 +208,15 @@ completes, the table says how many runs it is the median of, the failed runs are
 and the command exits 1. `node --test scripts/bench-jfb/summarize.test.mjs` tests the table, and
 `runs.test.mjs` the runs.
 
+The four benchmarks whose vanillajs script takes under a millisecond (update every 10th row, select,
+swap, remove one) take 100 samples each, the others the benchmark's own count: their spread is wide
+and the benchmark reports in steps of 0.1 ms. `--json` records the means of the samples beside the
+medians, under `$means`. To see how noisy a statistic is over runs already made,
+`node scripts/bench-jfb/bench-all.mjs <folder>` fetches the nightly history (it needs the GitHub CLI),
+and `node scripts/bench-jfb/bench-replay.mjs <folder>` prints, per metric, the pooled spread of
+ln(ratio) within runs of the same code, for the medians and for the means. It reads a folder of
+same-runner A/B rounds (`<ref>-r<n>`, jfb results) as well.
+
 ### How signals flush
 
 `pnpm --filter @pdxui/core run bench` times one event handler's writes under two flush strategies:

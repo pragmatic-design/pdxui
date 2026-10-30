@@ -13,7 +13,11 @@
 // clean. PDX is built from this checkout: core and compiler first, then the app in this folder.
 //
 // --json <file> also writes the combined medians of every framework of the run to that file, which
-// thresholds.mjs holds to thresholds in the nightly job (#248).
+// thresholds.mjs holds to thresholds in the nightly job (#248), and the combined means of the samples
+// under `$means` (#736).
+//
+// The four benchmarks whose vanillajs script is under a millisecond take 100 samples, the others the
+// benchmark's own count (runs.mjs, SUB_MS_BENCHMARKS, #736).
 //
 // A run that fails does not lose the others (runs.mjs, #374): each completed run's medians are written
 // to <clone>/pdx-runs/<start time>/run-<i>.json as it completes, the table is the median of the runs
@@ -39,7 +43,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { combineRuns, readRun, toMarkdown } from './summarize.mjs';
 import { measureSelect10k, select10kMarkdown } from './select10k.mjs';
-import { collectRuns, runsTitle } from './runs.mjs';
+import { collectRuns, jfbInvocations, runsTitle } from './runs.mjs';
 
 const JFB_REPO = 'https://github.com/krausest/js-framework-benchmark.git';
 // The commit the procedure was first run against by hand (2026-10-10). Moving it is a change to
@@ -289,13 +293,17 @@ async function main() {
                 step(`run ${i} of ${options.runs}: ${frameworks.join(', ')}`);
                 const results = join(webdriver, 'results');
                 rmSync(results, { recursive: true, force: true });
-                const args = ['dist/benchmarkRunner.js', ...browserArgs, '--framework', ...frameworks.map(f => `keyed/${f}`)];
-                if (options.only.length) args.push('--benchmark', ...options.only);
-                run(process.execPath, args, webdriver, env);
-                const measured = readRun(results);
-                const missing = frameworks.filter(f => !measured[f]);
+                // Two invocations into one results folder: the four sub-millisecond benchmarks take more
+                // samples, and --count applies to every benchmark of an invocation (#736, runs.mjs).
+                for (const { benchmarks, count } of jfbInvocations(options.only)) {
+                    const args = ['dist/benchmarkRunner.js', ...browserArgs, '--framework', ...frameworks.map(f => `keyed/${f}`),
+                        '--benchmark', ...benchmarks, ...(count ? ['--count', String(count)] : [])];
+                    run(process.execPath, args, webdriver, env);
+                }
+                const medians = readRun(results);
+                const missing = frameworks.filter(f => !medians[f]);
                 if (missing.length) throw new Error(`run ${i} has no results for ${missing.join(', ')}`);
-                return measured;
+                return { medians, means: readRun(results, 'mean') };
             },
         }));
         if (runs.length === 0) {
@@ -313,7 +321,7 @@ async function main() {
     }
 
     console.log(`\n## js-framework-benchmark, ${runsTitle(runs.length, options.runs)} (benchmark ${JFB_COMMIT.slice(0, 12)})\n`);
-    const combined = combineRuns(runs);
+    const combined = combineRuns(runs.map(r => r.medians));
     console.log(toMarkdown(combined, frameworks));
     // A failed run is reported beside the table it is missing from, and the command fails: the table
     // stands for the runs it has, and says how many.
@@ -323,8 +331,11 @@ async function main() {
         process.exitCode = 1;
     }
     if (options.json) {
-        writeFileSync(resolve(options.json), JSON.stringify(combined, null, 2));
-        console.log(`\n[bench:jfb] the combined medians are in ${resolve(options.json)}`);
+        // The medians as before, at the top; the means beside them under `$means`, a key no framework
+        // folder can have, so a reader of the medians alone is unchanged (#736).
+        const means = combineRuns(runs.map(r => r.means));
+        writeFileSync(resolve(options.json), JSON.stringify({ ...combined, $means: means }, null, 2));
+        console.log(`\n[bench:jfb] the combined medians, and the means under $means, are in ${resolve(options.json)}`);
     }
     // A local check, measured on the same builds after the runs, and kept apart from them (#117).
     console.log('\n## Local check, not part of js-framework-benchmark\n');

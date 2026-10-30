@@ -53,12 +53,46 @@ describe('checkThresholds', () => {
         const { failures } = checkThresholds(RUN, { ratio: { '01_run1k script': null }, memoryMB: {} });
         expect(failures).toEqual([expect.stringContaining('01_run1k script')]);
     });
+
+    // #736: the means of jfb's samples, recorded beside the medians under `$means`. A threshold says
+    // which it was derived on; a bare number is a median, as every threshold was before.
+    describe('a threshold of the means', () => {
+        const WITH_MEANS = {
+            ...RUN,
+            $means: {
+                vanillajs: { '04_select1k script': 1.0 },
+                pdx: { '04_select1k script': 1.5 },
+            },
+        };
+
+        it('reads the means: the ratio is of the means, and the row says so', () => {
+            const { failures, rows } = checkThresholds(WITH_MEANS, { ratio: { '04_select1k script': { max: 1.6, of: 'mean' } } });
+            expect(failures).toEqual([]);
+            expect(rows).toEqual([expect.objectContaining({ metric: '04_select1k script', of: 'mean', value: 1.5, threshold: 1.6, ok: true })]);
+        });
+
+        it('fails a ratio of the means over its threshold', () => {
+            const { failures } = checkThresholds(WITH_MEANS, { ratio: { '04_select1k script': { max: 1.4, of: 'mean' } } });
+            expect(failures).toEqual([expect.stringContaining('04_select1k script')]);
+        });
+
+        it('control — a bare number still reads the medians, with the means beside them', () => {
+            const { rows } = checkThresholds(WITH_MEANS, { ratio: { '04_select1k script': 1.2 } });
+            expect(rows).toEqual([expect.objectContaining({ of: 'median', value: 1.1 })]);
+        });
+
+        it('fails a threshold of the means when the run recorded none, rather than reading the medians', () => {
+            const { failures } = checkThresholds(RUN, { ratio: { '04_select1k script': { max: 2, of: 'mean' } } });
+            expect(failures).toEqual([expect.stringContaining('04_select1k script')]);
+        });
+    });
 });
 
 // The run's own summary — reading the results, combining runs, the table — has node:test tests of
 // its own beside it, which no gate ran: found while doing #248. They run here, so `pnpm test` does.
 // And the runs of a comparison, kept as they complete when a later one fails (#374).
-for (const name of ['summarize.test.mjs', 'runs.test.mjs']) {
+// And the replay of a rule over runs already made (#736).
+for (const name of ['summarize.test.mjs', 'runs.test.mjs', 'bench-replay.test.mjs']) {
     describe(`scripts/bench-jfb/${name}`, () => {
         it('passes under node --test', () => {
             const file = join(__dirname, '..', '..', '..', 'scripts', 'bench-jfb', name);

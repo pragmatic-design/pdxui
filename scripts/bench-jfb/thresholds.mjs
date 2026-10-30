@@ -2,10 +2,15 @@
 // node scripts/bench-jfb/thresholds.mjs <bench.json>
 //
 // Holds PDX to thresholds over a js-framework-benchmark run (#248). `<bench.json>` is what
-// `pnpm bench:jfb --json` writes: the combined medians of every framework of the run.
+// `pnpm bench:jfb --json` writes: the combined medians of every framework of the run, and since #736
+// the combined means of the samples under `$means`.
 //
 // - Script times are held as the RATIO of PDX to vanillajs in the same run: a ratio carries across
 //   machines, a millisecond does not.
+// - A ratio threshold is a number, held against the ratio of the medians, or `{ "max": …, "of": "mean" }`,
+//   held against the ratio of the means (#736). Each says the statistic it was derived on: the means
+//   are steadier on a sub-millisecond script, and a threshold moves to them once the nightlies that
+//   recorded them are enough to derive it (bench-replay.mjs measures that).
 // - Memory is held in MB, absolute.
 // - A threshold of null is reported and not held: that is how the first nightly measures. A metric
 //   the run does not have fails, whatever its threshold, rather than passing in silence.
@@ -31,20 +36,24 @@ const TARGETS = [
 ];
 
 /**
- * Check a run against thresholds. `data` is `{ [framework]: { [metric]: median } }`; `thresholds`
- * is `{ ratio: { [metric]: max | null }, memoryMB: { [metric]: max | null } }`. Returns the rows to
- * print and the failures, each naming its metric.
+ * Check a run against thresholds. `data` is `{ [framework]: { [metric]: median }, $means?: { [framework]:
+ * { [metric]: mean } } }`; `thresholds` is `{ ratio: { [metric]: max | null | { max, of } }, memoryMB:
+ * { [metric]: max | null } }`. Returns the rows to print and the failures, each naming its metric.
  */
 export function checkThresholds(data, thresholds) {
     const rows = [];
     const failures = [];
-    const subject = data[SUBJECT] ?? {};
-    const base = data[BASELINE] ?? {};
 
-    for (const [metric, threshold] of Object.entries(thresholds.ratio ?? {})) {
+    for (const [metric, entry] of Object.entries(thresholds.ratio ?? {})) {
+        const { max, of } = entry !== null && typeof entry === 'object' ? entry : { max: entry, of: 'median' };
+        // The means are their own table: a threshold of the means never falls back to the medians.
+        const table = of === 'mean' ? data.$means ?? {} : data;
+        const subject = table[SUBJECT] ?? {};
+        const base = table[BASELINE] ?? {};
         const value = subject[metric] !== undefined && base[metric] ? subject[metric] / base[metric] : undefined;
-        rows.push(row('ratio', metric, value, threshold, failures, `${SUBJECT}/${BASELINE}`));
+        rows.push({ ...row('ratio', metric, value, max, failures, `${SUBJECT}/${BASELINE}, ${of}s`), of });
     }
+    const subject = data[SUBJECT] ?? {};
     for (const [metric, threshold] of Object.entries(thresholds.memoryMB ?? {})) {
         rows.push(row('memoryMB', metric, subject[metric], threshold, failures, 'MB'));
     }
@@ -65,7 +74,7 @@ function markdown(rows, data) {
     const lines = [
         '| metric | measured | threshold | |',
         '|---|---|---|---|',
-        ...rows.map((r) => `| ${r.metric} (${r.kind === 'ratio' ? '× vanillajs' : 'MB'}) | ${r.value === undefined ? '—' : r.value.toFixed(2)} | ${r.threshold ?? 'not held yet'} | ${r.ok ? 'ok' : 'FAIL'} |`),
+        ...rows.map((r) => `| ${r.metric} (${r.kind === 'ratio' ? `× vanillajs, ${r.of}s` : 'MB'}) | ${r.value === undefined ? '—' : r.value.toFixed(2)} | ${r.threshold ?? 'not held yet'} | ${r.ok ? 'ok' : 'FAIL'} |`),
         '',
         '| PDX, absolute | measured | the specification |',
         '|---|---|---|',

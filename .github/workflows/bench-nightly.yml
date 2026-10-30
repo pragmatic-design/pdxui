@@ -30,7 +30,10 @@ jobs:
   bench:
     name: js-framework-benchmark thresholds
     runs-on: ubuntu-24.04
-    timeout-minutes: 90
+    # About 2 h 20 min from #736, when the four sub-millisecond benchmarks went to 100 samples each:
+    # jfb takes 2.5 to 2.9 s a sample whatever it measures, and those benchmarks went from 70 to 410
+    # samples per framework per run (select1k keeps jfb's 10 extra). Was 90, for a job of about 50 min.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
