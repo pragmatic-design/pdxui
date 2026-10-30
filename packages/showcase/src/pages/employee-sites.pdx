@@ -61,10 +61,9 @@
     <!-- ADD, in a modal. The site comes from a PAGED, SEARCHED source, as intake picks a customer:
          the picker asks for a page, `siteTransport` answers with that page and a total. -->
     <pdx-dialog
-      :open="addOpen"
+      ::open="addOpen"
       size="lg"
       :title="$t('employees.sites.add')"
-      @pdx-close="addOpen = false"
       data-test="site-dialog">
       <pdx-relation-picker
         :source="sites"

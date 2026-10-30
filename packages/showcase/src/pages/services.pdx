@@ -27,7 +27,7 @@
       data-test="grid"></pdx-data-grid>
 
     <!-- NEW, in a modal: its terms, then the service opens. -->
-    <pdx-dialog :open="createOpen" size="lg" :title="$t('services.new')" @pdx-close="createOpen = false" data-test="create-dialog">
+    <pdx-dialog ::open="createOpen" size="lg" :title="$t('services.new')" data-test="create-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="create-form">
         <div class="grid">
           <pdx-form-field :field="draft.code" :label="$t('services.fields.code')">

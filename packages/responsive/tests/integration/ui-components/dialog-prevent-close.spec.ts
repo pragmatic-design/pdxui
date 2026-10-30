@@ -17,7 +17,8 @@ type Read = { open: boolean; panelPresent: boolean; beforeCloseCount: number };
 async function open(page: Page): Promise<void> {
     await openPage(page, BASE);
     await page.evaluate(() => (window as unknown as { __gotcha: { openDialog(): void } }).__gotcha.openDialog());
-    await page.waitForSelector('.pdx-dialog-backdrop[data-open]');
+    // The host has no box of its own: what is waited for is the state, not a visible host.
+    await page.waitForSelector('pdx-dialog:state(open)', { state: 'attached' });
     await page.waitForTimeout(300);
 }
 

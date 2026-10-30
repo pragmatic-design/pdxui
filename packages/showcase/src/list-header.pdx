@@ -33,7 +33,7 @@
     <!-- The name, asked in the page: a browser prompt is unstyled, untranslated and outside the
          app's focus. One dialog for Save as and Rename. -->
     <pdx-dialog :open="naming !== ''" size="sm" :title="naming === 'rename' ? $t('app.views.renameTitle') : $t('app.views.saveAsTitle')"
-      @pdx-close="naming = ''" data-test="view-name-dialog">
+      @open-change="if ($event.detail.value) return; naming = ''" data-test="view-name-dialog">
       <form class="name-form" @submit="commitName">
         <pdx-form-field :label="$t('app.views.name')" :error="nameError" :show-error="nameError !== ''">
           <pdx-input :value="draft" :aria-label="$t('app.views.name')" autofocus @value-change="e => { draft = e.currentTarget.value; nameError = ''; }" data-test="view-name"></pdx-input>

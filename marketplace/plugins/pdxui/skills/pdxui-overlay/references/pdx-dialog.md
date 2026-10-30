@@ -4,7 +4,6 @@ A modal window with focus trap.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `title` | `title` | string | `''` | The dialog heading. |
 | `closeOnBackdrop` | `closeonbackdrop` | boolean | `true` | Close when the backdrop is clicked. |
 | `closeOnEscape` | `closeonescape` | boolean | `true` | Close when the Escape key is pressed. |
@@ -13,6 +12,7 @@ A modal window with focus trap.
 | `preventClose` | `preventclose` | boolean | `false` | Blocks all dismiss paths (must close programmatically). |
 | `loading` | `loading` | boolean | `false` | Show loading state |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' \| 'xl' \| 'full' | `'md'` | sm, md (the default), lg, xl or full. |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
@@ -23,11 +23,15 @@ A modal window with focus trap.
 | `toggle()` | Toggles it open/closed. |
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
-**Events:** `pdx-before-close` — Fired (cancelable) before closing; call preventDefault() to block it.; `pdx-close` — Fired after the dialog closes. Does not bubble.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-before-close` — Fired (cancelable) before closing; call preventDefault() to block it.
 
 **Renders:** roles `dialog`
 
 **Slot:** `footer` — Action area at the bottom (e.g. Confirm/Cancel); hidden automatically when empty.
+
+**States:** `:state(open)` — Matched with `:state(open)`.; `:state(loading)` — Matched with `:state(loading)`.; `:state(scroll-top)` — Matched with `:state(scroll-top)`.; `:state(scroll-bottom)` — Matched with `:state(scroll-bottom)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.
 
 
 #### Examples
@@ -41,7 +45,7 @@ are checked against the manifest above._
 ```html
 <pdx-button variant="primary" @click="openBasic">Open Dialog</pdx-button>
 
-<pdx-dialog :open="basicOpen" title="Welcome" @pdx-close="closeBasic">
+<pdx-dialog ::open="basicOpen" title="Welcome">
   <p>Dialog body content here.</p>
 </pdx-dialog>
 ```
@@ -49,7 +53,7 @@ are checked against the manifest above._
 **Sizes** — 5 sizes: sm (360px), md (480px, default), lg (640px), xl (800px), full.
 
 ```html
-<pdx-dialog :open="sizeOpen" title="Dialog" size="sm" @pdx-close="close">
+<pdx-dialog ::open="sizeOpen" title="Dialog" size="sm">
   <p>Content</p>
 </pdx-dialog>
 
@@ -59,7 +63,7 @@ are checked against the manifest above._
 **With Footer Actions** — Footer slot for action buttons — confirm/cancel pattern.
 
 ```html
-<pdx-dialog :open="footerOpen" title="Edit Profile" size="md" @pdx-close="closeFooter">
+<pdx-dialog ::open="footerOpen" title="Edit Profile" size="md">
   <div class="form-fields">
     <label>Full Name</label>
     <input type="text" class="pdx-input" value="Jane Smith" />
@@ -74,7 +78,7 @@ are checked against the manifest above._
 **Scrollable Content** — Long content scrolls within the body — header and footer stay fixed. Scroll shadows appear at edges.
 
 ```html
-<pdx-dialog :open="scrollOpen" title="Terms of Service" size="md" @pdx-close="closeScroll">
+<pdx-dialog ::open="scrollOpen" title="Terms of Service" size="md">
   <div class="long-content">
     <h3>1. Acceptance of Terms</h3>
     <p>Long scrollable content...</p>
@@ -89,8 +93,8 @@ are checked against the manifest above._
 **Prevent Close** — Use `prevent-close` to intercept close attempts. Useful for unsaved changes confirmation.
 
 ```html
-<pdx-dialog :open="preventOpen" title="Edit Document" size="md"
-  prevent-close @pdx-before-close="onBeforeClose" @pdx-close="closePrevent">
+<pdx-dialog ::open="preventOpen" title="Edit Document" size="md"
+  prevent-close @pdx-before-close="onBeforeClose">
   <p>Try closing — you'll be asked in the page first.</p>
   <span slot="footer">
     <pdx-button variant="ghost" @click="closePrevent">Discard</pdx-button>
@@ -129,12 +133,12 @@ async function onBeforeClose() {
 **Nested Dialogs** — Dialogs stack via overlayStack — each gets a higher z-index. Escape closes only the topmost.
 
 ```html
-<pdx-dialog :open="nested1Open" title="First Dialog" size="lg" @pdx-close="closeNested1">
+<pdx-dialog ::open="nested1Open" title="First Dialog" size="lg">
   <p>First dialog content.</p>
   <pdx-button variant="primary" @click="openNested2">Open Nested</pdx-button>
 </pdx-dialog>
 
-<pdx-dialog :open="nested2Open" title="Nested Dialog" size="sm" @pdx-close="closeNested2">
+<pdx-dialog ::open="nested2Open" title="Nested Dialog" size="sm">
   <p>Nested dialog on top. Escape closes only this one.</p>
 </pdx-dialog>
 ```
@@ -142,8 +146,8 @@ async function onBeforeClose() {
 **Initial Focus** — Control which element receives focus when the dialog opens via `initial-focus` selector.
 
 ```html
-<pdx-dialog :open="focusOpen" title="Login" size="sm"
-  :initialfocus="'.focus-email'" @pdx-close="closeFocus">
+<pdx-dialog ::open="focusOpen" title="Login" size="sm"
+  :initialfocus="'.focus-email'">
   <input type="text" class="pdx-input" placeholder="username" />
   <input type="email" class="pdx-input focus-email" placeholder="email" />
   <span slot="footer">

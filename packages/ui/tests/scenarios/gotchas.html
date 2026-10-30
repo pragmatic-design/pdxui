@@ -172,7 +172,7 @@
                 const dlg = sec.querySelector('pdx-dialog');
                 api.read = () => ({
                     open: !!dlg.open,
-                    panelPresent: !!document.querySelector('.pdx-dialog-backdrop[data-open]'),
+                    panelPresent: !!document.querySelector('pdx-dialog:state(open)'),
                 });
             },
 
@@ -195,9 +195,24 @@
                 api.callClose = () => dlg.close?.();
                 api.read = () => ({
                     open: !!dlg.open,
-                    panelPresent: !!document.querySelector('.pdx-dialog-backdrop[data-open]'),
+                    panelPresent: !!document.querySelector('pdx-dialog:state(open)'),
                     beforeCloseCount: api._before,
                 });
+            },
+
+            // pdx-dialog on the beta contract (#288): `::open` bound to a signal, as a template binds it,
+            // and a button that opens it with an invoker command.
+            'dialog-beta-contract': () => {
+                const open = signal(false);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="opener" commandfor="bound-dlg" command="--show">Open</button>
+                        <pdx-dialog id="bound-dlg" ::open=${open} title="Bound"><p>body</p><button type="button" data-test="inside">Inside</button></pdx-dialog>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
             },
 
             // A crumb with no href has to be reachable from the keyboard.

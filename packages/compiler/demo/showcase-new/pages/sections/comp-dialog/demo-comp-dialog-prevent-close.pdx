@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading">Prevent Close</h2>
     <p class="pdx-txt-small pdx-ink-muted">Use <code>prevent-close</code> to intercept close attempts. Useful for unsaved changes confirmation.</p>
     <pdx-button variant="warning" size="sm" @click="openPrevent">Edit with Unsaved Warning</pdx-button>
-    <pdx-dialog :open="preventOpen" title="Edit Document" size="md" prevent-close @pdx-before-close="onBeforeClose" @pdx-close="closePrevent">
+    <pdx-dialog ::open="preventOpen" title="Edit Document" size="md" prevent-close @pdx-before-close="onBeforeClose">
       <p>Try closing this dialog — you'll be asked in the page first, because <code>prevent-close</code> is enabled.</p>
       <div style="margin-top: var(--pdx-space-md)">
         <label class="pdx-txt-small pdx-ink-muted">Document Title</label>
@@ -19,8 +19,8 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="preventOpen" title="Edit Document" size="md"
-  prevent-close @pdx-before-close="onBeforeClose" @pdx-close="closePrevent"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog ::open="preventOpen" title="Edit Document" size="md"
+  prevent-close @pdx-before-close="onBeforeClose"&gt;
   &lt;p&gt;Try closing — you'll be asked in the page first.&lt;/p&gt;
   &lt;span slot="footer"&gt;
     &lt;pdx-button variant="ghost" @click="closePrevent"&gt;Discard&lt;/pdx-button&gt;

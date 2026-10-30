@@ -108,7 +108,7 @@ and in a build alike. A hand-written TypeScript component can call it the same w
 ## React to the user: `@event`
 
 `@event="…"` runs when the event fires. `event` is any DOM event (`click`, `input`, `keydown`) or a
-custom component event (`pdx-close`). The value can be a reference, an expression, or a small block —
+custom component event (`open-change`). The value can be a reference, an expression, or a small block —
 whatever reads best:
 
 ```pdx
@@ -119,7 +119,7 @@ whatever reads best:
 <input @input="name = $event.target.value" />     <!-- $event = the raw event (Vue-style) -->
 <input @keydown="e => onKey(e.key)" />             <!-- a lambda; the param stays local -->
 <button @click="count++; touched = true">…</button>  <!-- several statements, run in order -->
-<pdx-dialog @pdx-close="onClose" />                <!-- custom component event -->
+<pdx-dialog @open-change="onOpenChange" />         <!-- custom component event -->
 ```
 
 You don't manage subscription/teardown — the compiler wires `addEventListener` and removes it when

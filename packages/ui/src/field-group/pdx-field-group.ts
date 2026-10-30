@@ -98,7 +98,7 @@ component('pdx-field-group', {
                     ${() => ctx._dialogOpen() ? html`
                         <pdx-dialog :open="${() => true}"
                                      :title="${ctx.label}"
-                                     @pdx-close="${ctx.closeDialog}">
+                                     @open-change="${(e: CustomEvent<{ value: boolean }>) => { if (!e.detail.value) ctx.closeDialog(); }}">
                             <div class="pdx-field-group-content">
                                 <slot></slot>
                             </div>

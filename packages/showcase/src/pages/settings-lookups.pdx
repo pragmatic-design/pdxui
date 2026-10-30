@@ -84,7 +84,7 @@
     </div>
 
     <!-- A new category: its name in both languages, its colour, and what it applies to. -->
-    <pdx-dialog :open="adding" size="md" :title="$t('settings.categories.add')" @pdx-close="adding = false" data-test="category-dialog">
+    <pdx-dialog ::open="adding" size="md" :title="$t('settings.categories.add')" data-test="category-dialog">
       <form class="add-form" @submit="saveNew">
         <pdx-form-field :label="$t('settings.categories.en')" :error="addError" :show-error="addError !== ''">
           <pdx-input :value="draftEn" @value-change="e => { draftEn = e.currentTarget.value; addError = ''; }" data-test="category-en"></pdx-input>

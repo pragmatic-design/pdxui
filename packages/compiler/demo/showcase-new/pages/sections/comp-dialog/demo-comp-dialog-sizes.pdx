@@ -9,7 +9,7 @@
       <pdx-button variant="outline" size="sm" @click="openSize" data-size="xl">X-Large</pdx-button>
       <pdx-button variant="outline" size="sm" @click="openSize" data-size="full">Full</pdx-button>
     </div>
-    <pdx-dialog :open="sizeOpen" :title="sizeTitle" :size="currentSize" @pdx-close="closeSizeDialog">
+    <pdx-dialog ::open="sizeOpen" :title="sizeTitle" :size="currentSize">
       <p>This dialog uses the <strong>{{ currentSize }}</strong> size variant.</p>
       <p class="pdx-txt-small pdx-ink-muted" style="margin-top: var(--pdx-space-sm)">
         Resize your browser to see how the dialog adapts responsively.
@@ -18,7 +18,7 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog :open="sizeOpen" title="Dialog" size="sm" @pdx-close="close"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-dialog ::open="sizeOpen" title="Dialog" size="sm"&gt;
   &lt;p&gt;Content&lt;/p&gt;
 &lt;/pdx-dialog&gt;
 
@@ -37,7 +37,6 @@ function openSize(e) {
   sizeOpen = true;
 }
 
-function closeSizeDialog() { sizeOpen = false; }
 </script>
 
 <style scoped>

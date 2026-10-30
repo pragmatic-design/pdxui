@@ -36,7 +36,8 @@ describe('open-change-event: the mechanical rewrite', () => {
     });
 
     it('a tag that has not moved to open-change is left alone', () => {
-        const source = '<pdx-dialog @pdx-close="done = true"></pdx-dialog>';
+        // pdx-tabs' pdx-close closes a tab, a result: it stays.
+        const source = '<pdx-tabs @pdx-close="done = true"></pdx-tabs>';
         expect(openChangeEvent.detect(source)).toEqual([]);
         expect(fix(source)).toBe(source);
     });
@@ -117,6 +118,13 @@ describe('tree-select: its popup events and its undeclared methods', () => {
         expect(script('t.openTreeSelect(); t?.closeTreeSelect();')).toBe('t.show(); t?.close();');
         const template = treeSelectOverlayVerbs.fix as (text: string) => string;
         expect(template('<template><button @click="t.closeTreeSelect()">x</button></template>')).toBe('<template><button @click="t.close()">x</button></template>');
+    });
+});
+
+describe('the overlays of #288', () => {
+    it('`@pdx-close` on a pdx-dialog is rewritten: its open is a model, announced by open-change', () => {
+        expect(fix('<pdx-dialog :open="editing" @pdx-close="editing = false"></pdx-dialog>'))
+            .toBe('<pdx-dialog :open="editing" @open-change="if ($event.detail.value) return; editing = false"></pdx-dialog>');
     });
 });
 
@@ -216,7 +224,7 @@ describe('the registry', () => {
     });
 
     it('control: `@pdx-close` on a component that keeps it is not reported', () => {
-        const r = compile('<template>\n  <pdx-dialog @pdx-close="n++"></pdx-dialog>\n</template>\n<script>\nlet n = $signal(0);\n</script>\n', 'f.pdx');
+        const r = compile('<template>\n  <pdx-tabs @pdx-close="n++"></pdx-tabs>\n</template>\n<script>\nlet n = $signal(0);\n</script>\n', 'f.pdx');
         expect(r.warnings.filter((w) => w.code === 'PDX_REMOVED_FORM')).toEqual([]);
     });
 });

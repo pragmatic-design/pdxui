@@ -25,7 +25,10 @@
                 visibility 0s linear var(--pdx-duration-base, 200ms);
 }
 
-.pdx-dialog-backdrop[data-open] {
+/* Open: pdx-dialog's custom state (#288); `[data-open]` is the alert dialog's, the overlay outlet's and
+   native markup's, which draw the same backdrop. */
+.pdx-dialog-backdrop[data-open],
+pdx-dialog:state(open) > .pdx-dialog-backdrop {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-base, 200ms) ease,
@@ -66,7 +69,8 @@
  * The drawer follows the same rule. If you add another overlay that animates with a transform, it
  * needs this too.
  */
-.pdx-dialog-backdrop[data-open] .pdx-dialog-panel {
+.pdx-dialog-backdrop[data-open] .pdx-dialog-panel,
+pdx-dialog:state(open) > .pdx-dialog-backdrop > .pdx-dialog-panel {
     transform: none;
     opacity: 1;
 }
@@ -113,14 +117,15 @@
     flex: 1;
 }
 
-/* Scroll shadow indicators */
-.pdx-dialog-body.pdx-scroll-top {
+/* Scroll shadow indicators: the dialog's custom states (#288), more above and more below. Each step is
+   a child, so a dialog nested in the body does not take its parent's shadows. */
+pdx-dialog:state(scroll-top) > .pdx-dialog-backdrop > .pdx-dialog-panel > .pdx-dialog-body {
     box-shadow: inset 0 8px 6px -6px oklch(0 0 0 / 0.08);
 }
-.pdx-dialog-body.pdx-scroll-bottom {
+pdx-dialog:state(scroll-bottom) > .pdx-dialog-backdrop > .pdx-dialog-panel > .pdx-dialog-body {
     box-shadow: inset 0 -8px 6px -6px oklch(0 0 0 / 0.08);
 }
-.pdx-dialog-body.pdx-scroll-top.pdx-scroll-bottom {
+pdx-dialog:state(scroll-top):state(scroll-bottom) > .pdx-dialog-backdrop > .pdx-dialog-panel > .pdx-dialog-body {
     box-shadow: inset 0 8px 6px -6px oklch(0 0 0 / 0.08),
                 inset 0 -8px 6px -6px oklch(0 0 0 / 0.08);
 }

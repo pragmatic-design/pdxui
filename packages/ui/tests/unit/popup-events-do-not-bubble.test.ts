@@ -41,12 +41,12 @@ function count(el: HTMLElement, type: string): () => number {
 describe('a popup inside a popup: the inner one\'s events stay on it', () => {
     beforeEach(cleanup);
 
-    // The select announces its popup with open-change (#287), which no more bubbles than pdx-close did.
+    // The select announces its popup with open-change (#287), which no more bubbles than pdx-close did;
+    // the dialog announces its own open state with open-change too (#288), so that is what it must not hear.
     it('pdx-select in pdx-dialog: the select\'s open and close do not reach the dialog', async () => {
         const { outer, inner } = await nest('pdx-dialog', 'pdx-select', (s) => {
             (s as HTMLElement & { options: unknown[] }).options = [{ value: 'rossi', label: 'Dr. Rossi' }];
         });
-        const dialogCloses = count(outer, 'pdx-close');
         const dialogChanges = count(outer, 'open-change');
         const selectChanges = count(inner, 'open-change');
 
@@ -57,8 +57,7 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
         await tick(20);
 
         expect(selectChanges(), 'the select did not announce its own open and close').toBe(2);
-        expect(dialogCloses(), 'the dialog heard the select close, and an app would close the dialog').toBe(0);
-        expect(dialogChanges(), 'the select\'s open-change bubbled to the dialog').toBe(0);
+        expect(dialogChanges(), 'the select\'s open-change bubbled to the dialog, and an app would close the dialog').toBe(0);
     });
 
     // The picker announces its popup with open-change too (#287).
@@ -100,7 +99,8 @@ describe('a popup inside a popup: the inner one\'s events stay on it', () => {
 });
 
 // ─── Guard: every emission of the three names says bubbles: false ───────────
-// A new component that emits a bubbling pdx-close puts the vanishing dialog back, silently.
+// A new component that emits a bubbling pdx-close puts the vanishing dialog back, silently. The overlays
+// trade the pair for `open-change` (#287, #288), which is guarded too: it never says bubbles: true.
 describe('guard: pdx-open, pdx-close and pdx-toggle are emitted with { bubbles: false }', () => {
     const SRC = join(__dirname, '../../src');
     const files = (dir: string, acc: string[] = []): string[] => {
@@ -113,7 +113,7 @@ describe('guard: pdx-open, pdx-close and pdx-toggle are emitted with { bubbles: 
     };
 
     it('finds emissions to check at all', () => {
-        const hits = files(SRC).flatMap((f) => readFileSync(f, 'utf8').match(/emit\(\s*'pdx-(open|close|toggle)'/g) ?? []);
+        const hits = files(SRC).flatMap((f) => readFileSync(f, 'utf8').match(/emit\(\s*'(pdx-open|pdx-close|pdx-toggle|open-change)'/g) ?? []);
         // A zero here would make the assertion below pass by measuring nothing.
         expect(hits.length).toBeGreaterThan(10);
     });
@@ -133,5 +133,19 @@ describe('guard: pdx-open, pdx-close and pdx-toggle are emitted with { bubbles: 
             }
         }
         expect(offenders, 'these still bubble to every ancestor').toEqual([]);
+    });
+
+    it('no emission of open-change says bubbles: true', () => {
+        const offenders: string[] = [];
+        // Match: emit('open-change' — then the rest of that call's line.
+        const re = /emit\(\s*['"`]open-change['"`][^\n]*/g;
+        for (const f of files(SRC)) {
+            const text = readFileSync(f, 'utf8');
+            let m: RegExpExecArray | null;
+            while ((m = re.exec(text)) !== null) {
+                if (/bubbles:\s*true/.test(m[0])) offenders.push(`${relative(SRC, f)}:${text.slice(0, m.index).split('\n').length}  ${m[0].trim()}`);
+            }
+        }
+        expect(offenders, 'an overlay\'s open state reaches every ancestor').toEqual([]);
     });
 });

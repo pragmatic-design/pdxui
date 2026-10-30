@@ -19,7 +19,8 @@ test.describe('an exposed method is an invoker command', () => {
         expect((await read(page)).open, 'open before anyone asked').toBe(false);
 
         await page.locator('[data-test="show"]').click();
-        await page.waitForSelector('.pdx-dialog-backdrop[data-open]');
+        // The host has no box of its own: what is waited for is the state, not a visible host.
+        await page.waitForSelector('pdx-dialog:state(open)', { state: 'attached' });
         expect((await read(page)).open).toBe(true);
 
         await page.locator('[data-test="close"]').click();

@@ -58,7 +58,7 @@
     @show (saved !== '') { <p class="pdx-txt-small pdx-ink-muted" role="status" data-test="saved">{{ saved }}</p> }
 
     <!-- A NEW role: a name, and whose permissions it starts from. The key is the name's, made unique. -->
-    <pdx-dialog :open="newOpen" size="md" :title="$t('settings.permissions.newRole')" @pdx-close="newOpen = false" data-test="role-dialog">
+    <pdx-dialog ::open="newOpen" size="md" :title="$t('settings.permissions.newRole')" data-test="role-dialog">
       <pdx-form :form="draft" @pdx-submit="onCreate" data-test="role-form">
         <pdx-form-field :field="draft.name" :label="$t('settings.permissions.roleName')">
           <pdx-input name="name" ::value="draft.name" data-test="new-role-name"></pdx-input>

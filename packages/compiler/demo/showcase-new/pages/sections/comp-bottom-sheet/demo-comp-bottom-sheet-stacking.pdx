@@ -9,7 +9,7 @@
       <p>Click the button below to open a dialog on top of this sheet.</p>
       <pdx-button variant="primary" size="sm" @click="openNestedDialog">Open Dialog</pdx-button>
 
-      <pdx-dialog :open="nestedDialogOpen" title="Confirm" size="sm" @pdx-close="closeNestedDialog">
+      <pdx-dialog ::open="nestedDialogOpen" title="Confirm" size="sm">
         <p>This dialog is stacked above the bottom sheet.</p>
         <p class="pdx-txt-small pdx-ink-muted">Escape closes this dialog first, then the sheet.</p>
         <span slot="footer">
