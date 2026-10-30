@@ -44,7 +44,7 @@
         <div class="opt-row"><code>type</code><span>string</span><span>text | number | currency | date | datetime | boolean | select | multiselect | color | rating | textarea</span></div>
         <div class="opt-row"><code>value</code><span>any</span><span>Current value</span></div>
         <div class="opt-row"><code>options</code><span>array</span><span>For select/multiselect: [{ value, label }]</span></div>
-        <div class="opt-row"><code>editOn</code><span>string</span><span>'click' (default) | 'dblclick' | 'icon'</span></div>
+        <div class="opt-row"><code>editOn</code><span>string</span><span>'click' (default) | 'dblclick' | 'icon': only the pencil button opens the editor, the value is not a tab stop</span></div>
         <div class="opt-row"><code>saveOn</code><span>string</span><span>'blur' (default, auto-save) | 'action' (confirm/cancel buttons)</span></div>
         <div class="opt-row"><code>currency</code><span>string</span><span>Currency code for type=currency (default: EUR)</span></div>
         <div class="opt-row"><code>placeholder</code><span>string</span><span>Text when value is empty</span></div>
@@ -66,7 +66,7 @@
         <div class="opt-header"><span>Method</span><span>—</span><span>Description</span></div>
         <div class="opt-row"><code>startEdit()</code><span></span><span>Open the editor, as a click does; nothing while disabled or readonly</span></div>
         <div class="opt-row"><code>confirmEdit() / cancelEdit()</code><span></span><span>Save and close / close and keep the value (emits <code>pdx-cancel</code>)</span></div>
-        <div class="opt-row"><code>focus() / blur()</code><span></span><span>Focus or blur the display</span></div>
+        <div class="opt-row"><code>focus() / blur()</code><span></span><span>Focus or blur the display, or with editOn 'icon' the pencil button</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
@@ -75,6 +75,7 @@
         <div class="opt-row"><code>:state(disabled) / :state(readonly)</code><span></span><span><code>disabled</code> / <code>readonly</code> is set</span></div>
         <div class="opt-row"><code>:state(editing)</code><span></span><span>The editor is open</span></div>
         <div class="opt-row"><code>[data-part="root"] / [data-part="display"] / [data-part="editor"]</code><span></span><span>The frame, the value at rest (<code>role="button"</code>), the editor's container</span></div>
+        <div class="opt-row"><code>[data-part="edit"]</code><span></span><span>With <code>editOn="icon"</code>, the pencil button that opens the editor; the display is then no button</span></div>
         <div class="opt-row"><code>[data-part="save"] / [data-part="cancel"]</code><span></span><span>The buttons of <code>saveOn="action"</code></span></div>
       </div>
     </section>

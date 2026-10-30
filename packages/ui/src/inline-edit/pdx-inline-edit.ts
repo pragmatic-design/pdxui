@@ -40,7 +40,8 @@ registerFormControl('pdx-inline-edit', {
  * A value the user clicks to edit in place, in the editor its `type` calls for.
  *
  * @csspart root - The frame around the display and the editor.
- * @csspart display - The value at rest, a `role="button"` that opens the editor.
+ * @csspart display - The value at rest, a `role="button"` that opens the editor; with `edit-on="icon"` it only shows the value.
+ * @csspart edit - With `edit-on="icon"`, the pencil button that opens the editor, and the only thing that does.
  * @csspart editor - The editor's container, shown while editing.
  * @csspart save - The save button, with `save-on="action"`, while editing.
  * @csspart cancel - The cancel button, with `save-on="action"`, while editing.
@@ -64,7 +65,7 @@ component('pdx-inline-edit', {
     },
     // On the host as custom states (#132); the root carries no state class of its own.
     states: ['disabled', 'readonly', 'editing'],
-    parts: ['root', 'display', 'editor', 'save', 'cancel'],
+    parts: ['root', 'display', 'edit', 'editor', 'save', 'cancel'],
     props: {
         /** Data type — determines which editor to show */
         type: { type: String, default: 'text' },
@@ -72,8 +73,8 @@ component('pdx-inline-edit', {
         options: { type: Array, default: [] },
         /** Placeholder when value is empty */
         placeholder: { type: String, default: '' },
-        /** When to enter edit mode: 'click' | 'dblclick' | 'icon' */
-        editOn: { type: String, default: 'click' },
+        /** What opens the editor: a click on the value, a double click, or only the pencil button ('icon'). */
+        editOn: { type: String, default: 'click', enum: ['click', 'dblclick', 'icon'] },
         /** When to save: 'blur' (auto-save on blur/Enter) | 'action' (confirm/cancel buttons) */
         saveOn: { type: String, default: 'blur' },
         /** Disabled */
@@ -104,6 +105,8 @@ component('pdx-inline-edit', {
 
         // DOM refs
         let _displayEl: HTMLElement | null = null;
+        // The pencil button of `edit-on="icon"`, made once: a field's labelling on it survives a redraw.
+        let _editBtn: HTMLButtonElement | null = null;
         let _editorEl: HTMLElement | null = null;
         // _actionsEl reserved for future use (action buttons container)
         // A form submits the value (#135): text and a number as they are, a boolean as true/false, an
@@ -119,6 +122,12 @@ component('pdx-inline-edit', {
 
         function getType(): string {
             return (ctx.type() as string) || 'text';
+        }
+
+        /** What opens the editor; a value outside the three is the default, a click. */
+        function editMode(): 'click' | 'dblclick' | 'icon' {
+            const mode = ctx.editOn() as string;
+            return mode === 'dblclick' || mode === 'icon' ? mode : 'click';
         }
 
         /** The prop, then the page's lang, then the browser. */
@@ -233,12 +242,14 @@ component('pdx-inline-edit', {
 
         // Closing the editor removes the element that had focus, and focus would fall to <body>: a
         // keyboard user who saved or cancelled would have to find their place again. It goes back to the
-        // display — only when the editor had it, so a click or Tab elsewhere keeps where it went.
+        // display — only when the editor had it, so a click or Tab elsewhere keeps where it went. With
+        // `edit-on="icon"` the display is no tab stop: it goes to the pencil button that opened it.
         function editorHasFocus(): boolean {
             return !!_editorEl && _editorEl.contains(document.activeElement);
         }
         function refocusDisplay(hadFocus: boolean): void {
-            if (hadFocus && _displayEl && !_editing.peek()) _displayEl.focus();
+            if (!hadFocus || _editing.peek()) return;
+            (editMode() === 'icon' && _editBtn?.isConnected ? _editBtn : _displayEl)?.focus();
         }
 
         function confirmEdit(): void {
@@ -481,18 +492,22 @@ component('pdx-inline-edit', {
             _displayEl = document.createElement('div');
             _displayEl.className = 'pdx-inline-edit-display';
             _displayEl.dataset.part = 'display';
-            _displayEl.setAttribute('role', 'button');
-            _displayEl.setAttribute('tabindex', '0');
 
-            const editOn = (ctx.editOn() as string) || 'click';
-            if (editOn === 'dblclick') {
-                _displayEl.addEventListener('dblclick', startEdit);
-            } else {
-                _displayEl.addEventListener('click', startEdit);
-            }
+            // `edit-on` is read when the event comes, so a change after mount takes effect (#710). With
+            // `icon` the display opens nothing: the pencil button does, and a key on it bubbles here.
+            _displayEl.addEventListener('click', () => { if (editMode() === 'click') startEdit(); });
+            _displayEl.addEventListener('dblclick', () => { if (editMode() === 'dblclick') startEdit(); });
             _displayEl.addEventListener('keydown', (e: KeyboardEvent) => {
+                if (editMode() === 'icon') return;
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); startEdit(); }
             });
+
+            _editBtn = document.createElement('button');
+            _editBtn.type = 'button';
+            _editBtn.className = 'pdx-inline-edit-icon';
+            _editBtn.dataset.part = 'edit';
+            _editBtn.textContent = '✎';
+            _editBtn.addEventListener('click', startEdit);
 
             _rootEl.appendChild(_displayEl);
 
@@ -531,8 +546,18 @@ component('pdx-inline-edit', {
             const readonly_ = ctx.readonly() as boolean;
             const showIcon = ctx.showIcon() as boolean;
             const type = getType();
+            const mode = editMode();
 
             if (!_displayEl || !_editorEl || !_rootEl) return;
+
+            // With `icon` the display only shows the value: no button, no tab stop. The pencil is.
+            if (mode === 'icon') {
+                _displayEl.removeAttribute('role');
+                _displayEl.removeAttribute('tabindex');
+            } else {
+                _displayEl.setAttribute('role', 'button');
+                _displayEl.setAttribute('tabindex', '0');
+            }
 
             // The type is an attribute: as a class, `pdx-inline-edit-${type}`, "text" and "textarea"
             // would be the value span's and the editor's own classes, and their styles would land on
@@ -574,8 +599,14 @@ component('pdx-inline-edit', {
                 text.textContent = formatDisplay(val);
                 _displayEl.appendChild(text);
 
-                // Edit icon
-                if (showIcon && !disabled && !readonly_) {
+                // Edit icon: with `icon` a real button, named for what it edits, whatever `show-icon` says
+                // — it is the only way in; otherwise a decoration of the clickable value.
+                if (mode === 'icon' && _editBtn && !disabled && !readonly_) {
+                    _editBtn.setAttribute('aria-label', isEmptyVal
+                        ? getComponentString('inline-edit', 'label')()
+                        : format(uiString('inline-edit', 'edit'), { value: formatDisplay(val) }));
+                    _displayEl.appendChild(_editBtn);
+                } else if (mode !== 'icon' && showIcon && !disabled && !readonly_) {
                     const icon = document.createElement('span');
                     icon.className = 'pdx-inline-edit-icon';
                     icon.textContent = '✎';
@@ -593,8 +624,9 @@ component('pdx-inline-edit', {
             confirmEdit,
             /** Close the editor and keep the value; emits `pdx-cancel`. */
             cancelEdit,
-            focus() { _displayEl?.focus(); },
-            blur() { _displayEl?.blur(); },
+            /** Focus what opens the editor: the value, or with `edit-on="icon"` the pencil button. */
+            focus() { (editMode() === 'icon' && _editBtn?.isConnected ? _editBtn : _displayEl)?.focus(); },
+            blur() { (editMode() === 'icon' && _editBtn?.isConnected ? _editBtn : _displayEl)?.blur(); },
         });
 
         return { startEdit, confirmEdit, cancelEdit };

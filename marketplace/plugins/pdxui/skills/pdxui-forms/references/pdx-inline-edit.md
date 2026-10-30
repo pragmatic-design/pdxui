@@ -17,7 +17,7 @@ numbers). The number editor shows the value with that many decimals while you ed
 | `type` | `type` | string | `'text'` | Data type — determines which editor to show |
 | `options` | — | array | `[]` | Options for select/multiselect: [{ value, label }] |
 | `placeholder` | `placeholder` | string | `''` | Placeholder when value is empty |
-| `editOn` | `editon` | string | `'click'` | When to enter edit mode: 'click' \| 'dblclick' \| 'icon' |
+| `editOn` | `editon` | 'click' \| 'dblclick' \| 'icon' | `'click'` | What opens the editor: a click on the value, a double click, or only the pencil button ('icon'). |
 | `saveOn` | `saveon` | string | `'blur'` | When to save: 'blur' (auto-save on blur/Enter) \| 'action' (confirm/cancel buttons) |
 | `disabled` | `disabled` | boolean | `false` | Disabled |
 | `readonly` | `readonly` | boolean | `false` | Readonly |
@@ -37,7 +37,7 @@ numbers). The number editor shows the value with that many decimals while you ed
 | `startEdit()` | Open the editor, as a click on the value does. Nothing while `disabled` or `readonly`. |
 | `confirmEdit()` | Save the edited value and close the editor. |
 | `cancelEdit()` | Close the editor and keep the value; emits `pdx-cancel`. |
-| `focus()` | Moves focus to it. |
+| `focus()` | Focus what opens the editor: the value, or with `edit-on="icon"` the pencil button. |
 | `blur()` | Removes focus from it. |
 
 **Events:** `pdx-cancel` — The edit was cancelled: Escape, or the cancel button. The value is unchanged.; `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.
@@ -46,7 +46,7 @@ numbers). The number editor shows the value with that many decimals while you ed
 
 **States:** `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(editing)` — The editor is open.
 
-**Parts:** `[data-part="root"]` — The frame around the display and the editor.; `[data-part="display"]` — The value at rest, a `role="button"` that opens the editor.; `[data-part="editor"]` — The editor's container, shown while editing.; `[data-part="save"]` — The save button, with `save-on="action"`, while editing.; `[data-part="cancel"]` — The cancel button, with `save-on="action"`, while editing.
+**Parts:** `[data-part="root"]` — The frame around the display and the editor.; `[data-part="display"]` — The value at rest, a `role="button"` that opens the editor; with `edit-on="icon"` it only shows the value.; `[data-part="edit"]` — With `edit-on="icon"`, the pencil button that opens the editor, and the only thing that does.; `[data-part="editor"]` — The editor's container, shown while editing.; `[data-part="save"]` — The save button, with `save-on="action"`, while editing.; `[data-part="cancel"]` — The cancel button, with `save-on="action"`, while editing.
 
 
 #### Examples

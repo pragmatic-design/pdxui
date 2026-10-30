@@ -75,7 +75,8 @@ const DONE: Row[] = [
         tag: 'pdx-inline-edit',
         model: 'value',
         states: ['disabled', 'readonly', 'editing'],
-        parts: ['root', 'display', 'editor', 'save', 'cancel'],
+        // `edit`: the pencil button of `edit-on="icon"` (#710).
+        parts: ['root', 'display', 'edit', 'editor', 'save', 'cancel'],
     },
     {
         tag: 'pdx-rich-text',
