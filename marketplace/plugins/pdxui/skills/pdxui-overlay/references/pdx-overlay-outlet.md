@@ -6,6 +6,8 @@ _No public props._
 
 **Renders:** roles `alertdialog` · `dialog`
 
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="panel"]` — The element reached as `[data-part="panel"]`.; `[data-part="header"]` — The element reached as `[data-part="header"]`.; `[data-part="title"]` — The element reached as `[data-part="title"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="body"]` — The element reached as `[data-part="body"]`.; `[data-part="message"]` — The element reached as `[data-part="message"]`.; `[data-part="confirm-input"]` — The element reached as `[data-part="confirm-input"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.; `[data-part="cancel"]` — The element reached as `[data-part="cancel"]`.; `[data-part="confirm"]` — The element reached as `[data-part="confirm"]`.; `[data-part="ok"]` — The element reached as `[data-part="ok"]`.
+
 
 #### Examples
 

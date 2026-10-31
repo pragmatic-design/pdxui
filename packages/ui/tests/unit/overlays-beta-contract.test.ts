@@ -105,6 +105,12 @@ const DONE: Row[] = [
 const HOLDERS_DONE: { tag: string; parts: string[] }[] = [
     // The stack, and a toast with its icon, title, message, action, close button and progress bar.
     { tag: 'pdx-toast', parts: ['root', 'toast', 'icon', 'title', 'message', 'action', 'close', 'progress'] },
+    // The stack, and a dialog opened from code with its backdrop, panel and sections, and the buttons
+    // and field each kind has: close (a dialog), cancel, confirm and confirm-input (a confirm), ok (an alert).
+    {
+        tag: 'pdx-overlay-outlet',
+        parts: ['root', 'backdrop', 'panel', 'header', 'title', 'close', 'body', 'message', 'confirm-input', 'footer', 'cancel', 'confirm', 'ok'],
+    },
 ];
 
 describe.each(HOLDERS_DONE)('$tag, a holder on the beta contract', (row) => {
