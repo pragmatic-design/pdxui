@@ -26,7 +26,13 @@ test('"City (server lookup)": typing "ro" lists Roma, and choosing it fills the 
 
 test('"Form (edit first record)" shows Alice, and saving an edit updates the grid', async ({ page }) => {
     await page.goto('/components/pdx-auto-form', { waitUntil: 'domcontentloaded' });
+    // The page first: the gallery's chunks and its sections, under the test's timeout. The form
+    // reads its record synchronously from a static source, and once its section is on the page it
+    // has "Alice" in ~15 ms; the page itself took 0.6–1.1 s under this suite's own load and more
+    // under the pre-push gate's. Waited for inside the assertion's 5 s, the page's cost failed the
+    // form's check (#772).
     const s = section(page, 'One JSON — Grid + Form + Filter');
+    await s.waitFor();
     const name = s.locator('pdx-auto-form pdx-input[name="name"] input');
     await expect(name, 'the form is not wired to the first record').toHaveValue('Alice');
     await name.fill('Alicia');
