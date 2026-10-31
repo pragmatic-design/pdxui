@@ -265,6 +265,40 @@ describe('usePopover — dismissing', () => {
         p.dispose();
     });
 
+    it('Escape gives focus back to the element that had it when the popover opened: an invoker that is not the trigger (#288)', () => {
+        const opener = document.createElement('button');
+        document.body.append(opener);
+        const p = usePopover();
+        p.setTrigger(trigger);
+        p.setContent(content);
+        opener.focus();
+        p.open();
+        content.tabIndex = -1;
+        content.focus();
+
+        escape();
+
+        expect(p.isOpen()).toBe(false);
+        expect(document.activeElement, 'focus went to the trigger, not to the button that opened it').toBe(opener);
+        p.dispose();
+    });
+
+    it('control: an opener that left the page hands the focus to the trigger', () => {
+        const opener = document.createElement('button');
+        document.body.append(opener);
+        const p = usePopover();
+        p.setTrigger(trigger);
+        p.setContent(content);
+        opener.focus();
+        p.open();
+        opener.remove();
+
+        escape();
+
+        expect(document.activeElement).toBe(trigger);
+        p.dispose();
+    });
+
     it('Escape closes only the popover opened last', () => {
         // Nested menus: each instance has its own document listener, so without the stack every
         // open popover would close on one Escape.

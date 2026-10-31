@@ -61,6 +61,14 @@ const DONE: Row[] = [
         parts: ['root', 'backdrop', 'handle', 'header', 'close', 'body', 'footer'],
         removed: ['pdx-close'],
     },
+    {
+        tag: 'pdx-popover',
+        models: ['open'],
+        states: ['open'],
+        // The floating panel; the trigger is the page's own element, not the popover's.
+        parts: ['root'],
+        removed: ['hide'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

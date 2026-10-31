@@ -167,11 +167,14 @@ export const popover: ComponentManifest = {
     },
 
     // ── Dim. 4: keyboard ──
-    // The minimum: Tab puts the focus on the trigger (the popover opens with Enter or Space on it).
+    // Tab reaches the trigger; Enter opens the popover and puts the focus in its panel (#288: focus on
+    // open); Escape closes it and gives the focus back to the trigger.
     keyboard: {
         scenario: 'popover-bottom',
         steps: [
             { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="trigger"]' },
+            { key: 'Enter', expectFocusWithin: 'section:not([hidden]) pdx-popover [data-part="root"]' },
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="trigger"]' },
         ],
     },
 

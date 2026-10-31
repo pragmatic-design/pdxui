@@ -191,12 +191,21 @@ export function usePopover(options?: PopoverOptions): PopoverReturn {
     // This instance's identity token in the stack of open popovers
     const _stackToken = {};
 
+    /**
+     * The element that had focus when the popover opened, where Escape gives it back: the trigger
+     * after a click, an invoker button (`command="--show"`) that is not the trigger (#288).
+     */
+    let _returnFocus: HTMLElement | null = null;
+
     function setOpen(open: boolean): void {
         if (_isOpen.peek() === open) return;
         _isOpen.set(open);
         if (open) {
+            const active = typeof document !== 'undefined' ? document.activeElement : null;
+            _returnFocus = active instanceof HTMLElement && active !== document.body ? active : null;
             _openPopoverTokens.push(_stackToken);
         } else {
+            _returnFocus = null;
             const i = _openPopoverTokens.indexOf(_stackToken);
             if (i >= 0) _openPopoverTokens.splice(i, 1);
         }
@@ -280,8 +289,9 @@ export function usePopover(options?: PopoverOptions): PopoverReturn {
             on(document, 'keydown', (e) => {
                 if (!_isOpen.peek() || (e as KeyboardEvent).key !== 'Escape') return;
                 if (_openPopoverTokens[_openPopoverTokens.length - 1] !== _stackToken) return;
+                const back = _returnFocus?.isConnected ? _returnFocus : _triggerEl.peek();
                 setOpen(false);
-                _triggerEl.peek()?.focus();
+                back?.focus();
             });
         }
 

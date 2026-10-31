@@ -261,6 +261,22 @@
                 api.readOpen = () => open();
             },
 
+            // pdx-popover on the beta contract (#288): its trigger, and an invoker that is not the
+            // trigger, in a wrapper of its own so the popover does not take it for its trigger.
+            'popover-beta-contract': () => {
+                const open = signal(false);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound" style="padding: 24px">
+                        <p><button type="button" data-test="opener" commandfor="bound-pop" command="--show">Details</button></p>
+                        <div><button type="button" data-test="trigger" data-pdx-trigger>Trigger</button>
+                        <pdx-popover id="bound-pop" ::open=${open}><p>body</p><button type="button" data-test="inside">Inside</button></pdx-popover></div>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
+            },
+
             // A crumb with no href has to be reachable from the keyboard.
             'breadcrumb-no-href': () => {
                 const sec = show('case-breadcrumb-no-href');

@@ -228,55 +228,64 @@ export const datePickerOverlayVerbsScript = aliasVerbs(DATE_PICKER_VERBS, 'scrip
 // template or its script. A call on a lookup of the tag (`querySelector('pdx-autocomplete')`) is
 // flagged; anything else cannot be told from any other `open()`, and is left.
 
-/** Every `name.open()` / `name?.open()` of a name a `:ref` binds on `tag`. Groups: [1]=the name [2]=the access */
-function refOpenCalls(text: string, tag: string): RegExpMatchArray[] {
+/** Every `name.<from>()` / `name?.<from>()` of a name a `:ref` binds on `tag`. Groups: [1]=the name [2]=the access */
+function refVerbCalls(text: string, tag: string, from: string): RegExpMatchArray[] {
     // Match: a `:ref` on the tag's opening tag, quoted values read whole. Groups: [1]=the bound name
     const ref = new RegExp(`<${escapeForRegExp(tag)}\\b(?:[^>"']|"[^"]*"|'[^']*')*?\\s:ref\\s*=\\s*["']\\s*([A-Za-z_$][\\w$]*)\\s*["']`, 'gi');
     const names = [...new Set([...text.matchAll(ref)].map((m) => m[1]))];
     if (names.length === 0) return [];
-    // Match: the name standing alone, its member access and `open()`. Groups: [1]=the name [2]=`.` or `?.`
-    const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*open\\s*\\(\\s*\\)`, 'g');
+    // Match: the name standing alone, its member access and `<from>()`. Groups: [1]=the name [2]=`.` or `?.`
+    const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*${escapeForRegExp(from)}\\s*\\(\\s*\\)`, 'g');
     return [...text.matchAll(call)];
 }
 
-/** The pair of entries for a tag whose undeclared `open()` is `show()`: the ref'd calls, and the lookups. */
-function openShow(tag: string, id: string): { ref: LanguageChange; unbound: LanguageChange } {
-    // Match: `.open()` on a lookup of the tag, `querySelector('<tag>')` or `('#f <tag>')`, with an
+/** A tag's alpha verb, a common name tied to the tag by a `:ref`, and the overlay verb that replaces it. */
+interface TagVerb { tag: string; id: string; from: string; to: string; issue: number; message: string }
+
+/** The pair of entries for a tag whose `from()` is `to()`: the ref'd calls, and the lookups. */
+function tagVerb(v: TagVerb): { ref: LanguageChange; unbound: LanguageChange } {
+    // Match: `.<from>()` on a lookup of the tag, `querySelector('<tag>')` or `('#f <tag>')`, with an
     // optional `!` or index. Groups: [1]=the quote
     const lookup = (): RegExp => new RegExp(
-        `querySelector(?:All)?\\s*\\(\\s*(['"\`])[^'"\`]*${escapeForRegExp(tag)}[^'"\`]*\\1\\s*\\)\\s*(?:\\[\\s*\\d+\\s*\\])?\\s*!?\\s*\\??\\.\\s*open\\s*\\(\\s*\\)`, 'g');
+        `querySelector(?:All)?\\s*\\(\\s*(['"\`])[^'"\`]*${escapeForRegExp(v.tag)}[^'"\`]*\\1\\s*\\)\\s*(?:\\[\\s*\\d+\\s*\\])?\\s*!?\\s*\\??\\.\\s*${escapeForRegExp(v.from)}\\s*\\(\\s*\\)`, 'g');
     return {
         ref: {
-            id: `${id}-open-show`,
+            id: `${v.id}-${v.from}-${v.to}`,
             kind: 'removed',
             scope: 'pdx',
-            issue: 287,
-            message: `\`${tag}\` opens its popup with the overlay verb: \`open()\` is \`show()\`; \`close()\` is unchanged.`,
-            marker: tag,
-            detect: (text) => refOpenCalls(text, tag).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${m[1]}${m[2]}show()\`.` })),
+            issue: v.issue,
+            message: v.message,
+            marker: v.tag,
+            detect: (text) => refVerbCalls(text, v.tag, v.from).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${m[1]}${m[2]}${v.to}()\`.` })),
             fix: (text) => {
                 let out = text;
-                for (const m of refOpenCalls(text, tag).reverse()) {
-                    out = out.slice(0, m.index!) + `${m[1]}${m[2]}show()` + out.slice(m.index! + m[0].length);
+                for (const m of refVerbCalls(text, v.tag, v.from).reverse()) {
+                    out = out.slice(0, m.index!) + `${m[1]}${m[2]}${v.to}()` + out.slice(m.index! + m[0].length);
                 }
                 return out;
             },
         },
         unbound: {
-            id: `${id}-open-unbound`,
+            id: `${v.id}-${v.from}-unbound`,
             kind: 'removed',
             scope: 'script',
-            issue: 287,
-            message: `\`${tag}\`'s \`open()\` is \`show()\`.`,
-            marker: tag,
+            issue: v.issue,
+            message: `\`${v.tag}\`'s \`${v.from}()\` is \`${v.to}()\`.`,
+            marker: v.tag,
             detect: (text) => [...text.matchAll(lookup())].map((m) => ({
                 line: lineAt(text, m.index!), found: m[0],
-                note: `Not rewritten: the call is on a lookup, not a \`:ref\` of this file; write \`show()\` if it is a ${tag}.`,
+                note: `Not rewritten: the call is on a lookup, not a \`:ref\` of this file; write \`${v.to}()\` if it is a ${v.tag}.`,
             })),
             fix: 'flag',
         },
     };
 }
+
+/** A tag whose undeclared `open()` is `show()` (#287). */
+const openShow = (tag: string, id: string) => tagVerb({
+    tag, id, from: 'open', to: 'show', issue: 287,
+    message: `\`${tag}\` opens its popup with the overlay verb: \`open()\` is \`show()\`; \`close()\` is unchanged.`,
+});
 
 const AUTOCOMPLETE_OPEN = openShow('pdx-autocomplete', 'autocomplete');
 const COLOR_PICKER_OPEN = openShow('pdx-color-picker', 'color-picker');
@@ -285,3 +294,13 @@ export const autocompleteOpenShow = AUTOCOMPLETE_OPEN.ref;
 export const autocompleteOpenUnbound = AUTOCOMPLETE_OPEN.unbound;
 export const colorPickerOpenShow = COLOR_PICKER_OPEN.ref;
 export const colorPickerOpenUnbound = COLOR_PICKER_OPEN.unbound;
+
+// `pdx-popover`'s `hide()` is `close()` (#288). `hide()` is a common name too, so it is tied to the
+// tag the same way.
+const POPOVER_HIDE = tagVerb({
+    tag: 'pdx-popover', id: 'popover', from: 'hide', to: 'close', issue: 288,
+    message: '`pdx-popover` closes with the overlay verb: `hide()` is `close()`; `show()` and `toggle()` are unchanged.',
+});
+
+export const popoverHideClose = POPOVER_HIDE.ref;
+export const popoverHideUnbound = POPOVER_HIDE.unbound;

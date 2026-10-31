@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -213,6 +213,41 @@ describe('autocomplete-open-unbound: a call the text cannot tie to the tag is fl
 
     it('a querySelector of another tag is not reported', () => {
         expect(autocompleteOpenUnbound.detect("document.querySelector('pdx-dialog').open();")).toEqual([]);
+    });
+});
+
+describe('popover-hide-close: pdx-popover\'s hide() is close() (#288)', () => {
+    const fix = popoverHideClose.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-popover of the file, in its template and its script', () => {
+        const source = '<template><pdx-popover :ref="pop"></pdx-popover><button @click="pop.hide()">Done</button></template>\n<script>\nlet pop = $signal(null);\nfunction done() { pop?.hide(); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="pop.close()"');
+        expect(out).toContain('pop?.close();');
+        expect(popoverHideClose.detect(out)).toEqual([]);
+        expect(fix(out)).toBe(out);
+    });
+
+    it('a ref on another component, or show() and toggle() on the popover, are left', () => {
+        const source = '<template><pdx-toast :ref="t"></pdx-toast><pdx-popover :ref="pop"></pdx-popover><button @click="pop.show()">x</button></template>\n<script>\nfunction f() { t.hide(); pop.toggle(); }\n</script>';
+        expect(popoverHideClose.detect(source)).toEqual([]);
+        expect(fix(source)).toBe(source);
+    });
+
+    it('`document.querySelector(\'pdx-popover\').hide()` is flagged and left', () => {
+        const found = popoverHideUnbound.detect("document.querySelector('pdx-popover').hide();");
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('close()');
+        expect(popoverHideUnbound.fix).toBe('flag');
+        expect(popoverHideUnbound.detect("document.querySelector('pdx-popover').show();")).toEqual([]);
+    });
+
+    it('both are in the registry, removed, under #288', () => {
+        for (const id of ['popover-hide-close', 'popover-hide-unbound']) {
+            const entry = languageChanges().find((c) => c.id === id);
+            expect(entry?.kind, id).toBe('removed');
+            expect(entry?.issue).toBe(288);
+        }
     });
 });
 
