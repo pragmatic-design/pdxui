@@ -394,6 +394,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-menu` takes the beta contract (#288).
+  - **`open` is a model.** Escape and a chosen entry close the menu itself and announce it with
+    `open-change` `{ value }`, so `::open="x"` follows them. Before, they emitted `pdx-close` and the
+    menu stayed open until its owner set `open` back. `pdx-close` is gone; `pdx migrate` turns
+    `@pdx-close` on a `pdx-menu` into `@open-change`.
+  - **`closeAll()` is `close()`**, and `show()` and `toggle()` are new; `closeSubmenu()` stays.
+    `pdx migrate` rewrites `closeAll()` on a `:ref` bound on a `pdx-menu`, and flags it on a lookup.
+  - **Focus.** A close while the focus is in the menu gives it back to the element that had it when the
+    menu opened, not to `<body>`.
+  - **States and parts.** `open` is a custom state on the host. The parts are `root` (the element that
+    is `role="menu"`), `item`, `separator` and `label`.
+  - `pdx-dropdown-menu`, which draws its list with a `pdx-menu`, closes on its `open-change`.
+
 - **Breaking:** `pdx-command` takes the beta contract (#288).
   - **`open` is a model.** The palette writes it when it opens or closes itself — the hotkey, Escape,
     the backdrop, a chosen command — and announces it with `open-change` `{ value }`, so `::open="x"`

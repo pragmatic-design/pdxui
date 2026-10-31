@@ -31,15 +31,14 @@
  *   checkbox→role="menuitemcheckbox"+aria-checked; radio→role="menuitemradio"+aria-checked; submenu→aria-haspopup="menu".
  *
  *   CAREFUL, a class collision: the HOST is <pdx-menu> and the inner panel has class="pdx-menu" — the SAME name.
- *   It is always disambiguated by the inner tag: the selector `div.pdx-menu` (the host is not a div). The menuitems (buttons)
- *   are unambiguous.
+ *   The rules select the panel by its part, [data-part="root"], and the menuitems by [data-part="item"] (#288).
  *
  * ── Keyboard (verified, src:381-387) ──
  *   focusGroup(menu, { selector:'.pdx-menu-item:not([disabled])', orientation:'vertical', wrap:true, typeAhead:true }).
  *   → a vertical roving tabindex: ArrowDown/Up move between the menuitems (with wrap), type-ahead, Enter/onSelect→click.
  *   On opening (open=true) the first menuitem is already focused (src:393-398). NO Tab (it is roving).
- *   Escape: handled (src:338-349) but on an inline menu with no submenu open it calls closeAll()→emit('pdx-close')
- *   (src:298-301), which does NOT hide the panel (no listener reduces the display) → not asserted by the keyboard rules.
+ *   Escape: on a menu with no submenu open it calls close(), which writes the `open` model (#288): the menu
+ *   hides and announces `open-change`. Measured in menu-beta-contract.spec.ts, not by the keyboard rules here.
  *
  * ── Contracts: CONSERVATIVE, no theme-specific px. Invariants that hold on all 13 themes:
  *   · the inner div.pdx-menu panel is VISIBLE (display flex) with a noticeable width (min-width 10rem from the CSS plus
@@ -48,10 +47,7 @@
  *     (flex-direction:column → item[1].top >= item[0].bottom, the stacking hierarchy).
  *
  * ── REAL BUGS ──
- *   None blocking. A minor note (NOT a certifiable bug): Escape on a standalone inline menu emits
- *   'pdx-close' (src:347→298-301) but the component has no logic to hide itself (that is the owner's —
- *   dropdown or context-menu — job). Expected for a rendering engine; not asserted on the keyboard side.
- *   A submenu measured before it is positioned is a block at the end of <body>, as wide as the
+ *   None blocking. A submenu measured before it is positioned is a block at the end of <body>, as wide as the
  *   body — so the flip always fires and it opens over or left of the menu. Held by the
  *   'menu-submenu' positioning rule.
  */
@@ -114,19 +110,19 @@ export const menu: ComponentManifest = {
                 standalone: [
                     {
                         // The inner div.pdx-menu panel → display:flex (column). Disambiguated by the `div` tag (the host is <pdx-menu>).
-                        selector: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
+                        selector: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
                         description: 'menu panel is displayed (flex column)',
                         display: { op: 'oneOf', value: ['flex', 'block'] },
                     },
                     {
 // .pdx-menu min-width 10rem (160px) + inline minWidth from the prop (default 180) → a measurable width.
-                        selector: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
+                        selector: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
                         description: 'menu panel has an appreciable width',
                         width: { op: '>=', value: 120 },
                     },
                     {
                         // .pdx-menu border-radius: var(--pdx-radius-md); the radius-zero themes zero it, never below 0.
-                        selector: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
+                        selector: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
                         description: 'menu panel radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -137,7 +133,7 @@ export const menu: ComponentManifest = {
                     },
                     {
                         // .pdx-menu-item { cursor: pointer } → menuitem interattivi.
-                        selector: 'section:not([hidden]) [data-test="menu"] .pdx-menu-item',
+                        selector: 'section:not([hidden]) [data-test="menu"] [data-part="item"]',
                         description: 'menu items are interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
@@ -146,10 +142,10 @@ export const menu: ComponentManifest = {
                     {
                         // The menuitems (buttons) live inside the menu panel (the layout holds).
                         description: 'menu items are contained within the menu panel',
-                        parent: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
+                        parent: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
                         children: {
-                            menu: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
-                            item: 'section:not([hidden]) [data-test="menu"] .pdx-menu-item',
+                            menu: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
+                            item: 'section:not([hidden]) [data-test="menu"] [data-part="item"]',
                         },
                         relations: [
                             { description: 'first menuitem within the menu panel', left: 'item', op: 'contained-in', right: 'menu' },
@@ -158,7 +154,7 @@ export const menu: ComponentManifest = {
                     {
                         // flex-direction:column → the menuitems are STACKED: the 2nd sits under the 1st.
                         description: 'menu items are stacked vertically',
-                        parent: 'section:not([hidden]) [data-test="menu"] div.pdx-menu',
+                        parent: 'section:not([hidden]) [data-test="menu"] [data-part="root"]',
                         children: {
                             first: 'section:not([hidden]) [data-test="menu"] [data-menu-key="new"]',
                             second: 'section:not([hidden]) [data-test="menu"] [data-menu-key="open"]',
@@ -202,7 +198,7 @@ export const menu: ComponentManifest = {
     isolation: {
         scenario: 'menu-open',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="menu"] div.pdx-menu', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="menu"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 

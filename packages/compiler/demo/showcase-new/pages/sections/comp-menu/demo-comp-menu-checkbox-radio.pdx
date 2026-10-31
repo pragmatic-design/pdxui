@@ -8,11 +8,11 @@
     <div class="demo-row">
       <div class="menu-demo">
         <button class="pdx-outline" size="sm" :aria-expanded="shown === 'format' ? 'true' : 'false'" @click="show('format')">Format</button>
-        <pdx-menu :open="shown === 'format'" :items="formatItems" @pdx-close="hide"></pdx-menu>
+        <pdx-menu :open="shown === 'format'" :items="formatItems" @open-change="if ($event.detail.value) return; hide($event)"></pdx-menu>
       </div>
       <div class="menu-demo">
         <button class="pdx-outline" size="sm" :aria-expanded="shown === 'size' ? 'true' : 'false'" @click="show('size')">Text size</button>
-        <pdx-menu :open="shown === 'size'" :items="sizeItems" @pdx-close="hide"></pdx-menu>
+        <pdx-menu :open="shown === 'size'" :items="sizeItems" @open-change="if ($event.detail.value) return; hide($event)"></pdx-menu>
       </div>
     </div>
     <details class="source-block">

@@ -17317,16 +17317,6 @@
             },
             {
               "kind": "field",
-              "name": "open",
-              "description": "Open state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "open"
-            },
-            {
-              "kind": "field",
               "name": "minWidth",
               "description": "Minimum width",
               "type": {
@@ -17365,10 +17355,38 @@
               "default": "null"
             },
             {
+              "kind": "field",
+              "name": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open"
+            },
+            {
               "kind": "method",
-              "name": "closeAll",
+              "name": "show",
               "parameters": [],
-              "description": "Close the submenu and emit `pdx-close` on the menu itself."
+              "description": "Shows it."
+            },
+            {
+              "kind": "method",
+              "name": "close",
+              "parameters": [],
+              "description": "Close the submenu and the menu."
+            },
+            {
+              "kind": "method",
+              "name": "toggle",
+              "parameters": [],
+              "description": "Toggles it open/closed."
+            },
+            {
+              "kind": "field",
+              "name": "isOpen",
+              "readonly": true,
+              "description": "Read-only, via a ref: `el.isOpen`."
             },
             {
               "kind": "method",
@@ -17377,7 +17395,18 @@
               "description": "Close only the open submenu, leaving the menu itself open."
             }
           ],
+          "models": [
+            "open"
+          ],
           "events": [
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
+            },
             {
               "name": "pdx-select",
               "type": {
@@ -17393,14 +17422,6 @@
               },
               "description": "Fired on `pdx-check`.",
               "detail": "{ key, checked, item } | { key, checked, radioGroup, item }"
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it closes. Does not bubble.",
-              "detail": "{}"
             }
           ],
           "roles": [
@@ -17412,15 +17433,6 @@
             "separator"
           ],
           "attributes": [
-            {
-              "name": "open",
-              "fieldName": "open",
-              "description": "Open state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "minwidth",
               "fieldName": "minWidth",
@@ -17447,6 +17459,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "open",
+              "fieldName": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "shapes": [
@@ -17473,6 +17494,30 @@
               "name": "item",
               "description": "Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).",
               "signature": "(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "item",
+              "description": "The element reached as `[data-part=\"item\"]`."
+            },
+            {
+              "name": "separator",
+              "description": "The element reached as `[data-part=\"separator\"]`."
+            },
+            {
+              "name": "label",
+              "description": "The element reached as `[data-part=\"label\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
             }
           ]
         }

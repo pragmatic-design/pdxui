@@ -157,7 +157,8 @@ describe('pdx-menu opened after mount', () => {
         document.body.appendChild(el);
         await tick(30);
         const closes: number[] = [];
-        el.addEventListener('pdx-close', () => closes.push(1));
+        // Escape closes the menu itself: `open-change` `{ value: false }` since #288.
+        el.addEventListener('open-change', (e) => { if (!(e as CustomEvent).detail.value) closes.push(1); });
 
         for (let round = 0; round < 2; round++) {
             el.open = true;

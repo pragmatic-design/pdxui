@@ -9,7 +9,7 @@
           <tr><td><kbd>Arrow Right</kbd></td><td>Open a submenu, on its first item</td></tr>
           <tr><td><kbd>Arrow Left</kbd></td><td>Close the submenu, back to its item</td></tr>
           <tr><td><kbd>Enter / Space</kbd></td><td>Activate item</td></tr>
-          <tr><td><kbd>Escape</kbd></td><td>Close the submenu; on the menu, <code>pdx-close</code></td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close the submenu; on the menu, close it (<code>open-change</code>)</td></tr>
           <tr><td><kbd>Home / End</kbd></td><td>First / last item</td></tr>
           <tr><td><kbd>Type character</kbd></td><td>Typeahead search</td></tr>
         </tbody>
