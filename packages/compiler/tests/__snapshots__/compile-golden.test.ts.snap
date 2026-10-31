@@ -4966,7 +4966,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n@scope ([data-pdx-sfc22l]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Command</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-command&gt;</code> — a command palette (⌘K / Ctrl+K). Fuzzy filter, grouped\\n      items, keyboard shortcuts, arrow-key navigation, focus trap and an empty state.\\n    </p> <app-demo-comp-command-basic class="demo-section"></app-demo-comp-command-basic> <app-demo-comp-command-custom class="demo-section"></app-demo-comp-command-custom> <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>open</code><span>boolean</span><span>Open state (two-way via pdx-open/pdx-close)</span></div> <div class="opt-row"><code>items</code><span>CommandItem[]</span><span>{ id, label, group?, icon?, shortcut?, action?, disabled?, keywords? }</span></div> <div class="opt-row"><code>placeholder</code><span>string</span><span>Search input placeholder</span></div> <div class="opt-row"><code>empty-text</code><span>string</span><span>Text shown when no item matches</span></div> <div class="opt-row"><code>hotkey</code><span>boolean</span><span>Bind the global ⌘K / Ctrl+K opener (default true)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods (via a ref)</h3> <div class="options-table"> <div class="opt-header"><span>Method</span><span>What it does</span></div> <div class="opt-row"><code>show()</code><span>Open the palette</span></div> <div class="opt-row"><code>close()</code><span>Close it</span></div> <div class="opt-row"><code>toggle()</code><span>Open or close it</span></div> <div class="opt-row"><code>isOpen</code><span>Read-only: whether it is open</span></div> <div class="opt-row"><code>openPalette() / closePalette()</code><span>Deprecated aliases of show() / close()</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span></div> <div class="opt-row"><code>pdx-open</code><span>—</span></div> <div class="opt-row"><code>pdx-close</code><span>—</span></div> <div class="opt-row"><code>pdx-select</code><span>CommandItem</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Keys</span><span>Action</span></div> <div class="opt-row"><code>Ctrl/⌘ + K</code><span>Open the palette</span></div> <div class="opt-row"><code>↑ / ↓</code><span>Move highlight</span></div> <div class="opt-row"><code>Enter</code><span>Run highlighted command</span></div> <div class="opt-row"><code>Esc</code><span>Close</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Command</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-command&gt;</code> — a command palette (⌘K / Ctrl+K). Fuzzy filter, grouped\\n      items, keyboard shortcuts, arrow-key navigation, focus trap and an empty state.\\n    </p> <app-demo-comp-command-basic class="demo-section"></app-demo-comp-command-basic> <app-demo-comp-command-custom class="demo-section"></app-demo-comp-command-custom> <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>open</code><span>boolean</span><span>Open state, a model: bind it with <code>::open</code></span></div> <div class="opt-row"><code>items</code><span>CommandItem[]</span><span>{ id, label, group?, icon?, shortcut?, action?, disabled?, keywords? }</span></div> <div class="opt-row"><code>placeholder</code><span>string</span><span>Search input placeholder</span></div> <div class="opt-row"><code>empty-text</code><span>string</span><span>Text shown when no item matches</span></div> <div class="opt-row"><code>hotkey</code><span>boolean</span><span>Bind the global ⌘K / Ctrl+K opener (default true)</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods (via a ref)</h3> <div class="options-table"> <div class="opt-header"><span>Method</span><span>What it does</span></div> <div class="opt-row"><code>show()</code><span>Open the palette</span></div> <div class="opt-row"><code>close()</code><span>Close it</span></div> <div class="opt-row"><code>toggle()</code><span>Open or close it</span></div> <div class="opt-row"><code>isOpen</code><span>Read-only: whether it is open</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events</h3> <div class="options-table"> <div class="opt-header"><span>Event</span><span>Detail</span></div> <div class="opt-row"><code>open-change</code><span>{ value: boolean }, when it opens or closes itself</span></div> <div class="opt-row"><code>pdx-select</code><span>CommandItem</span></div> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"> <div class="opt-header"><span>Keys</span><span>Action</span></div> <div class="opt-row"><code>Ctrl/⌘ + K</code><span>Open the palette</span></div> <div class="opt-row"><code>↑ / ↓</code><span>Move highlight</span></div> <div class="opt-row"><code>Enter</code><span>Run highlighted command</span></div> <div class="opt-row"><code>Esc</code><span>Close</span></div> </div> </section> </div> '));
 component('app-comp-command', {
   props: {},
   setup(ctx) {
@@ -14378,7 +14378,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-comma
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-knjqul");
@@ -14386,7 +14386,7 @@ import { assignBoundProperty, batchHandler, bindInterpolation, component, effect
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-knjqul]) to ([data-pdx-root] \\u003E *) {:scope .demo-container { display: flex; align-items: center; gap: var(--pdx-space-md); flex-wrap: wrap; padding: var(--pdx-space-lg); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-surface); }\\n  :scope .run-note { white-space: nowrap; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Press <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>⌘</kbd>+<kbd>K</kbd>), or click the button.\\n      Type to filter, <kbd>↑</kbd>/<kbd>↓</kbd> to move, <kbd>Enter</kbd> to run, <kbd>Esc</kbd> to close.\\n      Items with a <code>group</code> are listed under named groups; "Billing" is <code>disabled</code> — listed,\\n      skipped by the arrows, never run. A <code>shortcut</code> is shown and announced as a key shortcut.\\n    </p> <div class="demo-container"> <button class="pdx-btn pdx-primary"> <pdx-icon name="search" size="14"></pdx-icon> Open command palette\\n      </button> <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong><!----></strong></span> <pdx-command placeholder="Search commands…"> </pdx-command> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const items = [\\n  { id: \\'dashboard\\', label: \\'Go to Dashboard\\', group: \\'Navigate\\', icon: \\'home\\' },\\n  { id: \\'team\\', label: \\'Manage Team\\', group: \\'Navigate\\', icon: \\'users\\' },\\n  { id: \\'settings\\', label: \\'Settings\\', group: \\'Account\\', icon: \\'settings\\', shortcut: \\'Ctrl ,\\' },\\n];\\n\\n&lt;pdx-command :open="open" :items="items"\\n  @pdx-select="onSelect" /&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Press <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>⌘</kbd>+<kbd>K</kbd>), or click the button.\\n      Type to filter, <kbd>↑</kbd>/<kbd>↓</kbd> to move, <kbd>Enter</kbd> to run, <kbd>Esc</kbd> to close.\\n      Items with a <code>group</code> are listed under named groups; "Billing" is <code>disabled</code> — listed,\\n      skipped by the arrows, never run. A <code>shortcut</code> is shown and announced as a key shortcut.\\n    </p> <div class="demo-container"> <button class="pdx-btn pdx-primary"> <pdx-icon name="search" size="14"></pdx-icon> Open command palette\\n      </button> <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong><!----></strong></span> <pdx-command placeholder="Search commands…"> </pdx-command> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const items = [\\n  { id: \\'dashboard\\', label: \\'Go to Dashboard\\', group: \\'Navigate\\', icon: \\'home\\' },\\n  { id: \\'team\\', label: \\'Manage Team\\', group: \\'Navigate\\', icon: \\'users\\' },\\n  { id: \\'settings\\', label: \\'Settings\\', group: \\'Account\\', icon: \\'settings\\', shortcut: \\'Ctrl ,\\' },\\n];\\n\\n&lt;pdx-command ::open="open" :items="items"\\n  @pdx-select="onSelect" /&gt;</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el14=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el15=__el14.firstChild.nextSibling;const __el17=__el15.nextSibling.nextSibling;const __el18=__el17.firstChild.nextSibling;const __t19=__el18.firstChild;const __el20=__el17.nextSibling.nextSibling;return [__el15,__t19,__el20];};
 component('app-demo-comp-command-basic', {
   props: {},
@@ -14407,7 +14407,6 @@ const commandItems = [
     
     function onSelect(e) {
       __lastRun.setRaw((e.detail && e.detail.label) || '—');
-      __open.setRaw(false);
     }
     ctx.el.setAttribute('data-pdx-knjqul', '');
     return { open: __open, lastRun: __lastRun, commandItems, onSelect };
@@ -14417,10 +14416,8 @@ const commandItems = [
     const [__el15,__t19,__el20]=__walk0(__frag);
     __el15.addEventListener('click', safeHandler(batchHandler(() => ctx.open.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t19,()=>ctx.lastRun());
-    let __el20w_open = {}; effect(() => { const __b = ctx.open(); if (Object.is(__b, __el20w_open)) return; __el20w_open = __b; assignBoundProperty(__el20, "open", __b); });
+    bindTwoWay(__el20, 'open', ctx.open);
     let __el20w_items = {}; effect(() => { const __b = ctx.commandItems; if (Object.is(__b, __el20w_items)) return; __el20w_items = __b; assignBoundProperty(__el20, "items", __b); });
-    __el20.addEventListener('pdx-open', safeHandler(batchHandler(() => ctx.open.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open'));
-    __el20.addEventListener('pdx-close', safeHandler(batchHandler(() => ctx.open.setRaw(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     __el20.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onSelect), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     return __frag;
   })(),
@@ -14432,7 +14429,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-comma
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-7u5zc8");
@@ -14469,11 +14466,9 @@ const fileItems = [
     const [__el8,__t11,__el12,__m18]=__walk1(__frag);
     __el8.addEventListener('click', safeHandler(batchHandler(() => ctx.filesOpen.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'click'));
     bindInterpolation(__t11,()=>ctx.lastFile());
-    let __el12w_open = {}; effect(() => { const __b = ctx.filesOpen(); if (Object.is(__b, __el12w_open)) return; __el12w_open = __b; assignBoundProperty(__el12, "open", __b); });
+    bindTwoWay(__el12, 'open', ctx.filesOpen);
     let __el12w_items = {}; effect(() => { const __b = ctx.fileItems; if (Object.is(__b, __el12w_items)) return; __el12w_items = __b; assignBoundProperty(__el12, "items", __b); });
     { assignBoundProperty(__el12, "hotkey", false); }
-    __el12.addEventListener('pdx-open', safeHandler(batchHandler(() => ctx.filesOpen.setRaw(true)), ctx.el?.tagName?.toLowerCase(), 'pdx-open'));
-    __el12.addEventListener('pdx-close', safeHandler(batchHandler(() => ctx.filesOpen.setRaw(false)), ctx.el?.tagName?.toLowerCase(), 'pdx-close'));
     __el12.addEventListener('pdx-select', safeHandler(batchHandler(ctx.onFile), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
     __m18.replaceWith(slotCarrier('item', __pdxSlot_item_0));
     return __frag;

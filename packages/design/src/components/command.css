@@ -39,7 +39,8 @@
     transition: opacity var(--pdx-duration-fast), visibility 0ms var(--pdx-duration-fast);
 }
 
-.pdx-command-backdrop[data-open] {
+/* Open: `pdx-command:state(open)` on the component (#288), `[data-open]` in native markup. */
+.pdx-command-backdrop:is([data-open], pdx-command:state(open) > *) {
     opacity: 1;
     visibility: visible;
     transition: opacity var(--pdx-duration-fast), visibility 0ms;
@@ -68,7 +69,7 @@
     transition: opacity var(--pdx-duration-fast), transform var(--pdx-duration-fast), visibility 0ms var(--pdx-duration-fast);
 }
 
-.pdx-command[data-open] {
+.pdx-command:is([data-open], pdx-command:state(open) > *) {
     opacity: 1;
     visibility: visible;
     transform: translateX(-50%) scale(1);

@@ -31,7 +31,7 @@ import { parseSFC } from '../parser/sfc';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
-export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select', 'pdx-date-picker', 'pdx-dialog', 'pdx-drawer', 'pdx-bottom-sheet']);
+export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select', 'pdx-date-picker', 'pdx-dialog', 'pdx-drawer', 'pdx-bottom-sheet', 'pdx-command']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -150,7 +150,7 @@ export const openChangeEvent: LanguageChange = {
 };
 
 /** A component's alpha popup methods, each a name no other component has, and the verb each is. */
-interface AliasVerbs { id: string; message: string; verbs: Record<string, string> }
+interface AliasVerbs { id: string; message: string; verbs: Record<string, string>; issue?: number }
 
 /** Every call of one of `verbs`, with no argument, in `text`; the template's alone in the `pdx` scope. */
 function aliasCalls(text: string, verbs: Record<string, string>, scope: LanguageChangeScope): RegExpMatchArray[] {
@@ -174,7 +174,7 @@ function aliasVerbs(alias: AliasVerbs, scope: LanguageChangeScope): LanguageChan
         id: scope === 'pdx' ? alias.id : `${alias.id}-script`,
         kind: 'removed',
         scope,
-        issue: 287,
+        issue: alias.issue ?? 287,
         message: alias.message,
         marker: new RegExp(`(?:${Object.keys(alias.verbs).map(escapeForRegExp).join('|')})\\s*\\(`),
         detect: (text) => aliasCalls(text, alias.verbs, scope).map((m) => ({
@@ -221,6 +221,18 @@ export const treeSelectOverlayVerbs = aliasVerbs(TREE_SELECT_VERBS, 'pdx');
 export const treeSelectOverlayVerbsScript = aliasVerbs(TREE_SELECT_VERBS, 'script');
 export const datePickerOverlayVerbs = aliasVerbs(DATE_PICKER_VERBS, 'pdx');
 export const datePickerOverlayVerbsScript = aliasVerbs(DATE_PICKER_VERBS, 'script');
+
+// `pdx-command`'s deprecated `openPalette()` and `closePalette()` were aliases of `show()` and
+// `close()`; no other component has those names (#288).
+const COMMAND_VERBS: AliasVerbs = {
+    id: 'command-overlay-verbs',
+    message: '`pdx-command`\'s `openPalette()` and `closePalette()` are gone: write `show()` and `close()`.',
+    verbs: { openPalette: 'show', closePalette: 'close' },
+    issue: 288,
+};
+
+export const commandOverlayVerbs = aliasVerbs(COMMAND_VERBS, 'pdx');
+export const commandOverlayVerbsScript = aliasVerbs(COMMAND_VERBS, 'script');
 
 // `pdx-autocomplete`'s and `pdx-color-picker`'s `open()` is `show()`; their `close()` stays (#287).
 // `open()` is a common name — a dialog has one — so the call is rewritten only where its receiver is

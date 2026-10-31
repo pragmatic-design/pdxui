@@ -69,6 +69,15 @@ const DONE: Row[] = [
         parts: ['root'],
         removed: ['hide'],
     },
+    {
+        tag: 'pdx-command',
+        models: ['open'],
+        states: ['open'],
+        // The panel and its backdrop, the search combobox, the listbox, a named group, an option, the
+        // message when nothing matches, and the keys' footer.
+        parts: ['root', 'backdrop', 'input', 'list', 'group', 'option', 'empty', 'footer'],
+        removed: ['openPalette', 'closePalette'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

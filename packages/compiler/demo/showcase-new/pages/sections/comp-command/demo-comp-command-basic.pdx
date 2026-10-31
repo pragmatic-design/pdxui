@@ -13,11 +13,9 @@
       </button>
       <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong>{{ lastRun }}</strong></span>
       <pdx-command
-        :open="open"
+        ::open="open"
         :items="commandItems"
         placeholder="Search commands…"
-        @pdx-open="open = true"
-        @pdx-close="open = false"
         @pdx-select="onSelect">
       </pdx-command>
     </div>
@@ -29,7 +27,7 @@
   { id: 'settings', label: 'Settings', group: 'Account', icon: 'settings', shortcut: 'Ctrl ,' },
 ];
 
-&lt;pdx-command :open="open" :items="items"
+&lt;pdx-command ::open="open" :items="items"
   @pdx-select="onSelect" /&gt;</code></pre>
     </details>
   </section>
@@ -52,7 +50,6 @@ const commandItems = [
 
 function onSelect(e) {
   lastRun = (e.detail && e.detail.label) || '—';
-  open = false;
 }
 </script>
 

@@ -3,7 +3,7 @@
 // Features: fuzzy filter, grouped items, keyboard shortcuts display, empty state, focus trap.
 // Uses overlayStack for z-index coordination + Escape handling.
 
-import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, snippetOrSlot, model } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 
 /** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
@@ -29,16 +29,21 @@ export interface CommandItem {
 
 /**
  * A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with
- * `show()`, close it with `close()` (or `toggle()`); `openPalette()` / `closePalette()` are
- * deprecated aliases of those two. Focus stays in the input, and the highlighted command is its
- * `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is announced as
- * `aria-keyshortcuts`.
+ * `show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted
+ * command is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is
+ * announced as `aria-keyshortcuts`.
  * @slot item - Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.
  * @fires pdx-select {CommandItem} - The chosen item itself, after its own `action` (if any) has run.
  */
 component('pdx-command', {
+    // `open` is a model (#288): the palette opens and closes itself — the hotkey, Escape, the backdrop, a
+    // chosen command — and its own writes announce `open-change` `{ value }`, which `::open` follows. It
+    // replaced `pdx-open` and `pdx-close`.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as a custom state (#132, #288): command.css draws the panel and backdrop from it.
+    states: ['open'],
+    parts: ['root', 'backdrop', 'input', 'list', 'group', 'option', 'empty', 'footer'],
     props: {
-        open: { type: Boolean, default: false },
         /** The search input's placeholder. Empty: the command.placeholder component string, «Type a command...». */
         placeholder: { type: String, default: '' },
         items: { type: Array, default: [] },
@@ -54,7 +59,8 @@ component('pdx-command', {
         item: slot<(item: T, index: number, active: boolean) => Node>(),
     },
     setup(ctx) {
-        const _open = signal(false);
+        /** The model, read as the palette's open state everywhere below. */
+        const _open = ctx.open;
         const _query = signal('');
         const _activeIndex = signal(0);
 
@@ -113,19 +119,22 @@ component('pdx-command', {
             return groups;
         });
 
-        function openPalette() {
-            _open.set(true);
-            _query.set('');
-            // Untracked: the `open` prop's track calls this, and a tracked read of the list
-            // would subscribe it to the query — every key would re-open the palette and wipe what was typed.
-            _activeIndex.set(untracked(firstEnabled));
-            ctx.emit('pdx-open', undefined, { bubbles: false });
-        }
+        // Its own writes of the model announce `open-change`; a value the parent set announces nothing.
+        function openPalette() { _open.set(true); }
+        function closePalette() { _open.set(false); }
 
-        function closePalette() {
-            _open.set(false);
-            ctx.emit('pdx-close', undefined, { bubbles: false });
-        }
+        // Each opening starts on an empty query with the first enabled command highlighted, however it
+        // was opened — the hotkey, show(), `::open`. Untracked: a tracked read of the list would
+        // subscribe this to the query, and every key would wipe what was typed.
+        ctx.track(() => {
+            const open = _open();
+            ctx.state('open', open);
+            if (!open) return;
+            untracked(() => {
+                _query.set('');
+                _activeIndex.set(firstEnabled());
+            });
+        });
 
         function selectItem(item: CommandItem) {
             if (item.disabled) return;
@@ -165,15 +174,6 @@ component('pdx-command', {
                 else openPalette();
             }
         }
-
-        // Sync with the external `open` prop (controlled mode). It reads _open with peek() so as NOT to
-        // subscribe to the internal signal: otherwise an uncontrolled openPalette() (setup/hotkey/API)
-        // re-triggers the effect which, seeing the prop open=false, would close it again straight away.
-        // This way the effect reacts ONLY to the prop's changes, leaving programmatic opening working.
-        ctx.track(() => {
-            if (ctx.open()) openPalette();
-            else if (_open.peek()) closePalette();
-        });
 
         // Hotkey registration
         ctx.track(() => {
@@ -227,19 +227,15 @@ component('pdx-command', {
         onMount(() => { if (getItemSlot()) _slotsIn.set(true); });
 
         // Exposes the methods on the host: `return {}` from the setup gives them only to the render context, NOT
-        // to the DOM element. ctx.expose makes them reachable through a parent ref.
-        // NOTE: `show` (not `open`): `open` is a PROP — a member of the same name shadows its setter.
+        // to the DOM element. ctx.expose makes them reachable through a parent ref. Each writes the model,
+        // so each announces `open-change`. `openPalette()` and `closePalette()`, their alpha aliases, are
+        // gone (#288).
         ctx.expose({
+            /** Open the palette, clearing the query and highlighting the first command that is not disabled. */
             show: openPalette,
             close: closePalette,
             toggle: () => { if (_open.peek()) closePalette(); else openPalette(); },
             get isOpen() { return _open.peek(); },
-            // Deprecated aliases of show() / close(), kept for existing callers (the component's
-            // JSDoc says which is the API).
-            /** Open the palette, clearing the query and highlighting the first item that is not disabled. */
-            openPalette,
-            /** Close the palette and emit `pdx-close`. */
-            closePalette,
         });
 
         /** "Ctrl Shift ," → "Control+Shift+,": the aria-keyshortcuts form of a displayed shortcut. */
@@ -263,17 +259,15 @@ component('pdx-command', {
         };
     },
     render: (ctx) => html`
-        <div :class="${() => 'pdx-command-backdrop' + (ctx._open() ? '' : '')}"
-             :data-open="${() => ctx._open() ? '' : null}"
+        <div class="pdx-command-backdrop" data-part="backdrop"
              @click="${ctx.closePalette}"></div>
-        <div class="pdx-command"
+        <div class="pdx-command" data-part="root"
              role="dialog"
              aria-modal="true"
-             :aria-label="${() => uiString('command', 'palette')}"
-             :data-open="${() => ctx._open() ? '' : null}">
+             :aria-label="${() => uiString('command', 'palette')}">
             <div class="pdx-command-input">
                 <span class="pdx-command-search-icon" aria-hidden="true">&#8981;</span>
-                <input type="text"
+                <input type="text" data-part="input"
                     autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
                     :placeholder="${ctx.resolvedPlaceholder}"
                     :value="${ctx._query}"
@@ -288,9 +282,12 @@ component('pdx-command', {
                 <kbd class="pdx-command-kbd">ESC</kbd>
             </div>
             <!-- The live region OUTSIDE the listbox: role=status is not an allowed child of role=listbox
-                 (axe aria-required-children). It stays a sibling and announces the count all the same. -->
+                 (axe aria-required-children). It stays a sibling and announces the count all the same.
+                 Empty while the palette is closed: a status region speaks only when it has something to
+                 say (A4, #288). -->
             <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">
                 ${() => {
+                    if (!ctx._open()) return '';
                     const n = ctx.filteredItems().filter((i: CommandItem) => !i.disabled).length;
                     return n === 0 ? uiString('command', 'noResults') : format(uiString('command', 'commandsAvailable'), { n });
                 }}
@@ -298,13 +295,13 @@ component('pdx-command', {
             <!-- The input is the list's one tab stop: options are divs it points at with
                  aria-activedescendant, not <button>s, which would each be a tab stop.
                  A named group is a role="group" labelled by its heading. -->
-            <div class="pdx-command-list" :id="${() => ctx.listId}" role="listbox" :aria-label="${() => uiString('command', 'commands')}">
+            <div class="pdx-command-list" data-part="list" :id="${() => ctx.listId}" role="listbox" :aria-label="${() => uiString('command', 'commands')}">
                 ${() => {
                     void ctx._slotsIn();
                     const groups = ctx.groupedItems();
                     const items = ctx.filteredItems();
                     if (items.length === 0) {
-                        return html`<div class="pdx-command-empty">${ctx.resolvedEmpty}</div>`;
+                        return html`<div class="pdx-command-empty" data-part="empty">${ctx.resolvedEmpty}</div>`;
                     }
                     let flatIdx = 0;
                     return groups.map((g, gi) => {
@@ -312,7 +309,7 @@ component('pdx-command', {
                             const idx = flatIdx++;
                             const isActive = () => ctx._activeIndex() === idx;
                             return html`<div class="${() => 'pdx-command-item' + (isActive() ? ' active' : '')}"
-                                role="option"
+                                role="option" data-part="option"
                                 :id="${() => ctx.optionId(idx)}"
                                 :aria-selected="${() => isActive() ? 'true' : 'false'}"
                                 :aria-disabled="${() => item.disabled ? 'true' : null}"
@@ -333,7 +330,7 @@ component('pdx-command', {
                             </div>`;
                         });
                         return g.name
-                            ? html`<div role="group" :aria-labelledby="${() => ctx.groupId(gi)}">
+                            ? html`<div role="group" data-part="group" :aria-labelledby="${() => ctx.groupId(gi)}">
                                 <span class="pdx-command-group" :id="${() => ctx.groupId(gi)}" aria-hidden="true">${() => g.name}</span>
                                 ${itemsHtml}
                             </div>`
@@ -341,7 +338,7 @@ component('pdx-command', {
                     });
                 }}
             </div>
-            <div class="pdx-command-footer">
+            <div class="pdx-command-footer" data-part="footer">
                 <span><kbd>↑↓</kbd> ${() => uiString('command', 'navigate')}</span>
                 <span><kbd>↵</kbd> ${() => uiString('command', 'select')}</span>
                 <span><kbd>ESC</kbd> ${() => uiString('command', 'close')}</span>

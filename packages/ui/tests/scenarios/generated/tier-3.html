@@ -81,7 +81,7 @@
                 if (host && typeof host.show === 'function') host.show(); },
         "command-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="cmd"]');
-                if (host && typeof host.openPalette === 'function') host.openPalette(); },
+                if (host && typeof host.show === 'function') host.show(); },
         "date-picker-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dp-open"]');
                 if (host && typeof host.show === 'function') {
