@@ -4,7 +4,7 @@
 // validates onChange.
 // ZERO validation built-in — validation lives in @form rune or dev code.
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField, untracked } from '@pdxui/core';
 import type { Form, FormField } from '@pdxui/core';
 
 
@@ -407,6 +407,11 @@ component('pdx-form-field', {
                     if (size && size !== 'md') wc.setAttribute('size', size);
                 }
             };
+            // Now as well as in a frame (A2, #786): a control bound to a form field (`::value`) is
+            // marked invalid in the flush that makes the field invalid, and a description written a
+            // frame later leaves it aria-invalid with nothing that says why. The frame stays for a
+            // control whose DOM is not built yet.
+            untracked(lastWire);
             requestAnimationFrame(lastWire);
         });
 
