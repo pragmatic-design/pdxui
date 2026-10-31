@@ -3,7 +3,7 @@
 // Items support icons, shortcuts, submenus, checkbox/radio, disabled, danger.
 // Dynamic items: pass a function to generate items based on the clicked target.
 
-import { component, html, signal, focusGroup, onDestroy, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, slot, snippetOrSlot, event } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -25,6 +25,20 @@ function loadIcon(): void {
  * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-context-menu', {
+    events: {
+        /**
+         * The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent
+         * never writes it, so it is not a model, and `::open` on it is an error.
+         */
+        'open-change': event<{ value: boolean }>(),
+        /** An entry was chosen. */
+        'pdx-select': event<{ key: string; item: MenuItem }>(),
+    },
+    // On the host as a custom state (#132, #288).
+    states: ['open'],
+    // The panel (on <body> while the page lives, so a theme reaches it by part, not under the host's
+    // state), an entry, a separator and a group label.
+    parts: ['root', 'item', 'separator', 'label'],
     props: {
         /** Menu items (static array or function returning items) */
         items: { type: Array, default: [] },
@@ -64,6 +78,7 @@ component('pdx-context-menu', {
                 if (item.type === 'separator') {
                     const sep = document.createElement('hr');
                     sep.className = 'pdx-menu-sep';
+                    sep.dataset.part = 'separator';
                     sep.setAttribute('role', 'separator');
                     container.appendChild(sep);
                     continue;
@@ -71,6 +86,7 @@ component('pdx-context-menu', {
                 if (item.type === 'label') {
                     const lbl = document.createElement('div');
                     lbl.className = 'pdx-menu-label';
+                    lbl.dataset.part = 'label';
                     lbl.setAttribute('role', 'presentation');
                     lbl.textContent = item.label;
                     container.appendChild(lbl);
@@ -80,6 +96,7 @@ component('pdx-context-menu', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-menu-item';
+                btn.dataset.part = 'item';
                 if (item.danger) btn.classList.add('pdx-menu-danger');
                 if (item.className) btn.classList.add(item.className);
                 btn.setAttribute('data-menu-key', item.key);
@@ -154,9 +171,18 @@ component('pdx-context-menu', {
         // ─── Open at cursor position ─────────────────────────
         function openAt(clientX: number, clientY: number): void {
             if (!_panelEl) return;
+            // Already open — a second right-click, a show() at another point: the menu moves, and is
+            // still the same opening, so nothing is announced and the opener is kept.
+            const wasOpen = _open.peek();
+            if (wasOpen) {
+                removeListeners();
+            } else {
+                // Where the focus goes back when the menu closes from inside: what had it now — a
+                // focusable element in the area, or an invoker outside it (`command="--show"`).
+                const focused = document.activeElement;
+                _opener = focused instanceof HTMLElement && focused !== document.body ? focused : null;
+            }
             _open.set(true);
-            const focused = document.activeElement;
-            _opener = focused instanceof HTMLElement && ctx.el.contains(focused) ? focused : null;
 
             const items = ctx.items() as MenuItem[];
             buildMenuItems(items, _panelEl);
@@ -215,6 +241,19 @@ component('pdx-context-menu', {
                 if (ev.key === 'Escape') { ev.preventDefault(); close(); }
             };
             document.addEventListener('keydown', _escHandler, true);
+
+            if (!wasOpen) {
+                ctx.state('open', true);
+                ctx.emit('open-change', { value: true });
+            }
+        }
+
+        /** The listeners an opening adds: press outside, scroll and resize, Escape, the arrow keys. */
+        function removeListeners(): void {
+            _outsideDispose?.(); _outsideDispose = null;
+            if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
+            if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
+            if (_focusDispose) { _focusDispose(); _focusDispose = null; }
         }
 
         function close(): void {
@@ -226,10 +265,19 @@ component('pdx-context-menu', {
             if (_panelEl) _panelEl.style.display = 'none';
             if (hadFocus && _opener?.isConnected) _opener.focus();
             _opener = null;
-            _outsideDispose?.(); _outsideDispose = null;
-            if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
-            if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
-            if (_focusDispose) { _focusDispose(); _focusDispose = null; }
+            removeListeners();
+            ctx.state('open', false);
+            ctx.emit('open-change', { value: false });
+        }
+
+        /**
+         * Open at a point, or — with none, from a method or an invoker command — over the area it
+         * wraps: the host draws no box of its own (`display: contents`), so its first element's.
+         */
+        function show(clientX?: number, clientY?: number): void {
+            if (typeof clientX === 'number' && typeof clientY === 'number') { openAt(clientX, clientY); return; }
+            const area = (ctx.el.firstElementChild as HTMLElement | null)?.getBoundingClientRect();
+            openAt(area ? area.left + area.width / 2 : 0, area ? area.top + area.height / 2 : 0);
         }
 
         function destroy(): void {
@@ -253,6 +301,7 @@ component('pdx-context-menu', {
                     // Create panel (appended to body for correct z-index)
                     _panelEl = document.createElement('div');
                     _panelEl.className = 'pdx-context-menu-panel pdx-menu';
+                    _panelEl.dataset.part = 'root';
                     _panelEl.setAttribute('role', 'menu');
                     uiAttr(_panelEl, 'aria-label', () => uiString('context-menu', 'label'));
                     _panelEl.style.display = 'none';
@@ -263,7 +312,7 @@ component('pdx-context-menu', {
                         if (ctx.disabled()) return;
                         const me = e as MouseEvent;
                         me.preventDefault();
-                        close();
+                        // Open, or — already open — move to the new point.
                         openAt(me.clientX, me.clientY);
                     });
 
@@ -307,7 +356,13 @@ component('pdx-context-menu', {
         // Teardown on destroy only (not on prop change).
         onDestroy(destroy);
 
-        ctx.expose({ open: openAt, close });
+        // The overlay verbs (#288): `open(x, y)` is `show(x, y)`, and `toggle()` is new.
+        ctx.expose({
+            show,
+            close,
+            toggle(clientX?: number, clientY?: number) { if (_open.peek()) close(); else show(clientX, clientY); },
+            get isOpen() { return _open() as boolean; },
+        });
 
         return {};
     },

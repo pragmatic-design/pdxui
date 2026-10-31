@@ -394,6 +394,20 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-context-menu` takes the beta contract (#288).
+  - **`open(x, y)` is `show(x, y)`**; with no point it opens over the area it wraps, so an invoker
+    command, `command="--show"`, opens it. `close()` stays; `toggle()` and `isOpen` are new.
+    `pdx migrate` rewrites `open(…)` on a `:ref` bound on a `pdx-context-menu`, its arguments kept, and
+    flags it on a lookup.
+  - **`open-change` `{ value }`** announces each opening and closing. A `show()` at another point while
+    open moves the menu and announces nothing; a right-click elsewhere in the area closes it (its press
+    is outside the menu) and opens it there. It is read-only: the parent never writes whether the menu
+    is open, so it is not a model.
+  - **Focus.** A close from inside the menu gives the focus back to the element that had it when the
+    menu opened — an invoker outside the area too, where before only an element inside it got it back.
+  - **States and parts.** `open` is a custom state on the host. The parts are `root` (the panel, on
+    `<body>`), `item`, `separator` and `label`.
+
 - **Breaking:** `pdx-dropdown-menu` takes the beta contract (#288).
   - **`open()` is `show()`**; `close()` and `toggle()` stay, and `isOpen` is new. The alpha handle
     `host.__dropdownMenu` is gone. `pdx migrate` rewrites `open()` on a `:ref` bound on a

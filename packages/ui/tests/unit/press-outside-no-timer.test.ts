@@ -62,7 +62,7 @@ const TARGETS: Target[] = [
                 (e as unknown as { items: unknown[] }).items = [{ key: 'a', label: 'A' }];
                 e.appendChild(document.createElement('div'));
             });
-            return () => el.open(10, 10);
+            return () => el.show(10, 10);
         },
     },
     {

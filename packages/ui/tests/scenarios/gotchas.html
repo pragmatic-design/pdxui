@@ -323,6 +323,19 @@
                 };
             },
 
+            // pdx-context-menu on the beta contract (#288). No model: its open state is read-only, so the
+            // opener is an invoker command and nothing is bound.
+            'context-menu-beta-contract': () => {
+                const items = [{ key: 'cut', label: 'Cut' }, { type: 'separator' }, { type: 'label', label: 'More' }, { key: 'copy', label: 'Copy' }];
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound" style="padding: 24px">
+                        <p><button type="button" data-test="opener" commandfor="bound-cm" command="--show">Actions</button></p>
+                        <pdx-context-menu id="bound-cm" :items=${items}><div data-test="area" style="width: 240px; height: 120px; border: 1px dashed">Right-click here</div></pdx-context-menu>
+                    </div>`);
+                };
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

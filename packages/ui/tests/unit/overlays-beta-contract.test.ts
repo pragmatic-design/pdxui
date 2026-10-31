@@ -105,6 +105,16 @@ const DONE: Row[] = [
         parts: ['trigger'],
         removed: ['open'],
     },
+    {
+        tag: 'pdx-context-menu',
+        // The parent never writes its open state: `open-change` is a read-only output.
+        models: [],
+        states: ['open'],
+        // The panel (on <body>), an entry, a separator and a group label, as pdx-menu's.
+        parts: ['root', 'item', 'separator', 'label'],
+        // `open(x, y)` is `show(x, y)`.
+        removed: ['open'],
+    },
 ];
 
 /**

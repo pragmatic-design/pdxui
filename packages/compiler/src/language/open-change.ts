@@ -240,26 +240,44 @@ export const commandOverlayVerbsScript = aliasVerbs(COMMAND_VERBS, 'script');
 // template or its script. A call on a lookup of the tag (`querySelector('pdx-autocomplete')`) is
 // flagged; anything else cannot be told from any other `open()`, and is left.
 
-/** Every `name.<from>()` / `name?.<from>()` of a name a `:ref` binds on `tag`. Groups: [1]=the name [2]=the access */
-function refVerbCalls(text: string, tag: string, from: string): RegExpMatchArray[] {
+/**
+ * The argument list of a call: `()` alone, or — `args` — anything, with at most one level of
+ * parentheses inside (`(e.clientX, Math.round(y))`). Groups (with args): [1]=the arguments
+ */
+function callParens(args: boolean): string {
+    return args ? '\\(((?:[^()]|\\([^()]*\\))*)\\)' : '\\(\\s*\\)';
+}
+
+/**
+ * Every `name.<from>(…)` / `name?.<from>(…)` of a name a `:ref` binds on `tag`.
+ * Groups: [1]=the name [2]=the access [3]=the arguments (with `args`)
+ */
+function refVerbCalls(text: string, tag: string, from: string, args = false): RegExpMatchArray[] {
     // Match: a `:ref` on the tag's opening tag, quoted values read whole. Groups: [1]=the bound name
     const ref = new RegExp(`<${escapeForRegExp(tag)}\\b(?:[^>"']|"[^"]*"|'[^']*')*?\\s:ref\\s*=\\s*["']\\s*([A-Za-z_$][\\w$]*)\\s*["']`, 'gi');
     const names = [...new Set([...text.matchAll(ref)].map((m) => m[1]))];
     if (names.length === 0) return [];
     // Match: the name standing alone, its member access and `<from>()`. Groups: [1]=the name [2]=`.` or `?.`
-    const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*${escapeForRegExp(from)}\\s*\\(\\s*\\)`, 'g');
+    const call = new RegExp(`(?<![\\w$.])(${names.map(escapeForRegExp).join('|')})\\s*(\\??\\.)\\s*${escapeForRegExp(from)}\\s*${callParens(args)}`, 'g');
     return [...text.matchAll(call)];
 }
 
-/** A tag's alpha verb, a common name tied to the tag by a `:ref`, and the overlay verb that replaces it. */
-interface TagVerb { tag: string; id: string; from: string; to: string; issue: number; message: string }
+/**
+ * A tag's alpha verb, a common name tied to the tag by a `:ref`, and the overlay verb that replaces it.
+ * `args`: the verb takes arguments, kept as written (`open(x, y)` → `show(x, y)`); without it only a
+ * call with none matches.
+ */
+interface TagVerb { tag: string; id: string; from: string; to: string; issue: number; message: string; args?: boolean }
 
 /** The pair of entries for a tag whose `from()` is `to()`: the ref'd calls, and the lookups. */
 function tagVerb(v: TagVerb): { ref: LanguageChange; unbound: LanguageChange } {
     // Match: `.<from>()` on a lookup of the tag, `querySelector('<tag>')` or `('#f <tag>')`, with an
     // optional `!` or index. Groups: [1]=the quote
     const lookup = (): RegExp => new RegExp(
-        `querySelector(?:All)?\\s*\\(\\s*(['"\`])[^'"\`]*${escapeForRegExp(v.tag)}[^'"\`]*\\1\\s*\\)\\s*(?:\\[\\s*\\d+\\s*\\])?\\s*!?\\s*\\??\\.\\s*${escapeForRegExp(v.from)}\\s*\\(\\s*\\)`, 'g');
+        `querySelector(?:All)?\\s*\\(\\s*(['"\`])[^'"\`]*${escapeForRegExp(v.tag)}[^'"\`]*\\1\\s*\\)\\s*(?:\\[\\s*\\d+\\s*\\])?\\s*!?\\s*\\??\\.\\s*${escapeForRegExp(v.from)}\\s*${callParens(!!v.args)}`, 'g');
+    const args = !!v.args;
+    /** The call rewritten: the same name and access, the new verb, the arguments as written. */
+    const rewritten = (m: RegExpMatchArray): string => `${m[1]}${m[2]}${v.to}(${args ? m[3] : ''})`;
     return {
         ref: {
             id: `${v.id}-${v.from}-${v.to}`,
@@ -268,11 +286,11 @@ function tagVerb(v: TagVerb): { ref: LanguageChange; unbound: LanguageChange } {
             issue: v.issue,
             message: v.message,
             marker: v.tag,
-            detect: (text) => refVerbCalls(text, v.tag, v.from).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${m[1]}${m[2]}${v.to}()\`.` })),
+            detect: (text) => refVerbCalls(text, v.tag, v.from, args).map((m) => ({ line: lineAt(text, m.index!), found: m[0], note: `Here, write \`${rewritten(m)}\`.` })),
             fix: (text) => {
                 let out = text;
-                for (const m of refVerbCalls(text, v.tag, v.from).reverse()) {
-                    out = out.slice(0, m.index!) + `${m[1]}${m[2]}${v.to}()` + out.slice(m.index! + m[0].length);
+                for (const m of refVerbCalls(text, v.tag, v.from, args).reverse()) {
+                    out = out.slice(0, m.index!) + rewritten(m) + out.slice(m.index! + m[0].length);
                 }
                 return out;
             },
@@ -345,3 +363,12 @@ const DROPDOWN_MENU_OPEN = tagVerb({
 
 export const dropdownMenuOpenShow = DROPDOWN_MENU_OPEN.ref;
 export const dropdownMenuOpenUnbound = DROPDOWN_MENU_OPEN.unbound;
+
+// `pdx-context-menu`'s `open(x, y)` is `show(x, y)`, the overlay verb (#288); its point is kept.
+const CONTEXT_MENU_OPEN = tagVerb({
+    tag: 'pdx-context-menu', id: 'context-menu', from: 'open', to: 'show', issue: 288, args: true,
+    message: '`pdx-context-menu` opens with the overlay verb: `open(x, y)` is `show(x, y)`, which also opens over its area with no point; `close()` is unchanged and `toggle()` is new.',
+});
+
+export const contextMenuOpenShow = CONTEXT_MENU_OPEN.ref;
+export const contextMenuOpenUnbound = CONTEXT_MENU_OPEN.unbound;
