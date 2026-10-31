@@ -125,6 +125,17 @@ const DONE: Row[] = [
         parts: ['root', 'primary', 'trigger', 'menu', 'item', 'separator'],
         removed: [],
     },
+    {
+        tag: 'pdx-fab',
+        // The parent never writes its open state: `open-change` is a read-only output.
+        models: [],
+        // fab.css draws the open dial, the turned icon and the mask from it.
+        states: ['open'],
+        // The main button, the speed dial, an action, its label and the mask.
+        parts: ['root', 'menu', 'item', 'label', 'mask'],
+        // `open()` is `show()`.
+        removed: ['open'],
+    },
 ];
 
 /**

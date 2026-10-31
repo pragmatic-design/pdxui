@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound, fabOpenShow, fabOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -368,6 +368,30 @@ describe('context-menu-open-show: pdx-context-menu\'s open(x, y) is show(x, y) (
         // A dropdown's open() takes no arguments: a call with some is not its alpha verb.
         expect(dropdownMenuOpenShow.detect('<template><pdx-dropdown-menu :ref="dd"></pdx-dropdown-menu><button @click="dd.open(1)">x</button></template>')).toEqual([]);
         for (const id of ['context-menu-open-show', 'context-menu-open-unbound']) {
+            expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
+        }
+    });
+});
+
+describe('fab-open-show: pdx-fab\'s open() is show() (#288)', () => {
+    const fix = fabOpenShow.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-fab of the file is rewritten; close() and toggle() stay', () => {
+        const source = '<template><pdx-fab :ref="fab"></pdx-fab><button @click="fab.open()">x</button><button @click="fab.toggle()">y</button></template>\n<script>\nfunction more() { fab?.open(); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="fab.show()"');
+        expect(out).toContain('fab?.show();');
+        expect(out).toContain('@click="fab.toggle()"');
+        expect(fabOpenShow.detect(out)).toEqual([]);
+        expect(fix(out)).toBe(out);
+    });
+
+    it('a lookup of the tag is flagged', () => {
+        const found = fabOpenUnbound.detect("document.querySelector('pdx-fab').open();");
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('show()');
+        expect(fabOpenUnbound.fix).toBe('flag');
+        for (const id of ['fab-open-show', 'fab-open-unbound']) {
             expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
         }
     });

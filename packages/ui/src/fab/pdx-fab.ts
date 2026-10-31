@@ -2,7 +2,7 @@
 // Supports: direction (up/down/left/right), type (linear/circle/semi-circle/quarter-circle),
 // tooltip labels, mask overlay, trigger (click/hover), animation stagger.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, event } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -23,6 +23,22 @@ export interface FabAction {
  * A floating action button that can open a speed dial of actions, in four directions and four layouts.
  */
 component('pdx-fab', {
+    events: {
+        /**
+         * The speed dial opened (`true`) or closed (`false`): its open state, read-only (#288). The
+         * parent never writes it, so it is not a model, and `::open` on it is an error.
+         */
+        'open-change': event<{ value: boolean }>(),
+        /** The button was pressed, on a FAB with no speed dial. */
+        'pdx-click': event<Record<string, never>>(),
+        /** An action of the speed dial was chosen. */
+        'pdx-select': event<{ key: string; action: FabAction }>(),
+    },
+    // On the host as a custom state (#132, #288): fab.css draws the open dial, the turned icon and the
+    // mask from it.
+    states: ['open'],
+    // The main button, the speed dial, an action, its label and the mask.
+    parts: ['root', 'menu', 'item', 'label', 'mask'],
     // The axes fab.css keys by (#630), reflected on the host; a variant and a size map the class that
     // draws the same button on native markup. The position places the host itself.
     variants: {
@@ -141,8 +157,14 @@ component('pdx-fab', {
         let _dialEl: HTMLElement | null = null;
 
         function setOpen(v: boolean): void {
+            const was = _open.peek();
             _open.set(v);
             _dialEl?.toggleAttribute('inert', !v);
+            // Announced once, on a change: a hover's leave timer or a close() may repeat it.
+            if (v !== was) {
+                ctx.state('open', v);
+                ctx.emit('open-change', { value: v });
+            }
         }
 
         /** The actions nearest the FAB first. A linear dial going up or left sits before the FAB in
@@ -226,6 +248,7 @@ component('pdx-fab', {
                     if (useMask) {
                         _maskEl = document.createElement('div');
                         _maskEl.className = 'pdx-fab-mask';
+                        _maskEl.dataset.part = 'mask';
                         ctx.el.appendChild(_maskEl);
                     }
 
@@ -234,6 +257,7 @@ component('pdx-fab', {
                         const dial = document.createElement('div');
                         dial.className = 'pdx-fab-dial pdx-fab-dial-' + layoutType;
                         dial.setAttribute('role', 'menu');
+                        dial.dataset.part = 'menu';
                         dial.setAttribute('aria-label', fabName());
                         dial.toggleAttribute('inert', !_open.peek());
                         dial.addEventListener('keydown', onDialKeydown);
@@ -250,6 +274,7 @@ component('pdx-fab', {
                             btn.className = 'pdx-fab-action';
                             btn.setAttribute('aria-label', action.label);
                             btn.setAttribute('role', 'menuitem');
+                            btn.dataset.part = 'item';
 
                             const ic = document.createElement('pdx-icon');
                             ic.setAttribute('name', action.icon);
@@ -267,6 +292,7 @@ component('pdx-fab', {
                             if (showTooltip && action.label) {
                                 const tip = document.createElement('span');
                                 tip.className = 'pdx-fab-tooltip';
+                                tip.dataset.part = 'label';
                                 tip.textContent = action.label;
                                 wrap.appendChild(tip);
                             }
@@ -336,11 +362,10 @@ component('pdx-fab', {
         ctx.track(() => {
             const isOpen = _open();
             requestAnimationFrame(() => {
+                // The open look — the dial, the turned icon, the mask — is fab.css's, from the host's
+                // `:state(open)` (#288); the component sets no class for it.
                 const dial = ctx.el.querySelector('.pdx-fab-dial');
-                if (dial) {
-                    dial.classList.toggle('pdx-fab-dial-open', isOpen);
-                    dial.toggleAttribute('inert', !isOpen);
-                }
+                if (dial) dial.toggleAttribute('inert', !isOpen);
 
                 // Position circular actions when first opened
                 const lt = (ctx.type() as string);
@@ -350,11 +375,7 @@ component('pdx-fab', {
                 }
 
                 const mainFab = ctx.el.querySelector('.pdx-fab');
-                if (mainFab) {
-                    mainFab.classList.toggle('pdx-fab-open', isOpen);
-                    mainFab.setAttribute('aria-expanded', String(isOpen));
-                }
-                if (_maskEl) _maskEl.classList.toggle('pdx-fab-mask-visible', isOpen);
+                if (mainFab) mainFab.setAttribute('aria-expanded', String(isOpen));
 
                 // Click-outside to close
                 if (isOpen) {
@@ -377,10 +398,12 @@ component('pdx-fab', {
             });
         });
 
+        // The overlay verbs (#288): `open()` is `show()`.
         ctx.expose({
-            open: () => setOpen(true),
-            close: () => setOpen(false),
-            toggle: () => setOpen(!_open.peek()),
+            show: () => setOpen(true),
+            close: () => closeToFab(),
+            toggle: () => { if (_open.peek()) closeToFab(); else setOpen(true); },
+            get isOpen() { return _open() as boolean; },
         });
 
         return {};
