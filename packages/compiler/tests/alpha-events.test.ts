@@ -209,3 +209,25 @@ describe('the resolver reads them from a manifest', () => {
         });
     });
 });
+
+// The shipped manifest, as `pdx migrate` reads it in a project that depends on @pdxui/ui.
+describe('the navigation components, from the shipped manifest (#289)', () => {
+    const r = new ComponentResolver();
+    r.registerUiManifest(process.cwd());
+    const fix = (text: string): string => {
+        const apply = alphaChangeEvent.fix;
+        // The rule rewrites, it does not only flag: a `'flag'` here is the failure.
+        if (typeof apply !== 'function') throw new Error('alpha-change-event no longer rewrites');
+        return apply(text, { alphaOf: (tag: string) => r.alphaOf(tag) });
+    };
+
+    it('pdx-tabs: @pdx-change becomes @value-change', () => {
+        expect(fix('<pdx-tabs @pdx-change="tab = $event.detail.value"></pdx-tabs>'))
+            .toBe('<pdx-tabs @value-change="tab = $event.detail.value"></pdx-tabs>');
+    });
+
+    it('pdx-pagination: @pdx-change becomes @page-change, its page read as the value and its size off the host', () => {
+        expect(fix('<pdx-pagination @pdx-change="load($event.detail.page, $event.detail.pageSize)"></pdx-pagination>'))
+            .toBe('<pdx-pagination @page-change="load($event.detail.value, $event.currentTarget.pageSize)"></pdx-pagination>');
+    });
+});

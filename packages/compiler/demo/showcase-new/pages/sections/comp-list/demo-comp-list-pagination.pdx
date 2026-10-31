@@ -7,7 +7,7 @@
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)">
       <span class="pdx-txt-small pdx-ink-muted" id="paged-info">{{ pagedInfo }}</span>
-      <pdx-pagination :total="pagedTotal" :pageSize="5" :page="pagedPage" @pdx-change="onPageChange" id="paged-pagination"></pdx-pagination>
+      <pdx-pagination :total="pagedTotal" :pageSize="5" :page="pagedPage" @page-change="onPageChange" id="paged-pagination"></pdx-pagination>
     </div>
     <details class="source-block">
       <summary>Source</summary>
@@ -19,7 +19,7 @@
 
 &lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;
 &lt;pdx-pagination :total="ds.total()" :pageSize="5"
-  :page="ds.page()" @pdx-change="onPage"&gt;
+  :page="ds.page()" @page-change="onPage"&gt;
 &lt;/pdx-pagination&gt;</code></pre>
     </details>
   </section>
@@ -67,7 +67,7 @@ const pagedInfo = $derived(pagedDS.isLoading()
   : 'Showing ' + pagedDS.data().length + ' of ' + pagedDS.total() + ' items (page ' + pagedDS.page() + ')');
 
 function onPageChange(evt) {
-  pagedDS.setPage(evt.detail.page);
+  pagedDS.setPage(evt.detail.value);
 }
 
 function renderPagedItem(userItem) {

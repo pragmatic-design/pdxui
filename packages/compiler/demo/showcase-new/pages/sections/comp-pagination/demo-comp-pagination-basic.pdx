@@ -1,25 +1,21 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Basic</h2>
-    <p class="pdx-txt-small pdx-ink-muted">10 pages. Click page numbers or arrows to navigate.</p>
+    <p class="pdx-txt-small pdx-ink-muted">10 pages. Click page numbers or arrows to navigate: <code>::page</code> follows them.</p>
     <div class="demo-row">
-      <pdx-pagination :total="100" :pageSize="10" :page="1" @pdx-change="onPageChange"></pdx-pagination>
+      <pdx-pagination :total="100" :pageSize="10" ::page="current"></pdx-pagination>
     </div>
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" :page="1" @pdx-change="onPageChange"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" ::page="current"&gt;
 &lt;/pdx-pagination&gt;</code></pre>
     </details>
-    <div class="event-log pdx-txt-mono pdx-txt-small" id="page-event-log">{{ pageLog }}</div>
+    <div class="event-log pdx-txt-mono pdx-txt-small" id="page-event-log">page {{ current }}</div>
   </section>
 </template>
 
 <script>
-let pageLog = $signal('Click a page...');
-
-function onPageChange(e) {
-  pageLog = 'pdx-change: page ' + e.detail.page + ', pageSize ' + e.detail.pageSize;
-}
+let current = $signal(1);
 </script>
 
 <style scoped>

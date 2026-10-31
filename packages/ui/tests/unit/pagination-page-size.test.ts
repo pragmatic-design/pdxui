@@ -24,7 +24,9 @@ type SizeSelect = HTMLElement & { value: string | null; options: { value: string
 // claims. The "absent by default" case below is exactly that shape, so it waits too.
 async function mount(attrs: string): Promise<HTMLElement> {
     const host = document.createElement('div');
-    host.innerHTML = `<pdx-pagination total="100" page="1" page-size="10" ${attrs}></pdx-pagination>`;
+    // `attrs` first: the parser keeps the first of two equal attributes, so a `page="3"` passed in
+    // would otherwise lose to the default `page="1"`.
+    host.innerHTML = `<pdx-pagination ${attrs} total="100" page="1" page-size="10"></pdx-pagination>`;
     document.body.appendChild(host);
     await tick(20);
     // The selector is a lazily imported pdx-select: read once it is upgraded (#692).
@@ -73,17 +75,20 @@ describe('pdx-pagination page size', () => {
         expect(Number(sel.value)).toBe(10);
     });
 
-    it('emits pdx-change with the new size, and goes back to page 1', async () => {
+    it('announces the new size by page-size-change, and page 1 by page-change', async () => {
         // Page 1 is not a detail: staying on page 9 of 20 while the size triples lands past the end.
         const host = await mount('show-page-size page="3"');
         const el = host.querySelector('pdx-pagination')!;
         const seen: unknown[] = [];
-        el.addEventListener('pdx-change', (e) => seen.push((e as CustomEvent).detail));
+        // The models' events since #289.
+        for (const name of ['page-size-change', 'page-change', 'value-change']) {
+            el.addEventListener(name, (e) => seen.push([name, (e as CustomEvent).detail]));
+        }
 
         await chooseSize(host, '50');
 
-        // One event, the pager's: the select's own pdx-change does not leak out of it as a second.
-        expect(seen).toEqual([{ page: 1, pageSize: 50 }]);
+        // The pager's own, one each: the select's value-change does not bubble out of it as a third.
+        expect(seen).toEqual([['page-size-change', { value: 50 }], ['page-change', { value: 1 }]]);
     });
 
     it('has an accessible name, and a translatable one', async () => {

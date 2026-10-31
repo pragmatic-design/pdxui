@@ -168,7 +168,7 @@ const ds = createDataSource({
 ```html
 <pdx-list :source="ds" :render-item="renderItem"></pdx-list>
 <pdx-pagination :total="ds.total()" :pageSize="5"
-  :page="ds.page()" @pdx-change="onPage">
+  :page="ds.page()" @page-change="onPage">
 </pdx-pagination>
 ```
 

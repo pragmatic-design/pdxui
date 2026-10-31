@@ -38,8 +38,8 @@
           <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>total</code></td><td>Number</td><td>0</td><td>Total number of items</td></tr>
-            <tr><td><code>pagesize</code></td><td>Number</td><td>10</td><td>Items per page</td></tr>
-            <tr><td><code>page</code></td><td>Number</td><td>1</td><td>Current page (1-based)</td></tr>
+            <tr><td><code>pagesize</code></td><td>Number</td><td>10</td><td>Items per page. A model: a new size from the size select writes it, announced by <code>page-size-change</code> { value }</td></tr>
+            <tr><td><code>page</code></td><td>Number</td><td>1</td><td>Current page (1-based). A model: <code>::page</code> follows a click, announced by <code>page-change</code> { value }</td></tr>
             <tr><td><code>showedges</code></td><td>Boolean</td><td>true</td><td>Show « » first/last buttons</td></tr>
             <tr><td><code>simple</code></td><td>Boolean</td><td>false</td><td>Simple ‹ X/Y › mode</td></tr>
             <tr><td><code>showtotal</code></td><td>Boolean</td><td>false</td><td>Show "X–Y of Z" info text</td></tr>
@@ -55,7 +55,23 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-change</code></td><td>{ page, pageSize }</td><td>Page changed</td></tr>
+            <tr><td><code>page-change</code></td><td>{ value }</td><td>The pager moved to another page</td></tr>
+            <tr><td><code>page-size-change</code></td><td>{ value }</td><td>A new page size was picked</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ═══ Methods and parts ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Methods and parts</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>goTo(n)</code></td><td>Go to page n, clamped to the pages there are</td></tr>
+            <tr><td><code>next() / prev() / first() / last()</code></td><td>Also as <code>command="--next"</code> on a button</td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>nav</code>, <code>page</code>, <code>first</code>, <code>prev</code>, <code>next</code>, <code>last</code>, <code>ellipsis</code>, <code>range</code>, <code>position</code>, <code>size</code></td></tr>
           </tbody>
         </table>
       </div>
