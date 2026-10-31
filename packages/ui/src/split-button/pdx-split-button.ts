@@ -2,7 +2,7 @@
 // Left side: primary action (click). Right side: chevron that opens a dropdown menu.
 // Reuses menu rendering pattern from pdx-dropdown-menu.
 
-import { component, html, signal, focusGroup, onDestroy } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, event } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -22,6 +22,23 @@ function loadIcon(): void {
  * A primary action button with a dropdown arrow that opens the secondary actions.
  */
 component('pdx-split-button', {
+    events: {
+        /**
+         * The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent
+         * never writes it, so it is not a model, and `::open` on it is an error.
+         */
+        'open-change': event<{ value: boolean }>(),
+        /** The primary button was pressed. */
+        'pdx-click': event<Record<string, never>>(),
+        /** An entry of the menu was chosen. */
+        'pdx-select': event<{ key: string; item: MenuItem }>(),
+    },
+    // On the host as custom states (#132, #288): `open` while the menu shows, `loading` while the
+    // primary action is pending (its button is `aria-busy` then, A4).
+    states: ['open', 'loading'],
+    // The button group, its primary button and the arrow that opens the menu; the menu (on <body>
+    // while open), an entry and a separator.
+    parts: ['root', 'primary', 'trigger', 'menu', 'item', 'separator'],
     props: {
         /** Primary button label */
         label: { type: String, default: '' },
@@ -66,6 +83,7 @@ component('pdx-split-button', {
                 if (item.type === 'separator') {
                     const sep = document.createElement('hr');
                     sep.className = 'pdx-menu-sep';
+                    sep.dataset.part = 'separator';
                     container.appendChild(sep);
                     continue;
                 }
@@ -73,6 +91,7 @@ component('pdx-split-button', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-menu-item';
+                btn.dataset.part = 'item';
                 if (item.danger) btn.classList.add('pdx-menu-danger');
                 btn.setAttribute('role', 'menuitem');
                 btn.setAttribute('data-menu-key', item.key);
@@ -138,10 +157,19 @@ component('pdx-split-button', {
         function setOpen(v: boolean): void {
             _open.set(v);
             _arrowEl?.setAttribute('aria-expanded', String(v));
+            ctx.state('open', v);
+            ctx.emit('open-change', { value: v });
         }
+
+        /** The element that had the focus when the menu opened: it gets it back on close. */
+        let _returnFocus: HTMLElement | null = null;
 
         function open(): void {
             if (_open.peek() || !_panelEl || !_arrowEl) return;
+            // What had the focus now — an invoker that is not the arrow (`command="--show"`), or the
+            // arrow itself — and the arrow when nothing had it.
+            const before = document.activeElement;
+            _returnFocus = before instanceof HTMLElement && before !== document.body ? before : null;
             setOpen(true);
 
             if (!_panelEl.isConnected) document.body.appendChild(_panelEl);
@@ -204,7 +232,8 @@ component('pdx-split-button', {
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
             if (_focusDispose) { _focusDispose(); _focusDispose = null; }
-            _arrowEl?.focus();
+            (_returnFocus?.isConnected ? _returnFocus : _arrowEl)?.focus();
+            _returnFocus = null;
         }
 
         function toggle(): void {
@@ -219,6 +248,7 @@ component('pdx-split-button', {
             const size = ctx.size() as string;
             const loading = ctx.loading() as boolean;
             const disabled = ctx.disabled() as boolean;
+            ctx.state('loading', loading);
 
             if (!_built) {
                 _built = true;
@@ -228,11 +258,13 @@ component('pdx-split-button', {
 
                     const group = document.createElement('div');
                     group.className = 'pdx-split-button-group';
+                    group.dataset.part = 'root';
 
                     // Primary button
                     _primaryEl = document.createElement('button');
                     _primaryEl.type = 'button';
                     _primaryEl.className = `pdx-${variant} pdx-split-primary`;
+                    _primaryEl.dataset.part = 'primary';
                     if (size) _primaryEl.setAttribute('size', size);
 
                     if (iconName) {
@@ -248,8 +280,11 @@ component('pdx-split-button', {
                     }
 
                     _primaryEl.disabled = disabled || loading;
+                    if (loading) _primaryEl.setAttribute('aria-busy', 'true');
+                    // Read when pressed, not when built: the values the build saw were frozen in
+                    // here, so a button that started loading stayed silent once it had loaded.
                     _primaryEl.addEventListener('click', () => {
-                        if (disabled || loading) return;
+                        if (ctx.disabled() || ctx.loading()) return;
                         ctx.emit('pdx-click', {});
                     });
 
@@ -259,6 +294,7 @@ component('pdx-split-button', {
                     _arrowEl = document.createElement('button');
                     _arrowEl.type = 'button';
                     _arrowEl.className = `pdx-${variant} pdx-split-arrow`;
+                    _arrowEl.dataset.part = 'trigger';
                     if (size) _arrowEl.setAttribute('size', size);
                     _arrowEl.setAttribute('aria-haspopup', 'menu');
                     _arrowEl.setAttribute('aria-expanded', 'false');
@@ -268,7 +304,7 @@ component('pdx-split-button', {
                     _arrowEl.disabled = disabled;
                     _arrowEl.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (disabled) return;
+                        if (ctx.disabled()) return;
                         toggle();
                     });
 
@@ -280,6 +316,7 @@ component('pdx-split-button', {
                     // Attached in open(), removed in close()/onDestroy.
                     _panelEl = document.createElement('div');
                     _panelEl.className = 'pdx-split-button-panel pdx-menu';
+                    _panelEl.dataset.part = 'menu';
                     _panelEl.setAttribute('role', 'menu');
                     _panelEl.style.display = 'none';
                 });
@@ -288,9 +325,22 @@ component('pdx-split-button', {
 
             // Update on prop changes
             requestAnimationFrame(() => {
-                if (_primaryEl) _primaryEl.disabled = disabled || loading;
+                if (_primaryEl) {
+                    _primaryEl.disabled = disabled || loading;
+                    // A4: busy while its action is pending, and not otherwise.
+                    if (loading) _primaryEl.setAttribute('aria-busy', 'true');
+                    else _primaryEl.removeAttribute('aria-busy');
+                }
                 if (_arrowEl) _arrowEl.disabled = disabled;
             });
+        });
+
+        // The overlay verbs (#288), which it had none of.
+        ctx.expose({
+            show() { open(); },
+            close,
+            toggle,
+            get isOpen() { return _open() as boolean; },
         });
 
         // Teardown on DESTROY only, not in a track reading ctx.disabled(): toggling `disabled`

@@ -394,6 +394,22 @@ semver.
 
 ### Changed
 
+- `pdx-split-button` takes the beta contract (#288).
+  - **`show()`, `close()`, `toggle()`** open and close its menu from code, and `isOpen` reads it: it
+    had no methods, so an invoker command (`command="--show"`) could not reach it.
+  - **`open-change` `{ value }`** announces each opening and closing of the menu. It is read-only: the
+    parent never writes it, so it is not a model.
+  - **A4.** While `loading`, the primary button is `aria-busy="true"` (and draws the shared busy
+    overlay), and not otherwise; the host is in the custom state `loading`.
+  - **Fixed:** the primary button and the arrow read `loading` and `disabled` when pressed, not when
+    built. A split button that started loading never fired `pdx-click` once it had loaded, and one that
+    started disabled never opened its menu once enabled.
+  - **Focus.** A close gives the focus back to the element that had it when the menu opened, and to
+    the arrow otherwise; before, always to the arrow.
+  - **States and parts.** `open` and `loading` are custom states on the host. The parts are `root`
+    (the button group), `primary`, `trigger` (the arrow), `menu` (on `<body>` while open), `item` and
+    `separator`.
+
 - **Breaking:** `pdx-context-menu` takes the beta contract (#288).
   - **`open(x, y)` is `show(x, y)`**; with no point it opens over the area it wraps, so an invoker
     command, `command="--show"`, opens it. `close()` stays; `toggle()` and `isOpen` are new.

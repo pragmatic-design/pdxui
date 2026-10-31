@@ -74,7 +74,7 @@
         "icon-semantic": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
         "icon-sizes": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
         "split-open": async function () { 
-                const arrow = document.querySelector('section:not([hidden]) [data-test="sb-open"] .pdx-split-arrow');
+                const arrow = document.querySelector('section:not([hidden]) [data-test="sb-open"] [data-part="trigger"]');
                 if (arrow) arrow.click(); },
         };
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).

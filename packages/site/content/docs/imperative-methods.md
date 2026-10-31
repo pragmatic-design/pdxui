@@ -111,6 +111,7 @@ ships today:
 | `pdx-drawer` | controlled via the `open` prop (set `dlg.open = true`) |
 | `pdx-fab` | `open()`, `close()`, `toggle()` |
 | `pdx-dropdown-menu` | `show()`, `close()`, `toggle()` |
+| `pdx-split-button` | `show()`, `close()`, `toggle()` — its menu |
 | `pdx-context-menu` | `show(x?, y?)` (at a point, or over its area), `close()`, `toggle()` |
 | `pdx-menu` | `show()`, `close()`, `toggle()`, `closeSubmenu()` — or the `open` prop |
 | `pdx-menubar` | `openMenu(key)`, `closeMenu()` |

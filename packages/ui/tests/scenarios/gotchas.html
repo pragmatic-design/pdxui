@@ -336,6 +336,19 @@
                 };
             },
 
+            // pdx-split-button on the beta contract (#288). No model: its open state is read-only, so the
+            // opener is an invoker command and nothing is bound.
+            'split-button-beta-contract': () => {
+                const items = [{ key: 'draft', label: 'Save as draft' }, { type: 'separator' }, { key: 'copy', label: 'Save a copy' }];
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound" style="padding: 24px">
+                        <p><button type="button" data-test="opener" commandfor="bound-sb" command="--show">More</button></p>
+                        <pdx-split-button id="bound-sb" label="Save" :items=${items}></pdx-split-button>
+                    </div>`);
+                };
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);
