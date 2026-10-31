@@ -228,16 +228,16 @@ describe('pdx-wizard', () => {
 
     // ─── Events ──────────────────────────────────────────
 
-    it('emits pdx-change when navigating', async () => {
+    it('announces value-change when navigating, its model\'s event (#289)', async () => {
         const el = await mountWizard();
         let detail: any = null;
-        el.addEventListener('pdx-change', (e: any) => { detail = e.detail; });
+        el.addEventListener('value-change', (e: any) => { detail = e.detail; });
 
         const nextBtn = el.querySelector<HTMLButtonElement>('[data-wizard-next]')!;
         nextBtn.click();
         await tick(100);
 
-        expect(detail).toEqual({ value: 1, previous: 0 });
+        expect(detail).toEqual({ value: 1 });
     });
 
     it('emits pdx-complete on last step', async () => {
@@ -289,9 +289,11 @@ describe('pdx-wizard', () => {
 
     // ─── Orientation ─────────────────────────────────────
 
-    it('adds vertical class and stepper-vertical', async () => {
+    it('draws a vertical stepper, and puts no class on the host for it', async () => {
+        // Vertical is the host's :state(vertical) (#289), measured in Chromium by
+        // wizard-beta-contract.spec.ts; here, no class on the host for it.
         const el = await mountWizard({ orientation: 'vertical' });
-        expect(el.classList.contains('pdx-wizard-vertical')).toBe(true);
+        expect(el.classList.contains('pdx-wizard-vertical')).toBe(false);
         const stepper = el.querySelector('.pdx-stepper-vertical');
         expect(stepper).toBeTruthy();
     });
@@ -306,9 +308,11 @@ describe('pdx-wizard', () => {
 
     // ─── Disabled ────────────────────────────────────────
 
-    it('adds disabled class when disabled', async () => {
+    it('disabled puts no class on the host', async () => {
+        // The host's :state(disabled) (#289), measured in Chromium by wizard-beta-contract.spec.ts.
         const el = await mountWizard({ disabled: '' });
-        expect(el.classList.contains('pdx-wizard-disabled')).toBe(true);
+        expect(el.classList.contains('pdx-wizard-disabled')).toBe(false);
+        expect(el.classList.contains('pdx-wizard')).toBe(false);
     });
 
     // ─── Step indicator ──────────────────────────────────

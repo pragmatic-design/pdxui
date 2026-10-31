@@ -119,7 +119,7 @@ ships today:
 | `pdx-navbar` | `toggleMobile()` |
 | `pdx-app-layout` | `toggleNavbar()`, `openNavbar()`, `closeNavbar()` |
 | `pdx-carousel` | `next()`, `prev()`, `goTo(i)`, `play()`, `pause()` |
-| `pdx-wizard` | `goNext()`, `goPrev()`, `goTo(i)`, `complete()` |
+| `pdx-wizard` | `next()`, `prev()`, `goTo(i)`, `complete()` |
 | `pdx-splitter` | `getSizes()`, `setSizes([…])`, `resetSizes()`, `isDragging()` |
 | `pdx-scroll-spy` | `getActiveSection()` |
 | `pdx-list` | `refresh()` |

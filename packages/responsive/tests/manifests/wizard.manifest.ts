@@ -7,8 +7,9 @@
  *       · Compound: the CE discovers the [data-wizard-step] children (discoverSteps, lines 51-60) and
  *         auto-generates the stepper header + the navigation footer in a rAF.
  *       · render() = <slot></slot>: the step panels are projected as direct children
- *         of the <pdx-wizard> HOST (light DOM). In a rAF the host receives the class `.pdx-wizard`
- *         (line 305) + `.pdx-wizard-vertical` when orientation=vertical.
+ *         of the <pdx-wizard> HOST (light DOM). In a rAF the host takes the custom state
+ *         `:state(ready)`, + `:state(vertical)` when orientation=vertical, and `:state(disabled)`
+ *         follows `disabled` (#289): no class on the host.
  *       · STEPPER (buildStepper, lines 106-168):
  *           <nav class="pdx-stepper" role="tablist" aria-label="Wizard steps"
  *                aria-orientation="horizontal|vertical">
@@ -35,7 +36,7 @@
  *             <span class="pdx-wizard-indicator" data-wizard-indicator>  ← "Step N of M"
  *             <button class="pdx-primary|pdx-success" data-wizard-next>  ← "Next"/"Complete" (rAF)
  *           On the FIRST step backBtn has visibility:hidden + disabled.
- *       · Events: pdx-before-change (cancelable), pdx-change, pdx-complete.
+ *       · Events: pdx-before-change (cancelable), value-change (the `value` model, #289), pdx-complete.
  *       · Keyboard: focusGroup(el, {selector:'[data-step-btn]:not([disabled])',
  *         orientation, wrap:false}) line 315 → ROVING tabindex with the arrows + onSelect→goTo.
  *         The back/next buttons are NATIVE <button>s (tabbable). Stepper pattern = 'tabs'.
@@ -51,12 +52,11 @@
  *       · `.pdx-step-connector { flex:1; height:2px }` → a horizontal line between steps.
  *       · `.pdx-wizard .pdx-step { cursor:pointer }` (wizard.css lines 77-78); :disabled → not-allowed.
  *
- * SEMANTIC NOTES (not a bug, a WAI-ARIA choice):
- *   The wizard does NOT use aria-current="step": it adopts the TABS pattern (role="tablist" on the
- *   stepper, role="tab"+aria-selected on the buttons, role="tabpanel" on the panels). It is a
- *   legitimate and complete WAI-ARIA pattern for a navigable stepper — the active step IS
- *   marked semantically through aria-selected="true". The a11y checks below verify
- *   THAT contract (aria-selected on the active step) instead of aria-current. See the report.
+ * SEMANTIC NOTES (a WAI-ARIA choice):
+ *   The wizard adopts the TABS pattern (role="tablist" on the stepper, role="tab"+aria-selected on
+ *   the buttons, role="tabpanel" on the panels), and marks the current step `aria-current="step"`
+ *   as well, with its position `aria-posinset`/`aria-setsize` (A6, #289; measured by
+ *   wizard-beta-contract.spec.ts). The a11y checks below verify aria-selected on the active step.
  *
  * Contracts kept CONSERVATIVE but true in all 13 themes: NO theme-specific px.
  *   - stepper display:flex (a row), step number ~a circle (width≈height), connectors width>0.
@@ -124,10 +124,11 @@ export const wizard: ComponentManifest = {
             'wizard-basic': {
                 standalone: [
                     {
-                        // Host: the class .pdx-wizard → a flex column (wizard.css).
+                        // Host: its :state(ready) → a flex column (wizard.css, #289). `flex` alone:
+                        // `block` is what it is before the state, so accepting it measured nothing.
                         selector: 'section:not([hidden]) [data-test="wizard"]',
                         description: 'wizard host renders as flex',
-                        display: { op: 'oneOf', value: ['flex', 'block'] },
+                        display: { op: 'is', value: 'flex' },
                     },
                     {
                         // The auto-generated stepper header: display flex (a row of steps).
@@ -228,6 +229,16 @@ export const wizard: ComponentManifest = {
                         ],
                     },
                 ],
+                // Ready is a custom state of the host (#289), what wizard.css lays it out from; no class.
+                states: [
+                    {
+                        description: 'a wizard with its steps found is the custom state :state(ready)',
+                        selector: 'section:not([hidden]) [data-test="wizard"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="wizard"]', name: 'ready' },
+                        changes: {},
+                    },
+                ],
                 // NB: the "marked active step" (aria-selected=true) and the "completed step"
                 // (data-status=done) are PRE-SET attributes, not changes on interaction.
                 // A StateRule exists to measure CHANGES of a CSS property on hover/focus/click, so
@@ -240,7 +251,17 @@ export const wizard: ComponentManifest = {
                         // Vertical: the host becomes a flex row (the stepper on the left, the content on the right).
                         selector: 'section:not([hidden]) [data-test="wizard-vertical"]',
                         description: 'vertical wizard host renders as flex',
-                        display: { op: 'oneOf', value: ['flex', 'block'] },
+                        display: { op: 'is', value: 'flex' },
+                    },
+                ],
+                // Vertical is a custom state of the host (#289), what wizard.css lays it out from.
+                states: [
+                    {
+                        description: 'orientation="vertical" is the custom state :state(vertical)',
+                        selector: 'section:not([hidden]) [data-test="wizard-vertical"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="wizard-vertical"]', name: 'vertical' },
+                        changes: {},
                     },
                 ],
                 composition: [

@@ -80,10 +80,10 @@ test('the wizard survives typing: its panels are nested, and a field\'s event is
     // `insertBefore(stepper, panel)` that assumes a direct child throws NotFoundError inside the
     // component's own rAF, with the console empty while four steps render stacked.
     //
-    // Then `pdx-change`: `<pdx-input>` emits it too, it bubbles, and the page's listener is on an
-    // ancestor of every field. Typing one character delivers `{ value: 'A' }` to the wizard's
-    // step handler (`target=pdx-input detail={"value":"A"}`); taken as the step, it becomes a
-    // string, and `:value` coerces it to NaN.
+    // Then the step's event: the wizard announces its step by `value-change` (#289), the event
+    // every field's model announces too, and the page's listener is on an ancestor of every field.
+    // Were it to bubble, typing one character would deliver `{ value: 'A' }` to the wizard's step
+    // handler; taken as the step, it becomes a string, and `:value` coerces it to NaN.
     await openIntake(page);
     const wizard = page.locator('[data-test="wizard"]');
     await expect(wizard.locator('.pdx-stepper'), 'no stepper: the build threw where nobody saw it').toBeVisible();

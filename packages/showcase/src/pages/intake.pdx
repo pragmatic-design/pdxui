@@ -34,7 +34,7 @@
          Only the `intake` form carries `name`: the coordinator keys by name, and the three panels
          share one Form object — registering it three times is the same entry, but saying so once
          is clearer than relying on that. -->
-    <pdx-wizard :value="step" @pdx-before-change.self="onBeforeStep" @pdx-change.self="onStep" data-test="wizard">
+    <pdx-wizard :value="step" @pdx-before-change.self="onBeforeStep" @value-change.self="onStep" data-test="wizard">
 
         <!-- The three steps of the intake form are grouped BY FORM: a <form> inside a
              <form> is invalid HTML, so one form wrapping its panels is the arrangement an
@@ -177,7 +177,7 @@ function resumeDraft() {
   customerName = v.customerName ?? '';
   assetCustomerId = Number(v.customerId ?? 0);
   // The wizard's `value` track moves the step WITHOUT re-running `pdx-before-change`
-  // (`pdx-wizard.ts:444`), so restoring step 2 does not have to pass step 1's guard on the way —
+  // (a parent's write of the model, pdx-wizard.ts), so restoring step 2 does not have to pass step 1's guard on the way —
   // which is right: those answers are the ones being restored.
   step = found.step ?? 0;
 }
@@ -228,12 +228,12 @@ function onBeforeStep(e) {
 }
 
 /**
- * The wizard's own step change — and ONLY its own.
+ * The wizard's own step change — and ONLY its own: `value-change`, its `value` model's event (#289).
  *
- * `pdx-change` is not the wizard's private name: `<pdx-input>` emitted it too (until #479), and the listener is on
- * an ancestor of every field on every step. When it bubbled (before #138), typing one character
- * delivered `{ value: 'A' }` here (`target=pdx-input detail={"value":"A"}`), `step` became the
- * string, and the wizard's `:value` coerced it to NaN. It no longer bubbles; the guard stays.
+ * `value-change` is not the wizard's private name: every field inside the steps has a model and
+ * announces it too. When change events bubbled (before #138), typing one character in a field
+ * delivered `{ value: 'A' }` here, `step` became the string, and the wizard's `:value` coerced it
+ * to NaN. They no longer bubble; the guard stays.
  *
  * So the listener says `.self`, which is the modifier for exactly this and the one `gotchas.md` names — an event
  * belongs to the element it was dispatched on, and a name is not private to a component.

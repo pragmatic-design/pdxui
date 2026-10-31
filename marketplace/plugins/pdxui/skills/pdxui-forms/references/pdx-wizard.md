@@ -13,40 +13,41 @@ if you like, grouped under one or more forms. **Not when** the steps are section
   `async` handler blocks nothing.
 - `form.validate()` is async and covers the whole form, so it is no use per step: touch the step's fields with
   `onBlur()` and read their `error()`.
-- Listen with `.self`: a component inside a step that announces a bubbling `pdx-change` of its own would
-  otherwise become the step.
+- The step is the `value` model: `::value` follows it, `@value-change` hears it. Listen with `.self`: every
+  field inside a step announces a `value-change` of its own, and one that bubbled would become the step.
 - Steps are discovered once, in the first frame: a panel added later (behind an `@if`) is not a step.
-- Setting `:value` moves the step without `pdx-before-change`: right for restoring a draft, a bypass otherwise.
+- Setting `:value` moves the step without `pdx-before-change`, and announces nothing: right for restoring a
+  draft, a bypass otherwise.
 
 **Composes with** `pdx-form` (steps grouped by form) · `createFormCoordinator()` (one Save over several forms)
 · `pdx-field-list` (rows inside a step).
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | number | `0` | Current step (0-based index) |
 | `linear` | `linear` | boolean | `true` | Sequential navigation — can't skip ahead |
 | `orientation` | `orientation` | string | `'horizontal'` | Stepper orientation |
 | `hideNav` | `hidenav` | boolean | `false` | Hide the auto-generated navigation footer |
 | `hideStepper` | `hidestepper` | boolean | `false` | Hide the stepper header |
 | `disabled` | `disabled` | boolean | `false` | Disabled state — no interaction |
 | `size` | `size` | 'md' \| 'sm' | `'md'` | The step numbers' size: md (the default) or sm. |
+| `value` | `value` | number | `0` | Current step (0-based index) |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `goTo(targetIndex)` | Go to a step by index. Returns false, and moves nothing, when the step is not reachable yet or a `pdx-before-change` listener cancels. |
-| `goNext()` | The next step, through the same guards as `goTo`; false at the last one. |
-| `goPrev()` | The previous step, through the same guards as `goTo`; false at the first one. |
+| `next()` | The next step, through the same guards as `goTo`; false at the last one. |
+| `prev()` | The previous step, through the same guards as `goTo`; false at the first one. |
 | `complete()` | Emit `pdx-complete` for the step in view. It does not advance, validate or close anything. |
-| `next()` | Advances to the next item. |
-| `prev()` | Goes to the previous item. |
-| `goto(step)` | `goTo` under its all-lowercase spelling. |
-| `step` _(read-only)_ | Read-only, via a ref: `el.step`. |
 
-**Events:** `pdx-before-change` — Fired when the before changes.; `pdx-change` → `detail: { value, previous }` — Fired when the value changes.; `pdx-complete` → `detail: { value }` — Fired on `pdx-complete`.
+**Events:** `pdx-before-change` → `detail: { value: number; previous: number }` — Before a move, cancellable: `preventDefault()` keeps the wizard where it is.; `pdx-complete` → `detail: { value: number }` — Next on the last step, or `complete()`.; `value-change` → `detail: { value: number }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `navigation` · `status` · `tab` · `tablist` · `tabpanel`
+
+**States:** `:state(ready)` — Its steps are found and its stepper is drawn.; `:state(disabled)` — `disabled` is set: no step can be reached.; `:state(vertical)` — `orientation="vertical"`: the stepper beside the panels.
+
+**Parts:** `[data-part="root"]` — The stepper, the `role="tablist"` element (`.pdx-stepper`).; `[data-part="step"]` — A step's button in the stepper; the current one is `aria-current="step"`.; `[data-part="connector"]` — The line between two steps of a horizontal stepper.; `[data-part="panel"]` — A step's panel, an element with `data-wizard-step`.; `[data-part="nav"]` — The footer with Back, the position and Next.; `[data-part="back"]` — The Back button.; `[data-part="next"]` — The Next button, Complete on the last step.; `[data-part="indicator"]` — The "Step 2 of 4" text of the footer.
 
 **Shapes:** `StepMeta { index: number; label: string; description: string; icon: string; el: HTMLElement }`
 
@@ -173,11 +174,11 @@ are checked against the manifest above._
 </div>
 ```
 
-**Events** — Listen to `pdx-change` and `pdx-complete`. _(from the live demo)_
+**Events** — Listen to `value-change`, the step model's event, and `pdx-complete`. _(from the live demo)_
 
 ```html
 <div class="demo-box">
-  <pdx-wizard @pdx-change="onStepChange" @pdx-complete="onComplete">
+  <pdx-wizard @value-change="onStepChange" @pdx-complete="onComplete">
     <div data-wizard-step data-label="First">
       <p class="pdx-txt-body">Navigate and watch the event log below.</p>
     </div>

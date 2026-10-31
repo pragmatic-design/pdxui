@@ -1,6 +1,6 @@
 // The area skills publish what a ref reaches.
 //
-// `wizard.goNext()`, `grid.startEdit(id, field)` and `editor.getJSON()` are in
+// `wizard.next()`, `grid.startEdit(id, field)` and `editor.getJSON()` are in
 // `custom-elements.json`, on the site and in `llms.txt`; a catalogue that renders only props, events,
 // slots, shapes and roles leaves them out of the skill an agent reads first.
 //
@@ -30,7 +30,8 @@ describe('the area skills publish the imperative API', () => {
     it('a wizard says how to drive it', () => {
         // The whole point of pdx-wizard from JS: you cannot step it with an attribute.
         const section = sectionFor('pdx-wizard');
-        expect(section, 'the wizard section names no method at all').toMatch(/goNext/);
+        // Its verbs since #289: `next()`, `prev()`, `goTo(n)`.
+        expect(section, 'the wizard section names no method at all').toMatch(/`next\(\)`/);
         expect(section).toMatch(/goTo/);
     });
 
