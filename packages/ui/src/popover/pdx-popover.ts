@@ -2,7 +2,7 @@
 // Provides: click/hover/manual trigger, positioning, hover relay, outside click, Escape.
 // Uses core primitive for all logic — no reimplementation.
 
-import { component, html, generatedId } from '@pdxui/core';
+import { component, html, generatedId, model } from '@pdxui/core';
 import { usePopover, overlayStack, focusFirst } from '@pdxui/core';
 import type { PopoverTrigger, PopoverPlacement } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -18,12 +18,19 @@ let _popoverCounter = 0;
  * outside or Escape.
  */
 component('pdx-popover', {
+    // `open` is a model (#288): the popover opens and closes itself — its trigger, Escape, a click
+    // outside — and its own writes announce `open-change` `{ value }`, which `::open` follows. Setting
+    // it opens and closes the popover in every trigger mode, not in `manual` alone.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as a custom state (#132, #288).
+    states: ['open'],
+    // The floating panel. The trigger is the page's own element, not one the popover renders.
+    parts: ['root'],
     props: {
         trigger: { type: String, default: 'click' },
         placement: { type: String, default: 'bottom' },
         /** The dialog's name. Empty: its first heading, else the popover.label component string. */
         ariaLabel: { type: String, default: '' },
-        open: { type: Boolean, default: false },
         closeOnOutside: { type: Boolean, default: true },
         closeOnEscape: { type: Boolean, default: true },
         // null, not 8: a numeric default is always passed, and a value that is always passed
@@ -73,7 +80,6 @@ component('pdx-popover', {
             // pdx-button, not the host.
             const trigger = anchorControl(anchor);
             const triggerMode = ctx.trigger() as PopoverTrigger;
-            const shouldBeOpen = ctx.open();
 
             popover = usePopover({
                 trigger: triggerMode,
@@ -83,6 +89,10 @@ component('pdx-popover', {
                 dismissOnEscape: ctx.closeOnEscape() as boolean,
                 hoverDelay: { open: 0, close: 150 },
                 onOpenChange: (open) => {
+                    ctx.state('open', open);
+                    // Its own open or close writes the model, which announces it; a value the parent
+                    // set is already there, and announces nothing.
+                    ctx.open.set(open);
                     if (open) {
                         overlayId = 'pdx-popover-' + (++_popoverCounter);
                         const zIndex = overlayStack.push(overlayId);
@@ -133,10 +143,9 @@ component('pdx-popover', {
                 const floatingEl = floating();
                 if (floatingEl && popover) {
                     popover.setContent(floatingEl);
-                    // Manual mode: apply initial open state after content is bound
-                    if (triggerMode === 'manual' && shouldBeOpen) {
-                        popover.open();
-                    }
+                    // Open as the model says once the content is bound, in every mode: an `open`
+                    // attribute, or a popover rebuilt while open (its trigger mode changed).
+                    if (ctx.open.peek()) popover.open();
                 }
             };
             if (floating()) bindContent();
@@ -162,35 +171,30 @@ component('pdx-popover', {
             requestAnimationFrame(nameDialog);
         });
 
-        // Manual mode: react to open prop changes AFTER initial setup
+        // The model drives the popover, in every trigger mode: a value the parent set (`::open`, the
+        // property, the attribute) opens or closes it. The popover's own changes come back here with
+        // the value already equal, and do nothing. Before its content is bound, binding it applies the
+        // model (above).
         ctx.track(() => {
-            if (ctx.trigger() !== 'manual') return;
-            const shouldOpen = ctx.open();
-            // Defer to next microtask so the first track() has time to create popover
-            queueMicrotask(() => {
-                if (!popover) return;
-                if (shouldOpen && !popover.isOpen()) popover.open();
-                else if (!shouldOpen && popover.isOpen()) popover.close();
-            });
+            const want = ctx.open() as boolean;
+            if (!popover || popover.isOpen.peek() === want) return;
+            if (want) popover.open(); else popover.close();
         });
 
-        // Imperative API: el.show() / el.hide() / el.toggle() / el.isOpen
+        // Imperative API: el.show() / el.close() / el.toggle() / el.isOpen. Each writes the model, so
+        // each announces `open-change`. `hide()` is `close()`, the overlay verb (#288).
         ctx.expose({
-            show() { popover?.open(); },
-            hide() { popover?.close(); },
-            toggle() { popover?.isOpen() ? popover.close() : popover?.open(); },
-            get isOpen() { return popover?.isOpen() ?? false; },
+            show() { ctx.open.set(true); },
+            close() { ctx.open.set(false); },
+            toggle() { ctx.open.set(!ctx.open.peek()); },
+            get isOpen() { return ctx.open() as boolean; },
         });
 
-        return {
-            isOpen: () => popover?.isOpen() ?? false,
-            hide: () => popover?.close(),
-            floatId,
-        };
+        return { floatId };
     },
     render: (ctx) => html`
-        <div class="pdx-popover-float" role="dialog" tabindex="-1" :id="${() => ctx.floatId}"
-            :style="${() => ctx.isOpen() ? '' : 'display:none'}">
+        <div class="pdx-popover-float" data-part="root" role="dialog" tabindex="-1" :id="${() => ctx.floatId}"
+            :style="${() => ctx.open() ? '' : 'display:none'}">
             <slot></slot>
         </div>
     `,

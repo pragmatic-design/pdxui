@@ -7,21 +7,27 @@ Floating content anchored to a trigger.
 | `trigger` | `trigger` | string | `'click'` | How it opens: 'click', 'hover', 'focus' or 'manual'. |
 | `placement` | `placement` | string | `'bottom'` | Position relative to the anchor element. |
 | `ariaLabel` | `arialabel` | string | `''` | The dialog's name. Empty: its first heading, else the popover.label component string. |
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `closeOnOutside` | `closeonoutside` | boolean | `true` | Close when clicking outside. |
 | `closeOnEscape` | `closeonescape` | boolean | `true` | Close when the Escape key is pressed. |
 | `offsetPx` | `offsetpx` | number \| null | `null` | Gap in px between the popover and its anchor. |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
 | `show()` | Shows it. |
-| `hide()` | Hides it. |
+| `close()` | Closes it. |
 | `toggle()` | Toggles it open/closed. |
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.
+
 **Renders:** roles `dialog`
+
+**States:** `:state(open)` — Matched with `:state(open)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.
 
 
 #### Examples

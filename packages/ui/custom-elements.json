@@ -19748,16 +19748,6 @@
             },
             {
               "kind": "field",
-              "name": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "open"
-            },
-            {
-              "kind": "field",
               "name": "closeOnOutside",
               "description": "Close when clicking outside.",
               "type": {
@@ -19787,6 +19777,16 @@
               "attribute": "offsetpx"
             },
             {
+              "kind": "field",
+              "name": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open"
+            },
+            {
               "kind": "method",
               "name": "show",
               "parameters": [],
@@ -19794,9 +19794,9 @@
             },
             {
               "kind": "method",
-              "name": "hide",
+              "name": "close",
               "parameters": [],
-              "description": "Hides it."
+              "description": "Closes it."
             },
             {
               "kind": "method",
@@ -19809,6 +19809,19 @@
               "name": "isOpen",
               "readonly": true,
               "description": "Read-only, via a ref: `el.isOpen`."
+            }
+          ],
+          "models": [
+            "open"
+          ],
+          "events": [
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -19843,15 +19856,6 @@
               "default": "''"
             },
             {
-              "name": "open",
-              "fieldName": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
               "name": "closeonoutside",
               "fieldName": "closeOnOutside",
               "description": "Close when clicking outside.",
@@ -19877,12 +19881,33 @@
                 "text": "number | null"
               },
               "default": "null"
+            },
+            {
+              "name": "open",
+              "fieldName": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
             }
           ]
         }

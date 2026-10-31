@@ -394,6 +394,18 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-popover` takes the beta contract (#288).
+  - **`open` is a model.** The popover writes it when it opens or closes itself — its trigger, Escape,
+    a click outside — and announces it with `open-change` `{ value }`, so `::open="x"` follows it.
+    Setting it opens and closes the popover in every trigger mode; it was read in `trigger="manual"`
+    alone, so an `open` attribute on a click popover now opens it.
+  - **`hide()` is `close()`**, the overlay verb; `show()` and `toggle()` stay. `pdx migrate` rewrites
+    `hide()` on a `:ref` bound on a `pdx-popover` of the same file, and flags it on a lookup.
+  - **States and parts.** `open` is a custom state on the host; the panel is the `root` part.
+  - **Focus.** Escape gives the focus back to the element that had it when the popover opened — a
+    button with `command="--show"` that is not the trigger — and to the trigger otherwise. The same
+    holds for every component on `usePopover`.
+
 - **Breaking:** `pdx-bottom-sheet` takes the beta contract (#288).
   - **`open` is a model.** The sheet writes it when it closes itself — Escape, the ✕, the backdrop, a
     swipe down — and announces it with `open-change` `{ value }`, so `::open="x"` follows it.
