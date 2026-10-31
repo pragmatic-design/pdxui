@@ -62,8 +62,8 @@ the value properties of native form elements (`value`, `checked`, `files`) and o
 field, `change` on a `<select>` and on `::checked`, and on a component its `<name>-change` event
 (`value-change` for `::value`), reading `detail.value` — so `<pdx-select ::value="country">` works as
 `<input ::value="name">` does: every value component of the library declares its model. `::x` on a
-component prop that is not a model is an error, `PDX_TWO_WAY_NOT_MODEL` — `::page` on `pdx-pagination`,
-say, which announces a page but holds no model.
+component prop that is not a model is an error, `PDX_TWO_WAY_NOT_MODEL` — `::value` on `pdx-progress`,
+say, which shows a value only its parent writes.
 
 A one-way `:value` is not the controlled form: it writes the field when its value *changes*, so that a
 re-render for another reason never overwrites what is being typed. A handler that writes the signal

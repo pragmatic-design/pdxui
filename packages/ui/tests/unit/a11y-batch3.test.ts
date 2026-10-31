@@ -51,7 +51,8 @@ describe('pdx-pagination keeps focus', () => {
 
     it('focus survives a parent that reflects the page back into the prop', async () => {
         const el = await mountPager() as HTMLElement & { page: number };
-        el.addEventListener('pdx-change', (e) => { el.page = (e as CustomEvent).detail.page; });
+        // The page model's event since #289.
+        el.addEventListener('page-change', (e) => { el.page = (e as CustomEvent).detail.value; });
         byLabel(el, 'Next page').focus();
         byLabel(el, 'Next page').click();
         await frame();

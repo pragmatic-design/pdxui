@@ -403,6 +403,20 @@
                 api.readValue = () => value();
             },
 
+            // pdx-pagination on the beta contract (#289): `::page` bound to a signal.
+            'pagination-beta-contract': () => {
+                const page = signal(2);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="next" commandfor="bound-pager" command="--next">Next</button>
+                        <pdx-pagination id="bound-pager" total="100" page-size="10" ::page=${page}></pdx-pagination>
+                    </div>`);
+                };
+                api.setValue = (v) => page.set(v);
+                api.readValue = () => page();
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

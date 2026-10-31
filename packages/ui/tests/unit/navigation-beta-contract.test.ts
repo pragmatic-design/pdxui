@@ -37,6 +37,16 @@ const DONE: Row[] = [
         verbs: ['next', 'prev'],
         removed: ['pdx-change'],
     },
+    {
+        tag: 'pdx-pagination',
+        models: ['page', 'pageSize'],
+        // The current page is marked on its button (`aria-current`), not on the host.
+        states: [],
+        parts: ['nav', 'page', 'first', 'prev', 'next', 'last', 'ellipsis', 'range', 'position', 'size'],
+        verbs: ['next', 'prev', 'goTo', 'first', 'last'],
+        // `currentPage` stood in for `page`, which the model now is.
+        removed: ['pdx-change', 'goto', 'currentPage'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -62,7 +72,8 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     });
 
     it('declares none of its removed names, and records its alpha events for `pdx migrate`', () => {
-        expect([...events, ...methods].filter((n) => row.removed.includes(n))).toEqual([]);
+        const members = (decl?.members ?? []).map((m) => m.name);
+        expect([...events, ...members].filter((n) => row.removed.includes(n))).toEqual([]);
         const alphaEvents = row.removed.filter((n) => n.startsWith('pdx-'));
         expect(decl?.alphaEvents ?? []).toEqual(alphaEvents);
     });

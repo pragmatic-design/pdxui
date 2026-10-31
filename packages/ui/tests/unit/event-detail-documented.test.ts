@@ -98,7 +98,7 @@ describe('an event with a detail says what is in it', () => {
         // lowered to follow it guards less every time.
         expect(checks).toEqual(expect.arrayContaining([
             'pdx-tag-input pdx-add', 'pdx-tag-input pdx-remove', 'pdx-select pdx-search', 'pdx-calendar pdx-navigate',
-            'pdx-autocomplete query-change', 'pdx-tag-input draft-change', 'pdx-pagination pdx-change',
+            'pdx-autocomplete query-change', 'pdx-tag-input draft-change', 'pdx-bottom-sheet pdx-detent-change',
         ]));
     });
 

@@ -19377,26 +19377,6 @@
             },
             {
               "kind": "field",
-              "name": "pageSize",
-              "description": "Items per page (overrides DataSource)",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "pagesize"
-            },
-            {
-              "kind": "field",
-              "name": "page",
-              "description": "Current page 1-based (overrides DataSource)",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1",
-              "attribute": "page"
-            },
-            {
-              "kind": "field",
               "name": "showEdges",
               "description": "Show first/last buttons",
               "type": {
@@ -19445,8 +19425,28 @@
               "attribute": "showtotal"
             },
             {
+              "kind": "field",
+              "name": "page",
+              "description": "Current page 1-based (overrides DataSource)",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "page"
+            },
+            {
+              "kind": "field",
+              "name": "pageSize",
+              "description": "Items per page (overrides DataSource)",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "pagesize"
+            },
+            {
               "kind": "method",
-              "name": "goto",
+              "name": "goTo",
               "parameters": [
                 {
                   "name": "p",
@@ -19455,7 +19455,7 @@
                   }
                 }
               ],
-              "description": "Go to a page, clamped to 1..total. Emits `pdx-change`, and moves the bound DataSource with it."
+              "description": "Go to a page, clamped to 1..total. Writes `page`, and moves the bound DataSource with it."
             },
             {
               "kind": "method",
@@ -19473,29 +19473,42 @@
               "kind": "method",
               "name": "first",
               "parameters": [],
-              "description": "The first page, through the same path as `goto`."
+              "description": "The first page, through the same path as `goTo`."
             },
             {
               "kind": "method",
               "name": "last",
               "parameters": [],
-              "description": "The last page, through the same path as `goto`."
-            },
-            {
-              "kind": "field",
-              "name": "currentPage",
-              "readonly": true,
-              "description": "Read-only, via a ref: `el.currentPage`."
+              "description": "The last page, through the same path as `goTo`."
             }
           ],
+          "models": [
+            "page",
+            "pageSize"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "page": "$event.detail.value",
+            "pageSize": "$event.currentTarget.pageSize"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "page-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ page, pageSize }"
+              "description": "Fired when the component writes `page`. Does not bubble.",
+              "detail": "{ value: number }"
+            },
+            {
+              "name": "page-size-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `pageSize`. Does not bubble.",
+              "detail": "{ value: number }"
             }
           ],
           "roles": [
@@ -19506,24 +19519,6 @@
               "name": "total",
               "fieldName": "total",
               "description": "Total number of items (overrides DataSource)",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1"
-            },
-            {
-              "name": "pagesize",
-              "fieldName": "pageSize",
-              "description": "Items per page (overrides DataSource)",
-              "type": {
-                "text": "number"
-              },
-              "default": "-1"
-            },
-            {
-              "name": "page",
-              "fieldName": "page",
-              "description": "Current page 1-based (overrides DataSource)",
               "type": {
                 "text": "number"
               },
@@ -19564,6 +19559,24 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "page",
+              "fieldName": "page",
+              "description": "Current page 1-based (overrides DataSource)",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1"
+            },
+            {
+              "name": "pagesize",
+              "fieldName": "pageSize",
+              "description": "Items per page (overrides DataSource)",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1"
             }
           ],
           "slots": [
@@ -19575,6 +19588,48 @@
             {
               "name": "page",
               "description": "The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "nav",
+              "description": "The `role=\"navigation\"` element that holds the controls (`.pdx-pagination`)."
+            },
+            {
+              "name": "page",
+              "description": "A page button; the current one is `aria-current=\"page\"`."
+            },
+            {
+              "name": "first",
+              "description": "The button to the first page."
+            },
+            {
+              "name": "prev",
+              "description": "The button to the previous page."
+            },
+            {
+              "name": "next",
+              "description": "The button to the next page."
+            },
+            {
+              "name": "last",
+              "description": "The button to the last page."
+            },
+            {
+              "name": "ellipsis",
+              "description": "The gap drawn for the pages left out of a long range."
+            },
+            {
+              "name": "range",
+              "description": "The \"1–10 of 47\" text, with `show-total`."
+            },
+            {
+              "name": "position",
+              "description": "The \"3 / 10\" text of `simple`."
+            },
+            {
+              "name": "size",
+              "description": "The rows-per-page select, with `show-page-size`."
             }
           ],
           "x-pdx-context": {

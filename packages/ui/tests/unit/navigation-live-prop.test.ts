@@ -71,12 +71,13 @@ describe('after a user move, the property is the emitted value', () => {
 
     it('pdx-pagination: a click on a page', async () => {
         const el = await mount('<pdx-pagination total="100" page-size="10" page="1"></pdx-pagination>');
-        const seen = record(el, 'pdx-change', ['page']);
+        // Its model's event since #289.
+        const seen = record(el, 'page-change', ['page']);
         el.querySelector<HTMLElement>('[data-page-key="page:2"]')!.click();
         await tick();
-        expect(seen, 'one pdx-change for one click').toHaveLength(1);
-        expect(seen[0].detail.page).toBe(2);
-        expect(seen[0].atEmit.page, 'el.page when pdx-change was dispatched').toBe(2);
+        expect(seen, 'one page-change for one click').toHaveLength(1);
+        expect(seen[0].detail.value).toBe(2);
+        expect(seen[0].atEmit.page, 'el.page when page-change was dispatched').toBe(2);
         expect(el.page, 'el.page after the frame').toBe(2);
         expect(el.querySelector('[aria-current="page"]')!.textContent).toBe('2');
     });
@@ -90,7 +91,8 @@ describe('after a user move, the property is the emitted value', () => {
 
     it('pdx-pagination: a new page size, and page 1 with it', async () => {
         const el = await mount('<pdx-pagination total="100" page-size="10" page="3" show-page-size></pdx-pagination>');
-        const seen = record(el, 'pdx-change', ['page', 'pageSize']);
+        // Read inside the last of the two model events (#289): both are written by then.
+        const seen = record(el, 'page-change', ['page', 'pageSize']);
         // The size control is a pdx-select, imported lazily: read once it is upgraded (#692).
         await whenUpgraded(el.querySelector('.pdx-pagination-size'));
         // Opened and picked as a person does.
@@ -99,7 +101,7 @@ describe('after a user move, the property is the emitted value', () => {
         [...el.querySelectorAll<HTMLElement>('.pdx-pagination-size [role="option"]')].find(o => o.textContent?.trim() === '50')!.click();
         await tick();
         expect(seen).toHaveLength(1);
-        expect(seen[0].atEmit, 'el.page and el.pageSize when pdx-change was dispatched').toEqual({ page: 1, pageSize: 50 });
+        expect(seen[0].atEmit, 'el.page and el.pageSize when page-change was dispatched').toEqual({ page: 1, pageSize: 50 });
         expect({ page: el.page, pageSize: el.pageSize }).toEqual({ page: 1, pageSize: 50 });
         // The size sticks: with the prop left at 10, a rebuild would go back to 10 pages of 10.
         expect(el.querySelector<HTMLElement & { value: string }>('.pdx-pagination-size')!.value).toBe('50');

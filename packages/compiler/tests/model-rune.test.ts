@@ -138,20 +138,23 @@ describe('the resolver knows the models', () => {
         expect([...r.modelsOf('pdx-input')!]).toEqual(['value']);
         expect([...r.modelsOf('pdx-select')!]).toEqual(['value']);
         expect([...r.modelsOf('pdx-otp-input')!]).toEqual(['value']);
-        // A navigation component announces a page, not a value it holds for a parent (#289): no model,
-        // and that is known — so `::page` on it is refused, not left to a listening that is gone.
-        expect(r.has('pdx-pagination')).toBe(true);
-        expect([...r.modelsOf('pdx-pagination')!]).toEqual([]);
+        // The page and its size are positions the pager changes itself (#289): models.
+        expect([...r.modelsOf('pdx-pagination')!]).toEqual(['page', 'pageSize']);
+        // A progress bar shows a value only its parent writes: no model, and that is known — so
+        // `::value` on it is refused, not left to a listening that never comes.
+        expect(r.has('pdx-progress')).toBe(true);
+        expect([...r.modelsOf('pdx-progress')!]).toEqual([]);
         expect(r.modelsOf('pdx-not-a-component')).toBeNull();
     });
 
     it('`::x` on a library component that lists no model is PDX_TWO_WAY_NOT_MODEL (#125)', () => {
         const r = new ComponentResolver();
         r.registerUiManifest(process.cwd());
-        const { warnings } = compile('<template>\n  <pdx-pagination ::page="p"></pdx-pagination>\n</template>\n<script>\nlet p = $signal(1);\n</script>\n',
+        const { warnings } = compile('<template>\n  <pdx-progress ::value="p"></pdx-progress>\n  <pdx-pagination ::page="n"></pdx-pagination>\n</template>\n<script>\nlet p = $signal(40);\nlet n = $signal(1);\n</script>\n',
             'page.pdx', [], undefined, { modelsOf: (tag) => r.modelsOf(tag) });
+        // The pager's `::page` is a model since #289, and is not reported.
         expect(warnings.filter((w) => w.code === 'PDX_TWO_WAY_NOT_MODEL').map((w) => w.message))
-            .toEqual([expect.stringContaining("'::page' on <pdx-pagination>")]);
+            .toEqual([expect.stringContaining("'::value' on <pdx-progress>")]);
     });
 });
 

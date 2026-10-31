@@ -7,14 +7,15 @@
  * DOM structure (host vs inner):
  *   - The host <pdx-pagination> → `display: block` (CSS), with no class applied to the host.
  *   - The custom element builds an INNER box imperatively (rebuild(), in an rAF):
- *       <nav class="pdx-pagination" role="navigation" aria-label="Pagination"> (display:flex, gap).
- *     The contracts on the nav's and the buttons' geometry must be scoped INSIDE the host.
+ *       <nav class="pdx-pagination" data-part="nav" role="navigation" aria-label="Pagination"> (display:flex, gap).
+ *     The contracts on the nav's and the buttons' geometry must be scoped INSIDE the host, and select
+ *     by part (#289): `[data-part="nav"]`, `page`, `first`, `prev`, `next`, `last`.
  *   - The prev/next/first/last/number buttons: <button class="pdx-page" type="button"> (NOT the host).
  *       · display: inline-flex, min-width/min-height 2.75rem, cursor pointer, radius md.
  *       · prev/next are disabled on page 1 and on the last one → a native <button disabled> with
  *         `opacity: var(--pdx-opacity-disabled)` + cursor not-allowed (NO aria-disabled,
  *         is a native <button disabled> → fine for a11y).
- *   - The active page: its button gets the class `.pdx-page-active` plus the attribute `aria-current="page"`;
+ *   - The active page: its button gets the attribute `aria-current="page"`, and no class (#289);
  *     the filled style (a primary background) is applied through the `.pdx-page[aria-current="page"]` selector.
  *
  * A NOTE on the asynchronous build: the nav is built in a requestAnimationFrame after the mount.
@@ -64,29 +65,29 @@ export const pagination: ComponentManifest = {
             'pagination-basic': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="pg"] .pdx-pagination',
+                        selector: 'section:not([hidden]) [data-test="pg"] [data-part="nav"]',
                         description: 'pagination nav renders as flex row',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]',
+                        selector: 'section:not([hidden]) [data-test="pg"] [data-part="page"][aria-current="page"]',
                         description: 'active page button is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]',
+                        selector: 'section:not([hidden]) [data-test="pg"] [data-part="page"][aria-current="page"]',
                         description: 'page button has non-negative radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // prev on page 1 = a native <button disabled> → a reduced opacity.
                         // A state ALREADY in the markup (page=1), so a standalone rule (no reactive trigger).
-                        selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Previous page"]',
+                        selector: 'section:not([hidden]) [data-test="pg"] [data-part="prev"]',
                         description: 'disabled prev button has reduced opacity',
                         opacity: { op: '<', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Previous page"]',
+                        selector: 'section:not([hidden]) [data-test="pg"] [data-part="prev"]',
                         description: 'disabled prev button shows not-allowed cursor',
                         cursor: { op: 'is', value: 'not-allowed' },
                     },
@@ -98,11 +99,11 @@ export const pagination: ComponentManifest = {
                     {
                         // The page buttons must share the same height (a row of controls).
                         description: 'page buttons share the same height',
-                        parent: 'section:not([hidden]) [data-test="pg"] .pdx-pagination',
+                        parent: 'section:not([hidden]) [data-test="pg"] [data-part="nav"]',
                         children: {
-                            prev: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Previous page"]',
-                            active: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]',
-                            next: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Next page"]',
+                            prev: 'section:not([hidden]) [data-test="pg"] [data-part="prev"]',
+                            active: 'section:not([hidden]) [data-test="pg"] [data-part="page"][aria-current="page"]',
+                            next: 'section:not([hidden]) [data-test="pg"] [data-part="next"]',
                         },
                         relations: [
                             { description: 'prev == active height', left: 'prev.height', op: '==', right: 'active.height', tolerance: 1 },
@@ -112,10 +113,10 @@ export const pagination: ComponentManifest = {
                     {
                         // Aligned on the same row: the same top.
                         description: 'page buttons are aligned on the same row (same top)',
-                        parent: 'section:not([hidden]) [data-test="pg"] .pdx-pagination',
+                        parent: 'section:not([hidden]) [data-test="pg"] [data-part="nav"]',
                         children: {
-                            prev: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Previous page"]',
-                            next: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Next page"]',
+                            prev: 'section:not([hidden]) [data-test="pg"] [data-part="prev"]',
+                            next: 'section:not([hidden]) [data-test="pg"] [data-part="next"]',
                         },
                         relations: [
                             { description: 'prev.top == next.top', left: 'prev.top', op: '==', right: 'next.top', tolerance: 2 },
@@ -124,10 +125,10 @@ export const pagination: ComponentManifest = {
                     {
                         // The active page is styled differently: a filled background → full opacity, against the disabled prev.
                         description: 'active page is more opaque than disabled prev (different state)',
-                        parent: 'section:not([hidden]) [data-test="pg"] .pdx-pagination',
+                        parent: 'section:not([hidden]) [data-test="pg"] [data-part="nav"]',
                         children: {
-                            prev: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Previous page"]',
-                            active: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]',
+                            prev: 'section:not([hidden]) [data-test="pg"] [data-part="prev"]',
+                            active: 'section:not([hidden]) [data-test="pg"] [data-part="page"][aria-current="page"]',
                         },
                         relations: [
                             { description: 'active.opacity > prev.opacity', left: 'active.opacity', op: '>', right: 'prev.opacity' },
@@ -144,8 +145,8 @@ export const pagination: ComponentManifest = {
                         parent: 'section:not([hidden]) [data-test="pg-box"]',
                         children: {
                             box: 'section:not([hidden]) [data-test="pg-box"]',
-                            nav: 'section:not([hidden]) [data-test="pg"] .pdx-pagination',
-                            next: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-label="Next page"]',
+                            nav: 'section:not([hidden]) [data-test="pg"] [data-part="nav"]',
+                            next: 'section:not([hidden]) [data-test="pg"] [data-part="next"]',
                         },
                         relations: [
                             { description: 'nav right edge within the box', left: 'nav.right', op: '<=', right: 'box.right' },
@@ -169,7 +170,7 @@ export const pagination: ComponentManifest = {
         scenario: 'pagination-basic',
         targets: [
             // The page button keeps its min-height even under hostile global CSS.
-            { selector: 'section:not([hidden]) [data-test="pg"] .pdx-page[aria-current="page"]', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="pg"] [data-part="page"][aria-current="page"]', tolerancePx: 10 },
         ],
     },
 

@@ -2,12 +2,11 @@
 // Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
 // Priority: explicit props > :source prop > injected DataSource from context.
 
-import { component, html, signal, inject, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, inject, slot, snippetOrSlot, model } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { SlotFunction } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/pagination';
@@ -20,17 +19,38 @@ type SizeSelect = HTMLElement & { options: { value: string; label: string }[]; v
  *
  * @slot item - Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.
  * @slot page - The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form.
+ *
+ * @csspart nav - The `role="navigation"` element that holds the controls (`.pdx-pagination`).
+ * @csspart page - A page button; the current one is `aria-current="page"`.
+ * @csspart first - The button to the first page.
+ * @csspart prev - The button to the previous page.
+ * @csspart next - The button to the next page.
+ * @csspart last - The button to the last page.
+ * @csspart ellipsis - The gap drawn for the pages left out of a long range.
+ * @csspart range - The "1–10 of 47" text, with `show-total`.
+ * @csspart position - The "3 / 10" text of `simple`.
+ * @csspart size - The rows-per-page select, with `show-page-size`.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail page $event.detail.value
+ * @alphadetail pageSize $event.currentTarget.pageSize
  */
 component('pdx-pagination', {
+    // The current page and the page size are positions the pager changes itself (#289): models, so a
+    // click writes them and announces `page-change` / `page-size-change` { value }. -1 leaves each to
+    // the DataSource, which then holds it and is not written.
+    models: {
+        /** Current page 1-based (overrides DataSource) */
+        page: model<number>(-1, { type: Number }),
+        /** Items per page (overrides DataSource) */
+        pageSize: model<number>(-1, { type: Number }),
+    },
+    parts: ['nav', 'page', 'first', 'prev', 'next', 'last', 'ellipsis', 'range', 'position', 'size'],
     props: {
         /** DataSource instance — auto-binds total, page, pageSize */
         source: { type: Object, default: null },
         /** Total number of items (overrides DataSource) */
         total: { type: Number, default: -1 },
-        /** Items per page (overrides DataSource) */
-        pageSize: { type: Number, default: -1 },
-        /** Current page 1-based (overrides DataSource) */
-        page: { type: Number, default: -1 },
         /** Show first/last buttons */
         showEdges: { type: Boolean, default: true },
         /** Show page size selector */
@@ -94,13 +114,12 @@ component('pdx-pagination', {
         }
 
         /**
-         * `page` / `pageSize` are the live values, already when pdx-change is dispatched,
-         * not their initial ones. Not while they are left to a DataSource (the -1
-         * default with a source): there the source holds them, and writing the prop would pin it.
+         * Write the model, which announces it when it changed. Not while it is left to a DataSource
+         * (the -1 default with a source): there the source holds it, and writing it would pin it.
          */
         function reflect(name: 'page' | 'pageSize', value: number): void {
-            const current = (name === 'page' ? ctx.page() : ctx.pageSize()) as number;
-            if (current >= 0 || !resolveDS()) setOwnProp(ctx.el, name, value);
+            const m = name === 'page' ? ctx.page : ctx.pageSize;
+            if ((m.peek() as number) >= 0 || !resolveDS()) m.set(value);
         }
 
         function goTo(pageNum: number): void {
@@ -111,7 +130,6 @@ component('pdx-pagination', {
             const ds = resolveDS();
             if (ds) ds.setPage(clamped);
             reflect('page', clamped);
-            ctx.emit('pdx-change', { page: clamped, pageSize: getPageSize() });
             rebuild();
         }
 
@@ -127,6 +145,7 @@ component('pdx-pagination', {
             const el = ctx.el;
             const nav = el.querySelector('.pdx-pagination') || document.createElement('nav');
             nav.className = 'pdx-pagination';
+            nav.setAttribute('data-part', 'nav');
             nav.setAttribute('role', 'navigation');
             uiAttr(nav, 'aria-label', () => uiString('pagination', 'label'));
             // The control that had focus, by what it does: the rebuild replaces every button, and focus
@@ -149,6 +168,7 @@ component('pdx-pagination', {
             if (showTotal) {
                 const info = document.createElement('span');
                 info.className = 'pdx-pagination-info';
+                info.setAttribute('data-part', 'range');
                 const start = (page - 1) * pageSize + 1;
                 const end = Math.min(page * pageSize, total);
                 // Nothing to show is "0 of 0", not "1–0 of 0".
@@ -187,6 +207,7 @@ component('pdx-pagination', {
                     if (p === -1) {
                         const ellipsis = document.createElement('span');
                         ellipsis.className = 'pdx-page-ellipsis';
+                        ellipsis.setAttribute('data-part', 'ellipsis');
                         ellipsis.textContent = '…';
                         // Drawn, not read: a gap in the numbers, which the page names already say.
                         ellipsis.setAttribute('aria-hidden', 'true');
@@ -196,7 +217,9 @@ component('pdx-pagination', {
                         if (pageSlot) {
                             const content = pageSlot({ page: p, isActive: p === page });
                             const wrapper = document.createElement('span');
-                            wrapper.className = 'pdx-page-btn' + (p === page ? ' pdx-page-active' : '');
+                            // The current page is its `aria-current`, which the CSS selects: no class.
+                            wrapper.className = 'pdx-page-btn';
+                            wrapper.setAttribute('data-part', 'page');
                             if (p === page) wrapper.setAttribute('aria-current', 'page');
                             wrapper.addEventListener('click', () => goTo(p));
                             wrapper.appendChild(content instanceof DocumentFragment ? content : content);
@@ -205,10 +228,7 @@ component('pdx-pagination', {
                             // "Page 2", not the bare number.
                             const btn = makeBtn(String(p), () => goTo(p), false,
                                 format(uiString('pagination', 'page'), { n: p }), `page:${p}`);
-                            if (p === page) {
-                                btn.classList.add('pdx-page-active');
-                                btn.setAttribute('aria-current', 'page');
-                            }
+                            if (p === page) btn.setAttribute('aria-current', 'page');
                             nav.appendChild(btn);
                         }
                     }
@@ -217,6 +237,7 @@ component('pdx-pagination', {
                 // Simple: show "Page X of Y"
                 const info = document.createElement('span');
                 info.className = 'pdx-pagination-simple-info';
+                info.setAttribute('data-part', 'position');
                 info.textContent = total > 0 ? `${page} / ${tp}` : '0 / 0';
                 nav.appendChild(info);
             }
@@ -244,11 +265,12 @@ component('pdx-pagination', {
             if (!customElements.get('pdx-select')) void import('../select/pdx-select');
             const select = document.createElement('pdx-select') as SizeSelect;
             select.className = 'pdx-pagination-size';
+            select.setAttribute('data-part', 'size');
             select.setAttribute('size', 'sm');
             select.setAttribute('data-page-key', 'size');
             uiAttr(select, 'label', () => uiString('pagination', 'pageSize'));
-            // The select's model event (#481), which does not bubble: the pager's pdx-change is the
-            // one its listeners read.
+            // The select's model event (#481), which does not bubble: the pager's own model events
+            // are the ones its listeners read.
             select.addEventListener('value-change', (e) => {
                 const next = Number((e as CustomEvent<{ value: string | null }>).detail.value);
                 if (!next) return;
@@ -260,7 +282,6 @@ component('pdx-pagination', {
                 // no source, gives the rebuild the old size back.
                 reflect('pageSize', next);
                 reflect('page', 1);
-                ctx.emit('pdx-change', { page: 1, pageSize: next });
                 rebuild();
             });
             return select;
@@ -282,7 +303,11 @@ component('pdx-pagination', {
             btn.textContent = text;
             btn.disabled = disabled;
             if (label) btn.setAttribute('aria-label', label);
-            if (key) btn.setAttribute('data-page-key', key);
+            if (key) {
+                btn.setAttribute('data-page-key', key);
+                // `page:3` is a page button; the others are named by what they do.
+                btn.setAttribute('data-part', key.startsWith('page:') ? 'page' : key);
+            }
             btn.addEventListener('click', onClick);
             return btn;
         }
@@ -300,19 +325,17 @@ component('pdx-pagination', {
             return pages;
         }
 
-        // Imperative API — exposed on host for parent ref access.
-        // NOTE: cannot expose a `page` member: it would shadow the `page` PROP setter
-        // (exposeOnElement redefines the property getter-only). Use `currentPage` instead.
+        // The navigation verbs of the library (#289): `next()`, `prev()`, `goTo(n)`, and `first()` /
+        // `last()`. The current page is the `page` model itself.
         ctx.expose({
-            /** Go to a page, clamped to 1..total. Emits `pdx-change`, and moves the bound DataSource with it. */
-            goto: (p: number) => goTo(p),
+            /** Go to a page, clamped to 1..total. Writes `page`, and moves the bound DataSource with it. */
+            goTo: (p: number) => goTo(p),
             next: () => goTo(_page.peek() + 1),
             prev: () => goTo(_page.peek() - 1),
-            /** The first page, through the same path as `goto`. */
+            /** The first page, through the same path as `goTo`. */
             first: () => goTo(1),
-            /** The last page, through the same path as `goto`. */
+            /** The last page, through the same path as `goTo`. */
             last: () => goTo(totalPages()),
-            get currentPage() { return _page.peek(); },
         });
 
         ctx.track(() => {

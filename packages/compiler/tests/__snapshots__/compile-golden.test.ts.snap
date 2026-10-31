@@ -6821,7 +6821,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n@scope ([data-pdx-tpoh2k]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Pagination</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-pagination&gt;</code> — page navigation with numbered buttons, prev/next, first/last,\\n      ellipsis for large ranges, simple mode, and total info display.\\n    </p>  <app-demo-comp-pagination-basic class="demo-section"></app-demo-comp-pagination-basic>  <app-demo-comp-pagination-many-pages class="demo-section"></app-demo-comp-pagination-many-pages>  <app-demo-comp-pagination-start-end class="demo-section"></app-demo-comp-pagination-start-end>  <app-demo-comp-pagination-simple class="demo-section"></app-demo-comp-pagination-simple>  <app-demo-comp-pagination-total-info class="demo-section"></app-demo-comp-pagination-total-info>  <app-demo-comp-pagination-no-first-last class="demo-section"></app-demo-comp-pagination-no-first-last>  <app-demo-comp-pagination-few-pages class="demo-section"></app-demo-comp-pagination-few-pages>  <app-demo-comp-pagination-slots class="demo-section"></app-demo-comp-pagination-slots>  <section> <h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>total</code></td><td>Number</td><td>0</td><td>Total number of items</td></tr><tr><td><code>pagesize</code></td><td>Number</td><td>10</td><td>Items per page</td></tr><tr><td><code>page</code></td><td>Number</td><td>1</td><td>Current page (1-based)</td></tr><tr><td><code>showedges</code></td><td>Boolean</td><td>true</td><td>Show « » first/last buttons</td></tr><tr><td><code>simple</code></td><td>Boolean</td><td>false</td><td>Simple ‹ X/Y › mode</td></tr><tr><td><code>showtotal</code></td><td>Boolean</td><td>false</td><td>Show "X–Y of Z" info text</td></tr></tbody></table> </div> </section>  <section> <h2 class="pdx-txt-heading section-heading">Events</h2> <div class="options-table"> <table><thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead><tbody><tr><td><code>pdx-change</code></td><td>{ page, pageSize }</td><td>Page changed</td></tr></tbody></table> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Pagination</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-pagination&gt;</code> — page navigation with numbered buttons, prev/next, first/last,\\n      ellipsis for large ranges, simple mode, and total info display.\\n    </p>  <app-demo-comp-pagination-basic class="demo-section"></app-demo-comp-pagination-basic>  <app-demo-comp-pagination-many-pages class="demo-section"></app-demo-comp-pagination-many-pages>  <app-demo-comp-pagination-start-end class="demo-section"></app-demo-comp-pagination-start-end>  <app-demo-comp-pagination-simple class="demo-section"></app-demo-comp-pagination-simple>  <app-demo-comp-pagination-total-info class="demo-section"></app-demo-comp-pagination-total-info>  <app-demo-comp-pagination-no-first-last class="demo-section"></app-demo-comp-pagination-no-first-last>  <app-demo-comp-pagination-few-pages class="demo-section"></app-demo-comp-pagination-few-pages>  <app-demo-comp-pagination-slots class="demo-section"></app-demo-comp-pagination-slots>  <section> <h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>total</code></td><td>Number</td><td>0</td><td>Total number of items</td></tr><tr><td><code>pagesize</code></td><td>Number</td><td>10</td><td>Items per page. A model: a new size from the size select writes it, announced by <code>page-size-change</code> { value }</td></tr><tr><td><code>page</code></td><td>Number</td><td>1</td><td>Current page (1-based). A model: <code>::page</code> follows a click, announced by <code>page-change</code> { value }</td></tr><tr><td><code>showedges</code></td><td>Boolean</td><td>true</td><td>Show « » first/last buttons</td></tr><tr><td><code>simple</code></td><td>Boolean</td><td>false</td><td>Simple ‹ X/Y › mode</td></tr><tr><td><code>showtotal</code></td><td>Boolean</td><td>false</td><td>Show "X–Y of Z" info text</td></tr></tbody></table> </div> </section>  <section> <h2 class="pdx-txt-heading section-heading">Events</h2> <div class="options-table"> <table><thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead><tbody><tr><td><code>page-change</code></td><td>{ value }</td><td>The pager moved to another page</td></tr><tr><td><code>page-size-change</code></td><td>{ value }</td><td>A new page size was picked</td></tr></tbody></table> </div> </section>  <section> <h2 class="pdx-txt-heading section-heading">Methods and parts</h2> <div class="options-table"> <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><code>goTo(n)</code></td><td>Go to page n, clamped to the pages there are</td></tr><tr><td><code>next() / prev() / first() / last()</code></td><td>Also as <code>command="--next"</code> on a button</td></tr><tr><td><code>[data-part]</code></td><td><code>nav</code>, <code>page</code>, <code>first</code>, <code>prev</code>, <code>next</code>, <code>last</code>, <code>ellipsis</code>, <code>range</code>, <code>position</code>, <code>size</code></td></tr></tbody></table> </div> </section> </div> '));
 component('app-comp-pagination', {
   props: {},
   setup(ctx) {
@@ -23163,7 +23163,7 @@ import { assignBoundProperty, batchHandler, bindInterpolation, component, comput
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-qkqj8x]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n  :scope .demo-container { max-width: 600px; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2> <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p> <div class="demo-container"> <pdx-list dividers bordered id="paged-list"></pdx-list> </div> <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)"> <span class="pdx-txt-small pdx-ink-muted" id="paged-info"><!----></span> <pdx-pagination id="paged-pagination"></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: fakePagedTransport,\\n  pageSize: 5,\\n  autoLoad: true,\\n});\\n\\n&lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;\\n&lt;pdx-pagination :total="ds.total()" :pageSize="5"\\n  :page="ds.page()" @pdx-change="onPage"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2> <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p> <div class="demo-container"> <pdx-list dividers bordered id="paged-list"></pdx-list> </div> <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)"> <span class="pdx-txt-small pdx-ink-muted" id="paged-info"><!----></span> <pdx-pagination id="paged-pagination"></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: fakePagedTransport,\\n  pageSize: 5,\\n  autoLoad: true,\\n});\\n\\n&lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;\\n&lt;pdx-pagination :total="ds.total()" :pageSize="5"\\n  :page="ds.page()" @page-change="onPage"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> </section> '));
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el3.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __t7=__el6.firstChild;const __el8=__el6.nextSibling.nextSibling;return [__el4,__t7,__el8];};
 component('app-demo-comp-list-pagination', {
   props: {},
@@ -23206,7 +23206,7 @@ component('app-demo-comp-list-pagination', {
     
     
     function onPageChange(evt) {
-      pagedDS.setPage(evt.detail.page);
+      pagedDS.setPage(evt.detail.value);
     }
     
     function renderPagedItem(userItem) {
@@ -23232,7 +23232,7 @@ component('app-demo-comp-list-pagination', {
     let __el8w_total = {}; effect(() => { const __b = ctx.pagedTotal(); if (Object.is(__b, __el8w_total)) return; __el8w_total = __b; assignBoundProperty(__el8, "total", __b); });
     { assignBoundProperty(__el8, "pageSize", 5); }
     let __el8w_page = {}; effect(() => { const __b = ctx.pagedPage(); if (Object.is(__b, __el8w_page)) return; __el8w_page = __b; assignBoundProperty(__el8, "page", __b); });
-    __el8.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
+    __el8.addEventListener('page-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'page-change'));
     return __frag;
   })(),
 });
@@ -25636,7 +25636,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-pagin
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, bindTwoWay, component, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-zdbkwz");
@@ -25644,26 +25644,22 @@ import { assignBoundProperty, batchHandler, bindInterpolation, component, safeHa
   __pdx_style.textContent = "\\n@scope ([data-pdx-zdbkwz]) to ([data-pdx-root] \\u003E *) {:scope .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); }\\n\\n  \\n  :scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">10 pages. Click page numbers or arrows to navigate.</p> <div class="demo-row"> <pdx-pagination></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" :page="1" @pdx-change="onPageChange"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> <div class="event-log pdx-txt-mono pdx-txt-small" id="page-event-log"><!----></div> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el9=__el3.nextSibling.nextSibling.nextSibling.nextSibling;const __t10=__el9.firstChild;return [__el4,__t10];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">10 pages. Click page numbers or arrows to navigate: <code>::page</code> follows them.</p> <div class="demo-row"> <pdx-pagination></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-pagination :total="100" :pageSize="10" ::page="current"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> <div class="event-log pdx-txt-mono pdx-txt-small" id="page-event-log">page <!----></div> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __el10=__el4.nextSibling.nextSibling.nextSibling.nextSibling;const __t11=__el10.firstChild.nextSibling;return [__el5,__t11];};
 component('app-demo-comp-pagination-basic', {
   props: {},
   setup(ctx) {
-    const __pageLog = signal('Click a page...', { name: 'demo-comp-pagination-basic:pageLog' });
-function onPageChange(e) {
-      __pageLog.setRaw('pdx-change: page ' + e.detail.page + ', pageSize ' + e.detail.pageSize);
-    }
+    const __current = signal(1, { name: 'demo-comp-pagination-basic:current' });
     ctx.el.setAttribute('data-pdx-zdbkwz', '');
-    return { pageLog: __pageLog, onPageChange };
+    return { current: __current };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el4,__t10]=__walk0(__frag);
-    { assignBoundProperty(__el4, "total", 100); }
-    { assignBoundProperty(__el4, "pageSize", 10); }
-    { assignBoundProperty(__el4, "page", 1); }
-    __el4.addEventListener('pdx-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'pdx-change'));
-    bindInterpolation(__t10,()=>ctx.pageLog());
+    const [__el5,__t11]=__walk0(__frag);
+    { assignBoundProperty(__el5, "total", 100); }
+    { assignBoundProperty(__el5, "pageSize", 10); }
+    bindTwoWay(__el5, 'page', ctx.current);
+    bindInterpolation(__t11,()=>ctx.current());
     return __frag;
   })(),
 });
