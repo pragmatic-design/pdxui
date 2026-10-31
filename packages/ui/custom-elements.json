@@ -29647,16 +29647,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Current step (0-based index)",
-              "type": {
-                "text": "number"
-              },
-              "default": "0",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "linear",
               "description": "Sequential navigation — can't skip ahead",
               "type": {
@@ -29716,6 +29706,16 @@
               "attribute": "size"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "Current step (0-based index)",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "goTo",
               "parameters": [
@@ -29730,13 +29730,13 @@
             },
             {
               "kind": "method",
-              "name": "goNext",
+              "name": "next",
               "parameters": [],
               "description": "The next step, through the same guards as `goTo`; false at the last one."
             },
             {
               "kind": "method",
-              "name": "goPrev",
+              "name": "prev",
               "parameters": [],
               "description": "The previous step, through the same guards as `goTo`; false at the first one."
             },
@@ -29745,38 +29745,10 @@
               "name": "complete",
               "parameters": [],
               "description": "Emit `pdx-complete` for the step in view. It does not advance, validate or close anything."
-            },
-            {
-              "kind": "method",
-              "name": "next",
-              "parameters": [],
-              "description": "Advances to the next item."
-            },
-            {
-              "kind": "method",
-              "name": "prev",
-              "parameters": [],
-              "description": "Goes to the previous item."
-            },
-            {
-              "kind": "method",
-              "name": "goto",
-              "parameters": [
-                {
-                  "name": "step",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "description": "`goTo` under its all-lowercase spelling."
-            },
-            {
-              "kind": "field",
-              "name": "step",
-              "readonly": true,
-              "description": "Read-only, via a ref: `el.step`."
             }
+          ],
+          "models": [
+            "value"
           ],
           "variants": [
             {
@@ -29792,29 +29764,36 @@
               }
             }
           ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
             {
               "name": "pdx-before-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the before changes."
-            },
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value, previous }"
+              "description": "Before a move, cancellable: `preventDefault()` keeps the wizard where it is.",
+              "detail": "{ value: number; previous: number }"
             },
             {
               "name": "pdx-complete",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-complete`.",
-              "detail": "{ value }"
+              "description": "Next on the last step, or `complete()`.",
+              "detail": "{ value: number }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: number }"
             }
           ],
           "roles": [
@@ -29825,15 +29804,6 @@
             "tabpanel"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Current step (0-based index)",
-              "type": {
-                "text": "number"
-              },
-              "default": "0"
-            },
             {
               "name": "linear",
               "fieldName": "linear",
@@ -29887,6 +29857,15 @@
                 "text": "'md' | 'sm'"
               },
               "default": "'md'"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "Current step (0-based index)",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
             }
           ],
           "shapes": [
@@ -29905,6 +29884,54 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The stepper, the `role=\"tablist\"` element (`.pdx-stepper`)."
+            },
+            {
+              "name": "step",
+              "description": "A step's button in the stepper; the current one is `aria-current=\"step\"`."
+            },
+            {
+              "name": "connector",
+              "description": "The line between two steps of a horizontal stepper."
+            },
+            {
+              "name": "panel",
+              "description": "A step's panel, an element with `data-wizard-step`."
+            },
+            {
+              "name": "nav",
+              "description": "The footer with Back, the position and Next."
+            },
+            {
+              "name": "back",
+              "description": "The Back button."
+            },
+            {
+              "name": "next",
+              "description": "The Next button, Complete on the last step."
+            },
+            {
+              "name": "indicator",
+              "description": "The \"Step 2 of 4\" text of the footer."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "ready",
+              "description": "Its steps are found and its stepper is drawn."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: no step can be reached."
+            },
+            {
+              "name": "vertical",
+              "description": "`orientation=\"vertical\"`: the stepper beside the panels."
             }
           ]
         }

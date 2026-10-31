@@ -2,11 +2,10 @@
 // Compound: discovers [data-wizard-step] children. Auto-generates stepper + footer.
 // Supports: linear/free navigation, vertical/horizontal, validation guard, i18n.
 
-import { component, html, signal, focusGroup, registerComponentStrings, generatedId } from '@pdxui/core';
+import { component, html, signal, focusGroup, registerComponentStrings, generatedId, model, event } from '@pdxui/core';
 import { watchStepLabels, refreshStepMeta, applyStepLabels, stepName, type StepMeta } from './wizard-step-labels';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/wizard';
@@ -26,8 +25,37 @@ registerComponentStrings('wizard', {
 /**
  * A multi-step wizard with a stepper header, back/next navigation in linear or free mode, and a
  * validation guard before moving on.
+ *
+ * @csspart root - The stepper, the `role="tablist"` element (`.pdx-stepper`).
+ * @csspart step - A step's button in the stepper; the current one is `aria-current="step"`.
+ * @csspart connector - The line between two steps of a horizontal stepper.
+ * @csspart panel - A step's panel, an element with `data-wizard-step`.
+ * @csspart nav - The footer with Back, the position and Next.
+ * @csspart back - The Back button.
+ * @csspart next - The Next button, Complete on the last step.
+ * @csspart indicator - The "Step 2 of 4" text of the footer.
+ * @cssstate ready - Its steps are found and its stepper is drawn.
+ * @cssstate disabled - `disabled` is set: no step can be reached.
+ * @cssstate vertical - `orientation="vertical"`: the stepper beside the panels.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-wizard', {
+    // The current step is a position the wizard changes itself (#289): a model, so Next, Back, a
+    // step button or `goTo(n)` writes it and announces `value-change` { value }.
+    models: {
+        /** Current step (0-based index) */
+        value: model<number>(0, { type: Number }),
+    },
+    events: {
+        /** Before a move, cancellable: `preventDefault()` keeps the wizard where it is. */
+        'pdx-before-change': event<{ value: number; previous: number }>(),
+        /** Next on the last step, or `complete()`. */
+        'pdx-complete': event<{ value: number }>(),
+    },
+    states: ['ready', 'disabled', 'vertical'],
+    parts: ['root', 'step', 'connector', 'panel', 'nav', 'back', 'next', 'indicator'],
     // The axis pagination.css keys by (#632), reflected on the host and drawn on the stepper, the
     // root part, where `.pdx-stepper-sm` draws the same on a native stepper. The navigation buttons
     // take it too.
@@ -36,8 +64,6 @@ component('pdx-wizard', {
         size: { md: '.pdx-stepper-md', sm: '.pdx-stepper-sm' },
     },
     props: {
-        /** Current step (0-based index) */
-        value: { type: Number, default: 0 },
         /** Sequential navigation — can't skip ahead */
         linear: { type: Boolean, default: true },
         /** Stepper orientation */
@@ -103,32 +129,28 @@ component('pdx-wizard', {
         // ─── Navigate to step ────────────────────────────────
         function goTo(targetIndex: number): boolean {
             if (!canGoTo(targetIndex)) return false;
-            const prev = _step.peek();
-            if (targetIndex === prev) return false;
+            const from = _step.peek();
+            if (targetIndex === from) return false;
 
-            // Emit before-change — allow cancellation
-            const event = new CustomEvent('pdx-before-change', {
-                bubbles: true, cancelable: true,
-                detail: { value: targetIndex, previous: prev },
-            });
-            ctx.el.dispatchEvent(event);
-            if (event.defaultPrevented) return false;
+            // Before the move, cancellable: a listener that validates the step being left stops it.
+            // Declared, so it does not bubble (#138).
+            if (!ctx.emit('pdx-before-change', { value: targetIndex, previous: from }, { cancelable: true })) return false;
 
             _step.set(targetIndex);
             if (targetIndex > _highestVisited.peek()) {
                 _highestVisited.set(targetIndex);
             }
-            // `value` is the live step, already when the event is dispatched. The value track sees its own reflection as the current step, a no-op.
-            setOwnProp(ctx.el, 'value', targetIndex);
-            ctx.emit('pdx-change', { value: targetIndex, previous: prev });
+            // The model, which announces the move. The value track sees its own write as the
+            // current step, a no-op.
+            ctx.value.set(targetIndex);
             return true;
         }
 
-        function goNext(): boolean {
+        function next(): boolean {
             return goTo(_step.peek() + 1);
         }
 
-        function goPrev(): boolean {
+        function prev(): boolean {
             return goTo(_step.peek() - 1);
         }
 
@@ -152,9 +174,14 @@ component('pdx-wizard', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-step';
+                btn.setAttribute('data-part', 'step');
                 btn.setAttribute('role', 'tab');
                 btn.setAttribute('data-step-btn', String(i));
                 btn.setAttribute('aria-label', stepName(s));
+                // A6: "2 of 4" in the accessibility tree. Chromium computes no position for these
+                // tabs, so it is written.
+                btn.setAttribute('aria-posinset', String(i + 1));
+                btn.setAttribute('aria-setsize', String(_steps.length));
 
                 // Click handler for step navigation
                 const idx = i;
@@ -193,6 +220,7 @@ component('pdx-wizard', {
                 if (!isVert && i < _steps.length - 1) {
                     const conn = document.createElement('span');
                     conn.className = 'pdx-step-connector';
+                    conn.setAttribute('data-part', 'connector');
                     conn.setAttribute('data-connector', String(i));
                     nav.appendChild(conn);
                 }
@@ -205,6 +233,7 @@ component('pdx-wizard', {
         function buildNav(): HTMLElement {
             const nav = document.createElement('div');
             nav.className = 'pdx-wizard-nav';
+            nav.setAttribute('data-part', 'nav');
             nav.setAttribute('role', 'navigation');
             uiAttr(nav, 'aria-label', () => uiString('wizard', 'navigation'));
 
@@ -216,20 +245,23 @@ component('pdx-wizard', {
             backBtn.type = 'button';
             backBtn.className = 'pdx-ghost';
             backBtn.setAttribute('data-wizard-back', '');
-            backBtn.addEventListener('click', () => goPrev());
+            backBtn.setAttribute('data-part', 'back');
+            backBtn.addEventListener('click', () => prev());
 
             const nextBtn = document.createElement('button');
             nextBtn.type = 'button';
             nextBtn.className = 'pdx-primary';
             nextBtn.setAttribute('data-wizard-next', '');
+            nextBtn.setAttribute('data-part', 'next');
             nextBtn.addEventListener('click', () => {
                 if (_step.peek() === _steps.length - 1) complete();
-                else goNext();
+                else next();
             });
 
             const indicator = document.createElement('span');
             indicator.className = 'pdx-wizard-indicator pdx-txt-small pdx-ink-muted';
             indicator.setAttribute('data-wizard-indicator', '');
+            indicator.setAttribute('data-part', 'indicator');
 
             nav.appendChild(backBtn);
             nav.appendChild(indicator);
@@ -288,6 +320,7 @@ component('pdx-wizard', {
                 const isActive = i === current;
                 s.el.style.display = isActive ? '' : 'none';
                 s.el.setAttribute('role', 'tabpanel');
+                s.el.setAttribute('data-part', 'panel');
                 s.el.setAttribute('aria-hidden', String(!isActive));
                 if (isActive) {
                     s.el.setAttribute('aria-labelledby', `${uid}-step-${i}`);
@@ -334,7 +367,7 @@ component('pdx-wizard', {
 
         // ─── Disabled ─────────────────────────────────────────
         ctx.track(() => {
-            ctx.el.classList.toggle('pdx-wizard-disabled', ctx.disabled() as boolean);
+            ctx.state('disabled', ctx.disabled() as boolean);
         });
 
         // ─── One-shot bind ────────────────────────────────────
@@ -353,10 +386,10 @@ component('pdx-wizard', {
                     _steps = discoverSteps();
                     if (_steps.length === 0) return;
 
-                    // Add wrapper class
-                    el.classList.add('pdx-wizard');
+                    // States, not classes (#289): wizard.css lays the wizard out from them.
+                    ctx.state('ready', true);
                     const isVert = (ctx.orientation() as string) === 'vertical';
-                    if (isVert) el.classList.add('pdx-wizard-vertical');
+                    ctx.state('vertical', isVert);
 
                     // Build and insert stepper (before step panels)
                     if (!ctx.hideStepper()) {
@@ -471,22 +504,17 @@ component('pdx-wizard', {
             }
         });
 
-        // Expose API for programmatic control.
-        // `step` getter is safe: the PROP is `value`, not `step`.
+        // The navigation verbs of the library (#289): `next()`, `prev()`, `goTo(n)`. The current
+        // step is the `value` model itself.
         ctx.expose({
             /** Go to a step by index. Returns false, and moves nothing, when the step is not reachable yet or a `pdx-before-change` listener cancels. */
             goTo,
             /** The next step, through the same guards as `goTo`; false at the last one. */
-            goNext,
+            next,
             /** The previous step, through the same guards as `goTo`; false at the first one. */
-            goPrev,
+            prev,
             /** Emit `pdx-complete` for the step in view. It does not advance, validate or close anything. */
             complete,
-            next: goNext,
-            prev: goPrev,
-            /** `goTo` under its all-lowercase spelling. */
-            goto: (step: number) => goTo(step),
-            get step() { return _step.peek(); },
         });
 
         return {};

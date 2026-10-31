@@ -417,6 +417,25 @@
                 api.readValue = () => page();
             },
 
+            // pdx-wizard on the beta contract (#289): `::value` bound to a signal.
+            'wizard-beta-contract': () => {
+                const value = signal(1);
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="next" commandfor="bound-wizard" command="--next">Next step</button>
+                        <pdx-wizard id="bound-wizard" ::value=${value}>
+                            <div data-wizard-step data-label="One">Panel one</div>
+                            <div data-wizard-step data-label="Two">Panel two</div>
+                            <div data-wizard-step data-label="Three">Panel three</div>
+                            <div data-wizard-step data-label="Four">Panel four</div>
+                        </pdx-wizard>
+                    </div>`);
+                };
+                api.setValue = (v) => value.set(v);
+                api.readValue = () => value();
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

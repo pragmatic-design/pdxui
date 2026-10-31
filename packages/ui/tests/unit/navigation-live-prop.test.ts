@@ -110,12 +110,13 @@ describe('after a user move, the property is the emitted value', () => {
 
     it('pdx-wizard: Next', async () => {
         const el = await mount(WIZARD);
-        const seen = record(el, 'pdx-change', ['value']);
+        // Its model's event since #289.
+        const seen = record(el, 'value-change', ['value']);
         el.querySelector<HTMLButtonElement>('[data-wizard-next]')!.click();
         await tick();
-        expect(seen, 'one pdx-change for one click').toHaveLength(1);
+        expect(seen, 'one value-change for one click').toHaveLength(1);
         expect(seen[0].detail.value).toBe(1);
-        expect(seen[0].atEmit.value, 'el.value when pdx-change was dispatched').toBe(1);
+        expect(seen[0].atEmit.value, 'el.value when value-change was dispatched').toBe(1);
         expect(el.value, 'el.value after the frame').toBe(1);
     });
 });

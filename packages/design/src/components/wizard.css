@@ -1,50 +1,52 @@
 /* pdx-wizard — Multi-step wizard layout */
 /* Stepper circles/connectors use .pdx-stepper from pagination.css */
+/* The host's custom states (#289), not the classes it set: `ready` once its steps are found,
+   `disabled`, `vertical`. `:where(pdx-wizard):state(x)` weighs what the class did. */
 
 pdx-wizard {
     display: block;
 }
 
-.pdx-wizard {
+:where(pdx-wizard):state(ready) {
     display: flex;
     flex-direction: column;
     gap: var(--pdx-space-lg);
 }
 
-.pdx-wizard-disabled {
+:where(pdx-wizard):state(disabled) {
     opacity: 0.5;
     pointer-events: none;
 }
 
 /* ─── Vertical layout: stepper left, content right ─── */
-.pdx-wizard-vertical {
+:where(pdx-wizard):state(vertical) {
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--pdx-space-xl);
 }
 
-.pdx-wizard-vertical > .pdx-stepper-vertical {
+:where(pdx-wizard):state(vertical) > .pdx-stepper-vertical {
     flex-shrink: 0;
     min-width: 200px;
 }
 
-.pdx-wizard-vertical > [data-wizard-step] {
+:where(pdx-wizard):state(vertical) > [data-wizard-step] {
     flex: 1;
     min-width: 0;
 }
 
 /* Nav footer spans full width below stepper + content */
-.pdx-wizard-vertical > .pdx-wizard-nav {
+:where(pdx-wizard):state(vertical) > .pdx-wizard-nav {
     width: 100%;
 }
 
 /* ─── Step panels ─── */
-.pdx-wizard > [data-wizard-step] {
+:where(pdx-wizard):state(ready) > [data-wizard-step] {
     padding: var(--pdx-space-md) 0;
     animation: pdx-wizard-fade-in 0.2s ease;
 }
 
-.pdx-wizard-vertical > [data-wizard-step] {
+:where(pdx-wizard):state(vertical) > [data-wizard-step] {
     padding: 0;
 }
 
@@ -54,46 +56,46 @@ pdx-wizard {
 }
 
 /* ─── Stepper containment ─── */
-.pdx-wizard > .pdx-stepper {
+:where(pdx-wizard):state(ready) > .pdx-stepper {
     width: 100%;
     min-width: 0;
     overflow: hidden;
 }
 
 /* Step labels truncate when space is tight */
-.pdx-wizard .pdx-step-label {
+:where(pdx-wizard):state(ready) .pdx-step-label {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 /* Steps shrink proportionally — never overflow */
-.pdx-wizard .pdx-step {
+:where(pdx-wizard):state(ready) .pdx-step {
     min-width: 0;
     flex-shrink: 1;
 }
 
 /* ─── Stepper clickable enhancement ─── */
-.pdx-wizard .pdx-step {
+:where(pdx-wizard):state(ready) .pdx-step {
     cursor: pointer;
     border: none;
     background: none;
     padding: var(--pdx-space-xs);
 }
 
-.pdx-wizard .pdx-step:disabled {
+:where(pdx-wizard):state(ready) .pdx-step:disabled {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
-.pdx-wizard .pdx-step:focus-visible {
+:where(pdx-wizard):state(ready) .pdx-step:focus-visible {
     outline: var(--pdx-focus-width) solid var(--pdx-color-focus);
     outline-offset: var(--pdx-focus-offset);
     border-radius: var(--pdx-radius-sm);
 }
 
 /* Connector done state for horizontal */
-.pdx-wizard .pdx-step-connector[data-status="done"] {
+:where(pdx-wizard):state(ready) .pdx-step-connector[data-status="done"] {
     background: var(--pdx-color-primary);
 }
 

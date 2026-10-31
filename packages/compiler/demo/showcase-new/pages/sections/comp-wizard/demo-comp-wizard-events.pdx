@@ -1,10 +1,10 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Events</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Listen to <code>pdx-change</code> and <code>pdx-complete</code>.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Listen to <code>value-change</code>, the step model's event, and <code>pdx-complete</code>.</p>
 
     <div class="demo-box">
-      <pdx-wizard @pdx-change="onStepChange" @pdx-complete="onComplete">
+      <pdx-wizard @value-change="onStepChange" @pdx-complete="onComplete">
         <div data-wizard-step data-label="First">
           <p class="pdx-txt-body">Navigate and watch the event log below.</p>
         </div>
@@ -24,7 +24,7 @@
 let wizardLog = $signal('No events yet');
 
 function onStepChange(e) {
-  wizardLog = 'pdx-change: step ' + e.detail.value + ' (from ' + e.detail.previous + ')';
+  wizardLog = 'value-change: step ' + e.detail.value;
 }
 
 function onComplete(e) {

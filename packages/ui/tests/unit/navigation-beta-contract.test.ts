@@ -47,6 +47,17 @@ const DONE: Row[] = [
         // `currentPage` stood in for `page`, which the model now is.
         removed: ['pdx-change', 'goto', 'currentPage'],
     },
+    {
+        tag: 'pdx-wizard',
+        models: ['value'],
+        // `ready` once its steps are found and its stepper drawn; the current step is marked on its
+        // button (`aria-current="step"`), not on the host.
+        states: ['ready', 'disabled', 'vertical'],
+        parts: ['root', 'step', 'connector', 'panel', 'nav', 'back', 'next', 'indicator'],
+        verbs: ['next', 'prev', 'goTo'],
+        // `step` stood in for `value`, which the model now is; the rest were aliases.
+        removed: ['pdx-change', 'goNext', 'goPrev', 'goto', 'step'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

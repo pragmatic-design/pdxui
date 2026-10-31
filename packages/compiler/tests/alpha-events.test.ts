@@ -230,4 +230,11 @@ describe('the navigation components, from the shipped manifest (#289)', () => {
         expect(fix('<pdx-pagination @pdx-change="load($event.detail.page, $event.detail.pageSize)"></pdx-pagination>'))
             .toBe('<pdx-pagination @page-change="load($event.detail.value, $event.currentTarget.pageSize)"></pdx-pagination>');
     });
+
+    it('pdx-wizard: @pdx-change becomes @value-change; one that reads detail.previous is left for a person', () => {
+        expect(fix('<pdx-wizard @pdx-change="s = $event.detail.value"></pdx-wizard>'))
+            .toBe('<pdx-wizard @value-change="s = $event.detail.value"></pdx-wizard>');
+        const reads = '<pdx-wizard @pdx-change="log($event.detail.previous)"></pdx-wizard>';
+        expect(fix(reads)).toBe(reads);
+    });
 });

@@ -9,10 +9,11 @@ if you like, grouped under one or more forms. **Not when** the steps are section
   `async` handler blocks nothing.
 - `form.validate()` is async and covers the whole form, so it is no use per step: touch the step's fields with
   `onBlur()` and read their `error()`.
-- Listen with `.self`: a component inside a step that announces a bubbling `pdx-change` of its own would
-  otherwise become the step.
+- The step is the `value` model: `::value` follows it, `@value-change` hears it. Listen with `.self`: every
+  field inside a step announces a `value-change` of its own, and one that bubbled would become the step.
 - Steps are discovered once, in the first frame: a panel added later (behind an `@if`) is not a step.
-- Setting `:value` moves the step without `pdx-before-change`: right for restoring a draft, a bypass otherwise.
+- Setting `:value` moves the step without `pdx-before-change`, and announces nothing: right for restoring a
+  draft, a bypass otherwise.
 
 **Composes with** `pdx-form` (steps grouped by form) · `createFormCoordinator()` (one Save over several forms)
 · `pdx-field-list` (rows inside a step).
