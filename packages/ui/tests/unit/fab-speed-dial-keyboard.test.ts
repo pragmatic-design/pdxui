@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/fab/pdx-fab';
 
-type Fab = HTMLElement & { open(): void; close(): void };
+type Fab = HTMLElement & { show(): void; close(): void };
 
 const ACTIONS = [
     { key: 'share', label: 'Share', icon: 'share' },
@@ -42,7 +42,7 @@ describe('a closed speed dial has no reachable actions', () => {
     it('the dial is inert while closed, and not once open', async () => {
         const { el } = await mount();
         expect(dial(el).hasAttribute('inert')).toBe(true);
-        el.open();
+        el.show();
         await tick();
         expect(dial(el).hasAttribute('inert')).toBe(false);
         el.close();

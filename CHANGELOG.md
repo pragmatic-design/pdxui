@@ -394,6 +394,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-fab` takes the beta contract (#288), the last of the overlay family.
+  - **`open()` is `show()`**; `close()` and `toggle()` stay, and `isOpen` is new. `pdx migrate`
+    rewrites `open()` on a `:ref` bound on a `pdx-fab`, and flags it on a lookup.
+  - **`open-change` `{ value }`** announces each opening and closing of the speed dial, once. It is
+    read-only: the parent never writes it, so it is not a model.
+  - **States, not classes.** The open dial, the turned icon and the mask are drawn from the host's
+    `:state(open)`; the component no longer sets `pdx-fab-open`, `pdx-fab-dial-open` and
+    `pdx-fab-mask-visible`, which stay for native markup. A stylesheet that selected those classes
+    on a `pdx-fab` selects `pdx-fab:state(open)` instead.
+  - **Parts.** `root` (the button), `menu` (the speed dial), `item`, `label` and `mask`.
+
 - `pdx-split-button` takes the beta contract (#288).
   - **`show()`, `close()`, `toggle()`** open and close its menu from code, and `isOpen` reads it: it
     had no methods, so an invoker command (`command="--show"`) could not reach it.

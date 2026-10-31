@@ -11919,9 +11919,9 @@
             },
             {
               "kind": "method",
-              "name": "open",
+              "name": "show",
               "parameters": [],
-              "description": "Opens it."
+              "description": "Shows it."
             },
             {
               "kind": "method",
@@ -11934,6 +11934,12 @@
               "name": "toggle",
               "parameters": [],
               "description": "Toggles it open/closed."
+            },
+            {
+              "kind": "field",
+              "name": "isOpen",
+              "readonly": true,
+              "description": "Read-only, via a ref: `el.isOpen`."
             }
           ],
           "variants": [
@@ -11978,20 +11984,28 @@
           ],
           "events": [
             {
-              "name": "pdx-select",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is selected.",
-              "detail": "{ key, action }"
+              "description": "The speed dial opened (`true`) or closed (`false`): its open state, read-only (#288). The\nparent never writes it, so it is not a model, and `::open` on it is an error.",
+              "detail": "{ value: boolean }"
             },
             {
               "name": "pdx-click",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-click`.",
-              "detail": "{}"
+              "description": "The button was pressed, on a FAB with no speed dial.",
+              "detail": "Record<string, never>"
+            },
+            {
+              "name": "pdx-select",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An action of the speed dial was chosen.",
+              "detail": "{ key: string; action: FabAction }"
             }
           ],
           "roles": [
@@ -12098,6 +12112,34 @@
                 "label: string",
                 "icon: string"
               ]
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "menu",
+              "description": "The element reached as `[data-part=\"menu\"]`."
+            },
+            {
+              "name": "item",
+              "description": "The element reached as `[data-part=\"item\"]`."
+            },
+            {
+              "name": "label",
+              "description": "The element reached as `[data-part=\"label\"]`."
+            },
+            {
+              "name": "mask",
+              "description": "The element reached as `[data-part=\"mask\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
             }
           ],
           "cssProperties": [

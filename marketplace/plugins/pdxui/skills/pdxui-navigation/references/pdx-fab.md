@@ -20,13 +20,18 @@ A floating action button.
 
 | Call | Notes |
 |---|---|
-| `open()` | Opens it. |
+| `show()` | Shows it. |
 | `close()` | Closes it. |
 | `toggle()` | Toggles it open/closed. |
+| `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
-**Events:** `pdx-click` → `detail: {}` — Fired on `pdx-click`.; `pdx-select` → `detail: { key, action }` — Fired when an item is selected.
+**Events:** `open-change` → `detail: { value: boolean }` — The speed dial opened (`true`) or closed (`false`): its open state, read-only (#288). The parent never writes it, so it is not a model, and `::open` on it is an error.; `pdx-click` → `detail: Record<string, never>` — The button was pressed, on a FAB with no speed dial.; `pdx-select` → `detail: { key: string; action: FabAction }` — An action of the speed dial was chosen.
 
 **Renders:** roles `menu` · `menuitem`
+
+**States:** `:state(open)` — Matched with `:state(open)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="menu"]` — The element reached as `[data-part="menu"]`.; `[data-part="item"]` — The element reached as `[data-part="item"]`.; `[data-part="label"]` — The element reached as `[data-part="label"]`.; `[data-part="mask"]` — The element reached as `[data-part="mask"]`.
 
 **Shapes:** `FabAction { key: string; label: string; icon: string }`
 

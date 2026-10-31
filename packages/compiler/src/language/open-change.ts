@@ -372,3 +372,12 @@ const CONTEXT_MENU_OPEN = tagVerb({
 
 export const contextMenuOpenShow = CONTEXT_MENU_OPEN.ref;
 export const contextMenuOpenUnbound = CONTEXT_MENU_OPEN.unbound;
+
+// `pdx-fab`'s `open()` is `show()`, the overlay verb (#288).
+const FAB_OPEN = tagVerb({
+    tag: 'pdx-fab', id: 'fab', from: 'open', to: 'show', issue: 288,
+    message: '`pdx-fab` opens its speed dial with the overlay verb: `open()` is `show()`; `close()` and `toggle()` are unchanged.',
+});
+
+export const fabOpenShow = FAB_OPEN.ref;
+export const fabOpenUnbound = FAB_OPEN.unbound;
