@@ -191,7 +191,8 @@ jobs:
 
   # The project-wide passes a developer waits on — `pdx check`, `pdx analyze`, a cold `pdx build` —
   # timed against the showcase, three runs each (#247), here and on `main` built on the same runner:
-  # the median here over the median there is held to a ratio (#593). An absolute budget judged the
+  # the fastest run here over the fastest there is held to a ratio (#593; the median until #789, which
+  # one slow sample of a half-second pass moved over the margin). An absolute budget judged the
   # runner, and a slower one failed a change `pdx` does not read. The ratios and how they move are in
   # scripts/time-budgets/budgets.json and run.mjs.
   time-budgets:
