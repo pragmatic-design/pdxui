@@ -62,7 +62,7 @@ describe('MenuItem.lang', () => {
         (bar as any).items = [{ key: 'file', label: 'File', children: items() }];
         await tick(50);
 
-        (ctxMenu as any).open(20, 20);
+        (ctxMenu as any).show(20, 20);
         (split.querySelector('.pdx-split-arrow') as HTMLButtonElement).click();
         (bar.querySelector('.pdx-menubar-trigger') as HTMLButtonElement).click();
         await tick(50);

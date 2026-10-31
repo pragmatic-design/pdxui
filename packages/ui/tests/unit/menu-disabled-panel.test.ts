@@ -50,7 +50,7 @@ describe('disabled toggle keeps the menu panel alive', () => {
         (el as any).disabled = false;
         await tick(50);
 
-        (el as any).open(20, 20);
+        (el as any).show(20, 20);
         await tick();
 
         const panel = document.querySelector('.pdx-context-menu-panel') as HTMLElement | null;

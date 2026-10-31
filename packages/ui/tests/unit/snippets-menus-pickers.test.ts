@@ -73,7 +73,7 @@ const CASES: Case[] = [
     {
         tag: 'pdx-context-menu', slot: 'item',
         props: { items: MENU_ITEMS },
-        open: (el) => (el as unknown as { open(x: number, y: number): void }).open(10, 10),
+        open: (el) => (el as unknown as { show(x: number, y: number): void }).show(10, 10),
         fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
     },
