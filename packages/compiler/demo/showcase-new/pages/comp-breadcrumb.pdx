@@ -39,6 +39,17 @@
           </tbody>
         </table>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and parts</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-select</code></td><td>{ key, item }: a crumb was chosen. Does not bubble</td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>nav</code>, <code>list</code>, <code>item</code>, <code>link</code> (a link with an href, a button without), <code>current</code> (the page you are on, <code>aria-current="page"</code>), <code>separator</code>, <code>ellipsis</code></td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>

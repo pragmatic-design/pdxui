@@ -32,6 +32,7 @@
         import '@pdxui/ui/affix';
         import '@pdxui/ui/app-layout';
         import '@pdxui/ui/bottom-nav';
+        import '@pdxui/ui/breadcrumb';
         import '@pdxui/ui/data-grid';
         import '@pdxui/ui/fab';
         import '@pdxui/ui/nav-menu';
@@ -126,7 +127,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-data-grid","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-pagination","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
+        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-breadcrumb","pdx-data-grid","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-pagination","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -183,6 +184,16 @@
                     <a href="#">Products</a>
                     <span>Details</span>
                 </nav>
+    </section>
+
+    <section data-scenario="breadcrumb-element">
+        <h3>Breadcrumb — the element</h3>
+        <pdx-breadcrumb data-test="crumbs" items='[{"key":"home","label":"Home","href":"#home"},{"key":"products","label":"Products"},{"key":"detail","label":"Detail"}]'></pdx-breadcrumb>
+    </section>
+
+    <section data-scenario="breadcrumb-collapsed">
+        <h3>Breadcrumb — a long trail, collapsed</h3>
+        <pdx-breadcrumb data-test="crumbs-long" max-items="3" items='[{"key":"a","label":"Home","href":"#a"},{"key":"b","label":"Catalogue","href":"#b"},{"key":"c","label":"Shoes","href":"#c"},{"key":"d","label":"Running","href":"#d"},{"key":"e","label":"Detail"}]'></pdx-breadcrumb>
     </section>
 
     <section data-scenario="data-grid-basic">
