@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -317,6 +317,32 @@ describe('tooltip-hide-close: pdx-tooltip\'s hide() is close() (#288)', () => {
         expect(found[0].note).toContain('close()');
         expect(tooltipHideUnbound.fix).toBe('flag');
         for (const id of ['tooltip-hide-close', 'tooltip-hide-unbound']) {
+            expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
+        }
+    });
+});
+
+describe('dropdown-menu-open-show: pdx-dropdown-menu\'s open() is show() (#288)', () => {
+    const fix = dropdownMenuOpenShow.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-dropdown-menu of the file is rewritten; close() stays', () => {
+        const source = '<template><pdx-dropdown-menu :ref="dd"></pdx-dropdown-menu><button @click="dd.open()">x</button><button @click="dd.close()">y</button></template>\n<script>\nfunction more() { dd?.open(); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="dd.show()"');
+        expect(out).toContain('dd?.show();');
+        expect(out).toContain('@click="dd.close()"');
+        expect(dropdownMenuOpenShow.detect(out)).toEqual([]);
+        expect(fix(out)).toBe(out);
+    });
+
+    it('an open() on something else is left, and a lookup of the tag is flagged', () => {
+        const source = '<template><pdx-dropdown-menu :ref="dd"></pdx-dropdown-menu></template>\n<script>\nwindow.open();\n</script>';
+        expect(dropdownMenuOpenShow.detect(source)).toEqual([]);
+        const found = dropdownMenuOpenUnbound.detect("document.querySelector('pdx-dropdown-menu').open();");
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('show()');
+        expect(dropdownMenuOpenUnbound.fix).toBe('flag');
+        for (const id of ['dropdown-menu-open-show', 'dropdown-menu-open-unbound']) {
             expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
         }
     });

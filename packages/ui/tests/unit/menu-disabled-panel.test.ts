@@ -31,7 +31,7 @@ describe('disabled toggle keeps the menu panel alive', () => {
         (el as any).disabled = false;
         await tick(50);
 
-        (el as any).open();
+        (el as any).show();
         await tick();
 
         const trigger = el.querySelector('button');

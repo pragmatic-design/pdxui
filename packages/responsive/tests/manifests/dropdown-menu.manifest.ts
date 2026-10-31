@@ -33,8 +33,8 @@
  *   - Mouse: a click on the trigger → toggle() → open() (:376, :284).
  *   - Keyboard: ArrowDown on the trigger (while closed) → open('first'); ArrowUp → open('last').
  *     While open, the trigger carries aria-controls = the panel's id; Tab closes it without preventing the Tab.
- *   - Programmatic: the host EXPOSES the API on `(ctx.el).__dropdownMenu = { open, close, toggle }` (:468) —
- *     It is NOT a direct method on the host. The setup calls `host.__dropdownMenu.open()`.
+ *   - Programmatic: the host's overlay verbs, `show()`, `close()`, `toggle()` (#288; `open()` and the alpha
+ *     handle `__dropdownMenu` are gone). The setups call `host.show()`.
  *   open() (:235): aria-expanded='true', display='', positionMenu() (position:fixed, under the trigger through
  *   placement 'bottom-start', offset 4 → :303), an rAF focus on the first menuitem (:249), click-outside (mousedown)
  *   and Escape (a capture keydown) to close. close() (:271): aria-expanded='false', display:none, focus back to the trigger.
@@ -92,7 +92,7 @@ export const dropdownMenu: ComponentManifest = {
         },
         {
             // The ONE open scenario: the panel is portalled to document.body. It is opened programmatically
-            // through the API exposed on the host (__dropdownMenu.open). The await waits for the positioning rAF.
+            // through the host's `show()`. The await waits for the positioning rAF.
             id: 'dd-open',
             title: 'Dropdown Menu — Open (menu panel visible below trigger)',
             // Room for the panel, as the cascader, the tree-select and the date picker have. Without it
@@ -109,7 +109,7 @@ export const dropdownMenu: ComponentManifest = {
                 </div>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-open"]');
-                if (host && host.__dropdownMenu && typeof host.__dropdownMenu.open === 'function') host.__dropdownMenu.open();
+                if (host && typeof host.show === 'function') host.show();
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
         },
         {
@@ -125,7 +125,7 @@ export const dropdownMenu: ComponentManifest = {
                 </pdx-dropdown-menu>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-custom"]');
-                if (host && typeof host.open === 'function') host.open();
+                if (host && typeof host.show === 'function') host.show();
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
         },
         {
@@ -149,19 +149,19 @@ export const dropdownMenu: ComponentManifest = {
                 standalone: [
                     {
                         // Trigger = button.pdx-{variant} in the host; a visible box.
-                        selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]',
+                        selector: 'section:not([hidden]) [data-test="dd"] [data-part="trigger"]',
                         description: 'trigger button is a visible box',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // CSS button: cursor pointer → interactive.
-                        selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]',
+                        selector: 'section:not([hidden]) [data-test="dd"] [data-part="trigger"]',
                         description: 'trigger button is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // A non-negative radius (the radius-zero themes zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]',
+                        selector: 'section:not([hidden]) [data-test="dd"] [data-part="trigger"]',
                         description: 'trigger radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -175,9 +175,9 @@ export const dropdownMenu: ComponentManifest = {
                     {
                         // The chevron is contained in the trigger (the layout holds).
                         description: 'chevron is contained within the trigger button',
-                        parent: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]',
+                        parent: 'section:not([hidden]) [data-test="dd"] [data-part="trigger"]',
                         children: {
-                            trigger: 'button[aria-haspopup="menu"]',
+                            trigger: '[data-part="trigger"]',
                             chevron: '.pdx-dropdown-chevron',
                         },
                         relations: [
@@ -210,10 +210,10 @@ export const dropdownMenu: ComponentManifest = {
                 ],
                 overlay: [
                     {
-                        // Opened by the setup (__dropdownMenu.open) → action:'call' = the state is already on, and the runner
+                        // Opened by the setup (show()) → action:'call' = the state is already on, and the runner
                         // does NOT click; it measures the panel. The panel is on the body → a global selector. No backdrop.
                         description: 'open dropdown shows the menu panel without a backdrop',
-                        trigger: { selector: 'section:not([hidden]) [data-test="dd-open"] button[aria-haspopup="menu"]', action: 'call' },
+                        trigger: { selector: 'section:not([hidden]) [data-test="dd-open"] [data-part="trigger"]', action: 'call' },
                         panel: '.pdx-dropdown-menu-panel',
                         hasBackdrop: false,
                         minWidth: { op: '>=', value: 120 },
@@ -226,7 +226,7 @@ export const dropdownMenu: ComponentManifest = {
                         description: 'menu panel sits below the trigger',
                         parent: 'body',
                         children: {
-                            trigger: 'section:not([hidden]) [data-test="dd-open"] button[aria-haspopup="menu"]',
+                            trigger: 'section:not([hidden]) [data-test="dd-open"] [data-part="trigger"]',
                             panel: '.pdx-dropdown-menu-panel',
                         },
                         relations: [
@@ -293,7 +293,7 @@ export const dropdownMenu: ComponentManifest = {
                 standalone: [
                     {
                         // button:disabled → cursor not-allowed (UA + .pdx-* button styles).
-                        selector: 'section:not([hidden]) [data-test="dd-dis"] button[aria-haspopup="menu"]',
+                        selector: 'section:not([hidden]) [data-test="dd-dis"] [data-part="trigger"]',
                         description: 'disabled trigger is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
                     },
@@ -317,12 +317,12 @@ export const dropdownMenu: ComponentManifest = {
     isolation: {
         scenario: 'dd-closed',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="dd"] button[aria-haspopup="menu"]', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="dd"] [data-part="trigger"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA) — menu ──
-    // Pattern 'menu'. The scenario is already open from the setup (__dropdownMenu.open) → in the opening rAF the focus goes
+    // Pattern 'menu'. The scenario is already open from the setup (show()) → in the opening rAF the focus goes
     // to the first menuitem (pdx-dropdown-menu.ts:249) and focusGroup (vertical, wrap, typeAhead) handles ArrowUp/Down.
     // initialFocus on the first menuitem (already focused by the opening). ArrowDown moves inside the panel; Escape closes
     // → aria-expanded goes back to false on the trigger and the focus returns to it. Then the APG menu button:
@@ -335,13 +335,14 @@ export const dropdownMenu: ComponentManifest = {
             // Open: the focus must be INSIDE the menu panel.
             { key: 'ArrowDown', expectFocusWithin: '.pdx-dropdown-menu-panel' },
             // Escape closes it → aria-expanded goes back to false on the trigger.
-            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dd-open"] button[aria-haspopup="menu"]', name: 'aria-expanded', value: 'false' } },
-            // …and the focus returns to the trigger (close() → _triggerEl.focus()).
-            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="dd-open"] button[aria-haspopup="menu"]' },
+            { key: 'Escape', expectAttr: { selector: 'section:not([hidden]) [data-test="dd-open"] [data-part="trigger"]', name: 'aria-expanded', value: 'false' } },
+            // …and the focus returns to the trigger: nothing had it when the setup opened the menu, so
+            // close() gives it to the trigger.
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="dd-open"] [data-part="trigger"]' },
             // ArrowUp on the closed trigger → it opens on the last item ("Delete"; the separator is not an item).
             { key: 'ArrowUp', expectFocus: '.pdx-dropdown-menu-panel .pdx-menu-item[data-menu-key="del"]' },
 // Tab from the open menu → closes it.
-            { key: 'Tab', expectAttr: { selector: 'section:not([hidden]) [data-test="dd-open"] button[aria-haspopup="menu"]', name: 'aria-expanded', value: 'false' } },
+            { key: 'Tab', expectAttr: { selector: 'section:not([hidden]) [data-test="dd-open"] [data-part="trigger"]', name: 'aria-expanded', value: 'false' } },
         ],
     },
 

@@ -6,7 +6,7 @@
 
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
 import '../menu/pdx-menu';
-import { component, html, signal, onDestroy, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, onDestroy, generatedId, slot, snippetOrSlot, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -37,6 +37,22 @@ interface MenuHost extends HTMLElement {
  * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-dropdown-menu', {
+    events: {
+        /**
+         * The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent
+         * never writes it, so it is not a model, and `::open` on it is an error.
+         */
+        'open-change': event<{ value: boolean }>(),
+        /** An entry was chosen: the menu's own event, re-dispatched on this element. */
+        'pdx-select': event<{ key: string; item: MenuItem }>(),
+        /** A checkbox or radio entry changed: the menu's own event, re-dispatched on this element. */
+        'pdx-check': event<{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }>(),
+    },
+    // On the host as a custom state (#132, #288).
+    states: ['open'],
+    // The built-in menu button. A `trigger` slot's element is the author's, and the menu is
+    // pdx-menu's, with its own parts.
+    parts: ['trigger'],
     props: {
         items: { type: Array, default: [] },
         label: { type: String, default: '' },
@@ -68,6 +84,8 @@ component('pdx-dropdown-menu', {
         /** Removes the press-outside listener, added when the menu opens (#427). */
         let _outsideDispose: (() => void) | null = null;
         let _escHandler: ((e: KeyboardEvent) => void) | null = null;
+        /** The element that had the focus when the menu opened: it gets it back on close. */
+        let _returnFocus: HTMLElement | null = null;
 
         // ─── The menu ────────────────────────────────────────
         /**
@@ -111,8 +129,14 @@ component('pdx-dropdown-menu', {
         /** `focus`: the item that takes focus — the first, or the last (ArrowUp on the trigger). */
         function open(focus: 'first' | 'last' = 'first'): void {
             if (_open.peek() || !_triggerEl) return;
+            // Where the focus goes back on close: what had it now — an invoker that is not the trigger
+            // (`command="--show"`), or the trigger itself — and the trigger when nothing had it.
+            const before = document.activeElement;
+            _returnFocus = before instanceof HTMLElement && before !== document.body ? before : null;
             _menuEl = buildMenu();
             _open.set(true);
+            ctx.state('open', true);
+            ctx.emit('open-change', { value: true });
             _triggerEl.setAttribute('aria-expanded', 'true');
             // Only while open: the menu leaves the document when it closes.
             _triggerEl.setAttribute('aria-controls', _menuId);
@@ -173,7 +197,10 @@ component('pdx-dropdown-menu', {
             _outsideDispose?.(); _outsideDispose = null;
             if (_escHandler) { document.removeEventListener('keydown', _escHandler, true); _escHandler = null; }
             if (_scrollHandler) { window.removeEventListener('scroll', _scrollHandler, true); window.removeEventListener('resize', _scrollHandler); _scrollHandler = null; }
-            _triggerEl?.focus();
+            (_returnFocus?.isConnected ? _returnFocus : _triggerEl)?.focus();
+            _returnFocus = null;
+            ctx.state('open', false);
+            ctx.emit('open-change', { value: false });
         }
 
         function toggle(): void {
@@ -241,6 +268,7 @@ component('pdx-dropdown-menu', {
                     } else {
                         const button = document.createElement('button');
                         button.type = 'button';
+                        button.dataset.part = 'trigger';
                         button.className = `pdx-${variant}`;
                         if (size) button.setAttribute('size', size);
                         if (disabled) button.disabled = true;
@@ -332,10 +360,13 @@ component('pdx-dropdown-menu', {
         // leave the menu dead.
         onDestroy(() => close());
 
-        ctx.expose({ open, close, toggle });
-        // @deprecated legacy handle — the certification manifests still call host.__dropdownMenu.open();
-        // remove once they migrate to the flattened host.open()/close()/toggle().
-        (ctx.el as any).__dropdownMenu = { open, close, toggle };
+        // The overlay verbs (#288): `open()` is `show()`, and the alpha handle `__dropdownMenu` is gone.
+        ctx.expose({
+            show() { open('first'); },
+            close,
+            toggle,
+            get isOpen() { return _open() as boolean; },
+        });
         return {};
     },
     // The trigger slot only: the menu itself is built on <body> when it opens.

@@ -96,6 +96,15 @@ const DONE: Row[] = [
         parts: ['root', 'arrow'],
         removed: ['hide'],
     },
+    {
+        tag: 'pdx-dropdown-menu',
+        // The parent never writes its open state: `open-change` is a read-only output.
+        models: [],
+        states: ['open'],
+        // Its built-in button; the menu it opens is pdx-menu's, with its own parts.
+        parts: ['trigger'],
+        removed: ['open'],
+    },
 ];
 
 /**

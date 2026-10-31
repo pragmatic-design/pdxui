@@ -64,11 +64,11 @@
         "button-action-pending": async function () { document.querySelector('section:not([hidden]) [data-test="btn-pending"]').action = { execute() {}, pending: () => true }; },
         "dd-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-open"]');
-                if (host && host.__dropdownMenu && typeof host.__dropdownMenu.open === 'function') host.__dropdownMenu.open();
+                if (host && typeof host.show === 'function') host.show();
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "dd-custom-trigger": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="dd-custom"]');
-                if (host && typeof host.open === 'function') host.open();
+                if (host && typeof host.show === 'function') host.show();
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "icon-decorative": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },
         "icon-semantic": async function () { await new Promise((r) => { let n = 0; const c = () => { const icons = Array.from(document.querySelectorAll('section:not([hidden]) pdx-icon')); if ((icons.length && icons.every((i) => i.querySelector('svg'))) || n++ > 60) r(); else requestAnimationFrame(c); }; c(); }); },

@@ -335,3 +335,13 @@ const TOOLTIP_HIDE = tagVerb({
 
 export const tooltipHideClose = TOOLTIP_HIDE.ref;
 export const tooltipHideUnbound = TOOLTIP_HIDE.unbound;
+
+// `pdx-dropdown-menu`'s `open()` is `show()`, the overlay verb (#288). `open()` is `window.open()`
+// and a dozen other things too, so the call is tied to the tag by a `:ref`.
+const DROPDOWN_MENU_OPEN = tagVerb({
+    tag: 'pdx-dropdown-menu', id: 'dropdown-menu', from: 'open', to: 'show', issue: 288,
+    message: '`pdx-dropdown-menu` opens with the overlay verb: `open()` is `show()`; `close()` and `toggle()` are unchanged.',
+});
+
+export const dropdownMenuOpenShow = DROPDOWN_MENU_OPEN.ref;
+export const dropdownMenuOpenUnbound = DROPDOWN_MENU_OPEN.unbound;

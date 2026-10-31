@@ -38,7 +38,7 @@ const POPUPS: Popup[] = [
             el.setAttribute('label', 'Options');
             (el as unknown as { items: unknown[] }).items = [{ key: 'a', label: 'A' }];
         }),
-        open: (el) => el.open(),
+        open: (el) => el.show(),
         close: (el) => el.close(),
     },
     {
