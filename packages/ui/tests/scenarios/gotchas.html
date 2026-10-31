@@ -27,7 +27,7 @@
         // Not the barrel: a load of this page builds ONE case, and registers that case's components
         // (the barrel is 414 requests a load, ~400 loads a certify run).
         import { loadTags, tagsIn } from './generated/component-loaders.js';
-        import { createDataSource, component, html, signal, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
+        import { createDataSource, createForm, required, email, component, html, signal, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
 
         const p = new URLSearchParams(location.search);
         const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
@@ -358,6 +358,24 @@
                     document.body.appendChild(html`<div id="bound" style="position: relative; height: 320px; --pdx-fab-position: absolute">
                         <p><button type="button" data-test="opener" commandfor="bound-fab" command="--show">Contact</button></p>
                         <pdx-fab id="bound-fab" label="Contact" mask :actions=${actions}></pdx-fab>
+                    </div>`);
+                };
+            },
+
+            // A2 under a field (#786): a pdx-input bound to a form field (`::value`), inside a
+            // pdx-form-field bound to the same field — the showcase's /intake email. The binding marks
+            // the input invalid in the flush that makes the field invalid; the field must describe it
+            // in that same flush.
+            'field-error-described': () => {
+                api.mountField = async () => {
+                    await loadTags(['pdx-form-field', 'pdx-input']);
+                    document.getElementById('f')?.remove();
+                    const form = createForm({ initialValues: { email: '' }, validators: { email: [required(), email()] } });
+                    api.form = form;
+                    document.body.appendChild(html`<div id="f">
+                        <pdx-form-field label="Email" :field=${form.email}>
+                            <pdx-input name="email" type="email" ::value=${form.email}></pdx-input>
+                        </pdx-form-field>
                     </div>`);
                 };
             },
