@@ -2,7 +2,7 @@
 // Data-driven: pass `items` array. Auto-generates ARIA, keyboard nav, submenu positioning.
 // Used by pdx-dropdown-menu and pdx-context-menu as the rendering engine.
 
-import { component, html, signal, focusGroup, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, focusGroup, slot, snippetOrSlot, model } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
@@ -47,11 +47,17 @@ export interface MenuItem {
  * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
  */
 component('pdx-menu', {
+    // `open` is a model (#288): the menu closes itself — Escape, a chosen entry — and its own writes
+    // announce `open-change` `{ value }`, which `::open` follows. It replaced `pdx-close`.
+    models: { open: model<boolean>(false, { type: Boolean }) },
+    // On the host as a custom state (#132, #288).
+    states: ['open'],
+    // The element that is role="menu", an entry, a separator and a group label. A submenu's panel is
+    // drawn on <body>; its entries are parts all the same.
+    parts: ['root', 'item', 'separator', 'label'],
     props: {
         /** Menu items (data-driven) */
         items: { type: Array, default: [] },
-        /** Open state */
-        open: { type: Boolean, default: false },
         /** Minimum width */
         minWidth: { type: Number, default: 180 },
         /** The id of the element that is `role="menu"`, for a trigger's `aria-controls`. */
@@ -97,6 +103,7 @@ component('pdx-menu', {
             const menu = document.createElement('div');
             menu.className = 'pdx-menu' + (isSubmenu ? ' pdx-menu-sub-panel' : '');
             menu.setAttribute('role', 'menu');
+            if (!isSubmenu) menu.setAttribute('data-part', 'root');
             const menuId = ctx.menuId() as string;
             const menuClass = ctx.menuClass() as string;
             if (!isSubmenu) {
@@ -111,6 +118,7 @@ component('pdx-menu', {
                     const sep = document.createElement('hr');
                     sep.className = 'pdx-menu-separator';
                     sep.setAttribute('role', 'separator');
+                    sep.setAttribute('data-part', 'separator');
                     menu.appendChild(sep);
                     continue;
                 }
@@ -119,6 +127,7 @@ component('pdx-menu', {
                     const lbl = document.createElement('div');
                     lbl.className = 'pdx-menu-label';
                     lbl.setAttribute('role', 'presentation');
+                    lbl.setAttribute('data-part', 'label');
                     lbl.textContent = item.label;
                     menu.appendChild(lbl);
                     continue;
@@ -127,6 +136,7 @@ component('pdx-menu', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-menu-item';
+                btn.setAttribute('data-part', 'item');
                 if (item.danger) btn.classList.add('pdx-menu-danger');
                 if (item.className) btn.classList.add(item.className);
                 if (item.type === 'submenu') btn.classList.add('pdx-menu-sub');
@@ -214,7 +224,7 @@ component('pdx-menu', {
                         if (now.children?.length) openSubmenuAndFocus(btn, now);
                     } else {
                         ctx.emit('pdx-select', { key: now.key, item: now });
-                        closeAll();
+                        close();
                     }
                 });
 
@@ -402,9 +412,13 @@ component('pdx-menu', {
             _activeSubmenuKey = '';
         }
 
-        function closeAll(): void {
+        /**
+         * Close the submenu and the menu. A write of the model, so it announces `open-change`; the owner
+         * that placed the menu (pdx-dropdown-menu) hears that and takes it away.
+         */
+        function close(): void {
             closeSubmenu();
-            ctx.emit('pdx-close', {}, { bubbles: false });
+            ctx.open.set(false);
         }
 
         // ─── Arrow Right/Left for submenu keyboard nav ──────
@@ -443,7 +457,7 @@ component('pdx-menu', {
                     const trigger = menuEl.querySelector(`[data-menu-key="${key}"]`) as HTMLElement;
                     if (trigger) trigger.focus();
                 } else {
-                    closeAll();
+                    close();
                 }
             }
         }
@@ -549,12 +563,23 @@ component('pdx-menu', {
             closeSubmenu();
         });
 
-        // React to open prop changes
+        // React to open changes, the parent's or the menu's own. Opening records where the focus was; a
+        // close while the focus is in the menu gives it back there — the button that opened it, an
+        // invoker with `command="--show"` (#288) — rather than to <body> once the menu hides.
+        let _returnFocus: HTMLElement | null = null;
         ctx.track(() => {
             const isOpen = ctx.open() as boolean;
+            ctx.state('open', isOpen);
             if (!_bound) return;
 
             const before = document.activeElement;
+            if (isOpen) {
+                _returnFocus = before instanceof HTMLElement && before !== document.body ? before : null;
+            } else {
+                const inside = !!before && (ctx.el.contains(before) || !!before.closest?.('[data-submenu-key]'));
+                if (inside && _returnFocus?.isConnected) _returnFocus.focus();
+                _returnFocus = null;
+            }
             requestAnimationFrame(() => {
                 ctx.el.style.display = isOpen ? '' : 'none';
                 if (isOpen) {
@@ -614,10 +639,14 @@ component('pdx-menu', {
             });
         });
 
-        // Expose API
+        // Expose API: the overlay verbs, each a write of the model, so each announces `open-change`.
+        // `closeAll()` is `close()` (#288).
         ctx.expose({
-            /** Close the submenu and emit `pdx-close` on the menu itself. */
-            closeAll,
+            show() { ctx.open.set(true); },
+            /** Close the submenu and the menu. */
+            close,
+            toggle() { if (ctx.open.peek()) close(); else ctx.open.set(true); },
+            get isOpen() { return ctx.open() as boolean; },
             /** Close only the open submenu, leaving the menu itself open. */
             closeSubmenu,
         });

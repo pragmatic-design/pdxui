@@ -312,7 +312,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 470 → 471 (owner's OK): the pickers' beta contract (#287) — pdx-color-picker's states, parts,
 // `open-change` and overlay verbs, and pdx-form-field's rule that finds its swatch first. Same machine,
 // the built dist: main js 469.7 → this branch 470.2 KB (+466 bytes).
-const BUDGET_KB = { entry: 43, js: 471, css: 65, blocking: 102 };
+// blocking 102 → 103 (owner's OK): pdx-menu's beta contract (#288) — its `open` model, the `open`
+// state, its parts, `show()`/`toggle()` and the focus it gives back on close. The shell's profile and
+// language menus draw with it, so it ships before the first paint. The pre-push build: main blocking
+// 101.9 → this branch 102.1 KB.
+const BUDGET_KB = { entry: 43, js: 471, css: 65, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

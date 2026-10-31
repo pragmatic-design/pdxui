@@ -31,7 +31,7 @@ import { parseSFC } from '../parser/sfc';
 import { escapeForRegExp } from '../compiler/regexp-escape';
 
 /** The tags that announce their popup with `open-change`, and no longer with `pdx-open`/`pdx-close`. */
-export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select', 'pdx-date-picker', 'pdx-dialog', 'pdx-drawer', 'pdx-bottom-sheet', 'pdx-command']);
+export const OPEN_CHANGE_TAGS: ReadonlySet<string> = new Set(['pdx-select', 'pdx-cascader', 'pdx-tree-select', 'pdx-date-picker', 'pdx-dialog', 'pdx-drawer', 'pdx-bottom-sheet', 'pdx-command', 'pdx-menu']);
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -316,3 +316,13 @@ const POPOVER_HIDE = tagVerb({
 
 export const popoverHideClose = POPOVER_HIDE.ref;
 export const popoverHideUnbound = POPOVER_HIDE.unbound;
+
+// `pdx-menu`'s `closeAll()` closed its submenu and the menu: it is `close()` (#288). The dialog service
+// has a `closeAll()` of its own, so the call is tied to the tag by a `:ref`.
+const MENU_CLOSE_ALL = tagVerb({
+    tag: 'pdx-menu', id: 'menu', from: 'closeAll', to: 'close', issue: 288,
+    message: '`pdx-menu` closes with the overlay verb: `closeAll()` is `close()`; `closeSubmenu()` is unchanged.',
+});
+
+export const menuCloseAllClose = MENU_CLOSE_ALL.ref;
+export const menuCloseAllUnbound = MENU_CLOSE_ALL.unbound;

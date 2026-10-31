@@ -99,8 +99,11 @@ component('pdx-dropdown-menu', {
                 const d = (e as CustomEvent<{ key: string; checked: boolean; radioGroup?: string; item: MenuItem }>).detail;
                 ctx.emit('pdx-check', { key: d.key, checked: d.checked, radioGroup: d.radioGroup, item: d.item });
             });
-            // A chosen entry, and Escape inside it: the menu asks to be closed.
-            menu.addEventListener('pdx-close', () => close());
+            // A chosen entry, and Escape inside it: the menu closes itself and says so with
+            // `open-change` `{ value: false }` (#288); the dropdown takes it away.
+            menu.addEventListener('open-change', (e) => {
+                if (!(e as CustomEvent<{ value: boolean }>).detail.value) close();
+            });
             return menu;
         }
 

@@ -78,6 +78,15 @@ const DONE: Row[] = [
         parts: ['root', 'backdrop', 'input', 'list', 'group', 'option', 'empty', 'footer'],
         removed: ['openPalette', 'closePalette'],
     },
+    {
+        tag: 'pdx-menu',
+        models: ['open'],
+        states: ['open'],
+        // The element that is role="menu", an entry, a separator and a group label.
+        parts: ['root', 'item', 'separator', 'label'],
+        // `closeAll()` closed the menu and its submenu: it is `close()`.
+        removed: ['pdx-close', 'closeAll'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

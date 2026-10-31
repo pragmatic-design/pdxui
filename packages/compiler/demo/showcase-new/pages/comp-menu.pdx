@@ -31,7 +31,7 @@
           <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td><code>items</code></td><td>MenuItem[]</td><td>[]</td><td>Menu items array</td></tr>
-            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Shows the menu and focuses its first item</td></tr>
+            <tr><td><code>open</code></td><td>Boolean</td><td>false</td><td>Shows the menu and focuses its first item. A model: <code>::open</code> follows Escape and a chosen item</td></tr>
             <tr><td><code>min-width</code></td><td>Number</td><td>180</td><td>Minimum menu width (px)</td></tr>
           </tbody>
         </table>
@@ -43,7 +43,7 @@
           <tbody>
             <tr><td><code>pdx-select</code></td><td><code>{ key, item }</code></td><td>An item was activated</td></tr>
             <tr><td><code>pdx-check</code></td><td><code>{ key, checked, item }</code></td><td>A checkbox or radio item changed</td></tr>
-            <tr><td><code>pdx-close</code></td><td>—</td><td>Escape on the top-level menu</td></tr>
+            <tr><td><code>open-change</code></td><td><code>{ value }</code></td><td>The menu opened or closed itself: Escape on the top-level menu, a chosen item</td></tr>
           </tbody>
         </table>
       </div>
