@@ -39,7 +39,9 @@ const listen = (page: Page) => page.evaluate(() => {
     host.addEventListener('pdx-change', () => { log.alpha++; });
 });
 const log = (page: Page) => page.evaluate(() => (window as unknown as { __log: Log }).__log);
-const shown = (page: Page) => page.locator('[data-wizard-step]:visible');
+// The panel the wizard shows, by the attribute it writes: before its first frame no panel has it and
+// the assertion waits, where `:visible` matched all four and failed at once on strict mode.
+const shown = (page: Page) => page.locator('[data-wizard-step][aria-hidden="false"]');
 const next = (page: Page) => page.locator('[data-wizard-next]');
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=wizard-beta-contract'); });
