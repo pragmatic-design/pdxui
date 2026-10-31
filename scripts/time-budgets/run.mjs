@@ -7,10 +7,11 @@
 //
 // A pass is judged against `main`, not against a number of milliseconds (#593). `--base` is a built
 // checkout of `main` (installed and `pnpm build`-ed); each pass runs N times (3 by default) in both
-// trees, alternating, on the same machine, and the median on this tree over the median on `main` is
-// held to the pass's `maxRatio` in budgets.json (verdict.mjs). An absolute budget judged the runner:
+// trees, alternating, on the same machine, and the fastest run on this tree over the fastest on `main`
+// is held to the pass's `maxRatio` in budgets.json (verdict.mjs; the fastest, not the median, since
+// #789). An absolute budget judged the runner:
 // a runner 19-24% slower failed a change that `pdx` does not read. The script exits non-zero when a
-// ratio is over its budget or a command fails. Without `--base` it only prints this tree's medians,
+// ratio is over its budget or a command fails. Without `--base` it only prints this tree's times,
 // and in CI (`CI` set) it refuses to run without one.
 //
 // A `maxRatio` is raised only in a commit that says why the pass got slower.
@@ -20,7 +21,7 @@ import { appendFileSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'n
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { judge } from './verdict.mjs';
+import { judge, summarize } from './verdict.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, '..', '..');
@@ -72,12 +73,6 @@ function runOnce(t, command) {
     return { ms };
 }
 
-const median = (xs) => {
-    const s = [...xs].sort((a, b) => a - b);
-    const mid = Math.floor(s.length / 2);
-    return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
-};
-
 function main() {
     const options = parseArgs(process.argv.slice(2));
     if (!options.base && process.env.CI) throw new Error('--base is required in CI: a pass is judged against main on the same runner (#593)');
@@ -85,7 +80,7 @@ function main() {
     const base = options.base ? tree(options.base) : null;
     const budgets = JSON.parse(readFileSync(join(here, 'budgets.json'), 'utf8'));
 
-    const medians = { branch: {}, base: {} };
+    const summarized = { branch: {}, base: {} };
     const times = {};
     let failed = false;
     for (const command of options.only) {
@@ -106,11 +101,11 @@ function main() {
                 console.log(`pdx ${command} ${side === 'base' ? 'main' : 'this tree'} run ${i + 1}: ${Math.round(run.ms)} ms`);
             }
         }
-        if (times[command].branch.length === options.runs) medians.branch[command] = Math.round(median(times[command].branch));
-        if (times[command].base.length === options.runs) medians.base[command] = Math.round(median(times[command].base));
+        if (times[command].branch.length === options.runs) summarized.branch[command] = Math.round(summarize(times[command].branch));
+        if (times[command].base.length === options.runs) summarized.base[command] = Math.round(summarize(times[command].base));
     }
 
-    const rows = judge(medians.branch, medians.base, budgets);
+    const rows = judge(summarized.branch, summarized.base, budgets);
     if (rows.some((r) => r.verdict === 'OVER')) failed = true;
     const runs = (xs) => xs.map(Math.round).join(', ');
     const table = [
