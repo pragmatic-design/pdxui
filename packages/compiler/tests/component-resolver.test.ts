@@ -2,7 +2,7 @@
 // custom-elements.json for authoritative tags + prop enums, resolving the public import subpath
 // from package.json exports (so nested/renamed exports stay correct).
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeAll } from 'vitest';
 import { readdirSync, readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { ComponentResolver } from '../src/component-resolver';
@@ -160,8 +160,17 @@ describe('ComponentResolver — the custom elements of the other @pdxui packages
         expect(defined.size, 'no customElements.define found outside packages/ui').toBeGreaterThan(0);
     });
 
+    // The resolver walks the sibling packages once, on the first `pdx-` tag it cannot resolve: about
+    // 2,400 files, 0.4 s alone and 2 s or more under the parallel gate (#771). Paid here, with a
+    // timeout of its own, so the test below measures the answers and not the walk.
+    let known: ComponentResolver;
+    beforeAll(() => {
+        known = new ComponentResolver();
+        known.knownWithoutImport('pdx-warm-up-the-scan');
+    }, 60_000);
+
     it('knows every one of them, without an import', () => {
-        const r = new ComponentResolver();
+        const r = known;
         const missing = [...defined]
             .filter(([tag]) => !r.knownWithoutImport(tag))
             .map(([tag, pkg]) => `${tag} (${pkg})`);

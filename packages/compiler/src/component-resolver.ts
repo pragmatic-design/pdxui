@@ -148,6 +148,9 @@ export class ComponentResolver {
     knownWithoutImport(tag: string): boolean {
         const t = tag.toLowerCase();
         if (this.map.has(t)) return true;
+        // The scan collects `pdx-` tags only, so it cannot know any other: an unresolved `<app-…>`
+        // is answered without walking the sibling packages (#771).
+        if (!t.startsWith('pdx-')) return false;
         if (this.noImportTags === null) this.noImportTags = scanNoImportTags(moduleDir());
         return this.noImportTags.has(t);
     }
