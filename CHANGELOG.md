@@ -394,6 +394,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-tooltip` takes the beta contract (#288).
+  - **`hide()` is `close()`**; `show()` and `toggle()` stay. `pdx migrate` rewrites `hide()` on a
+    `:ref` bound on a `pdx-tooltip`, and flags it on a lookup.
+  - **`open-change` `{ value }`** announces each show and hide, once. It is read-only: the parent
+    never writes the tooltip's open state, so it is not a model.
+  - **States and parts.** `open` is a custom state on the host, and so is the side the tooltip went
+    to after flipping, `placed-top`, `placed-bottom`, `placed-left` or `placed-right`; the arrow is
+    drawn from it. The floating element no longer carries `data-visible`, and the stylesheet no longer
+    reads its `[data-placement]`. The parts are `root` (the element that is `role="tooltip"`) and
+    `arrow`.
+
 - **Breaking:** `pdx-menu` takes the beta contract (#288).
   - **`open` is a model.** Escape and a chosen entry close the menu itself and announce it with
     `open-change` `{ value }`, so `::open="x"` follows them. Before, they emitted `pdx-close` and the

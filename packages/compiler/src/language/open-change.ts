@@ -326,3 +326,12 @@ const MENU_CLOSE_ALL = tagVerb({
 
 export const menuCloseAllClose = MENU_CLOSE_ALL.ref;
 export const menuCloseAllUnbound = MENU_CLOSE_ALL.unbound;
+
+// `pdx-tooltip`'s `hide()` is `close()`, the overlay verb (#288), as the popover's.
+const TOOLTIP_HIDE = tagVerb({
+    tag: 'pdx-tooltip', id: 'tooltip', from: 'hide', to: 'close', issue: 288,
+    message: '`pdx-tooltip` closes with the overlay verb: `hide()` is `close()`; `show()` and `toggle()` are unchanged.',
+});
+
+export const tooltipHideClose = TOOLTIP_HIDE.ref;
+export const tooltipHideUnbound = TOOLTIP_HIDE.unbound;

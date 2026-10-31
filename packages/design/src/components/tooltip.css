@@ -26,7 +26,7 @@ pdx-tooltip {
     box-shadow: var(--pdx-shadow-sm);
 }
 
-/* Arrow */
+/* Arrow: on the side the tooltip went to after flipping, the host's `placed-<side>` state (#288). */
 .pdx-tooltip-arrow {
     position: absolute;
     width: 8px;
@@ -35,22 +35,22 @@ pdx-tooltip {
     transform: rotate(45deg);
 }
 
-.pdx-tooltip-float[data-placement^="top"] .pdx-tooltip-arrow {
+pdx-tooltip:state(placed-top) .pdx-tooltip-arrow {
     bottom: -4px;
     left: 50%;
     margin-left: -4px;
 }
-.pdx-tooltip-float[data-placement^="bottom"] .pdx-tooltip-arrow {
+pdx-tooltip:state(placed-bottom) .pdx-tooltip-arrow {
     top: -4px;
     left: 50%;
     margin-left: -4px;
 }
-.pdx-tooltip-float[data-placement^="left"] .pdx-tooltip-arrow {
+pdx-tooltip:state(placed-left) .pdx-tooltip-arrow {
     right: -4px;
     top: 50%;
     margin-top: -4px;
 }
-.pdx-tooltip-float[data-placement^="right"] .pdx-tooltip-arrow {
+pdx-tooltip:state(placed-right) .pdx-tooltip-arrow {
     left: -4px;
     top: 50%;
     margin-top: -4px;

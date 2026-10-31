@@ -17,11 +17,17 @@ A hint on hover or focus.
 | Call | Notes |
 |---|---|
 | `show()` | Shows it. |
-| `hide()` | Hides it. |
+| `close()` | Closes it. |
 | `toggle()` | Toggles it open/closed. |
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
+**Events:** `open-change` → `detail: { value: boolean }` — The tooltip showed (`true`) or hid (`false`): its open state, read-only (#288). The parent never writes it, so it is not a model, and `::open` on it is an error.
+
 **Renders:** roles `tooltip`
+
+**States:** `:state(open)` — Matched with `:state(open)`.; `:state(placed-top)` — Matched with `:state(placed-top)`.; `:state(placed-bottom)` — Matched with `:state(placed-bottom)`.; `:state(placed-left)` — Matched with `:state(placed-left)`.; `:state(placed-right)` — Matched with `:state(placed-right)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="arrow"]` — The element reached as `[data-part="arrow"]`.
 
 
 #### Examples

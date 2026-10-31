@@ -28061,9 +28061,9 @@
             },
             {
               "kind": "method",
-              "name": "hide",
+              "name": "close",
               "parameters": [],
-              "description": "Hides it."
+              "description": "Closes it."
             },
             {
               "kind": "method",
@@ -28076,6 +28076,16 @@
               "name": "isOpen",
               "readonly": true,
               "description": "Read-only, via a ref: `el.isOpen`."
+            }
+          ],
+          "events": [
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The tooltip showed (`true`) or hid (`false`): its open state, read-only (#288). The parent\nnever writes it, so it is not a model, and `::open` on it is an error.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -28150,6 +28160,38 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "arrow",
+              "description": "The element reached as `[data-part=\"arrow\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
+            },
+            {
+              "name": "placed-top",
+              "description": "Matched with `:state(placed-top)`."
+            },
+            {
+              "name": "placed-bottom",
+              "description": "Matched with `:state(placed-bottom)`."
+            },
+            {
+              "name": "placed-left",
+              "description": "Matched with `:state(placed-left)`."
+            },
+            {
+              "name": "placed-right",
+              "description": "Matched with `:state(placed-right)`."
             }
           ]
         }
