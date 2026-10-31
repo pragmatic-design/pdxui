@@ -87,6 +87,15 @@ const DONE: Row[] = [
         // `closeAll()` closed the menu and its submenu: it is `close()`.
         removed: ['pdx-close', 'closeAll'],
     },
+    {
+        tag: 'pdx-tooltip',
+        // The parent never writes its open state: `open-change` is a read-only output.
+        models: [],
+        // `placed-<side>`, the side it went to after flipping, draws the arrow.
+        states: ['open', 'placed-top', 'placed-bottom', 'placed-left', 'placed-right'],
+        parts: ['root', 'arrow'],
+        removed: ['hide'],
+    },
 ];
 
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */

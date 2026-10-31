@@ -8,8 +8,7 @@
  * - right:  tooltip.left >= trigger.right (right of)
  * a 4px tolerance, and it must stay inside the viewport.
  *
- * Floating selector: '.pdx-tooltip-float' — confirmed in tooltip-position.spec.ts,
- * where the floating element is reached as
+ * Floating selector: the tooltip's `root` part (#288), the element tooltip-position.spec.ts reaches as
  * trigger.nextElementSibling (PDX-TOOLTIP) → .querySelector('.pdx-tooltip-float').
  */
 import type { ComponentManifest } from './_types';
@@ -91,7 +90,7 @@ export const tooltip: ComponentManifest = {
                     {
                         description: 'tooltip placed above trigger, centered',
                         trigger: { selector: 'section:not([hidden]) [data-test="trigger"]', action: 'hover' },
-                        floating: 'section:not([hidden]) .pdx-tooltip-float',
+                        floating: 'section:not([hidden]) pdx-tooltip [data-part="root"]',
                         placement: 'top',
                         // 4: the token, not a hardcode. An explicit `offset` passed to usePopover
                         // is exactly what stops it reading `--pdx-float-offset` — a theme setting
@@ -114,7 +113,7 @@ export const tooltip: ComponentManifest = {
                     {
                         description: 'tooltip placed below trigger, centered',
                         trigger: { selector: 'section:not([hidden]) [data-test="trigger"]', action: 'hover' },
-                        floating: 'section:not([hidden]) .pdx-tooltip-float',
+                        floating: 'section:not([hidden]) pdx-tooltip [data-part="root"]',
                         placement: 'bottom',
                         // 4: the token, not a hardcode. An explicit `offset` passed to usePopover
                         // is exactly what stops it reading `--pdx-float-offset` — a theme setting
@@ -137,7 +136,7 @@ export const tooltip: ComponentManifest = {
                     {
                         description: 'tooltip placed left of trigger, vertically centered',
                         trigger: { selector: 'section:not([hidden]) [data-test="trigger"]', action: 'hover' },
-                        floating: 'section:not([hidden]) .pdx-tooltip-float',
+                        floating: 'section:not([hidden]) pdx-tooltip [data-part="root"]',
                         placement: 'left',
                         // 4: the token, not a hardcode. An explicit `offset` passed to usePopover
                         // is exactly what stops it reading `--pdx-float-offset` — a theme setting
@@ -160,7 +159,7 @@ export const tooltip: ComponentManifest = {
                     {
                         description: 'tooltip placed right of trigger, vertically centered',
                         trigger: { selector: 'section:not([hidden]) [data-test="trigger"]', action: 'hover' },
-                        floating: 'section:not([hidden]) .pdx-tooltip-float',
+                        floating: 'section:not([hidden]) pdx-tooltip [data-part="root"]',
                         placement: 'right',
                         // 4: the token, not a hardcode. An explicit `offset` passed to usePopover
                         // is exactly what stops it reading `--pdx-float-offset` — a theme setting

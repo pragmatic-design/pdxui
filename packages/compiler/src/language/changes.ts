@@ -41,7 +41,7 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound } from './open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound } from './open-change';
 import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
 
 /** What a change is, by `migration.md`'s classes. */
@@ -433,6 +433,9 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #288: pdx-menu's closeAll() is the overlay verb close() (./open-change).
     menuCloseAllClose,
     menuCloseAllUnbound,
+    // #288: pdx-tooltip's hide() is the overlay verb close() (./open-change).
+    tooltipHideClose,
+    tooltipHideUnbound,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
