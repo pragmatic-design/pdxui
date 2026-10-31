@@ -394,6 +394,16 @@ semver.
 
 ### Changed
 
+- `pdx-toast` takes the beta contract (#288). It holds the toasts of the global queue and opens
+  nothing itself, so it gains no open state and no overlay verbs.
+  - **A4.** A dismissed toast stays 300 ms to slide out; for those it is no longer a `status` (or an
+    `alert`) and is `inert`, so a screen reader is not left with a live region holding a message that
+    has gone, and its buttons are out of reach. Before, it kept its role and its text until it was
+    removed.
+  - **Parts.** `root` (the stack), and on each toast `toast`, `icon`, `title`, `message`, `action`,
+    `close` and `progress`. A toast's own state stays on it: its type class, and `data-open` while it
+    shows.
+
 - **Breaking:** `pdx-tooltip` takes the beta contract (#288).
   - **`hide()` is `close()`**; `show()` and `toggle()` stay. `pdx migrate` rewrites `hide()` on a
     `:ref` bound on a `pdx-tooltip`, and flags it on a lookup.

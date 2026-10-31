@@ -110,22 +110,22 @@ export const toast: ComponentManifest = {
             'toast-stack': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast',
+                        selector: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]',
                         description: 'toast item is a flex row',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast',
+                        selector: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]',
                         description: 'toast item has content-driven positive height',
                         height: { op: '>', value: 0 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast',
+                        selector: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]',
                         description: 'toast item has non-negative radius (metro may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast-close',
+                        selector: 'section:not([hidden]) [data-test="toast"] [data-part="close"]',
                         description: 'close button has cursor pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
@@ -135,10 +135,10 @@ export const toast: ComponentManifest = {
                 composition: [
                     {
                         description: 'stacked toasts do not overlap (second sits below the first)',
-                        parent: 'section:not([hidden]) [data-test="toast"] .pdx-toast-container',
+                        parent: 'section:not([hidden]) [data-test="toast"] [data-part="root"]',
                         children: {
-                            first: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1)',
-                            second: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(2)',
+                            first: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1)',
+                            second: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(2)',
                         },
                         relations: [
                             {
@@ -152,11 +152,11 @@ export const toast: ComponentManifest = {
                     },
                     {
                         description: 'toast parts are contained within the toast box',
-                        parent: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1)',
+                        parent: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1)',
                         children: {
-                            toast: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1)',
-                            content: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1) .pdx-toast-content',
-                            close: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1) .pdx-toast-close',
+                            toast: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1)',
+                            content: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1) .pdx-toast-content',
+                            close: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1) [data-part="close"]',
                         },
                         relations: [
                             { description: 'content within toast box', left: 'content', op: 'contained-in', right: 'toast' },
@@ -176,7 +176,7 @@ export const toast: ComponentManifest = {
                 // Rich: the title above the message, both inside the content box.
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast',
+                        selector: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]',
                         description: 'rich toast item has content-driven positive height',
                         height: { op: '>', value: 0 },
                     },
@@ -187,8 +187,8 @@ export const toast: ComponentManifest = {
                         parent: 'section:not([hidden]) [data-test="toast"] .pdx-toast-content',
                         children: {
                             content: 'section:not([hidden]) [data-test="toast"] .pdx-toast-content',
-                            title: 'section:not([hidden]) [data-test="toast"] .pdx-toast-title',
-                            message: 'section:not([hidden]) [data-test="toast"] .pdx-toast-message',
+                            title: 'section:not([hidden]) [data-test="toast"] [data-part="title"]',
+                            message: 'section:not([hidden]) [data-test="toast"] [data-part="message"]',
                         },
                         relations: [
                             { description: 'title within content', left: 'title', op: 'contained-in', right: 'content' },
@@ -222,7 +222,7 @@ export const toast: ComponentManifest = {
             // A content-driven toast (height = the sum of its content, sensitive to the host's line-height) → skipHeight.
             // The radius (a CSS value, not scaled) and the border stay asserted. Standard tolerance.
             {
-                selector: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1)',
+                selector: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1)',
                 tolerancePx: 2,
                 skipHeight: true,
             },
@@ -237,7 +237,7 @@ export const toast: ComponentManifest = {
         steps: [
             {
                 key: 'Tab',
-                expectFocus: 'section:not([hidden]) [data-test="toast"] .pdx-toast:nth-child(1) .pdx-toast-close',
+                expectFocus: 'section:not([hidden]) [data-test="toast"] [data-part="toast"]:nth-child(1) [data-part="close"]',
             },
         ],
     },

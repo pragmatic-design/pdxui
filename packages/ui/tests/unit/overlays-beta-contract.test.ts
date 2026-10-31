@@ -98,6 +98,28 @@ const DONE: Row[] = [
     },
 ];
 
+/**
+ * The two that hold other overlays and open nothing themselves (`pdx-toast`, `pdx-overlay-outlet`): no
+ * open state, no `open-change`, no overlay verbs; their parts are listed.
+ */
+const HOLDERS_DONE: { tag: string; parts: string[] }[] = [
+    // The stack, and a toast with its icon, title, message, action, close button and progress bar.
+    { tag: 'pdx-toast', parts: ['root', 'toast', 'icon', 'title', 'message', 'action', 'close', 'progress'] },
+];
+
+describe.each(HOLDERS_DONE)('$tag, a holder on the beta contract', (row) => {
+    const decl = decls.find((d) => d.tagName === row.tag);
+
+    it('lists its public parts', () => {
+        expect((decl?.cssParts ?? []).map((p) => p.name).sort()).toEqual([...row.parts].sort());
+    });
+
+    it('has no open state of its own, and announces none', () => {
+        expect((decl?.cssStates ?? []).map((s) => s.name)).not.toContain('open');
+        expect((decl?.events ?? []).map((e) => e.name)).not.toContain('open-change');
+    });
+});
+
 /** The verbs every overlay drives its open state with, the names `<dialog>` uses. */
 const VERBS = ['show', 'close', 'toggle'];
 /** The events the beta took from every overlay. */

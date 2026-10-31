@@ -8,6 +8,8 @@ Transient, stacked notifications.
 
 **Renders:** roles `alert` · `status`
 
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="toast"]` — The element reached as `[data-part="toast"]`.; `[data-part="icon"]` — The element reached as `[data-part="icon"]`.; `[data-part="title"]` — The element reached as `[data-part="title"]`.; `[data-part="message"]` — The element reached as `[data-part="message"]`.; `[data-part="action"]` — The element reached as `[data-part="action"]`.; `[data-part="close"]` — The element reached as `[data-part="close"]`.; `[data-part="progress"]` — The element reached as `[data-part="progress"]`.
+
 
 #### Examples
 

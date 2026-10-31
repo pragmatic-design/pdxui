@@ -27371,6 +27371,40 @@
               },
               "default": "'top-right'"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "toast",
+              "description": "The element reached as `[data-part=\"toast\"]`."
+            },
+            {
+              "name": "icon",
+              "description": "The element reached as `[data-part=\"icon\"]`."
+            },
+            {
+              "name": "title",
+              "description": "The element reached as `[data-part=\"title\"]`."
+            },
+            {
+              "name": "message",
+              "description": "The element reached as `[data-part=\"message\"]`."
+            },
+            {
+              "name": "action",
+              "description": "The element reached as `[data-part=\"action\"]`."
+            },
+            {
+              "name": "close",
+              "description": "The element reached as `[data-part=\"close\"]`."
+            },
+            {
+              "name": "progress",
+              "description": "The element reached as `[data-part=\"progress\"]`."
+            }
           ]
         }
       ],

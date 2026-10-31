@@ -49,6 +49,10 @@ const ICON_MAP: Record<string, string> = {
  * pausing on hover and offering action buttons.
  */
 component('pdx-toast', {
+    // The stack, and each toast with its pieces (#288). A toast's own state stays on the toast — its
+    // type class and `data-open` while it shows — as an option's does: the host holds many toasts and
+    // opens none of them itself, so it has no open state, no `open-change` and no overlay verbs.
+    parts: ['root', 'toast', 'icon', 'title', 'message', 'action', 'close', 'progress'],
     // The axis toast.css and adaptive.css key by (#631), reflected on the host; each value maps the
     // container's attribute that places the same stack on native markup.
     variants: {
@@ -81,7 +85,16 @@ component('pdx-toast', {
             for (const child of Array.from(containerEl.children)) {
                 const id = (child as HTMLElement).dataset.toastId;
                 if (id && !currentIds.has(id)) {
-                    (child as HTMLElement).removeAttribute('data-open');
+                    const leaving = child as HTMLElement;
+                    leaving.removeAttribute('data-open');
+                    // A4 (#288): a status carries text only while it has something to say. The toast
+                    // stays 300 ms to slide out; for those it is no longer a live region, and `inert`
+                    // takes it out of the accessibility tree and its buttons out of reach — not
+                    // `aria-hidden`, which would hide the close button the user just pressed while it
+                    // still has the focus.
+                    leaving.removeAttribute('role');
+                    leaving.removeAttribute('aria-live');
+                    leaving.inert = true;
                     setTimeout(() => child.remove(), 300);
                 }
             }
@@ -118,6 +131,7 @@ component('pdx-toast', {
                 if (!existingProgress) {
                     const progress = document.createElement('div');
                     progress.className = 'pdx-toast-progress';
+                    progress.dataset.part = 'progress';
                     progress.style.animationDuration = t.duration + 'ms';
                     el.appendChild(progress);
                 } else {
@@ -146,6 +160,7 @@ component('pdx-toast', {
             const el = document.createElement('div');
             el.className = buildToastClass(t);
             el.dataset.toastId = t.id;
+            el.dataset.part = 'toast';
             el.setAttribute('role', t.type === 'error' ? 'alert' : 'status');
             el.setAttribute('aria-live', t.type === 'error' ? 'assertive' : 'polite');
 
@@ -156,6 +171,7 @@ component('pdx-toast', {
                 icon.setAttribute('name', iconName);
                 icon.setAttribute('size', t.title ? 'md' : 'sm');
                 icon.className = 'pdx-toast-icon';
+                icon.dataset.part = 'icon';
                 el.appendChild(icon);
             }
 
@@ -165,11 +181,13 @@ component('pdx-toast', {
             if (t.title) {
                 const titleEl = document.createElement('div');
                 titleEl.className = 'pdx-toast-title';
+                titleEl.dataset.part = 'title';
                 titleEl.textContent = t.title;
                 content.appendChild(titleEl);
             }
             const msg = document.createElement('div');
             msg.className = 'pdx-toast-message';
+            msg.dataset.part = 'message';
             msg.textContent = t.message;
             content.appendChild(msg);
             el.appendChild(content);
@@ -178,6 +196,7 @@ component('pdx-toast', {
             if (t.action) {
                 const actionBtn = document.createElement('button');
                 actionBtn.className = 'pdx-toast-action';
+                actionBtn.dataset.part = 'action';
                 actionBtn.textContent = t.action.label;
                 actionBtn.onclick = () => { t.action!.onClick(); queue.dismiss(t.id); };
                 el.appendChild(actionBtn);
@@ -187,6 +206,7 @@ component('pdx-toast', {
             if (t.dismissible) {
                 const closeBtn = document.createElement('button');
                 closeBtn.className = 'pdx-toast-close';
+                closeBtn.dataset.part = 'close';
                 uiAttr(closeBtn, 'aria-label', () => uiString('toast', 'dismiss'));
                 closeBtn.textContent = '\u00d7';
                 closeBtn.onclick = () => queue.dismiss(t.id);
@@ -197,6 +217,7 @@ component('pdx-toast', {
             if (t.duration > 0) {
                 const progress = document.createElement('div');
                 progress.className = 'pdx-toast-progress';
+                progress.dataset.part = 'progress';
                 progress.style.animationDuration = t.duration + 'ms';
                 el.appendChild(progress);
             }
