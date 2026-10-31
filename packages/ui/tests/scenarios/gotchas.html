@@ -310,6 +310,19 @@
                 };
             },
 
+            // pdx-dropdown-menu on the beta contract (#288). No model: its open state is read-only, so the
+            // opener is an invoker command and nothing is bound.
+            'dropdown-menu-beta-contract': () => {
+                const items = [{ key: 'edit', label: 'Edit' }, { key: 'copy', label: 'Copy' }];
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound" style="padding: 24px">
+                        <p><button type="button" data-test="opener" commandfor="bound-dd" command="--show">Actions</button></p>
+                        <pdx-dropdown-menu id="bound-dd" label="More" :items=${items}></pdx-dropdown-menu>
+                    </div>`);
+                };
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

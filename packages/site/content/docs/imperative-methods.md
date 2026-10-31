@@ -109,7 +109,8 @@ ships today:
 | `pdx-tag-input`    | `addTag()`, `removeTag()`, `clear()`, `getTags()` |
 | `pdx-dialog` | `show()`, `close()`, `toggle()` — or the `open` prop |
 | `pdx-drawer` | controlled via the `open` prop (set `dlg.open = true`) |
-| `pdx-fab` / `pdx-dropdown-menu` | `open()`, `close()`, `toggle()` |
+| `pdx-fab` | `open()`, `close()`, `toggle()` |
+| `pdx-dropdown-menu` | `show()`, `close()`, `toggle()` |
 | `pdx-context-menu` | `open(anchorEl)`, `close()` |
 | `pdx-menu` | `show()`, `close()`, `toggle()`, `closeSubmenu()` — or the `open` prop |
 | `pdx-menubar` | `openMenu(key)`, `closeMenu()` |

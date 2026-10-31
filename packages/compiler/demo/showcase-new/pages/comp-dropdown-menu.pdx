@@ -37,7 +37,8 @@
         <div class="opt-header"><span>Event / method</span><span>Detail</span></div>
         <div class="opt-row"><code>pdx-select</code><span>{ key, item }</span></div>
         <div class="opt-row"><code>pdx-check</code><span>{ key, checked, item, radioGroup? }</span></div>
-        <div class="opt-row"><code>open() / close() / toggle()</code><span>Imperative control on the element</span></div>
+        <div class="opt-row"><code>open-change</code><span>{ value } — opened or closed, read-only</span></div>
+        <div class="opt-row"><code>show() / close() / toggle()</code><span>Imperative control on the element; <code>isOpen</code> reads it</span></div>
       </div>
     </section>
   </div>

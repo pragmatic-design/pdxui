@@ -50,7 +50,7 @@ describe('pdx-dropdown-menu — a slotted trigger', () => {
         expect(trigger.getAttribute('aria-expanded')).toBe('false');
         expect(trigger.hasAttribute('aria-controls')).toBe(false);
 
-        (el as any).open();
+        (el as any).show();
         await tick();
         expect(trigger.getAttribute('aria-expanded')).toBe('true');
         expect(document.getElementById(trigger.getAttribute('aria-controls')!)).toBe(panel());
@@ -122,7 +122,7 @@ describe('pdx-dropdown-menu — a slotted trigger', () => {
         // First in the file to open a menu with no icons, and nothing above imports pdx-icon: a
         // registration here can only come from the dropdown or its menu.
         const { el } = await mountSlotted('<button slot="trigger">AS</button>');
-        (el as any).open();
+        (el as any).show();
         await tick(50);
         expect(customElements.get('pdx-icon'), 'the slotted trigger path loaded pdx-icon').toBeUndefined();
     });

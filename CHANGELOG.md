@@ -394,6 +394,19 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-dropdown-menu` takes the beta contract (#288).
+  - **`open()` is `show()`**; `close()` and `toggle()` stay, and `isOpen` is new. The alpha handle
+    `host.__dropdownMenu` is gone. `pdx migrate` rewrites `open()` on a `:ref` bound on a
+    `pdx-dropdown-menu`, and flags it on a lookup.
+  - **`open-change` `{ value }`** announces each opening and closing, however it came: the trigger,
+    Escape, Tab, an outside press, a chosen entry, a method. It is read-only: the parent never writes
+    whether the menu is open, so it is not a model.
+  - **Focus.** A close gives the focus back to the element that had it when the menu opened — a
+    `command="--show"` invoker elsewhere on the page — and to the trigger otherwise. Before, it always
+    went to the trigger.
+  - **States and parts.** `open` is a custom state on the host; the built-in button is the part
+    `trigger`.
+
 - `pdx-overlay-outlet` takes the beta contract (#288). It draws the dialogs opened from code and opens
   nothing itself, so it gains no open state and no overlay verbs.
   - **Parts.** `root` (the stack), and on each dialog `backdrop`, `panel`, `header`, `title`, `body`,

@@ -41,7 +41,7 @@ const MOUNTS: Record<string, Mount> = {
         (el as any).items = items();
         document.body.appendChild(el);
         await tick(50);
-        (el as any).open();
+        (el as any).show();
         await tick(50);
         return moreItem();
     },

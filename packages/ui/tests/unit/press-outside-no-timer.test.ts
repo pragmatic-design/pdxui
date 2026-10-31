@@ -52,7 +52,7 @@ const TARGETS: Target[] = [
                 e.setAttribute('label', 'Options');
                 (e as unknown as { items: unknown[] }).items = [{ key: 'a', label: 'A' }];
             });
-            return () => el.open();
+            return () => el.show();
         },
     },
     {

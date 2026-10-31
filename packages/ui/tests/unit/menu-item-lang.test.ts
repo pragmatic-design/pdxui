@@ -41,7 +41,7 @@ describe('MenuItem.lang', () => {
         (el as any).items = items();
         document.body.appendChild(el);
         await tick(50);
-        (el as any).open();
+        (el as any).show();
         await tick(50);
         expect(rendered('it').map(b => b.lang)).toEqual(['it']);
     });

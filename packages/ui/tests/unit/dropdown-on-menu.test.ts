@@ -73,7 +73,7 @@ describe('pdx-dropdown-menu, on pdx-menu', () => {
         (el as any).items = [{ key: 'a', label: 'A' }, { key: 'b', label: 'B' }];
         document.body.appendChild(el);
         await tick(50);
-        (el as any).open();
+        (el as any).show();
         await tick(50);
 
         // The panel is still the element that is the menu — what apps and the certification select

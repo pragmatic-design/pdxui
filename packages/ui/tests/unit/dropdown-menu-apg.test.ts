@@ -110,7 +110,7 @@ describe('pdx-dropdown-menu — APG menu button keys', () => {
 
     it('Tab closes the open menu and does not prevent the Tab', async () => {
         const el = await mountDropdown(items);
-        (el as any).open();
+        (el as any).show();
         await tick();
         const focused = document.activeElement as HTMLElement;
         expect(panel()!.contains(focused)).toBe(true);
@@ -147,7 +147,7 @@ describe('pdx-dropdown-menu — APG menu button keys', () => {
         const el = await mountDropdown(items);
         expect(trigger(el).hasAttribute('aria-controls')).toBe(false);
 
-        (el as any).open();
+        (el as any).show();
         await tick();
         const id = trigger(el).getAttribute('aria-controls');
         expect(id).toBeTruthy();
@@ -160,11 +160,11 @@ describe('pdx-dropdown-menu — APG menu button keys', () => {
     it('two dropdowns control two different menus', async () => {
         const a = await mountDropdown(items);
         const b = await mountDropdown(items);
-        (a as any).open();
+        (a as any).show();
         await tick();
         const idA = trigger(a).getAttribute('aria-controls');
         (a as any).close();
-        (b as any).open();
+        (b as any).show();
         await tick();
         expect(trigger(b).getAttribute('aria-controls')).not.toBe(idA);
     });
