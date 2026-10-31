@@ -4,7 +4,6 @@ Switch between panels.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `value` | `value` | string | `''` | Active tab value (string matching data-tab attribute) |
 | `orientation` | `orientation` | string | `'horizontal'` | Orientation: horizontal (default) or vertical |
 | `bordered` | `bordered` | boolean | `false` | Add border around entire tabs + panels |
 | `mount` | `mount` | string | `'eager'` | Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate) |
@@ -12,6 +11,7 @@ Switch between panels.
 | `label` | `label` | string | `''` | The tablist's accessible name ("Account settings"). |
 | `loading` | `loading` | boolean | `false` | Show loading state |
 | `variant` | `variant` | 'line' \| 'card' \| 'pills' | `'line'` | line (the default), card (a bordered container) or pills (rounded buttons). |
+| `value` | `value` | string | `''` | The current value. |
 
 **API (via `:ref`)**
 
@@ -22,9 +22,13 @@ Switch between panels.
 | `prev()` | Goes to the previous item. |
 | `active` _(read-only)_ | Read-only, via a ref: `el.active`. |
 
-**Events:** `pdx-change` → `detail: { value }` — Fired when the value changes.; `pdx-close` → `detail: { value }` — Fired when it closes. Does not bubble.
+**Events:** `pdx-close` → `detail: { value: string }` — A tab's close button removed it and its panel; the value is the removed tab's. Does not bubble.; `value-change` → `detail: { value: string }` — Fired when the component writes `value`. Does not bubble.
 
 **Renders:** roles `tab` · `tablist` · `tabpanel`
+
+**States:** `:state(loading)` — `loading` is set: the active panel is `aria-busy`.; `:state(bordered)` — `bordered` is set: a border around the strip and the panels.; `:state(overflow)` — The tabs do not fit in one row: the strip keeps one row and scrolls.
+
+**Parts:** `[data-part="list"]` — The strip of tabs, the `role="tablist"` element the author wrote (`.pdx-tabs`).; `[data-part="tab"]` — A tab, an element with `data-tab`.; `[data-part="panel"]` — A panel, an element with `data-tab-panel`.; `[data-part="indicator"]` — The bar under the active tab, which slides to it (not with `variant="pills"`).
 
 
 #### Examples

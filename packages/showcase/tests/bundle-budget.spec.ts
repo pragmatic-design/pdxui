@@ -316,7 +316,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // state, its parts, `show()`/`toggle()` and the focus it gives back on close. The shell's profile and
 // language menus draw with it, so it ships before the first paint. The pre-push build: main blocking
 // 101.9 → this branch 102.1 KB.
-const BUDGET_KB = { entry: 43, js: 471, css: 65, blocking: 103 };
+// js 471 → 472 (owner's OK): pdx-tabs' beta contract (#289) — its `value` model, the loading,
+// bordered and overflow states, its parts and the busy active panel. Main sat on the ceiling (it
+// passed 471); the built dist of this branch weighs 471.1 KB.
+const BUDGET_KB = { entry: 43, js: 472, css: 65, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

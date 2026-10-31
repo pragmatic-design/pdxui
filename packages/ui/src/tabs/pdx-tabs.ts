@@ -2,9 +2,8 @@
 // Compound: discovers [data-tab] and [data-tab-panel] children linked by value.
 // Supports: vertical, lazy mount, closable tabs, scroll overflow.
 
-import { component, html, focusGroup, generatedId } from '@pdxui/core';
+import { component, html, focusGroup, generatedId, model, event } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/tabs';
@@ -14,8 +13,31 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([t
 /**
  * Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy
  * mounting and closable tabs.
+ *
+ * @csspart list - The strip of tabs, the `role="tablist"` element the author wrote (`.pdx-tabs`).
+ * @csspart tab - A tab, an element with `data-tab`.
+ * @csspart panel - A panel, an element with `data-tab-panel`.
+ * @csspart indicator - The bar under the active tab, which slides to it (not with `variant="pills"`).
+ *
+ * @cssstate loading - `loading` is set: the active panel is `aria-busy`.
+ * @cssstate bordered - `bordered` is set: a border around the strip and the panels.
+ * @cssstate overflow - The tabs do not fit in one row: the strip keeps one row and scrolls.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
  */
 component('pdx-tabs', {
+    // The active tab (#289). A click, a key and `select()`/`next()`/`prev()` write it, and the write
+    // dispatches `value-change` `{ value }`, which `::value` follows; a parent's write moves the tabs.
+    models: { value: model<string>('', { type: String }) },
+    events: {
+        /** A tab's close button removed it and its panel; the value is the removed tab's. */
+        'pdx-close': event<{ value: string }>(),
+    },
+    // On the host as custom states (#132, #289): the design CSS draws the border and the scrolled strip
+    // from them, and neither carries a class or an attribute for it.
+    states: ['loading', 'bordered', 'overflow'],
+    parts: ['list', 'tab', 'panel', 'indicator'],
     // The axis tabs.css keys by (#632), reflected on the host and drawn from it; the host is the
     // element the old `.pdx-tabs-card`/`.pdx-tabs-pills` classes went on, so no native class is kept.
     variants: {
@@ -23,8 +45,6 @@ component('pdx-tabs', {
         variant: ['line', 'card', 'pills'],
     },
     props: {
-        /** Active tab value (string matching data-tab attribute) */
-        value: { type: String, default: '' },
         /** Orientation: horizontal (default) or vertical */
         orientation: { type: String, default: 'horizontal' },
         /** Add border around entire tabs + panels */
@@ -80,6 +100,7 @@ component('pdx-tabs', {
             tabs.forEach(t => {
                 const v = t.getAttribute('data-tab') || '';
                 const isActive = v === value;
+                t.setAttribute('data-part', 'tab');
                 t.setAttribute('aria-selected', String(isActive));
                 t.setAttribute('tabindex', isActive ? '0' : '-1');
             });
@@ -88,6 +109,7 @@ component('pdx-tabs', {
             panels.forEach(p => {
                 const v = p.getAttribute('data-tab-panel') || '';
                 const isActive = v === value;
+                p.setAttribute('data-part', 'panel');
                 // The active panel is a tab stop when nothing inside it takes focus (APG): otherwise Tab from
                 // the tablist would skip it and go on down the page.
                 if (isActive && !p.querySelector(FOCUSABLE)) p.setAttribute('tabindex', '0');
@@ -106,22 +128,34 @@ component('pdx-tabs', {
                 }
             });
 
+            markBusy();
             revealActive();
             updateIndicator();
-            // `value` is the live tab, already when the event is dispatched. The value track below
-            // sees its own reflection as the active tab, a no-op.
-            setOwnProp(ctx.el, 'value', value);
-            ctx.emit('pdx-change', { value });
+            // The model's write announces `value-change` when the tab changed, and nothing when a
+            // parent's write brought it here: the value is already this one. The value track below sees
+            // its own write as the active tab, a no-op.
+            ctx.value.set(value);
+        }
+
+        /** A4: the active panel is busy while `loading`, and no other panel is. */
+        function markBusy(): void {
+            const loading = ctx.loading.peek() as boolean;
+            for (const p of getPanels()) {
+                if (loading && p.getAttribute('data-tab-panel') === activeValue) p.setAttribute('aria-busy', 'true');
+                else p.removeAttribute('aria-busy');
+            }
         }
 
         // A strip narrower than its tabs keeps one row and scrolls it. The CSS alone
         // wraps the tabs, the only thing it can do without measuring; here the strip is measured on
-        // one row, and keeps [data-overflow] (one row, scrolled) only while that row does not fit.
+        // one row, and keeps the `overflow` state (one row, scrolled) only while that row does not fit.
+        let overflowing = false;
         function fitStrip(): void {
             const tabList = getTabList();
             if (!tabList || (ctx.orientation() as string) === 'vertical') return;
-            tabList.setAttribute('data-overflow', '');
-            if (tabList.scrollWidth <= tabList.clientWidth + 1) tabList.removeAttribute('data-overflow');
+            ctx.state('overflow', true);
+            overflowing = tabList.scrollWidth > tabList.clientWidth + 1;
+            ctx.state('overflow', overflowing);
             revealActive();
             updateIndicator();
         }
@@ -129,7 +163,7 @@ component('pdx-tabs', {
         /** Scroll the strip, and only the strip, so the active tab is in view. */
         function revealActive(): void {
             const tabList = getTabList();
-            if (!tabList || !tabList.hasAttribute('data-overflow')) return;
+            if (!tabList || !overflowing) return;
             const tab = tabFor(activeValue);
             if (!tab) return;
             // offsetLeft is from the strip's padding edge: the strip is position: relative (tabs.css).
@@ -197,13 +231,14 @@ component('pdx-tabs', {
             if (value) activate(value);
         }
 
-        // Reactive: loading → aria-busy. Kept SEPARATE from the one-shot bind below so that
-        // reading a prop here never tears down the click listener/focusGroup.
+        // Reactive: loading → its state and the active panel's aria-busy (A4), bordered → its state.
+        // Kept SEPARATE from the one-shot bind below so that reading a prop here never tears down the
+        // click listener/focusGroup.
         ctx.track(() => {
-            const el = ctx.el;
-            if (ctx.loading()) el.setAttribute('aria-busy', 'true');
-            else el.removeAttribute('aria-busy');
+            ctx.state('loading', ctx.loading() as boolean);
+            markBusy();
         });
+        ctx.track(() => { ctx.state('bordered', ctx.bordered() as boolean); });
 
         let _bound = false;
         // One-shot bind. This track reads NO reactive prop synchronously, so it runs exactly
@@ -255,12 +290,11 @@ component('pdx-tabs', {
 
                     if (tabList) {
                         tabList.setAttribute('role', 'tablist');
+                        tabList.setAttribute('data-part', 'list');
                         tabList.setAttribute('aria-orientation', orient);
                         // Named: a tablist needs an accessible name.
                         const label = ctx.label() as string;
                         if (label) tabList.setAttribute('aria-label', label);
-                        // The variant is drawn from the host attribute (#632); bordered is a class.
-                        if (ctx.bordered()) el.classList.add('pdx-tabs-bordered');
                     }
 
                     // Create animated indicator (not for pills variant)
@@ -268,6 +302,7 @@ component('pdx-tabs', {
                     if (tabList && variant !== 'pills') {
                         indicatorEl = document.createElement('span');
                         indicatorEl.className = 'pdx-tab-indicator';
+                        indicatorEl.setAttribute('data-part', 'indicator');
                         tabList.style.position = 'relative';
                         tabList.appendChild(indicatorEl);
                     }

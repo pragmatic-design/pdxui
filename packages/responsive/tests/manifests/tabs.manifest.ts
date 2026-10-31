@@ -39,7 +39,10 @@
  *     · aria-selected = String(v===value)   → "true" on the active one, "false" on the others
  *     · tabindex      = active ? "0" : "-1" (roving: a single tabbable tab)
  *   and on EVERY panel: display = active ? '' : 'none' (mount=eager, the default).
- *   Then it emits the CustomEvent 'pdx-change' { value }.
+ *   Then it writes its `value` model, which dispatches 'value-change' { value } (#289; it was
+ *   'pdx-change'). The strip, a tab, a panel and the indicator carry `data-part` (list, tab, panel,
+ *   indicator); `loading`, `bordered` and a strip that does not fit one row are the host's custom
+ *   states `loading`, `bordered`, `overflow`.
  *
  *   Keyboard = focusGroup (core). orientation horizontal → ArrowLeft/Right (+ wrap),
  *   Home/End to the ends; onFocus with activation=automatic (the default) → activate(tab)
@@ -283,6 +286,16 @@ export const tabs: ComponentManifest = {
                         radius: { all: { op: '>=', value: 0 } },
                     },
                 ],
+                // Bordered is a custom state of the host (#289), what tabs.css selects; no class.
+                states: [
+                    {
+                        description: 'bordered is the custom state :state(bordered)',
+                        selector: 'section:not([hidden]) [data-test="tablist-bordered"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="tabs-bordered"]', name: 'bordered' },
+                        changes: {},
+                    },
+                ],
             },
             // After the outer tabs switch away and back, the inner tabs still show their own
             // active panel, not the one that shares the outer value.
@@ -315,6 +328,16 @@ export const tabs: ComponentManifest = {
                             // Scrolled, not wrapped: the tabs keep one row.
                             { description: 'the tabs keep one row', left: 'active.top', op: '==', right: 'first.top', tolerance: 3 },
                         ],
+                    },
+                ],
+                // The scrolled strip is the host's custom state `overflow` (#289), what tabs.css selects.
+                states: [
+                    {
+                        description: 'a strip that does not fit is the custom state :state(overflow)',
+                        selector: 'section:not([hidden]) [data-test="tablist-narrow"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="tabs-narrow"]', name: 'overflow' },
+                        changes: {},
                     },
                 ],
             },
