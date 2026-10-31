@@ -290,6 +290,16 @@
                 };
             },
 
+            // pdx-toast on the beta contract (#288): it holds the toasts of the global queue, and opens
+            // nothing itself. The test reaches the queue's API through `api.toast()`.
+            'toast-beta-contract': () => {
+                api.toast = async () => (await import('@pdxui/ui/toast')).toast;
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound"><pdx-toast position="top-right"></pdx-toast></div>`);
+                };
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);
