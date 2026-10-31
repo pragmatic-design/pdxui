@@ -380,6 +380,29 @@
                 };
             },
 
+            // pdx-tabs on the beta contract (#289): `::value` bound to a signal.
+            'tabs-beta-contract': () => {
+                const value = signal('b');
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="next" commandfor="bound-tabs" command="--next">Next</button>
+                        <pdx-tabs id="bound-tabs" label="Sections" ::value=${value}>
+                            <div class="pdx-tabs">
+                                <button class="pdx-tab" data-tab="a">Alpha</button>
+                                <button class="pdx-tab" data-tab="b">Beta</button>
+                                <button class="pdx-tab" data-tab="c">Gamma</button>
+                            </div>
+                            <div data-tab-panel="a">Panel A</div>
+                            <div data-tab-panel="b">Panel B</div>
+                            <div data-tab-panel="c">Panel C</div>
+                        </pdx-tabs>
+                    </div>`);
+                };
+                api.setValue = (v) => value.set(v);
+                api.readValue = () => value();
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

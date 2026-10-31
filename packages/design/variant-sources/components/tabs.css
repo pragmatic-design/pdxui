@@ -10,7 +10,7 @@ pdx-tabs { display: block; }
     display: flex;
     /* Narrower than its tabs, the strip wraps them onto another row rather than running past its
        edge, where a page that clips sideways makes them unreachable. That is all CSS can
-       do: <pdx-tabs> measures its strip and scrolls it instead ([data-overflow] below). */
+       do: <pdx-tabs> measures its strip and scrolls it instead (its `overflow` state below). */
     flex-wrap: wrap;
     border-bottom: 1px solid var(--pdx-color-border);   /* the container's top edge */
     gap: var(--pdx-space-2xs);
@@ -20,15 +20,17 @@ pdx-tabs { display: block; }
 }
 .pdx-tabs::-webkit-scrollbar { display: none; }
 
-/* Set by <pdx-tabs> only while its tabs do not fit one row: one row, scrolled sideways. Not the
-   default: a scroller clips at its padding box, and the active tab's join to the panel, a theme's
-   indicator and its glow all hang below it. */
-.pdx-tabs[data-overflow] {
+/* <pdx-tabs>' `overflow` state (#289), only while its tabs do not fit one row: one row, scrolled
+   sideways. Not the default: a scroller clips at its padding box, and the active tab's join to the
+   panel, a theme's indicator and its glow all hang below it. The strip is the host's direct child,
+   so an inner pdx-tabs' strip is not scrolled by the outer's state; `:where()` keeps the weight the
+   old `[data-overflow]` had. */
+:where(pdx-tabs):state(overflow) > .pdx-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
 }
-.pdx-tabs[data-overflow] > .pdx-tab-indicator { bottom: 0; }
+:where(pdx-tabs):state(overflow) > .pdx-tabs > .pdx-tab-indicator { bottom: 0; }
 
 .pdx-tab {
     /* Difensivo: line-height + box-sizing espliciti per la style-isolation. */
@@ -119,16 +121,17 @@ pdx-tabs [data-tab-panel], pdx-tabs [role="tabpanel"] {
 /* Badge in tab */
 .pdx-tab pdx-badge { margin-left: var(--pdx-space-xs); }
 
-/* ── Bordered — applies to any variant ── */
-.pdx-tabs-bordered {
+/* ── Bordered — applies to any variant ──
+   <pdx-tabs>' `bordered` state (#289), where a class was; `:where()` keeps the class's weight. */
+:where(pdx-tabs):state(bordered) {
     border: var(--pdx-border-width) solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-lg);
     overflow: hidden;
 }
-.pdx-tabs-bordered [data-tab-panel] {
+:where(pdx-tabs):state(bordered) [data-tab-panel] {
     padding: var(--pdx-space-lg);
 }
-.pdx-tabs-bordered .pdx-tab-indicator {
+:where(pdx-tabs):state(bordered) .pdx-tab-indicator {
     /* align to the tablist's border-bottom (indicator-size), not border-width — otherwise the
        coloured indicator sits 1px off the divider line ("staccato"). */
     bottom: calc(-1 * var(--pdx-tab-indicator-size));
@@ -228,7 +231,7 @@ pdx-tabs[orientation="vertical"] .pdx-tabs {
     overflow-y: auto;
     min-width: 160px;
 }
-pdx-tabs[orientation="vertical"].pdx-tabs-bordered .pdx-tabs {
+pdx-tabs[orientation="vertical"]:state(bordered) .pdx-tabs {
     border-right: var(--pdx-border-width) solid var(--pdx-color-border);
     background: var(--pdx-color-inset);
 }

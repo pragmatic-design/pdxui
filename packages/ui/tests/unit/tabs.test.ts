@@ -71,13 +71,13 @@ describe('pdx-tabs', () => {
         expect(panels[0]?.getAttribute('aria-labelledby')).toBe(tabs[0]?.id);
     });
 
-    it('emits pdx-change on tab activation', async () => {
+    it('emits value-change on tab activation', async () => {
         const el = createTabs();
         await tick(50);
 
         let changedValue = '';
-        el.addEventListener('pdx-change', ((e: CustomEvent) => {
-            changedValue = e.detail?.value ?? e.detail;
+        el.addEventListener('value-change', ((e: CustomEvent) => {
+            changedValue = e.detail?.value;
         }) as EventListener);
 
         const tabs = el.querySelectorAll('[data-tab]');
@@ -105,14 +105,14 @@ describe('pdx-tabs', () => {
         expect(tabs[1]?.getAttribute('aria-selected')).toBe('false');
     });
 
-    it('emits pdx-change on click after a prop change', async () => {
+    it('emits value-change on click after a prop change', async () => {
         const el = createTabs('one');
         await tick(50);
         (el as any).loading = true; // any prop change
         await tick(50);
 
         let changed = '';
-        el.addEventListener('pdx-change', ((e: CustomEvent) => { changed = e.detail?.value; }) as EventListener);
+        el.addEventListener('value-change', ((e: CustomEvent) => { changed = e.detail?.value; }) as EventListener);
         const tabs = el.querySelectorAll('[data-tab]');
         (tabs[2] as HTMLElement).click();
         await tick();

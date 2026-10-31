@@ -25784,16 +25784,6 @@
           "members": [
             {
               "kind": "field",
-              "name": "value",
-              "description": "Active tab value (string matching data-tab attribute)",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "value"
-            },
-            {
-              "kind": "field",
               "name": "orientation",
               "description": "Orientation: horizontal (default) or vertical",
               "type": {
@@ -25863,6 +25853,16 @@
               "attribute": "variant"
             },
             {
+              "kind": "field",
+              "name": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "value"
+            },
+            {
               "kind": "method",
               "name": "select",
               "parameters": [
@@ -25894,6 +25894,9 @@
               "description": "Read-only, via a ref: `el.active`."
             }
           ],
+          "models": [
+            "value"
+          ],
           "variants": [
             {
               "name": "variant",
@@ -25905,22 +25908,28 @@
               "default": "line"
             }
           ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "value": "$event.detail.value"
+          },
           "events": [
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ value }"
-            },
             {
               "name": "pdx-close",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when it closes. Does not bubble.",
-              "detail": "{ value }"
+              "description": "A tab's close button removed it and its panel; the value is the removed tab's. Does not bubble.",
+              "detail": "{ value: string }"
+            },
+            {
+              "name": "value-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: string }"
             }
           ],
           "roles": [
@@ -25929,15 +25938,6 @@
             "tabpanel"
           ],
           "attributes": [
-            {
-              "name": "value",
-              "fieldName": "value",
-              "description": "Active tab value (string matching data-tab attribute)",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
             {
               "name": "orientation",
               "fieldName": "orientation",
@@ -26000,12 +26000,53 @@
                 "text": "'line' | 'card' | 'pills'"
               },
               "default": "'line'"
+            },
+            {
+              "name": "value",
+              "fieldName": "value",
+              "description": "The current value.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ],
           "slots": [
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The strip of tabs, the `role=\"tablist\"` element the author wrote (`.pdx-tabs`)."
+            },
+            {
+              "name": "tab",
+              "description": "A tab, an element with `data-tab`."
+            },
+            {
+              "name": "panel",
+              "description": "A panel, an element with `data-tab-panel`."
+            },
+            {
+              "name": "indicator",
+              "description": "The bar under the active tab, which slides to it (not with `variant=\"pills\"`)."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "`loading` is set: the active panel is `aria-busy`."
+            },
+            {
+              "name": "bordered",
+              "description": "`bordered` is set: a border around the strip and the panels."
+            },
+            {
+              "name": "overflow",
+              "description": "The tabs do not fit in one row: the strip keeps one row and scrolls."
             }
           ]
         }

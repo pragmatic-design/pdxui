@@ -42,12 +42,23 @@
       <h2 class="pdx-txt-heading">Reference</h2>
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Description</span></div>
-        <div class="opt-row"><code>value</code><span>Active tab value (matches data-tab)</span></div>
+        <div class="opt-row"><code>value</code><span>Active tab value (matches data-tab). A model: <code>::value</code> follows a click and the keyboard, announced by <code>value-change</code> { value }</span></div>
         <div class="opt-row"><code>variant</code><span>"line" (default), "card" (bordered bg), "pills" (segmented)</span></div>
         <div class="opt-row"><code>bordered</code><span>Add border container around tabs + panels (any variant)</span></div>
         <div class="opt-row"><code>orientation</code><span>"horizontal" (default) or "vertical"</span></div>
         <div class="opt-row"><code>mount</code><span>"eager" (default), "lazy", or "unmount"</span></div>
         <div class="opt-row"><code>activation</code><span>"automatic" (default) or "manual"</span></div>
+        <div class="opt-row"><code>loading</code><span>The active panel is aria-busy while it loads</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Description</span></div>
+        <div class="opt-row"><code>:state(loading)</code><span><code>loading</code> is set</span></div>
+        <div class="opt-row"><code>:state(bordered)</code><span><code>bordered</code> is set</span></div>
+        <div class="opt-row"><code>:state(overflow)</code><span>The tabs do not fit one row: the strip scrolls</span></div>
+        <div class="opt-row"><code>[data-part]</code><span><code>list</code> (the strip), <code>tab</code>, <code>panel</code>, <code>indicator</code></span></div>
+        <div class="opt-row"><code>next() / prev()</code><span>Move to the next or previous tab, also as <code>command="--next"</code> on a button</span></div>
       </div>
 
       <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Structure</h3>

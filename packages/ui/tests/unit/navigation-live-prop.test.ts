@@ -58,12 +58,13 @@ beforeEach(cleanup);
 describe('after a user move, the property is the emitted value', () => {
     it('pdx-tabs: a click on a tab', async () => {
         const el = await mount(TABS);
-        const seen = record(el, 'pdx-change', ['value']);
+        // Its model's event since #289.
+        const seen = record(el, 'value-change', ['value']);
         el.querySelector<HTMLElement>('[data-tab="b"]')!.click();
         await tick();
-        expect(seen, 'one pdx-change for one click').toHaveLength(1);
+        expect(seen, 'one value-change for one click').toHaveLength(1);
         expect(seen[0].detail.value).toBe('b');
-        expect(seen[0].atEmit.value, 'el.value when pdx-change was dispatched').toBe('b');
+        expect(seen[0].atEmit.value, 'el.value when value-change was dispatched').toBe('b');
         expect(el.value, 'el.value after the frame').toBe('b');
         expect(el.querySelector('[data-tab="b"]')!.getAttribute('aria-selected')).toBe('true');
     });
@@ -149,12 +150,13 @@ describe('writing the value back is not a second move', () => {
         expect(el.querySelector('[aria-current="page"]')!.textContent).toBe('5');
     });
 
-    it('pdx-tabs: a value set by the parent activates that tab, once', async () => {
+    it('pdx-tabs: a value set by the parent activates that tab, and announces nothing', async () => {
         const el = await mount(TABS);
-        const seen = record(el, 'pdx-change', ['value']);
+        // A model's event answers the component's own writes (#289): the parent knows what it set.
+        const seen = record(el, 'value-change', ['value']);
         el.value = 'c';
         await tick();
-        expect(seen.map((s) => s.detail.value)).toEqual(['c']);
+        expect(seen.map((s) => s.detail.value)).toEqual([]);
         expect(el.querySelector('[data-tab="c"]')!.getAttribute('aria-selected')).toBe('true');
     });
 
