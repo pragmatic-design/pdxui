@@ -107,7 +107,7 @@ export const splitButton: ComponentManifest = {
                     </pdx-split-button>
                 </div>`,
             setup: `
-                const arrow = document.querySelector('section:not([hidden]) [data-test="sb-open"] .pdx-split-arrow');
+                const arrow = document.querySelector('section:not([hidden]) [data-test="sb-open"] [data-part="trigger"]');
                 if (arrow) arrow.click();`,
         },
         {
@@ -130,35 +130,35 @@ export const splitButton: ComponentManifest = {
             'split-basic': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-button-group',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
                         description: 'split button group is an inline-flex row',
                         display: { op: 'is', value: 'inline-flex' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
                         description: 'primary half is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-arrow',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         description: 'chevron half is interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The CSS forces a right radius of 0 on the primary (it seams with the chevron).
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
                         description: 'primary half has no right-side radius (joined seam)',
                         radius: { topRight: { op: '<=', value: 1 }, bottomRight: { op: '<=', value: 1 } },
                     },
                     {
                         // The CSS forces a left radius of 0 on the chevron (it seams with the primary).
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-arrow',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         description: 'chevron half has no left-side radius (joined seam)',
                         radius: { topLeft: { op: '<=', value: 1 }, bottomLeft: { op: '<=', value: 1 } },
                     },
                     {
                         // The group's outer halves stay non-negative (the radius-zero themes zero them).
-                        selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary',
+                        selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
                         description: 'primary left radius is non-negative',
                         radius: { topLeft: { op: '>=', value: 0 }, bottomLeft: { op: '>=', value: 0 } },
                     },
@@ -167,10 +167,10 @@ export const splitButton: ComponentManifest = {
                     {
                         // The same height: the group is align-items:stretch.
                         description: 'primary and chevron halves share the same height (stretch)',
-                        parent: 'section:not([hidden]) [data-test="sb"] .pdx-split-button-group',
+                        parent: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
                         children: {
-                            primary: '.pdx-split-primary',
-                            arrow: '.pdx-split-arrow',
+                            primary: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                            arrow: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         },
                         relations: [
                             { description: 'primary == arrow height', left: 'primary.height', op: '==', right: 'arrow.height', tolerance: 1 },
@@ -179,10 +179,10 @@ export const splitButton: ComponentManifest = {
                     {
                         // Aligned on the same row (the same top) — a horizontal row.
                         description: 'halves are aligned on the same row (same top)',
-                        parent: 'section:not([hidden]) [data-test="sb"] .pdx-split-button-group',
+                        parent: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
                         children: {
-                            primary: '.pdx-split-primary',
-                            arrow: '.pdx-split-arrow',
+                            primary: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                            arrow: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         },
                         relations: [
                             { description: 'primary.top == arrow.top', left: 'primary.top', op: '==', right: 'arrow.top', tolerance: 2 },
@@ -191,10 +191,10 @@ export const splitButton: ComponentManifest = {
                     {
                         // Flush and joined: the arrow starts where the primary ends, with no gap.
                         description: 'chevron is flush to the right of the primary (no gap)',
-                        parent: 'section:not([hidden]) [data-test="sb"] .pdx-split-button-group',
+                        parent: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
                         children: {
-                            primary: '.pdx-split-primary',
-                            arrow: '.pdx-split-arrow',
+                            primary: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                            arrow: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         },
                         relations: [
                             { description: 'arrow.left <= primary.right (touching)', left: 'arrow.left', op: '<=', right: 'primary.right', tolerance: 2 },
@@ -204,11 +204,11 @@ export const splitButton: ComponentManifest = {
                     {
                         // Both are contained in the group's wrapper.
                         description: 'both halves are contained within the group wrapper',
-                        parent: 'section:not([hidden]) [data-test="sb"] .pdx-split-button-group',
+                        parent: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
                         children: {
-                            group: '.pdx-split-button-group',
-                            primary: '.pdx-split-primary',
-                            arrow: '.pdx-split-arrow',
+                            group: 'section:not([hidden]) [data-test="sb"] [data-part="root"]',
+                            primary: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]',
+                            arrow: 'section:not([hidden]) [data-test="sb"] [data-part="trigger"]',
                         },
                         relations: [
                             { description: 'primary within group', left: 'primary', op: 'contained-in', right: 'group' },
@@ -225,7 +225,7 @@ export const splitButton: ComponentManifest = {
                         // trigger = a click on the arrow; the runner clicks and waits for the panel to be visible.
                         // The panel is on document.body (NOT section-scoped) → a global selector.
                         description: 'clicking the chevron opens the dropdown menu panel',
-                        trigger: { selector: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow', action: 'click' },
+                        trigger: { selector: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]', action: 'click' },
                         panel: '.pdx-split-button-panel',
                         hasBackdrop: false,
                         minWidth: { op: '>=', value: 160 },
@@ -237,7 +237,7 @@ export const splitButton: ComponentManifest = {
             'split-disabled': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="sb-dis"] .pdx-split-primary',
+                        selector: 'section:not([hidden]) [data-test="sb-dis"] [data-part="primary"]',
                         description: 'disabled primary half is not clickable (no pointer cursor)',
                         cursor: { op: 'isNot', value: 'pointer' },
                     },
@@ -261,7 +261,7 @@ export const splitButton: ComponentManifest = {
     isolation: {
         scenario: 'split-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="sb"] .pdx-split-primary', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="sb"] [data-part="primary"]', tolerancePx: 10 },
         ],
     },
 
@@ -273,17 +273,17 @@ export const splitButton: ComponentManifest = {
     // choice has closed it.
     keyboard: {
         scenario: 'split-menu',
-        initialFocus: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow',
+        initialFocus: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]',
         steps: [
             // After the opening and its rAF the focus must be INSIDE the menu panel (the first menuitem).
             // aria-expanded follows the menu: 'true' while it is open, 'false' once it closes.
             {
                 key: 'Enter', expectFocusWithin: '.pdx-split-button-panel',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow', name: 'aria-expanded', value: 'true' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]', name: 'aria-expanded', value: 'true' },
             },
             {
-                key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow', name: 'aria-expanded', value: 'false' },
+                key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]', name: 'aria-expanded', value: 'false' },
             },
             // Choosing an item from the keyboard. focusGroup cancels Enter, so the menu needs an
             // onSelect: without one, Enter on "Save a copy" does nothing, focus stays on the item and
@@ -291,8 +291,8 @@ export const splitButton: ComponentManifest = {
             { key: 'Enter', expectFocus: '.pdx-split-button-panel [data-menu-key="draft"]' },
             { key: 'ArrowDown', expectFocus: '.pdx-split-button-panel [data-menu-key="copy"]' },
             {
-                key: 'Enter', expectFocus: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] .pdx-split-arrow', name: 'aria-expanded', value: 'false' },
+                key: 'Enter', expectFocus: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]',
+                expectAttr: { selector: 'section:not([hidden]) [data-test="sb-menu"] [data-part="trigger"]', name: 'aria-expanded', value: 'false' },
             },
         ],
     },

@@ -115,6 +115,16 @@ const DONE: Row[] = [
         // `open(x, y)` is `show(x, y)`.
         removed: ['open'],
     },
+    {
+        tag: 'pdx-split-button',
+        // The parent never writes its open state: `open-change` is a read-only output.
+        models: [],
+        // `loading` busies the primary button (A4).
+        states: ['open', 'loading'],
+        // The group, its primary button, the arrow; the menu (on <body>), an entry, a separator.
+        parts: ['root', 'primary', 'trigger', 'menu', 'item', 'separator'],
+        removed: [],
+    },
 ];
 
 /**
