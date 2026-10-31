@@ -21,8 +21,8 @@
  *   in an rAF and reused; close() only sets display:none (it does not remove it), destroy() removes it on disconnect.
  *
  * ── HOW IT OPENS (CRITICAL for the setup) ──
- *   There is no public `open()` method on the host like openSelect(); the host exposes
- *   `(ctx.el).__contextMenu = { open: openAt, close }` (src:272). Opening:
+ *   The host's overlay verbs are `show(x?, y?)`, `close()` and `toggle()` (#288; `open(x, y)` is gone).
+ *   The setup below opens it as a user does instead. Opening:
  *     1. a real right-click: dispatching a 'contextmenu' MouseEvent on the target (clientX/clientY) → openAt(x,y).
  *     2. a touch long-press (500ms) or Shift+F10 from the keyboard → openAt(...).
  *   openAt() (src:124):
@@ -122,19 +122,19 @@ export const contextMenu: ComponentManifest = {
                 // The panel is on document.body → GLOBAL selectors (not section-scoped).
                 standalone: [
                     {
-                        selector: '.pdx-context-menu-panel.pdx-menu',
+                        selector: '.pdx-context-menu-panel[data-part="root"]',
                         description: 'open context menu panel is displayed (flex, not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
                     {
                         // min-width = prop minWidth (default 180px) set inline by openAt → a measurable width.
-                        selector: '.pdx-context-menu-panel.pdx-menu',
+                        selector: '.pdx-context-menu-panel[data-part="root"]',
                         description: 'open menu panel has an appreciable width',
                         width: { op: '>=', value: 120 },
                     },
                     {
                         // .pdx-menu border-radius: var(--pdx-radius-md); the radius-zero themes zero it, never below 0.
-                        selector: '.pdx-context-menu-panel.pdx-menu',
+                        selector: '.pdx-context-menu-panel[data-part="root"]',
                         description: 'menu panel radius is non-negative',
                         radius: {
                             topLeft: { op: '>=', value: 0 },
@@ -145,7 +145,7 @@ export const contextMenu: ComponentManifest = {
                     },
                     {
                         // .pdx-menu-item { cursor: pointer } → menuitem interattivi.
-                        selector: '.pdx-context-menu-panel .pdx-menu-item',
+                        selector: '.pdx-context-menu-panel [data-part="item"]',
                         description: 'menu items are interactive (cursor pointer)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
@@ -156,7 +156,7 @@ export const contextMenu: ComponentManifest = {
                         // the runner measures without interacting further. A floating menu → no backdrop.
                         description: 'context menu shows a floating menu panel without a backdrop',
                         trigger: { selector: 'section:not([hidden]) [data-test="cm-target"]', action: 'call' },
-                        panel: '.pdx-context-menu-panel.pdx-menu',
+                        panel: '.pdx-context-menu-panel[data-part="root"]',
                         hasBackdrop: false,
                     },
                 ],
@@ -164,13 +164,13 @@ export const contextMenu: ComponentManifest = {
                     {
                         // The menuitems (buttons) live inside the menu panel (the layout holds).
                         description: 'menu items are contained within the menu panel',
-                        parent: '.pdx-context-menu-panel.pdx-menu',
+                        parent: '.pdx-context-menu-panel[data-part="root"]',
                         // The item is looked up INSIDE the panel: a bare `.pdx-menu-item` finds the
                         // first one in the document, in a hidden scenario (0×0 at the origin), and
                         // the relation would measure that.
                         children: {
-                            menu: '.pdx-context-menu-panel.pdx-menu',
-                            item: '.pdx-context-menu-panel.pdx-menu .pdx-menu-item',
+                            menu: '.pdx-context-menu-panel[data-part="root"]',
+                            item: '.pdx-context-menu-panel[data-part="root"] [data-part="item"]',
                         },
                         relations: [
                             { description: 'first menuitem within the menu panel', left: 'item', op: 'contained-in', right: 'menu' },
@@ -197,7 +197,7 @@ export const contextMenu: ComponentManifest = {
     isolation: {
         scenario: 'ctxmenu-open',
         targets: [
-            { selector: '.pdx-context-menu-panel.pdx-menu', tolerancePx: 10, skipHeight: true },
+            { selector: '.pdx-context-menu-panel[data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 

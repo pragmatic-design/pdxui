@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -343,6 +343,31 @@ describe('dropdown-menu-open-show: pdx-dropdown-menu\'s open() is show() (#288)'
         expect(found[0].note).toContain('show()');
         expect(dropdownMenuOpenUnbound.fix).toBe('flag');
         for (const id of ['dropdown-menu-open-show', 'dropdown-menu-open-unbound']) {
+            expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
+        }
+    });
+});
+
+describe('context-menu-open-show: pdx-context-menu\'s open(x, y) is show(x, y) (#288)', () => {
+    const fix = contextMenuOpenShow.fix as (text: string) => string;
+
+    it('a call on a :ref bound on a pdx-context-menu is rewritten with its arguments, one level of parentheses in them too', () => {
+        const source = '<template><pdx-context-menu :ref="cm"></pdx-context-menu><button @click="cm.open(10, 20)">x</button></template>\n<script>\nfunction at(e) { cm?.open(e.clientX, Math.round(e.clientY)); }\n</script>';
+        const out = fix(source);
+        expect(out).toContain('@click="cm.show(10, 20)"');
+        expect(out).toContain('cm?.show(e.clientX, Math.round(e.clientY));');
+        expect(contextMenuOpenShow.detect(out)).toEqual([]);
+        expect(fix(out)).toBe(out);
+    });
+
+    it('a lookup of the tag is flagged, with arguments; the zero-argument entries of other tags keep matching none', () => {
+        const found = contextMenuOpenUnbound.detect("document.querySelector('pdx-context-menu').open(4, 8);");
+        expect(found).toHaveLength(1);
+        expect(found[0].note).toContain('show()');
+        expect(contextMenuOpenUnbound.fix).toBe('flag');
+        // A dropdown's open() takes no arguments: a call with some is not its alpha verb.
+        expect(dropdownMenuOpenShow.detect('<template><pdx-dropdown-menu :ref="dd"></pdx-dropdown-menu><button @click="dd.open(1)">x</button></template>')).toEqual([]);
+        for (const id of ['context-menu-open-show', 'context-menu-open-unbound']) {
             expect(languageChanges().find((c) => c.id === id)?.issue, id).toBe(288);
         }
     });

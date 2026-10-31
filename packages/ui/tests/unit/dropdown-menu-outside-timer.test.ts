@@ -47,7 +47,7 @@ const POPUPS: Popup[] = [
             (el as unknown as { items: unknown[] }).items = [{ key: 'a', label: 'A' }];
             el.appendChild(document.createElement('div'));
         }),
-        open: (el) => el.open(10, 10),
+        open: (el) => el.show(10, 10),
         close: (el) => el.close(),
     },
     {

@@ -12,14 +12,20 @@ A right-click menu.
 
 | Call | Notes |
 |---|---|
-| `open(clientX, clientY)` | Opens it. |
+| `show(clientX?, clientY?)` | Shows it. |
 | `close()` | Closes it. |
+| `toggle(clientX?, clientY?)` | Toggles it open/closed. |
+| `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
 
-**Events:** `pdx-select` → `detail: { key, item }` — Fired when an item is selected.
+**Events:** `open-change` → `detail: { value: boolean }` — The menu opened (`true`) or closed (`false`): its open state, read-only (#288). The parent never writes it, so it is not a model, and `::open` on it is an error.; `pdx-select` → `detail: { key: string; item: MenuItem }` — An entry was chosen.
 
 **Renders:** roles `menu` · `menuitem` · `menuitemcheckbox` · `menuitemradio` · `presentation` · `separator`
 
 **Slot:** `item` — Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+
+**States:** `:state(open)` — Matched with `:state(open)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="item"]` — The element reached as `[data-part="item"]`.; `[data-part="separator"]` — The element reached as `[data-part="separator"]`.; `[data-part="label"]` — The element reached as `[data-part="label"]`.
 
 
 #### Examples
