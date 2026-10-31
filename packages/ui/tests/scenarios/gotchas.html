@@ -277,6 +277,21 @@
                 api.readOpen = () => open();
             },
 
+            // pdx-command on the beta contract (#288), the same way.
+            'command-beta-contract': () => {
+                const open = signal(false);
+                const items = [{ id: 'a', label: 'Alpha' }, { id: 'b', label: 'Beta' }];
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound">
+                        <button type="button" data-test="opener" commandfor="bound-cmd" command="--show">Commands</button>
+                        <pdx-command id="bound-cmd" ::open=${open} :items=${items} :hotkey=${false}></pdx-command>
+                    </div>`);
+                };
+                api.setOpen = (v) => open.set(v);
+                api.readOpen = () => open();
+            },
+
             // A crumb with no href has to be reachable from the keyboard.
             'breadcrumb-no-href': () => {
                 const sec = show('case-breadcrumb-no-href');

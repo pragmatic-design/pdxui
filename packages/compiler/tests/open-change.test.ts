@@ -3,7 +3,7 @@
 // mechanically; what a person must join by hand is flagged and left as written.
 
 import { describe, it, expect } from 'vitest';
-import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound } from '../src/language/open-change';
+import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript } from '../src/language/open-change';
 import { languageChanges } from '../src/language/changes';
 import { compile } from '../src/plugin';
 
@@ -130,6 +130,23 @@ describe('the overlays of #288', () => {
     it('`@pdx-close` on a pdx-bottom-sheet is rewritten the same way', () => {
         expect(fix('<pdx-bottom-sheet :open="sheet" @pdx-close="sheet = false"></pdx-bottom-sheet>'))
             .toBe('<pdx-bottom-sheet :open="sheet" @open-change="if ($event.detail.value) return; sheet = false"></pdx-bottom-sheet>');
+    });
+
+    it('`@pdx-open` and `@pdx-close` on a pdx-command are joined into one `@open-change` (#288)', () => {
+        expect(fix('<pdx-command :open="open" @pdx-open="track()" @pdx-close="open = false"></pdx-command>'))
+            .toBe('<pdx-command :open="open" @open-change="if ($event.detail.value) return track(); open = false"></pdx-command>');
+    });
+
+    it('`openPalette()` and `closePalette()` on a pdx-command are `show()` and `close()`, wherever they are written (#288)', () => {
+        const script = commandOverlayVerbsScript.fix as (text: string) => string;
+        expect(script('cmd.openPalette(); cmd?.closePalette();')).toBe('cmd.show(); cmd?.close();');
+        const template = commandOverlayVerbs.fix as (text: string) => string;
+        expect(template('<template><button @click="cmd.openPalette()">x</button></template>')).toBe('<template><button @click="cmd.show()">x</button></template>');
+        for (const id of ['command-overlay-verbs', 'command-overlay-verbs-script']) {
+            const entry = languageChanges().find((c) => c.id === id);
+            expect(entry?.kind, id).toBe('removed');
+            expect(entry?.issue).toBe(288);
+        }
     });
 
     it('`@pdx-close` on a pdx-drawer is rewritten the same way', () => {

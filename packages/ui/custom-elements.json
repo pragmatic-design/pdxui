@@ -7391,21 +7391,11 @@
           "tagName": "pdx-command",
           "category": "Overlay + Containers",
           "order": 95,
-          "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`); `openPalette()` / `closePalette()` are\ndeprecated aliases of those two. Focus stays in the input, and the highlighted command is its\n`aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is announced as\n`aria-keyshortcuts`.",
+          "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
           "generics": [
             "T extends { label: string }"
           ],
           "members": [
-            {
-              "kind": "field",
-              "name": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "open"
-            },
             {
               "kind": "field",
               "name": "placeholder",
@@ -7446,10 +7436,20 @@
               "attribute": "hotkey"
             },
             {
+              "kind": "field",
+              "name": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "open"
+            },
+            {
               "kind": "method",
               "name": "show",
               "parameters": [],
-              "description": "Shows it."
+              "description": "Open the palette, clearing the query and highlighting the first command that is not disabled."
             },
             {
               "kind": "method",
@@ -7468,21 +7468,20 @@
               "name": "isOpen",
               "readonly": true,
               "description": "Read-only, via a ref: `el.isOpen`."
-            },
-            {
-              "kind": "method",
-              "name": "openPalette",
-              "parameters": [],
-              "description": "Open the palette, clearing the query and highlighting the first item that is not disabled."
-            },
-            {
-              "kind": "method",
-              "name": "closePalette",
-              "parameters": [],
-              "description": "Close the palette and emit `pdx-close`."
             }
           ],
+          "models": [
+            "open"
+          ],
           "events": [
+            {
+              "name": "open-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `open`. Does not bubble.",
+              "detail": "{ value: boolean }"
+            },
             {
               "name": "pdx-select",
               "type": {
@@ -7490,20 +7489,6 @@
               },
               "description": "The chosen item itself, after its own `action` (if any) has run.",
               "detail": "CommandItem"
-            },
-            {
-              "name": "pdx-open",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it opens. Does not bubble."
-            },
-            {
-              "name": "pdx-close",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when it closes. Does not bubble."
             }
           ],
           "roles": [
@@ -7515,15 +7500,6 @@
             "status"
           ],
           "attributes": [
-            {
-              "name": "open",
-              "fieldName": "open",
-              "description": "Whether it is open.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
             {
               "name": "placeholder",
               "fieldName": "placeholder",
@@ -7550,6 +7526,15 @@
                 "text": "boolean"
               },
               "default": "true"
+            },
+            {
+              "name": "open",
+              "fieldName": "open",
+              "description": "Whether it is open.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "shapes": [
@@ -7572,6 +7557,46 @@
               "name": "item",
               "description": "Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.",
               "signature": "(item: T, index: number, active: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The element reached as `[data-part=\"root\"]`."
+            },
+            {
+              "name": "backdrop",
+              "description": "The element reached as `[data-part=\"backdrop\"]`."
+            },
+            {
+              "name": "input",
+              "description": "The element reached as `[data-part=\"input\"]`."
+            },
+            {
+              "name": "list",
+              "description": "The element reached as `[data-part=\"list\"]`."
+            },
+            {
+              "name": "group",
+              "description": "The element reached as `[data-part=\"group\"]`."
+            },
+            {
+              "name": "option",
+              "description": "The element reached as `[data-part=\"option\"]`."
+            },
+            {
+              "name": "empty",
+              "description": "The element reached as `[data-part=\"empty\"]`."
+            },
+            {
+              "name": "footer",
+              "description": "The element reached as `[data-part=\"footer\"]`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "Matched with `:state(open)`."
             }
           ]
         }

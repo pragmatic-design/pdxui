@@ -10,13 +10,11 @@
       <button class="pdx-btn pdx-outline" @click="filesOpen = true">Find a file</button>
       <span class="run-note pdx-txt-small pdx-ink-muted">Opened: <strong>{{ lastFile }}</strong></span>
       <pdx-command
-        :open="filesOpen"
+        ::open="filesOpen"
         :items="fileItems"
         :hotkey="false"
         placeholder="Find a file…"
         empty-text="No file with that name — check the spelling."
-        @pdx-open="filesOpen = true"
-        @pdx-close="filesOpen = false"
         @pdx-select="onFile">
         <slot name="item" let:item let:active>
           <span class="file-row"><strong>{{ item.label }}</strong><span class="pdx-txt-small pdx-ink-muted">{{ item.keywords }}</span></span>

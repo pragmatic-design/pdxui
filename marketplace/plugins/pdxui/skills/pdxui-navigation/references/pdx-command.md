@@ -4,28 +4,30 @@ A ⌘K command palette.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `open` | `open` | boolean | `false` | Whether it is open. |
 | `placeholder` | `placeholder` | string | `''` | The search input's placeholder. Empty: the command.placeholder component string, «Type a command...». |
 | `items` | — | T[] | `[]` | The data items to render. |
 | `emptyText` | `emptytext` | string | `''` | The message when nothing matches. Empty: the command.empty component string, «No results found.». |
 | `hotkey` | `hotkey` | boolean | `true` | Global keyboard shortcut to open (default: Ctrl+K / Cmd+K) |
+| `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**
 
 | Call | Notes |
 |---|---|
-| `show()` | Shows it. |
+| `show()` | Open the palette, clearing the query and highlighting the first command that is not disabled. |
 | `close()` | Closes it. |
 | `toggle()` | Toggles it open/closed. |
 | `isOpen` _(read-only)_ | Read-only, via a ref: `el.isOpen`. |
-| `openPalette()` | Open the palette, clearing the query and highlighting the first item that is not disabled. |
-| `closePalette()` | Close the palette and emit `pdx-close`. |
 
-**Events:** `pdx-close` — Fired when it closes. Does not bubble.; `pdx-open` — Fired when it opens. Does not bubble.; `pdx-select` → `detail: CommandItem` — The chosen item itself, after its own `action` (if any) has run.
+**Events:** `open-change` → `detail: { value: boolean }` — Fired when the component writes `open`. Does not bubble.; `pdx-select` → `detail: CommandItem` — The chosen item itself, after its own `action` (if any) has run.
 
 **Renders:** roles `combobox` · `dialog` · `group` · `listbox` · `option` · `status`
 
 **Slot:** `item` — Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.
+
+**States:** `:state(open)` — Matched with `:state(open)`.
+
+**Parts:** `[data-part="root"]` — The element reached as `[data-part="root"]`.; `[data-part="backdrop"]` — The element reached as `[data-part="backdrop"]`.; `[data-part="input"]` — The element reached as `[data-part="input"]`.; `[data-part="list"]` — The element reached as `[data-part="list"]`.; `[data-part="group"]` — The element reached as `[data-part="group"]`.; `[data-part="option"]` — The element reached as `[data-part="option"]`.; `[data-part="empty"]` — The element reached as `[data-part="empty"]`.; `[data-part="footer"]` — The element reached as `[data-part="footer"]`.
 
 **Shapes:** `CommandItem { id: string; label: string; group?: string; icon?: string; shortcut?: string; action?: () => void; keywords?: string; disabled?: boolean }`
 
@@ -47,7 +49,7 @@ const items = [
 ```
 
 ```html
-<pdx-command :open="open" :items="items"
+<pdx-command ::open="open" :items="items"
   @pdx-select="onSelect" />
 ```
 
@@ -58,13 +60,11 @@ const items = [
   <button class="pdx-btn pdx-outline" @click="filesOpen = true">Find a file</button>
   <span class="run-note pdx-txt-small pdx-ink-muted">Opened: <strong>{{ lastFile }}</strong></span>
   <pdx-command
-    :open="filesOpen"
+    ::open="filesOpen"
     :items="fileItems"
     :hotkey="false"
     placeholder="Find a file…"
     empty-text="No file with that name — check the spelling."
-    @pdx-open="filesOpen = true"
-    @pdx-close="filesOpen = false"
     @pdx-select="onFile">
     <slot name="item" let:item let:active>
       <span class="file-row"><strong>{{ item.label }}</strong><span class="pdx-txt-small pdx-ink-muted">{{ item.keywords }}</span></span>

@@ -6,14 +6,14 @@
  *
  * ── DOM structure (light DOM, render() in pdx-command.ts:175) ──
  *   <pdx-command>                                          ← host
- *     <div class="pdx-command-backdrop" :data-open>        ← BACKDROP: position:fixed, inset:0,
- *          @click=closePalette>                                blur, opacity 0 → 1 with [data-open] (CSS:31-46)
- *     <div class="pdx-command"                             ← the modal PANEL
+ *     <div class="pdx-command-backdrop"                    ← BACKDROP, part "backdrop": position:fixed, inset:0,
+ *          data-part="backdrop" @click=close>                  blur, opacity 0 → 1 under the host's :state(open)
+ *     <div class="pdx-command" data-part="root"            ← the modal PANEL, part "root"
  *          role="dialog" aria-modal="true"
- *          aria-label="Command palette"                    ← the dialog's accessible name (render:182)
- *          :data-open>                                         CSS: position:fixed, top:20%, left:50%,
+ *          aria-label="Command palette">                   ← the dialog's accessible name
+ *                                                              CSS: position:fixed, top:20%, left:50%,
  *                                                              transform:translateX(-50%) → centred ONLY
- *                                                              horizontally; opacity 0→1 with [data-open] (CSS:50-76)
+ *                                                              horizontally; opacity 0→1 under :state(open)
  *       <div class="pdx-command-input">                    ← the search row (a flex row)
  *         <span class="pdx-command-search-icon" aria-hidden="true">⌕</span>
  *         <input type="text" role="combobox"               ← the search INPUT, the list's only tab stop
@@ -41,19 +41,17 @@
  * ── WHERE THE PANEL LIVES (CRITICAL) ──
  *   The backdrop and the panel are rendered in the HOST's light DOM (NOT portalled to document.body):
  *   they are the two direct children the host's render emits. So the selectors stay
- *   section-scoped like every other component's. The visibility is driven by the [data-open] attribute
- *   (on both the backdrop and the panel), set when _open() is true. The panel is `position: fixed`
- *   with `transform: translateX(-50%) scale(1)` when open.
+ *   section-scoped like every other component's. The visibility is driven by the host's custom state
+ *   `:state(open)` (#288), which command.css reads for both the backdrop and the panel. The panel is
+ *   `position: fixed` with `transform: translateX(-50%) scale(1)` when open.
  *
  * ── Opening (CRITICAL — deterministic through the setup) ──
- *   Three ways, in the source:
- *     1. prop `open` → ctx.track (pdx-command.ts:117) synchronises: open() true → openPalette().
- *     2. the `openPalette` method exposed on the host (the setup's return, pdx-command.ts:170) → host.openPalette().
- *     3. the global hotkey Ctrl/Cmd+K (onGlobalKeydown:108) → toggle.
- *   openPalette() (pdx-command.ts:65) sets _open=true → [data-open] on the backdrop + panel (rAF),
- *   a focusTrap on the `.pdx-command`, and the focus on the input. closePalette sets _open=false.
- *   THE CHOICE: the open scenario uses the `open` prop in the HTML plus a `host.openPalette()` call in the setup as a
- *   guard (it is idempotent: openPalette is safe to call again). ONE open scenario → no collision
+ *   Three ways, in the source, all writing the `open` model:
+ *     1. the `open` prop, or `::open`;
+ *     2. the `show()` method exposed on the host → host.show();
+ *     3. the global hotkey Ctrl/Cmd+K → toggle.
+ *   Open, the host is in :state(open), a focusTrap is on the panel, and the focus is on the input.
+ *   THE CHOICE: the open scenario calls `host.show()` in the setup. ONE open scenario → no collision
  *   between overlapping fixed panels.
  *
  * ── Centring (CRITICAL) ──
@@ -65,13 +63,13 @@
  *   The panel: role="dialog" + aria-modal="true" + aria-label="Command palette" → accessible name OK.
  *   The combobox input: an aria-label, not a placeholder alone.
  *   The listbox: an aria-label.
- *   The options: role="option" + aria-selected are on every .pdx-command-item.
+ *   The options: role="option" + aria-selected are on every option part.
  *
  * ── Contracts: CONSERVATIVE, no theme-specific px. Invariants that hold on all 13 themes:
  *   · the open panel is VISIBLE (opacity ~1), a flex column box, radius >= 0, a measurable width;
  *   · the panel is centred horizontally over a backdrop;
  *   · the search input is there and visible, above the list;
- *   · the options (.pdx-command-item) are contained in the list (the listbox).
+ *   · the options (the option part) are contained in the list (the listbox).
  */
 import type { ComponentManifest } from './_types';
 
@@ -85,7 +83,7 @@ export const command: ComponentManifest = {
     // ── Scenarios ──
     scenarios: [
         {
-            // The ONE open scenario: it is opened by the setup ALONE (host.openPalette()), NOT through the
+            // The ONE open scenario: it is opened by the setup ALONE (host.show()), NOT through the
             // `open` attribute. That attribute would open the palette when the custom element upgrades (before the
             // generator removes [open] from the hidden sections) → the focus trap would set aria-hidden on EVERY
             // section of the tier page, failing its neighbours' a11y (toolbar, splitter, menubar) with
@@ -105,7 +103,7 @@ export const command: ComponentManifest = {
                 </pdx-command>`,
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="cmd"]');
-                if (host && typeof host.openPalette === 'function') host.openPalette();`,
+                if (host && typeof host.show === 'function') host.show();`,
         },
     ],
 
@@ -115,32 +113,32 @@ export const command: ComponentManifest = {
             'command-open': {
                 standalone: [
                     {
-                        // [data-open] brings opacity to 1 (CSS:71-76). The panel is fully visible.
-                        selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+                        // :state(open) brings opacity to 1. The panel is fully visible.
+                        selector: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
                         description: 'open command palette panel is fully visible (opacity 1)',
                         opacity: { op: '>=', value: 0.99 },
                     },
                     {
                         // CSS:63 → display:flex, flex-direction:column (input / list / footer impilati).
-                        selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+                        selector: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
                         description: 'command palette panel is a flex column box',
                         display: { op: 'is', value: 'flex' },
                     },
                     {
                         // A non-negative radius (metro and cyberpunk may zero it, never below 0).
-                        selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+                        selector: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
                         description: 'command palette panel has non-negative radius',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // CSS:56-57 → width:90%, max-width:36rem → a measurable width at a 1280 viewport.
-                        selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+                        selector: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
                         description: 'command palette panel has an appreciable width',
                         width: { op: '>=', value: 200 },
                     },
                     {
                         // The search input is there and visible (the flex input row).
-                        selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input input',
+                        selector: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]',
                         description: 'search input is displayed (not none)',
                         display: { op: 'isNot', value: 'none' },
                     },
@@ -149,10 +147,10 @@ export const command: ComponentManifest = {
                 overlay: [
                     {
                         description: 'open command palette is centered horizontally over a backdrop',
-                        // action:'call' → the state is already on from the setup (openPalette); the runner does NOT click.
+                        // action:'call' → the state is already on from the setup (show()); the runner does NOT click.
                         trigger: { selector: 'section:not([hidden]) [data-test="cmd"]', action: 'call' },
-                        panel: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
-                        backdrop: 'section:not([hidden]) [data-test="cmd"] .pdx-command-backdrop',
+                        panel: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
+                        backdrop: 'section:not([hidden]) [data-test="cmd"] [data-part="backdrop"]',
                         centering: 'horizontal',
                         hasBackdrop: true,
                     },
@@ -161,11 +159,11 @@ export const command: ComponentManifest = {
                     {
                         // The input (the search row) sits ABOVE the list in the flex-column panel.
                         description: 'search input row sits above the results list within the panel',
-                        parent: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+                        parent: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
                         children: {
-                            panel: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
-                            input: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input',
-                            list: 'section:not([hidden]) [data-test="cmd"] .pdx-command-list',
+                            panel: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
+                            input: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]',
+                            list: 'section:not([hidden]) [data-test="cmd"] [data-part="list"]',
                         },
                         relations: [
                             { description: 'input row within panel', left: 'input', op: 'contained-in', right: 'panel' },
@@ -174,12 +172,12 @@ export const command: ComponentManifest = {
                         ],
                     },
                     {
-                        // The options (button.pdx-command-item) live inside the listbox.
+                        // The options (the option part) live inside the listbox.
                         description: 'command options are contained within the listbox',
-                        parent: 'section:not([hidden]) [data-test="cmd"] .pdx-command-list',
+                        parent: 'section:not([hidden]) [data-test="cmd"] [data-part="list"]',
                         children: {
-                            list: 'section:not([hidden]) [data-test="cmd"] .pdx-command-list',
-                            option: 'section:not([hidden]) [data-test="cmd"] .pdx-command-item',
+                            list: 'section:not([hidden]) [data-test="cmd"] [data-part="list"]',
+                            option: 'section:not([hidden]) [data-test="cmd"] [data-part="option"]',
                         },
                         relations: [
                             { description: 'first option within listbox', left: 'option', op: 'contained-in', right: 'list' },
@@ -205,37 +203,36 @@ export const command: ComponentManifest = {
     isolation: {
         scenario: 'command-open',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command', tolerancePx: 4, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]', tolerancePx: 4, skipHeight: true },
         ],
     },
 
     // ── Dim. 4: keyboard (WAI-ARIA combobox/listbox) ──
-    // The initial focus is on the input (the focusTrap and input.focus() in the component's setup, and openPalette in the scenario).
+    // The initial focus is on the input (the focusTrap and input.focus() in the component's setup, and show() in the scenario).
     // onKeydown on the input (pdx-command.ts:88): ArrowDown/ArrowUp move _activeIndex (aria-selected="true"
     // on the active option, render:220), Enter selects and closes, Escape closes. The navigation is checked through
     // aria-selected (deterministic and readable from the DOM); the initial active one is index 0.
-    // Note: Escape→close is NOT asserted: closePalette removes the [data-open] attribute (it sets it to null,
-    //   render:183) → expectAttr cannot match an attribute that is not there, and KeyStep exposes no check on
-    //   opacity or visibility. Closing with Escape stays covered by the component's unit test.
+    // Note: Escape→close is NOT asserted here: the trap check runs after the last step, on an open palette.
+    //   Escape, and the focus going back to the opener, are measured in command-beta-contract.spec.ts (#288).
     // Pattern 'listbox'. The focus stays in the input: the highlighted option is its aria-activedescendant
     // (without it, the arrows announce nothing). Tab does not enter the list:
     // the options are not <button>s, which Tab would walk one by one.
     // trapContainer: after the steps, 10 Tabs and 10 Shift+Tabs stay in the palette.
     keyboard: {
         scenario: 'command-open',
-        initialFocus: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input input',
-        trapContainer: 'section:not([hidden]) [data-test="cmd"] .pdx-command',
+        initialFocus: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]',
+        trapContainer: 'section:not([hidden]) [data-test="cmd"] [data-part="root"]',
         steps: [
             // ArrowDown: from index 0 → the second option (data-cmd-index="1") becomes active.
             { key: 'ArrowDown',
                 expectAttr: { selector: 'section:not([hidden]) [data-test="cmd"] [data-cmd-index="1"]', name: 'aria-selected', value: 'true' },
-                expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input input', target: '[role="option"][data-cmd-index="1"]' } },
+                expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]', target: '[role="option"][data-cmd-index="1"]' } },
             // ArrowUp: back to the first option (data-cmd-index="0").
             { key: 'ArrowUp',
                 expectAttr: { selector: 'section:not([hidden]) [data-test="cmd"] [data-cmd-index="0"]', name: 'aria-selected', value: 'true' },
-                expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input input', target: '[role="option"][data-cmd-index="0"]' } },
+                expectActiveDescendant: { selector: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]', target: '[role="option"][data-cmd-index="0"]' } },
             // Tab: no option is a tab stop; the focus trap brings it back to the input.
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cmd"] .pdx-command-input input' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="cmd"] [data-part="input"]' },
         ],
     },
 
@@ -245,7 +242,7 @@ export const command: ComponentManifest = {
         scenarios: ['command-open'],
         // Drawn position: fixed, outside its section: shot as the viewport (#714).
         viewportScenarios: ['command-open'],
-        mask: ['section:not([hidden]) [data-test="cmd"] .pdx-command-input input'],
+        mask: ['section:not([hidden]) [data-test="cmd"] [data-part="input"]'],
     },
 };
 

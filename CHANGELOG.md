@@ -394,6 +394,20 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-command` takes the beta contract (#288).
+  - **`open` is a model.** The palette writes it when it opens or closes itself — the hotkey, Escape,
+    the backdrop, a chosen command — and announces it with `open-change` `{ value }`, so `::open="x"`
+    follows it. Before, a palette bound with `:open` stayed open in the parent's state after Escape
+    unless `@pdx-close` wrote it back. `pdx-open` and `pdx-close` are gone; `pdx migrate` turns them
+    into `@open-change`.
+  - **`openPalette()` and `closePalette()` are gone:** they were aliases of `show()` and `close()`,
+    and `pdx migrate` rewrites them.
+  - **States and parts.** `open` is a custom state on the host; the panel and backdrop no longer carry
+    `data-open`. The parts are `root` (the panel), `backdrop`, `input`, `list`, `group`, `option`,
+    `empty` and `footer`.
+  - **Its status region is empty while the palette is closed**: it said «N commands available» to a
+    page that showed no palette.
+
 - **Breaking:** `pdx-popover` takes the beta contract (#288).
   - **`open` is a model.** The popover writes it when it opens or closes itself — its trigger, Escape,
     a click outside — and announces it with `open-change` `{ value }`, so `::open="x"` follows it.
