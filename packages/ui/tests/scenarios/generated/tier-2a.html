@@ -33,6 +33,7 @@
         import '@pdxui/ui/bottom-sheet';
         import '@pdxui/ui/dialog';
         import '@pdxui/ui/drawer';
+        import '@pdxui/ui/overlay-outlet';
         import '@pdxui/ui/popover';
         import '@pdxui/ui/tooltip';
 
@@ -55,6 +56,15 @@
         // The per-scenario setup scripts (state markup cannot express). Run after the CEs upgrade
         // and after their initial render, before signalling ready.
         const __setups = {
+        "outlet-confirm-alert": async function () { 
+                const { dialog } = await import('@pdxui/ui/dialog-service');
+                dialog.closeAll();
+                void dialog.confirm({ title: 'Delete item', message: 'This action cannot be undone.', confirmLabel: 'Delete', variant: 'danger' });
+                void dialog.alert({ title: 'Saved', message: 'Your changes are saved.' });
+                const ok = 'section:not([hidden]) [data-test="outlet"] [data-part="backdrop"][data-open]:has([data-part="ok"]) [data-part="ok"]';
+                for (let i = 0; i < 120 && !document.querySelector(ok)?.matches(':focus'); i++) {
+                    await new Promise((r) => requestAnimationFrame(r));
+                } },
         "popover-open": async function () { 
                 const pop = document.querySelector('section:not([hidden]) [data-test="pop"]');
                 if (pop && typeof pop.show === 'function') pop.show(); },
@@ -65,7 +75,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-alert-dialog","pdx-bottom-sheet","pdx-dialog","pdx-drawer","pdx-popover","pdx-tooltip"];
+        const __tags = ["pdx-alert-dialog","pdx-bottom-sheet","pdx-dialog","pdx-drawer","pdx-overlay-outlet","pdx-popover","pdx-tooltip"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -165,6 +175,11 @@
                     <p>Drawer body content.</p>
                     <button data-test="drw-action" type="button">Do something</button>
                 </pdx-drawer>
+    </section>
+
+    <section data-scenario="outlet-confirm-alert">
+        <h3>Overlay Outlet — a confirm and an alert opened from code</h3>
+        <pdx-overlay-outlet data-test="outlet"></pdx-overlay-outlet>
     </section>
 
     <section data-scenario="popover-bottom">

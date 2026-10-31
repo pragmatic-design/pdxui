@@ -2090,6 +2090,21 @@
       ]
     },
     {
+      "name": "overlay-outlet",
+      "tags": [
+        "pdx-overlay-outlet"
+      ],
+      "tier": "2A",
+      "status": "wip",
+      "page": "tier-2a",
+      "scenarios": [
+        {
+          "id": "outlet-confirm-alert",
+          "title": "Overlay Outlet — a confirm and an alert opened from code"
+        }
+      ]
+    },
+    {
       "name": "pagination",
       "tags": [
         "pdx-pagination"

@@ -394,6 +394,15 @@ semver.
 
 ### Changed
 
+- `pdx-overlay-outlet` takes the beta contract (#288). It draws the dialogs opened from code and opens
+  nothing itself, so it gains no open state and no overlay verbs.
+  - **Parts.** `root` (the stack), and on each dialog `backdrop`, `panel`, `header`, `title`, `body`,
+    `message` and `footer`, with the buttons and field each kind has: `close` (a dialog), `cancel`,
+    `confirm` and `confirm-input` (a confirm), `ok` (an alert). A dialog's own state stays on it:
+    `data-open` while it shows.
+  - **Certified.** It has a manifest at last: a confirm and an alert opened from code, in every theme —
+    geometry, axe, hostile CSS, the focus on the alert on top and its trap, and a visual baseline.
+
 - `pdx-toast` takes the beta contract (#288). It holds the toasts of the global queue and opens
   nothing itself, so it gains no open state and no overlay verbs.
   - **A4.** A dismissed toast stays 300 ms to slide out; for those it is no longer a `status` (or an

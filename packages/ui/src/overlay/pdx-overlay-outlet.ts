@@ -18,6 +18,10 @@ import '@pdxui/design/components/dialog';
  */
 component('pdx-overlay-outlet', {
     props: {},
+    // The stack, and each dialog drawn from code with its pieces (#288). A dialog's own state stays on
+    // it — `data-open` while it shows — since the outlet holds many and opens none itself: it has no
+    // open state, no `open-change` and no overlay verbs. The service opens and closes them.
+    parts: ['root', 'backdrop', 'panel', 'header', 'title', 'close', 'body', 'message', 'confirm-input', 'footer', 'cancel', 'confirm', 'ok'],
     setup(ctx) {
         const queue = getDialogQueue();
         let containerEl: HTMLElement | null = null;
@@ -138,11 +142,13 @@ component('pdx-overlay-outlet', {
             const wrapper = document.createElement('div');
             wrapper.dataset.dialogId = item.id;
             wrapper.className = 'pdx-dialog-backdrop';
+            wrapper.dataset.part = 'backdrop';
             wrapper.style.zIndex = String(item.zIndex);
 
             const sizeClass = item.size ? `pdx-dialog-${item.size}` : 'pdx-dialog-sm';
             const panel = document.createElement('div');
             panel.className = `pdx-dialog-panel ${sizeClass}`;
+            panel.dataset.part = 'panel';
             // confirm/alert = alertdialog (requires user action), dialog = dialog
             panel.setAttribute('role', item.type === 'dialog' ? 'dialog' : 'alertdialog');
             panel.setAttribute('aria-modal', 'true');
@@ -151,13 +157,16 @@ component('pdx-overlay-outlet', {
             // Header
             const header = document.createElement('div');
             header.className = 'pdx-dialog-header';
+            header.dataset.part = 'header';
             const titleSpan = document.createElement('span');
             titleSpan.textContent = item.title;
+            titleSpan.dataset.part = 'title';
             header.appendChild(titleSpan);
 
             if (item.type === 'dialog') {
                 const closeBtn = document.createElement('button');
                 closeBtn.className = 'pdx-dialog-close';
+                closeBtn.dataset.part = 'close';
                 uiAttr(closeBtn, 'aria-label', () => uiString('overlay', 'close'));
                 closeBtn.textContent = '\u00d7';
                 closeBtn.onclick = () => closeDialog(item, undefined);
@@ -169,11 +178,13 @@ component('pdx-overlay-outlet', {
             // Body
             const body = document.createElement('div');
             body.className = 'pdx-dialog-body';
+            body.dataset.part = 'body';
 
             if (item.message) {
                 const msg = document.createElement('p');
                 msg.style.cssText = 'margin:0 0 var(--pdx-space-md);color:var(--pdx-color-muted)';
                 msg.textContent = item.message;
+                msg.dataset.part = 'message';
                 // The message is the dialog's description, read with its title.
                 msg.id = `pdx-outlet-msg-${item.id}`;
                 panel.setAttribute('aria-describedby', msg.id);
@@ -199,6 +210,7 @@ component('pdx-overlay-outlet', {
                 typeBlock.appendChild(typeLabel);
                 typeInput = document.createElement('input');
                 typeInput.className = 'pdx-input';
+                typeInput.dataset.part = 'confirm-input';
                 typeInput.type = 'text';
                 typeBlock.appendChild(typeInput);
                 body.appendChild(typeBlock);
@@ -209,10 +221,12 @@ component('pdx-overlay-outlet', {
             // Footer
             const footer = document.createElement('div');
             footer.className = 'pdx-dialog-footer';
+            footer.dataset.part = 'footer';
 
             if (item.type === 'confirm') {
                 const cancelBtn = document.createElement('button');
                 cancelBtn.className = 'pdx-alert-cancel pdx-ghost';
+                cancelBtn.dataset.part = 'cancel';
                 cancelBtn.type = 'button';
                 cancelBtn.textContent = item.cancelLabel || uiString('alert-dialog', 'cancel');
                 cancelBtn.onclick = () => closeDialog(item, false);
@@ -220,6 +234,7 @@ component('pdx-overlay-outlet', {
 
                 const confirmBtn = document.createElement('button');
                 confirmBtn.className = `pdx-alert-confirm ${item.variant === 'danger' ? 'pdx-danger' : 'pdx-primary'}`;
+                confirmBtn.dataset.part = 'confirm';
                 confirmBtn.type = 'button';
                 footer.appendChild(confirmBtn);
 
@@ -267,6 +282,7 @@ component('pdx-overlay-outlet', {
             } else if (item.type === 'alert') {
                 const okBtn = document.createElement('button');
                 okBtn.className = 'pdx-alert-ok pdx-primary';
+                okBtn.dataset.part = 'ok';
                 okBtn.type = 'button';
                 okBtn.textContent = uiString('overlay', 'ok');
                 okBtn.onclick = () => closeDialog(item, undefined);
@@ -310,5 +326,5 @@ component('pdx-overlay-outlet', {
 
         return {};
     },
-    render: () => html`<div class="pdx-overlay-container"></div>`,
+    render: () => html`<div class="pdx-overlay-container" data-part="root"></div>`,
 });

@@ -300,6 +300,16 @@
                 };
             },
 
+            // pdx-overlay-outlet on the beta contract (#288): it draws the dialogs opened from code, and
+            // opens nothing itself. The test reaches the service through `api.dialog()`.
+            'overlay-outlet-beta-contract': () => {
+                api.dialog = async () => (await import('@pdxui/ui/dialog-service')).dialog;
+                api.mountBound = () => {
+                    document.getElementById('bound')?.remove();
+                    document.body.appendChild(html`<div id="bound"><pdx-overlay-outlet></pdx-overlay-outlet></div>`);
+                };
+            },
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);
