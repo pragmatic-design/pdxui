@@ -58,6 +58,15 @@ const DONE: Row[] = [
         // `step` stood in for `value`, which the model now is; the rest were aliases.
         removed: ['pdx-change', 'goNext', 'goPrev', 'goto', 'step'],
     },
+    {
+        tag: 'pdx-breadcrumb',
+        // Holds no position of its own: the page you are on is the last crumb, `aria-current="page"`.
+        models: [],
+        states: [],
+        parts: ['nav', 'list', 'item', 'link', 'current', 'separator', 'ellipsis'],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

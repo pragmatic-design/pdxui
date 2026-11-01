@@ -8,7 +8,7 @@
 //     </slot>
 //   </pdx-breadcrumb>
 
-import { component, html, sanitizeUrl, routeTrail, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, sanitizeUrl, routeTrail, slot, snippetOrSlot, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 /** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
@@ -27,8 +27,23 @@ export interface BreadcrumbItem {
  * Navigation breadcrumbs, with overflow collapse and custom separators.
  *
  * @slot item - Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.
+ *
+ * @csspart nav - The `<nav>` that names the trail (`.pdx-breadcrumb`).
+ * @csspart list - The `<ol>` of the crumbs.
+ * @csspart item - One crumb, an `<li>`; the last is `aria-current="page"` when a snippet draws it.
+ * @csspart link - A crumb that leads somewhere: a link with an `href`, a button without one.
+ * @csspart current - The page you are on, the last crumb, `aria-current="page"`.
+ * @csspart separator - The glyph between two crumbs, hidden from assistive technology.
+ * @csspart ellipsis - The button that stands for the crumbs `max-items` collapsed.
  */
 component('pdx-breadcrumb', {
+    // It holds no position of its own (#289): the page you are on is its last crumb, so it has no
+    // model and no state.
+    events: {
+        /** A crumb was chosen: its `key` and the item. */
+        'pdx-select': event<{ key: string; item: T }>(),
+    },
+    parts: ['nav', 'list', 'item', 'link', 'current', 'separator', 'ellipsis'],
     props: {
         items: { type: Array, default: [] },
         // Empty = use the theme's --pdx-breadcrumb-separator (filled via CSS on the
@@ -79,10 +94,7 @@ component('pdx-breadcrumb', {
 
             if (!built) {
                 built = true;
-                requestAnimationFrame(() => {
-                    ctx.el.classList.add('pdx-breadcrumb-root');
-                    buildBreadcrumb(items, separator, maxItems);
-                });
+                requestAnimationFrame(() => buildBreadcrumb(items, separator, maxItems));
                 return;
             }
 
@@ -92,6 +104,7 @@ component('pdx-breadcrumb', {
         function buildBreadcrumb(items: BreadcrumbItem[], separator: string, maxItems: number): void {
             const nav = ctx.el.querySelector('nav') || document.createElement('nav');
             nav.className = 'pdx-breadcrumb';
+            nav.setAttribute('data-part', 'nav');
             uiAttr(nav, 'aria-label', () => uiString('breadcrumb', 'label'));
             nav.innerHTML = '';
 
@@ -105,11 +118,13 @@ component('pdx-breadcrumb', {
 
             const ol = document.createElement('ol');
             ol.className = 'pdx-breadcrumb-list';
+            ol.setAttribute('data-part', 'list');
             ol.setAttribute('role', 'list');
 
             visibleItems.forEach((item, i) => {
                 const li = document.createElement('li');
                 li.className = 'pdx-breadcrumb-item';
+                li.setAttribute('data-part', 'item');
                 const isLast = i === visibleItems.length - 1;
                 const isFirst = i === 0;
                 const isEllipsis = item.key === '__ellipsis';
@@ -121,6 +136,7 @@ component('pdx-breadcrumb', {
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'pdx-breadcrumb-ellipsis';
+                    btn.setAttribute('data-part', 'ellipsis');
                     btn.textContent = '\u2026';
                     uiAttr(btn, 'aria-label', () => uiString('breadcrumb', 'expand'));
                     btn.addEventListener('click', () => {
@@ -141,6 +157,7 @@ component('pdx-breadcrumb', {
                 } else if (isLast) {
                     const span = document.createElement('span');
                     span.className = 'pdx-breadcrumb-current';
+                    span.setAttribute('data-part', 'current');
                     span.setAttribute('aria-current', 'page');
                     if (item.icon) {
                         loadIcon();
@@ -160,6 +177,7 @@ component('pdx-breadcrumb', {
                     const safeHref = sanitizeUrl(item.href);
                     const a = document.createElement(safeHref ? 'a' : 'button');
                     a.className = 'pdx-breadcrumb-link';
+                    a.setAttribute('data-part', 'link');
                     if (safeHref) (a as HTMLAnchorElement).href = safeHref;
                     else (a as HTMLButtonElement).type = 'button';
                     if (item.icon) {
@@ -181,6 +199,7 @@ component('pdx-breadcrumb', {
                 if (!isLast) {
                     const sep = document.createElement('span');
                     sep.className = 'pdx-breadcrumb-sep';
+                    sep.setAttribute('data-part', 'separator');
                     sep.setAttribute('aria-hidden', 'true');
                     // Leave empty when no explicit prop → CSS fills the glyph from the theme token.
                     if (separator) sep.textContent = separator;

@@ -436,6 +436,9 @@
                 api.readValue = () => value();
             },
 
+            // pdx-breadcrumb on the beta contract (#289): the spec mounts its own markup.
+            'breadcrumb-beta-contract': () => {},
+
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
                 const open = signal(false);

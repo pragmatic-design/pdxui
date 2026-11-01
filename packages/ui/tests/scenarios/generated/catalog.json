@@ -406,6 +406,14 @@
         {
           "id": "breadcrumb-basic",
           "title": "Breadcrumb — Basic"
+        },
+        {
+          "id": "breadcrumb-element",
+          "title": "Breadcrumb — the element"
+        },
+        {
+          "id": "breadcrumb-collapsed",
+          "title": "Breadcrumb — a long trail, collapsed"
         }
       ]
     },
