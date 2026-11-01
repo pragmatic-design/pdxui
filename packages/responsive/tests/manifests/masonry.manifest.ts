@@ -13,7 +13,7 @@
  *           columnWidth  (Number, 250 by default) → the minimum column width in px (auto mode only)
  *           gap          (String, default '1rem')
  *       · In a ctx.track() (the `_built` gate) inside requestAnimationFrame the host gets:
- *           - the class `.pdx-masonry`
+ *           - no class on the host (#290): masonry.css draws on the tag
  *           - CSS var --pdx-masonry-gap = gap
  *           - style.columnCount = String(cols)   (cols = columns, or computed from clientWidth/columnWidth when auto)
  *           - style.columnGap = gap
@@ -27,9 +27,9 @@
  *
  *   - CSS: packages/design/src/components/masonry.css
  *       · `pdx-masonry { display: block }` (host element)
- *       · `.pdx-masonry { column-fill: balance }`  → the mechanism is CSS MULTI-COLUMN, not JS positioning.
+ *       · `:is(.pdx-masonry, pdx-masonry) { column-fill: balance }`  → the mechanism is CSS MULTI-COLUMN, not JS positioning.
  *         column-count is inline (from the JS); the columns are rendered by the browser's layout engine.
- *       · `.pdx-masonry > * { break-inside: avoid; margin-bottom: var(--pdx-masonry-gap, 1rem) }`
+ *       · `:is(.pdx-masonry, pdx-masonry) > * { break-inside: avoid; margin-bottom: var(--pdx-masonry-gap, 1rem) }`
  *         → every direct child is an "item" that does not break across columns; the bottom margin is the vertical gap.
  *
  * THE LAYOUT MECHANISM — CSS columns (NOT JS absolute positioning):

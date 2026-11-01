@@ -89,6 +89,7 @@ const DONE: Row[] = [
     { tag: 'pdx-aspect-ratio', models: [], outputs: [], states: [], parts: [], removed: [] },
     { tag: 'pdx-row', models: [], outputs: [], states: [], parts: [], removed: [] },
     { tag: 'pdx-col', models: [], outputs: [], states: [], parts: [], removed: [] },
+    { tag: 'pdx-masonry', models: [], outputs: [], states: [], parts: [], removed: [] },
     {
         tag: 'pdx-divider',
         models: [],
