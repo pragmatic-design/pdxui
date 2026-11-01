@@ -22,11 +22,15 @@ A multi-level navigation menu.
 | `expandAll()` | Expand every group that has children, at any depth. |
 | `collapseAll()` | Collapse every group. |
 
-**Events:** `pdx-select` → `detail: { key, item, href }` — Fired when an item is selected.; `pdx-toggle` → `detail: { key, expanded }` — Fired when toggled open or closed. Does not bubble.
+**Events:** `pdx-select` → `detail: { key: string; item: T; href?: string }` — An entry was chosen; cancellable, so an app under the router navigates itself.; `pdx-toggle` → `detail: { key: string; expanded: boolean }` — A group was folded or unfolded: its `key` and whether it is open now. Does not bubble.
 
 **Renders:** roles `group` · `navigation`
 
 **Slot:** `item` — Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.; `itemActions` — Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.; `actions` — The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
+
+**States:** `:state(ready)` — Its entries are drawn.; `:state(collapsed)` — `collapsed` is set: icons only, a group in a flyout.
+
+**Parts:** `[data-part="nav"]` — The `role="navigation"` element that holds the entries (`.pdx-nav`).; `[data-part="item"]` — An entry, a link or a button; the current one is `aria-current="page"`, an open group's `aria-expanded="true"`.; `[data-part="group"]` — The entries of an open group, or of a heading that folds (`role="group"`).; `[data-part="heading"]` — A section heading, text or the button that folds its group.; `[data-part="separator"]` — The rule between two sections.; `[data-part="actions"]` — The `actions` slot's controls beside a leaf entry.; `[data-part="flyout"]` — A collapsed menu's group, opened beside its icon (on `<body>`).
 
 **Shapes:** `NavMenuItem { key: string; label: string; icon?: string; badge?: string; badgeVariant?: 'default' | 'primary' | 'danger' | 'success'; children?: NavMenuItem[]; type?: 'item' | 'header' | 'separator'; href?: string; disabled?: boolean; expanded?: boolean; collapsed?: boolean; data?: Record<string, string> }`
 

@@ -319,7 +319,12 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // js 471 → 472 (owner's OK): pdx-tabs' beta contract (#289) — its `value` model, the loading,
 // bordered and overflow states, its parts and the busy active panel. Main sat on the ceiling (it
 // passed 471); the built dist of this branch weighs 471.1 KB.
-const BUDGET_KB = { entry: 43, js: 472, css: 65, blocking: 103 };
+// css 65 → 66 (owner's OK): pdx-nav-menu's beta contract (#289) — its host classes became the ready
+// and collapsed states and its entries' classes their ARIA attributes, so nav.css selects
+// `pdx-nav-menu:state(collapsed)` and `[aria-expanded="true"] > .pdx-nav-chevron`, each longer than
+// the class it replaced. The built dist: 66609 bytes locally, which rounds to 65.0, and 65.1 KB on
+// the CI's Linux runner.
+const BUDGET_KB = { entry: 43, js: 472, css: 66, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

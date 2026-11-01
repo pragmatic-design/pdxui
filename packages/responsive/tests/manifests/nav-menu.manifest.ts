@@ -3,11 +3,12 @@
  *
  * NEW contracts, derived by inspecting:
  *  - the source: packages/ui/src/nav-menu/pdx-nav-menu.ts
- *      the HOST <pdx-nav-menu> → in an rAF it adds the class .pdx-nav-menu-root to the host and creates
- *      inside it an INNER <nav class="pdx-nav" role="navigation" aria-label="Navigation">.
+ *      the HOST <pdx-nav-menu> → in an rAF it takes the custom state :state(ready), and :state(collapsed)
+ *      while `collapsed` is set (#289, no class on the host), and creates inside it an INNER
+ *      <nav class="pdx-nav" data-part="nav" role="navigation" aria-label="Navigation">. Selected by part.
  *      Every entry is an <a class="pdx-nav-item"> (when item.href is set and there are no children) or a
  *      <button type="button" class="pdx-nav-item"> (groups, and entries with no href).
- *        - active: the .active class plus aria-current="page" (both there) ✔ a11y.
+ *        - active: aria-current="page", and no class (#289; native markup keeps `.active`) ✔ a11y.
  *        - disabled: aria-disabled="true" (plus button.disabled).
  *        - a group with children: aria-expanded plus a .pdx-nav-chevron chevron.
  *      Data-driven (the `items` prop). A roving tabindex and the APG disclosure-navigation keys
@@ -124,20 +125,20 @@ export const navMenu: ComponentManifest = {
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
-                        // The active entry: .pdx-nav-item.active → border-radius (sm), metro/cyberpunk → >= 0.
-                        selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active',
+                        // The active entry: [data-part="item"][aria-current="page"] → border-radius (sm), metro/cyberpunk → >= 0.
+                        selector: 'section:not([hidden]) [data-test="nav-menu"] [data-part="item"][aria-current="page"]',
                         description: 'active nav item radius >= 0',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // The active entry is interactive → cursor pointer.
-                        selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="nav-menu"] [data-part="item"][aria-current="page"]',
                         description: 'active nav item cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The active entry (not disabled) → opaque.
-                        selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="nav-menu"] [data-part="item"][aria-current="page"]',
                         description: 'active nav item opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
@@ -154,8 +155,8 @@ export const navMenu: ComponentManifest = {
                         description: 'nav items share the same width (left-aligned column)',
                         parent: '[data-test="nav-menu"] .pdx-nav',
                         children: {
-                            active: '[data-test="nav-menu"] .pdx-nav-item.active',
-                            other: '[data-test="nav-menu"] .pdx-nav-item:not(.active):not([aria-disabled="true"])',
+                            active: '[data-test="nav-menu"] [data-part="item"][aria-current="page"]',
+                            other: '[data-test="nav-menu"] [data-part="item"]:not([aria-current]):not([aria-disabled="true"])',
                         },
                         relations: [
                             {
@@ -173,7 +174,7 @@ export const navMenu: ComponentManifest = {
                         parent: 'body',
                         children: {
                             nav: '[data-test="nav-menu"] .pdx-nav',
-                            item: '[data-test="nav-menu"] .pdx-nav-item.active',
+                            item: '[data-test="nav-menu"] [data-part="item"][aria-current="page"]',
                         },
                         relations: [
                             {
@@ -209,6 +210,16 @@ export const navMenu: ComponentManifest = {
                         tolerance: 6,
                     },
                 ],
+                // Collapsed is a custom state of the host (#289), what nav.css draws the rail from.
+                states: [
+                    {
+                        description: 'collapsed is the custom state :state(collapsed)',
+                        selector: 'section:not([hidden]) [data-test="nav-menu-fly"] [data-part="nav"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="nav-menu-fly"]', name: 'collapsed' },
+                        changes: {},
+                    },
+                ],
             },
             // `size="sm"` is smaller in every part a dense sidebar needs smaller.
             'nav-menu-sm': {
@@ -240,17 +251,17 @@ export const navMenu: ComponentManifest = {
             'nav-menu-border': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="nav-border"] .pdx-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="nav-border"] [data-part="item"][aria-current="page"]',
                         description: 'the current entry carries a 3px solid bar on its start edge',
                         border: { left: { width: { op: '==', value: 3, tolerance: 0.5 }, style: { op: 'is', value: 'solid' } } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="nav-border"] .pdx-nav-item:not(.active)',
+                        selector: 'section:not([hidden]) [data-test="nav-border"] [data-part="item"]:not([aria-current])',
                         description: 'another entry keeps the bar\'s width, transparent',
                         border: { left: { width: { op: '==', value: 3, tolerance: 0.5 }, color: { op: 'is', value: 'rgba(0, 0, 0, 0)' } } },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="nav-border"] .pdx-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="nav-border"] [data-part="item"][aria-current="page"]',
                         description: 'a bar on a square entry: no radius',
                         radius: { all: { op: '==', value: 0, tolerance: 0.5 } },
                     },
@@ -260,8 +271,8 @@ export const navMenu: ComponentManifest = {
                         description: 'the labels stay in one column, current or not',
                         parent: 'section:not([hidden]) [data-test="nav-border"]',
                         children: {
-                            current: 'section:not([hidden]) [data-test="nav-border"] .pdx-nav-item.active .pdx-nav-label',
-                            other: 'section:not([hidden]) [data-test="nav-border"] .pdx-nav-item:not(.active) .pdx-nav-label',
+                            current: 'section:not([hidden]) [data-test="nav-border"] [data-part="item"][aria-current="page"] .pdx-nav-label',
+                            other: 'section:not([hidden]) [data-test="nav-border"] [data-part="item"]:not([aria-current]) .pdx-nav-label',
                         },
                         relations: [{ description: 'same label start', left: 'current.left', op: '==', right: 'other.left', tolerance: 1 }],
                     },
@@ -322,7 +333,7 @@ export const navMenu: ComponentManifest = {
     isolation: {
         scenario: 'nav-menu-basic',
         targets: [
-            { selector: 'section:not([hidden]) [data-test="nav-menu"] .pdx-nav-item.active', tolerancePx: 12, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="nav-menu"] [data-part="item"][aria-current="page"]', tolerancePx: 12, skipHeight: true },
         ],
     },
 

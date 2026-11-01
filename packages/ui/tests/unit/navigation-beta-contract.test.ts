@@ -76,6 +76,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-nav-menu',
+        // `activeKey` and `collapsed` are written by the app, never by the menu: props, not models.
+        models: [],
+        // `ready` once its entries are drawn; the current entry is `aria-current="page"`, an open
+        // group `aria-expanded="true"`, each on its entry.
+        states: ['ready', 'collapsed'],
+        parts: ['nav', 'item', 'group', 'heading', 'separator', 'actions', 'flyout'],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

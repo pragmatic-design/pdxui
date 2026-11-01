@@ -37,8 +37,8 @@ describe('NavMenuItem.data', () => {
             { key: 'x', label: 'X', href: '/x', data: { 'on click': 'bad', 'Test': 'upper', '"><img': 'bad' } },
         ]);
         const link = el.querySelector('[data-nav-key="x"]')!;
-        // The menu's own attributes are not the item's data: its key, and its level.
-        const own = new Set(['data-nav-key', 'data-level']);
+        // The menu's own attributes are not the item's data: its key, its level, and its part (#289).
+        const own = new Set(['data-nav-key', 'data-level', 'data-part']);
         const written = [...link.attributes].map(a => a.name).filter(n => n.startsWith('data-') && !own.has(n));
         expect(written).toEqual([]);
         expect(link.getAttribute('href')).toBe('/x');

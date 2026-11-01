@@ -17988,20 +17988,20 @@
           ],
           "events": [
             {
-              "name": "pdx-toggle",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when toggled open or closed. Does not bubble.",
-              "detail": "{ key, expanded }"
-            },
-            {
               "name": "pdx-select",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is selected.",
-              "detail": "{ key, item, href }"
+              "description": "An entry was chosen; cancellable, so an app under the router navigates itself.",
+              "detail": "{ key: string; item: T; href?: string }"
+            },
+            {
+              "name": "pdx-toggle",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A group was folded or unfolded: its `key` and whether it is open now. Does not bubble.",
+              "detail": "{ key: string; expanded: boolean }"
             }
           ],
           "roles": [
@@ -18115,6 +18115,46 @@
             {
               "name": "actions",
               "description": "The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "nav",
+              "description": "The `role=\"navigation\"` element that holds the entries (`.pdx-nav`)."
+            },
+            {
+              "name": "item",
+              "description": "An entry, a link or a button; the current one is `aria-current=\"page\"`, an open group's `aria-expanded=\"true\"`."
+            },
+            {
+              "name": "group",
+              "description": "The entries of an open group, or of a heading that folds (`role=\"group\"`)."
+            },
+            {
+              "name": "heading",
+              "description": "A section heading, text or the button that folds its group."
+            },
+            {
+              "name": "separator",
+              "description": "The rule between two sections."
+            },
+            {
+              "name": "actions",
+              "description": "The `actions` slot's controls beside a leaf entry."
+            },
+            {
+              "name": "flyout",
+              "description": "A collapsed menu's group, opened beside its icon (on `<body>`)."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "ready",
+              "description": "Its entries are drawn."
+            },
+            {
+              "name": "collapsed",
+              "description": "`collapsed` is set: icons only, a group in a flyout."
             }
           ]
         }
