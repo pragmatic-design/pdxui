@@ -11997,8 +11997,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an error occurs.",
-              "detail": "{ error, retryCount }"
+              "description": "A child threw; the error, and how many retries have been made.",
+              "detail": "{ error: Error; retryCount: number }"
             }
           ],
           "roles": [
@@ -12057,6 +12057,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "fallback",
+              "description": "The fallback shown in place of the children (`role=\"alert\"`)."
+            },
+            {
+              "name": "message",
+              "description": "The fallback's message: `fallbackMessage`, or the component string."
+            },
+            {
+              "name": "detail",
+              "description": "The error's own message, under it."
+            },
+            {
+              "name": "retry",
+              "description": "The Retry button, while retries are left; the note that none are, after."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "error",
+              "description": "A child threw: the fallback shows. Cleared when Retry brings the children back."
             }
           ],
           "x-pdx-context": {
@@ -25548,24 +25572,24 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-resize`.",
-              "detail": "{ sizes }"
+              "description": "The sizes changed: by a drag, the arrows, Home/End or a double-click; in percent.",
+              "detail": "{ sizes: number[] }"
             },
             {
               "name": "pdx-resize-start",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-resize-start`.",
-              "detail": "{ sizes }"
+              "description": "A drag began; the sizes before it.",
+              "detail": "{ sizes: number[] }"
             },
             {
               "name": "pdx-resize-end",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-resize-end`.",
-              "detail": "{ sizes }"
+              "description": "A drag ended; the sizes it left.",
+              "detail": "{ sizes: number[] }"
             }
           ],
           "roles": [
@@ -25625,6 +25649,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "pane",
+              "description": "One of the app's children, laid out as a pane (`.pdx-splitter-pane`)."
+            },
+            {
+              "name": "gutter",
+              "description": "The handle between two panes (`role=\"separator\"`), dragged or moved with the arrows."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "horizontal",
+              "description": "`orientation=\"horizontal\"`: the panes side by side."
+            },
+            {
+              "name": "vertical",
+              "description": "`orientation=\"vertical\"`: the panes stacked."
+            },
+            {
+              "name": "dragging",
+              "description": "A gutter is being dragged: the panes take no pointer until it is let go."
             }
           ]
         }

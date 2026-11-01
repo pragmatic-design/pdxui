@@ -10,10 +10,10 @@
  *         (pdx-splitter.ts:284-292). So the handles and the classes do NOT exist on the first tick:
  *         the scenario needs a `setup` that waits 2 rAFs before the measurement.
  *       · initPanes (pdx-splitter.ts:66) needs >= 2 children (count < 2 → it returns, and nothing is built).
- *       · On the host: the classes `.pdx-splitter` + `.pdx-splitter-<orientation>` (line 103).
- *       · On every pane child: the class `.pdx-splitter-pane` plus the attribute `data-pane-index` (lines 110-111).
+ *       · On the host: no class (#290); the custom state `horizontal` or `vertical`, and `dragging` during a drag.
+ *       · On every pane child: the class `.pdx-splitter-pane`, the part `pane` and the attribute `data-pane-index`.
  *         The panes get an inline `flex-basis: calc(N% - their share of the gutters)`, `flex-grow:0`, `flex-shrink:0` (applySizes).
- *       · Between the panes (never after the last) a <div class="pdx-splitter-handle"> is inserted
+ *       · Between the panes (never after the last) a <div class="pdx-splitter-handle" data-part="gutter"> is inserted
  *         with: role="separator", tabindex="0", aria-orientation=<orientation>,
  *         aria-valuenow=<round(size)>, data-handle-index (lines 116-122).
  *         Inline cursor: `col-resize` (horizontal) o `row-resize` (vertical); an inline width or
@@ -25,8 +25,8 @@
  *
  *   - CSS: packages/design/src/components/splitter.css
  *       · `pdx-splitter { display:block }` (host element default).
- *       · `.pdx-splitter { display:flex; width:100%; height:100%; overflow:hidden }`.
- *       · `.pdx-splitter-horizontal { flex-direction:row }`, `.pdx-splitter-vertical { flex-direction:column }`.
+ *       · `:is(.pdx-splitter, pdx-splitter) { display:flex; width:100%; height:100%; overflow:hidden }`.
+ *       · the state (or class) horizontal → flex-direction:row, vertical → flex-direction:column.
  *       · `.pdx-splitter-pane { overflow:auto; position:relative; min-width:0; min-height:0 }`.
  *       · `.pdx-splitter-handle { flex-shrink:0; display:flex; align-items:center; justify-content:center;
  *         background: var(--pdx-color-border); user-select:none; touch-action:none }`. The col-resize
@@ -132,7 +132,7 @@ export const splitter: ComponentManifest = {
             'splitter-horizontal': {
                 standalone: [
                     {
-                        // The host gets .pdx-splitter → display flex.
+                        // The host (no class, #290) is drawn from the tag → display flex.
                         selector: 'section:not([hidden]) [data-test="splitter"]',
                         description: 'splitter host renders as flex',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
@@ -200,11 +200,27 @@ export const splitter: ComponentManifest = {
                 ],
             },
             'splitter-vertical': {
+                states: [
+                    {
+                        // The orientation is the host's custom state (#290), which stacks the panes.
+                        description: 'orientation="vertical" is the custom state :state(vertical)',
+                        selector: 'section:not([hidden]) [data-test="splitter-v"] [data-part="gutter"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="splitter-v"]', name: 'vertical' },
+                        changes: {},
+                    },
+                ],
                 standalone: [
                     {
                         selector: 'section:not([hidden]) [data-test="splitter-v"]',
                         description: 'vertical splitter host renders as flex',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
+                    },
+                    {
+                        // The gutter part, between the stacked panes: as tall as gutterSize (6px).
+                        selector: 'section:not([hidden]) [data-test="splitter-v"] [data-part="gutter"]',
+                        description: 'the vertical gutter part is a thin bar',
+                        height: { op: '<=', value: 8 },
                     },
                     {
                         // The handle: a row-resize cursor (inline from the JS) for the vertical orientation.

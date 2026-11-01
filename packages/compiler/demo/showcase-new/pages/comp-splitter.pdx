@@ -45,6 +45,19 @@
           </tbody>
         </table>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Kind</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>pdx-resize</code>, <code>pdx-resize-start</code>, <code>pdx-resize-end</code></td><td>Event <code>{ sizes }</code></td><td>The sizes changed; a drag began; a drag ended. They do not bubble</td></tr>
+            <tr><td><code>:state(horizontal)</code>, <code>:state(vertical)</code></td><td>State</td><td>From <code>orientation</code></td></tr>
+            <tr><td><code>:state(dragging)</code></td><td>State</td><td>A gutter is being dragged</td></tr>
+            <tr><td><code>pane</code>, <code>gutter</code></td><td>Part</td><td>Each child laid out as a pane; the handle between two</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </div>
 </template>

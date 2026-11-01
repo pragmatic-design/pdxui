@@ -35,11 +35,13 @@
         import '@pdxui/ui/breadcrumb';
         import '@pdxui/ui/button';
         import '@pdxui/ui/data-grid';
+        import '@pdxui/ui/error-boundary';
         import '@pdxui/ui/fab';
         import '@pdxui/ui/nav-menu';
         import '@pdxui/ui/navbar';
         import '@pdxui/ui/page-header';
         import '@pdxui/ui/pagination';
+        import '@pdxui/ui/provide';
         import '@pdxui/ui/scroll-area';
         import '@pdxui/ui/scroll-spy';
         import '@pdxui/ui/segmented';
@@ -117,6 +119,40 @@
                 grid.appendChild(carrier);
                 stage.appendChild(grid);
                 for (let i = 0; i < 30 && !grid.querySelector('[role="columnheader"]'); i++) await new Promise(r => requestAnimationFrame(r)); },
+        "error-boundary-fallback": async function () { 
+                const { component, html, signal, computed } = await import('@pdxui/core');
+                const broken = signal(false);
+                const status = computed(() => {
+                    if (broken()) throw new Error('The data source failed');
+                    return 'healthy';
+                });
+                if (!customElements.get('scenario-flaky-child')) {
+                    component('scenario-flaky-child', { render: () => html`<p data-test="eb-child">${() => status()}</p>` });
+                }
+                const wrap = document.querySelector('section:not([hidden]) [data-test="eb-wrap"]');
+                wrap.innerHTML = '<pdx-error-boundary data-test="eb" max-retries="2"><scenario-flaky-child></scenario-flaky-child></pdx-error-boundary>';
+                for (let i = 0; i < 30 && !wrap.querySelector('[data-test="eb-child"]'); i++) {
+                    await new Promise((r) => requestAnimationFrame(r));
+                }
+                broken.set(true);
+                for (let i = 0; i < 30 && !wrap.querySelector('[data-part="fallback"]'); i++) {
+                    await new Promise((r) => requestAnimationFrame(r));
+                } },
+        "provide-consumer": async function () { 
+                const { component, html, context, inject } = await import('@pdxui/core');
+                const Theme = context('scenario-theme');
+                if (!customElements.get('scenario-theme-reader')) {
+                    component('scenario-theme-reader', {
+                        render: (ctx) => html`<p data-test="provide-read" style="margin: 0; padding: 8px;">Theme: ${() => String(inject(Theme, ctx.el, 'none'))}</p>`,
+                    });
+                }
+                const host = document.querySelector('section:not([hidden]) [data-test="provide"]');
+                host.token = Theme;
+                host.value = 'dark';
+                host.appendChild(document.createElement('scenario-theme-reader'));
+                for (let i = 0; i < 30 && !host.querySelector('[data-test="provide-read"]'); i++) {
+                    await new Promise((r) => requestAnimationFrame(r));
+                } },
         "scroll-spy-basic": async function () { 
     const links = Array.from(document.querySelectorAll('section:not([hidden]) [data-test="scroll-spy"] .spy-link'));
     links.forEach((l, i) => {
@@ -129,7 +165,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-breadcrumb","pdx-button","pdx-data-grid","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-page-header","pdx-pagination","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
+        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-breadcrumb","pdx-button","pdx-data-grid","pdx-error-boundary","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-page-header","pdx-pagination","pdx-provide","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -312,6 +348,11 @@
     <section data-scenario="data-grid-header-names">
         <h3>Data grid — header names: a sortable filterable column, a slotted header, a plain one</h3>
         <div data-test="dg-host"></div>
+    </section>
+
+    <section data-scenario="error-boundary-fallback">
+        <h3>Error boundary — a child that throws, and the fallback</h3>
+        <div data-test="eb-wrap" style="width: 360px;"></div>
     </section>
 
     <section data-scenario="fab-basic">
@@ -498,6 +539,13 @@
         <h3>Pagination — in a box narrower than its row</h3>
         <div data-test="pg-box" style="width: 220px">
                     <pdx-pagination data-test="pg" total="50" page-size="10" page="3"></pdx-pagination>
+                </div>
+    </section>
+
+    <section data-scenario="provide-consumer">
+        <h3>Provide — a reader of the provided value inside</h3>
+        <div data-test="provide-wrap" style="width: 320px;">
+                    <pdx-provide data-test="provide"></pdx-provide>
                 </div>
     </section>
 

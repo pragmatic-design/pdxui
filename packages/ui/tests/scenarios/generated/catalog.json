@@ -1206,6 +1206,21 @@
       ]
     },
     {
+      "name": "error-boundary",
+      "tags": [
+        "pdx-error-boundary"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "error-boundary-fallback",
+          "title": "Error boundary — a child that throws, and the fallback"
+        }
+      ]
+    },
+    {
       "name": "fab",
       "tags": [
         "pdx-fab"
@@ -2264,6 +2279,21 @@
         {
           "id": "progress-size-lg",
           "title": "pdx-progress — size=\"lg\""
+        }
+      ]
+    },
+    {
+      "name": "provide",
+      "tags": [
+        "pdx-provide"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "provide-consumer",
+          "title": "Provide — a reader of the provided value inside"
         }
       ]
     },
