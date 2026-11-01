@@ -84,6 +84,10 @@ const DONE: Row[] = [
     { tag: 'pdx-avatar', models: [], outputs: [], states: ['broken'], parts: ['root', 'image', 'fallback'], removed: [] },
     // Its size is a variant drawn by spinner.css; its status is the root part (A4).
     { tag: 'pdx-spinner', models: [], outputs: [], states: [], parts: ['root', 'indicator', 'label'], removed: [] },
+    // Closed is a state, which takes its alert or status out of the tree (A4); show and dismiss are exposed.
+    { tag: 'pdx-banner', models: [], outputs: [], states: ['dismissed'], parts: ['root', 'icon', 'message', 'close'], removed: [] },
+    // Its updates are an effect, parked with a frozen page (#269).
+    { tag: 'pdx-relative-time', models: [], outputs: [], states: [], parts: ['root'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

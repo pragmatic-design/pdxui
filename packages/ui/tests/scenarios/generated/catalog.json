@@ -356,6 +356,10 @@
           "title": "Banner — Closable"
         },
         {
+          "id": "banner-dismissed",
+          "title": "Banner — Dismissed"
+        },
+        {
           "id": "banner-variant-info",
           "title": "pdx-banner — variant=\"info\""
         },
