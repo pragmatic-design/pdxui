@@ -37,6 +37,10 @@
       "development": "./src/components/layered/autocomplete.css",
       "default": "./dist/components/autocomplete.css"
     },
+    "./components/avatar": {
+      "development": "./src/components/layered/avatar.css",
+      "default": "./dist/components/avatar.css"
+    },
     "./components/avatar-group": {
       "development": "./src/components/layered/avatar-group.css",
       "default": "./dist/components/avatar-group.css"
@@ -224,6 +228,10 @@
     "./components/sortable-list": {
       "development": "./src/components/layered/sortable-list.css",
       "default": "./dist/components/sortable-list.css"
+    },
+    "./components/spinner": {
+      "development": "./src/components/layered/spinner.css",
+      "default": "./dist/components/spinner.css"
     },
     "./components/split-button": {
       "development": "./src/components/layered/split-button.css",

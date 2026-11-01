@@ -19,8 +19,15 @@ async function mount(page: Page, html: string): Promise<void> {
     }, html);
 }
 
-const parts = (page: Page, sel: string) => page.locator(sel).evaluate((h) =>
-    [...new Set([...h.querySelectorAll('[data-part]')].map((e) => e.getAttribute('data-part')))].sort());
+/** The element's own parts: not those of a component nested in it (the group's avatars, the block's spinner). */
+const parts = (page: Page, sel: string) => page.locator(sel).evaluate((h) => {
+    const owner = (e: Element): Element | null => {
+        let p = e.parentElement;
+        while (p && !p.tagName.includes('-')) p = p.parentElement;
+        return p;
+    };
+    return [...new Set([...h.querySelectorAll('[data-part]')].filter((e) => owner(e) === h).map((e) => e.getAttribute('data-part')))].sort();
+});
 
 /** Count `name` on the element and on its parent: a declared event does not bubble. */
 async function listen(page: Page, sel: string, name: string): Promise<void> {

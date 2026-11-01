@@ -80,6 +80,10 @@ const DONE: Row[] = [
         parts: ['overlay', 'spinner', 'message'],
         removed: [],
     },
+    // Its size and shape are variants drawn by avatar.css; a picture that fails is a state.
+    { tag: 'pdx-avatar', models: [], outputs: [], states: ['broken'], parts: ['root', 'image', 'fallback'], removed: [] },
+    // Its size is a variant drawn by spinner.css; its status is the root part (A4).
+    { tag: 'pdx-spinner', models: [], outputs: [], states: [], parts: ['root', 'indicator', 'label'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

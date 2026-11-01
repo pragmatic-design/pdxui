@@ -3,8 +3,10 @@
  *
  * Contracts DERIVED by inspecting the source and the design tokens (they are NOT in universal.ts):
  *   - Source: packages/ui/src/avatar/pdx-avatar.ts
- *       · the rendered root = <span role="img" :aria-label=alt> with the inline style from baseStyle().
- *       · SIZES px: xs=24 sm=32 md=40 lg=48 xl=64 (mappa SIZES). width === height (quadrato).
+ *       · the rendered root = <span data-part="root" role="img" :aria-label=alt>, drawn by avatar.css
+ *         (#291) from the host's `size` and `shape` variants; only the colour is left inline, as
+ *         custom properties. A failed image is the host's :state(broken).
+ *       · sizes px: xs=24 sm=32 md=40 lg=48 xl=64. width === height (a square box).
  *       · display:inline-flex; flex-shrink:0; user-select:none.
  *       · shape 'circle' → border-radius:50%; shape 'square' → border-radius:var(--pdx-radius-md).
  *   - Token: packages/design/src/tokens.css → --pdx-radius-md: 0.5rem (= 8px).
@@ -12,7 +14,7 @@
  *       · square: radius == var(--pdx-radius-md) ≈ 8px ('>=' 4 is cautious, it varies by theme).
  *
  * Note: light DOM → the styled <span> is a child of the custom element. The selectors point
- *     a `pdx-avatar[data-test="..."] > span` (root renderizzato).
+ *     at its part, `pdx-avatar[data-test="..."] > [data-part="root"]`.
  *
  * The contracts are CONSERVATIVE but true on all 13 themes: no exact px on the radius,
  * only relations (the size hierarchy in a composition) and '>=' on display and shape.
@@ -60,20 +62,49 @@ export const avatar: ComponentManifest = {
                     <pdx-avatar data-test="av-named" size="md" alt="Ada Lovelace"></pdx-avatar>
                 </div>`,
         },
+        {
+            // A picture that fails: an empty PNG data URI, refused by the decoder without a request.
+            // The host is :state(broken) and the initials show in the picture's place.
+            id: 'avatar-broken',
+            title: 'Avatar — a picture that fails to load',
+            html: `
+                <div class="row" style="display:flex;align-items:center;gap:12px">
+                    <pdx-avatar data-test="av-broken" size="md" alt="Ada Lovelace" src="data:image/png;base64,"></pdx-avatar>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'avatar-broken': {
+                // What a theme selects (#291): the picture failed.
+                states: [
+                    {
+                        description: 'a failed picture is the custom state :state(broken)',
+                        selector: 'pdx-avatar[data-test="av-broken"]',
+                        trigger: 'attribute',
+                        customState: { host: 'pdx-avatar[data-test="av-broken"]', name: 'broken' },
+                        changes: {},
+                    },
+                ],
+                standalone: [
+                    {
+                        selector: 'pdx-avatar[data-test="av-broken"] [data-part="fallback"]',
+                        description: 'the initials show in the failed picture\'s place',
+                        width: { op: '>', value: 0 },
+                    },
+                ],
+            },
             'avatar-sizes': {
                 standalone: [
                     {
-                        selector: 'pdx-avatar[data-test="av-md"] > span',
+                        selector: 'pdx-avatar[data-test="av-md"] > [data-part="root"]',
                         description: 'avatar root renders as inline-flex box',
                         display: { op: 'is', value: 'inline-flex' },
                     },
                     {
-                        selector: 'pdx-avatar[data-test="av-md"] > span',
+                        selector: 'pdx-avatar[data-test="av-md"] > [data-part="root"]',
                         description: 'md avatar is at least 24px tall',
                         height: { op: '>=', value: 24 },
                     },
@@ -84,11 +115,11 @@ export const avatar: ComponentManifest = {
                         description: 'size hierarchy: xs < sm < md < lg < xl widths',
                         parent: 'body',
                         children: {
-                            xs: 'pdx-avatar[data-test="av-xs"] > span',
-                            sm: 'pdx-avatar[data-test="av-sm"] > span',
-                            md: 'pdx-avatar[data-test="av-md"] > span',
-                            lg: 'pdx-avatar[data-test="av-lg"] > span',
-                            xl: 'pdx-avatar[data-test="av-xl"] > span',
+                            xs: 'pdx-avatar[data-test="av-xs"] > [data-part="root"]',
+                            sm: 'pdx-avatar[data-test="av-sm"] > [data-part="root"]',
+                            md: 'pdx-avatar[data-test="av-md"] > [data-part="root"]',
+                            lg: 'pdx-avatar[data-test="av-lg"] > [data-part="root"]',
+                            xl: 'pdx-avatar[data-test="av-xl"] > [data-part="root"]',
                         },
                         relations: [
                             { description: 'xs < sm', left: 'xs.width', op: '<', right: 'sm.width' },
@@ -101,8 +132,8 @@ export const avatar: ComponentManifest = {
                         description: 'avatar is square: width == height (md)',
                         parent: 'body',
                         children: {
-                            box: 'pdx-avatar[data-test="av-md"] > span',
-                            box2: 'pdx-avatar[data-test="av-md"] > span',
+                            box: 'pdx-avatar[data-test="av-md"] > [data-part="root"]',
+                            box2: 'pdx-avatar[data-test="av-md"] > [data-part="root"]',
                         },
                         relations: [
                             { description: 'width == height', left: 'box.width', op: '==', right: 'box2.height', tolerance: 1 },
@@ -114,7 +145,7 @@ export const avatar: ComponentManifest = {
                 standalone: [
                     {
                         // circle → border-radius 50% → in px about half the side (lg 48px → ~24px). '>=' 12 is cautious.
-                        selector: 'pdx-avatar[data-test="av-circle"] > span',
+                        selector: 'pdx-avatar[data-test="av-circle"] > [data-part="root"]',
                         description: 'circle avatar has large radius (>=12px on lg)',
                         radius: { all: { op: '>=', value: 12 } },
                     },
@@ -122,7 +153,7 @@ export const avatar: ComponentManifest = {
                         // square → radius-md, but the radius-zero themes (metro, cyberpunk) zero it:
                         // a sharp "square" avatar is legitimate. The invariant = a non-negative radius;
                         // "the circle is rounder than the square" is in the composition below.
-                        selector: 'pdx-avatar[data-test="av-square"] > span',
+                        selector: 'pdx-avatar[data-test="av-square"] > [data-part="root"]',
                         description: 'square avatar radius is defined (>= 0)',
                         radius: { all: { op: '>=', value: 0 } },
                     },
@@ -133,8 +164,8 @@ export const avatar: ComponentManifest = {
                         description: 'circle radius >= square radius',
                         parent: 'body',
                         children: {
-                            circle: 'pdx-avatar[data-test="av-circle"] > span',
-                            square: 'pdx-avatar[data-test="av-square"] > span',
+                            circle: 'pdx-avatar[data-test="av-circle"] > [data-part="root"]',
+                            square: 'pdx-avatar[data-test="av-square"] > [data-part="root"]',
                         },
                         relations: [
                             { description: 'circle more rounded than square', left: 'circle.borderTopLeftRadius', op: '>=', right: 'square.borderTopLeftRadius' },
@@ -155,9 +186,9 @@ export const avatar: ComponentManifest = {
     isolation: {
         scenario: 'avatar-sizes',
         targets: [
-            // The avatar is sized through an inline width and height: it must keep its square box
-            // even under hostile global CSS. An 8px tolerance (a first pass, to be tightened).
-            { selector: 'pdx-avatar[data-test="av-md"] > span', tolerancePx: 8 },
+            // The avatar is sized by avatar.css from its `size` (it was an inline width and height
+            // before #291): it must keep its square box even under hostile global CSS. An 8px tolerance (a first pass, to be tightened).
+            { selector: 'pdx-avatar[data-test="av-md"] > [data-part="root"]', tolerancePx: 8 },
         ],
     },
 

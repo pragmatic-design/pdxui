@@ -4,12 +4,14 @@ A lightweight loading indicator.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `variant` | `variant` | string | `'spinner'` | Visual variant. |
-| `size` | `size` | string | `'md'` | Size of the control (e.g. sm, md, lg). |
+| `variant` | `variant` | string | `'spinner'` | spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the component renders, and spinner.css has nothing to key by it (decision 51's reasoning for pdx-button-group's own props). |
 | `label` | `label` | string | `''` | The accessible name. Empty means "use the translated default" — a prop default cannot be a literal here, because the spinners the LIBRARY builds have no author to pass one: a pdx-list puts a pdx-block-ui over itself while its source loads, and nothing on that path reaches the spinner inside it. An app in Italian would be left with an English "Loading" it could not override. |
 | `showLabel` | `showlabel` | boolean | `false` | Shows a text label beside the spinner. |
+| `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px). |
 
 **Renders:** roles `status`
+
+**Parts:** `[data-part="root"]` — The status (`role="status"`), named by the label.; `[data-part="indicator"]` — The ring, the dots or the bar.; `[data-part="label"]` — The visible label, with `show-label`.
 
 
 #### Examples

@@ -1,0 +1,47 @@
+/* pdx-spinner — a loading indicator: a ring, three dots or a bar (#291).
+   It drew every piece with an inline style built from its props, and wrote its keyframe into the
+   document's head; the status, the indicator and the label are its parts now, and this stylesheet
+   draws them at the same sizes. `size` is a `@variant` axis on the host; `variant` stays a prop, since
+   it picks what the component renders and nothing here is keyed by it. `--pdx-spinner-speed` and `--pdx-spinner-thickness` are still read. */
+
+@keyframes pdx-spin {
+    to { transform: rotate(360deg); }
+}
+
+:where(pdx-spinner) > [data-part="root"] {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--pdx-space-xs, 6px);
+}
+
+/* md (the default) is the fallback, not a rule on the tag: the `@variant` rules below weigh nothing. */
+:where(pdx-spinner) [data-part="indicator"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--pdx-spinner-size, 24px);
+    height: var(--pdx-spinner-size, 24px);
+}
+
+:where(pdx-spinner) [data-part="indicator"] > svg {
+    width: var(--pdx-spinner-size, 24px);
+    height: var(--pdx-spinner-size, 24px);
+    animation: pdx-spin var(--pdx-spinner-speed, 1s) linear infinite;
+}
+
+/* Three pulsing dots in a row. The bar needs no rule: progress.css's track fills the indicator. */
+:where(pdx-spinner) [data-part="indicator"] > .pdx-spinner-dots {
+    display: flex;
+    gap: 3px;
+}
+
+:where(pdx-spinner) [data-part="label"] {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+}
+
+@variant size(xs) { :scope { --pdx-spinner-size: 12px; } }
+@variant size(sm) { :scope { --pdx-spinner-size: 16px; } }
+@variant size(lg) { :scope { --pdx-spinner-size: 32px; } }
+@variant size(xl) { :scope { --pdx-spinner-size: 48px; } }
