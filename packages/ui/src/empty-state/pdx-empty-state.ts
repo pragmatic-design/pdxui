@@ -2,7 +2,7 @@
 // Shows icon + title + description + optional action button.
 // Used inside List, Table, DataGrid when data is empty.
 
-import { component, html, onDestroy } from '@pdxui/core';
+import { component, html, onDestroy, event } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -16,8 +16,18 @@ defineIcons({ inbox: iconInbox });
 /**
  * A placeholder for an empty data view: an icon, a title and a description, with an optional action
  * button.
+ *
+ * @csspart icon - The icon above the title.
+ * @csspart title - The title, `role="heading"`.
+ * @csspart description - The description under the title.
+ * @csspart action - The action button, when `actionLabel` is set.
  */
 component('pdx-empty-state', {
+    events: {
+        /** The action button was pressed. */
+        'pdx-action': event<void>(),
+    },
+    parts: ['icon', 'title', 'description', 'action'],
     props: {
         /** Icon name */
         icon: { type: String, default: 'inbox', iconName: true },
@@ -54,13 +64,13 @@ component('pdx-empty-state', {
             if (!_built) {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
+                // The host carries no class (#291): empty-state.css lays it out from the tag.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-empty-state');
-
                     // Icon
                     if (iconName) {
                         const iconEl = document.createElement('pdx-icon');
                         iconEl.className = 'pdx-empty-state-icon';
+                        iconEl.setAttribute('data-part', 'icon');
                         iconEl.setAttribute('name', iconName);
                         iconEl.setAttribute('size', String(iconSz));
                         own(iconEl);
@@ -71,6 +81,7 @@ component('pdx-empty-state', {
                     // theme's type styles and the page's own heading margins do not apply to it.
                     const titleEl = document.createElement('div');
                     titleEl.className = 'pdx-empty-state-title';
+                    titleEl.setAttribute('data-part', 'title');
                     titleEl.setAttribute('role', 'heading');
                     titleEl.setAttribute('aria-level', level);
                     titleEl.textContent = titleText;
@@ -80,6 +91,7 @@ component('pdx-empty-state', {
                     if (descText) {
                         const descEl = document.createElement('div');
                         descEl.className = 'pdx-empty-state-desc';
+                        descEl.setAttribute('data-part', 'description');
                         descEl.textContent = descText;
                         own(descEl);
                     }
@@ -88,9 +100,10 @@ component('pdx-empty-state', {
                     if (actionText) {
                         const btnEl = document.createElement('button');
                         btnEl.className = 'pdx-primary pdx-empty-state-action';
+                        btnEl.setAttribute('data-part', 'action');
                         btnEl.setAttribute('size', 'sm');
                         btnEl.textContent = actionText;
-                        btnEl.addEventListener('click', () => ctx.emit('pdx-action', {}));
+                        btnEl.addEventListener('click', () => ctx.emit('pdx-action'));
                         own(btnEl);
                     }
 

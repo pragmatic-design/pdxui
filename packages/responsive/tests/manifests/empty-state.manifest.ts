@@ -6,14 +6,14 @@
  *  - packages/design/src/components/empty-state.css  (the .pdx-empty-state* block)
  *
  * DOM structure (host vs inner):
- *   <pdx-empty-state>                            ← HOST: gets .pdx-empty-state (ctx.el.classList.add)
+ *   <pdx-empty-state>                            ← HOST: no class (#291), empty-state.css draws the tag
  *     render: <slot></slot>                      ← no inner wrapper
  *     children appended DIRECTLY to the host (an imperative rAF):
  *       <pdx-icon class="pdx-empty-state-icon">          (when icon)
  *       <div class="pdx-empty-state-title">              (always)
  *       <div class="pdx-empty-state-desc">               (when description)
  *       <button class="pdx-primary pdx-empty-state-action"> (when actionLabel)
- * So the measurable container IS the host itself ([data-test] === .pdx-empty-state).
+ * So the measurable container IS the host itself. Each piece is also a part (icon, title, description, action).
  * CSS: display:flex column, center, padding 2xl/lg → a content-driven height (the 48px icon +
  * the title, the description and the padding). Conservative: display oneOf, height >= a minimum, no exact px.
  *

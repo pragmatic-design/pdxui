@@ -11,9 +11,11 @@ A friendly “nothing here yet”.
 | `iconSize` | `iconsize` | number | `48` | Icon size |
 | `headingLevel` | `headinglevel` | number | `3` | The title's heading level (1-6). Default 3: an empty state usually sits in a section whose own heading is level 2. |
 
-**Events:** `pdx-action` → `detail: {}` — Fired on `pdx-action`.
+**Events:** `pdx-action` — The action button was pressed.
 
 **Renders:** roles `heading`
+
+**Parts:** `[data-part="icon"]` — The icon above the title.; `[data-part="title"]` — The title, `role="heading"`.; `[data-part="description"]` — The description under the title.; `[data-part="action"]` — The action button, when `actionLabel` is set.
 
 
 #### Examples

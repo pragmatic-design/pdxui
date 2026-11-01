@@ -1,6 +1,8 @@
 /* pdx-empty-state — No data placeholder */
 pdx-empty-state { display: block; }
-.pdx-empty-state {
+/* The component's host carries no class (#291): the tag, at the class's weight. The class stays for
+   CSS-only markup. */
+:is(.pdx-empty-state, pdx-empty-state) {
     display: flex;
     flex-direction: column;
     align-items: center;
