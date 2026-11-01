@@ -39,6 +39,17 @@ test('pdx-aspect-ratio: no class on the host, and still a clipped box at its rat
     expect(m).toEqual({ cls: null, position: 'relative', overflow: 'hidden', width: 600, height: 300, media: [600, 300] });
 });
 
+test('pdx-masonry: no class on the host, and still balanced columns whose items do not break across them', async ({ page }) => {
+    await mount(page, '<pdx-masonry columns="2"><div style="height: 40px">A</div><div style="height: 80px">B</div></pdx-masonry>', 'pdx-masonry');
+    const m = await page.locator('#f pdx-masonry').evaluate((h) => ({
+        cls: h.getAttribute('class'),
+        columnFill: getComputedStyle(h).columnFill,
+        breakInside: getComputedStyle(h.firstElementChild!).breakInside,
+        itemGap: getComputedStyle(h.firstElementChild!).marginBottom,
+    }));
+    expect(m).toEqual({ cls: null, columnFill: 'balance', breakInside: 'avoid', itemGap: '16px' });
+});
+
 test('pdx-row and pdx-col: no class on either host, and col.css still reaches the registered row', async ({ page }) => {
     await mount(page, '<pdx-row gutter="sm"><pdx-col span="6">A</pdx-col><pdx-col span="6">B</pdx-col></pdx-row>', 'pdx-col');
     const m = await page.locator('#f pdx-row').evaluate((row) => {

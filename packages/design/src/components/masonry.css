@@ -1,10 +1,11 @@
 /* pdx-masonry — CSS columns masonry grid */
 pdx-masonry { display: block; }
-.pdx-masonry {
+/* The component's host carries no class (#290): the tag, at the class's weight. */
+:is(.pdx-masonry, pdx-masonry) {
     column-fill: balance;
 }
 /* Each direct child is a masonry item — prevent column breaks inside */
-.pdx-masonry > * {
+:is(.pdx-masonry, pdx-masonry) > * {
     break-inside: avoid;
     margin-bottom: var(--pdx-masonry-gap, 1rem);
 }

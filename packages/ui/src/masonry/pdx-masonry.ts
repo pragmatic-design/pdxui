@@ -50,7 +50,6 @@ component('pdx-masonry', {
         gap: { type: String, default: '1rem' },
     },
     setup(ctx) {
-        let _built = false;
         let _resizeObserver: ResizeObserver | null = null;
 
         /** Writes the count, and answers whether it was computed from the width (responsive). */
@@ -90,11 +89,8 @@ component('pdx-masonry', {
             void ctx.columnWidth();
             const gapVal = ctx.gap() as string;
 
+            // The host carries no class (#290): masonry.css draws the columns on the tag.
             requestAnimationFrame(() => {
-                if (!_built) {
-                    _built = true;
-                    ctx.el.classList.add('pdx-masonry');
-                }
                 // Gap as row-gap via CSS variable
                 ctx.el.style.setProperty('--pdx-masonry-gap', gapVal);
                 // One read of `columns` per update, so a value that warns warns once.
