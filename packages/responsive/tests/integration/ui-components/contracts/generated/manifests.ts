@@ -616,6 +616,7 @@ export const scenarioPage: Record<string, string> = {
     "splitter-horizontal": "tier-3",
     "splitter-vertical": "tier-3",
     "statistic-basic": "tier-5b",
+    "statistic-loading": "tier-5b",
     "statistic-size-md": "tier-5b",
     "statistic-size-sm": "tier-5b",
     "statistic-size-lg": "tier-5b",

@@ -2813,6 +2813,10 @@
           "title": "Statistic — KPI with title, value, trend"
         },
         {
+          "id": "statistic-loading",
+          "title": "Statistic — loading"
+        },
+        {
           "id": "statistic-size-md",
           "title": "pdx-statistic — size=\"md\""
         },
