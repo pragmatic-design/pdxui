@@ -29,7 +29,7 @@ Measured in `skill-claims.spec.ts` (case `who-scrolls`).
 |---|---|
 | `getActiveSection()` | The id of the section marked active, or '' before the first measurement. |
 
-**Events:** `pdx-change` → `detail: { section }` — Fired when the value changes.
+**Events:** `section-change` → `detail: { value: string }` — The section in view changed: its `data-section`, or its id.
 
 
 #### Examples

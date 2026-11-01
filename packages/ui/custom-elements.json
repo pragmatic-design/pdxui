@@ -22607,14 +22607,23 @@
               "description": "The id of the section marked active, or '' before the first measurement."
             }
           ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "section": "$event.detail.value"
+          },
+          "alphaRename": {
+            "pdx-change": "section-change"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "section-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ section }"
+              "description": "The section in view changed: its `data-section`, or its id.",
+              "detail": "{ value: string }"
             }
           ],
           "attributes": [

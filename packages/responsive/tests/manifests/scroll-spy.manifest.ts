@@ -21,11 +21,12 @@
  *   - smooth-scroll    (true by default)         → a smooth scroll when a link is clicked
  *
  * EVENTS
- *   - pdx-change { section } → emitted when the active section changes (line 53). Async and scroll-driven.
+ *   - section-change { value } → emitted when the active section changes (#289; it was pdx-change
+ *     { section }). A read-only output, declared, so it does not bubble. Async and scroll-driven.
  *
- * THE ACTIVE STATE (source, updateLinks() lines 85-97)
- *   On the active link: it adds the '.active' class (a toggle) and the attribute aria-current="true";
- *   on the others it removes both. The match is by href#id, or data-spy-target == data-section.
+ * THE ACTIVE STATE (source, updateLinks())
+ *   On the active link it sets aria-current="page"; on the others it removes it. No class is written on
+ *   the app's links (#289). The match is by href#id, or data-spy-target == data-section.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
  * DETERMINISM — this component's critical point
@@ -36,14 +37,13 @@
  *   on the first paint NO link is marked until the observer fires.
  *
  *   Conceptually, at scroll-top the first section (the top one, with the smallest rect.top) is the active one →
- *   the first link gets .active. But relying on the observer's firing makes the measurement FLAKY
+ *   the first link gets aria-current. But relying on the observer's firing makes the measurement FLAKY
  *   (it depends on when the browser delivers the first entry).
  *
  *   THE CHOICE: nothing is scrolled during the test and the observer is not awaited. The `setup` applies
  *   the scroll-top state (the first entry active) SYNCHRONOUSLY and deterministically, reproducing
- *   EXACTLY what updateLinks() does (the .active class plus aria-current). We measure the stable
- *   initial state. This does NOT mask a bug: the aria-current value the setup applies
- *   is the SAME ("true") the source produces — so the BUG stays observable (see below).
+ *   EXACTLY what updateLinks() does (aria-current="page"). We measure the stable initial state; the
+ *   scroll-driven behaviour is measured in scroll-spy-beta-contract.spec.ts.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
  * ✅ FIXATO (era: aria-current="true")
@@ -88,13 +88,13 @@ const SCENARIO_HTML = `
         </pdx-scroll-spy>
     </div>`;
 
-// A SYNCHRONOUS reproduction of updateLinks() for the top section (scroll-top → the first entry active).
-// It uses the SAME aria-current="true" the source does (line 92), so the bug stays observable.
+// A SYNCHRONOUS reproduction of updateLinks() for the top section (scroll-top → the first entry active):
+// aria-current="page", as the source writes it.
 const SETUP_SCROLL_TOP = `
     const links = Array.from(document.querySelectorAll('section:not([hidden]) [data-test="scroll-spy"] .spy-link'));
     links.forEach((l, i) => {
-        if (i === 0) { l.classList.add('active'); l.setAttribute('aria-current', 'page'); }
-        else { l.classList.remove('active'); l.removeAttribute('aria-current'); }
+        if (i === 0) l.setAttribute('aria-current', 'page');
+        else l.removeAttribute('aria-current');
     });`;
 
 export const scrollSpy: ComponentManifest = {
@@ -133,13 +133,13 @@ export const scrollSpy: ComponentManifest = {
                     },
                     {
                         // The active entry (the first) is opaque and visible.
-                        selector: 'section:not([hidden]) [data-test="scroll-spy"] .spy-link.active',
+                        selector: 'section:not([hidden]) [data-test="scroll-spy"] .spy-link[aria-current="page"]',
                         description: 'active spy link opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
                         // The active entry is tall enough to hold its text.
-                        selector: 'section:not([hidden]) [data-test="scroll-spy"] .spy-link.active',
+                        selector: 'section:not([hidden]) [data-test="scroll-spy"] .spy-link[aria-current="page"]',
                         description: 'active spy link tall enough to hold its label',
                         height: { op: '>=', value: 16 },
                     },
@@ -196,9 +196,7 @@ export const scrollSpy: ComponentManifest = {
 
     // ── Dim. 2: axe-core ──
     // A <nav> with aria-label="On this page"; <a> entries with text (their accessible name); the active
-    // entry has aria-current (the value "true", from the source — see the BUG in the header comment:
-    // valid for axe, but semantically it should be "page"). No disableRules: the scenario
-    // is accessible by design.
+    // entry has aria-current="page". No disableRules: the scenario is accessible by design.
     a11y: {
         scenarios: ['scroll-spy-basic'],
     },

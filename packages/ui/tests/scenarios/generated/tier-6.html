@@ -120,8 +120,8 @@
         "scroll-spy-basic": async function () { 
     const links = Array.from(document.querySelectorAll('section:not([hidden]) [data-test="scroll-spy"] .spy-link'));
     links.forEach((l, i) => {
-        if (i === 0) { l.classList.add('active'); l.setAttribute('aria-current', 'page'); }
-        else { l.classList.remove('active'); l.removeAttribute('aria-current'); }
+        if (i === 0) l.setAttribute('aria-current', 'page');
+        else l.removeAttribute('aria-current');
     }); },
         "sidebar-collapsed": async function () { (() => { const sb = document.querySelector('[data-test="sidebar-collapsed"]'); if (sb) sb.open = false; })() },
         "sidebar-mini": async function () { (() => { const sb = document.querySelector('[data-test="sidebar-mini"]'); if (sb) sb.open = false; })() },

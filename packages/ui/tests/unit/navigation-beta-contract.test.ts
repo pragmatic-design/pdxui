@@ -120,6 +120,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-scroll-spy',
+        // The section in view is a read-only output, announced by `section-change` `{ value }`: not a
+        // model, so `::section` stays an error.
+        models: [],
+        states: [],
+        // It wraps the app's links and sections and draws nothing of its own.
+        parts: [],
+        verbs: [],
+        removed: ['pdx-change'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

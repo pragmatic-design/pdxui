@@ -220,13 +220,19 @@ export class ComponentResolver {
 
     /**
      * The alpha events a library component no longer emits, how each alpha `detail.<field>` reads now,
-     * and its model's event (#478) — or null when its manifest records none, or it has no model to
-     * name instead.
+     * and its model's event (#478) — or null when its manifest records none, or it has nothing to
+     * name instead. A component with no model names one when every alpha event it recorded was
+     * renamed (#289: pdx-scroll-spy's `pdx-change` is the read-only `section-change`); the first of
+     * those names stands where the model's event would.
      */
     alphaOf(tag: string): AlphaEvents | null {
         const alpha = this.libraryAlpha.get(tag);
-        const model = alpha ? this.modelEventOf(tag) : null;
-        return alpha && model ? { ...alpha, modelEvent: model.event } : null;
+        if (!alpha) return null;
+        const model = this.modelEventOf(tag);
+        if (model) return { ...alpha, modelEvent: model.event };
+        const renamed = alpha.renamed ?? {};
+        const allRenamed = alpha.events.length > 0 && alpha.events.every((e) => e in renamed);
+        return allRenamed ? { ...alpha, modelEvent: renamed[alpha.events[0]] } : null;
     }
 
     /**
