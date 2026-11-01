@@ -15,7 +15,8 @@
  *
  * ── DOM structure (light DOM, built imperatively in an rAF — pdx-menubar.ts:477-542) ──
  *   render() = html`` (empty). The DOM is created in ctx.track → requestAnimationFrame:
- *     <pdx-menubar class="pdx-menubar" items='…'>          ← host, CSS: display:block (menu.css:210)
+ *     <pdx-menubar items='…'>                              ← host, no class (#289), CSS: display:block;
+ *                                                          :state(open) while one of its menus is open
  *       <div class="pdx-menubar-bar" role="menubar" aria-label="Menu">   ← BARRA top-level
  *                                                          CSS: display:flex; align-items:center (menu.css:214)
  *                                                          → ALWAYS horizontal (a row). Stable geometry.
@@ -37,7 +38,8 @@
  *   The panel's entries: <button class="pdx-menu-item" role="menuitem|menuitemcheckbox|menuitemradio">.
  *
  * ── Opening ── a click on the trigger (toggle) or a hover (when trigger='hover'). openMenu and closeMenu are exposed
- *   on `host.__menubar` (pdx-menubar.ts:587) → programmatic opening in the "open" scenario through the setup.
+ *   on the host (the alpha `host.__menubar` handle is gone, #289) → programmatic opening in the "open"
+ *   scenario through the setup.
  *
  * ── Keyboard (verified in the source) ──
  *   · The bar: a horizontal focusGroup with roving and wrap (pdx-menubar.ts:532-541, orientation:'horizontal').
@@ -102,20 +104,18 @@ export const menubar: ComponentManifest = {
         },
         {
             // The ONE open scenario: it opens the "file" menu programmatically → the panel is portalled to the body.
-            // openMenu is exposed on host.__menubar (pdx-menubar.ts:587). Called after the mount (the build's rAF).
+            // openMenu is exposed on the host. Called after the mount (the build's rAF).
             id: 'menubar-open',
             title: 'Menubar — Open (File menu panel visible below trigger)',
             html: `
                 <div style="width: 600px; max-width: 100%;">
                     <pdx-menubar data-test="mb-open" trigger="click" items='${ITEMS}'></pdx-menubar>
                 </div>`,
-            // The bar is built in an rAF; two rAFs guarantee that __menubar and the triggers exist.
+            // The bar is built in an rAF; two rAFs guarantee that the triggers exist.
             setup: `
                 const host = document.querySelector('section:not([hidden]) [data-test="mb-open"]');
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-                if (host && host.__menubar && typeof host.__menubar.openMenu === 'function') {
-                    host.__menubar.openMenu('file');
-                }
+                host.openMenu('file');
                 await new Promise(r => requestAnimationFrame(r));`,
         },
     ],
@@ -176,6 +176,16 @@ export const menubar: ComponentManifest = {
                         selector: '.pdx-menubar-panel',
                         description: 'open menu panel has an appreciable width',
                         width: { op: '>=', value: 80 },
+                    },
+                ],
+                states: [
+                    {
+                        // A menu open: a custom state on the host, not a class (#289).
+                        description: 'a menu open, the menubar is the custom state :state(open)',
+                        selector: 'section:not([hidden]) [data-test="mb-open"] [data-part="bar"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="mb-open"]', name: 'open' },
+                        changes: {},
                     },
                 ],
                 overlay: [

@@ -142,6 +142,18 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-menubar',
+        // Which menu is open is the user's gesture, read back by nobody: no model.
+        models: [],
+        // `open` while one of its menus is; the trigger of that menu is `aria-expanded="true"`.
+        states: ['open'],
+        // The bar and its triggers; the open menu's panel (on <body>) and its entries, as pdx-menu's.
+        parts: ['bar', 'trigger', 'panel', 'item', 'separator', 'label'],
+        verbs: [],
+        // The alpha handle the certification manifest called; `openMenu()` is on the host.
+        removed: ['__menubar'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

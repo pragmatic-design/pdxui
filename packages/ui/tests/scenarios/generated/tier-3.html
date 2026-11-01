@@ -162,9 +162,7 @@
         "menubar-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="mb-open"]');
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-                if (host && host.__menubar && typeof host.__menubar.openMenu === 'function') {
-                    host.__menubar.openMenu('file');
-                }
+                host.openMenu('file');
                 await new Promise(r => requestAnimationFrame(r)); },
         "rich-text-menu": async function () { 
                 const trigger = document.querySelector('section:not([hidden]) [data-test="rt-menu"] .pdx-rt-toolbar-btn[data-menu="heading"]');

@@ -2,7 +2,7 @@
 // Supports: nested submenus, checkbox/radio items, icons, shortcuts, mega menu panels,
 // Arrow L/R between top-level items, Arrow Down to open, full WAI-ARIA menubar pattern.
 
-import { component, html, signal, focusGroup } from '@pdxui/core';
+import { component, html, signal, focusGroup, event } from '@pdxui/core';
 // A menubar is painted by menu.css — the rules are named after the MENU, not after this
 // component, so the import is easy to miss, and without it a page that renders a menubar has to
 // load the whole library to paint it.
@@ -40,8 +40,25 @@ export interface MegaColumn {
 
 /**
  * A horizontal menu bar whose entries open dropdown submenus, as in File, Edit, View.
+ *
+ * @csspart bar - The `role="menubar"` row of triggers.
+ * @csspart trigger - A top-level entry; the one whose menu is open is `aria-expanded="true"`.
+ * @csspart panel - The open menu, `role="menu"` (on `<body>`).
+ * @csspart item - An entry of the open menu, or of a submenu.
+ * @csspart separator - The rule between two groups of entries.
+ * @csspart label - A group's label.
+ * @cssstate open - One of its menus is open.
  */
 component('pdx-menubar', {
+    // Which menu is open is the user's gesture, read back by nobody: no model (#289).
+    events: {
+        /** An entry was chosen: its `key` and its item. */
+        'pdx-select': event<{ key: string; item: MenuItem }>(),
+        /** A checkbox or radio entry was toggled: its `key`, whether it is checked, its radio group. */
+        'pdx-check': event<{ key: string; checked: boolean | undefined; radioGroup?: string; item: MenuItem }>(),
+    },
+    states: ['open'],
+    parts: ['bar', 'trigger', 'panel', 'item', 'separator', 'label'],
     props: {
         /** Top-level menu items */
         items: { type: Array, default: [] },
@@ -84,12 +101,12 @@ component('pdx-menubar', {
 
             closeMenu(false);
             _activeKey.set(key);
+            ctx.state('open', true);
             // _hasOpened = true; (removed: was never read)
 
-            // Highlight trigger
+            // The open menu's trigger is its aria-expanded, which menu.css selects: no class (#289).
             if (_barEl) {
                 _barEl.querySelectorAll('.pdx-menubar-trigger').forEach(t => {
-                    t.classList.toggle('active', t.getAttribute('data-menubar-key') === key);
                     t.setAttribute('aria-expanded', t.getAttribute('data-menubar-key') === key ? 'true' : 'false');
                 });
             }
@@ -98,6 +115,7 @@ component('pdx-menubar', {
             if (_panelEl) _panelEl.remove();
             _panelEl = document.createElement('div');
             _panelEl.className = 'pdx-menubar-panel' + (item.mega ? ' pdx-menubar-mega' : '');
+            _panelEl.setAttribute('data-part', 'panel');
             _panelEl.setAttribute('role', 'menu');
             _panelEl.style.position = 'fixed';
             _panelEl.style.zIndex = '1000';
@@ -194,6 +212,7 @@ component('pdx-menubar', {
             const prevKey = _activeKey.peek();
             if (!prevKey) return;
             _activeKey.set('');
+            ctx.state('open', false);
             _hoverOpenedKey = '';
             closeSubmenu();
             _mouseInPanel = false;
@@ -201,7 +220,6 @@ component('pdx-menubar', {
 
             if (_barEl) {
                 _barEl.querySelectorAll('.pdx-menubar-trigger').forEach(t => {
-                    t.classList.remove('active');
                     t.setAttribute('aria-expanded', 'false');
                 });
             }
@@ -244,6 +262,7 @@ component('pdx-menubar', {
                 if (item.type === 'separator') {
                     const sep = document.createElement('hr');
                     sep.className = 'pdx-menu-separator';
+                    sep.setAttribute('data-part', 'separator');
                     sep.setAttribute('role', 'separator');
                     container.appendChild(sep);
                     continue;
@@ -251,6 +270,7 @@ component('pdx-menubar', {
                 if (item.type === 'label') {
                     const lbl = document.createElement('div');
                     lbl.className = 'pdx-menu-label';
+                    lbl.setAttribute('data-part', 'label');
                     lbl.setAttribute('role', 'presentation');
                     lbl.textContent = item.label;
                     container.appendChild(lbl);
@@ -260,6 +280,7 @@ component('pdx-menubar', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-menu-item';
+                btn.setAttribute('data-part', 'item');
                 if (item.danger) btn.classList.add('pdx-menu-danger');
                 if (item.type === 'submenu') btn.classList.add('pdx-menu-sub');
                 btn.setAttribute('data-menu-key', item.key);
@@ -528,6 +549,7 @@ component('pdx-menubar', {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'pdx-menubar-trigger';
+            btn.setAttribute('data-part', 'trigger');
             btn.setAttribute('role', 'menuitem');
             btn.setAttribute('data-menubar-key', item.key);
             btn.setAttribute('aria-haspopup', 'menu');
@@ -575,10 +597,10 @@ component('pdx-menubar', {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-menubar');
-
+                    // No class on the host (#289): menu.css reads its tag; a menu open is :state(open).
                     _barEl = document.createElement('div');
                     _barEl.className = 'pdx-menubar-bar';
+                    _barEl.setAttribute('data-part', 'bar');
                     _barEl.setAttribute('role', 'menubar');
                     uiAttr(_barEl, 'aria-label', () => uiString('menubar', 'label'));
 
@@ -636,9 +658,7 @@ component('pdx-menubar', {
             /** Close the open menu and any submenu under it. The boolean it takes is not read. */
             closeMenu,
         });
-        // @deprecated legacy handle — the certification manifests still call host.__menubar.openMenu();
-        // remove once they migrate to the flattened host.openMenu()/closeMenu().
-        (ctx.el as any).__menubar = { openMenu, closeMenu };
+        // The alpha handle `host.__menubar` is gone (#289): `openMenu()` and `closeMenu()` are on the host.
         return {};
     },
     render: () => html``,
