@@ -4859,6 +4859,16 @@
               "attribute": "label"
             },
             {
+              "kind": "field",
+              "name": "index",
+              "description": "The slide on show, 0-based.",
+              "type": {
+                "text": "number"
+              },
+              "default": "0",
+              "attribute": "index"
+            },
+            {
               "kind": "method",
               "name": "next",
               "parameters": [],
@@ -4894,51 +4904,39 @@
               "name": "pause",
               "parameters": [],
               "description": "Stop autoplay, leaving the slide where it is."
-            },
-            {
-              "kind": "method",
-              "name": "goto",
-              "parameters": [
-                {
-                  "name": "index",
-                  "type": {
-                    "text": "number"
-                  }
-                }
-              ],
-              "description": "`goTo` under its all-lowercase spelling."
-            },
-            {
-              "kind": "field",
-              "name": "index",
-              "readonly": true,
-              "description": "Read-only, via a ref: `el.index`."
             }
           ],
+          "models": [
+            "index"
+          ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "index": "$event.detail.value"
+          },
           "events": [
-            {
-              "name": "pdx-change",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when the value changes.",
-              "detail": "{ index, item }"
-            },
             {
               "name": "pdx-autoplay-start",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-autoplay-start`.",
-              "detail": "{}"
+              "description": "Autoplay started: on mount with `autoplay`, from `play()`, the rotation control, or the pointer leaving."
             },
             {
               "name": "pdx-autoplay-stop",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-autoplay-stop`.",
-              "detail": "{}"
+              "description": "Autoplay stopped: from `pause()`, the rotation control, keyboard focus moving in, or the pointer over it."
+            },
+            {
+              "name": "index-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `index`. Does not bubble.",
+              "detail": "{ value: number }"
             }
           ],
           "roles": [
@@ -5046,6 +5044,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "index",
+              "fieldName": "index",
+              "description": "The slide on show, 0-based.",
+              "type": {
+                "text": "number"
+              },
+              "default": "0"
             }
           ],
           "shapes": [
@@ -5064,6 +5071,38 @@
               "name": "slide",
               "description": "Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.",
               "signature": "(slide: T, index: number, active: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The carousel region (`role=\"region\"`), which clips the slides and takes the focus."
+            },
+            {
+              "name": "track",
+              "description": "The strip the slides sit in, moved to bring a slide on show."
+            },
+            {
+              "name": "slide",
+              "description": "A slide; the one on show is `aria-current=\"true\"`."
+            },
+            {
+              "name": "control",
+              "description": "A button over the slides: the previous and next arrows, the rotation stop/start."
+            },
+            {
+              "name": "dots",
+              "description": "The tablist of dots under the slides."
+            },
+            {
+              "name": "dot",
+              "description": "A dot; the one of the slide on show is `aria-selected=\"true\"`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "fade",
+              "description": "`animation=\"fade\"`: the slides cross-fade in place instead of sliding."
             }
           ]
         }

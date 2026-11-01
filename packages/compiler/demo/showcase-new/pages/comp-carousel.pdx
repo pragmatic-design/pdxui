@@ -39,6 +39,7 @@
           <tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr>
         </thead>
         <tbody>
+          <tr><td><code>index</code></td><td>Number (model)</td><td>0</td><td>The slide on show. The carousel writes it, <code>::index</code> follows it, and writing it moves the slide</td></tr>
           <tr><td><code>items</code></td><td>Array</td><td>null</td><td>Slide items: <code>{ src?, alt?, content?, caption? }</code></td></tr>
           <tr><td><code>renderSlide</code></td><td>Function</td><td>null</td><td>Custom render: <code>(item, index) =&gt; HTMLElement | string</code></td></tr>
           <tr><td><code>autoplay</code></td><td>Boolean</td><td>false</td><td>Auto-advance slides</td></tr>
@@ -63,9 +64,22 @@
           <tr><th>Event</th><th>Detail</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>pdx-change</code></td><td><code>{ index, item }</code></td><td>Fired when the active slide changes</td></tr>
+          <tr><td><code>index-change</code></td><td><code>{ value }</code></td><td>The carousel moved to another slide; the value is its index</td></tr>
           <tr><td><code>pdx-autoplay-start</code></td><td>—</td><td>Autoplay started</td></tr>
           <tr><td><code>pdx-autoplay-stop</code></td><td>—</td><td>Autoplay stopped</td></tr>
+        </tbody>
+      </table>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, state and parts</h3>
+      <table class="options-table">
+        <thead>
+          <tr><th>Name</th><th>Kind</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>next()</code>, <code>prev()</code>, <code>goTo(n)</code></td><td>Method</td><td>Move to the next, previous or n-th slide</td></tr>
+          <tr><td><code>play()</code>, <code>pause()</code></td><td>Method</td><td>Start or stop autoplay. A frozen page's autoplay stops with it and starts again when it comes back</td></tr>
+          <tr><td><code>:state(fade)</code></td><td>State</td><td><code>animation="fade"</code></td></tr>
+          <tr><td><code>root</code>, <code>track</code>, <code>slide</code>, <code>control</code>, <code>dots</code>, <code>dot</code></td><td>Part</td><td>The region, the strip of slides, a slide (the one on show is <code>aria-current</code>), an arrow or the rotation button, the tablist and a dot (the selected one is <code>aria-selected</code>)</td></tr>
         </tbody>
       </table>
     </section>

@@ -26,14 +26,15 @@ pdx-carousel {
     display: block;
 }
 
-/* Fade mode */
-.pdx-carousel-fade .pdx-carousel-track {
+/* Fade mode: the host's custom state (#290), at the weight of the class it replaced; the slide on show is
+   its aria-current. */
+:where(pdx-carousel):state(fade) .pdx-carousel-track {
     position: relative;
     transition: none;
     transform: none !important;
 }
 
-.pdx-carousel-fade .pdx-carousel-slide {
+:where(pdx-carousel):state(fade) .pdx-carousel-slide {
     position: absolute;
     inset: 0;
     width: 100% !important;
@@ -42,11 +43,11 @@ pdx-carousel {
     pointer-events: none;
 }
 
-.pdx-carousel-fade .pdx-carousel-slide:first-child {
+:where(pdx-carousel):state(fade) .pdx-carousel-slide:first-child {
     position: relative;
 }
 
-.pdx-carousel-fade .pdx-carousel-slide-active {
+:where(pdx-carousel):state(fade) :where(.pdx-carousel-slide)[aria-current="true"] {
     opacity: 1;
     pointer-events: auto;
     z-index: 1;
@@ -157,7 +158,8 @@ pdx-carousel {
     outline-offset: var(--pdx-focus-offset);
 }
 
-.pdx-carousel-dot-active {
+/* The dot of the slide on show (#290): its aria-selected, at the weight of the class it replaced. */
+:where(.pdx-carousel-dot)[aria-selected="true"] {
     background: var(--pdx-color-primary, oklch(0.55 0.2 235));
     width: 24px;
     border-radius: 4px;

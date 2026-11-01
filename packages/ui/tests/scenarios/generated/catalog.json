@@ -621,6 +621,10 @@
         {
           "id": "carousel-basic",
           "title": "Carousel — 3 slides (autoplay off)"
+        },
+        {
+          "id": "carousel-fade",
+          "title": "Carousel — fade (autoplay off)"
         }
       ]
     },

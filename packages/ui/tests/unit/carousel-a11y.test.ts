@@ -94,7 +94,7 @@ describe('pdx-carousel dots are a tablist', () => {
     it('ArrowRight on the focused tab selects and focuses the next one, once', async () => {
         const el = await mount('loop="false"');
         const changes: number[] = [];
-        el.addEventListener('pdx-change', (e) => changes.push((e as CustomEvent).detail.index));
+        el.addEventListener('index-change', (e) => changes.push((e as CustomEvent).detail.value));
         dots(el)[0].focus();
         key(dots(el)[0], 'ArrowRight');
         await tick(20);

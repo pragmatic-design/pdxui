@@ -278,6 +278,23 @@
                 </div>
     </section>
 
+    <section data-scenario="carousel-fade">
+        <h3>Carousel — fade (autoplay off)</h3>
+        <div style="width: 640px; max-width: 100%;">
+                <style>
+                    .demo-slide { height: 160px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 600; }
+                    .demo-slide-1 { background: oklch(0.55 0.18 235); }
+                    .demo-slide-2 { background: oklch(0.55 0.18 155); }
+                    .demo-slide-3 { background: oklch(0.55 0.18 25); }
+                </style>
+                    <pdx-carousel
+                        data-test="carousel-fade"
+                        animation="fade"
+                        autoplay="false"
+                        items='[{"content":"<div class=\"demo-slide demo-slide-1\" data-test=\"slide-content-0\">Slide One</div>"},{"content":"<div class=\"demo-slide demo-slide-2\" data-test=\"slide-content-1\">Slide Two</div>"},{"content":"<div class=\"demo-slide demo-slide-3\" data-test=\"slide-content-2\">Slide Three</div>"}]'></pdx-carousel>
+                </div>
+    </section>
+
     <section data-scenario="cascader-closed">
         <h3>Cascader — Closed (trigger with a selected path)</h3>
         <pdx-cascader data-test="casc"
