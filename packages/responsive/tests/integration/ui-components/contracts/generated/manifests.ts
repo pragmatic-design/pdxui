@@ -69,6 +69,7 @@ import { navbar } from '../../../../manifests/navbar.manifest';
 import { numberInput } from '../../../../manifests/number-input.manifest';
 import { otpInput } from '../../../../manifests/otp-input.manifest';
 import { overlayOutlet } from '../../../../manifests/overlay-outlet.manifest';
+import { pageHeader } from '../../../../manifests/page-header.manifest';
 import { pagination } from '../../../../manifests/pagination.manifest';
 import { passwordInput } from '../../../../manifests/password-input.manifest';
 import { popover } from '../../../../manifests/popover.manifest';
@@ -164,7 +165,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pagination, passwordInput, popover, progress, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -508,6 +509,8 @@ export const scenarioPage: Record<string, string> = {
     "otp-input-size-sm": "tier-1c",
     "otp-input-size-lg": "tier-1c",
     "outlet-confirm-alert": "tier-2a",
+    "page-header-full": "tier-6",
+    "page-header-title": "tier-6",
     "pagination-basic": "tier-6",
     "pagination-narrow": "tier-6",
     "password-input-basic": "tier-1c",

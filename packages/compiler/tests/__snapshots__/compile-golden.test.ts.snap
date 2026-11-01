@@ -3837,6 +3837,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/navbar', label: 'Navbar' },
           { key: '/components/sidebar', label: 'Sidebar' },
           { key: '/components/breadcrumb', label: 'Breadcrumb' },
+          { key: '/components/page-header', label: 'PageHeader' },
           { key: '/components/bottom-nav', label: 'BottomNav' },
         ]},
         { key: 'nav-helpers', label: 'Helpers', icon: 'pin', children: [
@@ -3954,7 +3955,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:305" });
+}, { name: "app.pdx:306" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -6806,6 +6807,39 @@ component('app-comp-overlay-stack', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/overlay-stack",tag:"app-comp-overlay-stack",title:"Overlay Stack",lazy:true,file:'./comp-overlay-stack.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-page-header.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-x38dhf");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-x38dhf"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n@scope ([data-pdx-x38dhf]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Page Header</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-page-header&gt;</code> — the standard header of a page: a breadcrumb, the title with an optional\\n      subtitle, and an area for the page\\'s actions. Its title is an <code>h1</code>, the page\\'s own;\\n      <code>heading-level</code> lowers it inside a dialog or a section — as here, where each example sits under\\n      this page\\'s section headings.\\n    </p> <app-demo-comp-page-header-full class="demo-section"></app-demo-comp-page-header-full> <app-demo-comp-page-header-title class="demo-section"></app-demo-comp-page-header-title> <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>title</code></td><td>String</td><td>\\'\\'</td><td>The title</td></tr><tr><td><code>subtitle</code></td><td>String</td><td>\\'\\'</td><td>The line under the title</td></tr><tr><td><code>crumbs</code></td><td>{ key, label, href? }[]</td><td>[]</td><td>The trail; the last is the page you are on. A crumb without <code>href</code> is a button</td></tr><tr><td><code>heading-level</code></td><td>Number</td><td>1</td><td>The title\\'s heading level, 1-6</td></tr></tbody></table> </div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots, events and parts</h3> <div class="options-table"> <table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody><tr><td><code>slot="actions"</code></td><td>The page\\'s commands, at the end of the title row</td></tr><tr><td><code>pdx-crumb</code></td><td>{ key, item }: a crumb was chosen. Does not bubble</td></tr><tr><td><code>[data-part]</code></td><td><code>root</code> (the header), <code>breadcrumb</code>, <code>title</code>, <code>subtitle</code>, <code>actions</code></td></tr></tbody></table> </div> </section> </div> '));
+component('app-comp-page-header', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Page Header — PDX Components" });
+    ctx.el.setAttribute('data-pdx-x38dhf', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/page-header'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/page-header",tag:"app-comp-page-header",title:"Page Header — PDX Components",lazy:true,file:'./comp-page-header.pdx'});
 "
 `;
 
@@ -25626,6 +25660,67 @@ async function onDialogPlusToast() {
     const __frag=__blk0();
     const [__el4]=__walk0(__frag);
     __el4.addEventListener('click', safeHandler(batchHandler(ctx.onDialogPlusToast), ctx.el?.tagName?.toLowerCase(), 'click'));
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-page-header/demo-comp-page-header-full.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-9vwdhm");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-9vwdhm"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-9vwdhm], [data-pdx-9vwdhm-in]) to ([data-pdx-root] \\u003E *) {:scope .crumb-log, :where(:not([data-pdx-9vwdhm])):scope:is(.crumb-log) { margin-top: var(--pdx-space-sm); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Title, breadcrumb and actions</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      The trail above the title, the subtitle under it, the <code>actions</code> slot at the end of the row. A crumb\\n      without an <code>href</code> is a button that announces <code>pdx-crumb</code>; the last is the page you are on.\\n    </p> <pdx-page-header title="Patients" subtitle="1,204 records" heading-level="3"> <pdx-button slot="actions" variant="outline" size="sm" data-pdx-9vwdhm-in>Export</pdx-button> <pdx-button slot="actions" variant="primary" size="sm" data-pdx-9vwdhm-in>New patient</pdx-button> </pdx-page-header> <p class="pdx-txt-small pdx-ink-muted crumb-log"><!----></p> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-page-header title="Patients" subtitle="1,204 records" :crumbs="crumbs" @pdx-crumb="onCrumb"&gt;\\n  &lt;pdx-button slot="actions" variant="outline"&gt;Export&lt;/pdx-button&gt;\\n  &lt;pdx-button slot="actions" variant="primary"&gt;New patient&lt;/pdx-button&gt;\\n&lt;/pdx-page-header&gt;</code></pre> </details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el9=__el6.nextSibling.nextSibling;const __t10=__el9.firstChild;return [__el6,__t10];};
+component('app-demo-comp-page-header-full', {
+  props: {},
+  setup(ctx) {
+    const __crumbs = signal([
+  { key: 'home', label: 'Home', href: '#' },
+  { key: 'clinic', label: 'Clinic' },
+  { key: 'patients', label: 'Patients' },
+], { name: 'demo-comp-page-header-full:crumbs' });
+    const __crumbLog = signal('Choose "Clinic"…', { name: 'demo-comp-page-header-full:crumbLog' });
+function onCrumb(e) {
+      __crumbLog.setRaw('pdx-crumb: ' + e.detail.key);
+    }
+    ctx.el.setAttribute('data-pdx-9vwdhm', '');
+    return { crumbs: __crumbs, crumbLog: __crumbLog, onCrumb };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el6,__t10]=__walk0(__frag);
+    let __el6w_crumbs = {}; effect(() => { const __b = ctx.crumbs(); if (Object.is(__b, __el6w_crumbs)) return; __el6w_crumbs = __b; assignBoundProperty(__el6, "crumbs", __b); });
+    __el6.addEventListener('pdx-crumb', safeHandler(batchHandler(ctx.onCrumb), ctx.el?.tagName?.toLowerCase(), 'pdx-crumb'));
+    bindInterpolation(__t10,()=>ctx.crumbLog());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-page-header/demo-comp-page-header-title.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Title only</h2> <p class="pdx-txt-small pdx-ink-muted">No crumbs, no breadcrumb: the header is its title.</p> <pdx-page-header title="Dashboard" heading-level="3"></pdx-page-header> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-page-header title="Dashboard"&gt;&lt;/pdx-page-header&gt;</code></pre> </details> </section> '));
+component('app-demo-comp-page-header-title', {
+  props: {},
+  setup(ctx) {
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
     return __frag;
   })(),
 });

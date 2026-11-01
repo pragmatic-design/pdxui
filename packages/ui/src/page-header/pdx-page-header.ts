@@ -8,7 +8,7 @@
 //     <pdx-button slot="actions">New</pdx-button>
 //   </pdx-page-header>
 
-import { component, html } from '@pdxui/core';
+import { component, html, event } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -25,8 +25,20 @@ export interface PageHeaderCrumb {
  * the page's actions.
  *
  * @slot actions - Commands shown in the header's actions area (e.g. the page's primary action).
+ *
+ * @csspart root - The `<header>`.
+ * @csspart breadcrumb - The `<nav>` of the crumbs, when there are any.
+ * @csspart title - The title, the heading `heading-level` names.
+ * @csspart subtitle - The line under the title, when there is one.
+ * @csspart actions - The area the `actions` slot lands in.
  */
 component('pdx-page-header', {
+    // A header holds no position and no state of its own (#289).
+    events: {
+        /** A crumb with a link was chosen: its `key` and the crumb. */
+        'pdx-crumb': event<{ key: string; item: PageHeaderCrumb }>(),
+    },
+    parts: ['root', 'breadcrumb', 'title', 'subtitle', 'actions'],
     props: {
         title: { type: String, default: '' },
         subtitle: { type: String, default: '' },
@@ -44,14 +56,12 @@ component('pdx-page-header', {
             const level = Math.min(6, Math.max(1, Math.round(Number(ctx.headingLevel()) || 1)));
             const h = document.createElement(`h${level}`);
             h.className = 'pdx-page-header-title';
+            h.setAttribute('data-part', 'title');
             h.textContent = ctx.title() as string;
             return h;
         }
         function onCrumb(c: PageHeaderCrumb) {
-            return (e: Event) => {
-                if (!c.href) e.preventDefault();
-                ctx.emit('pdx-crumb', { key: c.key, item: c });
-            };
+            return () => { ctx.emit('pdx-crumb', { key: c.key, item: c }); };
         }
         // A `:crumbs` binding reaches the prop as the array: core's bindProperty calls the compiled getter
         // and assigns its value, so it is read as a value, not called.
@@ -62,16 +72,23 @@ component('pdx-page-header', {
         return { onCrumb, crumbList, heading };
     },
     render: (ctx) => html`
-        <header class="pdx-page-header">
+        <header class="pdx-page-header" data-part="root">
             ${() => ctx.crumbList().length ? html`
-                <nav class="pdx-breadcrumb" :aria-label="${() => uiString('page-header', 'breadcrumb')}">
+                <nav class="pdx-breadcrumb" data-part="breadcrumb" :aria-label="${() => uiString('page-header', 'breadcrumb')}">
                     <ol class="pdx-breadcrumb-list" role="list">
                         ${() => ctx.crumbList().map((c: PageHeaderCrumb, i: number, arr: PageHeaderCrumb[]) => html`
                             <li class="pdx-breadcrumb-item">
                                 ${i === arr.length - 1
                                     ? html`<span class="pdx-breadcrumb-current" aria-current="page">${c.label}</span>`
-                                    : html`<a class="pdx-breadcrumb-link" href="${c.href || ''}" @click="${ctx.onCrumb(c)}">${c.label}</a>`}
-                                ${i < arr.length - 1 ? html`<span class="pdx-breadcrumb-sep" aria-hidden="true">/</span>` : ''}
+                                    : c.href
+                                        ? html`<a class="pdx-breadcrumb-link" href="${c.href}" @click="${ctx.onCrumb(c)}">${c.label}</a>`
+                                        // No href: a button. An <a> without one is not a link and takes
+                                        // no focus, so the keyboard could not reach the crumb (#289).
+                                        : html`<button type="button" class="pdx-breadcrumb-link" @click="${ctx.onCrumb(c)}">${c.label}</button>`}
+                                ${i < arr.length - 1
+                                    // Empty: nav.css fills the theme's glyph, as pdx-breadcrumb's.
+                                    ? html`<span class="pdx-breadcrumb-sep" aria-hidden="true"></span>`
+                                    : ''}
                             </li>
                         `)}
                     </ol>
@@ -80,9 +97,9 @@ component('pdx-page-header', {
             <div class="pdx-page-header-row">
                 <div class="pdx-page-header-titles">
                     ${() => ctx.heading()}
-                    ${() => ctx.subtitle() ? html`<p class="pdx-page-header-subtitle">${() => ctx.subtitle()}</p>` : ''}
+                    ${() => ctx.subtitle() ? html`<p class="pdx-page-header-subtitle" data-part="subtitle">${() => ctx.subtitle()}</p>` : ''}
                 </div>
-                <div class="pdx-page-header-actions"><slot name="actions"></slot></div>
+                <div class="pdx-page-header-actions" data-part="actions"><slot name="actions"></slot></div>
             </div>
         </header>
     `,

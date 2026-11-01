@@ -256,6 +256,7 @@ const componentItems = [
       { key: '/components/navbar', label: 'Navbar' },
       { key: '/components/sidebar', label: 'Sidebar' },
       { key: '/components/breadcrumb', label: 'Breadcrumb' },
+      { key: '/components/page-header', label: 'PageHeader' },
       { key: '/components/bottom-nav', label: 'BottomNav' },
     ]},
     { key: 'nav-helpers', label: 'Helpers', icon: 'pin', children: [

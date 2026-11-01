@@ -2113,6 +2113,25 @@
       ]
     },
     {
+      "name": "page-header",
+      "tags": [
+        "pdx-page-header"
+      ],
+      "tier": "6",
+      "status": "wip",
+      "page": "tier-6",
+      "scenarios": [
+        {
+          "id": "page-header-full",
+          "title": "Page header — breadcrumb, title, subtitle and actions"
+        },
+        {
+          "id": "page-header-title",
+          "title": "Page header — the title alone"
+        }
+      ]
+    },
+    {
       "name": "pagination",
       "tags": [
         "pdx-pagination"
