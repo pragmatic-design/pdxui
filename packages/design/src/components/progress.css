@@ -83,7 +83,9 @@
 .pdx-progress-ring-value[data-variant="warning"] { stroke: var(--pdx-color-warning); }
 .pdx-progress-ring-value[data-variant="danger"]  { stroke: var(--pdx-color-danger); }
 
-.pdx-progress-ring-spin {
+/* The ring spins while there is no value: from its root's `.pdx-progress-indeterminate`, which follows
+   the value, as the linear bar does; `.pdx-progress-ring-spin` stays for CSS-only markup. */
+:is(.pdx-progress-ring-spin, .pdx-progress-indeterminate .pdx-progress-ring) {
     animation: pdx-ring-spin 1.2s linear infinite;
 }
 @keyframes pdx-ring-spin {

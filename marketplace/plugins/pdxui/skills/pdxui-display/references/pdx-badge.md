@@ -16,6 +16,8 @@ A small count or status dot on anything.
 
 **Renders:** roles `status`
 
+**Parts:** `[data-part="root"]` — The badge or the dot (`role="status"`), hidden while it has nothing to show.
+
 
 #### Examples
 

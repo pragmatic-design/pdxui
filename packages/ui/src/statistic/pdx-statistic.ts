@@ -12,8 +12,21 @@ function loadIcon(): void {
 
 /**
  * Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.
+ *
+ * @csspart icon - The icon beside the title.
+ * @csspart title - The label above the value.
+ * @csspart value - The number, between its prefix and suffix.
+ * @csspart trend - The trend line: its arrow and text.
+ * @csspart description - The description below the value.
+ * @csspart compare - The comparison with a previous value.
+ *
+ * @cssstate loading - `loading` is set: skeletons in place of the value, and the host `aria-busy`.
  */
 component('pdx-statistic', {
+    // On the host as a custom state (#132, #291), in place of the classes it set on itself; the host is
+    // `aria-busy` only while it holds (A4).
+    states: ['loading'],
+    parts: ['icon', 'title', 'value', 'trend', 'description', 'compare'],
     // The axis statistic.css keys by (#632), reflected on the host and drawn from it; the host is the
     // element the old `.pdx-statistic-sm`/`-lg` classes went on, so no native class is kept.
     variants: {
@@ -90,9 +103,11 @@ component('pdx-statistic', {
 
             el.innerHTML = '';
 
-            // Own classes only, via classList: `className =` would wipe the author's classes.
-            el.classList.add('pdx-statistic-root');
-            el.classList.toggle('pdx-statistic-loading', !!isLoading);
+            // No class of its own on the host (#291): statistic.css draws the tag, and the author's classes
+            // stay as they are. Loading is the custom state, and the host is busy only while it holds (A4).
+            ctx.state('loading', !!isLoading);
+            if (isLoading) el.setAttribute('aria-busy', 'true');
+            else el.removeAttribute('aria-busy');
 
             if (isLoading) {
                 // Skeleton placeholders
@@ -113,6 +128,7 @@ component('pdx-statistic', {
                 loadIcon();
                 const iconEl = document.createElement('pdx-icon');
                 iconEl.className = 'pdx-statistic-icon';
+                iconEl.setAttribute('data-part', 'icon');
                 iconEl.setAttribute('name', iconName);
                 iconEl.setAttribute('size', size === 'sm' ? '20' : size === 'lg' ? '32' : '24');
                 iconEl.setAttribute('aria-hidden', 'true');   // decorative: the title says it
@@ -123,6 +139,7 @@ component('pdx-statistic', {
             if (titleText) {
                 const titleEl = document.createElement('div');
                 titleEl.className = 'pdx-statistic-title';
+                titleEl.setAttribute('data-part', 'title');
                 titleEl.textContent = titleText;
                 el.appendChild(titleEl);
             }
@@ -140,6 +157,7 @@ component('pdx-statistic', {
 
             const valEl = document.createElement('span');
             valEl.className = 'pdx-statistic-value';
+            valEl.setAttribute('data-part', 'value');
             valEl.textContent = formatValue(valueText, prec, sep);
             valueWrap.appendChild(valEl);
 
@@ -160,6 +178,7 @@ component('pdx-statistic', {
                 else if (autoColor && trendDir === 'down') trendClass += ' pdx-statistic-trend-down';
                 else if (trendDir === 'flat') trendClass += ' pdx-statistic-trend-flat';
                 trendEl.className = trendClass;
+                trendEl.setAttribute('data-part', 'trend');
 
                 const trendIconName = getTrendIcon(trendDir);
                 if (trendIconName) {
@@ -185,6 +204,7 @@ component('pdx-statistic', {
             if (descText) {
                 const descEl = document.createElement('div');
                 descEl.className = 'pdx-statistic-desc';
+                descEl.setAttribute('data-part', 'description');
                 descEl.textContent = descText;
                 el.appendChild(descEl);
             }
@@ -193,6 +213,7 @@ component('pdx-statistic', {
             if (compareVal) {
                 const cmpEl = document.createElement('div');
                 cmpEl.className = 'pdx-statistic-compare';
+                cmpEl.setAttribute('data-part', 'compare');
                 cmpEl.textContent = (compareLbl ? compareLbl + ' ' : '') + formatValue(compareVal, prec, sep);
                 el.appendChild(cmpEl);
             }

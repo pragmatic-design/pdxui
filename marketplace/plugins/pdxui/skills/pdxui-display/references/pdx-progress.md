@@ -16,6 +16,8 @@ Linear progress, determinate or not.
 
 **Renders:** roles `progressbar`
 
+**Parts:** `[data-part="root"]` — The track: `.pdx-progress` (linear) or `.pdx-progress-circular`, with `.pdx-progress-indeterminate` while there is no value.; `[data-part="bar"]` — The linear bar.; `[data-part="ring"]` — The circular ring (`<svg>`), which spins while there is no value.; `[data-part="label"]` — The percentage or `label`, with `showLabel`.
+
 
 #### Examples
 

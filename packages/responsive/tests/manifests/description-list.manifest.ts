@@ -5,7 +5,7 @@
  * and the CSS (packages/design/src/components/description-list.css, the .pdx-dl* block).
  *
  * DOM structure (host vs inner):
- *   <pdx-description-list>                  ← HOST: gets .pdx-dl-root (ctx.el.classList.add, rAF)
+ *   <pdx-description-list>                  ← HOST: no class (#291), description-list.css draws the tag
  *     <dl class="pdx-dl pdx-dl-{layout} pdx-dl-{size} [pdx-dl-colon] ...">  ← INNER, appended to the host
  *       <div class="pdx-dl-item">           ← one key-value pair
  *         <dt class="pdx-dl-label"><span>label</span></dt>

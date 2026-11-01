@@ -10,8 +10,15 @@ import '@pdxui/design/components/progress';
 
 /**
  * A linear or circular progress indicator, determinate with a value or indeterminate and animated.
+ *
+ * @csspart root - The track: `.pdx-progress` (linear) or `.pdx-progress-circular`, with
+ *   `.pdx-progress-indeterminate` while there is no value.
+ * @csspart bar - The linear bar.
+ * @csspart ring - The circular ring (`<svg>`), which spins while there is no value.
+ * @csspart label - The percentage or `label`, with `showLabel`.
  */
 component('pdx-progress', {
+    parts: ['root', 'bar', 'ring', 'label'],
     // The axis progress.css keys by (#631), reflected on the host; each value maps the class that draws
     // the same track on native markup. `md` is the base look. The colour `variant` stays a prop: it is
     // passed to the bar and the ring as attributes, which progress.css draws natively.
@@ -86,7 +93,6 @@ component('pdx-progress', {
 
             requestAnimationFrame(() => {
                 if (ctx.circular()) {
-                    const svg = el.querySelector('.pdx-progress-ring') as SVGElement;
                     const circle = el.querySelector('.pdx-progress-ring-value') as SVGCircleElement;
                     const lbl = el.querySelector('.pdx-progress-circular-label') as HTMLElement;
                     if (circle) {
@@ -98,9 +104,9 @@ component('pdx-progress', {
                     if (lbl && ctx.showLabel()) {
                         lbl.textContent = labelText();
                     }
-                    if (svg && isIndeterminate()) {
-                        svg.classList.add('pdx-progress-ring-spin');
-                    }
+                    // The ring spins from its root's `.pdx-progress-indeterminate` (progress.css), which
+                    // follows the value: a class added here was never taken off, and a ring that got a
+                    // value went on spinning.
                 } else {
                     const bar = el.querySelector('.pdx-progress-bar') as HTMLElement;
                     if (bar) {
@@ -134,21 +140,21 @@ component('pdx-progress', {
             <div :class="${ctx.rootClass}" data-part="root" role="progressbar" :aria-label="${() => (ctx.ariaLabel() as string) || uiString('progress', 'label')}"
                 aria-valuemin="0" :aria-valuemax="${ctx.max}"
                 :aria-valuenow="${ctx.ariaValueNow}" :aria-valuetext="${ctx.ariaValueText}">
-                <svg class="pdx-progress-ring" viewBox="0 0 100 100">
+                <svg class="pdx-progress-ring" data-part="ring" viewBox="0 0 100 100">
                     <circle class="pdx-progress-ring-track" cx="50" cy="50" r="40" fill="none" stroke-width="8" />
                     <circle class="pdx-progress-ring-value" cx="50" cy="50" r="40" fill="none" stroke-width="8"
                         stroke-linecap="round" />
                 </svg>
-                ${() => ctx.showLabel() ? html`<span class="pdx-progress-circular-label"></span>` : ''}
+                ${() => ctx.showLabel() ? html`<span class="pdx-progress-circular-label" data-part="label"></span>` : ''}
             </div>
         ` : html`
             <div role="progressbar" :aria-label="${() => (ctx.ariaLabel() as string) || uiString('progress', 'label')}"
                 aria-valuemin="0" :aria-valuemax="${ctx.max}"
                 :aria-valuenow="${ctx.ariaValueNow}" :aria-valuetext="${ctx.ariaValueText}" style="display:flex;align-items:center;gap:var(--pdx-space-sm);width:100%">
                 <div :class="${ctx.rootClass}" data-part="root">
-                    <div class="pdx-progress-bar"></div>
+                    <div class="pdx-progress-bar" data-part="bar"></div>
                 </div>
-                ${() => ctx.showLabel() ? html`<span class="pdx-progress-label" style="font-size:var(--pdx-text-xs);color:var(--pdx-color-muted);white-space:nowrap;min-width:3ch;text-align:right"></span>` : ''}
+                ${() => ctx.showLabel() ? html`<span class="pdx-progress-label" data-part="label" style="font-size:var(--pdx-text-xs);color:var(--pdx-color-muted);white-space:nowrap;min-width:3ch;text-align:right"></span>` : ''}
             </div>
         `}
     `,

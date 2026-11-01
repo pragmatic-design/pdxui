@@ -2,7 +2,7 @@
 /* pdx-statistic — Numeric KPI display */
 pdx-statistic { display: block; }
 
-.pdx-statistic-root {
+:is(.pdx-statistic-root, pdx-statistic) {
     display: flex;
     flex-direction: column;
     gap: var(--pdx-space-2xs);
@@ -83,30 +83,30 @@ pdx-statistic { display: block; }
     font-style: italic;
 }
 
-/* ── Size variants, keyed on the host's `size` (#632). The host carries `.pdx-statistic-root`, which
-   gives each rule the weight the size class did. ── */
-:where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-value {
+/* ── Size variants, keyed on the host's `size` (#632). The host carries no class (#291): the tag,
+   inside :is() with the native class, gives each rule the weight the size class did. ── */
+:where(pdx-statistic[size="sm"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-value {
         font-size: var(--pdx-text-lg);
     }
-    :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-title {
+    :where(pdx-statistic[size="sm"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-title {
         font-size: var(--pdx-text-xs);
     }
-    :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-prefix, :where(pdx-statistic[size="sm"]).pdx-statistic-root .pdx-statistic-suffix {
+    :where(pdx-statistic[size="sm"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-prefix, :where(pdx-statistic[size="sm"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-suffix {
         font-size: var(--pdx-text-sm);
     }
 
-:where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-value {
+:where(pdx-statistic[size="lg"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-value {
         font-size: var(--pdx-text-display);
     }
-    :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-title {
+    :where(pdx-statistic[size="lg"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-title {
         font-size: var(--pdx-text-base);
     }
-    :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-prefix, :where(pdx-statistic[size="lg"]).pdx-statistic-root .pdx-statistic-suffix {
+    :where(pdx-statistic[size="lg"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-prefix, :where(pdx-statistic[size="lg"]):is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-suffix {
         font-size: var(--pdx-text-xl);
     }
 
 /* ── Loading / skeleton ── */
-.pdx-statistic-loading {
+:is(.pdx-statistic-loading, :where(pdx-statistic):state(loading)) {
     gap: var(--pdx-space-xs);
 }
 

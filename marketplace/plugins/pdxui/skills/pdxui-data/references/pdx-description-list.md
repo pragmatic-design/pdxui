@@ -16,6 +16,8 @@ Key/value pairs, neatly aligned.
 
 **Slot:** `value` — Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
 
+**Parts:** `[data-part="root"]` — The `<dl>`, with the classes a native list uses (`.pdx-dl`, `-bordered`, `-striped`…).
+
 **Shapes:** `DescriptionListItem { label: string; value: string | HTMLElement; span?: number; icon?: string }`
 
 

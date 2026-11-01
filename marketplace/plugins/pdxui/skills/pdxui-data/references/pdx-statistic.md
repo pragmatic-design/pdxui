@@ -20,6 +20,10 @@ A big number with label and trend.
 | `description` | `description` | string | `''` | Description text below value |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
+**States:** `:state(loading)` — `loading` is set: skeletons in place of the value, and the host `aria-busy`.
+
+**Parts:** `[data-part="icon"]` — The icon beside the title.; `[data-part="title"]` — The label above the value.; `[data-part="value"]` — The number, between its prefix and suffix.; `[data-part="trend"]` — The trend line: its arrow and text.; `[data-part="description"]` — The description below the value.; `[data-part="compare"]` — The comparison with a previous value.
+
 
 #### Examples
 

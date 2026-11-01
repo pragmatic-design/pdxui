@@ -5,9 +5,9 @@
  * and the CSS (packages/design/src/components/statistic.css).
  *
  * DOM structure (host vs inner):
- *   - The ROOT class is on the HOST <pdx-statistic> itself: `el.className = 'pdx-statistic-root'`
- *     (the size is the host's `size` attribute, #632). The host's CSS: `display: block`; the root: `display: flex`,
- *     flex-direction column, gap. → the host's effective display = flex.
+ *   - The HOST <pdx-statistic> is the root and carries no class (#291): statistic.css draws the tag
+ *     (the size is the host's `size` attribute, #632) as `display: flex`, flex-direction column, gap;
+ *     while `loading` the host is :state(loading) and aria-busy. Each piece is a part (title, value…).
  *   - Children (inner), built imperatively in an rAF:
  *       · <pdx-icon class="pdx-statistic-icon">          (when icon)
  *       · <div class="pdx-statistic-title">              (label, when title)
@@ -59,11 +59,31 @@ export const statistic: ComponentManifest = {
                         trend-value="+12.5%"></pdx-statistic>
                 </div>`,
         },
+        {
+            // While its source loads: skeletons, the custom state, the host aria-busy (#291, A4).
+            id: 'statistic-loading',
+            title: 'Statistic — loading',
+            html: `
+                <div style="max-width: 320px;">
+                    <pdx-statistic data-test="stat-loading" title="Monthly revenue" value="48295" loading></pdx-statistic>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'statistic-loading': {
+                states: [
+                    {
+                        description: 'loading is the custom state :state(loading)',
+                        selector: 'section:not([hidden]) [data-test="stat-loading"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="stat-loading"]', name: 'loading' },
+                        changes: {},
+                    },
+                ],
+            },
             'statistic-basic': {
                 standalone: [
                     {

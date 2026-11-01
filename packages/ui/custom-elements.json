@@ -2409,6 +2409,12 @@
               },
               "default": "'pill'"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The badge or the dot (`role=\"status\"`), hidden while it has nothing to show."
+            }
           ]
         }
       ],
@@ -10194,6 +10200,12 @@
               "description": "Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.",
               "signature": "(item: T, index: number)"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `<dl>`, with the classes a native list uses (`.pdx-dl`, `-bordered`, `-striped`…)."
+            }
           ]
         }
       ],
@@ -11585,8 +11597,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-action`.",
-              "detail": "{}"
+              "description": "The action button was pressed."
             }
           ],
           "roles": [
@@ -11652,6 +11663,24 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "icon",
+              "description": "The icon above the title."
+            },
+            {
+              "name": "title",
+              "description": "The title, `role=\"heading\"`."
+            },
+            {
+              "name": "description",
+              "description": "The description under the title."
+            },
+            {
+              "name": "action",
+              "description": "The action button, when `actionLabel` is set."
             }
           ]
         }
@@ -16430,6 +16459,12 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The combination (`<kbd class=\"pdx-kbd-combo\">`) around its keys."
+            }
           ]
         }
       ],
@@ -20876,6 +20911,24 @@
                 "text": "'md' | 'sm' | 'lg'"
               },
               "default": "'md'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The track: `.pdx-progress` (linear) or `.pdx-progress-circular`, with\n`.pdx-progress-indeterminate` while there is no value."
+            },
+            {
+              "name": "bar",
+              "description": "The linear bar."
+            },
+            {
+              "name": "ring",
+              "description": "The circular ring (`<svg>`), which spins while there is no value."
+            },
+            {
+              "name": "label",
+              "description": "The percentage or `label`, with `showLabel`."
             }
           ]
         }
@@ -25999,6 +26052,38 @@
                 "text": "'md' | 'sm' | 'lg'"
               },
               "default": "'md'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "icon",
+              "description": "The icon beside the title."
+            },
+            {
+              "name": "title",
+              "description": "The label above the value."
+            },
+            {
+              "name": "value",
+              "description": "The number, between its prefix and suffix."
+            },
+            {
+              "name": "trend",
+              "description": "The trend line: its arrow and text."
+            },
+            {
+              "name": "description",
+              "description": "The description below the value."
+            },
+            {
+              "name": "compare",
+              "description": "The comparison with a previous value."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "`loading` is set: skeletons in place of the value, and the host `aria-busy`."
             }
           ]
         }

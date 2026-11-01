@@ -7,8 +7,11 @@ import { uiString, format } from '../shared/i18n';
 
 /**
  * A notification badge that shows a count or a dot, on its own or overlaid on another element.
+ *
+ * @csspart root - The badge or the dot (`role="status"`), hidden while it has nothing to show.
  */
 component('pdx-badge', {
+    parts: ['root'],
     // The axes feedback.css keys by (#631), reflected on the host; each value maps the class that draws
     // the same counter on a native badge. A dot draws its variant from the host alone, and on native
     // markup with its own `.pdx-dot-{variant}`. `md` and `pill` are the base look.

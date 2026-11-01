@@ -8,6 +8,8 @@ Render keyboard keys and shortcuts.
 | `symbols` | `symbols` | boolean | `false` | Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
+**Parts:** `[data-part="root"]` — The combination (`<kbd class="pdx-kbd-combo">`) around its keys.
+
 
 #### Examples
 
