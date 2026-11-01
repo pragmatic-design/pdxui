@@ -243,7 +243,8 @@ pdx-menubar {
     background: var(--pdx-color-inset);
 }
 
-.pdx-menubar-trigger.active {
+/* The trigger of the open menu: its aria-expanded, which pdx-menubar writes (#289). */
+.pdx-menubar-trigger[aria-expanded="true"] {
     background: var(--pdx-color-inset);
     color: var(--pdx-color-primary-ink);
 }

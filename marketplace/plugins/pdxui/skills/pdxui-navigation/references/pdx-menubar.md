@@ -14,9 +14,13 @@ A desktop-style menu bar.
 | `openMenu(key, focus?)` | Open one top-level menu by key, focusing its first item (its last with 'last'). A disabled or unknown key opens nothing. |
 | `closeMenu(_resetHasOpened)` | Close the open menu and any submenu under it. The boolean it takes is not read. |
 
-**Events:** `pdx-check` → `detail: { key, checked, item } | { key, checked, radioGroup, item }` — Fired on `pdx-check`.; `pdx-select` → `detail: { key, item }` — Fired when an item is selected.
+**Events:** `pdx-check` → `detail: { key: string; checked: boolean | undefined; radioGroup?: string; item: MenuItem }` — A checkbox or radio entry was toggled: its `key`, whether it is checked, its radio group.; `pdx-select` → `detail: { key: string; item: MenuItem }` — An entry was chosen: its `key` and its item.
 
 **Renders:** roles `menu` · `menubar` · `menuitem` · `menuitemcheckbox` · `menuitemradio` · `presentation` · `separator`
+
+**States:** `:state(open)` — One of its menus is open.
+
+**Parts:** `[data-part="bar"]` — The `role="menubar"` row of triggers.; `[data-part="trigger"]` — A top-level entry; the one whose menu is open is `aria-expanded="true"`.; `[data-part="panel"]` — The open menu, `role="menu"` (on `<body>`).; `[data-part="item"]` — An entry of the open menu, or of a submenu.; `[data-part="separator"]` — The rule between two groups of entries.; `[data-part="label"]` — A group's label.
 
 **Shapes:** `MenubarItem { key: string; label: string; children?: MenuItem[]; mega?: boolean; megaColumns?: MegaColumn[]; disabled?: boolean }` · `MegaColumn { title: string; items: MenuItem[] }`
 

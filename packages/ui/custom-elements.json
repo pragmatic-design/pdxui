@@ -17780,20 +17780,20 @@
           ],
           "events": [
             {
-              "name": "pdx-check",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on `pdx-check`.",
-              "detail": "{ key, checked, item } | { key, checked, radioGroup, item }"
-            },
-            {
               "name": "pdx-select",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is selected.",
-              "detail": "{ key, item }"
+              "description": "An entry was chosen: its `key` and its item.",
+              "detail": "{ key: string; item: MenuItem }"
+            },
+            {
+              "name": "pdx-check",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A checkbox or radio entry was toggled: its `key`, whether it is checked, its radio group.",
+              "detail": "{ key: string; checked: boolean | undefined; radioGroup?: string; item: MenuItem }"
             }
           ],
           "roles": [
@@ -17834,6 +17834,38 @@
                 "title: string",
                 "items: MenuItem[]"
               ]
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "bar",
+              "description": "The `role=\"menubar\"` row of triggers."
+            },
+            {
+              "name": "trigger",
+              "description": "A top-level entry; the one whose menu is open is `aria-expanded=\"true\"`."
+            },
+            {
+              "name": "panel",
+              "description": "The open menu, `role=\"menu\"` (on `<body>`)."
+            },
+            {
+              "name": "item",
+              "description": "An entry of the open menu, or of a submenu."
+            },
+            {
+              "name": "separator",
+              "description": "The rule between two groups of entries."
+            },
+            {
+              "name": "label",
+              "description": "A group's label."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "open",
+              "description": "One of its menus is open."
             }
           ]
         }

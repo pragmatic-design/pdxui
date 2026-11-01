@@ -30,6 +30,18 @@
           </tbody>
         </table>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Methods, states and parts</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>openMenu(key)</code>, <code>closeMenu()</code></td><td>Open a top-level menu by key; close the open one. On the element</td></tr>
+            <tr><td><code>:state(open)</code></td><td>One of its menus is open; that menu's trigger is <code>aria-expanded="true"</code></td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>bar</code>, <code>trigger</code>, <code>panel</code>, <code>item</code>, <code>separator</code>, <code>label</code></td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- ═══ MenubarItem Interface ═══ -->
