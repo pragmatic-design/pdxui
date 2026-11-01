@@ -15,10 +15,14 @@
 
 /* ===== Container ===== */
 
+/* <pdx-toolbar> is laid out from its tag and its custom states (#289), CSS-only markup from
+   .pdx-toolbar and its modifier classes: each rule names both, inside :is(), so it keeps the weight
+   of the class. */
+
 /* Narrower than its controls, a toolbar wraps them onto another row: on one row, on a phone,
    the controls past the edge are cut off by the page's sideways clip. Not a
    scroller: that would clip the focus ring of the controls at its edges and hide the ones past it. */
-.pdx-toolbar {
+:is(.pdx-toolbar, pdx-toolbar) {
     display: flex;
     align-items: center;
     gap: 0.15rem;
@@ -27,17 +31,17 @@
 }
 
 /* Icon-only buttons in toolbar — tight square sizing */
-.pdx-toolbar :is(button, a, [role="button"]):is(.pdx-btn-xs, .pdx-btn-sm) {
+:is(.pdx-toolbar, pdx-toolbar) :is(button, a, [role="button"]):is(.pdx-btn-xs, .pdx-btn-sm) {
     padding: 0.3rem;
     min-height: 1.75rem;
     font-size: 0.8rem;
 }
-.pdx-toolbar :is(button, a, [role="button"]) pdx-icon {
+:is(.pdx-toolbar, pdx-toolbar) :is(button, a, [role="button"]) pdx-icon {
     display: inline-flex;
 }
 
 /* Bordered variant — with background and border */
-.pdx-toolbar-bordered {
+:is(.pdx-toolbar-bordered, :where(pdx-toolbar):state(bordered)) {
     background: light-dark(oklch(0.97 0 0), oklch(0.15 0 0));
     border: var(--pdx-border-width) solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-md);
@@ -45,21 +49,21 @@
 }
 
 /* ===== Vertical orientation ===== */
-/* The `vertical` prop adds .pdx-toolbar-vertical on the host: it stacks the items in a column
-   e ruota i separatori (diventano linee orizzontali a tutta larghezza). */
-.pdx-toolbar-vertical {
+/* The `vertical` prop puts the host in its vertical state (CSS-only markup: .pdx-toolbar-vertical):
+   it stacks the items in a column and turns the separators into horizontal lines. */
+:is(.pdx-toolbar-vertical, :where(pdx-toolbar):state(vertical)) {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
 }
 
-.pdx-toolbar-vertical .pdx-toolbar-sep {
+:is(.pdx-toolbar-vertical, :where(pdx-toolbar):state(vertical)) .pdx-toolbar-sep {
     width: 1.2rem;
     height: 1px;
     margin: 0.15rem auto;
 }
 
-.pdx-toolbar-vertical .pdx-toolbar-spacer {
+:is(.pdx-toolbar-vertical, :where(pdx-toolbar):state(vertical)) .pdx-toolbar-spacer {
     flex: 1 0 auto;
 }
 
@@ -106,12 +110,12 @@
 /* ===== Button hover inside toolbar — stronger contrast on gray bg ===== */
 
 @variant pdx-button variant(ghost) {
-    .pdx-toolbar :scope > :is(button, a, [role="button"])[data-part="root"]:hover {
+    :is(.pdx-toolbar, pdx-toolbar) :scope > :is(button, a, [role="button"])[data-part="root"]:hover {
         background: light-dark(oklch(0.88 0 0), oklch(0.25 0 0));
     }
 
-    .pdx-toolbar :scope > :is(button, a, [role="button"])[data-part="root"][aria-pressed="true"],
-    .pdx-toolbar :scope > :is(button, a, [role="button"])[data-part="root"].active {
+    :is(.pdx-toolbar, pdx-toolbar) :scope > :is(button, a, [role="button"])[data-part="root"][aria-pressed="true"],
+    :is(.pdx-toolbar, pdx-toolbar) :scope > :is(button, a, [role="button"])[data-part="root"].active {
         background: light-dark(oklch(0.85 0 0), oklch(0.28 0 0));
         color: var(--pdx-color-primary-ink);
     }
@@ -128,19 +132,19 @@
 
 /* ===== Compact variant ===== */
 
-.pdx-toolbar-compact {
+:is(.pdx-toolbar-compact, :where(pdx-toolbar):state(compact)) {
     gap: 0.1rem;
     padding: 0.2rem;
 }
 
-.pdx-toolbar-compact .pdx-toolbar-sep {
+:is(.pdx-toolbar-compact, :where(pdx-toolbar):state(compact)) .pdx-toolbar-sep {
     height: 1rem;
     margin: 0 0.1rem;
 }
 
 /* ===== Sticky toolbar ===== */
 
-.pdx-toolbar[pdx-sticky] {
+:is(.pdx-toolbar, pdx-toolbar)[pdx-sticky] {
     position: sticky;
     top: 0;
     z-index: var(--pdx-z-sticky, 10);

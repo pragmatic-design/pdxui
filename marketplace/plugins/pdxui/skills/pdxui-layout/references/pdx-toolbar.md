@@ -11,6 +11,8 @@ A row of grouped actions.
 
 **Renders:** roles `toolbar`
 
+**States:** `:state(compact)` — `compact` is set: less padding, a tighter gap.; `:state(bordered)` — `bordered` is set: a border and a background.; `:state(vertical)` — `vertical` is set: the controls in a column, ↑/↓ between them.
+
 
 #### Examples
 

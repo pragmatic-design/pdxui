@@ -55,8 +55,15 @@ const isDisabled = (el: HTMLElement): boolean => el.hasAttribute('disabled') || 
 /**
  * A toolbar of buttons, separators, groups and spacers that is one tab stop: the arrow keys, Home
  * and End move between its controls.
+ *
+ * @cssstate compact - `compact` is set: less padding, a tighter gap.
+ * @cssstate bordered - `bordered` is set: a border and a background.
+ * @cssstate vertical - `vertical` is set: the controls in a column, ↑/↓ between them.
  */
 component('pdx-toolbar', {
+    // Its controls are the app's markup, so it has no parts; it holds no value, so no model (#289).
+    // toolbar.css lays it out from its tag, as it does `.pdx-toolbar` in CSS-only markup.
+    states: ['compact', 'bordered', 'vertical'],
     props: {
         /** Compact mode (less padding) */
         compact: { type: Boolean, default: false },
@@ -75,10 +82,10 @@ component('pdx-toolbar', {
             const label = ctx.label() as string;
 
             requestAnimationFrame(() => {
-                ctx.el.classList.add('pdx-toolbar');
-                ctx.el.classList.toggle('pdx-toolbar-compact', compact);
-                ctx.el.classList.toggle('pdx-toolbar-bordered', bordered);
-                ctx.el.classList.toggle('pdx-toolbar-vertical', vertical);
+                // States, not classes (#289).
+                ctx.state('compact', compact);
+                ctx.state('bordered', bordered);
+                ctx.state('vertical', vertical);
                 ctx.el.setAttribute('role', 'toolbar');
                 uiAttr(ctx.el, 'aria-label', () => label || uiString('toolbar', 'label'));
                 if (vertical) ctx.el.setAttribute('aria-orientation', 'vertical');
