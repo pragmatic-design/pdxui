@@ -21,11 +21,15 @@ test('the hamburger is named, controls the navbar, and its aria-expanded follows
     const nav = s.getByRole('navigation');
     await expect(nav).toHaveAttribute('id', controls!);
     const width = () => nav.evaluate((el) => Math.round(el.getBoundingClientRect().width));
+    // The rail is icons only: the demo hides an item's label from the layout's navbar-collapsed state.
+    const label = () => nav.getByRole('button', { name: 'Users' }).evaluate((el) => getComputedStyle(el).fontSize);
     await expect.poll(width).toBe(160);
+    expect(await label()).not.toBe('0px');
 
     await burger.click();
     await expect(burger).toHaveAttribute('aria-expanded', 'false');
     await expect.poll(width, 'the navbar did not collapse to its rail').toBe(60);
+    expect(await label(), 'the rail still shows the labels').toBe('0px');
 
     await burger.click();
     await expect(burger).toHaveAttribute('aria-expanded', 'true');

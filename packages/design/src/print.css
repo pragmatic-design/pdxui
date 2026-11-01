@@ -73,8 +73,8 @@
      * `[data-pdx-no-print]` is the escape hatch for anything else an app does not want printed. */
 
     /* ── The content takes the width the chrome gave back ─────────────────── */
-    .pdx-app-layout {
-        display: block;      /* the grid's three columns were for the chrome that just left */
+    :is(.pdx-app-layout, pdx-app-layout) {
+        display: block;   /* the grid's three columns were for the chrome that just left */
         height: auto;        /* 100vh is a screen measurement; paper is as long as it needs */
         overflow: visible;   /* … and the shell's own clip would cut it at one page */
     }

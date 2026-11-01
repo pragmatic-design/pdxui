@@ -71,6 +71,19 @@ const DONE: Row[] = [
         // `goto` was `goTo` in lowercase, and the `index` getter stood in for the model.
         removed: ['pdx-change', 'goto'],
     },
+    {
+        tag: 'pdx-app-layout',
+        // `toggleNavbar()`, `openNavbar()` and `closeNavbar()` write `navbarCollapsed` above the
+        // breakpoint: a prop it writes itself. Below it the drawer is its own state, not the prop's.
+        models: ['navbarCollapsed'],
+        outputs: [],
+        // `withBorder`; below the breakpoint the navbar is a drawer, open or not; above it, collapsed
+        // to its rail, or to nothing.
+        states: ['bordered', 'drawer', 'drawer-open', 'navbar-collapsed', 'navbar-gone'],
+        // The app's regions as it places them, the <main> it wraps the rest in, and the drawer's backdrop.
+        parts: ['header', 'navbar', 'aside', 'main', 'footer', 'overlay'],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

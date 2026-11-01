@@ -20,7 +20,12 @@ there are exactly **four** names:
 know gets neither treatment — it is skipped by the four and skipped by the `main` wrap, so it drops
 out of the grid **silently**: no class, no `grid-area`, no warning.
 
-`:class` on a region is safe: the layout adds its class with `classList.add`, so both survive.
+`:class` on a region is safe: the layout adds its class with `classList.add`, so both survive. Each
+region is also the part of its name (`[data-part="navbar"]`), and the `<main>` is `[data-part="main"]`.
+
+**Its states are on the host, not on the navbar.** Style the collapsed rail from
+`pdx-app-layout:state(navbar-collapsed) .my-nav-item`, the open mobile drawer from `:state(drawer-open)`;
+the old `.pdx-app-navbar-collapsed` class is not written any more.
 
 **Who scrolls: `main.pdx-app-main`, never the window.** The shell is `overflow: hidden` and the main
 region is `overflow-y: auto`, so `<html>` and `<body>` do not scroll at all — measured at 800px tall
@@ -42,12 +47,12 @@ so the day the shell stops owning the scroll this note fails with it.
 | `footerHeight` | `footerheight` | string | `''` | Footer height (CSS value). Empty = no footer. |
 | `navbarWidth` | `navbarwidth` | string | `'260px'` | Navbar (left sidebar) width (CSS value) |
 | `navbarCollapsedWidth` | `navbarcollapsedwidth` | string | `'60px'` | Navbar collapsed width for mini mode. A non-zero rail keeps icon-only nav visible when collapsed (set to '0px' explicitly for a fully-hidden navbar). |
-| `navbarCollapsed` | `navbarcollapsed` | boolean | `false` | Navbar collapsed state |
 | `navbarBreakpoint` | `navbarbreakpoint` | number | `768` | Breakpoint (px) below which navbar auto-collapses to overlay |
 | `asideWidth` | `asidewidth` | string | `''` | Aside (right sidebar) width. Empty = no aside. |
 | `navbarFullHeight` | `navbarfullheight` | boolean | `false` | Full-height navbar: the left sidebar spans header+main+footer (logo lives in the navbar), and the header only sits above main. Default false = header spans full width. |
 | `withBorder` | `withborder` | boolean | `true` | Show border between regions |
 | `transitionDuration` | `transitionduration` | number | `200` | Transition duration (ms) |
+| `navbarCollapsed` | `navbarcollapsed` | boolean | `false` | Navbar collapsed state |
 
 **API (via `:ref`)**
 
@@ -57,7 +62,13 @@ so the day the shell stops owning the scroll this note fails with it.
 | `openNavbar()` | Open the navbar, on either side of the breakpoint. |
 | `closeNavbar()` | Close the navbar, on either side of the breakpoint. |
 
+**Events:** `navbar-collapsed-change` → `detail: { value: boolean }` — Fired when the component writes `navbarCollapsed`. Does not bubble.
+
 **Renders:** roles `banner` · `complementary` · `contentinfo` · `navigation`
+
+**States:** `:state(bordered)` — `withBorder` is set: a line between the regions.; `:state(drawer)` — Below `navbarBreakpoint`: the navbar is an overlay drawer, off screen until opened.; `:state(drawer-open)` — The drawer is open, with its backdrop.; `:state(navbar-collapsed)` — Above the breakpoint, the navbar is collapsed to its rail.; `:state(navbar-gone)` — Collapsed to a `0px` rail: the navbar takes no width at all.
+
+**Parts:** `[data-part="header"]` — The app's `data-region="header"` element (`.pdx-app-header`, `role="banner"`).; `[data-part="navbar"]` — The app's `data-region="navbar"` element (`.pdx-app-navbar`, `role="navigation"`).; `[data-part="aside"]` — The app's `data-region="aside"` element (`.pdx-app-aside`, `role="complementary"`).; `[data-part="main"]` — The `<main class="pdx-app-main">` it wraps everything without a region in; the element that scrolls.; `[data-part="footer"]` — The app's `data-region="footer"` element (`.pdx-app-footer`, `role="contentinfo"`).; `[data-part="overlay"]` — The backdrop behind the open drawer, below the breakpoint.
 
 
 #### Examples

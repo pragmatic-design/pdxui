@@ -2,7 +2,7 @@
 // CSS Grid layout with responsive collapse. Semantic HTML elements.
 // Props: navbarWidth, navbarCollapsed, navbarBreakpoint, asideWidth, headerHeight, footerHeight.
 
-import { component, html, signal, moveMounted, DEV } from '@pdxui/core';
+import { component, html, signal, moveMounted, DEV, model } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -19,8 +19,33 @@ const REGIONS = ['header', 'navbar', 'aside', 'footer'];
 /**
  * An application shell that places a header, side bars, main content and a footer on a CSS grid that
  * collapses responsively.
+ *
+ * @csspart header - The app's `data-region="header"` element (`.pdx-app-header`, `role="banner"`).
+ * @csspart navbar - The app's `data-region="navbar"` element (`.pdx-app-navbar`, `role="navigation"`).
+ * @csspart aside - The app's `data-region="aside"` element (`.pdx-app-aside`, `role="complementary"`).
+ * @csspart main - The `<main class="pdx-app-main">` it wraps everything without a region in; the element that scrolls.
+ * @csspart footer - The app's `data-region="footer"` element (`.pdx-app-footer`, `role="contentinfo"`).
+ * @csspart overlay - The backdrop behind the open drawer, below the breakpoint.
+ *
+ * @cssstate bordered - `withBorder` is set: a line between the regions.
+ * @cssstate drawer - Below `navbarBreakpoint`: the navbar is an overlay drawer, off screen until opened.
+ * @cssstate drawer-open - The drawer is open, with its backdrop.
+ * @cssstate navbar-collapsed - Above the breakpoint, the navbar is collapsed to its rail.
+ * @cssstate navbar-gone - Collapsed to a `0px` rail: the navbar takes no width at all.
  */
 component('pdx-app-layout', {
+    // Collapsed above the breakpoint (#290). `toggleNavbar()`, `openNavbar()` and `closeNavbar()` write
+    // it, and the write dispatches `navbar-collapsed-change` `{ value }`, which `::navbar-collapsed`
+    // follows; a parent's write moves the navbar. Below the breakpoint the drawer is the layout's own
+    // state, `drawer-open`, which the prop drives but the drawer does not write back.
+    models: {
+        /** Navbar collapsed state */
+        navbarCollapsed: model<boolean>(false, { type: Boolean }),
+    },
+    // On the host as custom states (#132): app-layout.css draws the border, the drawer and the rail
+    // from them, and none of them carries a class.
+    states: ['bordered', 'drawer', 'drawer-open', 'navbar-collapsed', 'navbar-gone'],
+    parts: ['header', 'navbar', 'aside', 'main', 'footer', 'overlay'],
     props: {
         /** Header height (CSS value). Empty = no header. */
         headerHeight: { type: String, default: '52px' },
@@ -31,8 +56,6 @@ component('pdx-app-layout', {
         /** Navbar collapsed width for mini mode. A non-zero rail keeps icon-only nav visible
          *  when collapsed (set to '0px' explicitly for a fully-hidden navbar). */
         navbarCollapsedWidth: { type: String, default: '60px' },
-        /** Navbar collapsed state */
-        navbarCollapsed: { type: Boolean, default: false },
         /** Breakpoint (px) below which navbar auto-collapses to overlay */
         navbarBreakpoint: { type: Number, default: 768 },
         /** Aside (right sidebar) width. Empty = no aside. */
@@ -141,12 +164,17 @@ component('pdx-app-layout', {
 
             // Navbar: desktop = in-grid (collapsible rail); mobile = fixed overlay drawer that
             // slides off-screen when collapsed (full navbar width when open, never the rail width).
+            // The states are the host's (#290): app-layout.css draws the drawer, its backdrop and the rail
+            // from them, on the app's navbar and the layout's own backdrop.
+            const drawerOpen = isMobile && !_mobileCollapsed.peek();
+            const railGone = !isMobile && isCollapsed && parseFloat(currentNavW || '0') === 0;
+            ctx.state('drawer', !!_navbarEl && isMobile);
+            ctx.state('drawer-open', !!_navbarEl && drawerOpen);
+            ctx.state('navbar-collapsed', !!_navbarEl && !isMobile && isCollapsed);
+            ctx.state('navbar-gone', !!_navbarEl && railGone);
             if (_navbarEl) {
                 if (isMobile) {
-                    _navbarEl.classList.add('pdx-app-navbar-overlay');
-                    _navbarEl.classList.remove('pdx-app-navbar-collapsed');
                     const offScreen = _mobileCollapsed.peek();
-                    _navbarEl.classList.toggle('pdx-app-navbar-hidden', offScreen);
                     // ⚠️ Off screen is not hidden. The closed drawer slides away with a transform and
                     // nothing else, so its entries would keep their place in the tab order and in the
                     // accessibility tree: Tab would walk into an invisible menu. `inert` removes both in
@@ -155,20 +183,16 @@ component('pdx-app-layout', {
                     _navbarEl.toggleAttribute('inert', offScreen);
                     _navbarEl.style.width = navW;
                 } else {
-                    _navbarEl.classList.remove('pdx-app-navbar-overlay', 'pdx-app-navbar-hidden');
                     // On desktop the navbar is in the grid and always reachable, collapsed or not:
                     // the rail is a visual state, not a hidden one.
                     _navbarEl.removeAttribute('inert');
-                    _navbarEl.classList.toggle('pdx-app-navbar-collapsed', isCollapsed);
                     _navbarEl.style.width = currentNavW;
                     // ⚠️ `width: 0` does NOT hide an element that has padding: with border-box the
                     // padding is a floor, so a navbar with 12px padding and a 1px border still
                     // occupies 25px — a sliver where the prop promises "a fully-hidden navbar".
                     // Done here rather than in a CSS class because the author's padding may be an
                     // inline style, which no selector outranks.
-                    const gone = isCollapsed && parseFloat(currentNavW || '0') === 0;
-                    _navbarEl.classList.toggle('pdx-app-navbar-gone', gone);
-                    if (gone) {
+                    if (railGone) {
                         _navbarEl.style.setProperty('padding-left', '0', 'important');
                         _navbarEl.style.setProperty('padding-right', '0', 'important');
                         _navbarEl.style.setProperty('border-left-width', '0', 'important');
@@ -181,13 +205,8 @@ component('pdx-app-layout', {
                 }
             }
 
-            // Overlay backdrop — visible only when the mobile drawer is open
-            if (_overlayEl) {
-                _overlayEl.classList.toggle('pdx-app-overlay-visible', isMobile && !_mobileCollapsed.peek());
-            }
-
-            // Border
-            el.classList.toggle('pdx-app-with-border', withBorder);
+            // The backdrop is drawn while `drawer-open` holds, and the border from `bordered`.
+            ctx.state('bordered', withBorder);
         }
 
         ctx.track(() => {
@@ -195,7 +214,9 @@ component('pdx-app-layout', {
             void ctx.headerHeight();
             void ctx.footerHeight();
             void ctx.navbarWidth();
+            void ctx.navbarCollapsedWidth();
             void ctx.asideWidth();
+            void ctx.transitionDuration();
 
             // The author wrote the prop → the mobile drawer follows. First run only records the
             // value: an initial `navbar-collapsed` is the starting state, not a command to open.
@@ -213,8 +234,8 @@ component('pdx-app-layout', {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
+                    // The host carries no class (#290): app-layout.css draws the grid on the tag.
                     const el = ctx.el;
-                    el.classList.add('pdx-app-layout');
 
                     // Discover slot children and wrap remaining in main
                     const children = Array.from(el.children) as HTMLElement[];
@@ -241,6 +262,7 @@ component('pdx-app-layout', {
                     if (slotMap['header']) {
                         _headerEl = slotMap['header'];
                         _headerEl.classList.add('pdx-app-header');
+                        _headerEl.setAttribute('data-part', 'header');
                         _headerEl.setAttribute('role', 'banner');
                     }
 
@@ -248,6 +270,7 @@ component('pdx-app-layout', {
                     if (slotMap['navbar']) {
                         _navbarEl = slotMap['navbar'];
                         _navbarEl.classList.add('pdx-app-navbar');
+                        _navbarEl.setAttribute('data-part', 'navbar');
                         _navbarEl.setAttribute('role', 'navigation');
                         // An accessible name: it disambiguates the landmark (axe landmark-unique with several <nav>).
                         if (!_navbarEl.hasAttribute('aria-label')) uiAttr(_navbarEl, 'aria-label', () => uiString('app-layout', 'mainNav'));
@@ -257,6 +280,7 @@ component('pdx-app-layout', {
                     if (slotMap['aside']) {
                         _asideEl = slotMap['aside'];
                         _asideEl.classList.add('pdx-app-aside');
+                        _asideEl.setAttribute('data-part', 'aside');
                         _asideEl.setAttribute('role', 'complementary');
                         if (!_asideEl.hasAttribute('aria-label')) uiAttr(_asideEl, 'aria-label', () => uiString('app-layout', 'aside'));
                     }
@@ -265,6 +289,7 @@ component('pdx-app-layout', {
                     if (slotMap['footer']) {
                         _footerEl = slotMap['footer'];
                         _footerEl.classList.add('pdx-app-footer');
+                        _footerEl.setAttribute('data-part', 'footer');
                         _footerEl.setAttribute('role', 'contentinfo');
                     }
 
@@ -274,6 +299,7 @@ component('pdx-app-layout', {
                     // and the insertion that puts them back in the document, run inside moveMounted.
                     const main = document.createElement('main');
                     main.className = 'pdx-app-main';
+                    main.setAttribute('data-part', 'main');
                     moveMounted(el, () => {
                         for (const child of children) {
                             if (!child.getAttribute('data-region')) {
@@ -293,6 +319,7 @@ component('pdx-app-layout', {
                     // Overlay for mobile navbar
                     _overlayEl = document.createElement('div');
                     _overlayEl.className = 'pdx-app-overlay';
+                    _overlayEl.setAttribute('data-part', 'overlay');
                     _overlayEl.addEventListener('click', () => {
                         _mobileCollapsed.set(true);
                         updateLayout();
@@ -314,9 +341,12 @@ component('pdx-app-layout', {
             requestAnimationFrame(() => updateLayout());
         });
 
+        // Above the breakpoint the methods write the model, which announces `navbar-collapsed-change`;
+        // the `_lastPropCollapsed` track sees the new value and the drawer follows it, as for a parent's
+        // write. Below it they move the drawer only.
         function setNavbarOpen(open: boolean): void {
             if (_mediaQuery?.matches) _mobileCollapsed.set(!open);
-            else (ctx.el as unknown as { navbarCollapsed: boolean }).navbarCollapsed = !open;
+            else ctx.navbarCollapsed.set(!open);
             updateLayout();
         }
 
@@ -324,13 +354,8 @@ component('pdx-app-layout', {
         ctx.expose({
             /** Open or close the navbar: the mobile drawer under the breakpoint, the `navbar-collapsed` prop above it. */
             toggleNavbar: () => {
-                if (_mediaQuery?.matches) {
-                    _mobileCollapsed.set(!_mobileCollapsed.peek());
-                } else {
-                    // Toggle via property
-                    (ctx.el as any).navbarCollapsed = !(ctx.navbarCollapsed() as boolean);
-                }
-                updateLayout();
+                if (_mediaQuery?.matches) setNavbarOpen(_mobileCollapsed.peek());
+                else setNavbarOpen(ctx.navbarCollapsed.peek() as boolean);
             },
             // Both modes, as toggleNavbar: the drawer below the breakpoint, the navbarCollapsed
             // property above it, so they act on desktop too.

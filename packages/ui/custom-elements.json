@@ -709,16 +709,6 @@
             },
             {
               "kind": "field",
-              "name": "navbarCollapsed",
-              "description": "Navbar collapsed state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "navbarcollapsed"
-            },
-            {
-              "kind": "field",
               "name": "navbarBreakpoint",
               "description": "Breakpoint (px) below which navbar auto-collapses to overlay",
               "type": {
@@ -768,6 +758,16 @@
               "attribute": "transitionduration"
             },
             {
+              "kind": "field",
+              "name": "navbarCollapsed",
+              "description": "Navbar collapsed state",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "navbarcollapsed"
+            },
+            {
               "kind": "method",
               "name": "toggleNavbar",
               "parameters": [],
@@ -784,6 +784,19 @@
               "name": "closeNavbar",
               "parameters": [],
               "description": "Close the navbar, on either side of the breakpoint."
+            }
+          ],
+          "models": [
+            "navbarCollapsed"
+          ],
+          "events": [
+            {
+              "name": "navbar-collapsed-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `navbarCollapsed`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -830,15 +843,6 @@
               "default": "'60px'"
             },
             {
-              "name": "navbarcollapsed",
-              "fieldName": "navbarCollapsed",
-              "description": "Navbar collapsed state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
               "name": "navbarbreakpoint",
               "fieldName": "navbarBreakpoint",
               "description": "Breakpoint (px) below which navbar auto-collapses to overlay",
@@ -882,12 +886,69 @@
                 "text": "number"
               },
               "default": "200"
+            },
+            {
+              "name": "navbarcollapsed",
+              "fieldName": "navbarCollapsed",
+              "description": "Navbar collapsed state",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "header",
+              "description": "The app's `data-region=\"header\"` element (`.pdx-app-header`, `role=\"banner\"`)."
+            },
+            {
+              "name": "navbar",
+              "description": "The app's `data-region=\"navbar\"` element (`.pdx-app-navbar`, `role=\"navigation\"`)."
+            },
+            {
+              "name": "aside",
+              "description": "The app's `data-region=\"aside\"` element (`.pdx-app-aside`, `role=\"complementary\"`)."
+            },
+            {
+              "name": "main",
+              "description": "The `<main class=\"pdx-app-main\">` it wraps everything without a region in; the element that scrolls."
+            },
+            {
+              "name": "footer",
+              "description": "The app's `data-region=\"footer\"` element (`.pdx-app-footer`, `role=\"contentinfo\"`)."
+            },
+            {
+              "name": "overlay",
+              "description": "The backdrop behind the open drawer, below the breakpoint."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "bordered",
+              "description": "`withBorder` is set: a line between the regions."
+            },
+            {
+              "name": "drawer",
+              "description": "Below `navbarBreakpoint`: the navbar is an overlay drawer, off screen until opened."
+            },
+            {
+              "name": "drawer-open",
+              "description": "The drawer is open, with its backdrop."
+            },
+            {
+              "name": "navbar-collapsed",
+              "description": "Above the breakpoint, the navbar is collapsed to its rail."
+            },
+            {
+              "name": "navbar-gone",
+              "description": "Collapsed to a `0px` rail: the navbar takes no width at all."
             }
           ]
         }

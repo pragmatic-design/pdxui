@@ -1,8 +1,8 @@
 /* pdx-app-layout — Application shell with grid regions */
 
-pdx-app-layout { display: block; }
-
-.pdx-app-layout {
+/* The component's host carries no class (#290): the tag, at the class's weight. The class stays for
+   CSS-only markup. */
+:is(.pdx-app-layout, pdx-app-layout) {
     display: grid;
     height: 100vh;
     overflow: hidden;
@@ -34,7 +34,9 @@ pdx-app-layout { display: block; }
     z-index: 30;
     min-width: 0;
 }
-.pdx-app-navbar-collapsed {
+
+/* The states are the host's (#290), each at the weight of the class it replaced. */
+:where(pdx-app-layout):state(navbar-collapsed) > :where(.pdx-app-navbar) {
     overflow: hidden;
 }
 
@@ -42,20 +44,20 @@ pdx-app-layout { display: block; }
    done in JS next to `style.width`, not here: an author's `padding` may be an inline style, which no
    selector can outrank, and the component already owns this element's geometry. */
 
-/* Navbar overlay drawer on mobile — slides in/out from the left */
-.pdx-app-navbar-overlay {
+/* Navbar overlay drawer on mobile — off screen to the left until it is opened */
+:where(pdx-app-layout):state(drawer) > :where(.pdx-app-navbar) {
     position: fixed;
     top: 0;
     left: 0;
     bottom: 0;
-    box-shadow: var(--pdx-shadow-xl);
     z-index: 100;
-    transform: translateX(0);
-    transition: transform var(--pdx-app-transition, 200ms) ease;
-}
-.pdx-app-navbar-overlay.pdx-app-navbar-hidden {
     transform: translateX(-100%);
     box-shadow: none;
+    transition: transform var(--pdx-app-transition, 200ms) ease;
+}
+:where(pdx-app-layout):state(drawer-open) > :where(.pdx-app-navbar) {
+    transform: translateX(0);
+    box-shadow: var(--pdx-shadow-xl);
 }
 
 /* Main content */
@@ -85,12 +87,12 @@ pdx-app-layout { display: block; }
 }
 
 /* Borders between regions */
-.pdx-app-with-border .pdx-app-header { border-bottom: 1px solid var(--pdx-color-border); }
-.pdx-app-with-border .pdx-app-navbar { border-right: 1px solid var(--pdx-color-border); }
-.pdx-app-with-border .pdx-app-aside { border-left: 1px solid var(--pdx-color-border); }
-.pdx-app-with-border .pdx-app-footer { border-top: 1px solid var(--pdx-color-border); }
+:where(pdx-app-layout):state(bordered) .pdx-app-header { border-bottom: 1px solid var(--pdx-color-border); }
+:where(pdx-app-layout):state(bordered) .pdx-app-navbar { border-right: 1px solid var(--pdx-color-border); }
+:where(pdx-app-layout):state(bordered) .pdx-app-aside { border-left: 1px solid var(--pdx-color-border); }
+:where(pdx-app-layout):state(bordered) .pdx-app-footer { border-top: 1px solid var(--pdx-color-border); }
 
-/* Mobile overlay backdrop */
+/* Mobile overlay backdrop, drawn while the drawer is open */
 .pdx-app-overlay {
     display: none;
     position: fixed;
@@ -98,6 +100,6 @@ pdx-app-layout { display: block; }
     background: var(--pdx-color-backdrop);
     z-index: 99;
 }
-.pdx-app-overlay-visible {
+:where(pdx-app-layout):state(drawer-open) > :where(.pdx-app-overlay) {
     display: block;
 }

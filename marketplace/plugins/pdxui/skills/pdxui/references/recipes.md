@@ -5,9 +5,11 @@ Always read [gotchas.md](gotchas.md) and the [catalogue](README.md) too.
 
 ## App shell (header + sidebar + content + footer)
 The component: **`pdx-app-layout`** (its regions come from `data-region="header|navbar|aside|footer"`, and everything else is main).
-- Collapsing to a mini rail: `navbar-collapsed` plus `navbar-collapsed-width`. Responsively: `navbar-breakpoint` (below it →
-  a drawer overlay). The variants: `navbar-full-height` (a sidebar that swallows the header) against a full-width header.
-- Toggling the mobile drawer: the imperative API, `document.querySelector('pdx-app-layout').__appLayout.toggleNavbar()`.
+- Collapsing to a mini rail: `navbar-collapsed` plus `navbar-collapsed-width`. It is a model: `::navbarCollapsed="collapsed"`
+  follows `toggleNavbar()`/`openNavbar()`/`closeNavbar()`, announced by `navbar-collapsed-change`. Responsively: `navbar-breakpoint`
+  (below it → a drawer overlay). The variants: `navbar-full-height` (a sidebar that swallows the header) against a full-width header.
+- Toggling the navbar: the element's methods, `toggleNavbar()`, `openNavbar()`, `closeNavbar()` — the drawer below the
+  breakpoint, the rail above it. Style a state from the host: `pdx-app-layout:state(navbar-collapsed)`, `:state(drawer-open)`.
 - The nav: **`pdx-nav-menu`** (`:items` is `{key,label,icon,href,disabled,badge,children}`, plus `active-key` and `@pdx-select`).
 - Keep the developer tools (the theme and scheme switchers) OUTSIDE the layout: a `position:fixed` gear opening a `pdx-drawer`.
 - `:class` on a `data-region` is fine — it merges with the class the layout adds (measured). ⚠️ But the region NAMES are a closed set of four: anything else drops out of the layout in

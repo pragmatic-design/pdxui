@@ -28,7 +28,7 @@ const DOM_QUERIES = new Set(['querySelector', 'querySelectorAll', 'getElementByI
 const PUBLIC_STATE_CLASSES = new Map<string, string>([
     ['pdx-in-view', 'useScrollAnimation, on the element it watches (composables docs)'],
     ['pdx-out-view', 'useScrollAnimation, on the element it watches (composables docs)'],
-    ['pdx-app-navbar-collapsed', 'pdx-app-layout, on the navbar the app slots in'],
+    // pdx-app-layout's collapsed navbar is the host's `:state(navbar-collapsed)` since #290: no class.
 ]);
 const GLOBAL_TARGETS = new Set(['document', 'window']);
 
