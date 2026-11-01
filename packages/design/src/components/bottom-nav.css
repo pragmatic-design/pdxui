@@ -2,7 +2,10 @@
 
 pdx-bottom-nav { display: block; }
 
-.pdx-bottom-nav {
+/* The component pins itself once drawn, from its ready state (#289), at the weight of the class it
+   replaced; CSS-only markup keeps the class. */
+.pdx-bottom-nav,
+:where(pdx-bottom-nav):state(ready) {
     position: fixed;
     bottom: 0;
     left: 0;
@@ -35,7 +38,8 @@ pdx-bottom-nav { display: block; }
     transition: color var(--pdx-transition);
 }
 
-.pdx-bottom-nav-item.active { color: var(--pdx-color-primary-ink); }
+/* The component marks the current item aria-current="page"; CSS-only markup may still write .active. */
+.pdx-bottom-nav-item:is(.active, [aria-current="page"]) { color: var(--pdx-color-primary-ink); }
 .pdx-bottom-nav-item:hover { color: var(--pdx-color-text); }
 
 .pdx-bottom-nav-icon { position: relative; display: flex; align-items: center; justify-content: center; }

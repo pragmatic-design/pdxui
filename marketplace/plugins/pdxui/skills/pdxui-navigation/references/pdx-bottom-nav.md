@@ -7,9 +7,13 @@ Mobile bottom navigation.
 | `items` | — | array | `[]` | The data items to render. |
 | `activeKey` | `activekey` | string | `''` | Key of the active item. |
 
-**Events:** `pdx-select` → `detail: { key, item }` — Fired when an item is selected.
+**Events:** `pdx-select` → `detail: { key: string; item: BottomNavItem }` — An item was chosen: its `key` and its item.
 
 **Renders:** roles `navigation`
+
+**States:** `:state(ready)` — Its bar is drawn, pinned to the bottom of the viewport.
+
+**Parts:** `[data-part="bar"]` — The row of items.; `[data-part="item"]` — An item, a button; the current one is `aria-current="page"`.; `[data-part="icon"]` — An item's icon, and the badge over it.; `[data-part="badge"]` — An item's count.; `[data-part="label"]` — An item's text.
 
 **Shapes:** `BottomNavItem { key: string; label: string; icon: string; badge?: string; badgeVariant?: 'default' | 'primary' | 'danger' }`
 

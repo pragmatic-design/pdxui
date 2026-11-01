@@ -3,21 +3,22 @@
  *
  * NEW contracts, derived by inspecting:
  *  - source: packages/ui/src/bottom-nav/pdx-bottom-nav.ts
- *      HOST <pdx-bottom-nav> → in an rAF it adds the class .pdx-bottom-nav to the host +
- *      role="navigation" + aria-label="Bottom navigation". Inside it, it creates an INNER
- *      <div class="pdx-bottom-nav-bar"> with N <button type="button" class="pdx-bottom-nav-item">.
- *        - active: the .active class ONLY  →  ⚠ NO aria-current, no aria-selected (see the BUG below).
+ *      HOST <pdx-bottom-nav> → in an rAF it takes the custom state :state(ready) (#289; it was the
+ *      class .pdx-bottom-nav) + role="navigation" + aria-label="Bottom navigation". Inside it, it
+ *      creates an INNER <div class="pdx-bottom-nav-bar"> with N <button type="button" class="pdx-bottom-nav-item">.
+ *      Each piece carries its data-part: bar, item, icon, badge, label.
+ *        - active: aria-current="page" on the item, no class.
  *        - icon: a <pdx-icon name size=22> inside .pdx-bottom-nav-icon (no aria-hidden).
  *        - label: a text span .pdx-bottom-nav-label → the button's accessible name.
  *      Data-driven (the `items` prop). No keydown handler, no roving tabindex: the buttons are
  *      nativamente tabbabili → pattern keyboard 'none'.
  *  - CSS: packages/design/src/components/bottom-nav.css
- *      .pdx-bottom-nav → position:fixed; bottom:0; left:0; right:0 (full-width viewport-driven).
+ *      :state(ready) (or .pdx-bottom-nav, CSS-only markup) → position:fixed; bottom:0; left:0; right:0.
  *      .pdx-bottom-nav-bar → display:flex; justify-content:space-around; align-items:center;
  *                            height:56px.
  *      .pdx-bottom-nav-item → display:flex; flex-direction:column; align-items:center;
  *                             flex:1 (→ the same width); cursor:pointer; color:muted.
- *      .pdx-bottom-nav-item.active → color: primary.
+ *      .pdx-bottom-nav-item[aria-current="page"] (or .active) → color: primary.
  *
  * Conservative rules: invariants true on ALL themes. No exact px.
  * States that are already in the DOM (the active item) → a STANDALONE rule (no triggered state: it avoids flake).
@@ -25,11 +26,7 @@
  *   target is .pdx-bottom-nav-bar (a stable geometry) with a 12px tolerance.
  *
  * Accessibility: the <nav> has aria-label="Bottom navigation" ✔; every item takes its accessible name
- *   from its label text ✔.
- *   ⚠ a11y BUG: the active item is marked with the .active class ALONE, with no aria-current and no
- *   aria-selected → the "active" state is not exposed to assistive technology. aria-current="page"
- *   should be added to the active item in the source (see the report). axe does not report it (it is
- *   not a hard WCAG violation), so no disableRules is needed.
+ *   from its label text ✔; the active item is aria-current="page" ✔.
  */
 import type { ComponentManifest } from './_types';
 
@@ -41,7 +38,7 @@ export const bottomNav: ComponentManifest = {
     imports: ['@pdxui/ui/bottom-nav'],
 
     // ── Scenarios ──
-    // items are JSON-driven (the model requires an icon). One active entry (activeKey) to exercise .active.
+    // items are JSON-driven (the model requires an icon). One active entry (activeKey) to exercise aria-current.
     scenarios: [
         {
             id: 'bottom-nav-basic',
@@ -69,15 +66,25 @@ export const bottomNav: ComponentManifest = {
                     },
                     {
                         // The active item is interactive → cursor pointer.
-                        selector: 'section:not([hidden]) [data-test="bottom-nav"] .pdx-bottom-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="bottom-nav"] [data-part="item"][aria-current="page"]',
                         description: 'active item cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The active item (not disabled) → opaque.
-                        selector: 'section:not([hidden]) [data-test="bottom-nav"] .pdx-bottom-nav-item.active',
+                        selector: 'section:not([hidden]) [data-test="bottom-nav"] [data-part="item"][aria-current="page"]',
                         description: 'active item opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
+                    },
+                ],
+                states: [
+                    {
+                        // Drawn and pinned: a custom state, not a class (#289).
+                        description: 'drawn, the bar is the custom state :state(ready)',
+                        selector: 'section:not([hidden]) [data-test="bottom-nav"] [data-part="bar"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="bottom-nav"]', name: 'ready' },
+                        changes: {},
                     },
                 ],
                 composition: [
@@ -86,8 +93,8 @@ export const bottomNav: ComponentManifest = {
                         description: 'bottom nav items have consistent width (flex:1)',
                         parent: '[data-test="bottom-nav"] .pdx-bottom-nav-bar',
                         children: {
-                            active: '[data-test="bottom-nav"] .pdx-bottom-nav-item.active',
-                            inactive: '[data-test="bottom-nav"] .pdx-bottom-nav-item:not(.active)',
+                            active: '[data-test="bottom-nav"] [data-part="item"][aria-current="page"]',
+                            inactive: '[data-test="bottom-nav"] [data-part="item"]:not([aria-current])',
                         },
                         relations: [
                             {
@@ -117,7 +124,7 @@ export const bottomNav: ComponentManifest = {
 
     // ── Dim. 2: axe-core ──
     // A <nav> with aria-label="Bottom navigation"; every item takes its accessible name from its label text.
-    // No disableRules (the aria-current BUG on the active item is not a hard WCAG violation for axe).
+    // No disableRules: no known false positive.
     a11y: {
         scenarios: ['bottom-nav-basic'],
     },

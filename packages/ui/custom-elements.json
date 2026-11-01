@@ -2705,8 +2705,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is selected.",
-              "detail": "{ key, item }"
+              "description": "An item was chosen: its `key` and its item.",
+              "detail": "{ key: string; item: BottomNavItem }"
             }
           ],
           "roles": [
@@ -2733,6 +2733,34 @@
                 "badge?: string",
                 "badgeVariant?: 'default' | 'primary' | 'danger'"
               ]
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "bar",
+              "description": "The row of items."
+            },
+            {
+              "name": "item",
+              "description": "An item, a button; the current one is `aria-current=\"page\"`."
+            },
+            {
+              "name": "icon",
+              "description": "An item's icon, and the badge over it."
+            },
+            {
+              "name": "badge",
+              "description": "An item's count."
+            },
+            {
+              "name": "label",
+              "description": "An item's text."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "ready",
+              "description": "Its bar is drawn, pinned to the bottom of the viewport."
             }
           ]
         }

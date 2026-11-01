@@ -98,6 +98,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-bottom-nav',
+        // `activeKey` is the app's to write: a click announces `pdx-select`, the app moves the key.
+        models: [],
+        // `ready` once its bar is drawn, and pinned to the bottom from then on; the current item is
+        // `aria-current="page"`, on the item.
+        states: ['ready'],
+        parts: ['bar', 'item', 'icon', 'badge', 'label'],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
