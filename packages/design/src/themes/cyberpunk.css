@@ -114,7 +114,7 @@
     --pdx-card-border-color: light-dark(var(--pdx-color-border), oklch(0.3 0.05 330));
 }
 [pdx-theme="cyberpunk"] .pdx-surface-card[interactive]:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)),
-[pdx-theme="cyberpunk"] .pdx-card-hoverable:hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+[pdx-theme="cyberpunk"] :is(.pdx-card-hoverable, :where(pdx-card:state(hoverable)) > [data-part="root"]):hover:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
     border-color: var(--pdx-color-primary);
     box-shadow: 0 0 8px oklch(from var(--pdx-color-primary) l c h / 0.3),
                 0 0 20px oklch(from var(--pdx-color-primary) l c h / 0.15);

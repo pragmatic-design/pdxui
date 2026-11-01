@@ -1,13 +1,32 @@
 // pdx-card — Structured card with header/body/footer/media slots.
 // Enhances Pragmatic CSS cards with: loading skeleton, clickable, selectable, link overlay.
 
-import { component, html, sanitizeUrl } from '@pdxui/core';
+import { component, html, sanitizeUrl, event } from '@pdxui/core';
 
 /**
  * A structured card with header, body, footer and media slots, which can show a loading skeleton
  * and be clickable or selectable.
+ *
+ * @csspart root - The card's box (`.pdx-surface-card`); the header, body and footer inside it are your markup.
+ * @csspart link - The `<a>` laid across the card when it has an `href`.
+ * @cssstate horizontal - `horizontal` is set: media beside the body.
+ * @cssstate compact - `compact` is set: tighter sections.
+ * @cssstate hoverable - It lifts on hover: `hoverable`, `clickable` or an `href`.
+ * @cssstate clickable - It is pressed or followed as a whole: `clickable` or an `href`.
+ * @cssstate selected - `selected` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set: a skeleton in place of the content, and `aria-busy`.
  */
 component('pdx-card', {
+    // `selected` is the app's to write — the card announces a click, it never selects itself — so it
+    // is a prop, not a model (#290). Its looks are states on the host, which base.css draws on the
+    // root part beside the classes of CSS-only markup.
+    events: {
+        /** The card was clicked, or pressed with Enter or Space, as `clickable`. */
+        'pdx-click': event<void>(),
+    },
+    states: ['horizontal', 'compact', 'hoverable', 'clickable', 'selected', 'disabled', 'loading'],
+    parts: ['root', 'link'],
     // The axis base.css keys by (#632), reflected on the host; each value maps the class that draws
     // the same card on native markup. `default` is the base look.
     variants: {
@@ -40,15 +59,21 @@ component('pdx-card', {
         elevation: { type: Number, default: -1 },
     },
     setup(ctx) {
+        // States, not classes on the box (#290). The elevation stays a class: it is a level, 0 to 4,
+        // not a state.
+        ctx.track(() => {
+            const link = !!ctx.href();
+            ctx.state('horizontal', !!ctx.horizontal());
+            ctx.state('compact', !!ctx.compact());
+            ctx.state('hoverable', !!(ctx.hoverable() || ctx.clickable() || link));
+            ctx.state('clickable', !!(ctx.clickable() || link));
+            ctx.state('selected', !!ctx.selected());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('loading', !!ctx.loading());
+        });
+
         function rootClass(): string {
             let cls = 'pdx-surface pdx-surface-card';
-            if (ctx.horizontal()) cls += ' pdx-card-horizontal';
-            if (ctx.compact()) cls += ' pdx-card-compact';
-            if (ctx.hoverable() || ctx.clickable() || ctx.href()) cls += ' pdx-card-hoverable';
-            if (ctx.clickable() || ctx.href()) cls += ' pdx-card-clickable';
-            if (ctx.selected()) cls += ' pdx-card-selected';
-            if (ctx.disabled()) cls += ' pdx-card-disabled';
-            if (ctx.loading()) cls += ' pdx-card-loading';
             const elev = ctx.elevation() as number;
             if (elev >= 0) cls += ' pdx-card-elevation-' + elev;
             return cls;
@@ -142,7 +167,7 @@ component('pdx-card', {
     },
     render: (ctx) => html`
         <div :class="${ctx.rootClass}" data-part="root">
-            ${() => ctx.safeHref() ? html`<a class="pdx-card-link" :href="${ctx.safeHref}" aria-hidden="true" tabindex="-1"></a>` : ''}
+            ${() => ctx.safeHref() ? html`<a class="pdx-card-link" data-part="link" :href="${ctx.safeHref}" aria-hidden="true" tabindex="-1"></a>` : ''}
             ${() => ctx.loading() ? html`
                 <div class="pdx-card-body">
                     <div class="pdx-skeleton" style="height:1rem;width:60%;margin-bottom:var(--pdx-space-sm)"></div>

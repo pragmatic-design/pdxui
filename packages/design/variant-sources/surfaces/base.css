@@ -103,22 +103,22 @@
 
 /* ===== Card — Horizontal layout ===== */
 
-.pdx-card-horizontal {
+:is(.pdx-card-horizontal, :where(pdx-card:state(horizontal)) > [data-part="root"]) {
     display: flex;
 }
 
-.pdx-card-horizontal > .pdx-card-media {
+:is(.pdx-card-horizontal, :where(pdx-card:state(horizontal)) > [data-part="root"]) > .pdx-card-media {
     border-radius: var(--pdx-radius-lg) 0 0 var(--pdx-radius-lg);
     width: 40%;
     flex-shrink: 0;
 }
 
-.pdx-card-horizontal > .pdx-card-media > img {
+:is(.pdx-card-horizontal, :where(pdx-card:state(horizontal)) > [data-part="root"]) > .pdx-card-media > img {
     height: 100%;
     object-fit: cover;
 }
 
-.pdx-card-horizontal > .pdx-card-body {
+:is(.pdx-card-horizontal, :where(pdx-card:state(horizontal)) > [data-part="root"]) > .pdx-card-body {
     flex: 1;
 }
 
@@ -145,19 +145,19 @@
 
 /* ===== Card — Compact ===== */
 
-.pdx-card-compact {
+:is(.pdx-card-compact, :where(pdx-card:state(compact)) > [data-part="root"]) {
     padding: var(--pdx-space-sm);
 }
 
-.pdx-card-compact .pdx-card-header {
+:is(.pdx-card-compact, :where(pdx-card:state(compact)) > [data-part="root"]) .pdx-card-header {
     padding: var(--pdx-space-xs) var(--pdx-space-sm);
 }
 
-.pdx-card-compact .pdx-card-body {
+:is(.pdx-card-compact, :where(pdx-card:state(compact)) > [data-part="root"]) .pdx-card-body {
     padding: var(--pdx-space-sm);
 }
 
-.pdx-card-compact .pdx-card-footer {
+:is(.pdx-card-compact, :where(pdx-card:state(compact)) > [data-part="root"]) .pdx-card-footer {
     padding: var(--pdx-space-xs) var(--pdx-space-sm);
 }
 
@@ -217,8 +217,8 @@ a.pdx-surface-card:focus-visible {
 .pdx-surface-card.pdx-card-elevation-4 { box-shadow: var(--pdx-shadow-xl); }
 
 /* Card — interactive states for WC */
-.pdx-card-hoverable { transition: box-shadow var(--pdx-transition), transform var(--pdx-transition); }
-.pdx-card-hoverable:hover { box-shadow: var(--pdx-shadow-md); transform: translateY(-1px); }
+:is(.pdx-card-hoverable, :where(pdx-card:state(hoverable)) > [data-part="root"]) { transition: box-shadow var(--pdx-transition), transform var(--pdx-transition); }
+:is(.pdx-card-hoverable, :where(pdx-card:state(hoverable)) > [data-part="root"]):hover { box-shadow: var(--pdx-shadow-md); transform: translateY(-1px); }
 /* Card with `href` — the link overlay. A real <a> across the card, so middle-click, open in a new
    tab, copy link address and the status bar all work and the address is in the DOM, none of
    which a card that navigates from JS has. It is aria-hidden and out of the
@@ -233,17 +233,17 @@ a.pdx-surface-card:focus-visible {
    the JS fallback keeps plain clicks looking correct. Text over the overlay is not
    selectable; that is inherent to a card that IS a link, and the same is true of an <a>
    wrapped around one. */
-.pdx-card-clickable { cursor: pointer; position: relative; }
+:is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) { cursor: pointer; position: relative; }
 .pdx-card-link { position: absolute; inset: 0; z-index: 0; }
-.pdx-card-clickable a:not(.pdx-card-link), .pdx-card-clickable button,
-.pdx-card-clickable input, .pdx-card-clickable select, .pdx-card-clickable textarea,
-.pdx-card-clickable [role='button'], .pdx-card-clickable pdx-button {
+:is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) a:not(.pdx-card-link), :is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) button,
+:is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) input, :is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) select, :is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) textarea,
+:is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) [role='button'], :is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]) pdx-button {
     position: relative; z-index: 1;
 }
-.pdx-card-clickable:focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
-.pdx-card-selected { border-color: var(--pdx-color-primary); box-shadow: 0 0 0 2px var(--pdx-color-primary); }
-.pdx-card-disabled { opacity: var(--pdx-opacity-disabled); pointer-events: none; }
-.pdx-card-loading .pdx-skeleton {
+:is(.pdx-card-clickable, :where(pdx-card:state(clickable)) > [data-part="root"]):focus-visible { box-shadow: var(--pdx-focus-ring); outline: none; }
+:is(.pdx-card-selected, :where(pdx-card:state(selected)) > [data-part="root"]) { border-color: var(--pdx-color-primary); box-shadow: 0 0 0 2px var(--pdx-color-primary); }
+:is(.pdx-card-disabled, :where(pdx-card:state(disabled)) > [data-part="root"]) { opacity: var(--pdx-opacity-disabled); pointer-events: none; }
+:is(.pdx-card-loading, :where(pdx-card:state(loading)) > [data-part="root"]) .pdx-skeleton {
     background: var(--pdx-color-inset);
     border-radius: var(--pdx-radius-sm);
     animation: pdx-skeleton-pulse 1.5s ease-in-out infinite;

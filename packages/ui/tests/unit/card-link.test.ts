@@ -91,7 +91,8 @@ describe('what a clickable card does still holds', () => {
         // without it the anchor covers the button and the card becomes one big link.
         const css = readFileSync(join(__dirname, '..', '..', '..', 'design', 'src', 'surfaces', 'base.css'), 'utf-8');
         expect(css, 'the overlay has no CSS at all').toMatch(/\.pdx-card-link\s*\{[^}]*inset:\s*0/);
+        // The rule names the class of CSS-only markup and the component's clickable state (#290).
         expect(css, 'nothing raises a card interactive child above the link overlay')
-            .toMatch(/\.pdx-card-clickable button/);
+            .toMatch(/:is\(\.pdx-card-clickable, :where\(pdx-card:state\(clickable\)\) > \[data-part="root"\]\) button/);
     });
 });
