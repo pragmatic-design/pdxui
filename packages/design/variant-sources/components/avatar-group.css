@@ -1,14 +1,14 @@
 /* avatar-group — stacked avatars with overflow badge */
 
 /* Override media.css legacy .pdx-avatar-group rule */
-.pdx-avatar-group-root .pdx-avatar-group {
+:is(.pdx-avatar-group-root, pdx-avatar-group) .pdx-avatar-group {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: flex-start;
 }
 
-.pdx-avatar-group-root .pdx-avatar-group-reverse {
+:is(.pdx-avatar-group-root, pdx-avatar-group) .pdx-avatar-group-reverse {
     flex-direction: row-reverse;
 }
 
@@ -67,7 +67,7 @@
     background: var(--pdx-color-border);
 }
 
-/* Root host element */
-.pdx-avatar-group-root {
+/* The host, at the root class's weight (#291) */
+:is(.pdx-avatar-group-root, pdx-avatar-group) {
     display: inline-block;
 }

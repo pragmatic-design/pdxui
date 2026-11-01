@@ -1,7 +1,7 @@
 // pdx-avatar-group — Stacked avatar group with overflow counter.
 // Shows up to `max` avatars overlapping, with a +N badge for the rest.
 
-import { component, html } from '@pdxui/core';
+import { component, html, event } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -23,8 +23,19 @@ function makeButton(el: HTMLElement, name: string, activate: () => void): void {
 
 /**
  * Stacked, overlapping avatars, up to a maximum count, with an overflow counter for the rest.
+ *
+ * @csspart root - The row the avatars and the counter are laid out in.
+ * @csspart avatar - Each avatar shown.
+ * @csspart overflow - The «+N» counter for the avatars not shown.
  */
 component('pdx-avatar-group', {
+    events: {
+        /** A clickable group's avatar was pressed: its item and its index. */
+        'pdx-click': event<{ item: unknown; index: number }>(),
+        /** The «+N» counter was pressed: how many are hidden, and which. */
+        'pdx-overflow-click': event<{ count: number; items: unknown[] }>(),
+    },
+    parts: ['root', 'avatar', 'overflow'],
     // The axis avatar-group.css keys by (#632), reflected on the host: it draws the overflow badge
     // and is passed to every avatar. No native class is kept: the badge is not the root part, and
     // nothing used `.pdx-avatar-size-*` on native markup.
@@ -59,6 +70,7 @@ component('pdx-avatar-group', {
             const isReverse = dir === 'row-reverse';
 
             _containerEl.className = 'pdx-avatar-group';
+            _containerEl.setAttribute('data-part', 'root');
             if (isReverse) _containerEl.classList.add('pdx-avatar-group-reverse');
 
             const visible = allItems.slice(0, maxCount);
@@ -71,6 +83,7 @@ component('pdx-avatar-group', {
                 if (item.color) avatar.setAttribute('color', item.color);
                 avatar.setAttribute('size', avatarSize);
                 avatar.className = 'pdx-avatar-group-item';
+                avatar.setAttribute('data-part', 'avatar');
                 if (isBordered) avatar.classList.add('pdx-avatar-group-bordered');
                 // First avatar on top, decreasing z-index for overlap stacking
                 avatar.style.zIndex = String(visible.length + 1 - idx);
@@ -98,6 +111,7 @@ component('pdx-avatar-group', {
             if (overflow > 0) {
                 const badge = document.createElement('div');
                 badge.className = 'pdx-avatar-group-overflow pdx-avatar-group-item';
+                badge.setAttribute('data-part', 'overflow');
                 if (isBordered) badge.classList.add('pdx-avatar-group-bordered');
                 if (isReverse) {
                     badge.style.marginRight = overlapPx + 'px';
@@ -131,8 +145,8 @@ component('pdx-avatar-group', {
             if (!_built) {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
+                // The host carries no class (#291): avatar-group.css draws it from the tag.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-avatar-group-root');
                     _containerEl = document.createElement('div');
                     ctx.el.appendChild(_containerEl);
                     renderGroup();
