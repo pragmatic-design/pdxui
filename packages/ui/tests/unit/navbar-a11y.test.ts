@@ -49,7 +49,8 @@ describe('pdx-navbar mobile menu', () => {
         const link = document.activeElement as HTMLElement;
         expect(key(link, 'Escape').defaultPrevented).toBe(true);
         expect(t.getAttribute('aria-expanded')).toBe('false');
-        expect(el.querySelector('.pdx-navbar-drawer')?.classList.contains('pdx-navbar-drawer-open')).toBe(false);
+        // The drawer it shows is the host's :state(menu-open) (#289), measured in Chromium by
+        // navbar-beta-contract.spec.ts.
         expect(document.activeElement).toBe(t);
     });
 

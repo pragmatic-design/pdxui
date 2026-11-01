@@ -87,6 +87,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-navbar',
+        // Nothing the app reads back: the mobile menu it opens and closes is a state, not a prop.
+        models: [],
+        // `sticky` and `compact` follow their props, `collapsed` its own width, `menu-open` its toggle;
+        // the current link is `aria-current="page"`, on the link.
+        states: ['sticky', 'compact', 'collapsed', 'menu-open'],
+        parts: ['bar', 'brand', 'toggle', 'nav', 'item', 'actions', 'drawer'],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
