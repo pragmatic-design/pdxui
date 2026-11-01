@@ -8,7 +8,7 @@
 // one that ends 20 ms after appearing does not blink. `fullscreen` covers the viewport and makes the
 // rest of the document inert, which the libraries that have a full-screen mode do not.
 
-import { component, html, onDestroy } from '@pdxui/core';
+import { component, html, onDestroy, event } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/block-ui';
@@ -17,8 +17,22 @@ import '../spinner/pdx-spinner'; // rendered by this component, and registered b
 /**
  * A loading overlay that wraps content and, while blocked, stops interaction with it and covers it
  * with a semi-transparent overlay and a spinner.
+ *
+ * @cssstate blocked - The input is blocked: from the moment `blocked` turns on until the overlay is taken away.
+ * @cssstate shown - The overlay is drawn: past its `delay`, and for at least `min-duration`.
+ * @csspart overlay - The overlay over the wrapped content.
+ * @csspart spinner - The group in the overlay that holds the spinner and the message.
+ * @csspart message - The message, the overlay's live region.
  */
 component('pdx-block-ui', {
+    events: {
+        /** The overlay is drawn: past its delay, the moment a person sees it. */
+        'pdx-block': event<void>(),
+        /** The overlay is taken away and the input given back. */
+        'pdx-unblock': event<void>(),
+    },
+    states: ['blocked', 'shown'],
+    parts: ['overlay', 'spinner', 'message'],
     props: {
         /** Whether the UI is blocked (shows overlay + spinner) */
         blocked: { type: Boolean, default: false },
@@ -103,16 +117,17 @@ component('pdx-block-ui', {
         }
 
         function draw(on: boolean): void {
-            if (_overlayEl) {
-                _overlayEl.classList.toggle('pdx-block-ui-visible', on);
-                _overlayEl.setAttribute('aria-hidden', String(!on));
-            }
+            // Drawn is the host's state (#291); block-ui.css draws the overlay from it.
+            ctx.state('shown', on);
+            if (_overlayEl) _overlayEl.setAttribute('aria-hidden', String(!on));
             syncMessage(on, ctx.message() as string);
         }
 
         /** The input: blocked or given back, at once. */
         function block(on: boolean): void {
-            ctx.el.setAttribute('aria-busy', String(on));
+            // Busy while blocked and not otherwise (A4): no `aria-busy="false"` on a region at rest.
+            if (on) ctx.el.setAttribute('aria-busy', 'true'); else ctx.el.removeAttribute('aria-busy');
+            ctx.state('blocked', on);
             syncInert(on);
             inertOutside(on && (ctx.fullscreen() as boolean));
         }
@@ -161,15 +176,16 @@ component('pdx-block-ui', {
             if (!_built) {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
+                // The host carries no class (#291): block-ui.css draws it from the tag.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-block-ui');
-
                     _overlayEl = document.createElement('div');
                     _overlayEl.className = 'pdx-block-ui-overlay';
+                    _overlayEl.setAttribute('data-part', 'overlay');
                     _overlayEl.setAttribute('aria-hidden', 'true');
 
                     const spinnerWrap = document.createElement('div');
                     spinnerWrap.className = 'pdx-block-ui-spinner';
+                    spinnerWrap.setAttribute('data-part', 'spinner');
 
                     if (variant !== 'none') {
                         const spinner = document.createElement('pdx-spinner');
@@ -185,6 +201,7 @@ component('pdx-block-ui', {
                     // Live region: the screen reader announces the loading state.
                     _msgEl = document.createElement('span');
                     _msgEl.className = 'pdx-block-ui-message';
+                    _msgEl.setAttribute('data-part', 'message');
                     _msgEl.setAttribute('role', 'status');
                     _msgEl.setAttribute('aria-live', 'polite');
                     spinnerWrap.appendChild(_msgEl);
@@ -192,7 +209,6 @@ component('pdx-block-ui', {
                     _overlayEl.appendChild(spinnerWrap);
                     _overlayEl.classList.toggle('pdx-block-ui-fullscreen', ctx.fullscreen() as boolean);
                     ctx.el.appendChild(_overlayEl);
-                    ctx.el.setAttribute('aria-busy', 'false');
                     apply(ctx.blocked() as boolean);
                 });
                 return;

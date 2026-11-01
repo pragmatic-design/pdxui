@@ -23,7 +23,9 @@ async function mount(html: string): Promise<{ block: BlockUi; events: string[] }
 }
 
 const overlay = () => document.querySelector('.pdx-block-ui-overlay') as HTMLElement;
-const visible = () => overlay().classList.contains('pdx-block-ui-visible');
+// Drawn is the host's :state(shown) (#291), measured in Chromium by display-b-beta-contract.spec.ts;
+// the overlay leaves the accessibility tree's hiding at the same moment.
+const visible = () => overlay().getAttribute('aria-hidden') === 'false';
 const inert = (sel: string) => document.querySelector(sel)!.closest('[inert]') !== null;
 
 afterEach(() => { vi.useRealTimers(); document.body.innerHTML = ''; });
@@ -44,7 +46,7 @@ describe('pdx-block-ui — delay', () => {
         expect(visible()).toBe(false);
         expect(events, 'a block that was never drawn announced one').toEqual([]);
         expect(inert('#a')).toBe(false);
-        expect(block.getAttribute('aria-busy')).toBe('false');
+        expect(block.getAttribute('aria-busy'), 'busy only while blocked (A4)').toBeNull();
     });
 
     it('a block that ends right after the delay stays drawn for min-duration', async () => {
