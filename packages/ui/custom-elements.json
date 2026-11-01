@@ -28497,6 +28497,20 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssStates": [
+            {
+              "name": "compact",
+              "description": "`compact` is set: less padding, a tighter gap."
+            },
+            {
+              "name": "bordered",
+              "description": "`bordered` is set: a border and a background."
+            },
+            {
+              "name": "vertical",
+              "description": "`vertical` is set: the controls in a column, ↑/↓ between them."
+            }
           ]
         }
       ],

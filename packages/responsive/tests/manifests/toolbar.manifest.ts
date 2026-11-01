@@ -6,12 +6,13 @@
  *   - Source: packages/ui/src/toolbar/pdx-toolbar.ts
  *       · render() = <slot></slot>: the children (native buttons, separators, spacers, groups)
  *         are projected as direct children of the <pdx-toolbar> HOST (light DOM).
- *       · In a rAF the host receives: the class `.pdx-toolbar`, role="toolbar", aria-label = the `label` prop
- *         (default the toolbar.label string, "Toolbar"), aria-orientation="vertical" when vertical.
- *       · Boolean props → classes toggled on the host:
- *           compact   → .pdx-toolbar-compact
- *           bordered  → .pdx-toolbar-bordered
- *           vertical  → .pdx-toolbar-vertical   (see the vertical toolbar below)
+ *       · In a rAF the host receives: role="toolbar", aria-label = the `label` prop (default the
+ *         toolbar.label string, "Toolbar"), aria-orientation="vertical" when vertical. No class (#289):
+ *         toolbar.css lays `pdx-toolbar` out from its tag, as it does `.pdx-toolbar` in CSS-only markup.
+ *       · Boolean props → custom states on the host (CSS-only markup: the modifier classes):
+ *           compact   → :state(compact)    (.pdx-toolbar-compact)
+ *           bordered  → :state(bordered)   (.pdx-toolbar-bordered)
+ *           vertical  → :state(vertical)   (.pdx-toolbar-vertical; see the vertical toolbar below)
  *       · WAI-ARIA toolbar: ONE tab stop (roving tabindex through focusGroup over the controls
  *         it finds — the inner <button> of a pdx-button, the trigger of a pdx-select), ←/→ (↑/↓ when
  *         vertical), Home/End between the controls. A control that uses those keys (a text field, a select) keeps them.
@@ -26,7 +27,7 @@
  *         radii (first one left, last one right, middles 0) and a negative margin-left (flush).
  *
  * The vertical toolbar:
- *   The `vertical` prop adds `.pdx-toolbar-vertical` to the host (pdx-toolbar.ts:35), and
+ *   The `vertical` prop puts the host in :state(vertical), and
  *   packages/design/src/components/toolbar.css implements it (flex-direction:column;
  *   align-items:stretch) + rotated separators; without that rule the prop is inert and the
  *   toolbar stays horizontal. The scenario `toolbar-vertical` below catches the regression
@@ -244,10 +245,27 @@ export const toolbar: ComponentManifest = {
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                 ],
+                states: [
+                    {
+                        // From their props: custom states, not classes (#289).
+                        description: 'vertical is the custom state :state(vertical)',
+                        selector: 'section:not([hidden]) [data-test="toolbar-vertical"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="toolbar-vertical"]', name: 'vertical' },
+                        changes: {},
+                    },
+                    {
+                        description: 'bordered is the custom state :state(bordered)',
+                        selector: 'section:not([hidden]) [data-test="toolbar-vertical"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="toolbar-vertical"]', name: 'bordered' },
+                        changes: {},
+                    },
+                ],
                 composition: [
                     {
                         // Vertical: the two buttons are STACKED (bottom below top), not side by side.
-                        // It catches a .pdx-toolbar-vertical that lays the items out in a row instead of a column.
+                        // It catches a vertical state that lays the items out in a row instead of a column.
                         description: 'vertical toolbar stacks items in a column',
                         parent: 'section:not([hidden]) [data-test="toolbar-vertical"]',
                         children: {

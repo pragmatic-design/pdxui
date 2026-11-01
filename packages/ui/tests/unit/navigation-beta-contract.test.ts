@@ -109,6 +109,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-toolbar',
+        // Holds no position: its controls are the app's, and the roving tab stop is focus, not a value.
+        models: [],
+        // From their props; a toolbar is a toolbar from its tag, with no state for it.
+        states: ['compact', 'bordered', 'vertical'],
+        // It draws nothing of its own: every control, separator and group is the app's markup.
+        parts: [],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
