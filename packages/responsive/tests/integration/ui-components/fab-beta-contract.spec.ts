@@ -29,6 +29,12 @@ const call = (page: Page, method: string) =>
     page.locator(HOST).evaluate((h, m) => (h as unknown as Record<string, () => void>)[m](), method);
 
 const fab = (page: Page) => page.locator(`${HOST} .pdx-fab`);
+/**
+ * The FAB listens for Escape from the frame after it opens, the frame that writes its button's
+ * `aria-expanded="true"` (#801): an Escape pressed before that frame reaches no listener. Wait on the
+ * attribute the FAB writes, not on `isOpen`, which turns true at once.
+ */
+const takesEscape = (page: Page) => expect(fab(page)).toHaveAttribute('aria-expanded', 'true');
 /** Whether the dial shows: its first action is opaque. */
 const dialShown = (page: Page) => page.locator(`${HOST} .pdx-fab-action-wrap`).first().evaluate((w) => getComputedStyle(w).opacity === '1');
 
@@ -85,6 +91,7 @@ test.describe('open, a read-only state', () => {
         const isOpen = () => page.locator(HOST).evaluate((h) => (h as unknown as { isOpen: boolean }).isOpen);
         await fab(page).click();
         expect(await isOpen()).toBe(true);
+        await takesEscape(page);
         await page.keyboard.press('Escape');
         await expect.poll(isOpen).toBe(false);
         await fab(page).click();
