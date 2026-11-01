@@ -60,6 +60,26 @@ const DONE: Row[] = [
     },
     // Its inner <dl> is the root part and keeps the native classes; the host carries none.
     { tag: 'pdx-description-list', models: [], outputs: [], states: [], parts: ['root'], removed: [] },
+    // Its row's direction and borders are the row part's own classes, set from props.
+    { tag: 'pdx-avatar-group', models: [], outputs: [], states: [], parts: ['root', 'avatar', 'overflow'], removed: [] },
+    {
+        tag: 'pdx-image',
+        models: [],
+        outputs: [],
+        // Its source not arrived yet, zoomed in, and failed.
+        states: ['loading', 'zoomed', 'broken'],
+        parts: ['frame', 'image', 'placeholder', 'fallback', 'caption'],
+        removed: [],
+    },
+    {
+        tag: 'pdx-block-ui',
+        models: [],
+        outputs: [],
+        // The input blocked at once; the overlay drawn after its delay (A4: aria-busy while blocked).
+        states: ['blocked', 'shown'],
+        parts: ['overlay', 'spinner', 'message'],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

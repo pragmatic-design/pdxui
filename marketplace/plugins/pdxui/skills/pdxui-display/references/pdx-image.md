@@ -34,9 +34,13 @@ Two asymmetries the policy's name does not give away:
 | `authProvider` | — | object | `null` | Function returning HTTP headers for auth requests |
 | `fetchFn` | — | object | `null` | Custom fetch function: (url: string) => Promise<Blob> |
 
-**Events:** `pdx-error` → `detail: {}` — Fired when an error occurs.; `pdx-load` → `detail: {}` — Fired when content has loaded.; `pdx-zoom` → `detail: { zoomed }` — Fired on `pdx-zoom`.
+**Events:** `pdx-error` → `detail: Record<string, never>` — The source failed, or the authenticated fetch did.; `pdx-load` → `detail: Record<string, never>` — The image arrived and is drawn.; `pdx-zoom` → `detail: { zoomed: boolean }` — A zoomable image was zoomed in or out.
 
 **Renders:** roles `button` · `dialog`
+
+**States:** `:state(loading)` — Its source has not arrived yet: the image is not drawn.; `:state(zoomed)` — A zoomable image is zoomed in.; `:state(broken)` — Its source failed: the fallback shows in its place.
+
+**Parts:** `[data-part="frame"]` — The box the image is drawn in, and the zoom or lightbox trigger.; `[data-part="image"]` — The `<img>`.; `[data-part="placeholder"]` — The skeleton shown until the image arrives.; `[data-part="fallback"]` — The icon shown when the source fails and no fallback image is set.; `[data-part="caption"]` — The caption under the image.
 
 
 #### Examples

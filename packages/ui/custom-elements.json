@@ -1948,16 +1948,16 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-click`.",
-              "detail": "{ item, index }"
+              "description": "A clickable group's avatar was pressed: its item and its index.",
+              "detail": "{ item: unknown; index: number }"
             },
             {
               "name": "pdx-overflow-click",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the overflow is clicked.",
-              "detail": "{ count, items }"
+              "description": "The «+N» counter was pressed: how many are hidden, and which.",
+              "detail": "{ count: number; items: unknown[] }"
             }
           ],
           "roles": [
@@ -2018,6 +2018,20 @@
                 "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
               },
               "default": "'md'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The row the avatars and the counter are laid out in."
+            },
+            {
+              "name": "avatar",
+              "description": "Each avatar shown."
+            },
+            {
+              "name": "overflow",
+              "description": "The «+N» counter for the avatars not shown."
             }
           ]
         }
@@ -2690,14 +2704,14 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-block`."
+              "description": "The overlay is drawn: past its delay, the moment a person sees it."
             },
             {
               "name": "pdx-unblock",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-unblock`."
+              "description": "The overlay is taken away and the input given back."
             }
           ],
           "roles": [
@@ -2763,6 +2777,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "overlay",
+              "description": "The overlay over the wrapped content."
+            },
+            {
+              "name": "spinner",
+              "description": "The group in the overlay that holds the spinner and the message."
+            },
+            {
+              "name": "message",
+              "description": "The message, the overlay's live region."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "blocked",
+              "description": "The input is blocked: from the moment `blocked` turns on until the overlay is taken away."
+            },
+            {
+              "name": "shown",
+              "description": "The overlay is drawn: past its `delay`, and for at least `min-duration`."
             }
           ]
         }
@@ -14838,24 +14876,24 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when content has loaded.",
-              "detail": "{}"
+              "description": "The image arrived and is drawn.",
+              "detail": "Record<string, never>"
             },
             {
               "name": "pdx-error",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an error occurs.",
-              "detail": "{}"
+              "description": "The source failed, or the authenticated fetch did.",
+              "detail": "Record<string, never>"
             },
             {
               "name": "pdx-zoom",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-zoom`.",
-              "detail": "{ zoomed }"
+              "description": "A zoomable image was zoomed in or out.",
+              "detail": "{ zoomed: boolean }"
             }
           ],
           "roles": [
@@ -15006,6 +15044,42 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "frame",
+              "description": "The box the image is drawn in, and the zoom or lightbox trigger."
+            },
+            {
+              "name": "image",
+              "description": "The `<img>`."
+            },
+            {
+              "name": "placeholder",
+              "description": "The skeleton shown until the image arrives."
+            },
+            {
+              "name": "fallback",
+              "description": "The icon shown when the source fails and no fallback image is set."
+            },
+            {
+              "name": "caption",
+              "description": "The caption under the image."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "Its source has not arrived yet: the image is not drawn."
+            },
+            {
+              "name": "zoomed",
+              "description": "A zoomable image is zoomed in."
+            },
+            {
+              "name": "broken",
+              "description": "Its source failed: the fallback shows in its place."
             }
           ]
         }
