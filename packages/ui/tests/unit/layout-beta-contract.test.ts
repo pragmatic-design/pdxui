@@ -84,6 +84,11 @@ const DONE: Row[] = [
         parts: ['header', 'navbar', 'aside', 'main', 'footer', 'overlay'],
         removed: [],
     },
+    // Three wrappers that lay out the app's content and write nothing back: no model, no event, no
+    // state, no part. What they had was a class on the host, gone (layout-hosts-beta-contract.spec.ts).
+    { tag: 'pdx-aspect-ratio', models: [], outputs: [], states: [], parts: [], removed: [] },
+    { tag: 'pdx-row', models: [], outputs: [], states: [], parts: [], removed: [] },
+    { tag: 'pdx-col', models: [], outputs: [], states: [], parts: [], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

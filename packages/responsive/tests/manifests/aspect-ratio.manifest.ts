@@ -8,7 +8,7 @@
  *       · the content is projected through <slot> as a direct child (CSS: `> *`).
  *       · NOT interactive → no keyboard, no speed dial, no states.
  *   - CSS: packages/design/src/components/aspect-ratio.css
- *       · pdx-aspect-ratio { display:block }, .pdx-aspect-ratio { position:relative;
+ *       · pdx-aspect-ratio { display:block }, :is(.pdx-aspect-ratio, pdx-aspect-ratio) { position:relative;
  *         width:100%; overflow:hidden }. `> *` forzato a width/height 100%, object-fit:cover.
  *
  * MEASUREMENT STRATEGY: the width is 100% of the parent → it is pinned with a wrapper of a known

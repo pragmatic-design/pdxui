@@ -104,8 +104,8 @@ component('pdx-col', {
 
             if (!_built) {
                 _built = true;
+                // The host carries no class (#290): col.css styles the tag, and nothing read `.pdx-col`.
                 requestAnimationFrame(() => {
-                    ctx.el.classList.add('pdx-col');
                     applyStyles();
                     setupBreakpointListeners();
                 });

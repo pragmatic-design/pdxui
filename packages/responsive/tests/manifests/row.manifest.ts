@@ -7,7 +7,7 @@
  *       · render() = <slot></slot>: the pdx-col children are projected as DIRECT children
  *         of the HOST <pdx-row> (light DOM, no Shadow DOM).
  *       · In an rAF (ctx.track) the host gets an INLINE STYLE (not CSS classes):
- *           - the class `.pdx-row-wc` (the only class the WC adds)
+ *           - no class on the host (#290): a registered row is `pdx-row:defined`
  *           - el.style.display = 'flex'
  *           - el.style.flexWrap = wrap ? 'wrap' : 'nowrap'   (prop wrap, default true)
  *           - el.style.gap = gutterCss                        (prop gutter, default 'md')
@@ -19,7 +19,7 @@
  *       · No event is emitted. No keydown handler. No role and no aria. → keyboard 'none'.
  *
  *   - Source, col: packages/ui/src/col/pdx-col.ts
- *       · render() = <slot></slot>. In an rAF it adds the class `.pdx-col` and an INLINE STYLE:
+ *       · render() = <slot></slot>. In an rAF it writes an INLINE STYLE (no class, #290):
  *           - flex = `0 0 calc(<span>/var(--pdx-row-cols,12)*100% - var(--pdx-row-gutter,0px))`
  *           - maxWidth = `calc(<span>/var(--pdx-row-cols,12)*100%)`
  *           - offset>0 → marginLeft; order>0 → order.
@@ -27,7 +27,7 @@
  *
  *   - CSS: packages/design/src/layout.css (CSS-only pdx-row) + components/col.css
  *       · `pdx-row { display:flex; flex-wrap:wrap; align-items:center }` (base CSS-only).
- *       · `pdx-row.pdx-row-wc { min-width:0; max-width:100% }` (override WC).
+ *       · `pdx-row:defined { min-width:0; max-width:100% }` (override WC).
  *       · `pdx-col { display:block; min-width:0; transition flex-basis/max-width/margin-left }`.
  *
  * THE SCENARIO: one <pdx-row gutter="md"> with 3 <pdx-col span="4"> inside a wrapper of a
@@ -176,7 +176,7 @@ export const row: ComponentManifest = {
 
     // ── Dim. 3: style isolation ──
     // The target is the row host: the width is the clean structural invariant (it follows the 600px wrapper,
-    // with max-width:100% from .pdx-row-wc). skipHeight: the row's height is CONTENT-DRIVEN (the sum
+    // with max-width:100% from pdx-row:defined). skipHeight: the row's height is CONTENT-DRIVEN (the sum
     // of the columns' content, sensitive to the host font and line-height injected by the hostile CSS) →
     // not a clean geometric invariant across platforms (as for card and toolbar). The width stays
     // asserted as the immunity guarantee. The row has no border or radius of its own (an inline display plus gap).
