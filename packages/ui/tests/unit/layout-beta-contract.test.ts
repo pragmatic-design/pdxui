@@ -89,6 +89,16 @@ const DONE: Row[] = [
     { tag: 'pdx-aspect-ratio', models: [], outputs: [], states: [], parts: [], removed: [] },
     { tag: 'pdx-row', models: [], outputs: [], states: [], parts: [], removed: [] },
     { tag: 'pdx-col', models: [], outputs: [], states: [], parts: [], removed: [] },
+    {
+        tag: 'pdx-divider',
+        models: [],
+        outputs: [],
+        // From `orientation` and `labelPosition` (center draws both lines alike, and is no state).
+        states: ['vertical', 'label-left', 'label-right'],
+        // A line (the <hr>, the vertical rule, or each side of a label) and the label.
+        parts: ['line', 'label'],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

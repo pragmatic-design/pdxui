@@ -1,0 +1,54 @@
+/* GENERATED from packages/design/variant-sources/components/divider.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
+/* pdx-divider — a separator, with an optional label (#290).
+   It drew every line with an inline style built from its props; the lines and the label are its parts
+   now, and this stylesheet draws them. The CSS-only divider is the class `.pdx-divider`
+   (typography.css), which this file does not touch. */
+
+pdx-divider { display: block; }
+pdx-divider:state(vertical) { display: inline-block; }
+
+/* The line's style is the `variant` axis (solid, the default; dashed; dotted): one property for every
+   line the divider draws, whichever side its border is on, read with `solid` as its fallback. Not set
+   on the tag: the `@variant` rules below weigh nothing, and a default on the tag would beat them. */
+
+/* A plain divider: one <hr> line. */
+:where(pdx-divider) > hr[data-part="line"] {
+    border: none;
+    border-top: 1px var(--pdx-divider-style, solid) var(--pdx-color-border, #e0e0e0);
+    margin: var(--pdx-space-sm, 8px) 0;
+}
+
+/* A vertical divider: a rule as tall as the text around it. */
+:where(pdx-divider) > [aria-orientation="vertical"][data-part="line"] {
+    display: inline-block;
+    width: 0;
+    border-left: 1px var(--pdx-divider-style, solid) var(--pdx-color-border, #e0e0e0);
+    min-height: 1em;
+    margin: 0 var(--pdx-space-sm, 8px);
+    vertical-align: middle;
+}
+
+/* A labelled divider: a line on each side of the label. Centred, both lines grow; `label-left` and
+   `label-right` keep the line on that side to 1rem. */
+.pdx-divider-labeled {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm, 8px);
+    margin: var(--pdx-space-sm, 8px) 0;
+}
+.pdx-divider-labeled > [data-part="line"] {
+    flex: 1;
+    border-top: 1px var(--pdx-divider-style, solid) var(--pdx-color-border, #e0e0e0);
+}
+:where(pdx-divider):state(label-left) .pdx-divider-labeled > [data-part="line"]:first-child,
+:where(pdx-divider):state(label-right) .pdx-divider-labeled > [data-part="line"]:last-child {
+    flex: 0 0 1rem;
+}
+.pdx-divider-labeled > [data-part="label"] {
+    font-size: var(--pdx-text-xs, 0.75rem);
+    color: var(--pdx-color-muted, #999);
+}
+
+:where(pdx-divider[variant="dashed"]) { --pdx-divider-style: dashed; }
+
+:where(pdx-divider[variant="dotted"]) { --pdx-divider-style: dotted; }

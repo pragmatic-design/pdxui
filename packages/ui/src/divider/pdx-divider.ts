@@ -1,17 +1,35 @@
 // pdx-divider — Separator with optional label.
 // Label position: left/center/right. Variants: solid/dashed/dotted.
 
-import { component, html, effect, signal, onMount, onDestroy } from '@pdxui/core';
+import { component, html, signal, onMount, onDestroy } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/divider';
 
 /**
  * A separator, horizontal or vertical, with an optional label.
+ *
+ * @csspart line - A line: the `<hr>`, the vertical rule, or each line beside the label.
+ * @csspart label - The label between the two lines.
+ *
+ * @cssstate vertical - `orientation="vertical"`: an inline rule between items on a line.
+ * @cssstate label-left - `labelPosition="left"`: the line before the label is short.
+ * @cssstate label-right - `labelPosition="right"`: the line after the label is short.
  */
 component('pdx-divider', {
+    // The line's style (#290, #153): reflected on the host and drawn by divider.css with `@variant`.
+    // It was a string spliced into an inline `border-top`.
+    variants: {
+        /** solid (the default), dashed or dotted. */
+        variant: ['solid', 'dashed', 'dotted'],
+    },
+    // On the host as custom states (#132): divider.css lays the divider out from them.
+    states: ['vertical', 'label-left', 'label-right'],
+    parts: ['line', 'label'],
     props: {
         orientation: { type: String, default: 'horizontal' },
         /** The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`. */
         label: { type: String, default: '' },
-        variant: { type: String, default: 'solid' },
         labelPosition: { type: String, default: 'center' },
     },
     setup(ctx) {
@@ -40,29 +58,15 @@ component('pdx-divider', {
         /** Before the mount has read the text, and with no label: draw nothing yet, not a bare line. */
         function collecting(): boolean { return !_textRead() && !(ctx.label() as string); }
 
-        function borderStyle(): string {
-            return '1px ' + (ctx.variant() || 'solid') + ' var(--pdx-color-border,#e0e0e0)';
-        }
-        function leftLineStyle(): string {
-            const pos = ctx.labelPosition() as string || 'center';
-            return 'flex:' + (pos === 'left' ? '0 0 1rem' : '1') + ';border-top:' + borderStyle();
-        }
-        function rightLineStyle(): string {
-            const pos = ctx.labelPosition() as string || 'center';
-            return 'flex:' + (pos === 'right' ? '0 0 1rem' : '1') + ';border-top:' + borderStyle();
-        }
-        function hrStyle(): string {
-            return 'border:none;border-top:' + borderStyle() + ';margin:var(--pdx-space-sm,8px) 0';
-        }
-        function verticalStyle(): string {
-            return 'display:inline-block;width:0;border-left:' + borderStyle() + ';min-height:1em;margin:0 var(--pdx-space-sm,8px);vertical-align:middle';
-        }
-        // The host CE is inline by default: a horizontal <hr> (block) would have no width
-        // context → width 0 (an invisible divider). This sets the host's display.
-        effect(() => {
-            ctx.el.style.display = ctx.orientation() === 'vertical' ? 'inline-block' : 'block';
+        // The host CE is inline by default: a horizontal <hr> (block) would have no width context →
+        // width 0 (an invisible divider). divider.css makes it a block, and an inline-block when vertical.
+        ctx.track(() => { ctx.state('vertical', ctx.orientation() === 'vertical'); });
+        ctx.track(() => {
+            const pos = ctx.labelPosition() as string;
+            ctx.state('label-left', pos === 'left');
+            ctx.state('label-right', pos === 'right');
         });
-        return { leftLineStyle, rightLineStyle, hrStyle, verticalStyle, labelText, collecting };
+        return { labelText, collecting };
     },
     // The separator is redrawn on the host, beside the slot: the host's late-children watcher leaves
     // it there, as a node its own template placed. Otherwise it would take a redrawn line for
@@ -70,17 +74,17 @@ component('pdx-divider', {
     // the page.
     render: (ctx) => html`<span data-divider-text hidden><slot></slot></span>${() => {
             if (ctx.orientation() === 'vertical') {
-                return html`<div role="separator" aria-orientation="vertical" :style="${ctx.verticalStyle}"></div>`;
+                return html`<div role="separator" aria-orientation="vertical" data-part="line"></div>`;
             }
             if (ctx.collecting()) return html``;
             const text = ctx.labelText();
             if (text) {
-                return html`<div role="separator" style="display:flex;align-items:center;gap:var(--pdx-space-sm,8px);margin:var(--pdx-space-sm,8px) 0">
-                    <span :style="${ctx.leftLineStyle}"></span>
-                    <span style="font-size:var(--pdx-text-xs,0.75rem);color:var(--pdx-color-muted,#999)">${text}</span>
-                    <span :style="${ctx.rightLineStyle}"></span>
+                return html`<div role="separator" class="pdx-divider-labeled">
+                    <span data-part="line"></span>
+                    <span data-part="label">${text}</span>
+                    <span data-part="line"></span>
                 </div>`;
             }
-            return html`<hr role="separator" :style="${ctx.hrStyle}" />`;
+            return html`<hr role="separator" data-part="line" />`;
         }}`,
 });

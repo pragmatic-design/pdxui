@@ -6,10 +6,14 @@ A plain or labeled separating line.
 |---|---|---|---|---|
 | `orientation` | `orientation` | string | `'horizontal'` | Layout orientation — horizontal or vertical. |
 | `label` | `label` | string | `''` | The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`. |
-| `variant` | `variant` | string | `'solid'` | Visual variant. |
 | `labelPosition` | `labelposition` | string | `'center'` | Where the label sits relative to the control. |
+| `variant` | `variant` | 'solid' \| 'dashed' \| 'dotted' | `'solid'` | solid (the default), dashed or dotted. |
 
 **Renders:** roles `separator`
+
+**States:** `:state(vertical)` — `orientation="vertical"`: an inline rule between items on a line.; `:state(label-left)` — `labelPosition="left"`: the line before the label is short.; `:state(label-right)` — `labelPosition="right"`: the line after the label is short.
+
+**Parts:** `[data-part="line"]` — A line: the `<hr>`, the vertical rule, or each line beside the label.; `[data-part="label"]` — The label between the two lines.
 
 
 #### Examples

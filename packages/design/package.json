@@ -105,6 +105,10 @@
       "development": "./src/components/layered/dialog.css",
       "default": "./dist/components/dialog.css"
     },
+    "./components/divider": {
+      "development": "./src/components/layered/divider.css",
+      "default": "./dist/components/divider.css"
+    },
     "./components/drawer": {
       "development": "./src/components/layered/drawer.css",
       "default": "./dist/components/drawer.css"
