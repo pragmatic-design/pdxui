@@ -3,7 +3,7 @@
 // Props: type (auto/always/hover/scroll/never), axis, scrollHideDelay.
 // API: scrollTo, scrollBy, scrollIntoView. Events: pdx-scroll.
 
-import { component, html } from '@pdxui/core';
+import { component, html, event } from '@pdxui/core';
 import { useScrollbar } from '@pdxui/core';
 import type { ScrollbarReturn } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -18,8 +18,25 @@ function toCssLength(v: string): string {
 /**
  * A scrollable container that replaces the native scrollbars with styled, auto-hiding overlay
  * scrollbars, vertical, horizontal or on both axes.
+ *
+ * @csspart viewport - The element that scrolls (`.pdx-scroll-area-viewport`), around the content.
+ * @csspart scrollbar - An overlay scrollbar's track, one per axis it scrolls on.
+ * @csspart thumb - A scrollbar's thumb.
+ *
+ * @cssstate at-top - Scrolled to the top: nothing more above.
+ * @cssstate at-bottom - Scrolled to the bottom: nothing more below.
+ * @cssstate at-left - Scrolled to the left edge (horizontal or two-axis area).
+ * @cssstate at-right - Scrolled to the right edge (horizontal or two-axis area).
  */
 component('pdx-scroll-area', {
+    events: {
+        /** The viewport scrolled: where it is, and how big the content and the viewport are. */
+        'pdx-scroll': event<{ scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number }>(),
+    },
+    // On the host as custom states (#132, #290), in place of the `data-at-*` attributes it wrote:
+    // scroll-area.css fades the edges that have more content past them from these.
+    states: ['at-top', 'at-bottom', 'at-left', 'at-right'],
+    parts: ['viewport', 'scrollbar', 'thumb'],
     props: {
         /** Scrollbar visibility: auto (show on scroll+hover), always, hover (show on hover only), never */
         type: { type: String, default: 'auto' },
@@ -70,9 +87,8 @@ component('pdx-scroll-area', {
 
             if (!_built) {
                 _built = true;
+                // The host carries no class (#290): scroll-area.css draws it on the tag.
                 requestAnimationFrame(() => {
-                    ctx.el.classList.add('pdx-scroll-area');
-
                     // The viewport is in the template, around the slot: the children are projected
                     // into it when the scroll area mounts. They are not MOVED into a viewport built
                     // here, a frame after they have mounted: a move is a disconnect, and every component
@@ -123,6 +139,10 @@ component('pdx-scroll-area', {
                         );
                         // The primitive attaches listeners/observers: dispose on destroy
                         ctx.track(() => () => { _scrollbar?.dispose(); _scrollbar = null; });
+                        // The track and thumb it draws, named as parts. It builds them synchronously,
+                        // beside the viewport, inside the wrapper it puts around it.
+                        for (const t of ctx.el.querySelectorAll('[data-pdx-scrollbar-track]')) t.setAttribute('data-part', 'scrollbar');
+                        for (const t of ctx.el.querySelectorAll('[data-pdx-scrollbar-thumb]')) t.setAttribute('data-part', 'thumb');
                     }
 
                     // Wheel → horizontal scroll for horizontal-only axis
@@ -147,18 +167,18 @@ component('pdx-scroll-area', {
                         });
                     }, { passive: true });
 
-                    // Edge detection data attributes
+                    // The edges it has scrolled to, as the host's custom states (#290).
                     const _updateEdges = () => {
                         if (!_viewportEl) return;
                         const atTop = _viewportEl.scrollTop <= 1;
                         const atBottom = _viewportEl.scrollTop + _viewportEl.clientHeight >= _viewportEl.scrollHeight - 1;
                         const atLeft = _viewportEl.scrollLeft <= 1;
                         const atRight = _viewportEl.scrollLeft + _viewportEl.clientWidth >= _viewportEl.scrollWidth - 1;
-                        ctx.el.toggleAttribute('data-at-top', atTop);
-                        ctx.el.toggleAttribute('data-at-bottom', atBottom);
+                        ctx.state('at-top', atTop);
+                        ctx.state('at-bottom', atBottom);
                         if (axis === 'horizontal' || axis === 'both') {
-                            ctx.el.toggleAttribute('data-at-left', atLeft);
-                            ctx.el.toggleAttribute('data-at-right', atRight);
+                            ctx.state('at-left', atLeft);
+                            ctx.state('at-right', atRight);
                         }
                     };
                     _viewportEl.addEventListener('scroll', _updateEdges, { passive: true });
@@ -187,5 +207,5 @@ component('pdx-scroll-area', {
 
         return {};
     },
-    render: () => html`<div class="pdx-scroll-area-viewport"><slot></slot></div>`,
+    render: () => html`<div class="pdx-scroll-area-viewport" data-part="viewport"><slot></slot></div>`,
 });

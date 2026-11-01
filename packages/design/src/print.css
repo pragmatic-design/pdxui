@@ -91,6 +91,11 @@
      * `max-height: 120px` over 600px of content is 480px the reader cannot scroll to on paper.
      * Every clip becomes a silent truncation, so every clip is lifted. */
     .pdx-scroll-area,
+    /* The component: its host (#290, no class), the viewport that holds the max-height inline, and the
+       wrapper the overlay scrollbar puts between them, clipping too. */
+    pdx-scroll-area,
+    pdx-scroll-area .pdx-scroll-area-viewport,
+    pdx-scroll-area div:has(> .pdx-scroll-area-viewport),
     .pdx-dg-body,
     [data-pdx-collapse="expanded"] {
         max-height: none !important;

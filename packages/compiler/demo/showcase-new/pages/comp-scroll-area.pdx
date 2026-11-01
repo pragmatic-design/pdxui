@@ -31,15 +31,17 @@
     </section>
 
     <section>
-      <h2 class="pdx-txt-heading section-heading">Data Attributes</h2>
+      <h2 class="pdx-txt-heading section-heading">States and parts</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Attribute</th><th>Description</th></tr></thead>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>data-at-top</code></td><td>Present when scrolled to top</td></tr>
-            <tr><td><code>data-at-bottom</code></td><td>Present when scrolled to bottom</td></tr>
-            <tr><td><code>data-at-left</code></td><td>Present when scrolled to left (H/both)</td></tr>
-            <tr><td><code>data-at-right</code></td><td>Present when scrolled to right (H/both)</td></tr>
+            <tr><td><code>:state(at-top)</code></td><td>Scrolled to the top</td></tr>
+            <tr><td><code>:state(at-bottom)</code></td><td>Scrolled to the bottom</td></tr>
+            <tr><td><code>:state(at-left)</code></td><td>Scrolled to the left edge (H/both)</td></tr>
+            <tr><td><code>:state(at-right)</code></td><td>Scrolled to the right edge (H/both)</td></tr>
+            <tr><td><code>[data-part="viewport"]</code></td><td>The element that scrolls</td></tr>
+            <tr><td><code>[data-part="scrollbar"]</code>, <code>[data-part="thumb"]</code></td><td>The overlay scrollbar's track and thumb</td></tr>
           </tbody>
         </table>
       </div>

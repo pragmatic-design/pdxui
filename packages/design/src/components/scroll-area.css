@@ -5,7 +5,9 @@ pdx-scroll-area {
     position: relative;
 }
 
-.pdx-scroll-area {
+/* The component's host carries no class (#290): the tag, at the class's weight. The class stays for
+   CSS-only markup. */
+:is(.pdx-scroll-area, pdx-scroll-area) {
     position: relative;
     overflow: hidden;
 }
@@ -35,8 +37,8 @@ pdx-scroll-area {
 }
 
 /* Edge fade state: 1 = there is more content past this edge, 0 = you can see the end.
-   Read by the mask on .pdx-scroll-area-viewport above. */
-pdx-scroll-area[data-at-top] { --pdx-scroll-fade-top: 0; }
-pdx-scroll-area:not([data-at-top]) { --pdx-scroll-fade-top: 1; }
-pdx-scroll-area[data-at-bottom] { --pdx-scroll-fade-bottom: 0; }
-pdx-scroll-area:not([data-at-bottom]) { --pdx-scroll-fade-bottom: 1; }
+   Read by the mask on .pdx-scroll-area-viewport above. The edges are the host's custom states (#290),
+   positive: 1 on the tag, 0 once the state says the end is in view. */
+pdx-scroll-area { --pdx-scroll-fade-top: 1; --pdx-scroll-fade-bottom: 1; }
+pdx-scroll-area:state(at-top) { --pdx-scroll-fade-top: 0; }
+pdx-scroll-area:state(at-bottom) { --pdx-scroll-fade-bottom: 0; }
