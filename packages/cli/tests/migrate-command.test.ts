@@ -74,7 +74,7 @@ describe('pdx migrate — application tags take the app prefix (#136)', () => {
 
 describe('pdx migrate — events stop bubbling, and $emit leaves (#138)', () => {
     it('keeps an alpha component bubbling, rewrites $emit, and flags the one it cannot rewrite', async () => {
-        file('src/card.pdx', "<template><button @click=\"$emit('saved', 1)\">x</button></template>\n<script>\n@event closed;\nfunction go() { closed(); $emit('pdx-change', 2); }\n</script>\n");
+        file('src/card.pdx', "<template><button @click=\"$emit('saved', 1)\">x</button></template>\n<script>\n@event closed;\nfunction go() { closed(); $emit('pdx-change', 2); $emit('Pdx-Change', 3); }\n</script>\n");
 
         const report = await migrate(['.'], { cwd: root });
 
@@ -83,9 +83,12 @@ describe('pdx migrate — events stop bubbling, and $emit leaves (#138)', () => 
         // Declared for the $emit it replaced, and marked bubbling, as $emit bubbled.
         expect(card).toContain('@event(bubbles) saved: unknown;');
         expect(card).toContain('@event(bubbles) closed;');
-        expect(card, 'a hyphenated name has no @event to call').toContain("$emit('pdx-change', 2)");
-        expect(report.changed.map((c) => [c.id, c.count])).toEqual([['emit-removed', 1], ['event-bubbles', 2]]);
-        expect(report.flagged.map((f) => [f.id, f.found])).toEqual([['emit-removed', "$emit('pdx-change', 2)"]]);
+        // A hyphenated name is declared quoted and called by its camelCase (#749).
+        expect(card).toContain("@event(bubbles) 'pdx-change': unknown;");
+        expect(card).toContain('pdxChange(2)');
+        expect(card, 'a name that is neither an identifier nor a quoted name has no @event to call').toContain("$emit('Pdx-Change', 3)");
+        expect(report.changed.map((c) => [c.id, c.count])).toEqual([['emit-removed', 2], ['event-bubbles', 3]]);
+        expect(report.flagged.map((f) => [f.id, f.found])).toEqual([['emit-removed', "$emit('Pdx-Change', 3)"]]);
         // Idempotent: what is left is flagged again, nothing is rewritten again.
         const second = await migrate(['.'], { cwd: root });
         expect(second.changed).toEqual([]);

@@ -69,7 +69,7 @@ DataDecl       ::= FetchDecl | ActionDecl | FormDecl | StoreDecl
 PropDecl       ::= "@prop" S Identifier "?"? S? ":" S? Type ( S? "=" S? Expression )? End          (β #130: `?`; no default = required)
 ModelDecl      ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? ModelOptions )? End   (β #124, #135)
 ModelOptions   ::= "{" S? "form" S? "}"
-EventDecl      ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S? Type )? End      (β #138: `(bubbles)`)
+EventDecl      ::= "@event" ( "(" S? "bubbles" S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? End      (β #138: `(bubbles)`; #749: a quoted name)
 SlotDecl       ::= "@slot" S Identifier "?"? ( S? ":" S? SlotSignature )? End                     (β #131: a signature)
 SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type

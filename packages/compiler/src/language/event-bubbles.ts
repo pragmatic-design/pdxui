@@ -7,12 +7,14 @@
 //
 // `$emit('saved', x)` is a `removed` form: the function `@event saved` declares is the only way to
 // dispatch from a `.pdx`. `pdx migrate` rewrites a call whose name is an identifier to that function,
-// and declares `@event saved: unknown;` when the script does not; a hyphenated name, which no `@event`
-// can declare, is left for a person.
+// and declares `@event saved: unknown;` when the script does not. A hyphenated name is declared quoted
+// (#749): `$emit('open-change', v)` becomes `openChange(v)` and `@event 'open-change': unknown;`. A name
+// that is neither is left for a person.
 // Both are looked for in the `<script>` and the `<template>` of a `.pdx`, one declaration per line.
 
 import { parseSFC } from '../parser/sfc';
 import type { LanguageChange, LanguageChangeFinding } from './changes';
+import { isEventName, eventEmitterName } from '../compiler/event-names';
 
 /** The line (1-based) of `index` in `text`. */
 const lineAt = (text: string, index: number): number => text.slice(0, index).split('\n').length;
@@ -29,8 +31,8 @@ function plainEvents(text: string): PlainEvent[] {
     for (const raw of script.content.split('\n')) {
         const lead = raw.length - raw.trimStart().length;
         const trimmed = raw.trim();
-        // Match: `@event` then blank space then a name — a declaration with no option.
-        if (/^@event\s+[A-Za-z_$]/.test(trimmed)) {
+        // Match: `@event` then blank space then a name, bare or quoted (#749) — a declaration with no option.
+        if (/^@event\s+[A-Za-z_$'"]/.test(trimmed)) {
             out.push({ keywordEnd: offset + lead + '@event'.length, line: lineAt(text, offset), found: trimmed });
         }
         offset += raw.length + 1;
@@ -64,9 +66,16 @@ function emitBlocks(text: string): { from: number; to: number }[] {
 
 // Match: a call of `$emit` — the call up to its closing parenthesis on the same line, for the finding.
 const EMIT_CALL = /\$emit\s*\([^)\n]*\)?/g;
-// Match: `$emit('name'` / `$emit("name"` / `` $emit(`name` `` with an identifier for a name, and the comma
-// after it when there is one. Groups: [1]=the quote [2]=the name
-const EMIT_NAMED = /\$emit\s*\(\s*(['"`])([A-Za-z_$][\w$]*)\1\s*(?:,\s*)?/g;
+// Match: `$emit('name'` / `$emit("name"` / `` $emit(`name` `` with an identifier or a hyphenated name, and
+// the comma after it when there is one; which of the two it is, `fix` decides. Groups: [1]=the quote [2]=the name
+const EMIT_NAMED = /\$emit\s*\(\s*(['"`])([A-Za-z_$][\w$-]*)\1\s*(?:,\s*)?/g;
+
+/** The function a `$emit` name becomes, and the name its `@event` declares; null when it can be neither. */
+function emitTarget(name: string): { fn: string; declared: string } | null {
+    if (/^[A-Za-z_$][\w$]*$/.test(name)) return { fn: name, declared: name };
+    if (isEventName(name)) return { fn: eventEmitterName(name), declared: `'${name}'` };
+    return null;
+}
 
 export const emitRemoved: LanguageChange = {
     id: 'emit-removed',
@@ -83,13 +92,16 @@ export const emitRemoved: LanguageChange = {
         return findings;
     },
     fix(text) {
+        // Each event called, by the name its declaration writes: `saved`, or `'open-change'` quoted.
         const used = new Set<string>();
         let out = '';
         let last = 0;
         for (const { from, to } of emitBlocks(text)) {
-            out += text.slice(last, from) + text.slice(from, to).replace(EMIT_NAMED, (_m, _q: string, name: string) => {
-                used.add(name);
-                return `${name}(`;
+            out += text.slice(last, from) + text.slice(from, to).replace(EMIT_NAMED, (whole, _q: string, name: string) => {
+                const target = emitTarget(name);
+                if (!target) return whole;
+                used.add(target.declared);
+                return `${target.fn}(`;
             });
             last = to;
         }
@@ -97,7 +109,9 @@ export const emitRemoved: LanguageChange = {
         // The declarations the script is missing, written at the top of the script.
         const script = parseSFC(out).script;
         if (!script || script.src) return out;
-        const declared = new Set([...script.content.matchAll(/^[ \t]*@event(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*)/gm)].map((m) => m[1]));
+        // Match: an `@event` declaration's name, bare or quoted. Groups: [1]=the name as written
+        const declared = new Set([...script.content.matchAll(/^[ \t]*@event(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*|'[^'\n]*'|"[^"\n]*")/gm)]
+            .map((m) => m[1].replace(/^"(.*)"$/, "'$1'")));
         const missing = [...used].filter((name) => !declared.has(name));
         if (missing.length === 0) return out;
         const at = script.start + (script.content.startsWith('\n') ? 1 : 0);

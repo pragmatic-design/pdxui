@@ -323,8 +323,13 @@ it. `pdx migrate` writes `(bubbles)` on the `@event`s of an alpha project, which
 `PDX_EVENT_BUBBLES_UNUSED` then lists the ones nothing hears above the component.
 
 Convention: library-component events use the `pdx-` prefix (e.g. `pdx-change`). For your own app
-components, pick meaningful names. An `@event` name is a JavaScript identifier, since it is also the
-function that emits it: `@event pdx-change` is an error.
+components, pick meaningful names. A plain `@event` name is a JavaScript identifier, since it is also
+the function that emits it. A name with hyphens is written in quotes, and its function is the
+camelCase of it:
+
+```pdx
+@event 'open-change': { value: boolean };   // a parent listens with @open-change; openChange({ value: true }) sends it
+```
 
 ## Slots — content decided by the parent
 

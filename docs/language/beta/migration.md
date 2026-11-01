@@ -32,7 +32,7 @@ proposals the implementing issue may change.
 | Alpha | Beta | `pdx migrate` | Source |
 |---|---|---|---|
 | `@prop x: T;` (optional, its type's empty value) | `@prop x?: T;` — without `?` it is required | mechanical: adds `?` to every `@prop` without a default — landed: `prop-required` | #130 |
-| `$emit('saved', v)` | `saved(v)`, with `@event saved: …;` | mechanical; adds `@event saved: unknown;` when missing (and `(bubbles)`, as `$emit` bubbled); a hyphenated name is flagged — landed: `emit-removed` | #138 |
+| `$emit('saved', v)` | `saved(v)`, with `@event saved: …;` | mechanical; adds `@event saved: unknown;` when missing (and `(bubbles)`, as `$emit` bubbled); a hyphenated name becomes its camelCase emitter with a quoted `@event 'x-y': unknown;` (#749), and a name that is neither is flagged — landed: `emit-removed` | #138, #749 |
 | `@event saved: T;` (bubbles) | `@event(bubbles) saved: T;` keeps that; `@event saved` no longer bubbles | mechanical: adds `(bubbles)` to every existing `@event`; `PDX_EVENT_BUBBLES_UNUSED` lists the removable ones — landed: `event-bubbles` | #138 |
 | a listener above a `@pdxui/ui` component (`<section @pdx-change>`) | the listener on the component itself | not detected: library events no longer bubble (#138), listed in the release notes | #138 |
 | `@provide user = v;` / `@inject user;` / `@inject user as me;` | `@provide User = v;` / `@inject user from User;` / `@inject me from User;` | mechanical: generates `contexts.ts`, one token per key, and maps the library's keys to its tokens (`errorContext` → `ErrorContext`) — landed: `context-string-provide`, `context-string-inject`, `context-tokens` | #139 (landed, #497) |

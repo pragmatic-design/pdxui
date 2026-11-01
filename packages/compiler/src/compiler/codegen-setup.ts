@@ -120,9 +120,12 @@ export function buildSetupBody(
     // @event name: T → `name(detail)` dispatches it from the host; it stays there unless declared
     // `@event(bubbles)` (#138). Declared before everything else, so the body can call it at setup
     // time. An author who declares the name themselves keeps their own function.
-    const emitters = analysis.events.filter(e => !bodyLocalNames.has(e.name));
+    // A quoted name (`@event 'open-change'`, #749) dispatches that name from its camelCase emitter.
+    const emitters = analysis.events
+        .map(e => ({ ...e, fn: e.emitter ?? e.name }))
+        .filter(e => !bodyLocalNames.has(e.fn));
     for (const e of emitters) {
-        parts.push(`    const ${e.name} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${e.bubbles ? ', { bubbles: true }' : ''});`);
+        parts.push(`    const ${e.fn} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${e.bubbles ? ', { bubbles: true }' : ''});`);
     }
 
     // Late signals: those reading a body-local, and those reading a late signal. They are
@@ -646,7 +649,7 @@ export function buildSetupBody(
 
     // Auto-return (no manual return needed). The emitters go too: the template calls ctx.<name>.
     const returned = [...analysis.exports];
-    for (const { name } of emitters) {
+    for (const { fn: name } of emitters) {
         if (!returned.some(e => e.name === name)) returned.push({ name, kind: 'function' });
     }
     parts.push(generateAutoReturn(returned));

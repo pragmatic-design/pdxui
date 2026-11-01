@@ -9,6 +9,7 @@
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { analyzeScript } from '../src/compiler/script-analyzer';
+import { generateDts } from '../src/compiler/dts-generator';
 import { eventBubbles, emitRemoved } from '../src/language/event-bubbles';
 import { ComponentResolver } from '../src/component-resolver';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, utimesSync } from 'node:fs';
@@ -74,11 +75,70 @@ describe('$emit — removed', () => {
         expect(emitRemoved.detect(after)).toEqual([]);
     });
 
-    it('migrate leaves a hyphenated name, which no @event can declare, for a person', () => {
-        const before = sfc("function go() { $emit('pdx-change', 1); }", '<b @click="go()">x</b>');
+    it('migrate rewrites a hyphenated name to its camelCase emitter and declares it quoted (#749)', () => {
+        const before = sfc("function go(v) { $emit('open-change', v); }", '<b @click="$emit(\'value-change\', 2)">x</b>');
         const after = (emitRemoved.fix as (t: string) => string)(before);
-        expect(after).toContain("$emit('pdx-change', 1)");
+        expect(after).toContain('function go(v) { openChange(v); }');
+        expect(after).toContain('<b @click="valueChange(2)">x</b>');
+        expect(after).toContain("@event 'open-change': unknown;");
+        expect(after).toContain("@event 'value-change': unknown;");
+        expect(emitRemoved.detect(after)).toEqual([]);
+        // A second run changes nothing.
+        expect((emitRemoved.fix as (t: string) => string)(after)).toBe(after);
+    });
+
+    it('migrate still leaves a name no @event can declare for a person', () => {
+        // Neither an identifier nor a quoted name: uppercase and a hyphen.
+        const before = sfc("function go() { $emit('Open-Change', 1); }", '<b @click="go()">x</b>');
+        const after = (emitRemoved.fix as (t: string) => string)(before);
+        expect(after).toContain("$emit('Open-Change', 1)");
         expect(emitRemoved.detect(after)).toHaveLength(1);
+    });
+});
+
+describe('@event with a quoted name (#749)', () => {
+    it('is read under its quoted name, with its camelCase emitter; (bubbles) works with it', () => {
+        const { events, warnings } = analyzeScript("@event 'open-change': { value: boolean };\n@event(bubbles) 'value-change': number;", 'x.pdx');
+        expect(warnings).toEqual([]);
+        expect(events).toEqual([
+            { name: 'open-change', emitter: 'openChange', payloadType: '{ value: boolean }' },
+            { name: 'value-change', emitter: 'valueChange', payloadType: 'number', bubbles: true },
+        ]);
+    });
+
+    it('a name that is not lowercase letters, digits and hyphens is PDX_UNKNOWN_DECLARATION, with the form as its hint', () => {
+        for (const bad of ["@event 'Open-Change': number;", "@event 'open_change': number;", "@event '1-change';", "@event 'open change';"]) {
+            const { events, warnings } = analyzeScript(bad, 'x.pdx');
+            expect(events, bad).toEqual([]);
+            const w = warnings.find((x) => x.code === 'PDX_UNKNOWN_DECLARATION');
+            expect(w, `${bad} was accepted`).toBeDefined();
+            expect(w!.hint).toContain("@event 'open-change'");
+        }
+    });
+
+    it('the emitter is the camelCase of the name, and dispatches the quoted name', () => {
+        const { code, warnings } = compile(sfc("@event 'open-change': { value: boolean };\n@event(bubbles) 'value-change': number;", '<b @click="openChange({ value: true }); valueChange(1)">x</b>'), 'card.pdx', [], undefined, {});
+        expect(codes({ warnings }).filter((c) => c !== 'PDX_EVENT_BUBBLES_UNUSED')).toEqual([]);
+        expect(code).toMatch(/const openChange = \(detail\) => ctx\.emit\('open-change', detail\);/);
+        expect(code).toMatch(/const valueChange = \(detail\) => ctx\.emit\('value-change', detail, \{ bubbles: true \}\)/);
+        expect(code).toContain(`events: { 'open-change': {}, 'value-change': { bubbles: true } }`);
+    });
+
+    it('two declarations with one emitter are PDX_DUP_EVENT', () => {
+        const r = compile(sfc("@event 'open-change': boolean;\n@event openChange: boolean;", '<b @click="openChange(true)">x</b>'), 'card.pdx', [], undefined, {});
+        expect(codes(r)).toContain('PDX_DUP_EVENT');
+    });
+
+    it('the .d.ts lists the event under its quoted name', () => {
+        const { events } = analyzeScript("@event 'open-change': { value: boolean };", 'x.pdx');
+        const dts = generateDts({ tag: 'app-card', props: [], events, slots: [] });
+        expect(dts).toContain("'open-change': { value: boolean };");
+    });
+
+    it('pdx migrate writes (bubbles) on a quoted @event as on any other', () => {
+        const before = sfc("@event 'open-change': unknown;");
+        const after = (eventBubbles.fix as (t: string) => string)(before);
+        expect(after).toContain("@event(bubbles) 'open-change': unknown;");
     });
 });
 

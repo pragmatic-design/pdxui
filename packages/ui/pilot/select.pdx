@@ -155,6 +155,12 @@ import type { Option, Template, Row, SourceElement } from './select-types';
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md, xs, sm, lg, xl } = md; }
 @part root;
+// Its events: kebab-case names, declared quoted (#749), each dispatched by its camelCase function.
+@event 'pdx-open';
+@event 'pdx-close';
+@event 'pdx-clear';
+@event 'pdx-search': { query: string };
+@event 'pdx-create': { value: string, label: string };
 // No `= []`: that default is one array literal in the descriptor, shared by every instance; with
 // none, core gives each instance its own (packages/ui/PILOT.md, finding 8).
 @prop options?: unknown[];
@@ -427,8 +433,7 @@ function open() {
   activeIndex = -1;
   const ds = dataSource;
   if (ds && externalSource && ds.data().length === 0 && !ds.isLoading()) ds.refresh();
-  // ESCAPE HATCH: `pdx-open` has a hyphen, which no @event can declare.
-  ctx.emit('pdx-open', undefined, { bubbles: false });
+  pdxOpen();
 }
 
 function close() {
@@ -436,8 +441,7 @@ function close() {
   isOpen = false;
   query = '';
   if (externalSource && dataSource && query.peek()) dataSource!.setFilter([]);
-  // ESCAPE HATCH: as pdx-open.
-  ctx.emit('pdx-close', undefined, { bubbles: false });
+  pdxClose();
 }
 
 function toggle() { if (isOpen) close(); else open(); }
@@ -470,8 +474,7 @@ function removeTag(val: unknown) {
 function clearSelection() {
   selectedValues = new Set();
   reflectValue();
-  // ESCAPE HATCH: as pdx-open.
-  ctx.emit('pdx-clear');
+  pdxClear();
 }
 
 // ── Search ──
@@ -485,8 +488,7 @@ function onSearchInput(e: Event) {
   userTyped = true;
   query = val;
   activeIndex = -1;
-  // ESCAPE HATCH: as pdx-open.
-  ctx.emit('pdx-search', { query: val });
+  pdxSearch({ query: val });
   const ds = dataSource;
   if (externalSource && ds) {
     const lf = labelField || 'label';
@@ -517,8 +519,7 @@ const showCreateOption = $derived((): boolean => {
 function createOption() {
   const q = query.trim();
   if (!q) return;
-  // ESCAPE HATCH: as pdx-open.
-  ctx.emit('pdx-create', { value: q, label: q });
+  pdxCreate({ value: q, label: q });
   selectItem({ label: q, value: q, _raw: q });
   query = '';
 }

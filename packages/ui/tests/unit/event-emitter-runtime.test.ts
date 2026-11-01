@@ -39,9 +39,31 @@ let got = $signal('');
 let chose = $signal('');
 </script>`;
 
+// A quoted name (#749): the library's kebab-case events, with the emitter in camelCase.
+const QUOTED_CHILD = `<template>
+<button class="open" @click="openChange({ value: true })">open</button>
+<button class="count" @click="valueChange(3)">count</button>
+</template>
+<script>
+@event 'open-change': { value: boolean };
+@event(bubbles) 'value-change': number;
+</script>`;
+
+const QUOTED_PARENT = `<template>
+<app-ev-quoted @open-change="e => opened = e.detail.value" @value-change="e => counted = e.detail"></app-ev-quoted>
+<p class="opened">{{ opened }}</p>
+<p class="counted">{{ counted }}</p>
+</template>
+<script>
+let opened = $signal(false);
+let counted = $signal(0);
+</script>`;
+
 beforeAll(() => {
     load('ev-child.pdx', CHILD);
     load('ev-parent.pdx', PARENT);
+    load('ev-quoted.pdx', QUOTED_CHILD);
+    load('ev-quoted-parent.pdx', QUOTED_PARENT);
 });
 afterEach(() => cleanup());
 
@@ -93,5 +115,37 @@ describe('@event, compiled and mounted', () => {
         expect(seen, 'the event did not reach the document body').not.toBeNull();
         expect(seen!.detail).toBe('c');
         expect(seen!.composed).toBe(true);
+    });
+});
+
+describe('@event with a quoted name, compiled and mounted (#749)', () => {
+    async function mountQuoted(): Promise<HTMLElement> {
+        const el = document.createElement('app-ev-quoted-parent');
+        document.body.appendChild(el);
+        await tick();
+        return el;
+    }
+
+    it('openChange(…) dispatches open-change with its detail, which stays on the component', async () => {
+        const parent = await mountQuoted();
+        let above = 0;
+        const count = () => { above++; };
+        document.body.addEventListener('open-change', count);
+        parent.querySelector<HTMLButtonElement>('.open')!.click();
+        await tick();
+        document.body.removeEventListener('open-change', count);
+        expect(parent.querySelector('.opened')?.textContent, 'the parent did not hear open-change').toBe('true');
+        expect(above, 'the event climbed past the component').toBe(0);
+    });
+
+    it('the (bubbles) form reaches the document', async () => {
+        const parent = await mountQuoted();
+        let seen: CustomEvent | null = null;
+        document.body.addEventListener('value-change', (e) => { seen = e as CustomEvent; }, { once: true });
+        parent.querySelector<HTMLButtonElement>('.count')!.click();
+        await tick();
+        expect(parent.querySelector('.counted')?.textContent).toBe('3');
+        expect(seen, 'value-change did not reach the document body').not.toBeNull();
+        expect(seen!.detail).toBe(3);
     });
 });
