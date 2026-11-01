@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Title, breadcrumb and actions</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      The trail above the title, the subtitle under it, the <code>actions</code> slot at the end of the row. A crumb
+      without an <code>href</code> is a button that announces <code>pdx-crumb</code>; the last is the page you are on.
+    </p>
+    <pdx-page-header title="Patients" subtitle="1,204 records" heading-level="3" :crumbs="crumbs" @pdx-crumb="onCrumb">
+      <pdx-button slot="actions" variant="outline" size="sm">Export</pdx-button>
+      <pdx-button slot="actions" variant="primary" size="sm">New patient</pdx-button>
+    </pdx-page-header>
+    <p class="pdx-txt-small pdx-ink-muted crumb-log">{{ crumbLog }}</p>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-page-header title="Patients" subtitle="1,204 records" :crumbs="crumbs" @pdx-crumb="onCrumb"&gt;
+  &lt;pdx-button slot="actions" variant="outline"&gt;Export&lt;/pdx-button&gt;
+  &lt;pdx-button slot="actions" variant="primary"&gt;New patient&lt;/pdx-button&gt;
+&lt;/pdx-page-header&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+let crumbs = $signal([
+  { key: 'home', label: 'Home', href: '#' },
+  { key: 'clinic', label: 'Clinic' },
+  { key: 'patients', label: 'Patients' },
+]);
+let crumbLog = $signal('Choose "Clinic"…');
+
+function onCrumb(e) {
+  crumbLog = 'pdx-crumb: ' + e.detail.key;
+}
+</script>
+
+<style scoped>
+  .crumb-log { margin-top: var(--pdx-space-sm); }
+</style>

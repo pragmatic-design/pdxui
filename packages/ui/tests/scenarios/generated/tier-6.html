@@ -33,10 +33,12 @@
         import '@pdxui/ui/app-layout';
         import '@pdxui/ui/bottom-nav';
         import '@pdxui/ui/breadcrumb';
+        import '@pdxui/ui/button';
         import '@pdxui/ui/data-grid';
         import '@pdxui/ui/fab';
         import '@pdxui/ui/nav-menu';
         import '@pdxui/ui/navbar';
+        import '@pdxui/ui/page-header';
         import '@pdxui/ui/pagination';
         import '@pdxui/ui/scroll-area';
         import '@pdxui/ui/scroll-spy';
@@ -127,7 +129,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-breadcrumb","pdx-data-grid","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-pagination","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
+        const __tags = ["pdx-affix","pdx-app-layout","pdx-bottom-nav","pdx-breadcrumb","pdx-button","pdx-data-grid","pdx-fab","pdx-nav-menu","pdx-navbar","pdx-page-header","pdx-pagination","pdx-scroll-area","pdx-scroll-spy","pdx-segmented","pdx-sidebar"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -468,6 +470,23 @@
     <section data-scenario="navbar-phone">
         <h3>Navbar — collapsed, actions wider than what is left of the bar</h3>
         <div data-test="nav-box" style="width: 320px"><pdx-navbar data-test="navbar-phone" brand="Enterprise" brand-icon="box" label="App" items='[{"key":"home","label":"Home","href":"#","active":true},{"key":"docs","label":"Documentation","href":"#"}]'><div class="pdx-input-wrap" style="max-width: 220px"><input class="pdx-input" type="text" placeholder="Search..." aria-label="Search"></div><button class="pdx-navbar-icon-btn" type="button" aria-label="Notifications">N</button><button class="pdx-navbar-icon-btn" type="button" aria-label="Settings">S</button><button class="pdx-ghost pdx-btn-sm" type="button" data-test="nav-user">John Doe</button></pdx-navbar></div>
+    </section>
+
+    <section data-scenario="page-header-full">
+        <h3>Page header — breadcrumb, title, subtitle and actions</h3>
+        <div style="width: 760px; max-width: 100%;">
+                    <pdx-page-header data-test="ph" title="Patients" subtitle="1,204 records" heading-level="2" crumbs='[{"key":"home","label":"Home","href":"#home"},{"key":"clinic","label":"Clinic"},{"key":"patients","label":"Patients"}]'>
+                        <pdx-button slot="actions" variant="outline" data-test="ph-export">Export</pdx-button>
+                        <pdx-button slot="actions" variant="primary" data-test="ph-new">New patient</pdx-button>
+                    </pdx-page-header>
+                </div>
+    </section>
+
+    <section data-scenario="page-header-title">
+        <h3>Page header — the title alone</h3>
+        <div style="width: 760px; max-width: 100%;">
+                    <pdx-page-header data-test="ph-title" title="Dashboard" heading-level="2"></pdx-page-header>
+                </div>
     </section>
 
     <section data-scenario="pagination-basic">

@@ -12,7 +12,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const SRC = join(here, '../../compiler/demo/showcase-new/pages');
 const OUT = join(here, '../src/demos');
 // Pages written FOR the site, because the component has no showcase page to port — pdx-calendar,
-// pdx-page-header, pdx-relation-picker. They live in a committed directory of
+// pdx-relation-picker. They live in a committed directory of
 // their own, not in OUT: a hand-written file inside a generated, uncommitted directory is
 // distinguishable only by a banner and is easily lost. The routes read them from it, and this
 // script is the ONLY writer of OUT.

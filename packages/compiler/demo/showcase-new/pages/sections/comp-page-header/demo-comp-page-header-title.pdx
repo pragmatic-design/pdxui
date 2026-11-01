@@ -1,0 +1,11 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Title only</h2>
+    <p class="pdx-txt-small pdx-ink-muted">No crumbs, no breadcrumb: the header is its title.</p>
+    <pdx-page-header title="Dashboard" heading-level="3"></pdx-page-header>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-page-header title="Dashboard"&gt;&lt;/pdx-page-header&gt;</code></pre>
+    </details>
+  </section>
+</template>

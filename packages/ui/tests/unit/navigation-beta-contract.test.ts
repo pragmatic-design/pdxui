@@ -67,6 +67,15 @@ const DONE: Row[] = [
         verbs: [],
         removed: [],
     },
+    {
+        tag: 'pdx-page-header',
+        // A header: no position, no state of its own.
+        models: [],
+        states: [],
+        parts: ['root', 'breadcrumb', 'title', 'subtitle', 'actions'],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

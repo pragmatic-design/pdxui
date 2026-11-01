@@ -1,0 +1,51 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Page Header</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-page-header&gt;</code> — the standard header of a page: a breadcrumb, the title with an optional
+      subtitle, and an area for the page's actions. Its title is an <code>h1</code>, the page's own;
+      <code>heading-level</code> lowers it inside a dialog or a section — as here, where each example sits under
+      this page's section headings.
+    </p>
+
+    <app-demo-comp-page-header-full class="demo-section"></app-demo-comp-page-header-full>
+
+    <app-demo-comp-page-header-title class="demo-section"></app-demo-comp-page-header-title>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>title</code></td><td>String</td><td>''</td><td>The title</td></tr>
+            <tr><td><code>subtitle</code></td><td>String</td><td>''</td><td>The line under the title</td></tr>
+            <tr><td><code>crumbs</code></td><td>{ key, label, href? }[]</td><td>[]</td><td>The trail; the last is the page you are on. A crumb without <code>href</code> is a button</td></tr>
+            <tr><td><code>heading-level</code></td><td>Number</td><td>1</td><td>The title's heading level, 1-6</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Slots, events and parts</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>slot="actions"</code></td><td>The page's commands, at the end of the title row</td></tr>
+            <tr><td><code>pdx-crumb</code></td><td>{ key, item }: a crumb was chosen. Does not bubble</td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>root</code> (the header), <code>breadcrumb</code>, <code>title</code>, <code>subtitle</code>, <code>actions</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/page-header';
+@title 'Page Header — PDX Components';
+</script>
+
+<style scoped>
+.page { }
+</style>

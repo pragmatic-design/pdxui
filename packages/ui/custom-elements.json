@@ -19310,8 +19310,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-crumb`.",
-              "detail": "{ key, item }"
+              "description": "A crumb with a link was chosen: its `key` and the crumb.",
+              "detail": "{ key: string; item: PageHeaderCrumb }"
             }
           ],
           "roles": [
@@ -19358,6 +19358,28 @@
             {
               "name": "actions",
               "description": "Commands shown in the header's actions area (e.g. the page's primary action)."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `<header>`."
+            },
+            {
+              "name": "breadcrumb",
+              "description": "The `<nav>` of the crumbs, when there are any."
+            },
+            {
+              "name": "title",
+              "description": "The title, the heading `heading-level` names."
+            },
+            {
+              "name": "subtitle",
+              "description": "The line under the title, when there is one."
+            },
+            {
+              "name": "actions",
+              "description": "The area the `actions` slot lands in."
             }
           ]
         }
