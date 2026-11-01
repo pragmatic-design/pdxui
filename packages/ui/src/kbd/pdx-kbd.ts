@@ -19,8 +19,11 @@ const SYMBOLS: Record<string, string> = {
 
 /**
  * Shows a keyboard shortcut, written as keys joined by +, optionally with modifier symbols.
+ *
+ * @csspart root - The combination (`<kbd class="pdx-kbd-combo">`) around its keys.
  */
 component('pdx-kbd', {
+    parts: ['root'],
     // The axis kbd.css keys by (#632), reflected on the host and drawn on the combo, the root part;
     // each value maps the class that draws the same on a native key. `md` is the base look.
     variants: {

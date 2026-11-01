@@ -1,7 +1,8 @@
 /* pdx-description-list — Key-value pair display */
 pdx-description-list { display: block; }
 
-.pdx-dl-root { position: relative; }
+/* The component's host carries no class (#291): the tag, at the class's weight. */
+:is(.pdx-dl-root, pdx-description-list) { position: relative; }
 
 .pdx-dl {
     display: grid;

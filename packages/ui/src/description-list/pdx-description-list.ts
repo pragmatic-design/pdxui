@@ -32,8 +32,11 @@ export interface DescriptionListItem {
  * values as plain text or custom HTML.
  *
  * @slot value - Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
+ *
+ * @csspart root - The `<dl>`, with the classes a native list uses (`.pdx-dl`, `-bordered`, `-striped`…).
  */
 component('pdx-description-list', {
+    parts: ['root'],
     // The axis description-list.css keys by (#632), reflected on the host; each value maps the class
     // that draws the same list on a native <dl>.
     variants: {
@@ -171,8 +174,9 @@ component('pdx-description-list', {
             if (!built) {
                 built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
+                // The host carries no class (#291): description-list.css draws it from the tag. The inner
+                // <dl> is the root part and keeps the classes a native list uses.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-dl-root');
                     listEl = document.createElement('dl');
                     listEl.className = 'pdx-dl';
                     listEl.setAttribute('data-part', 'root');
