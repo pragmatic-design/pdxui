@@ -19,9 +19,13 @@ Resizable panes.
 | `resetSizes()` | Forget the saved sizes and lay the panes out again from their props. |
 | `isDragging()` | Whether a divider is being dragged right now. |
 
-**Events:** `pdx-resize` → `detail: { sizes }` — Fired on `pdx-resize`.; `pdx-resize-end` → `detail: { sizes }` — Fired on `pdx-resize-end`.; `pdx-resize-start` → `detail: { sizes }` — Fired on `pdx-resize-start`.
+**Events:** `pdx-resize` → `detail: { sizes: number[] }` — The sizes changed: by a drag, the arrows, Home/End or a double-click; in percent.; `pdx-resize-end` → `detail: { sizes: number[] }` — A drag ended; the sizes it left.; `pdx-resize-start` → `detail: { sizes: number[] }` — A drag began; the sizes before it.
 
 **Renders:** roles `separator`
+
+**States:** `:state(horizontal)` — `orientation="horizontal"`: the panes side by side.; `:state(vertical)` — `orientation="vertical"`: the panes stacked.; `:state(dragging)` — A gutter is being dragged: the panes take no pointer until it is let go.
+
+**Parts:** `[data-part="pane"]` — One of the app's children, laid out as a pane (`.pdx-splitter-pane`).; `[data-part="gutter"]` — The handle between two panes (`role="separator"`), dragged or moved with the arrows.
 
 **Shapes:** `SplitterPane { min?: number; max?: number; defaultSize?: number; collapsible?: boolean; collapsedSize?: number }`
 

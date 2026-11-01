@@ -3,7 +3,7 @@
 // Supports: H/V orientation, min/max per pane, collapsible, keyboard resize,
 // autoSaveId persistence, double-click to collapse/reset, nested splits.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, html, signal, generatedId, event } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -25,8 +25,26 @@ export interface SplitterPane {
 /**
  * A layout of resizable panes the user resizes by dragging the handles between them or from the
  * keyboard, with collapsible and nested panes.
+ *
+ * @csspart pane - One of the app's children, laid out as a pane (`.pdx-splitter-pane`).
+ * @csspart gutter - The handle between two panes (`role="separator"`), dragged or moved with the arrows.
+ *
+ * @cssstate horizontal - `orientation="horizontal"`: the panes side by side.
+ * @cssstate vertical - `orientation="vertical"`: the panes stacked.
+ * @cssstate dragging - A gutter is being dragged: the panes take no pointer until it is let go.
  */
 component('pdx-splitter', {
+    events: {
+        /** The sizes changed: by a drag, the arrows, Home/End or a double-click; in percent. */
+        'pdx-resize': event<{ sizes: number[] }>(),
+        /** A drag began; the sizes before it. */
+        'pdx-resize-start': event<{ sizes: number[] }>(),
+        /** A drag ended; the sizes it left. */
+        'pdx-resize-end': event<{ sizes: number[] }>(),
+    },
+    // On the host as custom states (#132, #290), in place of the classes it set on itself.
+    states: ['horizontal', 'vertical', 'dragging'],
+    parts: ['pane', 'gutter'],
     props: {
         /** Orientation: horizontal (side-by-side) or vertical (stacked) */
         orientation: { type: String, default: 'horizontal' },
@@ -112,7 +130,9 @@ component('pdx-splitter', {
             const orientation = ctx.orientation() as string;
             const gutterSize = ctx.gutterSize() as number;
 
-            ctx.el.classList.add('pdx-splitter', 'pdx-splitter-' + orientation);
+            // The host carries no class (#290): splitter.css draws it on the tag, oriented by the state.
+            ctx.state('horizontal', orientation !== 'vertical');
+            ctx.state('vertical', orientation === 'vertical');
             _paneEls = [];
             _handleEls = [];
 
@@ -120,6 +140,7 @@ component('pdx-splitter', {
             for (let idx = 0; idx < children.length; idx++) {
                 const pane = children[idx];
                 pane.classList.add('pdx-splitter-pane');
+                pane.setAttribute('data-part', 'pane');
                 pane.setAttribute('data-pane-index', String(idx));
                 if (!pane.id) pane.id = `${_uid}-pane-${idx}`;
                 _paneEls.push(pane);
@@ -128,6 +149,7 @@ component('pdx-splitter', {
                 if (idx < children.length - 1) {
                     const handle = document.createElement('div');
                     handle.className = 'pdx-splitter-handle';
+                    handle.setAttribute('data-part', 'gutter');
                     handle.setAttribute('role', 'separator');
                     handle.setAttribute('tabindex', '0');
                     handle.setAttribute('aria-orientation', orientation);
@@ -247,8 +269,8 @@ component('pdx-splitter', {
                 e.preventDefault();
                 handle.setPointerCapture(e.pointerId);
                 _dragging.set(true);
-                ctx.el.classList.add('pdx-splitter-dragging');
-                handle.classList.add('pdx-splitter-handle-active');
+                // The host's `dragging` state (#290); the dragged gutter is its own `:active`.
+                ctx.state('dragging', true);
 
                 startPos = orientation === 'vertical' ? e.clientY : e.clientX;
                 startSizes = _sizes.peek().slice();
@@ -306,8 +328,7 @@ component('pdx-splitter', {
             const onPointerUp = () => {
                 if (!_dragging.peek()) return;
                 _dragging.set(false);
-                ctx.el.classList.remove('pdx-splitter-dragging');
-                handle.classList.remove('pdx-splitter-handle-active');
+                ctx.state('dragging', false);
                 saveSizes(_sizes.peek());
                 ctx.emit('pdx-resize-end', { sizes: _sizes.peek() });
             };

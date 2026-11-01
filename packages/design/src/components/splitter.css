@@ -2,14 +2,16 @@
 
 pdx-splitter { display: block; }
 
-.pdx-splitter {
+/* The component's host carries no class (#290): the tag and its custom states, each at the weight of
+   the class it replaced. The classes stay for CSS-only markup. */
+:is(.pdx-splitter, pdx-splitter) {
     display: flex;
     width: 100%;
     height: 100%;
     overflow: hidden;
 }
-.pdx-splitter-horizontal { flex-direction: row; }
-.pdx-splitter-vertical { flex-direction: column; }
+:is(.pdx-splitter-horizontal, :where(pdx-splitter):state(horizontal)) { flex-direction: row; }
+:is(.pdx-splitter-vertical, :where(pdx-splitter):state(vertical)) { flex-direction: column; }
 
 /* Pane */
 .pdx-splitter-pane {
@@ -31,7 +33,10 @@ pdx-splitter { display: block; }
     touch-action: none;
     z-index: 1;
 }
+/* The gutter being dragged is its own :active (the pointer is down on it); the component no longer
+   marks it with a class. */
 .pdx-splitter-handle:hover,
+.pdx-splitter-handle:active,
 .pdx-splitter-handle-active {
     background: var(--pdx-color-primary);
 }
@@ -41,14 +46,14 @@ pdx-splitter { display: block; }
 }
 
 /* Dot indicator on handle */
-.pdx-splitter-horizontal > .pdx-splitter-handle::after {
+:is(.pdx-splitter-horizontal, :where(pdx-splitter):state(horizontal)) > .pdx-splitter-handle::after {
     content: '';
     width: 2px;
     height: 20px;
     border-radius: 1px;
     background: rgba(128,128,128,0.5);
 }
-.pdx-splitter-vertical > .pdx-splitter-handle::after {
+:is(.pdx-splitter-vertical, :where(pdx-splitter):state(vertical)) > .pdx-splitter-handle::after {
     content: '';
     width: 20px;
     height: 2px;
@@ -56,18 +61,19 @@ pdx-splitter { display: block; }
     background: rgba(128,128,128,0.5);
 }
 .pdx-splitter-handle:hover::after,
+.pdx-splitter-handle:active::after,
 .pdx-splitter-handle-active::after {
     background: rgba(255,255,255,0.6);
 }
 
 /* Prevent text selection during drag */
-.pdx-splitter-dragging {
+:is(.pdx-splitter-dragging, :where(pdx-splitter):state(dragging)) {
     user-select: none;
     cursor: col-resize;
 }
-.pdx-splitter-vertical.pdx-splitter-dragging {
+:is(.pdx-splitter-vertical, :where(pdx-splitter):state(vertical)):is(.pdx-splitter-dragging, :where(pdx-splitter):state(dragging)) {
     cursor: row-resize;
 }
-.pdx-splitter-dragging .pdx-splitter-pane {
+:is(.pdx-splitter-dragging, :where(pdx-splitter):state(dragging)) .pdx-splitter-pane {
     pointer-events: none;
 }
