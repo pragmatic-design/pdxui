@@ -1,7 +1,7 @@
 // pdx-relative-time — Displays relative time ("3 hours ago", "in 2 days")
 // with auto-update. Uses Intl.RelativeTimeFormat for locale-aware output.
 
-import { component, html, onDestroy } from '@pdxui/core';
+import { component, html, signal } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -57,8 +57,11 @@ function formatAbsoluteDate(date: Date, locale: string): string {
 
 /**
  * Shows a time relative to now ("3 hours ago", "in 2 days"), locale-aware and kept up to date.
+ *
+ * @csspart root - The `<time>`, with the machine-readable `datetime` and the full date as its title.
  */
 component('pdx-relative-time', {
+    parts: ['root'],
     props: {
         datetime: { type: String, default: '' },
         /** Locale of the wording. Empty: the page's language (`lang`), then the browser's. */
@@ -72,7 +75,8 @@ component('pdx-relative-time', {
     setup(ctx) {
         let built = false;
         let spanEl: HTMLElement | null = null;
-        let timer: ReturnType<typeof setInterval> | null = null;
+        /** The update's beat: one tick per interval. */
+        const tick = signal(0);
 
         function update(): void {
             if (!spanEl) return;
@@ -103,54 +107,40 @@ component('pdx-relative-time', {
             }
         }
 
-        function setupTimer(): void {
-            clearTimer();
-            const intervalMs = ctx.updateInterval() as number;
-            if (intervalMs > 0) {
-                timer = setInterval(() => update(), intervalMs);
-            }
-        }
-
-        function clearTimer(): void {
-            if (timer !== null) {
-                clearInterval(timer);
-                timer = null;
-            }
-        }
-
+        // The update is an effect of this component (#291; lifecycle.md: no work while frozen). Each run
+        // writes the text and waits one interval, then ticks; the tick runs it again. On a frozen page the
+        // scope parks the effect (#269): the tick due then writes nothing and starts no wait, and the page
+        // coming back runs the effect once — the text brought up to date, then the beat again. No interval
+        // of its own to pause, so none to forget; the effect's cleanup clears the wait on destroy too.
         ctx.track(() => {
-            // Subscribe to all props
+            // Subscribe to all props, and to the beat
+            void tick();
             void ctx.datetime();
             void ctx.locale();
             void ctx.formatStyle();
             void ctx.numeric();
-            void ctx.updateInterval();
             void ctx.showTooltip();
+            const intervalMs = ctx.updateInterval() as number;
 
             if (!built) {
                 built = true;
-                // ctx.frame: a setup a move destroyed does not build again, nor start a timer
-                // its onDestroy already ran for.
+                // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
                     // A <time> with a machine-readable datetime: the text is relative ("2 hours ago") but
                     // the absolute time stays exposed in machine form (semantic HTML <time>).
                     spanEl = document.createElement('time');
                     spanEl.className = 'pdx-rt-root';
+                    spanEl.setAttribute('data-part', 'root');
                     ctx.el.appendChild(spanEl);
                     update();
-                    setupTimer();
                 });
-                return;
-            }
-            requestAnimationFrame(() => {
+            } else {
                 update();
-                setupTimer();
-            });
+            }
+            if (!(intervalMs > 0)) return;
+            const id = setTimeout(() => tick.set((n) => n + 1), intervalMs);
+            return () => clearTimeout(id);
         });
-
-        // core's onDestroy: `ctx.onDestroy` does not exist, and an optional call would hide that the
-        // interval outlives the element.
-        onDestroy(() => { clearTimer(); });
 
         return {};
     },
