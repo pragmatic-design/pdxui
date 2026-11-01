@@ -17,9 +17,13 @@ A top navigation bar.
 |---|---|
 | `toggleMobile()` | Open or close the mobile menu, moving focus into it when it opens. |
 
-**Events:** `pdx-select` → `detail: { key, item }` — Fired when an item is selected.
+**Events:** `pdx-select` → `detail: { key: string; item: NavbarItem }` — A link was chosen: its `key` and its item.
 
 **Renders:** roles `banner` · `navigation`
+
+**States:** `:state(sticky)` — `sticky` is set: it stays at the top as the page scrolls.; `:state(compact)` — `compact` is set: the shorter bar.; `:state(collapsed)` — Its bar does not fit its width: the links go behind the toggle.; `:state(menu-open)` — The drawer is open.
+
+**Parts:** `[data-part="bar"]` — The row that holds the brand, the toggle, the nav and the actions.; `[data-part="brand"]` — The brand's icon and text.; `[data-part="toggle"]` — The button that opens the drawer while the navbar is collapsed.; `[data-part="nav"]` — The `<nav>` of the links in the bar.; `[data-part="item"]` — A link, in the bar or the drawer; the current one is `aria-current="page"`.; `[data-part="actions"]` — The navbar's children, moved to the end of the bar.; `[data-part="drawer"]` — The `<nav>` of the links shown under the bar while collapsed.
 
 **Shapes:** `NavbarItem { key: string; label: string; href?: string; icon?: string; active?: boolean }`
 

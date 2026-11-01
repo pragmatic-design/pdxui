@@ -18256,8 +18256,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is selected.",
-              "detail": "{ key, item }"
+              "description": "A link was chosen: its `key` and its item.",
+              "detail": "{ key: string; item: NavbarItem }"
             }
           ],
           "roles": [
@@ -18327,6 +18327,54 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "bar",
+              "description": "The row that holds the brand, the toggle, the nav and the actions."
+            },
+            {
+              "name": "brand",
+              "description": "The brand's icon and text."
+            },
+            {
+              "name": "toggle",
+              "description": "The button that opens the drawer while the navbar is collapsed."
+            },
+            {
+              "name": "nav",
+              "description": "The `<nav>` of the links in the bar."
+            },
+            {
+              "name": "item",
+              "description": "A link, in the bar or the drawer; the current one is `aria-current=\"page\"`."
+            },
+            {
+              "name": "actions",
+              "description": "The navbar's children, moved to the end of the bar."
+            },
+            {
+              "name": "drawer",
+              "description": "The `<nav>` of the links shown under the bar while collapsed."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "sticky",
+              "description": "`sticky` is set: it stays at the top as the page scrolls."
+            },
+            {
+              "name": "compact",
+              "description": "`compact` is set: the shorter bar."
+            },
+            {
+              "name": "collapsed",
+              "description": "Its bar does not fit its width: the links go behind the toggle."
+            },
+            {
+              "name": "menu-open",
+              "description": "The drawer is open."
             }
           ]
         }

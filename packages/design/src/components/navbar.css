@@ -6,7 +6,8 @@ pdx-navbar {
     border-bottom: 1px solid var(--pdx-color-border);
 }
 
-.pdx-navbar-sticky { position: sticky; top: 0; z-index: 100; }
+/* The component's own states (#289), at the weight of the classes they replaced. */
+:where(pdx-navbar):state(sticky) { position: sticky; top: 0; z-index: 100; }
 .pdx-navbar-transparent { background: transparent; border-bottom: none; }
 
 /* ─── Bar layout ─── */
@@ -18,7 +19,7 @@ pdx-navbar {
     padding: 0 var(--pdx-space-md);
 }
 
-.pdx-navbar-compact .pdx-navbar-bar { height: 48px; }
+:where(pdx-navbar):state(compact) .pdx-navbar-bar { height: 48px; }
 
 /* ─── Brand ─── */
 .pdx-navbar-brand {
@@ -75,7 +76,8 @@ pdx-navbar {
 }
 
 .pdx-navbar-link:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
-.pdx-navbar-link.active { color: var(--pdx-color-primary-ink); font-weight: var(--pdx-weight-medium); }
+/* The component marks the current link aria-current="page"; CSS-only markup may still write .active. */
+.pdx-navbar-link:is(.active, [aria-current="page"]) { color: var(--pdx-color-primary-ink); font-weight: var(--pdx-weight-medium); }
 
 /* ─── Spacer ─── */
 .pdx-navbar-spacer { flex: 1; }
@@ -201,31 +203,33 @@ pdx-navbar {
     padding: var(--pdx-space-sm);
 }
 
-/* Drawer open — always works regardless of viewport size */
-.pdx-navbar-drawer-open {
+/* Drawer open — always works regardless of viewport size. The component opens it with its
+   menu-open state; CSS-only markup toggles the class. */
+.pdx-navbar-drawer-open,
+:where(pdx-navbar):state(menu-open) > .pdx-navbar-drawer {
     display: flex !important;
 }
 
 /* ─── Collapsed ─── */
-/* <pdx-navbar> collapses on its own width: it sets .pdx-navbar-collapsed when its bar overflows, in
+/* <pdx-navbar> collapses on its own width: it takes its collapsed state when its bar overflows, in
    a column, a sidebar layout or a dialog as on a phone. */
-.pdx-navbar-collapsed .pdx-navbar-hamburger { display: flex; }
-.pdx-navbar-collapsed .pdx-navbar-nav { display: none; }
+:where(pdx-navbar):state(collapsed) .pdx-navbar-hamburger { display: flex; }
+:where(pdx-navbar):state(collapsed) .pdx-navbar-nav { display: none; }
 /* Hide the user name, keep the avatar */
-.pdx-navbar-collapsed .pdx-navbar-user-name { display: none; }
-.pdx-navbar-collapsed .pdx-navbar-bar { padding: 0 var(--pdx-space-sm); }
+:where(pdx-navbar):state(collapsed) .pdx-navbar-user-name { display: none; }
+:where(pdx-navbar):state(collapsed) .pdx-navbar-bar { padding: 0 var(--pdx-space-sm); }
 /* Collapsed and still narrower than its actions, the bar gives them the next row, and they wrap
    there too: on a phone, actions kept on one row run past the edge. On one row the bar keeps its
    height: `min-height` is the bar's height, and the padding fits inside it. */
-.pdx-navbar-collapsed .pdx-navbar-bar {
+:where(pdx-navbar):state(collapsed) .pdx-navbar-bar {
     flex-wrap: wrap;
     height: auto;
     min-height: 56px;
     row-gap: var(--pdx-space-xs);
     padding-block: var(--pdx-space-xs);
 }
-.pdx-navbar-collapsed.pdx-navbar-compact .pdx-navbar-bar { min-height: 48px; }
-.pdx-navbar-collapsed .pdx-navbar-actions {
+:where(pdx-navbar):state(collapsed):state(compact) .pdx-navbar-bar { min-height: 48px; }
+:where(pdx-navbar):state(collapsed) .pdx-navbar-actions {
     flex-wrap: wrap;
     flex-shrink: 1;
     min-width: 0;
@@ -234,7 +238,7 @@ pdx-navbar {
 }
 
 /* ─── Responsive (real viewport) — the CSS-only .pdx-navbar markup, which has no script to measure
-   its width. The component (.pdx-navbar-fit) uses the rules above instead. ─── */
+   its width. The component, which carries no .pdx-navbar class, uses the rules above instead. ─── */
 @media (max-width: 768px) {
     .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-hamburger { display: flex; }
     .pdx-navbar:not(.pdx-navbar-fit) .pdx-navbar-nav { display: none; }

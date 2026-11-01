@@ -2,7 +2,7 @@
 // Props for brand + nav. Discovers existing children for actions area.
 // Responsive: hamburger + drawer on mobile breakpoint.
 
-import { component, html, signal, sanitizeUrl, generatedId } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, event } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -23,8 +23,27 @@ export interface NavbarItem {
 /**
  * A responsive app header holding the brand, the navigation links and the user's avatar with its
  * dropdown.
+ *
+ * @csspart bar - The row that holds the brand, the toggle, the nav and the actions.
+ * @csspart brand - The brand's icon and text.
+ * @csspart toggle - The button that opens the drawer while the navbar is collapsed.
+ * @csspart nav - The `<nav>` of the links in the bar.
+ * @csspart item - A link, in the bar or the drawer; the current one is `aria-current="page"`.
+ * @csspart actions - The navbar's children, moved to the end of the bar.
+ * @csspart drawer - The `<nav>` of the links shown under the bar while collapsed.
+ * @cssstate sticky - `sticky` is set: it stays at the top as the page scrolls.
+ * @cssstate compact - `compact` is set: the shorter bar.
+ * @cssstate collapsed - Its bar does not fit its width: the links go behind the toggle.
+ * @cssstate menu-open - The drawer is open.
  */
 component('pdx-navbar', {
+    // Nothing the navbar holds is read back by the app: no model (#289).
+    events: {
+        /** A link was chosen: its `key` and its item. */
+        'pdx-select': event<{ key: string; item: NavbarItem }>(),
+    },
+    states: ['sticky', 'compact', 'collapsed', 'menu-open'],
+    parts: ['bar', 'brand', 'toggle', 'nav', 'item', 'actions', 'drawer'],
     props: {
         /** Brand text */
         brand: { type: String, default: '' },
@@ -51,7 +70,8 @@ component('pdx-navbar', {
 
         function setMobile(open: boolean): void {
             _mobileOpen.set(open);
-            if (_drawerEl) _drawerEl.classList.toggle('pdx-navbar-drawer-open', open);
+            // A state, not a class on the drawer (#289): navbar.css shows the drawer from it.
+            ctx.state('menu-open', open);
             if (_hamburgerEl) _hamburgerEl.setAttribute('aria-expanded', String(open));
         }
 
@@ -79,14 +99,14 @@ component('pdx-navbar', {
         // dialog would never collapse, and its actions would run past the edge. It collapses when its bar overflows, and expands again once the width
         // it needed is back. The media query stays for the CSS-only `.pdx-navbar` markup.
         let _neededWidth = 0;
+        let _collapsed = false;
         function barOverflows(bar: HTMLElement): boolean {
             return bar.scrollWidth > bar.clientWidth + 1;
         }
         function fit(): void {
             const bar = ctx.el.querySelector(':scope > .pdx-navbar-bar') as HTMLElement | null;
             if (!bar) return;
-            const collapsed = ctx.el.classList.contains('pdx-navbar-collapsed');
-            if (!collapsed) {
+            if (!_collapsed) {
                 if (barOverflows(bar)) { _neededWidth = bar.scrollWidth; setCollapsed(true); }
                 return;
             }
@@ -95,7 +115,8 @@ component('pdx-navbar', {
             if (barOverflows(bar)) { _neededWidth = bar.scrollWidth; setCollapsed(true); }
         }
         function setCollapsed(collapsed: boolean): void {
-            ctx.el.classList.toggle('pdx-navbar-collapsed', collapsed);
+            _collapsed = collapsed;
+            ctx.state('collapsed', collapsed);
             // An open menu does not outlive the collapse that showed its toggle.
             if (!collapsed && _mobileOpen.peek()) setMobile(false);
         }
@@ -116,21 +137,23 @@ component('pdx-navbar', {
                 ctx.frame(() => {
                     const el = ctx.el;
                     el.setAttribute('role', 'banner');
-                    // pdx-navbar-fit: the component collapses on its own width, not the media query.
-                    el.classList.add('pdx-navbar', 'pdx-navbar-fit');
-                    if (sticky) el.classList.add('pdx-navbar-sticky');
-                    if (compact) el.classList.add('pdx-navbar-compact');
+                    // States, not classes (#289). With no `.pdx-navbar` class the media query of the
+                    // CSS-only markup does not reach it: it collapses on its own width.
+                    ctx.state('sticky', sticky);
+                    ctx.state('compact', compact);
 
                     // Capture any existing children (actions area) before restructuring
                     const existingChildren = Array.from(el.childNodes);
 
                     const bar = document.createElement('div');
                     bar.className = 'pdx-navbar-bar';
+                    bar.setAttribute('data-part', 'bar');
 
                     // Brand
                     if (brand || brandIcon) {
                         const brandEl = document.createElement('div');
                         brandEl.className = 'pdx-navbar-brand';
+                        brandEl.setAttribute('data-part', 'brand');
                         if (brandIcon) {
                             loadIcon();
                             const icon = document.createElement('pdx-icon');
@@ -150,6 +173,7 @@ component('pdx-navbar', {
                     _hamburgerEl = document.createElement('button');
                     _hamburgerEl.type = 'button';
                     _hamburgerEl.className = 'pdx-navbar-hamburger';
+                    _hamburgerEl.setAttribute('data-part', 'toggle');
                     uiAttr(_hamburgerEl, 'aria-label', () => uiString('navbar', 'toggle'));
                     _hamburgerEl.setAttribute('aria-expanded', 'false');
                     _hamburgerEl.setAttribute('aria-controls', _menuId);
@@ -160,6 +184,7 @@ component('pdx-navbar', {
                     // Desktop nav
                     const nav = document.createElement('nav');
                     nav.className = 'pdx-navbar-nav';
+                    nav.setAttribute('data-part', 'nav');
                     nav.setAttribute('role', 'navigation');
                     nav.setAttribute('aria-label', name);
                     buildNavItems(items, nav);
@@ -174,6 +199,7 @@ component('pdx-navbar', {
                     if (existingChildren.length > 0) {
                         const actions = document.createElement('div');
                         actions.className = 'pdx-navbar-actions';
+                        actions.setAttribute('data-part', 'actions');
                         for (const child of existingChildren) {
                             actions.appendChild(child);
                         }
@@ -186,6 +212,7 @@ component('pdx-navbar', {
                     // the two is ever displayed.
                     _drawerEl = document.createElement('nav');
                     _drawerEl.className = 'pdx-navbar-drawer';
+                    _drawerEl.setAttribute('data-part', 'drawer');
                     _drawerEl.id = _menuId;
                     _drawerEl.setAttribute('aria-label', name);
                     buildNavItems(items, _drawerEl);
@@ -205,8 +232,8 @@ component('pdx-navbar', {
 
             // Rebuild on prop changes
             requestAnimationFrame(() => {
-                ctx.el.classList.toggle('pdx-navbar-sticky', sticky);
-                ctx.el.classList.toggle('pdx-navbar-compact', compact);
+                ctx.state('sticky', sticky);
+                ctx.state('compact', compact);
                 const nav = ctx.el.querySelector('.pdx-navbar-nav') as HTMLElement | null;
                 if (nav) { nav.innerHTML = ''; buildNavItems(items, nav); nav.setAttribute('aria-label', name); }
                 if (_drawerEl) { _drawerEl.innerHTML = ''; buildNavItems(items, _drawerEl); _drawerEl.setAttribute('aria-label', name); }
@@ -220,7 +247,9 @@ component('pdx-navbar', {
             for (const item of items) {
                 const a = document.createElement('a');
                 a.className = 'pdx-navbar-link';
-                if (item.active) { a.classList.add('active'); a.setAttribute('aria-current', 'page'); }
+                a.setAttribute('data-part', 'item');
+                // The current link is its aria-current, which navbar.css selects: no class (#289).
+                if (item.active) a.setAttribute('aria-current', 'page');
                 // An item with no (safe) href is still a link: `#`, and the click below keeps it from
                 // navigating. With no href the <a> is not a link and takes no focus — keyboard users
                 // could not reach the app navigation.

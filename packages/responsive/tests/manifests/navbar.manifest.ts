@@ -3,9 +3,10 @@
  *
  * Contracts derived by inspecting:
  *  - source: packages/ui/src/navbar/pdx-navbar.ts
- *      the HOST <pdx-navbar>: in an rAF it adds the class .pdx-navbar plus role="banner" (NOT "navigation":
- *      the host is the banner landmark; the real nav is a child). Optionally .pdx-navbar-sticky /
- *      .pdx-navbar-compact from a prop.
+ *      the HOST <pdx-navbar>: in an rAF it sets role="banner" (NOT "navigation": the host is the banner
+ *      landmark; the real nav is a child). No class (#289): the custom states :state(sticky) /
+ *      :state(compact) from their props, :state(collapsed) from its width, :state(menu-open) from its toggle.
+ *      Each piece below also carries its data-part (bar, brand, toggle, nav, item, actions, drawer).
  *      The structure is built imperatively inside the host:
  *        <div class="pdx-navbar-bar">                      ← INNER bar, geometria stabile (h:56px)
  *          [<div class="pdx-navbar-brand">…]               ← only with the brand/brandIcon prop
@@ -15,10 +16,10 @@
  *          <nav class="pdx-navbar-nav" role="navigation"   ← landmark navigazione + aria-label
  *               aria-label="Main navigation">                 "Main navigation". display:flex ≥768px,
  *            <a class="pdx-navbar-link" data-nav-key=…>        display:none <768px.
- *              [.active + aria-current="page" when item.active]  Data-driven links from the `items` prop.
+ *              [aria-current="page" when item.active]             Data-driven links from the `items` prop.
  *          <div class="pdx-navbar-spacer">                  ← flex:1
  *          [<div class="pdx-navbar-actions">…]              ← only when the host had children (the actions slot)
- *        <div class="pdx-navbar-drawer">                    ← the mobile nav (display:none, flex when -open)
+ *        <div class="pdx-navbar-drawer">                    ← the mobile nav (display:none, flex in :state(menu-open))
  *          <a class="pdx-navbar-link">…                        it duplicates the items for the drawer.
  *      Events: it emits 'pdx-select' {key,item} when a link is clicked. No keydown handler and no
  *      roving tabindex: the hamburger is a native <button> and the links are native <a>s → tabbable →
@@ -27,19 +28,19 @@
  *  - CSS: packages/design/src/components/navbar.css
  *      pdx-navbar → display:block; background:surface; border-bottom:1px solid border.
  *      .pdx-navbar-bar → display:flex; align-items:center; gap; height:56px; padding 0 md.
- *                        (.pdx-navbar-compact → 48px). A FIXED height → a stable isolation target.
+ *                        (:state(compact) → 48px). A FIXED height → a stable isolation target.
  *      .pdx-navbar-brand → display:flex; align-items:center; flex-shrink:0.
  *      .pdx-navbar-hamburger → display:none (default desktop); flex <768px; cursor:pointer.
  *      .pdx-navbar-nav → display:flex; align-items:center (default desktop); display:none <768px.
  *      .pdx-navbar-link → display:inline-flex; cursor:pointer; color:muted.
- *      .pdx-navbar-link.active → color:primary.
+ *      .pdx-navbar-link[aria-current="page"] (or .active, CSS-only markup) → color:primary.
  *      .pdx-navbar-spacer → flex:1.
  *
  * Robustness choices:
  *  - Universal rules: true on ALL themes, no theme-specific px. The only px measurements are
  *    conservative minimum thresholds (height >= 40px on a bar that is 56px in the CSS).
  *  - States set up front: the active item is set through items[].active in the scenario → a
- *    STANDALONE rule (.pdx-navbar-link.active is already there), no triggered StateRule (it avoids flake).
+ *    STANDALONE rule (the current link is already there), no triggered StateRule (it avoids flake).
  *  - The DEFAULT 1280px viewport: on the desktop the .pdx-navbar-nav is flex and the hamburger is display:none.
  *    The rules on .pdx-navbar-nav hold at the desktop viewport only → a scenario at 1280.
  *  - Isolation: the host is display:block, its width viewport-driven (a full-width border-bottom) and
@@ -113,13 +114,13 @@ export const navbar: ComponentManifest = {
                     },
                     {
                         // The active link (not disabled) → opaque.
-                        selector: 'section:not([hidden]) [data-test="navbar"] .pdx-navbar-link.active',
+                        selector: 'section:not([hidden]) [data-test="navbar"] [data-part="nav"] [data-part="item"][aria-current="page"]',
                         description: 'active link opacity = 1',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
                         // The link is interactive → cursor pointer.
-                        selector: 'section:not([hidden]) [data-test="navbar"] .pdx-navbar-link.active',
+                        selector: 'section:not([hidden]) [data-test="navbar"] [data-part="nav"] [data-part="item"][aria-current="page"]',
                         description: 'active link cursor = pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
@@ -165,6 +166,16 @@ export const navbar: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="navbar-narrow"] .pdx-navbar-nav',
                         description: 'narrow container: the inline links are behind the toggle',
                         display: { op: 'is', value: 'none' },
+                    },
+                ],
+                states: [
+                    {
+                        // Its own width collapsed it: a custom state, not a class (#289).
+                        description: 'narrow container: collapsed is the custom state :state(collapsed)',
+                        selector: 'section:not([hidden]) [data-test="navbar-narrow"] [data-part="bar"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="navbar-narrow"]', name: 'collapsed' },
+                        changes: {},
                     },
                 ],
                 composition: [
