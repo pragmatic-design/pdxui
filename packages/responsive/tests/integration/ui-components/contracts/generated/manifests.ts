@@ -38,6 +38,7 @@ import { divider } from '../../../../manifests/divider.manifest';
 import { drawer } from '../../../../manifests/drawer.manifest';
 import { dropdownMenu } from '../../../../manifests/dropdown-menu.manifest';
 import { emptyState } from '../../../../manifests/empty-state.manifest';
+import { errorBoundary } from '../../../../manifests/error-boundary.manifest';
 import { fab } from '../../../../manifests/fab.manifest';
 import { fieldGroup } from '../../../../manifests/field-group.manifest';
 import { fieldList } from '../../../../manifests/field-list.manifest';
@@ -74,6 +75,7 @@ import { pagination } from '../../../../manifests/pagination.manifest';
 import { passwordInput } from '../../../../manifests/password-input.manifest';
 import { popover } from '../../../../manifests/popover.manifest';
 import { progress } from '../../../../manifests/progress.manifest';
+import { provide } from '../../../../manifests/provide.manifest';
 import { radioGroup } from '../../../../manifests/radio-group.manifest';
 import { radio } from '../../../../manifests/radio.manifest';
 import { rating } from '../../../../manifests/rating.manifest';
@@ -166,7 +168,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -369,6 +371,7 @@ export const scenarioPage: Record<string, string> = {
     "dd-disabled": "tier-1a",
     "empty-state-basic": "tier-5b",
     "empty-state-action": "tier-5b",
+    "error-boundary-fallback": "tier-6",
     "fab-basic": "tier-6",
     "fab-sizes": "tier-6",
     "fab-speed-dial": "tier-6",
@@ -535,6 +538,7 @@ export const scenarioPage: Record<string, string> = {
     "progress-size-md": "tier-1c",
     "progress-size-sm": "tier-1c",
     "progress-size-lg": "tier-1c",
+    "provide-consumer": "tier-6",
     "radio-group-basic": "tier-1b",
     "radio-group-disabled": "tier-1b",
     "radio-group-orientation-vertical": "tier-1b",

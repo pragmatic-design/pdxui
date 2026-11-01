@@ -50,7 +50,18 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-error</code></td><td><code>{ error, retryCount }</code></td><td>Fired on every caught error. Use for logging/telemetry.</td></tr>
+            <tr><td><code>pdx-error</code></td><td><code>{ error, retryCount }</code></td><td>Fired on every caught error. Use for logging/telemetry. It does not bubble: listen on the boundary.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">State and parts</h3>
+      <div class="props-table">
+        <table>
+          <thead><tr><th>Name</th><th>Kind</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>:state(error)</code></td><td>State</td><td>A child threw and the fallback shows; cleared when Retry brings the children back</td></tr>
+            <tr><td><code>fallback</code>, <code>message</code>, <code>detail</code>, <code>retry</code></td><td>Part</td><td>The fallback, its message, the error's own message, the Retry button</td></tr>
           </tbody>
         </table>
       </div>

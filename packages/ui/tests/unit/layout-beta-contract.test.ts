@@ -101,6 +101,29 @@ const DONE: Row[] = [
         removed: [],
     },
     {
+        tag: 'pdx-splitter',
+        // The sizes are a read-only result of a drag, announced by its declared resize events.
+        models: [],
+        outputs: [],
+        // From `orientation`, and while a gutter is dragged.
+        states: ['horizontal', 'vertical', 'dragging'],
+        // The app's children, and the gutter it inserts between each two.
+        parts: ['pane', 'gutter'],
+        removed: [],
+    },
+    // It provides and renders nothing of its own.
+    { tag: 'pdx-provide', models: [], outputs: [], states: [], parts: [], removed: [] },
+    {
+        tag: 'pdx-error-boundary',
+        models: [],
+        outputs: [],
+        // While it shows its fallback.
+        states: ['error'],
+        // The fallback and its pieces; the children are the app's.
+        parts: ['fallback', 'message', 'detail', 'retry'],
+        removed: [],
+    },
+    {
         tag: 'pdx-divider',
         models: [],
         outputs: [],

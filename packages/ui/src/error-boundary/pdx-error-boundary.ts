@@ -11,7 +11,7 @@
 //     <pdx-data-heavy-panel />
 //   </pdx-error-boundary>
 
-import { component, html, signal, computed, provide, context } from '@pdxui/core';
+import { component, html, signal, computed, provide, context, event } from '@pdxui/core';
 import { errorBoundary } from '@pdxui/core';
 import type { Signal, ReadonlySignal } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -36,8 +36,22 @@ export const ErrorContext = context<ErrorContext>('error-boundary');
 
 /**
  * Catches render errors and effect failures from its children and shows a fallback UI with retry.
+ *
+ * @csspart fallback - The fallback shown in place of the children (`role="alert"`).
+ * @csspart message - The fallback's message: `fallbackMessage`, or the component string.
+ * @csspart detail - The error's own message, under it.
+ * @csspart retry - The Retry button, while retries are left; the note that none are, after.
+ *
+ * @cssstate error - A child threw: the fallback shows. Cleared when Retry brings the children back.
  */
 component('pdx-error-boundary', {
+    events: {
+        /** A child threw; the error, and how many retries have been made. */
+        'pdx-error': event<{ error: Error; retryCount: number }>(),
+    },
+    // On the host as a custom state (#132, #290): a page can tell a failed boundary from outside it.
+    states: ['error'],
+    parts: ['fallback', 'message', 'detail', 'retry'],
     props: {
         /** Maximum retries before permanent fallback. 0 = no retry. Default: 3. */
         maxRetries: { type: Number, default: 3 },
@@ -84,8 +98,9 @@ component('pdx-error-boundary', {
             // Only while the content shows: the fallback's own nodes are not the children.
             if (nodes.length && !ctx.el.querySelector(':scope > .pdx-error-boundary')) _children = nodes;
         }
-        /** The content: the slot the first time, the kept children after. */
+        /** The content: the slot the first time, the kept children after. Rendering it ends the error state. */
         function content(): Node | DocumentFragment {
+            ctx.state('error', false);
             if (!_children) return html`<slot></slot>`;
             const frag = document.createDocumentFragment();
             for (const n of _children) frag.appendChild(n);
@@ -95,7 +110,7 @@ component('pdx-error-boundary', {
         return {
             _error, _retryCount, _canRetry, retry, keepChildren, content,
             setRetryFn: (fn: () => void) => { _retryFn = fn; },
-            setError: (e: Error | null) => _error.set(e),
+            setError: (e: Error | null) => { _error.set(e); ctx.state('error', e !== null); },
             setRetryCount: (n: number) => _retryCount.set(n),
         };
     },
@@ -114,13 +129,13 @@ component('pdx-error-boundary', {
                 (ctx as any).setRetryFn(retry);
                 const canRetry = (ctx as any)._retryCount() < maxRetries;
 
-                return html`<div class="pdx-error-boundary" role="alert">
+                return html`<div class="pdx-error-boundary" role="alert" data-part="fallback">
                     <div class="pdx-error-boundary-icon">⚠</div>
-                    <div class="pdx-error-boundary-message">${() => fallbackMsg || uiString('error-boundary', 'message')}</div>
-                    <div class="pdx-error-boundary-detail pdx-txt-small pdx-ink-muted">${error.message}</div>
+                    <div class="pdx-error-boundary-message" data-part="message">${() => fallbackMsg || uiString('error-boundary', 'message')}</div>
+                    <div class="pdx-error-boundary-detail pdx-txt-small pdx-ink-muted" data-part="detail">${error.message}</div>
                     ${() => canRetry
-                        ? html`<button class="pdx-outline" size="sm" @click=${retry}>${() => uiString('error-boundary', 'retry')}</button>`
-                        : html`<span class="pdx-txt-small pdx-ink-muted">${() => uiString('error-boundary', 'maxRetries')}</span>`
+                        ? html`<button class="pdx-outline" size="sm" data-part="retry" @click=${retry}>${() => uiString('error-boundary', 'retry')}</button>`
+                        : html`<span class="pdx-txt-small pdx-ink-muted" data-part="retry">${() => uiString('error-boundary', 'maxRetries')}</span>`
                     }
                 </div>`;
             },

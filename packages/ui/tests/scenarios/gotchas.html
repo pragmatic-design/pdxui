@@ -27,7 +27,7 @@
         // Not the barrel: a load of this page builds ONE case, and registers that case's components
         // (the barrel is 414 requests a load, ~400 loads a certify run).
         import { loadTags, tagsIn } from './generated/component-loaders.js';
-        import { createDataSource, createForm, required, email, component, html, signal, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
+        import { createDataSource, createForm, required, email, component, html, signal, computed, context, inject, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
 
         const p = new URLSearchParams(location.search);
         const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
@@ -470,6 +470,31 @@
             'divider-beta-contract': () => {},
             // pdx-scroll-area on the beta contract (#290): the spec mounts its own markup.
             'scroll-area-beta-contract': () => {},
+            // pdx-splitter on the beta contract (#290): the spec mounts its own markup.
+            'splitter-beta-contract': () => {},
+            // pdx-provide and pdx-error-boundary on the beta contract (#290). What they wrap is the
+            // test: a reader of a provided token, and a child whose computed throws once `api.breakChild()`
+            // breaks it — the way a widget's data source fails after the screen is up. Both are defined
+            // here, before the spec builds the wrappers around them.
+            'wrappers-beta-contract': () => {
+                const Theme = context('gotcha-theme');
+                api.Theme = Theme;
+                if (!customElements.get('gotcha-theme-reader')) {
+                    component('gotcha-theme-reader', {
+                        render: (ctx) => html`<span data-test="read">${() => String(inject(Theme, ctx.el, 'none'))}</span>`,
+                    });
+                }
+                const broken = signal(false);
+                const status = computed(() => {
+                    if (broken()) throw new Error('The data source failed');
+                    return 'healthy';
+                });
+                if (!customElements.get('gotcha-flaky-child')) {
+                    component('gotcha-flaky-child', { render: () => html`<p data-test="child">${() => status()}</p>` });
+                }
+                api.breakChild = () => broken.set(true);
+                api.fixChild = () => broken.set(false);
+            },
 
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
