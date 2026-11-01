@@ -130,7 +130,7 @@ The rule asks for no escape hatch. The select needs five kinds, each marked `ESC
 | What the component does | Why no declaration covers it | Places |
 |---|---|---|
 | Dispatches `pdx-open`, `pdx-close`, `pdx-clear`, `pdx-search`, `pdx-create` | `@event` took an identifier, and every library event has a hyphen. **Declared since #749**: `@event 'pdx-open';`, dispatched by `pdxOpen()` | 0 (was 5 × `ctx.emit`) |
-| Reads its own element: its `id`, for a `<label for>`, and as the popover's container | No declaration names the host. The label lookup also needs `document.querySelector`, which the compiler flags (CD-A1) with no alternative to offer | 2 × `ctx.el` |
+| Reads its own element: its `id`, for a `<label for>`, and as the popover's container | No declaration named the host. **Named since #750**: `@host self { … }`. The label lookup still needs `document.querySelector`, which the compiler flags (CD-A1) with no alternative to offer | 0 (was 2 × `ctx.el`) |
 | Submits an empty entry when nothing is chosen, as a native select does | `@model … { form }` submits the model, and has no option for what the form gets instead | `ctx.formValue` |
 | Exposes `selectedItem` as a read-only value | `@expose` puts a member on the element as it is, and a `$derived` is a function | `ctx.expose` with a getter |
 

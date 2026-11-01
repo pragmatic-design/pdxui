@@ -533,6 +533,15 @@ and a generic argument mean nothing on a host and are `PDX_HOST_INVALID_ATTRIBUT
 component declares the same thing in its descriptor:
 `host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown.enter': (ctx, e) => … }`.
 
+When the script needs the element itself — its `id` for a `<label for>`, its size, a place to anchor a
+popup — give it a name. The name is the element, from the first line of the script and in the template:
+
+```pdx
+@host el { role="combobox" }   // or @host el; with no attributes
+const wide = $derived(() => el.offsetWidth > 320);
+function focusMe() { el.focus(); }
+```
+
 ## @state — a visual state of the host
 
 Open, selected, invalid, loading: a state the outside styles. Declare it with the condition it is on

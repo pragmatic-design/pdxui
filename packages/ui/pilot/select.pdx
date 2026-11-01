@@ -207,7 +207,7 @@ import type { Option, Template, Row, SourceElement } from './select-types';
 @inject injectedSource from DataSourceContext = null;
 
 // The host is the one submitter; an inner field carrying the name too would send the value twice.
-@host { :name="name || null" }
+@host self { :name="name || null" }
 
 @expose focus, blur, clear, openSelect, closeSelect, toggleSelect;
 
@@ -383,8 +383,7 @@ function openOnOption(fallback: number): void {
 
 // A <label for="{host id}"> names the host, not the combobox inside it: its id goes on the combobox.
 onMount(() => {
-  // ESCAPE HATCH: the host's id. No declaration gives a .pdx its own element.
-  const id = ctx.el.id;
+  const id = self.id;
   if (!id) return;
   const lab = document.querySelector<HTMLLabelElement>(`label[for="${id.replace(/["\\]/g, '\\$&')}"]`);
   const cb = (inputInTrigger ? triggerSearchEl : triggerEl) as HTMLElement | null;
@@ -618,8 +617,8 @@ onMount(() => {
     flip: true,
     dismissOnOutside: true,
     dismissOnEscape: false,
-    // ESCAPE HATCH: the host, which holds the trigger and the list side by side in the light DOM.
-    container: ctx.el,
+    // The host, which holds the trigger and the list side by side in the light DOM.
+    container: self,
     onOpenChange: (opened) => { if (!opened && isOpen.peek()) close(); },
   });
   popover.setTrigger(trigger);

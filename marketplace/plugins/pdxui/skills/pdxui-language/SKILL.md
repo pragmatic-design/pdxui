@@ -167,7 +167,8 @@ and listeners on the component's own element — the template's attribute syntax
 Use it instead of `ctx.el.setAttribute(…)` or `ctx.el.addEventListener(…)` in the script. A static
 attribute is set only if the page did not set it (the page's `role` wins); a binding follows its signal;
 a listener keeps the template's handler forms and modifiers. `::x`, `data-part` and `T="…"` are
-`PDX_HOST_INVALID_ATTRIBUTE`.
+`PDX_HOST_INVALID_ATTRIBUTE`. **`@host el { … }`** or **`@host el;`** also names the element itself —
+use `el` (its `id`, its size, `el.focus()`) instead of `ctx.el`.
 
 **`@state name = condition;`** is a visual state of the host — open, selected, invalid — held in the
 platform's custom states and matched in CSS with `:state(name)` (`my-menu:state(expanded) button { … }`,

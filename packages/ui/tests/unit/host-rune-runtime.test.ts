@@ -30,7 +30,29 @@ let open = $signal(false);
 function onKey(e) { open = !open; }
 </script>`;
 
-beforeAll(() => load('host-combo.pdx', COMBO));
+// `@host self;` (#750): a name for the component's own element, read in setup and in the template.
+const NAMED = `<template>
+<label class="lbl" :for="self.id">Name</label>
+<p class="seen">{{ seenAtSetup }}</p>
+</template>
+<script>
+@host self;
+const seenAtSetup = self.id;
+</script>`;
+
+// A name and attributes in one declaration.
+const NAMED_BLOCK = `<template>
+<p class="tag">{{ me.tagName.toLowerCase() }}</p>
+</template>
+<script>
+@host me { role="group" }
+</script>`;
+
+beforeAll(() => {
+    load('host-combo.pdx', COMBO);
+    load('host-named.pdx', NAMED);
+    load('host-named-block.pdx', NAMED_BLOCK);
+});
 afterEach(() => cleanup());
 
 async function mount(attrs: Record<string, string> = {}): Promise<HTMLElement> {
@@ -61,5 +83,24 @@ describe('@host, compiled and mounted', () => {
 
     it('a role the page set is kept', async () => {
         expect((await mount({ role: 'listbox' })).getAttribute('role')).toBe('listbox');
+    });
+});
+
+describe('@host with a name (#750), compiled and mounted', () => {
+    it('the name is the host element: setup reads its id, and :for="self.id" renders it', async () => {
+        const el = document.createElement('app-host-named');
+        el.id = 'h-750';
+        document.body.appendChild(el);
+        await tick();
+        expect(el.querySelector('.seen')?.textContent, 'setup did not read the host').toBe('h-750');
+        expect(el.querySelector('label')?.getAttribute('for')).toBe('h-750');
+    });
+
+    it('a name and attributes together: the attributes reach the host, and the name is the host', async () => {
+        const el = document.createElement('app-host-named-block');
+        document.body.appendChild(el);
+        await tick();
+        expect(el.getAttribute('role')).toBe('group');
+        expect(el.querySelector('.tag')?.textContent).toBe('app-host-named-block');
     });
 });

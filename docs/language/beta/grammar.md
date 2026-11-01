@@ -76,7 +76,7 @@ SlotParam      ::= Identifier S? ":" S? Type
 GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
 StateDecl      ::= "@state" S Identifier S? "=" S? Expression End                                   (β #132)
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
-HostDecl       ::= "@host" S? "{" ( S? Attribute )* S? "}"                                          (β #133: the template's attribute grammar)
+HostDecl       ::= "@host" ( S Identifier )? ( S? "{" ( S? Attribute )* S? "}" | End )          (β #133: the template's attribute grammar; #750: a name)
 ExposeDecl     ::= "@expose" S Identifier ( S? "," S? Identifier )* End
 ProvideDecl    ::= "@provide" S Identifier S? "=" S? Expression End                                  (β #139: Identifier is a token — landed #496)
 InjectDecl     ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? End         (β #139 — landed #496)

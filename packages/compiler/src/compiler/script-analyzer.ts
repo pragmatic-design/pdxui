@@ -193,6 +193,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const exposes: string[] = [];
     const states: StateDecl[] = [];
     let host: HostAttr[] | undefined;
+    let hostName: string | undefined;
     const variants: VariantAxis[] = [];
     const parts: string[] = [];
     const route: RouteInfo = {};
@@ -700,11 +701,22 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── @host { attributes } — the component's own element (#133) ───
-        // Match: `@host {` or `@host{`, the block possibly spread over several lines.
-        if (/^@host\s*\{/.test(trimmed)) {
+        // With a name (#750), `@host el { … }` or `@host el;`, the element is also a constant of the script
+        // and the template: the host exists before setup runs, so it is there from the first line.
+        // Match: `@host`, an optional name, then `{` (a block, possibly spread over several lines).
+        // Groups: [1]=the name, when written
+        const hostOpen = trimmed.match(/^@host(?:\s+([A-Za-z_$][\w$]*))?\s*\{/);
+        if (hostOpen) {
             const block = extractBlock(lines, i);
             host = [...(host ?? []), ...parseHostBlock(block.content)];
+            if (hostOpen[1]) hostName = hostOpen[1];
             i = block.endLine;
+            continue;
+        }
+        // Match: `@host el;` — a name and no attributes. Groups: [1]=the name
+        const hostNamed = trimmed.match(/^@host\s+([A-Za-z_$][\w$]*)\s*;?\s*$/);
+        if (hostNamed) {
+            hostName = hostNamed[1];
             continue;
         }
 
@@ -1290,6 +1302,10 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // A page's title as data the route tables can carry (#389): read without importing the page.
     if (route.page) Object.assign(route, routeTitleOf(head.title));
 
+    // The host's name (#750) is a constant of the script, as a `const` the body declared would be: the
+    // template reads it, and it is not a signal. A script name of the same name is PDX_DUP_DECLARATION.
+    if (hostName && !exports.some((e) => e.name === hostName)) exports.push({ name: hostName, kind: 'const' });
+
     const analysis: ScriptAnalysis = {
         props,
         events,
@@ -1306,6 +1322,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         exposes,
         states,
         ...(host ? { host } : {}),
+        ...(hostName ? { hostName } : {}),
         ...(variants.length ? { variants } : {}),
         parts,
         route,
