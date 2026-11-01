@@ -7,10 +7,11 @@
  *         lazy (default TRUE), placeholder (default 'skeleton'), ratio, rounded, radius,
  *         fallback, fallbackIcon, zoomable, lightbox, caption, authSrc, ...
  *       · DOM built in a requestAnimationFrame inside ctx.track() (line 243+):
- *           the HOST <pdx-image> gets the class `pdx-img-root` + style.width/height.
+ *           the HOST <pdx-image> carries no class (#291), only style.width/height; its states are
+ *             :state(loading) until the source arrives, :state(zoomed), :state(broken) when it fails.
  *           Inner: <div class="pdx-img-wrapper"> (it gets style.aspectRatio = ratio when ratio,
  *             the class `pdx-img-rounded` when rounded, style.borderRadius when radius).
- *           Inside the wrapper: <img class="pdx-img pdx-img-loading"> with alt and objectFit.
+ *           Inside the wrapper: <img class="pdx-img" data-part="image"> with alt and objectFit.
  *           When placeholder==='skeleton': <div class="pdx-img-skeleton"> (it PULSES → not
  *             deterministic for the visual dimension, see below).
  *       · alt is forwarded to the inner <img> (line 266, `_imgEl.alt = alt`), and also
@@ -18,9 +19,9 @@
  *       · Loading: with lazy=true (the default) it uses an IntersectionObserver (rootMargin 200px),
  *         so the src is assigned ASYNCHRONOUSLY. With lazy=false it loads at once
  *         (loadImage → _imgEl.src = src).
- *       · onload adds the class `pdx-img-loaded` (opacity 1) and removes the skeleton.
+ *       · onload leaves :state(loading) (the image is drawn) and removes the skeleton.
  *   - CSS: packages/design/src/components/image.css
- *       · .pdx-img-root { display:inline-block; position:relative; overflow:hidden; line-height:0 }
+ *       · pdx-image { display:inline-block; position:relative; overflow:hidden; line-height:0 }
  *       · .pdx-img-wrapper { position:relative; width:100%; height:100%; display:flex;
  *           background: surface-inset }  → the height follows the content, or the aspect ratio.
  *       · .pdx-img { display:block; width:100%; height:100% }
@@ -130,6 +131,24 @@ export const image: ComponentManifest = {
                 </div>`,
         },
         {
+            // A source that fails: an empty PNG data URI, refused by the decoder without a request.
+            // The host is :state(broken) and the fallback icon shows in the image's place.
+            id: 'image-broken',
+            title: 'Image — Broken source (fallback)',
+            html: `
+                <div style="width:160px">
+                    <pdx-image
+                        data-test="image-broken"
+                        width="160px"
+                        ratio="1/1"
+                        lazy="false"
+                        placeholder="none"
+                        alt="A picture that failed to load"
+                        src="data:image/png;base64,">
+                    </pdx-image>
+                </div>`,
+        },
+        {
             // The lightbox OPEN, for axe: a modal dialog with a name and a close button.
             id: 'image-lightbox-open',
             title: 'Image — Lightbox open',
@@ -202,6 +221,25 @@ export const image: ComponentManifest = {
                             { description: 'img height <= wrapper height', left: 'img.height', op: '<=', right: 'wrapper.height', tolerance: 1 },
                             { description: 'img width <= wrapper width', left: 'img.width', op: '<=', right: 'wrapper.width', tolerance: 1 },
                         ],
+                    },
+                ],
+            },
+            'image-broken': {
+                // What a theme selects (#291): the source failed.
+                states: [
+                    {
+                        description: 'a failed source is the custom state :state(broken)',
+                        selector: 'section:not([hidden]) [data-test="image-broken"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="image-broken"]', name: 'broken' },
+                        changes: {},
+                    },
+                ],
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="image-broken"] [data-part="fallback"]',
+                        description: 'the fallback shows in the failed image\'s place',
+                        height: { op: '>', value: 0 },
                     },
                 ],
             },

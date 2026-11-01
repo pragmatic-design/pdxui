@@ -1,7 +1,7 @@
 // pdx-image — Rich image component with lazy loading, fallback, zoom, lightbox,
 // and authenticated image loading via fetch + objectURL.
 
-import { component, html, onDestroy, focusTrap } from '@pdxui/core';
+import { component, html, onDestroy, focusTrap, event } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -15,8 +15,27 @@ function loadIcon(): void {
 /**
  * An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source
  * behind authentication.
+ *
+ * @cssstate loading - Its source has not arrived yet: the image is not drawn.
+ * @cssstate zoomed - A zoomable image is zoomed in.
+ * @cssstate broken - Its source failed: the fallback shows in its place.
+ * @csspart frame - The box the image is drawn in, and the zoom or lightbox trigger.
+ * @csspart image - The `<img>`.
+ * @csspart placeholder - The skeleton shown until the image arrives.
+ * @csspart fallback - The icon shown when the source fails and no fallback image is set.
+ * @csspart caption - The caption under the image.
  */
 component('pdx-image', {
+    events: {
+        /** The image arrived and is drawn. */
+        'pdx-load': event<Record<string, never>>(),
+        /** The source failed, or the authenticated fetch did. */
+        'pdx-error': event<Record<string, never>>(),
+        /** A zoomable image was zoomed in or out. */
+        'pdx-zoom': event<{ zoomed: boolean }>(),
+    },
+    states: ['loading', 'zoomed', 'broken'],
+    parts: ['frame', 'image', 'placeholder', 'fallback', 'caption'],
     props: {
         /** Image URL */
         src: { type: String, default: '' },
@@ -75,6 +94,8 @@ component('pdx-image', {
         function showFallback(): void {
             if (!_wrapperEl) return;
             _errored = true;
+            ctx.state('loading', false);
+            ctx.state('broken', true);
 
             // Remove skeleton if present
             const skeleton = _wrapperEl.querySelector('.pdx-img-skeleton');
@@ -89,7 +110,8 @@ component('pdx-image', {
             if (fallbackSrc) {
                 // Use fallback image URL
                 const fbImg = document.createElement('img');
-                fbImg.className = 'pdx-img pdx-img-loaded';
+                fbImg.className = 'pdx-img';
+                fbImg.setAttribute('data-part', 'image');
                 fbImg.src = fallbackSrc;
                 fbImg.alt = ctx.alt() as string;
                 fbImg.style.objectFit = ctx.fit() as string;
@@ -100,6 +122,7 @@ component('pdx-image', {
             // Show fallback icon
             const fbDiv = document.createElement('div');
             fbDiv.className = 'pdx-img-fallback';
+            fbDiv.setAttribute('data-part', 'fallback');
             loadIcon();
             const iconEl = document.createElement('pdx-icon');
             iconEl.setAttribute('name', ctx.fallbackIcon() as string);
@@ -111,8 +134,7 @@ component('pdx-image', {
         function onImageLoad(): void {
             if (!_imgEl) return;
             _loaded = true;
-            _imgEl.classList.remove('pdx-img-loading');
-            _imgEl.classList.add('pdx-img-loaded');
+            ctx.state('loading', false);
 
             // Remove skeleton
             const skeleton = _wrapperEl?.querySelector('.pdx-img-skeleton');
@@ -176,13 +198,7 @@ component('pdx-image', {
         function toggleZoom(): void {
             if (!_imgEl || !_loaded) return;
             _zoomed = !_zoomed;
-            if (_zoomed) {
-                _imgEl.classList.add('pdx-img-zoomed');
-                _imgEl.classList.remove('pdx-img-zoomable');
-            } else {
-                _imgEl.classList.remove('pdx-img-zoomed');
-                _imgEl.classList.add('pdx-img-zoomable');
-            }
+            ctx.state('zoomed', _zoomed);
             _wrapperEl?.setAttribute('aria-pressed', String(_zoomed));
             ctx.emit('pdx-zoom', { zoomed: _zoomed });
         }
@@ -306,15 +322,17 @@ component('pdx-image', {
             if (!_built) {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
+                // The host carries no class (#291): image.css draws it from the tag.
                 ctx.frame(() => {
                     const el = ctx.el;
-                    el.classList.add('pdx-img-root');
+                    ctx.state('loading', true);
                     el.style.width = width;
                     el.style.height = height === 'auto' && ratio ? 'auto' : height;
 
                     // Wrapper
                     _wrapperEl = document.createElement('div');
                     _wrapperEl.className = 'pdx-img-wrapper';
+                    _wrapperEl.setAttribute('data-part', 'frame');
                     if (ratio) _wrapperEl.style.aspectRatio = ratio;
                     if (rounded) _wrapperEl.classList.add('pdx-img-rounded');
                     if (radiusProp) _wrapperEl.style.borderRadius = radiusProp;
@@ -323,19 +341,17 @@ component('pdx-image', {
                     if (placeholder === 'skeleton') {
                         const skel = document.createElement('div');
                         skel.className = 'pdx-img-skeleton';
+                        skel.setAttribute('data-part', 'placeholder');
                         _wrapperEl.appendChild(skel);
                     }
 
                     // Image element
                     _imgEl = document.createElement('img');
-                    _imgEl.className = 'pdx-img pdx-img-loading';
+                    _imgEl.className = 'pdx-img';
+                    _imgEl.setAttribute('data-part', 'image');
                     _imgEl.alt = alt;
                     _imgEl.style.objectFit = fit;
                     _imgEl.draggable = false;
-
-                    if (zoomable && !lightboxProp) {
-                        _imgEl.classList.add('pdx-img-zoomable');
-                    }
 
                     _imgEl.addEventListener('load', onImageLoad);
                     _imgEl.addEventListener('error', onImageError);
@@ -354,6 +370,7 @@ component('pdx-image', {
                     if (captionText) {
                         const capEl = document.createElement('div');
                         capEl.className = 'pdx-img-caption';
+                        capEl.setAttribute('data-part', 'caption');
                         capEl.textContent = captionText;
                         el.appendChild(capEl);
                     }
@@ -394,8 +411,7 @@ component('pdx-image', {
                 // Reload if src changed
                 if (!_errored && src && _imgEl && _imgEl.src !== src && !_objectUrl) {
                     _loaded = false;
-                    _imgEl.classList.remove('pdx-img-loaded');
-                    _imgEl.classList.add('pdx-img-loading');
+                    ctx.state('loading', true);
                     loadImage();
                 }
             });

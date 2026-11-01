@@ -15,7 +15,8 @@ pdx-block-ui { display: block; position: relative; }
     z-index: 10;
     border-radius: inherit;
 }
-.pdx-block-ui-visible {
+/* Drawn: the component's state `shown` (#291), or the class native markup (pdx-list's overlay) sets. */
+:is(.pdx-block-ui-visible, :where(pdx-block-ui:state(shown)) > .pdx-block-ui-overlay) {
     opacity: 0.7;
     pointer-events: auto;
 }

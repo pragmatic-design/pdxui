@@ -1570,6 +1570,10 @@
           "title": "Image — Lightbox trigger (keyboard)"
         },
         {
+          "id": "image-broken",
+          "title": "Image — Broken source (fallback)"
+        },
+        {
           "id": "image-lightbox-open",
           "title": "Image — Lightbox open"
         }

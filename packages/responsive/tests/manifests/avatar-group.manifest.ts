@@ -4,7 +4,7 @@
  * Contracts DERIVED by inspecting the source and the CSS (they are NOT in universal.ts):
  *   - Source: packages/ui/src/avatar-group/pdx-avatar-group.ts
  *       · render() = html`` (EMPTY). The DOM is built imperatively in ctx.track:
- *         · the HOST <pdx-avatar-group> gets the class `.pdx-avatar-group-root` (display:inline-block).
+ *         · the HOST <pdx-avatar-group> carries no class (#291): the tag is display:inline-block.
  *         · a <div class="pdx-avatar-group"> (the INNER box) is created and appended to the host → it is
  *           the flex container (display:flex, flex-direction:row). It is NOT the host.
  *         · every avatar = a <pdx-avatar class="pdx-avatar-group-item"> created with createElement,
@@ -15,11 +15,11 @@
  *           marginLeft negativo.
  *       · `items` is an Array prop: coercible from a JSON attribute (component.ts coerce → JSON.parse).
  *   - CSS: packages/design/src/components/avatar-group.css
- *       · `.pdx-avatar-group-root .pdx-avatar-group { display:flex; flex-direction:row }`.
+ *       · `:is(.pdx-avatar-group-root, pdx-avatar-group) .pdx-avatar-group { display:flex; flex-direction:row }`.
  *       · `.pdx-avatar-group-overflow { border-radius:50%; display:inline-flex }` + size map px.
  *
  * SELECTORS: the container's styled class is on the INNER <div>, NOT on the host.
- *   The host only carries `.pdx-avatar-group-root`. The measurable items are the <pdx-avatar> elements
+ *   The row is the `root` part, each avatar an `avatar` part, the counter the `overflow` part. The measurable items are the <pdx-avatar> elements
  *   with the class `.pdx-avatar-group-item` (the overlap's marginLeft lives on those hosts).
  *
  * The contracts are CONSERVATIVE but true on all 13 themes: NO exact px.

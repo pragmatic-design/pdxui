@@ -16,11 +16,13 @@
  *   the drawn overlay; the timing is ui/tests/unit/block-ui-timing.test.ts's.
  *
  * DOM STRUCTURE (built imperatively in an rAF inside ctx.track):
- *   <pdx-block-ui class="pdx-block-ui">           ← host; position: relative (CSS pdx-block-ui + tag)
+ *   <pdx-block-ui>                                ← host, no class (#291); position: relative from the tag;
+ *                                                  :state(blocked) and aria-busy="true" while blocked,
+ *                                                  :state(shown) while the overlay is drawn
  *     <slot> … wrapped content …                ← render: html`<slot></slot>`
- *     <div class="pdx-block-ui-overlay [pdx-block-ui-visible]" aria-hidden="true|false">
+ *     <div class="pdx-block-ui-overlay" data-part="overlay" aria-hidden="true|false">
  *                                                  ← absolute, inset:0, z-index:10, border-radius:inherit
- *                                                  ← opacity 0 → .pdx-block-ui-visible: opacity 0.7 + pointer-events auto
+ *                                                  ← opacity 0 → :state(shown): opacity 0.7 + pointer-events auto
  *       <div class="pdx-block-ui-spinner">         ← a flex column, there only when variant !== 'none'
  *         <pdx-spinner size="md">                  ← an SVG with the CSS @keyframes pdx-spin animation (IT SPINS → see visual/mask)
  *         <span class="pdx-block-ui-message">{message}</span>   ← there only when message is not empty
@@ -33,17 +35,9 @@
  * inset:0 ⇒ it covers exactly the host). The SVG spinner rotates forever (the pdx-spin animation)
  * ⇒ its pixels are NOT deterministic ⇒ it is masked in the visual dimension (a mask on .pdx-block-ui-spinner).
  *
- * REAL A11Y BUGS (NOT fixed):
- *   1) No `aria-busy="true"` on the container while blocked
- *      (pdx-block-ui.ts:28-29 adds the class only, never aria-busy). WAI-ARIA: an area that is
- *      loading should expose aria-busy.
- *   2) The message is a plain <span> with no `role="status"` and no `aria-live`
- *      (pdx-block-ui.ts:44-47) ⇒ a screen reader never announces the loading text.
- *   3) The overlay is created with `aria-hidden="true"` hardcoded (pdx-block-ui.ts:32) and the FIRST
- *      build (the `if (!_built)` branch, line 54) toggles ONLY the visible class, it does not update
- *      aria-hidden ⇒ with blocked=true from the start the overlay stays aria-hidden="true" while visible.
- *   So the a11y dimension does NOT assert those attributes (they would be red): they are written down
- *   as debt, not masked. axe still runs on the scenario (it checks the contrast and the base markup).
+ * A11Y: the host is aria-busy="true" while blocked and carries no aria-busy otherwise; the message is
+ *   the overlay's role="status" live region, in the tree only while the overlay is drawn (A4). Both are
+ *   measured in display-b-beta-contract.spec.ts; axe runs on the blocked scenario.
  */
 import type { ComponentManifest } from './_types';
 
@@ -106,6 +100,23 @@ export const blockUi: ComponentManifest = {
     contracts: {
         scenarios: {
             'block-ui-blocked': {
+                // What a theme selects (#291): the input blocked, and the overlay drawn past its delay.
+                states: [
+                    {
+                        description: 'blocked is the custom state :state(blocked)',
+                        selector: 'section:not([hidden]) [data-test="block"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="block"]', name: 'blocked' },
+                        changes: {},
+                    },
+                    {
+                        description: 'the drawn overlay is the custom state :state(shown)',
+                        selector: 'section:not([hidden]) [data-test="block"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="block"]', name: 'shown' },
+                        changes: {},
+                    },
+                ],
                 standalone: [
                     // The host: a block container with position relative (the anchor of the absolute overlay).
                     {
@@ -231,9 +242,6 @@ export const blockUi: ComponentManifest = {
     // ── Dim. 2: axe-core ──
     a11y: {
 // axe checks the basic markup and contrast of the blocked scenario.
-        // NOTE: the semantic ARIA attributes of a loading state (aria-busy on the container, role/aria-live on
-        // the message) are MISSING in the source (see the BUG list in the header comment) → they cannot be
-        // asserted here. Those bugs are to be fixed in the component, not silenced: no disableRules added.
         scenarios: ['block-ui-blocked'],
     },
 

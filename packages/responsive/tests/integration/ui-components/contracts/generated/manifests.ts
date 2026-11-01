@@ -424,6 +424,7 @@ export const scenarioPage: Record<string, string> = {
     "image-basic": "tier-7",
     "image-rounded": "tier-7",
     "image-lightbox": "tier-7",
+    "image-broken": "tier-7",
     "image-lightbox-open": "tier-7",
     "infinite-scroll-idle": "tier-5b",
     "inline-edit-display": "tier-3",
