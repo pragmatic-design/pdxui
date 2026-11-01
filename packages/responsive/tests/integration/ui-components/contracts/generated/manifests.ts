@@ -270,6 +270,7 @@ export const scenarioPage: Record<string, string> = {
     "card-variant-elevated": "tier-2",
     "card-variant-flat": "tier-2",
     "carousel-basic": "tier-3",
+    "carousel-fade": "tier-3",
     "cascader-closed": "tier-3",
     "cascader-open": "tier-3",
     "cascader-disabled": "tier-3",

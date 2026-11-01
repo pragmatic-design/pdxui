@@ -264,4 +264,11 @@ describe('the layout components, from the shipped manifest (#290)', () => {
         expect(fix('<pdx-affix @pdx-change="e => stuck = e.detail.affixed"></pdx-affix>'))
             .toBe('<pdx-affix @affixed-change="e => stuck = e.detail.value"></pdx-affix>');
     });
+
+    it('pdx-carousel: @pdx-change becomes the model\'s @index-change, its index read as the value; one that reads detail.item is left for a person', () => {
+        expect(fix('<pdx-carousel @pdx-change="slide = $event.detail.index"></pdx-carousel>'))
+            .toBe('<pdx-carousel @index-change="slide = $event.detail.value"></pdx-carousel>');
+        const reads = '<pdx-carousel @pdx-change="show($event.detail.item)"></pdx-carousel>';
+        expect(fix(reads)).toBe(reads);
+    });
 });

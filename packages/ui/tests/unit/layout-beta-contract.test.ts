@@ -58,6 +58,19 @@ const DONE: Row[] = [
         parts: [],
         removed: ['pdx-change'],
     },
+    {
+        tag: 'pdx-carousel',
+        // `goTo`, the arrows, the keys and a swipe write the slide shown; a parent's write moves it.
+        models: ['index'],
+        outputs: [],
+        // From `animation="fade"`; the slide and the dot on show are their aria-current and aria-selected.
+        states: ['fade'],
+        // The region, its strip of slides, a slide, a control (an arrow or the rotation button), the
+        // tablist of dots and a dot.
+        parts: ['root', 'track', 'slide', 'control', 'dots', 'dot'],
+        // `goto` was `goTo` in lowercase, and the `index` getter stood in for the model.
+        removed: ['pdx-change', 'goto'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

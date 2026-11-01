@@ -18,7 +18,8 @@
  *                 .pdx-carousel-dot → role="tab", aria-label="Go to slide N", aria-selected
  *                 N dots = getSlideCount() = items.length - slidesPerView + 1 (lines 61-67)
  *       · the `items` prop is an Array → passed as a JSON attribute (core/component.ts:379 does the JSON.parse).
- *       · Events: pdx-change, pdx-autoplay-start, pdx-autoplay-stop (not tested here).
+ *       · Events: index-change (the model `index`), pdx-autoplay-start, pdx-autoplay-stop (not tested here:
+ *         carousel-beta-contract.spec.ts measures them).
  *       · Keyboard (onKeydown, line 394): the HOST is tabIndex=0 (line 350) and handles
  *           ArrowLeft → prev(), ArrowRight → next(). With loop+slide+more than one item it uses the "virtual loop"
  *           (a DOM reorder, currentIndex changes) → it does NOT move the track (which stays at offset 0), but it changes
@@ -92,6 +93,20 @@ export const carousel: ComponentManifest = {
                 <div style="width: 640px; max-width: 100%;">${SLIDE_STYLE}
                     <pdx-carousel
                         data-test="carousel"
+                        autoplay="false"
+                        items='${ITEMS}'></pdx-carousel>
+                </div>`,
+        },
+        {
+            // The same three slides cross-fading in place (#290): the host's custom state `fade`, the slide
+            // on show its aria-current, drawn opaque, the others transparent.
+            id: 'carousel-fade',
+            title: 'Carousel — fade (autoplay off)',
+            html: `
+                <div style="width: 640px; max-width: 100%;">${SLIDE_STYLE}
+                    <pdx-carousel
+                        data-test="carousel-fade"
+                        animation="fade"
                         autoplay="false"
                         items='${ITEMS}'></pdx-carousel>
                 </div>`,
@@ -208,6 +223,36 @@ export const carousel: ComponentManifest = {
                                 right: 'next.left',
                             },
                         ],
+                    },
+                ],
+            },
+            'carousel-fade': {
+                standalone: [
+                    {
+                        // carousel.css draws the cross-fade from the state: the slide on show opaque…
+                        selector: 'section:not([hidden]) [data-test="carousel-fade"] [data-part="slide"][aria-current="true"]',
+                        description: 'fade: the slide part on show (aria-current) is opaque',
+                        opacity: { op: '==', value: 1, tolerance: 0.01 },
+                    },
+                    {
+                        // …and the others transparent, stacked under it.
+                        selector: 'section:not([hidden]) [data-test="carousel-fade"] [data-part="slide"]:not([aria-current])',
+                        description: 'fade: a slide part not on show is transparent',
+                        opacity: { op: '==', value: 0, tolerance: 0.01 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="carousel-fade"] [data-part="dot"][aria-selected="true"]',
+                        description: 'the dot part of the slide on show is drawn wider than a round dot',
+                        width: { op: '>', value: 8 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'animation="fade" is the custom state :state(fade)',
+                        selector: 'section:not([hidden]) [data-test="carousel-fade"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="carousel-fade"]', name: 'fade' },
+                        changes: {},
                     },
                 ],
             },

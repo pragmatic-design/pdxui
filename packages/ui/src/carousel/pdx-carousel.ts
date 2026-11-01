@@ -3,7 +3,7 @@
 // multiple slides per view, dot indicators, keyboard navigation.
 // Slot: "slide" — custom slide template (priority: slot > renderSlide > default)
 
-import { component, html, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, generatedId, slot, snippetOrSlot, model, event, signal, untracked } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -31,8 +31,36 @@ export interface CarouselItem {
  * A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.
  *
  * @slot slide - Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.
+ *
+ * @csspart root - The carousel region (`role="region"`), which clips the slides and takes the focus.
+ * @csspart track - The strip the slides sit in, moved to bring a slide on show.
+ * @csspart slide - A slide; the one on show is `aria-current="true"`.
+ * @csspart control - A button over the slides: the previous and next arrows, the rotation stop/start.
+ * @csspart dots - The tablist of dots under the slides.
+ * @csspart dot - A dot; the one of the slide on show is `aria-selected="true"`.
+ *
+ * @cssstate fade - `animation="fade"`: the slides cross-fade in place instead of sliding.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail index $event.detail.value
  */
 component('pdx-carousel', {
+    // The slide on show (#290). `next()`, `prev()`, `goTo()`, the arrows, the keys, the dots, a swipe
+    // and autoplay write it, and the write dispatches `index-change` `{ value }`, which `::index`
+    // follows; a parent's write moves the slide.
+    models: {
+        /** The slide on show, 0-based. */
+        index: model<number>(0, { type: Number }),
+    },
+    events: {
+        /** Autoplay started: on mount with `autoplay`, from `play()`, the rotation control, or the pointer leaving. */
+        'pdx-autoplay-start': event<void>(),
+        /** Autoplay stopped: from `pause()`, the rotation control, keyboard focus moving in, or the pointer over it. */
+        'pdx-autoplay-stop': event<void>(),
+    },
+    // On the host as a custom state (#132): carousel.css draws the cross-fade from it.
+    states: ['fade'],
+    parts: ['root', 'track', 'slide', 'control', 'dots', 'dot'],
     props: {
         items: { type: Array, default: null },
         renderSlide: { type: Object, default: null },
@@ -69,8 +97,10 @@ component('pdx-carousel', {
         let _abortCtrl: AbortController | null = null;
         let dotsEl: HTMLElement | null = null;
         let currentIndex = 0;
-        let autoplayTimer: ReturnType<typeof setInterval> | null = null;
         let isPlaying = false;
+        /** Whether autoplay runs, and its beat: one tick per interval, each a step forward. */
+        const playing = signal(false);
+        const tick = signal(0);
 
         // Infinite loop via DOM reordering (no clones)
         let useVirtualLoop = false;
@@ -99,9 +129,23 @@ component('pdx-carousel', {
             return Math.max(0, items.length - perView + 1);
         }
 
+        /**
+         * A slide transition still in flight. One interrupted — the page frozen, the carousel moved —
+         * never delivers its `transitionend`: what is running is asked of the track itself, and a
+         * transition that ended unseen is settled here, or the carousel would wait for it forever.
+         */
+        function transitionRunning(): boolean {
+            if (!isTransitioning) return false;
+            // Without the Web Animations API there is no asking: trust the flag, as before.
+            if (!trackEl || typeof trackEl.getAnimations !== 'function') return true;
+            if (trackEl.getAnimations().length > 0) return true;
+            onTrackTransitionEnd();
+            return false;
+        }
+
         function goTo(index: number): void {
             const items = getItems();
-            if (items.length === 0 || isTransitioning) return;
+            if (items.length === 0 || transitionRunning()) return;
 
             if (!useVirtualLoop) {
                 const max = getSlideCount() - 1;
@@ -118,16 +162,29 @@ component('pdx-carousel', {
                 updateTrackPosition();
                 updateDots();
                 updateArrows();
-                ctx.emit('pdx-change', { index: currentIndex, item: items[currentIndex] });
+                // The model's write announces `index-change`; nothing when a parent's write brought it here.
+                ctx.index.set(currentIndex);
                 return;
             }
 
-            // Virtual loop: animate one step, then reorder DOM
+            // Virtual loop: one step either way animates and then reorders the DOM; a jump further
+            // (a dot, a parent's write) turns the strip at once, so the slide asked for is the one on show.
             const n = items.length;
-            const direction = index > currentIndex ? 1 : -1;
-            currentIndex = ((index % n) + n) % n;
+            const target = ((index % n) + n) % n;
+            if (target === currentIndex) return;
+            const forward = (target - currentIndex + n) % n;
+            currentIndex = target;
 
-            if (direction > 0) {
+            if (forward !== 1 && forward !== n - 1) {
+                const slide = trackEl?.querySelector(`#${CSS.escape(`${uid}-slide-${target}`)}`);
+                if (trackEl && slide) {
+                    trackEl.style.transition = 'none';
+                    while (trackEl.firstElementChild !== slide) reorderSlides(1);
+                    setTrackOffset(0);
+                    void trackEl.offsetHeight;
+                    trackEl.style.transition = '';
+                }
+            } else if (forward === 1) {
                 // NEXT: animate transform to -slideWidth, then reorder
                 isTransitioning = true;
                 pendingDirection = 1;
@@ -146,8 +203,9 @@ component('pdx-carousel', {
                 setTrackOffset(0);
             }
 
+            markCurrent();
             updateDots();
-            ctx.emit('pdx-change', { index: currentIndex, item: items[currentIndex] });
+            ctx.index.set(currentIndex);
         }
 
         function next(): void { goTo(currentIndex + 1); }
@@ -197,33 +255,52 @@ component('pdx-carousel', {
 
         function play(): void {
             if (isPlaying) return;
-            const intervalMs = ctx.interval() as number;
+            const intervalMs = ctx.interval.peek() as number;
             if (intervalMs <= 0) return;
             isPlaying = true;
-            autoplayTimer = setInterval(() => next(), intervalMs);
-            ctx.emit('pdx-autoplay-start', {});
+            playing.set(true);
+            ctx.emit('pdx-autoplay-start');
         }
 
         function pause(): void {
             if (!isPlaying) return;
             isPlaying = false;
-            if (autoplayTimer !== null) {
-                clearInterval(autoplayTimer);
-                autoplayTimer = null;
+            playing.set(false);
+            ctx.emit('pdx-autoplay-stop');
+        }
+
+        // Autoplay's beat is an effect of this component (#290; lifecycle.md: no work while frozen). Each
+        // run waits one interval and then ticks; the tick runs it again, which takes the step and waits
+        // for the next one. On a frozen page the scope parks the effect (#269): the tick due then moves
+        // nothing and starts no wait, and the page coming back runs the effect once — the step, then
+        // the beat again. No timer of its own to pause, so none to forget.
+        let stepsTaken = 0;
+        ctx.track(() => {
+            const due = tick();
+            if (!playing()) { stepsTaken = due; return; }
+            if (due !== stepsTaken) {
+                stepsTaken = due;
+                untracked(next);
             }
-            ctx.emit('pdx-autoplay-stop', {});
+            const id = setTimeout(() => tick.set((n) => n + 1), ctx.interval.peek() as number);
+            return () => clearTimeout(id);
+        });
+
+        /** The slide on show is `aria-current`, which carousel.css selects for the fade: no class (#290). */
+        function markCurrent(): void {
+            if (!trackEl) return;
+            const current = `${uid}-slide-${currentIndex}`;
+            for (const slide of trackEl.querySelectorAll('.pdx-carousel-slide')) {
+                if (slide.id === current) slide.setAttribute('aria-current', 'true');
+                else slide.removeAttribute('aria-current');
+            }
         }
 
         function updateTrackPosition(): void {
             if (!trackEl) return;
+            markCurrent();
             const anim = ctx.animation() as string;
-            if (anim === 'fade') {
-                const slides = trackEl.querySelectorAll('.pdx-carousel-slide');
-                slides.forEach((slide, i) => {
-                    slide.classList.toggle('pdx-carousel-slide-active', i === currentIndex);
-                });
-                return;
-            }
+            if (anim === 'fade') return;
             if (useVirtualLoop) {
                 setTrackOffset(0); // virtual loop: always at position 0, DOM reorders
                 return;
@@ -235,7 +312,7 @@ component('pdx-carousel', {
             if (!dotsEl) return;
             const dots = dotsEl.querySelectorAll<HTMLElement>('.pdx-carousel-dot');
             dots.forEach((dot, i) => {
-                dot.classList.toggle('pdx-carousel-dot-active', i === currentIndex);
+                // The selected dot is its aria-selected, which carousel.css selects: no class (#290).
                 dot.setAttribute('aria-selected', i === currentIndex ? 'true' : 'false');
                 // Roving tabindex: the selected tab is the tablist's one tab stop.
                 dot.tabIndex = i === currentIndex ? 0 : -1;
@@ -290,6 +367,7 @@ component('pdx-carousel', {
         function buildSlideElement(item: CarouselItem, index: number): HTMLElement {
             const slideEl = document.createElement('div');
             slideEl.className = 'pdx-carousel-slide';
+            slideEl.setAttribute('data-part', 'slide');
             slideEl.setAttribute('role', 'group');
             slideEl.setAttribute('aria-roledescription', 'slide');
             slideEl.id = `${uid}-slide-${index}`;
@@ -346,8 +424,12 @@ component('pdx-carousel', {
             const perView = Math.max(1, ctx.slidesPerView() as number);
             const gapPx = ctx.gap() as number;
 
+            // The slide on show is the model's, kept across a rebuild while it still exists.
+            currentIndex = Math.max(0, Math.min(Math.trunc(Number(ctx.index.peek()) || 0), Math.max(0, items.length - 1)));
+
             rootEl.className = 'pdx-carousel-root';
-            if (anim === 'fade') rootEl.classList.add('pdx-carousel-fade');
+            rootEl.setAttribute('data-part', 'root');
+            ctx.state('fade', anim === 'fade');
             rootEl.setAttribute('role', 'region');
             rootEl.setAttribute('aria-roledescription', 'carousel');
             // A region without a name is not a landmark.
@@ -359,6 +441,7 @@ component('pdx-carousel', {
                 rotationBtn = document.createElement('button');
                 rotationBtn.type = 'button';
                 rotationBtn.className = 'pdx-carousel-arrow pdx-carousel-rotation';
+                rotationBtn.setAttribute('data-part', 'control');
                 rotationBtn.addEventListener('pointerdown', () => { pointerOnRotation = true; }, sig);
                 rotationBtn.addEventListener('click', () => {
                     pointerOnRotation = false;
@@ -377,12 +460,15 @@ component('pdx-carousel', {
             // Track
             trackEl = document.createElement('div');
             trackEl.className = 'pdx-carousel-track';
+            trackEl.setAttribute('data-part', 'track');
             if (anim === 'slide') {
                 trackEl.style.gap = gapPx > 0 ? `${gapPx}px` : '';
             }
 
             const shouldLoop = ctx.loop() as boolean;
             useVirtualLoop = shouldLoop && anim === 'slide' && items.length > 1;
+            // Without the virtual loop the last position shows the last `slidesPerView` slides.
+            if (!useVirtualLoop) currentIndex = Math.min(currentIndex, Math.max(0, getSlideCount() - 1));
 
             function applySlideWidth(el: HTMLElement): void {
                 if (gapPx > 0) {
@@ -397,15 +483,16 @@ component('pdx-carousel', {
             for (let i = 0; i < items.length; i++) {
                 const slideEl = buildSlideElement(items[i], i);
                 if (anim === 'slide') applySlideWidth(slideEl);
-                if (anim === 'fade' && i === currentIndex) {
-                    slideEl.classList.add('pdx-carousel-slide-active');
-                }
                 trackEl.appendChild(slideEl);
             }
 
             if (useVirtualLoop) {
                 trackEl.addEventListener('transitionend', onTrackTransitionEnd, sig);
+                // The virtual loop shows the strip's first slide: turn it to the one on show.
+                for (let i = 0; i < currentIndex; i++) reorderSlides(1);
             }
+            isTransitioning = false;
+            pendingDirection = 0;
 
             rootEl.appendChild(trackEl);
 
@@ -415,6 +502,7 @@ component('pdx-carousel', {
                 prevBtn = document.createElement('button');
                 prevBtn.type = 'button';
                 prevBtn.className = 'pdx-carousel-arrow pdx-carousel-arrow-prev';
+                prevBtn.setAttribute('data-part', 'control');
                 uiAttr(prevBtn, 'aria-label', () => uiString('carousel', 'previous'));
                 prevBtn.innerHTML = '<pdx-icon name="chevron-left" size="20"></pdx-icon>';
                 prevBtn.addEventListener('click', () => prev(), sig);
@@ -423,6 +511,7 @@ component('pdx-carousel', {
                 nextBtn = document.createElement('button');
                 nextBtn.type = 'button';
                 nextBtn.className = 'pdx-carousel-arrow pdx-carousel-arrow-next';
+                nextBtn.setAttribute('data-part', 'control');
                 uiAttr(nextBtn, 'aria-label', () => uiString('carousel', 'next'));
                 nextBtn.innerHTML = '<pdx-icon name="chevron-right" size="20"></pdx-icon>';
                 nextBtn.addEventListener('click', () => next(), sig);
@@ -434,13 +523,14 @@ component('pdx-carousel', {
             if (ctx.showDots() && items.length > 1) {
                 dotsEl = document.createElement('div');
                 dotsEl.className = 'pdx-carousel-dots';
+                dotsEl.setAttribute('data-part', 'dots');
                 dotsEl.setAttribute('role', 'tablist');
                 const slideCount = getSlideCount();
                 for (let i = 0; i < slideCount; i++) {
                     const dot = document.createElement('button');
                     dot.type = 'button';
                     dot.className = 'pdx-carousel-dot';
-                    if (i === currentIndex) dot.classList.add('pdx-carousel-dot-active');
+                    dot.setAttribute('data-part', 'dot');
                     dot.setAttribute('role', 'tab');
                     uiAttr(dot, 'aria-label', () => format(uiString('carousel', 'goToSlide'), { n: i + 1 }));
                     dot.setAttribute('aria-selected', i === currentIndex ? 'true' : 'false');
@@ -472,6 +562,8 @@ component('pdx-carousel', {
             }
 
             updateTrackPosition();
+            // A model past the new slides was brought back: say so, as any write of the component's.
+            if (currentIndex !== ctx.index.peek()) ctx.index.set(currentIndex);
             if (ctx.autoplay() && !stopped) play();
         }
 
@@ -513,7 +605,7 @@ component('pdx-carousel', {
             else if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
         }
 
-        // Expose imperative API. `index` getter is safe (no prop named index/goto).
+        // The library's navigation verbs (#289, #290); the slide on show is the model `index`.
         ctx.expose({
             next,
             prev,
@@ -523,9 +615,17 @@ component('pdx-carousel', {
             play,
             /** Stop autoplay, leaving the slide where it is. */
             pause,
-            /** `goTo` under its all-lowercase spelling. */
-            goto: (index: number) => goTo(index),
-            get index() { return currentIndex; },
+        });
+
+        // A parent's write moves the slide. The carousel's own write is the slide already on show, a
+        // no-op here; one it could not take (a transition still running) is put back to the slide shown.
+        ctx.track(() => {
+            const wanted = ctx.index() as number;
+            if (!rootEl || !trackEl || wanted === currentIndex) return;
+            untracked(() => {
+                goTo(wanted);
+                if (currentIndex !== wanted) ctx.index.set(currentIndex);
+            });
         });
 
         ctx.track(() => {
@@ -554,7 +654,6 @@ component('pdx-carousel', {
                 return;
             }
             pause();
-            currentIndex = 0;
             requestAnimationFrame(() => buildCarousel());
         });
 
