@@ -1,0 +1,38 @@
+/* GENERATED from packages/design/variant-sources/components/avatar.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
+/* pdx-avatar — a person's picture, or their initials (#291).
+   It drew its box with an inline style built from its props; the box, the image and the initials are
+   its parts now, and this stylesheet draws them at the same sizes. `size` and `shape` are `@variant`
+   axes on the host; the colour, which is any CSS colour or one derived from the name, stays the
+   component's, handed over as `--pdx-avatar-bg` and `--pdx-avatar-fg`. The CSS-only avatar is the class
+   `.pdx-avatar` (media.css), which this file does not touch. */
+
+/* md (the default) is the fallback, not a rule on the tag: the `@variant` rules below weigh nothing,
+   and a default on the tag would beat them. */
+:where(pdx-avatar) > [data-part="root"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--pdx-avatar-size, 40px);
+    height: var(--pdx-avatar-size, 40px);
+    border-radius: var(--pdx-avatar-radius, 50%);
+    overflow: hidden;
+    background: var(--pdx-avatar-bg, var(--pdx-color-inset));
+    color: var(--pdx-avatar-fg, var(--pdx-color-text));
+    font-size: calc(var(--pdx-avatar-size, 40px) * 0.38);
+    font-weight: 600;
+    flex-shrink: 0;
+    user-select: none;
+}
+
+:where(pdx-avatar) > [data-part="root"] > [data-part="image"] {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+:where(pdx-avatar[size="xs"]) { --pdx-avatar-size: 24px; }
+:where(pdx-avatar[size="sm"]) { --pdx-avatar-size: 32px; }
+:where(pdx-avatar[size="lg"]) { --pdx-avatar-size: 48px; }
+:where(pdx-avatar[size="xl"]) { --pdx-avatar-size: 64px; }
+
+:where(pdx-avatar[shape="square"]) { --pdx-avatar-radius: var(--pdx-radius-md); }

@@ -3,8 +3,9 @@
 // Auto-color: generates consistent background color from name hash.
 
 import { component, html, signal } from '@pdxui/core';
-
-const SIZES: Record<string, string> = { xs: '24px', sm: '32px', md: '40px', lg: '48px', xl: '64px' };
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more.
+import '@pdxui/design/components/avatar';
 
 // 10 distinct hues for auto-color generation (OKLCH)
 const COLOR_HUES = [210, 340, 140, 30, 270, 180, 50, 310, 100, 230];
@@ -29,19 +30,35 @@ function autoTextColor(name: string): string {
 
 /**
  * A user avatar that shows an image, or falls back to initials colored from the name.
+ *
+ * @cssstate broken - Its image failed to load: the initials show in its place.
+ * @csspart root - The avatar's box, `role="img"` when it has a name.
+ * @csspart image - The picture, when `src` is set and has loaded.
+ * @csspart fallback - The initials, shown without a picture or when it fails.
  */
 component('pdx-avatar', {
+    // The axes avatar.css keys by (#291), reflected on the host: it draws the box at the same sizes it
+    // had inline. No native class is kept: the CSS-only avatar is `.pdx-avatar`, a different element.
+    variants: {
+        /** xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px). */
+        size: ['md', 'xs', 'sm', 'lg', 'xl'],
+        /** circle (the default) or square (the theme's medium radius). */
+        shape: ['circle', 'square'],
+    },
+    states: ['broken'],
+    parts: ['root', 'image', 'fallback'],
     props: {
         src: { type: String, default: '' },
         /** The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden). */
         alt: { type: String, default: '' },
-        size: { type: String, default: 'md' },
-        shape: { type: String, default: 'circle' },
         /** 'auto' generates color from name. Or pass a CSS color. Default: 'auto'. */
         color: { type: String, default: 'auto' },
     },
     setup(ctx) {
         const imgError = signal(false);
+        // A new source is a new chance: the failure of the last one does not keep the initials up.
+        ctx.track(() => { void ctx.src(); imgError.set(false); });
+        ctx.track(() => { ctx.state('broken', imgError()); });
 
         function initials(): string {
             const name = ctx.alt() as string;
@@ -54,41 +71,30 @@ component('pdx-avatar', {
         function onImgError() { imgError.set(true); }
         function showImage(): boolean { return !!(ctx.src() && !imgError()); }
 
-        function px(): string { return SIZES[ctx.size() as string] || '40px'; }
-
-        function bgColor(): string {
+        /** The colours, handed to avatar.css as custom properties; unset, it uses the theme's. */
+        function colorStyle(): string {
             const c = ctx.color() as string;
-            if (c === 'auto') return autoColor(ctx.alt() as string);
-            if (c) return c;
-            return 'var(--pdx-color-inset)';
+            if (c === 'auto') {
+                const name = ctx.alt() as string;
+                return `--pdx-avatar-bg:${autoColor(name)};--pdx-avatar-fg:${autoTextColor(name)}`;
+            }
+            return c ? `--pdx-avatar-bg:${c}` : '';
         }
 
-        function txtColor(): string {
-            const c = ctx.color() as string;
-            if (c === 'auto') return autoTextColor(ctx.alt() as string);
-            return 'var(--pdx-color-text)';
-        }
-
-        function baseStyle(): string {
-            const s = px();
-            const r = (ctx.shape() as string) === 'square' ? 'var(--pdx-radius-md)' : '50%';
-            return `display:inline-flex;align-items:center;justify-content:center;width:${s};height:${s};border-radius:${r};overflow:hidden;background:${bgColor()};color:${txtColor()};font-size:calc(${s} * 0.38);font-weight:600;flex-shrink:0;user-select:none`;
-        }
-
-        return { initials, onImgError, showImage, baseStyle };
+        return { initials, onImgError, showImage, colorStyle };
     },
     // With a name, an image named by it; without one, decorative — hidden, no role. An unnamed
     // role="img" showing "?" fails axe's role-img-alt.
-    // `pdx-avatar-box` has no rule of its own: a pdx- class is how pdx.reset sees the element, and
-    // keeps a page's bare `span { border }` off it (#413). `.pdx-avatar` is the CSS-only avatar.
+    // `pdx-avatar-box` is how pdx.reset sees the element, and keeps a page's bare `span { border }` off
+    // it (#413); avatar.css draws it by its part. `.pdx-avatar` is the CSS-only avatar.
     render: (ctx) => html`
-        <span class="pdx-avatar-box" :style="${ctx.baseStyle}"
+        <span class="pdx-avatar-box" data-part="root" :style="${ctx.colorStyle}"
             :role="${() => ctx.alt() ? 'img' : null}"
             :aria-label="${() => ctx.alt() || null}"
             :aria-hidden="${() => ctx.alt() ? null : 'true'}">
             ${() => ctx.showImage()
-                ? html`<img src="${ctx.src}" alt="${ctx.alt}" style="width:100%;height:100%;object-fit:cover" @error="${ctx.onImgError}" />`
-                : html`<span>${ctx.initials}</span>`
+                ? html`<img data-part="image" src="${ctx.src}" alt="${ctx.alt}" @error="${ctx.onImgError}" />`
+                : html`<span data-part="fallback">${ctx.initials}</span>`
             }
         </span>
     `,
