@@ -38,6 +38,16 @@ const DONE: Row[] = [
         parts: ['root', 'link'],
         removed: [],
     },
+    {
+        tag: 'pdx-accordion',
+        // It has no prop for its open items and gains none: which are open is a read-only output.
+        models: [],
+        outputs: ['open'],
+        states: ['loading', 'disabled'],
+        // The app's markup, marked by the accordion as it wires it.
+        parts: ['item', 'trigger', 'panel'],
+        removed: ['pdx-change'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

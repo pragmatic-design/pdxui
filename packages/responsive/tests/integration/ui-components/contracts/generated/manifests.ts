@@ -172,6 +172,7 @@ export const scenarioPage: Record<string, string> = {
     "accordion-two-instances": "tier-2b",
     "accordion-disabled-item": "tier-2b",
     "accordion-basic": "tier-2b",
+    "accordion-loading": "tier-2b",
     "affix-basic": "tier-6",
     "alert-open": "tier-2a",
     "alert-danger": "tier-2a",

@@ -20,6 +20,10 @@
         {
           "id": "accordion-basic",
           "title": "Accordion — Basic"
+        },
+        {
+          "id": "accordion-loading",
+          "title": "Accordion — loading"
         }
       ]
     },

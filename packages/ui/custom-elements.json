@@ -97,14 +97,20 @@
               "description": "Close every item."
             }
           ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaRename": {
+            "pdx-change": "open-change"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "open-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ open }"
+              "description": "An item opened or closed: the keys of the items open now (`data-accordion-item`, or the index).",
+              "detail": "{ value: string[] }"
             }
           ],
           "roles": [
@@ -144,6 +150,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "item",
+              "description": "An item, `[data-accordion-item]`; open, it carries `data-open`."
+            },
+            {
+              "name": "trigger",
+              "description": "An item's header, `[data-accordion-trigger]`, `aria-expanded` while open."
+            },
+            {
+              "name": "panel",
+              "description": "An item's content, `[data-accordion-content]`, a `role=\"region\"`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "`loading` is set; the accordion is `aria-busy`."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: no item opens or closes."
             }
           ],
           "cssProperties": [
