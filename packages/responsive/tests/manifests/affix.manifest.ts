@@ -6,7 +6,7 @@
  * (sticky/fixed on scroll) and has no box styling of its own.
  *
  * DOM structure (host vs inner):
- *   <pdx-affix>                         ← HOST: gets .pdx-affix-root (ctx.el.classList.add, in rAF)
+ *   <pdx-affix>                         ← HOST: no class (#290); :state(affixed) while stuck
  *     <slot></slot>                     ← the developer's content is projected directly
  *
  * There is NO inner div: the render is `<slot></slot>`. The measurable element IS the HOST

@@ -29,7 +29,7 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-change</code></td><td>{ affixed: boolean }</td><td>Fired once each time the element starts or stops sticking; the class <code>pdx-affix-fixed</code> follows the same state</td></tr>
+            <tr><td><code>affixed-change</code></td><td>{ value: boolean }</td><td>Fired once each time the element starts or stops sticking; the custom state <code>:state(affixed)</code> follows it. Read-only: <code>::affixed</code> is an error</td></tr>
           </tbody>
         </table>
       </div>

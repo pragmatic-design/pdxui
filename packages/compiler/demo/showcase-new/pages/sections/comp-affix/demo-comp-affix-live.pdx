@@ -1,13 +1,13 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Live Demo</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Scroll the box below. The toolbar sticks to the top of the scroll container, and <code>pdx-change</code> says so.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Scroll the box below. The toolbar sticks to the top of the scroll container, and <code>affixed-change</code> says so.</p>
     <p class="pdx-txt-small affix-state" aria-live="polite">Affixed: <strong>{{ affixed ? 'yes' : 'no' }}</strong></p>
     <div class="scroll-container" id="affix-container">
       <div class="scroll-spacer">
         <p class="pdx-txt-small pdx-ink-muted">Scroll down to see the toolbar become sticky.</p>
       </div>
-      <pdx-affix :offsetTop="0" target="#affix-container" @pdx-change="e => affixed = e.detail.affixed">
+      <pdx-affix :offsetTop="0" target="#affix-container" @affixed-change="e => affixed = e.detail.value">
         <div class="sticky-bar">
           <pdx-icon name="filter" size="16"></pdx-icon>
           <strong>Sticky Toolbar</strong>
@@ -31,7 +31,7 @@
       <pre class="pdx-txt-mono"><code>&lt;div class="scroll-container" id="affix-container"&gt;
   …
   &lt;pdx-affix :offsetTop="0" target="#affix-container"
-    @pdx-change="e =&gt; affixed = e.detail.affixed"&gt;
+    @affixed-change="e =&gt; affixed = e.detail.value"&gt;
     &lt;div class="sticky-bar"&gt;Sticky Toolbar&lt;/div&gt;
   &lt;/pdx-affix&gt;
   …

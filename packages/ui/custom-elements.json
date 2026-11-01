@@ -246,14 +246,23 @@
               "attribute": "target"
             }
           ],
+          "alphaEvents": [
+            "pdx-change"
+          ],
+          "alphaDetail": {
+            "affixed": "$event.detail.value"
+          },
+          "alphaRename": {
+            "pdx-change": "affixed-change"
+          },
           "events": [
             {
-              "name": "pdx-change",
+              "name": "affixed-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value changes.",
-              "detail": "{ affixed }"
+              "description": "It started or stopped sticking: `true` while stuck.",
+              "detail": "{ value: boolean }"
             }
           ],
           "attributes": [
@@ -289,6 +298,12 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "affixed",
+              "description": "The element is stuck: fixed to the window, or sticking in its `target`."
             }
           ]
         }

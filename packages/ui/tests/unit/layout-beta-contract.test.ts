@@ -48,6 +48,16 @@ const DONE: Row[] = [
         parts: ['item', 'trigger', 'panel'],
         removed: ['pdx-change'],
     },
+    {
+        tag: 'pdx-affix',
+        // Stuck or not is the scroll's doing: a read-only output, and a state for CSS to read.
+        models: [],
+        outputs: ['affixed'],
+        states: ['affixed'],
+        // It wraps the app's element and draws nothing of its own.
+        parts: [],
+        removed: ['pdx-change'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
