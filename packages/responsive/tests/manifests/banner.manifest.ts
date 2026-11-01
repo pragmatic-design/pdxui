@@ -5,11 +5,12 @@
  * (packages/design/src/components/banner.css, the .pdx-banner / .pdx-banner-* block).
  *
  * DOM structure: the custom element <pdx-banner> renders an inner
- *   <div class="pdx-banner pdx-banner-{type}" role="alert|status">
- *     <pdx-icon class="pdx-banner-icon"> (when showIcon)
- *     <span class="pdx-banner-text"><slot></span>
- *     <button class="pdx-banner-close" aria-label="Close"> (when closable)
+ *   <div class="pdx-banner" data-part="root" role="alert|status">
+ *     <pdx-icon class="pdx-banner-icon" data-part="icon"> (when showIcon)
+ *     <span class="pdx-banner-text" data-part="message"><slot></span>
+ *     <button class="pdx-banner-close" data-part="close" aria-label="Close"> (when closable)
  *   </div>
+ * Closed, the host is :state(dismissed) (#291) and banner.css hides it, alert and all (A4).
  * The classes and the role are on the inner div. role = 'alert' for danger and error, 'status'
  * otherwise (the variant prop defaults to 'info'; the source uses 'variant', not 'type').
  *
@@ -47,11 +48,42 @@ export const banner: ComponentManifest = {
                     <pdx-banner data-test="banner-closable" variant="info" closable>Dismissable message.</pdx-banner>
                 </div>`,
         },
+        {
+            // A banner closed with dismiss(): the host is :state(dismissed) and takes no room.
+            id: 'banner-dismissed',
+            title: 'Banner — Dismissed',
+            html: `
+                <div style="max-width: 640px;">
+                    <pdx-banner data-test="banner-dismissed" variant="danger" closable>Dismissed message.</pdx-banner>
+                </div>`,
+            setup: `
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                document.querySelector('section:not([hidden]) [data-test="banner-dismissed"]').dismiss();`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract ──
     contracts: {
         scenarios: {
+            'banner-dismissed': {
+                // What a theme selects (#291): the banner closed.
+                states: [
+                    {
+                        description: 'a closed banner is the custom state :state(dismissed)',
+                        selector: 'section:not([hidden]) [data-test="banner-dismissed"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="banner-dismissed"]', name: 'dismissed' },
+                        changes: {},
+                    },
+                ],
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="banner-dismissed"]',
+                        description: 'a closed banner is not drawn',
+                        display: { op: 'is', value: 'none' },
+                    },
+                ],
+            },
             'banner-variants': {
                 standalone: [
                     {
