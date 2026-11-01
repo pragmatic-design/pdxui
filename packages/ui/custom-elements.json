@@ -4497,7 +4497,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-click`."
+              "description": "The card was clicked, or pressed with Enter or Space, as `clickable`."
             }
           ],
           "roles": [
@@ -4600,6 +4600,46 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The card's box (`.pdx-surface-card`); the header, body and footer inside it are your markup."
+            },
+            {
+              "name": "link",
+              "description": "The `<a>` laid across the card when it has an `href`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "horizontal",
+              "description": "`horizontal` is set: media beside the body."
+            },
+            {
+              "name": "compact",
+              "description": "`compact` is set: tighter sections."
+            },
+            {
+              "name": "hoverable",
+              "description": "It lifts on hover: `hoverable`, `clickable` or an `href`."
+            },
+            {
+              "name": "clickable",
+              "description": "It is pressed or followed as a whole: `clickable` or an `href`."
+            },
+            {
+              "name": "selected",
+              "description": "`selected` is set."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "loading",
+              "description": "`loading` is set: a skeleton in place of the content, and `aria-busy`."
             }
           ],
           "cssProperties": [

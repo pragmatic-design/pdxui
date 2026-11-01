@@ -5,7 +5,9 @@
  * (packages/design/src/surfaces/base.css, the .pdx-surface-card / .pdx-card-* block).
  *
  * DOM structure: the custom element <pdx-card> renders an inner <div class="pdx-surface pdx-surface-card ...">.
- * The visual classes (.pdx-card-clickable, -selected, -hoverable, -disabled) are on the inner div.
+ * Its looks are custom states on the HOST (#290) — :state(clickable), (selected), (hoverable), (disabled),
+ * (loading), (compact), (horizontal) — which base.css draws on the inner div, [data-part="root"], beside
+ * the .pdx-card-* classes of CSS-only markup. Only the elevation stays a class on the inner div.
  * The role and tabindex (clickable/href) are set on the HOST <pdx-card> (ctx.el) in ctx.track().
  *
  * Geometria base (.pdx-surface-card): border (border-width solid), border-radius lg,
@@ -146,6 +148,27 @@ export const card: ComponentManifest = {
                         cursor: { op: 'is', value: 'pointer' },
                     },
                 ],
+                states: [
+                    {
+                        // A custom state on the host, not a class on the box (#290).
+                        description: 'clickable is the custom state :state(clickable)',
+                        selector: 'section:not([hidden]) [data-test="card-clickable"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="card-clickable"]', name: 'clickable' },
+                        changes: {},
+                    },
+                ],
+            },
+            'card-selected': {
+                states: [
+                    {
+                        description: 'selected is the custom state :state(selected)',
+                        selector: 'section:not([hidden]) [data-test="card-selected"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="card-selected"]', name: 'selected' },
+                        changes: {},
+                    },
+                ],
             },
             'card-disabled': {
                 standalone: [
@@ -158,6 +181,15 @@ export const card: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="card-disabled"] .pdx-surface-card',
                         description: 'disabled card disables pointer events',
                         pointerEvents: { op: 'is', value: 'none' },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'disabled is the custom state :state(disabled)',
+                        selector: 'section:not([hidden]) [data-test="card-disabled"] [data-part="root"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="card-disabled"]', name: 'disabled' },
+                        changes: {},
                     },
                 ],
             },

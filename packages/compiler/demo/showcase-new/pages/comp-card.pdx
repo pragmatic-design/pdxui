@@ -25,6 +25,22 @@
 
     <!-- ═══ Compact Stats ═══ -->
     <app-demo-comp-card-compact class="demo-section"></app-demo-comp-card-compact>
+
+    <!-- ═══ States and parts ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">States and parts</h2>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>:state(horizontal)</code>, <code>:state(compact)</code></td><td><code>horizontal</code> or <code>compact</code> is set</td></tr>
+            <tr><td><code>:state(hoverable)</code>, <code>:state(clickable)</code></td><td>It lifts on hover; it is pressed or followed as a whole (<code>clickable</code> or <code>href</code>)</td></tr>
+            <tr><td><code>:state(selected)</code>, <code>:state(disabled)</code>, <code>:state(loading)</code></td><td>The prop of the same name is set; loading, the card is <code>aria-busy</code></td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>root</code> (the card's box), <code>link</code> (the overlay of an <code>href</code>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </div>
 </template>
 
