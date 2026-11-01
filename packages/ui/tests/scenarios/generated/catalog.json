@@ -1125,6 +1125,18 @@
         {
           "id": "divider-text-label",
           "title": "Divider — Text content as the label"
+        },
+        {
+          "id": "divider-variant-solid",
+          "title": "pdx-divider — variant=\"solid\""
+        },
+        {
+          "id": "divider-variant-dashed",
+          "title": "pdx-divider — variant=\"dashed\""
+        },
+        {
+          "id": "divider-variant-dotted",
+          "title": "pdx-divider — variant=\"dotted\""
         }
       ]
     },

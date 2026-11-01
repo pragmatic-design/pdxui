@@ -110,6 +110,21 @@ export const divider: ComponentManifest = {
                         description: 'vertical divider has a tall height (>= 12px)',
                         height: { op: '>=', value: 12 },
                     },
+                    {
+                        // divider.css draws the line part (#290), not an inline style: a 1px rule on its left.
+                        selector: 'pdx-divider[data-test="div-v"] > [data-part="line"]',
+                        description: 'the vertical line part is a 1px left rule',
+                        border: { left: { width: { op: '==', value: 1, tolerance: 0 } } },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'orientation="vertical" is the custom state :state(vertical)',
+                        selector: 'pdx-divider[data-test="div-v"] > [data-part="line"]',
+                        trigger: 'attribute',
+                        customState: { host: 'pdx-divider[data-test="div-v"]', name: 'vertical' },
+                        changes: {},
+                    },
                 ],
                 composition: [
                     {
