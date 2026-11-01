@@ -2082,26 +2082,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
-              "name": "shape",
-              "description": "Shape: 'circle' or 'square'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'circle'",
-              "attribute": "shape"
-            },
-            {
-              "kind": "field",
               "name": "color",
               "description": "'auto' generates color from name. Or pass a CSS color. Default: 'auto'.",
               "type": {
@@ -2109,6 +2089,47 @@
               },
               "default": "'auto'",
               "attribute": "color"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px).",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "shape",
+              "description": "circle (the default) or square (the theme's medium radius).",
+              "type": {
+                "text": "'circle' | 'square'"
+              },
+              "default": "'circle'",
+              "attribute": "shape"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md"
+            },
+            {
+              "name": "shape",
+              "values": [
+                "circle",
+                "square"
+              ],
+              "default": "circle"
             }
           ],
           "roles": [
@@ -2134,24 +2155,6 @@
               "default": "''"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
-            },
-            {
-              "name": "shape",
-              "fieldName": "shape",
-              "description": "Shape: 'circle' or 'square'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'circle'"
-            },
-            {
               "name": "color",
               "fieldName": "color",
               "description": "'auto' generates color from name. Or pass a CSS color. Default: 'auto'.",
@@ -2159,6 +2162,58 @@
                 "text": "string"
               },
               "default": "'auto'"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px).",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
+            },
+            {
+              "name": "shape",
+              "fieldName": "shape",
+              "description": "circle (the default) or square (the theme's medium radius).",
+              "type": {
+                "text": "'circle' | 'square'"
+              },
+              "default": "'circle'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The avatar's box, `role=\"img\"` when it has a name."
+            },
+            {
+              "name": "image",
+              "description": "The picture, when `src` is set and has loaded."
+            },
+            {
+              "name": "fallback",
+              "description": "The initials, shown without a picture or when it fails."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "broken",
+              "description": "Its image failed to load: the initials show in its place."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-avatar-bg"
+            },
+            {
+              "name": "--pdx-avatar-fg"
+            },
+            {
+              "name": "--pdx-avatar-radius"
+            },
+            {
+              "name": "--pdx-avatar-size"
             }
           ]
         }
@@ -25245,22 +25300,12 @@
             {
               "kind": "field",
               "name": "variant",
-              "description": "Visual variant.",
+              "description": "spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the\ncomponent renders, and spinner.css has nothing to key by it (decision 51's reasoning for\npdx-button-group's own props).",
               "type": {
                 "text": "string"
               },
               "default": "'spinner'",
               "attribute": "variant"
-            },
-            {
-              "kind": "field",
-              "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'",
-              "attribute": "size"
             },
             {
               "kind": "field",
@@ -25281,6 +25326,29 @@
               },
               "default": "false",
               "attribute": "showlabel"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px).",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'",
+              "attribute": "size"
+            }
+          ],
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "xs",
+                "sm",
+                "lg",
+                "xl"
+              ],
+              "default": "md"
             }
           ],
           "roles": [
@@ -25290,20 +25358,11 @@
             {
               "name": "variant",
               "fieldName": "variant",
-              "description": "Visual variant.",
+              "description": "spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the\ncomponent renders, and spinner.css has nothing to key by it (decision 51's reasoning for\npdx-button-group's own props).",
               "type": {
                 "text": "string"
               },
               "default": "'spinner'"
-            },
-            {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
-              "type": {
-                "text": "string"
-              },
-              "default": "'md'"
             },
             {
               "name": "label",
@@ -25322,6 +25381,37 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px).",
+              "type": {
+                "text": "'md' | 'xs' | 'sm' | 'lg' | 'xl'"
+              },
+              "default": "'md'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The status (`role=\"status\"`), named by the label."
+            },
+            {
+              "name": "indicator",
+              "description": "The ring, the dots or the bar."
+            },
+            {
+              "name": "label",
+              "description": "The visible label, with `show-label`."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-spinner-size"
+            },
+            {
+              "name": "--pdx-spinner-speed"
             }
           ]
         }

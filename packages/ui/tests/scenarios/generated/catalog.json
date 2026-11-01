@@ -169,6 +169,38 @@
         {
           "id": "avatar-no-alt",
           "title": "Avatar — without a name (decorative)"
+        },
+        {
+          "id": "avatar-broken",
+          "title": "Avatar — a picture that fails to load"
+        },
+        {
+          "id": "avatar-size-md",
+          "title": "pdx-avatar — size=\"md\""
+        },
+        {
+          "id": "avatar-size-xs",
+          "title": "pdx-avatar — size=\"xs\""
+        },
+        {
+          "id": "avatar-size-sm",
+          "title": "pdx-avatar — size=\"sm\""
+        },
+        {
+          "id": "avatar-size-lg",
+          "title": "pdx-avatar — size=\"lg\""
+        },
+        {
+          "id": "avatar-size-xl",
+          "title": "pdx-avatar — size=\"xl\""
+        },
+        {
+          "id": "avatar-shape-circle",
+          "title": "pdx-avatar — shape=\"circle\""
+        },
+        {
+          "id": "avatar-shape-square",
+          "title": "pdx-avatar — shape=\"square\""
         }
       ]
     },
@@ -2754,6 +2786,26 @@
         {
           "id": "spinner-sizes",
           "title": "Spinner — Sizes"
+        },
+        {
+          "id": "spinner-size-md",
+          "title": "pdx-spinner — size=\"md\""
+        },
+        {
+          "id": "spinner-size-xs",
+          "title": "pdx-spinner — size=\"xs\""
+        },
+        {
+          "id": "spinner-size-sm",
+          "title": "pdx-spinner — size=\"sm\""
+        },
+        {
+          "id": "spinner-size-lg",
+          "title": "pdx-spinner — size=\"lg\""
+        },
+        {
+          "id": "spinner-size-xl",
+          "title": "pdx-spinner — size=\"xl\""
         }
       ]
     },
