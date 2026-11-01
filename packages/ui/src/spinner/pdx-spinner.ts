@@ -5,27 +5,35 @@
 
 import { uiString } from '../shared/i18n';
 import { component, html } from '@pdxui/core';
+// This component's styles travel with it, so an app ships the CSS of what it renders
+// and no more: the indicator's sizes and the ring's keyframe.
+import '@pdxui/design/components/spinner';
 // The bar variant is painted by progress.css: without it the bar renders nothing on a page that
 // loads no other progress. The dots are .pdx-dot, in the base layer every page loads.
 import '@pdxui/design/components/progress';
 
-const SIZES: Record<string, string> = { xs: '12px', sm: '16px', md: '24px', lg: '32px', xl: '48px' };
-
-// Inject keyframe once
-if (typeof document !== 'undefined' && !document.getElementById('pdx-spin-kf')) {
-    const s = document.createElement('style');
-    s.id = 'pdx-spin-kf';
-    s.textContent = '@keyframes pdx-spin{to{transform:rotate(360deg)}}';
-    document.head.appendChild(s);
-}
-
 /**
  * A loading indicator, drawn as a spinner, dots or a bar.
+ *
+ * @csspart root - The status (`role="status"`), named by the label.
+ * @csspart indicator - The ring, the dots or the bar.
+ * @csspart label - The visible label, with `show-label`.
  */
 component('pdx-spinner', {
+    // The axis spinner.css keys by (#291), reflected on the host: it draws the indicator at the sizes
+    // it had inline.
+    variants: {
+        /** xs (12px), sm (16px), md (24px, the default), lg (32px) or xl (48px). */
+        size: ['md', 'xs', 'sm', 'lg', 'xl'],
+    },
+    parts: ['root', 'indicator', 'label'],
     props: {
+        /**
+         * spinner (the default, a ring), dots or bar. A prop, not a variant: it picks what the
+         * component renders, and spinner.css has nothing to key by it (decision 51's reasoning for
+         * pdx-button-group's own props).
+         */
         variant: { type: String, default: 'spinner' },
-        size: { type: String, default: 'md' },
         /**
          * The accessible name. Empty means "use the translated default" — a prop default cannot be
          * a literal here, because the spinners the LIBRARY builds have no author to pass one: a
@@ -36,28 +44,24 @@ component('pdx-spinner', {
         label: { type: String, default: '' },
         showLabel: { type: Boolean, default: false },
     },
-    setup(ctx) {
-        function px(): string { return SIZES[ctx.size() as string] || '24px'; }
-        function svgStyle(): string { return 'animation:pdx-spin var(--pdx-spinner-speed, 1s) linear infinite'; }
-        function containerStyle(): string { return 'display:inline-flex;align-items:center;justify-content:center;width:' + px() + ';height:' + px(); }
-        return { px, svgStyle, containerStyle };
+    setup() {
+        return {};
     },
-    // `pdx-spinner-status` has no rule of its own: a pdx- class is how pdx.reset sees the element and
-    // what is inside it, and keeps a page's bare `span { border }` off them (#413).
+    // `pdx-spinner-status` is how pdx.reset sees the element and what is inside it, and keeps a page's
+    // bare `span { border }` off them (#413); spinner.css draws the pieces by their parts.
     render: (ctx) => html`
-        <span class="pdx-spinner-status" role="status" aria-live="polite" :aria-label="${() => (ctx.label() as string) || uiString('spinner', 'loading')}" style="display:inline-flex;align-items:center;gap:var(--pdx-space-xs,6px);flex-direction:column">
-            <span :style="${ctx.containerStyle}">
+        <span class="pdx-spinner-status" data-part="root" role="status" aria-live="polite" :aria-label="${() => (ctx.label() as string) || uiString('spinner', 'loading')}">
+            <span data-part="indicator">
                 ${() => {
                     const v = ctx.variant();
-                    const s = ctx.px();
-                    if (v === 'dots') return html`<span style="display:flex;gap:3px"><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span></span>`;
+                    if (v === 'dots') return html`<span class="pdx-spinner-dots"><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span><span class="pdx-dot pdx-dot-primary pdx-dot-pulse"></span></span>`;
                     // The indeterminate class belongs on the TRACK, as in pdx-progress and the docs:
                     // on the bar it matches no rule, and the bar never slides.
-                    if (v === 'bar') return html`<span class="pdx-progress pdx-progress-indeterminate" :style="${() => 'width:' + s}"><span class="pdx-progress-bar"></span></span>`;
-                    return html`<svg viewBox="0 0 24 24" fill="none" :style="${ctx.svgStyle}" width="${s}" height="${s}"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="var(--pdx-spinner-thickness, 3)" stroke-linecap="round" stroke-dasharray="31.4 31.4" /></svg>`;
+                    if (v === 'bar') return html`<span class="pdx-progress pdx-progress-indeterminate"><span class="pdx-progress-bar"></span></span>`;
+                    return html`<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="var(--pdx-spinner-thickness, 3)" stroke-linecap="round" stroke-dasharray="31.4 31.4" /></svg>`;
                 }}
             </span>
-            ${() => ctx.showLabel() ? html`<span style="font-size:var(--pdx-text-xs);color:var(--pdx-color-muted)">${() => (ctx.label() as string) || uiString('spinner', 'loading')}</span>` : ''}
+            ${() => ctx.showLabel() ? html`<span data-part="label">${() => (ctx.label() as string) || uiString('spinner', 'loading')}</span>` : ''}
         </span>
     `,
 });

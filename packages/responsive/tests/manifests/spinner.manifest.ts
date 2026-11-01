@@ -5,13 +5,14 @@
  *
  * The source (ui/src/spinner/pdx-spinner.ts):
  *   - Sizes px: xs(12) sm(16) md(24) lg(32) xl(48). default 'md'.
- *   - Varianti: 'spinner' (SVG), 'dots' (.pdx-dot), 'bar' (.pdx-progress). default 'spinner'.
- *   - DOM: <span role="status" aria-live="polite" :aria-label> > <span container w/h = size px> > grafica.
- *   - The SVG animates (@keyframes pdx-spin) but its SIZE is fixed (width/height = size px) → stable to measure.
+ *   - The `variant` prop: 'spinner' (SVG), 'dots' (.pdx-dot), 'bar' (.pdx-progress). default 'spinner'.
+ *   - DOM: <span data-part="root" role="status" aria-live="polite" :aria-label> > <span data-part="indicator">
+ *     > the graphic. spinner.css (#291) sizes the indicator from the host's `size` variant.
+ *   - The SVG animates (@keyframes pdx-spin) but its SIZE is fixed (the indicator's) → stable to measure.
  *
- * Conservative contracts (true on all 13 themes): the design system does NOT redefine
- * the spinner's width and height (they are an inline style in the component), so the geometry is
- * independent of the theme. Only the display and a cautious minimum size are asserted.
+ * Conservative contracts (true on all 13 themes): no theme redefines the spinner's width and height
+ * (spinner.css draws them; they were an inline style before #291), so the geometry is independent of
+ * the theme. Only the display and a cautious minimum size are asserted.
  * The animated state (transform/rotate) is NOT asserted: the runner freezes the animations,
  * but the box's size is invariant and enough for the contract.
  */
@@ -61,12 +62,12 @@ export const spinner: ComponentManifest = {
                     },
                     {
                         // md container span: width/height = 24px (size 'md' default)
-                        selector: 'section:not([hidden]) [data-test="spin-default"] [role="status"] > span',
+                        selector: 'section:not([hidden]) [data-test="spin-default"] [data-part="indicator"]',
                         description: 'spinner (md) container height >= 16px',
                         height: { op: '>=', value: 16 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="spin-default"] [role="status"] > span',
+                        selector: 'section:not([hidden]) [data-test="spin-default"] [data-part="indicator"]',
                         description: 'spinner (md) container width >= 16px',
                         width: { op: '>=', value: 16 },
                     },
@@ -103,14 +104,14 @@ export const spinner: ComponentManifest = {
             'spinner-sizes': {
                 composition: [
                     {
-                        // The size is set inline on the container span (xs12<sm16<md24<lg32<xl48):
+                        // The size is drawn on the indicator by spinner.css (xs12<sm16<md24<lg32<xl48):
                         // an invariant on every theme, because the design system does not redefine width/height.
                         description: 'size hierarchy: sm < md < lg container size',
                         parent: 'section:not([hidden]) .row',
                         children: {
-                            sm: 'section:not([hidden]) [data-test="spin-sm"] [role="status"] > span',
-                            md: 'section:not([hidden]) [data-test="spin-md"] [role="status"] > span',
-                            lg: 'section:not([hidden]) [data-test="spin-lg"] [role="status"] > span',
+                            sm: 'section:not([hidden]) [data-test="spin-sm"] [data-part="indicator"]',
+                            md: 'section:not([hidden]) [data-test="spin-md"] [data-part="indicator"]',
+                            lg: 'section:not([hidden]) [data-test="spin-lg"] [data-part="indicator"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.height', op: '<', right: 'md.height' },
@@ -133,8 +134,8 @@ export const spinner: ComponentManifest = {
     isolation: {
         scenario: 'spinner-variants',
         targets: [
-            // The size is inline (24px) → it must resist hostile global CSS.
-            { selector: 'section:not([hidden]) [data-test="spin-default"] [role="status"] > span', tolerancePx: 8 },
+            // The size is spinner.css's (24px, inline before #291) → it must resist hostile global CSS.
+            { selector: 'section:not([hidden]) [data-test="spin-default"] [data-part="indicator"]', tolerancePx: 8 },
         ],
     },
 
@@ -145,7 +146,7 @@ export const spinner: ComponentManifest = {
     // The runner freezes the animation; the wrapper's mask is a safety net.
     visual: {
         scenarios: ['spinner-variants'],
-        mask: ['section:not([hidden]) [data-test="spin-default"] [role="status"] > span'],
+        mask: ['section:not([hidden]) [data-test="spin-default"] [data-part="indicator"]'],
     },
 };
 
