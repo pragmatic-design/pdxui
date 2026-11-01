@@ -2,7 +2,10 @@
 
 pdx-sidebar { display: block; }
 
-.pdx-sidebar {
+/* <pdx-sidebar> is laid out from its tag and its custom states (#289), CSS-only markup from
+   .pdx-sidebar and its classes: each rule names both, inside :is(), so it keeps the weight of the
+   class. */
+:is(.pdx-sidebar, pdx-sidebar) {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -12,13 +15,12 @@ pdx-sidebar { display: block; }
     overflow: hidden;
 }
 
-/* Keyed on the host's `position` (#633). The host carries `.pdx-sidebar`, which gives the rule the
-   weight the old `.pdx-sidebar-right` class did. */
+/* Keyed on the host's `position` (#633), at the weight the old `.pdx-sidebar-right` class had. */
 @variant position(right) {
-    :scope.pdx-sidebar {
+    :scope:is(.pdx-sidebar, pdx-sidebar) {
         border-right: none;
         border-left: 1px solid var(--pdx-color-border);
     }
 }
 
-.pdx-sidebar-collapsed:not(.pdx-sidebar-mini) { width: 0 !important; min-width: 0 !important; }
+:is(.pdx-sidebar-collapsed:not(.pdx-sidebar-mini), :where(pdx-sidebar):state(collapsed):not(:state(mini))) { width: 0 !important; min-width: 0 !important; }

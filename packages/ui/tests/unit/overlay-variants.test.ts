@@ -28,7 +28,7 @@ describe('pdx-sidebar\'s position', () => {
         const right = await mount('pdx-sidebar', { position: 'right' });
         await tick(50);
         expect([plain.getAttribute('position'), right.getAttribute('position')]).toEqual(['left', 'right']);
-        expect(right.classList.contains('pdx-sidebar')).toBe(true);
-        expect(right.classList.contains('pdx-sidebar-right')).toBe(false);
+        // No class at all (#289): sidebar.css draws it from its tag and its states.
+        expect(right.getAttribute('class')).toBeNull();
     });
 });

@@ -24128,6 +24128,16 @@
               "name": "",
               "description": "The content placed inside the element."
             }
+          ],
+          "cssStates": [
+            {
+              "name": "collapsed",
+              "description": "`open` is off: no width, or the icon rail when `mini`."
+            },
+            {
+              "name": "mini",
+              "description": "Collapsed as an icon rail, `collapsedWidth` wide."
+            }
           ]
         }
       ],

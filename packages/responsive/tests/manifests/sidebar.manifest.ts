@@ -5,13 +5,12 @@
  *  - source: packages/ui/src/sidebar/pdx-sidebar.ts
  *      Light DOM, render: <slot></slot> (no inner wrapper).
  *      In an rAF (on ctx.track's first run) it adds ON THE HOST <pdx-sidebar>:
- *        - class .pdx-sidebar
  *        - role="complementary"
  *        - aria-label="Sidebar"
- *      On every run, again in an rAF, it toggles on the host:
- *        - .pdx-sidebar-open       ← open
- *        - .pdx-sidebar-collapsed  ← !open
- *        - .pdx-sidebar-mini       ← mini && !open
+ *      No class (#289): sidebar.css lays `pdx-sidebar` out from its tag, as it does `.pdx-sidebar`
+ *      in CSS-only markup. On every run, again in an rAF, it sets the host's custom states:
+ *        - :state(collapsed)  ← !open
+ *        - :state(mini)       ← mini && !open
  *      `position` is the host's own attribute (#633), reflected with its default.
  *      and sets inline on host.style: width/minWidth =
  *        open ? width : (mini ? collapsedWidth : 0)  [px]
@@ -23,17 +22,17 @@
  *
  *  - CSS: packages/design/src/components/sidebar.css
  *      pdx-sidebar { display:block }  (the host's default, before the rAF)
- *      .pdx-sidebar { display:flex; flex-direction:column; height:100%;
+ *      :is(.pdx-sidebar, pdx-sidebar) { display:flex; flex-direction:column; height:100%;
  *                     background:surface; border-right:1px solid border; overflow:hidden;
  *                     transition: width/min-width 0.2s }
- *      pdx-sidebar[position="right"].pdx-sidebar { border-right:none; border-left:1px solid border }
- *      .pdx-sidebar-collapsed:not(.pdx-sidebar-mini) { width:0 !important; min-width:0 !important }
+ *      pdx-sidebar[position="right"] { border-right:none; border-left:1px solid border }
+ *      :state(collapsed):not(:state(mini)) { width:0 !important; min-width:0 !important }
  *
  * MEASUREMENT CHOICES (they matter):
- *  - .pdx-sidebar is `height:100%` → CONTENT- and PARENT-driven: without a parent of a
+ *  - The sidebar is `height:100%` → CONTENT- and PARENT-driven: without a parent of a
  *    defined height it would collapse. Every scenario wraps the sidebar in a 400px-tall container
  *    (with the data-test on the host), so the height is measurable and stable.
- *  - The classes are on the HOST itself (not on an inner div): the selectors point straight
+ *  - The states are on the HOST itself (not on an inner div): the selectors point straight
  *    at [data-test="..."] (which IS <pdx-sidebar>), NOT at a descendant.
  *  - States set up front through attributes (open / collapsed without open / mini) → STANDALONE
  *    rules on separate scenarios (no triggered StateRule: it avoids flake).
@@ -117,7 +116,7 @@ export const sidebar: ComponentManifest = {
             'sidebar-expanded': {
                 standalone: [
                     {
-                        // .pdx-sidebar → display:flex column.
+                        // pdx-sidebar → display:flex column.
                         selector: 'section:not([hidden]) [data-test="sidebar"]',
                         description: 'expanded sidebar is a flex column container',
                         display: { op: 'is', value: 'flex' },
@@ -181,10 +180,20 @@ export const sidebar: ComponentManifest = {
             'sidebar-collapsed': {
                 standalone: [
                     {
-                        // collapsed without mini → the CSS .pdx-sidebar-collapsed:not(.pdx-sidebar-mini) → width:0.
+                        // collapsed without mini → :state(collapsed):not(:state(mini)) → width:0.
                         selector: 'section:not([hidden]) [data-test="sidebar-collapsed"]',
                         description: 'collapsed (non-mini) sidebar collapses to zero width',
                         width: { op: '<=', value: 2 },
+                    },
+                ],
+                states: [
+                    {
+                        // Closed: a custom state, not a class (#289).
+                        description: 'closed, the sidebar is the custom state :state(collapsed)',
+                        selector: 'section:not([hidden]) [data-test="sidebar-collapsed"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="sidebar-collapsed"]', name: 'collapsed' },
+                        changes: {},
                     },
                 ],
             },
@@ -195,6 +204,15 @@ export const sidebar: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="sidebar-mini"]',
                         description: 'mini collapsed sidebar keeps a narrow visible rail',
                         width: { op: '>=', value: 20 },
+                    },
+                ],
+                states: [
+                    {
+                        description: 'closed as a rail, the sidebar is the custom state :state(mini)',
+                        selector: 'section:not([hidden]) [data-test="sidebar-mini"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="sidebar-mini"]', name: 'mini' },
+                        changes: {},
                     },
                 ],
             },
