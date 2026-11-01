@@ -1,7 +1,7 @@
 /* pdx-image — Rich image component */
 
-/* Root element */
-.pdx-img-root {
+/* The host, at the root class's weight (#291) */
+:is(.pdx-img-root, pdx-image) {
     display: inline-block;
     position: relative;
     overflow: hidden;
@@ -28,14 +28,9 @@
     transition: opacity 0.3s ease;
 }
 
-/* Hidden while loading */
-.pdx-img-loading {
+/* Hidden while its source loads: the host's state (#291), at a class's weight */
+:where(pdx-image:state(loading)) .pdx-img {
     opacity: 0;
-}
-
-/* Visible once loaded */
-.pdx-img-loaded {
-    opacity: 1;
 }
 
 /* Skeleton placeholder — pulsing gray box */
@@ -77,19 +72,14 @@
     line-height: 1.4;
 }
 
-/* Zoomable cursor */
-.pdx-img-zoomable {
-    cursor: zoom-in;
-}
-
 /* The zoom / lightbox trigger is focusable: it shows where the keyboard is. */
 .pdx-img-wrapper[role="button"]:focus-visible {
     outline: none;
     box-shadow: var(--pdx-focus-ring);
 }
 
-/* Zoomed state */
-.pdx-img-zoomed {
+/* Zoomed: the host's state (#291). Zoom-in is the frame's cursor, which the image inherits. */
+:where(pdx-image:state(zoomed)) .pdx-img {
     transform: scale(2);
     cursor: zoom-out;
     transition: transform 0.3s ease;
