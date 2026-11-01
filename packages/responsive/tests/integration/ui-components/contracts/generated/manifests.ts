@@ -233,6 +233,7 @@ export const scenarioPage: Record<string, string> = {
     "badge-shape-square": "tier-1a",
     "banner-variants": "tier-2",
     "banner-closable": "tier-2",
+    "banner-dismissed": "tier-2",
     "banner-variant-info": "tier-2",
     "banner-variant-success": "tier-2",
     "banner-variant-warning": "tier-2",

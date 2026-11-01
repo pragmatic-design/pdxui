@@ -11,6 +11,8 @@ Auto-updating “3 days ago”.
 | `updateInterval` | `updateinterval` | number | `60000` | How often (ms) to refresh the text. |
 | `showTooltip` | `showtooltip` | boolean | `true` | Shows the absolute date on hover. |
 
+**Parts:** `[data-part="root"]` — The `<time>`, with the machine-readable `datetime` and the full date as its title.
+
 
 #### Examples
 

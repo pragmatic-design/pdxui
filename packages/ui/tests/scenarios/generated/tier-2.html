@@ -90,6 +90,9 @@
                     input.dispatchEvent(new Event('input', { bubbles: true }));
                 }
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
+        "banner-dismissed": async function () { 
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                document.querySelector('section:not([hidden]) [data-test="banner-dismissed"]').dismiss(); },
         "ctxmenu-open": async function () { 
                 const host = document.querySelector('section:not([hidden]) [data-test="cm"]');
                 const target = document.querySelector('section:not([hidden]) [data-test="cm-target"]');
@@ -257,6 +260,13 @@
         <h3>Banner — Closable</h3>
         <div style="max-width: 640px;">
                     <pdx-banner data-test="banner-closable" variant="info" closable>Dismissable message.</pdx-banner>
+                </div>
+    </section>
+
+    <section data-scenario="banner-dismissed">
+        <h3>Banner — Dismissed</h3>
+        <div style="max-width: 640px;">
+                    <pdx-banner data-test="banner-dismissed" variant="danger" closable>Dismissed message.</pdx-banner>
                 </div>
     </section>
 

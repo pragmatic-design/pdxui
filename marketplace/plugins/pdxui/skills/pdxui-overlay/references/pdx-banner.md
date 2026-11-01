@@ -18,9 +18,13 @@ A persistent inline message.
 | `show()` | Shows it. |
 | `isVisible` _(read-only)_ | Read-only, via a ref: `el.isVisible`. |
 
-**Events:** `pdx-close` — Fired when it closes. Does not bubble.
+**Events:** `pdx-close` — The banner was closed: by its button, `dismiss()` or its auto-dismiss. Does not bubble.
 
 **Renders:** roles `alert` · `status`
+
+**States:** `:state(dismissed)` — Closed, by its button, `dismiss()` or its auto-dismiss: banner.css hides it.
+
+**Parts:** `[data-part="root"]` — The banner (`role="alert"` for danger and error, `role="status"` otherwise).; `[data-part="icon"]` — The icon matched to the variant, with `show-icon`.; `[data-part="message"]` — The banner's text, its default slot.; `[data-part="close"]` — The close button, with `closable`.
 
 
 #### Examples

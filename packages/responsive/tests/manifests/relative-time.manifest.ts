@@ -23,8 +23,8 @@
  *     text does NOT change between the start and the end of a test run.
  *     → No "close" date (seconds, minutes, hours): it would change every second.
  *
- *  2) THE TIMER IS OFF — `update-interval="0"`. The setup calls setupTimer() which,
- *     when intervalMs > 0 (60000 by default), installs a setInterval that re-renders.
+ *  2) THE TIMER IS OFF — `update-interval="0"`. Its update effect (#291) arms a wait
+ *     when intervalMs > 0 (60000 by default), whose tick re-renders.
  *     With 0 the timer does NOT start (see `if (intervalMs > 0)`), which removes every
  *     asynchronous re-render during the measurement: the screenshot and axe see a stable DOM.
  *
