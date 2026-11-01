@@ -5,7 +5,7 @@
  *  - source: packages/ui/src/scroll-area/pdx-scroll-area.ts
  *      Light DOM, render: <slot></slot>. On ctx.track's first run, inside a
  *      requestAnimationFrame, the setup:
- *        1. adds the class .pdx-scroll-area ON THE HOST <pdx-scroll-area> (ctx.el);
+ *        1. sets no class on the host (#290): scroll-area.css draws it on the tag;
  *        2. creates a <div class="pdx-scroll-area-viewport"> and MOVES every child into it
  *           (the slot content), then appends it to the host;
  *        3. applies the constrained height ON THE VIEWPORT (an inline style):
@@ -17,8 +17,8 @@
  *        5. hides the native scrollbar (scrollbarWidth:none plus the class
  *           .pdx-scroll-area-hide-native with ::-webkit-scrollbar{display:none}) and,
  *           when type != 'never', mounts the custom overlay scrollbar through useScrollbar();
- *        6. emits `pdx-scroll` on scroll and toggles the edge data attributes ON THE HOST
- *           (data-at-top / data-at-bottom, plus data-at-left/right for horizontal axes).
+ *        6. emits `pdx-scroll` (declared, not bubbling) on scroll and sets the edge custom states ON THE HOST
+ *           (:state(at-top) / at-bottom, plus at-left/at-right for horizontal axes, #290).
  *      Props: type='auto', axis='vertical', scrollHideDelay=1200, maxHeight='', height=''.
  *      Role and aria-label only with `label` (see [B1]); there is no keydown handler. The imperative API is on
  *      ctx.el.__scrollArea (scrollTo/By/IntoView/getViewport/recalculate).
@@ -27,10 +27,10 @@
  *
  *  - CSS: packages/design/src/components/scroll-area.css
  *      pdx-scroll-area            { display:block; position:relative }   (host, pre-rAF)
- *      .pdx-scroll-area           { position:relative; overflow:hidden }  (host, post-rAF: CLIPPA)
+ *      :is(.pdx-scroll-area, pdx-scroll-area) { position:relative; overflow:hidden }  (the host: it clips)
  *      .pdx-scroll-area-viewport  { width:100%; height:100% }
  *      .pdx-scroll-area-hide-native::-webkit-scrollbar { display:none }
- *      pdx-scroll-area[data-at-top/bottom] → custom prop --pdx-scroll-fade-* (edge fade)
+ *      pdx-scroll-area:state(at-top/at-bottom) → custom prop --pdx-scroll-fade-* (edge fade)
  *
  * MEASUREMENT CHOICES (they matter):
  *  - THE CONSTRAINED HEIGHT lives on the VIEWPORT (an inline maxHeight), NOT on the host: the host is
@@ -152,6 +152,22 @@ export const scrollArea: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="scroll-area"] .pdx-scroll-area-viewport',
                         description: 'viewport has non-negative border radius',
                         radius: { all: { op: '>=', value: 0 } },
+                    },
+                    {
+                        // The same element by its part (#290): what a theme or a test selects.
+                        selector: 'section:not([hidden]) [data-test="scroll-area"] [data-part="viewport"]',
+                        description: 'the viewport part is the height-constrained element',
+                        height: { op: '<=', value: 162 },
+                    },
+                ],
+                states: [
+                    {
+                        // Unscrolled, it is at its top edge: the host's custom state (#290), not data-at-top.
+                        description: 'at rest the scroll area is :state(at-top)',
+                        selector: 'section:not([hidden]) [data-test="scroll-area"] [data-part="viewport"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="scroll-area"]', name: 'at-top' },
+                        changes: {},
                     },
                 ],
                 // Composition: the content is clipped and contained horizontally in the viewport, aligned

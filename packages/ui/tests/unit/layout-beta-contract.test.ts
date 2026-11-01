@@ -91,6 +91,16 @@ const DONE: Row[] = [
     { tag: 'pdx-col', models: [], outputs: [], states: [], parts: [], removed: [] },
     { tag: 'pdx-masonry', models: [], outputs: [], states: [], parts: [], removed: [] },
     {
+        tag: 'pdx-scroll-area',
+        models: [],
+        outputs: [],
+        // The edges it has scrolled to: left and right only on a horizontal or two-axis area.
+        states: ['at-top', 'at-bottom', 'at-left', 'at-right'],
+        // The element that scrolls, and the overlay scrollbar it draws: a track and its thumb.
+        parts: ['viewport', 'scrollbar', 'thumb'],
+        removed: [],
+    },
+    {
         tag: 'pdx-divider',
         models: [],
         outputs: [],

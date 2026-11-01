@@ -17,9 +17,13 @@ A styled, custom scrollbar region.
 |---|---|
 | `scrollArea: { scrollTo(opts), scrollBy(opts), scrollIntoView(el, opts), getViewport(), recalculate() }` _(read-only)_ | Helpers over the inner viewport, reached as `el.scrollArea.scrollTo(…)`: the host is not the element that scrolls, so the natives would act on the wrong box (which is also why they are namespaced here rather than flattened onto the host). |
 
-**Events:** `pdx-scroll` → `detail: { scrollTop, scrollLeft, scrollHeight, scrollWidth, clientHeight, clientWidth }` — Fired on `pdx-scroll`.
+**Events:** `pdx-scroll` → `detail: { scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number }` — The viewport scrolled: where it is, and how big the content and the viewport are.
 
 **Renders:** roles `region`
+
+**States:** `:state(at-top)` — Scrolled to the top: nothing more above.; `:state(at-bottom)` — Scrolled to the bottom: nothing more below.; `:state(at-left)` — Scrolled to the left edge (horizontal or two-axis area).; `:state(at-right)` — Scrolled to the right edge (horizontal or two-axis area).
+
+**Parts:** `[data-part="viewport"]` — The element that scrolls (`.pdx-scroll-area-viewport`), around the content.; `[data-part="scrollbar"]` — An overlay scrollbar's track, one per axis it scrolls on.; `[data-part="thumb"]` — A scrollbar's thumb.
 
 
 #### Examples

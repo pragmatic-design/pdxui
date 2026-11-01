@@ -22722,8 +22722,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-scroll`.",
-              "detail": "{ scrollTop, scrollLeft, scrollHeight, scrollWidth, clientHeight, clientWidth }"
+              "description": "The viewport scrolled: where it is, and how big the content and the viewport are.",
+              "detail": "{ scrollTop: number; scrollLeft: number; scrollHeight: number; scrollWidth: number; clientHeight: number; clientWidth: number }"
             }
           ],
           "roles": [
@@ -22789,6 +22789,38 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "viewport",
+              "description": "The element that scrolls (`.pdx-scroll-area-viewport`), around the content."
+            },
+            {
+              "name": "scrollbar",
+              "description": "An overlay scrollbar's track, one per axis it scrolls on."
+            },
+            {
+              "name": "thumb",
+              "description": "A scrollbar's thumb."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "at-top",
+              "description": "Scrolled to the top: nothing more above."
+            },
+            {
+              "name": "at-bottom",
+              "description": "Scrolled to the bottom: nothing more below."
+            },
+            {
+              "name": "at-left",
+              "description": "Scrolled to the left edge (horizontal or two-axis area)."
+            },
+            {
+              "name": "at-right",
+              "description": "Scrolled to the right edge (horizontal or two-axis area)."
             }
           ]
         }
