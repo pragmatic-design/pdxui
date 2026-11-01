@@ -29,12 +29,12 @@ const focusables = (el: Element) => [...el.querySelectorAll<HTMLElement>('[tabin
 beforeEach(cleanup);
 
 describe('a selectable chip is a toggle button the keyboard can press', () => {
-    it('Space and Enter toggle aria-pressed and emit pdx-toggle; Space does not scroll', async () => {
+    it('Space and Enter toggle aria-pressed and announce selected-change (#291); Space does not scroll', async () => {
         const chip = await mountChip('<pdx-chip selectable value="music">Music</pdx-chip>');
         const btn = chip.querySelector('[role="button"]') as HTMLElement;
         expect(btn.getAttribute('aria-pressed')).toBe('false');
         const toggles: unknown[] = [];
-        chip.addEventListener('pdx-toggle', (e) => toggles.push((e as CustomEvent).detail));
+        chip.addEventListener('selected-change', (e) => toggles.push((e as CustomEvent).detail));
 
         const space = key(btn, ' ');
         await tick();
@@ -45,7 +45,7 @@ describe('a selectable chip is a toggle button the keyboard can press', () => {
         key(btn, 'Enter');
         await tick();
         expect(btn.getAttribute('aria-pressed')).toBe('false');
-        expect(toggles).toEqual([{ selected: true, value: 'music' }, { selected: false, value: 'music' }]);
+        expect(toggles).toEqual([{ value: true }, { value: false }]);
     });
 
     it('a disabled selectable chip says so on its button and does not toggle', async () => {

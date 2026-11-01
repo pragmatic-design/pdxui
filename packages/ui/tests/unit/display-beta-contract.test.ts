@@ -88,6 +88,8 @@ const DONE: Row[] = [
     { tag: 'pdx-banner', models: [], outputs: [], states: ['dismissed'], parts: ['root', 'icon', 'message', 'close'], removed: [] },
     // Its updates are an effect, parked with a frozen page (#269).
     { tag: 'pdx-relative-time', models: [], outputs: [], states: [], parts: ['root'], removed: [] },
+    // A click writes `selected`, a model: `selected-change` replaces `pdx-toggle` (#291).
+    { tag: 'pdx-chip', models: ['selected'], outputs: [], states: ['selected', 'disabled'], parts: ['root', 'body', 'remove'], removed: ['pdx-toggle'] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

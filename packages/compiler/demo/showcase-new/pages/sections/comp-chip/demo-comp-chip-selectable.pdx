@@ -5,7 +5,7 @@
 
     <div class="demo-row">
       @for (interests as item; track item.label) {
-        <pdx-chip selectable variant="primary" :selected="item.selected" :value="item.label" @pdx-toggle="toggleInterest">{{ item.label }}</pdx-chip>
+        <pdx-chip selectable variant="primary" :selected="item.selected" :value="item.label" @selected-change="e => toggleInterest(e.currentTarget.value, e.detail.value)">{{ item.label }}</pdx-chip>
       }
     </div>
     <p class="pdx-txt-small pdx-ink-muted" style="margin-top:var(--pdx-space-xs)">
@@ -14,10 +14,10 @@
 
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-chip selectable variant="primary" :selected="sel" @pdx-toggle="onToggle"&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-chip selectable variant="primary" value="Music" ::selected="music"&gt;
   Music
 &lt;/pdx-chip&gt;
-// event.detail = { selected: true, value: "Music" }</code></pre>
+// selected is a model: a click writes it and announces selected-change { value }</code></pre>
     </details>
   </section>
 </template>
@@ -38,11 +38,11 @@ let interests = $signal([
     { label: 'Art', selected: false },
 ]);
 
-function toggleInterest(e) {
-    const val = e.detail ? e.detail.value : '';
+// A click writes the chip's `selected` model; `selected-change` carries the new value.
+function toggleInterest(val, on) {
     if (val) {
-        interests = interests.map(i => i.label === val ? { label: i.label, selected: !i.selected } : i);
-        addLog('toggle: ' + val + ' → ' + (e.detail.selected ? 'on' : 'off'));
+        interests = interests.map(i => i.label === val ? { label: i.label, selected: on } : i);
+        addLog('toggle: ' + val + ' → ' + (on ? 'on' : 'off'));
     }
 }
 

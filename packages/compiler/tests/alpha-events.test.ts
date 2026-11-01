@@ -272,3 +272,18 @@ describe('the layout components, from the shipped manifest (#290)', () => {
         expect(fix(reads)).toBe(reads);
     });
 });
+
+describe('the display components, from the shipped manifest (#291)', () => {
+    const r = new ComponentResolver();
+    r.registerUiManifest(process.cwd());
+    const fix = (text: string): string => {
+        const apply = alphaChangeEvent.fix;
+        if (typeof apply !== 'function') throw new Error('alpha-change-event no longer rewrites');
+        return apply(text, { alphaOf: (tag: string) => r.alphaOf(tag) });
+    };
+
+    it('pdx-chip: @pdx-toggle becomes the model\'s @selected-change, its selected read as the value and its value off the host', () => {
+        expect(fix('<pdx-chip selectable @pdx-toggle="e => pick(e.detail.value, e.detail.selected)"></pdx-chip>'))
+            .toBe('<pdx-chip selectable @selected-change="e => pick(e.currentTarget.value, e.detail.value)"></pdx-chip>');
+    });
+});

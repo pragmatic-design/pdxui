@@ -39,22 +39,26 @@
     border-color: var(--pdx-color-border-strong, var(--pdx-color-border));
 }
 
-/* Selected state */
+/* Selected state — on a native chip its attribute or class; on pdx-chip the host's state (#291),
+   at the same weight */
 .pdx-chip[selected],
-.pdx-chip.selected {
+.pdx-chip.selected,
+:where(pdx-chip):state(selected) > .pdx-chip {
     background: var(--pdx-color-primary);
     color: var(--pdx-color-primary-text);
     border-color: var(--pdx-color-primary);
 }
 
 .pdx-chip[selected]:hover,
-.pdx-chip.selected:hover {
+.pdx-chip.selected:hover,
+:where(pdx-chip):state(selected) > .pdx-chip:hover {
     filter: brightness(1.1);
 }
 
 /* Disabled */
 .pdx-chip[disabled],
-.pdx-chip.disabled {
+.pdx-chip.disabled,
+:where(pdx-chip):state(disabled) > .pdx-chip {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
     pointer-events: none;
@@ -67,7 +71,7 @@
         border-color: var(--pdx-color-primary);
         color: var(--pdx-color-primary-ink);
     }
-    :scope > [data-part="root"][selected] {
+    :scope:state(selected) > [data-part="root"] {
         background: var(--pdx-color-primary);
         color: var(--pdx-color-primary-text);
     }
@@ -78,7 +82,7 @@
         border-color: var(--pdx-color-success);
         color: var(--pdx-color-success-ink);
     }
-    :scope > [data-part="root"][selected] {
+    :scope:state(selected) > [data-part="root"] {
         background: var(--pdx-color-success);
         color: var(--pdx-color-success-text);
     }
@@ -89,7 +93,7 @@
         border-color: var(--pdx-color-danger);
         color: var(--pdx-color-danger-ink);
     }
-    :scope > [data-part="root"][selected] {
+    :scope:state(selected) > [data-part="root"] {
         background: var(--pdx-color-danger);
         color: var(--pdx-color-danger-text);
     }
@@ -100,7 +104,7 @@
         border-color: var(--pdx-color-warning);
         color: var(--pdx-color-warning-ink);
     }
-    :scope > [data-part="root"][selected] {
+    :scope:state(selected) > [data-part="root"] {
         background: var(--pdx-color-warning);
         color: var(--pdx-color-warning-text);
     }
@@ -111,7 +115,7 @@
         border-color: var(--pdx-color-accent);
         color: var(--pdx-color-accent-ink);
     }
-    :scope > [data-part="root"][selected] {
+    :scope:state(selected) > [data-part="root"] {
         background: var(--pdx-color-accent);
         color: var(--pdx-color-accent-text);
     }
@@ -200,7 +204,8 @@ pdx-chip.pdx-secondary > .pdx-chip { background: var(--pdx-color-secondary, var(
     background: light-dark(oklch(0 0 0 / 0.1), oklch(1 0 0 / 0.15));
 }
 
-.pdx-chip[selected] .pdx-chip-remove:hover {
+.pdx-chip[selected] .pdx-chip-remove:hover,
+:where(pdx-chip):state(selected) > .pdx-chip .pdx-chip-remove:hover {
     background: oklch(1 0 0 / 0.2);
 }
 

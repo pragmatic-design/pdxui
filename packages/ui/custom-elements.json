@@ -6953,22 +6953,12 @@
             {
               "kind": "field",
               "name": "selectable",
-              "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips `selected` and emits pdx-toggle.",
+              "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips the `selected` model.",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
               "attribute": "selectable"
-            },
-            {
-              "kind": "field",
-              "name": "selected",
-              "description": "Selected state. A user toggle writes it before pdx-toggle; a parent that sets it afterwards wins.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "selected"
             },
             {
               "kind": "field",
@@ -6983,7 +6973,7 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "Value passed in remove/toggle event detail for identification.",
+              "description": "Value passed in the remove event's detail for identification.",
               "type": {
                 "text": "string"
               },
@@ -7019,7 +7009,20 @@
               },
               "default": "'md'",
               "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "selected",
+              "description": "The currently selected item(s).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "selected"
             }
+          ],
+          "models": [
+            "selected"
           ],
           "variants": [
             {
@@ -7067,22 +7070,29 @@
               }
             }
           ],
+          "alphaEvents": [
+            "pdx-toggle"
+          ],
+          "alphaDetail": {
+            "selected": "$event.detail.value",
+            "value": "$event.currentTarget.value"
+          },
           "events": [
             {
               "name": "pdx-remove",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when an item is removed.",
-              "detail": "{ value, label }"
+              "description": "The × was pressed: the chip's value (its label when it has none) and its label.",
+              "detail": "{ value: string; label: string }"
             },
             {
-              "name": "pdx-toggle",
+              "name": "selected-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when toggled open or closed. Does not bubble.",
-              "detail": "{ selected, value }"
+              "description": "Fired when the component writes `selected`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -7110,16 +7120,7 @@
             {
               "name": "selectable",
               "fieldName": "selectable",
-              "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips `selected` and emits pdx-toggle.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "name": "selected",
-              "fieldName": "selected",
-              "description": "Selected state. A user toggle writes it before pdx-toggle; a parent that sets it afterwards wins.",
+              "description": "A toggle button (role=\"button\", aria-pressed): click, Enter or Space flips the `selected` model.",
               "type": {
                 "text": "boolean"
               },
@@ -7137,7 +7138,7 @@
             {
               "name": "value",
               "fieldName": "value",
-              "description": "Value passed in remove/toggle event detail for identification.",
+              "description": "Value passed in the remove event's detail for identification.",
               "type": {
                 "text": "string"
               },
@@ -7169,6 +7170,15 @@
                 "text": "'md' | 'sm' | 'lg'"
               },
               "default": "'md'"
+            },
+            {
+              "name": "selected",
+              "fieldName": "selected",
+              "description": "The currently selected item(s).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
@@ -7179,6 +7189,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The chip, the pill drawn; the variants key by it."
+            },
+            {
+              "name": "body",
+              "description": "Its label, avatar and icon; the toggle when the chip is also removable."
+            },
+            {
+              "name": "remove",
+              "description": "The × button, with `removable`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "selected",
+              "description": "It is selected."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
             }
           ]
         }

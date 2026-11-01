@@ -52,6 +52,12 @@ export const chip: ComponentManifest = {
             html: `<pdx-chip data-test="sr" label="Tech" value="tech" selectable removable></pdx-chip>`,
         },
         {
+            // Selected, and coloured: the host's :state(selected) draws the fill (#291).
+            id: 'chip-selected',
+            title: 'Chip — Selected',
+            html: `<pdx-chip data-test="sel" label="Done" variant="success" selectable selected></pdx-chip>`,
+        },
+        {
             // The colour as text: on the page (outline) and on its own tint (tonal).
             id: 'chip-text-colours',
             title: 'Chip — Outline and tonal colours',
@@ -68,6 +74,18 @@ export const chip: ComponentManifest = {
     // ── Dim. 1: the mathematical contract (universal, derived from chip.css) ──
     contracts: {
         scenarios: {
+            'chip-selected': {
+                // What a theme selects (#291): the chip selected.
+                states: [
+                    {
+                        description: 'a selected chip is the custom state :state(selected)',
+                        selector: 'section:not([hidden]) [data-test="sel"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="sel"]', name: 'selected' },
+                        changes: {},
+                    },
+                ],
+            },
             'chip-variants': {
                 standalone: [
                     {
@@ -130,11 +148,12 @@ export const chip: ComponentManifest = {
             'chip-disabled': {
                 states: [
                     {
-                        // .pdx-chip.disabled → opacity: var(--pdx-opacity-disabled) (< 1).
+                        // The host's :state(disabled) (#291) → opacity: var(--pdx-opacity-disabled) (< 1).
                         description: 'disabled chip has reduced opacity',
                         selector: '[data-test="disabled"] .pdx-chip',
                         trigger: 'attribute',
                         attribute: { name: 'disabled', value: '' },
+                        customState: { host: 'section:not([hidden]) [data-test="disabled"]', name: 'disabled' },
                         changes: { opacity: { op: '<', value: 1 } },
                     },
                 ],

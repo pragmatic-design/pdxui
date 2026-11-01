@@ -4,14 +4,13 @@
 //
 // Interactive parts only. A plain chip is text: no role, no tab stop, no ARIA. A
 // selectable chip is a toggle button — role="button", aria-pressed, Enter and Space toggle it and
-// write `selected` before pdx-toggle. A removable chip's one tab stop is its ×, named "Remove {label}".
+// write the `selected` model, which announces `selected-change`. A removable chip's one tab stop is its ×, named "Remove {label}".
 // Selectable + removable: the toggle is the .pdx-chip-body and the × its sibling, inside a
 // non-interactive pill, so no button nests in a button. Disabled goes where it is read: on the
 // toggle, and as `disabled` on the ×. After a removal the app owns focus.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, model, event } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
-import { setOwnProp } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/chip';
@@ -20,8 +19,30 @@ import '@pdxui/design/components/chip';
  * A small tag that can be selectable or removable, with variants, an avatar and group support.
  *
  * @slot icon - An icon shown before the chip's label.
+ *
+ * @csspart root - The chip, the pill drawn; the variants key by it.
+ * @csspart body - Its label, avatar and icon; the toggle when the chip is also removable.
+ * @csspart remove - The × button, with `removable`.
+ *
+ * @cssstate selected - It is selected.
+ * @cssstate disabled - `disabled` is set.
+ *
+ * @alphaevent pdx-toggle
+ * @alphadetail selected $event.detail.value
+ * @alphadetail value $event.currentTarget.value
  */
 component('pdx-chip', {
+    // A click writes it (#291): `selected-change` `{ value }`, in place of `pdx-toggle`.
+    models: {
+        selected: model(false),
+    },
+    events: {
+        /** The × was pressed: the chip's value (its label when it has none) and its label. */
+        'pdx-remove': event<{ value: string; label: string }>(),
+    },
+    // On the host as custom states (#132); the pill keeps only the CSS-only chip's class.
+    states: ['selected', 'disabled'],
+    parts: ['root', 'body', 'remove'],
     // The axes chip.css keys by (#630), reflected on the host; each value maps the class that draws the
     // same look on a native chip. `outline` and `md` are the base look, which no class adds to.
     variants: {
@@ -43,37 +64,31 @@ component('pdx-chip', {
          * next chip's ×, or the previous one), or a keyboard user is left on <body>.
          */
         removable: { type: Boolean, default: false },
-        /** A toggle button (role="button", aria-pressed): click, Enter or Space flips `selected` and emits pdx-toggle. */
+        /** A toggle button (role="button", aria-pressed): click, Enter or Space flips the `selected` model. */
         selectable: { type: Boolean, default: false },
-        /** Selected state. A user toggle writes it before pdx-toggle; a parent that sets it afterwards wins. */
-        selected: { type: Boolean, default: false },
         disabled: { type: Boolean, default: false },
-        /** Value passed in remove/toggle event detail for identification. */
+        /** Value passed in the remove event's detail for identification. */
         value: { type: String, default: '' },
         /** Avatar URL — renders a small circle image before the label. */
         avatar: { type: String, default: '' },
     },
     setup(ctx) {
-        function cssClass(): string {
-            let cls = 'pdx-chip';
-            if (ctx.selected()) cls += ' selected';
-            if (ctx.disabled()) cls += ' disabled';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('selected', !!ctx.selected());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         function onRemove(e: Event) {
             e.stopPropagation();
             if (ctx.disabled()) return;
-            const val = ctx.value() || ctx.label() || '';
-            ctx.emit('pdx-remove', { value: val, label: ctx.label() });
+            const label = ctx.label() as string;
+            ctx.emit('pdx-remove', { value: (ctx.value() as string) || label || '', label });
         }
 
+        // The user's write of the model: it announces `selected-change` `{ value }`.
         function toggle() {
             if (ctx.disabled() || !ctx.selectable()) return;
-            const next = !ctx.selected();
-            setOwnProp(ctx.el, 'selected', next);
-            const val = ctx.value() || ctx.label() || '';
-            ctx.emit('pdx-toggle', { selected: next, value: val }, { bubbles: false });
+            ctx.selected.set(!ctx.selected());
         }
 
         /** Enter and Space press the toggle \u2014 whichever element carries role="button". */
@@ -101,11 +116,11 @@ component('pdx-chip', {
             return format(uiString('chip', 'remove'), { label: what }).trim();
         }
 
-        return { cssClass, onRemove, toggle, onKeydown, toggleOnPill, toggleOnBody, removeName };
+        return { onRemove, toggle, onKeydown, toggleOnPill, toggleOnBody, removeName };
     },
     render: (ctx) => html`
         <span
-            :class="${ctx.cssClass}"
+            class="pdx-chip"
             data-part="root"
             @click="${ctx.toggle}"
             @keydown="${ctx.onKeydown}"
@@ -116,6 +131,7 @@ component('pdx-chip', {
         >
             <span
                 class="pdx-chip-body"
+                data-part="body"
                 @keydown="${ctx.onKeydown}"
                 :role="${() => ctx.toggleOnBody() ? 'button' : null}"
                 :tabindex="${() => ctx.toggleOnBody() ? (ctx.disabled() ? '-1' : '0') : null}"
@@ -127,7 +143,7 @@ component('pdx-chip', {
                 ${() => ctx.label() || html`<slot></slot>`}
             </span>
             ${() => ctx.removable()
-                ? html`<button type="button" class="pdx-chip-remove" :disabled="${ctx.disabled}" :aria-label="${ctx.removeName}" @click="${ctx.onRemove}">\u00d7</button>`
+                ? html`<button type="button" class="pdx-chip-remove" data-part="remove" :disabled="${ctx.disabled}" :aria-label="${ctx.removeName}" @click="${ctx.onRemove}">\u00d7</button>`
                 : ''}
         </span>
     `,

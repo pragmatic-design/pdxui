@@ -65,9 +65,9 @@
         <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div>
         <div class="opt-row"><code>removable</code><span>boolean</span><span>Show close button</span></div>
         <div class="opt-row"><code>selectable</code><span>boolean</span><span>Click to toggle selection</span></div>
-        <div class="opt-row"><code>selected</code><span>boolean</span><span>Selected state (filled background)</span></div>
+        <div class="opt-row"><code>selected</code><span>boolean</span><span>Selected state (filled background); a model, <code>::selected</code></span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Prevents all interaction</span></div>
-        <div class="opt-row"><code>value</code><span>string</span><span>Identifier passed in remove/toggle events</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>Identifier passed in the remove event</span></div>
         <div class="opt-row"><code>avatar</code><span>string</span><span>URL for small circle image before label</span></div>
       </div>
 
@@ -75,7 +75,7 @@
       <div class="options-table">
         <div class="opt-header"><span>Event</span><span>Detail</span><span>When</span></div>
         <div class="opt-row"><code>pdx-remove</code><span>{ value, label }</span><span>Close button clicked</span></div>
-        <div class="opt-row"><code>pdx-toggle</code><span>{ selected, value }</span><span>Selectable chip clicked</span></div>
+        <div class="opt-row"><code>selected-change</code><span>{ value }</span><span>Selectable chip clicked: the new <code>selected</code></span></div>
       </div>
     </section>
   </div>

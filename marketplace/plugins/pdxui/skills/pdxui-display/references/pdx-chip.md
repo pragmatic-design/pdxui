@@ -6,19 +6,23 @@ Compact, optionally removable tag.
 |---|---|---|---|---|
 | `label` | `label` | string | `''` | Visible label text. |
 | `removable` | `removable` | boolean | `false` | Shows a × button — the chip's tab stop — named "Remove {label}", which emits pdx-remove. The chip does not remove itself: the app removes it and owns focus afterwards (move it to the next chip's ×, or the previous one), or a keyboard user is left on <body>. |
-| `selectable` | `selectable` | boolean | `false` | A toggle button (role="button", aria-pressed): click, Enter or Space flips `selected` and emits pdx-toggle. |
-| `selected` | `selected` | boolean | `false` | Selected state. A user toggle writes it before pdx-toggle; a parent that sets it afterwards wins. |
+| `selectable` | `selectable` | boolean | `false` | A toggle button (role="button", aria-pressed): click, Enter or Space flips the `selected` model. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `value` | `value` | string | `''` | Value passed in remove/toggle event detail for identification. |
+| `value` | `value` | string | `''` | Value passed in the remove event's detail for identification. |
 | `avatar` | `avatar` | string | `''` | Avatar URL — renders a small circle image before the label. |
 | `variant` | `variant` | 'outline' \| 'primary' \| 'success' \| 'danger' \| 'warning' \| 'info' \| 'tonal' \| 'tonal-primary' \| 'tonal-success' \| 'tonal-danger' \| 'tonal-warning' | `'outline'` | outline (the default), primary, success, danger, warning, info, tonal, or tonal with a colour. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
+| `selected` | `selected` | boolean | `false` | The currently selected item(s). |
 
-**Events:** `pdx-remove` → `detail: { value, label }` — Fired when an item is removed.; `pdx-toggle` → `detail: { selected, value }` — Fired when toggled open or closed. Does not bubble.
+**Events:** `pdx-remove` → `detail: { value: string; label: string }` — The × was pressed: the chip's value (its label when it has none) and its label.; `selected-change` → `detail: { value: boolean }` — Fired when the component writes `selected`. Does not bubble.
 
 **Renders:** roles `button`
 
 **Slot:** `icon` — An icon shown before the chip's label.
+
+**States:** `:state(selected)` — It is selected.; `:state(disabled)` — `disabled` is set.
+
+**Parts:** `[data-part="root"]` — The chip, the pill drawn; the variants key by it.; `[data-part="body"]` — Its label, avatar and icon; the toggle when the chip is also removable.; `[data-part="remove"]` — The × button, with `removable`.
 
 
 #### Examples
@@ -83,13 +87,13 @@ are checked against the manifest above._
 **Selectable (Toggle)** — `selectable` makes the chip a toggle button (`role="button"` + `aria-pressed`): click, Enter or Space. Plain chips are not tab stops.
 
 ```html
-<pdx-chip selectable variant="primary" :selected="sel" @pdx-toggle="onToggle">
+<pdx-chip selectable variant="primary" value="Music" ::selected="music">
   Music
 </pdx-chip>
 ```
 
 ```js
-// event.detail = { selected: true, value: "Music" }
+// selected is a model: a click writes it and announces selected-change { value }
 ```
 
 **Disabled** _(from the live demo)_
