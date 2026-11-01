@@ -29,7 +29,7 @@
         <table>
           <thead><tr><th>Event</th><th>Detail</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>pdx-change</code></td><td>{ section: string }</td><td>Active section changed</td></tr>
+            <tr><td><code>section-change</code></td><td>{ value: string }</td><td>The section in view changed: its <code>data-section</code>, or its id. Read-only, so not a model: <code>::section</code> is an error. Its link is <code>aria-current="page"</code>, with no class</td></tr>
           </tbody>
         </table>
       </div>

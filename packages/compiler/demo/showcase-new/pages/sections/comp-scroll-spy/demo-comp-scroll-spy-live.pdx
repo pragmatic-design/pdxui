@@ -24,13 +24,13 @@
           </div>
           <div data-section="spy-usage" id="spy-usage" class="spy-section">
             <h3>Usage</h3>
-            <p>Place <code>data-spy-target="sectionId"</code> on each link to match the section's <code>data-section</code> value. The component automatically adds an <code>active</code> class to the currently visible section's link.</p>
+            <p>Place <code>data-spy-target="sectionId"</code> on each link to match the section's <code>data-section</code> value. The component marks the currently visible section's link <code>aria-current="page"</code>; style that.</p>
             <p>Clicking a link scrolls smoothly to the target section (configurable via <code>smoothscroll</code> prop).</p>
           </div>
           <div data-section="spy-api" id="spy-api" class="spy-section">
             <h3>API Reference</h3>
             <p>Configure the observation threshold with the <code>offset</code> prop. Customize selectors with <code>sectionselector</code> and <code>linkselector</code> props.</p>
-            <p>The component emits a <code>pdx-change</code> event when the active section changes, with the section key in the event detail.</p>
+            <p>The component emits a <code>section-change</code> event when the active section changes, with the section key as <code>detail.value</code>, and marks its link <code>aria-current="page"</code>.</p>
           </div>
           <div data-section="spy-faq" id="spy-faq" class="spy-section">
             <h3>FAQ</h3>
@@ -84,7 +84,7 @@
   transition: all 0.15s;
 }
 .spy-link:hover { color: var(--pdx-color-text); background: var(--pdx-color-inset); }
-.spy-link.active {
+.spy-link[aria-current="page"] {
   color: var(--pdx-color-primary);
   border-left-color: var(--pdx-color-primary);
   background: var(--pdx-color-inset);

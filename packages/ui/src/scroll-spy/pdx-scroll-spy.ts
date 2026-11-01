@@ -1,12 +1,22 @@
 // pdx-scroll-spy — Highlights navigation items based on which section is in view.
 // Uses IntersectionObserver for efficient scroll detection.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, event } from '@pdxui/core';
 
 /**
  * Highlights the navigation link of the section currently visible, as the user scrolls.
+ *
+ * @alphaevent pdx-change
+ * @alpharename pdx-change section-change
+ * @alphadetail section $event.detail.value
  */
 component('pdx-scroll-spy', {
+    // The section in view is a read-only output (#289): announced like a model's event, `{ value }`,
+    // but the app cannot write it, so it is no model and `::section` stays an error.
+    events: {
+        /** The section in view changed: its `data-section`, or its id. */
+        'section-change': event<{ value: string }>(),
+    },
     props: {
         /** CSS selector for sections to observe */
         sectionSelector: { type: String, default: '[data-section]' },
@@ -53,10 +63,11 @@ component('pdx-scroll-spy', {
                         }
                     }
 
-                    if (topSection) {
+                    // Announced when the section changes, not on every pass of the observer.
+                    if (topSection && topSection !== _activeSection.peek()) {
                         _activeSection.set(topSection);
                         updateLinks(topSection, linkSelector);
-                        ctx.emit('pdx-change', { section: topSection });
+                        ctx.emit('section-change', { value: topSection });
                     }
                 }, {
                     rootMargin: `-${offset}px 0px -50% 0px`,
@@ -99,7 +110,8 @@ component('pdx-scroll-spy', {
             links.forEach(link => {
                 const target = link.getAttribute('href')?.replace('#', '') ||
                     link.getAttribute('data-spy-target') || '';
-                link.classList.toggle('active', target === activeId);
+                // The links are the app's: the current one is marked by its aria-current alone, which
+                // the app's CSS selects; no class is written on them (#289).
                 if (target === activeId) {
                     // 'page' is the semantically correct value for a link to the current section or page
                     // (consistent with nav-menu/breadcrumb), not the generic 'true'.

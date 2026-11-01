@@ -237,4 +237,9 @@ describe('the navigation components, from the shipped manifest (#289)', () => {
         const reads = '<pdx-wizard @pdx-change="log($event.detail.previous)"></pdx-wizard>';
         expect(fix(reads)).toBe(reads);
     });
+
+    it('pdx-scroll-spy: with no model, @pdx-change becomes the read-only @section-change, its section read as the value', () => {
+        expect(fix('<pdx-scroll-spy @pdx-change="current = $event.detail.section"></pdx-scroll-spy>'))
+            .toBe('<pdx-scroll-spy @section-change="current = $event.detail.value"></pdx-scroll-spy>');
+    });
 });
