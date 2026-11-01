@@ -20,7 +20,8 @@ const CASES: Array<[string, string, [string, string]]> = [
     ['pdx-radio-group', 'pdx-choice-group', ['orientation', 'horizontal']],
     ['pdx-input-group', 'pdx-input-group', ['size', 'sm']],
     ['pdx-button-group', 'pdx-btn-group', ['size', 'sm']],
-    ['pdx-statistic', 'pdx-statistic-root', ['size', 'lg']],
+    // pdx-statistic sets no class of its own on its host since #291; display-a-beta-contract.spec.ts
+    // measures that the author's class stays.
 ];
 
 beforeEach(() => { document.body.innerHTML = ''; });

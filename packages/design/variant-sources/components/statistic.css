@@ -1,7 +1,7 @@
 /* pdx-statistic — Numeric KPI display */
 pdx-statistic { display: block; }
 
-.pdx-statistic-root {
+:is(.pdx-statistic-root, pdx-statistic) {
     display: flex;
     flex-direction: column;
     gap: var(--pdx-space-2xs);
@@ -82,36 +82,36 @@ pdx-statistic { display: block; }
     font-style: italic;
 }
 
-/* ── Size variants, keyed on the host's `size` (#632). The host carries `.pdx-statistic-root`, which
-   gives each rule the weight the size class did. ── */
+/* ── Size variants, keyed on the host's `size` (#632). The host carries no class (#291): the tag,
+   inside :is() with the native class, gives each rule the weight the size class did. ── */
 @variant size(sm) {
-    :scope.pdx-statistic-root .pdx-statistic-value {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-value {
         font-size: var(--pdx-text-lg);
     }
-    :scope.pdx-statistic-root .pdx-statistic-title {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-title {
         font-size: var(--pdx-text-xs);
     }
-    :scope.pdx-statistic-root .pdx-statistic-prefix,
-    :scope.pdx-statistic-root .pdx-statistic-suffix {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-prefix,
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-suffix {
         font-size: var(--pdx-text-sm);
     }
 }
 
 @variant size(lg) {
-    :scope.pdx-statistic-root .pdx-statistic-value {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-value {
         font-size: var(--pdx-text-display);
     }
-    :scope.pdx-statistic-root .pdx-statistic-title {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-title {
         font-size: var(--pdx-text-base);
     }
-    :scope.pdx-statistic-root .pdx-statistic-prefix,
-    :scope.pdx-statistic-root .pdx-statistic-suffix {
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-prefix,
+    :scope:is(.pdx-statistic-root, pdx-statistic) .pdx-statistic-suffix {
         font-size: var(--pdx-text-xl);
     }
 }
 
 /* ── Loading / skeleton ── */
-.pdx-statistic-loading {
+:is(.pdx-statistic-loading, :where(pdx-statistic):state(loading)) {
     gap: var(--pdx-space-xs);
 }
 

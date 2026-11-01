@@ -89,7 +89,8 @@ describe('pdx-statistic\'s size', () => {
         const big = await mount('pdx-statistic', { title: 'B', value: '2', size: 'lg' });
         await tick(50);
         expect([plain.getAttribute('size'), big.getAttribute('size')]).toEqual(['md', 'lg']);
-        expect(big.classList.contains('pdx-statistic-root')).toBe(true);
+        // No class of its own on the host at all since #291: statistic.css draws the tag.
+        expect(big.getAttribute('class')).toBeNull();
         expect(classesLike(big, /^pdx-statistic-(sm|lg)$/)).toEqual([]);
     });
 });
