@@ -810,6 +810,10 @@
           "title": "Chip — Selectable and removable"
         },
         {
+          "id": "chip-selected",
+          "title": "Chip — Selected"
+        },
+        {
           "id": "chip-text-colours",
           "title": "Chip — Outline and tonal colours"
         },

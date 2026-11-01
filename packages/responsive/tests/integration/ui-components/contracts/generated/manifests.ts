@@ -308,6 +308,7 @@ export const scenarioPage: Record<string, string> = {
     "chip-variants": "tier-1a",
     "chip-disabled": "tier-1a",
     "chip-selectable-removable": "tier-1a",
+    "chip-selected": "tier-1a",
     "chip-text-colours": "tier-1a",
     "chip-variant-outline": "tier-1a",
     "chip-variant-primary": "tier-1a",
