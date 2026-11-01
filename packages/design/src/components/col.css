@@ -12,8 +12,9 @@ pdx-col {
         margin-left var(--pdx-duration-base, 250ms) var(--pdx-ease, ease);
 }
 
-/* Row WC — override CSS-only pdx-row defaults when registered as WC */
-pdx-row.pdx-row-wc {
+/* Row WC — override CSS-only pdx-row defaults when registered as WC: `:defined`, the same weight as the
+   class the component used to set on itself (#290). */
+pdx-row:defined {
     min-width: 0;
     max-width: 100%;
 }

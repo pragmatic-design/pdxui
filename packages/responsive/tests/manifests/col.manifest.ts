@@ -12,7 +12,7 @@
  *           offset  (Number, 0 by default)  → margin-left = offset/cols*100% (it pushes the column right)
  *           order   (Number, default 0)  → CSS order
  *       · In a ctx.track() (the `_built` gate) inside requestAnimationFrame the host gets:
- *           - the class `.pdx-col`
+ *           - no class on the host (#290)
  *           - style.flex    = `0 0 calc(span / var(--pdx-row-cols,12) * 100% - var(--pdx-row-gutter,0px))`
  *           - style.maxWidth = `calc(span / var(--pdx-row-cols,12) * 100%)`
  *           - style.marginLeft (when offset>0), style.order (when order>0)
@@ -24,14 +24,14 @@
  *
  *   - Source, row: packages/ui/src/row/pdx-row.ts
  *       · render() = <slot></slot> (light DOM, the direct children are the columns).
- *       · In an rAF (the `_built` gate) the host gets the class `.pdx-row-wc`, display:flex, flex-wrap,
+ *       · In an rAF (the `_built` gate) the host gets (no class, #290) display:flex, flex-wrap,
  *         gap = the gutter, plus the CSS vars --pdx-row-cols (12 by default) and --pdx-row-gutter (the resolved gutter)
  *         which the column reads to work out its own width.
  *       · gutter defaults to 'md' → var(--pdx-space-md): the row has a NON-zero gap between the columns.
  *
  *   - CSS: packages/design/src/components/col.css
  *       · `pdx-col { display: block; min-width: 0; transition: flex-basis/max-width/margin-left }`
- *       · `pdx-row.pdx-row-wc { min-width:0; max-width:100% }`
+ *       · `pdx-row:defined { min-width:0; max-width:100% }`
  *       · No border, radius, shadow or colour of its own → no theme-specific assertion.
  *
  * THE WIDTH MECHANISM — FLEXBOX (NOT a CSS grid):

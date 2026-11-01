@@ -57,8 +57,9 @@ component('pdx-row', {
             if (!_built) {
                 _built = true;
                 requestAnimationFrame(() => {
+                    // The host carries no class (#290): col.css tells a registered row from CSS-only
+                    // markup with `pdx-row:defined`.
                     const el = ctx.el;
-                    el.classList.add('pdx-row-wc');
                     el.style.display = 'flex';
                     el.style.flexWrap = wrap ? 'wrap' : 'nowrap';
                     el.style.gap = gutterCss;

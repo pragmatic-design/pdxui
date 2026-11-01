@@ -20,8 +20,8 @@ component('pdx-aspect-ratio', {
             const ratio = ctx.ratio() as string;
             if (!_built) {
                 _built = true;
+                // The host carries no class (#290): aspect-ratio.css draws the box on the tag.
                 requestAnimationFrame(() => {
-                    ctx.el.classList.add('pdx-aspect-ratio');
                     ctx.el.style.aspectRatio = ratio;
                 });
                 return;

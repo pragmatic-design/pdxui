@@ -1,11 +1,12 @@
 /* pdx-aspect-ratio — Fixed ratio container */
 pdx-aspect-ratio { display: block; }
-.pdx-aspect-ratio {
+/* The component's host carries no class (#290): the tag, at the class's weight. */
+:is(.pdx-aspect-ratio, pdx-aspect-ratio) {
     position: relative;
     width: 100%;
     overflow: hidden;
 }
-.pdx-aspect-ratio > * {
+:is(.pdx-aspect-ratio, pdx-aspect-ratio) > * {
     width: 100%;
     height: 100%;
     object-fit: cover;
