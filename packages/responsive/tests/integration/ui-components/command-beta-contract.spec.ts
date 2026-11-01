@@ -45,6 +45,12 @@ const call = (page: Page, method: string, sel = HOST) =>
 // By its class, so each behaviour is measured on its own; the parts have a test of their own below.
 const panel = (page: Page, sel = HOST) => page.locator(`${sel} .pdx-command`);
 const status = (page: Page, sel = HOST) => page.locator(`${sel} [role="status"]`);
+/**
+ * The palette takes keys once its input has the focus, which it moves there a frame after it shows
+ * (#799): a key pressed on the panel's first visible frame lands on <body> and does nothing. Wait on
+ * the focus the palette writes, not on its box.
+ */
+const takesKeys = (page: Page, sel = HOST) => expect(page.locator(`${sel} .pdx-command input`)).toBeFocused();
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=command-beta-contract'); });
 
@@ -89,6 +95,7 @@ test.describe('open, a model', () => {
 
         await call(page, 'show');
         await expect(panel(page)).toBeVisible();
+        await takesKeys(page);
         await page.keyboard.press('Escape');
         await expect(panel(page)).toBeHidden();
         expect(await isOpen()).toBe(false);
@@ -100,6 +107,7 @@ test.describe('open, a model', () => {
 
         await call(page, 'show');
         await expect(panel(page)).toBeVisible();
+        await takesKeys(page);
         await page.keyboard.press('Enter');
         await expect(panel(page)).toBeHidden();
 
@@ -114,6 +122,7 @@ test.describe('open, a model', () => {
 
         await setOpen(true);
         await expect(panel(page, bound)).toBeVisible();
+        await takesKeys(page, bound);
         await page.keyboard.press('Escape');
         await expect(panel(page, bound)).toBeHidden();
         expect(await readOpen(), 'Escape wrote the bound signal').toBe(false);
