@@ -39,9 +39,13 @@ ids are unique per accordion, so two on a page never collide; ids you write are 
 | `expandAll()` | Open every item — but under `mode="single"` each one closes the previous, so only the last stays open. |
 | `collapseAll()` | Close every item. |
 
-**Events:** `pdx-change` → `detail: { open }` — Fired when the value changes.
+**Events:** `open-change` → `detail: { value: string[] }` — An item opened or closed: the keys of the items open now (`data-accordion-item`, or the index).
 
 **Renders:** roles `button` · `region`
+
+**States:** `:state(loading)` — `loading` is set; the accordion is `aria-busy`.; `:state(disabled)` — `disabled` is set: no item opens or closes.
+
+**Parts:** `[data-part="item"]` — An item, `[data-accordion-item]`; open, it carries `data-open`.; `[data-part="trigger"]` — An item's header, `[data-accordion-trigger]`, `aria-expanded` while open.; `[data-part="panel"]` — An item's content, `[data-accordion-content]`, a `role="region"`.
 
 
 #### Examples

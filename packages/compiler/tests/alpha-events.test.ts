@@ -243,3 +243,20 @@ describe('the navigation components, from the shipped manifest (#289)', () => {
             .toBe('<pdx-scroll-spy @section-change="current = $event.detail.value"></pdx-scroll-spy>');
     });
 });
+
+describe('the layout components, from the shipped manifest (#290)', () => {
+    const r = new ComponentResolver();
+    r.registerUiManifest(process.cwd());
+    const fix = (text: string): string => {
+        const apply = alphaChangeEvent.fix;
+        if (typeof apply !== 'function') throw new Error('alpha-change-event no longer rewrites');
+        return apply(text, { alphaOf: (tag: string) => r.alphaOf(tag) });
+    };
+
+    it('pdx-accordion: @pdx-change becomes @open-change; one that reads detail.open, which has no beta form, is left for a person', () => {
+        expect(fix('<pdx-accordion @pdx-change="saveLayout()"></pdx-accordion>'))
+            .toBe('<pdx-accordion @open-change="saveLayout()"></pdx-accordion>');
+        const reads = '<pdx-accordion @pdx-change="log($event.detail.open)"></pdx-accordion>';
+        expect(fix(reads)).toBe(reads);
+    });
+});

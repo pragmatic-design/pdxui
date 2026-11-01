@@ -87,6 +87,18 @@ export const accordion: ComponentManifest = {
                     <div>Content of open accordion.</div>
                 </details>`,
         },
+        {
+            // Loading: the custom state and aria-busy (#290, A4).
+            id: 'accordion-loading',
+            title: 'Accordion — loading',
+            html: `
+                <pdx-accordion data-test="acc-loading" loading>
+                    <div data-accordion-item>
+                        <button data-accordion-trigger>Orders</button>
+                        <div data-accordion-content>Loading orders.</div>
+                    </div>
+                </pdx-accordion>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (transcribed from universal.ts) ──
@@ -103,6 +115,37 @@ export const accordion: ComponentManifest = {
                         selector: '[data-test="accordion-open"]',
                         description: 'open accordion has visible content',
                         height: { op: '>=', value: 40 },
+                    },
+                ],
+            },
+            // The custom element: its parts (#290), the open panel drawn and the closed one hidden.
+            'accordion-two-instances': {
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="acc-a"] [data-accordion-item][data-open] [data-part="panel"]',
+                        description: 'the open item\'s panel part is drawn',
+                        height: { op: '>=', value: 16 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="acc-a"] [data-accordion-item]:not([data-open]) [data-part="panel"]',
+                        description: 'a closed item\'s panel part is not drawn',
+                        display: { op: 'is', value: 'none' },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="acc-a"] [data-part="trigger"]',
+                        description: 'a trigger part is interactive',
+                        cursor: { op: 'is', value: 'pointer' },
+                    },
+                ],
+            },
+            'accordion-loading': {
+                states: [
+                    {
+                        description: 'loading is the custom state :state(loading)',
+                        selector: 'section:not([hidden]) [data-test="acc-loading"] [data-part="trigger"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="acc-loading"]', name: 'loading' },
+                        changes: {},
                     },
                 ],
             },

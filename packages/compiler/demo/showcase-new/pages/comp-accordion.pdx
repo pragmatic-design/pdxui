@@ -38,6 +38,14 @@
 &lt;!-- Attributes --&gt;
 data-open         Start expanded
 data-disabled     Disable individual item</code></pre>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, states and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Description</span></div>
+        <div class="opt-row"><code>open-change</code><span>An item opened or closed: <code>detail.value</code> lists the open items' keys (<code>data-accordion-item</code>, or the index). Read-only: the accordion has no prop for them</span></div>
+        <div class="opt-row"><code>:state(loading)</code>, <code>:state(disabled)</code><span><code>loading</code> (the accordion is <code>aria-busy</code>) or <code>disabled</code> is set</span></div>
+        <div class="opt-row"><code>[data-part]</code><span><code>item</code>, <code>trigger</code>, <code>panel</code>: your markup, marked as the accordion wires it</span></div>
+      </div>
     </section>
   </div>
 </template>

@@ -3,7 +3,7 @@
 // Uses focusGroup for keyboard nav between triggers.
 // mode="single" (one open at a time) or mode="multiple" (free).
 
-import { component, html, focusGroup, generatedId } from '@pdxui/core';
+import { component, html, focusGroup, generatedId, event } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -12,8 +12,24 @@ import '@pdxui/design/components/accordion';
 /**
  * Expandable sections with animated height, opened one at a time or several together, and navigated
  * with the arrow keys, Home and End.
+ *
+ * @csspart item - An item, `[data-accordion-item]`; open, it carries `data-open`.
+ * @csspart trigger - An item's header, `[data-accordion-trigger]`, `aria-expanded` while open.
+ * @csspart panel - An item's content, `[data-accordion-content]`, a `role="region"`.
+ * @cssstate loading - `loading` is set; the accordion is `aria-busy`.
+ * @cssstate disabled - `disabled` is set: no item opens or closes.
+ * @alphaevent pdx-change
+ * @alpharename pdx-change open-change
  */
 component('pdx-accordion', {
+    // It has no prop for its open items and gains none (#290): which are open is a read-only output,
+    // announced as a model's event is, `{ value }`, and `::open` stays an error.
+    events: {
+        /** An item opened or closed: the keys of the items open now (`data-accordion-item`, or the index). */
+        'open-change': event<{ value: string[] }>(),
+    },
+    states: ['loading', 'disabled'],
+    parts: ['item', 'trigger', 'panel'],
     props: {
         /** "single" = one open at a time (default), "multiple" = any number open */
         mode: { type: String, default: 'single' },
@@ -157,7 +173,12 @@ component('pdx-accordion', {
                 animateOpen(content);
             }
 
-            ctx.emit('pdx-change', { open: !wasOpen });
+            ctx.emit('open-change', { value: openKeys() });
+        }
+
+        /** The keys of the open items, in order: each one's `data-accordion-item`, or its index. */
+        function openKeys(): string[] {
+            return getItems().flatMap((it, i) => isItemOpen(it) ? [it.getAttribute('data-accordion-item') || String(i)] : []);
         }
 
         /** ARIA links, roles and the closed state of one item — once per item, whenever it arrives. */
@@ -167,6 +188,10 @@ component('pdx-accordion', {
             const content = item.querySelector('[data-accordion-content]') as HTMLElement | null;
             if (!content) return; // its content may still be on the way: the next mutation retries
             wired.add(item);
+            // Its parts, on the app's markup as the ids and roles below are (#290).
+            item.setAttribute('data-part', 'item');
+            trigger?.setAttribute('data-part', 'trigger');
+            content.setAttribute('data-part', 'panel');
 
             const n = ++seq;
             const contentId = content.id || `${uid}-content-${n}`;
@@ -205,8 +230,10 @@ component('pdx-accordion', {
         ctx.track(() => {
             const el = ctx.el;
 
-            if (ctx.loading()) el.setAttribute('aria-busy', 'true');
+            const loading = !!ctx.loading();
+            if (loading) el.setAttribute('aria-busy', 'true');
             else el.removeAttribute('aria-busy');
+            ctx.state('loading', loading);
 
             el.addEventListener('click', onClick);
 
@@ -255,7 +282,7 @@ component('pdx-accordion', {
         // The accordion's own `disabled` reaches every trigger, both ways. Read here, synchronously, so
         // the track subscribes; the items may not be wired yet, which wireItem covers.
         ctx.track(() => {
-            void ctx.disabled();
+            ctx.state('disabled', !!ctx.disabled());
             getItems().forEach(syncDisabled);
         });
 
