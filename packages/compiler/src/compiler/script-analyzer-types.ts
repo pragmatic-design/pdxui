@@ -20,7 +20,10 @@ export interface PropInfo {
 }
 
 export interface EventInfo {
+    /** The event dispatched, and listened for: `picked`, or a quoted name's `open-change` (#749). */
     name: string;
+    /** A quoted name's emitter, its camelCase (`openChange`); absent, the emitter is `name` itself. */
+    emitter?: string;
     payloadType: string;  // '{ value: number }', 'void', etc.
     /** `@event(bubbles) name`: the event bubbles and is composed; absent, it stays on the host (#138). */
     bubbles?: true;

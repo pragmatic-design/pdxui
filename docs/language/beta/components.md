@@ -184,7 +184,7 @@ beta (#124, #125, #135)
 ### Syntax
 
 ```ebnf
-EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S? Type )? End
+EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? End
 ```
 
 ### Semantics
@@ -196,10 +196,21 @@ composed: true`). The function is the only way to dispatch from a `.pdx` (`$emit
 parent listens with `@saved="…"`, and the editor types `$event` as `CustomEvent<Item>`. Descriptor:
 `events: { saved: event<Item>({ bubbles? }) }`; library events follow the same default.
 
+A quoted name (#749 — landed) declares an event no identifier can spell, as the library's kebab-case
+ones: `@event 'open-change': { value: boolean };` dispatches `open-change`, and its function is the
+camelCase of the name, `openChange({ value: true })`. A parent listens with `@open-change="…"`; the
+manifest, the `.d.ts` and the editor list the event under its quoted name. `(bubbles)` works with
+both forms.
+
 ### Rules
 
 - The alpha rules stay (`PDX_MALFORMED_EVENT`, `PDX_DUP_EVENT`, `PDX_EVENT_NAME_CASE`).
 - `@event(…)` with any option but `bubbles` is `PDX_UNKNOWN_DECLARATION`, its hint the form.
+- A quoted name is lowercase words of letters and digits, starting with a letter, joined by single
+  hyphens (`open-change`, `step-2`). Anything else (`'Open-Change'`, `'open_change'`, `'a--b'`) is
+  `PDX_UNKNOWN_DECLARATION`, its hint the form. Two events with one function — `@event 'open-change'`
+  beside `@event openChange` — are `PDX_DUP_EVENT`; a function of that name written in the script is
+  kept, as it is for an identifier name.
 - `pdx migrate` rewrites every existing `@event` as `@event(bubbles)`, preserving behaviour;
   `PDX_EVENT_BUBBLES_UNUSED` (info) then lists the events marked `bubbles` that no ancestor in the
   project listens to. "Listens" is read off the project's templates: a listener written on any element
@@ -214,17 +225,19 @@ parent listens with `@saved="…"`, and the editor types `$event` as `CustomEven
 ```pdx
 <template>
   <button @click="saved({ id: 'a1' })">Save</button>
+  <button @click="openChange({ value: false })">Close</button>
 </template>
 
 <script>
 @event saved: { id: string };
 @event(bubbles) closed;
+@event 'open-change': { value: boolean };
 </script>
 ```
 
 ### Since
 
-alpha → beta (#138)
+alpha → beta (#138; quoted names #749)
 
 ## @slot, @generic, @render, @snippet — templates a component accepts
 

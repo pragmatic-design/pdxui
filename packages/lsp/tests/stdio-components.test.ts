@@ -23,6 +23,7 @@ const PROFILE_MENU = `<template>
 @prop label: string = 'Me';
 @prop compact: boolean = false;
 @event closed: void;
+@event 'open-change': { value: boolean };
 </script>
 `;
 
@@ -81,7 +82,8 @@ describe('the language server over stdio', () => {
         const text = '<template>\n<app-profile-menu ></app-profile-menu>\n</template>\n';
         const labels = await complete('src/props.pdx', text, '<app-profile-menu ');
 
-        expect(labels).toEqual(expect.arrayContaining(['label', 'compact', '@closed']));
+        // A quoted @event (#749) is offered by the name it is listened for, not its emitter's.
+        expect(labels).toEqual(expect.arrayContaining(['label', 'compact', '@closed', '@open-change']));
         expect(labels, 'tag names were offered instead of its props').not.toContain('pdx-button');
     });
 
@@ -108,6 +110,7 @@ describe('the language server over stdio', () => {
         expect(hover, 'hovering a project component said nothing').not.toBeNull();
         expect(hover!.contents.value).toContain('label');
         expect(hover!.contents.value).toContain('@closed');
+        expect(hover!.contents.value).toContain('@open-change');
         expect(hover!.contents.value).toContain('header');
     });
 });

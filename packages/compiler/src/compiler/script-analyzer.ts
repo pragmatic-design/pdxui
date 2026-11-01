@@ -31,6 +31,7 @@ import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
+import { isEventName, eventEmitterName } from './event-names';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -432,6 +433,30 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 hint,
             });
             continue; // Don't push to bodyLines — it's a recognized (but malformed) decorator
+        }
+
+        // ─── @event 'open-change': PayloadType — a quoted name (#749) ───
+        // The library's events are kebab-case (`open-change`, `value-change`), which no identifier can
+        // spell. The quoted name is the event; its emitter is the camelCase of it.
+        // Match: `@event` or `@event(bubbles)`, then a name in single or double quotes, then `:`, `;` or
+        // the end. Groups: [1]=`(bubbles)` when written [2]=the quote [3]=the name as written
+        const quotedEvent = trimmed.match(/^@event(\(\s*bubbles\s*\))?\s+(['"])([^'"]*)\2\s*(?=:|;|$)/);
+        if (quotedEvent) {
+            const name = quotedEvent[3];
+            if (!isEventName(name)) {
+                warnings.push({
+                    code: 'PDX_UNKNOWN_DECLARATION',
+                    severity: 'error' as const,
+                    message: `\`${trimmed}\` is not a form of @event: a quoted name is lowercase words joined by hyphens, starting with a letter.`,
+                    hint: `Use: @event 'open-change': PayloadType; — whose emitter is openChange(…).`,
+                });
+                continue;
+            }
+            const colonPos = trimmed.indexOf(':', quotedEvent[0].length);
+            const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
+            const emitter = eventEmitterName(name);
+            events.push(quotedEvent[1] ? { name, emitter, payloadType, bubbles: true } : { name, emitter, payloadType });
+            continue;
         }
 
         // ─── @event name: PayloadType  /  @event(bubbles) name: PayloadType ───

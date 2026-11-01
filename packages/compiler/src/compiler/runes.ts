@@ -27,7 +27,7 @@ const f = (name: string, doc: string, shape: string, snippet: string): RuneInfo 
 export const RUNES: readonly RuneInfo[] = [
     d('prop', 'Declare a component prop: a signal synced with its attribute.', '@prop name: Type = default;', "@prop ${1:name}: ${2:string} = ${3:'default'};"),
     d('model', 'Declare a prop the component writes: assigning it dispatches `<name>-change` with `{ value }`, and the parent binds it with `::name`.', '@model name: Type = default;', "@model ${1:value}: ${2:string} = ${3:''};"),
-    d('event', 'Declare an event; `name(payload)` dispatches it from the host, where it stays unless declared `@event(bubbles)`.', '@event name: PayloadType;   // @event(bubbles) name: … to bubble', '@event ${1:name}: ${2:void};'),
+    d('event', 'Declare an event; `name(payload)` dispatches it from the host, where it stays unless declared `@event(bubbles)`. A quoted name, `@event \'open-change\'`, is dispatched by its camelCase, `openChange(payload)`.', '@event name: PayloadType;   // @event(bubbles) name: … to bubble; @event \'open-change\': … for a kebab-case name', '@event ${1:name}: ${2:void};'),
     d('slot', 'Declare a typed snippet the parent provides: its signature; `?` makes it optional.', '@slot row: (item: T, index: number);', '@slot ${1:row}: (${2:item: T});'),
     d('generic', 'Declare a type parameter, inferred from the props that use it (`T="User"` on the tag sets it).', '@generic T extends { id: string };', '@generic ${1:T};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),

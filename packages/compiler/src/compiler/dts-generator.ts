@@ -43,7 +43,8 @@ export function generateDts(input: DtsInput): string {
     if (input.events.length > 0 || models.length > 0) {
         lines.push(`export interface ${pascalTag}Events {`);
         for (const e of input.events) {
-            lines.push(`  ${e.name}: ${e.payloadType};`);
+            // A quoted name (#749) is not an identifier: it is a quoted key, as the model events are.
+            lines.push(`  ${/^[A-Za-z_$][\w$]*$/.test(e.name) ? e.name : `'${e.name}'`}: ${e.payloadType};`);
         }
         for (const m of models) {
             lines.push(`  '${modelEventName(m.name)}': { value: ${m.tsType} };`);

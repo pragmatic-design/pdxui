@@ -28,7 +28,8 @@ const ROUTER_READS = new Set(['navigation']);
 export function declaredNames(analysis: ScriptAnalysis): Set<string> {
     const s = new Set<string>();
     for (const p of analysis.props) s.add(p.name);
-    for (const e of analysis.events) s.add(e.name);
+    // The template calls an event's emitter: a quoted name's is its camelCase (#749).
+    for (const e of analysis.events) s.add(e.emitter ?? e.name);
     for (const sig of analysis.signals) s.add(sig.name);
     for (const d of analysis.deriveds) s.add(d.name);
     for (const st of analysis.stores) s.add(st.name);

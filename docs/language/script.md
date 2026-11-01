@@ -220,10 +220,11 @@ beta (#124)
 #### Syntax
 
 ```ebnf
-EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S Identifier ( S? ":" S? Type )? S? ";"?
+EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? S? ";"?
 ```
 
-The analyzer's form: `@event name: PayloadType;`, or `@event(bubbles) name: PayloadType;`
+The analyzer's form: `@event name: PayloadType;`, or `@event(bubbles) name: PayloadType;`; a kebab-case
+name is quoted, `@event 'open-change': PayloadType;` (#749).
 
 #### Semantics
 
@@ -238,18 +239,29 @@ declares the same (`events: { name: event({ bubbles: true }) }`). Without a type
 `void`. The `.d.ts` gets an `Events` interface; a parent listens with `@name="…"` on the component
 ([template.md](template.md)).
 
+A quoted name (#749) declares an event no identifier can spell, as the library's kebab-case ones:
+`@event 'open-change': { value: boolean };` dispatches `open-change`, and its function is the
+camelCase of the name, `const openChange = (detail) => ctx.emit('open-change', detail);`. A parent
+listens with `@open-change="…"`; the manifest, the `.d.ts` and the editor list it under the quoted
+name.
+
 #### Rules
 
-- A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`. That includes a name that is
-  not an `Identifier`: `@event pdx-change: T` is an error, since the name is the emitter function too.
+- A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`. That includes an unquoted
+  name that is not an `Identifier`: `@event pdx-change: T` is an error; `@event 'pdx-change': T` is
+  the form.
 - `@event(…)` with an option other than `bubbles` raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
+- A quoted name is lowercase words of letters and digits, starting with a letter, joined by single
+  hyphens; anything else raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
 - The function is the only way to dispatch from a `.pdx`. `$emit('name', x)` is removed (#138):
   `PDX_REMOVED_FORM`. `pdx migrate` rewrites it to `name(x)` and adds `@event name: unknown;` when the
-  script does not declare it; a hyphenated name, which no `@event` can declare, is listed for a person.
+  script does not declare it; a hyphenated name becomes its camelCase, with `@event 'x-y': unknown;`
+  (#749), and a name that is neither is listed for a person.
 - `@event name` keeps its spelling and no longer bubbles: `pdx migrate` writes `(bubbles)` on every
   existing `@event`, which keeps what it did. `PDX_EVENT_BUBBLES_UNUSED` (info) then lists each one
   that no template in the project listens to above the component, so the marker can be removed.
-- Two `@event` of one name raise `PDX_DUP_EVENT`.
+- Two `@event` of one name raise `PDX_DUP_EVENT`, and so do two with one function
+  (`@event 'open-change'` beside `@event openChange`).
 - A name with an uppercase letter raises `PDX_EVENT_NAME_CASE`: HTML lowercases the parent's listener
   attribute, which then never matches.
 - A function the script declares under the same name replaces the generated one.

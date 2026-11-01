@@ -350,16 +350,23 @@ export function validate(
     // ─── Check 2: Duplicate event names ────────────────────────────
 
     const eventNames = new Set<string>();
+    // A quoted name's emitter is its camelCase (#749): `@event 'open-change'` and `@event openChange`
+    // are two events with one function, so only one would be generated.
+    const emitterNames = new Set<string>();
     for (const ev of analysis.events) {
-        if (eventNames.has(ev.name)) {
+        const emitter = ev.emitter ?? ev.name;
+        if (eventNames.has(ev.name) || emitterNames.has(emitter)) {
             warnings.push({
                 code: 'PDX_DUP_EVENT',
                 severity: 'error',
-                message: `Duplicate @event declaration '${ev.name}'.`,
+                message: eventNames.has(ev.name)
+                    ? `Duplicate @event declaration '${ev.name}'.`
+                    : `@event '${ev.name}' has the emitter ${emitter}(…), which another @event already declares.`,
                 hint: `Remove the duplicate @event ${ev.name};`,
             });
         }
         eventNames.add(ev.name);
+        emitterNames.add(emitter);
         // A listener is written as an attribute (`@itemPicked="…"`), and HTML lowercases attribute
         // names: it is registered for `itempicked` while the child dispatches `itemPicked`, and
         // never runs.
