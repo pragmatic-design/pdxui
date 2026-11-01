@@ -2,7 +2,7 @@
 // Data-driven: items with nesting, icons, badges, collapsible groups, active state.
 // Use inside a sidebar or standalone as vertical navigation.
 
-import { component, html, signal, sanitizeUrl, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, slot, snippetOrSlot, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -66,8 +66,27 @@ type T = { key: string; label: string };
  * @slot item - Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.
  * @slot itemActions - Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.
  * @slot actions - The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
+ *
+ * @csspart nav - The `role="navigation"` element that holds the entries (`.pdx-nav`).
+ * @csspart item - An entry, a link or a button; the current one is `aria-current="page"`, an open group's `aria-expanded="true"`.
+ * @csspart group - The entries of an open group, or of a heading that folds (`role="group"`).
+ * @csspart heading - A section heading, text or the button that folds its group.
+ * @csspart separator - The rule between two sections.
+ * @csspart actions - The `actions` slot's controls beside a leaf entry.
+ * @csspart flyout - A collapsed menu's group, opened beside its icon (on `<body>`).
+ * @cssstate ready - Its entries are drawn.
+ * @cssstate collapsed - `collapsed` is set: icons only, a group in a flyout.
  */
 component('pdx-nav-menu', {
+    // `activeKey` and `collapsed` are the app's to write, never the menu's: props, not models (#289).
+    events: {
+        /** An entry was chosen; cancellable, so an app under the router navigates itself. */
+        'pdx-select': event<{ key: string; item: T; href?: string }>(),
+        /** A group was folded or unfolded: its `key` and whether it is open now. */
+        'pdx-toggle': event<{ key: string; expanded: boolean }>(),
+    },
+    states: ['ready', 'collapsed'],
+    parts: ['nav', 'item', 'group', 'heading', 'separator', 'actions', 'flyout'],
     // The looks nav.css keys by (#632), reflected on the host and drawn from it; the host is the
     // element the old `.pdx-nav-{look}-{value}` classes went on, so no native class is kept. A value
     // outside a list is the default, as an unknown attribute value is in HTML.
@@ -181,6 +200,7 @@ component('pdx-nav-menu', {
                 if (item.type === 'separator') {
                     const sep = document.createElement('hr');
                     sep.className = 'pdx-nav-separator';
+                    sep.setAttribute('data-part', 'separator');
                     container.appendChild(sep);
                     continue;
                 }
@@ -191,6 +211,7 @@ component('pdx-nav-menu', {
                         if (!isCollapsed) {
                             const hdr = document.createElement('div');
                             hdr.className = 'pdx-nav-heading';
+                            hdr.setAttribute('data-part', 'heading');
                             hdr.textContent = item.label;
                             container.appendChild(hdr);
                         }
@@ -202,12 +223,14 @@ component('pdx-nav-menu', {
                     const open = isCollapsed || expanded.has(item.key);
                     const section = document.createElement('div');
                     section.className = 'pdx-nav-section';
+                    section.setAttribute('data-part', 'group');
                     section.setAttribute('role', 'group');
                     section.id = `${_uid}-${item.key}`;
                     if (!isCollapsed) {
                         const hdr = document.createElement('button');
                         hdr.type = 'button';
                         hdr.className = 'pdx-nav-heading pdx-nav-heading-toggle';
+                        hdr.setAttribute('data-part', 'heading');
                         hdr.setAttribute('data-nav-key', item.key);
                         applyData(hdr, item.data);
                         hdr.setAttribute('aria-expanded', String(open));
@@ -216,7 +239,8 @@ component('pdx-nav-menu', {
                         text.textContent = item.label;
                         hdr.appendChild(text);
                         const chevron = document.createElement('span');
-                        chevron.className = 'pdx-nav-chevron pdx-nav-heading-chevron' + (open ? ' expanded' : '');
+                        // Turned by the heading's aria-expanded (nav.css), not a class (#289).
+                        chevron.className = 'pdx-nav-chevron pdx-nav-heading-chevron';
                         chevron.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>';
                         hdr.appendChild(chevron);
                         hdr.addEventListener('click', () => toggleGroup(item.key));
@@ -247,8 +271,9 @@ component('pdx-nav-menu', {
                     el.type = 'button';
                 }
 
+                // The current entry is its aria-current, below, which nav.css selects: no class (#289).
                 el.className = 'pdx-nav-item';
-                if (isActive) el.classList.add('active');
+                el.setAttribute('data-part', 'item');
                 if (hasChildren) el.classList.add('pdx-nav-group-trigger');
                 if (item.disabled) {
                     el.setAttribute('aria-disabled', 'true');
@@ -282,7 +307,8 @@ component('pdx-nav-menu', {
                 // Collapse chevron for groups
                 if (hasChildren) {
                     const chevron = document.createElement('span');
-                    chevron.className = 'pdx-nav-chevron' + (isExpanded ? ' expanded' : '');
+                    // Turned by the entry's aria-expanded (nav.css), not a class (#289).
+                    chevron.className = 'pdx-nav-chevron';
                     chevron.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"></polyline></svg>';
                     el.appendChild(chevron);
                 }
@@ -370,9 +396,9 @@ component('pdx-nav-menu', {
                 if (actionsSlot) {
                     const row = document.createElement('div');
                     row.className = 'pdx-nav-row';
-                    if (isActive) row.classList.add('active');
                     const actions = document.createElement('div');
                     actions.className = 'pdx-nav-actions';
+                    actions.setAttribute('data-part', 'actions');
                     actions.appendChild(actionsSlot({ item, level, active: isActive }));
                     row.append(el, actions);
                     container.appendChild(row);
@@ -384,6 +410,7 @@ component('pdx-nav-menu', {
                 if (hasChildren && isExpanded && !isCollapsed) {
                     const group = document.createElement('div');
                     group.className = 'pdx-nav-group';
+                    group.setAttribute('data-part', 'group');
                     group.setAttribute('role', 'group');
                     // The toggle says what it opens: aria-controls beside aria-expanded.
                     group.id = `${_uid}-${item.key}`;
@@ -471,11 +498,13 @@ component('pdx-nav-menu', {
                 _built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-nav-menu-root');
-                    if (collapsed) ctx.el.classList.add('pdx-nav-collapsed');
+                    // States, not classes (#289): nav.css lays the menu out from them.
+                    ctx.state('ready', true);
+                    ctx.state('collapsed', collapsed);
 
                     _navEl = document.createElement('nav');
                     _navEl.className = 'pdx-nav';
+                    _navEl.setAttribute('data-part', 'nav');
                     _navEl.setAttribute('role', 'navigation');
                     uiAttr(_navEl, 'aria-label', () => uiString('nav-menu', 'label'));
 
@@ -490,8 +519,7 @@ component('pdx-nav-menu', {
 
             // Rebuild on any prop change
             requestAnimationFrame(() => {
-                if (collapsed) ctx.el.classList.add('pdx-nav-collapsed');
-                else ctx.el.classList.remove('pdx-nav-collapsed');
+                ctx.state('collapsed', collapsed);
                 rebuildItems();
             });
         });

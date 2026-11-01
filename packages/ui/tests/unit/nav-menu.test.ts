@@ -74,8 +74,9 @@ describe('pdx-nav-menu', () => {
     it('marks active item', async () => {
         const el = await mountNav(BASIC_ITEMS, { activeKey: 'about' });
         const active = el.querySelector('[data-nav-key="about"]')!;
-        expect(active.classList.contains('active')).toBe(true);
+        // Its aria-current, which nav.css selects: no class beside it (#289).
         expect(active.getAttribute('aria-current')).toBe('page');
+        expect(active.classList.contains('active')).toBe(false);
     });
 
     // ─── Icons ───────────────────────────────────────────

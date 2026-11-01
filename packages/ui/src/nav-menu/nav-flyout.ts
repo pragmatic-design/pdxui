@@ -95,6 +95,7 @@ export function createNavFlyout(host: NavFlyoutHost): NavFlyout {
 
         const fly = document.createElement('div');
         fly.className = 'pdx-nav-flyout pdx-nav';
+        fly.setAttribute('data-part', 'flyout');
         fly.id = id(item.key);
         fly.setAttribute('role', 'group');
         fly.setAttribute('aria-label', item.label);

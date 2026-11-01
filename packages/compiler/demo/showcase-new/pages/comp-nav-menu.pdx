@@ -83,6 +83,18 @@
           </tbody>
         </table>
       </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <table>
+          <thead><tr><th>Name</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>:state(ready)</code>, <code>:state(collapsed)</code></td><td>Its entries are drawn; <code>collapsed</code> is set</td></tr>
+            <tr><td><code>[aria-current="page"]</code>, <code>[aria-expanded]</code></td><td>The current entry, and an open group, on the entry itself</td></tr>
+            <tr><td><code>[data-part]</code></td><td><code>nav</code>, <code>item</code>, <code>group</code>, <code>heading</code>, <code>separator</code>, <code>actions</code>, <code>flyout</code></td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
 
     <!-- ═══ NavMenuItem Interface ═══ -->
