@@ -433,7 +433,7 @@ beta (#134)
 ### Syntax
 
 ```ebnf
-HostDecl      ::= "@host" S? "{" ( S? Attribute )* S? "}"
+HostDecl      ::= "@host" ( S Identifier )? ( S? "{" ( S? Attribute )* S? "}" | End )
 ```
 
 ### Semantics
@@ -443,12 +443,20 @@ grammar as an element in the template (`Attribute`, [grammar.md](grammar.md)). A
 already set it (the consumer's `role` or `tabindex` wins). Descriptor:
 `host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown': (ctx, e) => … }`.
 
+A name (#750 — landed), `@host el { … }` or `@host el;`, binds the element itself to a constant of
+the script and the template, typed `HTMLElement`: its `id` for a `<label for>`, itself to measure, to
+focus, or to anchor a popup to. The host exists before setup runs, so the name is there from the
+first line of the script. It is not a signal and is never rewritten.
+
 ### Rules
 
 - A form that has no meaning on a host is `PDX_HOST_INVALID_ATTRIBUTE` (error), whose message names
   it: a two-way binding (`::x`, the host is the model's owner, not its consumer), `data-part`, a
   generic argument (decisions.md 21, landed with #133).
 - A static attribute the consumer already set is not overwritten (#133).
+- The name counts as a script name: a `let`, `const` or `@prop` of the same name is
+  `PDX_DUP_DECLARATION`, and a reserved member of the element (`style`, `innerHTML`…) is
+  `PDX_NAME_RESERVED` (#750).
 
 ### Examples
 

@@ -112,6 +112,26 @@ describe('getScriptDiagnostics', () => {
         expect(d.some((x) => /string/i.test(x.message) && /number/i.test(x.message)), 'the payload was not typed').toBe(true);
     });
 
+    // A diagnostic run over `sc` as a script block.
+    const diagnose = (sc: string) => {
+        const src = '<template></template>\n<script>' + sc + '</script>';
+        const start = src.indexOf('<script>') + '<script>'.length;
+        return (getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src) as { message: string }[]).map((d) => d.message);
+    };
+
+    it('a quoted @event (#749) declares its camelCase function, typed by its payload', () => {
+        const sc = "\n@event 'open-change': { value: boolean };\nfunction f() { openChange({ value: true }); openChange({ value: 'no' }); }\n";
+        const found = diagnose(sc);
+        expect(found.filter((m) => /Cannot find name/.test(m)), 'openChange() was not declared').toEqual([]);
+        expect(found.some((m) => /string/i.test(m) && /boolean/i.test(m)), 'the payload was not typed').toBe(true);
+    });
+
+    it('@host el (#750) declares the host element, typed, alone or with attributes', () => {
+        expect(diagnose('\n@host el;\nconst id: string = el.id;\nel.focus();\n')).toEqual([]);
+        expect(diagnose('\n@host me { role="group" }\nconst w: number = me.offsetWidth;\n')).toEqual([]);
+        expect(diagnose('\n@host el;\nconst n: number = el.id;\n').some((m) => /string/i.test(m) && /number/i.test(m)), 'el is not typed').toBe(true);
+    });
+
     it('the @event payload is typed: a string where a number belongs is an error', () => {
         const d = withEvent("function f() { changed('one'); }");
         expect(d.some((x: { message: string }) => /string/i.test(x.message) && /number/i.test(x.message))).toBe(true);

@@ -117,6 +117,9 @@ export function buildSetupBody(
     // Such signals must wait for that declaration. Conversely a derived used in the body
     // must emit BEFORE the body. We compute body-local declared names and partition.
     const bodyLocalNames = collectBodyLocalNames(analysis.body);
+    // `@host el;` (#750): the component's own element, a constant from the first line of setup — the
+    // host exists before setup runs. It is returned to the template with the script's other names.
+    if (analysis.hostName) parts.push(`    const ${analysis.hostName} = ctx.el;`);
     // @event name: T → `name(detail)` dispatches it from the host; it stays there unless declared
     // `@event(bubbles)` (#138). Declared before everything else, so the body can call it at setup
     // time. An author who declares the name themselves keeps their own function.

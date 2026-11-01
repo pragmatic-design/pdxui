@@ -42,6 +42,8 @@ export { findComponentTags, generateComponentImports } from './compiler/resolve'
 export { ComponentResolver } from './component-resolver';
 export { componentPackages } from './component-packages';
 export { RUNES, DECORATOR_RUNES } from './compiler/runes';
+// A quoted `@event` name and its emitter (#749): the editor declares the emitter the compiler generates.
+export { isEventName, eventEmitterName } from './compiler/event-names';
 /** The one reading of an `@fetch` line: the LSP types the resource from its `as Type`. */
 export { parseFetchDecl } from './compiler/script-analyzer-helpers';
 // The `@defer (…)` trigger grammar (#281): the editor's strict projection types its `when ( … )`.

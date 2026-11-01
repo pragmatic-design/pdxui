@@ -44,6 +44,11 @@ function declarations(descriptor: SFCDescriptor, source: string): Declaration[] 
     for (const m of script.content.matchAll(/^[ \t]*@(prop|model)\s+([A-Za-z_$][\w$]*)/gm)) {
         found.push({ name: m[2], kind: `@${m[1]}`, line: lineAt(script.start + m.index!) });
     }
+    // Match: a `@host name` line, with or without its attributes (#750): the name is a constant of the
+    // script. Groups: [1]=the name
+    for (const m of script.content.matchAll(/^[ \t]*@host\s+([A-Za-z_$][\w$]*)\s*(?=[{;]|$)/gm)) {
+        found.push({ name: m[1], kind: '@host', line: lineAt(script.start + m.index!) });
+    }
     const sf = parseableScript(script.content);
     const at = (node: ts.Node) => lineAt(script.start + node.getStart(sf));
     for (const st of sf.statements) {

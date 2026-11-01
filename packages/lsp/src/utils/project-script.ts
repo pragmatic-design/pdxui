@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { DECORATOR_RUNES, parseActionDecl, parseFetchDecl, parseVariantsBlock, routeParamsType } from '@pdxui/compiler';
+import { DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, routeParamsType } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -193,10 +193,18 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
             }
         }
         if (kw === 'event') {
-            // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138)
-            // Groups: [1]=name [2]=payload type (optional)
-            const ev = /^(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*)\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
-            if (ev) emitters.push(ev[2] ? `var ${ev[1]}: (detail: ${ev[2]}) => void;` : `var ${ev[1]}: (detail?: unknown) => void;`);
+            // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138), the name bare
+            // or quoted (#749), whose emitter is then its camelCase.
+            // Groups: [1]=bare name [2]=quoted name [3]=payload type (optional)
+            const ev = /^(?:\(\s*bubbles\s*\))?\s+(?:([A-Za-z_$][\w$]*)|['"]([^'"\n]+)['"])\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            const emitter = ev && (ev[1] ?? eventEmitterName(ev[2]));
+            if (ev && emitter) emitters.push(ev[3] ? `var ${emitter}: (detail: ${ev[3]}) => void;` : `var ${emitter}: (detail?: unknown) => void;`);
+        }
+        if (kw === 'host') {
+            // Match: @host el;  or  @host el { … } — the component's own element, named (#750).
+            // Groups: [1]=the name
+            const named = /^\s+([A-Za-z_$][\w$]*)\s*(?=[{;\n]|$)/.exec(s.slice(m.index + 1 + kw.length));
+            if (named) emitters.push(`var ${named[1]}: HTMLElement;`);
         }
         if (kw === 'part') {
             // Match: @part trigger, popup; — each name is its element, null while not rendered (#134).

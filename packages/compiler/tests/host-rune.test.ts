@@ -47,6 +47,40 @@ describe('@host compiles into the descriptor', () => {
     });
 });
 
+describe('@host with a name (#750)', () => {
+    it('is read alone or with attributes', () => {
+        expect(analyzeScript('@host el;', 'x.pdx').hostName).toBe('el');
+        const both = analyzeScript('@host el { role="group" }', 'x.pdx');
+        expect(both.hostName).toBe('el');
+        expect(both.host).toEqual([{ name: 'role', value: 'group' }]);
+        expect(both.warnings.map((w) => w.code)).toEqual([]);
+        expect(analyzeScript('@host { role="group" }', 'x.pdx').hostName, 'the control: no name').toBeUndefined();
+    });
+
+    it('is the host element, declared before the body and handed to the template as a constant', () => {
+        const { code } = compile('<template><label :for="el.id">x</label></template>\n<script>\n@host el;\nconst id = el.id;\n</script>', 'test.pdx');
+        expect(code).toContain('const el = ctx.el;');
+        expect(code.indexOf('const el = ctx.el;'), 'declared after the body that reads it').toBeLessThan(code.indexOf('const id = el.id;'));
+        // A constant, not a signal: the template reads ctx.el.id, not ctx.el().id.
+        expect(code).toContain('ctx.el.id');
+        expect(code).not.toContain('ctx.el().id');
+    });
+
+    it('a script name of the same name is PDX_DUP_DECLARATION', () => {
+        const r = compile(pdx('@host el;\nlet el = 1;'), 'test.pdx');
+        expect(r.warnings.map((w) => w.code)).toContain('PDX_DUP_DECLARATION');
+    });
+
+    it('the control: a host name alone is no diagnostic', () => {
+        const r = compile('<template><b>{{ el.id }}</b></template>\n<script>\n@host el;\n</script>', 'test.pdx');
+        expect(r.warnings.filter((w) => w.severity === 'error')).toEqual([]);
+    });
+
+    it('a name the element already has is PDX_NAME_RESERVED', () => {
+        expect(codes('@host style;', 'PDX_NAME_RESERVED')).toHaveLength(1);
+    });
+});
+
 describe('PDX_HOST_INVALID_ATTRIBUTE — each form says why', () => {
     it('a two-way binding: a host has none, a model is declared', () => {
         const found = codes('@host { ::value="v" }', 'PDX_HOST_INVALID_ATTRIBUTE');

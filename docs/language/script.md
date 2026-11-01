@@ -498,11 +498,12 @@ beta (#134)
 #### Syntax
 
 ```ebnf
-HostDecl ::= "@host" S? "{" ( S? Attribute )* S? "}"
+HostDecl ::= "@host" ( S Identifier )? ( S? "{" ( S? Attribute )* S? "}" | End )
 ```
 
 `Attribute` is the attribute of an element in the template. The analyzer's form:
-`@host { role="combobox" :aria-expanded="open" @keydown="onKey" }`, on one line or several.
+`@host { role="combobox" :aria-expanded="open" @keydown="onKey" }`, on one line or several; with a
+name, `@host el { … }` or `@host el;` (#750).
 
 #### Semantics
 
@@ -518,11 +519,17 @@ render's context:
 - a listener (`@keydown.enter="onKey"`) is built like the template's — a reference, an inline mutation,
   a call, an arrow — with its modifiers, and removed when the component disconnects.
 
+A name (#750) binds the element itself: `@host el;` compiles to `const el = ctx.el;`, declared before
+the rest of the setup and returned to the template, so `el.id` and `:for="el.id"` read the host. It
+is a constant typed `HTMLElement`, not a signal.
+
 #### Rules
 
 - A two-way binding (`::x`), `data-part` and a generic argument (`T="User"`) have no meaning on a host:
   each raises `PDX_HOST_INVALID_ATTRIBUTE`, whose message says which, and is not compiled.
 - A `$signal` read only by `@host` counts as read.
+- The name counts as a script name: one declared again is `PDX_DUP_DECLARATION`, and a member of the
+  element is `PDX_NAME_RESERVED`.
 
 #### Examples
 

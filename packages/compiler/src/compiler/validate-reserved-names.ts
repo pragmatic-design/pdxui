@@ -15,6 +15,8 @@ export function checkReservedNames(analysis: ScriptAnalysis): ValidationWarning[
         ...analysis.props.map(p => ({ name: p.name, rune: p.model ? '@model' : '@prop' })),
         // An object-form `@slot` generates nothing; a typed snippet is a property of the element.
         ...analysis.slots.filter(s => s.signature !== undefined).map(s => ({ name: s.name, rune: '@slot' })),
+        // The host's name (#750) is returned to the template beside the declarations above.
+        ...(analysis.hostName ? [{ name: analysis.hostName, rune: '@host' }] : []),
     ];
     const warnings: ValidationWarning[] = [];
     for (const d of declared) {
