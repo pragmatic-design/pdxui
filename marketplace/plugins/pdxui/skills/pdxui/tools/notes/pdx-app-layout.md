@@ -16,7 +16,12 @@ there are exactly **four** names:
 know gets neither treatment — it is skipped by the four and skipped by the `main` wrap, so it drops
 out of the grid **silently**: no class, no `grid-area`, no warning.
 
-`:class` on a region is safe: the layout adds its class with `classList.add`, so both survive.
+`:class` on a region is safe: the layout adds its class with `classList.add`, so both survive. Each
+region is also the part of its name (`[data-part="navbar"]`), and the `<main>` is `[data-part="main"]`.
+
+**Its states are on the host, not on the navbar.** Style the collapsed rail from
+`pdx-app-layout:state(navbar-collapsed) .my-nav-item`, the open mobile drawer from `:state(drawer-open)`;
+the old `.pdx-app-navbar-collapsed` class is not written any more.
 
 **Who scrolls: `main.pdx-app-main`, never the window.** The shell is `overflow: hidden` and the main
 region is `overflow-y: auto`, so `<html>` and `<body>` do not scroll at all — measured at 800px tall

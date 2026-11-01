@@ -462,6 +462,8 @@
             'affix-beta-contract': () => {},
             // pdx-carousel on the beta contract (#290): the spec mounts its own markup.
             'carousel-beta-contract': () => {},
+            // pdx-app-layout on the beta contract (#290): the spec mounts its own markup.
+            'app-layout-beta-contract': () => {},
 
             // pdx-menu on the beta contract (#288), the same way.
             'menu-beta-contract': () => {
@@ -750,8 +752,9 @@
                     if (first) { first.focus(); reachable = document.activeElement === first; first.blur(); }
                     return {
                         x: Math.round(r.x), width: Math.round(r.width),
-                        hidden: nav.classList.contains('pdx-app-navbar-hidden'),
-                        overlay: nav.classList.contains('pdx-app-navbar-overlay'),
+                        // The host's states (#290): a drawer below the breakpoint, hidden while not open.
+                        hidden: layout.matches(':state(drawer)') && !layout.matches(':state(drawer-open)'),
+                        overlay: layout.matches(':state(drawer)'),
                         prop: layout.navbarCollapsed,
                         inert: nav.hasAttribute('inert'),
                         focusReachable: reachable,

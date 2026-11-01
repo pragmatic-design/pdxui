@@ -125,7 +125,7 @@ let page = $signal('Dashboard');
 }
   .shell-nav-item:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
   .shell-nav-item:focus-visible { outline: 2px solid var(--pdx-color-focus); outline-offset: -2px; }
-  .shell-nav.pdx-app-navbar-collapsed .shell-nav-item { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }
+  pdx-app-layout:state(navbar-collapsed) .shell-nav .shell-nav-item { justify-content: center; gap: 0; padding-left: 0; padding-right: 0; font-size: 0; }
   .shell-nav-item[aria-current="page"] {
   background: var(--pdx-color-inset);
   color: var(--pdx-color-primary);

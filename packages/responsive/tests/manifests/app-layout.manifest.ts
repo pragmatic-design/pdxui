@@ -5,9 +5,9 @@
  *  - the source: packages/ui/src/app-layout/pdx-app-layout.ts
  *      Light DOM, render: <slot></slot>. In rAF (on ctx.track's first run) it builds the shell
  *      DIRECTLY on the HOST <pdx-app-layout>:
- *        - it adds the class .pdx-app-layout to the host
+ *        - the host carries NO class (#290): app-layout.css draws the grid on the tag
  *        - it finds the children carrying data-region={header|navbar|aside|footer} and promotes
- *          them to regions, adding to EACH a class and a landmark role:
+ *          them to regions, adding to EACH a class, a data-part of the region's name and a landmark role:
  *            data-region="header" → .pdx-app-header   + role="banner"
  *            data-region="navbar" → .pdx-app-navbar   + role="navigation"
  *            data-region="aside"  → .pdx-app-aside    + role="complementary"
@@ -19,23 +19,23 @@
  *          and appends it to the host.
  *      It sets gridTemplateColumns / gridTemplateRows inline on host.style, from the props
  *        (headerHeight=52px, footerHeight='', navbarWidth=260px, asideWidth='', ...). An empty string
- *        = the region is absent (the template filters it out). It toggles .pdx-app-with-border on the
- *        host (withBorder is true by default). The imperative API is on host.__appLayout
- *        (toggle/open/closeNavbar) — not tested here.
- *      ⚠ Everything (classes, roles, main, overlay, the inline grid) is applied inside
+ *        = the region is absent (the template filters it out). Its states are the host's custom states
+ *        (#290): :state(bordered) (withBorder, true by default), and :state(drawer), :state(drawer-open),
+ *        :state(navbar-collapsed), :state(navbar-gone) for the navbar. The navbar methods
+ *        (toggle/open/closeNavbar) are measured in app-layout-beta-contract.spec.ts, not here.
+ *      ⚠ Everything (classes, parts, states, roles, main, overlay, the inline grid) is applied inside
  *        requestAnimationFrame → the runners must wait (the measure helper already uses networkidle
  *        plus a waitForTimeout).
  *
  *  - CSS: packages/design/src/components/app-layout.css
- *      pdx-app-layout { display:block }  (the host's default, before the rAF)
- *      .pdx-app-layout { display:grid; height:100vh; overflow:hidden;
+ *      :is(.pdx-app-layout, pdx-app-layout) { display:grid; height:100vh; overflow:hidden;
  *                        grid-template-areas: "header header header" / "navbar main aside" / "footer footer footer" }
  *      .pdx-app-header  { grid-area:header; display:flex; align-items:center; z-index:20 }
  *      .pdx-app-navbar  { grid-area:navbar; overflow-y:auto }
  *      .pdx-app-main    { grid-area:main;   overflow-y:auto }
  *      .pdx-app-aside   { grid-area:aside;  overflow-y:auto }
  *      .pdx-app-footer  { grid-area:footer; display:flex; align-items:center }
- *      .pdx-app-with-border .pdx-app-{header|navbar|aside|footer} → a 1px border on one side.
+ *      :where(pdx-app-layout):state(bordered) .pdx-app-{header|navbar|aside|footer} → a 1px border on one side.
  *
  * MEASUREMENT CHOICES (they matter):
  *  - The host is `height:100vh` → without a sized parent it would take the whole viewport and the
@@ -112,7 +112,7 @@ export const appLayout: ComponentManifest = {
             'app-layout-basic': {
                 standalone: [
                     {
-                        // .pdx-app-layout → display:grid.
+                        // The tag → display:grid; the host carries no class (#290).
                         selector: 'section:not([hidden]) [data-test="app-layout"]',
                         description: 'app-layout host is a grid container',
                         display: { op: 'is', value: 'grid' },
@@ -140,6 +140,28 @@ export const appLayout: ComponentManifest = {
                         selector: 'section:not([hidden]) [data-test="app-layout"]',
                         description: 'app-layout has non-negative border radius',
                         radius: { all: { op: '>=', value: 0 } },
+                    },
+                    {
+                        // The <main> it wraps the rest in is the `main` part, and the element that scrolls.
+                        selector: 'section:not([hidden]) [data-test="app-layout"] > [data-part="main"]',
+                        description: 'the main part scrolls its content',
+                        overflow: { op: 'matches', value: /auto/ },
+                    },
+                    {
+                        // :state(bordered) draws a line beside the navbar part.
+                        selector: 'section:not([hidden]) [data-test="app-layout"] > [data-part="navbar"]',
+                        description: 'bordered: a line beside the navbar part',
+                        border: { right: { width: { op: '>=', value: 1 } } },
+                    },
+                ],
+                states: [
+                    {
+                        // withBorder is on by default: the host's custom state, which draws the lines.
+                        description: 'withBorder is the custom state :state(bordered)',
+                        selector: 'section:not([hidden]) [data-test="app-layout"] > [data-part="navbar"]',
+                        trigger: 'attribute',
+                        customState: { host: 'section:not([hidden]) [data-test="app-layout"]', name: 'bordered' },
+                        changes: {},
                     },
                 ],
                 // Composition: the grid shell's geometric relations.

@@ -22,11 +22,12 @@ test('"Without Border" has no border beside its navbar; the bordered demo above 
     const without = layoutUnder(page, 'Without Border');
     await expect(without).toHaveCount(1);
     await expect.poll(() => without.evaluate((el) => (el as HTMLElement & { withBorder: boolean }).withBorder)).toBe(false);
-    await expect(without).not.toHaveClass(/pdx-app-with-border/);
+    // The border is the host's custom state `bordered` (#290).
+    expect(await without.evaluate((el) => el.matches(':state(bordered)'))).toBe(false);
     expect(await navbarBorder(without)).toBe('0px');
 
     // The control: a demo that keeps the default draws the border, so the measure can see one.
-    const bordered = page.locator('.cmp-gallery pdx-app-layout.pdx-app-with-border').first();
-    await expect(bordered).toHaveCount(1);
+    const bordered = layoutUnder(page, 'Full Layout');
+    await expect.poll(() => bordered.evaluate((el) => el.matches(':state(bordered)'))).toBe(true);
     expect(await navbarBorder(bordered)).toBe('1px');
 });
