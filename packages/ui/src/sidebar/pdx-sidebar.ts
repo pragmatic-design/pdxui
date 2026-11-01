@@ -10,8 +10,15 @@ import '@pdxui/design/components/sidebar';
 /**
  * A collapsible sidebar container for a pdx-nav-menu or any content, expanded, collapsed or mini
  * (icon-only).
+ *
+ * @cssstate collapsed - `open` is off: no width, or the icon rail when `mini`.
+ * @cssstate mini - Collapsed as an icon rail, `collapsedWidth` wide.
  */
 component('pdx-sidebar', {
+    // `open` is the app's to write — the sidebar has no toggle of its own — so it is a prop, not a
+    // model; it draws nothing of its own, so it has no parts. sidebar.css lays it out from its tag and
+    // these states, as it does `.pdx-sidebar` in CSS-only markup (#289).
+    states: ['collapsed', 'mini'],
     // The axis sidebar.css keys by (#633), reflected on the host and drawn from it; the host is the
     // element the old `.pdx-sidebar-right` class went on, so no native class is kept.
     variants: {
@@ -40,7 +47,6 @@ component('pdx-sidebar', {
             if (!_built) {
                 _built = true;
                 requestAnimationFrame(() => {
-                    ctx.el.classList.add('pdx-sidebar');
                     ctx.el.setAttribute('role', 'complementary');
                     uiAttr(ctx.el, 'aria-label', () => uiString('sidebar', 'label'));
                 });
@@ -48,9 +54,9 @@ component('pdx-sidebar', {
 
             requestAnimationFrame(() => {
                 const el = ctx.el;
-                el.classList.toggle('pdx-sidebar-open', open);
-                el.classList.toggle('pdx-sidebar-collapsed', !open);
-                el.classList.toggle('pdx-sidebar-mini', mini && !open);
+                // States, not classes (#289).
+                ctx.state('collapsed', !open);
+                ctx.state('mini', mini && !open);
 
                 const currentWidth = open ? width : (mini ? collapsedWidth : 0);
                 el.style.width = currentWidth + 'px';

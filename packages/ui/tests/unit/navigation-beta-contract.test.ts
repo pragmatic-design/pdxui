@@ -131,6 +131,17 @@ const DONE: Row[] = [
         verbs: [],
         removed: ['pdx-change'],
     },
+    {
+        tag: 'pdx-sidebar',
+        // `open` is the app's to write: the sidebar has no toggle of its own, so it never writes it.
+        models: [],
+        // `collapsed` while closed; `mini` while closed as an icon rail.
+        states: ['collapsed', 'mini'],
+        // It wraps the app's content and draws nothing of its own.
+        parts: [],
+        verbs: [],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

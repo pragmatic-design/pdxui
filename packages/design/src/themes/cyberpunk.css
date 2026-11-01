@@ -157,7 +157,7 @@
     box-shadow: 0 2px 8px oklch(from var(--pdx-color-primary) l c h / 0.25);
 }
 [pdx-theme="cyberpunk"] .pdx-app-navbar:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)),
-[pdx-theme="cyberpunk"] .pdx-sidebar:not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
+[pdx-theme="cyberpunk"] :is(.pdx-sidebar, pdx-sidebar):not(:where([pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]), [pdx-theme="cyberpunk"] [pdx-theme]:not([pdx-theme="cyberpunk"]) *)) {
     background: light-dark(var(--pdx-color-surface), oklch(0.16 0.02 330));
     border-right: var(--pdx-border-width) solid oklch(from var(--pdx-color-primary) l c h / 0.4);
 }

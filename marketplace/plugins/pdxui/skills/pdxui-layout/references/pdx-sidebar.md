@@ -12,6 +12,8 @@ Collapsible side navigation.
 
 **Renders:** roles `complementary`
 
+**States:** `:state(collapsed)` — `open` is off: no width, or the icon rail when `mini`.; `:state(mini)` — Collapsed as an icon rail, `collapsedWidth` wide.
+
 
 #### Examples
 

@@ -161,7 +161,7 @@ details.pdx-accordion[open] summary::after {
     box-shadow: 0 2px 8px oklch(from var(--pdx-color-primary) l c h / 0.25);
 }
 .pdx-app-navbar,
-.pdx-sidebar {
+:is(.pdx-sidebar, pdx-sidebar) {
     background: light-dark(var(--pdx-color-surface), oklch(0.16 0.02 330));
     border-right: var(--pdx-border-width) solid oklch(from var(--pdx-color-primary) l c h / 0.4);
 }
