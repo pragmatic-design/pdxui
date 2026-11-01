@@ -1,11 +1,23 @@
 // pdx-affix — Makes child element sticky when scrolling past a threshold.
 
-import { component, html, signal, DEV } from '@pdxui/core';
+import { component, html, signal, DEV, event } from '@pdxui/core';
 
 /**
  * Makes an element sticky once the user scrolls past a threshold, and reports when it is.
+ *
+ * @cssstate affixed - The element is stuck: fixed to the window, or sticking in its `target`.
+ * @alphaevent pdx-change
+ * @alpharename pdx-change affixed-change
+ * @alphadetail affixed $event.detail.value
  */
 component('pdx-affix', {
+    // Stuck or not is the scroll's doing, not the app's (#290): a read-only output, announced as a
+    // model's event is, `{ value }`, and a state; `::affixed` stays an error.
+    events: {
+        /** It started or stopped sticking: `true` while stuck. */
+        'affixed-change': event<{ value: boolean }>(),
+    },
+    states: ['affixed'],
     props: {
         /** Offset from top when affixed (px) */
         offsetTop: { type: Number, default: 0 },
@@ -21,18 +33,18 @@ component('pdx-affix', {
         let _observer: IntersectionObserver | null = null;
         let _sentinel: HTMLElement | null = null;
 
-        /** The affixed state, reported once per change: the class, and `pdx-change { affixed }`. */
+        /** The affixed state, reported once per change: the custom state, and `affixed-change { value }`. */
         function setAffixed(affixed: boolean): void {
             if (affixed === _affixed.peek()) return;
             _affixed.set(affixed);
-            ctx.el.classList.toggle('pdx-affix-fixed', affixed);
-            ctx.emit('pdx-change', { affixed });
+            ctx.state('affixed', affixed);
+            ctx.emit('affixed-change', { value: affixed });
         }
 
         /**
          * Container mode reports when the sticky element is stuck. CSS sticky does the
-         * sticking, and says nothing about it: on its own, `pdx-change` would never fire and
-         * `pdx-affix-fixed` would never be added. A 1px sentinel sits against the element's
+         * sticking, and says nothing about it: on its own, `affixed-change` would never fire and
+         * the `affixed` state would never be set. A 1px sentinel sits against the element's
          * leading edge — before it for `offsetTop`, after it for `offsetBottom` — and an
          * IntersectionObserver rooted at the target, its edge moved in by the offset, sees the
          * sentinel leave: that is the moment the element starts to stick.
@@ -72,7 +84,6 @@ component('pdx-affix', {
             const targetSelector = ctx.target() as string;
 
             requestAnimationFrame(() => {
-                ctx.el.classList.add('pdx-affix-root');
                 // Host must be block-level: a custom element defaults to display:inline,
                 // but position:sticky/fixed require a block box to reserve space and honor top/bottom.
                 if (!ctx.el.style.display) ctx.el.style.display = 'block';
@@ -116,14 +127,12 @@ component('pdx-affix', {
                     }
 
                     if (shouldAffix && !_affixed.peek()) {
-                        _affixed.set(true);
                         if (!_placeholder) {
                             _placeholder = document.createElement('div');
                             _placeholder.style.width = el.offsetWidth + 'px';
                             _placeholder.style.height = el.offsetHeight + 'px';
                             el.parentNode?.insertBefore(_placeholder, el);
                         }
-                        el.classList.add('pdx-affix-fixed');
                         el.style.position = 'fixed';
                         if (offsetBottom >= 0) {
                             el.style.bottom = offsetBottom + 'px';
@@ -132,10 +141,8 @@ component('pdx-affix', {
                             el.style.top = offsetTop + 'px';
                             el.style.bottom = '';
                         }
-                        ctx.emit('pdx-change', { affixed: true });
+                        setAffixed(true);
                     } else if (!shouldAffix && _affixed.peek()) {
-                        _affixed.set(false);
-                        el.classList.remove('pdx-affix-fixed');
                         el.style.position = '';
                         el.style.top = '';
                         el.style.bottom = '';
@@ -143,7 +150,7 @@ component('pdx-affix', {
                             _placeholder.remove();
                             _placeholder = null;
                         }
-                        ctx.emit('pdx-change', { affixed: false });
+                        setAffixed(false);
                     }
                 };
 

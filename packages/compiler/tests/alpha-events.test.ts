@@ -259,4 +259,9 @@ describe('the layout components, from the shipped manifest (#290)', () => {
         const reads = '<pdx-accordion @pdx-change="log($event.detail.open)"></pdx-accordion>';
         expect(fix(reads)).toBe(reads);
     });
+
+    it('pdx-affix: @pdx-change becomes @affixed-change, its affixed read as the value', () => {
+        expect(fix('<pdx-affix @pdx-change="e => stuck = e.detail.affixed"></pdx-affix>'))
+            .toBe('<pdx-affix @affixed-change="e => stuck = e.detail.value"></pdx-affix>');
+    });
 });
