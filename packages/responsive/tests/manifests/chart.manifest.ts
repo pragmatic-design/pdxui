@@ -138,12 +138,12 @@ export const chart: ComponentManifest = {
                     },
                     {
                         // The inner canvas host has an inline min-height:200px → a guaranteed minimum area.
-                        selector: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas',
+                        selector: 'section:not([hidden]) [data-test="chart"] [data-part="canvas"]',
                         description: 'canvas host honors its inline min-height (>= 200px)',
                         height: { op: '>=', value: 200 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas',
+                        selector: 'section:not([hidden]) [data-test="chart"] [data-part="canvas"]',
                         description: 'canvas host has positive width',
                         width: { op: '>', value: 0 },
                     },
@@ -167,7 +167,7 @@ export const chart: ComponentManifest = {
                         parent: 'section:not([hidden]) [data-test="chart"]',
                         children: {
                             host: 'section:not([hidden]) [data-test="chart"]',
-                            canvasHost: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas',
+                            canvasHost: 'section:not([hidden]) [data-test="chart"] [data-part="canvas"]',
                             canvas: 'section:not([hidden]) [data-test="chart"] canvas',
                         },
                         relations: [
@@ -188,7 +188,7 @@ export const chart: ComponentManifest = {
             'chart-doughnut': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="doughnut"] .pdx-chart-legend:not([hidden]) .pdx-chart-legend-item',
+                        selector: 'section:not([hidden]) [data-test="doughnut"] [data-part="legend"]:not([hidden]) [data-part="legend-item"]',
                         description: 'a doughnut with three categories shows a legend of three items, one per slice',
                         count: { op: '==', value: 3 },
                     },
@@ -216,7 +216,7 @@ export const chart: ComponentManifest = {
             // The height is NOT an absolute invariant: it comes from the inline 16/9 aspect ratio and the width
             // (aspect-driven, as in aspect-ratio.manifest). skipHeight → the invariant is the width and the box,
             // not a fixed height. No radius or border from the design system (the style is inline) → a wide tolerance.
-            { selector: 'section:not([hidden]) [data-test="chart"] .pdx-chart-canvas', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="chart"] [data-part="canvas"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -229,10 +229,10 @@ export const chart: ComponentManifest = {
         scenario: 'chart-two-series',
         steps: [
             { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="chart2"]' },
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="chart2"] .pdx-chart-legend-item:nth-child(1)' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="chart2"] [data-part="legend-item"]:nth-child(1)' },
             {
                 key: 'Enter',
-                expectAttr: { selector: 'section:not([hidden]) [data-test="chart2"] .pdx-chart-legend-item:nth-child(1)', name: 'aria-pressed', value: 'false' },
+                expectAttr: { selector: 'section:not([hidden]) [data-test="chart2"] [data-part="legend-item"]:nth-child(1)', name: 'aria-pressed', value: 'false' },
             },
         ],
     },

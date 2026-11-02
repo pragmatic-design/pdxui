@@ -394,6 +394,9 @@ semver.
 
 ### Changed
 
+- `pdx-chart` and `pdx-sparkline` take the beta contract (#292). Their role, name and, for the chart,
+  its focus and its arrow keys are declared on the host. The chart's legend, legend buttons, swatches and canvas are parts, and the
+  sparkline's canvas; the sparkline is certified as itself.
 - **Breaking:** `pdx-filter-builder` takes the beta contract (#292). `value` and `logic` are models:
   an edit of the chips writes `value`, their descriptors, and announces it with `value-change`
   `{ value }`, so `::value` follows it; `pdx-filter-change` is gone, and `pdx migrate` rewrites an

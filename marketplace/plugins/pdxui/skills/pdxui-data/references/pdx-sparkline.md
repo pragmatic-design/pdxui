@@ -12,7 +12,7 @@ A tiny inline trend chart.
 | `smooth` | `smooth` | boolean | `true` | Smooth line |
 | `label` | `label` | string | `''` | Accessible name. Empty: the series in words, from the data. |
 
-**Renders:** roles `img`
+**Parts:** `[data-part="canvas"]` — The canvas the trend is drawn on.
 
 
 #### Examples

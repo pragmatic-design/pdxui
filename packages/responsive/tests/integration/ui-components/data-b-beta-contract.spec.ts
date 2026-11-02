@@ -1,7 +1,8 @@
-// The data family's second batch on the beta contract (#292): pdx-tree. Its row listeners are
+// The data family's second batch on the beta contract (#292). pdx-tree: its row listeners are
 // delegated to one on the tree (a tree of 200 nodes adds no more listeners than a tree of 2); a lazy
 // branch that loads makes the tree :state(loading) and aria-busy (A4); its rows carry level, position
-// and set size (A3); disabled is a state; its pieces are parts. Measured in Chromium.
+// and set size (A3); disabled is a state; its pieces are parts. pdx-chart and pdx-sparkline: the
+// role, name, focus and keys declared on the host, their pieces parts. Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
 import { openPage } from './contracts/measure';
 
@@ -115,5 +116,36 @@ test.describe('pdx-tree', () => {
         expect(await page.locator('#t').evaluate((h) => h.matches(':state(disabled)'))).toBe(true);
         expect(await parts(page, '#t')).toEqual(['check', 'group', 'item', 'label', 'root', 'twisty']);
         await expect(page.locator('#t [data-part="root"]')).toHaveAttribute('role', 'tree');
+    });
+});
+
+test.describe('pdx-chart', () => {
+    test('a named, focusable figure whose arrow keys walk the points; its legend and canvas are parts', async ({ page }) => {
+        await mount(page, `<div style="width:400px"><pdx-chart id="c" type="bar" title="Sales" x-field="m" y-field="s,t" series-names="S,T" tooltip="false" data='[{"m":"Jan","s":30,"t":1},{"m":"Feb","s":50,"t":2}]'></pdx-chart></div>`);
+        const chart = page.locator('#c');
+        await expect(chart).toHaveAttribute('role', 'figure');
+        await expect(chart).toHaveAttribute('aria-label', /^Sales/);
+        await expect(chart).toHaveAttribute('tabindex', '0');
+        await chart.focus();
+        await page.keyboard.press('ArrowRight');
+        await expect(chart.locator('.pdx-chart-live')).toContainText('Jan');
+        expect(await parts(page, '#c')).toEqual(['canvas', 'legend', 'legend-item', 'swatch']);
+    });
+
+    test('a gauge is named by its reading and is not a tab stop', async ({ page }) => {
+        await mount(page, '<pdx-chart id="g" type="gauge" title="Load" value="42"></pdx-chart>');
+        const gauge = page.locator('#g');
+        await expect(gauge).toHaveAttribute('aria-label', /42/);
+        await expect(gauge).not.toHaveAttribute('tabindex', /.*/);
+    });
+});
+
+test.describe('pdx-sparkline', () => {
+    test('an image named by its data; its canvas is a part', async ({ page }) => {
+        await mount(page, '<pdx-sparkline id="s" data="1,2,3"></pdx-sparkline>');
+        const spark = page.locator('#s');
+        await expect(spark).toHaveAttribute('role', 'img');
+        await expect(spark).toHaveAttribute('aria-label', /3/);
+        expect(await parts(page, '#s')).toEqual(['canvas']);
     });
 });

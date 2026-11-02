@@ -5945,7 +5945,6 @@
             }
           ],
           "roles": [
-            "figure",
             "group"
           ],
           "attributes": [
@@ -6174,6 +6173,24 @@
               },
               "default": "''"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "legend",
+              "description": "The legend, a group of buttons, while there is more than one series or slice."
+            },
+            {
+              "name": "legend-item",
+              "description": "A legend button: pressed while its series is shown."
+            },
+            {
+              "name": "swatch",
+              "description": "A legend button's colour."
+            },
+            {
+              "name": "canvas",
+              "description": "The box the chart is drawn in."
+            }
           ]
         }
       ],
@@ -6272,9 +6289,6 @@
               "attribute": "label"
             }
           ],
-          "roles": [
-            "img"
-          ],
           "attributes": [
             {
               "name": "data",
@@ -6338,6 +6352,12 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "canvas",
+              "description": "The canvas the trend is drawn on."
             }
           ]
         }

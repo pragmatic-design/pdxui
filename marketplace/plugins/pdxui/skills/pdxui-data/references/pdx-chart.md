@@ -48,7 +48,9 @@ tiny inline trend in a table cell or a KPI card → `pdx-sparkline`.
 | `format` | `format` | string | `''` | Gauge: value format (e.g. "{value}%") |
 | `source` | — | object | `null` | DataSource binding (duck-typed) |
 
-**Renders:** roles `figure` · `group`
+**Renders:** roles `group`
+
+**Parts:** `[data-part="legend"]` — The legend, a group of buttons, while there is more than one series or slice.; `[data-part="legend-item"]` — A legend button: pressed while its series is shown.; `[data-part="swatch"]` — A legend button's colour.; `[data-part="canvas"]` — The box the chart is drawn in.
 
 
 #### Examples

@@ -36,6 +36,10 @@ const DONE: Row[] = [
     { tag: 'pdx-tree', models: [], states: ['loading', 'disabled'], parts: ['root', 'item', 'group', 'twisty', 'check', 'label'], removed: [] },
     // It writes its own `value`, so it is a model, and `logic` with it; `pdx-filter-change` is gone.
     { tag: 'pdx-filter-builder', models: ['value', 'logic'], states: [], parts: ['root', 'chip', 'label', 'remove', 'add', 'clear'], removed: ['pdx-filter-change'], alpha: ['pdx-filter-change'] },
+    // A figure whose role, name, focus and keys are declared on the host; the legend and the canvas are parts.
+    { tag: 'pdx-chart', models: [], states: [], parts: ['legend', 'legend-item', 'swatch', 'canvas'], removed: [] },
+    // An image named by its data, declared on the host; its canvas is a part.
+    { tag: 'pdx-sparkline', models: [], states: [], parts: ['canvas'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

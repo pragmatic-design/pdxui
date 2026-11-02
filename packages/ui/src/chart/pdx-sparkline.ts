@@ -9,6 +9,8 @@ import { resolveLocale } from '../shared/locale';
 /**
  * A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip
  * or legend.
+ *
+ * @csspart canvas - The canvas the trend is drawn on.
  */
 component('pdx-sparkline', {
     props: {
@@ -27,6 +29,7 @@ component('pdx-sparkline', {
         /** Accessible name. Empty: the series in words, from the data. */
         label: { type: String, default: '' },
     },
+    parts: ['canvas'],
     setup(ctx) {
         let canvas: HTMLCanvasElement | null = null;
 
@@ -178,12 +181,6 @@ component('pdx-sparkline', {
         }
 
         ctx.track(() => {
-            void ctx.label();
-            ctx.el.setAttribute('role', 'img');
-            ctx.el.setAttribute('aria-label', describe(parseData()));
-        });
-
-        ctx.track(() => {
             void ctx.data();
             void ctx.type();
             void ctx.color();
@@ -214,9 +211,14 @@ component('pdx-sparkline', {
         });
         ctx.track(() => () => themeObs.disconnect());
 
-        return {};
+        return { accessibleName: () => describe(parseData()) };
+    },
+    // An image, named by its data or by `label`.
+    host: {
+        role: 'img',
+        ':aria-label': (ctx) => ctx.accessibleName(),
     },
     // `width` is a size to draw at, not to overflow at: in a narrower box the canvas shrinks to it
     // (draw() reads the rendered size). A fixed 140px line would run past a phone's edge.
-    render: () => html`<canvas style="display:block;max-width:100%"></canvas>`,
+    render: () => html`<canvas data-part="canvas" style="display:block;max-width:100%"></canvas>`,
 });
