@@ -208,6 +208,8 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // Each @provide / @inject as written, with its token: checked against the imports after the loop.
     const contextLines: { token: string; text: string; rune: 'provide' | 'inject' }[] = [];
     const bodyLines: string[] = [];
+    // `@model … { form: () => expr }` (#751): the `ctx.formValue(…)` each one adds, at the end of the body.
+    const formValueCalls: { text: string; line: number }[] = [];
     // One origin per LINE of the body, in order: a pushed entry may hold several lines.
     const bodyLineOrigins: (number | null)[] = [];
     /** Push an entry to the body; its lines come from line `first` on, one by one when `consecutive`. */
@@ -388,9 +390,17 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const optional = propPrefix[3] === '?';
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
             // `@model name: T = d { form }` (#135): the trailing option is taken off before the type
-            // and the default are read, which would otherwise swallow it.
-            // Match: ` { form }` at the end, before an optional `;`.
-            const formOption = rune === 'model' ? /\s*\{\s*form\s*\}\s*;?\s*$/.exec(trimmed) : null;
+            // and the default are read, which would otherwise swallow it. `{ form: () => expr }` (#751)
+            // also says what the form submits when it is not the model.
+            // Match: ` { form }` or ` { form: <expression> }` at the end, before an optional `;`.
+            // Groups: [1]=the expression, when written
+            const formOption = rune === 'model' ? /\s*\{\s*form\s*(?::\s*([\s\S]+?))?\s*\}\s*;?\s*$/.exec(trimmed) : null;
+            // The expression becomes a statement of the setup: rewritten as the script is, and read by
+            // core's form wiring whenever what it reads changes. Kept for the end of the body, so it may
+            // read what the script declares after the model.
+            // Optional: core installs `formValue` with the form wiring, which a runtime with no
+            // ElementInternals (happy-dom) does not run, and the component must still set up there.
+            if (formOption?.[1]) formValueCalls.push({ text: `ctx.formValue?.(${formOption[1]});`, line: i });
             const declaration = formOption ? trimmed.slice(0, formOption.index) + ';' : trimmed;
             const { type: tsType, rest } = extractTypeAnnotation(declaration, colonPos);
             if (tsType) {
@@ -1305,6 +1315,9 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // The host's name (#750) is a constant of the script, as a `const` the body declared would be: the
     // template reads it, and it is not a signal. A script name of the same name is PDX_DUP_DECLARATION.
     if (hostName && !exports.some((e) => e.name === hostName)) exports.push({ name: hostName, kind: 'const' });
+
+    // `{ form: () => expr }` (#751): after the script, which the expression may read.
+    for (const call of formValueCalls) pushBody(call.text, call.line);
 
     const analysis: ScriptAnalysis = {
         props,
