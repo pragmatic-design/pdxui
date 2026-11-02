@@ -6,8 +6,8 @@
  * packages/ui/src/index.ts (`import './form-actions/pdx-form-actions';`). Registrazione COMPLETA.
  *
  * ── Source: packages/ui/src/form-actions/pdx-form-actions.ts ──
- *   render() = an INNER <div :class="wrapClass"> holding a <slot>:
- *     - wrapClass() = `pdx-form-actions` + (align ? ` pdx-form-actions-${align}` : '')   (lines 33-38)
+ *   render() = an INNER <div class="pdx-form-actions" data-part="root"> holding a <slot>:
+ *     - `align` is a variant axis reflected on the host (#293); the bar carries no class for it
  *     - the <slot> (lines 59-73) has a FALLBACK: reset (<button type="reset" class="pdx-ghost">) plus
  *       submit (<button type="submit" class="pdx-primary">). The fallback is used ONLY when
  *       no child is slotted. If the developer slots their own buttons, those REPLACE the fallback
@@ -23,12 +23,10 @@
  *     Accessibility comes from the native <button>s (an accessible name from their text).
  *   Keyboard: NO handler. The children are native <button>s → natively tabbable → pattern 'none'.
  *
- * ── CSS: packages/design/src/components/form.css (lines 10-22) ──
+ * ── CSS: packages/design/variant-sources/components/form.css ──
  *   .pdx-form-actions            → display:flex; gap:sm; padding-top:md; border-top:1px solid; margin-top:md
- *   .pdx-form-actions-start      → justify-content: flex-start
- *   .pdx-form-actions-center     → justify-content: center
- *   .pdx-form-actions-end        → justify-content: flex-end
- *   .pdx-form-actions-between    → justify-content: space-between
+ *   @variant pdx-form-actions align(start|center|end|between) → justify-content, and the same on the
+ *   native classes .pdx-form-actions-start and the others
  *   A stable geometry across themes: no media query, no theme-specific px in the invariants.
  *
  * ── Testing choices ──
