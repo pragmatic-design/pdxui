@@ -14776,6 +14776,27 @@
               },
               "default": "false"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The box the SVG fills, `--pdx-icon-size` square."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "spin",
+              "description": "`spin` is set: the icon turns."
+            },
+            {
+              "name": "mirror",
+              "description": "`rtl=\"mirror\"`: in a right-to-left context the icon is drawn flipped."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-icon-size"
+            }
           ]
         }
       ],

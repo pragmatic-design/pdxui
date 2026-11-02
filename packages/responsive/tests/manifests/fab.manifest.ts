@@ -66,27 +66,27 @@ export const fab: ComponentManifest = {
             'fab-basic': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button is a flex box (display set)',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex', 'block', 'inline-block'] },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button has cursor pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button is fully opaque (base state)',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button is at least 36px tall (md=56, margin for compact density)',
                         height: { op: '>=', value: 36 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button is at least 36px wide',
                         width: { op: '>=', value: 36 },
                     },
@@ -94,7 +94,7 @@ export const fab: ComponentManifest = {
                         // radius-full (9999px) → "round". A cautious >=16: even if a theme reduced
                         // the token, a FAB stays visibly rounded. The real roundness is
 // guaranteed by the square composition (width == height) below.
-                        selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                        selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         description: 'fab button has large (round) radius',
                         radius: { all: { op: '>=', value: 16 } },
                     },
@@ -106,8 +106,8 @@ export const fab: ComponentManifest = {
                         description: 'fab button is square (width == height) → round',
                         parent: 'body',
                         children: {
-                            box: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
-                            box2: 'section:not([hidden]) [data-test="fab"] [data-part="root"]',
+                            box: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
+                            box2: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]',
                         },
                         relations: [
                             { description: 'width == height', left: 'box.width', op: '==', right: 'box2.height', tolerance: 2 },
@@ -121,9 +121,9 @@ export const fab: ComponentManifest = {
                         description: 'size hierarchy: sm < md < lg widths',
                         parent: 'body',
                         children: {
-                            sm: 'section:not([hidden]) [data-test="fab-sm"] [data-part="root"]',
-                            md: 'section:not([hidden]) [data-test="fab-md"] [data-part="root"]',
-                            lg: 'section:not([hidden]) [data-test="fab-lg"] [data-part="root"]',
+                            sm: 'section:not([hidden]) [data-test="fab-sm"] > [data-part="root"]',
+                            md: 'section:not([hidden]) [data-test="fab-md"] > [data-part="root"]',
+                            lg: 'section:not([hidden]) [data-test="fab-lg"] > [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm < md', left: 'sm.width', op: '<', right: 'md.width' },
@@ -148,7 +148,7 @@ export const fab: ComponentManifest = {
         targets: [
             // The round button must keep its size (a fixed px per size) and its shape (the radius)
             // even under hostile global CSS. A 10px tolerance.
-            { selector: 'section:not([hidden]) [data-test="fab"] [data-part="root"]', tolerancePx: 10 },
+            { selector: 'section:not([hidden]) [data-test="fab"] > [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
@@ -159,12 +159,12 @@ export const fab: ComponentManifest = {
     keyboard: {
         scenario: 'fab-speed-dial',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] [data-part="root"]' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] > [data-part="root"]' },
             { key: 'Enter', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] [data-part="item"][aria-label="Copy"]' },
             { key: 'ArrowUp', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] [data-part="item"][aria-label="Print"]' },
-            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] [data-part="root"]' },
+            { key: 'Escape', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] > [data-part="root"]' },
             { key: 'ArrowUp', expectFocus: 'section:not([hidden]) [data-test="fab-dial"] [data-part="item"][aria-label="Copy"]' },
-            { key: 'Tab', expectAttr: { selector: 'section:not([hidden]) [data-test="fab-dial"] [data-part="root"]', name: 'aria-expanded', value: 'false' } },
+            { key: 'Tab', expectAttr: { selector: 'section:not([hidden]) [data-test="fab-dial"] > [data-part="root"]', name: 'aria-expanded', value: 'false' } },
         ],
     },
 

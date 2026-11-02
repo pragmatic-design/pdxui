@@ -90,6 +90,8 @@ const DONE: Row[] = [
     { tag: 'pdx-relative-time', models: [], outputs: [], states: [], parts: ['root'], removed: [] },
     // A click writes `selected`, a model: `selected-change` replaces `pdx-toggle` (#291).
     { tag: 'pdx-chip', models: ['selected'], outputs: [], states: ['selected', 'disabled'], parts: ['root', 'body', 'remove'], removed: ['pdx-toggle'] },
+    // icon.css draws its box; spinning and a right-to-left mirror are states, not inline styles.
+    { tag: 'pdx-icon', models: [], outputs: [], states: ['spin', 'mirror'], parts: ['root'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

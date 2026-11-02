@@ -109,7 +109,12 @@ for (const row of ROWS) {
 
         test('its parts are reached by data-part, and the input part is the textbox', async ({ page }) => {
             await mount(page, row.full);
-            const parts = await page.locator('#f [data-part]').evaluateAll((els) => els.map((e) => e.getAttribute('data-part')).sort());
+            // The field's own parts: a pdx-icon in its prefix has a root part of its own.
+            const parts = await page.locator('#f [data-part]').evaluateAll((els, tag) => els.filter((e) => {
+                let p = e.parentElement;
+                while (p && !p.tagName.includes('-')) p = p.parentElement;
+                return p?.tagName.toLowerCase() === tag;
+            }).map((e) => e.getAttribute('data-part')).sort(), row.tag);
             expect(parts).toEqual(row.parts);
             const tagName = await page.locator(`#f ${row.tag} [data-part="input"]`).first().evaluate((e) => e.tagName);
             expect(['INPUT', 'TEXTAREA']).toContain(tagName);

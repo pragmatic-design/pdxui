@@ -1,0 +1,27 @@
+/* pdx-icon — an SVG icon (#291).
+   It drew its container with inline styles built in an effect: the layout, the size and the spin. The
+   container is its `root` part now and this stylesheet draws it; the component writes only the size,
+   as `--pdx-icon-size`, since a size may be any number of pixels. `:state(spin)` turns it, and
+   `:state(mirror)` flips it in a right-to-left context — the `--pdx-icon-rtl` it set before was read by
+   no rule, and `rtl="mirror"` mirrored nothing. */
+
+@keyframes pdx-spin {
+    to { transform: rotate(360deg); }
+}
+
+:where(pdx-icon) > [data-part="root"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    width: var(--pdx-icon-size, 20px);
+    height: var(--pdx-icon-size, 20px);
+}
+
+:where(pdx-icon):state(spin) > [data-part="root"] {
+    animation: pdx-spin 1s linear infinite;
+}
+
+:where(pdx-icon):state(mirror):dir(rtl) > [data-part="root"] {
+    transform: scaleX(-1);
+}

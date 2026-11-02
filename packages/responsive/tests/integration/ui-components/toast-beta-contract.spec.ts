@@ -83,8 +83,10 @@ test.describe('parts', () => {
         await page.evaluate(async () => (await (window as unknown as Api).__gotcha.toast())
             .add({ type: 'success', title: 'Backup', message: 'Done.', duration: 60000, action: { label: 'Undo', onClick: () => {} } }));
         await expect(items(page)).toHaveCount(1);
-        const parts = await page.locator('#bound pdx-toast').evaluate((host) =>
-            [...host.querySelectorAll('[data-part]')].map((e) => e.getAttribute('data-part')));
+        // Its own parts: the pdx-icon in a toast's icon part has a root part of its own.
+        const parts = await page.locator('#bound pdx-toast').evaluate((host) => [...host.querySelectorAll('[data-part]')]
+            .filter((e) => { let p = e.parentElement; while (p && !p.tagName.includes('-')) p = p.parentElement; return p === host; })
+            .map((e) => e.getAttribute('data-part')));
         expect(parts).toEqual(['root', 'toast', 'icon', 'title', 'message', 'action', 'close', 'progress']);
     });
 });

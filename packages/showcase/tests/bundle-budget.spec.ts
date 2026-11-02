@@ -324,7 +324,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // `pdx-nav-menu:state(collapsed)` and `[aria-expanded="true"] > .pdx-nav-chevron`, each longer than
 // the class it replaced. The built dist: 66609 bytes locally, which rounds to 65.0, and 65.1 KB on
 // the CI's Linux runner.
-const BUDGET_KB = { entry: 43, js: 472, css: 66, blocking: 103 };
+// entry 43 → 43.5 (owner's OK): pdx-icon's beta contract (#291) — its styles moved from inline to
+// icon.css, which travels with the component. The icon is a chunk of its own, not in the entry; what
+// the entry gains is the stylesheet's name in Vite's preload map, listed by every route that draws an
+// icon. The built dist: main 43.0 KB → this branch 44090 bytes (43.057 KB, which rounds to 43.1).
+const BUDGET_KB = { entry: 43.5, js: 472, css: 66, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
