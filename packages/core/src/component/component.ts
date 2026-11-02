@@ -267,14 +267,16 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
     for (const name of Object.keys(options.slots ?? {})) slotDefs[name] = { type: Function };
     // A variant axis (#512) is a String prop defaulting to its first value — a list's first member, a
     // record's first key — reflected on the host as a bound host attribute, where the design CSS's
-    // `@variant` rules read it. A value outside the axis reflects the default.
+    // `@variant` rules read it. A value outside the axis reflects the default. The attribute is the
+    // kebab-case of the axis (#834), the name an author writes and an alias the prop already observes:
+    // `connectorStyle` is `connector-style`, where the camelCase name would become `connectorstyle`.
     const variantDefs: Record<string, PropDefinition> = {};
     const host: HostBindings = {};
     for (const [name, spec] of Object.entries((options.variants ?? {}) as VariantMap)) {
         if (DEV && options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a variant axis; the axis wins.`);
         const values = Array.isArray(spec) ? spec as readonly string[] : Object.keys(spec);
         variantDefs[name] = { type: String, default: values[0] };
-        host[':' + name] = (c: Record<string, () => string>) => values.includes(c[name]()) ? c[name]() : values[0];
+        host[':' + name.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`)] = (c: Record<string, () => string>) => values.includes(c[name]()) ? c[name]() : values[0];
     }
     Object.assign(host, options.host);
     const propDefs = { ...(options.props ?? {}), ...variantDefs, ...modelDefs, ...slotDefs } as Record<string, PropDefinition>;

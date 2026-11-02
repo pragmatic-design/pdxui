@@ -124,8 +124,18 @@ export function expandVariantBlocks(css: string, under: (tests: string, selector
     return out;
 }
 
-// Match: one test of a `@variant` prelude, one value or several. Groups: [1]=axis [2]=the values
-export const VARIANT_TEST = /(\w+)\s*\(\s*([\w-]+(?:\s*,\s*[\w-]+)*)\s*\)/g;
+/**
+ * The attribute an axis is reflected under, and the name a `@variant` rule calls it by (#834): the
+ * kebab-case of its prop, the name an author writes — `connectorStyle` → `connector-style`. HTML
+ * lowercases attribute names, so the camelCase one would become a second attribute, `connectorstyle`.
+ */
+export function axisAttribute(name: string): string {
+    return name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+}
+
+// Match: one test of a `@variant` prelude, one value or several; the axis in kebab-case, as reflected.
+// Groups: [1]=axis [2]=the values
+export const VARIANT_TEST = /([\w-]+)\s*\(\s*([\w-]+(?:\s*,\s*[\w-]+)*)\s*\)/g;
 
 /** The values of a test, `ghost, danger` → `['ghost', 'danger']`. */
 export function testValues(list: string): string[] {
@@ -180,7 +190,7 @@ function hostsNative(tags: string[], tests: [string, string[]][], axesOf: (tag: 
  */
 function attributeTests(tests: [string, string[]][], axes: LibraryAxis[]): string {
     return tests.map(([name, values]) => {
-        const axis = axes.find((a) => a.name === name);
+        const axis = axes.find((a) => axisAttribute(a.name) === name);
         if (!axis) return attributeTest(name, values);
         const natives = new Set(values.map((v) => axis.native?.[v]));
         natives.delete(undefined);
@@ -193,7 +203,7 @@ function attributeTests(tests: [string, string[]][], axes: LibraryAxis[]): strin
 function nativeCompound(tests: [string, string[]][], axes: LibraryAxis[]): string | undefined {
     let compound = '';
     for (const [name, values] of tests) {
-        const axis = axes.find((a) => a.name === name);
+        const axis = axes.find((a) => axisAttribute(a.name) === name);
         const natives = values.map((v) => axis?.native?.[v]);
         if (natives.some((n) => n === undefined)) return undefined;
         const unique = [...new Set(natives)];

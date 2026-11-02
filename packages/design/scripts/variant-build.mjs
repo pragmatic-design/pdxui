@@ -16,7 +16,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expandLibraryVariants, libraryVariantTests } from '../../compiler/src/compiler/variant-css.ts';
+import { axisAttribute, expandLibraryVariants, libraryVariantTests } from '../../compiler/src/compiler/variant-css.ts';
 
 const here = dirname(fileURLToPath(import.meta.url));
 export const DESIGN = join(here, '..');
@@ -73,15 +73,19 @@ export function packageVariantFiles(axes) {
     return [...sources, ...themes];
 }
 
-/** What is wrong with a test against the manifest, or undefined; `styled` collects what it styles. */
+/**
+ * What is wrong with a test against the manifest, or undefined; `styled` collects what it styles. A rule
+ * names an axis by the attribute it is reflected under, its kebab-case (#834): `connector-style(dashed)`
+ * for the manifest's `connectorStyle`, never the camelCase name.
+ */
 function unknownOf(test, axes, styled) {
     const written = `@variant ${test.tag ? `${test.tag} ` : ''}${test.axis}(${test.value})`;
     if (!test.tag) return `${written} names no tag: outside a component's own stylesheet a rule names it, @variant pdx-<name> ${test.axis}(${test.value}).`;
     const declared = axes.get(test.tag);
     if (!declared) return `${written}: '${test.tag}' is not a component of @pdxui/ui.`;
-    const axis = declared.find((a) => a.name === test.axis);
-    if (!axis) return `${written}: '${test.axis}' is not a variant axis of ${test.tag} (${declared.map((a) => a.name).join(', ') || 'none declared'}).`;
-    if (!axis.values.includes(test.value)) return `${written}: '${test.value}' is not a value of the axis '${axis.name}' (${axis.values.join(', ')}).`;
+    const axis = declared.find((a) => axisAttribute(a.name) === test.axis);
+    if (!axis) return `${written}: '${test.axis}' is not a variant axis of ${test.tag} (${declared.map((a) => axisAttribute(a.name)).join(', ') || 'none declared'}).`;
+    if (!axis.values.includes(test.value)) return `${written}: '${test.value}' is not a value of the axis '${test.axis}' (${axis.values.join(', ')}).`;
     // A value styles every value that shares its native selector (#626).
     const native = axis.native?.[test.value];
     for (const v of axis.values) if (v === test.value || (native !== undefined && axis.native[v] === native)) styled.add(`${test.tag} ${axis.name}(${v})`);

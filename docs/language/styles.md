@@ -385,6 +385,13 @@ does everywhere: `:where(:scope)[data-pdx-HASH][variant="ghost"] .label` inside 
 sit inside `@media`, `@supports`, `@layer` or `@container`, and may hold one. Under
 `<template shadow>` the test is `:host([variant="ghost"])`.
 
+An axis of two words is reflected, and named in a rule, in kebab-case (#834): the axis
+`connectorStyle` is the attribute `connector-style="dashed"`, the name an author writes, and
+`@variant connector-style(dashed)` tests it. The camelCase name is not an axis to `@variant`
+(`PDX_VARIANT_UNKNOWN`, naming the kebab spelling): HTML lowercases attribute names, and
+`connectorStyle` would have become a second attribute, `connectorstyle`. In the library the same
+holds, `@variant pdx-timeline connector-style(dashed)`, checked against the manifest's `connectorStyle`.
+
 **In the library** (specified by #626, lands with #512). A library component declares its axes in its
 descriptor instead of a script. An axis is a list of values, `size: ['md', 'sm', 'lg']`, or a record
 from each value to the selector that draws the same look on native HTML,
