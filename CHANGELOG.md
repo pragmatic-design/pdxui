@@ -394,6 +394,17 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-button` and `pdx-button-group` take the beta contract (#291), the last of the
+  display, feedback and action family.
+  - **No toggle mode.** `toggle`, `pressed`, the `pdx-toggle` event and the `.pdx-pressed` class leave
+    the button, with their rules in `buttons.css`: the on/off button is `<pdx-toggle>`. `pdx migrate`
+    rewrites a `<pdx-button toggle>` to it (`button-toggle-removed`) and flags one it cannot; in a
+    `.pdx`, `toggle` or `pressed` on `<pdx-button>` is `PDX_REMOVED_FORM`.
+  - **Loading is a state.** The button is `:state(loading)` while `loading` is set or its `action` is
+    pending, and `aria-busy` only then; buttons.css draws the spinner from the state, and the button no
+    longer writes `pdx-loading` on its inner button. `label` is the part `[data-part="label"]`.
+  - **The group** declares its role and `aria-disabled` on the host; it has no value, no model and no
+    event, and a `pdx-toggle` inside it keeps its own `aria-pressed`.
 - **Breaking:** `@expose` of a `$signal` or a `$derived` puts its value on the element, not the
   function the component keeps it in (#752). `el.count` reads it; a `$signal` is written with
   `el.count = 5`, which the component sees; a `$derived` is read-only. A caller that wrote

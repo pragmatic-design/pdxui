@@ -24,8 +24,8 @@ describe('pdx-button label', () => {
         // The icon and the label are separate flex items; the button's `gap` spaces them.
         const icon = btn.querySelector('.icon')!;
         expect(icon, 'the slotted icon is not inside the button').toBeTruthy();
-        const texts = Array.from(btn.childNodes).filter(n => n.nodeType === Node.TEXT_NODE && n.textContent!.trim());
-        const label = texts[texts.length - 1];
+        // The label is the `label` part (#291), a child of the button after the slotted content.
+        const label = btn.querySelector(':scope > [data-part="label"]');
         expect(label?.textContent?.trim()).toBe('Save');
         expect(icon.compareDocumentPosition(label!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     });

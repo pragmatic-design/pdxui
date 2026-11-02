@@ -382,17 +382,22 @@
     margin-left: 0;
 }
 
-/* Loading button state — uses --_btn-color to hide text without !important */
-.pdx-loading {
+/* Loading button state — uses --_btn-color to hide text without !important. A native <button> takes
+   the class; pdx-button is :state(loading) on its host (#291), and no longer writes the class. */
+.pdx-loading,
+:where(pdx-button):state(loading) > [data-part="root"] {
     position: relative;
     pointer-events: none;
 }
 .pdx-loading,
-.pdx-loading:hover {
+.pdx-loading:hover,
+:where(pdx-button):state(loading) > [data-part="root"],
+:where(pdx-button):state(loading) > [data-part="root"]:hover {
     color: transparent;
 }
 
-.pdx-loading::after {
+.pdx-loading::after,
+:where(pdx-button):state(loading) > [data-part="root"]::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -405,22 +410,22 @@
     animation: pdx-spin 0.6s linear infinite;
 }
 
-:where(pdx-button:is([variant="primary"],[variant="solid"],[variant="danger"])) > [data-part="root"].pdx-loading::after, :is(.pdx-danger,.pdx-primary).pdx-loading::after {
+:where(pdx-button:is([variant="primary"],[variant="solid"],[variant="danger"])):state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-color-primary-text);
         border-right-color: transparent;
     }
 
-:where(pdx-button:is([variant="secondary"],[variant="ghost"])) > [data-part="root"].pdx-loading::after, :is(.pdx-secondary,.pdx-ghost).pdx-loading::after {
+:where(pdx-button:is([variant="secondary"],[variant="ghost"])):state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-color-text);
         border-right-color: transparent;
     }
 
-:where(pdx-button:is([variant="success"],[variant="info"])) > [data-part="root"].pdx-loading::after, :is(.pdx-success,.pdx-info).pdx-loading::after {
+:where(pdx-button:is([variant="success"],[variant="info"])):state(loading) > [data-part="root"]::after {
         border-color: light-dark(white, var(--pdx-gray-950));
         border-right-color: transparent;
     }
 
-:where(pdx-button[variant="warning"]) > [data-part="root"].pdx-loading::after, .pdx-warning.pdx-loading::after {
+:where(pdx-button[variant="warning"]):state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-gray-900);
         border-right-color: transparent;
     }
@@ -429,27 +434,3 @@
     to { transform: rotate(360deg); }
 }
 
-/* ── Toggle Button — pressed state (must override :hover) ── */
-.pdx-pressed,
-.pdx-pressed:hover {
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
-}
-.pdx-solid.pdx-pressed,
-.pdx-solid.pdx-pressed:hover {
-    background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
-}
-:where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"].pdx-pressed, .pdx-primary.pdx-pressed, :where(pdx-button:is([variant="primary"],[variant="solid"])) > [data-part="root"].pdx-pressed:hover, .pdx-primary.pdx-pressed:hover {
-        background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
-    }
-:where(pdx-button[variant="secondary"]) > [data-part="root"].pdx-pressed, .pdx-secondary.pdx-pressed, :where(pdx-button[variant="secondary"]) > [data-part="root"].pdx-pressed:hover, .pdx-secondary.pdx-pressed:hover {
-        background: var(--pdx-color-border);
-        color: var(--pdx-color-text);
-    }
-:where(pdx-button[variant="outline"]) > [data-part="root"].pdx-pressed, .pdx-outline.pdx-pressed, :where(pdx-button[variant="outline"]) > [data-part="root"].pdx-pressed:hover, .pdx-outline.pdx-pressed:hover {
-        background: var(--pdx-color-primary);
-        color: var(--pdx-color-primary-text);
-        border-color: var(--pdx-color-primary);
-    }
-:where(pdx-button[variant="ghost"]) > [data-part="root"].pdx-pressed, .pdx-ghost.pdx-pressed, :where(pdx-button[variant="ghost"]) > [data-part="root"].pdx-pressed:hover, .pdx-ghost.pdx-pressed:hover {
-        background: var(--pdx-color-inset);
-    }

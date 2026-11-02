@@ -12,8 +12,14 @@ import { hasAccessibleName } from '../shared/accessible-name';
  *
  * @fires pdx-action-error {{ error }} - When the `action`'s `execute` rejects. The error is the one
  * the action keeps on its `error()`; the button is idle again.
+ * @csspart root - The native `<button>`.
+ * @csspart label - The text of `label`, after any slotted content.
+ * @cssstate loading - `loading` is set, or the `action` is pending: the button shows a spinner and is
+ * `aria-busy`.
  */
 component('pdx-button', {
+    states: ['loading'],
+    parts: ['root', 'label'],
     // The axes its stylesheet keys by (#512), reflected on the host; each value maps the selector that
     // draws the same look on a native <button>. Five sizes, the same scale as pdx-input and pdx-select.
     variants: {
@@ -31,10 +37,6 @@ component('pdx-button', {
         loading: { type: Boolean, default: false },
         type: { type: String, default: 'button', enum: ['button', 'submit', 'reset'] },
         full: { type: Boolean, default: false },
-        /** Toggle mode: button maintains pressed/unpressed state */
-        toggle: { type: Boolean, default: false },
-        /** Pressed state for toggle buttons */
-        pressed: { type: Boolean, default: false },
         /** The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. */
         label: { type: String, default: '' },
         /** The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
@@ -47,8 +49,6 @@ component('pdx-button', {
         actionArg: { type: Object, default: null },
     },
     setup(ctx) {
-        let _pressed = false;
-
         type Action = { execute: (arg?: unknown) => unknown; pending: () => boolean; concurrency?: string };
 
         /** The `action`, if it has the shape: an `execute` to call and a `pending` to read. */
@@ -75,17 +75,8 @@ component('pdx-button', {
             return a.concurrency !== 'coalesce' && a.concurrency !== 'parallel';
         }
 
-        /**
-         * The inner button's classes: `pdx-button`, the same for every variant, which keeps it under
-         * the design system's reset of a host's bare element rules, and its state classes. The variant
-         * is the host's attribute.
-         */
-        function getClass(): string {
-            const states: string[] = ['pdx-button'];
-            if (isBusy()) states.push('pdx-loading');
-            if (ctx.toggle() && _pressed) states.push('pdx-pressed');
-            return states.join(' ');
-        }
+        // Loading is a state of the host (#291): buttons.css draws the spinner from `:state(loading)`.
+        ctx.track(() => { ctx.state('loading', isBusy()); });
 
         function isDisabled(): boolean {
             return !!(ctx.disabled() || ctx.loading() || refusesWhilePending());
@@ -113,30 +104,14 @@ component('pdx-button', {
                 e.stopPropagation();
                 return;
             }
-            // Toggle mode: flip pressed state
-            if (ctx.toggle()) {
-                _pressed = !_pressed;
-                const btn = ctx.el.querySelector('button');
-                if (btn) {
-                    btn.setAttribute('aria-pressed', String(_pressed));
-                    btn.className = getClass();
-                }
-                ctx.emit('pdx-toggle', { pressed: _pressed }, { bubbles: false });
-            }
             runAction();
         }
 
-        // Propagate size/full/toggle to inner <button> via DOM (after render)
+        // Propagate size and full to the inner <button> via DOM (after render). An on/off button is
+        // pdx-toggle: the toggle mode left the button (#291).
         ctx.track(() => {
             const s = ctx.size() as string;
             const f = ctx.full();
-            const isToggle = ctx.toggle();
-            const pressedProp = ctx.pressed();
-
-            // Sync pressed from external prop (reactive — parent can control toggle state)
-            if (isToggle && pressedProp !== undefined) {
-                _pressed = !!pressedProp;
-            }
 
             requestAnimationFrame(() => {
                 const btn = ctx.el.querySelector('button');
@@ -145,10 +120,6 @@ component('pdx-button', {
                 else btn.removeAttribute('size');
                 if (f) btn.setAttribute('full', '');
                 else btn.removeAttribute('full');
-                if (isToggle) {
-                    btn.setAttribute('aria-pressed', String(_pressed));
-                    btn.className = getClass();
-                }
             });
         });
 
@@ -161,20 +132,22 @@ component('pdx-button', {
                 + `give it aria-label (or aria-labelledby, or a label). ${ctx.el.outerHTML.slice(0, 120)}`);
         });
 
-        return { getClass, isBusy, isDisabled, onClick };
+        return { isBusy, isDisabled, onClick };
     },
     // The name goes on the element with the role: `aria-label` left on the host names nothing, and
-    // an icon-only button would be read "button".
+    // an icon-only button would be read "button". `pdx-button`, the root's class for every variant,
+    // keeps it under the design system's reset of a host's bare element rules; the variant is the
+    // host's attribute.
     render: (ctx) => html`
         <button
             data-part="root"
+            class="pdx-button"
             :type=${() => ctx.type()}
-            :class=${() => ctx.getClass()}
             :disabled=${() => ctx.isDisabled()}
             :aria-busy=${() => ctx.isBusy() ? 'true' : null}
             :aria-label=${() => (ctx.ariaLabel() as string) || null}
             :aria-labelledby=${() => (ctx.ariaLabelledby() as string) || null}
             @click=${ctx.onClick}
-        ><slot></slot>${() => ctx.label()}</button>
+        ><slot></slot>${() => ctx.label() ? html`<span data-part="label">${() => ctx.label()}</span>` : ''}</button>
     `,
 });

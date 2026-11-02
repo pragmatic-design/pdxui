@@ -42,6 +42,7 @@ import { formFieldsMember, formFieldsMemberScript, formFieldReserved } from './f
 import { formNameBinding, formRequiredInMarkup } from './form-name-binding';
 import { pinInputRemoved, pinInputStrings, otpInputMaskDefaults } from './pin-input';
 import { buttonGroupModes } from './button-group-modes';
+import { buttonToggleRemoved } from './button-toggle';
 import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound, fabOpenShow, fabOpenUnbound } from './open-change';
 import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
 
@@ -410,6 +411,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     pinInputStrings,
     // #286: `pdx-button-group`'s selection modes are `pdx-toggle-group` (./button-group-modes).
     buttonGroupModes,
+    // #291: `pdx-button`'s toggle mode is `pdx-toggle` (./button-toggle).
+    buttonToggleRemoved,
     // #287: a popup announces `open-change`, not `pdx-open`/`pdx-close`; pdx-select's popup methods are
     // the overlay verbs (./open-change).
     openChangeEvent,

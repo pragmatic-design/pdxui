@@ -10,8 +10,6 @@ Joined buttons that read as one control.
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `label` | `label` | string | `''` | The group's accessible name ("Text alignment"), set as `aria-label` on the group. |
 
-**Renders:** roles `group`
-
 
 #### Examples
 
