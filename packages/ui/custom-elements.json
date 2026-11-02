@@ -3676,9 +3676,6 @@
               "attribute": "label"
             }
           ],
-          "roles": [
-            "group"
-          ],
           "attributes": [
             {
               "name": "orientation",
@@ -3797,26 +3794,6 @@
               },
               "default": "false",
               "attribute": "full"
-            },
-            {
-              "kind": "field",
-              "name": "toggle",
-              "description": "Toggle mode: button maintains pressed/unpressed state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "toggle"
-            },
-            {
-              "kind": "field",
-              "name": "pressed",
-              "description": "Pressed state for toggle buttons",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "pressed"
             },
             {
               "kind": "field",
@@ -3943,14 +3920,6 @@
               },
               "description": "When the `action`'s `execute` rejects. The error is the one\nthe action keeps on its `error()`; the button is idle again.",
               "detail": "{ error }"
-            },
-            {
-              "name": "pdx-toggle",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when toggled open or closed. Does not bubble.",
-              "detail": "{ pressed }"
             }
           ],
           "attributes": [
@@ -3985,24 +3954,6 @@
               "name": "full",
               "fieldName": "full",
               "description": "Stretches to the full width of its container.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "name": "toggle",
-              "fieldName": "toggle",
-              "description": "Toggle mode: button maintains pressed/unpressed state",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
-              "name": "pressed",
-              "fieldName": "pressed",
-              "description": "Pressed state for toggle buttons",
               "type": {
                 "text": "boolean"
               },
@@ -4058,6 +4009,22 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native `<button>`."
+            },
+            {
+              "name": "label",
+              "description": "The text of `label`, after any slotted content."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "`loading` is set, or the `action` is pending: the button shows a spinner and is\n`aria-busy`."
             }
           ],
           "cssProperties": [

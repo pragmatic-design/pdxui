@@ -435,17 +435,22 @@
     margin-left: 0;
 }
 
-/* Loading button state — uses --_btn-color to hide text without !important */
-.pdx-loading {
+/* Loading button state — uses --_btn-color to hide text without !important. A native <button> takes
+   the class; pdx-button is :state(loading) on its host (#291), and no longer writes the class. */
+.pdx-loading,
+:where(pdx-button):state(loading) > [data-part="root"] {
     position: relative;
     pointer-events: none;
 }
 .pdx-loading,
-.pdx-loading:hover {
+.pdx-loading:hover,
+:where(pdx-button):state(loading) > [data-part="root"],
+:where(pdx-button):state(loading) > [data-part="root"]:hover {
     color: transparent;
 }
 
-.pdx-loading::after {
+.pdx-loading::after,
+:where(pdx-button):state(loading) > [data-part="root"]::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -459,28 +464,28 @@
 }
 
 @variant pdx-button variant(danger, primary) {
-    :scope > [data-part="root"].pdx-loading::after {
+    :scope:state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-color-primary-text);
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(secondary, ghost) {
-    :scope > [data-part="root"].pdx-loading::after {
+    :scope:state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-color-text);
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(success, info) {
-    :scope > [data-part="root"].pdx-loading::after {
+    :scope:state(loading) > [data-part="root"]::after {
         border-color: light-dark(white, var(--pdx-gray-950));
         border-right-color: transparent;
     }
 }
 
 @variant pdx-button variant(warning) {
-    :scope > [data-part="root"].pdx-loading::after {
+    :scope:state(loading) > [data-part="root"]::after {
         border-color: var(--pdx-gray-900);
         border-right-color: transparent;
     }
@@ -490,39 +495,3 @@
     to { transform: rotate(360deg); }
 }
 
-/* ── Toggle Button — pressed state (must override :hover) ── */
-.pdx-pressed,
-.pdx-pressed:hover {
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);
-}
-.pdx-solid.pdx-pressed,
-.pdx-solid.pdx-pressed:hover {
-    background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
-}
-@variant pdx-button variant(primary) {
-    :scope > [data-part="root"].pdx-pressed,
-    :scope > [data-part="root"].pdx-pressed:hover {
-        background: oklch(from var(--pdx-color-primary) calc(l - 0.08) c h);
-    }
-}
-@variant pdx-button variant(secondary) {
-    :scope > [data-part="root"].pdx-pressed,
-    :scope > [data-part="root"].pdx-pressed:hover {
-        background: var(--pdx-color-border);
-        color: var(--pdx-color-text);
-    }
-}
-@variant pdx-button variant(outline) {
-    :scope > [data-part="root"].pdx-pressed,
-    :scope > [data-part="root"].pdx-pressed:hover {
-        background: var(--pdx-color-primary);
-        color: var(--pdx-color-primary-text);
-        border-color: var(--pdx-color-primary);
-    }
-}
-@variant pdx-button variant(ghost) {
-    :scope > [data-part="root"].pdx-pressed,
-    :scope > [data-part="root"].pdx-pressed:hover {
-        background: var(--pdx-color-inset);
-    }
-}

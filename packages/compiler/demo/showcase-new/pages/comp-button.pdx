@@ -4,6 +4,7 @@
     <p class="pdx-txt-body pdx-ink-muted intro">
       <code>&lt;pdx-button&gt;</code> — Web Component wrapper over Pragmatic CSS buttons.
       Props: <code>variant</code>, <code>size</code>, <code>loading</code>, <code>disabled</code>, <code>full</code>. Slot for icons + text.
+      An on/off button is <code>&lt;pdx-toggle&gt;</code>.
     </p>
 
     <!-- ═══ Event Console ═══ -->
@@ -35,9 +36,6 @@
 
     <!-- ═══ Sizes ═══ -->
     <app-demo-comp-button-sizes class="demo-section"></app-demo-comp-button-sizes>
-
-    <!-- ═══ Toggle Button ═══ -->
-    <app-demo-comp-button-toggle class="demo-section"></app-demo-comp-button-toggle>
 
     <!-- ═══ Loading ═══ -->
     <app-demo-comp-button-loading class="demo-section"></app-demo-comp-button-loading>

@@ -5,7 +5,7 @@
 // that brings its component over.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'fs';
+import { readFileSync, readdirSync } from 'fs';
 import { join } from 'path';
 
 const root = join(__dirname, '..', '..');
@@ -92,6 +92,11 @@ const DONE: Row[] = [
     { tag: 'pdx-chip', models: ['selected'], outputs: [], states: ['selected', 'disabled'], parts: ['root', 'body', 'remove'], removed: ['pdx-toggle'] },
     // icon.css draws its box; spinning and a right-to-left mirror are states, not inline styles.
     { tag: 'pdx-icon', models: [], outputs: [], states: ['spin', 'mirror'], parts: ['root'], removed: [] },
+    // No toggle mode: the on/off button is pdx-toggle, and `pdx migrate` rewrites to it (button-toggle-removed,
+    // which also moves an `@pdx-toggle` handler: no alpha event is recorded for the generic rewrite).
+    { tag: 'pdx-button', models: [], outputs: [], states: ['loading'], parts: ['root', 'label'], removed: ['toggle', 'pressed'] },
+    // A visual group of action buttons (decision 51): no value, no model, no event; its modes went in #286.
+    { tag: 'pdx-button-group', models: [], outputs: [], states: [], parts: [], removed: ['mode', 'value'] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -120,5 +125,29 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
         const members = (decl?.members ?? []).map((m) => m.name);
         expect([...events, ...members].filter((n) => row.removed.includes(n))).toEqual([]);
         expect(decl?.alphaEvents ?? []).toEqual(row.removed.filter((n) => n.startsWith('pdx-')));
+    });
+});
+
+describe('the family, across its components (#291)', () => {
+    const decl = (tag: string) => decls.find((d) => d.tagName === tag);
+    const names = (tag: string) => [...(decl(tag)?.events ?? []).map((e) => e.name), ...(decl(tag)?.members ?? []).map((m) => m.name)];
+
+    it('pdx-button declares neither toggle, pressed nor pdx-toggle; the chip not pdx-toggle', () => {
+        expect(names('pdx-button').filter((n) => ['toggle', 'pressed', 'pdx-toggle'].includes(n))).toEqual([]);
+        expect(names('pdx-chip')).not.toContain('pdx-toggle');
+    });
+
+    it('pdx-button-group declares no mode, no value, no model and no event', () => {
+        const group = decl('pdx-button-group');
+        expect(names('pdx-button-group').filter((n) => n === 'mode' || n === 'value')).toEqual([]);
+        expect(group?.models ?? []).toEqual([]);
+        expect(group?.events ?? []).toEqual([]);
+    });
+
+    it('no rule under packages/design/src selects .pdx-pressed', () => {
+        const css = (dir: string): string[] => readdirSync(dir, { withFileTypes: true }).flatMap((e) =>
+            e.isDirectory() ? css(join(dir, e.name)) : e.name.endsWith('.css') ? [join(dir, e.name)] : []);
+        const selecting = css(join(root, '..', 'design', 'src')).filter((f) => /\.pdx-pressed\b/.test(readFileSync(f, 'utf8')));
+        expect(selecting).toEqual([]);
     });
 });

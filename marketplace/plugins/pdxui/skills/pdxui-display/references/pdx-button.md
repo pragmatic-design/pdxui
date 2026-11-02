@@ -22,8 +22,6 @@ no `@click` to write.
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `type` | `type` | 'button' \| 'submit' \| 'reset' | `'button'` | Native button type: 'button', 'submit' or 'reset'. |
 | `full` | `full` | boolean | `false` | Stretches to the full width of its container. |
-| `toggle` | `toggle` | boolean | `false` | Toggle mode: button maintains pressed/unpressed state |
-| `pressed` | `pressed` | boolean | `false` | Pressed state for toggle buttons |
 | `label` | `label` | string | `''` | The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. |
 | `ariaLabel` | `arialabel` | string | `''` | The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
 | `ariaLabelledby` | `arialabelledby` | string | `''` | The id of an element whose text names the button, forwarded to the inner `<button>`. |
@@ -32,7 +30,11 @@ no `@click` to write.
 | `variant` | `variant` | 'primary' \| 'solid' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. |
 
-**Events:** `pdx-action-error` → `detail: { error }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.; `pdx-toggle` → `detail: { pressed }` — Fired when toggled open or closed. Does not bubble.
+**Events:** `pdx-action-error` → `detail: { error }` — When the `action`'s `execute` rejects. The error is the one the action keeps on its `error()`; the button is idle again.
+
+**States:** `:state(loading)` — `loading` is set, or the `action` is pending: the button shows a spinner and is `aria-busy`.
+
+**Parts:** `[data-part="root"]` — The native `<button>`.; `[data-part="label"]` — The text of `label`, after any slotted content.
 
 
 #### Examples
@@ -71,13 +73,6 @@ are checked against the manifest above._
 <pdx-button variant="primary" size="sm">Small</pdx-button>
 <pdx-button variant="primary">Default</pdx-button>
 <pdx-button variant="primary" size="lg">Large</pdx-button>
-```
-
-**Toggle Button** — Add `toggle` prop for stateful on/off buttons. Uses `aria-pressed`. Emits `pdx-toggle`.
-
-```html
-<pdx-button toggle variant="outline">Bold</pdx-button>
-<pdx-button toggle variant="primary" pressed>Active</pdx-button>
 ```
 
 **Loading State** — Set `loading` prop. Button becomes disabled with spinner overlay. `aria-busy="true"` set automatically. Click to toggle.

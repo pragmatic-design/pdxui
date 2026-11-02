@@ -57,13 +57,6 @@ export default {
 <pdx-button variant="ghost" disabled>Ghost</pdx-button>`,
         },
         {
-            title: 'Toggle',
-            description: 'The toggle prop makes a stateful on/off button using aria-pressed.',
-            src: `<pdx-button toggle variant="outline" size="sm">B</pdx-button>
-<pdx-button toggle variant="outline" size="sm">I</pdx-button>
-<pdx-button toggle variant="primary" pressed>Active</pdx-button>`,
-        },
-        {
             title: 'Full width',
             description: 'The full prop makes a block-level button.',
             src: `<div style="display:flex;flex-direction:column;gap:.5rem;width:100%;max-width:400px">
@@ -116,7 +109,7 @@ export default {
     a11y: {
         notes: 'Renders a native <button>, so keyboard activation and focus are built in. '
             + 'disabled and loading both block activation; loading also sets aria-busy="true". '
-            + 'A toggle button exposes its state via aria-pressed.',
+            + 'An on/off button, with aria-pressed, is <pdx-toggle>.',
         keyboard: [
             { keys: 'Enter / Space', desc: 'Activate the button' },
             { keys: 'Tab', desc: 'Move focus to the button' },

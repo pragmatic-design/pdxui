@@ -35,14 +35,8 @@ component('pdx-button-group', {
             el.classList.toggle('pdx-btn-group-vertical', orient === 'vertical');
             el.classList.toggle('pdx-btn-group', orient !== 'vertical');
 
-            // ARIA on host. No aria-orientation: a `group` may not carry it (axe aria-allowed-attr).
-            el.setAttribute('role', 'group');
-            if (disabled) {
-                el.setAttribute('aria-disabled', 'true');
-            } else {
-                el.removeAttribute('aria-disabled');
-            }
-            // The name goes where the role is — on the host. Without `label`, an author's aria-label stays.
+            // The name goes where the role is — on the host. Without `label`, an author's aria-label
+            // stays, which a `host` binding would remove: it is written here.
             const label = ctx.label() as string;
             if (label) { el.setAttribute('aria-label', label); labelled = true; }
             else if (labelled) { el.removeAttribute('aria-label'); labelled = false; }
@@ -59,6 +53,14 @@ component('pdx-button-group', {
         });
 
         return {};
+    },
+    // Its role and ARIA (#133, #291). No aria-orientation: a `group` may not carry it (axe's
+    // aria-allowed-attr). Its classes, `pdx-btn-group` and `pdx-btn-group-vertical`, are the design
+    // system's CSS-only classes, set in setup: a `host` binding writes the whole attribute, and would
+    // wipe the author's classes. Written after `setup`, so its type is read.
+    host: {
+        role: 'group',
+        ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
     },
     // Empty render — host element IS the group container, children projected directly
     render: () => html`<slot></slot>`,

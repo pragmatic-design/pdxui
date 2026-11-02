@@ -15,14 +15,12 @@ describe('pdx-button', () => {
         expect([plain.getAttribute('variant'), danger.getAttribute('variant')]).toEqual(['primary', 'danger']);
     });
 
-    it('keeps the state classes, loading and pressed, on its inner button', async () => {
+    it('loading is no class on its inner button (#291): it is aria-busy, and :state(loading) in a browser', async () => {
+        // happy-dom has no custom states: button-beta-contract.spec.ts measures :state(loading) in Chromium.
         const busy = await mount('pdx-button', { loading: '' });
         await tick();
-        expect(busy.querySelector('button')?.className).toBe('pdx-button pdx-loading');
-        const toggle = await mount('pdx-button', { toggle: '', pressed: '' });
-        await tick();
-        await new Promise<void>((r) => requestAnimationFrame(() => r()));
-        expect(toggle.querySelector('button')?.className).toBe('pdx-button pdx-pressed');
+        expect(busy.querySelector('button')?.className).toBe('pdx-button');
+        expect(busy.querySelector('button')?.getAttribute('aria-busy')).toBe('true');
     });
 
     it('reflects its variant and size on the host, the defaults included (#512)', async () => {
@@ -48,41 +46,19 @@ describe('pdx-button', () => {
         expect(btn?.disabled).toBe(true);
     });
 
-    it('toggle mode: click toggles pressed state', async () => {
-        const el = await mount('pdx-button', { toggle: '' });
-        await tick();
-        const btn = el.querySelector('button');
-
-        btn?.click();
-        await tick();
-        expect(btn?.getAttribute('aria-pressed')).toBe('true');
-
-        btn?.click();
-        await tick();
-        expect(btn?.getAttribute('aria-pressed')).toBe('false');
-    });
-
-    it('toggle mode: pressed prop controls state externally', async () => {
+    it('has no toggle mode (#291): toggle and pressed do nothing, a click flips no state and announces no pdx-toggle', async () => {
+        // The on/off button is pdx-toggle; `pdx migrate` rewrites a `<pdx-button toggle>` to it.
         const el = await mount('pdx-button', { toggle: '', pressed: '' });
-        await tick();
-        const btn = el.querySelector('button');
-        expect(btn?.getAttribute('aria-pressed')).toBe('true');
-    });
-
-    it('emits pdx-toggle on toggle button click', async () => {
-        const el = await mount('pdx-button', { toggle: '' });
         let toggled = false;
         el.addEventListener('pdx-toggle', () => { toggled = true; });
+        await tick();
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
         const btn = el.querySelector('button');
         btn?.click();
         await tick();
-        expect(toggled).toBe(true);
-    });
-
-    it('loading state adds pdx-loading class', async () => {
-        const el = await mount('pdx-button', { loading: '' });
-        await tick();
-        const btn = el.querySelector('button');
-        expect(btn?.className).toContain('pdx-loading');
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
+        expect(btn?.hasAttribute('aria-pressed')).toBe(false);
+        expect(btn?.className).toBe('pdx-button');
+        expect(toggled).toBe(false);
     });
 });
