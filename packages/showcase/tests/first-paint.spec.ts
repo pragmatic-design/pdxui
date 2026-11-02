@@ -70,10 +70,24 @@ import { throttle, lcpOf, medianLcp } from './lcp';
  *   entry doubled (+34 KB gzipped)   1097–1111 ms           (4 medians, all red)
  *
  * CI runs ~27 ms slower than this machine, so a doubled entry there should land around 1070–1185.
- * The alarm sits between the two: 27 ms over the highest unchanged CI median, ~30 under the lowest
+ * The alarm sat between the two: 27 ms over the highest unchanged CI median, ~30 under the lowest
  * doubled estimate, 57 under the doubled medians measured here.
+ *
+ * And the shipped row rose to meet it (#832): with the entry at 43.0 KB, a pre-push run measured
+ * 1046 ms (runs 1029–1060) and `main` alone had a run at 1041, no single change to blame. Re-measured
+ * 2026-11-02, the entry doubled by appending 43 KB gzipped of incompressible data to it (a temporary
+ * Vite plugin, 43.0 → 86.3 KB):
+ *
+ *                                   app ready median
+ *   as shipped, CI                   960–989 ms            (8 runs of 2026-11-02, none touching the page)
+ *   as shipped, here                1000–1003 ms           (4 medians)
+ *   as shipped, here, pre-push      1046 ms                (the run that went red, #832)
+ *   entry doubled, here             1206–1225 ms           (4 medians, all red)
+ *
+ * CI is now the faster of the two, by ~15–40 ms. The alarm sits between the rows again: 74 ms over
+ * the slowest shipped median, the one under the pre-push's load, 86 under the fastest doubled one.
  */
-const APP_READY_CEILING_MS = 1_040;
+const APP_READY_CEILING_MS = 1_120;
 
 interface Timings {
     /** The first contentful paint — the SPLASH's, before any JavaScript has run. */
