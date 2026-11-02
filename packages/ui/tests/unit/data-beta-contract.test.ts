@@ -10,7 +10,7 @@ import { join } from 'path';
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
 type Member = { kind: string; name: string };
-type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts?: Named[]; events?: Named[]; members?: Member[]; alphaEvents?: string[]; capabilities?: Named[] };
+type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts?: Named[]; events?: Named[]; members?: Member[]; alphaEvents?: string[]; capabilities?: Named[]; variants?: { name: string; values: string[] }[] };
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
@@ -31,6 +31,8 @@ interface Row {
      * untyped detail such as `{ key, action }`, so the detail is what tells the two apart.
      */
     declaredEvents?: Record<string, string | undefined>;
+    /** Its variant axes and their values, reflected on the host. */
+    variants?: Record<string, string[]>;
 }
 
 const DONE: Row[] = [
@@ -80,6 +82,13 @@ const DONE: Row[] = [
         declaredEvents: { 'pdx-pick': '{ items: Record<string, unknown>[] }', 'pdx-create': undefined },
     },
     { tag: 'pdx-data-source', models: [], states: [], parts: [], removed: [] },
+    // Its mode, connector and dot alignment are variant axes; pending and clickable are states.
+    {
+        tag: 'pdx-timeline', models: [], states: ['pending', 'clickable'],
+        parts: ['list', 'item', 'track', 'line', 'dot', 'content', 'title', 'description', 'date', 'pending'], removed: [],
+        variants: { mode: ['left', 'right', 'alternate', 'horizontal'], connectorStyle: ['solid', 'dashed', 'dotted'], dotAlign: ['start', 'center', 'end'] },
+        declaredEvents: { 'pdx-click': '{ item: TimelineItem; index: number }' },
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -111,6 +120,11 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     it.runIf(row.declaredEvents)('declares its events, each with its typed detail', () => {
         const byName = Object.fromEntries((decl?.events ?? []).map((e) => [e.name, (e as Named & { detail?: string }).detail]));
         expect(byName).toEqual(row.declaredEvents);
+    });
+
+    it.runIf(row.variants)('declares its variant axes, each with its values', () => {
+        const axes = Object.fromEntries((decl?.variants ?? []).map((v) => [v.name, v.values]));
+        expect(axes).toEqual(row.variants);
     });
 
     it('declares its capabilities', () => {

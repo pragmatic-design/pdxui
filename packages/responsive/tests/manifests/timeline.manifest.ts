@@ -5,9 +5,9 @@
  * and the CSS (packages/design/src/components/timeline.css, the .pdx-tl* block).
  *
  * DOM structure (host vs inner):
- *   <pdx-timeline>                          ← HOST: receives .pdx-tl-root (ctx.el.classList.add, rAF)
- *     <ol class="pdx-tl [pdx-tl-horizontal|...]">  ← INNER, appended to the host (the
- *                                                     margin/marker reset lives in timeline.css)
+ *   <pdx-timeline mode="…" connector-style="…" dot-align="…">  ← HOST: its variant axes, reflected (#292, #834)
+ *     <ol class="pdx-tl" data-part="list">  ← INNER, appended to the host (the margin/marker reset
+ *                                               lives in timeline.css); no class for the mode
  *       <li class="pdx-tl-item">                 ← one event; its state in words inside a .pdx-sr-only
  *         <div class="pdx-tl-track">         ← the marker column: line + dot
  *           <div class="pdx-tl-line"></div>
