@@ -9249,6 +9249,24 @@
               "name": "editing",
               "description": "A cell or a row is being edited."
             }
+          ],
+          "capabilities": [
+            {
+              "name": "sortable",
+              "description": "A column declared `sortable` sorts on its header; the header carries `aria-sort`."
+            },
+            {
+              "name": "filterable",
+              "description": "The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`)."
+            },
+            {
+              "name": "selectable",
+              "description": "Rows are checked, one or many, with `selection=\"single\"` or `\"multiple\"`."
+            },
+            {
+              "name": "editable",
+              "description": "Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`."
+            }
           ]
         }
       ],

@@ -10,7 +10,7 @@ import { join } from 'path';
 const root = join(__dirname, '..', '..');
 type Named = { name: string };
 type Member = { kind: string; name: string };
-type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts?: Named[]; events?: Named[]; members?: Member[]; alphaEvents?: string[] };
+type Decl = { tagName?: string; models?: string[]; cssStates?: Named[]; cssParts?: Named[]; events?: Named[]; members?: Member[]; alphaEvents?: string[]; capabilities?: Named[] };
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
@@ -23,6 +23,8 @@ interface Row {
     removed: string[];
     /** Its alpha events, recorded so the compiler reports a listener on one and `pdx migrate` rewrites it. */
     alpha?: string[];
+    /** What it offers to do, declared with `@capability`. */
+    capabilities?: string[];
 }
 
 const DONE: Row[] = [
@@ -46,6 +48,8 @@ const DONE: Row[] = [
         states: ['striped', 'hover', 'row-clickable', 'compact', 'sticky-header', 'fill-height', 'loading', 'empty', 'editing'],
         parts: ['toolbar', 'group-bar', 'grid', 'header', 'column-header', 'filter-row', 'body', 'row', 'cell', 'summary', 'footer', 'empty', 'loading'],
         removed: [],
+        // What an agent's page card says it can do (library.md, «Accessibility»).
+        capabilities: ['sortable', 'filterable', 'selectable', 'editable'],
     },
 ];
 
@@ -73,5 +77,9 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
 
     it('records its alpha events', () => {
         expect(decl?.alphaEvents ?? []).toEqual(row.alpha ?? []);
+    });
+
+    it('declares its capabilities', () => {
+        expect((decl?.capabilities ?? []).map((c) => c.name)).toEqual(row.capabilities ?? []);
     });
 });

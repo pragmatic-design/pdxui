@@ -49,7 +49,10 @@ The rules of [agents.md](agents.md) A1–A6 are rules of the components that ren
 
 A component's manifest entry is also what an agent's page card reads ([agents.md](agents.md)
 `page()`): its role, its model and value, its states, its actions (sortable, filterable,
-selectable…). A capability the manifest does not declare is one an agent cannot be told about.
+selectable…). A capability the manifest does not declare is one an agent cannot be told about. A
+component declares one with a `@capability <name> - <what it does>` tag in its JSDoc, which the
+manifest lists as `capabilities: [{ name, description }]` (`pdx-data-grid` declares `sortable`,
+`filterable`, `selectable`, `editable`, #292).
 
 ## Performance
 

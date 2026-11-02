@@ -132,6 +132,11 @@ function warnRowHeightIgnored(el: Element): void {
  * @csspart footer - The footer and its pager; above the grid too with `pagination-position`.
  * @csspart empty - The empty status, while the source has settled with no row.
  * @csspart loading - The loading overlay, while the source is pending.
+ *
+ * @capability sortable - A column declared `sortable` sorts on its header; the header carries `aria-sort`.
+ * @capability filterable - The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`).
+ * @capability selectable - Rows are checked, one or many, with `selection="single"` or `"multiple"`.
+ * @capability editable - Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`.
  */
 component('pdx-data-grid', {
     props: {

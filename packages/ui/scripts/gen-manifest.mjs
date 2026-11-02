@@ -989,6 +989,9 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     }
     const cssProperties = tags.filter(t => t.tag === 'cssprop' || t.tag === 'cssproperty').map(t => splitNameDesc(t.text));
     const cssStates = extractDescriptorStates(optionsObj, sourceFile, tags);
+    // The capabilities (#292): `@capability <name> - <what it does>`, what an agent's page card says the
+    // component can do — sortable, filterable, selectable, editable (library.md, «Accessibility»).
+    const capabilities = tags.filter(t => t.tag === 'capability').map(t => splitNameDesc(t.text));
     // The alpha events the component no longer emits (#478): `@alphaevent <name>`, and how each alpha
     // `detail.<field>` reads in the beta, `@alphadetail <field> <expression>`. The compiler reports a
     // listener on one as a removed form; `pdx migrate` rewrites it with the detail map.
@@ -1085,6 +1088,8 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
             ...(cssParts.length ? { cssParts } : {}),
             ...(cssProperties.length ? { cssProperties } : {}),
             ...(cssStates.length ? { cssStates } : {}),
+            // What the component offers to do, which an agent's page card reads (#292).
+            ...(capabilities.length ? { capabilities } : {}),
             ...(contexts.provides.length || contexts.injects.length ? {
                 'x-pdx-context': {
                     ...(contexts.provides.length ? { provides: contexts.provides } : {}),
