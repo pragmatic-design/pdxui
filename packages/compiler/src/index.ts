@@ -13,7 +13,7 @@ export { stringContextKeys, contextTokenName, LIBRARY_CONTEXT_TOKENS, type Conte
 export { projectRoutePatterns, routeTypesDts, writeRouteTypes, routeParamsType, ROUTE_TYPES_FILE } from './route-types';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';
 export type { AlphaEvents, AlphaLookup } from './language/alpha-events';
-export { generateDts, modelEventName } from './compiler/dts-generator';
+export { generateDts, modelEventName, exposedMembers } from './compiler/dts-generator';
 export { SourceMapBuilder } from './compiler/sourcemap';
 export type { SourceMapJSON } from './compiler/sourcemap';
 

@@ -102,6 +102,8 @@ function projectContext(cwd: string, prefix: string, paths: string[]): LanguageC
             routePatterns: new Set(projectRoutePatterns(cwd, paths)),
             // The alpha events a library component no longer emits, from its manifest (#478).
             alphaOf: (tag) => resolver.alphaOf(tag),
+            // The reactive names a project .pdx exposes, which are values on the element now (#752).
+            reactiveExposedOf: (tag) => resolver.reactiveExposedOf(projectTags.get(tag) ?? tag),
         };
     } catch {
         return {};

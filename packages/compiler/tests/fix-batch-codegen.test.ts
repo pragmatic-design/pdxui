@@ -112,7 +112,8 @@ describe('#3 template-literal escaping', () => {
 });
 
 describe('#5 @expose maps signals to internal var', () => {
-    it('exposes a signal as __name and a function bare', () => {
+    // Since #752 the signal is an accessor over __name, not __name itself; the mapping is the same.
+    it('exposes a signal as an accessor over __name and a function bare', () => {
         const source = `<template><div>{{ count }}</div></template>
 <script>
 let count = $signal(0);
@@ -120,7 +121,7 @@ function reset() { count = 0; }
 @expose count, reset;
 </script>`;
         const { code } = compile(source, 'expose.pdx', [], undefined, { production: false });
-        expect(code).toContain('ctx.expose({ count: __count, reset })');
+        expect(code).toContain('ctx.expose({ get count() { return __count(); }, set count(v) { __count.setRaw(v); }, reset })');
     });
 });
 

@@ -505,6 +505,11 @@ calls the exposed method named by the command without its `--` prefix, so
 `<button commandfor="confirm" command="--open">` opens `<app-dialog id="confirm">` with no script.
 Descriptor: `expose: ['open', 'close']`.
 
+An exposed `$signal` or `$derived` is its **value** on the element, not the function the component
+keeps it in (#752): `el.selected` reads it. A `$signal` is written with `el.selected = v`, which the
+component sees; a `$derived` is read-only. The `.d.ts` types a `$derived` as `readonly name: T` and a
+`$signal` as `name: T`, `T` being the type the declaration was written with, `unknown` without one.
+
 ### Rules
 
 - A `commandfor` whose target id is not in the template: `PDX_COMMAND_TARGET_MISSING`; a custom

@@ -490,6 +490,9 @@ function close() { isOpen = false; }
 From the parent, with a reference to the element: `dialogRef.open()`. Use it sparingly: if you can
 get the same result with a prop (`:open="..."`), prefer the prop — it's more declarative.
 
+Exposing a `$signal` or a `$derived` puts its **value** on the element: `@expose isOpen` lets the
+parent read `dialogRef.isOpen`, and write `dialogRef.isOpen = true`. A `$derived` is read-only.
+
 ## @part — named, public parts
 
 A component's inner elements are its own business, except the ones it names. `@part` declares them,

@@ -81,6 +81,8 @@ export interface ScriptSnippet {
 export interface SignalDecl {
     name: string;
     initialExpr: string;
+    /** The type written for it (`$signal<T>`, or an annotation), for the .d.ts of an `@expose` (#752). */
+    type?: string;
     /** Where the declaration was written in the .pdx, when a source map was asked for. */
     origin?: number;
 }
@@ -88,6 +90,8 @@ export interface SignalDecl {
 export interface DerivedDecl {
     name: string;
     expr: string;
+    /** The type written for it (`$derived<T>`, or an annotation), for the .d.ts of an `@expose` (#752). */
+    type?: string;
     /** Where the declaration was written in the .pdx, when a source map was asked for. */
     origin?: number;
 }

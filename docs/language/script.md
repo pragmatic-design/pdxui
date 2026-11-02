@@ -418,14 +418,19 @@ The analyzer's form: `@expose methodA, methodB;`
 #### Semantics
 
 Puts the named members on the host element, for a parent that holds a reference to it: the setup
-ends with `ctx.expose({ methodA, methodB })`, which defines them as read-only properties of the
-element. A `$signal` is exposed as its signal (`open: __open`), so the outside reads it with `open()`
-and writes it with `open.set(…)`; a function or a constant as it is.
+ends with `ctx.expose({ methodA, methodB })`, which defines them as properties of the element that the
+outside cannot reassign. A function or a constant is exposed as it is. A reactive name is an accessor
+to its value (#752): a `$signal` gets a getter and a setter, so the outside reads `el.open` and writes
+`el.open = true`, a write the component sees, the value stored as it is, as an assignment does; a
+`$derived` gets a getter alone and is read-only. The `.d.ts` declares them on the element, a `$derived`
+`readonly`, each with the type its declaration was written with (`$signal<T>`, `$derived<T>` or an
+annotation), `unknown` without one.
 
 #### Rules
 
 - A name the component does not declare raises `PDX_EXPOSE_UNDECLARED`.
 - Several `@expose` lines add up.
+- An exposed `$signal` or `$derived` counts as used: no `PDX_UNUSED_REACTIVE`, its reader is outside.
 
 #### Examples
 

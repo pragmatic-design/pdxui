@@ -560,12 +560,16 @@ export function buildSetupBody(
         }
     });
 
-    // @expose — expose declared names on the host element.
-    // Signals live under the __name internal var, so map name → __name (like auto-return);
-    // plain functions/consts keep their bare name.
+    // @expose — expose declared names on the host element (#752). A reactive name becomes an accessor
+    // to its value: a $derived a getter alone (read-only), a $signal a getter and a setter that stores
+    // the value as an assignment in the script does (setRaw: a function is kept, not called). Functions
+    // and constants keep their bare name.
     if (analysis.exposes.length > 0) {
+        const derivedNames = new Set(analysis.deriveds.map(d => d.name));
         const exposeObj = analysis.exposes.map(n =>
-            signalNames.has(n) ? `${n}: __${n}` : `${n}`,
+            signalNames.has(n) ? `get ${n}() { return __${n}(); }, set ${n}(v) { __${n}.setRaw(v); }`
+                : derivedNames.has(n) ? `get ${n}() { return ${n}(); }`
+                    : `${n}`,
         ).join(', ');
         parts.push(`    ctx.expose({ ${exposeObj} });`);
     }
