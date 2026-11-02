@@ -22,17 +22,6 @@ registerPragmaticResolver();
 const SIZES: Record<string, number> = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 };
 
 /**
- * The size in pixels: a name of the scale, or a number of pixels — what the library's own components
- * pass (`size="48"` in pdx-empty-state, `"15"` in pdx-command). Anything else is md. A number fell back
- * to md before, and every one of those icons was drawn at 20px.
- */
-function sizeInPixels(size: string): number {
-    if (SIZES[size] !== undefined) return SIZES[size];
-    const px = Number(size);
-    return Number.isFinite(px) && px > 0 ? px : SIZES['md'];
-}
-
-/**
  * An icon drawn as SVG from a registered set, inline markup or a URL, with accessibility built in.
  */
 component('pdx-icon', {
@@ -68,7 +57,12 @@ component('pdx-icon', {
             const srcProp = ctx.src() as string;
             const nameProp = ctx.name() as string;
             const setProp = ctx.set() as string;
-            const sizePx = sizeInPixels((ctx.size() as string) || 'md');
+            // A name of the scale, or a number of pixels — what the library's own components pass
+            // (`size="48"` in pdx-empty-state, `"15"` in pdx-command); anything else is md (20). A number
+            // fell back to md before, and every one of those icons was drawn at 20px. Written short: this
+            // module is in the showcase's entry, whose budget counts every byte.
+            const sizeName = (ctx.size() as string) || 'md';
+            const sizePx = SIZES[sizeName] ?? (+sizeName > 0 ? +sizeName : 20);
             const labelVal = ctx.label() as string;
             const weightVal = ctx.weight() as string;
             const rtlVal = ctx.rtl() as string;
