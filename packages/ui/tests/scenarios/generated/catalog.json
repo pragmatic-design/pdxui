@@ -3250,6 +3250,46 @@
         {
           "id": "timeline-horizontal",
           "title": "Timeline — Horizontal"
+        },
+        {
+          "id": "timeline-mode-left",
+          "title": "pdx-timeline — mode=\"left\""
+        },
+        {
+          "id": "timeline-mode-right",
+          "title": "pdx-timeline — mode=\"right\""
+        },
+        {
+          "id": "timeline-mode-alternate",
+          "title": "pdx-timeline — mode=\"alternate\""
+        },
+        {
+          "id": "timeline-mode-horizontal",
+          "title": "pdx-timeline — mode=\"horizontal\""
+        },
+        {
+          "id": "timeline-connectorStyle-solid",
+          "title": "pdx-timeline — connectorStyle=\"solid\""
+        },
+        {
+          "id": "timeline-connectorStyle-dashed",
+          "title": "pdx-timeline — connectorStyle=\"dashed\""
+        },
+        {
+          "id": "timeline-connectorStyle-dotted",
+          "title": "pdx-timeline — connectorStyle=\"dotted\""
+        },
+        {
+          "id": "timeline-dotAlign-start",
+          "title": "pdx-timeline — dotAlign=\"start\""
+        },
+        {
+          "id": "timeline-dotAlign-center",
+          "title": "pdx-timeline — dotAlign=\"center\""
+        },
+        {
+          "id": "timeline-dotAlign-end",
+          "title": "pdx-timeline — dotAlign=\"end\""
         }
       ]
     },

@@ -28639,16 +28639,6 @@
             },
             {
               "kind": "field",
-              "name": "mode",
-              "description": "Alignment: 'left', 'right' or 'alternate'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'left'",
-              "attribute": "mode"
-            },
-            {
-              "kind": "field",
               "name": "reverse",
               "description": "Renders items newest-first.",
               "type": {
@@ -28689,10 +28679,20 @@
             },
             {
               "kind": "field",
-              "name": "connectorStyle",
-              "description": "Line style between nodes (solid, dashed, …).",
+              "name": "mode",
+              "description": "Where the events sit: beside the line, on the right of it, both sides in turn, or in a row.",
               "type": {
-                "text": "string"
+                "text": "'left' | 'right' | 'alternate' | 'horizontal'"
+              },
+              "default": "'left'",
+              "attribute": "mode"
+            },
+            {
+              "kind": "field",
+              "name": "connectorStyle",
+              "description": "How the connector between the dots is drawn.",
+              "type": {
+                "text": "'solid' | 'dashed' | 'dotted'"
               },
               "default": "'solid'",
               "attribute": "connectorstyle"
@@ -28700,12 +28700,42 @@
             {
               "kind": "field",
               "name": "dotAlign",
-              "description": "Dot vertical alignment relative to content: 'start' | 'center' | 'end'",
+              "description": "Where a dot sits against its event's content.",
               "type": {
-                "text": "string"
+                "text": "'start' | 'center' | 'end'"
               },
               "default": "'start'",
               "attribute": "dotalign"
+            }
+          ],
+          "variants": [
+            {
+              "name": "mode",
+              "values": [
+                "left",
+                "right",
+                "alternate",
+                "horizontal"
+              ],
+              "default": "left"
+            },
+            {
+              "name": "connectorStyle",
+              "values": [
+                "solid",
+                "dashed",
+                "dotted"
+              ],
+              "default": "solid"
+            },
+            {
+              "name": "dotAlign",
+              "values": [
+                "start",
+                "center",
+                "end"
+              ],
+              "default": "start"
             }
           ],
           "events": [
@@ -28714,20 +28744,11 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-click`.",
-              "detail": "{ item, index }"
+              "description": "A clickable event was clicked, or pressed with Enter or Space.",
+              "detail": "{ item: TimelineItem; index: number }"
             }
           ],
           "attributes": [
-            {
-              "name": "mode",
-              "fieldName": "mode",
-              "description": "Alignment: 'left', 'right' or 'alternate'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'left'"
-            },
             {
               "name": "reverse",
               "fieldName": "reverse",
@@ -28765,20 +28786,29 @@
               "default": "false"
             },
             {
+              "name": "mode",
+              "fieldName": "mode",
+              "description": "Where the events sit: beside the line, on the right of it, both sides in turn, or in a row.",
+              "type": {
+                "text": "'left' | 'right' | 'alternate' | 'horizontal'"
+              },
+              "default": "'left'"
+            },
+            {
               "name": "connectorstyle",
               "fieldName": "connectorStyle",
-              "description": "Line style between nodes (solid, dashed, …).",
+              "description": "How the connector between the dots is drawn.",
               "type": {
-                "text": "string"
+                "text": "'solid' | 'dashed' | 'dotted'"
               },
               "default": "'solid'"
             },
             {
               "name": "dotalign",
               "fieldName": "dotAlign",
-              "description": "Dot vertical alignment relative to content: 'start' | 'center' | 'end'",
+              "description": "Where a dot sits against its event's content.",
               "type": {
-                "text": "string"
+                "text": "'start' | 'center' | 'end'"
               },
               "default": "'start'"
             }
@@ -28802,6 +28832,58 @@
               "name": "content",
               "description": "Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).",
               "signature": "(item: T, index: number)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The `<ol>` of events."
+            },
+            {
+              "name": "item",
+              "description": "One event, an `<li>`."
+            },
+            {
+              "name": "track",
+              "description": "The column of an event's line and dot."
+            },
+            {
+              "name": "line",
+              "description": "The connector, drawn as the axis `connector-style` says."
+            },
+            {
+              "name": "dot",
+              "description": "The event's dot, with its icon when it has one."
+            },
+            {
+              "name": "content",
+              "description": "The event's text, or the `content` snippet."
+            },
+            {
+              "name": "title",
+              "description": "The event's title."
+            },
+            {
+              "name": "description",
+              "description": "The event's description."
+            },
+            {
+              "name": "date",
+              "description": "The event's date."
+            },
+            {
+              "name": "pending",
+              "description": "The pending row, while `pending`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "pending",
+              "description": "`pending`: a last row says more is to come."
+            },
+            {
+              "name": "clickable",
+              "description": "`clickable`: each event is a tab stop, and a click or Enter emits `pdx-click`."
             }
           ]
         }

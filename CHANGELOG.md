@@ -394,6 +394,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-timeline` takes the beta contract (#292), the last of the data family. `mode`,
+  `connectorStyle` and `dotAlign` are variant axes, reflected on the host as `mode`, `connector-style`
+  and `dot-align` and drawn by `@variant` rules, in place of the classes on its list and the
+  `pdx-tl-root` class on its host. `pending` and `clickable` are states, its pieces are parts, and
+  `pdx-click` is declared. A clickable timeline's events share one click and one keydown listener on
+  the list: 200 events add no more listeners than 2, where they added 401 against 5.
 - **Breaking:** the data composites take the beta contract (#292). `pdx-bulk-actions`,
   `pdx-edit-drawer`, `pdx-entity-grid` and `pdx-relation-picker` declare their events, which stay on
   the host and carry typed details; `pdx-clear` and `pdx-cancel` carry none, where they carried `{}`.
