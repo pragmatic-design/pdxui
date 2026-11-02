@@ -394,6 +394,10 @@ semver.
 
 ### Changed
 
+- `pdx-tree` takes the beta contract (#292). Its rows share one click listener on the tree, as its
+  keyboard already did: a tree of 200 nodes adds no more listeners than one of 2. A lazy branch on its
+  way makes the tree `:state(loading)` and `aria-busy`; `disabled` is `:state(disabled)`; its root,
+  rows, groups, twisties, checkboxes and labels are parts.
 - **Breaking:** `pdx-list` takes the beta contract (#292), the first of the data family.
   - **No `renderItem`.** An item is drawn by the `item` snippet or scoped slot; `pdx migrate` flags a
     `render-item`, and in a `.pdx` it is `PDX_REMOVED_FORM`.

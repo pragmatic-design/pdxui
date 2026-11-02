@@ -42,8 +42,18 @@ type CheckState = 'true' | 'false' | 'mixed';
  * @fires pdx-check - `{ checked: string[] }` — the ids fully checked (a mixed parent is not one).
  * @fires pdx-load-error - `{ id, error }` — `loadChildren` rejected; the branch stays askable.
  * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+ * @csspart root - The `role="tree"`: one click and one keydown listener serve every row.
+ * @csspart item - A row, `role="treeitem"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3).
+ * @csspart group - The `role="group"` of an open branch's children.
+ * @csspart twisty - A branch's open/closed marker.
+ * @csspart check - A row's checkbox, with `checkable`.
+ * @csspart label - A row's label.
+ * @cssstate loading - A lazy branch is loading: the tree is `aria-busy` too (A4).
+ * @cssstate disabled - `disabled` is set: a click opens and selects nothing.
  */
 component('pdx-tree', {
+    states: ['loading', 'disabled'],
+    parts: ['root', 'item', 'group', 'twisty', 'check', 'label'],
     props: {
         /** The roots. Children are read from `childrenField`. */
         nodes: { type: Array, default: () => [] },
@@ -213,6 +223,7 @@ component('pdx-tree', {
 
             const row = document.createElement('div');
             row.className = 'pdx-tree-item';
+            row.dataset.part = 'item';
             row.setAttribute('role', 'treeitem');
             row.dataset.nodeId = id;
             row.tabIndex = -1;
@@ -231,6 +242,7 @@ component('pdx-tree', {
 
             const twisty = document.createElement('span');
             twisty.className = 'pdx-tree-twisty';
+            twisty.dataset.part = 'twisty';
             twisty.setAttribute('aria-hidden', 'true');
             twisty.textContent = branch ? (loading.has(id) ? '⋯' : (expanded.has(id) ? '▾' : '▸')) : '';
             row.appendChild(twisty);
@@ -239,6 +251,7 @@ component('pdx-tree', {
                 const box = document.createElement('input');
                 box.type = 'checkbox';
                 box.className = 'pdx-tree-check';
+                box.dataset.part = 'check';
                 const state = checkStateOf(node);
                 box.checked = state === 'true';
                 box.indeterminate = state === 'mixed';
@@ -246,27 +259,38 @@ component('pdx-tree', {
                 // `aria-checked`, and two announcements of one state is one too many.
                 box.tabIndex = -1;
                 box.setAttribute('aria-hidden', 'true');
-                box.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    setChecked(node, state !== 'true');
-                });
                 row.appendChild(box);
             }
 
             const label = document.createElement('span');
             label.className = 'pdx-tree-label';
+            label.dataset.part = 'label';
             const slot = getNodeSlot();
             if (slot) label.appendChild(slot({ node, level, expanded: expanded.has(id) }));
             else label.textContent = labelOf(node);
             row.appendChild(label);
 
-            row.addEventListener('click', () => {
-                if (ctx.disabled()) return;
-                if (branch) void toggle(node);
-                select(node);
-            });
-
             return row;
+        }
+
+        /**
+         * One click listener for every row (#292, library.md «Performance»): a tree of 500 nodes had
+         * two listeners a row. The row's checkbox checks its subtree; anywhere else on a row opens a
+         * branch and selects the node.
+         */
+        function onClick(e: MouseEvent): void {
+            const target = e.target as HTMLElement;
+            const row = target.closest?.('[role="treeitem"]') as HTMLElement | null;
+            if (!row || !rootEl?.contains(row)) return;
+            const node = nodeOfRow(row);
+            if (!node) return;
+            if (target.closest('[data-part="check"]')) {
+                setChecked(node, checkStateOf(node) !== 'true');
+                return;
+            }
+            if (ctx.disabled()) return;
+            if (isBranch(node)) void toggle(node);
+            select(node);
         }
 
         function rebuild(): void {
@@ -278,6 +302,11 @@ component('pdx-tree', {
             else rootEl.removeAttribute('aria-multiselectable');
             const name = ctx.label() as string;
             if (name) rootEl.setAttribute('aria-label', name);
+            // A lazy branch on its way is a pending source (A4): the tree is busy, and says so.
+            const busy = loading.size > 0;
+            ctx.state('loading', busy);
+            if (busy) rootEl.setAttribute('aria-busy', 'true');
+            else rootEl.removeAttribute('aria-busy');
 
             const render = (list: TreeNode[], level: number, into: HTMLElement) => {
                 list.forEach((node, i) => {
@@ -287,6 +316,7 @@ component('pdx-tree', {
                         if (kids.length === 0) return;
                         const group = document.createElement('div');
                         group.className = 'pdx-tree-group';
+                        group.dataset.part = 'group';
                         group.setAttribute('role', 'group');
                         render(kids, level + 1, group);
                         into.appendChild(group);
@@ -406,6 +436,7 @@ component('pdx-tree', {
             void ctx.selectionMode();
             void ctx.checkable();
             void ctx.label();
+            ctx.state('disabled', !!ctx.disabled());
 
             requestAnimationFrame(() => {
                 rootEl = ctx.el.querySelector('.pdx-tree');
@@ -426,6 +457,7 @@ component('pdx-tree', {
                     // different set from "the children of this element" and changes on every
                     // toggle. `focusRow` is the one place that moves the single tab stop.
                     rootEl.addEventListener('keydown', onKeyDown);
+                    rootEl.addEventListener('click', onClick);
                 }
                 rebuild();
             });
@@ -433,6 +465,7 @@ component('pdx-tree', {
 
         onDestroy(() => {
             rootEl?.removeEventListener('keydown', onKeyDown);
+            rootEl?.removeEventListener('click', onClick);
             if (typeaheadTimer) clearTimeout(typeaheadTimer);
         });
 
@@ -441,7 +474,7 @@ component('pdx-tree', {
     // The root the setup fills. Everything below it is built imperatively: a tree's rows are
     // siblings inside their `role="group"`, and the ARIA a row carries depends on where it sits in
     // the whole — which is a thing to compute once per rebuild, not per binding.
-    render: () => html`<div class="pdx-tree"></div>`,
+    render: () => html`<div class="pdx-tree" data-part="root"></div>`,
 });
 
 /** The node a snippet receives, the app's (#651): the editor infers it from `:nodes`. */

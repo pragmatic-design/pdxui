@@ -36,6 +36,10 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 
 **Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
 
+**States:** `:state(loading)` — A lazy branch is loading: the tree is `aria-busy` too (A4).; `:state(disabled)` — `disabled` is set: a click opens and selects nothing.
+
+**Parts:** `[data-part="root"]` — The `role="tree"`: one click and one keydown listener serve every row.; `[data-part="item"]` — A row, `role="treeitem"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3).; `[data-part="group"]` — The `role="group"` of an open branch's children.; `[data-part="twisty"]` — A branch's open/closed marker.; `[data-part="check"]` — A row's checkbox, with `checkable`.; `[data-part="label"]` — A row's label.
+
 **Shapes:** `TreeNode { isBranch?: boolean }`
 
 

@@ -30,6 +30,8 @@ const DONE: Row[] = [
     { tag: 'pdx-sortable-list', models: [], states: ['disabled'], parts: ['list', 'item', 'handle', 'body'], removed: [] },
     // Its conditions are states; aria-busy only while loading, and each status speaks only when it has to (A4).
     { tag: 'pdx-infinite-scroll', models: [], states: ['loading', 'ended', 'disabled'], parts: ['sentinel', 'loading', 'end'], removed: [] },
+    // Row listeners delegated to the tree; a lazy branch loading is a state and aria-busy (A4).
+    { tag: 'pdx-tree', models: [], states: ['loading', 'disabled'], parts: ['root', 'item', 'group', 'twisty', 'check', 'label'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

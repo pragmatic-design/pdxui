@@ -30542,6 +30542,42 @@
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
             }
           ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `role=\"tree\"`: one click and one keydown listener serve every row."
+            },
+            {
+              "name": "item",
+              "description": "A row, `role=\"treeitem\"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3)."
+            },
+            {
+              "name": "group",
+              "description": "The `role=\"group\"` of an open branch's children."
+            },
+            {
+              "name": "twisty",
+              "description": "A branch's open/closed marker."
+            },
+            {
+              "name": "check",
+              "description": "A row's checkbox, with `checkable`."
+            },
+            {
+              "name": "label",
+              "description": "A row's label."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "A lazy branch is loading: the tree is `aria-busy` too (A4)."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: a click opens and selects nothing."
+            }
+          ],
           "cssProperties": [
             {
               "name": "--pdx-tree-level"
