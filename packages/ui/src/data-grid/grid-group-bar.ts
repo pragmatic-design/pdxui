@@ -7,6 +7,7 @@ import { t } from './grid-i18n';
 export function buildGroupBar(gc: GridContext): HTMLElement {
     const bar = document.createElement('div');
     bar.className = 'pdx-dg-group-bar';
+    bar.dataset.part = 'group-bar';
 
     // Drop zone listeners — attached once, survive innerHTML updates
     bar.addEventListener('dragover', (e) => {

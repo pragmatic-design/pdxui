@@ -394,6 +394,15 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-data-grid` takes the beta contract (#292). Its rows' events are one listener per
+  type on its body: a grid of 200 rows adds no more listeners than a grid of 2, where it added 2801
+  against 29. What a column's `format` returns is shown as text: markup goes through a typed cell
+  renderer or the `cell` snippet. Its looks are host states — `:state(striped)`, `hover`,
+  `row-clickable`, `compact`, `sticky-header`, `fill-height` — in place of the classes on its inner
+  wrapper, and `loading`, `empty` and `editing` are states too; while its source is pending the grid
+  is `aria-busy`, and its empty status holds text only while it shows. Its pieces are parts. Its
+  capabilities — sortable, filterable, selectable, editable — are in the manifest, from a new
+  `@capability` tag.
 - `pdx-chart` and `pdx-sparkline` take the beta contract (#292). Their role, name and, for the chart,
   its focus and its arrow keys are declared on the host. The chart's legend, legend buttons, swatches and canvas are parts, and the
   sparkline's canvas; the sparkline is certified as itself.

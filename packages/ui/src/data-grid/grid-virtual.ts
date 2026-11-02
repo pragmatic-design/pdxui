@@ -7,6 +7,7 @@ import { applyColSize, GRID_WIDGET } from './grid-context';
 import { getFieldValue, collectDisposers, DEV } from '@pdxui/core';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
+import { recordRow } from './grid-delegate';
 
 export interface VirtualScrollState {
     update: () => void;
@@ -108,6 +109,7 @@ export function setupVirtualScroll(
 
             const rowEl = document.createElement('div');
             rowEl.className = 'pdx-dg-row';
+            rowEl.dataset.part = 'row';
             // The same mark as the non-virtual body: two views of one grid that disagree is the
             // drift `grid-cell.ts` exists to avoid.
             const rowClass = gc.getRowClass?.(row as Record<string, unknown>, i);
@@ -119,6 +121,8 @@ export function setupVirtualScroll(
             if (DEV) rowEl.setAttribute('data-pdx-item', '');
             const rowId = row[idFieldName];
             if (rowId != null) rowEl.setAttribute('data-row-id', String(rowId));
+            // Its click and its checkbox are the body's listeners (grid-delegate.ts), as in the paged body.
+            recordRow(rowEl, { row, index: i, id: rowId, rows });
 
             // Selection
             if (gc.getSelectionMode() !== 'none') {
@@ -137,15 +141,6 @@ export function setupVirtualScroll(
                 cb.setAttribute(GRID_WIDGET, '');
                 cb.setAttribute('aria-label', t('selectRow').replace('{n}', String(i + 1)));
                 cb.checked = gc.selectedIds.has(rowId);
-                cb.addEventListener('change', (e) => {
-                    gc.emit('__toggle-select', { id: rowId, row, shiftKey: (e as any).shiftKey ?? false });
-                });
-                cb.addEventListener('click', (e) => e.stopPropagation());
-                // The cell is the checkbox's hit area, as in the paged body.
-                checkCell.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (e.target !== cb) cb.click();
-                });
                 checkCell.appendChild(cb);
                 rowEl.appendChild(checkCell);
             }
@@ -154,6 +149,7 @@ export function setupVirtualScroll(
             for (const col of visibleCols) {
                 const td = document.createElement('div');
                 td.className = 'pdx-dg-td';
+                td.dataset.part = 'cell';
                 if (col.def.command) td.classList.add('pdx-dg-td-command');
                 if (col.align === 'right') td.classList.add('pdx-dg-td-right');
                 else if (col.align === 'center') td.classList.add('pdx-dg-td-center');
@@ -172,10 +168,6 @@ export function setupVirtualScroll(
 
                 rowEl.appendChild(td);
             }
-
-            rowEl.addEventListener('click', () => {
-                gc.emit('pdx-row-click', { row, index: i, id: rowId });
-            });
 
             rowContainer.appendChild(rowEl);
         }

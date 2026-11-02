@@ -6,6 +6,7 @@ import { t } from './grid-i18n';
 export function buildFooter(gc: GridContext): HTMLElement {
     const footer = document.createElement('div');
     footer.className = 'pdx-dg-footer';
+    footer.dataset.part = 'footer';
 
     // Row count info
     const info = document.createElement('span');

@@ -6,6 +6,7 @@
 //   grid-context.ts  — shared context + applyColSize
 //   grid-header.ts   — header row, sort carets, resize handles
 //   grid-body.ts     — row rendering, cell formatting
+//   grid-delegate.ts — the body's events, one listener per type for every row
 //   grid-filter.ts   — inline filter row
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
@@ -15,6 +16,7 @@ import type { SlotFunction, DataSource, ColumnDef, Dispose, GridState } from '@p
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
 import { renderRows } from './grid-body';
+import { bindBody } from './grid-delegate';
 import { buildFilterRow } from './grid-filter';
 import { toggleSelect, selectAll, clearSelection, setSelection } from './grid-selection';
 import { renderGroupedRows } from './grid-grouping';
@@ -106,6 +108,35 @@ function warnRowHeightIgnored(el: Element): void {
  * @slot cell - Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.
  * @slot header - Draws a column's header: `header(column)`; a column it draws nothing for keeps its title. The alpha scoped slot `header:{field}` still draws one.
  * @slot detail - Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.
+ *
+ * @cssstate striped - `striped`: every other row is tinted.
+ * @cssstate hover - `hover`: a row under the pointer is highlighted.
+ * @cssstate row-clickable - `row-clickable`: the rows open something, and take a pointer.
+ * @cssstate compact - `compact`: tighter cells.
+ * @cssstate sticky-header - `sticky-header`: the header stays while the body scrolls.
+ * @cssstate fill-height - `fill-height`: the grid fills its parent's height and only its body scrolls.
+ * @cssstate loading - The source is pending; the grid is `aria-busy` meanwhile.
+ * @cssstate empty - The source has settled with no row; the empty status says so.
+ * @cssstate editing - A cell or a row is being edited.
+ *
+ * @csspart toolbar - The toolbar, with `show-toolbar`.
+ * @csspart group-bar - The group bar, with `show-group-bar`.
+ * @csspart grid - The scroll area that is the `role="grid"`: header, filter row, body, summary.
+ * @csspart header - The header row group.
+ * @csspart column-header - A column's header cell.
+ * @csspart filter-row - The inline filter row, with `filter-mode="row"`.
+ * @csspart body - The rows' group.
+ * @csspart row - A data row.
+ * @csspart cell - A data cell.
+ * @csspart summary - The summary row, when a column declares an aggregate.
+ * @csspart footer - The footer and its pager; above the grid too with `pagination-position`.
+ * @csspart empty - The empty status, while the source has settled with no row.
+ * @csspart loading - The loading overlay, while the source is pending.
+ *
+ * @capability sortable - A column declared `sortable` sorts on its header; the header carries `aria-sort`.
+ * @capability filterable - The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`).
+ * @capability selectable - Rows are checked, one or many, with `selection="single"` or `"multiple"`.
+ * @capability editable - Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`.
  */
 component('pdx-data-grid', {
     props: {
@@ -176,6 +207,10 @@ component('pdx-data-grid', {
         header: slot<(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }) => Node>(),
         detail: slot<(row: T) => Node>(),
     },
+    // Its looks and its conditions are states of the host (#132): the design CSS selects them; the
+    // wrapper inside carries no class for them.
+    states: ['striped', 'hover', 'row-clickable', 'compact', 'sticky-header', 'fill-height', 'loading', 'empty', 'editing'],
+    parts: ['toolbar', 'group-bar', 'grid', 'header', 'column-header', 'filter-row', 'body', 'row', 'cell', 'summary', 'footer', 'empty', 'loading'],
     setup(ctx) {
         let rootEl: HTMLElement | null = null;
         /** The role="grid" element (the scroll area), once the build has put it in the page. */
@@ -191,11 +226,17 @@ component('pdx-data-grid', {
         let loadingEl: HTMLElement | null = null;
         let emptyEl: HTMLElement | null = null;
 
-        /** Show or hide the empty state; the first time it shows its icon, load `pdx-icon`. */
+        /**
+         * Show or hide the empty state; the first time it shows its icon, load `pdx-icon`. It is a
+         * `role="status"`, which carries its text only while it has something to say (A4): its content
+         * is put in when it shows and taken out when it hides.
+         */
         function showEmpty(show: boolean): void {
             if (!emptyEl) return;
             emptyEl.style.display = show ? '' : 'none';
-            if (show && emptyEl.querySelector('pdx-icon')) loadIcon();
+            if (!show) { emptyEl.replaceChildren(); return; }
+            if (!emptyEl.hasChildNodes()) fillEmptyState(emptyEl);
+            if (emptyEl.querySelector('pdx-icon')) loadIcon();
         }
         let gridEffect: Dispose | null = null;
         let virtualState: VirtualScrollState | null = null;
@@ -282,11 +323,21 @@ component('pdx-data-grid', {
             },
         };
 
-        /** Counts, indices, selection state and the roving tab stop, after any render. */
+        /**
+         * Counts, indices, selection state and the roving tab stop, after any render; and the
+         * conditions the host shows: pending (A4: the grid is `aria-busy` while its source is, and not
+         * once it has settled), empty, editing.
+         */
         function refreshA11y(): void {
             if (!gridEl) return;
             applyGridAria(gc, gridEl);
             applyRoving(gc, gridEl);
+            const pending = !!gc.grid?.isLoading.peek();
+            if (pending) gridEl.setAttribute('aria-busy', 'true');
+            else gridEl.removeAttribute('aria-busy');
+            ctx.state('loading', pending);
+            ctx.state('empty', !pending && (gc.grid?.rows.peek().length ?? 0) === 0);
+            ctx.state('editing', gc.editingCell != null || gc.editingRowId != null);
         }
 
         /** Rebuild (or add/remove) the summary row for the current columns + rows. */
@@ -324,24 +375,26 @@ component('pdx-data-grid', {
         // A lone modifier held for the next click draws no focus ring.
         const stopModality = trackInputModality(ctx.el);
 
-        // Internal event routing (from sub-modules)
-        ctx.el.addEventListener('__select-all', () => selectAll(gc));
-        ctx.el.addEventListener('__toggle-select', ((e: CustomEvent) => {
-            toggleSelect(gc, e.detail.id, e.detail.shiftKey);
-        }) as EventListener);
-        ctx.el.addEventListener('__group-toggle', () => {
+        // Internal event routing (from sub-modules): the host's listeners, declared in `host` below.
+        /** A group opened or closed, or a detail row: the body is drawn again. */
+        function redrawBody(): void {
             if (bodyEl && gc.grid) {
                 renderBody(gc.grid.rows.peek(), gc.grid.columns.peek());
                 refreshA11y();
             }
-        });
-        ctx.el.addEventListener('__toggle-detail', ((e: CustomEvent) => {
-            toggleRowDetailFn(gc, e.detail.id);
-            if (bodyEl && gc.grid) {
-                renderBody(gc.grid.rows.peek(), gc.grid.columns.peek());
-                refreshA11y();
-            }
-        }) as EventListener);
+        }
+        const routed = {
+            onSelectAll: () => selectAll(gc),
+            onToggleSelect: (e: Event) => {
+                const { id, shiftKey } = (e as CustomEvent<{ id: unknown; shiftKey: boolean }>).detail;
+                toggleSelect(gc, id, shiftKey);
+            },
+            onGroupToggle: () => redrawBody(),
+            onToggleDetail: (e: Event) => {
+                toggleRowDetailFn(gc, (e as CustomEvent<{ id: unknown }>).detail.id);
+                redrawBody();
+            },
+        };
 
         // ─── DataSource resolution ───────────────────
         function resolveSource(): DataSource<Record<string, unknown>> {
@@ -424,14 +477,9 @@ component('pdx-data-grid', {
             }
 
             const wrap = document.createElement('div');
+            // Its looks are states of the host (the track above), not classes here.
             wrap.className = 'pdx-dg';
-            if (ctx.striped()) wrap.classList.add('pdx-dg-striped');
-            if (ctx.hover()) wrap.classList.add('pdx-dg-hover');
-            if (ctx.rowClickable()) wrap.classList.add('pdx-dg-rows-clickable');
-            if (ctx.compact()) wrap.classList.add('pdx-dg-compact');
-            if (ctx.stickyHeader()) wrap.classList.add('pdx-dg-sticky');
             if (ctx.fillHeight()) {
-                wrap.classList.add('pdx-dg-fill');
                 // Reserve the body's scrollbar gutter on the header/filter row → columns stay aligned.
                 wrap.style.setProperty('--pdx-dg-sbw', scrollbarWidth() + 'px');
             }
@@ -467,6 +515,7 @@ component('pdx-data-grid', {
 
             scrollEl = document.createElement('div');
             scrollEl.className = 'pdx-dg-scroll';
+            scrollEl.dataset.part = 'grid';
             // The grid is the scroll area — header, filter row, body, summary: a grid owns rows, and
             // the toolbar, the group bar and the pager beside it are not rows. The keyboard model is
             // the grid's, for every grid.
@@ -482,7 +531,10 @@ component('pdx-data-grid', {
 
             bodyEl = document.createElement('div');
             bodyEl.className = 'pdx-dg-body';
+            bodyEl.dataset.part = 'body';
             bodyEl.setAttribute('role', 'rowgroup');
+            // One listener per event type for every row (grid-delegate.ts).
+            bindBody(gc, bodyEl);
 
             // Virtual scroll or normal rendering
             virtualState?.dispose();
@@ -528,6 +580,7 @@ component('pdx-data-grid', {
             // Loading overlay
             loadingEl = document.createElement('div');
             loadingEl.className = 'pdx-dg-loading';
+            loadingEl.dataset.part = 'loading';
             loadingEl.innerHTML = '<pdx-spinner size="24"></pdx-spinner>';
             loadingEl.style.display = loading ? '' : 'none';
             wrap.appendChild(loadingEl);
@@ -615,21 +668,23 @@ component('pdx-data-grid', {
         }
 
         // ─── Empty state ─────────────────────────────
+        /** The empty status, built empty: `showEmpty` fills it when it shows. */
         function buildEmptyState(): HTMLElement {
-            const emptySlot = gc.getSlot('empty');
-            if (emptySlot) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'pdx-dg-empty';
-                wrapper.setAttribute('role', 'status');
-                const content = emptySlot({});
-                wrapper.appendChild(content instanceof DocumentFragment ? content : content);
-                return wrapper;
-            }
-
             const el = document.createElement('div');
             el.className = 'pdx-dg-empty';
+            el.dataset.part = 'empty';
             // A status: "No data" is what a filter that matches nothing has to say.
             el.setAttribute('role', 'status');
+            return el;
+        }
+
+        /** What the empty status says: the page's `empty` slot, or an icon and the empty title. */
+        function fillEmptyState(el: HTMLElement): void {
+            const emptySlot = gc.getSlot('empty');
+            if (emptySlot) {
+                el.appendChild(emptySlot({}));
+                return;
+            }
             const icon = document.createElement('div');
             icon.className = 'pdx-dg-empty-icon';
             // Built with the grid and hidden while it has rows: `pdx-icon` is loaded when it SHOWS.
@@ -645,17 +700,25 @@ component('pdx-data-grid', {
             txt.className = 'pdx-dg-empty-text';
             txt.textContent = (ctx.emptyTitle() as string) || t('empty.title');
             el.appendChild(txt);
-            return el;
         }
+
+        // ─── Its looks, as states of the host ────────
+        // Set here and not in the build: a state is the host's, and changing one restyles the grid
+        // without rebuilding it.
+        ctx.track(() => {
+            ctx.state('striped', !!ctx.striped());
+            ctx.state('hover', !!ctx.hover());
+            ctx.state('row-clickable', !!ctx.rowClickable());
+            ctx.state('compact', !!ctx.compact());
+            ctx.state('sticky-header', !!ctx.stickyHeader());
+            ctx.state('fill-height', !!ctx.fillHeight());
+        });
 
         // ─── Track prop changes ──────────────────────
         ctx.track(() => {
             void ctx.source();
             void ctx.columns();
             void ctx.data();
-            void ctx.striped();
-            void ctx.hover();
-            void ctx.compact();
             void ctx.stickyHeader();
             void ctx.selection();
             void ctx.idField();
@@ -773,7 +836,14 @@ component('pdx-data-grid', {
             (gc.grid as any)?.dispose?.();
         });
 
-        return {};
+        return routed;
+    },
+    // The sub-modules talk to the grid through events on its host (#133).
+    host: {
+        '@__select-all': (ctx) => ctx.onSelectAll(),
+        '@__toggle-select': (ctx, e) => ctx.onToggleSelect(e),
+        '@__group-toggle': (ctx) => ctx.onGroupToggle(),
+        '@__toggle-detail': (ctx, e) => ctx.onToggleDetail(e),
     },
     render: () => html``,
 });

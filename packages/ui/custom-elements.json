@@ -8717,20 +8717,20 @@
               "description": "Fired on `pdx-ready`."
             },
             {
-              "name": "pdx-row-reorder",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired on `pdx-row-reorder`.",
-              "detail": "{ from, to, fromId, toId }"
-            },
-            {
               "name": "pdx-row-click",
               "type": {
                 "text": "CustomEvent"
               },
               "description": "Fired when the row is clicked.",
               "detail": "{ row, index, id }"
+            },
+            {
+              "name": "pdx-row-reorder",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired on `pdx-row-reorder`.",
+              "detail": "{ from, to, fromId, toId }"
             },
             {
               "name": "pdx-row-collapse",
@@ -9156,6 +9156,116 @@
               "name": "detail",
               "description": "Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.",
               "signature": "(row: T)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "toolbar",
+              "description": "The toolbar, with `show-toolbar`."
+            },
+            {
+              "name": "group-bar",
+              "description": "The group bar, with `show-group-bar`."
+            },
+            {
+              "name": "grid",
+              "description": "The scroll area that is the `role=\"grid\"`: header, filter row, body, summary."
+            },
+            {
+              "name": "header",
+              "description": "The header row group."
+            },
+            {
+              "name": "column-header",
+              "description": "A column's header cell."
+            },
+            {
+              "name": "filter-row",
+              "description": "The inline filter row, with `filter-mode=\"row\"`."
+            },
+            {
+              "name": "body",
+              "description": "The rows' group."
+            },
+            {
+              "name": "row",
+              "description": "A data row."
+            },
+            {
+              "name": "cell",
+              "description": "A data cell."
+            },
+            {
+              "name": "summary",
+              "description": "The summary row, when a column declares an aggregate."
+            },
+            {
+              "name": "footer",
+              "description": "The footer and its pager; above the grid too with `pagination-position`."
+            },
+            {
+              "name": "empty",
+              "description": "The empty status, while the source has settled with no row."
+            },
+            {
+              "name": "loading",
+              "description": "The loading overlay, while the source is pending."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "striped",
+              "description": "`striped`: every other row is tinted."
+            },
+            {
+              "name": "hover",
+              "description": "`hover`: a row under the pointer is highlighted."
+            },
+            {
+              "name": "row-clickable",
+              "description": "`row-clickable`: the rows open something, and take a pointer."
+            },
+            {
+              "name": "compact",
+              "description": "`compact`: tighter cells."
+            },
+            {
+              "name": "sticky-header",
+              "description": "`sticky-header`: the header stays while the body scrolls."
+            },
+            {
+              "name": "fill-height",
+              "description": "`fill-height`: the grid fills its parent's height and only its body scrolls."
+            },
+            {
+              "name": "loading",
+              "description": "The source is pending; the grid is `aria-busy` meanwhile."
+            },
+            {
+              "name": "empty",
+              "description": "The source has settled with no row; the empty status says so."
+            },
+            {
+              "name": "editing",
+              "description": "A cell or a row is being edited."
+            }
+          ],
+          "capabilities": [
+            {
+              "name": "sortable",
+              "description": "A column declared `sortable` sorts on its header; the header carries `aria-sort`."
+            },
+            {
+              "name": "filterable",
+              "description": "The rows filter, with `filterable`: by column, in a row, a popover or the toolbar (`filter-mode`)."
+            },
+            {
+              "name": "selectable",
+              "description": "Rows are checked, one or many, with `selection=\"single\"` or `\"multiple\"`."
+            },
+            {
+              "name": "editable",
+              "description": "Cells or rows are edited in place or in a dialog, with `editable` and `edit-mode`."
             }
           ]
         }

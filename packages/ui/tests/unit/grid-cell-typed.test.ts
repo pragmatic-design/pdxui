@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { renderCellNode } from '../../src/data-grid/grid-cell';
+import { bindBody } from '../../src/data-grid/grid-delegate';
 import { status, link, currency, dateCell, booleanIcon, actions } from '@pdxui/core';
 
 const col = (cell: unknown, type = 'string') => ({ def: { cell, field: 'x' }, type } as never);
@@ -41,10 +42,26 @@ describe('renderCellNode — typed cells', () => {
     it('actions: buttons fire onClick(row) and stop row-click propagation', () => {
         let clicked: unknown = null;
         const n = renderCellNode(null, col(actions([{ label: 'Edit', onClick: (row) => { clicked = row; } }])), { id: 7 }) as HTMLElement;
+        // The click is the grid body's listener (grid-delegate.ts): the cell lives in a body.
+        const outside = document.createElement('div');
+        const body = document.createElement('div');
+        bindBody({ emit() {}, isRowReorder: () => false, getIdField: () => 'id' } as never, body);
+        body.appendChild(n);
+        outside.appendChild(body);
+        let reachedOutside = false;
+        outside.addEventListener('click', () => { reachedOutside = true; });
         const btn = n.querySelector('button')!;
         expect(btn.getAttribute('aria-label')).toBe('Edit');
         btn.click();
         expect(clicked).toEqual({ id: 7 });
+        expect(reachedOutside, 'the action click went past the grid body').toBe(false);
+    });
+
+    it('format: the string it returns is text, markup included — the HTML-string formatter is gone (#292)', () => {
+        const formatCol = { def: { field: 'x', format: (v: unknown) => `<b>${String(v)}</b>` }, type: 'string' } as never;
+        const n = renderCellNode('Ada', formatCol, {}) as HTMLElement;
+        expect(n.querySelector('b'), 'the format string was parsed as HTML').toBeNull();
+        expect(n.textContent).toBe('<b>Ada</b>');
     });
 
     it('link: blocks dangerous URL schemes (javascript:/data:/vbscript:)', () => {

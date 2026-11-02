@@ -178,6 +178,34 @@ describe('gen-manifest reads the alpha events a component no longer emits (#478)
     });
 });
 
+describe('gen-manifest reads the capabilities a component offers (#292)', () => {
+    // What an agent's page card says a component can do (library.md, «Accessibility»): a sortable,
+    // filterable, selectable, editable grid. A capability the manifest does not declare is one an agent
+    // cannot be told about.
+    const source = [
+        '/**',
+        ' * A table.',
+        ' * @capability sortable - A column with `sortable` sorts on its header.',
+        ' * @capability filterable - The rows filter, with `filterable`.',
+        ' */',
+        "component('pdx-table-ish', {",
+        '    render: () => html`<div></div>`,',
+        '});',
+    ].join('\n');
+    const decl = () => analyzeFile('src/table-ish/pdx-table-ish.ts', source, {})[0].declarations[0];
+
+    it('@capability becomes capabilities, each a name and a description, in order', () => {
+        expect(decl().capabilities).toEqual([
+            { name: 'sortable', description: 'A column with `sortable` sorts on its header.' },
+            { name: 'filterable', description: 'The rows filter, with `filterable`.' },
+        ]);
+    });
+
+    it('the control: a component that declares none lists none', () => {
+        expect(declaration().capabilities).toBeUndefined();
+    });
+});
+
 describe('gen-manifest reads the descriptor\'s slots (#491)', () => {
     const source = [
         '/**',
