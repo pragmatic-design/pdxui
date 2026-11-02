@@ -3790,6 +3790,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/entity-grid', label: 'EntityGrid' },
           { key: '/components/edit-drawer', label: 'EditDrawer' },
           { key: '/components/bulk-actions', label: 'BulkActions' },
+          { key: '/components/relation-picker', label: 'RelationPicker' },
         ]},
         { key: '/components/filter-builder', label: 'FilterBuilder', icon: 'filter' },
         { key: 'chart', label: 'Chart', icon: 'bar-chart-2', children: [
@@ -3955,7 +3956,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:306" });
+}, { name: "app.pdx:307" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -7103,6 +7104,39 @@ component('app-comp-rating', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/rating",tag:"app-comp-rating",title:"Rating Component",lazy:true,file:'./comp-rating.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-relation-picker.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-9zzgdt");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-9zzgdt"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n@scope ([data-pdx-9zzgdt]) to ([data-pdx-root] \\u003E *) {:scope .page { max-width: 1280px; }\\n:scope .intro { margin-bottom: var(--pdx-space-2xl); }\\n:scope section { margin-bottom: var(--pdx-space-3xl); }\\n:scope .section-heading { margin-bottom: var(--pdx-space-xs); }\\n:scope .options-table { width: 100%; border-collapse: collapse; font-size: .85rem; }\\n:scope .options-table th, :scope .options-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--pdx-color-border); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Relation Picker</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-relation-picker&gt;</code> — pick one or more existing rows for a many-to-many relation,\\n      and ask for a new one to be created. A data grid with multiple selection over a\\n      <code>DataSource</code>, and a footer: "Add selected" emits the rows, "create" asks the page.\\n    </p> <app-demo-comp-relation-picker-basic class="demo-section"></app-demo-comp-relation-picker-basic> <section> <h2 class="pdx-txt-heading section-heading">Props, events &amp; parts</h2> <table class="options-table"><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>The rows to pick from, handed to the grid.</td></tr><tr><td><code>columns</code></td><td>ColumnDef[]</td><td>[]</td><td>The grid\\'s columns.</td></tr><tr><td><code>id-field</code></td><td>string</td><td>\\'id\\'</td><td>The field that identifies a row.</td></tr><tr><td><code>searchable</code></td><td>boolean</td><td>false</td><td>A filter field under each column header, narrowing the source.</td></tr><tr><td><code>add-label</code></td><td>string</td><td>\\'Add selected\\'</td><td>The add button\\'s text.</td></tr><tr><td><code>create-label</code></td><td>string</td><td>\\'\\'</td><td>With a text, a create button that emits <code>pdx-create</code>.</td></tr></tbody></table> <table class="options-table" style="margin-top: var(--pdx-space-lg);"><thead><tr><th>Event</th><th>Detail</th></tr></thead><tbody><tr><td><code>pdx-pick</code></td><td>{ items } — the rows picked</td></tr><tr><td><code>pdx-create</code></td><td>—</td></tr></tbody></table> <table class="options-table" style="margin-top: var(--pdx-space-lg);"><thead><tr><th>Part</th><th>What it is</th></tr></thead><tbody><tr><td><code>grid</code></td><td>The data grid the rows are picked from.</td></tr><tr><td><code>foot</code></td><td>The footer under it.</td></tr><tr><td><code>count</code></td><td>"n selected", empty while nothing is picked.</td></tr><tr><td><code>create</code></td><td>The create button.</td></tr><tr><td><code>add</code></td><td>The add button, disabled while nothing is picked.</td></tr></tbody></table> </section> </div> '));
+component('app-comp-relation-picker', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Relation Picker — PDX Components" });
+    ctx.el.setAttribute('data-pdx-9zzgdt', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/relation-picker'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/relation-picker",tag:"app-comp-relation-picker",title:"Relation Picker — PDX Components",lazy:true,file:'./comp-relation-picker.pdx'});
 "
 `;
 
@@ -26762,6 +26796,61 @@ component('app-demo-comp-rating-tooltips', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-relation-picker/demo-comp-relation-picker-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, createDataSource, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-s11ttx");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-s11ttx"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n@scope ([data-pdx-s11ttx]) to ([data-pdx-root] \\u003E *) {:scope .picker-box { height: 360px; border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); padding: var(--pdx-space-sm); }\\n:scope .event-log { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); }\\n:scope .source-block { margin-top: var(--pdx-space-md); }\\n:scope section { margin-bottom: var(--pdx-space-3xl); }\\n:scope .section-heading { margin-bottom: var(--pdx-space-xs); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Pick, or create</h2> <p class="pdx-txt-small pdx-ink-muted">\\n      Check rows, then "Add selected": the picker emits them. "New city" asks the page to open its own form.\\n      <code>searchable</code> puts a filter field under each column header.\\n    </p> <div class="picker-box"> <pdx-relation-picker searchable create-label="New city"></pdx-relation-picker> </div> <div class="event-log"> <strong class="pdx-txt-small">Last event</strong> <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;"><!----></div> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const source = createDataSource({ data: rows, pageSize: 0 });\\nconst columns = [\\n  { field: \\'code\\', header: \\'Code\\', width: 120 },\\n  { field: \\'name\\', header: \\'Name\\' },\\n];\\n\\n&lt;pdx-relation-picker :source="source" :columns="columns" searchable\\n  create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate" /&gt;\\n\\nfunction onPick(e) { link(e.detail.items); }   // the rows themselves</code></pre> </details> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __el6=__el4.nextSibling.nextSibling;const __el8=__el6.firstChild.nextSibling.nextSibling.nextSibling;const __t9=__el8.firstChild;return [__el5,__t9];};
+component('app-demo-comp-relation-picker-basic', {
+  props: {},
+  setup(ctx) {
+    const __result = signal('Nothing picked yet.', { name: 'demo-comp-relation-picker-basic:result' });
+const rows = [
+      { id: 1, code: 'AMS', name: 'Amsterdam' },
+      { id: 2, code: 'LON', name: 'London' },
+      { id: 3, code: 'PAR', name: 'Paris' },
+      { id: 4, code: 'ROM', name: 'Rome' },
+      { id: 5, code: 'MAD', name: 'Madrid' },
+    ];
+    
+    const source = createDataSource({ data: rows, pageSize: 0 });
+    
+    const columns = [
+      // 120, not 100: a header keeps ~60px for its padding, sort and filter icons, and at 100 "Code" shows as "C…".
+      { field: 'code', header: 'Code', width: 120 },
+      { field: 'name', header: 'Name' },
+    ];
+    
+    
+    
+    function onPick(e) { __result.setRaw('pdx-pick: ' + e.detail.items.map(i => i.name).join(', ')); }
+    function onCreate() { __result.setRaw('pdx-create'); }
+    ctx.el.setAttribute('data-pdx-s11ttx', '');
+    return { rows, source, columns, result: __result, onPick, onCreate };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el5,__t9]=__walk0(__frag);
+    let __el5w_source = {}; effect(() => { const __b = ctx.source; if (Object.is(__b, __el5w_source)) return; __el5w_source = __b; assignBoundProperty(__el5, "source", __b); });
+    let __el5w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
+    __el5.addEventListener('pdx-pick', safeHandler(batchHandler(ctx.onPick), ctx.el?.tagName?.toLowerCase(), 'pdx-pick'));
+    __el5.addEventListener('pdx-create', safeHandler(batchHandler(ctx.onCreate), ctx.el?.tagName?.toLowerCase(), 'pdx-create'));
+    bindInterpolation(__t9,()=>ctx.result());
     return __frag;
   })(),
 });

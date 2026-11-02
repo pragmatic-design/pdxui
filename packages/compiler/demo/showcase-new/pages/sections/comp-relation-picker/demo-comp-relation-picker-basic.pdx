@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Pick, or create</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      Check rows, then "Add selected": the picker emits them. "New city" asks the page to open its own form.
+      <code>searchable</code> puts a filter field under each column header.
+    </p>
+
+    <div class="picker-box">
+      <pdx-relation-picker :source="source" :columns="columns" searchable create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate"></pdx-relation-picker>
+    </div>
+
+    <div class="event-log">
+      <strong class="pdx-txt-small">Last event</strong>
+      <div class="pdx-txt-mono pdx-txt-small pdx-ink-muted" style="margin-top: 6px;">{{ result }}</div>
+    </div>
+
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const source = createDataSource({ data: rows, pageSize: 0 });
+const columns = [
+  { field: 'code', header: 'Code', width: 120 },
+  { field: 'name', header: 'Name' },
+];
+
+&lt;pdx-relation-picker :source="source" :columns="columns" searchable
+  create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate" /&gt;
+
+function onPick(e) { link(e.detail.items); }   // the rows themselves</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+import { createDataSource } from '@pdxui/core';
+
+const rows = [
+  { id: 1, code: 'AMS', name: 'Amsterdam' },
+  { id: 2, code: 'LON', name: 'London' },
+  { id: 3, code: 'PAR', name: 'Paris' },
+  { id: 4, code: 'ROM', name: 'Rome' },
+  { id: 5, code: 'MAD', name: 'Madrid' },
+];
+const source = createDataSource({ data: rows, pageSize: 0 });
+const columns = [
+  // 120, not 100: a header keeps ~60px for its padding, sort and filter icons, and at 100 "Code" shows as "C…".
+  { field: 'code', header: 'Code', width: 120 },
+  { field: 'name', header: 'Name' },
+];
+
+let result = $signal('Nothing picked yet.');
+function onPick(e) { result = 'pdx-pick: ' + e.detail.items.map(i => i.name).join(', '); }
+function onCreate() { result = 'pdx-create'; }
+</script>
+
+<style scoped>
+.picker-box { height: 360px; border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); padding: var(--pdx-space-sm); }
+.event-log { margin-top: var(--pdx-space-md); padding: var(--pdx-space-md); border: 1px solid var(--pdx-color-border); border-radius: var(--pdx-radius-md); background: var(--pdx-color-inset); }
+.source-block { margin-top: var(--pdx-space-md); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+</style>

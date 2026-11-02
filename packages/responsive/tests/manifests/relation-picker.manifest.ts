@@ -2,7 +2,7 @@
  * MANIFEST — pdx-relation-picker (pick existing rows for a relation)
  *
  * ── DOM structure (light DOM, built in a rAF — pdx-relation-picker.ts:52) ──
- *   <pdx-relation-picker class="pdx-relation-picker">            ← host, the class is added in build()
+ *   <pdx-relation-picker>                                        ← host, no class: CSS selects the tag (#292)
  *     <pdx-data-grid class="pdx-relation-picker-grid"            ← selection=multiple, hover, id-field
  *                    [filterable]>                               ← ONLY with `searchable`
  *       … role="grid": header row, [filter row], body rows, pager …
