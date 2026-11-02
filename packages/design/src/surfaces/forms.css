@@ -409,20 +409,23 @@ pdx-form-field:last-child {
    `--pdx-field-required-marker: none` turns it off. The control's aria-required carries the
    meaning whatever the marker is, so the marker is for the eye only: the empty alternative text
    after the slash keeps it out of the label's accessible name, which would otherwise be read as
-   «Name star». */
-.pdx-field-required::after {
+   «Name star». A native <label> says it with its class; <pdx-label> with its state (#293). */
+.pdx-field-required::after,
+:where(pdx-label):state(required) > [data-part="root"]::after {
     content: var(--pdx-field-required-marker, ' *') / '';
     color: var(--pdx-color-danger-ink);
 }
 
-.pdx-field-optional::after {
+.pdx-field-optional::after,
+:where(pdx-label):state(optional) > [data-part="root"]::after {
     content: ' (optional)';
     font-size: var(--pdx-text-xs);
     font-weight: var(--pdx-weight-normal);
     color: var(--pdx-color-muted);
 }
 
-.pdx-field-label-disabled {
+.pdx-field-label-disabled,
+:where(pdx-label):state(disabled) > [data-part="root"] {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
 }

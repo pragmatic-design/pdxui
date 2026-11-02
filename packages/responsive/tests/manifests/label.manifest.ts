@@ -3,14 +3,13 @@
  *
  * NEW contracts (label was not in universal.ts), derived by inspecting:
  *  - source: packages/ui/src/label/pdx-label.ts
- *      render → <label class="pdx-field-label ..."> holding:
+ *      render → <label class="pdx-field-label" data-part="root"> holding:
  *        - the text prop → text, otherwise <slot>
  *        - for prop → attributo :for
- *        - size → ".pdx-field-label-{size}"
- *        - required → ".pdx-field-required" (CSS ::after content ' *')
- *        - optional → ".pdx-field-optional" (CSS ::after content ' (optional)')
- *        - disabled → ".pdx-field-label-disabled"
- *      + opzionali <span class="pdx-field-description"> e <span class="pdx-field-hint">.
+ *        - size → the host's `size` axis (#627)
+ *        - required, optional, disabled → states of the host, :state(required) and the others (#293);
+ *          forms.css draws them as it draws .pdx-field-required on a native label
+ *      + opzionali <span data-part="description"> e <span data-part="hint">.
  *      A component that is NOT interactive (it is a text <label>) → no keyboard.
  *  - CSS: packages/design/src/surfaces/forms.css
  *      .pdx-field-label → font-weight: medium; color: var(--pdx-color-text);
@@ -60,31 +59,31 @@ export const label: ComponentManifest = {
                 standalone: [
                     {
 // the <label> the component renders.
-                        selector: '[data-test="plain"] .pdx-field-label',
+                        selector: '[data-test="plain"] [data-part="root"]',
                         description: 'label is full opacity',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
                         // A text atom: it has a non-zero height.
-                        selector: '[data-test="plain"] .pdx-field-label',
+                        selector: '[data-test="plain"] [data-part="root"]',
                         description: 'label has non-zero height',
                         height: { op: '>=', value: 8 },
                     },
                     {
                         // .pdx-field-label is a <label> → block or inline, depending on the theme and the reset.
-                        selector: '[data-test="plain"] .pdx-field-label',
+                        selector: '[data-test="plain"] [data-part="root"]',
                         description: 'label display is block-ish or inline-ish',
                         display: { op: 'oneOf', value: ['block', 'inline-block', 'inline', 'flex', 'inline-flex'] },
                     },
                     {
                         // The required variant: the class is applied (the asterisk is a ::after, not measurable through a rect).
-                        selector: '[data-test="required"] .pdx-field-required',
+                        selector: '[data-test="required"] [data-part="root"]',
                         description: 'required label is full opacity',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
                     {
                         // The variant with a description: the <span> exists and is opaque.
-                        selector: '[data-test="described"] .pdx-field-description',
+                        selector: '[data-test="described"] [data-part="description"]',
                         description: 'description text is full opacity',
                         opacity: { op: '==', value: 1, tolerance: 0.01 },
                     },
@@ -95,8 +94,8 @@ export const label: ComponentManifest = {
                         description: 'description font-size <= label font-size',
                         parent: '[data-test="described"]',
                         children: {
-                            lbl: '[data-test="described"] .pdx-field-label',
-                            desc: '[data-test="described"] .pdx-field-description',
+                            lbl: '[data-test="described"] [data-part="root"]',
+                            desc: '[data-test="described"] [data-part="description"]',
                         },
                         relations: [
                             {
@@ -114,7 +113,7 @@ export const label: ComponentManifest = {
                     {
                         // .pdx-field-label-disabled → opacity: var(--pdx-opacity-disabled) (< 1).
                         description: 'disabled label has reduced opacity',
-                        selector: '[data-test="disabled"] .pdx-field-label',
+                        selector: '[data-test="disabled"] [data-part="root"]',
                         trigger: 'attribute',
                         attribute: { name: 'disabled', value: '' },
                         changes: { opacity: { op: '<', value: 1 } },
@@ -135,7 +134,7 @@ export const label: ComponentManifest = {
         scenario: 'label-variants',
         targets: [
             // A text atom: a generous tolerance (the font and line-height vary by theme).
-            { selector: '[data-test="plain"] .pdx-field-label', tolerancePx: 10 },
+            { selector: '[data-test="plain"] [data-part="root"]', tolerancePx: 10 },
         ],
     },
 
