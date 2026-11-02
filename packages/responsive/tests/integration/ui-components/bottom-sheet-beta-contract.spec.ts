@@ -60,6 +60,9 @@ test.describe('states', () => {
     test('dragging the handle is :state(dragging), and the sheet follows with no transition; released, it is not', async ({ page }) => {
         await mount(page, '<pdx-bottom-sheet label="T" open><p>x</p></pdx-bottom-sheet>');
         await expect(sheet(page)).toBeVisible();
+        // The sheet is visible as soon as it starts growing to its detent, and the handle rises with it:
+        // a box read during that transition puts the press where the handle no longer is.
+        await expect.poll(() => sheet(page).evaluate((s) => s.getAnimations().length)).toBe(0);
         const handle = page.locator(`${HOST} [data-part="handle"]`);
         const box = (await handle.boundingBox())!;
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
