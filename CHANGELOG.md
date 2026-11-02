@@ -394,6 +394,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-list` takes the beta contract (#292), the first of the data family.
+  - **No `renderItem`.** An item is drawn by the `item` snippet or scoped slot; `pdx migrate` flags a
+    `render-item`, and in a `.pdx` it is `PDX_REMOVED_FORM`.
+  - **States, not classes.** `:state(bordered)` (the default), `:state(dividers)`, `:state(loading)`
+    and `:state(empty)` on the host; the host no longer carries `pdx-list-root` or `pdx-list-bordered`.
+    Its list, items, empty state and overlay are parts.
+  - **A3.** A page of a larger source gives each item `aria-setsize` and `aria-posinset`.
 - **Breaking:** `pdx-button` and `pdx-button-group` take the beta contract (#291), the last of the
   display, feedback and action family.
   - **No toggle mode.** `toggle`, `pressed`, the `pdx-toggle` event and the `.pdx-pressed` class leave

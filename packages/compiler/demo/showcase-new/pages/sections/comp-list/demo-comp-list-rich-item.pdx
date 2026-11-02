@@ -3,21 +3,28 @@
     <h2 class="pdx-txt-heading section-heading">Rich Item Template</h2>
     <p class="pdx-txt-small pdx-ink-muted">Avatar + name + role + badge layout.</p>
     <div class="demo-container">
-      <pdx-list :items="richItems" :render-item="renderRichItem" dividers></pdx-list>
+      <pdx-list :items="richItems" dividers>
+        <slot name="item" let:item>
+          <div class="rich-row">
+            <div class="rich-avatar">{{ item.initials }}</div>
+            <div class="rich-who">
+              <div class="rich-name">{{ item.name }}</div>
+              <div class="rich-role">{{ item.role }}</div>
+            </div>
+            <span class="rich-status"><span :class="'rich-dot rich-' + item.status.toLowerCase()"></span>{{ item.status }}</span>
+          </div>
+        </slot>
+      </pdx-list>
     </div>
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>function renderRichItem(user) {
-  const statusColor = user.status === 'Active'
-    ? 'var(--pdx-color-success)' : 'var(--pdx-color-muted)';
-  return '&lt;div class="avatar"&gt;' + user.initials + '&lt;/div&gt;'
-    + '&lt;div&gt;&lt;strong&gt;' + user.name + '&lt;/strong&gt;'
-    + '&lt;div class="role"&gt;' + user.role + '&lt;/div&gt;&lt;/div&gt;'
-    + '&lt;span class="status"&gt;' + user.status + '&lt;/span&gt;';
-}
-
-&lt;pdx-list :items="richItems"
-  :render-item="renderRichItem" dividers&gt;
+      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="richItems" dividers&gt;
+  &lt;slot name="item" let:item&gt;
+    &lt;div class="avatar"&gt;{{ item.initials }}&lt;/div&gt;
+    &lt;div&gt;&lt;strong&gt;{{ item.name }}&lt;/strong&gt;
+      &lt;div class="role"&gt;{{ item.role }}&lt;/div&gt;&lt;/div&gt;
+    &lt;span class="status"&gt;{{ item.status }}&lt;/span&gt;
+  &lt;/slot&gt;
 &lt;/pdx-list&gt;</code></pre>
     </details>
   </section>
@@ -30,14 +37,18 @@ const richItems = [
   { id: 3, name: 'Carol White', role: 'Design', status: 'Away', initials: 'CW' },
   { id: 4, name: 'David Brown', role: 'PM', status: 'Offline', initials: 'DB' },
 ];
-
-function renderRichItem(userItem) {
-  const statusColor = userItem.status === 'Active' ? 'var(--pdx-color-success)' : userItem.status === 'Away' ? 'var(--pdx-color-warning)' : 'var(--pdx-color-muted)';
-  return '<div style="width:32px;height:32px;border-radius:50%;background:var(--pdx-color-primary);color:var(--pdx-color-primary-text);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0">' + userItem.initials + '</div><div style="flex:1;min-width:0"><div style="font-weight:500">' + userItem.name + '</div><div style="font-size:0.75rem;color:var(--pdx-color-muted)">' + userItem.role + '</div></div><span style="font-size:0.7rem;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:' + statusColor + '"></span>' + userItem.status + '</span>';
-}
 </script>
 
 <style scoped>
   /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
   .demo-container { max-width: 600px; }
+  .rich-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }
+  .rich-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); display: flex; align-items: center; justify-content: center; font-size: var(--pdx-text-xs); font-weight: 600; flex-shrink: 0; }
+  .rich-who { flex: 1; min-width: 0; }
+  .rich-name { font-weight: 500; }
+  .rich-role { font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); }
+  .rich-status { font-size: var(--pdx-text-xs); display: flex; align-items: center; gap: 4px; }
+  .rich-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--pdx-color-muted); }
+  .rich-active { background: var(--pdx-color-success); }
+  .rich-away { background: var(--pdx-color-warning); }
 </style>

@@ -5,19 +5,19 @@
  * (packages/design/src/components/list.css, the .pdx-list* block).
  *
  * DOM structure (host vs inner):
- *   <pdx-list>                          ← HOST: .pdx-list-root (+ .pdx-list-bordered when bordered)
- *     <div class="pdx-block-ui-overlay"> ← the loading overlay (display:none at rest)
- *     <div class="pdx-list-empty">       ← the empty state (display:none when there are items)
- *     <div class="pdx-list" role="list"> ← the INNER box: a flex column, the items' container
- *       <div class="pdx-list-item" role="listitem" data-list-index="0"> ... </div>
+ *   <pdx-list>                          ← HOST: :state(bordered) (the default), :state(dividers) — no class (#292)
+ *     <div data-part="overlay">          ← the loading overlay (display:none at rest)
+ *     <div data-part="empty">            ← the empty state (display:none when there are items)
+ *     <div data-part="list" role="list"> ← the INNER box: a flex column, the items' container
+ *       <div data-part="item" role="listitem" data-list-index="0"> ... </div>
  *       ...
  *
  * CRITICAL, host vs inner:
- *   - the border and the radius (.pdx-list-bordered) are on the HOST <pdx-list>, NOT on the inner .pdx-list.
- *   - display:flex / role="list" are on the inner .pdx-list.
- *   - the .pdx-list-item items (role="listitem", flex, align-items:center, min-height:40px)
+ *   - the border and the radius (:state(bordered)) are on the HOST <pdx-list>, NOT on the list part.
+ *   - display:flex / role="list" are on the list part.
+ *   - the item parts (role="listitem", flex, align-items:center, min-height:40px)
  *     hold avatar+text+action aligned horizontally.
- *   So: the radius and the border → measure the HOST [data-test="list"]; the items' layout → the inner .pdx-list.
+ *   So: the radius and the border → measure the HOST [data-test="list"]; the items' layout → the list part.
  *
  * Content-driven (a list of items, its height the sum of the rows) → isolation with skipHeight: true.
  *
@@ -82,17 +82,17 @@ export const list: ComponentManifest = {
                 standalone: [
                     {
                         // THE INNER BOX: the items' container is a flex column.
-                        selector: 'section:not([hidden]) [data-test="list"] .pdx-list',
+                        selector: 'section:not([hidden]) [data-test="list"] [data-part="list"]',
                         description: 'inner list container is a flex/block column box (display set)',
                         display: { op: 'oneOf', value: ['flex', 'block', 'grid'] },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="list"] .pdx-list',
+                        selector: 'section:not([hidden]) [data-test="list"] [data-part="list"]',
                         description: 'inner list is tall enough to hold the rows (content-driven)',
                         height: { op: '>=', value: 40 },
                     },
                     {
-                        // THE HOST: the border and the radius live here (.pdx-list-bordered), not on the inner box.
+                        // THE HOST: the border and the radius live here (:state(bordered)), not on the list part.
                         selector: 'section:not([hidden]) [data-test="list"]',
                         description: 'bordered list host has non-negative radius (metro/cyberpunk may zero it)',
                         radius: { all: { op: '>=', value: 0 } },
@@ -104,7 +104,7 @@ export const list: ComponentManifest = {
                     },
                     {
                         // Item: a row tall enough to hold avatar+text+action.
-                        selector: 'section:not([hidden]) [data-test="list"] .pdx-list-item',
+                        selector: 'section:not([hidden]) [data-test="list"] [data-part="item"]',
                         description: 'list item row is at least min-height tall',
                         height: { op: '>=', value: 36 },
                     },
@@ -114,11 +114,11 @@ export const list: ComponentManifest = {
                 composition: [
                     {
                         description: 'list items are stacked and contained within the inner list box',
-                        parent: 'section:not([hidden]) [data-test="list"] .pdx-list',
+                        parent: 'section:not([hidden]) [data-test="list"] [data-part="list"]',
                         children: {
-                            listbox: 'section:not([hidden]) [data-test="list"] .pdx-list',
-                            first: 'section:not([hidden]) [data-test="list"] .pdx-list-item[data-list-index="0"]',
-                            second: 'section:not([hidden]) [data-test="list"] .pdx-list-item[data-list-index="1"]',
+                            listbox: 'section:not([hidden]) [data-test="list"] [data-part="list"]',
+                            first: 'section:not([hidden]) [data-test="list"] [data-part="item"][data-list-index="0"]',
+                            second: 'section:not([hidden]) [data-test="list"] [data-part="item"][data-list-index="1"]',
                         },
                         relations: [
                             { description: 'first item within list', left: 'first', op: 'contained-in', right: 'listbox' },
@@ -151,7 +151,7 @@ export const list: ComponentManifest = {
             'list-clickable': {
                 standalone: [
                     {
-                        selector: 'section:not([hidden]) [data-test="list-clickable"] .pdx-list-item-clickable',
+                        selector: 'section:not([hidden]) [data-test="list-clickable"] [data-part="item"].pdx-list-item-clickable',
                         description: 'clickable list item has cursor pointer',
                         cursor: { op: 'is', value: 'pointer' },
                     },

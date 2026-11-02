@@ -16897,15 +16897,6 @@
             },
             {
               "kind": "field",
-              "name": "renderItem",
-              "description": "Render function for each item.",
-              "type": {
-                "text": "object"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "idField",
               "description": "Item field used as a unique key.",
               "type": {
@@ -17075,6 +17066,42 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The `role=\"list\"` container of the items."
+            },
+            {
+              "name": "item",
+              "description": "An item's row, `role=\"listitem\"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3)."
+            },
+            {
+              "name": "empty",
+              "description": "The empty state."
+            },
+            {
+              "name": "overlay",
+              "description": "The loading overlay, drawn while the source loads."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "bordered",
+              "description": "`bordered` is set (the default): the list is framed."
+            },
+            {
+              "name": "dividers",
+              "description": "`dividers` is set: a rule between items."
+            },
+            {
+              "name": "loading",
+              "description": "Its source is pending: the host is `aria-busy` too (A4)."
+            },
+            {
+              "name": "empty",
+              "description": "It has no items, and is not loading."
             }
           ],
           "x-pdx-context": {

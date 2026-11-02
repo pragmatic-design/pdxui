@@ -13,7 +13,7 @@
  *         <div class="pdx-sortable-body">
  *
  * The border and the radius are on the INNER <ul>, not on the host — the opposite of pdx-list,
- * where .pdx-list-bordered sits on the host. Measure the <ul>.
+ * where :state(bordered) draws it on the host. Measure the <ul>.
  *
  * Content-driven: the height is the sum of the rows → isolation with skipHeight.
  *

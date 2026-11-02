@@ -1,8 +1,7 @@
-/* pdx-list — Data-bound list */
-pdx-list { display: block; }
-
-.pdx-list-root { position: relative; }
-.pdx-list-bordered {
+/* pdx-list — Data-bound list. Its looks are custom states of the host (#292): the classes it wrote
+   there, pdx-list-root and pdx-list-bordered, are gone. */
+pdx-list { display: block; position: relative; }
+:where(pdx-list):state(bordered) {
     border: 1px solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-md);
     overflow: hidden;
@@ -54,8 +53,9 @@ pdx-list { display: block; }
     margin: 0;
 }
 
-/* CSS-based dividers (new: no DOM elements needed) */
-.pdx-list-dividers > .pdx-list-item + .pdx-list-item {
+/* CSS-based dividers (no DOM elements needed): a native .pdx-list takes the class, pdx-list the state */
+.pdx-list-dividers > .pdx-list-item + .pdx-list-item,
+:where(pdx-list):state(dividers) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
     border-top: 1px solid var(--pdx-color-border);
 }
 

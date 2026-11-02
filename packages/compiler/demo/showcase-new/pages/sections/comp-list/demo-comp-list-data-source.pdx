@@ -3,7 +3,16 @@
     <h2 class="pdx-txt-heading section-heading">With DataSource + Loading</h2>
     <p class="pdx-txt-small pdx-ink-muted">Simulates a 1.5s fetch. Shows loading overlay, then data.</p>
     <div class="demo-container">
-      <pdx-list :source="fakeDS" :render-item="renderUserItem" clickable dividers id="ds-list"></pdx-list>
+      <pdx-list :source="fakeDS" clickable dividers id="ds-list">
+        <slot name="item" let:item>
+          <div class="ds-row">
+            <pdx-icon name="user" size="16"></pdx-icon>
+            <span>{{ item.name }}</span>
+            <span class="ds-email">{{ item.email }}</span>
+            <span class="ds-role">{{ item.role }}</span>
+          </div>
+        </slot>
+      </pdx-list>
     </div>
     <button class="pdx-btn pdx-outline pdx-btn-xs" style="margin-top: var(--pdx-space-sm)" @click="reloadDS">Reload</button>
     <details class="source-block">
@@ -15,14 +24,10 @@
   autoLoad: true,
 });
 
-function renderUser(user) {
-  return '&lt;pdx-icon name="user"&gt;&lt;/pdx-icon&gt;'
-    + '&lt;span&gt;' + user.name + '&lt;/span&gt;'
-    + '&lt;span class="role"&gt;' + user.role + '&lt;/span&gt;';
-}
-
-&lt;pdx-list :source="ds" :render-item="renderUser"
-  clickable dividers&gt;
+&lt;pdx-list :source="ds" clickable dividers&gt;
+  &lt;slot name="item" let:item&gt;
+    &lt;span&gt;{{ item.name }}&lt;/span&gt; &lt;span class="role"&gt;{{ item.role }}&lt;/span&gt;
+  &lt;/slot&gt;
 &lt;/pdx-list&gt;</code></pre>
     </details>
   </section>
@@ -52,10 +57,6 @@ const fakeDS = createDataSource<(typeof fakeUsers)[number]>({
   autoLoad: true,
 });
 
-function renderUserItem(userItem) {
-  return '<pdx-icon name="user" size="16" style="display:inline-flex"></pdx-icon><span>' + userItem.name + '</span><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.75rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.role + '</span>';
-}
-
 function reloadDS() {
   fakeDS.refresh();
 }
@@ -64,4 +65,7 @@ function reloadDS() {
 <style scoped>
   /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
   .demo-container { max-width: 600px; }
+  .ds-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }
+  .ds-email { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }
+  .ds-role { margin-left: auto; font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); }
 </style>

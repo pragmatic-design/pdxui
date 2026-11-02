@@ -484,6 +484,15 @@
             'icon-pixel-size': () => {},
             'icon-beta-contract': () => {},
             'button-beta-contract': () => {},
+            // The data family (#292): a source over an array, and one that stays pending until the test settles it.
+            'data-a-beta-contract': () => {
+                window.__ds = (opts) => createDataSource(opts);
+                window.__pending = (pageSize) => {
+                    let settle = () => {};
+                    const ds = createDataSource({ pageSize, transport: { read: () => new Promise((r) => { settle = r; }) } });
+                    return { ds, settle: (data, total) => settle({ data, total }) };
+                };
+            },
             // pdx-splitter on the beta contract (#290): the spec mounts its own markup.
             'splitter-beta-contract': () => {},
             // pdx-provide and pdx-error-boundary on the beta contract (#290). What they wrap is the

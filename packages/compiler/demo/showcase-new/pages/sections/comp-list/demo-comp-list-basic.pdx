@@ -1,20 +1,22 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Basic (Static Array)</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array with a render function.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array, each item drawn by the <code>item</code> slot.</p>
     <div class="demo-container">
-      <pdx-list :items="basicItems" :render-item="renderBasicItem" clickable dividers @pdx-click="onItemClick"></pdx-list>
+      <pdx-list :items="basicItems" clickable dividers @pdx-click="onItemClick">
+        <slot name="item" let:item>
+          <div class="basic-row"><strong>{{ item.name }}</strong><span class="basic-role">{{ item.role }}</span></div>
+        </slot>
+      </pdx-list>
     </div>
     <div class="event-log pdx-txt-mono pdx-txt-small" id="list-log">{{ listLog }}</div>
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" :render-item="renderUser" clickable dividers
-  @pdx-click="onUserClick"&gt;
-&lt;/pdx-list&gt;
-
-// renderUser = (user) => {
-//   return '&lt;strong&gt;' + user.name + '&lt;/strong&gt; — ' + user.role;
-// }</code></pre>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" clickable dividers @pdx-click="onUserClick"&gt;
+  &lt;slot name="item" let:item&gt;
+    &lt;strong&gt;{{ item.name }}&lt;/strong&gt; {{ item.role }}
+  &lt;/slot&gt;
+&lt;/pdx-list&gt;</code></pre>
     </details>
   </section>
 </template>
@@ -28,10 +30,6 @@ const basicItems = [
   { id: 5, name: 'Eve Davis', role: 'DevOps Engineer' },
 ];
 
-function renderBasicItem(userItem) {
-  return '<strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);margin-left:auto;font-size:0.8rem">' + userItem.role + '</span>';
-}
-
 function onItemClick(evt) {
   listLog = 'Clicked: ' + evt.detail.item.name + ' (id: ' + evt.detail.id + ')';
 }
@@ -42,5 +40,7 @@ let listLog = $signal('Click an item...');
 <style scoped>
   /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
   .demo-container { max-width: 600px; }
+  .basic-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }
+  .basic-role { color: var(--pdx-color-muted); margin-left: auto; font-size: var(--pdx-text-xs); }
   .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }
 </style>
