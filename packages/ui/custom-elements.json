@@ -25254,16 +25254,6 @@
             },
             {
               "kind": "field",
-              "name": "axis",
-              "description": "'vertical' | 'horizontal' — decides which arrows move, and which way rows shift.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'",
-              "attribute": "axis"
-            },
-            {
-              "kind": "field",
               "name": "handle",
               "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
               "type": {
@@ -25281,6 +25271,26 @@
               },
               "default": "false",
               "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "axis",
+              "description": "vertical (the default) or horizontal.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "axis"
+            }
+          ],
+          "variants": [
+            {
+              "name": "axis",
+              "values": [
+                "vertical",
+                "horizontal"
+              ],
+              "default": "vertical"
             }
           ],
           "events": [
@@ -25316,15 +25326,6 @@
               "default": "'label'"
             },
             {
-              "name": "axis",
-              "fieldName": "axis",
-              "description": "'vertical' | 'horizontal' — decides which arrows move, and which way rows shift.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'"
-            },
-            {
               "name": "handle",
               "fieldName": "handle",
               "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
@@ -25341,6 +25342,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "axis",
+              "fieldName": "axis",
+              "description": "vertical (the default) or horizontal.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'"
             }
           ],
           "slots": [
@@ -25348,6 +25358,30 @@
               "name": "item",
               "description": "Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which\nreceives `{ item, index }`. Without either the row shows the item's `label-field`.",
               "signature": "(item: T, index: number)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The `role=\"list\"` `<ul>`, framed."
+            },
+            {
+              "name": "item",
+              "description": "A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`."
+            },
+            {
+              "name": "handle",
+              "description": "A row's handle, the button the pointer grabs and the keyboard moves."
+            },
+            {
+              "name": "body",
+              "description": "A row's content."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: nothing can be moved, and the handles are `aria-disabled`."
             }
           ]
         }

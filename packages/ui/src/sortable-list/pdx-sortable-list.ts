@@ -37,16 +37,27 @@ import '@pdxui/design/components/sortable-list';
  *
  * @slot item - Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which
  *   receives `{ item, index }`. Without either the row shows the item's `label-field`.
+ * @csspart list - The `role="list"` `<ul>`, framed.
+ * @csspart item - A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`.
+ * @csspart handle - A row's handle, the button the pointer grabs and the keyboard moves.
+ * @csspart body - A row's content.
+ * @cssstate disabled - `disabled` is set: nothing can be moved, and the handles are `aria-disabled`.
  */
 component('pdx-sortable-list', {
+    // The axis sortable-list.css keys by (#292), reflected on the host: it lays the rows out, and
+    // decides which arrows move and which way rows shift.
+    variants: {
+        /** vertical (the default) or horizontal. */
+        axis: ['vertical', 'horizontal'],
+    },
+    states: ['disabled'],
+    parts: ['list', 'item', 'handle', 'body'],
     props: {
         items: { type: Array, default: [] },
         /** How a row is identified. Empty: the row's index. */
         idField: { type: String, default: 'id' },
         /** What a row shows without an `item` slot, and what names its handle either way. */
         labelField: { type: String, default: 'label' },
-        /** 'vertical' | 'horizontal' — decides which arrows move, and which way rows shift. */
-        axis: { type: String, default: 'vertical' },
         /** A selector inside the row that the POINTER may grab. Empty: the rendered handle. */
         handle: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
@@ -98,11 +109,13 @@ component('pdx-sortable-list', {
         function buildRow(item: unknown, index: number): HTMLElement {
             const li = document.createElement('li');
             li.className = 'pdx-sortable-item';
+            li.dataset.part = 'item';
             li.dataset.pdxKey = String(idOf(item, index));
 
             const handle = document.createElement('button');
             handle.type = 'button';
             handle.className = 'pdx-sortable-handle';
+            handle.dataset.part = 'handle';
             uiAttr(handle, 'aria-roledescription', () => uiString('sortable-list', 'draggable'));
             handle.setAttribute('aria-describedby', helpId);
             uiAttr(handle, 'aria-label', () => format(uiString('sortable-list', 'reorder'), { label: labelOf(item, index) }));
@@ -112,6 +125,7 @@ component('pdx-sortable-list', {
 
             const body = document.createElement('div');
             body.className = 'pdx-sortable-body';
+            body.dataset.part = 'body';
             const slot = getItemSlot();
             if (slot) body.appendChild(slot({ item, index }));
             else body.textContent = labelOf(item, index);
@@ -147,15 +161,13 @@ component('pdx-sortable-list', {
             void ctx.items();
             void ctx.idField();
             void ctx.labelField();
-            void ctx.disabled();
+            ctx.state('disabled', !!ctx.disabled());
             const axis = ctx.axis() as string;
 
             if (!built) {
                 built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-sortable-root');
-
                     const help = document.createElement('div');
                     help.id = helpId;
                     help.className = 'pdx-sr-only';
@@ -164,8 +176,8 @@ component('pdx-sortable-list', {
 
                     listEl = document.createElement('ul');
                     listEl.className = 'pdx-sortable-list';
+                    listEl.dataset.part = 'list';
                     listEl.setAttribute('role', 'list');
-                    listEl.dataset.axis = axis;
                     ctx.el.appendChild(listEl);
 
                     rebuild();

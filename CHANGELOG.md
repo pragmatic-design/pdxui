@@ -401,6 +401,10 @@ semver.
     and `:state(empty)` on the host; the host no longer carries `pdx-list-root` or `pdx-list-bordered`.
     Its list, items, empty state and overlay are parts.
   - **A3.** A page of a larger source gives each item `aria-setsize` and `aria-posinset`.
+- **Breaking:** `pdx-sortable-list` takes the beta contract (#292). `axis` is a variant reflected on
+  the host (`[axis="horizontal"]`), its inner list no longer carries `data-axis`, and the host no
+  longer carries `pdx-sortable-root`; `disabled` is `:state(disabled)`; its list, items, handles and
+  bodies are parts.
 - **Breaking:** `pdx-button` and `pdx-button-group` take the beta contract (#291), the last of the
   display, feedback and action family.
   - **No toggle mode.** `toggle`, `pressed`, the `pdx-toggle` event and the `.pdx-pressed` class leave

@@ -107,6 +107,14 @@ test.describe('pdx-list', () => {
         await expect(page.locator('#l [data-part="list"]')).toHaveAttribute('role', 'list');
     });
 
+    test('control — a list over items it all shows carries no total, and is not busy', async ({ page }) => {
+        await mount(page, '<pdx-list id="l"></pdx-list>');
+        await page.locator('#l').evaluate((h) => { (h as unknown as { items: unknown[] }).items = [{ id: 1, name: 'A' }]; });
+        await frames(page);
+        await expect(page.locator('#l')).not.toHaveAttribute('aria-busy', /.*/);
+        expect(await states(page, '#l')).not.toContain('loading');
+    });
+
     test('renderItem is gone: a callback passed to it does not render the items', async ({ page }) => {
         await mount(page, '<pdx-list id="l"></pdx-list>');
         await page.locator('#l').evaluate((h) => {
@@ -116,5 +124,39 @@ test.describe('pdx-list', () => {
         await frames(page);
         await expect(page.locator('#l [data-part="item"]')).toHaveText('A');
         await expect(page.locator('#l .cb')).toHaveCount(0);
+    });
+});
+
+test.describe('pdx-sortable-list', () => {
+    const ITEMS = '[{"id":1,"label":"One"},{"id":2,"label":"Two"},{"id":3,"label":"Three"}]';
+    const boxes = (page: Page, sel: string) => page.locator(`${sel} [data-part="item"]`).evaluateAll((els) => els.map((e) => {
+        const r = e.getBoundingClientRect();
+        return { x: Math.round(r.left), y: Math.round(r.top) };
+    }));
+
+    test('axis is a variant reflected on the host, vertical by default; horizontal lays the items in a row', async ({ page }) => {
+        await mount(page, `<pdx-sortable-list id="v" items='${ITEMS}'></pdx-sortable-list><pdx-sortable-list id="h" axis="horizontal" items='${ITEMS}'></pdx-sortable-list>`);
+        await expect(page.locator('#v')).toHaveAttribute('axis', 'vertical');
+        await expect(page.locator('#h')).toHaveAttribute('axis', 'horizontal');
+        const v = await boxes(page, '#v');
+        const h = await boxes(page, '#h');
+        expect(new Set(v.map((b) => b.x)).size, 'one column').toBe(1);
+        expect(new Set(h.map((b) => b.y)).size, 'one row').toBe(1);
+        expect(await page.locator('#h [data-part="item"]').nth(1).evaluate((i) => getComputedStyle(i).borderLeftStyle)).toBe('solid');
+        expect(await page.locator('#v [data-part="item"]').nth(1).evaluate((i) => getComputedStyle(i).borderTopStyle)).toBe('solid');
+    });
+
+    test('no class on the host; disabled is :state(disabled), and its handles are aria-disabled', async ({ page }) => {
+        await mount(page, `<pdx-sortable-list id="d" disabled items='${ITEMS}'></pdx-sortable-list><pdx-sortable-list id="e" items='${ITEMS}'></pdx-sortable-list>`);
+        expect(await page.locator('#d').evaluate((h) => h.getAttribute('class'))).toBeNull();
+        expect(await page.locator('#d').evaluate((h) => h.matches(':state(disabled)'))).toBe(true);
+        expect(await page.locator('#e').evaluate((h) => h.matches(':state(disabled)'))).toBe(false);
+        await expect(page.locator('#d [data-part="handle"]').first()).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    test('its list, items, handles and bodies are parts', async ({ page }) => {
+        await mount(page, `<pdx-sortable-list id="s" items='${ITEMS}'></pdx-sortable-list>`);
+        expect(await parts(page, '#s')).toEqual(['body', 'handle', 'item', 'list']);
+        await expect(page.locator('#s [data-part="list"]')).toHaveAttribute('role', 'list');
     });
 });

@@ -26,6 +26,8 @@ interface Row {
 const DONE: Row[] = [
     // Its looks, loading and empty are states of the host; `renderItem` is the `item` slot (#292).
     { tag: 'pdx-list', models: [], states: ['bordered', 'dividers', 'loading', 'empty'], parts: ['list', 'item', 'empty', 'overlay'], removed: ['renderItem'] },
+    // `axis` is a variant reflected on the host; disabled a state; no class on the host.
+    { tag: 'pdx-sortable-list', models: [], states: ['disabled'], parts: ['list', 'item', 'handle', 'body'], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

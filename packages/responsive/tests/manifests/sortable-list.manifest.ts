@@ -5,9 +5,9 @@
  * (packages/design/src/components/sortable-list.css).
  *
  * DOM, host vs inner:
- *   <pdx-sortable-list>                       ← HOST: .pdx-sortable-root
+ *   <pdx-sortable-list axis="vertical">       ← HOST: the axis variant, :state(disabled) — no class (#292)
  *     <div class="pdx-sr-only" id="…">        ← the instructions every handle points at
- *     <ul class="pdx-sortable-list" role="list" data-axis="vertical">   ← the INNER box, the border
+ *     <ul data-part="list" class="pdx-sortable-list" role="list">   ← the INNER box, the border
  *       <li class="pdx-sortable-item">
  *         <button class="pdx-sortable-handle" aria-roledescription="draggable" aria-describedby>
  *         <div class="pdx-sortable-body">

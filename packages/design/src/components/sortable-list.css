@@ -1,7 +1,7 @@
-/* pdx-sortable-list — a list the user can reorder, by pointer and by keyboard */
-pdx-sortable-list { display: block; }
-
-.pdx-sortable-root { position: relative; }
+/* GENERATED from packages/design/variant-sources/components/sortable-list.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
+/* pdx-sortable-list — a list the user can reorder, by pointer and by keyboard. `axis` is a `@variant`
+   axis reflected on the host (#292): the host carries no class, and the inner list no data-axis. */
+pdx-sortable-list { display: block; position: relative; }
 
 .pdx-sortable-list {
     display: flex;
@@ -14,7 +14,6 @@ pdx-sortable-list { display: block; }
     overflow: hidden;
 }
 
-.pdx-sortable-list[data-axis='horizontal'] { flex-direction: row; }
 
 .pdx-sortable-item {
     display: flex;
@@ -29,12 +28,13 @@ pdx-sortable-list { display: block; }
     box-sizing: border-box;
 }
 
-.pdx-sortable-list:not([data-axis='horizontal']) .pdx-sortable-item + .pdx-sortable-item {
-    border-top: 1px solid var(--pdx-color-border);
-}
-.pdx-sortable-list[data-axis='horizontal'] .pdx-sortable-item + .pdx-sortable-item {
-    border-left: 1px solid var(--pdx-color-border);
-}
+:where(pdx-sortable-list[axis="vertical"]) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
+        border-top: 1px solid var(--pdx-color-border);
+    }
+:where(pdx-sortable-list[axis="horizontal"]) > [data-part="list"] { flex-direction: row; }
+    :where(pdx-sortable-list[axis="horizontal"]) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
+        border-left: 1px solid var(--pdx-color-border);
+    }
 
 /* Lifted from the keyboard: the same affordance a pointer drag gives, for the gesture that has no
    pointer to follow. */
