@@ -68,6 +68,15 @@ test.describe('pdx-input-group', () => {
         expect(await matches(page, '#g', 'disabled')).toBe(true);
         await expect(page.locator('#g pdx-input')).toHaveAttribute('disabled', '');
     });
+
+    test('keeps the class an author put on its host, on mount and when its size changes', async ({ page }) => {
+        await mount(page, '<pdx-input-group id="g" class="author-x"><pdx-input placeholder="Amount"></pdx-input></pdx-input-group>');
+        await expect(page.locator('#g')).toHaveAttribute('class', 'author-x');
+        await page.locator('#g').evaluate((h) => h.setAttribute('size', 'sm'));
+        await frames(page);
+        await expect(page.locator('#g')).toHaveAttribute('class', 'author-x');
+        await expect(page.locator('#g pdx-input')).toHaveAttribute('size', 'sm');
+    });
 });
 
 test.describe('pdx-form-section', () => {
