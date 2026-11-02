@@ -287,3 +287,18 @@ describe('the display components, from the shipped manifest (#291)', () => {
             .toBe('<pdx-chip selectable @selected-change="e => pick(e.currentTarget.value, e.detail.value)"></pdx-chip>');
     });
 });
+
+describe('the data components, from the shipped manifest (#292)', () => {
+    const r = new ComponentResolver();
+    r.registerUiManifest(process.cwd());
+    const fix = (text: string): string => {
+        const apply = alphaChangeEvent.fix;
+        if (typeof apply !== 'function') throw new Error('alpha-change-event no longer rewrites');
+        return apply(text, { alphaOf: (tag: string) => r.alphaOf(tag) });
+    };
+
+    it('pdx-filter-builder: @pdx-filter-change becomes the model\'s @value-change, its filters read as the value and its logic off the host', () => {
+        expect(fix('<pdx-filter-builder @pdx-filter-change="e => save(e.detail.filters, e.detail.logic)"></pdx-filter-builder>'))
+            .toBe('<pdx-filter-builder @value-change="e => save(e.detail.value, e.currentTarget.logic)"></pdx-filter-builder>');
+    });
+});

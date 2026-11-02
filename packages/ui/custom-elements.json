@@ -5945,7 +5945,6 @@
             }
           ],
           "roles": [
-            "figure",
             "group"
           ],
           "attributes": [
@@ -6174,6 +6173,24 @@
               },
               "default": "''"
             }
+          ],
+          "cssParts": [
+            {
+              "name": "legend",
+              "description": "The legend, a group of buttons, while there is more than one series or slice."
+            },
+            {
+              "name": "legend-item",
+              "description": "A legend button: pressed while its series is shown."
+            },
+            {
+              "name": "swatch",
+              "description": "A legend button's colour."
+            },
+            {
+              "name": "canvas",
+              "description": "The box the chart is drawn in."
+            }
           ]
         }
       ],
@@ -6272,9 +6289,6 @@
               "attribute": "label"
             }
           ],
-          "roles": [
-            "img"
-          ],
           "attributes": [
             {
               "name": "data",
@@ -6338,6 +6352,12 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "canvas",
+              "description": "The canvas the trend is drawn on."
             }
           ]
         }
@@ -13616,42 +13636,85 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "Initial filter descriptors.",
+              "description": "The current value.",
               "type": {
-                "text": "array"
+                "text": "(FilterDescriptor | CompositeFilter)[]"
               },
-              "default": "[]"
+              "default": "() => []"
             },
             {
               "kind": "field",
               "name": "logic",
-              "description": "Default logic between filters.",
               "type": {
-                "text": "string"
+                "text": "'and' | 'or'"
               },
               "default": "'and'",
               "attribute": "logic"
             }
           ],
+          "models": [
+            "value",
+            "logic"
+          ],
+          "alphaEvents": [
+            "pdx-filter-change"
+          ],
+          "alphaDetail": {
+            "filters": "$event.detail.value",
+            "logic": "$event.currentTarget.logic"
+          },
           "events": [
             {
-              "name": "pdx-filter-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the filter changes.",
-              "detail": "{ filters, logic }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: (FilterDescriptor | CompositeFilter)[] }"
+            },
+            {
+              "name": "logic-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `logic`. Does not bubble.",
+              "detail": "{ value: 'and' | 'or' }"
             }
           ],
           "attributes": [
             {
               "name": "logic",
               "fieldName": "logic",
-              "description": "Default logic between filters.",
               "type": {
-                "text": "string"
+                "text": "'and' | 'or'"
               },
               "default": "'and'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The bar that holds the chips and its buttons."
+            },
+            {
+              "name": "chip",
+              "description": "One filter: its label and its remove button."
+            },
+            {
+              "name": "label",
+              "description": "A chip's label, the button that opens its editor."
+            },
+            {
+              "name": "remove",
+              "description": "A chip's remove button."
+            },
+            {
+              "name": "add",
+              "description": "The \"+ Add Filter\" button."
+            },
+            {
+              "name": "clear",
+              "description": "The \"Clear all\" button, while there is a filter."
             }
           ]
         }
@@ -30540,6 +30603,42 @@
               "name": "node",
               "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `role=\"tree\"`: one click and one keydown listener serve every row."
+            },
+            {
+              "name": "item",
+              "description": "A row, `role=\"treeitem\"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3)."
+            },
+            {
+              "name": "group",
+              "description": "The `role=\"group\"` of an open branch's children."
+            },
+            {
+              "name": "twisty",
+              "description": "A branch's open/closed marker."
+            },
+            {
+              "name": "check",
+              "description": "A row's checkbox, with `checkable`."
+            },
+            {
+              "name": "label",
+              "description": "A row's label."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "A lazy branch is loading: the tree is `aria-busy` too (A4)."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: a click opens and selects nothing."
             }
           ],
           "cssProperties": [

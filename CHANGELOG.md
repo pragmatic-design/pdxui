@@ -394,6 +394,18 @@ semver.
 
 ### Changed
 
+- `pdx-chart` and `pdx-sparkline` take the beta contract (#292). Their role, name and, for the chart,
+  its focus and its arrow keys are declared on the host. The chart's legend, legend buttons, swatches and canvas are parts, and the
+  sparkline's canvas; the sparkline is certified as itself.
+- **Breaking:** `pdx-filter-builder` takes the beta contract (#292). `value` and `logic` are models:
+  an edit of the chips writes `value`, their descriptors, and announces it with `value-change`
+  `{ value }`, so `::value` follows it; `pdx-filter-change` is gone, and `pdx migrate` rewrites an
+  inline listener on it. A parent's write of `logic` now re-applies the filters to the source. Its bar,
+  chips, labels and buttons are parts.
+- `pdx-tree` takes the beta contract (#292). Its rows share one click listener on the tree, as its
+  keyboard already did: a tree of 200 nodes adds no more listeners than one of 2. A lazy branch on its
+  way makes the tree `:state(loading)` and `aria-busy`; `disabled` is `:state(disabled)`; its root,
+  rows, groups, twisties, checkboxes and labels are parts.
 - **Breaking:** `pdx-list` takes the beta contract (#292), the first of the data family.
   - **No `renderItem`.** An item is drawn by the `item` snippet or scoped slot; `pdx migrate` flags a
     `render-item`, and in a `.pdx` it is `PDX_REMOVED_FORM`.

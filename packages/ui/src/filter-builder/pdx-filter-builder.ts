@@ -2,7 +2,7 @@
 // Standalone component: works with DataSource, pdx-data-grid, or any list.
 // Uses shared filter-popover for the condition editor (same as grid filter).
 
-import { component, html, signal, DEV } from '@pdxui/core';
+import { component, html, signal, model, DEV } from '@pdxui/core';
 import type { FilterDescriptor, CompositeFilter } from '@pdxui/core';
 import { toFilterFields } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -27,6 +27,17 @@ interface ActiveFilter {
 
 /**
  * A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.
+ *
+ * @csspart root - The bar that holds the chips and its buttons.
+ * @csspart chip - One filter: its label and its remove button.
+ * @csspart label - A chip's label, the button that opens its editor.
+ * @csspart remove - A chip's remove button.
+ * @csspart add - The "+ Add Filter" button.
+ * @csspart clear - The "Clear all" button, while there is a filter.
+ *
+ * @alphaevent pdx-filter-change
+ * @alphadetail filters $event.detail.value
+ * @alphadetail logic $event.currentTarget.logic
  */
 component('pdx-filter-builder', {
     props: {
@@ -34,11 +45,15 @@ component('pdx-filter-builder', {
         fields: { type: Array, default: [] },
         /** DataSource to auto-bind filters. */
         source: { type: Object, default: null },
-        /** Initial filter descriptors. */
-        value: { type: Array, default: [] },
-        /** Default logic between filters. */
-        logic: { type: String, default: 'and' },
     },
+    // The builder writes its own filters, so they are a model (#292): an edit writes `value`, the
+    // descriptors one per chip, and the write dispatches `value-change`; setting it restores a saved
+    // view. `logic` joins them, `and` or `or`; a write re-applies the filters already there.
+    models: {
+        value: model<(FilterDescriptor | CompositeFilter)[]>(() => [], { type: Array }),
+        logic: model<'and' | 'or'>('and', { type: String }),
+    },
+    parts: ['root', 'chip', 'label', 'remove', 'add', 'clear'],
     setup(ctx) {
         let _built = false;
         let _barEl: HTMLElement | null = null;
@@ -108,13 +123,19 @@ component('pdx-filter-builder', {
             return all.filter(f => !used.has(f.field));
         }
 
-        /** Apply all filters to the DataSource, and announce them either way. */
-        function applyToSource(): void {
-            const allFilters: (FilterDescriptor | CompositeFilter)[] = [];
+        /** The descriptors of the chips, one per filter that says something: what `value` holds. */
+        function currentFilters(): (FilterDescriptor | CompositeFilter)[] {
+            const out: (FilterDescriptor | CompositeFilter)[] = [];
             for (const af of _filters.peek()) {
                 const filter = stateToFilter(af.field, af.state);
-                if (filter) allFilters.push(filter);
+                if (filter) out.push(filter);
             }
+            return out;
+        }
+
+        /** Apply all filters to the DataSource. */
+        function applyToSource(): void {
+            const allFilters = currentFilters();
 
             // `logic` cannot be expressed by the
             // array alone: an array of filters is an implicit AND at match time (`matchesFilters`,
@@ -129,9 +150,19 @@ component('pdx-filter-builder', {
             // Read source from signal or fall back to element property
             const src = (ctx.source() || (ctx.el as any).source) as any;
             if (src && typeof src.setFilter === 'function') src.setFilter(payload);
-            // ⚠️ Emitted even without a source. Returning before this line would leave a builder
-            // used standalone — which the header of this file offers — with no output at all.
-            ctx.emit('pdx-filter-change', { filters: payload, logic });
+        }
+
+        /**
+         * An edit: write `value`, which announces it with `value-change` — with or without a source,
+         * so a builder used standalone has its output — and apply it to the source.
+         */
+        function commit(): void {
+            const next = currentFilters();
+            // Marked as seen first: the seeding track below reads `value`, and must not take the
+            // builder's own write for a saved view to restore.
+            _seeded = next;
+            ctx.value.set(next);
+            applyToSource();
         }
 
         // Focus after a change. The chips are rebuilt from scratch, so the button that had
@@ -151,7 +182,7 @@ component('pdx-filter-builder', {
                 idx = current.push({ field: fieldInfo.field, info: fieldInfo, state }) - 1;
             }
             _filters.set(current);
-            applyToSource();
+            commit();
             rebuildChips();
             if (focusChip) focusChipOrAdd(idx);
         }
@@ -161,7 +192,7 @@ component('pdx-filter-builder', {
             const current = _filters.peek().slice();
             current.splice(index, 1);
             _filters.set(current);
-            applyToSource();
+            commit();
             rebuildChips();
             if (moveFocus) focusChipOrAdd(index);
         }
@@ -170,7 +201,7 @@ component('pdx-filter-builder', {
         function clearAll(): void {
             const moveFocus = barHasFocus();
             _filters.set([]);
-            applyToSource();
+            commit();
             rebuildChips();
             if (moveFocus) _addBtn?.focus();
         }
@@ -254,6 +285,7 @@ component('pdx-filter-builder', {
                 const af = filters[i];
                 const chip = document.createElement('span');
                 chip.className = 'pdx-fb-chip';
+                chip.dataset.part = 'chip';
 
                 const text = stateToChipText(af.info.label, af.state, af.info.type, af.info.options);
 
@@ -262,6 +294,7 @@ component('pdx-filter-builder', {
                 const labelBtn = document.createElement('button');
                 labelBtn.type = 'button';
                 labelBtn.className = 'pdx-fb-chip-label';
+                labelBtn.dataset.part = 'label';
                 labelBtn.textContent = text;
                 uiAttr(labelBtn, 'aria-label', () => uiString('filter-builder', 'editFilter').replace('{filter}', text));
                 // Click chip → reopen editor with current values (no remove)
@@ -280,6 +313,7 @@ component('pdx-filter-builder', {
 
                 const removeBtn = document.createElement('button');
                 removeBtn.className = 'pdx-fb-chip-remove';
+                removeBtn.dataset.part = 'remove';
                 removeBtn.type = 'button';
                 removeBtn.textContent = '\u2715';
                 // Named after its chip, so two chips do not read the same.
@@ -293,6 +327,7 @@ component('pdx-filter-builder', {
             // + Add Filter button
             const addBtn = document.createElement('button');
             addBtn.className = 'pdx-fb-add-btn';
+            addBtn.dataset.part = 'add';
             addBtn.type = 'button';
             // The icon via innerHTML, the LABEL via textContent: a string hidden in the middle of
             // that SVG would be untranslatable, and invisible to the i18n guard, which does not
@@ -311,6 +346,7 @@ component('pdx-filter-builder', {
             if (filters.length > 0) {
                 const clearBtn = document.createElement('button');
                 clearBtn.className = 'pdx-fb-clear-btn';
+                clearBtn.dataset.part = 'clear';
                 clearBtn.type = 'button';
                 clearBtn.textContent = uiString('filter-builder', 'clearAll');
                 clearBtn.addEventListener('click', clearAll);
@@ -351,6 +387,16 @@ component('pdx-filter-builder', {
             rebuildChips();
         });
 
+        // ─── Logic ─────────────────────────────────────────
+        // A write of `logic` changes how the filters already there are joined, so the source hears it
+        // now rather than at the next edit. The first run is the mount, which the seeding above covers.
+        let _logicSeen = false;
+        ctx.track(() => {
+            void ctx.logic();
+            if (!_logicSeen) { _logicSeen = true; return; }
+            applyToSource();
+        });
+
         // ─── Build ─────────────────────────────────────────
 
         ctx.track(() => {
@@ -368,6 +414,7 @@ component('pdx-filter-builder', {
                 ctx.frame(() => {
                     _barEl = document.createElement('div');
                     _barEl.className = 'pdx-filter-builder';
+                    _barEl.dataset.part = 'root';
                     ctx.el.appendChild(_barEl);
                     rebuildChips();
                 });

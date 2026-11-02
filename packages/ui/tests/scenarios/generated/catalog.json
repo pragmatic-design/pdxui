@@ -2787,6 +2787,29 @@
       ]
     },
     {
+      "name": "sparkline",
+      "tags": [
+        "pdx-sparkline"
+      ],
+      "tier": "7",
+      "status": "wip",
+      "page": "tier-7",
+      "scenarios": [
+        {
+          "id": "sparkline-line",
+          "title": "Sparkline — line, default size (120×32)"
+        },
+        {
+          "id": "sparkline-narrow",
+          "title": "Sparkline — in a 60px box, narrower than its width"
+        },
+        {
+          "id": "sparkline-labelled",
+          "title": "Sparkline — area, named by its label"
+        }
+      ]
+    },
+    {
       "name": "spinner",
       "tags": [
         "pdx-spinner"

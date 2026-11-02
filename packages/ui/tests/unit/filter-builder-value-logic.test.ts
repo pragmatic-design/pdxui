@@ -93,14 +93,40 @@ describe('pdx-filter-builder logic', () => {
         expect(source.calls.at(-1)).toEqual([TWO[0]]);
     });
 
-    it('reports the logic on the event too, not only to the source', async () => {
+    it('applies a logic set after mount to the source', async () => {
+        // `logic` is a model (#292): a parent that writes it changes how the filters already there
+        // are joined, without waiting for the next edit.
         const source = fakeSource();
-        const el = await mountFB({ source, logic: 'or' });
-        const seen: any[] = [];
-        el.addEventListener('pdx-filter-change', (e: Event) => seen.push((e as CustomEvent).detail));
-        el.value = TWO;
+        const el = await mountFB({ source, value: TWO });
+        el.logic = 'or';
         await tick(200);
-        expect(seen.length, 'no pdx-filter-change was emitted').toBeGreaterThan(0);
-        expect(seen.at(-1).logic).toBe('or');
+        expect(source.calls.at(-1)).toEqual([{ logic: 'or', filters: TWO }]);
+    });
+});
+
+// `value` and `logic` are models (#292): an edit writes `value` and announces it with `value-change`
+// `{ value }`; the alpha `pdx-filter-change` is gone. A model announces the component's own writes
+// only, and nothing in the bar writes `logic` yet, so `logic-change` has no edit to test here.
+describe('pdx-filter-builder models', () => {
+    it('an edit writes value, the flat descriptors, and announces value-change', async () => {
+        const el = await mountFB({ logic: 'or', value: [
+            { field: 'name', operator: 'contains', value: 'ada' },
+            { field: 'age', operator: 'gt', value: 30 },
+        ] });
+        const seen: unknown[] = [];
+        el.addEventListener('value-change', (e: Event) => seen.push((e as CustomEvent).detail));
+        (el.querySelector('.pdx-fb-chip-remove') as HTMLElement).click();
+        await tick(50);
+        expect(seen.at(-1), 'no value-change after removing a chip').toEqual({ value: [{ field: 'age', operator: 'gt', value: 30 }] });
+        expect(el.value).toEqual([{ field: 'age', operator: 'gt', value: 30 }]);
+    });
+
+    it('no longer emits pdx-filter-change', async () => {
+        const el = await mountFB({ value: [{ field: 'name', operator: 'contains', value: 'ada' }] });
+        let alpha = 0;
+        el.addEventListener('pdx-filter-change', () => { alpha++; });
+        (el.querySelector('.pdx-fb-chip-remove') as HTMLElement).click();
+        await tick(50);
+        expect(alpha).toBe(0);
     });
 });

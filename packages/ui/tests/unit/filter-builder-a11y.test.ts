@@ -21,7 +21,7 @@ async function mountBuilder(): Promise<{ el: HTMLElement; changes: unknown[] }> 
     const el = document.createElement('pdx-filter-builder');
     (el as unknown as { fields: unknown }).fields = FIELDS;
     const changes: unknown[] = [];
-    el.addEventListener('pdx-filter-change', (e) => changes.push((e as CustomEvent).detail));
+    el.addEventListener('value-change', (e) => changes.push((e as CustomEvent).detail));
     document.body.appendChild(el);
     await tick(20);
     return { el, changes };
@@ -99,10 +99,10 @@ describe('the value popover', () => {
         expect(changes).toHaveLength(0);
     });
 
-    it('Apply adds the chip, fires pdx-filter-change once with the filter, and focuses the chip', async () => {
+    it('Apply adds the chip, fires value-change once with the filter, and focuses the chip', async () => {
         const { el, changes } = await mountBuilder();
         await addEnumFilter(el, 'Category', 'Books');
-        expect(changes).toEqual([{ filters: [{ field: 'category', operator: 'in', value: ['Books'] }], logic: 'and' }]);
+        expect(changes).toEqual([{ value: [{ field: 'category', operator: 'in', value: ['Books'] }] }]);
         const chips = el.querySelectorAll('.pdx-fb-chip');
         expect(chips).toHaveLength(1);
         expect(document.activeElement).toBe(chips[0].querySelector('.pdx-fb-chip-remove'));

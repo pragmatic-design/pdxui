@@ -6,7 +6,7 @@ import { component, html, generatedId } from '@pdxui/core';
 import { ChartEngine, type ChartConfig } from './core/engine';
 import { chartDataTable, chartSeries, gaugeReading, pointText, type ChartDataTable } from './core/describe';
 import { chartNumbers } from './core/numbers';
-import { uiString, format, uiAttr} from '../shared/i18n';
+import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -14,6 +14,11 @@ import '@pdxui/design/components/chart';
 
 /**
  * A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.
+ *
+ * @csspart legend - The legend, a group of buttons, while there is more than one series or slice.
+ * @csspart legend-item - A legend button: pressed while its series is shown.
+ * @csspart swatch - A legend button's colour.
+ * @csspart canvas - The box the chart is drawn in.
  */
 component('pdx-chart', {
     props: {
@@ -72,6 +77,7 @@ component('pdx-chart', {
         /** DataSource binding (duck-typed) */
         source: { type: Object, default: null },
     },
+    parts: ['legend', 'legend-item', 'swatch', 'canvas'],
     setup(ctx) {
         let engine: ChartEngine | null = null;
         let canvasHost: HTMLElement | null = null;
@@ -131,9 +137,11 @@ component('pdx-chart', {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'pdx-chart-legend-item';
+                btn.dataset.part = 'legend-item';
                 btn.setAttribute('aria-pressed', String(!hidden.has(item.name)));
                 const swatch = document.createElement('span');
                 swatch.className = 'pdx-chart-legend-swatch';
+                swatch.dataset.part = 'swatch';
                 swatch.setAttribute('aria-hidden', 'true');
                 if (item.color) swatch.style.background = item.color;
                 btn.append(swatch, document.createTextNode(item.name));
@@ -175,12 +183,21 @@ component('pdx-chart', {
             announce('');
         }
 
-        ctx.track(() => {
-            const el = ctx.el;
-            el.addEventListener('keydown', onKeydown);
-            el.addEventListener('focusout', clearFocus);
-            return () => { el.removeEventListener('keydown', onKeydown); el.removeEventListener('focusout', clearFocus); };
-        });
+        /**
+         * The figure's name: its title, its type and its number of points, or for a gauge its
+         * reading. The data itself is in the table that describes it (renderTable, above).
+         */
+        function figureLabel(): string {
+            const title = (ctx.title() as string) || '';
+            const type = (ctx.type() as string) || 'line';
+            if (type === 'gauge') {
+                const nf = chartNumbers(resolveLocale(ctx.el, ctx.locale() as string));
+                const r = gaugeReading(ctx.value() as number, ctx.min() as number, ctx.max() as number, (ctx.format() as string) || undefined, nf);
+                return format(uiString('chart', 'gauge'), { label: title || uiString('chart', 'gaugeLabel'), ...r });
+            }
+            const n = Array.isArray(ctx.data()) ? (ctx.data() as unknown[]).length : 0;
+            return (title ? title + ' — ' : '') + format(uiString('chart', 'summary'), { type }) + (n ? format(uiString('chart', 'points'), { n }) : '');
+        }
 
         function buildConfig(): ChartConfig {
             const data = (ctx.data() as Record<string, unknown>[]) || [];
@@ -305,21 +322,6 @@ component('pdx-chart', {
                     if (!canvasHost) return;
                 }
 
-                // A figure, named: title + type + number of points, or for a gauge its reading. The
-                // data itself is in the table that describes it (renderTable, below).
-                const _t = (ctx.title() as string) || '';
-                const _ct = (ctx.type() as string) || 'line';
-                const _n = Array.isArray(ctx.data()) ? (ctx.data() as unknown[]).length : 0;
-                ctx.el.setAttribute('role', 'figure');
-                if (_ct === 'gauge') {
-                    const nf = chartNumbers(resolveLocale(ctx.el, ctx.locale() as string));
-                    const r = gaugeReading(ctx.value() as number, ctx.min() as number, ctx.max() as number, (ctx.format() as string) || undefined, nf);
-                    uiAttr(ctx.el, 'aria-label', () => format(uiString('chart', 'gauge'), { label: _t || uiString('chart', 'gaugeLabel'), ...r }));
-                    ctx.el.removeAttribute('tabindex');
-                } else {
-                    uiAttr(ctx.el, 'aria-label', () => (_t ? _t + ' — ' : '') + format(uiString('chart', 'summary'), { type: _ct }) + (_n ? format(uiString('chart', 'points'), { n: _n }) : ''));
-                    ctx.el.tabIndex = 0;   // the points are walked with the arrow keys
-                }
                 // The legend is a DOM row beside the canvas: a flex host, the legend before or after
                 // it by position. Inline, like the height below, so it holds without the design CSS.
                 const pos = (ctx.legendPosition() as string) || 'top';
@@ -355,11 +357,20 @@ component('pdx-chart', {
         // on documentElement + the canvas listeners survive every unmount.
         ctx.track(() => () => { engine?.destroy(); engine = null; });
 
-        return { dataId };
+        return { dataId, figureLabel, onKeydown, clearFocus };
+    },
+    // A figure, named; not role="img", whose children are presentational. Focusable unless it is a
+    // gauge, which has no points: the arrow keys walk them, and leaving the chart drops the point.
+    host: {
+        role: 'figure',
+        ':aria-label': (ctx) => ctx.figureLabel(),
+        ':tabindex': (ctx) => ctx.type() === 'gauge' ? null : '0',
+        '@keydown': (ctx, e) => ctx.onKeydown(e as KeyboardEvent),
+        '@focusout': (ctx) => ctx.clearFocus(),
     },
     render: (ctx) => html`
-        <div class="pdx-chart-legend" role="group" :aria-label="${() => uiString('chart', 'legend')}" hidden></div>
-        <div class="pdx-chart-canvas" aria-hidden="true" style="width:100%;min-height:200px"></div>
+        <div class="pdx-chart-legend" data-part="legend" role="group" :aria-label="${() => uiString('chart', 'legend')}" hidden></div>
+        <div class="pdx-chart-canvas" data-part="canvas" aria-hidden="true" style="width:100%;min-height:200px"></div>
         <div class="pdx-sr-only pdx-chart-data" :id="${() => ctx.dataId}"></div>
         <div class="pdx-sr-only pdx-chart-live" aria-live="polite"></div>`,
 });
