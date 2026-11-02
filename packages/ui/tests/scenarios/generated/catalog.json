@@ -458,6 +458,25 @@
       ]
     },
     {
+      "name": "bulk-actions",
+      "tags": [
+        "pdx-bulk-actions"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "bulk-actions-basic",
+          "title": "Bulk actions — 3 selected, three actions, one refused with a reason"
+        },
+        {
+          "id": "bulk-actions-empty",
+          "title": "Bulk actions — nothing selected: no bar"
+        }
+      ]
+    },
+    {
       "name": "button",
       "tags": [
         "pdx-button"
@@ -1021,6 +1040,21 @@
       ]
     },
     {
+      "name": "data-source",
+      "tags": [
+        "pdx-data-source"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "data-source-list",
+          "title": "Data source — three static rows, fed to a list"
+        }
+      ]
+    },
+    {
       "name": "date-picker",
       "tags": [
         "pdx-date-picker"
@@ -1227,6 +1261,25 @@
       ]
     },
     {
+      "name": "edit-drawer",
+      "tags": [
+        "pdx-edit-drawer"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "edit-drawer-open",
+          "title": "Edit drawer — open on a record"
+        },
+        {
+          "id": "edit-drawer-busy",
+          "title": "Edit drawer — open, the parent saving"
+        }
+      ]
+    },
+    {
       "name": "empty-state",
       "tags": [
         "pdx-empty-state"
@@ -1242,6 +1295,25 @@
         {
           "id": "empty-state-action",
           "title": "Empty State — With action button"
+        }
+      ]
+    },
+    {
+      "name": "entity-grid",
+      "tags": [
+        "pdx-entity-grid"
+      ],
+      "tier": "5B",
+      "status": "wip",
+      "page": "tier-5b",
+      "scenarios": [
+        {
+          "id": "entity-grid-basic",
+          "title": "Entity grid — three customers, create and row actions"
+        },
+        {
+          "id": "entity-grid-readonly",
+          "title": "Entity grid — readonly: no create, no row actions"
         }
       ]
     },

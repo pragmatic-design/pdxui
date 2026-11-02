@@ -9,9 +9,11 @@ An action bar for the current selection.
 | `label` | `label` | string | `''` | Label template; `{count}` is substituted. Default: the `bulk-actions.selected` component string, "{count} selected". |
 | `clearable` | `clearable` | boolean | `true` | Show the trailing clear (✕) button. |
 
-**Events:** `pdx-action` → `detail: { key, action }` — Fired on `pdx-action`.; `pdx-clear` → `detail: {}` — Fired when the value is cleared.
+**Events:** `pdx-action` → `detail: { key: string; action: BulkAction }` — An action was pressed; an `aria-disabled` one emits nothing.; `pdx-clear` — The clear button was pressed: the parent clears its selection.
 
 **Renders:** roles `toolbar`
+
+**Parts:** `[data-part="root"]` — The bar, a `role="toolbar"`, shown while `count` is above 0.; `[data-part="count"]` — The "{count} selected" label.; `[data-part="action"]` — An action's button.; `[data-part="clear"]` — The clear button, while `clearable`.
 
 **Shapes:** `BulkAction { key: string; label: string; icon?: string; tone?: string; disabled?: boolean; disabledReason?: string }`
 

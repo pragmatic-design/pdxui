@@ -43,7 +43,9 @@ and `pdx-alert-dialog`; extra bulk actions go in `bulkActions` and come back as 
 | `openEdit(row)` | Open the drawer on this row. |
 | `getSelectedIds()` | The ids currently checked. |
 
-**Events:** `pdx-bulk` → `detail: { key, ids }` — Fired on `pdx-bulk`.; `pdx-create` → `detail: { values, clientId }` — Fired when a new item is created.; `pdx-delete` → `detail: { ids, rows } | { ids }` — Fired on `pdx-delete`.; `pdx-update` → `detail: { id, values }` — Fired on `pdx-update`.
+**Events:** `pdx-bulk` → `detail: { key: string; ids: unknown[] }` — One of `bulkActions` was pressed, over the selection.; `pdx-create` → `detail: { values: Record<string, unknown>; clientId: unknown }` — A record was created in the drawer. `clientId` names its optimistic row until the app's id replaces it.; `pdx-delete` → `detail: { ids: unknown[]; rows?: Record<string, unknown>[] }` — Rows were deleted: one from its row's button (with the row), or the selection from the bulk bar.; `pdx-update` → `detail: { id: unknown; values: Record<string, unknown> }` — A record was edited in the drawer.
+
+**Parts:** `[data-part="toolbar"]` — The row above the grid: the title and the create button.; `[data-part="title"]` — The title, from `title`.; `[data-part="add"]` — The create button, while there is a `schema` and the grid is not `readonly`.
 
 
 #### Examples
