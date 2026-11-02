@@ -8,19 +8,7 @@ import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
 import { loadTag, type LazyTag } from '../shared/lazy-tags';
 import { startCellEdit, commitCellEdit, cancelCellEdit, createDefaultEditor, startRowEdit, commitRowEdit, cancelRowEdit, deleteRow, openEditDialog, readCellEditorValue } from './grid-edit';
-
-// A per-grid identity token used by the row reorder: the drag's dataTransfer
-// must identify the grid it came from so cross-grid drops can be refused.
-let _reorderSeq = 0;
-const _reorderTokens = new WeakMap<object, string>();
-function reorderTokenFor(gc: object): string {
-    let t = _reorderTokens.get(gc);
-    if (!t) {
-        t = `pdx-dg-${++_reorderSeq}`;
-        _reorderTokens.set(gc, t);
-    }
-    return t;
-}
+import { recordRow, onActivate, onDoubleActivate } from './grid-delegate';
 
 export function renderRows(
     gc: GridContext,
@@ -49,37 +37,13 @@ export function renderRows(
         if (DEV) rowEl.setAttribute('data-pdx-item', '');
         const rowId = row[idFieldName];
         if (rowId != null) rowEl.setAttribute('data-row-id', String(rowId));
+        // Its click, its checkbox and its drag are the body's listeners (grid-delegate.ts).
+        recordRow(rowEl, { row, index: i, id: rowId, rows });
 
-        // Drag-to-reorder (opt-in via `row-reorder`; non-virtual grids). Emits pdx-row-reorder {from,to,...};
-        // the consumer reorders the underlying data (the grid does not mutate the source itself).
-        // NOTE: from/to are indexes relative to the CURRENT PAGE — with pagination use
-        // fromId/toId to reorder the complete dataset.
+        // Drag-to-reorder (opt-in via `row-reorder`; non-virtual grids): the body handles the drag.
         if (gc.isRowReorder()) {
             rowEl.setAttribute('draggable', 'true');
             rowEl.classList.add('pdx-dg-row-draggable');
-            const fromIndex = i;
-            const gridToken = reorderTokenFor(gc);
-            rowEl.addEventListener('dragstart', (e) => {
-                // The token identifies the grid: a drop coming from ANOTHER grid
-                // must not emit a reorder with an index that is not ours.
-                (e as DragEvent).dataTransfer?.setData('text/plain', JSON.stringify({ g: gridToken, from: fromIndex }));
-                rowEl.classList.add('pdx-dg-row-dragging');
-            });
-            rowEl.addEventListener('dragend', () => rowEl.classList.remove('pdx-dg-row-dragging'));
-            rowEl.addEventListener('dragover', (e) => { e.preventDefault(); rowEl.classList.add('pdx-dg-row-dragover'); });
-            rowEl.addEventListener('dragleave', () => rowEl.classList.remove('pdx-dg-row-dragover'));
-            rowEl.addEventListener('drop', (e) => {
-                e.preventDefault();
-                rowEl.classList.remove('pdx-dg-row-dragover');
-                let from = NaN;
-                try {
-                    const payload = JSON.parse((e as DragEvent).dataTransfer?.getData('text/plain') ?? '');
-                    if (payload && payload.g === gridToken) from = Number(payload.from);
-                } catch { /* a payload that is not ours (a drag from outside) → ignore it */ }
-                if (!Number.isNaN(from) && from !== fromIndex) {
-                    gc.emit('pdx-row-reorder', { from, to: fromIndex, fromId: rows[from]?.[idFieldName], toId: rowId });
-                }
-            });
         }
 
         // Selection highlight, and the state a screen reader reads
@@ -104,16 +68,7 @@ export function renderRows(
             cb.setAttribute(GRID_WIDGET, '');
             cb.checked = gc.selectedIds.has(rowId);
             cb.setAttribute('aria-label', t('selectRow').replace('{n}', String(i + 1)));
-            cb.addEventListener('change', (e) => {
-                gc.emit('__toggle-select', { id: rowId, row, shiftKey: (e as any).shiftKey ?? false });
-            });
-            cb.addEventListener('click', (e) => e.stopPropagation());
-            // The cell is the checkbox's hit area: a click beside the box toggles it, and never
-            // reaches the row — there it would emit `pdx-row-click`, and the page would open the record.
-            checkCell.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (e.target !== cb) cb.click();
-            });
+            // Its change, and a click beside it in the cell, are the body's (grid-delegate.ts).
             checkCell.appendChild(cb);
             rowEl.appendChild(checkCell);
         }
@@ -180,12 +135,12 @@ export function renderRows(
                 saveBtn.setAttribute('size', 'xs');
                 saveBtn.setAttribute('variant', 'primary');
                 saveBtn.textContent = t('edit.save');
-                saveBtn.addEventListener('click', (e: Event) => { e.stopPropagation(); commitRowEdit(gc); });
+                onActivate(saveBtn, () => commitRowEdit(gc));
                 const cancelBtn = document.createElement('pdx-button') as any;
                 cancelBtn.setAttribute('size', 'xs');
                 cancelBtn.setAttribute('variant', 'ghost');
                 cancelBtn.textContent = t('edit.cancel');
-                cancelBtn.addEventListener('click', (e: Event) => { e.stopPropagation(); cancelRowEdit(gc); });
+                onActivate(cancelBtn, () => cancelRowEdit(gc));
                 actions.appendChild(saveBtn);
                 actions.appendChild(cancelBtn);
                 td.appendChild(actions);
@@ -203,8 +158,7 @@ export function renderRows(
 
                 // Double-click to start cell edit (all editable types including boolean)
                 if (isEditMode && isColEditable && (gc.editMode() === 'cell' || gc.editMode() === 'batch')) {
-                    td.addEventListener('dblclick', (e) => {
-                        e.stopPropagation();
+                    onDoubleActivate(td, () => {
                         startCellEdit(gc, rowId, col.field, displayValue);
                         gc.forceUpdate();
                     });
@@ -218,8 +172,7 @@ export function renderRows(
                     const editBtn = document.createElement('pdx-button') as any;
                     editBtn.setAttribute('size', 'xs');
                     editBtn.textContent = t('edit.edit');
-                    editBtn.addEventListener('click', (e: Event) => {
-                        e.stopPropagation();
+                    onActivate(editBtn, () => {
                         if (gc.editMode() === 'dialog') openEditDialog(gc, rowId);
                         else startRowEdit(gc, rowId);
                     });
@@ -227,7 +180,7 @@ export function renderRows(
                     delBtn.setAttribute('size', 'xs');
                     delBtn.setAttribute('variant', 'danger');
                     delBtn.textContent = t('edit.delete');
-                    delBtn.addEventListener('click', (e: Event) => { e.stopPropagation(); deleteRow(gc, rowId); });
+                    onActivate(delBtn, () => deleteRow(gc, rowId));
                     actions.appendChild(editBtn);
                     actions.appendChild(delBtn);
                     td.appendChild(actions);
@@ -251,10 +204,6 @@ export function renderRows(
 
             rowEl.appendChild(td);
         }
-
-        rowEl.addEventListener('click', () => {
-            gc.emit('pdx-row-click', { row, index: i, id: rowId });
-        });
 
         container.appendChild(rowEl);
 

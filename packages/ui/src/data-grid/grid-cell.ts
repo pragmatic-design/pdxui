@@ -6,6 +6,7 @@ import { sanitizeHTML } from '../shared/sanitize';
 import { sanitizeUrl, DEV } from '@pdxui/core';
 import { openGridMenu } from './grid-menu';
 import { t } from './grid-i18n';
+import { onActivate } from './grid-delegate';
 import { defineIcons } from '../icon/icon-map';
 import iconMoreHorizontal from '../icon/pragmatic/more-horizontal';
 
@@ -56,20 +57,14 @@ function cellLabel(raw: string, value: unknown, col: AnyColumn, row: Record<stri
  * Text in its own element, never a bare node in the cell: `.pdx-dg-td` is a flex container, and in
  * one `text-overflow` does not apply — a long subject would be cut mid-word with no ellipsis and no
  * way to read the rest. The element clips with an ellipsis, and names its whole text in a
- * `title` when, and only when, it is actually cut — measured as the pointer arrives, so a cell that
- * fits carries no tooltip repeating what it already shows.
+ * `title` when, and only when, it is actually cut — measured as the pointer arrives, by the body's
+ * listener (grid-delegate.ts), so a cell that fits carries no tooltip repeating what it already shows.
  */
 function textCell(node: Text): HTMLElement {
     const span = document.createElement('span');
     span.className = 'pdx-dg-td-text';
     span.appendChild(node);
-    span.addEventListener('pointerenter', fitTitle);
     return span;
-}
-
-function fitTitle(this: HTMLElement): void {
-    if (this.scrollWidth > this.clientWidth) this.title = this.textContent ?? '';
-    else this.removeAttribute('title');
 }
 
 export function renderCellNode(value: unknown, col: AnyColumn, row: Record<string, unknown>): Node {
@@ -161,9 +156,9 @@ function renderCellContent(value: unknown, col: AnyColumn, row: Record<string, u
                 const ic = document.createElement('pdx-icon');
                 ic.setAttribute('name', cell.icon ?? 'more-horizontal');
                 btn.appendChild(ic);
-                btn.addEventListener('click', (e) => {
-                    // The row underneath selects on click: an action of the row is not a vote on it.
-                    e.stopPropagation();
+                // The row underneath selects on click: an action of the row is not a vote on it. The
+                // body's listener (grid-delegate.ts) stops the click there.
+                onActivate(btn, () => {
                     openGridMenu(btn, cell.items.map((item) => ({
                         label: typeof item.label === 'function' ? item.label(row) : item.label,
                         icon: item.icon,
@@ -212,7 +207,7 @@ function renderCellContent(value: unknown, col: AnyColumn, row: Record<string, u
                     } else if (label) {
                         btn.textContent = label;
                     }
-                    btn.addEventListener('click', (e) => { e.stopPropagation(); act.onClick(row); });
+                    onActivate(btn, () => act.onClick(row));
                     wrap.appendChild(btn);
                 }
                 return wrap;

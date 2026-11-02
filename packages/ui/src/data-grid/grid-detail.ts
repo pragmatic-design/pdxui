@@ -4,6 +4,7 @@
 import type { GridContext } from './grid-context';
 import { GRID_WIDGET } from './grid-context';
 import { t } from './grid-i18n';
+import { onActivate } from './grid-delegate';
 
 // ─── Expanded row state (per-grid via GridContext) ──────────
 
@@ -35,10 +36,8 @@ export function renderExpandCell(gc: GridContext, rowId: unknown): HTMLElement {
     btn.setAttribute('aria-expanded', String(gc.expandedRows.has(rowId)));
     btn.setAttribute('aria-label', t(gc.expandedRows.has(rowId) ? 'detail.collapse' : 'detail.expand'));
     btn.textContent = gc.expandedRows.has(rowId) ? '▼' : '▶';
-    btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        gc.emit('__toggle-detail', { id: rowId });
-    });
+    // The body's listener (grid-delegate.ts); the click is not a click on the row.
+    onActivate(btn, () => gc.emit('__toggle-detail', { id: rowId }));
 
     cell.appendChild(btn);
     return cell;

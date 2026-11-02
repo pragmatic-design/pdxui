@@ -7,6 +7,7 @@ import { applyColSize, GRID_WIDGET } from './grid-context';
 import { getFieldValue, collectDisposers, DEV } from '@pdxui/core';
 import { renderCellNode } from './grid-cell';
 import { t } from './grid-i18n';
+import { recordRow } from './grid-delegate';
 
 export interface VirtualScrollState {
     update: () => void;
@@ -119,6 +120,8 @@ export function setupVirtualScroll(
             if (DEV) rowEl.setAttribute('data-pdx-item', '');
             const rowId = row[idFieldName];
             if (rowId != null) rowEl.setAttribute('data-row-id', String(rowId));
+            // Its click and its checkbox are the body's listeners (grid-delegate.ts), as in the paged body.
+            recordRow(rowEl, { row, index: i, id: rowId, rows });
 
             // Selection
             if (gc.getSelectionMode() !== 'none') {
@@ -137,15 +140,6 @@ export function setupVirtualScroll(
                 cb.setAttribute(GRID_WIDGET, '');
                 cb.setAttribute('aria-label', t('selectRow').replace('{n}', String(i + 1)));
                 cb.checked = gc.selectedIds.has(rowId);
-                cb.addEventListener('change', (e) => {
-                    gc.emit('__toggle-select', { id: rowId, row, shiftKey: (e as any).shiftKey ?? false });
-                });
-                cb.addEventListener('click', (e) => e.stopPropagation());
-                // The cell is the checkbox's hit area, as in the paged body.
-                checkCell.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (e.target !== cb) cb.click();
-                });
                 checkCell.appendChild(cb);
                 rowEl.appendChild(checkCell);
             }
@@ -172,10 +166,6 @@ export function setupVirtualScroll(
 
                 rowEl.appendChild(td);
             }
-
-            rowEl.addEventListener('click', () => {
-                gc.emit('pdx-row-click', { row, index: i, id: rowId });
-            });
 
             rowContainer.appendChild(rowEl);
         }

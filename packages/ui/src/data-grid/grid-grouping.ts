@@ -3,6 +3,7 @@
 import type { GridContext, AnyColumn } from './grid-context';
 import { GRID_WIDGET } from './grid-context';
 import { t } from './grid-i18n';
+import { onActivate } from './grid-delegate';
 
 // ─── Collapsed state helpers (per-instance via GridContext) ────
 
@@ -111,8 +112,9 @@ export function renderGroupedRows(
             cell.appendChild(aggSpan);
         }
 
-        // Click anywhere on the row to toggle — the button's click (and its Enter/Space) bubbles here
-        headerRow.addEventListener('click', () => {
+        // Click anywhere on the row to toggle — the button's click (and its Enter/Space) bubbles here,
+        // to the body's listener (grid-delegate.ts).
+        onActivate(headerRow, () => {
             toggleGroup(gc, group.field, group.value);
             gc.emit('__group-toggle', { field: group.field, value: group.value });
         });

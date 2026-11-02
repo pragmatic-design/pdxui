@@ -6,6 +6,7 @@
 //   grid-context.ts  — shared context + applyColSize
 //   grid-header.ts   — header row, sort carets, resize handles
 //   grid-body.ts     — row rendering, cell formatting
+//   grid-delegate.ts — the body's events, one listener per type for every row
 //   grid-filter.ts   — inline filter row
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
@@ -15,6 +16,7 @@ import type { SlotFunction, DataSource, ColumnDef, Dispose, GridState } from '@p
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
 import { renderRows } from './grid-body';
+import { bindBody } from './grid-delegate';
 import { buildFilterRow } from './grid-filter';
 import { toggleSelect, selectAll, clearSelection, setSelection } from './grid-selection';
 import { renderGroupedRows } from './grid-grouping';
@@ -483,6 +485,8 @@ component('pdx-data-grid', {
             bodyEl = document.createElement('div');
             bodyEl.className = 'pdx-dg-body';
             bodyEl.setAttribute('role', 'rowgroup');
+            // One listener per event type for every row (grid-delegate.ts).
+            bindBody(gc, bodyEl);
 
             // Virtual scroll or normal rendering
             virtualState?.dispose();

@@ -14,6 +14,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import { renderCellNode } from '../../src/data-grid/grid-cell';
+import { bindBody } from '../../src/data-grid/grid-delegate';
 import { rowMenu } from '@pdxui/core';
 import '../../src/data-grid/pdx-data-grid';
 
@@ -25,9 +26,13 @@ const items = () => [...(menu()?.querySelectorAll<HTMLElement>('[role="menuitem"
 const key = (target: Element, k: string) =>
     target.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
 
-/** Render the cell into the document — the menu anchors to a button that has to be connected. */
+/**
+ * Render the cell into the document — the menu anchors to a button that has to be connected — inside a
+ * grid body, whose listener handles the click (grid-delegate.ts).
+ */
 function mountCell(cell: unknown): HTMLButtonElement {
     const host = document.createElement('div');
+    bindBody({ emit() {}, isRowReorder: () => false, getIdField: () => 'id' } as never, host);
     host.appendChild(renderCellNode(null, col(cell), ROW));
     document.body.appendChild(host);
     return host.querySelector('button')!;
@@ -126,6 +131,7 @@ describe('rowMenu — one control per row', () => {
         cleanup();
 
         const host = document.createElement('div');
+        bindBody({ emit() {}, isRowReorder: () => false, getIdField: () => 'id' } as never, host);
         host.appendChild(renderCellNode(null, col(spec), { id: 8, reference: 'T-008' }));
         document.body.appendChild(host);
         host.querySelector('button')!.click();
