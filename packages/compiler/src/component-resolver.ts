@@ -56,6 +56,7 @@ export class ComponentResolver {
     private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string>; commit?: string; renamed?: Record<string, string> }>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
+    private projectReactiveExposed = new Map<string, { mtimeMs: number; names: Set<string> }>();
     /** tag → the props a library component's manifest marks required (#130); only components that mark some. */
     private libraryRequired = new Map<string, Set<string>>();
     /** A project file's required `@prop`s, with the modification time they were read at. */
@@ -206,6 +207,29 @@ export class ComponentResolver {
             this.projectModels.set(entry.importPath, { mtimeMs, models });
             return models;
         } catch { return null; } // unreadable: its models are not known
+    }
+
+    /**
+     * The `@expose`d names of a project `.pdx` declared `$signal` or `$derived` (#752) — on the element
+     * each is its value, not a function — or null when the tag is not a project `.pdx`. A library
+     * component is TypeScript and exposes what its `ctx.expose` writes: it is not asked.
+     */
+    reactiveExposedOf(tag: string): ReadonlySet<string> | null {
+        const entry = this.map.get(tag);
+        if (!entry || entry.source === 'ui') return null;
+        try {
+            const { mtimeMs } = statSync(entry.importPath);
+            const cached = this.projectReactiveExposed.get(entry.importPath);
+            if (cached && cached.mtimeMs === mtimeMs) return cached.names;
+            const text = readFileSync(entry.importPath, 'utf-8');
+            // Match: an `@expose a, b;` line of the script. Groups: [1]=the list of names
+            const exposed = [...text.matchAll(/^[ \t]*@expose\s+([^;\n]+)/gm)].flatMap(m => m[1].split(',').map(n => n.trim()));
+            // Match: `let|const|var name[: T] = $signal` / `$derived`. Groups: [1]=the name
+            const reactive = new Set([...text.matchAll(/\b(?:let|const|var)\s+([A-Za-z_$][\w$]*)\s*(?::[^=\n]+)?=\s*\$(?:signal|derived)\b/g)].map(m => m[1]));
+            const names = new Set(exposed.filter(n => reactive.has(n)));
+            this.projectReactiveExposed.set(entry.importPath, { mtimeMs, names });
+            return names;
+        } catch { return null; } // unreadable: what it exposes is not known
     }
 
     /**

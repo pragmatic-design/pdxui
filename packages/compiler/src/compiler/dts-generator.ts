@@ -1,8 +1,32 @@
 // DTS Generator — produces .pdx.d.ts files for IntelliSense.
-// Generates: Props, Events, Slots, Fetches, Forms, Stores, SearchParams, HTMLElementTagNameMap.
+// Generates: Props, Events, Slots, Fetches, Forms, Stores, SearchParams, Exposed, HTMLElementTagNameMap.
 
 import type { PropInfo, EventInfo, SlotInfo, FetchDecl, StoreDecl } from './script-analyzer';
-import type { SearchParamDecl } from './script-analyzer-types';
+import type { SearchParamDecl, ScriptAnalysis } from './script-analyzer-types';
+
+/** A reactive name an `@expose` puts on the element as an accessor (#752). */
+export interface ExposedMember {
+    name: string;
+    /** The type written for it, or `unknown`: the compiler has no type checker to infer one. */
+    type: string;
+    /** A $derived: a getter alone. A $signal is written through its setter. */
+    readonly: boolean;
+}
+
+/**
+ * The `@expose`d names that are a $signal or a $derived, with the type each was declared with.
+ * Functions and constants are exposed as they are, and the .d.ts says nothing of them.
+ */
+export function exposedMembers(analysis: Pick<ScriptAnalysis, 'exposes' | 'signals' | 'deriveds'>): ExposedMember[] {
+    const out: ExposedMember[] = [];
+    for (const name of analysis.exposes) {
+        const signal = analysis.signals.find(s => s.name === name);
+        const derived = signal ? undefined : analysis.deriveds.find(d => d.name === name);
+        const decl = signal ?? derived;
+        if (decl) out.push({ name, type: decl.type ?? 'unknown', readonly: derived !== undefined });
+    }
+    return out;
+}
 
 export interface DtsInput {
     tag: string;
@@ -17,6 +41,8 @@ export interface DtsInput {
     searchParams?: SearchParamDecl[];
     /** @form declarations — generates form value types. */
     forms?: { name: string; schemaType?: string }[];
+    /** The reactive names `@expose` puts on the element (#752) — `exposedMembers(analysis)`. */
+    exposed?: ExposedMember[];
 }
 
 /**
@@ -102,10 +128,19 @@ export function generateDts(input: DtsInput): string {
         if (input.forms.some(f => f.schemaType)) lines.push('');
     }
 
+    // Exposed reactive names (#752): a $derived is read-only on the element, a $signal is written.
+    const exposed = input.exposed ?? [];
+    if (exposed.length > 0) {
+        lines.push(`export interface ${pascalTag}Exposed {`);
+        for (const m of exposed) lines.push(`  ${m.readonly ? 'readonly ' : ''}${m.name}: ${m.type};`);
+        lines.push('}');
+        lines.push('');
+    }
+
     // HTMLElementTagNameMap augmentation
     lines.push('declare global {');
     lines.push('  interface HTMLElementTagNameMap {');
-    lines.push(`    '${input.tag}': HTMLElement & ${pascalTag}Props;`);
+    lines.push(`    '${input.tag}': HTMLElement & ${pascalTag}Props${exposed.length > 0 ? ` & ${pascalTag}Exposed` : ''};`);
     lines.push('  }');
     lines.push('}');
     lines.push('');

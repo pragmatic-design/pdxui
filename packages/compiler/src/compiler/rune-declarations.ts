@@ -24,6 +24,8 @@ export interface DeclaratorRead {
     arg: string;
     /** The declarator as written: `name: T = expr`, for an ordinary one to be kept as it is. */
     text: string;
+    /** For a rune, the type written for it — `$signal<T>(…)`, else `name: T` — or undefined (#752). */
+    type?: string;
 }
 
 /** Whether `code` names a rune as a call, with or without a type argument: `$signal(` or `$signal<`. */
@@ -58,6 +60,7 @@ export function readDeclarators(text: string): StatementRead | null {
                 name,
                 arg: init.arguments[0]?.getText(sf) ?? '',
                 text: d.getText(sf),
+                type: (init.typeArguments?.[0] ?? d.type)?.getText(sf),
             };
         }
         return { kind: null, name, arg: '', text: d.getText(sf) };

@@ -39,6 +39,14 @@ function close() { open = false; }
         const result = compile(source, 'dialog.pdx');
         expect(result.code).toContain('ctx.expose({ show, close })');
     });
+
+    it('an exposed $derived or $signal is used, by the caller: no PDX_UNUSED_REACTIVE (#752)', () => {
+        const unused = (script: string) => compile(`<template><div>x</div></template>\n<script>\n${script}\n</script>`, 'exposed.pdx')
+            .warnings.filter(w => w.code === 'PDX_UNUSED_REACTIVE').map(w => w.message);
+        expect(unused('let count = $signal(0);\nconst doubled = $derived(count * 2);\n@expose count, doubled;')).toEqual([]);
+        // control: not exposed and read nowhere, it is still reported
+        expect(unused('const lonely = $derived(1 + 1);')).toHaveLength(1);
+    });
 });
 
 // ─── $store ───────────────────────────────────────────────────────

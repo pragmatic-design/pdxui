@@ -1070,11 +1070,11 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 for (const d of read.declarators) {
                     const name = d.name!;
                     if (d.kind === 'signal') {
-                        signals.push({ name, initialExpr: d.arg, origin: originOf(i) ?? undefined });
+                        signals.push({ name, initialExpr: d.arg, type: d.type, origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'signal' });
                         usedFeatures.add('signal');
                     } else if (d.kind === 'derived') {
-                        deriveds.push({ name, expr: d.arg, origin: originOf(i) ?? undefined });
+                        deriveds.push({ name, expr: d.arg, type: d.type, origin: originOf(i) ?? undefined });
                         if (!name.startsWith('_')) exports.push({ name, kind: 'derived' });
                         usedFeatures.add('computed');
                     } else if (d.kind === 'store') {

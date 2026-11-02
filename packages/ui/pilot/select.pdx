@@ -68,8 +68,8 @@
         @input="onSearchInput"
         @focus="onSearchFocus"
         tabindex="0" />
-    } @else if (selectedItem) {
-      <span class="pdx-select-value">@render selected?.(optionOf(selectedItem)) @else {<slot name="selected" :label="selectedItem.label" :value="selectedItem.value" :raw="selectedItem._raw">{{ selectedFallback(selectedItem) }}</slot>}</span>
+    } @else if (selectedOption) {
+      <span class="pdx-select-value">@render selected?.(optionOf(selectedOption)) @else {<slot name="selected" :label="selectedOption.label" :value="selectedOption.value" :raw="selectedOption._raw">{{ selectedFallback(selectedOption) }}</slot>}</span>
     } @else {
       <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
     }
@@ -211,7 +211,7 @@ import type { Option, Template, Row, SourceElement } from './select-types';
 // The host is the one submitter; an inner field carrying the name too would send the value twice.
 @host self { :name="name || null" }
 
-@expose focus, blur, clear, openSelect, closeSelect, toggleSelect;
+@expose focus, blur, clear, openSelect, closeSelect, toggleSelect, selectedItem;
 
 const uid = generatedId('pdx-sel');
 const listboxId = uid + '-lb';
@@ -326,7 +326,7 @@ function reflectValue(): void {
 }
 
 const selectedItems = $derived(flatItems.filter(i => selectedValues.has(i.value)));
-const selectedItem = $derived((): Option | null => {
+const selectedOption = $derived((): Option | null => {
   const sel = selectedValues;
   if (sel.size === 0) return null;
   const val = sel.values().next().value;
@@ -716,12 +716,9 @@ function focus() { focusTarget()?.focus(); }
 function blur() { focusTarget()?.blur(); }
 function clear() { clearSelection(); }
 
-// ESCAPE HATCH: a read-only getter on the host. @expose puts a member there as it is, and a
-// $derived is a function, not the value `el.selectedItem` reads.
-ctx.expose({
-  get selectedItem(): unknown {
-    const items = selectedItems.map(i => i._raw);
-    return multiple ? items : (items.length > 0 ? items[0] : null);
-  },
+// Exposed, it is a read-only getter on the host: `el.selectedItem` is the value (#752).
+const selectedItem = $derived<unknown>(() => {
+  const items = selectedItems.map(i => i._raw);
+  return multiple ? items : (items.length > 0 ? items[0] : null);
 });
 </script>

@@ -30,7 +30,8 @@ function listenForCommands(element: HTMLElement): void {
 
 /**
  * Expose methods/signals on the host element for parent access via ref.
- * Each entry becomes a read-only, non-configurable own property (external code can't reassign).
+ * Each entry becomes an own property external code cannot reassign — unless it is an accessor with a
+ * setter, which external code writes through.
  *
  * Copies property DESCRIPTORS (not a spread), so a live `get x()` accessor stays live instead of
  * being snapshotted to its value at expose time — e.g. a component whose `get form()` is filled in
@@ -49,8 +50,9 @@ export function exposeOnElement(
         // a drawer portaling its children to <body> — threw "Cannot redefine property". Still getter-only /
         // writable:false, so external code cannot reassign via `el.x = y`.
         if (desc.get || desc.set) {
-            // Accessor: keep the getter live, drop any setter → read-only from outside.
-            Object.defineProperty(element, key, { get: desc.get, configurable: true, enumerable: true });
+            // Accessor: the getter stays live, and the setter comes along when there is one — `@expose`
+            // of a $signal writes it (#752). Without one, the member is read-only from outside.
+            Object.defineProperty(element, key, { ...desc, configurable: true, enumerable: true });
         } else {
             Object.defineProperty(element, key, { value: desc.value, writable: false, configurable: true, enumerable: true });
         }

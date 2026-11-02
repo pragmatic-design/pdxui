@@ -44,6 +44,7 @@ proposals the implementing issue may change.
 | `onSave()` with `onSave` a `$signal` (named nothing in alpha) | read, then called: `__onSave()()` | **fix**, nothing to rewrite | † (decision 17) |
 | `@mixin './x.ts' as name` | `const name = useX();` — an imported function | flagged (landed: `mixin-removed`; the module's `setup(ctx)` signature changes) | #158 (decision 6) |
 | a script `@snippet` body with `${arg}` | the body is a template: `{{ arg }}` | mechanical | † (decision 9) |
+| `@expose count` of a `$signal`, or of a `$derived`, read by a caller as `ref.count()` | `ref.count`: the element holds an accessor to the value. A `$signal` is written with `ref.count = v`, which the component sees; a `$derived` is read-only. Functions and constants are exposed as before | **behaviour**: flagged where a `.pdx` calls an exposed reactive name on the `:ref` of a project component — landed: `expose-reactive-call`; a call from a `.ts` module, or through a ref the template does not bind, is not found | #752 |
 | a rune outside its position (`$signal` in a function body) | `PDX_RUNE_POSITION`; the core function (`signal()`) | flagged — landed: `rune-position` | #278 (decision 12) |
 
 ## Component contract and templates

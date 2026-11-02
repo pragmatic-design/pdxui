@@ -394,6 +394,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** `@expose` of a `$signal` or a `$derived` puts its value on the element, not the
+  function the component keeps it in (#752). `el.count` reads it; a `$signal` is written with
+  `el.count = 5`, which the component sees; a `$derived` is read-only. A caller that wrote
+  `ref.count()` or `ref.count.set(5)` reads and writes the property instead. `pdx migrate` flags
+  `ref.name()` on the `:ref` of a project component whose exposed name is reactive. The `.d.ts`
+  declares the exposed names on the element, a `$derived` `readonly`, with the type written in the
+  declaration (`$signal<T>`, `$derived<T>`, an annotation), `unknown` without one. An exposed reactive
+  name no longer raises `PDX_UNUSED_REACTIVE`.
 - **Breaking:** `pdx-fab` takes the beta contract (#288), the last of the overlay family.
   - **`open()` is `show()`**; `close()` and `toggle()` stay, and `isOpen` is new. `pdx migrate`
     rewrites `open()` on a `:ref` bound on a `pdx-fab`, and flags it on a lookup.

@@ -34,6 +34,7 @@ import { routeBlock, pageAlias, pagePrefetch, pageTransition, routeMeta, headBlo
 import { runePosition, storePersist } from './script-misreadings';
 import { deferHover } from './defer-hover';
 import { relativeTimeStyle } from './relative-time-style';
+import { exposeReactiveCall, type ReactiveExposedLookup } from './expose-reactive';
 import { alphaChangeEvent, alphaChangeListener, type AlphaLookup } from './alpha-events';
 import { contextStringProvide, contextStringInject, type ContextTokenRef } from './context-keys';
 import { loaderAnonymous, loaderReaders, loaderReadsAddress } from './loader-forms';
@@ -78,6 +79,8 @@ export interface LanguageChangeContext {
     file?: string;
     /** The project's string context keys, each with the token it is migrated to (#497). */
     contextTokens?: ReadonlyMap<string, ContextTokenRef>;
+    /** The `@expose`d names of a project .pdx that are a $signal or a $derived (#752). */
+    reactiveExposedOf?: ReactiveExposedLookup;
 }
 
 /** A registered change. */
@@ -363,6 +366,8 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     deferHover,
     // #545: `<pdx-relative-time>`'s `style` prop is `format-style` (./relative-time-style).
     relativeTimeStyle,
+    // #752: an @expose'd $signal or $derived is its value on the element (./expose-reactive).
+    exposeReactiveCall,
     // #478: a library component's alpha change events, read from its manifest (./alpha-events).
     alphaChangeEvent,
     alphaChangeListener,

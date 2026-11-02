@@ -1976,7 +1976,8 @@ function exposeOnElement(element: HTMLElement, api: Record<string, unknown>): vo
 ```
 
 Expose methods/signals on the host element for parent access via ref.
-Each entry becomes a read-only, non-configurable own property (external code can't reassign).
+Each entry becomes an own property external code cannot reassign — unless it is an accessor with a
+setter, which external code writes through.
 
 Copies property DESCRIPTORS (not a spread), so a live `get x()` accessor stays live instead of
 being snapshotted to its value at expose time — e.g. a component whose `get form()` is filled in

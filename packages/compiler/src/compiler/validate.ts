@@ -406,6 +406,8 @@ export function validate(
         if (e.name.startsWith('_')) continue; // underscore = intentionally unused
         // A @part's ref (#134) is public by declaration: the element is the use, not a read.
         if (analysis.parts.includes(e.name)) continue;
+        // An @expose'd name is read by the caller, through the element (#752).
+        if (analysis.exposes.includes(e.name)) continue;
         if (!templateIds.has(e.name) && !snippetIds.has(e.name) && e.kind !== 'function') {
             // Only warn for signals/derived that are never in template.
             if (e.kind === 'signal' || e.kind === 'derived') {
