@@ -10,7 +10,7 @@
  *      - label    : string  → the header text (the legend) plus the aria-label on the fieldset
  *      - fields   : string  → a CSV of the fields the section validates (no DOM)
  *      - validate : 'onLeave'|'onSubmit'|'blocking' → the validation timing (no DOM)
- *      - active   : boolean  → when false it adds the class .pdx-form-section-hidden
+ *      - active   : boolean  → a state of the host; when false form.css hides the section (#293)
  *    No "description" prop, no "collapsible" prop, no toggle.
  *
  * DOM structure (NATIVE, render lines 71-81):

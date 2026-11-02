@@ -214,11 +214,11 @@ describe('pdx-form-actions', () => {
         expect(resetBtn).toBeNull();
     });
 
-    it('applies alignment class', async () => {
+    it('reflects its alignment on the host, a variant axis, and the bar keeps no class for it (#293)', async () => {
         const el = await mount('pdx-form-actions', { align: 'center' });
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-actions');
-        expect(wrapper?.classList.contains('pdx-form-actions-center')).toBe(true);
+        expect(el.getAttribute('align')).toBe('center');
+        expect(el.querySelector('[data-part="root"]')?.getAttribute('class')).toBe('pdx-form-actions');
     });
 
     it('submit button has pdx-primary class', async () => {
@@ -284,11 +284,12 @@ describe('pdx-form-section', () => {
         expect(content).toBeTruthy();
     });
 
-    it('applies hidden class when active is false', async () => {
+    // An inactive section is :state(active) off and hidden by form.css — measured in Chromium,
+    // form-a-beta-contract.spec.ts; happy-dom has no :state(). The class no CSS ever drew is gone (#293).
+    it('carries no class for being inactive', async () => {
         const el = await mount('pdx-form-section');
         (el as any).active = false;
         await tick(50);
-        const fieldset = el.querySelector('.pdx-form-section');
-        expect(fieldset?.classList.contains('pdx-form-section-hidden')).toBe(true);
+        expect(el.querySelector('[data-part="root"]')?.getAttribute('class')).toBe('pdx-form-section');
     });
 });
