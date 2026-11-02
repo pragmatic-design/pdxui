@@ -7,20 +7,27 @@ import { component, html } from '@pdxui/core';
 /**
  * Groups inputs, buttons and addons into one control with joined borders, passing its size and
  * disabled state to its children.
+ *
+ * @cssstate disabled - `disabled`: the group and its children are disabled.
  */
 component('pdx-input-group', {
     props: {
+        /** A size its children take; the group draws none of its own, so it is not a variant axis. */
         size: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
+    },
+    // No class on the host (#293): inputs.css selects the tag, `:is(.pdx-input-group, pdx-input-group)`.
+    states: ['disabled'],
+    host: {
+        role: 'group',
+        ':aria-disabled': (ctx) => ctx.disabled() ? 'true' : null,
     },
     setup(ctx) {
         ctx.track(() => {
             const el = ctx.el;
             const size = ctx.size() as string;
             const disabled = ctx.disabled();
-
-            // CSS class on host — added, not assigned: `className =` would wipe the author's classes.
-            el.classList.add('pdx-input-group');
+            ctx.state('disabled', !!disabled);
 
             // Propagate size/disabled to children after render
             requestAnimationFrame(() => {
