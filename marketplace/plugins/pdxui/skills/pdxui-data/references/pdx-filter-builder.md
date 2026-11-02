@@ -8,10 +8,12 @@ Build complex filters visually.
 |---|---|---|---|---|
 | `fields` | — | array | `[]` | Field definitions (FieldDefinition[] or FilterField[]). |
 | `source` | — | object | `null` | DataSource to auto-bind filters. |
-| `value` | — | array | `[]` | Initial filter descriptors. |
-| `logic` | `logic` | string | `'and'` | Default logic between filters. |
+| `value` | — | (FilterDescriptor \| CompositeFilter)[] | `() => []` | The current value. |
+| `logic` | `logic` | 'and' \| 'or' | `'and'` |  |
 
-**Events:** `pdx-filter-change` → `detail: { filters, logic }` — Fired when the filter changes.
+**Events:** `logic-change` → `detail: { value: 'and' | 'or' }` — Fired when the component writes `logic`. Does not bubble.; `value-change` → `detail: { value: (FilterDescriptor | CompositeFilter)[] }` — Fired when the component writes `value`. Does not bubble.
+
+**Parts:** `[data-part="root"]` — The bar that holds the chips and its buttons.; `[data-part="chip"]` — One filter: its label and its remove button.; `[data-part="label"]` — A chip's label, the button that opens its editor.; `[data-part="remove"]` — A chip's remove button.; `[data-part="add"]` — The "+ Add Filter" button.; `[data-part="clear"]` — The "Clear all" button, while there is a filter.
 
 
 #### Examples

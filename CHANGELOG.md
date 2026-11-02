@@ -394,6 +394,11 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-filter-builder` takes the beta contract (#292). `value` and `logic` are models:
+  an edit of the chips writes `value`, their descriptors, and announces it with `value-change`
+  `{ value }`, so `::value` follows it; `pdx-filter-change` is gone, and `pdx migrate` rewrites an
+  inline listener on it. A parent's write of `logic` now re-applies the filters to the source. Its bar,
+  chips, labels and buttons are parts.
 - `pdx-tree` takes the beta contract (#292). Its rows share one click listener on the tree, as its
   keyboard already did: a tree of 200 nodes adds no more listeners than one of 2. A lazy branch on its
   way makes the tree `:state(loading)` and `aria-busy`; `disabled` is `:state(disabled)`; its root,

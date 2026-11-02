@@ -97,37 +97,37 @@ export const filterBuilder: ComponentManifest = {
                 standalone: [
                     {
                         // The bar is a flex row that wraps (the host is display:block → the bar is the real layout).
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="root"]',
                         description: 'filter bar is a horizontal flex row (display set)',
                         display: { op: 'oneOf', value: ['flex', 'inline-flex'] },
                     },
                     {
                         // It holds at least the Add button → it has a noticeable height.
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="root"]',
                         description: 'filter bar is tall enough to hold the add button',
                         height: { op: '>=', value: 20 },
                     },
                     {
                         // The Add button: native, interactive → cursor pointer.
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]',
                         description: 'add-filter button has cursor pointer (interactive control)',
                         cursor: { op: 'is', value: 'pointer' },
                     },
                     {
                         // The Add button: a clickable target with a minimum height.
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]',
                         description: 'add-filter button is tall enough to be a click target',
                         height: { op: '>=', value: 20 },
                     },
                     {
                         // Add has a non-negative border-radius (radius-full; metro and cyberpunk may zero it).
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]',
                         description: 'add-filter button has non-negative border radius',
                         radius: { all: { op: '>=', value: 0 } },
                     },
                     {
                         // Add has a non-negative border width (1px dashed at the base).
-                        selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn',
+                        selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]',
                         description: 'add-filter button has non-negative border width',
                         border: { all: { width: { op: '>=', value: 0 } } },
                     },
@@ -136,10 +136,10 @@ export const filterBuilder: ComponentManifest = {
                 composition: [
                     {
                         description: 'add-filter button is contained within the filter bar',
-                        parent: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder',
+                        parent: 'section:not([hidden]) [data-test="filter-builder"] [data-part="root"]',
                         children: {
-                            bar: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder',
-                            addBtn: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn',
+                            bar: 'section:not([hidden]) [data-test="filter-builder"] [data-part="root"]',
+                            addBtn: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]',
                         },
                         relations: [
                             {
@@ -178,7 +178,7 @@ export const filterBuilder: ComponentManifest = {
             // host's hostile CSS) → skipHeight (as for field-list and toolbar). The bar has no radius or border
             // of its own (`.pdx-filter-builder` is only a flex row): what stays asserted is the width's integrity,
             // which the runner checks by default.
-            { selector: 'section:not([hidden]) [data-test="filter-builder"] .pdx-filter-builder', tolerancePx: 10, skipHeight: true },
+            { selector: 'section:not([hidden]) [data-test="filter-builder"] [data-part="root"]', tolerancePx: 10, skipHeight: true },
         ],
     },
 
@@ -189,7 +189,7 @@ export const filterBuilder: ComponentManifest = {
     keyboard: {
         scenario: 'filter-builder-empty',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="filter-builder"] .pdx-fb-add-btn' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="filter-builder"] [data-part="add"]' },
         ],
     },
 

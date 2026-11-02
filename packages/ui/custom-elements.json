@@ -13616,42 +13616,85 @@
             {
               "kind": "field",
               "name": "value",
-              "description": "Initial filter descriptors.",
+              "description": "The current value.",
               "type": {
-                "text": "array"
+                "text": "(FilterDescriptor | CompositeFilter)[]"
               },
-              "default": "[]"
+              "default": "() => []"
             },
             {
               "kind": "field",
               "name": "logic",
-              "description": "Default logic between filters.",
               "type": {
-                "text": "string"
+                "text": "'and' | 'or'"
               },
               "default": "'and'",
               "attribute": "logic"
             }
           ],
+          "models": [
+            "value",
+            "logic"
+          ],
+          "alphaEvents": [
+            "pdx-filter-change"
+          ],
+          "alphaDetail": {
+            "filters": "$event.detail.value",
+            "logic": "$event.currentTarget.logic"
+          },
           "events": [
             {
-              "name": "pdx-filter-change",
+              "name": "value-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the filter changes.",
-              "detail": "{ filters, logic }"
+              "description": "Fired when the component writes `value`. Does not bubble.",
+              "detail": "{ value: (FilterDescriptor | CompositeFilter)[] }"
+            },
+            {
+              "name": "logic-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `logic`. Does not bubble.",
+              "detail": "{ value: 'and' | 'or' }"
             }
           ],
           "attributes": [
             {
               "name": "logic",
               "fieldName": "logic",
-              "description": "Default logic between filters.",
               "type": {
-                "text": "string"
+                "text": "'and' | 'or'"
               },
               "default": "'and'"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The bar that holds the chips and its buttons."
+            },
+            {
+              "name": "chip",
+              "description": "One filter: its label and its remove button."
+            },
+            {
+              "name": "label",
+              "description": "A chip's label, the button that opens its editor."
+            },
+            {
+              "name": "remove",
+              "description": "A chip's remove button."
+            },
+            {
+              "name": "add",
+              "description": "The \"+ Add Filter\" button."
+            },
+            {
+              "name": "clear",
+              "description": "The \"Clear all\" button, while there is a filter."
             }
           ]
         }
