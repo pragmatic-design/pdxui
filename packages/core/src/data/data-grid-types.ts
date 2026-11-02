@@ -59,14 +59,13 @@ export interface ColumnDef<T = unknown> {
     /** Cell text alignment. Default: left (right for number/currency). */
     align?: 'left' | 'center' | 'right';
     /**
-     * Value formatter — string pattern or function.
-     * @deprecated A function that returns HTML is sanitized but fragile and not generator-friendly.
-     * Prefer a typed `cell` renderer (badge/status/link/currency/date/booleanIcon/actions). Plain
-     * (non-HTML) string formatters are still fine for simple text.
+     * Value formatter — string pattern or function. What it returns is shown as TEXT: markup in it is
+     * written out, not parsed (#292). Markup goes through a typed `cell` renderer
+     * (badge/status/link/currency/date/booleanIcon/actions) or the grid's `cell` snippet.
      */
     format?: string | ((value: unknown, row: T) => string);
     /**
-     * A typed, SAFE cell renderer (preferred over `format` with raw HTML, and generator-friendly).
+     * A typed, SAFE cell renderer (for anything more than text, and generator-friendly).
      * The grid builds the DOM safely (textContent), no innerHTML. E.g.: `cell: badge({ tones })`.
      */
     cell?: CellSpec;

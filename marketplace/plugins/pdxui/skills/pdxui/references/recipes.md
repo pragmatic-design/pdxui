@@ -20,10 +20,10 @@ The component: **`pdx-data-grid`**, with either `:data` (an array, auto-wrapped 
 - **Fill the viewport without scrolling the page**: `fill-height` plus `virtual-scroll` plus a host with `flex:1; min-height:0`
   inside a full-height column. Only the body scrolls, and it is virtualised.
 - FLEX columns → set a **`minWidth`** per column (≥120 when it is filterable). For anything richer than text use
-  **`cell:`**, not `format:` — the type marks `format` `@deprecated` («a function that returns HTML is sanitized but
-  fragile and not generator-friendly»). The typed renderers, all exported from `@pdxui/core`:
+  **`cell:`**, not `format:` — what `format` returns is shown as TEXT, markup written out rather than parsed (#292).
+  The typed renderers, all exported from `@pdxui/core`:
   **`badge()` `status()` `currency()` `dateCell()` `link()` `booleanIcon()` `actions()` `rowMenu()`** — the grid builds
-  the DOM with `textContent`, no `innerHTML`. A plain string formatter is still fine for simple text.
+  the DOM with `textContent`, no `innerHTML`. A string formatter is right for text: a label, a unit, a rounding.
 - **A row's OWN actions**: `actions()` draws a button per entry — right for one or two, wrong for four, because at
   390px a row of four icon buttons is the whole width of the phone. Past two, `rowMenu({ items })` draws ONE trigger
   that opens the grid's menu (arrows, type-ahead, Escape back to the trigger). Its items carry what a row of buttons

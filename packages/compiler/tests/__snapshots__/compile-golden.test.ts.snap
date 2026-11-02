@@ -14823,8 +14823,7 @@ component('app-demo-comp-data-grid-slot-templates', {
   setup(ctx) {
 // ─── Slot/cell demo — custom cell rendering ───────────
     // The name column renders through the \`col:name\` slot in the template; the status column through a
-    // typed cell renderer — not HTML-string \`format\` functions, which the grid deprecates and warns
-    // about on every tab.
+    // typed cell renderer — not a \`format\` function returning markup, which the grid shows as text.
     const slotColumns = [
       { field: 'name', header: 'User', width: 220 },
       { field: 'email', header: 'Email', width: 200 },

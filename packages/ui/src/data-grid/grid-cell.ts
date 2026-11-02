@@ -1,8 +1,7 @@
 // Rendering of one data-grid cell — the ONE place (used by grid-body and grid-virtual → no drift).
-// Ordine: 1) cell typed (sicuro, textContent) → 2) format (string|fn, HTML sanitizzato) → 3) default per tipo.
+// Order: 1) the typed cell (safe, textContent) → 2) format (string|fn, rendered as text) → 3) the type's default.
 
 import type { AnyColumn } from './grid-context';
-import { sanitizeHTML } from '../shared/sanitize';
 import { sanitizeUrl, DEV } from '@pdxui/core';
 import { openGridMenu } from './grid-menu';
 import { t } from './grid-i18n';
@@ -15,7 +14,7 @@ function loadIcon(): void {
     if (!customElements.get('pdx-icon')) void import('../icon/pdx-icon');
 }
 
-// One-time deprecation notice per column when an HTML-string formatter is used (see CellSpec).
+// One-time notice per column when `format` returns markup, which is shown as text (#292).
 const _warnedHtmlFormat = new WeakSet<object>();
 // One-time notice per column when `cell` is set to something that is not a known CellSpec.
 const _warnedUnknownCell = new WeakSet<object>();
@@ -218,25 +217,23 @@ function renderCellContent(value: unknown, col: AnyColumn, row: Record<string, u
         warnUnknownCell(col, cell as unknown);
     }
 
-    // 2. format legacy (string pattern o funzione). Se HTML → sanitizzato.
+    // 2. format (a function, or a string). What it returns is TEXT (#292): the HTML-string formatter
+    // is gone, and markup goes through a typed cell renderer.
     if (col.def.format) {
         const formatted = typeof col.def.format === 'function'
             ? col.def.format(value, row)
             : String(value ?? '');
-        if (typeof formatted === 'string' && formatted.includes('<')) {
-            if (DEV && !_warnedHtmlFormat.has(col.def)) {
-                _warnedHtmlFormat.add(col.def);
-                console.warn(
-                    `[pdx-data-grid] column "${(col.def as { field?: string }).field ?? '?'}": an HTML-string ` +
-                    `cell formatter is @deprecated. The HTML is sanitized, but a typed cell renderer ` +
-                    `(badge/status/link/currency/date/booleanIcon/actions) is safer and generator-friendly.`,
-                );
-            }
-            const wrapper = document.createElement('span');
-            wrapper.innerHTML = sanitizeHTML(formatted);
-            return wrapper;
+        const text = formatted == null ? '' : String(formatted);
+        if (DEV && /<[a-z]/i.test(text) && !_warnedHtmlFormat.has(col.def)) {
+            // Said once per column: a page that returned markup sees it written out, and is told why.
+            _warnedHtmlFormat.add(col.def);
+            console.warn(
+                `[pdx-data-grid] column "${(col.def as { field?: string }).field ?? '?'}": format returned markup, ` +
+                `which the grid shows as text. Draw markup with a typed cell renderer (badge, status, link, ` +
+                `currency, dateCell, booleanIcon, actions) or the cell snippet.`,
+            );
         }
-        return document.createTextNode(formatted);
+        return document.createTextNode(text);
     }
 
     // 3. Default per tipo colonna.

@@ -57,6 +57,13 @@ describe('renderCellNode — typed cells', () => {
         expect(reachedOutside, 'the action click went past the grid body').toBe(false);
     });
 
+    it('format: the string it returns is text, markup included — the HTML-string formatter is gone (#292)', () => {
+        const formatCol = { def: { field: 'x', format: (v: unknown) => `<b>${String(v)}</b>` }, type: 'string' } as never;
+        const n = renderCellNode('Ada', formatCol, {}) as HTMLElement;
+        expect(n.querySelector('b'), 'the format string was parsed as HTML').toBeNull();
+        expect(n.textContent).toBe('<b>Ada</b>');
+    });
+
     it('link: blocks dangerous URL schemes (javascript:/data:/vbscript:)', () => {
         const js = renderCellNode('x', col(link({ href: () => 'javascript:alert(1)' })), {}) as HTMLAnchorElement;
         expect(js.getAttribute('href')).toBe('#');
