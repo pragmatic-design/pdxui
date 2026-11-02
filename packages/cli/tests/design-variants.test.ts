@@ -44,6 +44,25 @@ describe('PDX_VARIANT_UNKNOWN', () => {
     });
 });
 
+// #834: an axis of two words is named in a rule as it is reflected, in kebab-case.
+describe('an axis of two words', () => {
+    const TIMELINE = new Map([['pdx-timeline', [{ name: 'connectorStyle', values: ['solid', 'dashed'], default: 'solid' }]]]);
+    const rule = (axis: string) => ({ path: 'variant-sources/components/timeline.css', css: `@variant ${axis}(dashed) { :scope { color: red } }`, impliedTag: 'pdx-timeline' });
+
+    it('is named in kebab-case, and compiles to its kebab attribute', () => {
+        expect((checkVariants([rule('connector-style')], TIMELINE) as Diagnostic[])).toEqual([]);
+        expect(generatedStylesheet(rule('connector-style').css, 'components/timeline.css', TIMELINE))
+            .toContain(':where(pdx-timeline[connector-style="dashed"])');
+    });
+
+    it('named in camelCase is refused, and the message names the kebab spelling', () => {
+        const found = (checkVariants([rule('connectorStyle')], TIMELINE) as Diagnostic[]).filter((d) => d.code === 'PDX_VARIANT_UNKNOWN');
+        expect(found.map((d) => d.message)).toEqual([
+            "@variant pdx-timeline connectorStyle(dashed): 'connectorStyle' is not a variant axis of pdx-timeline (connector-style).",
+        ]);
+    });
+});
+
 // A rule naming several hosts (#627) is checked as if written once per host.
 describe('a rule that names several hosts', () => {
     const FIELDS = new Map([

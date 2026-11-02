@@ -87,6 +87,28 @@ describe('a variant axis', () => {
         expect(seen).toEqual(['md', 'lg']);
     });
 
+    // #834: an axis of two words is reflected under its kebab attribute, the name an author writes —
+    // never the camelCase name, which HTML lowercases into a second attribute.
+    it('of two words reflects under its kebab attribute, and no lowercased one', () => {
+        const name = tag();
+        component(name, { variants: { connectorStyle: ['solid', 'dashed'] }, render: () => html`<p>x</p>` });
+        const el = mount(name);
+        expect(el.getAttribute('connector-style')).toBe('solid');
+        expect(el.hasAttribute('connectorstyle')).toBe(false);
+        el.connectorStyle = 'dashed';
+        expect(el.getAttribute('connector-style')).toBe('dashed');
+        expect(el.hasAttribute('connectorstyle')).toBe(false);
+    });
+
+    it('of two words takes its value from the kebab attribute an author writes, and keeps it', () => {
+        const name = tag();
+        component(name, { variants: { connectorStyle: ['solid', 'dashed'] }, render: () => html`<p>x</p>` });
+        const el = mount(name, { 'connector-style': 'dashed' });
+        expect(el.connectorStyle).toBe('dashed');
+        expect(el.getAttribute('connector-style')).toBe('dashed');
+        expect(el.hasAttribute('connectorstyle')).toBe(false);
+    });
+
     it('declared also as a prop is reported, and the axis wins', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
         const name = tag();

@@ -191,6 +191,9 @@ axis a prop typed with its values and reflected on the host; the styles key on i
 }
 ```
 
+An axis of two words, `connectorStyle`, is reflected as `connector-style="dashed"` and named so in a
+rule: `@variant connector-style(dashed)`.
+
 ### CD-A2 — A component does not write its own props, except as the user's input
 
 A prop the component edits is a two-way value: it emits the new value, and the parent writes it back.

@@ -97,6 +97,31 @@ describe('@variant in a scoped style', () => {
     });
 });
 
+// #834: an axis of two words is reflected, and named in a rule, in kebab-case — the attribute an author writes.
+describe('an axis of two words', () => {
+    const TWO = '@variants {\n  connectorStyle: { solid, dashed } = solid;\n}';
+    const RULE = '@variant connector-style(dashed) { [data-part="root"] { border-style: dashed; } }';
+
+    it('is reflected under its kebab attribute', () => {
+        const { code } = compile(file(TWO, RULE), 'btn.pdx');
+        expect(code).toContain(`':connector-style': (ctx) => ctx.connectorStyle()`);
+    });
+
+    it('a rule naming it in kebab-case compiles to that attribute and reports nothing', () => {
+        const { code } = compile(file(TWO, RULE), 'btn.pdx');
+        expect(code).toContain(`[connector-style=\\"dashed\\"] [data-part=\\"root\\"]`);
+        expect(codes(file(TWO, RULE), 'PDX_VARIANT_UNKNOWN')).toEqual([]);
+        expect(codes(file(TWO, RULE), 'PDX_VARIANT_UNSTYLED')).toEqual([]);
+    });
+
+    it('a rule naming it in camelCase is PDX_VARIANT_UNKNOWN, naming the kebab spelling', () => {
+        const found = codes(file(TWO, '@variant connectorStyle(dashed) { .x { color: red; } }'), 'PDX_VARIANT_UNKNOWN');
+        expect(found.map((w) => w.message)).toEqual([
+            "@variant connectorStyle(dashed): 'connectorStyle' is not an axis of @variants (connector-style).",
+        ]);
+    });
+});
+
 describe('the two diagnostics', () => {
     it('PDX_VARIANT_UNKNOWN: a @variant naming an undeclared axis or value', () => {
         const src = file(VARIANTS, `${STYLED}\n@variant variant(primay) { .x { color: red; } }\n@variant tone(dark) { .x { color: red; } }`);

@@ -14,7 +14,7 @@
 // `variant(ghost, danger)`, test any of them: `:is([variant="ghost"],[variant="danger"])`.
 
 import type { HostAttr, PropInfo } from './script-analyzer-types';
-import { attributeTest, expandVariantBlocks, testValues, VARIANT_TEST } from './variant-css';
+import { attributeTest, axisAttribute, expandVariantBlocks, testValues, VARIANT_TEST } from './variant-css';
 
 /** One axis of `@variants`: its name, its values in order, and the default (always one of them). */
 export interface VariantAxis {
@@ -81,9 +81,12 @@ export function variantProps(axes: VariantAxis[]): PropInfo[] {
     }));
 }
 
-/** The host attributes that reflect the axes: `:variant="variant"`, written as `@host` would. */
+/**
+ * The host attributes that reflect the axes: `:variant="variant"`, written as `@host` would. An axis of
+ * two words under its kebab attribute, `:connector-style="connectorStyle"` (#834).
+ */
 export function variantHostAttrs(axes: VariantAxis[]): HostAttr[] {
-    return axes.map((a) => ({ name: `:${a.name}`, value: a.name }));
+    return axes.map((a) => ({ name: `:${axisAttribute(a.name)}`, value: a.name }));
 }
 
 /** One selector under the variant's host test: `S` → `HOST S`, `:scope…` → `HOST…`. */
