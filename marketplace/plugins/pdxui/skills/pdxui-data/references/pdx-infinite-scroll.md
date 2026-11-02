@@ -20,6 +20,10 @@ Load more as you scroll.
 
 **Injects:** `DataSourceContext` (optional)
 
+**States:** `:state(loading)` — The source is pending, or `loading` is set: the host is `aria-busy` too (A4).; `:state(ended)` — The source has nothing more to load.; `:state(disabled)` — `disabled` is set: nothing more is loaded.
+
+**Parts:** `[data-part="sentinel"]` — The invisible line whose coming into view loads more.; `[data-part="loading"]` — The «loading» status, with its spinner; it says something only while loading.; `[data-part="end"]` — The «no more data» status; it says something only at the end of the source.
+
 
 #### Examples
 

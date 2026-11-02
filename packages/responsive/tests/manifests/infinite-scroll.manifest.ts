@@ -6,7 +6,7 @@
  *      Light DOM, render: <slot></slot>. The content (the items) is slotted as direct
  *      children of the host <pdx-infinite-scroll>. On ctx.track's FIRST run, inside a
  *      requestAnimationFrame, the setup builds the internal structure ONCE (_built):
- *        1. it adds .pdx-infinite-scroll-root ON THE HOST (ctx.el);
+ *        1. the host carries no class: loading, ended and disabled are custom states (#292);
  *        2. it APPENDS to the host (after the slotted items), in this order:
  *             <div class="pdx-infinite-scroll-sentinel" aria-hidden="true">   (height:1px)
  *             <div class="pdx-infinite-scroll-loading" role="status" aria-live="polite"
@@ -22,7 +22,7 @@
  *        the end element     → display='' ONLY when atEnd && showEndMessage; atEnd = ds && !ds.hasMore().
  *
  *  - CSS: packages/design/src/components/infinite-scroll.css
- *      .pdx-infinite-scroll-root     { position:relative; display:block }
+ *      pdx-infinite-scroll           { position:relative; display:block }
  *      .pdx-infinite-scroll-sentinel { height:1px; pointer-events:none }
  *      .pdx-infinite-scroll-loading  { display:flex; align-items/justify:center; gap; padding }
  *      .pdx-infinite-scroll-text     { color:muted; font-size:sm }
@@ -85,7 +85,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * REAL BUGS found in the source (NOT fixed here — only written down):
  *
- *  [B1] Accessibility — `aria-busy` is never set while loading.
+ *  [B1] Accessibility — `aria-busy` is never set while loading. FIXED in #292: the host is aria-busy="true" while loading, and has no aria-busy otherwise (data-a-beta-contract.spec.ts).
  *       packages/ui/src/infinite-scroll/pdx-infinite-scroll.ts:154-159
  *       When isCurrentlyLoading() turns true, the setup only shows the loading element
  *       (display=''). It NEVER sets aria-busy="true" on a container (the host, or the results
@@ -148,7 +148,7 @@ export const infiniteScroll: ComponentManifest = {
             'infinite-scroll-idle': {
                 standalone: [
                     {
-                        // Host: .pdx-infinite-scroll-root → display:block (post-rAF).
+                        // Host: pdx-infinite-scroll → display:block (infinite-scroll.css).
                         selector: 'section:not([hidden]) [data-test="infinite-scroll"]',
                         description: 'infinite-scroll host is a block container',
                         display: { op: 'is', value: 'block' },

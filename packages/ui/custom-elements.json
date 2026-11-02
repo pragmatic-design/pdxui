@@ -15354,6 +15354,34 @@
               "description": "The content placed inside the element."
             }
           ],
+          "cssParts": [
+            {
+              "name": "sentinel",
+              "description": "The invisible line whose coming into view loads more."
+            },
+            {
+              "name": "loading",
+              "description": "The «loading» status, with its spinner; it says something only while loading."
+            },
+            {
+              "name": "end",
+              "description": "The «no more data» status; it says something only at the end of the source."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "The source is pending, or `loading` is set: the host is `aria-busy` too (A4)."
+            },
+            {
+              "name": "ended",
+              "description": "The source has nothing more to load."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: nothing more is loaded."
+            }
+          ],
           "x-pdx-context": {
             "injects": [
               {

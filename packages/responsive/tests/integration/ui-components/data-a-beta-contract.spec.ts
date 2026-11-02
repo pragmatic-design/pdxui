@@ -160,3 +160,57 @@ test.describe('pdx-sortable-list', () => {
         await expect(page.locator('#s [data-part="list"]')).toHaveAttribute('role', 'list');
     });
 });
+
+test.describe('pdx-infinite-scroll', () => {
+    const IS_STATES = ['loading', 'ended', 'disabled'];
+    const isStates = (page: Page, sel: string) => page.locator(sel).evaluate((h, ns) => ns.filter((n) => h.matches(`:state(${n})`)), IS_STATES);
+
+    test('A4 — while its source is pending it is :state(loading) and aria-busy, its status says so; once settled, neither', async ({ page }) => {
+        await mount(page, '<pdx-infinite-scroll id="s"><p>feed</p></pdx-infinite-scroll>');
+        await page.locator('#s').evaluate((h) => {
+            const p = (window as unknown as { __pending(n: number): { ds: unknown; settle(d: unknown[], t: number): void } }).__pending(10);
+            (window as unknown as { __settle: unknown }).__settle = p.settle;
+            (h as unknown as { source: unknown }).source = p.ds;
+        });
+        await expect.poll(() => isStates(page, '#s')).toContain('loading');
+        await expect(page.locator('#s')).toHaveAttribute('aria-busy', 'true');
+        await expect(page.locator('#s [data-part="loading"]')).toBeVisible();
+        // A total the first page completes: with more to load the visible sentinel would ask again.
+        await page.evaluate(() => (window as unknown as { __settle(d: unknown[], t: number): void }).__settle([{ id: 1 }], 1));
+        await expect.poll(() => isStates(page, '#s')).not.toContain('loading');
+        await expect(page.locator('#s')).not.toHaveAttribute('aria-busy', /.*/);
+        expect(await page.locator('#s [data-part="loading"]').evaluate((e) => e.textContent?.trim()), 'a status with nothing to say is empty').toBe('');
+    });
+
+    test('at the end of its source it is :state(ended) and its end status speaks; no class on the host', async ({ page }) => {
+        await mount(page, '<pdx-infinite-scroll id="s"><p>feed</p></pdx-infinite-scroll>');
+        await page.locator('#s').evaluate((h) => {
+            const ds = (window as unknown as { __ds(o: unknown): unknown }).__ds({ data: [{ id: 1 }, { id: 2 }], pageSize: 10 });
+            (h as unknown as { source: unknown }).source = ds;
+        });
+        await expect.poll(() => isStates(page, '#s')).toContain('ended');
+        await expect(page.locator('#s [data-part="end"]')).not.toHaveText('');
+        expect(await page.locator('#s').evaluate((h) => h.getAttribute('class'))).toBeNull();
+    });
+
+    test('disabled is :state(disabled); its sentinel, loading and end status are parts', async ({ page }) => {
+        await mount(page, '<pdx-infinite-scroll id="s" disabled><p>feed</p></pdx-infinite-scroll>');
+        expect(await isStates(page, '#s')).toContain('disabled');
+        expect(await parts(page, '#s')).toEqual(['end', 'loading', 'sentinel']);
+    });
+
+    test('A3 — a list over the pages loaded so far numbers its items from the first, against the total', async ({ page }) => {
+        await mount(page, '<pdx-list id="l"></pdx-list>');
+        await page.locator('#l').evaluate(async (h) => {
+            const data = Array.from({ length: 25 }, (_, i) => ({ id: i + 1, name: `Item ${i + 1}` }));
+            const ds = (window as unknown as { __ds(o: unknown): { loadMore(): Promise<void> } }).__ds({ data, pageSize: 10 });
+            (h as unknown as { source: unknown }).source = ds;
+            await new Promise((r) => setTimeout(r, 50));
+            await ds.loadMore();
+        });
+        const items = page.locator('#l [data-part="item"]');
+        await expect(items).toHaveCount(20);
+        expect(await items.evaluateAll((els) => els.map((e) => [e.getAttribute('aria-setsize'), e.getAttribute('aria-posinset')])))
+            .toEqual(Array.from({ length: 20 }, (_, i) => ['25', String(i + 1)]));
+    });
+});

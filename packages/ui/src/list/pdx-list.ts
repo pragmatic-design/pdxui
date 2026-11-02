@@ -148,6 +148,7 @@ component('pdx-list', {
 
             const firstValue = Object.values(record).find(v => typeof v === 'string');
             li.textContent = (firstValue as string) || JSON.stringify(record);
+            markPosition(li, index);
             return li;
         }
 
@@ -166,20 +167,23 @@ component('pdx-list', {
         function markPositions(): void {
             if (!listEl) return;
             const rows = listEl.querySelectorAll<HTMLElement>(':scope > [data-part="item"]');
+            rows.forEach((row, i) => markPosition(row, i));
+        }
+
+        /** One item's place in its source (A3), from the source's total and paging and the items shown. */
+        function markPosition(row: HTMLElement, index: number): void {
             const ds = pagedSource(resolveDS());
+            const shown = getDataItems().length;
             const total = ds ? ds.total() : -1;
-            const partial = total > rows.length;
             const pageSize = ds ? ds.pageSize() : 0;
-            const offset = ds && pageSize > 0 && rows.length <= pageSize ? (ds.page() - 1) * pageSize : 0;
-            rows.forEach((row, i) => {
-                if (partial) {
-                    row.setAttribute('aria-setsize', String(total));
-                    row.setAttribute('aria-posinset', String(offset + i + 1));
-                } else {
-                    row.removeAttribute('aria-setsize');
-                    row.removeAttribute('aria-posinset');
-                }
-            });
+            const offset = ds && pageSize > 0 && shown <= pageSize ? (ds.page() - 1) * pageSize : 0;
+            if (total > shown) {
+                row.setAttribute('aria-setsize', String(total));
+                row.setAttribute('aria-posinset', String(offset + index + 1));
+            } else {
+                row.removeAttribute('aria-setsize');
+                row.removeAttribute('aria-posinset');
+            }
         }
 
         // Slot-based render: thin wrapper (role + data attrs only, no padding)
@@ -200,6 +204,7 @@ component('pdx-list', {
             li.setAttribute('data-list-index', String(index));
             if (record[idFieldName] != null) li.setAttribute('data-list-id', String(record[idFieldName]));
             li.appendChild(content instanceof DocumentFragment ? content : content);
+            markPosition(li, index);
             return li;
         }
 
@@ -358,11 +363,12 @@ component('pdx-list', {
                 return;
             }
 
-            // Update visibility
+            // Update visibility. The items already shown are marked again a frame later, once the
+            // keyed list has placed the rows a new total or page moved (a new row is marked as built).
             requestAnimationFrame(() => {
                 showEmpty(dataItems.length === 0 && !loading);
                 showBusy(loading);
-                markPositions();
+                requestAnimationFrame(markPositions);
             });
         });
 

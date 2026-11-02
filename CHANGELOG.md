@@ -405,6 +405,12 @@ semver.
   the host (`[axis="horizontal"]`), its inner list no longer carries `data-axis`, and the host no
   longer carries `pdx-sortable-root`; `disabled` is `:state(disabled)`; its list, items, handles and
   bodies are parts.
+- **Breaking:** `pdx-infinite-scroll` takes the beta contract (#292). `:state(loading)`,
+  `:state(ended)` and `:state(disabled)` on the host, which no longer carries
+  `pdx-infinite-scroll-root`. It is `aria-busy="true"` while loading and has no `aria-busy` otherwise
+  (it wrote `"false"`), and its two statuses hold their text only while they have something to say.
+  Its sentinel and statuses are parts. A `pdx-list` over the pages it loaded numbers its items from
+  the first against the source's total.
 - **Breaking:** `pdx-button` and `pdx-button-group` take the beta contract (#291), the last of the
   display, feedback and action family.
   - **No toggle mode.** `toggle`, `pressed`, the `pdx-toggle` event and the `.pdx-pressed` class leave
