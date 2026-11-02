@@ -96,19 +96,19 @@ pdx-data-grid {
    content, so the PAGE doesn't scroll — only the grid body does (virtualized).
    The consumer just makes the <pdx-data-grid> host a flex child (flex:1) of a
    full-height column; the rules below make toolbar/header/footer fixed and the body flex. */
-pdx-data-grid:has(.pdx-dg-fill) {
+pdx-data-grid:state(fill-height) {
     display: flex;
     flex-direction: column;
     min-height: 0;
 }
 /* The component wraps .pdx-dg in a .pdx-dg-root div — it must pass the height through. */
-pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
+pdx-data-grid:state(fill-height) > .pdx-dg-root {
     flex: 1;
     min-height: 0;
     display: flex;
     flex-direction: column;
 }
-.pdx-dg-fill {
+:where(pdx-data-grid):state(fill-height) :where(.pdx-dg) {
     flex: 1;
     min-height: 0;
     display: flex;
@@ -117,7 +117,7 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
 /* scrollEl owns the HORIZONTAL scroll so header + filter row + body move together when columns
    exceed the width; the body owns the VERTICAL scroll (virtualized). This keeps the filter row
    aligned and usable instead of getting clipped/squished on resize. */
-.pdx-dg-fill .pdx-dg-scroll {
+:where(pdx-data-grid):state(fill-height) .pdx-dg-scroll {
     flex: 1;
     min-height: 0;
     display: flex;
@@ -125,14 +125,14 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
     overflow-x: auto;
     overflow-y: hidden;
 }
-.pdx-dg-fill .pdx-dg-header,
-.pdx-dg-fill .pdx-dg-filter-row {
+:where(pdx-data-grid):state(fill-height) .pdx-dg-header,
+:where(pdx-data-grid):state(fill-height) .pdx-dg-filter-row {
     flex: 0 0 auto;
     /* Reserve the same width the body's vertical scrollbar consumes → columns stay aligned. */
     padding-right: var(--pdx-dg-sbw, 0px);
     box-sizing: border-box;
 }
-.pdx-dg-fill .pdx-dg-body {
+:where(pdx-data-grid):state(fill-height) .pdx-dg-body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
@@ -148,7 +148,7 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
     border-bottom: 1px solid var(--pdx-color-border);
 }
 
-.pdx-dg-sticky .pdx-dg-header {
+:where(pdx-data-grid):state(sticky-header) .pdx-dg-header {
     position: sticky;
     top: 0;
     z-index: 2;
@@ -451,13 +451,13 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
     padding: 4px 0;
 }
 
-.pdx-dg-sticky .pdx-dg-filter-row {
+:where(pdx-data-grid):state(sticky-header) .pdx-dg-filter-row {
     position: sticky;
     top: 41px; /* header height approx */
     z-index: 2;
 }
 
-.pdx-dg-compact .pdx-dg-sticky .pdx-dg-filter-row {
+:where(pdx-data-grid):state(compact):state(sticky-header) .pdx-dg-filter-row {
     top: 33px;
 }
 
@@ -498,22 +498,22 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
 }
 
 /* Striped */
-.pdx-dg-striped .pdx-dg-row:nth-child(even) {
+:where(pdx-data-grid):state(striped) .pdx-dg-row:nth-child(even) {
     background: light-dark(oklch(0.98 0 0 / 0.5), oklch(0.15 0 0 / 0.3));
 }
 
 /* Hover — 4% opacity neutral (industry standard). Disabled on editing row. */
-.pdx-dg-hover .pdx-dg-row:hover {
+:where(pdx-data-grid):state(hover) .pdx-dg-row:hover {
     background: var(--pdx-color-inset);
 }
-.pdx-dg-hover .pdx-dg-row:has(.pdx-dg-cell-editing):hover {
+:where(pdx-data-grid):state(hover) .pdx-dg-row:has(.pdx-dg-cell-editing):hover {
     background: transparent;
 }
 
 /* Rows that open something (`row-clickable`): the row says it can be clicked. The
    controls inside it keep their own cursor, and no page needs a rule of its own on this internal
    class. */
-.pdx-dg-rows-clickable .pdx-dg-row {
+:where(pdx-data-grid):state(row-clickable) .pdx-dg-row {
     cursor: pointer;
 }
 
@@ -563,12 +563,12 @@ pdx-data-grid:has(.pdx-dg-fill) > .pdx-dg-root {
 
 /* ─── Compact ──────────────────────────────────────────────── */
 
-.pdx-dg-compact .pdx-dg-th,
-.pdx-dg-compact .pdx-dg-td {
+:where(pdx-data-grid):state(compact) .pdx-dg-th,
+:where(pdx-data-grid):state(compact) .pdx-dg-td {
     padding: 6px var(--pdx-space-sm);
 }
 
-.pdx-dg-compact .pdx-dg-footer {
+:where(pdx-data-grid):state(compact) .pdx-dg-footer {
     padding: 6px var(--pdx-space-sm);
 }
 
@@ -1415,8 +1415,8 @@ pdx-data-grid[data-pdx-pointer] :is(.pdx-dg-td, .pdx-dg-th, .pdx-dg-summary-cell
 
 /* UI-15d edge-fade: opt-in via `edge-fade` attribute. Soft gradient at the bottom of a scrolling grid,
    lifted above the horizontal scrollbar (--pdx-dg-sbw, measured by the grid); never blocks scroll/click. */
-pdx-data-grid[edge-fade] .pdx-dg-fill { position: relative; }
-pdx-data-grid[edge-fade] .pdx-dg-fill::after {
+pdx-data-grid[edge-fade]:state(fill-height) :where(.pdx-dg) { position: relative; }
+pdx-data-grid[edge-fade]:state(fill-height) :where(.pdx-dg)::after {
     content: "";
     position: absolute;
     left: 0;

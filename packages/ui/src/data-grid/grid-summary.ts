@@ -26,6 +26,7 @@ function formatSummary(v: unknown): string {
 export function buildSummaryRow(gc: GridContext, cols: AnyColumn[]): HTMLElement {
     const row = document.createElement('div');
     row.className = 'pdx-dg-summary';
+    row.dataset.part = 'summary';
     row.setAttribute('role', 'row');
 
     // Leading spacers — mirror the header (expand chevron column, then selection checkbox).

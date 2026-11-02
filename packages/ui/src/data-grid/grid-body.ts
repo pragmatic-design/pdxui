@@ -26,6 +26,7 @@ export function renderRows(
         const row = rows[i];
         const rowEl = document.createElement('div');
         rowEl.className = 'pdx-dg-row';
+        rowEl.dataset.part = 'row';
         // The consumer's own mark on the row. Before the selection and the drag
         // classes, so a `pdx-dg-row-selected` still wins where they overlap.
         const rowClass = gc.getRowClass?.(row, i);
@@ -76,6 +77,7 @@ export function renderRows(
         for (const col of visibleCols) {
             const td = document.createElement('div');
             td.className = 'pdx-dg-td';
+            td.dataset.part = 'cell';
             if (col.def.command) td.classList.add('pdx-dg-td-command');
             if (col.align === 'right') td.classList.add('pdx-dg-td-right');
             else if (col.align === 'center') td.classList.add('pdx-dg-td-center');

@@ -109,6 +109,7 @@ export function setupVirtualScroll(
 
             const rowEl = document.createElement('div');
             rowEl.className = 'pdx-dg-row';
+            rowEl.dataset.part = 'row';
             // The same mark as the non-virtual body: two views of one grid that disagree is the
             // drift `grid-cell.ts` exists to avoid.
             const rowClass = gc.getRowClass?.(row as Record<string, unknown>, i);
@@ -148,6 +149,7 @@ export function setupVirtualScroll(
             for (const col of visibleCols) {
                 const td = document.createElement('div');
                 td.className = 'pdx-dg-td';
+                td.dataset.part = 'cell';
                 if (col.def.command) td.classList.add('pdx-dg-td-command');
                 if (col.align === 'right') td.classList.add('pdx-dg-td-right');
                 else if (col.align === 'center') td.classList.add('pdx-dg-td-center');

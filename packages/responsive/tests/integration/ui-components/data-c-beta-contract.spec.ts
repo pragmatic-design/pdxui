@@ -119,6 +119,123 @@ test.describe('pdx-data-grid', () => {
         await expect(page.locator('#g .pdx-dg-body [data-row-id="2"] [data-field="name"].pdx-dg-cell-editing')).toHaveCount(1);
     });
 
+    test('its looks are states of the host, and the wrapper keeps no class for them', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="g" striped compact row-clickable fill-height show-footer="false"></pdx-data-grid>');
+        await page.locator('#g').evaluate(async (el) => {
+            const g = el as HTMLElement & Record<string, unknown> & { whenReady(): Promise<void> };
+            g.columns = [{ field: 'name', header: 'Name' }];
+            g.data = [{ id: 1, name: 'Ada' }];
+            await g.whenReady();
+        });
+        await frames(page, 3);
+        const states = await page.locator('#g').evaluate((h) => ['striped', 'hover', 'row-clickable', 'compact', 'sticky-header', 'fill-height', 'empty', 'loading', 'editing']
+            .filter((s) => h.matches(`:state(${s})`)));
+        expect(states).toEqual(['striped', 'hover', 'row-clickable', 'compact', 'sticky-header', 'fill-height']);
+        expect(await page.locator('#g .pdx-dg').getAttribute('class')).toBe('pdx-dg');
+        await page.locator('#g').evaluate((h) => { (h as unknown as { striped: boolean }).striped = false; });
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(striped)'))).toBe(false);
+    });
+
+    test('row-clickable is a state set by the property as by the attribute, and absent without either', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="a" row-clickable></pdx-data-grid><pdx-data-grid id="p"></pdx-data-grid><pdx-data-grid id="n"></pdx-data-grid>');
+        await page.locator('#p').evaluate((h) => { (h as unknown as { rowClickable: boolean }).rowClickable = true; });
+        const clickable = (id: string) => page.locator(id).evaluate((h) => h.matches(':state(row-clickable)'));
+        await expect.poll(() => clickable('#a')).toBe(true);
+        await expect.poll(() => clickable('#p')).toBe(true);
+        expect(await clickable('#n')).toBe(false);
+    });
+
+    test('empty and editing are states; its pieces are parts', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="g" editable show-toolbar show-footer="true"></pdx-data-grid>');
+        await page.locator('#g').evaluate(async (el) => {
+            const g = el as HTMLElement & Record<string, unknown> & { whenReady(): Promise<void> };
+            g.columns = [{ field: 'name', header: 'Name' }];
+            g.data = [];
+            await g.whenReady();
+        });
+        await frames(page, 3);
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(empty)'))).toBe(true);
+        await page.locator('#g').evaluate((h) => { (h as unknown as { data: unknown }).data = [{ id: 1, name: 'Ada' }]; });
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(empty)'))).toBe(false);
+        await page.locator('#g .pdx-dg-body [data-row-id="1"] [data-field="name"]').dblclick();
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(editing)'))).toBe(true);
+        // The editor loads lazily and takes the focus a frame later: Escape goes to it then.
+        await expect(page.locator('#g .pdx-dg-cell-editing input')).toBeFocused();
+        await page.keyboard.press('Escape');
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(editing)'))).toBe(false);
+        const parts = await page.locator('#g').evaluate((h) => [...new Set([...h.querySelectorAll('[data-part]')]
+            .filter((e) => { let p = e.parentElement; while (p && !p.tagName.includes('-')) p = p.parentElement; return p === h; })
+            .map((e) => e.getAttribute('data-part')))].sort());
+        expect(parts).toEqual(['body', 'cell', 'column-header', 'empty', 'footer', 'grid', 'header', 'loading', 'row', 'toolbar']);
+    });
+
+    test('A3 — a page of a larger source carries its total in aria-rowcount, and each row its index', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="g" show-footer="false"></pdx-data-grid>');
+        await page.locator('#g').evaluate(async (el) => {
+            const g = el as HTMLElement & Record<string, unknown> & { whenReady(): Promise<void> };
+            const w = window as unknown as { __ds(o: unknown): unknown };
+            g.columns = [{ field: 'name', header: 'Name' }];
+            g.source = w.__ds({ data: Array.from({ length: 1240 }, (_, i) => ({ id: i + 1, name: `Row ${i + 1}` })), pageSize: 25 });
+            await g.whenReady();
+        });
+        await frames(page, 3);
+        const grid = page.locator('#g [role="grid"]');
+        // The header row counts, as ARIA defines: 1 + 1240.
+        await expect(grid).toHaveAttribute('aria-rowcount', '1241');
+        await expect(page.locator('#g .pdx-dg-body [role="row"]').nth(2)).toHaveAttribute('aria-rowindex', '4');
+    });
+
+    test('A4 — while its source is pending the grid is aria-busy and :state(loading); the empty status speaks only when empty', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="g" show-footer="false"></pdx-data-grid>');
+        await page.locator('#g').evaluate(async (el) => {
+            const g = el as HTMLElement & Record<string, unknown> & { whenReady(): Promise<void> };
+            const w = window as unknown as { __pending(n: number): { ds: unknown; settle(d: unknown[], t: number): void }; __settle: unknown };
+            const p = w.__pending(25);
+            w.__settle = p.settle;
+            g.columns = [{ field: 'name', header: 'Name' }];
+            g.source = p.ds;
+            (p.ds as { read(): void }).read?.();
+            await g.whenReady();
+        });
+        await frames(page, 3);
+        const grid = page.locator('#g [role="grid"]');
+        // The empty state's status; the loading overlay's spinner is a status of its own, shown while it loads.
+        const status = page.locator('#g [data-part="empty"][role="status"]');
+        await expect(grid).toHaveAttribute('aria-busy', 'true');
+        expect(await page.locator('#g').evaluate((h) => h.matches(':state(loading)'))).toBe(true);
+        await expect(status).toHaveText('');
+        await page.evaluate(() => (window as unknown as { __settle(d: unknown[], t: number): void }).__settle([{ id: 1, name: 'Ada' }], 1));
+        await expect(grid).not.toHaveAttribute('aria-busy', /.*/);
+        await expect.poll(() => page.locator('#g').evaluate((h) => h.matches(':state(loading)'))).toBe(false);
+        await expect(status).toHaveText('');
+        await page.locator('#g').evaluate((h) => { (h as unknown as { grid: { source: { setFilter(f: unknown[]): void } } }).grid.source.setFilter([{ field: 'name', operator: 'eq', value: 'nobody' }]); });
+        await page.evaluate(() => (window as unknown as { __settle(d: unknown[], t: number): void }).__settle([], 0));
+        await expect(status).not.toHaveText('');
+    });
+
+    test('A5 — each sortable header carries aria-sort, and is named by its label alone, filterable or not', async ({ page }) => {
+        await mount(page, '<pdx-data-grid id="g" filterable filter-mode="popover" show-footer="false"></pdx-data-grid>');
+        const COLS = [
+            { field: 'name', header: 'Name', type: 'string', sortable: true },
+            { field: 'price', header: 'Price', type: 'number', sortable: true },
+            { field: 'due', header: 'Due', type: 'date', sortable: true },
+            { field: 'paid', header: 'Paid', type: 'boolean', sortable: true },
+            { field: 'note', header: 'Note', type: 'string', sortable: true, filterable: false },
+        ];
+        await page.locator('#g').evaluate(async (el, cols) => {
+            const g = el as HTMLElement & Record<string, unknown> & { whenReady(): Promise<void> };
+            g.columns = cols;
+            g.data = [{ id: 1, name: 'Ada', price: 3, due: '2026-01-02', paid: true, note: 'x' }];
+            await g.whenReady();
+        }, COLS);
+        await frames(page, 3);
+        for (const c of COLS) {
+            const header = page.getByRole('columnheader', { name: c.header, exact: true });
+            await expect(header, `${c.header} (${c.type}) is not named by its label alone`).toHaveCount(1);
+            await expect(header).toHaveAttribute('aria-sort', 'none');
+        }
+    });
+
     test('a dragged row reports where it went', async ({ page }) => {
         await mount(page, '<pdx-data-grid id="g" row-reorder show-footer="false"></pdx-data-grid>');
         await page.locator('#g').evaluate(async (el) => {

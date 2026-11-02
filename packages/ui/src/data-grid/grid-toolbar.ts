@@ -21,6 +21,7 @@ const SEARCH_PAUSE_MS = 300;
 export function buildToolbar(gc: GridContext): HTMLElement {
     const bar = document.createElement('div');
     bar.className = 'pdx-dg-toolbar';
+    bar.dataset.part = 'toolbar';
     bar.setAttribute('role', 'toolbar');
     i18nMark(bar, 'toolbar.label', 'label');
 

@@ -40,6 +40,13 @@ const DONE: Row[] = [
     { tag: 'pdx-chart', models: [], states: [], parts: ['legend', 'legend-item', 'swatch', 'canvas'], removed: [] },
     // An image named by its data, declared on the host; its canvas is a part.
     { tag: 'pdx-sparkline', models: [], states: [], parts: ['canvas'], removed: [] },
+    // Its looks and its conditions are states of the host; its row events are delegated to its body.
+    {
+        tag: 'pdx-data-grid', models: [],
+        states: ['striped', 'hover', 'row-clickable', 'compact', 'sticky-header', 'fill-height', 'loading', 'empty', 'editing'],
+        parts: ['toolbar', 'group-bar', 'grid', 'header', 'column-header', 'filter-row', 'body', 'row', 'cell', 'summary', 'footer', 'empty', 'loading'],
+        removed: [],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

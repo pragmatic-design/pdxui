@@ -64,6 +64,7 @@ export function buildFilterRow(gc: GridContext, cols: AnyColumn[]): HTMLElement 
     // over: the inputs keep their own tab stops and their own arrow keys.
     const row = document.createElement('div');
     row.className = 'pdx-dg-filter-row';
+    row.dataset.part = 'filter-row';
     row.setAttribute('role', 'row');
     row.setAttribute(NAV_SKIP, '');
 

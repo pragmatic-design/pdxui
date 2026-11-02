@@ -74,6 +74,7 @@ function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTML
 
     const th = document.createElement('div');
     th.className = 'pdx-dg-th';
+    th.dataset.part = 'column-header';
     if (col.sortable) th.classList.add('pdx-dg-th-sortable');
     if (col.align === 'right') th.classList.add('pdx-dg-td-right');
     else if (col.align === 'center') th.classList.add('pdx-dg-td-center');
@@ -259,6 +260,7 @@ function buildColumnTh(gc: GridContext, col: AnyColumn, root: HTMLElement): HTML
 function buildFlatHeader(gc: GridContext, cols: AnyColumn[]): HTMLElement {
     const header = document.createElement('div');
     header.className = 'pdx-dg-header';
+    header.dataset.part = 'header';
     header.setAttribute('role', 'row');
 
     buildLeadingCells(gc, header);
