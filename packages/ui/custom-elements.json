@@ -15354,6 +15354,34 @@
               "description": "The content placed inside the element."
             }
           ],
+          "cssParts": [
+            {
+              "name": "sentinel",
+              "description": "The invisible line whose coming into view loads more."
+            },
+            {
+              "name": "loading",
+              "description": "The «loading» status, with its spinner; it says something only while loading."
+            },
+            {
+              "name": "end",
+              "description": "The «no more data» status; it says something only at the end of the source."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "loading",
+              "description": "The source is pending, or `loading` is set: the host is `aria-busy` too (A4)."
+            },
+            {
+              "name": "ended",
+              "description": "The source has nothing more to load."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: nothing more is loaded."
+            }
+          ],
           "x-pdx-context": {
             "injects": [
               {
@@ -16897,15 +16925,6 @@
             },
             {
               "kind": "field",
-              "name": "renderItem",
-              "description": "Render function for each item.",
-              "type": {
-                "text": "object"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "idField",
               "description": "Item field used as a unique key.",
               "type": {
@@ -17075,6 +17094,42 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The `role=\"list\"` container of the items."
+            },
+            {
+              "name": "item",
+              "description": "An item's row, `role=\"listitem\"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3)."
+            },
+            {
+              "name": "empty",
+              "description": "The empty state."
+            },
+            {
+              "name": "overlay",
+              "description": "The loading overlay, drawn while the source loads."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "bordered",
+              "description": "`bordered` is set (the default): the list is framed."
+            },
+            {
+              "name": "dividers",
+              "description": "`dividers` is set: a rule between items."
+            },
+            {
+              "name": "loading",
+              "description": "Its source is pending: the host is `aria-busy` too (A4)."
+            },
+            {
+              "name": "empty",
+              "description": "It has no items, and is not loading."
             }
           ],
           "x-pdx-context": {
@@ -25227,16 +25282,6 @@
             },
             {
               "kind": "field",
-              "name": "axis",
-              "description": "'vertical' | 'horizontal' — decides which arrows move, and which way rows shift.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'",
-              "attribute": "axis"
-            },
-            {
-              "kind": "field",
               "name": "handle",
               "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
               "type": {
@@ -25254,6 +25299,26 @@
               },
               "default": "false",
               "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "axis",
+              "description": "vertical (the default) or horizontal.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'",
+              "attribute": "axis"
+            }
+          ],
+          "variants": [
+            {
+              "name": "axis",
+              "values": [
+                "vertical",
+                "horizontal"
+              ],
+              "default": "vertical"
             }
           ],
           "events": [
@@ -25289,15 +25354,6 @@
               "default": "'label'"
             },
             {
-              "name": "axis",
-              "fieldName": "axis",
-              "description": "'vertical' | 'horizontal' — decides which arrows move, and which way rows shift.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'vertical'"
-            },
-            {
               "name": "handle",
               "fieldName": "handle",
               "description": "A selector inside the row that the POINTER may grab. Empty: the rendered handle.",
@@ -25314,6 +25370,15 @@
                 "text": "boolean"
               },
               "default": "false"
+            },
+            {
+              "name": "axis",
+              "fieldName": "axis",
+              "description": "vertical (the default) or horizontal.",
+              "type": {
+                "text": "'vertical' | 'horizontal'"
+              },
+              "default": "'vertical'"
             }
           ],
           "slots": [
@@ -25321,6 +25386,30 @@
               "name": "item",
               "description": "Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which\nreceives `{ item, index }`. Without either the row shows the item's `label-field`.",
               "signature": "(item: T, index: number)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "list",
+              "description": "The `role=\"list\"` `<ul>`, framed."
+            },
+            {
+              "name": "item",
+              "description": "A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`."
+            },
+            {
+              "name": "handle",
+              "description": "A row's handle, the button the pointer grabs and the keyboard moves."
+            },
+            {
+              "name": "body",
+              "description": "A row's content."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set: nothing can be moved, and the handles are `aria-disabled`."
             }
           ]
         }

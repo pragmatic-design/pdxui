@@ -5,15 +5,15 @@
  * (packages/design/src/components/sortable-list.css).
  *
  * DOM, host vs inner:
- *   <pdx-sortable-list>                       ← HOST: .pdx-sortable-root
+ *   <pdx-sortable-list axis="vertical">       ← HOST: the axis variant, :state(disabled) — no class (#292)
  *     <div class="pdx-sr-only" id="…">        ← the instructions every handle points at
- *     <ul class="pdx-sortable-list" role="list" data-axis="vertical">   ← the INNER box, the border
+ *     <ul data-part="list" class="pdx-sortable-list" role="list">   ← the INNER box, the border
  *       <li class="pdx-sortable-item">
  *         <button class="pdx-sortable-handle" aria-roledescription="draggable" aria-describedby>
  *         <div class="pdx-sortable-body">
  *
  * The border and the radius are on the INNER <ul>, not on the host — the opposite of pdx-list,
- * where .pdx-list-bordered sits on the host. Measure the <ul>.
+ * where :state(bordered) draws it on the host. Measure the <ul>.
  *
  * Content-driven: the height is the sum of the rows → isolation with skipHeight.
  *

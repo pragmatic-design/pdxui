@@ -14,8 +14,17 @@ import '../spinner/pdx-spinner'; // rendered by this component, and registered b
 /**
  * Loads more data as the user scrolls to the bottom, paging a DataSource or firing
  * `pdx-load-more` for manual control.
+ *
+ * @csspart sentinel - The invisible line whose coming into view loads more.
+ * @csspart loading - The «loading» status, with its spinner; it says something only while loading.
+ * @csspart end - The «no more data» status; it says something only at the end of the source.
+ * @cssstate loading - The source is pending, or `loading` is set: the host is `aria-busy` too (A4).
+ * @cssstate ended - The source has nothing more to load.
+ * @cssstate disabled - `disabled` is set: nothing more is loaded.
  */
 component('pdx-infinite-scroll', {
+    states: ['loading', 'ended', 'disabled'],
+    parts: ['sentinel', 'loading', 'end'],
     props: {
         /** DataSource instance for auto-paging */
         source: { type: Object, default: null },
@@ -91,39 +100,39 @@ component('pdx-infinite-scroll', {
                 void ds.data();
                 void ds.isLoading();
             }
+            // Its conditions are states of the host (#292); the class it wrote there is gone.
+            ctx.state('loading', currentlyLoading);
+            ctx.state('ended', atEnd);
+            ctx.state('disabled', !!ctx.disabled());
 
             if (!_built) {
                 _built = true;
                 _wasLoading = currentlyLoading;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    ctx.el.classList.add('pdx-infinite-scroll-root');
-
                     _sentinelEl = document.createElement('div');
                     _sentinelEl.className = 'pdx-infinite-scroll-sentinel';
+                    _sentinelEl.dataset.part = 'sentinel';
                     _sentinelEl.setAttribute('aria-hidden', 'true');
                     ctx.el.appendChild(_sentinelEl);
 
+                    // The two statuses are always there, so a screen reader hears what is written
+                    // into them; each holds text only while it has something to say (A4).
                     _loadingEl = document.createElement('div');
                     _loadingEl.className = 'pdx-infinite-scroll-loading';
+                    _loadingEl.dataset.part = 'loading';
                     _loadingEl.setAttribute('role', 'status');
                     _loadingEl.setAttribute('aria-live', 'polite');
-                    const spinner = document.createElement('pdx-spinner');
-                    spinner.setAttribute('size', 'sm');
-                    _loadingEl.appendChild(spinner);
-                    const loadText = document.createElement('span');
-                    loadText.textContent = loadMsg;
-                    loadText.className = 'pdx-infinite-scroll-text';
-                    _loadingEl.appendChild(loadText);
                     _loadingEl.style.display = 'none';
                     ctx.el.appendChild(_loadingEl);
 
                     _endEl = document.createElement('div');
                     _endEl.className = 'pdx-infinite-scroll-end';
+                    _endEl.dataset.part = 'end';
                     _endEl.setAttribute('role', 'status');
-                    _endEl.textContent = endMsg;
                     _endEl.style.display = 'none';
                     ctx.el.appendChild(_endEl);
+                    paint(currentlyLoading, atEnd, showEnd, loadMsg, endMsg);
 
                     // Find nearest scrollable ancestor
                     let scrollRoot: Element | null = null;
@@ -162,20 +171,36 @@ component('pdx-infinite-scroll', {
             }
             _wasLoading = currentlyLoading;
 
-            requestAnimationFrame(() => {
-                // aria-busy on the region while it loads (WAI-ARIA: dynamic content being loaded).
-                ctx.el.setAttribute('aria-busy', currentlyLoading ? 'true' : 'false');
-                if (_loadingEl) {
-                    _loadingEl.style.display = currentlyLoading ? '' : 'none';
-                    const textEl = _loadingEl.querySelector('.pdx-infinite-scroll-text');
-                    if (textEl) textEl.textContent = loadMsg;
-                }
-                if (_endEl) {
-                    _endEl.style.display = atEnd && showEnd ? '' : 'none';
-                    _endEl.textContent = endMsg;
-                }
-            });
+            requestAnimationFrame(() => paint(currentlyLoading, atEnd, showEnd, loadMsg, endMsg));
         });
+
+        /**
+         * The region is aria-busy while it loads, and not otherwise (A4, #292). The loading status holds
+         * its spinner and text only while loading, the end status its text only at the end: a status
+         * with nothing to say is empty, not hidden text a screen reader may still reach.
+         */
+        function paint(loading: boolean, atEnd: boolean, showEnd: boolean, loadMsg: string, endMsg: string): void {
+            if (loading) ctx.el.setAttribute('aria-busy', 'true');
+            else ctx.el.removeAttribute('aria-busy');
+            if (_loadingEl) {
+                _loadingEl.style.display = loading ? '' : 'none';
+                if (loading && !_loadingEl.firstChild) {
+                    const spinner = document.createElement('pdx-spinner');
+                    spinner.setAttribute('size', 'sm');
+                    const text = document.createElement('span');
+                    text.className = 'pdx-infinite-scroll-text';
+                    _loadingEl.append(spinner, text);
+                }
+                if (!loading) _loadingEl.replaceChildren();
+                const text = _loadingEl.querySelector('.pdx-infinite-scroll-text');
+                if (text) text.textContent = loadMsg;
+            }
+            if (_endEl) {
+                const show = atEnd && showEnd;
+                _endEl.style.display = show ? '' : 'none';
+                _endEl.textContent = show ? endMsg : '';
+            }
+        }
 
         // core's onDestroy: `ctx.onDestroy` does not exist, and an optional call would hide that the
         // observer is never disconnected. The built elements sit on the host next to the author's

@@ -5,7 +5,8 @@
     <details class="source-block">
       <summary>Source (Pattern)</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-data-source url="/api/users" :page-size="5"&gt;
-  &lt;pdx-list :render-item="renderUser" clickable dividers&gt;
+  &lt;pdx-list clickable dividers&gt;
+    &lt;slot name="item" let:item&gt;{item.name}&lt;/slot&gt;
   &lt;/pdx-list&gt;
   &lt;pdx-pagination&gt;&lt;/pdx-pagination&gt;
 &lt;/pdx-data-source&gt;

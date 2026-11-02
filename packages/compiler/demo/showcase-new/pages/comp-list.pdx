@@ -30,7 +30,6 @@
           <tbody>
             <tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr>
             <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr>
-            <tr><td><code>render-item</code></td><td>Function</td><td>null</td><td>(item, index) => HTML string or HTMLElement (escape hatch)</td></tr>
             <tr><td><code>id-field</code></td><td>String</td><td>'id'</td><td>Unique ID field name</td></tr>
             <tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr>
             <tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr>
@@ -49,7 +48,7 @@
         <table>
           <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>item</code></td><td><code>{ item, index, id }</code></td><td>Custom item template. Priority: slot > render-item > default.</td></tr>
+            <tr><td><code>item</code></td><td><code>{ item, index, id }</code></td><td>Custom item template, a snippet or the scoped slot; without it, the item's first text field.</td></tr>
             <tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr>
           </tbody>
         </table>

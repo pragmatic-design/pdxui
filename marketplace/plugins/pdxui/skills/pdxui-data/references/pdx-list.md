@@ -8,7 +8,6 @@ Data-driven list with custom rows.
 |---|---|---|---|---|
 | `items` | — | T[] | `null` | The data items to render. |
 | `source` | — | object | `null` | The data source to render from. |
-| `renderItem` | — | object | `null` | Render function for each item. |
 | `idField` | `idfield` | string | `'id'` | Item field used as a unique key. |
 | `dividers` | `dividers` | boolean | `false` | Shows dividers between items. |
 | `clickable` | `clickable` | boolean | `false` | Whether items are clickable. |
@@ -31,6 +30,10 @@ Data-driven list with custom rows.
 
 **Slot:** `item` — Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).; `empty` — Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
 
+**States:** `:state(bordered)` — `bordered` is set (the default): the list is framed.; `:state(dividers)` — `dividers` is set: a rule between items.; `:state(loading)` — Its source is pending: the host is `aria-busy` too (A4).; `:state(empty)` — It has no items, and is not loading.
+
+**Parts:** `[data-part="list"]` — The `role="list"` container of the items.; `[data-part="item"]` — An item's row, `role="listitem"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3).; `[data-part="empty"]` — The empty state.; `[data-part="overlay"]` — The loading overlay, drawn while the source loads.
+
 
 #### Examples
 
@@ -38,18 +41,14 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Basic (Static Array)** — Simple list from a static items array with a render function.
+**Basic (Static Array)** — Simple list from a static items array, each item drawn by the `item` slot.
 
 ```html
-<pdx-list :items="users" :render-item="renderUser" clickable dividers
-  @pdx-click="onUserClick">
+<pdx-list :items="users" clickable dividers @pdx-click="onUserClick">
+  <slot name="item" let:item>
+    <strong>{item.name}</strong> {item.role}
+  </slot>
 </pdx-list>
-```
-
-```js
-// renderUser = (user) => {
-//   return '<strong>' + user.name + '</strong> — ' + user.role;
-// }
 ```
 
 **With DataSource + Loading** — Simulates a 1.5s fetch. Shows loading overlay, then data.
@@ -61,17 +60,13 @@ const ds = createDataSource({
   },
   autoLoad: true,
 });
-
-function renderUser(user) {
-  return '<pdx-icon name="user"></pdx-icon>'
-    + '<span>' + user.name + '</span>'
-    + '<span class="role">' + user.role + '</span>';
-}
 ```
 
 ```html
-<pdx-list :source="ds" :render-item="renderUser"
-  clickable dividers>
+<pdx-list :source="ds" clickable dividers>
+  <slot name="item" let:item>
+    <span>{item.name}</span> <span class="role">{item.role}</span>
+  </slot>
 </pdx-list>
 ```
 
@@ -138,20 +133,14 @@ function renderUser(user) {
 
 **Rich Item Template** — Avatar + name + role + badge layout.
 
-```js
-function renderRichItem(user) {
-  const statusColor = user.status === 'Active'
-    ? 'var(--pdx-color-success)' : 'var(--pdx-color-muted)';
-  return '<div class="avatar">' + user.initials + '</div>'
-    + '<div><strong>' + user.name + '</strong>'
-    + '<div class="role">' + user.role + '</div></div>'
-    + '<span class="status">' + user.status + '</span>';
-}
-```
-
 ```html
-<pdx-list :items="richItems"
-  :render-item="renderRichItem" dividers>
+<pdx-list :items="richItems" dividers>
+  <slot name="item" let:item>
+    <div class="avatar">{item.initials}</div>
+    <div><strong>{item.name}</strong>
+      <div class="role">{item.role}</div></div>
+    <span class="status">{item.status}</span>
+  </slot>
 </pdx-list>
 ```
 
@@ -166,7 +155,9 @@ const ds = createDataSource({
 ```
 
 ```html
-<pdx-list :source="ds" :render-item="renderItem"></pdx-list>
+<pdx-list :source="ds">
+  <slot name="item" let:item><strong>{item.name}</strong></slot>
+</pdx-list>
 <pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage">
 </pdx-pagination>
@@ -176,7 +167,8 @@ const ds = createDataSource({
 
 ```html
 <pdx-data-source url="/api/users" :page-size="5">
-  <pdx-list :render-item="renderUser" clickable dividers>
+  <pdx-list clickable dividers>
+    <slot name="item" let:item>{item.name}</slot>
   </pdx-list>
   <pdx-pagination></pdx-pagination>
 </pdx-data-source>

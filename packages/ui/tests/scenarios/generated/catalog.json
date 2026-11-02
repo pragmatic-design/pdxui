@@ -2775,6 +2775,14 @@
         {
           "id": "sortable-disabled",
           "title": "Sortable list — disabled"
+        },
+        {
+          "id": "sortable-list-axis-vertical",
+          "title": "pdx-sortable-list — axis=\"vertical\""
+        },
+        {
+          "id": "sortable-list-axis-horizontal",
+          "title": "pdx-sortable-list — axis=\"horizontal\""
         }
       ]
     },

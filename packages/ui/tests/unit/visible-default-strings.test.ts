@@ -56,8 +56,13 @@ const CASES: Record<string, Case> = {
         string: ['data-grid', 'empty.title'], html: '<pdx-data-grid></pdx-data-grid>', prop: 'empty-title', target: '.pdx-dg-empty-text', read: 'text',
         setup: (el) => { Object.assign(el, { columns: [{ field: 'name', header: 'Name' }], data: [] }); },
     },
-    'infinite-scroll end': { string: ['infinite-scroll', 'end'], html: '<pdx-infinite-scroll></pdx-infinite-scroll>', prop: 'end-message', target: '.pdx-infinite-scroll-end', read: 'text' },
-    'infinite-scroll loading': { string: ['infinite-scroll', 'loading'], html: '<pdx-infinite-scroll></pdx-infinite-scroll>', prop: 'loading-message', target: '.pdx-infinite-scroll-text', read: 'text' },
+    // Each status holds its text only while it has something to say (A4, #292): at the end of a
+    // source, and while loading.
+    'infinite-scroll end': {
+        string: ['infinite-scroll', 'end'], html: '<pdx-infinite-scroll></pdx-infinite-scroll>', prop: 'end-message', target: '.pdx-infinite-scroll-end', read: 'text',
+        setup: (host) => { (host as unknown as { source: unknown }).source = { data: () => [], isLoading: () => false, hasMore: () => false }; },
+    },
+    'infinite-scroll loading': { string: ['infinite-scroll', 'loading'], html: '<pdx-infinite-scroll loading></pdx-infinite-scroll>', prop: 'loading-message', target: '.pdx-infinite-scroll-text', read: 'text' },
     // The key is read, not shadowed by a literal '+ Add' as the prop's default.
     'field-list add': { string: ['field-list', 'add'], html: '<pdx-field-list></pdx-field-list>', prop: 'add-label', target: '.pdx-field-list-header button', read: 'text' },
 };

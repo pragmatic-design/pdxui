@@ -6360,7 +6360,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n@scope ([data-pdx-suprvs]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">List</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-list&gt;</code> — data-bound list. Supports static arrays, DataSource,\\n      custom item templates, loading overlay, empty state, clickable items, dividers.\\n    </p> <app-demo-comp-list-basic class="demo-section"></app-demo-comp-list-basic> <app-demo-comp-list-data-source class="demo-section"></app-demo-comp-list-data-source> <app-demo-comp-list-empty class="demo-section"></app-demo-comp-list-empty> <app-demo-comp-list-slot-template class="demo-section"></app-demo-comp-list-slot-template> <app-demo-comp-list-custom-empty class="demo-section"></app-demo-comp-list-custom-empty> <app-demo-comp-list-rich-item class="demo-section"></app-demo-comp-list-rich-item> <app-demo-comp-list-pagination class="demo-section"></app-demo-comp-list-pagination> <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper> <section> <h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr><tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr><tr><td><code>render-item</code></td><td>Function</td><td>null</td><td>(item, index) =&gt; HTML string or HTMLElement (escape hatch)</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field name</td></tr><tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr><tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr><tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>Border around list</td></tr><tr><td><code>empty-title</code></td><td>String</td><td>\\'No items\\'</td><td>Empty state title</td></tr><tr><td><code>empty-description</code></td><td>String</td><td>\\'\\'</td><td>Empty state description</td></tr><tr><td><code>empty-icon</code></td><td>String</td><td>\\'inbox\\'</td><td>Empty state icon</td></tr></tbody></table> </div> </section> <section> <h2 class="pdx-txt-heading section-heading">Slots</h2> <div class="options-table"> <table><thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead><tbody><tr><td><code>item</code></td><td><code>{ item, index, id }</code></td><td>Custom item template. Priority: slot &gt; render-item &gt; default.</td></tr><tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr></tbody></table> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">List</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-list&gt;</code> — data-bound list. Supports static arrays, DataSource,\\n      custom item templates, loading overlay, empty state, clickable items, dividers.\\n    </p> <app-demo-comp-list-basic class="demo-section"></app-demo-comp-list-basic> <app-demo-comp-list-data-source class="demo-section"></app-demo-comp-list-data-source> <app-demo-comp-list-empty class="demo-section"></app-demo-comp-list-empty> <app-demo-comp-list-slot-template class="demo-section"></app-demo-comp-list-slot-template> <app-demo-comp-list-custom-empty class="demo-section"></app-demo-comp-list-custom-empty> <app-demo-comp-list-rich-item class="demo-section"></app-demo-comp-list-rich-item> <app-demo-comp-list-pagination class="demo-section"></app-demo-comp-list-pagination> <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper> <section> <h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"> <table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr><tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field name</td></tr><tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr><tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr><tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>Border around list</td></tr><tr><td><code>empty-title</code></td><td>String</td><td>\\'No items\\'</td><td>Empty state title</td></tr><tr><td><code>empty-description</code></td><td>String</td><td>\\'\\'</td><td>Empty state description</td></tr><tr><td><code>empty-icon</code></td><td>String</td><td>\\'inbox\\'</td><td>Empty state icon</td></tr></tbody></table> </div> </section> <section> <h2 class="pdx-txt-heading section-heading">Slots</h2> <div class="options-table"> <table><thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead><tbody><tr><td><code>item</code></td><td><code>{ item, index, id }</code></td><td>Custom item template, a snippet or the scoped slot; without it, the item\\'s first text field.</td></tr><tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr></tbody></table> </div> </section> </div> '));
 component('app-comp-list', {
   props: {},
   setup(ctx) {
@@ -22970,16 +22970,18 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qyjb19");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-qyjb19"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-qyjb19]) to ([data-pdx-root] \\u003E *) {:scope .demo-container { max-width: 600px; }\\n  :scope .event-log { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }\\n}";
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-qyjb19], [data-pdx-qyjb19-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-container, :where(:not([data-pdx-qyjb19])):scope:is(.demo-container) { max-width: 600px; }\\n  :scope .basic-row, :where(:not([data-pdx-qyjb19])):scope:is(.basic-row) { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }\\n  :scope .basic-role, :where(:not([data-pdx-qyjb19])):scope:is(.basic-role) { color: var(--pdx-color-muted); margin-left: auto; font-size: var(--pdx-text-xs); }\\n  :scope .event-log, :where(:not([data-pdx-qyjb19])):scope:is(.event-log) { margin-top: var(--pdx-space-sm); padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-sm); max-width: 600px; }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic (Static Array)</h2> <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array with a render function.</p> <div class="demo-container"> <pdx-list clickable dividers></pdx-list> </div> <div class="event-log pdx-txt-mono pdx-txt-small" id="list-log"><!----></div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" :render-item="renderUser" clickable dividers\\n  @pdx-click="onUserClick"&gt;\\n&lt;/pdx-list&gt;\\n\\n// renderUser = (user) =&gt; {\\n//   return \\'&lt;strong&gt;\\' + user.name + \\'&lt;/strong&gt; — \\' + user.role;\\n// }</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el3.nextSibling.nextSibling;const __t6=__el5.firstChild;return [__el4,__t6];};
+const __blk0=staticBlock(staticMarkup(' <div class="basic-row" data-pdx-qyjb19-in><strong data-pdx-qyjb19-in><!----></strong><span class="basic-role" data-pdx-qyjb19-in><!----></span></div> '));
+const __walk0=(r)=>{const __el6=r.firstChild.nextSibling;const __el7=__el6.firstChild;const __t8=__el7.firstChild;const __el9=__el7.nextSibling;const __t10=__el9.firstChild;return [__t8,__t10];};
+const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Basic (Static Array)</h2> <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array, each item drawn by the <code>item</code> slot.</p> <div class="demo-container"> <pdx-list clickable dividers> <!----> </pdx-list> </div> <div class="event-log pdx-txt-mono pdx-txt-small" id="list-log"><!----></div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" clickable dividers @pdx-click="onUserClick"&gt;\\n  &lt;slot name="item" let:item&gt;\\n    &lt;strong&gt;{item.name}&lt;/strong&gt; {item.role}\\n  &lt;/slot&gt;\\n&lt;/pdx-list&gt;</code></pre> </details> </section> '));
+const __walk1=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;const __m11=__el5.firstChild.nextSibling;const __el12=__el4.nextSibling.nextSibling;const __t13=__el12.firstChild;return [__el5,__m11,__t13];};
 component('app-demo-comp-list-basic', {
   props: {},
   setup(ctx) {
@@ -22993,25 +22995,24 @@ const basicItems = [
     ];
     
     
-    function renderBasicItem(userItem) {
-      return '<strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);margin-left:auto;font-size:0.8rem">' + userItem.role + '</span>';
-    }
-    
     function onItemClick(evt) {
       __listLog.setRaw('Clicked: ' + evt.detail.item.name + ' (id: ' + evt.detail.id + ')');
     }
     ctx.el.setAttribute('data-pdx-qyjb19', '');
-    return { basicItems, renderBasicItem, onItemClick, listLog: __listLog };
+    return { basicItems, onItemClick, listLog: __listLog };
   },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el4,__t6]=__walk0(__frag);
-    let __el4w_items = {}; effect(() => { const __b = ctx.basicItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_render_item = {}; effect(() => { const __b = ctx.renderBasicItem; if (Object.is(__b, __el4w_render_item)) return; __el4w_render_item = __b; assignBoundProperty(__el4, "renderItem", __b); });
-    __el4.addEventListener('pdx-click', safeHandler(batchHandler(ctx.onItemClick), ctx.el?.tagName?.toLowerCase(), 'pdx-click'));
-    bindInterpolation(__t6,()=>ctx.listLog());
+  render: (ctx) => {
+    const __pdxSlot_item_0 = (__scope) => { const { item } = __scope; const __frag=__blk0();const [__t8,__t10]=__walk0(__frag);bindInterpolation(__t8,()=>item.name);bindInterpolation(__t10,()=>item.role);return __frag; };
+    return (() => {
+    const __frag=__blk1();
+    const [__el5,__m11,__t13]=__walk1(__frag);
+    let __el5w_items = {}; effect(() => { const __b = ctx.basicItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
+    __el5.addEventListener('pdx-click', safeHandler(batchHandler(ctx.onItemClick), ctx.el?.tagName?.toLowerCase(), 'pdx-click'));
+    __m11.replaceWith(slotCarrier('item', __pdxSlot_item_0));
+    bindInterpolation(__t13,()=>ctx.listLog());
     return __frag;
-  })(),
+  })();
+  },
 });
 "
 `;
@@ -23056,16 +23057,18 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, createDataSource, effect, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, createDataSource, effect, safeHandler, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-bfkm1f");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-bfkm1f"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-bfkm1f]) to ([data-pdx-root] \\u003E *) {:scope .demo-container { max-width: 600px; }\\n}";
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-bfkm1f], [data-pdx-bfkm1f-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-container, :where(:not([data-pdx-bfkm1f])):scope:is(.demo-container) { max-width: 600px; }\\n  :scope .ds-row, :where(:not([data-pdx-bfkm1f])):scope:is(.ds-row) { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }\\n  :scope .ds-email, :where(:not([data-pdx-bfkm1f])):scope:is(.ds-email) { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }\\n  :scope .ds-role, :where(:not([data-pdx-bfkm1f])):scope:is(.ds-role) { margin-left: auto; font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">With DataSource + Loading</h2> <p class="pdx-txt-small pdx-ink-muted">Simulates a 1.5s fetch. Shows loading overlay, then data.</p> <div class="demo-container"> <pdx-list clickable dividers id="ds-list"></pdx-list> </div> <button class="pdx-btn pdx-outline pdx-btn-xs" style="margin-top: var(--pdx-space-sm)">Reload</button> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: {\\n    read: () =&gt; fetch(\\'/api/users\\').then(r =&gt; r.json()),\\n  },\\n  autoLoad: true,\\n});\\n\\nfunction renderUser(user) {\\n  return \\'&lt;pdx-icon name="user"&gt;&lt;/pdx-icon&gt;\\'\\n    + \\'&lt;span&gt;\\' + user.name + \\'&lt;/span&gt;\\'\\n    + \\'&lt;span class="role"&gt;\\' + user.role + \\'&lt;/span&gt;\\';\\n}\\n\\n&lt;pdx-list :source="ds" :render-item="renderUser"\\n  clickable dividers&gt;\\n&lt;/pdx-list&gt;</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el3.nextSibling.nextSibling;return [__el4,__el5];};
+const __blk0=staticBlock(staticMarkup(' <div class="ds-row" data-pdx-bfkm1f-in> <pdx-icon name="user" size="16" data-pdx-bfkm1f-in></pdx-icon> <span data-pdx-bfkm1f-in><!----></span> <span class="ds-email" data-pdx-bfkm1f-in><!----></span> <span class="ds-role" data-pdx-bfkm1f-in><!----></span> </div> '));
+const __walk0=(r)=>{const __el5=r.firstChild.nextSibling;const __el7=__el5.firstChild.nextSibling.nextSibling.nextSibling;const __t8=__el7.firstChild;const __el9=__el7.nextSibling.nextSibling;const __t10=__el9.firstChild;const __el11=__el9.nextSibling.nextSibling;const __t12=__el11.firstChild;return [__t8,__t10,__t12];};
+const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">With DataSource + Loading</h2> <p class="pdx-txt-small pdx-ink-muted">Simulates a 1.5s fetch. Shows loading overlay, then data.</p> <div class="demo-container"> <pdx-list clickable dividers id="ds-list"> <!----> </pdx-list> </div> <button class="pdx-btn pdx-outline pdx-btn-xs" style="margin-top: var(--pdx-space-sm)">Reload</button> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: {\\n    read: () =&gt; fetch(\\'/api/users\\').then(r =&gt; r.json()),\\n  },\\n  autoLoad: true,\\n});\\n\\n&lt;pdx-list :source="ds" clickable dividers&gt;\\n  &lt;slot name="item" let:item&gt;\\n    &lt;span&gt;{item.name}&lt;/span&gt; &lt;span class="role"&gt;{item.role}&lt;/span&gt;\\n  &lt;/slot&gt;\\n&lt;/pdx-list&gt;</code></pre> </details> </section> '));
+const __walk1=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __m13=__el4.firstChild.nextSibling;const __el14=__el3.nextSibling.nextSibling;return [__el4,__m13,__el14];};
 component('app-demo-comp-list-data-source', {
   props: {},
   setup(ctx) {
@@ -23092,24 +23095,23 @@ component('app-demo-comp-list-data-source', {
     });
     
     
-    function renderUserItem(userItem) {
-      return '<pdx-icon name="user" size="16" style="display:inline-flex"></pdx-icon><span>' + userItem.name + '</span><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.75rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.role + '</span>';
-    }
-    
     function reloadDS() {
       fakeDS.refresh();
     }
     ctx.el.setAttribute('data-pdx-bfkm1f', '');
-    return { fakeUsers, fakeDS, renderUserItem, reloadDS };
+    return { fakeUsers, fakeDS, reloadDS };
   },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el4,__el5]=__walk0(__frag);
+  render: (ctx) => {
+    const __pdxSlot_item_0 = (__scope) => { const { item } = __scope; const __frag=__blk0();const [__t8,__t10,__t12]=__walk0(__frag);bindInterpolation(__t8,()=>item.name);bindInterpolation(__t10,()=>item.email);bindInterpolation(__t12,()=>item.role);return __frag; };
+    return (() => {
+    const __frag=__blk1();
+    const [__el4,__m13,__el14]=__walk1(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.fakeDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
-    let __el4w_render_item = {}; effect(() => { const __b = ctx.renderUserItem; if (Object.is(__b, __el4w_render_item)) return; __el4w_render_item = __b; assignBoundProperty(__el4, "renderItem", __b); });
-    __el5.addEventListener('click', safeHandler(batchHandler(ctx.reloadDS), ctx.el?.tagName?.toLowerCase(), 'click'));
+    __m13.replaceWith(slotCarrier('item', __pdxSlot_item_0));
+    __el14.addEventListener('click', safeHandler(batchHandler(ctx.reloadDS), ctx.el?.tagName?.toLowerCase(), 'click'));
     return __frag;
-  })(),
+  })();
+  },
 });
 "
 `;
@@ -23120,7 +23122,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">pdx-data-source Wrapper</h2> <p class="pdx-txt-small pdx-ink-muted">Zero wiring: <code>pdx-data-source</code> provides DataSource to both List and Pagination via context. No explicit <code>:source</code> needed.</p> <details class="source-block"> <summary>Source (Pattern)</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-data-source url="/api/users" :page-size="5"&gt;\\n  &lt;pdx-list :render-item="renderUser" clickable dividers&gt;\\n  &lt;/pdx-list&gt;\\n  &lt;pdx-pagination&gt;&lt;/pdx-pagination&gt;\\n&lt;/pdx-data-source&gt;\\n\\n// Both components auto-inject the DataSource from context.\\n// Pagination reads total/page, List reads data/isLoading.\\n// Page change → DataSource.setPage() → List auto-reloads.</code></pre> </details> </section> '));
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">pdx-data-source Wrapper</h2> <p class="pdx-txt-small pdx-ink-muted">Zero wiring: <code>pdx-data-source</code> provides DataSource to both List and Pagination via context. No explicit <code>:source</code> needed.</p> <details class="source-block"> <summary>Source (Pattern)</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-data-source url="/api/users" :page-size="5"&gt;\\n  &lt;pdx-list clickable dividers&gt;\\n    &lt;slot name="item" let:item&gt;{item.name}&lt;/slot&gt;\\n  &lt;/pdx-list&gt;\\n  &lt;pdx-pagination&gt;&lt;/pdx-pagination&gt;\\n&lt;/pdx-data-source&gt;\\n\\n// Both components auto-inject the DataSource from context.\\n// Pagination reads total/page, List reads data/isLoading.\\n// Page change → DataSource.setPage() → List auto-reloads.</code></pre> </details> </section> '));
 component('app-demo-comp-list-data-source-wrapper', {
   props: {},
   setup(ctx) {
@@ -23169,16 +23171,18 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, createDataSource, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, batchHandler, bindInterpolation, component, computed, createDataSource, effect, safeHandler, signal, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-qkqj8x");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-qkqj8x"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-qkqj8x]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n  :scope .demo-container { max-width: 600px; }\\n}";
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-qkqj8x], [data-pdx-qkqj8x-in]) to ([data-pdx-root] \\u003E *) {:scope .page, :where(:not([data-pdx-qkqj8x])):scope:is(.page) { }\\n  :scope .demo-container, :where(:not([data-pdx-qkqj8x])):scope:is(.demo-container) { max-width: 600px; }\\n  :scope .paged-row, :where(:not([data-pdx-qkqj8x])):scope:is(.paged-row) { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }\\n  :scope .paged-id, :where(:not([data-pdx-qkqj8x])):scope:is(.paged-id) { min-width: 28px; color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }\\n  :scope .paged-email, :where(:not([data-pdx-qkqj8x])):scope:is(.paged-email) { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }\\n  :scope .paged-dept, :where(:not([data-pdx-qkqj8x])):scope:is(.paged-dept) { margin-left: auto; font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2> <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p> <div class="demo-container"> <pdx-list dividers bordered id="paged-list"></pdx-list> </div> <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)"> <span class="pdx-txt-small pdx-ink-muted" id="paged-info"><!----></span> <pdx-pagination id="paged-pagination"></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: fakePagedTransport,\\n  pageSize: 5,\\n  autoLoad: true,\\n});\\n\\n&lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;\\n&lt;pdx-pagination :total="ds.total()" :pageSize="5"\\n  :page="ds.page()" @page-change="onPage"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el3.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;const __t7=__el6.firstChild;const __el8=__el6.nextSibling.nextSibling;return [__el4,__t7,__el8];};
+const __blk0=staticBlock(staticMarkup(' <div class="paged-row" data-pdx-qkqj8x-in> <span class="paged-id" data-pdx-qkqj8x-in>#<!----></span> <strong data-pdx-qkqj8x-in><!----></strong> <span class="paged-email" data-pdx-qkqj8x-in><!----></span> <span class="paged-dept" data-pdx-qkqj8x-in><!----></span> </div> '));
+const __walk0=(r)=>{const __el5=r.firstChild.nextSibling;const __el6=__el5.firstChild.nextSibling;const __t7=__el6.firstChild.nextSibling;const __el8=__el6.nextSibling.nextSibling;const __t9=__el8.firstChild;const __el10=__el8.nextSibling.nextSibling;const __t11=__el10.firstChild;const __el12=__el10.nextSibling.nextSibling;const __t13=__el12.firstChild;return [__t7,__t9,__t11,__t13];};
+const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2> <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p> <div class="demo-container"> <pdx-list dividers bordered id="paged-list"> <!----> </pdx-list> </div> <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)"> <span class="pdx-txt-small pdx-ink-muted" id="paged-info"><!----></span> <pdx-pagination id="paged-pagination"></pdx-pagination> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>const ds = createDataSource({\\n  transport: fakePagedTransport,\\n  pageSize: 5,\\n  autoLoad: true,\\n});\\n\\n&lt;pdx-list :source="ds"&gt;\\n  &lt;slot name="item" let:item&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;&lt;/slot&gt;\\n&lt;/pdx-list&gt;\\n&lt;pdx-pagination :total="ds.total()" :pageSize="5"\\n  :page="ds.page()" @page-change="onPage"&gt;\\n&lt;/pdx-pagination&gt;</code></pre> </details> </section> '));
+const __walk1=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __m14=__el4.firstChild.nextSibling;const __el15=__el3.nextSibling.nextSibling;const __el16=__el15.firstChild.nextSibling;const __t17=__el16.firstChild;const __el18=__el16.nextSibling.nextSibling;return [__el4,__m14,__t17,__el18];};
 component('app-demo-comp-list-pagination', {
   props: {},
   setup(ctx) {
@@ -23222,10 +23226,6 @@ component('app-demo-comp-list-pagination', {
     function onPageChange(evt) {
       pagedDS.setPage(evt.detail.value);
     }
-    
-    function renderPagedItem(userItem) {
-      return '<span style="min-width:28px;color:var(--pdx-color-muted);font-size:0.75rem">#' + userItem.id + '</span><strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.dept + '</span>';
-    }
     ctx.track(() => {
   const loading = pagedDS.isLoading();
   const total = pagedDS.total();
@@ -23233,22 +23233,25 @@ component('app-demo-comp-list-pagination', {
   const dataLen = pagedDS.data().length;
   __pagedTotal.setRaw(total);
   __pagedPage.setRaw(pageNum);
-}, { name: "demo-comp-list-pagination.pdx:56" });
+}, { name: "demo-comp-list-pagination.pdx:67" });
     ctx.el.setAttribute('data-pdx-qkqj8x', '');
-    return { allUsers, pagedDS, pagedTotal: __pagedTotal, pagedPage: __pagedPage, pagedInfo, onPageChange, renderPagedItem };
+    return { allUsers, pagedDS, pagedTotal: __pagedTotal, pagedPage: __pagedPage, pagedInfo, onPageChange };
   },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el4,__t7,__el8]=__walk0(__frag);
+  render: (ctx) => {
+    const __pdxSlot_item_0 = (__scope) => { const { item } = __scope; const __frag=__blk0();const [__t7,__t9,__t11,__t13]=__walk0(__frag);bindInterpolation(__t7,()=>item.id);bindInterpolation(__t9,()=>item.name);bindInterpolation(__t11,()=>item.email);bindInterpolation(__t13,()=>item.dept);return __frag; };
+    return (() => {
+    const __frag=__blk1();
+    const [__el4,__m14,__t17,__el18]=__walk1(__frag);
     let __el4w_source = {}; effect(() => { const __b = ctx.pagedDS; if (Object.is(__b, __el4w_source)) return; __el4w_source = __b; assignBoundProperty(__el4, "source", __b); });
-    let __el4w_render_item = {}; effect(() => { const __b = ctx.renderPagedItem; if (Object.is(__b, __el4w_render_item)) return; __el4w_render_item = __b; assignBoundProperty(__el4, "renderItem", __b); });
-    bindInterpolation(__t7,()=>ctx.pagedInfo());
-    let __el8w_total = {}; effect(() => { const __b = ctx.pagedTotal(); if (Object.is(__b, __el8w_total)) return; __el8w_total = __b; assignBoundProperty(__el8, "total", __b); });
-    { assignBoundProperty(__el8, "pageSize", 5); }
-    let __el8w_page = {}; effect(() => { const __b = ctx.pagedPage(); if (Object.is(__b, __el8w_page)) return; __el8w_page = __b; assignBoundProperty(__el8, "page", __b); });
-    __el8.addEventListener('page-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'page-change'));
+    __m14.replaceWith(slotCarrier('item', __pdxSlot_item_0));
+    bindInterpolation(__t17,()=>ctx.pagedInfo());
+    let __el18w_total = {}; effect(() => { const __b = ctx.pagedTotal(); if (Object.is(__b, __el18w_total)) return; __el18w_total = __b; assignBoundProperty(__el18, "total", __b); });
+    { assignBoundProperty(__el18, "pageSize", 5); }
+    let __el18w_page = {}; effect(() => { const __b = ctx.pagedPage(); if (Object.is(__b, __el18w_page)) return; __el18w_page = __b; assignBoundProperty(__el18, "page", __b); });
+    __el18.addEventListener('page-change', safeHandler(batchHandler(ctx.onPageChange), ctx.el?.tagName?.toLowerCase(), 'page-change'));
     return __frag;
-  })(),
+  })();
+  },
 });
 "
 `;
@@ -23257,16 +23260,18 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { assignBoundProperty, bindInterpolation, component, effect, interpolationText, slotCarrier, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-lfpd5z");
   if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-lfpd5z"; document.head.appendChild(__pdx_style); }
-  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-lfpd5z]) to ([data-pdx-root] \\u003E *) {:scope .demo-container { max-width: 600px; }\\n}";
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-lfpd5z], [data-pdx-lfpd5z-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-container, :where(:not([data-pdx-lfpd5z])):scope:is(.demo-container) { max-width: 600px; }\\n  :scope .rich-row, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-row) { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }\\n  :scope .rich-avatar, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-avatar) { width: 32px; height: 32px; border-radius: 50%; background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); display: flex; align-items: center; justify-content: center; font-size: var(--pdx-text-xs); font-weight: 600; flex-shrink: 0; }\\n  :scope .rich-who, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-who) { flex: 1; min-width: 0; }\\n  :scope .rich-name, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-name) { font-weight: 500; }\\n  :scope .rich-role, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-role) { font-size: var(--pdx-text-xs); color: var(--pdx-color-muted); }\\n  :scope .rich-status, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-status) { font-size: var(--pdx-text-xs); display: flex; align-items: center; gap: 4px; }\\n  :scope .rich-dot, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-dot) { width: 6px; height: 6px; border-radius: 50%; background: var(--pdx-color-muted); }\\n  :scope .rich-active, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-active) { background: var(--pdx-color-success); }\\n  :scope .rich-away, :where(:not([data-pdx-lfpd5z])):scope:is(.rich-away) { background: var(--pdx-color-warning); }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Rich Item Template</h2> <p class="pdx-txt-small pdx-ink-muted">Avatar + name + role + badge layout.</p> <div class="demo-container"> <pdx-list dividers></pdx-list> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>function renderRichItem(user) {\\n  const statusColor = user.status === \\'Active\\'\\n    ? \\'var(--pdx-color-success)\\' : \\'var(--pdx-color-muted)\\';\\n  return \\'&lt;div class="avatar"&gt;\\' + user.initials + \\'&lt;/div&gt;\\'\\n    + \\'&lt;div&gt;&lt;strong&gt;\\' + user.name + \\'&lt;/strong&gt;\\'\\n    + \\'&lt;div class="role"&gt;\\' + user.role + \\'&lt;/div&gt;&lt;/div&gt;\\'\\n    + \\'&lt;span class="status"&gt;\\' + user.status + \\'&lt;/span&gt;\\';\\n}\\n\\n&lt;pdx-list :items="richItems"\\n  :render-item="renderRichItem" dividers&gt;\\n&lt;/pdx-list&gt;</code></pre> </details> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;return [__el4];};
+const __blk0=staticBlock(staticMarkup(' <div class="rich-row" data-pdx-lfpd5z-in> <div class="rich-avatar" data-pdx-lfpd5z-in><!----></div> <div class="rich-who" data-pdx-lfpd5z-in> <div class="rich-name" data-pdx-lfpd5z-in><!----></div> <div class="rich-role" data-pdx-lfpd5z-in><!----></div> </div> <span class="rich-status" data-pdx-lfpd5z-in><span data-pdx-lfpd5z-in></span><!----></span> </div> '));
+const __walk0=(r)=>{const __el5=r.firstChild.nextSibling;const __el6=__el5.firstChild.nextSibling;const __t7=__el6.firstChild;const __el8=__el6.nextSibling.nextSibling;const __el9=__el8.firstChild.nextSibling;const __t10=__el9.firstChild;const __el11=__el9.nextSibling.nextSibling;const __t12=__el11.firstChild;const __el13=__el8.nextSibling.nextSibling;const __el14=__el13.firstChild;const __t15=__el14.nextSibling;return [__t7,__t10,__t12,__el14,__t15];};
+const __blk1=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Rich Item Template</h2> <p class="pdx-txt-small pdx-ink-muted">Avatar + name + role + badge layout.</p> <div class="demo-container"> <pdx-list dividers> <!----> </pdx-list> </div> <details class="source-block"> <summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="richItems" dividers&gt;\\n  &lt;slot name="item" let:item&gt;\\n    &lt;div class="avatar"&gt;{item.initials}&lt;/div&gt;\\n    &lt;div&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;\\n      &lt;div class="role"&gt;{item.role}&lt;/div&gt;&lt;/div&gt;\\n    &lt;span class="status"&gt;{item.status}&lt;/span&gt;\\n  &lt;/slot&gt;\\n&lt;/pdx-list&gt;</code></pre> </details> </section> '));
+const __walk1=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __m16=__el4.firstChild.nextSibling;return [__el4,__m16];};
 component('app-demo-comp-list-rich-item', {
   props: {},
   setup(ctx) {
@@ -23276,22 +23281,19 @@ const richItems = [
       { id: 3, name: 'Carol White', role: 'Design', status: 'Away', initials: 'CW' },
       { id: 4, name: 'David Brown', role: 'PM', status: 'Offline', initials: 'DB' },
     ];
-    
-    
-    function renderRichItem(userItem) {
-      const statusColor = userItem.status === 'Active' ? 'var(--pdx-color-success)' : userItem.status === 'Away' ? 'var(--pdx-color-warning)' : 'var(--pdx-color-muted)';
-      return '<div style="width:32px;height:32px;border-radius:50%;background:var(--pdx-color-primary);color:var(--pdx-color-primary-text);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:600;flex-shrink:0">' + userItem.initials + '</div><div style="flex:1;min-width:0"><div style="font-weight:500">' + userItem.name + '</div><div style="font-size:0.75rem;color:var(--pdx-color-muted)">' + userItem.role + '</div></div><span style="font-size:0.7rem;display:flex;align-items:center;gap:4px"><span style="width:6px;height:6px;border-radius:50%;background:' + statusColor + '"></span>' + userItem.status + '</span>';
-    }
     ctx.el.setAttribute('data-pdx-lfpd5z', '');
-    return { richItems, renderRichItem };
+    return { richItems };
   },
-  render: (ctx) => (() => {
-    const __frag=__blk0();
-    const [__el4]=__walk0(__frag);
+  render: (ctx) => {
+    const __pdxSlot_item_0 = (__scope) => { const { item } = __scope; const __frag=__blk0();const [__t7,__t10,__t12,__el14,__t15]=__walk0(__frag);bindInterpolation(__t7,()=>item.initials);bindInterpolation(__t10,()=>item.name);bindInterpolation(__t12,()=>item.role);effect(()=>{__el14.className=interpolationText('rich-dot rich-' + item.status.toLowerCase());});bindInterpolation(__t15,()=>item.status);return __frag; };
+    return (() => {
+    const __frag=__blk1();
+    const [__el4,__m16]=__walk1(__frag);
     let __el4w_items = {}; effect(() => { const __b = ctx.richItems; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
-    let __el4w_render_item = {}; effect(() => { const __b = ctx.renderRichItem; if (Object.is(__b, __el4w_render_item)) return; __el4w_render_item = __b; assignBoundProperty(__el4, "renderItem", __b); });
+    __m16.replaceWith(slotCarrier('item', __pdxSlot_item_0));
     return __frag;
-  })(),
+  })();
+  },
 });
 "
 `;

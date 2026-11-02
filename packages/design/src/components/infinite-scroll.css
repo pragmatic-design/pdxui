@@ -1,6 +1,7 @@
-/* pdx-infinite-scroll — Infinite scroll container */
+/* pdx-infinite-scroll — Infinite scroll container. Its conditions are custom states of the host
+   (#292): the pdx-infinite-scroll-root class it wrote there is gone. */
 
-.pdx-infinite-scroll-root {
+pdx-infinite-scroll {
   position: relative;
   display: block;
 }

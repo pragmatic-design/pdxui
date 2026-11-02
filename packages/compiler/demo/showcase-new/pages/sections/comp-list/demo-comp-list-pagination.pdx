@@ -3,7 +3,16 @@
     <h2 class="pdx-txt-heading section-heading">DataSource + Pagination</h2>
     <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p>
     <div class="demo-container">
-      <pdx-list :source="pagedDS" :render-item="renderPagedItem" dividers bordered id="paged-list"></pdx-list>
+      <pdx-list :source="pagedDS" dividers bordered id="paged-list">
+        <slot name="item" let:item>
+          <div class="paged-row">
+            <span class="paged-id">#{{ item.id }}</span>
+            <strong>{{ item.name }}</strong>
+            <span class="paged-email">{{ item.email }}</span>
+            <span class="paged-dept">{{ item.dept }}</span>
+          </div>
+        </slot>
+      </pdx-list>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)">
       <span class="pdx-txt-small pdx-ink-muted" id="paged-info">{{ pagedInfo }}</span>
@@ -17,7 +26,9 @@
   autoLoad: true,
 });
 
-&lt;pdx-list :source="ds" :render-item="renderItem"&gt;&lt;/pdx-list&gt;
+&lt;pdx-list :source="ds"&gt;
+  &lt;slot name="item" let:item&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;&lt;/slot&gt;
+&lt;/pdx-list&gt;
 &lt;pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage"&gt;
 &lt;/pdx-pagination&gt;</code></pre>
@@ -69,14 +80,14 @@ const pagedInfo = $derived(pagedDS.isLoading()
 function onPageChange(evt) {
   pagedDS.setPage(evt.detail.value);
 }
-
-function renderPagedItem(userItem) {
-  return '<span style="min-width:28px;color:var(--pdx-color-muted);font-size:0.75rem">#' + userItem.id + '</span><strong>' + userItem.name + '</strong><span style="color:var(--pdx-color-muted);font-size:0.8rem">' + userItem.email + '</span><span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;border-radius:9999px;background:var(--pdx-color-inset)">' + userItem.dept + '</span>';
-}
 </script>
 
 <style scoped>
   /* Moved here from the page's scoped block: a scoped style stops at nested components (#152). */
   .page { }
   .demo-container { max-width: 600px; }
+  .paged-row { display: flex; align-items: center; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }
+  .paged-id { min-width: 28px; color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }
+  .paged-email { color: var(--pdx-color-muted); font-size: var(--pdx-text-xs); }
+  .paged-dept { margin-left: auto; font-size: var(--pdx-text-xs); padding: 2px 8px; border-radius: 9999px; background: var(--pdx-color-inset); }
 </style>

@@ -10,15 +10,19 @@ move, so the array it owns stays the one source of truth.
 | `items` | — | T[] | `[]` | The data items to render. |
 | `idField` | `idfield` | string | `'id'` | How a row is identified. Empty: the row's index. |
 | `labelField` | `labelfield` | string | `'label'` | What a row shows without an `item` slot, and what names its handle either way. |
-| `axis` | `axis` | string | `'vertical'` | 'vertical' \| 'horizontal' — decides which arrows move, and which way rows shift. |
 | `handle` | `handle` | string | `''` | A selector inside the row that the POINTER may grab. Empty: the rendered handle. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
+| `axis` | `axis` | 'vertical' \| 'horizontal' | `'vertical'` | vertical (the default) or horizontal. |
 
 **Events:** `pdx-reorder` → `detail: { from, to, id }` — Fired on `pdx-reorder`.
 
 **Renders:** roles `list`
 
 **Slot:** `item` — Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index }`. Without either the row shows the item's `label-field`.
+
+**States:** `:state(disabled)` — `disabled` is set: nothing can be moved, and the handles are `aria-disabled`.
+
+**Parts:** `[data-part="list"]` — The `role="list"` `<ul>`, framed.; `[data-part="item"]` — A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`.; `[data-part="handle"]` — A row's handle, the button the pointer grabs and the keyboard moves.; `[data-part="body"]` — A row's content.
 
 
 #### Examples

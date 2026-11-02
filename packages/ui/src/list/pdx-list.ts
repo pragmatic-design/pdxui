@@ -1,5 +1,6 @@
 // pdx-list — Data-bound list component with scoped slot support.
-// Priority: slot template (declarative) > renderItem callback > default renderer.
+// Priority: the `item` snippet or slot > the default renderer. The `renderItem` callback of alpha is
+// gone (#292): the slot is the way.
 // Uses keyed reconciliation (repeat/LIS) instead of innerHTML rebuild.
 //
 // Slot usage:
@@ -11,14 +12,10 @@
 //       <div>No users found</div>
 //     </slot>
 //   </pdx-list>
-//
-// Callback (backward compat):
-//   <pdx-list :items="${users}" :render-item="${renderUser}">
 
 import { component, html, inject, repeatWithSlot, slot, snippetOrSlot } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
-import { sanitizeHTML } from '../shared/sanitize';
 import { uiString } from '../shared/i18n';
 import { defineIcons } from '../icon/icon-map';
 import iconInbox from '../icon/pragmatic/inbox';
@@ -45,12 +42,21 @@ export interface ListItem {
  *
  * @slot item - Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).
  * @slot empty - Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
+ * @csspart list - The `role="list"` container of the items.
+ * @csspart item - An item's row, `role="listitem"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3).
+ * @csspart empty - The empty state.
+ * @csspart overlay - The loading overlay, drawn while the source loads.
+ * @cssstate bordered - `bordered` is set (the default): the list is framed.
+ * @cssstate dividers - `dividers` is set: a rule between items.
+ * @cssstate loading - Its source is pending: the host is `aria-busy` too (A4).
+ * @cssstate empty - It has no items, and is not loading.
  */
 component('pdx-list', {
+    states: ['bordered', 'dividers', 'loading', 'empty'],
+    parts: ['list', 'item', 'empty', 'overlay'],
     props: {
         items: { type: Array, default: null },
         source: { type: Object, default: null },
-        renderItem: { type: Object, default: null },
         idField: { type: String, default: 'id' },
         dividers: { type: Boolean, default: false },
         clickable: { type: Boolean, default: false },
@@ -74,6 +80,7 @@ component('pdx-list', {
 
         /** Show or hide the empty state; the first time it shows its icon, load `pdx-icon`. */
         function showEmpty(show: boolean): void {
+            ctx.state('empty', show);
             if (!emptyEl) return;
             emptyEl.style.display = show ? '' : 'none';
             if (show && emptyEl.querySelector('pdx-icon') && !customElements.get('pdx-icon')) void import('../icon/pdx-icon');
@@ -86,6 +93,7 @@ component('pdx-list', {
          * the host is aria-busy while loading — pdx-block-ui's own rules.
          */
         function showBusy(loading: boolean): void {
+            ctx.state('loading', loading);
             if (!blockEl) return;
             blockEl.classList.toggle('pdx-block-ui-visible', loading);
             if (loading) blockEl.removeAttribute('aria-hidden');
@@ -131,6 +139,7 @@ component('pdx-list', {
             const li = document.createElement('div');
             // Text only, written by the list: `.pdx-list-item-text` lets it be skipped off screen.
             li.className = 'pdx-list-item pdx-list-item-text';
+            li.setAttribute('data-part', 'item');
             if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
             li.setAttribute('role', 'listitem');
             li.setAttribute('data-list-index', String(index));
@@ -139,48 +148,42 @@ component('pdx-list', {
 
             const firstValue = Object.values(record).find(v => typeof v === 'string');
             li.textContent = (firstValue as string) || JSON.stringify(record);
+            markPosition(li, index);
             return li;
         }
 
-        function wrapInListItem(node: Node, item: unknown, index: number): Node {
-            // If the slot/callback already returns a .pdx-list-item, use it directly
-            if (node instanceof HTMLElement && node.classList.contains('pdx-list-item')) {
-                node.setAttribute('role', 'listitem');
-                node.setAttribute('data-list-index', String(index));
-                const idFieldName = ctx.idField() as string;
-                const record = item as Record<string, unknown>;
-                if (record[idFieldName] != null) node.setAttribute('data-list-id', String(record[idFieldName]));
-                if (ctx.clickable()) { node.classList.add('pdx-list-item-clickable'); node.tabIndex = 0; }
-                return node;
-            }
-            // Wrap in standard list item
-            const li = document.createElement('div');
-            li.className = 'pdx-list-item';
-            if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
-            li.setAttribute('role', 'listitem');
-            li.setAttribute('data-list-index', String(index));
-            const idFieldName = ctx.idField() as string;
-            const record = item as Record<string, unknown>;
-            if (record[idFieldName] != null) li.setAttribute('data-list-id', String(record[idFieldName]));
-            li.appendChild(node);
-            return li;
+        /** The source, when it pages: a source of data and loading alone has no total to give. */
+        function pagedSource(ds: DataSource<unknown> | null): Pick<DataSource<unknown>, 'total' | 'page' | 'pageSize'> | null {
+            return ds && typeof ds.total === 'function' && typeof ds.page === 'function' && typeof ds.pageSize === 'function' ? ds : null;
         }
 
-        // Wrap renderItem callback to produce proper list items
-        function callbackRender(item: unknown, index: number): Node {
-            const renderFn = ctx.renderItem() as ((item: unknown, index: number) => HTMLElement | string) | null;
-            if (!renderFn) return defaultRenderItem(item, index);
-            const content = renderFn(item, index);
-            if (typeof content === 'string') {
-                const li = document.createElement('div');
-                li.className = 'pdx-list-item pdx-list-item-text';
-                if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
-                li.setAttribute('role', 'listitem');
-                li.setAttribute('data-list-index', String(index));
-                li.innerHTML = sanitizeHTML(content);
-                return li;
+        /**
+         * A3 (#292): when the list shows part of its source — a page, or the pages loaded so far — each
+         * item says the source's total and its place in it. A list that shows all of its items says
+         * nothing: the count of its items is the set's size. The offset is the page's, unless the
+         * source has accumulated pages (infinite scroll), which start at the first item: an
+         * accumulated set holds more than one page, since a page is appended only after a full one.
+         */
+        function markPositions(): void {
+            if (!listEl) return;
+            const rows = listEl.querySelectorAll<HTMLElement>(':scope > [data-part="item"]');
+            rows.forEach((row, i) => markPosition(row, i));
+        }
+
+        /** One item's place in its source (A3), from the source's total and paging and the items shown. */
+        function markPosition(row: HTMLElement, index: number): void {
+            const ds = pagedSource(resolveDS());
+            const shown = getDataItems().length;
+            const total = ds ? ds.total() : -1;
+            const pageSize = ds ? ds.pageSize() : 0;
+            const offset = ds && pageSize > 0 && shown <= pageSize ? (ds.page() - 1) * pageSize : 0;
+            if (total > shown) {
+                row.setAttribute('aria-setsize', String(total));
+                row.setAttribute('aria-posinset', String(offset + index + 1));
+            } else {
+                row.removeAttribute('aria-setsize');
+                row.removeAttribute('aria-posinset');
             }
-            return wrapInListItem(content, item, index);
         }
 
         // Slot-based render: thin wrapper (role + data attrs only, no padding)
@@ -195,17 +198,20 @@ component('pdx-list', {
             // Structural wrapper: role + data + click, but NO padding (slot controls its own)
             const li = document.createElement('div');
             li.className = 'pdx-list-item pdx-list-item-slot';
+            li.setAttribute('data-part', 'item');
             if (ctx.clickable()) { li.classList.add('pdx-list-item-clickable'); li.tabIndex = 0; }
             li.setAttribute('role', 'listitem');
             li.setAttribute('data-list-index', String(index));
             if (record[idFieldName] != null) li.setAttribute('data-list-id', String(record[idFieldName]));
             li.appendChild(content instanceof DocumentFragment ? content : content);
+            markPosition(li, index);
             return li;
         }
 
         function buildEmptyState(): HTMLElement {
             const el = document.createElement('div');
             el.className = 'pdx-list-empty';
+            el.setAttribute('data-part', 'empty');
             el.style.display = 'none';
 
             const emptySlot = getEmptySlot();
@@ -247,18 +253,9 @@ component('pdx-list', {
             if (!listEl) return;
 
             const idFieldName = ctx.idField() as string;
-            const renderFn = ctx.renderItem() as ((item: unknown, index: number) => HTMLElement | string) | null;
 
-            // Determine effective render function (slot > callback > default)
-            let effectiveRenderFn: (item: unknown, index: number) => Node;
-            const itemSlot = getItemSlot();
-            if (itemSlot) {
-                effectiveRenderFn = slotRender;
-            } else if (renderFn) {
-                effectiveRenderFn = callbackRender;
-            } else {
-                effectiveRenderFn = defaultRenderItem;
-            }
+            // The item snippet or slot, else the default renderer.
+            const effectiveRenderFn: (item: unknown, index: number) => Node = getItemSlot() ? slotRender : defaultRenderItem;
 
             // Use repeatWithSlot for keyed reconciliation
             // We pass null for slotFn since we handle slot wrapping ourselves
@@ -311,10 +308,10 @@ component('pdx-list', {
             void ctx.source();
             const ds = resolveDS();
             if (ds) { void ds.data(); void ds.isLoading(); }
-            void ctx.bordered();
-            void ctx.dividers();
+            // Its looks are states of the host (#292): list.css draws them, and the host carries no class.
+            ctx.state('bordered', !!ctx.bordered());
+            ctx.state('dividers', !!ctx.dividers());
             void ctx.clickable();
-            void ctx.renderItem();
             void ctx.emptyTitle();
             void ctx.emptyDescription();
             void ctx.emptyIcon();
@@ -322,19 +319,18 @@ component('pdx-list', {
 
             const dataItems = getDataItems();
             const loading = isLoading();
+            // What A3 reads, so a new total or page marks the items again.
+            const paged = pagedSource(ds);
+            if (paged) { void paged.total(); void paged.page(); void paged.pageSize(); }
 
             if (!built) {
                 built = true;
                 // ctx.frame: a setup a move destroyed does not build again.
                 ctx.frame(() => {
-                    const bordered = ctx.bordered() as boolean;
-                    const dividers = ctx.dividers() as boolean;
-                    ctx.el.classList.add('pdx-list-root');
-                    if (bordered) ctx.el.classList.add('pdx-list-bordered');
-
                     // Block UI overlay
                     blockEl = document.createElement('div');
                     blockEl.className = 'pdx-block-ui-overlay';
+                    blockEl.setAttribute('data-part', 'overlay');
                     blockEl.setAttribute('aria-hidden', 'true');
                     const spinWrap = document.createElement('div');
                     spinWrap.className = 'pdx-block-ui-spinner';
@@ -351,7 +347,7 @@ component('pdx-list', {
                     // List container
                     listEl = document.createElement('div');
                     listEl.className = 'pdx-list';
-                    if (dividers) listEl.classList.add('pdx-list-dividers');
+                    listEl.setAttribute('data-part', 'list');
                     listEl.setAttribute('role', 'list');
                     listEl.addEventListener('click', onListClick);
                     listEl.addEventListener('keydown', onListKeydown);
@@ -362,14 +358,17 @@ component('pdx-list', {
                     // Initial state
                     showEmpty(dataItems.length === 0 && !loading);
                     showBusy(loading);
+                    markPositions();
                 });
                 return;
             }
 
-            // Update visibility
+            // Update visibility. The items already shown are marked again a frame later, once the
+            // keyed list has placed the rows a new total or page moved (a new row is marked as built).
             requestAnimationFrame(() => {
                 showEmpty(dataItems.length === 0 && !loading);
                 showBusy(loading);
+                requestAnimationFrame(markPositions);
             });
         });
 
