@@ -25,6 +25,12 @@ interface Row {
     alpha?: string[];
     /** What it offers to do, declared with `@capability`. */
     capabilities?: string[];
+    /**
+     * Its events, declared in the descriptor (#138): each name with its typed detail, or undefined for
+     * an event with none. An event only emitted and not declared is in the manifest too, with an
+     * untyped detail such as `{ key, action }`, so the detail is what tells the two apart.
+     */
+    declaredEvents?: Record<string, string | undefined>;
 }
 
 const DONE: Row[] = [
@@ -51,6 +57,29 @@ const DONE: Row[] = [
         // What an agent's page card says it can do (library.md, «Accessibility»).
         capabilities: ['sortable', 'filterable', 'selectable', 'editable'],
     },
+    // Batch 4, the composites: their events declared, their pieces parts, no class on the host.
+    {
+        tag: 'pdx-bulk-actions', models: [], states: [], parts: ['root', 'count', 'action', 'clear'], removed: [],
+        declaredEvents: { 'pdx-action': '{ key: string; action: BulkAction }', 'pdx-clear': undefined },
+    },
+    {
+        tag: 'pdx-edit-drawer', models: [], states: ['busy'], parts: ['header', 'body', 'actions', 'cancel', 'save'], removed: [],
+        declaredEvents: { 'pdx-save': "{ values: Record<string, unknown>; mode: 'edit' | 'create' }", 'pdx-cancel': undefined },
+    },
+    {
+        tag: 'pdx-entity-grid', models: [], states: [], parts: ['toolbar', 'title', 'add'], removed: [],
+        declaredEvents: {
+            'pdx-create': '{ values: Record<string, unknown>; clientId: unknown }',
+            'pdx-update': '{ id: unknown; values: Record<string, unknown> }',
+            'pdx-delete': '{ ids: unknown[]; rows?: Record<string, unknown>[] }',
+            'pdx-bulk': '{ key: string; ids: unknown[] }',
+        },
+    },
+    {
+        tag: 'pdx-relation-picker', models: [], states: [], parts: ['grid', 'foot', 'count', 'create', 'add'], removed: [],
+        declaredEvents: { 'pdx-pick': '{ items: Record<string, unknown>[] }', 'pdx-create': undefined },
+    },
+    { tag: 'pdx-data-source', models: [], states: [], parts: [], removed: [] },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -77,6 +106,11 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
 
     it('records its alpha events', () => {
         expect(decl?.alphaEvents ?? []).toEqual(row.alpha ?? []);
+    });
+
+    it.runIf(row.declaredEvents)('declares its events, each with its typed detail', () => {
+        const byName = Object.fromEntries((decl?.events ?? []).map((e) => [e.name, (e as Named & { detail?: string }).detail]));
+        expect(byName).toEqual(row.declaredEvents);
     });
 
     it('declares its capabilities', () => {

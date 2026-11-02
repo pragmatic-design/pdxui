@@ -38,7 +38,11 @@ A drawer holding a schema-driven form.
 | `validate()` | Runs validation and returns the result. |
 | `isDirty()` | Whether anything in the form was changed since it opened.  A drawer is not a modal — Escape and the ✕ close it, and both are easy to hit by accident — so a host has to ask before discarding, and only when there is something to discard. The host cannot work this out for itself: the panel is re-parented to <body>, so a query under the host finds no form, and comparing `getValues()` with the record races the keystroke that has not reached the form model yet. The form carries this itself. |
 
-**Events:** `pdx-cancel` → `detail: {}` — Fired when cancelled.; `pdx-save` → `detail: { values, mode }` — Fired on `pdx-save`.
+**Events:** `pdx-cancel` — Cancel, Escape, the ✕, the backdrop: the host decides, and closes by setting `open`.; `pdx-save` → `detail: { values: Record<string, unknown>; mode: 'edit' | 'create' }` — Save, with a valid form: the values, and whether the drawer was editing or creating.
+
+**States:** `:state(busy)` — `busy`: the parent is saving, and the footer buttons are disabled.
+
+**Parts:** `[data-part="header"]` — The title above the form.; `[data-part="body"]` — The form, built from `schema`.; `[data-part="actions"]` — The footer row of Cancel and Save.; `[data-part="cancel"]` — The Cancel button.; `[data-part="save"]` — The Save button.
 
 
 #### Examples

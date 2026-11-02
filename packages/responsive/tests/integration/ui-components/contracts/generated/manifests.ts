@@ -16,6 +16,7 @@ import { blockUi } from '../../../../manifests/block-ui.manifest';
 import { bottomNav } from '../../../../manifests/bottom-nav.manifest';
 import { bottomSheet } from '../../../../manifests/bottom-sheet.manifest';
 import { breadcrumb } from '../../../../manifests/breadcrumb.manifest';
+import { bulkActions } from '../../../../manifests/bulk-actions.manifest';
 import { buttonGroup } from '../../../../manifests/button-group.manifest';
 import { button } from '../../../../manifests/button.manifest';
 import { calendar } from '../../../../manifests/calendar.manifest';
@@ -31,13 +32,16 @@ import { colorPicker } from '../../../../manifests/color-picker.manifest';
 import { command } from '../../../../manifests/command.manifest';
 import { contextMenu } from '../../../../manifests/context-menu.manifest';
 import { dataGrid } from '../../../../manifests/data-grid.manifest';
+import { dataSource } from '../../../../manifests/data-source.manifest';
 import { datePicker } from '../../../../manifests/date-picker.manifest';
 import { descriptionList } from '../../../../manifests/description-list.manifest';
 import { dialog } from '../../../../manifests/dialog.manifest';
 import { divider } from '../../../../manifests/divider.manifest';
 import { drawer } from '../../../../manifests/drawer.manifest';
 import { dropdownMenu } from '../../../../manifests/dropdown-menu.manifest';
+import { editDrawer } from '../../../../manifests/edit-drawer.manifest';
 import { emptyState } from '../../../../manifests/empty-state.manifest';
+import { entityGrid } from '../../../../manifests/entity-grid.manifest';
 import { errorBoundary } from '../../../../manifests/error-boundary.manifest';
 import { fab } from '../../../../manifests/fab.manifest';
 import { fieldGroup } from '../../../../manifests/field-group.manifest';
@@ -172,7 +176,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, emptyState, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -249,6 +253,8 @@ export const scenarioPage: Record<string, string> = {
     "breadcrumb-basic": "tier-6",
     "breadcrumb-element": "tier-6",
     "breadcrumb-collapsed": "tier-6",
+    "bulk-actions-basic": "tier-5b",
+    "bulk-actions-empty": "tier-5b",
     "button-group-basic": "tier-1a",
     "button-variants": "tier-1a",
     "button-sizes": "tier-1a",
@@ -348,6 +354,7 @@ export const scenarioPage: Record<string, string> = {
     "data-grid-empty": "tier-6",
     "data-grid-row-menu": "tier-6",
     "data-grid-header-names": "tier-6",
+    "data-source-list": "tier-5b",
     "date-picker-closed": "tier-3",
     "date-picker-open": "tier-3",
     "date-picker-month-open": "tier-3",
@@ -383,8 +390,12 @@ export const scenarioPage: Record<string, string> = {
     "dd-open": "tier-1a",
     "dd-custom-trigger": "tier-1a",
     "dd-disabled": "tier-1a",
+    "edit-drawer-open": "tier-5b",
+    "edit-drawer-busy": "tier-5b",
     "empty-state-basic": "tier-5b",
     "empty-state-action": "tier-5b",
+    "entity-grid-basic": "tier-5b",
+    "entity-grid-readonly": "tier-5b",
     "error-boundary-fallback": "tier-6",
     "fab-basic": "tier-6",
     "fab-sizes": "tier-6",

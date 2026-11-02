@@ -1,0 +1,58 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Relation Picker</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-relation-picker&gt;</code> — pick one or more existing rows for a many-to-many relation,
+      and ask for a new one to be created. A data grid with multiple selection over a
+      <code>DataSource</code>, and a footer: "Add selected" emits the rows, "create" asks the page.
+    </p>
+
+    <app-demo-comp-relation-picker-basic class="demo-section"></app-demo-comp-relation-picker-basic>
+
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Props, events &amp; parts</h2>
+      <table class="options-table">
+        <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>The rows to pick from, handed to the grid.</td></tr>
+          <tr><td><code>columns</code></td><td>ColumnDef[]</td><td>[]</td><td>The grid's columns.</td></tr>
+          <tr><td><code>id-field</code></td><td>string</td><td>'id'</td><td>The field that identifies a row.</td></tr>
+          <tr><td><code>searchable</code></td><td>boolean</td><td>false</td><td>A filter field under each column header, narrowing the source.</td></tr>
+          <tr><td><code>add-label</code></td><td>string</td><td>'Add selected'</td><td>The add button's text.</td></tr>
+          <tr><td><code>create-label</code></td><td>string</td><td>''</td><td>With a text, a create button that emits <code>pdx-create</code>.</td></tr>
+        </tbody>
+      </table>
+      <table class="options-table" style="margin-top: var(--pdx-space-lg);">
+        <thead><tr><th>Event</th><th>Detail</th></tr></thead>
+        <tbody>
+          <tr><td><code>pdx-pick</code></td><td>{ items } — the rows picked</td></tr>
+          <tr><td><code>pdx-create</code></td><td>—</td></tr>
+        </tbody>
+      </table>
+      <table class="options-table" style="margin-top: var(--pdx-space-lg);">
+        <thead><tr><th>Part</th><th>What it is</th></tr></thead>
+        <tbody>
+          <tr><td><code>grid</code></td><td>The data grid the rows are picked from.</td></tr>
+          <tr><td><code>foot</code></td><td>The footer under it.</td></tr>
+          <tr><td><code>count</code></td><td>"n selected", empty while nothing is picked.</td></tr>
+          <tr><td><code>create</code></td><td>The create button.</td></tr>
+          <tr><td><code>add</code></td><td>The add button, disabled while nothing is picked.</td></tr>
+        </tbody>
+      </table>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/relation-picker';
+@title 'Relation Picker — PDX Components';
+</script>
+
+<style scoped>
+.page { max-width: 1280px; }
+.intro { margin-bottom: var(--pdx-space-2xl); }
+section { margin-bottom: var(--pdx-space-3xl); }
+.section-heading { margin-bottom: var(--pdx-space-xs); }
+.options-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+.options-table th, .options-table td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--pdx-color-border); }
+</style>

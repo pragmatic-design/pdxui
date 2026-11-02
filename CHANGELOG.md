@@ -394,6 +394,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** the data composites take the beta contract (#292). `pdx-bulk-actions`,
+  `pdx-edit-drawer`, `pdx-entity-grid` and `pdx-relation-picker` declare their events, which stay on
+  the host and carry typed details; `pdx-clear` and `pdx-cancel` carry none, where they carried `{}`.
+  Their pieces are parts, `pdx-edit-drawer`'s `busy` is `:state(busy)`, and `pdx-relation-picker`
+  no longer adds a class to its host. `pdx-bulk-actions`, `pdx-data-source`, `pdx-edit-drawer` and
+  `pdx-entity-grid` are certified as themselves, and `pdx-relation-picker` has a showcase page.
 - **Breaking:** `pdx-data-grid` takes the beta contract (#292). Its rows' events are one listener per
   type on its body: a grid of 200 rows adds no more listeners than a grid of 2, where it added 2801
   against 29. What a column's `format` returns is shown as text: markup goes through a typed cell

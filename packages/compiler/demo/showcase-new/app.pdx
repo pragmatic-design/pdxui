@@ -209,6 +209,7 @@ const componentItems = [
       { key: '/components/entity-grid', label: 'EntityGrid' },
       { key: '/components/edit-drawer', label: 'EditDrawer' },
       { key: '/components/bulk-actions', label: 'BulkActions' },
+      { key: '/components/relation-picker', label: 'RelationPicker' },
     ]},
     { key: '/components/filter-builder', label: 'FilterBuilder', icon: 'filter' },
     { key: 'chart', label: 'Chart', icon: 'bar-chart-2', children: [

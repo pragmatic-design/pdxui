@@ -2,7 +2,7 @@
 // Visible while `count > 0`; renders "{count} selected" + one button per action + a clear button.
 // Event-driven and standalone: the parent feeds `count`/`actions` and reacts to pdx-action/pdx-clear.
 
-import { component, html, generatedId } from '@pdxui/core';
+import { component, html, generatedId, event } from '@pdxui/core';
 
 /** An action's icon, loading `pdx-icon` the first time one is named: a bar of labels never pays for the set. */
 function actionIcon(name: string) {
@@ -58,6 +58,11 @@ const BAR_STYLE = 'align-items:center;gap:var(--pdx-space-md);flex-wrap:wrap;max
 /**
  * A contextual action bar for a multi-selection: while items are selected it shows how many, a
  * button per action and a clear button.
+ *
+ * @csspart root - The bar, a `role="toolbar"`, shown while `count` is above 0.
+ * @csspart count - The "{count} selected" label.
+ * @csspart action - An action's button.
+ * @csspart clear - The clear button, while `clearable`.
  */
 component('pdx-bulk-actions', {
     props: {
@@ -70,6 +75,14 @@ component('pdx-bulk-actions', {
         /** Show the trailing clear (✕) button. */
         clearable: { type: Boolean, default: true },
     },
+    // Declared (#138): they stay on the host, which the parent listens on.
+    events: {
+        /** An action was pressed; an `aria-disabled` one emits nothing. */
+        'pdx-action': event<{ key: string; action: BulkAction }>(),
+        /** The clear button was pressed: the parent clears its selection. */
+        'pdx-clear': event<void>(),
+    },
+    parts: ['root', 'count', 'action', 'clear'],
     setup(ctx) {
         const barId = generatedId('pdx-bulk');
 
@@ -93,17 +106,17 @@ component('pdx-bulk-actions', {
         function reasons(): BulkAction[] {
             return (ctx.actions() as BulkAction[]).filter((a) => reasonId(a) !== null);
         }
-        function clear(): void { ctx.emit('pdx-clear', {}); }
+        function clear(): void { ctx.emit('pdx-clear'); }
         return { countLabel, onAction, reasonId, reasons, clear };
     },
     render: (ctx) => html`
-        <div class="pdx-bulk-actions" role="toolbar" :aria-label="${() => uiString('bulk-actions', 'label')}"
+        <div class="pdx-bulk-actions" data-part="root" role="toolbar" :aria-label="${() => uiString('bulk-actions', 'label')}"
             :hidden="${() => (ctx.count() as number) <= 0}"
             :style="${() => ((ctx.count() as number) > 0 ? 'display:inline-flex;' : 'display:none;') + BAR_STYLE}">
-            <span class="pdx-bulk-count" style="font-weight:600;font-size:.85rem;white-space:nowrap">${() => ctx.countLabel()}</span>
+            <span class="pdx-bulk-count" data-part="count" style="font-weight:600;font-size:.85rem;white-space:nowrap">${() => ctx.countLabel()}</span>
             <div class="pdx-bulk-buttons" style="display:inline-flex;flex-wrap:wrap;align-items:center;gap:var(--pdx-space-xs)">
                 ${() => (ctx.actions() as BulkAction[]).map((a) => html`
-                    <button type="button" size="sm" class="pdx-bulk-action ${a.tone ? 'pdx-' + a.tone : 'pdx-ghost'}"
+                    <button type="button" size="sm" data-part="action" class="pdx-bulk-action ${a.tone ? 'pdx-' + a.tone : 'pdx-ghost'}"
                         :aria-disabled="${() => (a.disabled ? 'true' : null)}"
                         :aria-describedby="${() => ctx.reasonId(a)}"
                         style="display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap"
@@ -116,7 +129,7 @@ component('pdx-bulk-actions', {
                 <span id="${ctx.reasonId(a)}" style="${HIDDEN_STYLE}">${a.disabledReason}</span>
             `)}
             ${() => ctx.clearable() ? html`
-                <button type="button" size="sm" class="pdx-bulk-clear pdx-ghost" :aria-label="${() => uiString('bulk-actions', 'clearSelection')}"
+                <button type="button" size="sm" data-part="clear" class="pdx-bulk-clear pdx-ghost" :aria-label="${() => uiString('bulk-actions', 'clearSelection')}"
                     style="margin-inline-start:auto;flex:0 0 auto"
                     @click="${() => ctx.clear()}">✕</button>
             ` : ''}

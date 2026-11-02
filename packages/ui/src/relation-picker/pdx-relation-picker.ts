@@ -8,7 +8,7 @@
 //   el.addEventListener('pdx-pick',   e => link(e.detail.items));   // [{...row}, ...]
 //   el.addEventListener('pdx-create', () => openCreateForm());
 
-import { component, html } from '@pdxui/core';
+import { component, html, event } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import '../data-grid/pdx-data-grid';
 import '../button/pdx-button';
@@ -19,6 +19,12 @@ import '@pdxui/design/components/relation-picker';
 /**
  * Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new
  * one to be created.
+ *
+ * @csspart grid - The data grid the rows are picked from.
+ * @csspart foot - The footer under the grid.
+ * @csspart count - "n selected", empty while nothing is picked.
+ * @csspart create - The create button, with `create-label`.
+ * @csspart add - The add button, disabled while nothing is picked.
  */
 component('pdx-relation-picker', {
     props: {
@@ -43,6 +49,14 @@ component('pdx-relation-picker', {
          */
         searchable: { type: Boolean, default: false },
     },
+    // Declared (#138): they stay on the host, which the parent listens on.
+    events: {
+        /** Add was pressed with rows picked: the rows themselves. */
+        'pdx-pick': event<{ items: Record<string, unknown>[] }>(),
+        /** The create button was pressed: the parent opens its form. */
+        'pdx-create': event<void>(),
+    },
+    parts: ['grid', 'foot', 'count', 'create', 'add'],
     setup(ctx) {
         let built = false;
         let selected: Record<string, unknown>[] = [];
@@ -66,10 +80,11 @@ component('pdx-relation-picker', {
 
         function build(source: unknown, columns: unknown, createLabel: string, addLabel: string,
             idField: string, searchable: boolean): void {
+            // No class on the host (#292): the design CSS selects the element itself.
             ctx.el.innerHTML = '';
-            ctx.el.classList.add('pdx-relation-picker');
 
             const grid = document.createElement('pdx-data-grid') as HTMLElement & { source: unknown; columns: unknown };
+            grid.dataset.part = 'grid';
             grid.setAttribute('selection', 'multiple');
             grid.setAttribute('hover', '');
             grid.setAttribute('id-field', idField);
@@ -88,7 +103,9 @@ component('pdx-relation-picker', {
             ctx.el.appendChild(grid);
 
             const foot = document.createElement('div'); foot.className = 'pdx-relation-picker-foot';
+            foot.dataset.part = 'foot';
             const count = document.createElement('span'); count.className = 'pdx-relation-picker-count';
+            count.dataset.part = 'count';
             foot.appendChild(count);
 
             // Labels through pdx-button's `label` prop. `textContent` on a connected pdx-button
@@ -97,6 +114,7 @@ component('pdx-relation-picker', {
                 const createBtn = document.createElement('pdx-button');
                 createBtn.setAttribute('variant', 'ghost'); createBtn.setAttribute('size', 'sm');
                 createBtn.setAttribute('label', createLabel);
+                createBtn.dataset.part = 'create';
                 createBtn.addEventListener('click', () => ctx.emit('pdx-create'));
                 foot.appendChild(createBtn);
                 _createBtn = createBtn;
@@ -105,6 +123,7 @@ component('pdx-relation-picker', {
             const addBtn = document.createElement('pdx-button');
             addBtn.setAttribute('variant', 'primary'); addBtn.setAttribute('size', 'sm');
             addBtn.setAttribute('label', addLabel);
+            addBtn.dataset.part = 'add';
             addBtn.addEventListener('click', () => { if (selected.length) ctx.emit('pdx-pick', { items: selected }); });
             foot.appendChild(addBtn);
             _addBtn = addBtn;

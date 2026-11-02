@@ -3542,16 +3542,15 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-action`.",
-              "detail": "{ key, action }"
+              "description": "An action was pressed; an `aria-disabled` one emits nothing.",
+              "detail": "{ key: string; action: BulkAction }"
             },
             {
               "name": "pdx-clear",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the value is cleared.",
-              "detail": "{}"
+              "description": "The clear button was pressed: the parent clears its selection."
             }
           ],
           "roles": [
@@ -3597,6 +3596,24 @@
                 "disabled?: boolean",
                 "disabledReason?: string"
               ]
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The bar, a `role=\"toolbar\"`, shown while `count` is above 0."
+            },
+            {
+              "name": "count",
+              "description": "The \"{count} selected\" label."
+            },
+            {
+              "name": "action",
+              "description": "An action's button."
+            },
+            {
+              "name": "clear",
+              "description": "The clear button, while `clearable`."
             }
           ]
         }
@@ -11675,16 +11692,15 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-save`.",
-              "detail": "{ values, mode }"
+              "description": "Save, with a valid form: the values, and whether the drawer was editing or creating.",
+              "detail": "{ values: Record<string, unknown>; mode: 'edit' | 'create' }"
             },
             {
               "name": "pdx-cancel",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when cancelled.",
-              "detail": "{}"
+              "description": "Cancel, Escape, the ✕, the backdrop: the host decides, and closes by setting `open`."
             }
           ],
           "attributes": [
@@ -11749,6 +11765,34 @@
                 "text": "boolean"
               },
               "default": "false"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "header",
+              "description": "The title above the form."
+            },
+            {
+              "name": "body",
+              "description": "The form, built from `schema`."
+            },
+            {
+              "name": "actions",
+              "description": "The footer row of Cancel and Save."
+            },
+            {
+              "name": "cancel",
+              "description": "The Cancel button."
+            },
+            {
+              "name": "save",
+              "description": "The Save button."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "busy",
+              "description": "`busy`: the parent is saving, and the footer buttons are disabled."
             }
           ]
         }
@@ -12098,36 +12142,36 @@
           ],
           "events": [
             {
-              "name": "pdx-delete",
+              "name": "pdx-create",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-delete`.",
-              "detail": "{ ids, rows } | { ids }"
+              "description": "A record was created in the drawer. `clientId` names its optimistic row until the app's id replaces it.",
+              "detail": "{ values: Record<string, unknown>; clientId: unknown }"
             },
             {
               "name": "pdx-update",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-update`.",
-              "detail": "{ id, values }"
+              "description": "A record was edited in the drawer.",
+              "detail": "{ id: unknown; values: Record<string, unknown> }"
             },
             {
-              "name": "pdx-create",
+              "name": "pdx-delete",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when a new item is created.",
-              "detail": "{ values, clientId }"
+              "description": "Rows were deleted: one from its row's button (with the row), or the selection from the bulk bar.",
+              "detail": "{ ids: unknown[]; rows?: Record<string, unknown>[] }"
             },
             {
               "name": "pdx-bulk",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-bulk`.",
-              "detail": "{ key, ids }"
+              "description": "One of `bulkActions` was pressed, over the selection.",
+              "detail": "{ key: string; ids: unknown[] }"
             }
           ],
           "attributes": [
@@ -12199,6 +12243,20 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "toolbar",
+              "description": "The row above the grid: the title and the create button."
+            },
+            {
+              "name": "title",
+              "description": "The title, from `title`."
+            },
+            {
+              "name": "add",
+              "description": "The create button, while there is a `schema` and the grid is not `readonly`."
             }
           ]
         }
@@ -22309,19 +22367,19 @@
           ],
           "events": [
             {
-              "name": "pdx-create",
-              "type": {
-                "text": "CustomEvent"
-              },
-              "description": "Fired when a new item is created."
-            },
-            {
               "name": "pdx-pick",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-pick`.",
-              "detail": "{ items }"
+              "description": "Add was pressed with rows picked: the rows themselves.",
+              "detail": "{ items: Record<string, unknown>[] }"
+            },
+            {
+              "name": "pdx-create",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The create button was pressed: the parent opens its form."
             }
           ],
           "attributes": [
@@ -22358,6 +22416,28 @@
                 "text": "boolean"
               },
               "default": "false"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "grid",
+              "description": "The data grid the rows are picked from."
+            },
+            {
+              "name": "foot",
+              "description": "The footer under the grid."
+            },
+            {
+              "name": "count",
+              "description": "\"n selected\", empty while nothing is picked."
+            },
+            {
+              "name": "create",
+              "description": "The create button, with `create-label`."
+            },
+            {
+              "name": "add",
+              "description": "The add button, disabled while nothing is picked."
             }
           ]
         }

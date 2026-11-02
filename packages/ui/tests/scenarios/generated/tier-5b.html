@@ -29,8 +29,12 @@
         // Each component carries its own CSS, so that an app ships the styles of what it renders.
         // A barrel import here would register every component and load every stylesheet, and a
         // scenario could then rely on a neighbour's import without anything noticing.
+        import '@pdxui/ui/bulk-actions';
+        import '@pdxui/ui/data-source';
         import '@pdxui/ui/description-list';
+        import '@pdxui/ui/edit-drawer';
         import '@pdxui/ui/empty-state';
+        import '@pdxui/ui/entity-grid';
         import '@pdxui/ui/infinite-scroll';
         import '@pdxui/ui/list';
         import '@pdxui/ui/relation-picker';
@@ -60,6 +64,98 @@
         // The per-scenario setup scripts (state markup cannot express). Run after the CEs upgrade
         // and after their initial render, before signalling ready.
         const __setups = {
+        "bulk-actions-basic": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="ba"]');
+    if (host) host.actions = [
+        { key: 'archive', label: 'Archive' },
+        { key: 'delete', label: 'Delete', tone: 'danger' },
+        { key: 'export', label: 'Export', disabled: true, disabledReason: 'You need the export permission' },
+    ];
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+ },
+        "bulk-actions-empty": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="ba0"]');
+    if (host) host.actions = [
+        { key: 'archive', label: 'Archive' },
+        { key: 'delete', label: 'Delete', tone: 'danger' },
+        { key: 'export', label: 'Export', disabled: true, disabledReason: 'You need the export permission' },
+    ];
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+ },
+        "data-source-list": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="ds"]');
+    const list = document.querySelector('section:not([hidden]) [data-test="ds-list"]');
+    if (host && list) {
+        // The name first: a list with no item slot shows a record's first value.
+        host.data = [
+            { name: 'Northwind Traders', id: 1 },
+            { name: 'Contoso', id: 2 },
+            { name: 'Fabrikam', id: 3 },
+        ];
+        // The source is created in the provider's track; it is read once it exists.
+        await new Promise(r => requestAnimationFrame(r));
+        list.source = host.source();
+    }
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r))));
+ },
+        "edit-drawer-open": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="ed"]');
+    if (host) {
+        host.schema = { fields: [
+            { name: 'name', label: 'Name', type: 'text', required: true },
+            { name: 'email', label: 'Email', type: 'email' },
+        ] };
+        host.value = { id: 7, name: 'Alice Johnson', email: 'alice@example.com' };
+        host.open = true;
+    }
+    // The form is built a frame after the drawer opens, and its fields a frame after that.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(
+        () => requestAnimationFrame(() => requestAnimationFrame(r)))));
+ },
+        "edit-drawer-busy": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="edb"]');
+    if (host) {
+        host.schema = { fields: [
+            { name: 'name', label: 'Name', type: 'text', required: true },
+            { name: 'email', label: 'Email', type: 'email' },
+        ] };
+        host.value = { id: 7, name: 'Alice Johnson', email: 'alice@example.com' };
+        host.open = true;
+    }
+    // The form is built a frame after the drawer opens, and its fields a frame after that.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(
+        () => requestAnimationFrame(() => requestAnimationFrame(r)))));
+ },
+        "entity-grid-basic": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="eg"]');
+    if (host) {
+        host.schema = { fields: [{ name: 'name', label: 'Name', type: 'text', required: true }] };
+        host.columns = [{ field: 'name', header: 'Name' }];
+        host.data = [
+            { id: 1, name: 'Northwind Traders' },
+            { id: 2, name: 'Contoso' },
+            { id: 3, name: 'Fabrikam' },
+        ];
+    }
+    // The grid builds a frame after it gets its columns, its rows a frame after that.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(
+        () => requestAnimationFrame(() => requestAnimationFrame(r)))));
+ },
+        "entity-grid-readonly": async function () { 
+    const host = document.querySelector('section:not([hidden]) [data-test="egr"]');
+    if (host) {
+        host.schema = { fields: [{ name: 'name', label: 'Name', type: 'text', required: true }] };
+        host.columns = [{ field: 'name', header: 'Name' }];
+        host.data = [
+            { id: 1, name: 'Northwind Traders' },
+            { id: 2, name: 'Contoso' },
+            { id: 3, name: 'Fabrikam' },
+        ];
+    }
+    // The grid builds a frame after it gets its columns, its rows a frame after that.
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(
+        () => requestAnimationFrame(() => requestAnimationFrame(r)))));
+ },
         "relation-picker-basic": async function () { 
     const { createDataSource, arrayTransport } = await import('@pdxui/core');
     const rows = [
@@ -104,7 +200,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-description-list","pdx-empty-state","pdx-infinite-scroll","pdx-list","pdx-relation-picker","pdx-relative-time","pdx-sortable-list","pdx-statistic","pdx-timeline","pdx-transfer","pdx-tree"];
+        const __tags = ["pdx-bulk-actions","pdx-data-source","pdx-description-list","pdx-edit-drawer","pdx-empty-state","pdx-entity-grid","pdx-infinite-scroll","pdx-list","pdx-relation-picker","pdx-relative-time","pdx-sortable-list","pdx-statistic","pdx-timeline","pdx-transfer","pdx-tree"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -118,6 +214,29 @@
     </script>
 </head>
 <body>
+
+    <section data-scenario="bulk-actions-basic">
+        <h3>Bulk actions — 3 selected, three actions, one refused with a reason</h3>
+        <div data-test="box" style="width: 360px;">
+                    <pdx-bulk-actions data-test="ba" count="3"></pdx-bulk-actions>
+                </div>
+    </section>
+
+    <section data-scenario="bulk-actions-empty">
+        <h3>Bulk actions — nothing selected: no bar</h3>
+        <div style="width: 360px;">
+                    <pdx-bulk-actions data-test="ba0" count="0"></pdx-bulk-actions>
+                </div>
+    </section>
+
+    <section data-scenario="data-source-list">
+        <h3>Data source — three static rows, fed to a list</h3>
+        <div data-test="box" style="width: 360px;">
+                    <pdx-data-source data-test="ds">
+                        <pdx-list data-test="ds-list" aria-label="Customers"></pdx-list>
+                    </pdx-data-source>
+                </div>
+    </section>
 
     <section data-scenario="description-list-basic">
         <h3>Description List — Basic (horizontal, single column)</h3>
@@ -178,6 +297,16 @@
         <pdx-description-list data-test="variant" size="lg"></pdx-description-list>
     </section>
 
+    <section data-scenario="edit-drawer-open">
+        <h3>Edit drawer — open on a record</h3>
+        <pdx-edit-drawer data-test="ed"></pdx-edit-drawer>
+    </section>
+
+    <section data-scenario="edit-drawer-busy">
+        <h3>Edit drawer — open, the parent saving</h3>
+        <pdx-edit-drawer data-test="edb" busy></pdx-edit-drawer>
+    </section>
+
     <section data-scenario="empty-state-basic">
         <h3>Empty State — Basic (icon + title + desc)</h3>
         <div style="max-width: 480px;">
@@ -200,6 +329,20 @@
                         description="Create your first item to get started."
                         action-label="Create item">
                     </pdx-empty-state>
+                </div>
+    </section>
+
+    <section data-scenario="entity-grid-basic">
+        <h3>Entity grid — three customers, create and row actions</h3>
+        <div style="width: 640px;">
+                    <pdx-entity-grid data-test="eg" title="Customers"></pdx-entity-grid>
+                </div>
+    </section>
+
+    <section data-scenario="entity-grid-readonly">
+        <h3>Entity grid — readonly: no create, no row actions</h3>
+        <div style="width: 640px;">
+                    <pdx-entity-grid data-test="egr" title="Customers" readonly></pdx-entity-grid>
                 </div>
     </section>
 

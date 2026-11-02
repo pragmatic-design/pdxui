@@ -29,7 +29,9 @@ proves nothing a select would not.
 | `idField` | `idfield` | string | `'id'` |  |
 | `searchable` | `searchable` | boolean | `false` | Let the user narrow the list — the one thing a picker exists for.  It turns on the grid's FILTER ROW: a field under each column header, debounced, which calls `source.setFilter()`. So the narrowing happens where the rows come from and a picker over ten thousand customers works the same as one over fourteen.  ⚠️ Not the grid's toolbar, which is what this issue first proposed: measured, the toolbar is a reload button, filter chips and "+ Add Filter" — a filter builder, not a search. Whether the picker should also carry a search field of its OWN, above the grid and across every column, is a design decision and is still open. |
 
-**Events:** `pdx-create` — Fired when a new item is created.; `pdx-pick` → `detail: { items }` — Fired on `pdx-pick`.
+**Events:** `pdx-create` — The create button was pressed: the parent opens its form.; `pdx-pick` → `detail: { items: Record<string, unknown>[] }` — Add was pressed with rows picked: the rows themselves.
+
+**Parts:** `[data-part="grid"]` — The data grid the rows are picked from.; `[data-part="foot"]` — The footer under the grid.; `[data-part="count"]` — "n selected", empty while nothing is picked.; `[data-part="create"]` — The create button, with `create-label`.; `[data-part="add"]` — The add button, disabled while nothing is picked.
 
 
 #### Examples
@@ -38,12 +40,22 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Multi-select + create** — Select rows, then "Add selected". The result is shown below. _(from the live demo)_
+**Pick, or create** — Check rows, then "Add selected": the picker emits them. "New city" asks the page to open its own form. `searchable` puts a filter field under each column header.
+
+```js
+const source = createDataSource({ data: rows, pageSize: 0 });
+const columns = [
+  { field: 'code', header: 'Code', width: 120 },
+  { field: 'name', header: 'Name' },
+];
+```
 
 ```html
-<div style="height: 320px; border: 1px solid var(--pdx-color-border); border-radius: 10px; padding: .75rem;">
-  <pdx-relation-picker :source="source" :columns="columns" create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate"></pdx-relation-picker>
-</div>
-<p class="pdx-txt-small pdx-ink-muted" style="margin-top: .6rem;">{{ result }}</p>
+<pdx-relation-picker :source="source" :columns="columns" searchable
+  create-label="New city" @pdx-pick="onPick" @pdx-create="onCreate" />
+```
+
+```js
+function onPick(e) { link(e.detail.items); }   // the rows themselves
 ```
 

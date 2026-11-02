@@ -5,7 +5,7 @@
 // The form-template is mounted IMPERATIVELY (schema/form set as properties), matching pdx-auto-form:
 // passing an object prop down two declarative-binding levels does not reliably reach the child.
 
-import { component, html, createFormFromSchema } from '@pdxui/core';
+import { component, html, createFormFromSchema, event } from '@pdxui/core';
 import type { FormSchema, Form } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // Self-contained: ensure the composed custom elements are registered when this entry is imported
@@ -19,6 +19,14 @@ import '@pdxui/design/components/drawer';
 /**
  * A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits
  * `pdx-save` with the values.
+ *
+ * @csspart header - The title above the form.
+ * @csspart body - The form, built from `schema`.
+ * @csspart actions - The footer row of Cancel and Save.
+ * @csspart cancel - The Cancel button.
+ * @csspart save - The Save button.
+ *
+ * @cssstate busy - `busy`: the parent is saving, and the footer buttons are disabled.
  */
 component('pdx-edit-drawer', {
     props: {
@@ -40,6 +48,16 @@ component('pdx-edit-drawer', {
         /** Disable the footer buttons while the parent is persisting. */
         busy: { type: Boolean, default: false },
     },
+    // `open` stays a prop the host writes: the drawer never writes it, it asks with `pdx-cancel`.
+    // Declared (#138): they stay on the host, which the parent listens on.
+    events: {
+        /** Save, with a valid form: the values, and whether the drawer was editing or creating. */
+        'pdx-save': event<{ values: Record<string, unknown>; mode: 'edit' | 'create' }>(),
+        /** Cancel, Escape, the ✕, the backdrop: the host decides, and closes by setting `open`. */
+        'pdx-cancel': event<void>(),
+    },
+    states: ['busy'],
+    parts: ['header', 'body', 'actions', 'cancel', 'save'],
     setup(ctx) {
         let formInstance: Form<Record<string, unknown>> | null = null;
         /** This drawer's form body — the drawer may move its panel to <body>, so it is kept, not re-queried. */
@@ -117,7 +135,9 @@ component('pdx-edit-drawer', {
                 target.focus();
             });
         }
-        function cancel(): void { ctx.emit('pdx-cancel', {}); }
+        function cancel(): void { ctx.emit('pdx-cancel'); }
+
+        ctx.track(() => { ctx.state('busy', !!ctx.busy()); });
 
         /**
          * The inner drawer trying to close itself — Escape, the ✕, the backdrop, a swipe.
@@ -161,15 +181,15 @@ component('pdx-edit-drawer', {
         <pdx-drawer :open="${ctx.open}" :position="${ctx.position}" :size="${ctx.size}"
             :label="${() => ctx.resolvedTitle()}" @pdx-before-close="${(e: Event) => ctx.onBeforeClose(e)}">
             <div class="pdx-edit-drawer" style="display:flex;flex-direction:column;height:100%;gap:var(--pdx-space-md)">
-                <header style="font-weight:600" class="pdx-txt-heading">${() => ctx.resolvedTitle()}</header>
-                <div class="pdx-edit-drawer-body" style="flex:1;overflow:auto;min-height:0"></div>
+                <header style="font-weight:600" class="pdx-txt-heading" data-part="header">${() => ctx.resolvedTitle()}</header>
+                <div class="pdx-edit-drawer-body" data-part="body" style="flex:1;overflow:auto;min-height:0"></div>
             </div>
             <!-- Cancel/Save go in the drawer's own footer slot: the .pdx-drawer-footer provides the full-width
                  separator + padding (no inset border, no extra empty footer below). -->
-            <div slot="footer" style="display:flex;justify-content:flex-end;align-items:center;gap:var(--pdx-space-sm)">
-                <button type="button" size="sm" class="pdx-ghost" :disabled="${ctx.busy}"
+            <div slot="footer" data-part="actions" style="display:flex;justify-content:flex-end;align-items:center;gap:var(--pdx-space-sm)">
+                <button type="button" size="sm" class="pdx-ghost" data-part="cancel" :disabled="${ctx.busy}"
                     @click="${() => ctx.cancel()}">${() => (ctx.cancelLabel() as string) || uiString('edit-drawer', 'cancel')}</button>
-                <button type="button" size="sm" class="pdx-primary" :disabled="${ctx.busy}"
+                <button type="button" size="sm" class="pdx-primary" data-part="save" :disabled="${ctx.busy}"
                     @click="${() => ctx.save()}">${() => (ctx.saveLabel() as string) || uiString('edit-drawer', 'save')}</button>
             </div>
         </pdx-drawer>
