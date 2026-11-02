@@ -50,7 +50,7 @@
           <code>src</code><span>string</span><span>URL to external SVG file</span>
         </div>
         <div class="opt-row">
-          <code>size</code><span>string</span><span>xs(12) sm(16) md(20) lg(24) xl(32)</span>
+          <code>size</code><span>string</span><span>xs(12) sm(16) md(20) lg(24) xl(32), or a number of pixels</span>
         </div>
         <div class="opt-row">
           <code>weight</code><span>string</span><span>thin(1) light(1.5) regular(2) bold(2.5)</span>
@@ -59,7 +59,10 @@
           <code>label</code><span>string</span><span>Accessible name (enables role="img")</span>
         </div>
         <div class="opt-row">
-          <code>rtl</code><span>string</span><span>'mirror' or 'none' (default)</span>
+          <code>rtl</code><span>string</span><span>'mirror' flips it in a right-to-left context; 'none' (default)</span>
+        </div>
+        <div class="opt-row">
+          <code>spin</code><span>boolean</span><span>Turns it, for a loading indicator</span>
         </div>
       </div>
     </section>

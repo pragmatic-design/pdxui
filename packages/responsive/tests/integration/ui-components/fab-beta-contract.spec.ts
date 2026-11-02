@@ -115,7 +115,10 @@ test.describe('open, a read-only state', () => {
 test.describe('parts', () => {
     test('the button is the root part; the dial, an action, its label and the mask are parts', async ({ page }) => {
         await mount(page);
-        const parts = await page.locator(HOST).evaluate((h) => [...h.querySelectorAll('[data-part]')].map((e) => e.getAttribute('data-part')));
+        // Its own parts: the pdx-icon in the button and in each action has a root part of its own.
+        const parts = await page.locator(HOST).evaluate((h) => [...h.querySelectorAll('[data-part]')]
+            .filter((e) => { let p = e.parentElement; while (p && !p.tagName.includes('-')) p = p.parentElement; return p === h; })
+            .map((e) => e.getAttribute('data-part')));
         expect(parts).toEqual(['mask', 'menu', 'item', 'label', 'item', 'label', 'root']);
     });
 });

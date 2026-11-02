@@ -20,8 +20,15 @@ async function mount(page: Page, html: string): Promise<void> {
 }
 
 const frames = (page: Page) => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-const parts = (page: Page, sel: string) => page.locator(sel).evaluate((h) =>
-    [...new Set([...h.querySelectorAll('[data-part]')].map((e) => e.getAttribute('data-part')))].sort());
+/** The element's own parts: not those of a component nested in it, as the pdx-icon its icon part holds. */
+const parts = (page: Page, sel: string) => page.locator(sel).evaluate((h) => {
+    const owner = (e: Element): Element | null => {
+        let p = e.parentElement;
+        while (p && !p.tagName.includes('-')) p = p.parentElement;
+        return p;
+    };
+    return [...new Set([...h.querySelectorAll('[data-part]')].filter((e) => owner(e) === h).map((e) => e.getAttribute('data-part')))].sort();
+});
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=display-a-beta-contract'); });
 

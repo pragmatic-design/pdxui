@@ -137,6 +137,10 @@
       "development": "./src/components/layered/form.css",
       "default": "./dist/components/form.css"
     },
+    "./components/icon": {
+      "development": "./src/components/layered/icon.css",
+      "default": "./dist/components/icon.css"
+    },
     "./components/image": {
       "development": "./src/components/layered/image.css",
       "default": "./dist/components/image.css"

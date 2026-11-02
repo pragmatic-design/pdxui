@@ -402,6 +402,12 @@ semver.
   declares the exposed names on the element, a `$derived` `readonly`, with the type written in the
   declaration (`$signal<T>`, `$derived<T>`, an annotation), `unknown` without one. An exposed reactive
   name no longer raises `PDX_UNUSED_REACTIVE`.
+- **Breaking:** `pdx-icon` takes the beta contract (#291). Its box is the part `[data-part="root"]`
+  (it keeps the `pdx-icon-container` class, which is how the reset sees it), drawn by `icon.css`,
+  which travels with the component, at `--pdx-icon-size`; the component no longer writes its layout,
+  size or spin inline. `spin` is `:state(spin)`, and `rtl="mirror"` is `:state(mirror)`: in a
+  right-to-left context the icon is now drawn flipped — before, it set a `--pdx-icon-rtl` that no rule
+  read, and mirrored nothing.
 - **Breaking:** `pdx-fab` takes the beta contract (#288), the last of the overlay family.
   - **`open()` is `show()`**; `close()` and `toggle()` stay, and `isOpen` is new. `pdx migrate`
     rewrites `open()` on a `:ref` bound on a `pdx-fab`, and flags it on a lookup.

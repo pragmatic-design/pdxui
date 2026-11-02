@@ -6,6 +6,8 @@ import { signal, effect, component, html } from '@pdxui/core';
 import { resolveIcon } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { registerPragmaticResolver } from './pragmatic-resolver';
+// Its styles travel with it: the root's layout and size, the spin and the mirror (#291).
+import '@pdxui/design/components/icon';
 
 // How an imported icon reaches the page: `import check from '@pdxui/ui/icons/check'` is the SVG, and
 // this adds it. The compiler emits the pair for every icon a template names (#47).
@@ -23,8 +25,14 @@ const SIZES: Record<string, number> = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 }
 
 /**
  * An icon drawn as SVG from a registered set, inline markup or a URL, with accessibility built in.
+ *
+ * @csspart root - The box the SVG fills, `--pdx-icon-size` square.
+ * @cssstate spin - `spin` is set: the icon turns.
+ * @cssstate mirror - `rtl="mirror"`: in a right-to-left context the icon is drawn flipped.
  */
 component('pdx-icon', {
+    states: ['spin', 'mirror'],
+    parts: ['root'],
     props: {
         name: { type: String, default: '' },
         set: { type: String, default: '' },
@@ -65,26 +73,11 @@ component('pdx-icon', {
             const sizePx = SIZES[sizeName] ?? (+sizeName > 0 ? +sizeName : 20);
             const labelVal = ctx.label() as string;
             const weightVal = ctx.weight() as string;
-            const rtlVal = ctx.rtl() as string;
 
-            // Sizing
+            // icon.css draws the root at this size, turns it and mirrors it from the states.
             el.style.setProperty('--pdx-icon-size', `${sizePx}px`);
-            el.style.width = `${sizePx}px`;
-            el.style.height = `${sizePx}px`;
-
-            // Spin animation
-            if (ctx.spin()) {
-                el.style.animation = 'pdx-spin 1s linear infinite';
-            } else {
-                el.style.animation = '';
-            }
-
-            // RTL mirroring
-            if (rtlVal === 'mirror') {
-                el.style.setProperty('--pdx-icon-rtl', 'scaleX(-1)');
-            } else {
-                el.style.removeProperty('--pdx-icon-rtl');
-            }
+            ctx.state('spin', !!ctx.spin());
+            ctx.state('mirror', ctx.rtl() === 'mirror');
 
             // ARIA
             if (labelVal) {
@@ -173,10 +166,6 @@ component('pdx-icon', {
         return { containerRef };
     },
     render: (ctx) => html`
-        <span
-            :ref=${ctx.containerRef}
-            class="pdx-icon-container"
-            style="display:inline-flex;align-items:center;justify-content:center;line-height:0;"
-        ></span>
+        <span :ref=${ctx.containerRef} class="pdx-icon-container" data-part="root"></span>
     `,
 });

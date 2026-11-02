@@ -4,15 +4,15 @@
  * Contracts DERIVED by inspecting the source (packages/ui/src/icon/pdx-icon.ts).
  *
  * DOM STRUCTURE (light DOM, no shadow):
- *   <pdx-icon> (host) > <span class="pdx-icon-container"
- *                             style="display:inline-flex;align-items:center;justify-content:center;line-height:0"> > <svg>
- *   In an effect, the container span gets an inline style: width = height = sizePx, plus --pdx-icon-size.
- *   The inner <svg> is normalised to width:100% / height:100% (it fills the container).
+ *   <pdx-icon> (host) > <span data-part="root" class="pdx-icon-container"> > <svg>
+ *   The class is how pdx.reset sees the root, and keeps a page's bare `span { border }` off it.
+ *   icon.css draws the root (inline-flex, centred, `--pdx-icon-size` square); the effect writes only
+ *   `--pdx-icon-size` on it (#291). The inner <svg> is normalised to width:100% / height:100% (it fills
+ *   the root).
  *
- * SIZING (source, SIZES px): xs=12, sm=16, md=20 (default), lg=24, xl=32.
- *   The size is inline on the container span → an INVARIANT on all 13 themes: the design
- *   system does NOT redefine the container's width and height. The hierarchy is sm(16) < md(20) < lg(24)
- *   can be verified mathematically.
+ * SIZING (source, SIZES px): xs=12, sm=16, md=20 (default), lg=24, xl=32, or a number of pixels.
+ *   No theme redefines `--pdx-icon-size` → an INVARIANT on all 13 themes. The hierarchy
+ *   sm(16) < md(20) < lg(24) can be verified mathematically.
  *
  * ARIA (source, effect):
  *   - an EMPTY label (a decorative icon)  → the host: aria-hidden="true", no role, no aria-label.
@@ -66,7 +66,7 @@ export const icon: ComponentManifest = {
             setup: WAIT_ICONS,
         },
         {
-            // (b) SIZES: sm(16) < md(20) < lg(24). The hierarchy is on the container span (inline width/height).
+            // (b) SIZES: sm(16) < md(20) < lg(24). The hierarchy is on the root part.
             id: 'icon-sizes',
             title: 'Icon — Sizes (sm / md / lg)',
             html: `
@@ -85,34 +85,34 @@ export const icon: ComponentManifest = {
             'icon-decorative': {
                 standalone: [
                     {
-                        // The container is inline-flex (an inline style from the component).
-                        selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container',
+                        // The root is inline-flex (icon.css).
+                        selector: 'section:not([hidden]) [data-test="icon-decorative"] [data-part="root"]',
                         description: 'icon container is inline-flex',
                         display: { op: 'is', value: 'inline-flex' },
                     },
                     {
-                        // md (default) → 20px inline. Bound prudente: > 0 e >= 12 (min size = xs).
-                        selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container',
+                        // md (default) → 20px. A cautious bound: >= 12 (the smallest size, xs).
+                        selector: 'section:not([hidden]) [data-test="icon-decorative"] [data-part="root"]',
                         description: 'icon container has positive width (>= 12px)',
                         width: { op: '>=', value: 12 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container',
+                        selector: 'section:not([hidden]) [data-test="icon-decorative"] [data-part="root"]',
                         description: 'icon container has positive height (>= 12px)',
                         height: { op: '>=', value: 12 },
                     },
                 ],
             },
             'icon-sizes': {
-                // The size hierarchy: an invariant on every theme (the size is inline, not from the design system).
+                // The size hierarchy: an invariant on every theme (no theme redefines --pdx-icon-size).
                 composition: [
                     {
                         description: 'size hierarchy: sm < md < lg container size',
                         parent: 'section:not([hidden]) .row',
                         children: {
-                            sm: 'section:not([hidden]) [data-test="icon-sm"] .pdx-icon-container',
-                            md: 'section:not([hidden]) [data-test="icon-md"] .pdx-icon-container',
-                            lg: 'section:not([hidden]) [data-test="icon-lg"] .pdx-icon-container',
+                            sm: 'section:not([hidden]) [data-test="icon-sm"] [data-part="root"]',
+                            md: 'section:not([hidden]) [data-test="icon-md"] [data-part="root"]',
+                            lg: 'section:not([hidden]) [data-test="icon-lg"] [data-part="root"]',
                         },
                         relations: [
                             { description: 'sm width < md width', left: 'sm.width', op: '<', right: 'md.width' },
@@ -124,10 +124,10 @@ export const icon: ComponentManifest = {
                     {
                         // The <svg> is normalised to 100%/100% → it stays contained in the container.
                         description: 'inner svg is contained within the md icon container',
-                        parent: 'section:not([hidden]) [data-test="icon-md"] .pdx-icon-container',
+                        parent: 'section:not([hidden]) [data-test="icon-md"] [data-part="root"]',
                         children: {
-                            container: 'section:not([hidden]) [data-test="icon-md"] .pdx-icon-container',
-                            svg: 'section:not([hidden]) [data-test="icon-md"] .pdx-icon-container svg',
+                            container: 'section:not([hidden]) [data-test="icon-md"] [data-part="root"]',
+                            svg: 'section:not([hidden]) [data-test="icon-md"] [data-part="root"] svg',
                         },
                         relations: [
                             { description: 'svg within container', left: 'svg', op: 'contained-in', right: 'container' },
@@ -152,9 +152,9 @@ export const icon: ComponentManifest = {
     isolation: {
         scenario: 'icon-decorative',
         targets: [
-            // The size (20px for md) is inline on the container → it must resist hostile global CSS.
+            // The size (20px for md) is drawn by icon.css from --pdx-icon-size → it must resist hostile global CSS.
             // It is not font- or transform-driven: the height IS a structural invariant → NO skipHeight.
-            { selector: 'section:not([hidden]) [data-test="icon-decorative"] .pdx-icon-container', tolerancePx: 4 },
+            { selector: 'section:not([hidden]) [data-test="icon-decorative"] [data-part="root"]', tolerancePx: 4 },
         ],
     },
 
