@@ -13,6 +13,10 @@ A form label tied to its control.
 | `description` | `description` | string | `''` | Secondary descriptive text. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl: the label's text size. |
 
+**States:** `:state(required)` — `required`: the label carries the required marker (`--pdx-field-required-marker`).; `:state(optional)` — `optional`: the label says the field is optional.; `:state(disabled)` — `disabled`: the label is dimmed with its control.
+
+**Parts:** `[data-part="root"]` — The `<label>` itself.; `[data-part="description"]` — The description under the label, with `description`.; `[data-part="hint"]` — The hint under the label, with `hint`.
+
 
 #### Examples
 

@@ -1549,6 +1549,22 @@
         {
           "id": "form-actions-end",
           "title": "Form actions — slotted buttons, align end"
+        },
+        {
+          "id": "form-actions-align-end",
+          "title": "pdx-form-actions — align=\"end\""
+        },
+        {
+          "id": "form-actions-align-start",
+          "title": "pdx-form-actions — align=\"start\""
+        },
+        {
+          "id": "form-actions-align-center",
+          "title": "pdx-form-actions — align=\"center\""
+        },
+        {
+          "id": "form-actions-align-between",
+          "title": "pdx-form-actions — align=\"between\""
         }
       ]
     },

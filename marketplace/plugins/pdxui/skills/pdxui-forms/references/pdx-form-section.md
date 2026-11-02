@@ -12,6 +12,10 @@ A titled section within a form.
 
 **Renders:** roles `group`
 
+**States:** `:state(active)` — `active` (the default): the section is shown; a section that is not active is hidden.; `:state(invalid)` — The last `validateSection()` found an error in one of its fields.
+
+**Parts:** `[data-part="root"]` — The `<fieldset>`.; `[data-part="legend"]` — The legend, with `label`.; `[data-part="content"]` — The fields.
+
 
 #### Examples
 

@@ -6,8 +6,12 @@ The submit/cancel action bar.
 |---|---|---|---|---|
 | `submitLabel` | `submitlabel` | string | `''` | Submit button label. Uses i18n registry default if not set. |
 | `resetLabel` | `resetlabel` | string | `''` | Reset button label. Set to 'none' to hide. Uses i18n registry default if not set. |
-| `align` | `align` | string | `'end'` | Alignment: 'start' \| 'center' \| 'end' \| 'between'. Default: 'end'. |
 | `showLoading` | `showloading` | boolean | `true` | Show loading spinner on submit button while submitting. |
+| `align` | `align` | 'end' \| 'start' \| 'center' \| 'between' | `'end'` | Where the buttons sit: end (the default), start, center, or apart. |
+
+**States:** `:state(submitting)` — The form it sits in is submitting; its buttons are disabled meanwhile.
+
+**Parts:** `[data-part="root"]` — The bar.; `[data-part="reset"]` — The reset button, unless `reset-label="none"`.; `[data-part="submit"]` — The submit button.
 
 
 #### Examples
