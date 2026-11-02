@@ -4,7 +4,7 @@
 // the parent can persist. Composes Track A (exposed grid methods), B1 (typed `actions` cell) and
 // B2 (reactive `data` swap).
 
-import { component, html, signal, computed, actions } from '@pdxui/core';
+import { component, html, signal, computed, actions, event } from '@pdxui/core';
 import type { ColumnDef } from '@pdxui/core';
 import type { BulkAction } from '../bulk-actions/pdx-bulk-actions';
 import { uiString, format } from '../shared/i18n';
@@ -42,6 +42,10 @@ function firstTextField(cols: ColumnDef[], idField: string): string | undefined 
 /**
  * A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,
  * and `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.
+ *
+ * @csspart toolbar - The row above the grid: the title and the create button.
+ * @csspart title - The title, from `title`.
+ * @csspart add - The create button, while there is a `schema` and the grid is not `readonly`.
  */
 component('pdx-entity-grid', {
     props: {
@@ -69,6 +73,18 @@ component('pdx-entity-grid', {
          *  the first text column, else the id. */
         rowLabel: { type: String, default: '' },
     },
+    // Declared (#138): they stay on the host, which the app listens on to persist.
+    events: {
+        /** A record was created in the drawer. `clientId` names its optimistic row until the app's id replaces it. */
+        'pdx-create': event<{ values: Record<string, unknown>; clientId: unknown }>(),
+        /** A record was edited in the drawer. */
+        'pdx-update': event<{ id: unknown; values: Record<string, unknown> }>(),
+        /** Rows were deleted: one from its row's button (with the row), or the selection from the bulk bar. */
+        'pdx-delete': event<{ ids: unknown[]; rows?: Record<string, unknown>[] }>(),
+        /** One of `bulkActions` was pressed, over the selection. */
+        'pdx-bulk': event<{ key: string; ids: unknown[] }>(),
+    },
+    parts: ['toolbar', 'title', 'add'],
     setup(ctx) {
         const rows = signal<Row[]>([]);
         const drawerOpen = signal(false);
@@ -217,12 +233,12 @@ component('pdx-entity-grid', {
     },
     render: (ctx) => html`
         <div class="pdx-entity-grid" style="display:flex;flex-direction:column;gap:var(--pdx-space-sm)">
-            <header class="pdx-entity-grid-toolbar"
+            <header class="pdx-entity-grid-toolbar" data-part="toolbar"
                 style="display:flex;align-items:center;justify-content:space-between;gap:var(--pdx-space-md)">
-                <h2 class="pdx-txt-heading" style="margin:0">${ctx.title}</h2>
+                <h2 class="pdx-txt-heading" data-part="title" style="margin:0">${ctx.title}</h2>
                 <div>
                     ${() => ctx.schema() && !ctx.readonly() ? html`
-                        <button type="button" size="sm" class="pdx-primary" @click="${() => ctx.openCreate()}">
+                        <button type="button" size="sm" class="pdx-primary" data-part="add" @click="${() => ctx.openCreate()}">
                             <pdx-icon name="plus" size="16"></pdx-icon> ${() => (ctx.addLabel() as string) || uiString('entity-grid', 'add')}
                         </button>
                     ` : ''}
