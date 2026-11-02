@@ -151,7 +151,9 @@ import '@pdxui/design/components/chip';
 import type { Option, Template, Row, SourceElement } from './select-types';
 
 /** The selection (#481): the option's value, or null; in multiple mode the array of values. */
-@model value: string = null { form };
+// What the form submits (#751): with nothing chosen a native select with an empty placeholder submits
+// an empty entry, where the model (null) would submit none; in multiple mode, every selected value.
+@model value: string = null { form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md, xs, sm, lg, xl } = md; }
 @part root;
@@ -713,14 +715,6 @@ function focusTarget(): HTMLElement | null {
 function focus() { focusTarget()?.focus(); }
 function blur() { focusTarget()?.blur(); }
 function clear() { clearSelection(); }
-
-// ESCAPE HATCH: what the form submits is not the model. With nothing chosen a native select with an
-// empty placeholder submits an empty entry, and the model (null) submits none; `{ form }` has no
-// option for it.
-ctx.formValue?.(() => {
-  const sel = Array.from(selectedValues);
-  return multiple ? sel : (sel.length > 0 ? sel[0] : '');
-});
 
 // ESCAPE HATCH: a read-only getter on the host. @expose puts a member there as it is, and a
 // $derived is a function, not the value `el.selectedItem` reads.

@@ -1,0 +1,10 @@
+<template>
+  <span class="expr">{{ value }}</span>
+</template>
+
+<script>
+// What the form submits is not the model (#751): with nothing chosen the model is null, which
+// submits nothing, and the field submits an empty entry, as a native select with an empty
+// placeholder does. tests/form-model.spec.ts.
+@model value: string | null = null { form: () => value ?? '' };
+</script>

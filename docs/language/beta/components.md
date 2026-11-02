@@ -81,7 +81,7 @@ alpha → beta (#130)
 ### Syntax
 
 ```ebnf
-ModelDecl    ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? "{" S? "form" S? "}" )? End
+ModelDecl    ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? "{" S? "form" ( S? ":" S? Expression )? S? "}" )? End
 ```
 
 ### Semantics
@@ -107,8 +107,12 @@ them: `formResetCallback` restores the value it mounted with, `formStateRestoreC
 saved with the state; `formDisabledCallback` sets the `disabled` prop, when it declares one. One model
 of a component may declare it. Descriptor: `model<T>(d, { form: true })`. A component whose form value
 is not its model as it is — a number clamped into its range, a group's selection, a mention's markup —
-says what it submits in its setup, `ctx.formValue(() => value)`, serialized by the same rules; reset,
-restore and `required` stay on the model. A control inside another control with a form model is part
+says what it submits on the model, `{ form: () => expr }` (#751 — landed), serialized by the same
+rules; reset, restore and `required` stay on the model. The expression is a function of no arguments,
+read again whenever what it reads changes, its signals rewritten as the script's are; it compiles to
+`ctx.formValue(…)` at the end of the setup, so it may read what the script declares after the model.
+`@model value: string | null = null { form: () => value ?? '' };` submits an empty entry where a null
+model would submit none, as a native select with an empty placeholder does. A control inside another control with a form model is part
 of it, as a checkbox in a checkbox group: the outer one resets and restores through its own model, and
 the inner one does not reset or restore itself after it.
 

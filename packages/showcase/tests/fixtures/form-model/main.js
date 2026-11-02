@@ -30,5 +30,7 @@ component('fm-object', {
 });
 
 await import('./fm-text.pdx');
-await Promise.all(['fm-check', 'fm-tags', 'fm-number', 'fm-object', 'app-fm-text'].map((t) => customElements.whenDefined(t)));
+await import('./fm-expr.pdx');
+await import('./fm-null.pdx');
+await Promise.all(['fm-check', 'fm-tags', 'fm-number', 'fm-object', 'app-fm-text', 'app-fm-expr', 'app-fm-null'].map((t) => customElements.whenDefined(t)));
 window.__fm = { ready: true };

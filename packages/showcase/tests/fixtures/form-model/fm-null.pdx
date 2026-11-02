@@ -1,0 +1,8 @@
+<template>
+  <span class="null">{{ value }}</span>
+</template>
+
+<script>
+// The control for fm-expr.pdx: the same null model, declared `{ form }`, submits nothing.
+@model value: string | null = null { form };
+</script>

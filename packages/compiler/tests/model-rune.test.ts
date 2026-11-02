@@ -192,3 +192,26 @@ describe('@model … { form }', () => {
         expect(code).not.toContain('wireFormModel');
     });
 });
+
+// `{ form: () => expr }` (#751): what the form submits when it is not the model. The runtime half is
+// packages/showcase/tests/form-model.spec.ts, a null model submitting an empty entry in Chromium.
+describe('@model … { form: () => expr }', () => {
+    it('is read as { form }: the type and the default are the type and the default', () => {
+        const analysis = analyzeScript("@model value: string | null = null { form: () => value ?? '' };", 'field.pdx');
+        expect(analysis.props).toEqual([expect.objectContaining({ name: 'value', tsType: 'string | null', default: 'null', model: true, form: true })]);
+        expect(analysis.warnings).toEqual([]);
+    });
+
+    it('compiles to ctx.formValue with the expression, its signals rewritten as the script\'s are', () => {
+        const { code } = compile(sfc("@model value: string | null = null { form: () => value ?? '' };\nlet extra = $signal('x');\n@model other: string = '' { form: () => other + extra };"), 'field.pdx', [], undefined, {});
+        expect(code).toMatch(/models: \{\s*value: \{[^}]*form: wireFormModel/);
+        // Optional: with no ElementInternals (happy-dom) core installs no formValue, and setup must not throw.
+        expect(code).toContain("ctx.formValue?.(() => __value() ?? '');");
+        expect(code).toContain('ctx.formValue?.(() => __other() + __extra());');
+    });
+
+    it('control: a bare { form } calls no formValue', () => {
+        const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, {});
+        expect(code).not.toContain('formValue');
+    });
+});

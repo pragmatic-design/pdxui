@@ -97,3 +97,13 @@ test('a disabled fieldset disables the components that declare `disabled`, and t
     await expect.poll(() => page.evaluate(() => (document.querySelector('fm-number') as unknown as { disabled: boolean }).disabled)).toBe(false);
     expect(await formData(page)).toEqual([['t', 'init'], ['n', '0']]);
 });
+
+// `{ form: () => expr }` (#751): what the form submits when it is not the model.
+test('a model\'s { form: () => expr } is what the form submits; a null model with { form } submits nothing', async ({ page }) => {
+    const second = () => page.evaluate(() => [...new FormData(document.getElementById('f2') as HTMLFormElement).entries()]
+        .map(([k, v]) => [k, String(v)] as [string, string]));
+    expect(await second(), 'null: the expression\'s empty entry, and none for the plain { form }').toEqual([['e', '']]);
+    await setProp(page, 'app-fm-expr', 'value', 'b');
+    await setProp(page, 'app-fm-null', 'value', 'z1');
+    expect(await second(), 'the expression follows the model').toEqual([['e', 'b'], ['z', 'z1']]);
+});

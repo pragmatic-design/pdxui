@@ -286,8 +286,10 @@ Either way the model carries core's `wireFormModel`, which `component()` calls o
 you never call it yourself, and a component without `{ form }` does not load it.
 
 When what the form should receive is not the model as it is — a number clamped into its range, the
-selection of a group — say so in the setup: `ctx.formValue(() => clamped())`. The value goes through
-the same rules, and reset, restore and `required` stay on the model. A control placed inside another
+selection of a group — say so on the model: `@model value: string | null = null { form: () => value ?? '' };`
+submits an empty entry while the model is `null`. The value goes through the same rules, and reset,
+restore and `required` stay on the model. A TypeScript component says it in its setup,
+`ctx.formValue(() => clamped())`. A control placed inside another
 one that has a form model, as a `pdx-checkbox` inside a `pdx-checkbox-group`, is part of it: the group
 resets, and the checkbox follows the group instead of resetting itself.
 
