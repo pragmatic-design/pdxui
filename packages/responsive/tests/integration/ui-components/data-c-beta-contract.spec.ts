@@ -80,6 +80,12 @@ test.describe('pdx-data-grid', () => {
         // A first grid, not counted: what a page sets up once — a module the grid loads, its global
         // listeners — is set up by it.
         await listenersFor(page, 2);
+        // …and set up to the end before anything is counted (#840). The grid prefetches its editors and
+        // filters when the page is idle; one that arrived during a count upgraded the page's own pickers,
+        // whose popovers added four document listeners to the 2-row grid's total on a slow runner (14
+        // against 10). Each prefetched tag defined, every one of them has run.
+        await page.evaluate(() => Promise.all(['pdx-input', 'pdx-number-input', 'pdx-select', 'pdx-date-picker', 'pdx-form-field', 'pdx-dialog']
+            .map((tag) => customElements.whenDefined(tag))));
         const few = await listenersFor(page, 2);
         const many = await listenersFor(page, 200);
         expect(many, `2 rows: ${few} listeners, 200 rows: ${many}`).toBe(few);
