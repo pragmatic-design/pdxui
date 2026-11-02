@@ -17,6 +17,12 @@ registerComponentStrings('form-actions', {
 /**
  * The submit and reset button bar of a form, wired to the form it sits in, with configurable
  * labels, alignment and a loading state.
+ *
+ * @cssstate submitting - The form it sits in is submitting; its buttons are disabled meanwhile.
+ *
+ * @csspart root - The bar.
+ * @csspart reset - The reset button, unless `reset-label="none"`.
+ * @csspart submit - The submit button.
  */
 component('pdx-form-actions', {
     props: {
@@ -24,11 +30,17 @@ component('pdx-form-actions', {
         submitLabel: { type: String, default: '' },
         /** Reset button label. Set to 'none' to hide. Uses i18n registry default if not set. */
         resetLabel: { type: String, default: '' },
-        /** Alignment: 'start' | 'center' | 'end' | 'between'. Default: 'end'. */
-        align: { type: String, default: 'end' },
         /** Show loading spinner on submit button while submitting. */
         showLoading: { type: Boolean, default: true },
     },
+    // The bar's alignment is an axis reflected on the host, which form.css draws (#293); each value
+    // maps the class a native bar carries.
+    variants: {
+        /** Where the buttons sit: end (the default), start, center, or apart. */
+        align: { end: '.pdx-form-actions-end', start: '.pdx-form-actions-start', center: '.pdx-form-actions-center', between: '.pdx-form-actions-between' },
+    },
+    states: ['submitting'],
+    parts: ['root', 'reset', 'submit'],
     setup(ctx) {
         // Looked up when read, and kept once found: set up before its <pdx-form>, a one-time lookup
         // at setup would never find it. See tryUseForm(from).
@@ -40,12 +52,7 @@ component('pdx-form-actions', {
         function isDirty(): boolean { return form()?.dirty() ?? false; }
         function onReset(): void { form()?.reset(); }
 
-        function wrapClass(): string {
-            let cls = 'pdx-form-actions';
-            const align = ctx.align() as string;
-            if (align) cls += ' pdx-form-actions-' + align;
-            return cls;
-        }
+        ctx.track(() => { ctx.state('submitting', isSubmitting()); });
 
         // i18n: prop overrides registry. Empty string = use registry. 'none' = hide.
         const _submitDefault = getComponentString('form-actions', 'submit');
@@ -62,18 +69,18 @@ component('pdx-form-actions', {
             return prop || _resetDefault();
         }
 
-        return { isSubmitting, isDisabled, isDirty, onReset, wrapClass, submitText, resetText };
+        return { isSubmitting, isDisabled, isDirty, onReset, submitText, resetText };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}">
+        <div class="pdx-form-actions" data-part="root">
             <slot>
                 ${() => ctx.resetText() ? html`
-                    <button type="reset" class="pdx-ghost"
+                    <button type="reset" class="pdx-ghost" data-part="reset"
                             :disabled="${ctx.isDisabled}">
                         ${ctx.resetText}
                     </button>
                 ` : ''}
-                <button type="submit" class="pdx-primary"
+                <button type="submit" class="pdx-primary" data-part="submit"
                         :disabled="${ctx.isDisabled}">
                     ${() => ctx.isSubmitting() && ctx.showLoading()
                         ? html`<span class="pdx-spinner pdx-spinner-sm"></span> `

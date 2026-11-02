@@ -394,6 +394,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-label`, `pdx-form-actions`, `pdx-input-group` and `pdx-form-section` take the
+  beta contract (#293), the first of the form family. `pdx-label`'s required, optional and disabled
+  are states of the host, drawn as the native classes are; `pdx-form-actions`' `align` is a variant
+  axis, `submitting` a state; `pdx-input-group` adds no class to its host and is a `role="group"`
+  with `:state(disabled)`; `pdx-form-section`'s `active` and `invalid` are states, and a section
+  that is not active is now hidden, which the class it set never did. Their pieces are parts.
 - **Breaking:** `pdx-timeline` takes the beta contract (#292), the last of the data family. `mode`,
   `connectorStyle` and `dotAlign` are variant axes, reflected on the host as `mode`, `connector-style`
   and `dot-align` and drawn by `@variant` rules, in place of the classes on its list and the

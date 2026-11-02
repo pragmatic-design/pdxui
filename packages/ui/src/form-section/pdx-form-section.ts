@@ -11,6 +11,13 @@ import '@pdxui/design/components/form';
 /**
  * Groups related fields of a form under a labelled heading, and can scope validation to its own
  * fields.
+ *
+ * @cssstate active - `active` (the default): the section is shown; a section that is not active is hidden.
+ * @cssstate invalid - The last `validateSection()` found an error in one of its fields.
+ *
+ * @csspart root - The `<fieldset>`.
+ * @csspart legend - The legend, with `label`.
+ * @csspart content - The fields.
  */
 component('pdx-form-section', {
     props: {
@@ -25,6 +32,10 @@ component('pdx-form-section', {
         /** Whether the section is currently active/visible. */
         active: { type: Boolean, default: true },
     },
+    // `active` stays a prop: the section never writes it, its parent does. Its conditions are states
+    // of the host (#293), which form.css draws; the fieldset carries no class for them.
+    states: ['active', 'invalid'],
+    parts: ['root', 'legend', 'content'],
     setup(ctx) {
         // Looked up when read, and kept once found: set up before its <pdx-form>, a one-time lookup
         // at setup would never find it. See tryUseForm(from).
@@ -71,22 +82,20 @@ component('pdx-form-section', {
             _sectionDirty.set(hasDirty);
         });
 
-        function wrapClass(): string {
-            let cls = 'pdx-form-section';
-            if (!ctx.active()) cls += ' pdx-form-section-hidden';
-            if (!_sectionValid()) cls += ' pdx-form-section-invalid';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('active', !!ctx.active());
+            ctx.state('invalid', !_sectionValid());
+        });
 
-        return { validateSection, sectionValid: _sectionValid, sectionDirty: _sectionDirty, wrapClass };
+        return { validateSection, sectionValid: _sectionValid, sectionDirty: _sectionDirty };
     },
     render: (ctx) => html`
-        <fieldset :class="${ctx.wrapClass}" role="group"
+        <fieldset class="pdx-form-section" data-part="root" role="group"
                   :aria-label="${ctx.label}">
             ${() => ctx.label() ? html`
-                <legend class="pdx-form-section-legend">${ctx.label}</legend>
+                <legend class="pdx-form-section-legend" data-part="legend">${ctx.label}</legend>
             ` : ''}
-            <div class="pdx-form-section-content">
+            <div class="pdx-form-section-content" data-part="content">
                 <slot></slot>
             </div>
         </fieldset>

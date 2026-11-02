@@ -1,11 +1,19 @@
 // pdx-label — Accessible form label with required/optional indicators.
-// Maps to .pdx-field-label, .pdx-field-required, .pdx-field-optional,
-// .pdx-field-hint, .pdx-field-description CSS classes.
+// Renders a .pdx-field-label with .pdx-field-hint and .pdx-field-description; required, optional and
+// disabled are states of the host, which forms.css draws beside the native .pdx-field-required classes.
 
 import { component, html, signal, generatedId } from '@pdxui/core';
 
 /**
  * An accessible form label, with a required or optional indicator, a hint and a description.
+ *
+ * @cssstate required - `required`: the label carries the required marker (`--pdx-field-required-marker`).
+ * @cssstate optional - `optional`: the label says the field is optional.
+ * @cssstate disabled - `disabled`: the label is dimmed with its control.
+ *
+ * @csspart root - The `<label>` itself.
+ * @csspart description - The description under the label, with `description`.
+ * @csspart hint - The hint under the label, with `hint`.
  */
 component('pdx-label', {
     // The axis forms.css keys by (#627), reflected on the host; each value maps the class that draws
@@ -23,14 +31,16 @@ component('pdx-label', {
         hint: { type: String, default: '' },
         description: { type: String, default: '' },
     },
+    // Its conditions are states of the host (#293), which forms.css draws; the <label> keeps only its
+    // base class, the one a native label shares.
+    states: ['required', 'optional', 'disabled'],
+    parts: ['root', 'description', 'hint'],
     setup(ctx) {
-        function cssClass(): string {
-            let cls = 'pdx-field-label';
-            if (ctx.required()) cls += ' pdx-field-required';
-            if (ctx.optional()) cls += ' pdx-field-optional';
-            if (ctx.disabled()) cls += ' pdx-field-label-disabled';
-            return cls;
-        }
+        ctx.track(() => {
+            ctx.state('required', !!ctx.required());
+            ctx.state('optional', !!ctx.optional());
+            ctx.state('disabled', !!ctx.disabled());
+        });
 
         // With no `for`, the label ties itself to the control that follows it: rendered as for="" —
         // an empty string is written as an attribute — a label would name nothing. A single control gets `for` (and an id if it has none); a group (a radio or
@@ -82,13 +92,13 @@ component('pdx-label', {
         /** The label's `for`: the prop, else the control found after it, else no attribute at all. */
         const forValue = (): string | null => (ctx.for() as string) || autoFor() || null;
 
-        return { cssClass, forValue };
+        return { forValue };
     },
     render: (ctx) => html`
-        <label :class="${ctx.cssClass}" data-part="root" :for="${ctx.forValue}">
+        <label class="pdx-field-label" data-part="root" :for="${ctx.forValue}">
             ${() => ctx.text() || html`<slot></slot>`}
         </label>
-        ${() => ctx.description() ? html`<span class="pdx-field-description">${ctx.description}</span>` : ''}
-        ${() => ctx.hint() ? html`<span class="pdx-field-hint">${ctx.hint}</span>` : ''}
+        ${() => ctx.description() ? html`<span class="pdx-field-description" data-part="description">${ctx.description}</span>` : ''}
+        ${() => ctx.hint() ? html`<span class="pdx-field-hint" data-part="hint">${ctx.hint}</span>` : ''}
     `,
 });

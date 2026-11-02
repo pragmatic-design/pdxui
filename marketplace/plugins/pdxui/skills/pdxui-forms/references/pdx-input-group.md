@@ -4,8 +4,10 @@ Inputs joined with addons and buttons.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `size` | `size` | string | `''` | Size of the control (e.g. sm, md, lg). |
+| `size` | `size` | string | `''` | A size its children take; the group draws none of its own, so it is not a variant axis. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
+
+**States:** `:state(disabled)` — `disabled`: the group and its children are disabled.
 
 
 #### Examples

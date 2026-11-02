@@ -13933,16 +13933,6 @@
             },
             {
               "kind": "field",
-              "name": "align",
-              "description": "Alignment: 'start' | 'center' | 'end' | 'between'. Default: 'end'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'end'",
-              "attribute": "align"
-            },
-            {
-              "kind": "field",
               "name": "showLoading",
               "description": "Show loading spinner on submit button while submitting.",
               "type": {
@@ -13950,6 +13940,34 @@
               },
               "default": "true",
               "attribute": "showloading"
+            },
+            {
+              "kind": "field",
+              "name": "align",
+              "description": "Where the buttons sit: end (the default), start, center, or apart.",
+              "type": {
+                "text": "'end' | 'start' | 'center' | 'between'"
+              },
+              "default": "'end'",
+              "attribute": "align"
+            }
+          ],
+          "variants": [
+            {
+              "name": "align",
+              "values": [
+                "end",
+                "start",
+                "center",
+                "between"
+              ],
+              "default": "end",
+              "native": {
+                "end": ".pdx-form-actions-end",
+                "start": ".pdx-form-actions-start",
+                "center": ".pdx-form-actions-center",
+                "between": ".pdx-form-actions-between"
+              }
             }
           ],
           "attributes": [
@@ -13972,15 +13990,6 @@
               "default": "''"
             },
             {
-              "name": "align",
-              "fieldName": "align",
-              "description": "Alignment: 'start' | 'center' | 'end' | 'between'. Default: 'end'.",
-              "type": {
-                "text": "string"
-              },
-              "default": "'end'"
-            },
-            {
               "name": "showloading",
               "fieldName": "showLoading",
               "description": "Show loading spinner on submit button while submitting.",
@@ -13988,12 +13997,41 @@
                 "text": "boolean"
               },
               "default": "true"
+            },
+            {
+              "name": "align",
+              "fieldName": "align",
+              "description": "Where the buttons sit: end (the default), start, center, or apart.",
+              "type": {
+                "text": "'end' | 'start' | 'center' | 'between'"
+              },
+              "default": "'end'"
             }
           ],
           "slots": [
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The bar."
+            },
+            {
+              "name": "reset",
+              "description": "The reset button, unless `reset-label=\"none\"`."
+            },
+            {
+              "name": "submit",
+              "description": "The submit button."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "submitting",
+              "description": "The form it sits in is submitting; its buttons are disabled meanwhile."
             }
           ]
         }
@@ -14478,6 +14516,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `<fieldset>`."
+            },
+            {
+              "name": "legend",
+              "description": "The legend, with `label`."
+            },
+            {
+              "name": "content",
+              "description": "The fields."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "active",
+              "description": "`active` (the default): the section is shown; a section that is not active is hidden."
+            },
+            {
+              "name": "invalid",
+              "description": "The last `validateSection()` found an error in one of its fields."
             }
           ]
         }
@@ -16044,7 +16106,7 @@
             {
               "kind": "field",
               "name": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
+              "description": "A size its children take; the group draws none of its own, so it is not a variant axis.",
               "type": {
                 "text": "string"
               },
@@ -16066,7 +16128,7 @@
             {
               "name": "size",
               "fieldName": "size",
-              "description": "Size of the control (e.g. sm, md, lg).",
+              "description": "A size its children take; the group draws none of its own, so it is not a variant axis.",
               "type": {
                 "text": "string"
               },
@@ -16086,6 +16148,12 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled`: the group and its children are disabled."
             }
           ]
         }
@@ -17105,6 +17173,34 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `<label>` itself."
+            },
+            {
+              "name": "description",
+              "description": "The description under the label, with `description`."
+            },
+            {
+              "name": "hint",
+              "description": "The hint under the label, with `hint`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "required",
+              "description": "`required`: the label carries the required marker (`--pdx-field-required-marker`)."
+            },
+            {
+              "name": "optional",
+              "description": "`optional`: the label says the field is optional."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled`: the label is dimmed with its control."
             }
           ]
         }

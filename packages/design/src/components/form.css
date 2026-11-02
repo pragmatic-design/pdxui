@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/form.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* Form system — pdx-form, pdx-form-actions, pdx-form-section, pdx-form-template */
 
 /* ─── pdx-form ──────────────────────────────────────── */
@@ -16,10 +17,12 @@
     margin-top: var(--pdx-space-md);
 }
 
-.pdx-form-actions-start { justify-content: flex-start; }
-.pdx-form-actions-center { justify-content: center; }
-.pdx-form-actions-end { justify-content: flex-end; }
-.pdx-form-actions-between { justify-content: space-between; }
+/* Its alignment is the host's `align` (#293); each rule also draws the class a native bar carries,
+   .pdx-form-actions-start and the others. */
+:where(pdx-form-actions[align="start"]) [data-part="root"]:not(:where(pdx-form-actions[align="start"] [data-pdx-root] [data-part="root"])), .pdx-form-actions-start { justify-content: flex-start; }
+:where(pdx-form-actions[align="center"]) [data-part="root"]:not(:where(pdx-form-actions[align="center"] [data-pdx-root] [data-part="root"])), .pdx-form-actions-center { justify-content: center; }
+:where(pdx-form-actions[align="end"]) [data-part="root"]:not(:where(pdx-form-actions[align="end"] [data-pdx-root] [data-part="root"])), .pdx-form-actions-end { justify-content: flex-end; }
+:where(pdx-form-actions[align="between"]) [data-part="root"]:not(:where(pdx-form-actions[align="between"] [data-pdx-root] [data-part="root"])), .pdx-form-actions-between { justify-content: space-between; }
 
 /* ─── pdx-form-section ──────────────────────────────── */
 .pdx-form-section {
@@ -42,6 +45,11 @@
 }
 
 .pdx-form-section-content[hidden] {
+    display: none;
+}
+
+/* A section that is not active is not shown (#293): `active` is a state of the host. */
+:where(pdx-form-section):not(:state(active)) > [data-part="root"] {
     display: none;
 }
 

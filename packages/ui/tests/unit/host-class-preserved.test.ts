@@ -18,10 +18,10 @@ async function frames(n = 3): Promise<void> {
 const CASES: Array<[string, string, [string, string]]> = [
     ['pdx-checkbox-group', 'pdx-choice-group', ['orientation', 'horizontal']],
     ['pdx-radio-group', 'pdx-choice-group', ['orientation', 'horizontal']],
-    ['pdx-input-group', 'pdx-input-group', ['size', 'sm']],
     ['pdx-button-group', 'pdx-btn-group', ['size', 'sm']],
     // pdx-statistic sets no class of its own on its host since #291; display-a-beta-contract.spec.ts
-    // measures that the author's class stays.
+    // measures that the author's class stays. pdx-input-group neither, since #293;
+    // form-a-beta-contract.spec.ts measures it.
 ];
 
 beforeEach(() => { document.body.innerHTML = ''; });
