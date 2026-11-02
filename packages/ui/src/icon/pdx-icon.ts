@@ -57,8 +57,12 @@ component('pdx-icon', {
             const srcProp = ctx.src() as string;
             const nameProp = ctx.name() as string;
             const setProp = ctx.set() as string;
+            // A name of the scale, or a number of pixels — what the library's own components pass
+            // (`size="48"` in pdx-empty-state, `"15"` in pdx-command); anything else is md (20). A number
+            // fell back to md before, and every one of those icons was drawn at 20px. Written short: this
+            // module is in the showcase's entry, whose budget counts every byte.
             const sizeName = (ctx.size() as string) || 'md';
-            const sizePx = SIZES[sizeName] ?? 20;
+            const sizePx = SIZES[sizeName] ?? (+sizeName > 0 ? +sizeName : 20);
             const labelVal = ctx.label() as string;
             const weightVal = ctx.weight() as string;
             const rtlVal = ctx.rtl() as string;
