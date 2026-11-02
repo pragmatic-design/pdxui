@@ -14,7 +14,7 @@
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" clickable dividers @pdx-click="onUserClick"&gt;
   &lt;slot name="item" let:item&gt;
-    &lt;strong&gt;{{ item.name }}&lt;/strong&gt; {{ item.role }}
+    &lt;strong&gt;{item.name}&lt;/strong&gt; {item.role}
   &lt;/slot&gt;
 &lt;/pdx-list&gt;</code></pre>
     </details>

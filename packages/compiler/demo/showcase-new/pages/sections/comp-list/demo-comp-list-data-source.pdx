@@ -26,7 +26,7 @@
 
 &lt;pdx-list :source="ds" clickable dividers&gt;
   &lt;slot name="item" let:item&gt;
-    &lt;span&gt;{{ item.name }}&lt;/span&gt; &lt;span class="role"&gt;{{ item.role }}&lt;/span&gt;
+    &lt;span&gt;{item.name}&lt;/span&gt; &lt;span class="role"&gt;{item.role}&lt;/span&gt;
   &lt;/slot&gt;
 &lt;/pdx-list&gt;</code></pre>
     </details>

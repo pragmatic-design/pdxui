@@ -20,10 +20,10 @@
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="richItems" dividers&gt;
   &lt;slot name="item" let:item&gt;
-    &lt;div class="avatar"&gt;{{ item.initials }}&lt;/div&gt;
-    &lt;div&gt;&lt;strong&gt;{{ item.name }}&lt;/strong&gt;
-      &lt;div class="role"&gt;{{ item.role }}&lt;/div&gt;&lt;/div&gt;
-    &lt;span class="status"&gt;{{ item.status }}&lt;/span&gt;
+    &lt;div class="avatar"&gt;{item.initials}&lt;/div&gt;
+    &lt;div&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;
+      &lt;div class="role"&gt;{item.role}&lt;/div&gt;&lt;/div&gt;
+    &lt;span class="status"&gt;{item.status}&lt;/span&gt;
   &lt;/slot&gt;
 &lt;/pdx-list&gt;</code></pre>
     </details>

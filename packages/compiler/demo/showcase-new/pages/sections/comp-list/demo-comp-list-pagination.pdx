@@ -27,7 +27,7 @@
 });
 
 &lt;pdx-list :source="ds"&gt;
-  &lt;slot name="item" let:item&gt;&lt;strong&gt;{{ item.name }}&lt;/strong&gt;&lt;/slot&gt;
+  &lt;slot name="item" let:item&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;&lt;/slot&gt;
 &lt;/pdx-list&gt;
 &lt;pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage"&gt;

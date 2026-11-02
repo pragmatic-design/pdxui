@@ -46,7 +46,7 @@ are checked against the manifest above._
 ```html
 <pdx-list :items="users" clickable dividers @pdx-click="onUserClick">
   <slot name="item" let:item>
-    <strong>{{ item.name }}</strong> {{ item.role }}
+    <strong>{item.name}</strong> {item.role}
   </slot>
 </pdx-list>
 ```
@@ -65,7 +65,7 @@ const ds = createDataSource({
 ```html
 <pdx-list :source="ds" clickable dividers>
   <slot name="item" let:item>
-    <span>{{ item.name }}</span> <span class="role">{{ item.role }}</span>
+    <span>{item.name}</span> <span class="role">{item.role}</span>
   </slot>
 </pdx-list>
 ```
@@ -136,10 +136,10 @@ const ds = createDataSource({
 ```html
 <pdx-list :items="richItems" dividers>
   <slot name="item" let:item>
-    <div class="avatar">{{ item.initials }}</div>
-    <div><strong>{{ item.name }}</strong>
-      <div class="role">{{ item.role }}</div></div>
-    <span class="status">{{ item.status }}</span>
+    <div class="avatar">{item.initials}</div>
+    <div><strong>{item.name}</strong>
+      <div class="role">{item.role}</div></div>
+    <span class="status">{item.status}</span>
   </slot>
 </pdx-list>
 ```
@@ -156,7 +156,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :source="ds">
-  <slot name="item" let:item><strong>{{ item.name }}</strong></slot>
+  <slot name="item" let:item><strong>{item.name}</strong></slot>
 </pdx-list>
 <pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage">
@@ -168,7 +168,7 @@ const ds = createDataSource({
 ```html
 <pdx-data-source url="/api/users" :page-size="5">
   <pdx-list clickable dividers>
-    <slot name="item" let:item>{{ item.name }}</slot>
+    <slot name="item" let:item>{item.name}</slot>
   </pdx-list>
   <pdx-pagination></pdx-pagination>
 </pdx-data-source>
