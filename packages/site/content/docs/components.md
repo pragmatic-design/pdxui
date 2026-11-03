@@ -421,7 +421,7 @@ So do the lists and the navigation (#595): `pdx-list`'s `item(item, index)` and 
 `pdx-sortable-list`'s `item(item, index)`, `pdx-description-list`'s `value(item, index)`,
 `pdx-timeline`'s `content(item, index)`, `pdx-tree`'s `node(node, level, expanded)`,
 `pdx-breadcrumb`'s `item(item, index, isLast)`, and `pdx-nav-menu`'s `item(item, level, expanded,
-active)`. Two scoped slots share their name with a prop, so their snippets are named apart and the
+active)`. Two alpha slots shared their name with a prop, so their snippets are named apart and the
 prop stays what it was: `pdx-pagination`'s `page` slot is the snippet `item(page, active)`, and
 `pdx-nav-menu`'s `actions` slot is `itemActions(item, level, active)`. And so do the remaining
 inputs and media (#596): `pdx-carousel`'s `slide(slide, index, active)`, `pdx-field-list`'s
@@ -461,28 +461,16 @@ grid's `DataGrid`, and `empty()` replaces the empty state.
 A component written in TypeScript reads the parent's template with core's `declaredSnippet(ctx,
 name, args)`: the snippet when the parent gave one, called with the arguments `args` takes from the
 scope, and nothing otherwise (#492); every component of the library reads its snippets with it.
-`snippetOrSlot(ctx, name, args, slotName?)` falls back on the alpha scoped slot, and goes with it.
 
-### Scoped slots (data from the component to the content)
+### Scoped slots, removed
 
-Typed snippets replace them (#131): they still compile, until the beta removes them.
-
-When the component has the data but the parent decides *how* to show it (think of a list that lets
-you customize the row), you use a **scoped slot**, passing data to the slot:
-
-```pdx
-<slot :row="item" :index="i" let:row let:index>{{ row.name }}</slot>
-```
-
-> Compiler rule: a `<slot>` is treated as a parent template **only if it has at least one `let:`**.
-> Without `let:` it's a normal projection slot. If you need a named slot with no data, add a dummy
-> `let:_` so it gets recognized.
-
-The component says what the slot passes with `@slot row: { row: User; index: number };` in its
-script, and the editor and `pdx check --types` type the parent's `let:` names from it: `row.nmae` is
-an error. A component of yours that declares the slot with no type gives `unknown` names, which
-cannot be read unchecked — declare the type. A library component's slots are not typed yet: their
-names are not checked.
+The alpha passed data to a slot with `<slot :row="item">` in the child and `<slot let:row>` or
+`@slot(row, { row }) { … }` in the parent. Typed snippets replace them, and they are removed (#492):
+each is the error `PDX_REMOVED_FORM`, and so are the object form `@slot row: { row: User };` and a
+template prop such as `:item-template`. `pdx migrate` rewrites them — the parent's fill to a
+`@snippet` with the child's parameters, the child's outlet to `@render row?.(item) @else { … }` with
+an optional `@slot row?: (row: User);`. Core's `snippetOrSlot`, `renderSlot` and `slotCarrier` and the
+context's `ctx.slot()` are gone with them.
 
 ## @expose — an imperative API, when you need it
 

@@ -25,7 +25,7 @@ semver.
   become `@snippet row(item) { … }`, with the parameters in the order of the child's signature — a
   library component's from its manifest, a project component's from its `@slot` or, in the same run,
   from its alpha outlets. A script `@snippet` body's `${arg}` becomes `{{ arg }}`, and a template prop
-  such as `:item-template` on a library component is flagged. The alpha forms still compile, silently.
+  such as `:item-template` on a library component is flagged. The alpha forms are removed (Changed).
 
 - `pdx-data-grid`'s other templates get a typed snippet each (#673), with the alpha slot's context as
   arguments: `editCell(row, column, value, form)`, `filter(column)`, `filterPopover(column, apply,
@@ -427,6 +427,15 @@ semver.
   `execute` and `pending` qualifies, a `mutation()` among them. (#49)
 
 ### Changed
+
+- **Breaking:** the alpha's scoped slots are removed (#492). A parent's `<slot name="row" let:item>`
+  and `@slot(row, { item }) { … }`, a child's `<slot name="row" :item="it">`, the object form
+  `@slot row: { item: T };` and a template prop such as `:item-template` on a library component are
+  each the error `PDX_REMOVED_FORM`, and render nothing; `pdx migrate` rewrites them to `@snippet`,
+  `@render` and a `@slot` signature (the object form with the new `slot-object-form` rewrite), and
+  lists the template props. Core's `snippetOrSlot`, `renderSlot` and `slotCarrier` leave the exports,
+  and `ctx.slot()` the component context: a component written in TypeScript reads its parent's
+  snippet with `declaredSnippet(ctx, name, args)`. A `<slot>` with no data still projects content.
 
 - **Breaking:** `pdx-data-grid` reads its snippets only (#492): its alpha scoped slots — `col:{field}`,
   `header:{field}`, `col-edit:{field}`, `filter:{field}`, `filter-popover:{field}`, `detail`,

@@ -136,7 +136,7 @@ the others in the table above land with #132, #153 and #156)
 
 A template is compiled by **one** code generator, in development and in a production build (#107 —
 landed; the parity table's recorded expectations, #237 — landed; the template path's removal, #238 —
-landed, but for a scoped slot's body, #364):
+landed, the alpha scoped slot's body last, #364):
 the template becomes imperative DOM code — with its static parts copied from a `<template>` built once
 (#109 — landed) — that binds each dynamic part in place. There is no second render path whose behaviour could
 differ: a construct means the same everywhere, and the render parity table

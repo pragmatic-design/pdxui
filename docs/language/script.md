@@ -314,11 +314,13 @@ render renders too. Without `?` the parent must provide it; with `?` it is optio
 row?.(…)` renders nothing, or its `@else` block, when the parent gives none.
 
 A snippet is a function the component calls, not content projected into it: one rendered inside an
-`@if` that becomes true later renders like anything else there — the case a scoped `<slot>` fails.
+`@if` that becomes true later renders like anything else there — the case the alpha's scoped
+`<slot>` failed.
 
-The object form, `@slot name: { row: Item };`, names the scope of an alpha scoped `<slot>`. It keeps
-compiling until #131 removes it; it generates nothing in the module, and requires nothing of a parent.
-The `.d.ts` gets a `Slots` interface with `name: ScopeType`, or `{}` without a type.
+Without a type, `@slot name;` declares a slot of plain content projection, `<slot name="name">` in the
+template; the `.d.ts` gets `name: {}` in its `Slots` interface. The alpha object form,
+`@slot name: { row: Item };`, which named the scope of a scoped `<slot>`, is removed (#492):
+`PDX_REMOVED_FORM`, and `pdx migrate` rewrites it to the signature `@slot name?: (row: Item);`.
 
 #### Rules
 
@@ -957,7 +959,7 @@ the rewritten expression is `undefined`.
   (warning), with a fix for `push` (`items = [...items, x]`) and a one-level field
   (`user = { ...user, name: v }`). It is reported in the script and in a template event handler
   (`@click="items.push(x)"`), where a name the template binds — a `@for` item or index, a `@let`, a
-  slot's `let:`, an arrow parameter — is not the signal. A `:ref` target and a `$store` are not
+  snippet's parameter, an arrow parameter — is not the signal. A `:ref` target and a `$store` are not
   reported: setting an element's properties, and mutating a store in place, is what they are for.
 - A signal nothing reads raises `PDX_UNUSED_REACTIVE` (info); a leading `_` silences it.
 - A signal only ever incremented and read to be discarded raises `PDX_VERSION_COUNTER`.

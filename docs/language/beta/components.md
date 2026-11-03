@@ -292,8 +292,9 @@ it where no alias is in scope.
 ### Rules
 
 - A required slot the parent does not fill is `PDX_SLOT_REQUIRED` (error).
-- `let:`, the parent-side `@slot(name, { … }) { }` block, the child's scoped `<slot :x>` and template
-  props (`itemTemplate`) are removed (language changes). `pdx migrate` rewrites the parent forms to
+- `let:`, the parent-side `@slot(name, { … }) { }` block, the child's scoped `<slot :x>`, the object
+  form `@slot name: { … }` and template props (`itemTemplate`) are removed (language changes — landed,
+  #492: each is `PDX_REMOVED_FORM`). `pdx migrate` rewrites the parent forms to
   `@snippet`. In the child, an alpha slot is optional by nature (a parent may not fill it), so the
   migration preserves that: `<slot name="row" :item="it">fallback</slot>` becomes
   `@slot row?: (item: T);` and `@render row?.(it) @else { fallback }`; with no fallback,

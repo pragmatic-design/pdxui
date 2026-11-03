@@ -10,8 +10,8 @@ A template compiles along one **render path**, in the dev server and in a produc
 (#107): the **inline path**, imperative `createElement` code (`codegen-template-inline.ts`).
 `pdx({ inlineBindings })` no longer selects anything (`PDX_INLINE_BINDINGS_IGNORED`), and nothing else
 does (#238). The **template path** — an `html\`…\`` tagged template that core parsed and bound at
-runtime — is removed (#526): the body of a scoped slot fill was the last part it built, until #364,
-and the legacy mode that rendered through it is removed (#158). `html\`\`` stays in core for
+runtime — is removed (#526): the body of an alpha scoped slot fill was the last part it built, until
+#364, and the legacy mode that rendered through it is removed (#158). `html\`\`` stays in core for
 components written by hand.
 
 ```ebnf
@@ -786,58 +786,7 @@ let label = $signal('Orders');
 
 alpha
 
-### `<slot :name>` scoped slot outlet
-
-#### Syntax
-
-```ebnf
-SlotOutlet     ::= "<slot" ( S "name=" AttrValue )? ( S ":" Identifier "=" AttrValue )+ S?
-                   ( "/>" | ">" Template "</slot>" )
-```
-
-A `<slot>` with no `:` binding (and no `let:`) is plain HTML.
-
-#### Semantics
-
-In the child, `<slot name="row" :item="first">fallback</slot>` compiles to
-`renderSlot(ctx.__slots, 'row', () => ({ item: … }), () => html\`fallback\`)`: the parent's fill for
-`row` is rendered with `{ item }` as its scope, and the content between the tags when the parent
-gives none. `name` defaults to `default`. Declare what a slot passes with `@slot` in the script
-([script.md](script.md)), e.g. `@slot name: { row: Item };`.
-
-#### Rules
-
-- Both render paths compile it to the same `renderSlot(…)` call.
-- The fallback is a template like any block's body: an interpolation, an element, a block directive
-  (`@if`, `@for`, …) in it are rendered inside the outlet, only when the parent gives no fill (#276).
-  The outlet is closed by the first `</slot>` that is not a nested outlet's own.
-- The child collects the parent's fills before it renders, so a fill the parent writes is the one
-  rendered. A fill added later, after the child has mounted, is not read.
-- With nothing between the tags, or self-closing, the default renders nothing.
-- A bound name is `[A-Za-z0-9_]+`: no `-`. Not checked today.
-
-#### Examples
-
-```pdx
-<template>
-  <ul>
-    <slot name="row" :item="first" :index="0">
-      <li>{{ first }}</li>
-    </slot>
-  </ul>
-</template>
-
-<script>
-@slot row: { item: string, index: number };
-let first = $signal('Ada');
-</script>
-```
-
-#### Since
-
-alpha
-
-### `@slot`, `<slot let:name>`
+### `@slot(…)`, `<slot let:name>`, `<slot :name>` — removed
 
 #### Syntax
 
@@ -845,49 +794,56 @@ alpha
 SlotBlock      ::= "@slot" S? "(" S? SlotName S? ( "," S? SlotScope S? )? ")" Block
 SlotScope      ::= "{" S? Identifier ( S? "," S? Identifier )* S? "}" | Identifier
 SlotFill       ::= "<slot" ( S "name=" AttrValue )? ( S "let:" Identifier )+ S? ( "/>" | ">" Template "</slot>" )
+SlotOutlet     ::= "<slot" ( S "name=" AttrValue )? ( S ":" Identifier "=" AttrValue )+ S?
+                   ( "/>" | ">" Template "</slot>" )
 SlotName       ::= [^,)]+
 ```
 
+A `<slot>` with neither a `let:` nor a `:` binding is plain HTML: content projection, which stays.
+
 #### Semantics
 
-The parent's side of a scoped slot, written inside the child component's tag.
-`@slot(row, { item, index }) { … }` and `<slot name="row" let:item let:index>…</slot>` are the same
-node: the body is hoisted out of the template as `const __pdxSlot_row_0 = (__scope) => { const {
-item, index } = __scope; return html\`…\`; }` and the tag gets `slotCarrier('row', __pdxSlot_row_0)`.
-The child calls it with its scope. `@slot(row)` takes no scope; `<slot>` without a `name` fills
-`default`. The scope names are local to the body. Both paths hoist the same function.
+The alpha's scoped slots, removed (#492). The parent's side, `@slot(row, { item, index }) { … }` and
+`<slot name="row" let:item let:index>…</slot>` written in a component's tag, is
+`@snippet row(item, index) { … }` (below). The child's side, the outlet
+`<slot name="row" :item="first">fallback</slot>`, is `@render row?.(first) @else { fallback }`
+([`@render`](#render)), with the slot declared `@slot row?: (item: T);` in the script
+([script.md](script.md)); the alpha object form `@slot row: { item: T };` is that signature.
+
+Each is `PDX_REMOVED_FORM`. The parser still reads the form whole, its body with it, so the file
+parses and what follows is read as written; nothing is rendered for it.
 
 #### Rules
 
-- `@slot(name, item)` with one bare name destructures `{ item }` from the scope; it is not the whole
-  scope object. Not checked today.
-- A slot name need not be an identifier (`col:price`, `empty-state`). Not checked today.
-- A `<slot let:…>` must have its `</slot>`, or be self-closing (then it has no body). Not checked
-  today.
-- The `@slot` script declaration (`@slot name: { row: Item };`) is the child's, in
-  [script.md](script.md); this is the parent's.
+- `pdx migrate` rewrites each one: the parent's slot by the child's signature, its parameters in the
+  signature's order (`scoped-slot-parent`); the outlet to `@render` with an optional `@slot` it
+  declares (`scoped-slot-outlet`); the object form to a signature (`slot-object-form`). What it cannot
+  rewrite — a slot name that is not an identifier, a key the signature lacks, a child it does not
+  know — it lists, and leaves.
+- A template prop of a library component, `:item-template="fn"`, is removed with them
+  (`template-prop`): `pdx migrate` lists it, and its markup moves into a `@snippet`.
+- `snippetOrSlot`, `renderSlot` and `slotCarrier` leave `@pdxui/core`, and `ctx.slot()` the component
+  context: a component reads its parent's snippet with `declaredSnippet`.
 
 #### Examples
 
 ```pdx
 <template>
-  <app-user-table>
-    @slot(row, { user, index }) {
+  <app-user-table :items="users">
+    @snippet row(user, index) {
       <span>{{ index }}. {{ user.name }}</span>
     }
-    <slot name="empty" let:query>
-      <p>No user matches {{ query }}.</p>
-    </slot>
   </app-user-table>
 </template>
 
 <script>
+let users = $signal([{ name: 'Ada' }]);
 </script>
 ```
 
 #### Since
 
-alpha
+alpha; removed in beta (#492)
 
 ### `@render`
 

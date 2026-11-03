@@ -163,7 +163,6 @@ setup(ctx) {
     ctx.emit('change', { value: 42 })   // Emits a CustomEvent
     ctx.track(fn)    // Registers an effect with automatic cleanup
     ctx.expose(api)  // Exposes methods for imperative access from outside
-    ctx.slot('name') // Reaches a named slot
 }
 ```
 
