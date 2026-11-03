@@ -92,7 +92,7 @@ nothing on a narrow viewport.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `source` | — | object | `null` | The data source to render from. |
+| `source` | — | import('@pdxui/core').DataSource<T> \| null | `null` | The data source to render from. |
 | `columns` | — | array | `null` | Column definitions: field, header, width, sortable, render, etc. |
 | `data` | — | T[] | `null` | The row data to display. |
 | `striped` | `striped` | boolean | `false` | Alternates row background colours. |

@@ -8249,7 +8249,7 @@
               "name": "source",
               "description": "The data source to render from.",
               "type": {
-                "text": "object"
+                "text": "import('@pdxui/core').DataSource<T> | null"
               },
               "default": "null"
             },
@@ -17594,7 +17594,7 @@
               "name": "source",
               "description": "The data source to render from.",
               "type": {
-                "text": "object"
+                "text": "import('@pdxui/core').DataSource<T> | null"
               },
               "default": "null"
             },
@@ -24585,13 +24585,16 @@
           "category": "Data-bound",
           "order": 96,
           "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
+          "generics": [
+            "T"
+          ],
           "members": [
             {
               "kind": "field",
               "name": "options",
               "description": "The selectable options.",
               "type": {
-                "text": "unknown[]"
+                "text": "T[]"
               },
               "default": "() => []"
             },
@@ -24600,7 +24603,7 @@
               "name": "source",
               "description": "DataSource instance — dedicated prop for data-driven select. Takes priority over options.",
               "type": {
-                "text": "DataSource<unknown> | null"
+                "text": "import('@pdxui/core').DataSource<T> | null"
               },
               "default": "null"
             },
@@ -25189,12 +25192,12 @@
             {
               "name": "item",
               "description": "Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).",
-              "signature": "(option: { label: string; value: unknown; raw: unknown }, index: number)"
+              "signature": "(option: { label: string; value: unknown; raw: T }, index: number)"
             },
             {
               "name": "selected",
               "description": "Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.",
-              "signature": "(option: { label: string; value: unknown; raw: unknown })"
+              "signature": "(option: { label: string; value: unknown; raw: T })"
             },
             {
               "name": "",

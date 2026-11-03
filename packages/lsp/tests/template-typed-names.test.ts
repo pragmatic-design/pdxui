@@ -286,6 +286,26 @@ describe("a library component's snippet, from the real manifest (#595)", () => {
             + '</pdx-data-grid>';
         expect(diagnose(ROWS, template, undefined, fromManifest, IN_APP)).toEqual([]);
     });
+
+    // #853: a component fed by a DataSource infers `T` from it, as from an array. Before, `source` was
+    // `object` in the manifest and the snippet's item `unknown`: reading any member was an error.
+    const USERS = "import { createDataSource } from '@pdxui/core';\nconst users = createDataSource([{ id: 1, name: 'Ada' }]);";
+
+    it("pdx-list :source: the source's item reads with its type, an invented member is an error (#853)", () => {
+        const found = diagnose(USERS, '<pdx-list :source="users">@snippet item(it) { <b>{{ it.name.length }} {{ it.nmae }}</b> }</pdx-list>', undefined, fromManifest, IN_APP);
+        expect(found.map((f) => f.at)).toEqual(['nmae']);
+    });
+
+    it("pdx-data-grid :source: the row is the source's (#853)", () => {
+        const found = diagnose(USERS, '<pdx-data-grid :source="users">@snippet cell(row) { <b>{{ row.name.length }} {{ row.nmae }}</b> }</pdx-data-grid>', undefined, fromManifest, IN_APP);
+        expect(found.map((f) => f.at)).toEqual(['nmae']);
+    });
+
+    it("pdx-select :options: an option's raw is the app's entry (#853)", () => {
+        const TEAM = "const team = [{ id: 1, name: 'Ada', initials: 'AL' }];";
+        const found = diagnose(TEAM, '<pdx-select :options="team">@snippet item(o) { <b>{{ o.raw.initials.length }} {{ o.label }} {{ o.raw.initals }}</b> }@snippet selected(o) { <i>{{ o.raw.name }}</i> }</pdx-select>', undefined, fromManifest, IN_APP);
+        expect(found.map((f) => f.at)).toEqual(['initals']);
+    });
 });
 
 describe('a type parameter inside the component that declares it', () => {

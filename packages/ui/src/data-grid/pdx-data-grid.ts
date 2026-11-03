@@ -206,8 +206,9 @@ component('pdx-data-grid', {
     // than a slot per column, since a snippet's name is an identifier and `cell:price` is not one.
     // The value is passed because the row does not hold it for a computed column, nor for a batch
     // edit not yet saved.
-    // The row a snippet receives is the app's, an element of `data` (#651): the editor infers `T`.
-    generics: { T: { from: 'data' } },
+    // The row a snippet receives is the app's, an element of `data` (#651) or of `source` (#853): the
+    // editor infers `T`.
+    generics: { T: { from: 'data', source: 'source' } },
     slots: {
         cell: slot<(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown) => Node>(),
         header: slot<(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }) => Node>(),
@@ -876,5 +877,5 @@ component('pdx-data-grid', {
     render: () => html``,
 });
 
-/** The row a snippet receives, the app's (#651): the editor infers it from `:data`. */
+/** The row a snippet receives, the app's (#651): the editor infers it from `:data` or `:source`. */
 type T = unknown;

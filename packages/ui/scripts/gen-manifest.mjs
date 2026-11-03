@@ -364,8 +364,10 @@ function extractVariants(optionsObj, sourceFile) {
 
 /**
  * The type parameters a descriptor declares (#651), metadata for the editor only:
- * `generics: { T: { extends: '{ key: string }', from: 'items' } }` → { name, extends?, from? }. `from`
- * names the array prop the parameter is inferred from, which the manifest then types `T[]`.
+ * `generics: { T: { extends: '{ key: string }', from: 'items', source: 'source' } }` → { name,
+ * extends?, from?, source? }. `from` names the array prop the parameter is inferred from, which the
+ * manifest then types `T[]`; `source` (#853) the DataSource prop it is inferred from as well, typed
+ * `DataSource<T> | null`.
  */
 function extractGenerics(optionsObj, sourceFile) {
     const genericsProp = optionsObj.properties.find(
@@ -378,7 +380,7 @@ function extractGenerics(optionsObj, sourceFile) {
             const p = decl.initializer.properties.find(e => ts.isPropertyAssignment(e) && e.name.getText(sourceFile) === key);
             return p && ts.isStringLiteralLike(p.initializer) ? p.initializer.text : undefined;
         };
-        out.push({ name: decl.name.getText(sourceFile), extends: field('extends'), from: field('from') });
+        out.push({ name: decl.name.getText(sourceFile), extends: field('extends'), from: field('from'), source: field('source') });
     }
     return out;
 }
@@ -913,11 +915,14 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
         ...variantProps, ...models,
     ];
     // A type parameter (#651) types the array prop it is inferred from as `T[]`: what the editor infers
-    // `T` from, at a parent's `:items`, to type the snippets that use it.
+    // `T` from, at a parent's `:items`, to type the snippets that use it. Its DataSource prop (#853) is
+    // typed `DataSource<T>`, written as core's, so `:source` infers it too.
     const generics = extractGenerics(optionsObj, sourceFile);
     for (const g of generics) {
         const from = g.from && props.find(p => p.name === g.from);
         if (from) from.type = `${g.name}[]`;
+        const source = g.source && props.find(p => p.name === g.source);
+        if (source) source.type = `import('@pdxui/core').DataSource<${g.name}> | null`;
     }
     const tags = jsdocTags(statement);
 

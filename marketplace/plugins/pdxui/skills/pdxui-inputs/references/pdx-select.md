@@ -37,8 +37,8 @@ paged table → `pdx-relation-picker`.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `options` | — | unknown[] | `() => []` | The selectable options. |
-| `source` | — | DataSource<unknown> \| null | `null` | DataSource instance — dedicated prop for data-driven select. Takes priority over options. |
+| `options` | — | T[] | `() => []` | The selectable options. |
+| `source` | — | import('@pdxui/core').DataSource<T> \| null | `null` | DataSource instance — dedicated prop for data-driven select. Takes priority over options. |
 | `labelField` | `labelfield` | string | `'label'` | Object field used as the option label. |
 | `valueField` | `valuefield` | string | `'value'` | Object field used as the option value. |
 | `placeholder` | `placeholder` | string | `''` | Placeholder text shown while empty. |
