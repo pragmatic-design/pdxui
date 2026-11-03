@@ -2,7 +2,7 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -38,7 +38,7 @@ export interface CascaderNode {
  * A multi-level drill-down selector: each choice opens the next column of children, as in Country,
  * then Region, then City.
  *
- * @slot option - Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
+ * @slot option - Renders one option in a column: a snippet `option(node, level, selected)`.
  *
  * @csspart root - The trigger, the combobox: the frame, its border and background.
  * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
@@ -103,7 +103,7 @@ component('pdx-cascader', {
     },
     // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
     generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // A first-column node, or one of a later column through `children`, written out because the
         // editor pastes the signature where no alias is in scope. A recursive node type collapses to `T`.
@@ -129,7 +129,7 @@ component('pdx-cascader', {
         const _panelId = generatedId('pdx-cascader-panel');
         let _panelEl: HTMLElement | null = null;
         function getOptionSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'option', (s) => [s.node, s.level, s.selected]);
+            return declaredSnippet(ctx, 'option', (s) => [s.node, s.level, s.selected]);
         }
         let _panelContentEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;
