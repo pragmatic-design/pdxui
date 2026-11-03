@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 430 keys in 77 components.
+> Generated from the sources. 426 keys in 77 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -250,10 +250,6 @@ placeholders, filled at render: keep them in the translation.
 | `form-template` | `list.empty` | `No items yet` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
 | `form-template` | `list.remove` | `Remove` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
 | `form-template` | `list.removeLine` | `Remove line {n}` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `steps` | `Form steps` | `@pdxui/ui/src/shared/i18n.ts` |
-| `form-template` | `wizard.back` | `← Back` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `wizard.next` | `Next →` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
-| `form-template` | `wizard.submit` | `Submit` | `@pdxui/ui/src/form-template/pdx-form-template.ts` |
 | `image` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
 | `image` | `image` | `image` | `@pdxui/ui/src/shared/i18n.ts` |
 | `image` | `view` | `View {alt}` | `@pdxui/ui/src/shared/i18n.ts` |

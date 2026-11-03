@@ -299,7 +299,7 @@ const orderForm = createForm({
 });
 ```
 
-**3. Wizard Layout** — `layout: 'wizard'` turns sections into steps with automatic navigation. Each step validates before advancing. Click a completed step to go back. _(from the live demo)_
+**3. Wizard Layout** — `layout: 'wizard'` turns sections into the steps of a `<pdx-wizard>`. Each step validates before advancing; the last step's button submits. Click a completed step to go back, or drive it with `next()`, `prev()` and `goTo(n)`. _(from the live demo)_
 
 ```html
 <div class="demo-block">

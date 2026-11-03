@@ -1650,6 +1650,10 @@
         {
           "id": "form-template-grid",
           "title": "Form Template — Schema-driven grid (2 cols, 2 fields)"
+        },
+        {
+          "id": "form-template-wizard",
+          "title": "Form Template — Wizard layout (2 steps)"
         }
       ]
     },

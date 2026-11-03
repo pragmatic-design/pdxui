@@ -394,6 +394,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-form-template` takes the beta contract (#293), the last of the form family. Its
+  wizard layout is a `pdx-wizard`, one panel per section, in place of a stepper of its own: the
+  current step is `aria-current="step"` and says «Step n of N» (A6), a step with an error is held in
+  the wizard's cancellable `pdx-before-change`, and the last step's button submits the form.
+  `wizardNext()`, `wizardPrev()` and `wizardGoTo(n)` are `next()`, `prev()` and `goTo(n)`, exposed
+  beside `getForm()`; the `form-template.wizard.*` and `steps` strings are gone, the wizard's own
+  apply. Its events are declared and its pieces are parts. `pdx-form-field` gives its control its
+  id again when it is moved, which left a field in a wizard panel with a label naming nothing.
 - **Breaking:** `pdx-fieldset`, `pdx-form` and `pdx-auto-form` take the beta contract (#293).
   `pdx-fieldset`'s `collapsed` is a model: its toggle announces `collapsed-change` `{ value }`, which
   replaces the `toggle` event (`pdx migrate` rewrites a listener on it), and invalid, collapsed,
