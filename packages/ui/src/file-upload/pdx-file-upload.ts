@@ -1,7 +1,7 @@
 // pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
 // Supports accept filter, size/count limits, image thumbnails, progress tracking.
 
-import { component, html, signal, computed, generatedId, model, untracked, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, computed, generatedId, model, untracked, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -69,7 +69,7 @@ function acceptHint(accept: string): string {
 /**
  * Drag-and-drop file upload with validation, image preview and size and count limits.
  *
- * @slot file - Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.
+ * @slot file - Renders one file in the list: a snippet `file(file, status, progress)`.
  *
  * @csspart root - The frame: the drop zone, the refusals and the list.
  * @csspart dropzone - The `role="button"` area a file is dropped on, or clicked to browse.
@@ -106,7 +106,7 @@ component('pdx-file-upload', {
         auto: { type: Boolean, default: false },
         action: { type: String, default: '' },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         file: slot<(file: File, status: 'pending' | 'uploading' | 'success' | 'error', progress: number) => Node>(),
     },
@@ -348,7 +348,7 @@ component('pdx-file-upload', {
         });
 
         function getFileSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'file', (s) => [s.file, s.status, s.progress]);
+            return declaredSnippet(ctx, 'file', (s) => [s.file, s.status, s.progress]);
         }
 
         /** A remove button's name: "Remove {file name}". */
