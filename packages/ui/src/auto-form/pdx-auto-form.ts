@@ -1,7 +1,7 @@
 // pdx-auto-form — JSON-driven form that accepts FieldDefinition[] or FormSchema.
 // Wraps pdx-form-template with DataSource integration for load/save.
 
-import { component, html, isDataSource, createFormFromSchema } from '@pdxui/core';
+import { component, html, isDataSource, createFormFromSchema, event } from '@pdxui/core';
 import type { DataSource, FormSchema, Form } from '@pdxui/core';
 import { toFormFields } from '@pdxui/core';
 import type { FieldDefinition } from '@pdxui/core';
@@ -13,6 +13,11 @@ import '../form-template/pdx-form-template'; // rendered by this component, and 
 /**
  * A form generated from field definitions or a form schema, so the same JSON that drives a data grid
  * also produces its edit form.
+ *
+ * @csspart root - The wrapper that holds the generated form and its actions.
+ * @csspart actions - The bar of the two buttons, with `show-actions`.
+ * @csspart reset - The reset button.
+ * @csspart submit - The save button.
  */
 component('pdx-auto-form', {
     props: {
@@ -35,6 +40,13 @@ component('pdx-auto-form', {
         /** Reset button label. Empty: the auto-form.reset component string, «Reset». */
         resetLabel: { type: String, default: '' },
     },
+    // Declared (#138): it stays on the host, which the parent listens on.
+    events: {
+        /** Save passed validation: the values (stored in the `source` when there is one). */
+        'pdx-submit': event<{ values: Record<string, unknown>; valid: true }>(),
+    },
+    // Its states are its form's, on the pdx-form the generated template holds (#293).
+    parts: ['root', 'actions', 'reset', 'submit'],
     setup(ctx) {
         let _built = false;
         let _formEl: HTMLElement | null = null;
@@ -107,12 +119,14 @@ component('pdx-auto-form', {
             // Action buttons
             if (ctx.showActions()) {
                 const actions = document.createElement('div');
+                actions.dataset.part = 'actions';
                 actions.style.display = 'flex';
                 actions.style.gap = 'var(--pdx-space-sm)';
                 actions.style.justifyContent = 'flex-end';
                 actions.style.marginTop = 'var(--pdx-space-lg)';
 
                 const resetBtn = document.createElement('pdx-button') as any;
+                resetBtn.dataset.part = 'reset';
                 resetBtn.setAttribute('variant', 'ghost');
                 resetBtn.setAttribute('label', resetText());
                 _resetBtn = resetBtn;
@@ -122,6 +136,7 @@ component('pdx-auto-form', {
                 });
 
                 const submitBtn = document.createElement('pdx-button') as any;
+                submitBtn.dataset.part = 'submit';
                 submitBtn.setAttribute('variant', 'primary');
                 submitBtn.setAttribute('label', submitText());
                 _submitBtn = submitBtn;
@@ -171,6 +186,7 @@ component('pdx-auto-form', {
                 ctx.frame(() => {
                     _formEl = document.createElement('div');
                     _formEl.className = 'pdx-auto-form';
+                    _formEl.dataset.part = 'root';
                     ctx.el.appendChild(_formEl);
                     buildForm();
                 });

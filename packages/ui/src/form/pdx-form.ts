@@ -5,7 +5,7 @@
 // Children (<pdx-form-field>, custom inputs) inject the form via useForm().
 // The form prop is required — create it with createForm() or @form rune.
 
-import { component, html, provideForm, useFormCoordinator, onDestroy, DEV } from '@pdxui/core';
+import { component, html, provideForm, useFormCoordinator, onDestroy, DEV, signal, event } from '@pdxui/core';
 import type { Form, DataSource, FormCoordinator } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -15,6 +15,13 @@ import '@pdxui/design/components/form';
 /**
  * A form that provides its Form to the controls and form fields inside it and validates them, with
  * save modes and DataSource integration.
+ *
+ * @cssstate dirty - A value differs from the one the form started from (or was last reset to).
+ * @cssstate valid - The form's `valid()`: no field has an error among the validations run so far.
+ * @cssstate invalid - Its last submit was refused, and an error is still there.
+ * @cssstate submitting - A submit is running (`form.handleSubmit`).
+ *
+ * @csspart root - The native `<form>`.
  */
 component('pdx-form', {
     props: {
@@ -33,6 +40,16 @@ component('pdx-form', {
         /** Record ID to load from the DataSource. */
         recordId: { type: String, default: '' },
     },
+    // Declared (#138): they stay on the host, which the parent listens on.
+    events: {
+        /** A submit passed validation: the values, and `saved` when a `source` stored them. */
+        'pdx-submit': event<{ values: Record<string, unknown>; saved?: boolean }>(),
+        /** The `source` refused the save. */
+        'pdx-submit-error': event<{ error: unknown }>(),
+    },
+    // What its form is (#293), which an agent's page card reads.
+    states: ['dirty', 'valid', 'invalid', 'submitting'],
+    parts: ['root'],
     setup(ctx) {
         // `form` is read REACTIVELY: schema-driven parents (pdx-form-template)
         // dispose the old Form and swap in a new one when the schema changes. Capturing it once
@@ -65,6 +82,18 @@ component('pdx-form', {
                 parentCoordinator.register(formName, f);
                 registeredForm = f;
             }
+        });
+
+        // A refused submit makes the form invalid while it has an error; a passing submit, or a reset,
+        // clears it. Its fields are touched from then on, so an error that comes back is shown.
+        const refused = signal(false);
+        ctx.track(() => {
+            const f = ctx.form() as Form<any> | null;
+            const valid = !!f?.valid();
+            ctx.state('dirty', !!f?.dirty());
+            ctx.state('valid', valid);
+            ctx.state('invalid', refused() && !valid);
+            ctx.state('submitting', !!f?.submitting());
         });
 
         function scrollToFirstError(): void {
@@ -109,6 +138,7 @@ component('pdx-form', {
 
             // Touch all fields to show errors, then validate
             f.validate().then((isValid: boolean) => {
+                refused.set(!isValid);
                 if (!isValid) {
                     scrollToFirstError();
                     return;
@@ -135,6 +165,7 @@ component('pdx-form', {
         function onReset(e: Event): void {
             e.preventDefault();
             if (!form) return;
+            refused.set(false);
             // Each control shows its field through its model binding, `::value="f.x"` (#128, #613).
             form.reset();
         }
@@ -163,7 +194,7 @@ component('pdx-form', {
         };
     },
     render: (ctx) => html`
-        <form :class="${ctx.wrapperClass}" novalidate
+        <form :class="${ctx.wrapperClass}" data-part="root" novalidate
               :autocomplete="${ctx.autocomplete}"
               @submit="${ctx.onSubmit}"
               @reset="${ctx.onReset}">

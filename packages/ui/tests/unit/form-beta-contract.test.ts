@@ -24,6 +24,8 @@ interface Row {
     parts: string[];
     /** Its variant axes and their values, reflected on the host. */
     variants?: Record<string, string[]>;
+    /** The events it declares, when the row says: a model's `<name>-change` included. */
+    events?: string[];
 }
 
 const DONE: Row[] = [
@@ -55,6 +57,22 @@ const DONE: Row[] = [
         tag: 'pdx-field-list', models: [], states: ['empty'],
         parts: ['root', 'header', 'label', 'add', 'columns', 'rows', 'row', 'cell', 'actions', 'empty', 'footer', 'dialog'],
     },
+    // `collapsed` is written by the toggle: a model, whose `collapsed-change` replaces the `toggle` event.
+    {
+        tag: 'pdx-fieldset', models: ['collapsed'], states: ['invalid', 'collapsed', 'collapsible', 'disabled'],
+        parts: ['root', 'legend', 'toggle', 'description', 'content', 'error'],
+        variants: { variant: ['bordered', 'filled', 'plain'], size: ['md', 'sm', 'lg'] },
+        events: ['collapsed-change'],
+    },
+    // What its form is: dirty, valid, refused at its last submit (invalid), submitting.
+    {
+        tag: 'pdx-form', models: [], states: ['dirty', 'valid', 'invalid', 'submitting'], parts: ['root'],
+        events: ['pdx-submit', 'pdx-submit-error'],
+    },
+    {
+        tag: 'pdx-auto-form', models: [], states: [], parts: ['root', 'actions', 'reset', 'submit'],
+        events: ['pdx-submit'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
@@ -74,6 +92,12 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
 
     it('declares its variant axes', () => {
         expect(Object.fromEntries((decl?.variants ?? []).map((v) => [v.name, v.values]))).toEqual(row.variants ?? {});
+    });
+
+    it.runIf(row.events)('declares its events, each with a typed detail', () => {
+        const events = (decl?.events ?? []) as (Named & { detail?: string })[];
+        expect(events.map((e) => e.name).sort()).toEqual([...(row.events ?? [])].sort());
+        for (const e of events) expect(e.detail, `${e.name} has no declared detail type`).toBeTruthy();
     });
 });
 

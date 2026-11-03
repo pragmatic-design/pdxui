@@ -1157,8 +1157,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the form is submitted.",
-              "detail": "{ values, valid }"
+              "description": "Save passed validation: the values (stored in the `source` when there is one).",
+              "detail": "{ values: Record<string, unknown>; valid: true }"
             }
           ],
           "attributes": [
@@ -1215,6 +1215,24 @@
                 "text": "string"
               },
               "default": "''"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The wrapper that holds the generated form and its actions."
+            },
+            {
+              "name": "actions",
+              "description": "The bar of the two buttons, with `show-actions`."
+            },
+            {
+              "name": "reset",
+              "description": "The reset button."
+            },
+            {
+              "name": "submit",
+              "description": "The save button."
             }
           ]
         }
@@ -13299,16 +13317,6 @@
             },
             {
               "kind": "field",
-              "name": "collapsed",
-              "description": "Whether it starts collapsed.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false",
-              "attribute": "collapsed"
-            },
-            {
-              "kind": "field",
               "name": "variant",
               "description": "bordered (the default), filled or plain.",
               "type": {
@@ -13326,7 +13334,20 @@
               },
               "default": "'md'",
               "attribute": "size"
+            },
+            {
+              "kind": "field",
+              "name": "collapsed",
+              "description": "Whether a collapsible fieldset is collapsed.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "collapsed"
             }
+          ],
+          "models": [
+            "collapsed"
           ],
           "variants": [
             {
@@ -13358,14 +13379,20 @@
               }
             }
           ],
+          "alphaEvents": [
+            "toggle"
+          ],
+          "alphaDetail": {
+            "collapsed": "$event.detail.value"
+          },
           "events": [
             {
-              "name": "toggle",
+              "name": "collapsed-change",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when toggled open or closed.",
-              "detail": "{ collapsed }"
+              "description": "Fired when the component writes `collapsed`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -13427,15 +13454,6 @@
               "default": "false"
             },
             {
-              "name": "collapsed",
-              "fieldName": "collapsed",
-              "description": "Whether it starts collapsed.",
-              "type": {
-                "text": "boolean"
-              },
-              "default": "false"
-            },
-            {
               "name": "variant",
               "fieldName": "variant",
               "description": "bordered (the default), filled or plain.",
@@ -13452,12 +13470,65 @@
                 "text": "'md' | 'sm' | 'lg'"
               },
               "default": "'md'"
+            },
+            {
+              "name": "collapsed",
+              "fieldName": "collapsed",
+              "description": "Whether a collapsible fieldset is collapsed.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             }
           ],
           "slots": [
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native `<fieldset>`."
+            },
+            {
+              "name": "legend",
+              "description": "The `<legend>`: the text and, when collapsible, the toggle."
+            },
+            {
+              "name": "toggle",
+              "description": "The collapse button in the legend."
+            },
+            {
+              "name": "description",
+              "description": "The description under the legend, with `description`."
+            },
+            {
+              "name": "content",
+              "description": "The slotted controls."
+            },
+            {
+              "name": "error",
+              "description": "The error message, with `error`; it is the fieldset's description."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "invalid",
+              "description": "`invalid`, or an `error` is set: the border turns to the danger colour."
+            },
+            {
+              "name": "collapsed",
+              "description": "`collapsed`: the content is hidden and the chevron turned."
+            },
+            {
+              "name": "collapsible",
+              "description": "`collapsible`: the legend holds the toggle."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled`: every control inside is disabled, by the native fieldset."
             }
           ]
         }
@@ -14930,16 +15001,16 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired when the form is submitted.",
-              "detail": "{ values, saved } | { values }"
+              "description": "A submit passed validation: the values, and `saved` when a `source` stored them.",
+              "detail": "{ values: Record<string, unknown>; saved?: boolean }"
             },
             {
               "name": "pdx-submit-error",
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "Fired on `pdx-submit-error`.",
-              "detail": "{ error }"
+              "description": "The `source` refused the save.",
+              "detail": "{ error: unknown }"
             }
           ],
           "attributes": [
@@ -14993,6 +15064,30 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The native `<form>`."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "dirty",
+              "description": "A value differs from the one the form started from (or was last reset to)."
+            },
+            {
+              "name": "valid",
+              "description": "The form's `valid()`: no field has an error among the validations run so far."
+            },
+            {
+              "name": "invalid",
+              "description": "Its last submit was refused, and an error is still there."
+            },
+            {
+              "name": "submitting",
+              "description": "A submit is running (`form.handleSubmit`)."
             }
           ]
         }

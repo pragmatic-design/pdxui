@@ -394,6 +394,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-fieldset`, `pdx-form` and `pdx-auto-form` take the beta contract (#293).
+  `pdx-fieldset`'s `collapsed` is a model: its toggle announces `collapsed-change` `{ value }`, which
+  replaces the `toggle` event (`pdx migrate` rewrites a listener on it), and invalid, collapsed,
+  collapsible and disabled are states of the host. A fieldset in error is described by its message
+  (A2). `pdx-form`'s `dirty`, `valid`, `submitting` and `invalid` (its last submit refused) are
+  states, and its events are declared. Their pieces are parts.
 - **Breaking:** `pdx-form-field`, `pdx-field-group` and `pdx-field-list` take the beta contract
   (#293). `pdx-form-field`'s error, warning and success — one at a time, as the message it shows —
   and its required, optional, disabled and horizontal are states of the host, drawn as the native
