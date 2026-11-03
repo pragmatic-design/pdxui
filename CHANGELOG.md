@@ -428,6 +428,12 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-breadcrumb`, `pdx-carousel`, `pdx-description-list`, `pdx-sortable-list` and
+  `pdx-timeline` read their snippet only (#492): a parent's alpha scoped slot (`<slot name="item"
+  let:item>`) draws nothing in them now; `pdx migrate` rewrites it to the `@snippet` that does. A
+  component written in TypeScript reads its parent's snippet alone with core's new
+  `declaredSnippet(ctx, name, args)`; `snippetOrSlot` stays for the components not moved yet.
+
 - **Breaking:** `pdx-form-template` takes the beta contract (#293), the last of the form family. Its
   wizard layout is a `pdx-wizard`, one panel per section, in place of a stepper of its own: the
   current step is `aria-current="step"` and says «Step n of N» (A6), a step with an error is held in
