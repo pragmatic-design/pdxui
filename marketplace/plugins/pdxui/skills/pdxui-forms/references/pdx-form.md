@@ -35,7 +35,11 @@ is one `<pdx-form name>` each under `createFormCoordinator()` (recipes: *A long 
 | `source` | — | object | `null` | DataSource for auto-load/save. When set, submit saves via DS. |
 | `recordId` | `recordid` | string | `''` | Record ID to load from the DataSource. |
 
-**Events:** `pdx-submit` → `detail: { values, saved } | { values }` — Fired when the form is submitted.; `pdx-submit-error` → `detail: { error }` — Fired on `pdx-submit-error`.
+**Events:** `pdx-submit` → `detail: { values: Record<string, unknown>; saved?: boolean }` — A submit passed validation: the values, and `saved` when a `source` stored them.; `pdx-submit-error` → `detail: { error: unknown }` — The `source` refused the save.
+
+**States:** `:state(dirty)` — A value differs from the one the form started from (or was last reset to).; `:state(valid)` — The form's `valid()`: no field has an error among the validations run so far.; `:state(invalid)` — Its last submit was refused, and an error is still there.; `:state(submitting)` — A submit is running (`form.handleSubmit`).
+
+**Parts:** `[data-part="root"]` — The native `<form>`.
 
 
 #### Examples

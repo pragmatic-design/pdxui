@@ -10,13 +10,17 @@ A bordered, titled group of fields.
 | `error` | `error` | string | `''` | Marks the control as invalid. |
 | `description` | `description` | string | `''` | Secondary descriptive text. |
 | `collapsible` | `collapsible` | boolean | `false` | Allows the group to collapse. |
-| `collapsed` | `collapsed` | boolean | `false` | Whether it starts collapsed. |
 | `variant` | `variant` | 'bordered' \| 'filled' \| 'plain' | `'bordered'` | bordered (the default), filled or plain. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
+| `collapsed` | `collapsed` | boolean | `false` | Whether a collapsible fieldset is collapsed. |
 
-**Events:** `toggle` → `detail: { collapsed }` — Fired when toggled open or closed.
+**Events:** `collapsed-change` → `detail: { value: boolean }` — Fired when the component writes `collapsed`. Does not bubble.
 
 **Renders:** roles `alert`
+
+**States:** `:state(invalid)` — `invalid`, or an `error` is set: the border turns to the danger colour.; `:state(collapsed)` — `collapsed`: the content is hidden and the chevron turned.; `:state(collapsible)` — `collapsible`: the legend holds the toggle.; `:state(disabled)` — `disabled`: every control inside is disabled, by the native fieldset.
+
+**Parts:** `[data-part="root"]` — The native `<fieldset>`.; `[data-part="legend"]` — The `<legend>`: the text and, when collapsible, the toggle.; `[data-part="toggle"]` — The collapse button in the legend.; `[data-part="description"]` — The description under the legend, with `description`.; `[data-part="content"]` — The slotted controls.; `[data-part="error"]` — The error message, with `error`; it is the fieldset's description.
 
 
 #### Examples
@@ -59,11 +63,11 @@ are checked against the manifest above._
 </div>
 ```
 
-**Collapsible** — Click the chevron to expand/collapse. _(from the live demo)_
+**Collapsible** — Click the chevron to expand/collapse. `collapsed` is a model: `::collapsed` follows the chevron. _(from the live demo)_
 
 ```html
 <div class="demo-block">
-  <pdx-fieldset legend="Advanced Options" collapsible :collapsed="collapsed1" @toggle="onToggle">
+  <pdx-fieldset legend="Advanced Options" collapsible ::collapsed="collapsed1">
     <pdx-form-field label="Timeout">
       <pdx-input placeholder="5000"></pdx-input>
     </pdx-form-field>
