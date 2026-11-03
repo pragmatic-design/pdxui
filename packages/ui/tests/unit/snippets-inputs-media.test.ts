@@ -1,12 +1,11 @@
 // Typed snippets for the carousel, the field list, the upload, the mention and the tag input (#596,
-// part 3c of #131).
+// part 3c of #131; snippet only, #492).
 //
-// Each of these components drew the template a parent gave it through a light-DOM scoped slot only
-// (`<slot name="x" let:row>`, `ctx.__slots`). It now declares the slot in its descriptor,
+// Each of these components drew the template a parent gave it through a light-DOM scoped slot
+// (`<slot name="x" let:row>`, `ctx.__slots`). It declares the slot in its descriptor,
 // `slot<(…) => Node>()`, so a parent's `@snippet` — which compiles to setting the element's property
-// — reaches it. For each one, the same text is drawn once by a snippet from its arguments and once by
-// the alpha scoped slot from its scope: the two must render the same entries, and the scoped slot
-// must keep working until #131's removal part.
+// — reaches it, and since #492 it reads that snippet alone. For each one, the snippet draws the
+// expected entries from its arguments, and a scoped slot given to the same element draws nothing.
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm } from '@pdxui/core';
@@ -29,11 +28,8 @@ interface Case {
     open?(el: HTMLElement): Promise<void> | void;
     fromScope(scope: Scope): string;
     fromArgs(...args: Args): string;
-    /**
-     * Set once the component reads its snippet only (#492, part 3): the entries its snippet draws.
-     * The alpha scoped slot then draws nothing, and the snippet is held to these instead of to it.
-     */
-    expected?: string[];
+    /** The entries the snippet draws (#492): the alpha scoped slot draws none. */
+    expected: string[];
 }
 
 const field = (x: unknown, name: string) => (x as Scope)[name] as string;
@@ -55,12 +51,14 @@ const CASES: Case[] = [
         }),
         fromScope: (s) => `${field(s.item, 'name')}#${s.index}:${typeof s.remove}`,
         fromArgs: (item, index, remove) => `${field(item, 'name')}#${index}:${typeof remove}`,
+        expected: ['alpha#0:function', 'beta#1:function'],
     },
     {
         tag: 'pdx-file-upload', slot: 'file',
         props: () => ({ multiple: true, value: [new File(['x'], 'a.txt'), new File(['yy'], 'b.txt')] }),
         fromScope: (s) => `${(s.file as File).name}:${s.status}:${s.progress}`,
         fromArgs: (file, status, progress) => `${(file as File).name}:${status}:${progress}`,
+        expected: ['a.txt:pending:0', 'b.txt:pending:0'],
     },
     {
         tag: 'pdx-mention', slot: 'suggestion',
@@ -74,12 +72,14 @@ const CASES: Case[] = [
         },
         fromScope: (s) => `${field(s.item, 'label')}#${s.index}${s.active ? '*' : ''}`,
         fromArgs: (item, index, active) => `${field(item, 'label')}#${index}${active ? '*' : ''}`,
+        expected: ['Alice#0*', 'Albert#1'],
     },
     {
         tag: 'pdx-tag-input', slot: 'tag',
         props: () => ({ value: ['red', 'blue'] }),
         fromScope: (s) => `${s.tag}#${s.index}`,
         fromArgs: (tag, index) => `${tag}#${index}`,
+        expected: ['red#0', 'blue#1'],
     },
 ];
 
@@ -120,32 +120,17 @@ function snippet(c: Case) {
     };
 }
 
-describe('carousel, field list, upload, mention, tag input: a snippet renders where the scoped slot did (#596)', () => {
+describe('carousel, field list, upload, mention, tag input: a snippet draws, a scoped slot does not (#596, #492)', () => {
     beforeEach(cleanup);
 
     for (const c of CASES) {
-        if (c.expected) {
-            const expected = c.expected;
-            describe(`${c.tag} — ${c.slot}, snippet only (#492)`, () => {
-                it('the alpha scoped slot draws nothing', async () => {
-                    expect(await mount(c, scopedSlot(c))).toEqual([]);
-                });
-
-                it('a snippet draws its entries, from its arguments', async () => {
-                    expect(await mount(c, snippet(c))).toEqual(expected);
-                });
-            });
-            continue;
-        }
         describe(`${c.tag} — ${c.slot}`, () => {
-            it('the alpha scoped slot still renders (control)', async () => {
-                expect(await mount(c, scopedSlot(c))).not.toEqual([]);
+            it('the alpha scoped slot draws nothing', async () => {
+                expect(await mount(c, scopedSlot(c))).toEqual([]);
             });
 
-            it('a snippet renders the same entries, from its arguments', async () => {
-                const fromSlot = await mount(c, scopedSlot(c));
-                cleanup();
-                expect(await mount(c, snippet(c))).toEqual(fromSlot);
+            it('a snippet draws its entries, from its arguments', async () => {
+                expect(await mount(c, snippet(c))).toEqual(c.expected);
             });
         });
     }
