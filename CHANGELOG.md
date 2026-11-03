@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- `pdx-data-grid`'s other templates get a typed snippet each (#673), with the alpha slot's context as
+  arguments: `editCell(row, column, value, form)`, `filter(column)`, `filterPopover(column, apply,
+  clear)`, `toolbarStart(grid)`, `toolbarEnd(grid)` and `empty()`. The per-column ones switch on
+  `column.field`, and a column they draw nothing for keeps the grid's own editor, filter input or
+  popover. `grid` is core's `DataGrid`; `form` is null in a cell edit, the only edit that draws one.
+  The alpha slots `col-edit:{field}`, `filter:{field}`, `filter-popover:{field}`, `toolbar-start`,
+  `toolbar-end` and `empty` still render, behind the snippets.
+
 - `__PDX_DEVTOOLS__` v2 gains its last five members (#298), in development only. `delta()` returns
   what changed in the card and the outline since the agent last looked; `actions()` lists the
   `@action`s of the components in the route, with `enabled`, `pending`, `error` and their parameter's

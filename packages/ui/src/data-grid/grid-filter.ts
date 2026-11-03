@@ -88,11 +88,10 @@ export function buildFilterRow(gc: GridContext, cols: AnyColumn[]): HTMLElement 
             continue;
         }
 
-        // Filter slot: filter:{field}
-        const filterSlot = gc.getSlot(`filter:${col.field}`);
-        if (filterSlot) {
-            const content = filterSlot({ col, field: col.field });
-            cell.appendChild(content instanceof DocumentFragment ? content : content);
+        // The page's filter cell: the `filter(column)` snippet, or the alpha `filter:{field}` slot
+        const custom = gc.customFilter(col);
+        if (custom) {
+            cell.appendChild(custom);
             row.appendChild(cell);
             continue;
         }

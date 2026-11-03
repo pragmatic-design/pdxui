@@ -72,15 +72,17 @@
       <h2 class="pdx-txt-heading section-heading">Slots</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>col:{field}</code></td><td><code>{ row, value, index, col }</code></td><td>Custom cell template for a specific column</td></tr>
-            <tr><td><code>header:{field}</code></td><td><code>{ col, field, header }</code></td><td>Custom header template for a specific column</td></tr>
-            <tr><td><code>empty</code></td><td><code>{}</code></td><td>Custom empty state</td></tr>
-            <tr><td><code>filter:{field}</code></td><td><code>{ col, field }</code></td><td>Custom inline filter input for a column</td></tr>
-            <tr><td><code>filter-popover:{field}</code></td><td><code>{ col, apply, clear }</code></td><td>Custom filter popover content for a column</td></tr>
-            <tr><td><code>toolbar-start</code></td><td><code>{ grid }</code></td><td>Custom content at the start of the toolbar</td></tr>
-            <tr><td><code>toolbar-end</code></td><td><code>{ grid }</code></td><td>Custom content at the end of the toolbar</td></tr>
+            <tr><td><code>cell</code></td><td><code>(row, column, value)</code></td><td>A cell, one snippet for every column: switch on <code>column.field</code></td></tr>
+            <tr><td><code>header</code></td><td><code>(column)</code></td><td>A column's header</td></tr>
+            <tr><td><code>detail</code></td><td><code>(row)</code></td><td>An expanded row's detail</td></tr>
+            <tr><td><code>editCell</code></td><td><code>(row, column, value, form)</code></td><td>The editor of the cell being edited</td></tr>
+            <tr><td><code>filter</code></td><td><code>(column)</code></td><td>A column's input in the filter row</td></tr>
+            <tr><td><code>filterPopover</code></td><td><code>(column, apply, clear)</code></td><td>A column's filter popover</td></tr>
+            <tr><td><code>toolbarStart</code></td><td><code>(grid)</code></td><td>Content at the start of the toolbar</td></tr>
+            <tr><td><code>toolbarEnd</code></td><td><code>(grid)</code></td><td>Content at the end of the toolbar</td></tr>
+            <tr><td><code>empty</code></td><td><code>()</code></td><td>The empty state</td></tr>
           </tbody>
         </table>
       </div>

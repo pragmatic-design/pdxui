@@ -67,12 +67,10 @@ export function openFilterPopover(
     }
     const state = gc.popoverFilters[col.field] as unknown as FilterConditionState;
 
-    // Custom slot: filter-popover:{field}
-    const popoverSlot = gc.getSlot(`filter-popover:${col.field}`);
-    if (popoverSlot) {
-        openCustomSlotPopover(gc, col, anchorEl, popoverSlot, state);
-        return;
-    }
+    // The page's popover: the `filterPopover(column, apply, clear)` snippet, or the alpha
+    // `filter-popover:{field}` slot. One that draws nothing for this column leaves it to the grid's own.
+    const custom = gc.customFilterPopover(col);
+    if (custom && openCustomPopover(gc, col, anchorEl, custom)) return;
 
     const callbacks = {
         onApply: (s: FilterConditionState) => { gc.popoverFilters[col.field] = s as any; applyPopoverFilters(gc); },
@@ -106,17 +104,15 @@ function funnelOf(gc: GridContext, field: string): HTMLElement | null {
         `[role="columnheader"][data-field="${CSS.escape(field)}"] .pdx-dg-filter-icon`) ?? null;
 }
 
-// ─── Custom slot popover (grid-specific) ───────────────────
+// ─── The page's popover (grid-specific) ────────────────────
 
-function openCustomSlotPopover(
+/** Open the popover the page draws; false, and nothing opened, when it draws nothing for this column. */
+function openCustomPopover(
     gc: GridContext,
     col: AnyColumn,
     anchorEl: HTMLElement,
-    slotFn: Function,
-    _state: FilterConditionState,
-): void {
-    closeFilterPopover();
-
+    draw: (apply: () => void, clear: () => void) => Node | null,
+): boolean {
     const popover = document.createElement('div');
     popover.className = 'pdx-dg-filter-popover';
     popover.style.position = 'fixed';
@@ -133,8 +129,10 @@ function openCustomSlotPopover(
         () => funnelOf(gc, col.field) ?? (anchorEl.isConnected ? anchorEl : null), () => dialog.closing(cleanup));
     const applyFn = () => dialog.closing(() => { applyPopoverFilters(gc); cleanup(); });
     const clearFn = () => dialog.closing(() => { delete gc.popoverFilters[col.field]; applyPopoverFilters(gc); cleanup(); });
-    const content = slotFn({ col, apply: applyFn, clear: clearFn });
-    popover.appendChild(content instanceof DocumentFragment ? content : content);
+    const content = draw(applyFn, clearFn);
+    if (!content) return false;
+    closeFilterPopover();
+    popover.appendChild(content);
 
     const rect = anchorEl.getBoundingClientRect();
     popover.style.top = `${rect.bottom + 4}px`;
@@ -154,6 +152,7 @@ function openCustomSlotPopover(
         if (!popover.contains(e.target as Node) && e.target !== anchorEl) cleanup();
     };
     setTimeout(() => document.addEventListener('pointerdown', onOut, true), 0);
+    return true;
 }
 
 // ─── Apply popover filters to DataSource ────────────────────

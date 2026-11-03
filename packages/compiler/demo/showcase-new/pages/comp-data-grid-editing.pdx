@@ -47,10 +47,10 @@
         <div class="opt-row"><code>pdx-batch-commit</code><span>{ count }</span></div>
       </div>
 
-      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Edit Slots</h3>
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Edit Snippet</h3>
       <div class="options-table">
-        <div class="opt-header"><span>Slot</span><span>Scope</span></div>
-        <div class="opt-row"><code>col-edit:{field}</code><span>{ row, value, col, form } — custom editor for a column</span></div>
+        <div class="opt-header"><span>Snippet</span><span>Arguments</span></div>
+        <div class="opt-row"><code>editCell</code><span>(row, column, value, form) — the editor of the cell being edited; switch on column.field</span></div>
       </div>
     </section>
   </div>

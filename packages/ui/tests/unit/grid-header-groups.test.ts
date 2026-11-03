@@ -13,7 +13,6 @@ function gcFor(grid: unknown): GridContext {
         getSelectionMode: () => 'none',
         hasFilterRow: () => true, // suppress filter icon → keep asserted DOM minimal
         hasToolbar: () => false,
-        getSlot: () => undefined,
         customCell: () => null,
         customHeader: () => null,
         customDetail: () => null,

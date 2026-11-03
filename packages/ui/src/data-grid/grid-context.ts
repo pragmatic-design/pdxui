@@ -1,7 +1,6 @@
 // Shared context passed to all grid sub-modules.
 // Avoids circular deps — each module imports only this interface.
 
-import type { SlotFunction } from '@pdxui/core';
 import type { ResolvedColumn } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 import type { EditCellState } from './grid-edit';
@@ -11,8 +10,6 @@ export type AnyColumn = ResolvedColumn<any>;
 export interface GridContext {
     /** useDataGrid composable (null before first build). */
     grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null;
-    /** Get a named slot function (lazy — populated after setup). */
-    getSlot: (name: string) => SlotFunction | undefined;
     /**
      * A cell the page draws (#597): the `cell(row, column, value)` snippet's node, else the alpha
      * `col:{field}` scoped slot's, else null — and the grid draws the cell itself. One snippet serves
@@ -23,6 +20,24 @@ export interface GridContext {
     customHeader: (col: AnyColumn) => Node | null;
     /** A row's detail: the `detail(row)` snippet's node, else the alpha `detail` slot's, else null. */
     customDetail: (row: Record<string, unknown>, index: number, id: unknown) => Node | null;
+    /**
+     * The editor of a cell being edited (#673): the `editCell(row, column, value, form)` snippet's
+     * node, else the alpha `col-edit:{field}` slot's, else null — and the grid draws its own editor.
+     */
+    customEditCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown) => Node | null;
+    /** A column's cell in the filter row: the `filter(column)` snippet's node, else `filter:{field}`'s, else null. */
+    customFilter: (col: AnyColumn) => Node | null;
+    /**
+     * What draws a column's filter popover, given its `apply` and `clear`: the `filterPopover(column,
+     * apply, clear)` snippet, else the alpha `filter-popover:{field}` slot. Null when the page gave
+     * neither; the drawer returns null when they draw nothing for this column. Either way the grid
+     * opens its own popover.
+     */
+    customFilterPopover: (col: AnyColumn) => ((apply: () => void, clear: () => void) => Node | null) | null;
+    /** What the toolbar holds at its start or end: the `toolbarStart`/`toolbarEnd(grid)` snippet's node, else `toolbar-start`/`toolbar-end`'s. */
+    customToolbar: (side: 'start' | 'end') => Node | null;
+    /** The empty state: the `empty()` snippet's node, else the alpha `empty` slot's, else null. */
+    customEmpty: () => Node | null;
     /** Current selection mode: 'none' | 'single' | 'multiple'. */
     getSelectionMode: () => string;
     /**
