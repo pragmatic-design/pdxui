@@ -460,8 +460,8 @@ grid's `DataGrid`, and `empty()` replaces the empty state.
 
 A component written in TypeScript reads the parent's template with core's `declaredSnippet(ctx,
 name, args)`: the snippet when the parent gave one, called with the arguments `args` takes from the
-scope, and nothing otherwise (#492). `snippetOrSlot(ctx, name, args, slotName?)` falls back on the
-alpha scoped slot, and stays only while the library's own components move off it.
+scope, and nothing otherwise (#492); every component of the library reads its snippets with it.
+`snippetOrSlot(ctx, name, args, slotName?)` falls back on the alpha scoped slot, and goes with it.
 
 ### Scoped slots (data from the component to the content)
 

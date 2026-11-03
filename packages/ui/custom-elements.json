@@ -9183,47 +9183,47 @@
           "slots": [
             {
               "name": "cell",
-              "description": "Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.",
+              "description": "Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes.",
               "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown)"
             },
             {
               "name": "header",
-              "description": "Draws a column's header: `header(column)`; a column it draws nothing for keeps its title. The alpha scoped slot `header:{field}` still draws one.",
+              "description": "Draws a column's header: `header(column)`; a column it draws nothing for keeps its title.",
               "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
             },
             {
               "name": "detail",
-              "description": "Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.",
+              "description": "Draws an expanded row's detail: `detail(row)`.",
               "signature": "(row: T)"
             },
             {
               "name": "editCell",
-              "description": "Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit. The alpha scoped slot `col-edit:{field}` still draws one column's.",
+              "description": "Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit.",
               "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown, form: import('@pdxui/core').Form<Record<string, unknown>> | null)"
             },
             {
               "name": "filter",
-              "description": "Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input. The alpha scoped slot `filter:{field}` still draws one.",
+              "description": "Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input.",
               "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
             },
             {
               "name": "filterPopover",
-              "description": "Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover. The alpha scoped slot `filter-popover:{field}` still draws one.",
+              "description": "Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover.",
               "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, apply: () => void, clear: () => void)"
             },
             {
               "name": "toolbarStart",
-              "description": "Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`, or the alpha scoped slot `toolbar-start`.",
+              "description": "Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`.",
               "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
             },
             {
               "name": "toolbarEnd",
-              "description": "Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`, or the alpha scoped slot `toolbar-end`.",
+              "description": "Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`.",
               "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
             },
             {
               "name": "empty",
-              "description": "Draws the empty state in place of the grid's icon and title: `empty()`, or the alpha scoped slot `empty`.",
+              "description": "Draws the empty state in place of the grid's icon and title: `empty()`.",
               "signature": "()"
             }
           ],

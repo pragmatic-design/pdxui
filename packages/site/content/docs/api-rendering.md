@@ -293,9 +293,9 @@ function declaredSnippet(ctx: object, name: string, args: (scope: Record<string,
 
 The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
 scope object, the arguments taken from it by `args` (#492). Undefined when the parent gave none: the
-alpha scoped slot (`ctx.__slots`) is not read, unlike {@link snippetOrSlot}, which a component left
-on the alpha path still uses. Read where the component draws, so a snippet set after mount is the
-one drawn.
+alpha scoped slot (`ctx.__slots`) is not read, unlike {@link snippetOrSlot}. Every component of the
+library reads its snippets with it. Read where the component draws, so a snippet set after mount is
+the one drawn.
 
 ## `defer`
 
@@ -754,6 +754,9 @@ component draws, so a snippet set after mount is the one drawn.
 
 `slotName` is the alpha slot's name when the snippet's differs: a slot that shares its name with a
 prop is renamed on the snippet side only (#595, `pdx-pagination`'s `page` is the snippet `item`).
+
+No component of the library uses it since #492's part 3: they read their snippet alone with
+{@link declaredSnippet}. It goes with the alpha scoped slots themselves.
 
 ## `spring`
 
