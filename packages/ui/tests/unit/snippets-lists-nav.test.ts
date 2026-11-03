@@ -37,6 +37,11 @@ interface Case {
     fromScope(scope: Scope): string;
     /** The same text, drawn by the snippet from its arguments. */
     fromArgs(...args: Args): string;
+    /**
+     * Set once the component reads its snippet only (#492, part 3): the entries its snippet draws.
+     * The alpha scoped slot then draws nothing, and the snippet is held to these instead of to it.
+     */
+    expected?: string[];
 }
 
 const label = (x: unknown) => (x as Scope).label as string;
@@ -48,12 +53,14 @@ const CASES: Case[] = [
         props: { items: [{ key: 'home', label: 'Home', href: '/' }, { key: 'docs', label: 'Docs' }] },
         fromScope: (s) => `${label(s.item)}#${s.index}${s.isLast ? '!' : ''}`,
         fromArgs: (item, index, isLast) => `${label(item)}#${index}${isLast ? '!' : ''}`,
+        expected: ['Home#0', 'Docs#1!'],
     },
     {
         tag: 'pdx-description-list', slot: 'value',
         props: { items: [{ label: 'Name', value: 'Ada' }, { label: 'Role', value: 'Engineer' }] },
         fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (item, index) => `${label(item)}=${(item as Scope).value}#${index}`,
+        expected: ['Name=Ada#0', 'Role=Engineer#1'],
     },
     {
         tag: 'pdx-list', slot: 'item',
@@ -90,12 +97,14 @@ const CASES: Case[] = [
         props: { items: [{ id: 1, label: 'One' }, { id: 2, label: 'Two' }] },
         fromScope: (s) => `${label(s.item)}#${s.index}`,
         fromArgs: (item, index) => `${label(item)}#${index}`,
+        expected: ['One#0', 'Two#1'],
     },
     {
         tag: 'pdx-timeline', slot: 'content',
         props: { items: [{ title: 'Filed' }, { title: 'Shipped', status: 'success' }] },
         fromScope: (s) => `${(s.item as Scope).title}#${s.index}:${s.status}`,
         fromArgs: (item, index) => `${(item as Scope).title}#${index}:${(item as Scope).status ?? 'default'}`,
+        expected: ['Filed#0:default', 'Shipped#1:success'],
     },
     {
         tag: 'pdx-tree', slot: 'node',
@@ -145,6 +154,19 @@ describe('lists and navigation: a snippet renders where the scoped slot did (#59
     beforeEach(cleanup);
 
     for (const c of CASES) {
+        if (c.expected) {
+            const expected = c.expected;
+            describe(`${c.tag} — ${c.snippet ?? c.slot}, snippet only (#492)`, () => {
+                it('the alpha scoped slot draws nothing', async () => {
+                    expect(await mount(c, scopedSlot(c))).toEqual([]);
+                });
+
+                it('a snippet draws its entries, from its arguments', async () => {
+                    expect(await mount(c, snippet(c))).toEqual(expected);
+                });
+            });
+            continue;
+        }
         describe(`${c.tag} — ${c.snippet ?? c.slot}`, () => {
             it('the alpha scoped slot still renders (control)', async () => {
                 expect(await mount(c, scopedSlot(c))).not.toEqual([]);

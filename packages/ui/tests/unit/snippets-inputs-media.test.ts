@@ -29,6 +29,11 @@ interface Case {
     open?(el: HTMLElement): Promise<void> | void;
     fromScope(scope: Scope): string;
     fromArgs(...args: Args): string;
+    /**
+     * Set once the component reads its snippet only (#492, part 3): the entries its snippet draws.
+     * The alpha scoped slot then draws nothing, and the snippet is held to these instead of to it.
+     */
+    expected?: string[];
 }
 
 const field = (x: unknown, name: string) => (x as Scope)[name] as string;
@@ -39,6 +44,7 @@ const CASES: Case[] = [
         props: () => ({ items: [{ caption: 'First' }, { caption: 'Second' }], loop: false }),
         fromScope: (s) => `${field(s.slide, 'caption')}#${s.index}${s.isActive ? '*' : ''}`,
         fromArgs: (slide, index, active) => `${field(slide, 'caption')}#${index}${active ? '*' : ''}`,
+        expected: ['First#0*', 'Second#1'],
     },
     {
         tag: 'pdx-field-list', slot: 'row',
@@ -118,6 +124,19 @@ describe('carousel, field list, upload, mention, tag input: a snippet renders wh
     beforeEach(cleanup);
 
     for (const c of CASES) {
+        if (c.expected) {
+            const expected = c.expected;
+            describe(`${c.tag} — ${c.slot}, snippet only (#492)`, () => {
+                it('the alpha scoped slot draws nothing', async () => {
+                    expect(await mount(c, scopedSlot(c))).toEqual([]);
+                });
+
+                it('a snippet draws its entries, from its arguments', async () => {
+                    expect(await mount(c, snippet(c))).toEqual(expected);
+                });
+            });
+            continue;
+        }
         describe(`${c.tag} — ${c.slot}`, () => {
             it('the alpha scoped slot still renders (control)', async () => {
                 expect(await mount(c, scopedSlot(c))).not.toEqual([]);

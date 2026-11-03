@@ -1,16 +1,14 @@
 // pdx-description-list — Key-value pair display component.
 // Supports: horizontal/vertical layout, multi-column grid, bordered,
 // striped rows, sizes (sm/md/lg), icons, colon after labels.
-// Slot: "value" — custom value template (priority: slot > renderValue > default)
+// Snippet: "value" — custom value template (priority: snippet > renderValue > default)
 //
 // Usage:
-//   <pdx-description-list :items="${items}" columns="2">
-//     <slot name="value" let:item let:index>
-//       <a :href="${item.href}">${item.value}</a>
-//     </slot>
+//   <pdx-description-list :items="items" columns="2">
+//     @snippet value(item, index) { <a :href="item.href">{{ item.value }}</a> }
 //   </pdx-description-list>
 
-import { component, html, repeatWithSlot, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, repeatWithSlot, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -31,7 +29,7 @@ export interface DescriptionListItem {
  * Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with
  * values as plain text or custom HTML.
  *
- * @slot value - Renders the value of one entry: a snippet `value(item, index)`, or the scoped slot, which receives `{ item, label, value, index }`.
+ * @slot value - Renders the value of one entry: a snippet `value(item, index)`.
  *
  * @csspart root - The `<dl>`, with the classes a native list uses (`.pdx-dl`, `-bordered`, `-striped`…).
  */
@@ -53,7 +51,7 @@ component('pdx-description-list', {
         colon: { type: Boolean, default: true },
         renderValue: { type: Object, default: null },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ label: string }', from: 'items' } },
     slots: {
@@ -63,9 +61,9 @@ component('pdx-description-list', {
         let built = false;
         let listEl: HTMLElement | null = null;
 
-        // Read slot lazily (_projectSlots runs after setup)
+        // Read where it draws: a snippet set after mount is the one drawn
         function getValueSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'value', (s) => [s.item, s.index]);
+            return declaredSnippet(ctx, 'value', (s) => [s.item, s.index]);
         }
 
         function getItems(): DescriptionListItem[] {
@@ -111,7 +109,7 @@ component('pdx-description-list', {
 
             const valueSlot = getValueSlot();
             if (valueSlot) {
-                const content = valueSlot({ item: dlItem, label: dlItem.label, value: dlItem.value, index });
+                const content = valueSlot({ item: dlItem, index });
                 dd.appendChild(content instanceof DocumentFragment ? content : content);
             } else if (renderValueFn) {
                 const customEl = renderValueFn(dlItem);

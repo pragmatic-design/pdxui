@@ -1,9 +1,9 @@
 // pdx-carousel — Carousel/slider for images, cards, or any content.
 // Supports: slide/fade animation, autoplay, touch/pointer swipe,
 // multiple slides per view, dot indicators, keyboard navigation.
-// Slot: "slide" — custom slide template (priority: slot > renderSlide > default)
+// Snippet: "slide" — custom slide template (priority: snippet > renderSlide > default)
 
-import { component, html, generatedId, slot, snippetOrSlot, model, event, signal, untracked } from '@pdxui/core';
+import { component, html, generatedId, slot, declaredSnippet, model, event, signal, untracked } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -30,7 +30,7 @@ export interface CarouselItem {
 /**
  * A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.
  *
- * @slot slide - Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.
+ * @slot slide - Renders one slide: a snippet `slide(slide, index, active)`.
  *
  * @csspart root - The carousel region (`role="region"`), which clips the slides and takes the focus.
  * @csspart track - The strip the slides sit in, moved to bring a slide on show.
@@ -77,7 +77,7 @@ component('pdx-carousel', {
         /** The region's accessible name. Empty: the component string `carousel.label` ("Carousel"). */
         label: { type: String, default: '' },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The slide a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { from: 'items' } },
     slots: {
@@ -112,9 +112,9 @@ component('pdx-carousel', {
         let pointerCurrentX = 0;
         let isDragging = false;
 
-        // Slot function — read lazily (_projectSlots runs after setup)
+        // Read where it draws: a snippet set after mount is the one drawn
         function getSlideSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'slide', (s) => [s.slide, s.index, s.isActive]);
+            return declaredSnippet(ctx, 'slide', (s) => [s.slide, s.index, s.isActive]);
         }
 
         function getItems(): CarouselItem[] {

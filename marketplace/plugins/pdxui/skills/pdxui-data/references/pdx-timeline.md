@@ -15,7 +15,7 @@ A vertical sequence of events.
 
 **Events:** `pdx-click` → `detail: { item: TimelineItem; index: number }` — A clickable event was clicked, or pressed with Enter or Space.
 
-**Slot:** `content` — Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).
+**Slot:** `content` — Renders the content of one entry: a snippet `content(item, index)`.
 
 **States:** `:state(pending)` — `pending`: a last row says more is to come.; `:state(clickable)` — `clickable`: each event is a tab stop, and a click or Enter emits `pdx-click`.
 

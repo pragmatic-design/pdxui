@@ -23,11 +23,11 @@
     <app-demo-comp-carousel-slot-template class="demo-section"></app-demo-comp-carousel-slot-template>
 
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <table class="options-table">
-        <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+        <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
         <tbody>
-          <tr><td><code>slide</code></td><td><code>{ slide, index, isActive }</code></td><td>Custom slide content. Priority: slot &gt; renderSlide &gt; default.</td></tr>
+          <tr><td><code>slide</code></td><td><code>(slide, index, active)</code></td><td>Custom slide content. Priority: snippet &gt; renderSlide &gt; default.</td></tr>
         </tbody>
       </table>
     </section>
