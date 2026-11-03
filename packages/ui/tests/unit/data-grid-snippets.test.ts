@@ -152,6 +152,179 @@ describe('pdx-data-grid: detail(row) (#597)', () => {
     });
 });
 
+// #673: the grid's other scoped slots get a snippet each, with the slot's context as arguments. The
+// snippet wins, the alpha slot is the fallback, and both draw in the same place.
+
+describe('pdx-data-grid: editCell(row, column, value, form) (#673)', () => {
+    const editing = (el: Grid) => el.querySelector('.pdx-dg-cell-editing');
+    const startEdit = async (el: Grid) => {
+        (el.startEdit as (id: unknown, field: string) => void)(1, 'name');
+        await tick(20);
+    };
+    const editor = (value: unknown) => {
+        const input = document.createElement('input');
+        input.className = 'mine';
+        input.value = String(value);
+        return input;
+    };
+
+    it('the alpha scoped slot col-edit:name still draws the editor (control)', async () => {
+        const el = await mountGrid({ editable: true }, scopedSlot('col-edit:name', (s) => editor(s.value)));
+        await startEdit(el);
+        expect(editing(el)?.querySelector('input.mine')).not.toBeNull();
+    });
+
+    it('a snippet draws the editor in the same cell, with the row, the column, the value and the form', async () => {
+        const seen: unknown[][] = [];
+        const el = await mountGrid({ editable: true }, (g) => {
+            g.editCell = (row: Row, column: Col, value: unknown, form: unknown) => {
+                seen.push([row.name, column.field, value, form]);
+                return column.field === 'name' ? editor(value) : null;
+            };
+        });
+        await startEdit(el);
+        expect(editing(el)?.querySelector('input.mine')).not.toBeNull();
+        // A cell edit has no form: the grid makes one only for a row edit (grid-edit.ts, startRowEdit).
+        expect(seen).toEqual([['Ada', 'name', 'Ada', null]]);
+    });
+
+    it('a snippet that draws nothing for the column leaves the grid\'s own editor', async () => {
+        const el = await mountGrid({ editable: true }, (g) => { g.editCell = () => null; });
+        await startEdit(el);
+        expect(editing(el)?.querySelector('.mine')).toBeNull();
+        expect(editing(el)?.childElementCount).toBeGreaterThan(0);
+    });
+
+    it('Enter commits what was typed in the snippet\'s editor, and saves it to the row', async () => {
+        const el = await mountGrid({ editable: true }, (g) => {
+            g.editCell = (_row: Row, column: Col, value: unknown) => (column.field === 'name' ? editor(value) : null);
+        });
+        const ends: unknown[] = [];
+        el.addEventListener('pdx-cell-edit-end', (e) => ends.push((e as CustomEvent).detail));
+        await startEdit(el);
+        const input = editing(el)?.querySelector('input.mine') as HTMLInputElement;
+        input.value = 'Zed';
+        input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+        await tick(20);
+        expect(ends).toEqual([{ rowId: 1, field: 'name', oldValue: 'Ada', newValue: 'Zed' }]);
+        expect(cellsOf(el, 0)[0]).toBe('Zed');
+    });
+});
+
+describe('pdx-data-grid: filter(column) (#673)', () => {
+    it('the alpha scoped slot filter:name still draws in the filter row (control)', async () => {
+        const el = await mountGrid({ filterable: true }, scopedSlot('filter:name', (s) => mark(`f ${s.field}`)));
+        expect(mine()).toEqual(['f name']);
+        expect(el.querySelector('.pdx-dg-filter-row .mine')).not.toBeNull();
+    });
+
+    it('a snippet draws the same filter cell, and the other columns keep the grid\'s', async () => {
+        const plain = await mountGrid({ filterable: true });
+        const inputs = plain.querySelectorAll('.pdx-dg-filter-row input').length;
+        cleanup();
+        const el = await mountGrid({ filterable: true }, (g) => {
+            g.filter = (column: Col) => (column.field === 'name' ? mark(`f ${column.field}`) : null);
+        });
+        expect(mine()).toEqual(['f name']);
+        expect(el.querySelector('.pdx-dg-filter-row .mine')).not.toBeNull();
+        expect(el.querySelectorAll('.pdx-dg-filter-row input').length, 'the price column keeps its own filter input').toBe(inputs - 1);
+    });
+});
+
+describe('pdx-data-grid: filterPopover(column, apply, clear) (#673)', () => {
+    type Popover = (column: Col, apply: () => void, clear: () => void) => Node | null;
+    const popover = () => document.querySelector('.pdx-dg-filter-popover');
+
+    async function openWith(give: (el: Grid) => void) {
+        const el = await mountGrid({}, give);
+        const source = (el.grid as { source: { setFilter(f: unknown[]): void } }).source;
+        const calls: unknown[][] = [];
+        const setFilter = source.setFilter.bind(source);
+        source.setFilter = (f: unknown[]) => { calls.push(f); setFilter(f); };
+        const anchor = document.createElement('button');
+        document.body.appendChild(anchor);
+        (el.openFilterPopover as (field: string, a: HTMLElement) => void)('name', anchor);
+        await tick(20);
+        return { el, calls };
+    }
+
+    for (const [kind, give] of [
+        ['the alpha scoped slot filter-popover:name (control)', (handles: { apply?: () => void; clear?: () => void }) =>
+            scopedSlot('filter-popover:name', (s) => { handles.apply = s.apply as () => void; handles.clear = s.clear as () => void; return mark('custom'); })],
+        ['a snippet', (handles: { apply?: () => void; clear?: () => void }) => (g: Grid) => {
+            g.filterPopover = ((column, apply, clear) => {
+                handles.apply = apply; handles.clear = clear;
+                return column.field === 'name' ? mark('custom') : null;
+            }) as Popover;
+        }],
+    ] as const) {
+        it(`${kind}: draws in the popover; apply() applies the filters and closes it, clear() clears them and closes it`, async () => {
+            const handles: { apply?: () => void; clear?: () => void } = {};
+            const first = await openWith(give(handles));
+            expect(popover()?.querySelector('.mine')?.textContent).toBe('custom');
+            handles.apply!();
+            await tick(20);
+            expect(popover(), 'apply closed the popover').toBeNull();
+            expect(first.calls).toHaveLength(1);
+            cleanup();
+
+            const second = await openWith(give(handles));
+            handles.clear!();
+            await tick(20);
+            expect(popover(), 'clear closed the popover').toBeNull();
+            expect(second.calls).toEqual([[]]);
+        });
+    }
+
+    it('a snippet that draws nothing for the column leaves the grid\'s own popover', async () => {
+        await openWith((g) => { g.filterPopover = (() => null) as Popover; });
+        expect(document.querySelector('.mine')).toBeNull();
+        expect(document.querySelector('.pdx-dg-fp-title, [role="dialog"]')).not.toBeNull();
+    });
+});
+
+describe('pdx-data-grid: toolbarStart(grid) and toolbarEnd(grid) (#673)', () => {
+    const toolbar = (el: Element) => el.querySelector('[data-part="toolbar"]');
+
+    it('the alpha scoped slots toolbar-start and toolbar-end still draw (control)', async () => {
+        const el = await mountGrid({ showToolbar: true }, (g) => {
+            scopedSlot('toolbar-start', () => mark('start'))(g);
+            scopedSlot('toolbar-end', () => mark('end'))(g);
+        });
+        expect([...toolbar(el)!.querySelectorAll('.mine')].map((n) => n.textContent)).toEqual(['start', 'end']);
+    });
+
+    it('snippets draw at the same two places, and receive the grid', async () => {
+        const got: unknown[] = [];
+        const el = await mountGrid({ showToolbar: true }, (g) => {
+            g.toolbarStart = (grid: unknown) => { got.push(grid); return mark('start'); };
+            g.toolbarEnd = (grid: unknown) => { got.push(grid); return mark('end'); };
+        });
+        const marks = [...toolbar(el)!.querySelectorAll('.mine')];
+        expect(marks.map((n) => n.textContent)).toEqual(['start', 'end']);
+        expect(got).toHaveLength(2);
+        expect(got.every((g) => g === el.grid && g !== null)).toBe(true);
+    });
+});
+
+describe('pdx-data-grid: empty() (#673)', () => {
+    const status = (el: Element) => el.querySelector('[data-part="empty"]');
+
+    it('the alpha scoped slot empty still draws the empty state (control)', async () => {
+        const el = await mountGrid({ data: [] }, scopedSlot('empty', () => mark('nothing here')));
+        expect(status(el)?.querySelector('.mine')?.textContent).toBe('nothing here');
+    });
+
+    it('a snippet draws the empty state in the same place, and the grid\'s own is not drawn', async () => {
+        const plain = await mountGrid({ data: [] });
+        const own = status(plain)?.textContent;
+        cleanup();
+        const el = await mountGrid({ data: [] }, (g) => { g.empty = () => mark('nothing here'); });
+        expect(status(el)?.querySelector('.mine')?.textContent).toBe('nothing here');
+        expect(status(el)?.textContent).not.toBe(own);
+    });
+});
+
 describe("a parent's @snippet cell, compiled (#597)", () => {
     it('switches on column.field, and the columns it does not draw are the grid\'s', async () => {
         const src = `<template>

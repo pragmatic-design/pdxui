@@ -435,6 +435,15 @@ text — is drawn by the grid as usual, so a page writes only the columns it cha
 grid would show, a computed column's included. A command column the snippet draws nothing for keeps
 its Edit and Delete buttons.
 
+The grid's other templates are snippets too (#673). `editCell(row, column, value, form)` draws the
+editor of the cell being edited; Enter, Tab and a click outside commit the value of its first control,
+as with the grid's own editor, and `form` is null, since only a row edit has one.
+`filter(column)` draws a column's input in the filter row, `filterPopover(column, apply, clear)` a
+column's filter popover: `apply()` applies the grid's filters and closes it, `clear()` drops the
+column's filter and closes it. The three draw nothing for a column to leave it the grid's.
+`toolbarStart(grid)` and `toolbarEnd(grid)` draw at the two ends of the toolbar, with `grid` the
+grid's `DataGrid`, and `empty()` replaces the empty state.
+
 ```pdx
 <pdx-data-grid :columns="columns" :data="orders">
   @snippet cell(row, column) {

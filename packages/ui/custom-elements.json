@@ -9133,10 +9133,14 @@
               "name": "GridContext",
               "fields": [
                 "grid: { sort: Function; resize: Function; reorder: Function; toggleColumn: Function; saveState: Function; loadState: Function; source: any; sortState: any; rows: any; columns: any; total: any; page: any; totalPages: any; isLoading: any } | null",
-                "getSlot: (name: string) => SlotFunction | undefined",
                 "customCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown, index: number) => Node | null",
                 "customHeader: (col: AnyColumn) => Node | null",
                 "customDetail: (row: Record<string, unknown>, index: number, id: unknown) => Node | null",
+                "customEditCell: (row: Record<string, unknown>, col: AnyColumn, value: unknown) => Node | null",
+                "customFilter: (col: AnyColumn) => Node | null",
+                "customFilterPopover: (col: AnyColumn) => ((apply: () => void, clear: () => void) => Node | null) | null",
+                "customToolbar: (side: 'start' | 'end') => Node | null",
+                "customEmpty: () => Node | null",
                 "getSelectionMode: () => string",
                 "getRowClass: (row: Record<string, unknown>, index: number) => string",
                 "getIdField: () => string",
@@ -9191,6 +9195,36 @@
               "name": "detail",
               "description": "Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.",
               "signature": "(row: T)"
+            },
+            {
+              "name": "editCell",
+              "description": "Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit. The alpha scoped slot `col-edit:{field}` still draws one column's.",
+              "signature": "(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown, form: import('@pdxui/core').Form<Record<string, unknown>> | null)"
+            },
+            {
+              "name": "filter",
+              "description": "Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input. The alpha scoped slot `filter:{field}` still draws one.",
+              "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown })"
+            },
+            {
+              "name": "filterPopover",
+              "description": "Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover. The alpha scoped slot `filter-popover:{field}` still draws one.",
+              "signature": "(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, apply: () => void, clear: () => void)"
+            },
+            {
+              "name": "toolbarStart",
+              "description": "Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`, or the alpha scoped slot `toolbar-start`.",
+              "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
+            },
+            {
+              "name": "toolbarEnd",
+              "description": "Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`, or the alpha scoped slot `toolbar-end`.",
+              "signature": "(grid: import('@pdxui/core').DataGrid<Record<string, unknown>>)"
+            },
+            {
+              "name": "empty",
+              "description": "Draws the empty state in place of the grid's icon and title: `empty()`, or the alpha scoped slot `empty`.",
+              "signature": "()"
             }
           ],
           "cssParts": [

@@ -99,9 +99,9 @@ export function renderRows(
 
             if (isCellEditing && isColEditable) {
                 // Cell edit mode — show editor for this cell
-                const editSlot = gc.getSlot(`col-edit:${col.field}`);
-                if (editSlot) {
-                    td.appendChild(editSlot({ row, value, col, form: gc.editForm }));
+                const customEditor = gc.customEditCell(row, col, value);
+                if (customEditor) {
+                    td.appendChild(customEditor);
                 } else {
                     let editVal = value;
                     td.appendChild(createDefaultEditor(col, value,

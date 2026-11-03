@@ -20,15 +20,16 @@ import { applyIgnores } from '../../compiler/src/compiler/ignores';
 
 const DIRS = ['../src/demos/', '../src/demos-authored/'].map((d) => fileURLToPath(new URL(d, import.meta.url)));
 
-test('the data-grid gallery warns about nothing, and its slot and typed cells render', async ({ page }) => {
+test('the data-grid gallery warns about nothing, and its snippet and typed cells render', async ({ page }) => {
     // HTML-string `format` functions, which the grid deprecates, warn twice on every one of its seven
-    // tabs. The name column is the `col:name` slot, the status column a typed renderer.
+    // tabs. The name column is the `cell` snippet (#673; the `col:name` slot before), the status column
+    // a typed renderer.
     const warnings: string[] = [];
     page.on('console', (m) => { if (m.type() === 'warning' && /pdx-data-grid/.test(m.text())) warnings.push(m.text()); });
     await page.goto('/components/pdx-data-grid', { waitUntil: 'networkidle' });
     // The section the heading heads — its parent. A `section` filtered by what it contains also
     // matches an outer one wrapping every grid on the page.
-    const section = page.locator('.cmp-gallery').getByRole('heading', { name: 'Slot Templates', exact: true }).locator('xpath=..');
+    const section = page.locator('.cmp-gallery').getByRole('heading', { name: 'Snippets', exact: true }).locator('xpath=..');
     const firstRow = section.locator('pdx-data-grid').getByRole('row', { name: /Alice Johnson/ }).first();
     await expect(firstRow.locator('pdx-avatar')).toHaveCount(1);
     // The avatar's initials come from `alt`, the row's name — "?" is an avatar given nothing.

@@ -1,23 +1,26 @@
 <template>
   <section>
-    <h2 class="pdx-txt-heading section-heading">Slot Templates</h2>
+    <h2 class="pdx-txt-heading section-heading">Snippets</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      Custom cell rendering via <code>&lt;slot name="col:field"&gt;</code>.
-      Custom header via <code>&lt;slot name="header:field"&gt;</code>.
-      Custom empty state via <code>&lt;slot name="empty"&gt;</code>.
+      A custom cell with <code>&#64;snippet cell(row, column, value)</code>, one for every column: it
+      switches on <code>column.field</code>, and the columns it draws nothing for are the grid's.
+      A custom header with <code>&#64;snippet header(column)</code>, the empty state with
+      <code>&#64;snippet empty()</code>.
     </p>
     <div class="demo-container">
-      <pdx-data-grid :source="slotDS" :columns="slotColumns" label="Users" hover>
-        <slot name="col:name" let:row let:value>
-          <div class="user-cell">
-            <pdx-avatar size="xs" :alt="row.name"></pdx-avatar>
-            <strong>{{ value }}</strong>
-          </div>
-        </slot>
+      <pdx-data-grid :data="slotData" :columns="slotColumns" label="Users" hover>
+        @snippet cell(row, column, value) {
+          @if (column.field === 'name') {
+            <div class="user-cell">
+              <pdx-avatar size="xs" :alt="row.name"></pdx-avatar>
+              <strong>{{ value }}</strong>
+            </div>
+          }
+        }
       </pdx-data-grid>
     </div>
     <details class="source-block">
-      <summary>Source (Slot Pattern)</summary>
+      <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>import { status } from '@pdxui/core';
 
 const columns = [
@@ -28,27 +31,30 @@ const columns = [
   { field: 'status', header: 'Status', cell: status({ tones: { Active: 'success', Away: 'warning', Offline: 'muted' } }) },
 ];
 
-&lt;pdx-data-grid :source="ds" :columns="columns" hover&gt;
+&lt;!-- `row` is typed from :data: each row is an element of it --&gt;
+&lt;pdx-data-grid :data="users" :columns="columns" hover&gt;
 
-  &lt;!-- Custom cell for 'name' column --&gt;
-  &lt;slot name="col:name" let:row let:value&gt;
-    &lt;div class="user-cell"&gt;
-      &lt;pdx-avatar size="xs" :alt="row.name"&gt;&lt;/pdx-avatar&gt;
-      &lt;strong&gt;&#123;&#123; value &#125;&#125;&lt;/strong&gt;
-    &lt;/div&gt;
-  &lt;/slot&gt;
+  &lt;!-- A custom cell for the 'name' column; the others are the grid's --&gt;
+  &#64;snippet cell(row, column, value) &#123;
+    &#64;if (column.field === 'name') &#123;
+      &lt;div class="user-cell"&gt;
+        &lt;pdx-avatar size="xs" :alt="row.name"&gt;&lt;/pdx-avatar&gt;
+        &lt;strong&gt;&#123;&#123; value &#125;&#125;&lt;/strong&gt;
+      &lt;/div&gt;
+    &#125;
+  &#125;
 
-  &lt;!-- Custom header --&gt;
-  &lt;slot name="header:name" let:col&gt;
-    &lt;pdx-icon name="user" size="14"&gt;&lt;/pdx-icon&gt;
-    {col.header}
-  &lt;/slot&gt;
+  &lt;!-- A custom header --&gt;
+  &#64;snippet header(column) &#123;
+    &#64;if (column.field === 'name') &#123;
+      &lt;pdx-icon name="user" size="14"&gt;&lt;/pdx-icon&gt; &#123;&#123; column.header &#125;&#125;
+    &#125;
+  &#125;
 
-  &lt;!-- Custom empty state --&gt;
-  &lt;slot name="empty" let:_&gt;
-    &lt;pdx-empty-state title="No results" icon="search"&gt;
-    &lt;/pdx-empty-state&gt;
-  &lt;/slot&gt;
+  &lt;!-- A custom empty state --&gt;
+  &#64;snippet empty() &#123;
+    &lt;pdx-empty-state title="No results" icon="search"&gt;&lt;/pdx-empty-state&gt;
+  &#125;
 
 &lt;/pdx-data-grid&gt;</code></pre>
     </details>
@@ -56,10 +62,10 @@ const columns = [
 </template>
 
 <script>
-import { createDataSource, status } from '@pdxui/core';
+import { status } from '@pdxui/core';
 
 // ─── Slot/cell demo — custom cell rendering ───────────
-// The name column renders through the `col:name` slot in the template; the status column through a
+// The name column renders through the `cell` snippet in the template; the status column through a
 // typed cell renderer — not a `format` function returning markup, which the grid shows as text.
 const slotColumns = [
   { field: 'name', header: 'User', width: 220 },
@@ -74,8 +80,6 @@ const slotData = [
   { id: 3, name: 'Carol White', email: 'carol@acme.com', role: 'PM', status: 'Active' },
   { id: 4, name: 'David Brown', email: 'david@acme.com', role: 'Engineer', status: 'Offline' },
 ];
-
-const slotDS = createDataSource({ data: slotData, pageSize: 0 });
 </script>
 
 <style scoped>

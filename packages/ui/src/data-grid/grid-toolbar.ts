@@ -36,12 +36,9 @@ export function buildToolbar(gc: GridContext): HTMLElement {
     reloadBtn.addEventListener('click', () => gc.grid?.source.refresh());
     bar.appendChild(reloadBtn);
 
-    // Slot: toolbar-start
-    const startSlot = gc.getSlot('toolbar-start');
-    if (startSlot) {
-        const content = startSlot({ grid: gc.grid });
-        bar.appendChild(content instanceof DocumentFragment ? content : content);
-    }
+    // The page's start of the toolbar: the `toolbarStart(grid)` snippet, or the alpha `toolbar-start` slot
+    const start = gc.customToolbar('start');
+    if (start) bar.appendChild(start);
 
     // Single chips area — sort + filter chips mixed together, inline
     const chipsArea = document.createElement('div');
@@ -53,12 +50,9 @@ export function buildToolbar(gc: GridContext): HTMLElement {
     spacer.style.flex = '1';
     bar.appendChild(spacer);
 
-    // Slot: toolbar-end
-    const endSlot = gc.getSlot('toolbar-end');
-    if (endSlot) {
-        const content = endSlot({ grid: gc.grid });
-        bar.appendChild(content instanceof DocumentFragment ? content : content);
-    }
+    // The page's end of the toolbar: the `toolbarEnd(grid)` snippet, or the alpha `toolbar-end` slot
+    const end = gc.customToolbar('end');
+    if (end) bar.appendChild(end);
 
     // Quick search: one term over the columns marked `searchable`, after a pause — a
     // request per keystroke is a server asked about «v», «vp» and «vpn» when the reader meant one.

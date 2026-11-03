@@ -31,12 +31,12 @@ const svc = new PdxTsService(ROOT);
 type Resolve = (tag: string, attr: string) => string | null;
 
 /** The TS diagnostics of a .pdx, each with the text of the .pdx it points at. */
-function diagnose(script: string, template: string, resolveType?: Resolve, resolveSnippet?: ResolveSnippet): { code: string; message: string; at: string }[] {
+function diagnose(script: string, template: string, resolveType?: Resolve, resolveSnippet?: ResolveSnippet, uri = URI): { code: string; message: string; at: string }[] {
     const source = `<template>${template}</template>\n<script>\n${script}\n</script>\n`;
     const scriptStart = source.indexOf('<script>\n') + '<script>\n'.length;
     const vf = buildVirtualFile(script, scriptStart, parseTemplate(template, 1), template, '<template>'.length, resolveType, undefined, resolveSnippet);
     const lines = source.split('\n');
-    return getTsDiagnostics(svc, URI, vf, source).map((d) => {
+    return getTsDiagnostics(svc, uri, vf, source).map((d) => {
         const line = lines[d.range.start.line];
         return { code: String(d.code), message: d.message.split('\n')[0], at: line.slice(d.range.start.character, d.range.end.character) };
     });
@@ -257,6 +257,34 @@ describe("a library component's snippet, from the real manifest (#595)", () => {
     it('control — the declared members read, and so does the renamed snippet', () => {
         expect(diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet item(it, level, open, on) { <b>{{ it.label }} {{ level + 1 }} {{ open && on }}</b> }</pdx-nav-menu>', undefined, fromManifest)).toEqual([]);
         expect(diagnose(NAV, '<pdx-nav-menu :items="nav">@snippet itemActions(it, level, on) { <i>{{ it.key }}{{ on }}</i> }</pdx-nav-menu>', undefined, fromManifest)).toEqual([]);
+    });
+
+    // #673: pdx-data-grid's other snippets. The row is the app's, `T` inferred from `:data` as #651's.
+    const ROWS = "let rows = $signal([{ id: 1, name: 'Ada', price: 3 }]);";
+    // `grid` and `form` are core's types, written `import('@pdxui/core')…` in the signature: they
+    // resolve where an app's .pdx is, since every compiled .pdx imports @pdxui/core. The repository's
+    // root has no @pdxui/core of its own, so these are checked from a file in the showcase app.
+    const IN_APP = pathToFileURL(join(ROOT, 'packages', 'showcase', 'src', 'x.pdx')).href;
+
+    it("editCell(row, column): the row's own field reads, an invented one is an error (#673)", () => {
+        const found = diagnose(ROWS, '<pdx-data-grid :data="rows">@snippet editCell(row, column) { <b>{{ row.name.length }} {{ row.nmae }} {{ column.field.length }}</b> }</pdx-data-grid>', undefined, fromManifest);
+        expect(found.map((f) => f.at)).toEqual(['nmae']);
+    });
+
+    it('toolbarStart(grid): the grid is typed from core, its members read and an invented one is an error (#673)', () => {
+        const found = diagnose(ROWS, '<pdx-data-grid :data="rows">@snippet toolbarStart(grid) { <b @click="grid.source.refresh()">{{ grid.total() }} {{ grid.totl }}</b> }</pdx-data-grid>', undefined, fromManifest, IN_APP);
+        expect(found.map((f) => f.at)).toEqual(['totl']);
+    });
+
+    it('control — the declared arguments of every new snippet read (#673)', () => {
+        const template = '<pdx-data-grid :data="rows">'
+            + '@snippet editCell(row, column, value, form) { <i>{{ row.price + 1 }} {{ column.header }} {{ String(value) }} {{ form === null }}</i> }'
+            + '@snippet filter(column) { <i>{{ column.field }}</i> }'
+            + '@snippet filterPopover(column, apply, clear) { <button @click="apply()">{{ column.field }}</button><button @click="clear()">x</button> }'
+            + '@snippet toolbarEnd(grid) { <i>{{ grid.page() }}</i> }'
+            + '@snippet empty() { <i>none</i> }'
+            + '</pdx-data-grid>';
+        expect(diagnose(ROWS, template, undefined, fromManifest, IN_APP)).toEqual([]);
     });
 });
 
