@@ -44,6 +44,10 @@ let pinError = $signal(''); // set when the server refuses the PIN: pinError = '
 
 **Renders:** roles `alert`
 
+**States:** `:state(required)` — `required`: required by its prop or by its form; the label carries the marker (`--pdx-field-required-marker`).; `:state(optional)` — `optional`: the label says the field is optional.; `:state(disabled)` — `disabled`: the field and its control are disabled.; `:state(invalid)` — `invalid`: its error is shown; the control is aria-invalid and described by it.; `:state(warning)` — `warning`: its warning is shown, and no error.; `:state(success)` — `success`: its success message is shown, and no error or warning.; `:state(horizontal)` — `horizontal`: the label sits beside the control.
+
+**Parts:** `[data-part="root"]` — The field's wrapper.; `[data-part="label"]` — The `<label>`, with `label`.; `[data-part="description"]` — The description under the label, with `description`.; `[data-part="control"]` — The box that holds the slotted control.; `[data-part="error"]` — The error message, while it is shown.; `[data-part="warning"]` — The warning message, while it is shown.; `[data-part="success"]` — The success message, while it is shown.; `[data-part="hint"]` — The hint, while no message takes its place.
+
 
 #### Examples
 

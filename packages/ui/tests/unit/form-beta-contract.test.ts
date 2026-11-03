@@ -35,6 +35,26 @@ const DONE: Row[] = [
     { tag: 'pdx-input-group', models: [], states: ['disabled'], parts: [] },
     // Active and invalid are states of the host: an inactive section is hidden by the design CSS.
     { tag: 'pdx-form-section', models: [], states: ['active', 'invalid'], parts: ['root', 'legend', 'content'] },
+    // Its conditions are states of the host — the message it shows (invalid, warning, success) one at a
+    // time — and the wrapper and its label keep only their base classes.
+    {
+        tag: 'pdx-form-field', models: [],
+        states: ['required', 'optional', 'disabled', 'invalid', 'warning', 'success', 'horizontal'],
+        parts: ['root', 'label', 'description', 'control', 'error', 'warning', 'success', 'hint'],
+        variants: { size: ['md', 'xs', 'sm', 'lg', 'xl'] },
+    },
+    // A panel's `collapsed` is written by the user's click: a model. Its display mode renders its own
+    // markup, with a fixed class, and is no variant axis.
+    {
+        tag: 'pdx-field-group', models: ['collapsed'], states: ['collapsed'],
+        parts: ['root', 'legend', 'toggle', 'content', 'trigger'],
+    },
+    // Its rows are built by script; their pieces are parts. Each cell is a pdx-form-field, which says its
+    // own state.
+    {
+        tag: 'pdx-field-list', models: [], states: ['empty'],
+        parts: ['root', 'header', 'label', 'add', 'columns', 'rows', 'row', 'cell', 'actions', 'empty', 'footer', 'dialog'],
+    },
 ];
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {

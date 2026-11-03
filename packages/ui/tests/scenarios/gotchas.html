@@ -493,6 +493,11 @@
                     return { ds, settle: (data, total) => settle({ data, total }) };
                 };
             },
+            // The form family (#293): the spec mounts its own markup, and builds its forms with these.
+            'form-b-beta-contract': () => {
+                api.createForm = createForm;
+                api.required = required;
+            },
             // pdx-splitter on the beta contract (#290): the spec mounts its own markup.
             'splitter-beta-contract': () => {},
             // pdx-provide and pdx-error-boundary on the beta contract (#290). What they wrap is the

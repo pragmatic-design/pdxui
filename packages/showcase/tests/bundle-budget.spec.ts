@@ -328,7 +328,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // icon.css, which travels with the component. The icon is a chunk of its own, not in the entry; what
 // the entry gains is the stylesheet's name in Vite's preload map, listed by every route that draws an
 // icon. The built dist: main 43.0 KB → this branch 44090 bytes (43.057 KB, which rounds to 43.1).
-const BUDGET_KB = { entry: 43.5, js: 472, css: 66, blocking: 103 };
+// css 66 → 67 (owner's OK, for the batches of #293): pdx-form-field and pdx-field-group draw their
+// conditions from their host's custom states, and each rule keeps the native class beside the
+// `:where(pdx-form-field):state(…)` form, for markup written without the component. Main sat on the
+// ceiling: 66 KB on the CI's line; the built dist of this branch weighs 66.1 KB locally.
+const BUDGET_KB = { entry: 43.5, js: 472, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

@@ -49,6 +49,10 @@ inside a step) · `pdx-select` and other components in the `row` slot.
 
 **Slot:** `row` — Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
 
+**States:** `:state(empty)` — `empty`: the list has no rows.
+
+**Parts:** `[data-part="root"]` — The list's wrapper.; `[data-part="header"]` — The line above the rows: the label and the add button.; `[data-part="label"]` — The list's label, with `label`.; `[data-part="add"]` — An add button, in the header and in the footer.; `[data-part="columns"]` — The column headers.; `[data-part="rows"]` — The box that holds the rows.; `[data-part="row"]` — One row.; `[data-part="cell"]` — One cell: a `pdx-form-field` around its control, or a summary in dialog mode.; `[data-part="actions"]` — A row's buttons: edit (dialog mode) and remove.; `[data-part="empty"]` — The message shown with no rows.; `[data-part="footer"]` — The line under the rows, with its add button.; `[data-part="dialog"]` — The dialog that edits one row, in dialog mode.
+
 **Shapes:** `FieldListItemSchema { name: string; type?: string; label?: string; placeholder?: string; required?: boolean }`
 
 
