@@ -27,7 +27,7 @@
     <!-- ═══ Few Pages ═══ -->
     <app-demo-comp-pagination-few-pages class="demo-section"></app-demo-comp-pagination-few-pages>
 
-    <!-- ═══ Slots ═══ -->
+    <!-- ═══ Snippets ═══ -->
     <app-demo-comp-pagination-slots class="demo-section"></app-demo-comp-pagination-slots>
 
     <!-- ═══ Props ═══ -->

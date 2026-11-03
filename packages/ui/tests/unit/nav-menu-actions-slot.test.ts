@@ -1,26 +1,15 @@
-// The `actions` slot is BESIDE the entry's link, never inside it.
+// The `itemActions` snippet is BESIDE the entry's link, never inside it.
 //
-// The `item` slot is the link's content: a pin button and an «open in a new tab» link put there make
-// every rail entry an <a> holding a <button> and another <a>. The HTML content model forbids
+// The `item` snippet is the link's content: a pin button and an «open in a new tab» link put there
+// make every rail entry an <a> holding a <button> and another <a>. The HTML content model forbids
 // interactive content in a link (axe: nested-interactive), and a screen reader folds the buttons'
-// names into the link's. The actions have a slot of their own, in a row with the link.
+// names into the link's. The actions have a snippet of their own, in a row with the link.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, tick } from './helpers';
 import '../../src/nav-menu/pdx-nav-menu';
 
-type Scope = { item: { key: string; label: string } };
-
-function carrier(name: string, draw: (scope: Scope) => Node): HTMLTemplateElement {
-    // What compiled parent code hands a component for `<slot name="…" let:item>`.
-    const t = document.createElement('template') as HTMLTemplateElement & {
-        __pdxSlot?: (scope: Scope) => Node;
-        __pdxSlotName?: string;
-    };
-    t.__pdxSlotName = name;
-    t.__pdxSlot = draw;
-    return t;
-}
+type Item = { key: string; label: string };
 
 async function mount(withActions: boolean): Promise<HTMLElement> {
     const el = document.createElement('pdx-nav-menu');
@@ -28,14 +17,15 @@ async function mount(withActions: boolean): Promise<HTMLElement> {
         { key: 'home', label: 'Home', href: '/' },
         { key: 'tickets', label: 'Tickets', href: '/tickets' },
     ];
-    el.appendChild(carrier('item', ({ item }) => {
+    // What a parent's `@snippet item(item)` and `@snippet itemActions(item)` compile to.
+    (el as any).item = (item: Item) => {
         const span = document.createElement('span');
         span.className = 'pdx-nav-label';
         span.textContent = item.label;
         return span;
-    }));
+    };
     if (withActions) {
-        el.appendChild(carrier('actions', ({ item }) => {
+        (el as any).itemActions = (item: Item) => {
             const tools = document.createElement('span');
             tools.className = 'tools';
             const pin = document.createElement('button');
@@ -46,14 +36,14 @@ async function mount(withActions: boolean): Promise<HTMLElement> {
             out.textContent = '↗';
             tools.append(pin, out);
             return tools;
-        }));
+        };
     }
     document.body.appendChild(el);
     await tick(50);
     return el;
 }
 
-describe('pdx-nav-menu actions slot', () => {
+describe('pdx-nav-menu itemActions snippet', () => {
     beforeEach(cleanup);
 
     it('no entry link holds a button, a link or an input', async () => {
@@ -81,7 +71,7 @@ describe('pdx-nav-menu actions slot', () => {
         expect(document.activeElement?.getAttribute('data-nav-key')).toBe('tickets');
     });
 
-    it('control — without an actions slot, an entry is drawn as before: no row around it', async () => {
+    it('control — without an itemActions snippet, an entry is drawn as before: no row around it', async () => {
         const el = await mount(false);
         const link = el.querySelector('a.pdx-nav-item[data-nav-key="home"]')!;
         expect(link.parentElement!.classList.contains('pdx-nav-row')).toBe(false);

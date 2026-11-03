@@ -23,9 +23,9 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
 }
 
 /**
- * Named slots the component in `text` renders: literal `<slot name="x">`, scoped `__slots['x']`, and
+ * Named slots the component in `text` renders: literal `<slot name="x">`, scoped `__slots['x']`,
  * `snippetOrSlot(ctx, 'x', (s) => […], 'y')` (#491, #595) — the snippet `x`, and the alpha slot `y`
- * when its name differs.
+ * when its name differs — and `declaredSnippet(ctx, 'x', …)` (#492), the snippet alone.
  */
 function renderedSlots(text: string): { tag: string | null; names: string[] } {
     const tag = (text.match(/component\('([\w-]+)'/) ?? [])[1] ?? null;
@@ -38,6 +38,8 @@ function renderedSlots(text: string): { tag: string | null; names: string[] } {
         names.add(m[1]);
         if (m[2]) names.add(m[2]);
     }
+    // Match: `declaredSnippet(ctx, 'x'`. Groups: [1]=the snippet's name
+    for (const m of text.matchAll(/declaredSnippet\(\s*ctx\s*,\s*'([\w-]+)'/g)) names.add(m[1]);
     return { tag, names: [...names].sort() };
 }
 
@@ -79,6 +81,10 @@ describe('the scan can fail', () => {
         expect(undocumented([src], docs)).toEqual(['pdx-probe: item', 'pdx-probe: page']);
         const plain = "component('pdx-probe', { setup(ctx) { return snippetOrSlot(ctx, 'row', (s) => [s.item]); } })";
         expect(undocumented([plain], docs)).toEqual(['pdx-probe: row']);
+    });
+    it('sees an undocumented snippet read alone (#492)', () => {
+        const src = "component('pdx-probe', { setup(ctx) { return declaredSnippet(ctx, 'row', (s) => [s.item]); } })";
+        expect(undocumented([src], docs)).toEqual(['pdx-probe: row']);
     });
     it('does not accuse a documented slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"footer\"></slot>` })";

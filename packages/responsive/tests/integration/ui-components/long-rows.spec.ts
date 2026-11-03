@@ -135,7 +135,7 @@ for (const [name, sel] of Object.entries(LISTS)) {
     });
 }
 
-test('a pdx-list row drawn by the item slot carries no content-visibility', async ({ page }) => {
+test('a pdx-list row drawn by the item snippet carries no content-visibility', async ({ page }) => {
     await open(page);
     const row = page.locator('[data-test="slotted"] .pdx-list-item').first();
     await expect(row.locator('.mine')).toHaveText('Slot row 1');

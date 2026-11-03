@@ -428,6 +428,11 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-list`, `pdx-nav-menu`, `pdx-pagination` and `pdx-tree` read their snippets only
+  (#492): a parent's alpha scoped slot draws nothing in them now. The two slots named apart from
+  their snippet go with it: `pdx-nav-menu`'s `actions` is the `itemActions` snippet, and
+  `pdx-pagination`'s `page` the `item` snippet; `pdx migrate` writes the snippet names.
+
 - **Breaking:** `pdx-breadcrumb`, `pdx-carousel`, `pdx-description-list`, `pdx-sortable-list` and
   `pdx-timeline` read their snippet only (#492): a parent's alpha scoped slot (`<slot name="item"
   let:item>`) draws nothing in them now; `pdx migrate` rewrites it to the `@snippet` that does. A

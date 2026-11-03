@@ -28,7 +28,7 @@ Data-driven list with custom rows.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `item` — Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).; `empty` — Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
+**Slot:** `item` — Renders one item: a snippet `item(item, index)`.; `empty` — Shown when the list has no items: a snippet `empty()`.
 
 **States:** `:state(bordered)` — `bordered` is set (the default): the list is framed.; `:state(dividers)` — `dividers` is set: a rule between items.; `:state(loading)` — Its source is pending: the host is `aria-busy` too (A4).; `:state(empty)` — It has no items, and is not loading.
 

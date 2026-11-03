@@ -2,7 +2,7 @@
 // Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
 // Priority: explicit props > :source prop > injected DataSource from context.
 
-import { component, html, signal, inject, slot, snippetOrSlot, model } from '@pdxui/core';
+import { component, html, signal, inject, slot, declaredSnippet, model } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { SlotFunction } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
@@ -18,7 +18,6 @@ type SizeSelect = HTMLElement & { options: { value: string; label: string }[]; v
  * behind an ellipsis.
  *
  * @slot item - Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.
- * @slot page - The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form.
  *
  * @csspart nav - The `role="navigation"` element that holds the controls (`.pdx-pagination`).
  * @csspart page - A page button; the current one is `aria-current="page"`.
@@ -62,8 +61,8 @@ component('pdx-pagination', {
         /** Show total info text */
         showTotal: { type: Boolean, default: false },
     },
-    // A parent's `@snippet` sets this, positional arguments; the alpha scoped slot stays (#595). The
-    // `page` slot shares its name with the prop above, so its snippet is `item`.
+    // A parent's `@snippet` sets this, positional arguments; the alpha scoped slot is not read
+    // (#492). The snippet is `item`, named apart from the `page` prop above.
     slots: {
         item: slot<(page: number, active: boolean) => Node>(),
     },
@@ -71,7 +70,7 @@ component('pdx-pagination', {
         const _page = signal(1);
         let _built = false;
         function getPageSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.page, s.isActive], 'page');
+            return declaredSnippet(ctx, 'item', (s) => [s.page, s.isActive]);
         }
         let _ds: DataSource<unknown> | null = null;
 

@@ -32,7 +32,7 @@ Page through long results.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `item` — Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.; `page` — The scoped slot for one page button, which receives `{ page, isActive }`; the snippet `item` is its typed form.
+**Slot:** `item` — Renders one page button, as a snippet `item(page, active)`: named apart from the `page` prop.
 
 **Parts:** `[data-part="nav"]` — The `role="navigation"` element that holds the controls (`.pdx-pagination`).; `[data-part="page"]` — A page button; the current one is `aria-current="page"`.; `[data-part="first"]` — The button to the first page.; `[data-part="prev"]` — The button to the previous page.; `[data-part="next"]` — The button to the next page.; `[data-part="last"]` — The button to the last page.; `[data-part="ellipsis"]` — The gap drawn for the pages left out of a long range.; `[data-part="range"]` — The "1–10 of 47" text, with `show-total`.; `[data-part="position"]` — The "3 / 10" text of `simple`.; `[data-part="size"]` — The rows-per-page select, with `show-page-size`.
 
