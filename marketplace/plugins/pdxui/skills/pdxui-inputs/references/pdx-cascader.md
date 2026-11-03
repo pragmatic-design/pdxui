@@ -31,7 +31,7 @@ Drill through nested options.
 
 **Renders:** roles `combobox` · `listbox` · `option` · `status`
 
-**Slot:** `option` — Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.
+**Slot:** `option` — Renders one option in a column: a snippet `option(node, level, selected)`.
 
 **States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — A branch's children are being fetched by `loadChildren`.
 

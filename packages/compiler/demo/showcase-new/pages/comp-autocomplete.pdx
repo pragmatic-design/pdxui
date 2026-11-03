@@ -32,12 +32,12 @@
 
     <!-- ═══ Slots ═══ -->
     <section>
-      <h2 class="pdx-txt-heading">Slots</h2>
+      <h2 class="pdx-txt-heading">Snippets</h2>
       <div class="props-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>option</code></td><td><code>{ label, value, raw, highlighted, index }</code></td><td>Custom suggestion item.</td></tr>
+            <tr><td><code>option</code></td><td><code>(option, index, highlighted)</code></td><td>Custom suggestion item; <code>option.raw</code> is the original item.</td></tr>
           </tbody>
         </table>
       </div>

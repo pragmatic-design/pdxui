@@ -17,12 +17,12 @@
     <app-demo-comp-tree-select-pre-selected class="demo-section"></app-demo-comp-tree-select-pre-selected>
 
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>node</code></td><td><code>{ node, level, expanded }</code></td><td>Custom tree node label.</td></tr>
+            <tr><td><code>node</code></td><td><code>(node, level, expanded)</code></td><td>Custom tree node label.</td></tr>
           </tbody>
         </table>
       </div>

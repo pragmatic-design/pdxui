@@ -428,6 +428,11 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-select`, `pdx-autocomplete`, `pdx-cascader` and `pdx-tree-select` read their
+  snippets only (#492): a parent's alpha scoped slot draws nothing in them now. `pdx-select` drops its
+  template props, `itemTemplate` and `selectedTemplate`: the `item` and `selected` snippets draw what
+  they drew, and `pdx migrate` flags each use.
+
 - **Breaking:** `pdx-command`, `pdx-menu`, `pdx-context-menu` and `pdx-dropdown-menu` read their
   `item` snippet only (#492): a parent's alpha scoped slot draws nothing in them now. `pdx-menu`'s
   `renderItem` callback is unchanged.

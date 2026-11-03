@@ -47,7 +47,7 @@ toggles only the node clicked).
 
 **Renders:** roles `combobox` · `tree` · `treeitem`
 
-**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`.
 
 **States:** `:state(open)` — The popup is open.; `:state(disabled)` — `disabled` is set.; `:state(loading)` — A branch's children are being fetched by `loadChildren`.
 

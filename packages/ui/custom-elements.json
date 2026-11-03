@@ -1779,7 +1779,7 @@
           "slots": [
             {
               "name": "option",
-              "description": "Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).",
+              "description": "Renders one option: a snippet `option(option, index, highlighted)`; `option.raw` is the original item.",
               "signature": "(option: { label: string; value: unknown; raw: T }, index: number, highlighted: boolean)"
             }
           ],
@@ -5636,7 +5636,7 @@
           "slots": [
             {
               "name": "option",
-              "description": "Renders one option in a column: a snippet `option(node, level, selected)`, or the scoped slot, which receives `{ node, level, selected }`.",
+              "description": "Renders one option in a column: a snippet `option(node, level, selected)`.",
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, selected: boolean)"
             }
           ],
@@ -24757,24 +24757,6 @@
             },
             {
               "kind": "field",
-              "name": "itemTemplate",
-              "description": "Custom render for each option: (item: {label, value, _raw}) => string|Node",
-              "type": {
-                "text": "((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "selectedTemplate",
-              "description": "Custom render for selected value in trigger: (item: {label, value, _raw}) => string|Node",
-              "type": {
-                "text": "((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null"
-              },
-              "default": "null"
-            },
-            {
-              "kind": "field",
               "name": "searchPosition",
               "description": "Where to show search input: 'trigger' (default) or 'dropdown'",
               "type": {
@@ -25179,17 +25161,13 @@
           "slots": [
             {
               "name": "item",
-              "description": "Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).",
+              "description": "Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.",
               "signature": "(option: { label: string; value: unknown; raw: T }, index: number)"
             },
             {
               "name": "selected",
-              "description": "Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.",
+              "description": "Renders the selected value in the trigger: a snippet `selected(option)`.",
               "signature": "(option: { label: string; value: unknown; raw: T })"
-            },
-            {
-              "name": "",
-              "description": "The content placed inside the element."
             }
           ],
           "cssParts": [
@@ -31008,7 +30986,7 @@
           "slots": [
             {
               "name": "node",
-              "description": "Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.",
+              "description": "Renders one node's label: a snippet `node(node, level, expanded)`.",
               "signature": "(node: T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), level: number, expanded: boolean)"
             }
           ],

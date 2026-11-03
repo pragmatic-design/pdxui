@@ -62,7 +62,7 @@ on blur.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `option` — Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+**Slot:** `option` — Renders one option: a snippet `option(option, index, highlighted)`; `option.raw` is the original item.
 
 **States:** `:state(open)` — The popup is open.; `:state(invalid)` — `error` is set.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set, or the DataSource is loading.
 

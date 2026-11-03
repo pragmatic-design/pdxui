@@ -55,8 +55,6 @@ paged table → `pdx-relation-picker`.
 | `loading` | `loading` | boolean | `false` | Shows a loading / busy state. |
 | `groupField` | `groupfield` | string | `''` | Object field used to group options. |
 | `label` | `label` | string | `''` | The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a label, after a pdx-label, or with a <label for> the select's id: those name it. |
-| `itemTemplate` | — | ((item: { label: string; value: unknown; _raw: unknown }) => string \| Node) \| null | `null` | Custom render for each option: (item: {label, value, _raw}) => string\|Node |
-| `selectedTemplate` | — | ((item: { label: string; value: unknown; _raw: unknown }) => string \| Node) \| null | `null` | Custom render for selected value in trigger: (item: {label, value, _raw}) => string\|Node |
 | `searchPosition` | `searchposition` | 'trigger' \| 'dropdown' | `'trigger'` | Where to show search input: 'trigger' (default) or 'dropdown' |
 | `creatable` | `creatable` | boolean | `false` | Allow creating new options when search has no match. Emits pdx-create. |
 | `createLabel` | `createlabel` | string | `''` | Label template for the create option. Use {query} as placeholder. Empty: the select.create component string, «Create "{query}"» in English. |
@@ -83,7 +81,7 @@ paged table → `pdx-relation-picker`.
 
 **Injects:** `DataSourceContext` (optional)
 
-**Slot:** `item` — Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).; `selected` — Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
+**Slot:** `item` — Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.; `selected` — Renders the selected value in the trigger: a snippet `selected(option)`.
 
 **States:** `:state(open)` — The popup is open.; `:state(invalid)` — `error` is set.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set, or the DataSource is loading.; `:state(multiple)` — `multiple` is set: the trigger holds tags.
 

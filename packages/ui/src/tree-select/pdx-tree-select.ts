@@ -2,7 +2,7 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
@@ -35,7 +35,7 @@ export interface TreeSelectNode {
  * A select whose dropdown is a tree the user can search and expand, picking one node or several,
  * with children loaded lazily.
  *
- * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+ * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`.
  *
  * @csspart root - The trigger, the combobox: the frame, its border and background.
  * @csspart clear - The clear button, while `clearable`, something is chosen and not `disabled`.
@@ -103,7 +103,7 @@ component('pdx-tree-select', {
     },
     // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
     generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // A root, or a child or grandchild of one, written out because the editor pastes the
         // signature where no alias is in scope. A recursive node type collapses to `T`.
@@ -122,7 +122,7 @@ component('pdx-tree-select', {
         let _textEl: HTMLElement | null = null;
         let _panelEl: HTMLElement | null = null;
         function getNodeSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
+            return declaredSnippet(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
         }
         let _treeContainerEl: HTMLElement | null = null;
         let _searchInputEl: HTMLInputElement | null = null;

@@ -1,11 +1,10 @@
-// Typed snippets for the menus and pickers (#491, part 3a of #131).
+// Typed snippets for the menus and pickers (#491, part 3a of #131; snippet only, #492).
 //
-// Each of these components drew the template a parent gave it through a light-DOM scoped slot only
-// (`<slot name="x" let:row>`, `ctx.__slots`). It now declares the slot in its descriptor,
+// Each of these components drew the template a parent gave it through a light-DOM scoped slot
+// (`<slot name="x" let:row>`, `ctx.__slots`). It declares the slot in its descriptor,
 // `slot<(…) => Node>()`, so a parent's `@snippet` — which compiles to setting the element's property
-// — reaches it. For each one, the same text is drawn once by a snippet from its arguments and once by
-// the alpha scoped slot from its scope: the two must render the same entries, and the scoped slot
-// must keep working until #131's removal part.
+// — reaches it, and since #492 it reads that snippet alone. For each one, the snippet draws the
+// expected entries from its arguments, and a scoped slot given to the same element draws nothing.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
@@ -35,11 +34,8 @@ interface Case {
     fromScope(scope: Scope): string;
     /** The same text, drawn by the snippet from its arguments. */
     fromArgs(...args: Args): string;
-    /**
-     * Set once the component reads its snippet only (#492, part 3): the entries its snippet draws.
-     * The alpha scoped slot then draws nothing, and the snippet is held to these instead of to it.
-     */
-    expected?: string[];
+    /** The entries the snippet draws (#492): the alpha scoped slot draws none. */
+    expected: string[];
 }
 
 const MENU_ITEMS = [{ key: 'cut', label: 'Cut' }, { key: 'copy', label: 'Copy' }];
@@ -60,6 +56,7 @@ const CASES: Case[] = [
         },
         fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (o, index) => `${(o as Scope).label}=${(o as Scope).value}#${index}`,
+        expected: ['Italy=it#0', 'France=fr#1'],
     },
     {
         tag: 'pdx-cascader', slot: 'option',
@@ -67,6 +64,7 @@ const CASES: Case[] = [
         open: (el) => click(el, '[role="combobox"]'),
         fromScope: (s) => `${(s.node as Scope).label}@${s.level}`,
         fromArgs: (node, level) => `${(node as Scope).label}@${level}`,
+        expected: ['Italy@0'],
     },
     {
         tag: 'pdx-command', slot: 'item',
@@ -106,6 +104,7 @@ const CASES: Case[] = [
         open: (el) => click(el, '.pdx-select-trigger'),
         fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (o, index) => `${(o as Scope).label}=${(o as Scope).value}#${index}`,
+        expected: ['Italy=it#0', 'France=fr#1'],
     },
     {
         tag: 'pdx-select', slot: 'selected',
@@ -113,6 +112,7 @@ const CASES: Case[] = [
         open: () => undefined,
         fromScope: (s) => `${s.label}=${s.value}`,
         fromArgs: (o) => `${(o as Scope).label}=${(o as Scope).value}`,
+        expected: ['France=fr'],
     },
     {
         tag: 'pdx-tree-select', slot: 'node',
@@ -120,6 +120,7 @@ const CASES: Case[] = [
         open: (el) => click(el, '[role="combobox"]'),
         fromScope: (s) => `${(s.node as Scope).label}@${s.level}`,
         fromArgs: (node, level) => `${(node as Scope).label}@${level}`,
+        expected: ['Fruit@0', 'Apple@1'],
     },
 ];
 
@@ -162,32 +163,17 @@ function snippet(c: Case) {
     };
 }
 
-describe('menus and pickers: a snippet renders where the scoped slot did (#491)', () => {
+describe('menus and pickers: a snippet draws, a scoped slot does not (#491, #492)', () => {
     beforeEach(cleanup);
 
     for (const c of CASES) {
-        if (c.expected) {
-            const expected = c.expected;
-            describe(`${c.tag} — ${c.slot}, snippet only (#492)`, () => {
-                it('the alpha scoped slot draws nothing', async () => {
-                    expect(await mount(c, scopedSlot(c))).toEqual([]);
-                });
-
-                it('a snippet draws its entries, from its arguments', async () => {
-                    expect(await mount(c, snippet(c))).toEqual(expected);
-                });
-            });
-            continue;
-        }
         describe(`${c.tag} — ${c.slot}`, () => {
-            it('the alpha scoped slot still renders (control)', async () => {
-                expect(await mount(c, scopedSlot(c))).not.toEqual([]);
+            it('the alpha scoped slot draws nothing', async () => {
+                expect(await mount(c, scopedSlot(c))).toEqual([]);
             });
 
-            it('a snippet renders the same entries, from its arguments', async () => {
-                const fromSlot = await mount(c, scopedSlot(c));
-                cleanup();
-                expect(await mount(c, snippet(c))).toEqual(fromSlot);
+            it('a snippet draws its entries, from its arguments', async () => {
+                expect(await mount(c, snippet(c))).toEqual(c.expected);
             });
         });
     }

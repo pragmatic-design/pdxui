@@ -69,7 +69,7 @@
         @focus="onSearchFocus"
         tabindex="0" />
     } @else if (selectedOption) {
-      <span class="pdx-select-value">@render selected?.(optionOf(selectedOption)) @else {<slot name="selected" :label="selectedOption.label" :value="selectedOption.value" :raw="selectedOption._raw">{{ selectedFallback(selectedOption) }}</slot>}</span>
+      <span class="pdx-select-value">@render selected?.(optionOf(selectedOption)) @else {{{ selectedOption.label }}}</span>
     } @else {
       <span class="pdx-select-value pdx-select-placeholder">{{ placeholder }}</span>
     }
@@ -125,7 +125,7 @@
                 <span class="pdx-select-check"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"></polyline></svg></span>
               }
               @render item?.(optionOf(row.item), row.index) @else {
-                <slot name="item" :label="row.item.label" :value="row.item.value" :raw="row.item._raw" :index="row.index">{{ itemFallback(row.item, row.index) }}</slot>
+                {{ row.item.label }}
               }
             </div>
           }
@@ -148,7 +148,7 @@ import { DataSourceContext } from '../src/data-source/data-source-context';
 import { uiString, format } from '../src/shared/i18n';
 import '@pdxui/design/components/select';
 import '@pdxui/design/components/chip';
-import type { Option, Template, Row, SourceElement } from './select-types';
+import type { Option, Row, SourceElement } from './select-types';
 
 /** The selection (#481): the option's value, or null; in multiple mode the array of values. */
 // What the form submits (#751): with nothing chosen a native select with an empty placeholder submits
@@ -186,10 +186,6 @@ import type { Option, Template, Row, SourceElement } from './select-types';
 @prop groupField: string = '';
 /** The combobox's accessible name, and its listbox's. */
 @prop label: string = '';
-/** Custom render for each option. */
-@prop itemTemplate: Template | null = null;
-/** Custom render for the selected value in the trigger. */
-@prop selectedTemplate: Template | null = null;
 /** Where the search input sits: 'trigger' (default) or 'dropdown'. */
 @prop searchPosition: 'trigger' | 'dropdown' = 'trigger';
 /** Allow creating new options when the search has no match. Emits pdx-create. */
@@ -346,14 +342,9 @@ const tagSummary = $derived(maxTagCount === 0 && selectedItems.length > 0);
 const shownTags = $derived(maxTagCount > 0 && selectedItems.length > maxTagCount ? selectedItems.slice(0, maxTagCount) : selectedItems);
 const tagOverflow = $derived(maxTagCount > 0 && selectedItems.length > maxTagCount ? selectedItems.length - maxTagCount : 0);
 
-// Priority: the parent's snippet (#491), then the alpha scoped slot, then the function prop, then the label.
+// Priority: the parent's snippet (#491), then the label. The alpha scoped slot and the template props
+// are gone (#492).
 function optionOf(item: Option) { return { label: item.label, value: item.value, raw: item._raw }; }
-function itemFallback(item: Option, index: number): unknown {
-  return itemTemplate ? itemTemplate({ label: item.label, value: item.value, raw: item._raw, index }) : item.label;
-}
-function selectedFallback(item: Option): unknown {
-  return selectedTemplate ? selectedTemplate(optionOf(item)) : item.label;
-}
 
 // ── The combobox ──
 // One element has role="combobox", the one that takes focus: the search input when it sits in the
