@@ -23,12 +23,12 @@
     <app-demo-comp-timeline-slot class="demo-section"></app-demo-comp-timeline-slot>
 
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>content</code></td><td><code>{ item, index, status }</code></td><td>Custom content for each timeline entry</td></tr>
+            <tr><td><code>content</code></td><td><code>(item, index)</code></td><td>Custom content for each timeline entry</td></tr>
           </tbody>
         </table>
       </div>

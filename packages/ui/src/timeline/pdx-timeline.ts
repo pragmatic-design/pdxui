@@ -3,7 +3,7 @@
 // Supports: left/right/alternate/horizontal mode, status colors,
 // icons, pending state, clickable items, connector styles.
 
-import { component, html, slot, snippetOrSlot, event } from '@pdxui/core';
+import { component, html, slot, declaredSnippet, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -36,7 +36,7 @@ const STATUS_CLASS: Record<string, string> = {
 /**
  * A vertical or horizontal sequence of events, with status colors, icons and clickable items.
  *
- * @slot content - Renders the content of one entry: a snippet `content(item, index)`, or the scoped slot, which receives `{ item, index, status }` (`status` is `'default'` when unset).
+ * @slot content - Renders the content of one entry: a snippet `content(item, index)`.
  *
  * @cssstate pending - `pending`: a last row says more is to come.
  * @cssstate clickable - `clickable`: each event is a tab stop, and a click or Enter emits `pdx-click`.
@@ -77,7 +77,7 @@ component('pdx-timeline', {
     },
     states: ['pending', 'clickable'],
     parts: ['list', 'item', 'track', 'line', 'dot', 'content', 'title', 'description', 'date', 'pending'],
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ title: string }', from: 'items' } },
     slots: {
@@ -93,7 +93,7 @@ component('pdx-timeline', {
         const pendingText = (): string => (ctx.pendingLabel() as string) || uiString('timeline', 'pending');
 
         function getContentSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'content', (s) => [s.item, s.index]);
+            return declaredSnippet(ctx, 'content', (s) => [s.item, s.index]);
         }
 
         function renderTimeline(): void {
@@ -168,7 +168,7 @@ component('pdx-timeline', {
 
                 const contentSlot = getContentSlot();
                 if (contentSlot) {
-                    const slotContent = contentSlot({ item, index: i, status: item.status || 'default' });
+                    const slotContent = contentSlot({ item, index: i });
                     contentEl.appendChild(slotContent instanceof DocumentFragment ? slotContent : slotContent);
                 } else {
                     const titleEl = document.createElement('div');
