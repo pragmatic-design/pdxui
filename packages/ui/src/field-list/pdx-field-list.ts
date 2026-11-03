@@ -11,7 +11,7 @@
 //       :item-fields="[{ name: 'product', type: 'text', label: 'Product' }]"
 //       :item-default="{ product: '', qty: 1, price: 0 }" />
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, declaredSnippet } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
 // Each cell's control is wrapped in a field (#293): named, marked required and described by its error
@@ -64,7 +64,7 @@ export interface FieldListItemSchema {
  * An array of objects in a form, one row per item: adding or removing a row re-indexes the fields,
  * and the values come back as an array.
  *
- * @slot row - Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
+ * @slot row - Renders one row: a snippet `row(item, index, remove)` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
  *
  * @cssstate empty - `empty`: the list has no rows.
  *
@@ -104,7 +104,7 @@ component('pdx-field-list', {
         /** Display mode: inline (default), dialog. */
         display: { type: String, default: 'inline' },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         row: slot<(item: { [field: string]: unknown }, index: number, remove: () => void) => Node>(),
     },
@@ -402,7 +402,7 @@ component('pdx-field-list', {
                     row.dataset.part = 'row';
                     row.dataset.index = String(i);
 
-                    // Slot for custom row rendering (priority: slot > default)
+                    // The parent's row snippet draws the row (priority: snippet > default)
                     const rowSlot = getRowSlot();
                     if (rowSlot && displayMode !== 'dialog') {
                         const itemValues: Record<string, unknown> = {};
@@ -413,7 +413,7 @@ component('pdx-field-list', {
                         }
                         // `remove` for a row that draws its own button.
                         const idx = i;
-                        const content = rowSlot({ item: itemValues, index: i, fields, remove: () => removeItem(idx) });
+                        const content = rowSlot({ item: itemValues, index: i, remove: () => removeItem(idx) });
                         row.appendChild(content instanceof DocumentFragment ? content : content);
                         // The same remove button as any other row, built before the slot branch goes
                         // on to the next row: otherwise a custom row could not be removed.
@@ -646,7 +646,7 @@ component('pdx-field-list', {
         }
 
         function getRowSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'row', (s) => [s.item, s.index, s.remove]);
+            return declaredSnippet(ctx, 'row', (s) => [s.item, s.index, s.remove]);
         }
 
         return { addItem, removeItem, editItem, closeDialog, getRowSlot };
