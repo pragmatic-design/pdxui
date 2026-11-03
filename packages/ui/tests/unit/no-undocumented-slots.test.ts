@@ -40,6 +40,8 @@ function renderedSlots(text: string): { tag: string | null; names: string[] } {
     }
     // Match: `declaredSnippet(ctx, 'x'`. Groups: [1]=the snippet's name
     for (const m of text.matchAll(/declaredSnippet\(\s*ctx\s*,\s*'([\w-]+)'/g)) names.add(m[1]);
+    // Match: `snippetOf('x')`, pdx-data-grid's reader of its own snippets. Groups: [1]=the snippet's name
+    for (const m of text.matchAll(/snippetOf\(\s*'([\w-]+)'\s*\)/g)) names.add(m[1]);
     return { tag, names: [...names].sort() };
 }
 
@@ -85,6 +87,8 @@ describe('the scan can fail', () => {
     it('sees an undocumented snippet read alone (#492)', () => {
         const src = "component('pdx-probe', { setup(ctx) { return declaredSnippet(ctx, 'row', (s) => [s.item]); } })";
         expect(undocumented([src], docs)).toEqual(['pdx-probe: row']);
+        const grid = "component('pdx-probe', { setup(ctx) { const c = snippetOf('cell')?.(row); } })";
+        expect(undocumented([grid], docs)).toEqual(['pdx-probe: cell']);
     });
     it('does not accuse a documented slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"footer\"></slot>` })";

@@ -428,6 +428,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-data-grid` reads its snippets only (#492): its alpha scoped slots — `col:{field}`,
+  `header:{field}`, `col-edit:{field}`, `filter:{field}`, `filter-popover:{field}`, `detail`,
+  `toolbar-start`, `toolbar-end`, `empty` — draw nothing now. The `cell`, `header`, `editCell`,
+  `filter` and `filterPopover` snippets switch on `column.field`; `detail`, `toolbarStart`,
+  `toolbarEnd` and `empty` take the rest. No component of the library reads an alpha scoped slot any
+  more; core's `snippetOrSlot` stays until the alpha slots themselves go.
+
 - **Breaking:** `pdx-field-list`, `pdx-file-upload`, `pdx-mention` and `pdx-tag-input` read their
   snippets only (#492): a parent's alpha scoped slot draws nothing in them now. A field-list row that
   draws its own remove button calls the `row` snippet's third argument, `remove`.
