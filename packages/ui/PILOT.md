@@ -113,9 +113,13 @@ What the numbers mean:
     dynamic attribute.
   - The `.pdx` filter popover content alone weighs more than the whole TypeScript module, helpers
     included.
-- **Mount.** The `.pdx` versions are slower everywhere: 1.4× the switch, 2.5× the select, 2.1–2.6× the
-  popover. Production is not measured. #685 measures it and fixes what it finds; one cause is visible
-  in the switch's module, the generic property-or-attribute branch on each binding.
+- **Mount.** On the dev server the `.pdx` versions were slower everywhere: 1.4× the switch, 2.5× the
+  select, 2.1–2.6× the popover. On a production build (#685) they are not: the switch mounts at 0.74×
+  and the select at 0.92× of their TypeScript versions. The popover stays slower, 2.1–2.3× the value
+  list and 1.85× the conditions, because its `.pdx` content is a component where the TypeScript one is
+  a function, and its list a reactive branch per row; the profile is in
+  `packages/showcase/tests/scenario-pilot-mount.spec.ts`, which measures the four rows in the
+  pre-push and holds each to its ratio.
 - **The one red that went away.** With the switch and the select piloted, `navigation-live-prop`'s
   page-size test was red. The pagination imports the select lazily and clicks it 50 ms after mounting,
   and a cold `.pdx` select is defined 301 ms after its import, against 69 ms. With the filter popover
@@ -143,14 +147,14 @@ What the pilot found that the language or the toolchain does not do yet.
 | 1 | `PDX_VARIANT_UNSTYLED` warns a library `.pdx` that its variants are unstyled. They are drawn by `@pdxui/design`, not its own `<style scoped>` | moot while the library is TypeScript |
 | 2 | `@variants` cannot name a value's native class (`sm: '.pdx-toggle-sm'`), which `gen-variants.mjs` draws native markup from | moot, as 1 |
 | 3 | The library's generators read TypeScript. `gen-manifest.mjs` parses `component()` calls, and the catalogue, the variants and the certification registry follow from it. A `.pdx` component is invisible to them | moot, as 1 |
-| 4 | The compiled render runs a generic property-or-attribute branch where the element's tag decides it | #685 |
+| 4 | The compiled render runs a generic property-or-attribute branch where the element's tag decides it | fixed, #685: a property the native element certainly has is assigned with no branch |
 | 5 | Certification does not check a switch's role: with `role="checkbox"` every spec stayed green, axe included | #684 |
 | 6 | The signal rewrite renames a type member that shares a prop's name (`{ source?: … }` → `{ source()?: … }`), and the type erasure then gives up without a word | #675 |
 | 7 | `.peek()` on a `$derived` or a prop is rewritten to a call that throws | #676 |
 | 8 | `@prop xs: T[] = []` is one array shared by every instance | #677 |
 | 9 | A `:value` binding does not write back a value the user changed | #678 |
 | 10 | A model cannot say its attribute is a string and its value is not (`@model value: string = null`) | #686, item 5 |
-| 11 | A cold `.pdx` compiles slowly in the dev transform: 301 ms for the first select against 69 ms | #685 |
+| 11 | A cold `.pdx` compiles slowly in the dev transform: 301 ms for the first select against 69 ms | open: #685 measured the mount on a production build, not the dev transform |
 | 12 | A script function named `valueOf` is taken for a core function: the lookup reads `Object.prototype` | #681 |
 | 13 | A `$signal` initialiser that reads another `$signal` is left as written, and throws | #682 |
 | 14 | `@defer` renders after its load resolves even when the code is there, so a box measured right after the append is empty | #686, noted |

@@ -428,6 +428,13 @@ semver.
 
 ### Changed
 
+- A compiled render does less at mount (#685). A binding on a property the native element certainly
+  has — `:value`, `:disabled`, `:checked` on an `<input>`, and the like — is the assignment alone, no
+  longer a property-or-attribute question asked on every update. A block that is one control-flow node
+  alone — an `@else if`, a `@for` row that is one `@if` chain — returns that node instead of cloning a
+  marker to replace with it. The DOM is the same. Measured against the library's TypeScript components
+  on a production build, the `.pdx` pilot's switch and select mount at 0.74× and 0.92× of their time.
+
 - **Breaking:** the alpha's scoped slots are removed (#492). A parent's `<slot name="row" let:item>`
   and `@slot(row, { item }) { … }`, a child's `<slot name="row" :item="it">`, the object form
   `@slot row: { item: T };` and a template prop such as `:item-template` on a library component are
