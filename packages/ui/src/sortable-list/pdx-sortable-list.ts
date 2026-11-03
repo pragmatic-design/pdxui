@@ -22,7 +22,7 @@
 // the app's language, the strings come from `uiString`, and `labelOf` reads the ITEM rather than
 // the row's text. Those travel as `a11y` options; the state machine does not.
 
-import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction, Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -35,8 +35,8 @@ import '@pdxui/design/components/sortable-list';
  * It emits `pdx-reorder` with the indices and never writes to `items`: the application applies the
  * move, so the array it owns stays the one source of truth.
  *
- * @slot item - Renders one row's content: a snippet `item(item, index)`, or the scoped slot, which
- *   receives `{ item, index }`. Without either the row shows the item's `label-field`.
+ * @slot item - Renders one row's content: a snippet `item(item, index)`. Without it the row shows
+ *   the item's `label-field`.
  * @csspart list - The `role="list"` `<ul>`, framed.
  * @csspart item - A row, `<li>`. The row lifted from the keyboard carries `pdx-sortable-item-lifted`.
  * @csspart handle - A row's handle, the button the pointer grabs and the keyboard moves.
@@ -62,7 +62,7 @@ component('pdx-sortable-list', {
         handle: { type: String, default: '' },
         disabled: { type: Boolean, default: false },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { from: 'items' } },
     slots: {
@@ -80,7 +80,7 @@ component('pdx-sortable-list', {
         let refocusIndex = -1;
 
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item, s.index]);
         }
 
         function rows(): unknown[] {
