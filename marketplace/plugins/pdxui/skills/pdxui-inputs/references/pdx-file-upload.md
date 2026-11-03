@@ -29,7 +29,7 @@ Drag-and-drop or browse to upload.
 
 **Renders:** roles `button` · `list` · `listitem` · `progressbar` · `status`
 
-**Slot:** `file` — Renders one file in the list: a snippet `file(file, status, progress)`, or the scoped slot, which receives `{ file, status, progress }`.
+**Slot:** `file` — Renders one file in the list: a snippet `file(file, status, progress)`.
 
 **States:** `:state(disabled)` — `disabled` is set.; `:state(dragover)` — A drag is over the drop zone.
 

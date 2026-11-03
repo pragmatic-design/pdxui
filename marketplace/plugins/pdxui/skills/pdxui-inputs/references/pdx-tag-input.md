@@ -35,7 +35,7 @@ Type to add removable tags.
 
 **Renders:** roles `group` · `status`
 
-**Slot:** `tag` — Renders one tag: a snippet `tag(tag, index)`, or the scoped slot, which receives `{ tag, index }`.
+**Slot:** `tag` — Renders one tag: a snippet `tag(tag, index)`.
 
 **States:** `:state(invalid)` — `error` is set; the text box is aria-invalid.; `:state(success)` — `success` is set.; `:state(warning)` — `warning` is set.; `:state(disabled)` — `disabled` is set.; `:state(readonly)` — `readonly` is set.; `:state(loading)` — `loading` is set; the group is aria-busy.
 

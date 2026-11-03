@@ -428,6 +428,10 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-field-list`, `pdx-file-upload`, `pdx-mention` and `pdx-tag-input` read their
+  snippets only (#492): a parent's alpha scoped slot draws nothing in them now. A field-list row that
+  draws its own remove button calls the `row` snippet's third argument, `remove`.
+
 - **Breaking:** `pdx-select`, `pdx-autocomplete`, `pdx-cascader` and `pdx-tree-select` read their
   snippets only (#492): a parent's alpha scoped slot draws nothing in them now. `pdx-select` drops its
   template props, `itemTemplate` and `selectedTemplate`: the `item` and `selected` snippets draw what
