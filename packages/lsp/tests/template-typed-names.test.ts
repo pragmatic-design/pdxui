@@ -1,14 +1,14 @@
 // The names a template reads that the projection used to type `any` (#122): a handler's `$event`,
-// the error of `@catch` and `@await … @error`, and a scoped slot's context. Each is typed now, so a
+// the error of `@catch` and `@await … @error`, and a snippet's parameters. Each is typed now, so a
 // misspelt member is an error where it is written — in the editor and in `pdx check --types`.
 //
 // The projection is checked under `strict`, in a program of its own (#468; template-strict.test.ts):
 // on `unknown`, TypeScript then reports the value read (`'err' is of type 'unknown'`, 18046), where
 // without strict mode it named the member (2339). Either way the read is an error where it is written.
 //
-// `unknown` where the declaring component could have said and did not — a .pdx's `@event x;`, its
-// slot with no context. A library component's manifest types neither, and an unknown tag says
-// nothing: those stay unchecked, because a template has no cast to answer a false error with.
+// `unknown` where the declaring component could have said and did not — a .pdx's `@event x;`. A
+// library component's manifest does not type an event's detail, and an unknown tag says nothing:
+// those stay unchecked, because a template has no cast to answer a false error with.
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { join } from 'path';
@@ -46,14 +46,14 @@ function diagnose(script: string, template: string, resolveType?: Resolve, resol
 // (#468) — paid here with a timeout of its own, not by the first `it` against vitest's 5s.
 beforeAll(() => { diagnose('let x = $signal(1);', '<p>{{ x }}</p>'); }, 60_000);
 
-describe('what the workspace answers for an event and a slot', () => {
+describe('what the workspace answers for an event', () => {
     const registry = {
         describe: (tag: string) => {
             if (tag === 'app-card') {
                 return {
                     tag, description: '', filePath: '/app/src/card.pdx', attributes: [],
                     events: [{ name: 'picked', type: '{ id: number }', description: '' }, { name: 'closed', type: undefined, description: '' }],
-                    slots: [{ name: 'row', description: '', scopeType: '{ item: { name: string } }' }, { name: 'footer', description: '' }],
+                    slots: [],
                 };
             }
             if (tag === 'pdx-lib') {
@@ -70,8 +70,6 @@ describe('what the workspace answers for an event and a slot', () => {
     it('a .pdx component: its declared types, and unknown for what it leaves out', () => {
         expect(resolvePropType(registry, 'app-card', '@picked')).toBe('CustomEvent<{ id: number }>');
         expect(resolvePropType(registry, 'app-card', '@closed')).toBe('CustomEvent<unknown>');
-        expect(resolvePropType(registry, 'app-card', '#row')).toBe('{ item: { name: string } }');
-        expect(resolvePropType(registry, 'app-card', '#footer')).toBe('unknown');
     });
 
     it('the host of a library component: its fields with their types, its methods callable (#479)', () => {
@@ -89,10 +87,9 @@ describe('what the workspace answers for an event and a slot', () => {
         expect(resolvePropType(lib, 'pdx-unknown', '$host')).toBeNull();
     });
 
-    it('a library component, whose manifest types neither: nothing to check against', () => {
+    it('a library component, whose manifest does not type it: nothing to check against', () => {
         expect(resolvePropType(registry, 'pdx-lib', '@pdx-change')).toBeNull();
-        expect(resolvePropType(registry, 'pdx-lib', '#item')).toBeNull();
-        expect(resolvePropType(registry, 'pdx-unknown', '#item')).toBeNull();
+        expect(resolvePropType(registry, 'pdx-unknown', '@pdx-change')).toBeNull();
     });
 });
 
@@ -155,29 +152,10 @@ describe('the error of @catch and @await … @error', () => {
     });
 });
 
-describe("a scoped slot's context", () => {
-    const list: Resolve = (tag, attr) => (tag === 'pdx-list' && attr === '#item' ? '{ row: { name: string } }' : null);
-
-    it('is what the component declares: a misspelt member is an error at the member', () => {
-        const found = diagnose('let x = $signal(1);', '<pdx-list>@slot (item, { row }) { <p>{{ row.nmae }}</p> }</pdx-list>', list);
-        expect(found.map((f) => f.at)).toEqual(['nmae']);
-    });
-
-    it('control — the declared member reads', () => {
-        expect(diagnose('let x = $signal(1);', '<pdx-list>@slot (item, { row }) { <p>{{ row.name }}</p> }</pdx-list>', list)).toEqual([]);
-    });
-
-    it('is unknown when a .pdx component declares no context for it', () => {
-        // What the workspace answers for a project component's slot with no `@slot name: { … }`.
-        const bare: Resolve = (tag, attr) => (tag === 'app-bare' && attr === '#item' ? 'unknown' : null);
-        const found = diagnose('let x = $signal(1);', '<app-bare>@slot (item, { row }) { <p>{{ row.name }}</p> }</app-bare>', bare);
-        expect(found.map((f) => [f.code, f.at])).toEqual([['ts(18046)', 'row']]);
-    });
-
-    it('control — the slot of a component that cannot type it (a library one) is left unchecked', () => {
-        // The alpha scoped slot's context: `<pdx-nav-menu>`'s manifest types its snippet `item`
-        // (#595, below), not the `let:` form, which stays unchecked until #131 removes it.
-        expect(diagnose('let x = $signal(1);', '<pdx-nav-menu><slot name="item" let:item><b>{{ item.label }}</b></slot></pdx-nav-menu>')).toEqual([]);
+describe('an alpha scoped slot (#492)', () => {
+    it('is not projected: the compiler reports it as a removed form, and the editor types nothing in it', () => {
+        expect(diagnose('let x = $signal(1);', '<pdx-nav-menu><slot name="item" let:item><b>{{ item.lable }}</b></slot></pdx-nav-menu>')).toEqual([]);
+        expect(diagnose('let x = $signal(1);', '<pdx-list>@slot (item, { row }) { <p>{{ row.nmae }}</p> }</pdx-list>')).toEqual([]);
     });
 });
 

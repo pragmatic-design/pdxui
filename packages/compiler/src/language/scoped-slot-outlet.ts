@@ -126,11 +126,44 @@ export function outletSnippetParams(text: string): Map<string, string[]> | null 
 
 export const scopedSlotOutlet: LanguageChange = {
     id: 'scoped-slot-outlet',
-    kind: 'changed',
+    kind: 'removed',
     scope: 'pdx',
     issue: 492,
     message: 'A component renders a template it is given with `@render`: `<slot name="row" :item="it">fallback</slot>` is `@slot row?: (item: T);` in the script and `@render row?.(it) @else { fallback }` in the template.',
     marker: '<slot',
     detect: (text) => plan(text).findings,
     fix: (text) => applyEdits(text, plan(text).edits),
+};
+
+// ─── the object form left without an outlet ──────────────────────────────────────────────────
+
+/** Every `@slot name: T` of the `.pdx` script whose type is not a signature, with its rewrite when T is an object literal. */
+function objectFormSlots(text: string): { finding: LanguageChangeFinding; edit?: TextEdit }[] {
+    const script = parseSFC(text).script;
+    if (!script || script.src) return [];
+    const out: { finding: LanguageChangeFinding; edit?: TextEdit }[] = [];
+    // Match: `@slot name: T` on a line, T not a `(…)` signature. Groups: [1]=the indentation [2]=the name [3]=the type
+    for (const m of script.content.matchAll(/^([ \t]*)@slot\s+([A-Za-z_$][\w$]*)\s*\??\s*:\s*(?![\s(])([^\n]*?)\s*;?[ \t]*$/gm)) {
+        const start = script.start + m.index;
+        const finding: LanguageChangeFinding = { line: lineAt(text, start), found: m[0].trim() };
+        const object = /^\{(.*)\}$/.exec(m[3]);
+        if (!object) { out.push({ finding: { ...finding, note: `Write its signature, \`@slot ${m[2]}?: (…)\`, by hand.` } }); continue; }
+        const keys = splitTopLevel(object[1], /[;,]/).map((p) => {
+            const at = p.indexOf(':');
+            return `${p.slice(0, at).replace('?', '').trim()}: ${p.slice(at + 1).trim()}`;
+        });
+        out.push({ finding, edit: { start, end: start + m[0].length, text: `${m[1]}@slot ${m[2]}?: (${keys.join(', ')});` } });
+    }
+    return out;
+}
+
+export const slotObjectForm: LanguageChange = {
+    id: 'slot-object-form',
+    kind: 'removed',
+    scope: 'pdx',
+    issue: 492,
+    message: 'A slot that passes data declares a signature: `@slot row: { item: User; index: number }` is `@slot row?: (item: User, index: number);`, rendered with `@render`.',
+    marker: '@slot',
+    detect: (text) => objectFormSlots(text).map((s) => s.finding),
+    fix: (text) => applyEdits(text, objectFormSlots(text).flatMap((s) => (s.edit ? [s.edit] : []))),
 };

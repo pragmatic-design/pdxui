@@ -10,15 +10,14 @@ import type { ScriptAnalysis } from './script-analyzer-types';
 import type { ValidationWarning } from './validate';
 import { escapeForRegExp } from './regexp-escape';
 
-/** The markup of the template: the text of every `html` node and of every scoped slot's tag, at any depth. */
+/** The markup of the template: the text of every `html` node, at any depth. */
 function markupOf(nodes: readonly TemplateNode[]): string[] {
     const out: string[] = [];
     const visit = (value: unknown): void => {
         if (Array.isArray(value)) { for (const v of value) visit(v); return; }
         if (!value || typeof value !== 'object') return;
-        const node = value as { type?: string; content?: unknown; tag?: unknown };
+        const node = value as { type?: string; content?: unknown };
         if (node.type === 'html' && typeof node.content === 'string') out.push(node.content);
-        if (node.type === 'scoped-slot' && typeof node.tag === 'string') out.push(node.tag);
         for (const child of Object.values(value)) if (child && typeof child === 'object') visit(child);
     };
     visit(nodes);

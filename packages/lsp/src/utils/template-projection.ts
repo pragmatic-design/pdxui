@@ -5,7 +5,7 @@
 // Signals are already typed as their value ($signal<T>:T) → no unwrapping needed.
 //
 // The names a template introduces are typed, not `any` (#122): a handler's `$event`, the error of
-// `@catch` / `@await … @error` (`unknown`), a scoped slot's context. The projection is checked
+// `@catch` / `@await … @error` (`unknown`), a snippet's parameters. The projection is checked
 // `strict`, in a program of its own (#468): forcing `strict` on the script raised 398 errors on the
 // showcase that are not errors, so the script stays in the lenient program (./ts-service).
 
@@ -19,8 +19,7 @@ export interface TemplateProjection { code: string; map: SegmentMap; }
 /**
  * Resolves the (safe) TS type of a component's prop attribute, or null. Asked with `@name` for an
  * event, it answers the type of that event's `$event` — `CustomEvent<Payload>` — or null when the
- * payload is unknown. Asked with `#name` for a slot, it answers the type of the context the slot
- * passes (`{ row: Row }`), or null when the component declares none.
+ * payload is unknown.
  */
 export type ResolveType = (tag: string, attr: string) => string | null;
 
@@ -67,14 +66,10 @@ function maskedRanges(content: string): Range[] {
 const VOID_ELEMENTS = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 
 /**
- * The innermost custom element (a tag with a `-`) still open at `offset` in the template content:
- * the component a slot fill written there belongs to. Null when none is.
+ * The innermost custom element (a tag with a `-`) still open at `offset` in the template content,
+ * with its opening tag as written: the component a `@snippet` written there belongs to. Null when
+ * none is.
  */
-export function enclosingComponent(content: string, offset: number): string | null {
-    return enclosingComponentTag(content, offset)?.name ?? null;
-}
-
-/** As `enclosingComponent`, with the component's opening tag as written: its attributes. */
 export function enclosingComponentTag(content: string, offset: number): { name: string; tag: string } | null {
     const open: { name: string; tag: string }[] = [];
     // Match: `<tag …>`, `</tag>`, `<tag … />`.  Groups: [1]=`/` of a closing tag [2]=the name [3]=`/` of a self-closing one
@@ -323,24 +318,6 @@ export function projectTemplate(
                 case 'require': case 'portal':
                     walk(node.body ?? []);
                     if ('elseBody' in node && node.elseBody) walk(node.elseBody);
-                    break;
-                case 'slot-template': {
-                    // The context the component around it declares for this slot (`#name`), or
-                    // `unknown` when it declares its slots and gives this one none (#122). A
-                    // component that cannot describe it — a library one, an unknown tag — leaves it
-                    // unchecked until its slots can be typed (#131).
-                    const host = node.loc?.offset !== undefined ? enclosingComponent(templateContent, node.loc.offset) : null;
-                    const scope = host && resolveType ? resolveType(host, '#' + node.name) : null;
-                    if (scope && scope !== 'unknown' && node.scopeVars.length > 0) emit(`const { ${node.scopeVars.join(', ')} }: ${scope} = null!;\n`);
-                    else for (const v of node.scopeVars) emit(`let ${v}: ${scope === 'unknown' ? 'unknown' : 'any'};\n`);
-                    walk(node.body);
-                    break;
-                }
-                case 'scoped-slot':
-                    // The outlet's tag is markup with bindings, projected as html was before it had a
-                    // node of its own (#276); then its fallback.
-                    walk([{ type: 'html', content: node.tag, loc: node.loc }]);
-                    walk(node.body);
                     break;
                 case 'render':
                     // `@render row(it, i)` (#489): its arguments are expressions of the template.

@@ -76,7 +76,7 @@ export interface CompileContext {
      */
     readonly moduleHoists: string[];
 
-    /** Hoisted slot functions — generated as variables before the html`` template.
+    /** Functions hoisted before the render's return: the script's `@snippet`s.
      * Each entry: [varName, code]. Emitted by codegen before the render return. */
     hoistedSlots: [string, string][];
 

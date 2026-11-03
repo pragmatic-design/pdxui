@@ -94,7 +94,6 @@ function templateHandlers(ast: TemplateNode[]): TemplateHandler[] {
                 case 'html': if (!node.raw) out.push(...handlersIn(node, bound)); break;
                 case 'let': bound.add(node.name); break;
                 case 'for': walk(node.body, plus(...bindingNames(node.item), node.index)); walk(node.emptyBody, bound); break;
-                case 'slot-template': walk(node.body, plus(...node.scopeVars)); break;
                 case 'snippet': walk(node.body, plus(...node.params)); break;
                 case 'render': walk(node.fallback, bound); break;
                 case 'try': walk(node.body, bound); walk(node.catchBody, plus(node.errorVar, node.retryVar)); break;
@@ -104,7 +103,7 @@ function templateHandlers(ast: TemplateNode[]): TemplateHandler[] {
                     break;
                 case 'if': case 'require': walk(node.body, bound); walk(node.elseBody, bound); break;
                 case 'switch': for (const c of node.cases) walk(c.body, bound); walk(node.defaultBody, bound); break;
-                case 'show': case 'portal': case 'scoped-slot': case 'custom-directive': walk(node.body, bound); break;
+                case 'show': case 'portal': case 'custom-directive': walk(node.body, bound); break;
                 case 'defer':
                     walk(node.body, bound); walk(node.placeholder, bound); walk(node.loading, bound);
                     walk(node.error, plus(node.errorVar || 'err', node.retryVar ?? 'retry'));

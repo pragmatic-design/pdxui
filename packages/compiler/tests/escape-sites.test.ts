@@ -22,8 +22,8 @@ function templateText(code: string): string {
     return out.join('');
 }
 
-/** The same template inside a scoped slot's body, which the inline path builds since #364. */
-const inSlot = (src: string) => src.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list><slot name="item" let:row>$1</slot></pdx-list></template>');
+/** The same template inside a snippet's body in a component's tag, which the inline path builds (#364, #492). */
+const inSlot = (src: string) => src.replace(/<template>([\s\S]*)<\/template>/, '<template><pdx-list>@snippet item(row) { $1 }</pdx-list></template>');
 
 describe('@raw keeps its text as written', () => {
     // A backslash went into the template literal unescaped: `\n` became a line break, `\d` a `d`,
@@ -33,7 +33,7 @@ describe('@raw keeps its text as written', () => {
     it('the render', () => {
         expect(templateText(compile(src, 'raw.pdx', [], undefined, { production: true }).code)).toContain(RAW);
     });
-    it('a scoped slot body', () => {
+    it('a snippet body', () => {
         expect(templateText(compile(inSlot(src), 'raw.pdx', [], undefined, { production: true }).code)).toContain(RAW);
     });
 });
@@ -49,7 +49,7 @@ describe('@raw inside a loop binds nothing', () => {
         expect(markup(code).join('')).toContain('<span title="${item}">x</span>');
     });
 
-    it('a scoped slot body, built inline since #364: the attribute is the text', () => {
+    it('a snippet body, built inline: the attribute is the text', () => {
         const { code } = compile(inSlot(src), 'raw-loop.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<span title="${item}">x</span>');
     });

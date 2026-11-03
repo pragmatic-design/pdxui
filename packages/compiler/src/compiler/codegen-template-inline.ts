@@ -7,7 +7,7 @@ import { awaitTimingArg, deferLoadFn, extractLoopInvariants, generateTransition,
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
     InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
-    CustomDirectiveNode, SlotTemplateNode, ScopedSlotNode, RenderNode, SnippetNode,
+    CustomDirectiveNode, RenderNode, SnippetNode,
 } from '../parser/template';
 import { parseTemplate } from '../parser/template';
 import type { ScriptSnippet } from './script-analyzer-types';
@@ -16,9 +16,8 @@ import { renderSnippetCall, snippetSourceOf } from './snippet-calls';
 import { createCompileContext, type CompileContext } from './compile-context';
 import { boundPropName } from './codegen-prop-names';
 import { BindingDedup } from './inline-dedup';
-import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, scopedSlotCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
+import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
-import { hoistSlotFunction } from './codegen-template';
 import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
@@ -273,8 +272,8 @@ class InlineGen {
                 case 'await': this.awaitN(node); break;
                 case 'let': this.letN(node); break;
                 case 'custom-directive': this.customDirectiveN(node as CustomDirectiveNode); break;
-                case 'slot-template': this.slotTemplateN(node as SlotTemplateNode); break;
-                case 'scoped-slot': this.scopedSlotN(node); break;
+                // An alpha scoped slot: PDX_REMOVED_FORM, and nothing rendered (#492).
+                case 'removed-slot': break;
                 case 'render': this.renderN(node); break;
                 case 'snippet': this.snippetN(node); break;
                 default:
@@ -290,28 +289,6 @@ class InlineGen {
                     break;
             }
         }
-    }
-
-    /**
-     * A scoped slot the parent passes down: `<slot name="item" let:label>…</slot>`.
-     *
-     * The function is hoisted by the SAME helper the template path uses, so the two cannot disagree
-     * about a slot's name or its scope variables. Its body is this path's own block (#364): it was an
-     * `html``` template, which core parsed at runtime and which read `${…}` and comments its own way.
-     * Opaque, as the content of a component's tag is: its events stay on its elements (#113).
-     */
-    private slotTemplateN(node: SlotTemplateNode): void {
-        this.place(hoistSlotFunction(node, this.imports, this.ctx, () => this.block(node.body, true).code));
-    }
-
-    /**
-     * A scoped slot outlet, `<slot name="row" :item="it">fallback</slot>`: it renders what the parent
-     * fills it with, as on the template path — not a literal <slot> element with an `item` property
-     * (#200). The fallback is the parser node's body, built by this path's own walk (#276).
-     */
-    private scopedSlotN(node: ScopedSlotNode): void {
-        this.imports.add('renderSlot');
-        this.place(scopedSlotCall(node.tag, `()=>{${this.sub(node.body)}}`, this.ctx));
     }
 
     /**

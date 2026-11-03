@@ -876,7 +876,7 @@ function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]
                 case 'portal': walk(node.body); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); walk(node.loading); walk(node.errorBody); break;
-                case 'slot-template': case 'scoped-slot': case 'snippet': walk(node.body); break;
+                case 'snippet': walk(node.body); break;
                 case 'render': walk(node.fallback); break;
                 case 'custom-directive': walk(node.body); break;
             }
@@ -931,10 +931,6 @@ function checkRawInterpolation(nodes: TemplateNode[], warnings: ValidationWarnin
                 case 'defer': walk(node.body); if (node.placeholder) walk(node.placeholder); if (node.loading) walk(node.loading); if (node.error) walk(node.error); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); if (node.loading) walk(node.loading); if (node.errorBody) walk(node.errorBody); break;
-                case 'slot-template': walk(node.body); break;
-                // The outlet's tag was html content before it had a node of its own (#276): it is
-                // checked as such, then its fallback.
-                case 'scoped-slot': walk([{ type: 'html', content: node.tag, loc: node.loc }]); walk(node.body); break;
                 case 'render': if (node.fallback) walk(node.fallback); break;
                 case 'snippet': walk(node.body); break;
                 case 'custom-directive': walk(node.body); break;
@@ -1053,21 +1049,6 @@ function walkNodes(
             case 'html':
                 extractHtmlBindingIds(node.content, ids);
                 break;
-            case 'slot-template':
-                // The content a page hands to a CHILD is still the page's template, and the signals
-                // it reads there are read. Without this case, `<slot name="empty" let:_>` would hide
-                // every identifier inside it and the page would be told its own variables were dead.
-                // `scopeVars` are the CHILD's — `let:row` names a value the child
-                // supplies — so they are treated exactly as a loop variable is: seen, then removed.
-                for (const v of node.scopeVars) loopVars.add(v);
-                walkNodes(node.body, ids, loopVars);
-                break;
-            case 'scoped-slot':
-                // The outlet's scope bindings (`:item="first"`) read the component's names, as any
-                // bound attribute does; then its fallback (#276).
-                extractHtmlBindingIds(node.tag, ids);
-                walkNodes(node.body, ids, loopVars);
-                break;
             case 'render':
                 // `@render row(it, i)` (#489): the arguments read the template's names; the name is
                 // the snippet's, not a variable of the script.
@@ -1075,8 +1056,8 @@ function walkNodes(
                 if (node.fallback) walkNodes(node.fallback, ids, loopVars);
                 break;
             case 'snippet':
-                // A snippet's parameters are the values the child passes, as a slot's `let:` names
-                // are: seen, then removed. What else it reads is the page's (#489).
+                // A snippet's parameters are the values the child passes: seen, then removed, as a
+                // loop variable is. What else it reads is the page's (#489).
                 for (const p of node.params) loopVars.add(p);
                 walkNodes(node.body, ids, loopVars);
                 break;

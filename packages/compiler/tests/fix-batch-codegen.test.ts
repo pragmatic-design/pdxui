@@ -103,8 +103,8 @@ describe('#3 template-literal escaping', () => {
         expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
     });
 
-    it('a scoped slot body, built inline since #364, writes them as text too', () => {
-        const source = '<template><pdx-list><slot name="item" let:row><p>a ` b ${y}</p></slot></pdx-list></template>\n<script>\nlet y = $signal(2);\n</script>';
+    it('a snippet body, built inline, writes them as text too', () => {
+        const source = '<template><pdx-list>@snippet item(row) { <p>a ` b ${y}</p> }</pdx-list></template>\n<script>\nlet y = $signal(2);\n</script>';
         const { code } = compile(source, 'esc-slot.pdx', [], undefined, { production: true });
         expect(markup(code).join('')).toContain('<p>a ` b ${y}</p>');
         expect(() => new Function(code.replace(/^import .*$/gm, ''))).not.toThrow();

@@ -54,16 +54,10 @@ export function resolvePropType(registry: Pick<ProjectRegistry, 'describe'>, tag
     const comp = registry.describe(tag);
     if (!comp) return null;
     if (attr === '$host') return hostTypeOf(comp);
-    // A .pdx of the project declares its slots and events itself, so what it leaves out is `unknown`.
-    // A library component is described by its manifest, which types neither a slot's context nor an
-    // event's detail: what it cannot say stays unchecked (null) rather than wrong (#122).
+    // A .pdx of the project declares its events itself, so what it leaves out is `unknown`. A library
+    // component is described by its manifest, which does not type an event's detail: what it cannot
+    // say stays unchecked (null) rather than wrong (#122).
     const declaresItself = comp.filePath?.endsWith('.pdx') === true;
-    if (attr.startsWith('#')) {
-        // A slot's context, as `@slot name: { … }` declares it: only a type that stands alone.
-        const scope = comp.slots.find(s => s.name === attr.slice(1))?.scopeType?.trim();
-        if (scope) return isSelfContainedType(scope) ? scope : null;
-        return declaresItself ? 'unknown' : null;
-    }
     if (attr.startsWith('@')) {
         const ev = comp.events.find(e => e.name === attr.slice(1));
         const payload = ev?.type?.trim();

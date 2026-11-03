@@ -42,8 +42,7 @@ export type TemplateNode =
     | TryNode
     | AwaitNode
     | LetNode
-    | SlotTemplateNode
-    | ScopedSlotNode
+    | RemovedSlotNode
     | RenderNode
     | SnippetNode
     | CustomDirectiveNode;
@@ -195,29 +194,14 @@ export interface LetNode {
     loc?: SourceLoc;
 }
 
-/** Parent-side scoped slot template: @slot(name, { vars }) { body } */
-export interface SlotTemplateNode {
-    type: 'slot-template';
-    /** Slot name (e.g. 'item', 'selected', 'empty') */
-    name: string;
-    /** Destructured scope variable names from the child (e.g. ['value', 'index']) */
-    scopeVars: string[];
-    /** Template body nodes */
-    body: TemplateNode[];
-    loc?: SourceLoc;
-}
-
 /**
- * Child-side scoped slot outlet: `<slot name="row" :item="it">fallback</slot>`. One node, so its
- * fallback is a list of nodes like any block's body — an interpolation or a directive in it no longer
- * splits it across `html` nodes, where the code generators lost it (#276).
+ * An alpha scoped slot, a form the beta removed (#492): the parent's `@slot(name, { … }) { … }` and
+ * `<slot name="row" let:item>…</slot>`, the child's `<slot name="row" :item="it">…</slot>`. Read whole,
+ * its body with it, so the file parses and the only thing said is PDX_REMOVED_FORM
+ * (`language/scoped-slots.ts`); it renders nothing.
  */
-export interface ScopedSlotNode {
-    type: 'scoped-slot';
-    /** The opening tag as written, `<slot name="row" :item="it">`: the name and the scope bindings. */
-    tag: string;
-    /** The fallback, rendered when the parent does not fill the slot. */
-    body: TemplateNode[];
+export interface RemovedSlotNode {
+    type: 'removed-slot';
     loc?: SourceLoc;
 }
 
@@ -434,9 +418,9 @@ function parseNodes(ctx: ParseContext, stopAt?: string): TemplateNode[] {
             }
         }
 
-        // <slot name="..." let:var> — parent-side scoped slot (HTML-native syntax)
+        // <slot let:item> or <slot :item="it"> — an alpha scoped slot, read only to be skipped (#492)
         if (lookAhead(ctx, '<slot ') || lookAhead(ctx, '<slot>')) {
-            const slotNode = tryParseParentSlotTag(ctx) ?? tryParseScopedSlotOutlet(ctx);
+            const slotNode = tryParseRemovedSlot(ctx);
             if (slotNode) {
                 flushHtml();
                 nodes.push(slotNode);
@@ -1089,37 +1073,14 @@ function parseTry(ctx: ParseContext, loc: SourceLoc): TryNode {
     return { type: 'try', body, errorVar, retryVar, catchBody, loc };
 }
 
-// ─── @slot (parent-side scoped slot template) ─────────────────────
+// ─── @slot(name, { … }) { … } (removed, #492) ─────────────────────
 
-/**
- * Parse @slot(name, { var1, var2 }) { body } — parent-side scoped slot.
- * Syntax: @slot(name) { ... } for scopeless, @slot(name, { a, b }) { ... } for scoped.
- */
-function parseSlotTemplate(ctx: ParseContext, loc: SourceLoc): SlotTemplateNode {
-    const raw = parseParenthesized(ctx);
-    // Parse: "name" or "name, { var1, var2 }"
-    const commaIdx = raw.indexOf(',');
-    let name: string;
-    let scopeVars: string[] = [];
-
-    if (commaIdx === -1) {
-        name = raw.trim();
-    } else {
-        name = raw.slice(0, commaIdx).trim();
-        const scopeStr = raw.slice(commaIdx + 1).trim();
-        // Extract variable names from destructuring: { value, index }
-        const match = scopeStr.match(/^\{([^}]*)\}$/);
-        if (match) {
-            scopeVars = match[1].split(',').map(v => v.trim()).filter(Boolean);
-        } else {
-            // Single variable: @slot(name, item)
-            scopeVars = [scopeStr];
-        }
-    }
-
+/** Read the alpha `@slot(name, { a, b }) { body }` whole, and keep nothing of it: a removed form. */
+function parseSlotTemplate(ctx: ParseContext, loc: SourceLoc): RemovedSlotNode {
+    parseParenthesized(ctx);
     skipWhitespace(ctx);
-    const body = parseBlock(ctx);
-    return { type: 'slot-template', name, scopeVars, body, loc };
+    parseBlock(ctx);
+    return { type: 'removed-slot', loc };
 }
 
 // ─── @render / @snippet (typed snippets, #489) ───────────────────
@@ -1234,75 +1195,27 @@ function parseRaw(ctx: ParseContext, loc: SourceLoc): HtmlNode {
     return { type: 'html', content, loc, raw: true };
 }
 
-// ─── <slot let:> (parent-side, HTML-native syntax) ────────────────
+// ─── <slot let:…> and <slot :x="…"> (removed, #492) ───────────────
 
 /**
- * Try to parse `<slot name="item" let:label let:raw>...</slot>` as a parent-side slot.
- * Returns SlotTemplateNode if `let:` attributes found, null otherwise (falls through to raw HTML).
- * Does NOT advance ctx if returning null — the caller accumulates the char as HTML.
+ * Read an alpha scoped slot whole — the parent's `<slot name="item" let:item>…</slot>`, the child's
+ * `<slot name="row" :item="it">…</slot>` — and keep nothing of it: a removed form. Its body is read as
+ * nodes, so a nested slot consumes its own `</slot>`. A `<slot>` with neither is plain HTML: null, and
+ * ctx is not advanced — the caller accumulates the char as HTML.
  */
-function tryParseParentSlotTag(ctx: ParseContext): SlotTemplateNode | null {
-    // Peek ahead to find the full opening tag without advancing
-    const tagEndIdx = findTagEndInSource(ctx.source, ctx.pos);
-    if (tagEndIdx === -1) return null;
-
-    const tagStr = ctx.source.slice(ctx.pos, tagEndIdx + 1);
-    // Only parent-side if it has let: attributes
-    if (!tagStr.includes('let:')) return null;
-
-    const loc = getLoc(ctx);
-    // Advance past the opening tag
-    advanceTo(ctx, tagEndIdx + 1);
-
-    // Extract slot name
-    const nameMatch = tagStr.match(/name\s*=\s*(?:"([^"]*?)"|'([^']*?)')/);
-    const name = nameMatch ? (nameMatch[1] ?? nameMatch[2]) : 'default';
-
-    // Extract let: variables: let:label let:raw → ['label', 'raw']
-    const scopeVars: string[] = [];
-    const letRegex = /\blet:([\w]+)/g;
-    let m;
-    while ((m = letRegex.exec(tagStr)) !== null) {
-        scopeVars.push(m[1]);
-    }
-
-    // Self-closing: <slot name="item" let:label />
-    const isSelfClosing = tagStr.trimEnd().endsWith('/>');
-    if (isSelfClosing) {
-        return { type: 'slot-template', name, scopeVars, body: [], loc };
-    }
-
-    // Parse inner content until </slot>
-    const body = parseNodes(ctx, '</slot>');
-
-    // Consume </slot>
-    if (lookAhead(ctx, '</slot>')) {
-        advanceTo(ctx, ctx.pos + 7); // </slot>
-    }
-
-    return { type: 'slot-template', name, scopeVars, body, loc };
-}
-
-/**
- * Try to parse `<slot name="row" :item="it">fallback</slot>` as a scoped slot outlet: a `<slot>`
- * with a `:` binding and no `let:`. The fallback is parsed as nodes up to `</slot>`, so an
- * interpolation or a block in it stays inside the outlet (#276); a nested outlet consumes its own
- * `</slot>`. Does NOT advance ctx if returning null — the caller accumulates the char as HTML.
- */
-function tryParseScopedSlotOutlet(ctx: ParseContext): ScopedSlotNode | null {
+function tryParseRemovedSlot(ctx: ParseContext): RemovedSlotNode | null {
     const tagEndIdx = findTagEndInSource(ctx.source, ctx.pos);
     if (tagEndIdx === -1) return null;
     const tag = ctx.source.slice(ctx.pos, tagEndIdx + 1);
-    // Match: a bound attribute, ` :item=` — what makes the outlet scoped.
-    if (tag.includes('let:') || !/\s:[\w-]+\s*=/.test(tag)) return null;
+    // Match: a `let:x` or a bound ` :x=` attribute — what made the slot scoped.
+    if (!/\slet:[\w$]/.test(tag) && !/\s:[\w-]+\s*=/.test(tag)) return null;
 
     const loc = getLoc(ctx);
     advanceTo(ctx, tagEndIdx + 1);
-    if (tag.trimEnd().endsWith('/>')) return { type: 'scoped-slot', tag, body: [], loc };
-
-    const body = parseNodes(ctx, '</slot>');
+    if (tag.trimEnd().endsWith('/>')) return { type: 'removed-slot', loc };
+    parseNodes(ctx, '</slot>');
     if (lookAhead(ctx, '</slot>')) advanceTo(ctx, ctx.pos + 7); // </slot>
-    return { type: 'scoped-slot', tag, body, loc };
+    return { type: 'removed-slot', loc };
 }
 
 /**

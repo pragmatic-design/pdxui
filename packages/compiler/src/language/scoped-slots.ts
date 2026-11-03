@@ -8,15 +8,15 @@
 //   - a script `@snippet` body is a template: `${arg}` is `{{ arg }}`.
 //   - a template prop (`:item-template="fn"`) on a library component is flagged: its markup is code.
 //
-// They are `changed` entries while the repository still uses the alpha forms, so the compiler says
-// nothing and `pdx migrate` rewrites them; #492's last part makes them `removed`.
+// The alpha forms are `removed`: the compiler reports each as PDX_REMOVED_FORM, and renders nothing
+// for it. A script snippet's `${arg}` is `changed`: valid beta that reads as text.
 
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
 import { parseSFC } from '../parser/sfc';
 import { applyEdits, braced, enclosingTag, lineAt, slotClose, tagEnd, selfClosing, attributeOf, type TextEdit } from './slot-markup';
 
 export { signatureParamNames } from './slot-markup';
-export { scopedSlotOutlet } from './scoped-slot-outlet';
+export { scopedSlotOutlet, slotObjectForm } from './scoped-slot-outlet';
 
 const IDENTIFIER = /^[A-Za-z_$][\w$]*$/;
 
@@ -88,7 +88,7 @@ function parentSlots(text: string, context?: LanguageChangeContext): ParentSlot[
 
 export const scopedSlotParent: LanguageChange = {
     id: 'scoped-slot-parent',
-    kind: 'changed',
+    kind: 'removed',
     scope: 'pdx',
     issue: 492,
     message: 'A scoped slot is a typed snippet: `<slot name="row" let:item>…</slot>` and `@slot(row, { item }) { … }` are `@snippet row(item) { … }` inside the component\'s tag, with the parameters of the component\'s signature, in its order.',
@@ -154,7 +154,7 @@ const TEMPLATE_PROP = /(?<=\s):{1,2}(?:[\w-]+-template|[a-z][\w]*Template)\s*=\s
 
 export const templatePropFlag: LanguageChange = {
     id: 'template-prop',
-    kind: 'changed',
+    kind: 'removed',
     scope: 'pdx',
     issue: 492,
     message: 'A template prop is a typed snippet: pass `@snippet item(o) { … }` inside the tag, by the component\'s signature, and move the function\'s markup into it.',

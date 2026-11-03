@@ -94,15 +94,6 @@ describe('control structures become the scope they imply', () => {
             .toBeGreaterThanOrEqual(2);
     });
 
-    it('a scoped slot declares its scope variables', () => {
-        // The parent-side syntax is `@slot(name, { vars })`, not a <template #name> element.
-        // No component around it to type the context: unchecked, as for a library component (#122).
-        const { code } = project(pdx('@slot(row, { item, index }) { <b>{{ item }}</b> }'));
-        expect(code, 'the slot scope variables were not declared, so they read as undefined')
-            .toContain('let item: any;');
-        expect(code).toContain('let index: any;');
-    });
-
     it('wraps everything in one function, so the script scope is visible to it', () => {
         const { code } = project(pdx('<b>{{ a }}</b>'));
         expect(code.startsWith('function __pdxRender() {')).toBe(true);
