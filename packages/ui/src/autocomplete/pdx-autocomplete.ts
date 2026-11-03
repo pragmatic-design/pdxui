@@ -1,7 +1,7 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
@@ -46,7 +46,7 @@ function buildHighlight(label: string, query: string): HTMLSpanElement {
  * A text input with suggestions whose value is free text: the user can type anything, or pick a
  * suggestion from a local list or a remote data source.
  *
- * @slot option - Renders one option: a snippet `option(option, index, highlighted)`, or the scoped slot, which receives `{ label, value, raw, highlighted, index }` (`raw` is the original item).
+ * @slot option - Renders one option: a snippet `option(option, index, highlighted)`; `option.raw` is the original item.
  *
  * @csspart root - The frame: border, background and the states' colours.
  * @csspart input - The native `<input>`, the combobox.
@@ -118,7 +118,7 @@ component('pdx-autocomplete', {
         success: { type: Boolean, default: false },
         warning: { type: Boolean, default: false },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // `raw` is the app's suggestion, an element of `suggestions` (#651): the editor infers `T`.
     generics: { T: { from: 'suggestions' } },
     slots: {
@@ -508,9 +508,9 @@ component('pdx-autocomplete', {
             return q === _committed || ctx.forceSelection() ? v : q;
         });
 
-        // Slot — read lazily (_projectSlots runs after setup)
+        // Read where it draws: a snippet set after mount is the one drawn
         function getOptionSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'option', (s) => [{ label: s.label, value: s.value, raw: s.raw }, s.index, s.highlighted]);
+            return declaredSnippet(ctx, 'option', (s) => [{ label: s.label, value: s.value, raw: s.raw }, s.index, s.highlighted]);
         }
 
         return {
