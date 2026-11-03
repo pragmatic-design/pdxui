@@ -244,6 +244,19 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
         expect(await migrate(['.'], { cwd: root }), 'not idempotent').toEqual({ changed: [], flagged: [] });
     });
 
+    it('rewrites a project child\'s scoped slot and its parent\'s let: slot in one run, whichever file comes first (#492)', async () => {
+        // `page.pdx` sorts before `row-list.pdx`: the parent is rewritten while the child still has its alpha outlet.
+        file('src/row-list.pdx', '<template><ul>@for (items as it, i; track it) {<li><slot name="row" :item="it" :index="i">{{ it }}</slot></li>}</ul></template>\n<script>\n@prop items: string[] = [];\n</script>\n');
+        file('src/page.pdx', "<template>\n  <app-row-list :items=\"['a']\">\n    <slot name=\"row\" let:index>#{{ index }}</slot>\n  </app-row-list>\n</template>\n");
+        const report = await migrate(['.'], { cwd: root });
+        expect(report.changed.map((c) => [c.file, c.id]).sort()).toEqual([['src/page.pdx', 'scoped-slot-parent'], ['src/row-list.pdx', 'scoped-slot-outlet']]);
+        expect(report.flagged).toEqual([]);
+        expect(read('src/row-list.pdx')).toContain('@slot row?: (item: unknown, index: unknown);');
+        expect(read('src/row-list.pdx')).toContain('@render row?.(it, i) @else { {{ it }} }');
+        expect(read('src/page.pdx')).toContain('@snippet row(_item, index) {#{{ index }} }');
+        expect(await migrate(['.'], { cwd: root }), 'not idempotent').toEqual({ changed: [], flagged: [] });
+    });
+
     it('control — a project written today has nothing to change or flag', async () => {
         file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
         file('vite.config.ts', "export default { plugins: [pdx()] };\n");
