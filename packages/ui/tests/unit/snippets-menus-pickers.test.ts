@@ -35,6 +35,11 @@ interface Case {
     fromScope(scope: Scope): string;
     /** The same text, drawn by the snippet from its arguments. */
     fromArgs(...args: Args): string;
+    /**
+     * Set once the component reads its snippet only (#492, part 3): the entries its snippet draws.
+     * The alpha scoped slot then draws nothing, and the snippet is held to these instead of to it.
+     */
+    expected?: string[];
 }
 
 const MENU_ITEMS = [{ key: 'cut', label: 'Cut' }, { key: 'copy', label: 'Copy' }];
@@ -69,6 +74,7 @@ const CASES: Case[] = [
         open: () => undefined,
         fromScope: (s) => `${(s.item as Scope).label}#${s.index}`,
         fromArgs: (item, index) => `${(item as Scope).label}#${index}`,
+        expected: ['Open#0', 'Save#1'],
     },
     {
         tag: 'pdx-context-menu', slot: 'item',
@@ -76,6 +82,7 @@ const CASES: Case[] = [
         open: (el) => (el as unknown as { show(x: number, y: number): void }).show(10, 10),
         fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
+        expected: ['Cut:item', 'Copy:item'],
     },
     {
         tag: 'pdx-dropdown-menu', slot: 'item',
@@ -83,6 +90,7 @@ const CASES: Case[] = [
         open: (el) => click(el, 'button'),
         fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
+        expected: ['Cut:item', 'Copy:item'],
     },
     {
         tag: 'pdx-menu', slot: 'item',
@@ -90,6 +98,7 @@ const CASES: Case[] = [
         open: () => undefined,
         fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
+        expected: ['Cut:item', 'Copy:item'],
     },
     {
         tag: 'pdx-select', slot: 'item',
@@ -157,6 +166,19 @@ describe('menus and pickers: a snippet renders where the scoped slot did (#491)'
     beforeEach(cleanup);
 
     for (const c of CASES) {
+        if (c.expected) {
+            const expected = c.expected;
+            describe(`${c.tag} — ${c.slot}, snippet only (#492)`, () => {
+                it('the alpha scoped slot draws nothing', async () => {
+                    expect(await mount(c, scopedSlot(c))).toEqual([]);
+                });
+
+                it('a snippet draws its entries, from its arguments', async () => {
+                    expect(await mount(c, snippet(c))).toEqual(expected);
+                });
+            });
+            continue;
+        }
         describe(`${c.tag} — ${c.slot}`, () => {
             it('the alpha scoped slot still renders (control)', async () => {
                 expect(await mount(c, scopedSlot(c))).not.toEqual([]);
