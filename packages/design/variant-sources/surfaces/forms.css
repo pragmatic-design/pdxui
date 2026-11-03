@@ -515,8 +515,10 @@ pdx-form-field:last-child {
     :scope > [data-part="root"] .pdx-legend { font-size: var(--pdx-text-base); }
 }
 
-/* Invalid */
-.pdx-fieldset-invalid { border-color: var(--pdx-color-danger); }
+/* Invalid. Each condition is a class on a native fieldset and a state of <pdx-fieldset>'s host
+   (#293), at the class's weight. */
+.pdx-fieldset-invalid,
+:where(pdx-fieldset):state(invalid) > :where([data-part="root"]) { border-color: var(--pdx-color-danger); }
 .pdx-fieldset-error {
     font-size: var(--pdx-text-xs);
     color: var(--pdx-color-danger-ink);
@@ -556,14 +558,17 @@ pdx-form-field:last-child {
     transition: transform var(--pdx-duration-base) var(--pdx-ease, ease);
 }
 
-.pdx-fieldset-collapsed .pdx-fieldset-chevron {
+.pdx-fieldset-collapsed .pdx-fieldset-chevron,
+:where(pdx-fieldset):state(collapsed) .pdx-fieldset-chevron {
     transform: rotate(-90deg);
 }
 
-.pdx-fieldset-collapsed .pdx-fieldset-content {
+.pdx-fieldset-collapsed .pdx-fieldset-content,
+:where(pdx-fieldset):state(collapsed) .pdx-fieldset-content {
     display: none;
 }
 
-.pdx-fieldset-collapsible .pdx-legend {
+.pdx-fieldset-collapsible .pdx-legend,
+:where(pdx-fieldset):state(collapsible) .pdx-legend {
     cursor: pointer;
 }

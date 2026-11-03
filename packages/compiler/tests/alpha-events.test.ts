@@ -302,3 +302,25 @@ describe('the data components, from the shipped manifest (#292)', () => {
             .toBe('<pdx-filter-builder @value-change="e => save(e.detail.value, e.currentTarget.logic)"></pdx-filter-builder>');
     });
 });
+
+describe('the form components, from the shipped manifest (#293)', () => {
+    const r = new ComponentResolver();
+    r.registerUiManifest(process.cwd());
+    const fix = (text: string): string => {
+        const apply = alphaChangeEvent.fix;
+        if (typeof apply !== 'function') throw new Error('alpha-change-event no longer rewrites');
+        return apply(text, { alphaOf: (tag: string) => r.alphaOf(tag) });
+    };
+
+    it('pdx-fieldset: @toggle becomes the model\'s @collapsed-change, its collapsed read as the value', () => {
+        expect(fix('<pdx-fieldset collapsible @toggle="open = !$event.detail.collapsed"></pdx-fieldset>'))
+            .toBe('<pdx-fieldset collapsible @collapsed-change="open = !$event.detail.value"></pdx-fieldset>');
+    });
+
+    it('pdx-fieldset: a listener on @toggle is PDX_REMOVED_FORM, naming @collapsed-change', () => {
+        const found = compile(page('<pdx-fieldset collapsible @toggle="save(1)"></pdx-fieldset>'), 'page.pdx', [], undefined, { alphaOf: (tag) => r.alphaOf(tag) })
+            .warnings.filter((w) => w.code === 'PDX_REMOVED_FORM');
+        expect(found).toHaveLength(1);
+        expect(found[0].message).toContain('`@collapsed-change`');
+    });
+});

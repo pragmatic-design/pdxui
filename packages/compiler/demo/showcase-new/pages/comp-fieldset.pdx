@@ -33,7 +33,7 @@
         <div class="opt-row"><code>description</code><span>string</span><span>Help text below legend</span></div>
         <div class="opt-row"><code>variant</code><span>string</span><span>bordered, filled, plain</span></div>
         <div class="opt-row"><code>collapsible</code><span>boolean</span><span>Show collapse toggle</span></div>
-        <div class="opt-row"><code>collapsed</code><span>boolean</span><span>Collapsed state (controlled)</span></div>
+        <div class="opt-row"><code>::collapsed</code><span>boolean model</span><span>Whether it is collapsed: the toggle writes it and announces <code>collapsed-change</code> <code>{ value }</code>; <code>:state(collapsed)</code></span></div>
         <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables all children</span></div>
         <div class="opt-row"><code>invalid</code><span>boolean</span><span>Error border state</span></div>
         <div class="opt-row"><code>error</code><span>string</span><span>Error message text</span></div>

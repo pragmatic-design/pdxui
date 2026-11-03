@@ -5729,7 +5729,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n  @scope ([data-pdx-4me78i]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Fieldset</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-fieldset&gt;</code> — semantic form group with native <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code>.\\n      Collapsible, disabled propagation, error state.\\n    </p>  <app-demo-comp-fieldset-bordered class="demo-section"></app-demo-comp-fieldset-bordered>  <app-demo-comp-fieldset-filled class="demo-section"></app-demo-comp-fieldset-filled>  <app-demo-comp-fieldset-plain class="demo-section"></app-demo-comp-fieldset-plain>  <app-demo-comp-fieldset-collapsible class="demo-section"></app-demo-comp-fieldset-collapsible>  <app-demo-comp-fieldset-disabled class="demo-section"></app-demo-comp-fieldset-disabled>  <app-demo-comp-fieldset-invalid class="demo-section"></app-demo-comp-fieldset-invalid>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>legend</code><span>string</span><span>Legend text</span></div> <div class="opt-row"><code>description</code><span>string</span><span>Help text below legend</span></div> <div class="opt-row"><code>variant</code><span>string</span><span>bordered, filled, plain</span></div> <div class="opt-row"><code>collapsible</code><span>boolean</span><span>Show collapse toggle</span></div> <div class="opt-row"><code>collapsed</code><span>boolean</span><span>Collapsed state (controlled)</span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables all children</span></div> <div class="opt-row"><code>invalid</code><span>boolean</span><span>Error border state</span></div> <div class="opt-row"><code>error</code><span>string</span><span>Error message text</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> </div> </section> </div> '));
+const __blk0=staticBlock(staticMarkup(' <div class="page"> <h1 class="pdx-txt-title">Fieldset</h1> <p class="pdx-txt-body pdx-ink-muted intro"> <code>&lt;pdx-fieldset&gt;</code> — semantic form group with native <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code>.\\n      Collapsible, disabled propagation, error state.\\n    </p>  <app-demo-comp-fieldset-bordered class="demo-section"></app-demo-comp-fieldset-bordered>  <app-demo-comp-fieldset-filled class="demo-section"></app-demo-comp-fieldset-filled>  <app-demo-comp-fieldset-plain class="demo-section"></app-demo-comp-fieldset-plain>  <app-demo-comp-fieldset-collapsible class="demo-section"></app-demo-comp-fieldset-collapsible>  <app-demo-comp-fieldset-disabled class="demo-section"></app-demo-comp-fieldset-disabled>  <app-demo-comp-fieldset-invalid class="demo-section"></app-demo-comp-fieldset-invalid>  <section> <h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"> <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>legend</code><span>string</span><span>Legend text</span></div> <div class="opt-row"><code>description</code><span>string</span><span>Help text below legend</span></div> <div class="opt-row"><code>variant</code><span>string</span><span>bordered, filled, plain</span></div> <div class="opt-row"><code>collapsible</code><span>boolean</span><span>Show collapse toggle</span></div> <div class="opt-row"><code>::collapsed</code><span>boolean model</span><span>Whether it is collapsed: the toggle writes it and announces <code>collapsed-change</code> <code>{ value }</code>; <code>:state(collapsed)</code></span></div> <div class="opt-row"><code>disabled</code><span>boolean</span><span>Disables all children</span></div> <div class="opt-row"><code>invalid</code><span>boolean</span><span>Error border state</span></div> <div class="opt-row"><code>error</code><span>string</span><span>Error message text</span></div> <div class="opt-row"><code>size</code><span>string</span><span>sm, (default), lg</span></div> </div> </section> </div> '));
 component('app-comp-fieldset', {
   props: {},
   setup(ctx) {
@@ -19080,7 +19080,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-field
 "// 0 warning(s)
 
 ============================================================
-import { assignBoundProperty, batchHandler, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindTwoWay, component, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-egshxd");
@@ -19088,23 +19088,19 @@ import { assignBoundProperty, batchHandler, component, effect, safeHandler, sign
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-egshxd], [data-pdx-egshxd-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-block, :where(:not([data-pdx-egshxd])):scope:is(.demo-block) {\\n    margin-top: var(--pdx-space-lg);\\n    padding: var(--pdx-space-md) 0;\\n  }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Collapsible</h2> <p class="pdx-txt-small pdx-ink-muted">Click the chevron to expand/collapse.</p> <div class="demo-block"> <pdx-fieldset legend="Advanced Options" collapsible> <pdx-form-field label="Timeout" data-pdx-egshxd-in> <pdx-input placeholder="5000" data-pdx-egshxd-in></pdx-input> </pdx-form-field> </pdx-fieldset> </div> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el3=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;return [__el4];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">Collapsible</h2> <p class="pdx-txt-small pdx-ink-muted">Click the chevron to expand/collapse. <code>collapsed</code> is a model: <code>::collapsed</code> follows the chevron.</p> <div class="demo-block"> <pdx-fieldset legend="Advanced Options" collapsible> <pdx-form-field label="Timeout" data-pdx-egshxd-in> <pdx-input placeholder="5000" data-pdx-egshxd-in></pdx-input> </pdx-form-field> </pdx-fieldset> </div> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild.nextSibling;return [__el6];};
 component('app-demo-comp-fieldset-collapsible', {
   props: {},
   setup(ctx) {
     const __collapsed1 = signal(false, { name: 'demo-comp-fieldset-collapsible:collapsed1' });
-function onToggle(e) {
-      __collapsed1.setRaw(e.detail.collapsed);
-    }
     ctx.el.setAttribute('data-pdx-egshxd', '');
-    return { collapsed1: __collapsed1, onToggle };
+    return { collapsed1: __collapsed1 };
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el4]=__walk0(__frag);
-    let __el4w_collapsed = {}; effect(() => { const __b = ctx.collapsed1(); if (Object.is(__b, __el4w_collapsed)) return; __el4w_collapsed = __b; assignBoundProperty(__el4, "collapsed", __b); });
-    __el4.addEventListener('toggle', safeHandler(batchHandler(ctx.onToggle), ctx.el?.tagName?.toLowerCase(), 'toggle'));
+    const [__el6]=__walk0(__frag);
+    bindTwoWay(__el6, 'collapsed', ctx.collapsed1);
     return __frag;
   })(),
 });
