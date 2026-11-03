@@ -67,8 +67,8 @@ export function openFilterPopover(
     }
     const state = gc.popoverFilters[col.field] as unknown as FilterConditionState;
 
-    // The page's popover: the `filterPopover(column, apply, clear)` snippet, or the alpha
-    // `filter-popover:{field}` slot. One that draws nothing for this column leaves it to the grid's own.
+    // The page's popover: the `filterPopover(column, apply, clear)` snippet. One that draws nothing
+    // for this column leaves it to the grid's own.
     const custom = gc.customFilterPopover(col);
     if (custom && openCustomPopover(gc, col, anchorEl, custom)) return;
 

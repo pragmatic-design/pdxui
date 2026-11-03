@@ -12,7 +12,7 @@
 //   grid-footer.ts   — pdx-pagination integration
 
 import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV, slot } from '@pdxui/core';
-import type { SlotFunction, DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
+import type { DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
 import { renderRows } from './grid-body';
@@ -105,15 +105,15 @@ function warnRowHeightIgnored(el: Element): void {
  * A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be
  * replaced with slot templates.
  *
- * @slot cell - Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes. The alpha scoped slot `col:{field}` still draws one column.
- * @slot header - Draws a column's header: `header(column)`; a column it draws nothing for keeps its title. The alpha scoped slot `header:{field}` still draws one.
- * @slot detail - Draws an expanded row's detail: `detail(row)`, or the alpha scoped slot `detail`, which receives `{ row, index, id }`.
- * @slot editCell - Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit. The alpha scoped slot `col-edit:{field}` still draws one column's.
- * @slot filter - Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input. The alpha scoped slot `filter:{field}` still draws one.
- * @slot filterPopover - Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover. The alpha scoped slot `filter-popover:{field}` still draws one.
- * @slot toolbarStart - Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`, or the alpha scoped slot `toolbar-start`.
- * @slot toolbarEnd - Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`, or the alpha scoped slot `toolbar-end`.
- * @slot empty - Draws the empty state in place of the grid's icon and title: `empty()`, or the alpha scoped slot `empty`.
+ * @slot cell - Draws a cell, one snippet for every column: `cell(row, column, value)`, switching on `column.field`. A column it draws nothing for (no element, no text) is drawn by the grid, so a page writes only the columns it changes.
+ * @slot header - Draws a column's header: `header(column)`; a column it draws nothing for keeps its title.
+ * @slot detail - Draws an expanded row's detail: `detail(row)`.
+ * @slot editCell - Draws the editor of the cell being edited: `editCell(row, column, value, form)`, switching on `column.field`; a column it draws nothing for gets the grid's editor. Enter, Tab and a click outside commit the value of its first control. `form` is null in a cell edit.
+ * @slot filter - Draws a column's cell in the filter row: `filter(column)`; a column it draws nothing for keeps the grid's input.
+ * @slot filterPopover - Draws a column's filter popover: `filterPopover(column, apply, clear)`. `apply()` applies the grid's filters and closes it, `clear()` drops this column's filter and closes it. A column it draws nothing for gets the grid's popover.
+ * @slot toolbarStart - Draws at the start of the toolbar, after Reload: `toolbarStart(grid)`.
+ * @slot toolbarEnd - Draws at the end of the toolbar, after the spacer: `toolbarEnd(grid)`.
+ * @slot empty - Draws the empty state in place of the grid's icon and title: `empty()`.
  *
  * @cssstate striped - `striped`: every other row is tinted.
  * @cssstate hover - `hover`: a row under the pointer is highlighted.
@@ -213,7 +213,7 @@ component('pdx-data-grid', {
         cell: slot<(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown) => Node>(),
         header: slot<(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }) => Node>(),
         detail: slot<(row: T) => Node>(),
-        // #673: the rest of the alpha slots, with their context as arguments. `form` is the grid's
+        // #673: the grid's other templates, with their context as arguments. `form` is the grid's
         // edit form, which only a row edit has: a cell edit passes null.
         editCell: slot<(row: T, column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }, value: unknown, form: import('@pdxui/core').Form<Record<string, unknown>> | null) => Node>(),
         filter: slot<(column: { field: string; header?: string; type?: string; command?: boolean; [key: string]: unknown }) => Node>(),
@@ -267,35 +267,28 @@ component('pdx-data-grid', {
         }
 
         // ─── Shared context for sub-modules ──────────
-        const slotOf = (name: string) => (ctx as any).__slots?.[name] as SlotFunction | undefined;
-        /** The parent's snippet for `name` (#597), when it gave one: the element's declared slot property. */
+        /**
+         * The parent's snippet for `name` (#597), when it gave one: the element's declared slot property.
+         * The alpha scoped slots (`col:{field}`, `header:{field}`, …) are not read (#492).
+         */
         const snippetOf = (name: 'cell' | 'header' | 'detail' | 'editCell' | 'filter' | 'filterPopover' | 'toolbarStart' | 'toolbarEnd' | 'empty') => {
             const fn = (ctx as unknown as Record<string, () => unknown>)[name]?.();
             return typeof fn === 'function' ? fn as (...args: unknown[]) => Node | null | undefined : null;
         };
         const gc: GridContext = {
             grid: null,
-            customCell: (row, col, value, index) =>
-                drawn(snippetOf('cell')?.(row, col.def, value)) ?? slotOf(`col:${col.field}`)?.({ row, value, index, col }) ?? null,
-            customHeader: (col) =>
-                drawn(snippetOf('header')?.(col.def)) ?? slotOf(`header:${col.field}`)?.({ col, field: col.field, header: col.header }) ?? null,
-            customDetail: (row, index, id) =>
-                drawn(snippetOf('detail')?.(row)) ?? slotOf('detail')?.({ row, index, id }) ?? null,
-            customEditCell: (row, col, value) =>
-                drawn(snippetOf('editCell')?.(row, col.def, value, gc.editForm))
-                    ?? slotOf(`col-edit:${col.field}`)?.({ row, value, col, form: gc.editForm }) ?? null,
-            customFilter: (col) =>
-                drawn(snippetOf('filter')?.(col.def)) ?? slotOf(`filter:${col.field}`)?.({ col, field: col.field }) ?? null,
+            customCell: (row, col, value) => drawn(snippetOf('cell')?.(row, col.def, value)) ?? null,
+            customHeader: (col) => drawn(snippetOf('header')?.(col.def)) ?? null,
+            customDetail: (row) => drawn(snippetOf('detail')?.(row)) ?? null,
+            customEditCell: (row, col, value) => drawn(snippetOf('editCell')?.(row, col.def, value, gc.editForm)) ?? null,
+            customFilter: (col) => drawn(snippetOf('filter')?.(col.def)) ?? null,
             customFilterPopover: (col) => {
                 const snippet = snippetOf('filterPopover');
-                const alpha = slotOf(`filter-popover:${col.field}`);
-                if (!snippet && !alpha) return null;
-                return (apply, clear) => drawn(snippet?.(col.def, apply, clear)) ?? alpha?.({ col, apply, clear }) ?? null;
+                if (!snippet) return null;
+                return (apply, clear) => drawn(snippet(col.def, apply, clear)) ?? null;
             },
-            customToolbar: (side) =>
-                drawn(snippetOf(side === 'start' ? 'toolbarStart' : 'toolbarEnd')?.(gc.grid))
-                    ?? slotOf(`toolbar-${side}`)?.({ grid: gc.grid }) ?? null,
-            customEmpty: () => drawn(snippetOf('empty')?.()) ?? slotOf('empty')?.({}) ?? null,
+            customToolbar: (side) => drawn(snippetOf(side === 'start' ? 'toolbarStart' : 'toolbarEnd')?.(gc.grid)) ?? null,
+            customEmpty: () => drawn(snippetOf('empty')?.()) ?? null,
             getSelectionMode: () => (ctx.selection() as string) || 'none',
             getRowClass: (row: Record<string, unknown>, index: number) => {
                 const rc = ctx.rowClass() as string | ((r: Record<string, unknown>, i: number) => string) | undefined;

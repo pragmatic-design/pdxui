@@ -1,6 +1,6 @@
 // Grid edit mode — cell, row, dialog, batch editing.
 // Uses DataSource CRUD (add/update/remove/patch/sync) for persistence.
-// Default editors auto-created from column type; custom via col-edit:{field} slot.
+// Default editors auto-created from column type; custom via the editCell(row, column, value, form) snippet.
 
 import type { GridContext, AnyColumn } from './grid-context';
 import { columnsToFormFields, createEditForm, formField } from '@pdxui/core';

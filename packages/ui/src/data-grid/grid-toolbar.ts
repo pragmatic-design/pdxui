@@ -36,7 +36,7 @@ export function buildToolbar(gc: GridContext): HTMLElement {
     reloadBtn.addEventListener('click', () => gc.grid?.source.refresh());
     bar.appendChild(reloadBtn);
 
-    // The page's start of the toolbar: the `toolbarStart(grid)` snippet, or the alpha `toolbar-start` slot
+    // The page's start of the toolbar: the `toolbarStart(grid)` snippet
     const start = gc.customToolbar('start');
     if (start) bar.appendChild(start);
 
@@ -50,7 +50,7 @@ export function buildToolbar(gc: GridContext): HTMLElement {
     spacer.style.flex = '1';
     bar.appendChild(spacer);
 
-    // The page's end of the toolbar: the `toolbarEnd(grid)` snippet, or the alpha `toolbar-end` slot
+    // The page's end of the toolbar: the `toolbarEnd(grid)` snippet
     const end = gc.customToolbar('end');
     if (end) bar.appendChild(end);
 
