@@ -36,7 +36,7 @@ Type @ to mention people.
 
 **Renders:** roles `listbox` · `option` · `status`
 
-**Slot:** `suggestion` — Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.
+**Slot:** `suggestion` — Renders one suggestion: a snippet `suggestion(item, index, active)`.
 
 **States:** `:state(disabled)` — `disabled` is set; the textarea is disabled.; `:state(readonly)` — `readonly` is set; the textarea is read-only.
 

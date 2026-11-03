@@ -3,7 +3,7 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, event, html, signal, model, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, event, html, signal, model, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
@@ -38,7 +38,7 @@ interface MentionRange {
 /**
  * A textarea where typing a trigger such as @ opens floating suggestions, to insert a mention.
  *
- * @slot suggestion - Renders one suggestion: a snippet `suggestion(item, index, active)`, or the scoped slot, which receives `{ item, index, active }`.
+ * @slot suggestion - Renders one suggestion: a snippet `suggestion(item, index, active)`.
  *
  * @csspart root - The frame around the textarea and its highlight layer.
  * @csspart input - The native `<textarea>` the text is typed into.
@@ -103,7 +103,7 @@ component('pdx-mention', {
         /** Form field name */
         name: { type: String, default: '' },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#596).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         suggestion: slot<(item: { value: string; label: string; description?: string }, index: number, active: boolean) => Node>(),
     },
@@ -124,7 +124,7 @@ component('pdx-mention', {
 
         let _textareaEl: HTMLTextAreaElement | null = null;
         function getSuggestionSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'suggestion', (s) => [s.item, s.index, s.active]);
+            return declaredSnippet(ctx, 'suggestion', (s) => [s.item, s.index, s.active]);
         }
         let _mirrorEl: HTMLElement | null = null;
         let _dropdownEl: HTMLElement | null = null;
