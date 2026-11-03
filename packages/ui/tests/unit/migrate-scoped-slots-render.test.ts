@@ -85,8 +85,7 @@ describe('scoped-slot-outlet: the migrated child renders its fallback, and a par
 describe('script-snippet-interpolation renders what ${arg} rendered', () => {
     it('a script @snippet with ${arg}, migrated to {{ arg }}, shows the same', async () => {
         const alpha = "<template><p>@render tag('one') @render tag('two')</p></template>\n<script>\n@snippet tag(label: string) {\n  <span class=\"t\">${label}</span>\n}\n</script>\n";
-        const script = alpha.slice(alpha.indexOf('<script>') + '<script>'.length, alpha.indexOf('</script>'));
-        const migrated = alpha.replace(script, fixWith(scriptSnippetInterpolation)(script));
+        const migrated = fixWith(scriptSnippetInterpolation)(alpha);
         expect(migrated).toContain('<span class="t">{{ label }}</span>');
         define('mig-snip-alpha', alpha);
         define('mig-snip-beta', migrated);

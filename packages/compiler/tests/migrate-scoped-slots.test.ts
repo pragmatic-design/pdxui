@@ -133,14 +133,20 @@ describe('scoped-slot-outlet: a child\'s <slot :x> becomes @slot + @render', () 
 describe('script-snippet-interpolation: a script @snippet body is a template', () => {
     const fix = (t: string) => (scriptSnippetInterpolation.fix as (x: string) => string)(t);
 
+    const pdx = (script: string) => `<template><p>x</p></template>\n<script>\n${script}</script>\n`;
+
     it('${arg} becomes {{ arg }}, an expression with braces of its own included', () => {
         const script = '@snippet badge(label: string, n: number) {\n  <span class="b">${label}: ${fmt({ n })}</span>\n}\nconst x = `${1}`;\n';
-        expect(scriptSnippetInterpolation.detect(script).map((f) => [f.line, f.found])).toEqual([[2, '${label}'], [2, '${fmt({ n })}']]);
-        expect(fix(script)).toBe('@snippet badge(label: string, n: number) {\n  <span class="b">{{ label }}: {{ fmt({ n }) }}</span>\n}\nconst x = `${1}`;\n');
+        expect(scriptSnippetInterpolation.detect(pdx(script)).map((f) => [f.line, f.found])).toEqual([[4, '${label}'], [4, '${fmt({ n })}']]);
+        expect(fix(pdx(script))).toBe(pdx('@snippet badge(label: string, n: number) {\n  <span class="b">{{ label }}: {{ fmt({ n }) }}</span>\n}\nconst x = `${1}`;\n'));
     });
 
     it('control: a snippet already in {{ }}, and a template literal outside a snippet, are not touched', () => {
-        expect(scriptSnippetInterpolation.detect('@snippet a(x) { <b>{{ x }}</b> }\nconst y = `${x}`;\n')).toEqual([]);
+        expect(scriptSnippetInterpolation.detect(pdx('@snippet a(x) { <b>{{ x }}</b> }\nconst y = `${x}`;\n'))).toEqual([]);
+    });
+
+    it('control: a @snippet outside the <script> — module text, or none — is not touched', () => {
+        expect(scriptSnippetInterpolation.detect("const src = '@snippet a(x) { <b>${x}</b> }';\n")).toEqual([]);
     });
 });
 

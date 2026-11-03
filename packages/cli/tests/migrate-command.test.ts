@@ -257,6 +257,16 @@ describe('pdx migrate — what it flags (the registry\'s entries)', () => {
         expect(await migrate(['.'], { cwd: root }), 'not idempotent').toEqual({ changed: [], flagged: [] });
     });
 
+    it('rewrites ${arg} in a .pdx script\'s @snippet, never in a .ts module, where a @snippet is only text (#492)', async () => {
+        const fixture = "export const src = '<script>@snippet a(x) { <b>${x}</b> }</script>';\n";
+        file('src/fixture.ts', fixture);
+        file('src/badge.pdx', '<template><p>x</p></template>\n<script>\n@snippet a(x: string) {\n  <b>${x}</b>\n}\n</script>\n');
+        const report = await migrate(['.'], { cwd: root });
+        expect(report.changed.map((c) => [c.file, c.id])).toEqual([['src/badge.pdx', 'script-snippet-interpolation']]);
+        expect(read('src/fixture.ts')).toBe(fixture);
+        expect(read('src/badge.pdx')).toContain('<b>{{ x }}</b>');
+    });
+
     it('control — a project written today has nothing to change or flag', async () => {
         file('src/a.pdx', '<template><p>{{ n }}</p></template>\n<script>\nlet n = $signal(0);\nfunction f() { n = n + 1; }\n</script>\n');
         file('vite.config.ts', "export default { plugins: [pdx()] };\n");

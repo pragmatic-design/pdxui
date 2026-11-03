@@ -12,6 +12,7 @@
 // nothing and `pdx migrate` rewrites them; #492's last part makes them `removed`.
 
 import type { LanguageChange, LanguageChangeContext, LanguageChangeFinding } from './changes';
+import { parseSFC } from '../parser/sfc';
 import { applyEdits, braced, enclosingTag, lineAt, slotClose, tagEnd, selfClosing, attributeOf, type TextEdit } from './slot-markup';
 
 export { signatureParamNames } from './slot-markup';
@@ -108,11 +109,20 @@ function closingBrace(text: string, open: number): number {
     return -1;
 }
 
-/** Every `${…}` inside a script `@snippet`'s body: where it starts, and where its `}` is. */
+/**
+ * Every `${…}` inside a `@snippet` body of the `.pdx` file's `<script>`: where it starts, and where
+ * its `}` is. Only that script: `@snippet` is a rune of a component's script, so in a `.ts` module
+ * it is text — a test's fixture, say — that must stay as written.
+ */
 function snippetInterpolations(text: string): { start: number; close: number }[] {
     const out: { start: number; close: number }[] = [];
+    const script = parseSFC(text).script;
+    if (!script || script.src) return out;
+    const from = script.start, to = script.start + script.content.length;
     // Match: `@snippet name(params) {` — a snippet declared in the script.
-    for (const m of text.matchAll(/@snippet\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{/g)) {
+    const re = /@snippet\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{/g;
+    re.lastIndex = from;
+    for (let m = re.exec(text); m && m.index < to; m = re.exec(text)) {
         const open = m.index + m[0].length - 1;
         const close = closingBrace(text, open);
         if (close === -1) continue;
@@ -127,7 +137,7 @@ function snippetInterpolations(text: string): { start: number; close: number }[]
 export const scriptSnippetInterpolation: LanguageChange = {
     id: 'script-snippet-interpolation',
     kind: 'changed',
-    scope: 'script',
+    scope: 'pdx',
     issue: 492,
     message: 'A script `@snippet` body is a template, like any other: write `{{ arg }}`, not `${arg}`.',
     marker: '@snippet',
