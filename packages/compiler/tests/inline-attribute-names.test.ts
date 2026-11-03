@@ -106,16 +106,16 @@ describe('inlineBindings: SVG is created in the SVG namespace', () => {
 
 describe('the controls', () => {
     // A plain element is asked at run time, as core asks it: the property when the element has it,
-    // the attribute otherwise. The assertion is that the property is the branch taken when the name
-    // is the element's; that an <input> takes it is pinned on a stub element in
-    // inline-attr-to-prop.test.ts. That branch hands null to core's clearBoundProperty, as core's
-    // does, and assigns anything else.
+    // the attribute otherwise. An <input> certainly has `disabled` and `value`
+    // (native-properties.ts, #685), so for it the question is not written: the binding is the
+    // property's branch alone, which hands null to core's clearBoundProperty, as core's does, and
+    // assigns anything else.
     it(':disabled and :value still assign the property', () => {
         const code = inline('<input :disabled="id" :value="label" />');
         parses(code);
         // The value is read once into __b, beside the value the binding last wrote (#44).
-        expect(code).toMatch(/const __b = ctx\.id\(\); [^\n]*if \("disabled" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "disabled", "disabled"\); else \1\["disabled"\] = __v; \}/);
-        expect(code).toMatch(/const __b = ctx\.label\(\); [^\n]*if \("value" in (\w+)\) \{ const __v = __b; if \(__v == null\) clearBoundProperty\(\1, "value", "value"\); else \1\["value"\] = __v; \}/);
+        expect(code).toMatch(/const __b = ctx\.id\(\); [^\n]*__el\w*w_disabled = __b; const __v = __b; if \(__v == null\) clearBoundProperty\((\w+), "disabled", "disabled"\); else \1\["disabled"\] = __v; \}\);/);
+        expect(code).toMatch(/const __b = ctx\.label\(\); [^\n]*__el\w*w_value = __b; const __v = __b; if \(__v == null\) clearBoundProperty\((\w+), "value", "value"\); else \1\["value"\] = __v; \}\);/);
     });
 
     it('a camelCase DOM property keeps the property path, on HTML and on SVG: :textContent', () => {
