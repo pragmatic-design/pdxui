@@ -77,9 +77,11 @@
     margin-top: var(--pdx-space-xs);
 }
 
+/* On native markup the wrapper's class; on <pdx-form-field> its state (#293). */
 .has-warning .pdx-input-wrap,
 .has-warning .pdx-checkbox,
-.has-warning .pdx-radio-input {
+.has-warning .pdx-radio-input,
+:where(pdx-form-field):state(warning) :is(.pdx-input-wrap, .pdx-checkbox, .pdx-radio-input) {
     border-color: var(--pdx-color-warning);
 }
 
@@ -129,13 +131,16 @@
     transition: transform 0.2s;
 }
 
-.pdx-field-group-panel.collapsed > legend > .pdx-field-group-toggle::before {
+/* Collapsed is a class on native markup and a state of <pdx-field-group>'s host (#293). */
+.pdx-field-group-panel.collapsed > legend > .pdx-field-group-toggle::before,
+:where(pdx-field-group):state(collapsed) > .pdx-field-group-panel > legend > .pdx-field-group-toggle::before {
     transform: rotate(-90deg);
 }
 
 /* Collapsed, the panel is its legend line and its border. The content is hidden, and the block
    padding that keeps it apart from the border would leave ~40px of empty frame under the legend. */
-.pdx-field-group-panel.collapsed {
+.pdx-field-group-panel.collapsed,
+:where(pdx-field-group):state(collapsed) > .pdx-field-group-panel {
     padding-block: 0;
 }
 
