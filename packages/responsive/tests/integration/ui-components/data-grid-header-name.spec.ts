@@ -30,11 +30,11 @@ test.describe('a data-grid column header is named by its label alone', () => {
             'the header is not named «Name» alone — its buttons are in its name').toHaveCount(1);
     });
 
-    test('a column whose header is a slot', async ({ page }) => {
+    test('a column whose header the header(column) snippet draws', async ({ page }) => {
         const grid = page.locator('section:not([hidden]) [data-test="dg"]');
-        await expect(grid.locator('[role="columnheader"][data-field="city"] em'), 'the slot did not render').toHaveText('Town');
+        await expect(grid.locator('[role="columnheader"][data-field="city"] em'), 'the snippet did not render').toHaveText('Town');
         await expect(grid.getByRole('columnheader', { name: 'Town', exact: true }),
-            'the slotted header is not named by its slot text alone').toHaveCount(1);
+            'the drawn header is not named by its text alone').toHaveCount(1);
     });
 
     test('a plain filterable column', async ({ page }) => {

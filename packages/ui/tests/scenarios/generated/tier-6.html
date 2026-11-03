@@ -109,14 +109,12 @@
     {"id":2,"name":"Grace","city":"Milano","category":"Books"},
     {"id":3,"name":"Katherine","city":"Torino","category":"Music"}
 ];
-                const carrier = document.createElement('template');
-                carrier.__pdxSlotName = 'header:city';
-                carrier.__pdxSlot = () => {
+                grid.header = (column) => {
+                    if (column.field !== 'city') return null;
                     const em = document.createElement('em');
                     em.textContent = 'Town';
                     return em;
                 };
-                grid.appendChild(carrier);
                 stage.appendChild(grid);
                 for (let i = 0; i < 30 && !grid.querySelector('[role="columnheader"]'); i++) await new Promise(r => requestAnimationFrame(r)); },
         "error-boundary-fallback": async function () { 
@@ -346,7 +344,7 @@
     </section>
 
     <section data-scenario="data-grid-header-names">
-        <h3>Data grid — header names: a sortable filterable column, a slotted header, a plain one</h3>
+        <h3>Data grid — header names: a sortable filterable column, a drawn header, a plain one</h3>
         <div data-test="dg-host"></div>
     </section>
 
