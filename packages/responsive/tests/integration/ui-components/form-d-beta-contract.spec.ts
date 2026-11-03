@@ -111,6 +111,48 @@ test.describe('pdx-form-template, wizard layout', () => {
         await expect(current(page)).toHaveAttribute('aria-posinset', '2');
     });
 
+    // tabs.css drew the pill tab style's panel padding on every [role="tabpanel"] of the page, and a
+    // wizard's panels are tabpanels. At equal weight the later stylesheet won: once the template brought
+    // wizard.css in before tabs.css, the wizards on a pill-style page (five themes) took the tabs' padding.
+    // Measured on the rules, not the computed padding: which one wins depends on the order the page loaded
+    // the two stylesheets in, and this page loads them in the order that hides it.
+    test('the pill tab style draws the tabs\' panels, not a wizard\'s', async ({ page }) => {
+        await page.evaluate(async () => {
+            document.documentElement.setAttribute('pdx-tab-style', 'pill');
+            await (window as unknown as Win).__gotcha.load('<pdx-tabs></pdx-tabs>'); // brings tabs.css
+        });
+        await mountWizard(page);
+        // The pill style is `[pdx-tab-style="pill"] X` under baseline-2024 and, under baseline-2026, X inside
+        // `@container style(--pdx-tab-…: pill)`: a rule is the pill style's when either says pill.
+        const pillRulesSelecting = (sel: string) => page.locator(sel).first().evaluate((el) => {
+            const found: string[] = [];
+            const walk = (rules: CSSRuleList, underPill: boolean) => {
+                for (const r of Array.from(rules)) {
+                    if (r instanceof CSSStyleRule) {
+                        const pill = underPill || r.selectorText.includes('pdx-tab-style="pill"');
+                        if (pill && el.matches(r.selectorText)) found.push(r.selectorText);
+                    } else if (r instanceof CSSImportRule) {
+                        // A layered entry imports its stylesheet: `@import url(…) layer(pdx.components)`.
+                        if (r.styleSheet) walk(r.styleSheet.cssRules, underPill);
+                    } else if (r instanceof CSSContainerRule) {
+                        walk(r.cssRules, underPill || /pill/.test(r.conditionText));
+                    } else if ('cssRules' in r) walk((r as CSSGroupingRule).cssRules, underPill);
+                }
+            };
+            for (const sheet of Array.from(document.styleSheets)) walk(sheet.cssRules, false);
+            return found;
+        });
+        // Control: a native tab panel is drawn by the pill style, so the rules are on the page.
+        await page.evaluate(() => {
+            const p = document.createElement('div');
+            p.setAttribute('data-tab-panel', '');
+            p.id = 'native-panel';
+            document.getElementById('f')!.appendChild(p);
+        });
+        expect(await pillRulesSelecting('#native-panel')).not.toEqual([]);
+        expect(await pillRulesSelecting('#t pdx-wizard > [data-wizard-step]'), 'a pill tab style rule selects a wizard panel').toEqual([]);
+    });
+
     test('its pieces are parts: the form, its content, the wizard, whose panels are a step per section', async ({ page }) => {
         await mountWizard(page);
         for (const part of ['form', 'content', 'wizard']) await expect(page.locator(`#t [data-part="${part}"]`), part).toHaveCount(1);

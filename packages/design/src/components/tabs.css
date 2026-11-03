@@ -209,7 +209,10 @@ pdx-tabs [data-tab-panel], pdx-tabs [role="tabpanel"] {
     color: var(--pdx-color-primary-text);
     box-shadow: var(--pdx-shadow-sm);
 }
-[pdx-tab-style="pill"] :is([data-tab-panel], [role="tabpanel"]) {
+/* A tabs' panel only: a native one, or a pdx-tabs' tabpanel. Every [role="tabpanel"] took it, a
+   pdx-wizard's step panels too, and at equal weight the later stylesheet won (#293). :where keeps
+   the weight it had. */
+[pdx-tab-style="pill"] :is([data-tab-panel], :where(pdx-tabs) [role="tabpanel"]) {
     border: none; border-radius: 0; padding: var(--pdx-space-lg) var(--pdx-space-md);
 }
 [pdx-tab-style="pill"] .pdx-tab-indicator { display: none; }
