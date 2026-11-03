@@ -75,7 +75,9 @@ describe('no component stylesheet is left with nobody to carry it', () => {
      * whose styles do not travel fails a min-height or a radius there, loudly.
      */
     it('the components with no stylesheet of their own say where theirs comes from', () => {
-        for (const dir of ['field-group', 'field-list', 'form-actions', 'form-section', 'form-template']) {
+        // pdx-form-field draws its warning with form.css's .pdx-field-warning, and its control's border
+        // with the rule for a field in warning: on a page holding fields and no form, neither showed (#293).
+        for (const dir of ['field-group', 'field-list', 'form-actions', 'form-field', 'form-section', 'form-template']) {
             expect(sourceOf(dir), `pdx-${dir}'s classes are written in form.css and it does not import it`)
                 .toContain(`@pdxui/design/components/form'`);
         }

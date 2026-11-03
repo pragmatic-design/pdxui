@@ -12838,7 +12838,7 @@
             {
               "kind": "field",
               "name": "display",
-              "description": "Display mode: inline (default), dialog, panel.",
+              "description": "Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its\nfixed class, so it is no variant axis; what changes within one, collapsed, is a state.",
               "type": {
                 "text": "string"
               },
@@ -12848,12 +12848,25 @@
             {
               "kind": "field",
               "name": "collapsed",
-              "description": "Whether the panel starts collapsed (only for display=\"panel\").",
+              "description": "Whether a panel is collapsed (display=\"panel\" only).",
               "type": {
                 "text": "boolean"
               },
               "default": "false",
               "attribute": "collapsed"
+            }
+          ],
+          "models": [
+            "collapsed"
+          ],
+          "events": [
+            {
+              "name": "collapsed-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `collapsed`. Does not bubble.",
+              "detail": "{ value: boolean }"
             }
           ],
           "roles": [
@@ -12881,7 +12894,7 @@
             {
               "name": "display",
               "fieldName": "display",
-              "description": "Display mode: inline (default), dialog, panel.",
+              "description": "Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its\nfixed class, so it is no variant axis; what changes within one, collapsed, is a state.",
               "type": {
                 "text": "string"
               },
@@ -12890,7 +12903,7 @@
             {
               "name": "collapsed",
               "fieldName": "collapsed",
-              "description": "Whether the panel starts collapsed (only for display=\"panel\").",
+              "description": "Whether a panel is collapsed (display=\"panel\" only).",
               "type": {
                 "text": "boolean"
               },
@@ -12901,6 +12914,34 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The `<fieldset>`, or the dialog mode's wrapper."
+            },
+            {
+              "name": "legend",
+              "description": "The `<legend>`, with `label` or in panel mode."
+            },
+            {
+              "name": "toggle",
+              "description": "The panel's disclosure button, in its legend."
+            },
+            {
+              "name": "content",
+              "description": "The box that holds the fields, inline and in panel mode."
+            },
+            {
+              "name": "trigger",
+              "description": "The dialog mode's button that opens the dialog."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "collapsed",
+              "description": "`collapsed`: a panel shows its legend line only."
             }
           ]
         }
@@ -13112,6 +13153,62 @@
               "name": "row",
               "description": "Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).",
               "signature": "(item: { [field: string]: unknown }, index: number, remove: () => void)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The list's wrapper."
+            },
+            {
+              "name": "header",
+              "description": "The line above the rows: the label and the add button."
+            },
+            {
+              "name": "label",
+              "description": "The list's label, with `label`."
+            },
+            {
+              "name": "add",
+              "description": "An add button, in the header and in the footer."
+            },
+            {
+              "name": "columns",
+              "description": "The column headers."
+            },
+            {
+              "name": "rows",
+              "description": "The box that holds the rows."
+            },
+            {
+              "name": "row",
+              "description": "One row."
+            },
+            {
+              "name": "cell",
+              "description": "One cell: a `pdx-form-field` around its control, or a summary in dialog mode."
+            },
+            {
+              "name": "actions",
+              "description": "A row's buttons: edit (dialog mode) and remove."
+            },
+            {
+              "name": "empty",
+              "description": "The message shown with no rows."
+            },
+            {
+              "name": "footer",
+              "description": "The line under the rows, with its add button."
+            },
+            {
+              "name": "dialog",
+              "description": "The dialog that edits one row, in dialog mode."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "empty",
+              "description": "`empty`: the list has no rows."
             }
           ]
         }
@@ -14377,6 +14474,70 @@
             {
               "name": "",
               "description": "The content placed inside the element."
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The field's wrapper."
+            },
+            {
+              "name": "label",
+              "description": "The `<label>`, with `label`."
+            },
+            {
+              "name": "description",
+              "description": "The description under the label, with `description`."
+            },
+            {
+              "name": "control",
+              "description": "The box that holds the slotted control."
+            },
+            {
+              "name": "error",
+              "description": "The error message, while it is shown."
+            },
+            {
+              "name": "warning",
+              "description": "The warning message, while it is shown."
+            },
+            {
+              "name": "success",
+              "description": "The success message, while it is shown."
+            },
+            {
+              "name": "hint",
+              "description": "The hint, while no message takes its place."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "required",
+              "description": "`required`: required by its prop or by its form; the label carries the marker (`--pdx-field-required-marker`)."
+            },
+            {
+              "name": "optional",
+              "description": "`optional`: the label says the field is optional."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled`: the field and its control are disabled."
+            },
+            {
+              "name": "invalid",
+              "description": "`invalid`: its error is shown; the control is aria-invalid and described by it."
+            },
+            {
+              "name": "warning",
+              "description": "`warning`: its warning is shown, and no error."
+            },
+            {
+              "name": "success",
+              "description": "`success`: its success message is shown, and no error or warning."
+            },
+            {
+              "name": "horizontal",
+              "description": "`horizontal`: the label sits beside the control."
             }
           ],
           "cssProperties": [

@@ -14,6 +14,17 @@
 import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, snippetOrSlot } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
+// Each cell's control is wrapped in a field (#293): named, marked required and described by its error
+// the way any field is (A1, A2), not by a second mechanism here.
+import '../form-field/pdx-form-field';
+// The controls of TYPE_TAG, rendered by this component and registered by nobody else: an app's compiler
+// imports the tags its templates name, and these are built from script (#293).
+import '../input/pdx-input';
+import '../number-input/pdx-number-input';
+import '../textarea/pdx-textarea';
+import '../select/pdx-select';
+import '../checkbox/pdx-checkbox';
+import '../switch-toggle/pdx-switch';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';
@@ -54,6 +65,21 @@ export interface FieldListItemSchema {
  * and the values come back as an array.
  *
  * @slot row - Renders one row: a snippet `row(item, index, remove)`, or the scoped slot, which receives `{ item, index, fields, remove }` (`item` holds that row's values; `remove()` removes the row, for a row that draws its own button — the list also draws its remove button after the row's content).
+ *
+ * @cssstate empty - `empty`: the list has no rows.
+ *
+ * @csspart root - The list's wrapper.
+ * @csspart header - The line above the rows: the label and the add button.
+ * @csspart label - The list's label, with `label`.
+ * @csspart add - An add button, in the header and in the footer.
+ * @csspart columns - The column headers.
+ * @csspart rows - The box that holds the rows.
+ * @csspart row - One row.
+ * @csspart cell - One cell: a `pdx-form-field` around its control, or a summary in dialog mode.
+ * @csspart actions - A row's buttons: edit (dialog mode) and remove.
+ * @csspart empty - The message shown with no rows.
+ * @csspart footer - The line under the rows, with its add button.
+ * @csspart dialog - The dialog that edits one row, in dialog mode.
  */
 component('pdx-field-list', {
     props: {
@@ -82,6 +108,8 @@ component('pdx-field-list', {
     slots: {
         row: slot<(item: { [field: string]: unknown }, index: number, remove: () => void) => Node>(),
     },
+    states: ['empty'],
+    parts: ['root', 'header', 'label', 'add', 'columns', 'rows', 'row', 'cell', 'actions', 'empty', 'footer', 'dialog'],
     setup(ctx) {
         // The context form is looked up when read, and kept once found: set up before its
         // <pdx-form>, a one-time lookup at setup would never find it. See tryUseForm(from).
@@ -105,6 +133,20 @@ component('pdx-field-list', {
 
         // Track item count via signal
         const _itemCount = signal(0);
+        ctx.track(() => { ctx.state('empty', _itemCount() === 0); });
+
+        /**
+         * A row's control in a field: bound to the row's form field, so it is marked required and in
+         * error, and described by its message, as any field's control is. In a row the column header
+         * names it only by sight, so the field names it (`a11y-label`); in the dialog, by a label.
+         */
+        function inField(control: HTMLElement, boundField: unknown, name: string, labelled: boolean): HTMLElement {
+            const field = document.createElement('pdx-form-field') as HTMLElement & { field: unknown };
+            field.setAttribute(labelled ? 'label' : 'a11y-label', name);
+            field.field = boundField ?? null;
+            field.appendChild(control);
+            return field;
+        }
 
         // Dialog state for display="dialog"
         const _editingIndex = signal<number | null>(null);
@@ -293,14 +335,17 @@ component('pdx-field-list', {
 
                 const wrapper = document.createElement('div');
                 wrapper.className = 'pdx-field-list';
+                wrapper.dataset.part = 'root';
 
                 // Header
                 if (label || showAdd) {
                     const header = document.createElement('div');
                     header.className = 'pdx-field-list-header';
+                    header.dataset.part = 'header';
                     if (label) {
                         const lbl = document.createElement('span');
                         lbl.className = 'pdx-field-list-label';
+                        lbl.dataset.part = 'label';
                         lbl.textContent = label;
                         header.appendChild(lbl);
                     }
@@ -308,6 +353,7 @@ component('pdx-field-list', {
                         const addBtn = document.createElement('button');
                         addBtn.type = 'button';
                         addBtn.className = 'pdx-outline';
+                        addBtn.dataset.part = 'add';
                         addBtn.setAttribute('size', 'sm');
                         addBtn.textContent = addLbl;
                         addBtn.addEventListener('click', addItem);
@@ -320,6 +366,7 @@ component('pdx-field-list', {
                 if (count > 0 && fields.length > 0) {
                     const headerRow = document.createElement('div');
                     headerRow.className = 'pdx-field-list-columns';
+                    headerRow.dataset.part = 'columns';
                     for (const field of fields) {
                         const col = document.createElement('span');
                         col.className = 'pdx-field-list-col-header';
@@ -347,10 +394,12 @@ component('pdx-field-list', {
                 // Rows
                 const rows = document.createElement('div');
                 rows.className = 'pdx-field-list-rows';
+                rows.dataset.part = 'rows';
 
                 for (let i = 0; i < count; i++) {
                     const row = document.createElement('div');
                     row.className = 'pdx-field-list-row';
+                    row.dataset.part = 'row';
                     row.dataset.index = String(i);
 
                     // Slot for custom row rendering (priority: slot > default)
@@ -378,6 +427,7 @@ component('pdx-field-list', {
                         for (const field of fields) {
                             const cell = document.createElement('div');
                             cell.className = 'pdx-field-list-cell';
+                            cell.dataset.part = 'cell';
                             const fieldPath = `${prefix}.${i}.${field.name}`;
                             const boundField = form ? formField(form, fieldPath) : undefined;
                             const val = boundField?.value();
@@ -393,6 +443,7 @@ component('pdx-field-list', {
                         for (const field of fields) {
                             const cell = document.createElement('div');
                             cell.className = 'pdx-field-list-cell';
+                            cell.dataset.part = 'cell';
                             const fieldPath = `${prefix}.${i}.${field.name}`;
                             const boundField = form ? formField(form, fieldPath) : undefined;
 
@@ -416,7 +467,7 @@ component('pdx-field-list', {
                                 : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField?.onChange(value));
                             input.addEventListener('pdx-blur', () => boundField?.onBlur());
 
-                            cell.appendChild(input);
+                            cell.appendChild(inField(input, boundField, field.label || field.name, false));
                             row.appendChild(cell);
                         }
                     }
@@ -435,6 +486,7 @@ component('pdx-field-list', {
                 if (count === 0) {
                     const empty = document.createElement('div');
                     empty.className = 'pdx-field-list-empty';
+                    empty.dataset.part = 'empty';
                     empty.textContent = getComponentString('field-list', 'empty')();
                     wrapper.appendChild(empty);
                 }
@@ -443,9 +495,11 @@ component('pdx-field-list', {
                 if (count > 0 && showAdd) {
                     const footer = document.createElement('div');
                     footer.className = 'pdx-field-list-footer';
+                    footer.dataset.part = 'footer';
                     const addBtn = document.createElement('button');
                     addBtn.type = 'button';
                     addBtn.className = 'pdx-outline';
+                    addBtn.dataset.part = 'add';
                     addBtn.setAttribute('size', 'sm');
                     addBtn.textContent = addLbl;
                     addBtn.addEventListener('click', addItem);
@@ -496,6 +550,7 @@ component('pdx-field-list', {
         function actionsCell(index: number, showRemove: boolean, displayMode: string): HTMLElement {
             const cell = document.createElement('div');
             cell.className = 'pdx-field-list-cell pdx-field-list-cell-actions';
+            cell.dataset.part = 'actions';
             for (const b of actionButtons(index, showRemove, displayMode)) cell.appendChild(b);
             return cell;
         }
@@ -514,6 +569,7 @@ component('pdx-field-list', {
 
             const dialog = document.createElement('div');
             dialog.className = 'pdx-field-list-dialog';
+            dialog.dataset.part = 'dialog';
             dialog.setAttribute('role', 'dialog');
             dialog.setAttribute('aria-modal', 'true');
             dialog.setAttribute('aria-label', editIdx != null ? getComponentString('field-list', 'editItem')() : getComponentString('field-list', 'addItem')());
@@ -539,11 +595,6 @@ component('pdx-field-list', {
                     const row = document.createElement('div');
                     row.className = 'pdx-field-list-dialog-field';
 
-                    const label = document.createElement('label');
-                    label.className = 'pdx-label';
-                    label.textContent = field.label || field.name;
-                    row.appendChild(label);
-
                     const tag = TYPE_TAG[field.type || 'text'] || 'pdx-input';
                     const input = document.createElement(tag);
                     if (field.placeholder) input.setAttribute('placeholder', field.placeholder);
@@ -562,7 +613,8 @@ component('pdx-field-list', {
                         : (e.detail?.value ?? (e.target as any)?.value), (value) => boundField.onChange(value));
                     input.addEventListener('pdx-blur', () => boundField.onBlur());
 
-                    row.appendChild(input);
+                    // Its label is the field's, tied to the control: a <label> beside it named nothing.
+                    row.appendChild(inField(input, boundField, field.label || field.name, true));
                     content.appendChild(row);
                 }
             }

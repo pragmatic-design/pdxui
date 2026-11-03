@@ -6,10 +6,16 @@ Group related fields together.
 |---|---|---|---|---|
 | `name` | `name` | string | `''` | Group name — maps to a nested object key in the form data. |
 | `label` | `label` | string | `''` | Optional label rendered as a fieldset legend. |
-| `display` | `display` | string | `'inline'` | Display mode: inline (default), dialog, panel. |
-| `collapsed` | `collapsed` | boolean | `false` | Whether the panel starts collapsed (only for display="panel"). |
+| `display` | `display` | string | `'inline'` | Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its fixed class, so it is no variant axis; what changes within one, collapsed, is a state. |
+| `collapsed` | `collapsed` | boolean | `false` | Whether a panel is collapsed (display="panel" only). |
+
+**Events:** `collapsed-change` → `detail: { value: boolean }` — Fired when the component writes `collapsed`. Does not bubble.
 
 **Renders:** roles `group`
+
+**States:** `:state(collapsed)` — `collapsed`: a panel shows its legend line only.
+
+**Parts:** `[data-part="root"]` — The `<fieldset>`, or the dialog mode's wrapper.; `[data-part="legend"]` — The `<legend>`, with `label` or in panel mode.; `[data-part="toggle"]` — The panel's disclosure button, in its legend.; `[data-part="content"]` — The box that holds the fields, inline and in panel mode.; `[data-part="trigger"]` — The dialog mode's button that opens the dialog.
 
 
 #### Examples

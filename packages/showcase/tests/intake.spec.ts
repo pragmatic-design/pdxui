@@ -125,9 +125,10 @@ test('a field the form requires says so: aria-required on the control, the marke
     await label.evaluate((el) => el.closest<HTMLElement>('pdx-form')!.style.setProperty('--pdx-field-required-marker', 'none'));
     expect(await marker(), 'the marker did not follow --pdx-field-required-marker').not.toContain('*');
     await expect(label, 'the label drew a marker after it was turned off').toHaveCSS('width', await label.evaluate((el) => {
-        // The label's width without any ::after: measured on a clone that carries no marker class.
+        // The label's width without any ::after: measured on a clone the marker rule does not select —
+        // it draws the label part of a required field (#293).
         const clone = el.cloneNode(true) as HTMLElement;
-        clone.classList.remove('pdx-field-required');
+        clone.removeAttribute('data-part');
         el.parentElement!.appendChild(clone);
         const w = getComputedStyle(clone).width;
         clone.remove();

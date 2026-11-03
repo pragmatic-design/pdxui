@@ -394,6 +394,15 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-form-field`, `pdx-field-group` and `pdx-field-list` take the beta contract
+  (#293). `pdx-form-field`'s error, warning and success — one at a time, as the message it shows —
+  and its required, optional, disabled and horizontal are states of the host, drawn as the native
+  classes are; its wrapper and label keep their base classes, and it carries `form.css`, which drew
+  its warning only where a form had brought it. `pdx-field-group`'s `collapsed` is a model
+  (`collapsed-change`) and a state, followed after setup too. `pdx-field-list` wraps each cell's
+  control in a `pdx-form-field` — named by its column, marked required and described by its error
+  (A1, A2) — and registers the controls it builds. Their pieces are parts. `pdx-form` finds the
+  first field in error by its control's `aria-invalid`, and focuses that control.
 - **Breaking:** `pdx-label`, `pdx-form-actions`, `pdx-input-group` and `pdx-form-section` take the
   beta contract (#293), the first of the form family. `pdx-label`'s required, optional and disabled
   are states of the host, drawn as the native classes are; `pdx-form-actions`' `align` is a variant

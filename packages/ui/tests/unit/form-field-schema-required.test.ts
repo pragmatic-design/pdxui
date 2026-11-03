@@ -33,12 +33,14 @@ function field(name: string, label: string, attrs: Record<string, string> = {}):
 }
 
 const input = (f: HTMLElement): HTMLInputElement => f.querySelector('input')!;
-const labelMarked = (f: HTMLElement): boolean => !!f.querySelector('label.pdx-field-required');
 
+// The label's marker is drawn from the host's :state(required) since #293, which happy-dom does not
+// have: form-b-beta-contract.spec.ts measures it in Chromium, required by the prop and by the form. Both
+// come from one answer, the one that sets aria-required here.
 describe('a field required by its form', () => {
     beforeEach(cleanup);
 
-    it('marks the control aria-required and the label with the required marker', async () => {
+    it('marks the control aria-required', async () => {
         const f = createForm({
             initialValues: { email: '', name: '' },
             validators: { email: [required()], name: [minLength(2)] },
@@ -48,9 +50,7 @@ describe('a field required by its form', () => {
         await mountForm(f, email, name);
 
         expect(input(email).getAttribute('aria-required'), 'the schema requires email').toBe('true');
-        expect(labelMarked(email), 'no required marker on the label of a required field').toBe(true);
         expect(input(name).hasAttribute('aria-required'), 'name is not required').toBe(false);
-        expect(labelMarked(name)).toBe(false);
     });
 
     it('never sets the native required attribute — the browser bubble would compete with the form', async () => {
@@ -65,6 +65,5 @@ describe('a field required by its form', () => {
         const note = field('note', 'Note', { required: '' });
         await mountForm(f, note);
         expect(input(note).getAttribute('aria-required')).toBe('true');
-        expect(labelMarked(note)).toBe(true);
     });
 });

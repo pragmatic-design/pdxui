@@ -310,28 +310,35 @@ pdx-form-field:last-child {
     gap: var(--pdx-space-2xs);
 }
 
-.pdx-form-field-horizontal {
+/* Each condition is a class on native markup and a state of <pdx-form-field>'s host (#293), at the
+   class's weight. */
+.pdx-form-field-horizontal,
+:where(pdx-form-field):state(horizontal) > [data-part="root"] {
     flex-direction: row;
     align-items: flex-start;
     gap: var(--pdx-space-md);
 }
-.pdx-form-field-horizontal > .pdx-field-label {
+.pdx-form-field-horizontal > .pdx-field-label,
+:where(pdx-form-field):state(horizontal) > :where([data-part="root"]) > .pdx-field-label {
     min-width: 8rem;
     padding-top: var(--pdx-space-xs);
     flex-shrink: 0;
 }
-.pdx-form-field-horizontal > .pdx-form-field-input {
+.pdx-form-field-horizontal > .pdx-form-field-input,
+:where(pdx-form-field):state(horizontal) > :where([data-part="root"]) > .pdx-form-field-input {
     flex: 1;
     min-width: 0;
 }
 
 /* Error state: label turns red */
-.pdx-form-field.has-error > .pdx-field-label {
+.pdx-form-field.has-error > .pdx-field-label,
+:where(pdx-form-field):state(invalid) > [data-part="root"] > .pdx-field-label {
     color: var(--pdx-color-danger-ink);
 }
 
 /* Disabled */
-.pdx-form-field.disabled { opacity: 0.6; }
+.pdx-form-field.disabled,
+:where(pdx-form-field):state(disabled) > [data-part="root"] { opacity: 0.6; }
 
 /* Transition on error message appearance */
 .pdx-form-field .pdx-field-error,
@@ -418,15 +425,18 @@ pdx-form-field:last-child {
    `--pdx-field-required-marker: none` turns it off. The control's aria-required carries the
    meaning whatever the marker is, so the marker is for the eye only: the empty alternative text
    after the slash keeps it out of the label's accessible name, which would otherwise be read as
-   «Name star». A native <label> says it with its class; <pdx-label> with its state (#293). */
+   «Name star». A native <label> says it with its class; <pdx-label> and <pdx-form-field> with their
+   state (#293). */
 .pdx-field-required::after,
-:where(pdx-label):state(required) > [data-part="root"]::after {
+:where(pdx-label):state(required) > [data-part="root"]::after,
+:where(pdx-form-field):state(required) > :where([data-part="root"]) > [data-part="label"]::after {
     content: var(--pdx-field-required-marker, ' *') / '';
     color: var(--pdx-color-danger-ink);
 }
 
 .pdx-field-optional::after,
-:where(pdx-label):state(optional) > [data-part="root"]::after {
+:where(pdx-label):state(optional) > [data-part="root"]::after,
+:where(pdx-form-field):state(optional) > :where([data-part="root"]) > [data-part="label"]::after {
     content: ' (optional)';
     font-size: var(--pdx-text-xs);
     font-weight: var(--pdx-weight-normal);
@@ -434,7 +444,8 @@ pdx-form-field:last-child {
 }
 
 .pdx-field-label-disabled,
-:where(pdx-label):state(disabled) > [data-part="root"] {
+:where(pdx-label):state(disabled) > [data-part="root"],
+:where(pdx-form-field):state(disabled) > :where([data-part="root"]) > [data-part="label"] {
     opacity: var(--pdx-opacity-disabled);
     cursor: not-allowed;
 }

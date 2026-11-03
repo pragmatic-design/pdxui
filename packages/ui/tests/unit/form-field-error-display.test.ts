@@ -50,7 +50,7 @@ describe('pdx-form-field: the rule the row states', () => {
     it('error alone, outside a form: no message', async () => {
         const el = await mount('pdx-form-field', { error: 'Wrong PIN' });
         expect(el.querySelector('.pdx-field-error')).toBeNull();
-        expect(el.querySelector('.pdx-form-field')?.classList.contains('has-error')).toBe(false);
+        expect(el.querySelector('[data-part="error"]')).toBeNull();
     });
 
     it('error with the show-error attribute, as the note writes it: the message shows', async () => {

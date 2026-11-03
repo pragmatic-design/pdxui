@@ -45,7 +45,8 @@ function field(name: string): HTMLElement & { error: unknown } {
     return el;
 }
 
-const shown = (f: HTMLElement): boolean => !!f.querySelector('.pdx-form-field.has-error');
+/** The field shows its error: the message part is rendered (a field in error is a state since #293). */
+const shown = (f: HTMLElement): boolean => !!f.querySelector('[data-part="error"]');
 
 describe('a form field set up before its <pdx-form>', () => {
     beforeEach(() => { cleanup(); setupOrder.length = 0; });

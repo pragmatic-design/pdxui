@@ -25,7 +25,7 @@
         <div class="opt-row"><code>name</code><span>string</span><span>Key of the nested object; prefixes the names of the fields inside</span></div>
         <div class="opt-row"><code>label</code><span>string</span><span>Legend (inline, panel) or button text (dialog)</span></div>
         <div class="opt-row"><code>display</code><span>string</span><span>inline (default), panel, dialog</span></div>
-        <div class="opt-row"><code>collapsed</code><span>boolean</span><span>A panel that starts closed</span></div>
+        <div class="opt-row"><code>::collapsed</code><span>boolean model</span><span>Whether a panel is closed: its toggle writes it and announces <code>collapsed-change</code> <code>{ value }</code>; <code>:state(collapsed)</code></span></div>
       </div>
       <p class="pdx-txt-small pdx-ink-muted note">
         In a test or a measurement, select a grouped field by its full path: <code>[name="customer.email"]</code>.
