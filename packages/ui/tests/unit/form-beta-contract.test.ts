@@ -73,7 +73,28 @@ const DONE: Row[] = [
         tag: 'pdx-auto-form', models: [], states: [], parts: ['root', 'actions', 'reset', 'submit'],
         events: ['pdx-submit'],
     },
+    // Its wizard layout is a pdx-wizard (A6), not a stepper of its own.
+    {
+        tag: 'pdx-form-template', models: [], states: [], parts: ['form', 'content', 'fields', 'section', 'wizard'],
+        events: ['pdx-submit', 'pdx-submit-error'],
+    },
 ];
+
+describe('pdx-form-template', () => {
+    const source = readFileSync(join(root, 'src', 'form-template', 'pdx-form-template.ts'), 'utf8');
+
+    it('builds no stepper of its own: its wizard layout is pdx-wizard', () => {
+        expect(source).not.toMatch(/['"]tablist['"]/);
+        expect(source).not.toMatch(/['"]tab['"]/);
+        expect(source).toMatch(/createElement\(['"]pdx-wizard['"]\)/);
+    });
+
+    it('navigates with the library\'s verbs, next, prev and goTo, and exposes them', () => {
+        const methods = ((decls.find((d) => d.tagName === 'pdx-form-template') as { members?: { kind: string; name: string }[] })?.members ?? [])
+            .filter((m) => m.kind === 'method').map((m) => m.name).sort();
+        expect(methods).toEqual(['getForm', 'goTo', 'next', 'prev']);
+    });
+});
 
 describe.each(DONE)('$tag, on the beta contract', (row) => {
     const decl = decls.find((d) => d.tagName === row.tag);

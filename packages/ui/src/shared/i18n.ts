@@ -132,7 +132,6 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         clearAll: 'Clear all', removeFilter: 'Remove filter: {filter}', editFilter: 'Edit filter: {filter}',
         selectField: 'Select field...', addFilter: '+ Add Filter', dialog: 'Add filter',
     },
-    'form-template': { steps: 'Form steps' },
     input: { clear: 'Clear', loading: 'Loading' },
     'json-editor': {
         apply: 'Apply', cancel: 'Cancel', edit: 'Edit…', empty: 'No items — use "＋ Add item" below.',

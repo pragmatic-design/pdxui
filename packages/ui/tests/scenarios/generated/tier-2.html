@@ -134,6 +134,24 @@
                 requestAnimationFrame(attempt);
             })();
         }); },
+        "form-template-wizard": async function () { 
+        const host = document.querySelector('section:not([hidden]) [data-test="ftw"]');
+        if (!host) return;
+        host.schema = {
+            layout: 'wizard',
+            sections: [{ name: 'who', label: 'Requester' }, { name: 'what', label: 'Request' }],
+            fields: [
+                { name: 'name', type: 'text', label: 'Name', section: 'who', required: true },
+                { name: 'topic', type: 'text', label: 'Topic', section: 'what' },
+            ],
+        };
+        await new Promise((resolve) => {
+            let tries = 0;
+            (function attempt() {
+                if (host.querySelector('[aria-current="step"]') || tries++ > 60) { resolve(); return; }
+                requestAnimationFrame(attempt);
+            })();
+        }); },
         "mention-closed": async function () { 
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "mention-open": async function () { 
@@ -664,6 +682,13 @@
         <h3>Form Template — Schema-driven grid (2 cols, 2 fields)</h3>
         <div style="max-width: 640px;">
                     <pdx-form-template data-test="ft"></pdx-form-template>
+                </div>
+    </section>
+
+    <section data-scenario="form-template-wizard">
+        <h3>Form Template — Wizard layout (2 steps)</h3>
+        <div style="max-width: 640px;">
+                    <pdx-form-template data-test="ftw"></pdx-form-template>
                 </div>
     </section>
 
