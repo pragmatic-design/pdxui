@@ -1,8 +1,8 @@
 // Every named slot a component renders is in the manifest — and so in the skills.
 //
 // The manifest lists a slot only when the component declares it with `@slot` in its JSDoc. Slots
-// are rendered two ways — literal `<slot name="…">`, and scoped slots read through
-// `ctx.__slots['…']` — and both need the tag. The skills are generated from the manifest, so an
+// are rendered two ways — literal `<slot name="…">`, and the parent's snippets read through
+// `declaredSnippet(ctx, '…')` — and both need the tag. The skills are generated from the manifest, so an
 // undocumented slot does not exist for an agent: `pdx-drawer`'s `header` and `footer` are then found
 // only by measuring the DOM, and `pdx-input`'s `prefix`/`suffix` and `pdx-list`'s `item`/`empty` are
 // the ones an app reaches for first.
@@ -23,21 +23,13 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
 }
 
 /**
- * Named slots the component in `text` renders: literal `<slot name="x">`, scoped `__slots['x']`,
- * `snippetOrSlot(ctx, 'x', (s) => […], 'y')` (#491, #595) — the snippet `x`, and the alpha slot `y`
- * when its name differs — and `declaredSnippet(ctx, 'x', …)` (#492), the snippet alone.
+ * Named slots the component in `text` renders: literal `<slot name="x">`, and the snippets it reads,
+ * `declaredSnippet(ctx, 'x', …)` (#492) and pdx-data-grid's `snippetOf('x')`.
  */
 function renderedSlots(text: string): { tag: string | null; names: string[] } {
     const tag = (text.match(/component\('([\w-]+)'/) ?? [])[1] ?? null;
     const names = new Set<string>();
     for (const m of text.matchAll(/<slot\s+name="([\w-]+)"/g)) names.add(m[1]);
-    for (const m of text.matchAll(/__slots\??\.?\[\s*'([\w-]+)'\s*\]/g)) names.add(m[1]);
-    // Match: `snippetOrSlot(ctx, 'x', <args>])` with an optional `, 'y'` after the args' array.
-    // Groups: [1]=the snippet's name [2]=the alpha slot's, when given.
-    for (const m of text.matchAll(/snippetOrSlot\(\s*ctx\s*,\s*'([\w-]+)'[^\n]*?\](?:\s*,\s*'([\w-]+)')?\s*\)/g)) {
-        names.add(m[1]);
-        if (m[2]) names.add(m[2]);
-    }
     // Match: `declaredSnippet(ctx, 'x'`. Groups: [1]=the snippet's name
     for (const m of text.matchAll(/declaredSnippet\(\s*ctx\s*,\s*'([\w-]+)'/g)) names.add(m[1]);
     // Match: `snippetOf('x')`, pdx-data-grid's reader of its own snippets. Groups: [1]=the snippet's name
@@ -67,24 +59,14 @@ function undocumented(sources: string[], documented: Map<string, Set<string>>): 
 }
 
 describe('the scan can fail', () => {
-    // Three planted shapes: a scan that returns [] passes the real assertion perfectly.
+    // Planted shapes: a scan that returns [] passes the real assertion perfectly.
     const docs = new Map([['pdx-probe', new Set(['footer'])]]);
 
     it('sees an undocumented literal slot', () => {
         const src = "component('pdx-probe', { render: () => html`<slot name=\"header\"></slot>` })";
         expect(undocumented([src], docs)).toEqual(['pdx-probe: header']);
     });
-    it('sees an undocumented scoped slot', () => {
-        const src = "component('pdx-probe', { setup(ctx) { const s = (ctx as any).__slots?.['row']; } })";
-        expect(undocumented([src], docs)).toEqual(['pdx-probe: row']);
-    });
-    it('sees an undocumented snippet, and the alpha slot it falls back to', () => {
-        const src = "component('pdx-probe', { setup(ctx) { const s = snippetOrSlot(ctx, 'item', (s) => [s.page, s.isActive], 'page'); } })";
-        expect(undocumented([src], docs)).toEqual(['pdx-probe: item', 'pdx-probe: page']);
-        const plain = "component('pdx-probe', { setup(ctx) { return snippetOrSlot(ctx, 'row', (s) => [s.item]); } })";
-        expect(undocumented([plain], docs)).toEqual(['pdx-probe: row']);
-    });
-    it('sees an undocumented snippet read alone (#492)', () => {
+    it('sees an undocumented snippet (#492)', () => {
         const src = "component('pdx-probe', { setup(ctx) { return declaredSnippet(ctx, 'row', (s) => [s.item]); } })";
         expect(undocumented([src], docs)).toEqual(['pdx-probe: row']);
         const grid = "component('pdx-probe', { setup(ctx) { const c = snippetOf('cell')?.(row); } })";

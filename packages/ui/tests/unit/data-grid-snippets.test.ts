@@ -5,7 +5,7 @@
 // column (the owner's direction, 2026-10-21): `cell(row, column, value)` and `header(column)`, which
 // switch on `column.field`, and `detail(row)`. A column the snippet draws nothing for is the grid's
 // to draw, so a page writes only the columns it changes. Since #492 the grid reads its snippets
-// alone: an alpha scoped slot given to it draws nothing.
+// alone, and the alpha scoped slots are removed.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
@@ -37,16 +37,6 @@ function mark(text: string): Node {
     return b;
 }
 
-/** What compiled parent code hands a component for `<slot name="x" let:…>`. */
-function scopedSlot(name: string, draw: (scope: Row) => Node) {
-    return (el: Grid) => {
-        const carrier = document.createElement('template') as HTMLTemplateElement & { __pdxSlot?: unknown; __pdxSlotName?: string };
-        carrier.__pdxSlotName = name;
-        carrier.__pdxSlot = draw;
-        el.appendChild(carrier);
-    };
-}
-
 const mine = () => [...document.querySelectorAll('.mine')].map((n) => n.textContent);
 const cellsOf = (el: Element, col: number) =>
     [...el.querySelectorAll('.pdx-dg-body .pdx-dg-row')].map((r) => r.querySelectorAll('[role="gridcell"]')[col]?.textContent?.trim());
@@ -55,11 +45,6 @@ const headerTexts = (el: Element) => [...el.querySelectorAll('.pdx-dg-th-label')
 beforeEach(cleanup);
 
 describe('pdx-data-grid: cell(row, column, value) (#597)', () => {
-    it('the alpha scoped slot col:name draws nothing (#492)', async () => {
-        await mountGrid({}, scopedSlot('col:name', (s) => mark(`${(s.row as Row).name}`)));
-        expect(mine()).toEqual([]);
-    });
-
     it('a snippet draws the same cells as col:name, and leaves the other columns to the grid', async () => {
         const plain = await mountGrid({});
         const prices = cellsOf(plain, 1);
@@ -118,11 +103,6 @@ describe('pdx-data-grid: cell(row, column, value) (#597)', () => {
 });
 
 describe('pdx-data-grid: header(column) (#597)', () => {
-    it('the alpha scoped slot header:price draws nothing (#492)', async () => {
-        await mountGrid({}, scopedSlot('header:price', (s) => mark(`[${s.header}]`)));
-        expect(mine()).toEqual([]);
-    });
-
     it('a snippet draws the same header, and the other columns keep their titles', async () => {
         const el = await mountGrid({}, (g) => {
             g.header = (column: Col) => (column.field === 'price' ? mark(`[${column.header}]`) : null);
@@ -138,12 +118,6 @@ describe('pdx-data-grid: detail(row) (#597)', () => {
         await tick(20);
     };
 
-    it('the alpha scoped slot detail draws nothing (#492)', async () => {
-        const el = await mountGrid({ expandable: true }, scopedSlot('detail', (s) => mark(`about ${(s.row as Row).name}`)));
-        await open(el);
-        expect(mine()).toEqual([]);
-    });
-
     it('a snippet draws the same detail', async () => {
         const el = await mountGrid({ expandable: true }, (g) => {
             g.detail = (row: Row) => mark(`about ${row.name}`);
@@ -153,8 +127,7 @@ describe('pdx-data-grid: detail(row) (#597)', () => {
     });
 });
 
-// #673: the grid's other scoped slots get a snippet each, with the slot's context as arguments; since
-// #492 the alpha slots are not read.
+// #673: the grid's other templates get a snippet each, with the alpha slot's context as arguments.
 
 describe('pdx-data-grid: editCell(row, column, value, form) (#673)', () => {
     const editing = (el: Grid) => el.querySelector('.pdx-dg-cell-editing');
@@ -168,13 +141,6 @@ describe('pdx-data-grid: editCell(row, column, value, form) (#673)', () => {
         input.value = String(value);
         return input;
     };
-
-    it('the alpha scoped slot col-edit:name draws nothing: the grid\'s own editor is there (#492)', async () => {
-        const el = await mountGrid({ editable: true }, scopedSlot('col-edit:name', (s) => editor(s.value)));
-        await startEdit(el);
-        expect(editing(el)?.querySelector('input.mine')).toBeNull();
-        expect(editing(el)?.childElementCount).toBeGreaterThan(0);
-    });
 
     it('a snippet draws the editor in the same cell, with the row, the column, the value and the form', async () => {
         const seen: unknown[][] = [];
@@ -214,12 +180,6 @@ describe('pdx-data-grid: editCell(row, column, value, form) (#673)', () => {
 });
 
 describe('pdx-data-grid: filter(column) (#673)', () => {
-    it('the alpha scoped slot filter:name draws nothing in the filter row (#492)', async () => {
-        const el = await mountGrid({ filterable: true }, scopedSlot('filter:name', (s) => mark(`f ${s.field}`)));
-        expect(mine()).toEqual([]);
-        expect(el.querySelector('.pdx-dg-filter-row .mine')).toBeNull();
-    });
-
     it('a snippet draws the same filter cell, and the other columns keep the grid\'s', async () => {
         const plain = await mountGrid({ filterable: true });
         const inputs = plain.querySelectorAll('.pdx-dg-filter-row input').length;
@@ -273,12 +233,6 @@ describe('pdx-data-grid: filterPopover(column, apply, clear) (#673)', () => {
         expect(second.calls).toEqual([[]]);
     });
 
-    it('the alpha scoped slot filter-popover:name draws nothing: the grid\'s own popover opens (#492)', async () => {
-        await openWith(scopedSlot('filter-popover:name', () => mark('custom')));
-        expect(document.querySelector('.mine')).toBeNull();
-        expect(document.querySelector('.pdx-dg-fp-title, [role="dialog"]')).not.toBeNull();
-    });
-
     it('a snippet that draws nothing for the column leaves the grid\'s own popover', async () => {
         await openWith((g) => { g.filterPopover = (() => null) as Popover; });
         expect(document.querySelector('.mine')).toBeNull();
@@ -288,15 +242,6 @@ describe('pdx-data-grid: filterPopover(column, apply, clear) (#673)', () => {
 
 describe('pdx-data-grid: toolbarStart(grid) and toolbarEnd(grid) (#673)', () => {
     const toolbar = (el: Element) => el.querySelector('[data-part="toolbar"]');
-
-    it('the alpha scoped slots toolbar-start and toolbar-end draw nothing (#492)', async () => {
-        const el = await mountGrid({ showToolbar: true }, (g) => {
-            scopedSlot('toolbar-start', () => mark('start'))(g);
-            scopedSlot('toolbar-end', () => mark('end'))(g);
-        });
-        expect(toolbar(el), 'the premise: the toolbar is drawn').not.toBeNull();
-        expect(toolbar(el)!.querySelectorAll('.mine')).toHaveLength(0);
-    });
 
     it('snippets draw at the same two places, and receive the grid', async () => {
         const got: unknown[] = [];
@@ -313,12 +258,6 @@ describe('pdx-data-grid: toolbarStart(grid) and toolbarEnd(grid) (#673)', () => 
 
 describe('pdx-data-grid: empty() (#673)', () => {
     const status = (el: Element) => el.querySelector('[data-part="empty"]');
-
-    it('the alpha scoped slot empty draws nothing: the grid\'s own empty state is there (#492)', async () => {
-        const el = await mountGrid({ data: [] }, scopedSlot('empty', () => mark('nothing here')));
-        expect(status(el), 'the premise: the empty state is drawn').not.toBeNull();
-        expect(status(el)?.querySelector('.mine')).toBeNull();
-    });
 
     it('a snippet draws the empty state in the same place, and the grid\'s own is not drawn', async () => {
         const plain = await mountGrid({ data: [] });

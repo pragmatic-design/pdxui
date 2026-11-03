@@ -85,7 +85,8 @@ test('the compiler and TypeScript are not in the entry chunk', () => {
     const html = readFileSync(join(dist, 'index.html'), 'utf8');
     const src = html.match(/<script[^>]+type="module"[^>]+src="\/?([^"]+\.js)"/)![1];
     const code = readFileSync(join(dist, src), 'utf8');
-    // Strings only TypeScript's own source carries, and one only the PDX compiler's codegen does.
+    // Strings only TypeScript's own source carries, and one only the PDX compiler's codegen does: the
+    // error a misplaced `@snippet` raises (it was the hoisted scoped slot's `__pdxSlot_`, gone with #492).
     expect(code.includes('ts.ScriptTarget') || code.includes('createSourceFile'), 'TypeScript is in the entry chunk').toBe(false);
-    expect(code.includes('__pdxSlot_'), 'the PDX compiler is in the entry chunk').toBe(false);
+    expect(code.includes('it fills a slot of the component it is written in'), 'the PDX compiler is in the entry chunk').toBe(false);
 });
