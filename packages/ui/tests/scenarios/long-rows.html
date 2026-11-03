@@ -17,7 +17,7 @@
         // the first render spent in layout. `?cv=off` forces `content-visibility: visible` on every
         // element before anything renders: the same page with the rule turned off, the control.
         //
-        // Last, a short `pdx-list` whose rows come from the `item` slot: the application's markup,
+        // Last, a short `pdx-list` whose rows come from the `item` snippet: the application's markup,
         // which the rule must not reach.
         import '@pdxui/design';
         // The components it renders, not the barrel.
@@ -71,19 +71,16 @@
         transfer.items = Array.from({ length: rows }, (_, i) => ({ value: 'v' + (i + 1), label: 'Transfer row ' + (i + 1) }));
         stage.appendChild(transfer);
 
-        // What compiled parent code hands a component for `<slot name="item" let:item>`.
+        // What a parent's `@snippet item(item) { … }` compiles to: the element's property (#492).
         const slotted = document.createElement('pdx-list');
         slotted.setAttribute('data-test', 'slotted');
         slotted.items = [{ id: 1, label: 'Slot row 1' }, { id: 2, label: 'Slot row 2' }];
-        const carrier = document.createElement('template');
-        carrier.__pdxSlotName = 'item';
-        carrier.__pdxSlot = ({ item }) => {
+        slotted.item = (item) => {
             const span = document.createElement('span');
             span.className = 'mine';
             span.textContent = item.label;
             return span;
         };
-        slotted.appendChild(carrier);
         stage.appendChild(slotted);
 
         // `data-pdx-ready` on <html> is the harness's contract — `openPage` waits for it.
