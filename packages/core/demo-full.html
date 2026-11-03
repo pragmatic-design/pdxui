@@ -121,7 +121,7 @@ import {
     store, watch,
     onMount, onDestroy, useEffect,
     errorBoundary,
-    renderSlot,
+    renderSnippet,
     keyframes, spring, playKeyframes,
     cssVar, createTokenBridge, createTheme, applyTheme,
     viewport, screen, adaptive,
@@ -252,7 +252,7 @@ function log(msg) {
     `);
 })();
 
-// ═══ 4. Scoped Slot ════════════════════════════════════════════
+// ═══ 4. Snippet ════════════════════════════════════════════════
 
 (() => {
     const users = signal([
@@ -261,29 +261,28 @@ function log(msg) {
         { id: 3, name: 'Charlie', role: 'Viewer' },
     ]);
 
-    const slots = {
-        row: (scope) => html`
-            <div class="item-row">
-                <strong style="flex:1">${scope.user.name}</strong>
-                <span class="tag ${scope.user.role === 'Admin' ? 'tag-red' : scope.user.role === 'Editor' ? 'tag-blue' : 'tag-green'}">
-                    ${scope.user.role}
-                </span>
-                <span class="mono" style="color:#999">#${scope.index + 1}</span>
-            </div>
-        `,
-    };
+    // The template a parent passes: a function of its arguments (what `@snippet row(user, index)` compiles to).
+    const row = (user, index) => html`
+        <div class="item-row">
+            <strong style="flex:1">${user.name}</strong>
+            <span class="tag ${user.role === 'Admin' ? 'tag-red' : user.role === 'Editor' ? 'tag-blue' : 'tag-green'}">
+                ${user.role}
+            </span>
+            <span class="mono" style="color:#999">#${index + 1}</span>
+        </div>
+    `;
 
     const el = document.getElementById('slot-demo');
     el.appendChild(html`
         <div>
             ${() => users().map((user, index) =>
-                renderSlot(slots, 'row', () => ({ user, index }),
+                renderSnippet(() => row, () => [user, index],
                     () => html`<div>${user.name}</div>`)
             )}
         </div>
         <button style="margin-top:0.5rem;" @click=${() => {
             users.set(prev => [...prev, { id: prev.length + 1, name: 'New User', role: 'Viewer' }]);
-            log('ScopedSlot: user added');
+            log('Snippet: user added');
         }}>Add User</button>
     `);
 })();

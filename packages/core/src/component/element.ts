@@ -159,9 +159,6 @@ export abstract class PdxElement extends HTMLElementBase {
     _beforeLeaveCallbacks: (() => boolean | 'destroy' | Promise<boolean>)[] = [];
     _routeChangeCallbacks: ((params: Record<string, string>) => void)[] = [];
 
-    /** Scoped slot functions provided by parent via <template #name="scope">. */
-    _slotFunctions: Record<string, (scope: Record<string, unknown>) => Node | DocumentFragment> = {};
-
     /** The <slot> elements this component's own template rendered — the only ones it projects into. */
     private _ownSlots: Element[] = [];
 
@@ -216,10 +213,6 @@ export abstract class PdxElement extends HTMLElementBase {
             if (DEV) devInstanceId(this);
             this._projectedChildren = Array.from(this.childNodes);
             this._lightChildren = this._projectedChildren.slice();
-            // The parent's scoped slot functions, BEFORE the render: a compiled `<slot :row>` outlet
-            // reads `ctx.__slots` while it renders, and collected after, every fill was missed and the
-            // outlet rendered its default for good (#221).
-            this._collectSlotFunctions();
             const target = this._renderTarget;
             // Light DOM: remove children for slot projection.
             // Mark ALL descendant PdxElements as keepAlive to prevent their
@@ -473,17 +466,7 @@ export abstract class PdxElement extends HTMLElementBase {
      */
     private _lightChildren: Node[] = [];
 
-    /** The scoped slot functions the parent's compiled code set on carrier children (`__pdxSlot`). */
-    private _collectSlotFunctions(): void {
-        for (const child of this._projectedChildren) {
-            const carrier = child as { __pdxSlot?: (scope: Record<string, unknown>) => Node | DocumentFragment; __pdxSlotName?: string };
-            if (child instanceof Element && carrier.__pdxSlot) {
-                this._slotFunctions[carrier.__pdxSlotName as string] = carrier.__pdxSlot;
-            }
-        }
-    }
-
-    /** Replace <slot> placeholders with projected children. A slot function carrier is not projected. */
+    /** Replace <slot> placeholders with projected children. */
     private _projectSlots(): void {
         if (this._projectedChildren.length === 0) return;
 
@@ -496,12 +479,11 @@ export abstract class PdxElement extends HTMLElementBase {
         const slots = this._ownSlots.filter(s => this.contains(s));
         if (slots.length === 0) { this._disposeUnprojected(); return; }
 
-        // Group projected children by slot name (exclude slot function carriers)
+        // Group projected children by slot name
         const named = new Map<string, Node[]>();
         const defaultNodes: Node[] = [];
 
         for (const child of this._projectedChildren) {
-            if (child instanceof Element && (child as { __pdxSlot?: unknown }).__pdxSlot) continue;
             const slotName = child instanceof Element ? child.getAttribute('slot') : null;
             if (slotName) {
                 if (!named.has(slotName)) named.set(slotName, []);
@@ -530,13 +512,11 @@ export abstract class PdxElement extends HTMLElementBase {
     /** The captured children that were NOT projected (a template with no <slot>, or a slot
      *  with no match) were frozen with _keepAlive during the capture: without a dispose
      *  they stay detached subtrees with live effects forever. It destroys the mounted
-     *  PdxElements left orphaned and frees the capture list (retention). The slot function
-     *  carriers stay alive: their closures are what renderSlot needs. */
+     *  PdxElements left orphaned and frees the capture list (retention). */
     private _disposeUnprojected(): void {
         for (const child of this._projectedChildren) {
             if (!(child instanceof Element)) continue;
             if (child.isConnected) continue; // projected into the DOM → alive
-            if ((child as { __pdxSlot?: unknown }).__pdxSlot) continue; // slot carrier
             const nodes: Element[] = [child, ...Array.from(child.querySelectorAll('*'))];
             for (const n of nodes) {
                 if (n instanceof PdxElement && (n as unknown as { _mounted?: boolean })._mounted) {

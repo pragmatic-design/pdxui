@@ -1,5 +1,5 @@
 // `@await` in a compiled .pdx (#145): the binding, the plain values, the timeout — on the inline path
-// every template takes, and in a scoped slot's body, which still takes the template path. The
+// every template takes, and in the body of a snippet the parent passes its child. The
 // runtime alone is await-block.test.ts; over a compiled @fetch, async-contract.test.ts (case 4).
 
 import { describe, it, expect, vi, afterEach } from 'vitest';
@@ -127,16 +127,17 @@ const p = globalThis.__awaitSlow;
     });
 });
 
-describe('@await in a scoped slot body (the template path)', () => {
+describe('@await in a snippet the parent passes', () => {
     it('binds the value there too', async () => {
         const p = held('__awaitSlot');
-        define('awaitslothost', `<template><div class="host"><slot name="row" :item="item"></slot></div></template>
+        define('awaitslothost', `<template><div class="host">@render row?.(item)</div></template>
 <script>
+@slot row?: (item: number);
 let item = $signal(1);
 </script>`);
         define('awaitslotuser', `<template>
 <app-awaitslothost>
-  @slot(row, { item }) { @await (p as v) { <b>{{ v }}-{{ item }}</b> } }
+  @snippet row(item) { @await (p as v) { <b>{{ v }}-{{ item }}</b> } }
 </app-awaitslothost>
 </template>
 <script>

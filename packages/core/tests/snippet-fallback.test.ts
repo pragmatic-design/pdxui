@@ -1,13 +1,11 @@
-// A scoped slot outlet's fallback survives an interpolation or a block (#276).
+// An optional snippet's fallback, whatever it holds: text, an element, an interpolation, a block (#276).
 //
-// `<slot name="row" :item="first">…fallback…</slot>`: the code generators looked for `</slot>` in the
-// HTML text they were given, and the parser cuts that text at every `{{ }}` and `@directive`. A
-// fallback showing data — `{{ first }}`, the usual case — was split across nodes: the outlet got an
-// empty default, and the fallback was emitted BESIDE it, rendered whether or not the parent filled
-// the slot (on the template path with an orphan `</slot>` in the page).
+// The alpha outlet `<slot name="row" :item="first">…fallback…</slot>` once lost a fallback that showed
+// data: the generators cut it at the first `{{ }}` and rendered it beside the fill. Its beta form,
+// `@render row?.(first) @else { … }` (#492), is held to the same cases.
 //
-// Compiled on both render paths and mounted, as render-parity.test.ts does: a child with the outlet,
-// alone (no fill → the fallback, once) and inside a parent that fills it (→ only the fill).
+// Compiled on both render paths and mounted, as render-parity.test.ts does: a child that renders the
+// snippet, alone (no snippet → the fallback, once) and inside a parent that gives one (→ only that).
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '../src/index';
@@ -40,34 +38,31 @@ const FALLBACKS: { name: string; fallback: string; shown: string }[] = [
 ];
 
 for (const [path, build] of [['dev', false], ['build', true]] as const) {
-    describe(`a scoped slot outlet's fallback — ${path}`, () => {
+    describe(`an optional snippet's fallback — ${path}`, () => {
         beforeEach(() => { document.body.innerHTML = ''; });
+        const CHILD_SCRIPT = "@slot row?: (item: string);\nlet first = $signal('Ada');";
 
         for (const f of FALLBACKS) {
-            it(`${f.name}: rendered once when the slot is not filled`, async () => {
+            it(`${f.name}: rendered once when the parent gives no snippet`, async () => {
                 const child = `sfchild${++seq}${build ? 'b' : 'd'}`;
-                define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
-                    "let first = $signal('Ada');", build);
+                define(child, `<div class="box">@render row?.(first) @else { ${f.fallback} }</div>`, CHILD_SCRIPT, build);
                 const el = document.createElement(`app-${child}`);
                 document.body.appendChild(el);
                 await settle();
                 const box = el.querySelector('.box')!;
-                expect(text(box), 'the fallback is not what the outlet shows').toBe(f.shown);
-                expect(box.querySelector('slot'), 'a literal <slot> element is in the page').toBeNull();
-                expect(el.textContent, 'an orphan </slot> is in the page').not.toContain('</slot>');
+                expect(text(box), 'the fallback is not what the child shows').toBe(f.shown);
             });
 
-            it(`${f.name}: not rendered when the parent fills the slot`, async () => {
+            it(`${f.name}: not rendered when the parent gives one`, async () => {
                 const child = `sfchild${++seq}${build ? 'b' : 'd'}`;
-                define(child, `<div class="box"><slot name="row" :item="first">${f.fallback}</slot></div>`,
-                    "let first = $signal('Ada');", build);
+                define(child, `<div class="box">@render row?.(first) @else { ${f.fallback} }</div>`, CHILD_SCRIPT, build);
                 const parent = `sfparent${seq}${build ? 'b' : 'd'}`;
-                define(parent, `<app-${child}><slot name="row" let:item><em>filled {{ item }}</em></slot></app-${child}>`, '', build);
+                define(parent, `<app-${child}>@snippet row(item) { <em>filled {{ item }}</em> }</app-${child}>`, '', build);
                 const el = document.createElement(`app-${parent}`);
                 document.body.appendChild(el);
                 await settle();
                 const box = el.querySelector('.box')!;
-                expect(text(box), 'the fallback rendered beside the fill').toBe('filled Ada');
+                expect(text(box), 'the fallback rendered beside the snippet').toBe('filled Ada');
             });
         }
     });

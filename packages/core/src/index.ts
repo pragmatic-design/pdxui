@@ -144,12 +144,9 @@ export { delegate } from './renderer/delegate';
 // Error Boundary
 export { errorBoundary } from './renderer/error-boundary';
 
-// Scoped Slot
-export { renderSlot, slotCarrier } from './renderer/slot';
+// Typed snippets (#489): what `@render` compiles to, and what a component draws a parent's snippet with
 export type { SlotFunction } from './renderer/slot';
-
-// Typed snippets (#489): what `@render` compiles to
-export { renderSnippet, snippetOrSlot, declaredSnippet } from './renderer/snippet';
+export { renderSnippet, declaredSnippet } from './renderer/snippet';
 
 // Helpers
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';

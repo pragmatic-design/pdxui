@@ -1,5 +1,5 @@
-// repeatWithSlot — Bridge between repeat() keyed reconciliation and scoped slots.
-// Priority chain: slot function > render callback prop > default renderer.
+// repeatWithSlot — Bridge between repeat() keyed reconciliation and a parent's snippet.
+// Priority chain: snippet > render callback prop > default renderer.
 // Each component provides a scopeMapper to shape the slot scope per-item.
 
 import { repeat } from './list';
@@ -15,7 +15,7 @@ import type { SlotFunction } from './slot';
  *
  * @param items - Signal or getter returning the array
  * @param keyFn - Unique key extractor per item
- * @param slotFn - Parent-provided scoped slot (from ctx.__slots)
+ * @param slotFn - The parent's snippet, as `declaredSnippet` gives it
  * @param renderFn - Imperative render callback prop (backward compat)
  * @param defaultFn - Built-in default renderer
  * @param scopeMapper - Converts (item, index) to the slot scope object

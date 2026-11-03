@@ -265,37 +265,6 @@ describe('form-associated components', () => {
     });
 });
 
-describe('ctx.slot', () => {
-    it('renders the fallback when the parent projected nothing', () => {
-        const tag = uniqueTag();
-        component(tag, {
-            render: (ctx) => {
-                const frag = document.createDocumentFragment();
-                frag.appendChild(ctx.slot('footer', undefined, () => {
-                    const p = document.createElement('p');
-                    p.textContent = 'default footer';
-                    return p;
-                }));
-                return frag;
-            },
-        });
-
-        expect(mount(tag).textContent).toBe('default footer');
-    });
-
-    it('an unfilled slot with no fallback renders nothing', () => {
-        const tag = uniqueTag();
-        component(tag, {
-            render: (ctx) => {
-                const frag = document.createDocumentFragment();
-                frag.appendChild(ctx.slot('footer'));
-                return frag;
-            },
-        });
-        expect(mount(tag).textContent).toBe('');
-    });
-});
-
 describe('ctx.expose', () => {
     it('puts the API on the element, read-only from outside', () => {
         const tag = uniqueTag();
