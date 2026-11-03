@@ -3,7 +3,7 @@
 // Features: fuzzy filter, grouped items, keyboard shortcuts display, empty state, focus trap.
 // Uses overlayStack for z-index coordination + Escape handling.
 
-import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, snippetOrSlot, model } from '@pdxui/core';
+import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, declaredSnippet, model } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 
 /** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
@@ -32,7 +32,7 @@ export interface CommandItem {
  * `show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted
  * command is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is
  * announced as `aria-keyshortcuts`.
- * @slot item - Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.
+ * @slot item - Renders one command: a snippet `item(item, index, active)`.
  * @fires pdx-select {CommandItem} - The chosen item itself, after its own `action` (if any) has run.
  */
 component('pdx-command', {
@@ -52,7 +52,7 @@ component('pdx-command', {
         /** Global keyboard shortcut to open (default: Ctrl+K / Cmd+K) */
         hotkey: { type: Boolean, default: true },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ label: string }', from: 'items' } },
     slots: {
@@ -219,7 +219,7 @@ component('pdx-command', {
 
         // Slot — read lazily (_projectSlots runs after setup)
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index, s.active]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item, s.index, s.active]);
         }
         // The list first renders before the slots are projected: with items bound by a template and
         // nothing else changing, the `item` slot would not be used until the query changed. This flips once the slots are in, and the list reads it.
