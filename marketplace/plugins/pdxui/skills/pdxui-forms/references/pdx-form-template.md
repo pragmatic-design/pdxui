@@ -23,7 +23,7 @@ Render a whole form from a layout.
 
 **Events:** `pdx-submit` → `detail: { values: Record<string, unknown>; saved?: boolean }` — The form submitted and its values validate; an invalid submit fires nothing and scrolls to the first error.; `pdx-submit-error` → `detail: { error: unknown }` — The form's `source` refused the save.
 
-**Renders:** roles `button` · `group`
+**Renders:** roles `group`
 
 **Slot:** `actions` — Replaces the default actions (the `pdx-form-actions` shown when `showActions`). Not rendered in the wizard layout, which has its own navigation.
 

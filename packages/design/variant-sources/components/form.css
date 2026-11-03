@@ -52,19 +52,32 @@
     display: none;
 }
 
-/* Collapsible sections */
-.pdx-form-section-collapsible > .pdx-form-section-legend::before {
+/* Collapsible sections — the legend holds a disclosure button (#847), drawn as the legend's text: a
+   keyboard reaches it, and Enter and Space toggle it. The chevron is the button's, so it toggles too. */
+.pdx-form-section-toggle {
+    all: unset;
+    cursor: pointer;
+    user-select: none;
+    border-radius: var(--pdx-radius-sm);
+}
+
+.pdx-form-section-toggle:focus-visible {
+    outline: var(--pdx-focus-width) solid var(--pdx-color-primary);
+    outline-offset: 2px;
+}
+
+.pdx-form-section-toggle::before {
     content: '▾';
     display: inline-block;
     margin-right: var(--pdx-space-xs);
     transition: transform 0.2s;
 }
 
-.pdx-form-section-collapsible.collapsed > .pdx-form-section-legend::before {
+.pdx-form-section-collapsible.collapsed > .pdx-form-section-legend > .pdx-form-section-toggle::before {
     transform: rotate(-90deg);
 }
 
-.pdx-form-section-collapsible > .pdx-form-section-legend:hover {
+.pdx-form-section-toggle:hover {
     color: var(--pdx-color-primary-ink);
 }
 

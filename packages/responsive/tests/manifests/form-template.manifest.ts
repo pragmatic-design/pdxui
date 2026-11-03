@@ -99,6 +99,23 @@ const SETUP_WIZARD = `
             })();
         });`;
 
+// A collapsible section (#847): its toggle is a button in the legend. Waits for the toggle.
+const SETUP_SECTIONS = `
+        const host = document.querySelector('section:not([hidden]) [data-test="fts"]');
+        if (!host) return;
+        host.showActions = false;
+        host.schema = {
+            sections: [{ name: 'address', label: 'Address', collapsible: true }],
+            fields: [{ name: 'street', type: 'text', label: 'Street', section: 'address' }],
+        };
+        await new Promise((resolve) => {
+            let tries = 0;
+            (function attempt() {
+                if (host.querySelector('.pdx-form-section-toggle') || tries++ > 60) { resolve(); return; }
+                requestAnimationFrame(attempt);
+            })();
+        });`;
+
 export const formTemplate: ComponentManifest = {
     name: 'form-template',
     tag: 'pdx-form-template',
@@ -128,6 +145,16 @@ export const formTemplate: ComponentManifest = {
                     <pdx-form-template data-test="ftw"></pdx-form-template>
                 </div>`,
             setup: SETUP_WIZARD,
+        },
+        {
+            // A collapsible section: the disclosure button in its legend (#847).
+            id: 'form-template-sections',
+            title: 'Form Template — Collapsible section',
+            html: `
+                <div style="max-width: 640px;">
+                    <pdx-form-template data-test="fts"></pdx-form-template>
+                </div>`,
+            setup: SETUP_SECTIONS,
         },
     ],
 
@@ -222,6 +249,21 @@ export const formTemplate: ComponentManifest = {
                     },
                 ],
             },
+            // The toggle is a real button in the legend, and the legend pretends to be none (#847).
+            'form-template-sections': {
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="fts"] legend > button.pdx-form-section-toggle[aria-expanded][aria-controls]',
+                        description: 'a collapsible section\'s toggle is a button in its legend',
+                        count: { op: '==', value: 1 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="fts"] legend[role]',
+                        description: 'the legend is no pretend button',
+                        count: { op: '==', value: 0 },
+                    },
+                ],
+            },
         },
     },
 
@@ -231,7 +273,8 @@ export const formTemplate: ComponentManifest = {
         // If the label↔input association were missing (form-field's async wiring), axe would report
         // the "label" rule. No disableRule: the generated fields' pattern is native and clean.
         // The wizard layout too: its stepper is pdx-wizard's, tabs naming their panels (#293).
-        scenarios: ['form-template-grid', 'form-template-wizard'],
+        // And a collapsible section, whose toggle is a button named by the section (#847).
+        scenarios: ['form-template-grid', 'form-template-wizard', 'form-template-sections'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -251,11 +294,18 @@ export const formTemplate: ComponentManifest = {
 
     // ── Dim. 4: keyboard (WAI-ARIA) ──
     keyboard: {
-        // The form-template is not a composite widget of its own: it is a layout hosting native fields.
-        // The focus management is the generated controls'. Tab reaches the first generated input.
-        scenario: 'form-template-grid',
+        // The form-template is not a composite widget of its own: it is a layout hosting native fields,
+        // whose focus is the generated controls'. What it adds is a collapsible section's toggle (#847):
+        // Tab reaches it, Enter and Space toggle it, and expanded, Tab goes on to the first generated input.
+        scenario: 'form-template-sections',
         steps: [
-            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="ft"] pdx-form-field:nth-of-type(1) input' },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fts"] .pdx-form-section-toggle',
+              expectAttr: { selector: 'section:not([hidden]) [data-test="fts"] .pdx-form-section-toggle', name: 'aria-expanded', value: 'true' } },
+            { key: 'Enter',
+              expectAttr: { selector: 'section:not([hidden]) [data-test="fts"] .pdx-form-section-toggle', name: 'aria-expanded', value: 'false' } },
+            { key: 'Space',
+              expectAttr: { selector: 'section:not([hidden]) [data-test="fts"] .pdx-form-section-toggle', name: 'aria-expanded', value: 'true' } },
+            { key: 'Tab', expectFocus: 'section:not([hidden]) [data-test="fts"] pdx-form-field input' },
         ],
     },
 

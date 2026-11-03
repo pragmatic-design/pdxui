@@ -53,6 +53,50 @@ const setValue = (page: Page, name: string, value: string) => page.locator('#t')
 
 test.beforeEach(async ({ page }) => { await openPage(page, '/gotchas.html?case=form-b-beta-contract'); });
 
+test.describe('pdx-form-template, a collapsible section (#847)', () => {
+    // Its toggle was a <legend role="button"> with a click listener: no tabindex and no keys, so Tab went
+    // past it and a collapsed section's fields could not be reached without a mouse.
+    test('its toggle is a button in the legend: Tab reaches it, Enter and Space collapse and expand the section', async ({ page }) => {
+        await page.evaluate(async () => {
+            const w = window as unknown as Win;
+            await w.__gotcha.load('<pdx-form-template></pdx-form-template>');
+            document.getElementById('f')?.remove();
+            const f = document.createElement('div');
+            f.id = 'f';
+            const before = document.createElement('button');
+            before.id = 'before';
+            before.textContent = 'Before';
+            const t = document.createElement('pdx-form-template') as HTMLElement & { schema: unknown; showActions: boolean };
+            t.id = 't';
+            t.showActions = false;
+            t.schema = {
+                sections: [{ name: 'address', label: 'Address', collapsible: true }],
+                fields: [{ name: 'street', label: 'Street', type: 'text', section: 'address' }],
+            };
+            f.append(before, t);
+            document.body.appendChild(f);
+        });
+        const toggle = page.getByRole('button', { name: 'Address' });
+        await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+        const content = page.locator('#t [data-part="section"] .pdx-form-section-content');
+        await expect(toggle).toHaveAttribute('aria-controls', (await content.getAttribute('id'))!);
+        await expect(page.locator('#t legend')).not.toHaveAttribute('role', /.*/);
+
+        await page.locator('#before').focus();
+        await page.keyboard.press('Tab');
+        await expect(toggle).toBeFocused();
+        await page.keyboard.press('Enter');
+        await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+        await expect(content).toBeHidden();
+        await page.keyboard.press('Space');
+        await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+        await expect(content).toBeVisible();
+        // Expanded, the next tab stop is the section's field.
+        await page.keyboard.press('Tab');
+        await expect(page.getByRole('textbox', { name: 'Street' })).toBeFocused();
+    });
+});
+
 test.describe('pdx-form-template, wizard layout', () => {
     test('A6: one stepper, the wizard\'s; its current step is aria-current="step" and says «1 of 3»', async ({ page }) => {
         await mountWizard(page);

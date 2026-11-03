@@ -1365,6 +1365,10 @@ semver.
 
 ### Fixes
 
+- A collapsible section of `pdx-form-template` (#847) is opened and closed by a real button in its
+  legend, named by the section, with `aria-expanded` and `aria-controls`: Tab reaches it, Enter and
+  Space toggle it. It was a `<legend role="button">` with a click listener, which Tab went past, so a
+  collapsed section's fields could not be reached without a mouse. Its chevron is part of the button.
 - `pdx-inline-edit`'s `edit-on="icon"` was documented and behaved as `click`. It now does what it
   says: the pencil is a real button, the `edit` part, named «Edit {value}», and the only thing that
   opens the editor; the value is then no button and no tab stop, the pencil is always shown, and

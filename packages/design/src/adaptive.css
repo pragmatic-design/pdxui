@@ -177,12 +177,13 @@
 }
 
 /* Glyphs the design keeps small (the toast ×, the clear × in a field, the fieldset chevron, a
-   field-group panel's toggle — its label, or its chevron alone without one): the
-   drawing stays where it is, and an invisible square centred on it takes the tap. */
-:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle) {
+   field-group panel's toggle — its label, or its chevron alone without one — and a form template's
+   collapsible section toggle, #847): the drawing stays where it is, and an invisible square centred on
+   it takes the tap. */
+:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle, .pdx-form-section-toggle) {
     position: relative;
 }
-:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle)::after {
+:is(.pdx-toast-close, .pdx-input-clear, .pdx-fieldset-toggle, .pdx-field-group-toggle, .pdx-form-section-toggle)::after {
     content: '';
     position: absolute;
     left: 50%;
