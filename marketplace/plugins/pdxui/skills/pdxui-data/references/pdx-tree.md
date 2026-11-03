@@ -34,7 +34,7 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 
 **Renders:** roles `group` · `tree` · `treeitem`
 
-**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+**Slot:** `node` — Renders one node's label: a snippet `node(node, level, expanded)`.
 
 **States:** `:state(loading)` — A lazy branch is loading: the tree is `aria-busy` too (A4).; `:state(disabled)` — `disabled` is set: a click opens and selects nothing.
 

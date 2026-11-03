@@ -20,7 +20,7 @@
 //     DOM is partial. The pattern requires them exactly in the two cases this component is for
 //     (lazy branches, and virtualization later), and they cost nothing in the others.
 
-import { component, html, onDestroy, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, onDestroy, slot, declaredSnippet } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders.
 import '@pdxui/design/components/tree';
@@ -41,7 +41,7 @@ type CheckState = 'true' | 'false' | 'mixed';
  * @fires pdx-expand - `{ id, expanded }` — one branch opened or closed.
  * @fires pdx-check - `{ checked: string[] }` — the ids fully checked (a mixed parent is not one).
  * @fires pdx-load-error - `{ id, error }` — `loadChildren` rejected; the branch stays askable.
- * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`, or the scoped slot, which receives `{ node, level, expanded }`.
+ * @slot node - Renders one node's label: a snippet `node(node, level, expanded)`.
  * @csspart root - The `role="tree"`: one click and one keydown listener serve every row.
  * @csspart item - A row, `role="treeitem"`, with its `aria-level`, `aria-posinset` and `aria-setsize` (A3).
  * @csspart group - The `role="group"` of an open branch's children.
@@ -77,7 +77,7 @@ component('pdx-tree', {
     },
     // The node a snippet receives is the app's, from `nodes` (#651): the editor infers `T`.
     generics: { T: { from: 'nodes' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // A root, or a child or grandchild of one through `children` (the default `childrenField`),
         // written out because the editor pastes the signature where no alias is in scope. A
@@ -213,7 +213,7 @@ component('pdx-tree', {
         // ─── Rendering ──────────────────────────────────────────
 
         function getNodeSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
+            return declaredSnippet(ctx, 'node', (s) => [s.node, s.level, s.expanded]);
         }
 
         function buildRow(node: TreeNode, level: number, position: number, setSize: number): HTMLElement {
