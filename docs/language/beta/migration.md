@@ -43,7 +43,7 @@ proposals the implementing issue may change.
 | `handler ??= fn` (and `\|\|=`, `&&=`) on a `$signal`, which called `fn` as an updater | stores `fn`, short circuit kept | **fix**, behaviour: flagged where the right side is a function | #187 (logical assignment †) |
 | `onSave()` with `onSave` a `$signal` (named nothing in alpha) | read, then called: `__onSave()()` | **fix**, nothing to rewrite | † (decision 17) |
 | `@mixin './x.ts' as name` | `const name = useX();` — an imported function | flagged (landed: `mixin-removed`; the module's `setup(ctx)` signature changes) | #158 (decision 6) |
-| a script `@snippet` body with `${arg}` | the body is a template: `{{ arg }}` | mechanical | † (decision 9) |
+| a script `@snippet` body with `${arg}` | the body is a template: `{{ arg }}` | mechanical — landed: `script-snippet-interpolation` | † (decision 9) |
 | `@expose count` of a `$signal`, or of a `$derived`, read by a caller as `ref.count()` | `ref.count`: the element holds an accessor to the value. A `$signal` is written with `ref.count = v`, which the component sees; a `$derived` is read-only. Functions and constants are exposed as before | **behaviour**: flagged where a `.pdx` calls an exposed reactive name on the `:ref` of a project component — landed: `expose-reactive-call`; a call from a `.ts` module, or through a ref the template does not bind, is not found | #752 |
 | a rune outside its position (`$signal` in a function body) | `PDX_RUNE_POSITION`; the core function (`signal()`) | flagged — landed: `rune-position` | #278 (decision 12) |
 
@@ -152,10 +152,10 @@ proposals the implementing issue may change.
 | `:class.active="c"` | `:class="{ active: c }"` | mechanical (merged into an existing object; joined to a string `:class`) — landed: `class-dot` | #129 |
 | `ref="el"` | `:ref="el"` | mechanical — landed: `ref-attribute` | #129 |
 | `:show="c"` on an element | `@show (c) { <element> }` | mechanical — landed: `show-attribute` | #129 |
-| child `<slot name="row" :item="it">fallback</slot>` | `@slot row?: (item: T);` + `@render row?.(it) @else { fallback }` — optional, as every alpha slot is, with its fallback kept | mechanical | #131 (optional + fallback †) |
-| child `<slot name="row" :item="it"></slot>` (no fallback) | `@slot row?: (item: T);` + `@render row?.(it)` | mechanical | #131 (†) |
-| parent `<slot name="row" let:item>…</slot>` / `@slot(row, { item }) { … }` | `@snippet row(item) { … }` inside the tag | mechanical | #131 |
-| template props (`:item-template="fn"`) on library components | `@snippet item(o) { … }` | flagged | #131 (flagging †) |
+| child `<slot name="row" :item="it">fallback</slot>` | `@slot row?: (item: T);` + `@render row?.(it) @else { fallback }` — optional, as every alpha slot is, with its fallback kept | mechanical: a parameter is named after its binding (`:row-index` → `rowIndex`) and typed as the alpha object form `@slot row: { item: User }` says, which it replaces, or `unknown`; flagged when the slot has no identifier name, already has a signature, or the outlet carries other attributes — landed: `scoped-slot-outlet` | #131 (optional + fallback †) |
+| child `<slot name="row" :item="it"></slot>` (no fallback) | `@slot row?: (item: T);` + `@render row?.(it)` | mechanical — landed: `scoped-slot-outlet` | #131 (†) |
+| parent `<slot name="row" let:item>…</slot>` / `@slot(row, { item }) { … }` | `@snippet row(item) { … }` inside the tag | mechanical: the parameters follow the child's signature — a library component's from its manifest, a project component's from its `@slot`, or from its alpha outlets in the same run — up to the last one used, an unused one as `_name`; flagged when the child's signature is not known or lacks a key — landed: `scoped-slot-parent` | #131 |
+| template props (`:item-template="fn"`) on library components | `@snippet item(o) { … }` | flagged — landed: `template-prop` | #131 (flagging †) |
 | `component(tag, { props: { x: { type: String } } })` (TypeScript) | the typed descriptor | manual (library work) | #123 |
 | `@await (…) { maxMs: n }` renders the body when `n` passes | `@error` with an `AwaitTimeoutError` when `n` passes; the body only with a result | behaviour: flagged on every `maxMs` — landed: `await-max-ms` | #145 (decision 26) |
 | `@await (x)` on a plain value decides by truthiness: `null`, `0`, `''` stay on `@loading` | `undefined` waits, `false` is a condition, anything else renders the body (data.md, E5) | behaviour: flagged on every `@await` whose operand is neither a declared source nor promise-typed — landed: `await-plain-value` | #145 |

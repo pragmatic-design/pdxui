@@ -11,6 +11,15 @@ semver.
 
 ### Features
 
+- `pdx migrate` rewrites the alpha's scoped slots to typed snippets (#492). A child's
+  `<slot name="row" :item="it">fallback</slot>` becomes `@slot row?: (item: T);` and
+  `@render row?.(it) @else { fallback }`, typed by the alpha object form `@slot row: { … }` when there
+  is one and `unknown` otherwise; a parent's `<slot name="row" let:item>` and `@slot(row, { item })`
+  become `@snippet row(item) { … }`, with the parameters in the order of the child's signature — a
+  library component's from its manifest, a project component's from its `@slot` or, in the same run,
+  from its alpha outlets. A script `@snippet` body's `${arg}` becomes `{{ arg }}`, and a template prop
+  such as `:item-template` on a library component is flagged. The alpha forms still compile, silently.
+
 - `pdx-data-grid`'s other templates get a typed snippet each (#673), with the alpha slot's context as
   arguments: `editCell(row, column, value, form)`, `filter(column)`, `filterPopover(column, apply,
   clear)`, `toolbarStart(grid)`, `toolbarEnd(grid)` and `empty()`. The per-column ones switch on

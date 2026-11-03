@@ -19,6 +19,8 @@ import { analyzeScript } from './compiler/script-analyzer';
 import { ProjectListeners } from './project-listeners';
 import { modelEventName } from './compiler/dts-generator';
 import type { AlphaEvents } from './language/alpha-events';
+import { signatureParamNames } from './language/slot-markup';
+import { outletSnippetParams } from './language/scoped-slot-outlet';
 
 /** Resolved component: tag name → import path */
 export interface ComponentEntry {
@@ -54,6 +56,8 @@ export class ComponentResolver {
     private libraryModels = new Map<string, Set<string>>();
     /** tag → the alpha events a library component's manifest records (#478); only components that record some. */
     private libraryAlpha = new Map<string, { events: string[]; detail: Record<string, string>; commit?: string; renamed?: Record<string, string> }>();
+    /** tag → a library component's typed snippets and their parameters' names (#492); only components that declare some. */
+    private librarySnippets = new Map<string, Map<string, string[]>>();
     /** A project file's `@model`s, with the modification time they were read at. */
     private projectModels = new Map<string, { mtimeMs: number; models: Set<string> }>();
     private projectReactiveExposed = new Map<string, { mtimeMs: number; names: Set<string> }>();
@@ -282,6 +286,25 @@ export class ComponentResolver {
         return this.projectDeclarations(entry.importPath)?.slots ?? null;
     }
 
+    /**
+     * A component's typed snippets, each with its parameters' names in order (#492), or null when it
+     * declares none or is not known: a library component's from its manifest, a project `.pdx`'s from
+     * its `@slot name: (…)` lines and, for a slot without one, from the alpha `<slot name :x>` outlet
+     * `pdx migrate` will rewrite — so a parent migrates in the same run whichever file comes first.
+     */
+    snippetParamsOf(tag: string): ReadonlyMap<string, readonly string[]> | null {
+        const entry = this.map.get(tag);
+        if (!entry) return null;
+        if (entry.source === 'ui') return this.librarySnippets.get(tag) ?? null;
+        try {
+            const text = readFileSync(entry.importPath, 'utf-8');
+            const analysis = analyzeScript(parseSFC(text).script?.content ?? '', entry.importPath);
+            const params = new Map<string, readonly string[]>(outletSnippetParams(text) ?? []);
+            for (const s of analysis.slots) if (s.signature) params.set(s.name, signatureParamNames(s.signature));
+            return params.size ? params : null;
+        } catch { return null; } // unreadable: its snippets are not known
+    }
+
     /** A project .pdx's required props and snippets, from one reading of its script per change. */
     private projectDeclarations(file: string): { props: Set<string>; slots: Set<string> } | null {
         try {
@@ -416,6 +439,9 @@ export class ComponentResolver {
                     ...(decl.alphaRename ? { renamed: { ...decl.alphaRename } } : {}),
                 });
             }
+            // Its typed snippets, by their parameters' names (#492: what `pdx migrate` maps `let:` to).
+            const snippets = new Map((decl.slots ?? []).filter((s) => s.signature).map((s) => [s.name, signatureParamNames(s.signature!)] as const));
+            if (snippets.size) this.librarySnippets.set(decl.tagName, snippets);
             this.props.set(decl.tagName, settable);
             this.methods.set(decl.tagName, methods);
             count++;
@@ -668,7 +694,7 @@ function isAlreadyImported(existingImports: string, importPath: string): boolean
 
 interface ManifestMember { kind?: string; name: string; readonly?: boolean; iconName?: boolean; required?: boolean; type?: { text?: string } }
 interface ManifestDeclaration {
-    tagName?: string; members?: ManifestMember[]; models?: string[];
+    tagName?: string; members?: ManifestMember[]; models?: string[]; slots?: { name: string; signature?: string }[];
     alphaEvents?: string[]; alphaDetail?: Record<string, string>; alphaCommit?: string; alphaRename?: Record<string, string>;
 }
 interface ManifestModule { path?: string; declarations?: ManifestDeclaration[] }

@@ -104,6 +104,8 @@ function projectContext(cwd: string, prefix: string, paths: string[]): LanguageC
             alphaOf: (tag) => resolver.alphaOf(tag),
             // The reactive names a project .pdx exposes, which are values on the element now (#752).
             reactiveExposedOf: (tag) => resolver.reactiveExposedOf(projectTags.get(tag) ?? tag),
+            // A component's snippets and their parameters, which a `let:` slot is mapped to (#492).
+            snippetParamsOf: (tag) => resolver.snippetParamsOf(projectTags.get(tag) ?? tag),
         };
     } catch {
         return {};

@@ -46,6 +46,7 @@ import { buttonToggleRemoved } from './button-toggle';
 import { listRenderItem } from './list-render-item';
 import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound, fabOpenShow, fabOpenUnbound } from './open-change';
 import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
+import { scopedSlotParent, scopedSlotOutlet, scriptSnippetInterpolation, templatePropFlag } from './scoped-slots';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -83,6 +84,8 @@ export interface LanguageChangeContext {
     contextTokens?: ReadonlyMap<string, ContextTokenRef>;
     /** The `@expose`d names of a project .pdx that are a $signal or a $derived (#752). */
     reactiveExposedOf?: ReactiveExposedLookup;
+    /** A component's typed snippets, each with its parameters' names in order, or null when not known (#492). */
+    snippetParamsOf?: (tag: string) => ReadonlyMap<string, readonly string[]> | null;
 }
 
 /** A registered change. */
@@ -456,6 +459,12 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #288: pdx-fab's open() is the overlay verb show() (./open-change).
     fabOpenShow,
     fabOpenUnbound,
+    // #492: scoped slots and template props are typed snippets (./scoped-slots). `changed` while the
+    // repository still uses them; the last part of #492 makes them `removed`.
+    scopedSlotParent,
+    scopedSlotOutlet,
+    scriptSnippetInterpolation,
+    templatePropFlag,
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;
