@@ -2,13 +2,13 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">Rows you render yourself</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      The <code>item</code> slot takes over the row's content. The handle stays the component's, so
+      The <code>item</code> snippet, <code>item(item, index)</code>, takes over the row's content. The handle stays the component's, so
       the keyboard path keeps working whatever you put in the row.
     </p>
 
     <div class="demo-stack narrow">
       <pdx-sortable-list :items="steps" @pdx-reorder="onStepReorder">
-        <slot name="item" let:item let:index>
+        @snippet item(item, index) {
           <div class="step-row">
             <pdx-badge :value="index + 1"></pdx-badge>
             <div>
@@ -16,7 +16,7 @@
               <div class="pdx-txt-small pdx-ink-muted">{{ item.owner }}</div>
             </div>
           </div>
-        </slot>
+        }
       </pdx-sortable-list>
     </div>
   </section>

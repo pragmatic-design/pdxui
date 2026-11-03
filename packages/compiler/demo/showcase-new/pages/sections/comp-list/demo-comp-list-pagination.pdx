@@ -4,14 +4,14 @@
     <p class="pdx-txt-small pdx-ink-muted">List and Pagination share the same DataSource. Page change reloads the list with loading overlay.</p>
     <div class="demo-container">
       <pdx-list :source="pagedDS" dividers bordered id="paged-list">
-        <slot name="item" let:item>
+        @snippet item(item) {
           <div class="paged-row">
             <span class="paged-id">#{{ item.id }}</span>
             <strong>{{ item.name }}</strong>
             <span class="paged-email">{{ item.email }}</span>
             <span class="paged-dept">{{ item.dept }}</span>
           </div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;max-width:600px;margin-top:var(--pdx-space-sm)">
@@ -27,7 +27,7 @@
 });
 
 &lt;pdx-list :source="ds"&gt;
-  &lt;slot name="item" let:item&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;&lt;/slot&gt;
+  &#64;snippet item(item) &#123; &lt;strong&gt;&#123;&#123; item.name &#125;&#125;&lt;/strong&gt; &#125;
 &lt;/pdx-list&gt;
 &lt;pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage"&gt;

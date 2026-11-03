@@ -141,13 +141,13 @@ are checked against the manifest above._
 <pdx-tag-input separator=";" placeholder="Paste ;-separated values..." />
 ```
 
-**Slot Template** — Use the `tag` slot to customize tag chip rendering.
+**Slot Template** — Use the `tag` snippet, `tag(tag, index)`, to customize tag chip rendering.
 
 ```html
 <pdx-tag-input :value="tags">
-  <slot name="tag" let:tag let:index>
-    <span class="tag-colored">$&lbrace;tag&rbrace;</span>
-  </slot>
+  &#64;snippet tag(tag) {
+    <span class="tag-colored">{{ tag }}</span>
+  }
 </pdx-tag-input>
 
 .tag-colored {

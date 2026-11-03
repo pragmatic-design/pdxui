@@ -53,7 +53,7 @@ const items = [
   @pdx-select="onSelect" />
 ```
 
-**Custom Item and Empty Text** — The `item` slot draws each command from `{ item, active, index }`; the option around it keeps its role, id and highlight. `empty-text` replaces "No results found." — type something no file matches. This one sets `:hotkey="false"`, so Ctrl+K stays with the palette above. _(from the live demo)_
+**Custom Item and Empty Text** — The `item` snippet, `item(item, index, active)`, draws each command; the option around it keeps its role, id and highlight. `empty-text` replaces "No results found." — type something no file matches. This one sets `:hotkey="false"`, so Ctrl+K stays with the palette above. _(from the live demo)_
 
 ```html
 <div class="demo-container">
@@ -66,9 +66,9 @@ const items = [
     placeholder="Find a file…"
     empty-text="No file with that name — check the spelling."
     @pdx-select="onFile">
-    <slot name="item" let:item let:active>
+    @snippet item(item, _index, active) {
       <span class="file-row"><strong>{{ item.label }}</strong><span class="pdx-txt-small pdx-ink-muted">{{ item.keywords }}</span></span>
-    </slot>
+    }
   </pdx-command>
 </div>
 ```

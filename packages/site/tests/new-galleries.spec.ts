@@ -137,9 +137,9 @@ test.describe('pdx-field-list', () => {
         await expect(s.getByRole('button', { name: 'Remove' })).toHaveCount(3);
     });
 
-    test('a row slot with a picker writes back to its row', async ({ page }) => {
+    test('a row snippet with a picker writes back to its row', async ({ page }) => {
         await gallery(page, 'pdx-field-list');
-        const s = section(page, 'A row of your own — the row slot');
+        const s = section(page, 'A row of your own — the row snippet');
         const second = s.locator('.pdx-field-list-row').nth(1);
         // A select's trigger is a combobox, not a role="button".
         await second.getByRole('combobox', { name: 'Assignee' }).click();
@@ -148,11 +148,11 @@ test.describe('pdx-field-list', () => {
         await expect(s.locator('.values-json')).toContainText('"assignee": "alan"');
     });
 
-    // A slot row has a remove button, so the gallery needs no :removable="false" to avoid promising
+    // A snippet row has a remove button, so the gallery needs no :removable="false" to avoid promising
     // one.
-    test('a row slot row can be removed, like any other', async ({ page }) => {
+    test('a row snippet row can be removed, like any other', async ({ page }) => {
         await gallery(page, 'pdx-field-list');
-        const s = section(page, 'A row of your own — the row slot');
+        const s = section(page, 'A row of your own — the row snippet');
         const rows = s.locator('.pdx-field-list-row');
         const before = await rows.count();
         await expect(s.getByRole('button', { name: 'Remove' })).toHaveCount(before);

@@ -92,15 +92,15 @@ const orderForm = createForm({
 </pdx-form>
 ```
 
-**A row of your own — the row slot** — `itemFields` builds plain controls. A row that needs a component of its own — here a `<pdx-select>` with options — goes in the `row` slot, which receives `item` (that row's values) and `index`. The slot writes back through the form's field at `tasks.{index}.assignee`. The list still draws each row's remove button; a row that wants its own calls `remove()`, which the slot also receives.
+**A row of your own — the row snippet** — `itemFields` builds plain controls. A row that needs a component of its own — here a `<pdx-select>` with options — goes in the `row` snippet, `row(item, index, remove)`: `item` holds that row's values. The snippet writes back through the form's field at `tasks.{index}.assignee`. The list still draws each row's remove button; a row that wants its own calls `remove()`, its third argument.
 
 ```html
 <pdx-field-list name="tasks" :itemFields="taskFields" :itemDefault="taskDefault">
-  <slot name="row" let:item let:index>
+  &#64;snippet row(item, index) {
     <pdx-input :value="item.title" @value-change="e => setTask(index, 'title', e.currentTarget.value)"></pdx-input>
     <pdx-select :options="people" :value="item.assignee"
       @value-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>
-  </slot>
+  }
 </pdx-field-list>
 ```
 

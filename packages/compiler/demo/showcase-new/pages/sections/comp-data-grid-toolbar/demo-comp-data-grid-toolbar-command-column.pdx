@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading section-heading">Command Column</h2>
     <p class="pdx-txt-small pdx-ink-muted">
       <code>command: true</code> on a column disables sort/filter/resize/reorder automatically.
-      Use the <code>col:{field}</code> slot for custom action buttons.
+      Draw its action buttons in the <code>cell(row, column, value)</code> snippet, for that column's field.
     </p>
     <div class="demo-container">
       <pdx-data-grid :source="commandDS" :columns="commandColumns" hover></pdx-data-grid>
@@ -17,12 +17,14 @@
 ];
 
 &lt;pdx-data-grid :source="ds" :columns="columns" hover&gt;
-  &lt;slot name="col:_actions" let:row let:id&gt;
-    &lt;pdx-button size="xs" @click="edit(id)"&gt;Edit&lt;/pdx-button&gt;
-    &lt;pdx-button size="xs" variant="danger" @click="remove(id)"&gt;
-      Delete
-    &lt;/pdx-button&gt;
-  &lt;/slot&gt;
+  &#64;snippet cell(row, column) &#123;
+    &#64;if (column.field === '_actions') &#123;
+      &lt;pdx-button size="xs" @click="edit(row.id)"&gt;Edit&lt;/pdx-button&gt;
+      &lt;pdx-button size="xs" variant="danger" @click="remove(row.id)"&gt;
+        Delete
+      &lt;/pdx-button&gt;
+    &#125;
+  &#125;
 &lt;/pdx-data-grid&gt;</code></pre>
     </details>
   </section>

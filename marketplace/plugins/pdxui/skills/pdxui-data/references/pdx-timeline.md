@@ -97,23 +97,21 @@ are checked against the manifest above._
 </div>
 ```
 
-**Slot Template** — Use the `content` slot with PDX components for rich timeline entries.
+**Slot Template** — Use the `content` snippet, `content(item, index)`, with PDX components for rich timeline entries.
 
 ```html
-<!-- PDX components inside a scoped slot -->
+<!-- PDX components inside a snippet -->
 <pdx-timeline :items="events">
-  <slot name="content" let:item let:index>
+  &#64;snippet content(item) {
     <pdx-card variant="outline" compact>
       <div class="header">
-        <strong>{item.title}</strong>
-        <pdx-chip size="sm" :variant="{item.status}">
-          {item.status}
-        </pdx-chip>
+        <strong>{{ item.title }}</strong>
+        <pdx-chip size="sm">{{ item.status }}</pdx-chip>
       </div>
-      <p>{item.description}</p>
-      <small>{item.date}</small>
+      <p>{{ item.description }}</p>
+      <small>{{ item.date }}</small>
     </pdx-card>
-  </slot>
+  }
 </pdx-timeline>
 ```
 

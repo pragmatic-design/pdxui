@@ -1,22 +1,22 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Use the <code>tag</code> slot to customize tag chip rendering.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Use the <code>tag</code> snippet, <code>tag(tag, index)</code>, to customize tag chip rendering.</p>
 
     <div class="demo-stack">
       <pdx-tag-input :value="slotTags">
-        <slot name="tag" let:tag let:index>
+        @snippet tag(tag, index) {
           <span class="tag-colored">{{ tag }}</span>
-        </slot>
+        }
       </pdx-tag-input>
     </div>
 
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-tag-input :value="tags"&gt;
-  &lt;slot name="tag" let:tag let:index&gt;
-    &lt;span class="tag-colored"&gt;$&lbrace;tag&rbrace;&lt;/span&gt;
-  &lt;/slot&gt;
+  &#64;snippet tag(tag) &#123;
+    &lt;span class="tag-colored"&gt;&#123;&#123; tag &#125;&#125;&lt;/span&gt;
+  &#125;
 &lt;/pdx-tag-input&gt;
 
 .tag-colored {

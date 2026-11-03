@@ -302,51 +302,28 @@ function onCountryChange(e) {
 <pdx-data-source url="/api/products" :page-size="25" />
 ```
 
-**Custom Template — Function Prop** — Use `:item-template` and `:selected-template` for rich rendering with avatars, descriptions, icons.
-
-```html
-<pdx-select :options="teamMembers"
-  labelField="name" valueField="id"
-  :item-template="renderTeamItem"
-  :selected-template="renderTeamSelected"
-  clearable placeholder="Select team member..." />
-```
-
-```js
-function renderTeamItem(item) {
-  const r = item.raw;
-  return html`<div class="team-option">
-    <span class="team-avatar">${r.initials}</span>
-    <div class="team-info">
-      <span class="team-name">${item.label}</span>
-      <span class="team-role">${r.role}</span>
-    </div>
-  </div>`;
-}
-```
-
-**Custom Template — Scoped Slot** — Alternative to function props: use `<slot let:var>` to define templates inline with data from the child. HTML-native syntax.
+**Custom Template — Snippets** — The `item` and `selected` snippets draw an option in the list and the chosen one in the trigger, with avatars, descriptions, icons: `item(option, index)` and `selected(option)`, where `option.raw` is the original entry.
 
 ```html
 <pdx-select :options="teamMembers"
   labelField="name" valueField="id"
   clearable placeholder="Select team member...">
 
-  <slot name="item" let:label let:raw>
+  @snippet item(option) {
     <div class="team-option">
-      <span class="team-avatar">{{ raw.initials }}</span>
+      <span class="team-avatar">{{ option.raw.initials }}</span>
       <div class="team-info">
-        <span class="team-name">{{ label }}</span>
-        <span class="team-role">{{ raw.role }}</span>
+        <span class="team-name">{{ option.label }}</span>
+        <span class="team-role">{{ option.raw.role }}</span>
       </div>
     </div>
-  </slot>
+  }
 
-  <slot name="selected" let:label let:raw>
+  @snippet selected(option) {
     <span class="team-selected">
-      <span class="team-avatar-sm">{{ raw.initials }}</span> {{ label }}
+      <span class="team-avatar-sm">{{ option.raw.initials }}</span> {{ option.label }}
     </span>
-  </slot>
+  }
 
 </pdx-select>
 ```

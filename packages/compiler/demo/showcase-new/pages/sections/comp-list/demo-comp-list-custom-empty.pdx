@@ -1,28 +1,27 @@
 <template>
   <section>
-    <h2 class="pdx-txt-heading section-heading">Custom Empty Slot</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Override the empty state with a custom slot template.</p>
+    <h2 class="pdx-txt-heading section-heading">Custom Empty State</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Override the empty state with the <code>empty()</code> snippet.</p>
     <div class="demo-container">
       <pdx-list :items="emptyItems">
-        <slot name="empty" let:_>
+        @snippet empty() {
           <div class="custom-empty">
             <pdx-icon name="search" size="32"></pdx-icon>
             <p>Nothing here yet — try adding some items!</p>
           </div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;!-- Empty slot overrides the default empty state --&gt;
-&lt;!-- Note: let:_ is required (compiler needs at least one let:) --&gt;
+      <pre class="pdx-txt-mono"><code>&lt;!-- The empty snippet overrides the default empty state --&gt;
 &lt;pdx-list :items="[]"&gt;
-  &lt;slot name="empty" let:_&gt;
+  &#64;snippet empty() &#123;
     &lt;div class="custom-empty"&gt;
       &lt;pdx-icon name="search" size="32"&gt;&lt;/pdx-icon&gt;
       &lt;p&gt;Nothing here yet — try adding some items!&lt;/p&gt;
     &lt;/div&gt;
-  &lt;/slot&gt;
+  &#125;
 &lt;/pdx-list&gt;
 
 .custom-empty {

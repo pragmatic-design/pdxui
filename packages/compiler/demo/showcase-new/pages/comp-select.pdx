@@ -48,10 +48,7 @@
     <!-- ═══ pdx-data-source Component ═══ -->
     <app-demo-comp-select-data-source-provider class="demo-section"></app-demo-comp-select-data-source-provider>
 
-    <!-- ═══ Custom Item Template (Function Prop) ═══ -->
-    <app-demo-comp-select-template-function class="demo-section"></app-demo-comp-select-template-function>
-
-    <!-- ═══ Scoped Slot ═══ -->
+    <!-- ═══ Custom Template (snippets) ═══ -->
     <app-demo-comp-select-template-slot class="demo-section"></app-demo-comp-select-template-slot>
 
     <!-- ═══ Width / Sizing ═══ -->

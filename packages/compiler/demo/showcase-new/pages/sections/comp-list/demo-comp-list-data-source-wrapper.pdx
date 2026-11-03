@@ -6,7 +6,7 @@
       <summary>Source (Pattern)</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-data-source url="/api/users" :page-size="5"&gt;
   &lt;pdx-list clickable dividers&gt;
-    &lt;slot name="item" let:item&gt;{item.name}&lt;/slot&gt;
+    &#64;snippet item(item) &#123; &#123;&#123; item.name &#125;&#125; &#125;
   &lt;/pdx-list&gt;
   &lt;pdx-pagination&gt;&lt;/pdx-pagination&gt;
 &lt;/pdx-data-source&gt;

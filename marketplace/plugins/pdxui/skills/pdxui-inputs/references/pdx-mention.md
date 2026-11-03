@@ -122,16 +122,16 @@ are checked against the manifest above._
 </div>
 ```
 
-**Slot Template** — Use the `suggestion` slot to customize suggestion items in the dropdown (e.g., avatars, badges). The slot receives scope data for each suggestion.
+**Slot Template** — Use the `suggestion` snippet to customize suggestion items in the dropdown (e.g., avatars, badges): `suggestion(item, index, active)`, once for each suggestion.
 
 ```html
 <pdx-mention :items="users">
-  <slot name="suggestion" let:item let:index let:active>
+  &#64;snippet suggestion(item) {
     <div class="mention-custom">
-      <span class="avatar">$&lbrace;item.label.charAt(0)&rbrace;</span>
-      <span>$&lbrace;item.label&rbrace;</span>
+      <span class="avatar">{{ item.label.charAt(0) }}</span>
+      <span>{{ item.label }}</span>
     </div>
-  </slot>
+  }
 </pdx-mention>
 
 .mention-custom {

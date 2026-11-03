@@ -72,7 +72,7 @@
              WAY BACK. A test that asserts one has to fail on the other, and that is the control.
              `@show` rather than `@if`, because a conditional AROUND slotted content does not
              project (the framework's own note). -->
-        <slot name="empty" let:_>
+        @snippet empty() {
           @show (activeFilterCount > 0) {
             <pdx-empty-state
               icon="filter"
@@ -92,7 +92,7 @@
               @pdx-action="list.openCreate()"
               data-test="empty-nothing-yet"></pdx-empty-state>
           }
-        </slot>
+        }
       </pdx-data-grid>
 
       <pdx-bulk-actions

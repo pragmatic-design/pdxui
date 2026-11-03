@@ -108,18 +108,18 @@ are checked against the manifest above._
 </div>
 ```
 
-**Slot Template** — Custom slide content via scoped slot. Receives `slide`, `index`, and `isActive`.
+**Slot Template** — Custom slide content via the `slide` snippet: `slide(slide, index, active)`.
 
 ```html
 <!-- Compose PDX components inside carousel slides -->
 <pdx-carousel :items="slides">
-  <slot name="slide" let:slide let:index>
+  &#64;snippet slide(slide, index) {
     <div class="slide">
-      <pdx-badge variant="outline">Step {index + 1}</pdx-badge>
-      <h3>{slide.title}</h3>
-      <p>{slide.desc}</p>
+      <pdx-badge variant="outline">Step {{ index + 1 }}</pdx-badge>
+      <h3>{{ slide.title }}</h3>
+      <p>{{ slide.desc }}</p>
     </div>
-  </slot>
+  }
 </pdx-carousel>
 ```
 

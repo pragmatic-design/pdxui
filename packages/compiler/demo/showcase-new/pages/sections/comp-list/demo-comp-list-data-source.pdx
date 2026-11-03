@@ -4,14 +4,14 @@
     <p class="pdx-txt-small pdx-ink-muted">Simulates a 1.5s fetch. Shows loading overlay, then data.</p>
     <div class="demo-container">
       <pdx-list :source="fakeDS" clickable dividers id="ds-list">
-        <slot name="item" let:item>
+        @snippet item(item) {
           <div class="ds-row">
             <pdx-icon name="user" size="16"></pdx-icon>
             <span>{{ item.name }}</span>
             <span class="ds-email">{{ item.email }}</span>
             <span class="ds-role">{{ item.role }}</span>
           </div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <button class="pdx-btn pdx-outline pdx-btn-xs" style="margin-top: var(--pdx-space-sm)" @click="reloadDS">Reload</button>
@@ -25,9 +25,9 @@
 });
 
 &lt;pdx-list :source="ds" clickable dividers&gt;
-  &lt;slot name="item" let:item&gt;
-    &lt;span&gt;{item.name}&lt;/span&gt; &lt;span class="role"&gt;{item.role}&lt;/span&gt;
-  &lt;/slot&gt;
+  &#64;snippet item(item) &#123;
+    &lt;span&gt;&#123;&#123; item.name &#125;&#125;&lt;/span&gt; &lt;span class="role"&gt;&#123;&#123; item.role &#125;&#125;&lt;/span&gt;
+  &#125;
 &lt;/pdx-list&gt;</code></pre>
     </details>
   </section>

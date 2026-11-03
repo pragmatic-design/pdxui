@@ -1,10 +1,10 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Slot Template (Declarative)</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Scoped slot template — declarative, no render function. The slot receives <code>item</code> and <code>index</code> from the list.</p>
+    <p class="pdx-txt-small pdx-ink-muted">A snippet — declarative, no render function: <code>item(item, index)</code>, called by the list for each row.</p>
     <div class="demo-container">
       <pdx-list :items="slotItems" clickable dividers @pdx-click="onSlotItemClick">
-        <slot name="item" let:item let:index>
+        @snippet item(item, index) {
           <div class="slot-user-row">
             <span class="slot-user-idx">{{ index + 1 }}.</span>
             <div class="slot-user-info">
@@ -13,24 +13,24 @@
             </div>
             <pdx-chip size="sm">{{ item.dept }}</pdx-chip>
           </div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <div class="event-log pdx-txt-mono pdx-txt-small" id="slot-log">{{ slotLog }}</div>
     <details class="source-block">
       <summary>Source</summary>
-      <pre class="pdx-txt-mono"><code>&lt;!-- Template: slot receives item + index from the list --&gt;
+      <pre class="pdx-txt-mono"><code>&lt;!-- Template: the snippet receives item + index from the list --&gt;
 &lt;pdx-list :items="users" clickable dividers&gt;
-  &lt;slot name="item" let:item let:index&gt;
+  &#64;snippet item(item, index) &#123;
     &lt;div class="user-row"&gt;
-      &lt;span class="idx"&gt;{index + 1}.&lt;/span&gt;
+      &lt;span class="idx"&gt;&#123;&#123; index + 1 &#125;&#125;.&lt;/span&gt;
       &lt;div class="info"&gt;
-        &lt;strong&gt;{item.name}&lt;/strong&gt;
-        &lt;span class="muted"&gt;{item.email}&lt;/span&gt;
+        &lt;strong&gt;&#123;&#123; item.name &#125;&#125;&lt;/strong&gt;
+        &lt;span class="muted"&gt;&#123;&#123; item.email &#125;&#125;&lt;/span&gt;
       &lt;/div&gt;
-      &lt;span class="badge"&gt;{item.dept}&lt;/span&gt;
+      &lt;span class="badge"&gt;&#123;&#123; item.dept &#125;&#125;&lt;/span&gt;
     &lt;/div&gt;
-  &lt;/slot&gt;
+  &#125;
 &lt;/pdx-list&gt;
 
 &lt;!-- Scoped styles (in &lt;style scoped&gt;) --&gt;
