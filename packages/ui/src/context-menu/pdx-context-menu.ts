@@ -3,7 +3,7 @@
 // Items support icons, shortcuts, submenus, checkbox/radio, disabled, danger.
 // Dynamic items: pass a function to generate items based on the clicked target.
 
-import { component, html, signal, focusGroup, onDestroy, slot, snippetOrSlot, event } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, slot, declaredSnippet, event } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -22,7 +22,7 @@ function loadIcon(): void {
  * A right-click menu that opens at the cursor, and also on a long press on mobile or Shift+F10 from
  * the keyboard.
  *
- * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`.
  */
 component('pdx-context-menu', {
     events: {
@@ -49,7 +49,7 @@ component('pdx-context-menu', {
     },
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // Less the separators and labels the menu draws itself (`type: 'separator' as const`).
         item: slot<(item: Exclude<T, { type: 'separator' | 'label' }>) => Node>(),
@@ -57,7 +57,7 @@ component('pdx-context-menu', {
     setup(ctx) {
         const _open = signal(false);
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item]);
         }
         let _panelEl: HTMLElement | null = null;
         /** Removes the press-outside listener, added when the menu opens (#427). */
@@ -125,7 +125,7 @@ component('pdx-context-menu', {
                 // Content: slot > default (icon + label + shortcut)
                 const itemSlot = getItemSlot();
                 if (itemSlot) {
-                    const content = itemSlot({ item, key: item.key, type: item.type || 'item' });
+                    const content = itemSlot({ item });
                     btn.appendChild(content instanceof DocumentFragment ? content : content);
                 } else {
                     if (item.icon) {
