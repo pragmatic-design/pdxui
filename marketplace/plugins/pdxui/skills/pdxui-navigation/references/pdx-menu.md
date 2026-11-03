@@ -25,7 +25,7 @@ A list of actions.
 
 **Renders:** roles `menu` · `menuitem` · `menuitemcheckbox` · `menuitemradio` · `presentation` · `separator`
 
-**Slot:** `item` — Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+**Slot:** `item` — Renders one menu entry: a snippet `item(item)`.
 
 **States:** `:state(open)` — Matched with `:state(open)`.
 
