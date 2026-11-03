@@ -35,7 +35,9 @@ const text = (el: Element) => el.textContent?.replace(/\s+/g, ' ').trim();
 beforeEach(cleanup);
 
 describe('scoped-slot-parent renders what the let: slot rendered', () => {
-    it('a pdx-list item slot and its @snippet show the same rows', async () => {
+    // pdx-list reads its snippet only since #492's part 3: the alpha parent draws nothing there now,
+    // which is what the rewrite is for. The rows the snippet draws are the ones the slot drew.
+    it('a pdx-list item slot, migrated to its @snippet, shows the rows', async () => {
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
         const context: LanguageChangeContext = { snippetParamsOf: (tag) => resolver.snippetParamsOf(tag) };
@@ -48,8 +50,8 @@ describe('scoped-slot-parent renders what the let: slot rendered', () => {
         define('mig-list-beta', migrated);
         const before = [...(await mount('app-mig-list-alpha')).querySelectorAll('b.row')].map(text);
         const after = [...(await mount('app-mig-list-beta')).querySelectorAll('b.row')].map(text);
-        expect(before).toEqual(['1. Ada', '2. Grace']);
-        expect(after).toEqual(before);
+        expect(after).toEqual(['1. Ada', '2. Grace']);
+        expect(before, 'the alpha let: slot, which pdx-list no longer reads').toEqual([]);
     });
 });
 

@@ -1,19 +1,15 @@
-// pdx-list — Data-bound list component with scoped slot support.
-// Priority: the `item` snippet or slot > the default renderer. The `renderItem` callback of alpha is
-// gone (#292): the slot is the way.
+// pdx-list — Data-bound list component drawn by its parent's snippets.
+// Priority: the `item` snippet > the default renderer. The `renderItem` callback of alpha is gone
+// (#292), and so is the scoped slot (#492): the snippet is the way.
 // Uses keyed reconciliation (repeat/LIS) instead of innerHTML rebuild.
 //
-// Slot usage:
-//   <pdx-list :items="${users}">
-//     <slot name="item" let:item let:index>
-//       <div>${item.name}</div>
-//     </slot>
-//     <slot name="empty">
-//       <div>No users found</div>
-//     </slot>
+// Usage:
+//   <pdx-list :items="users">
+//     @snippet item(item, index) { <div>{{ item.name }}</div> }
+//     @snippet empty() { <div>No users found</div> }
 //   </pdx-list>
 
-import { component, html, inject, repeatWithSlot, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, inject, repeatWithSlot, slot, declaredSnippet } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -40,8 +36,8 @@ export interface ListItem {
  * A list bound to data, an array or a DataSource, with custom item templates, a loading overlay
  * and an empty state.
  *
- * @slot item - Renders one item: a snippet `item(item, index)`, or the scoped slot, which receives `{ item, index, id }` (`id` is the value of `id-field`).
- * @slot empty - Shown when the list has no items: a snippet `empty()`, or the scoped slot, which receives nothing but is written `<slot name="empty" let:_>`: without a `let:` the compiler reads a `<slot>` as plain HTML and the template is ignored.
+ * @slot item - Renders one item: a snippet `item(item, index)`.
+ * @slot empty - Shown when the list has no items: a snippet `empty()`.
  * @csspart list - The `role="list"` container of the items.
  * @csspart item - An item's row, `role="listitem"`. A page of a larger source gives each its `aria-setsize` and `aria-posinset` (A3).
  * @csspart empty - The empty state.
@@ -66,7 +62,7 @@ component('pdx-list', {
         emptyDescription: { type: String, default: '' },
         emptyIcon: { type: String, default: 'inbox', iconName: true },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651) or of `source` (#853):
     // the editor infers `T`.
     generics: { T: { from: 'items', source: 'source' } },
@@ -106,12 +102,12 @@ component('pdx-list', {
 
         let injectedDS: DataSource<unknown> | null = null;
 
-        // Slot functions — read lazily (populated by _projectSlots AFTER setup)
+        // Read where they draw: a snippet set after mount is the one drawn
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item, s.index]);
         }
         function getEmptySlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'empty', () => []);
+            return declaredSnippet(ctx, 'empty', () => []);
         }
 
         function resolveDS(): DataSource<unknown> | null {
@@ -193,10 +189,9 @@ component('pdx-list', {
             if (!itemSlot) return defaultRenderItem(item, index);
             const idFieldName = ctx.idField() as string;
             const record = item as Record<string, unknown>;
-            const scope = { item, index, id: record[idFieldName] };
-            const content = itemSlot(scope);
+            const content = itemSlot({ item, index });
 
-            // Structural wrapper: role + data + click, but NO padding (slot controls its own)
+            // Structural wrapper: role + data + click, but NO padding (the snippet controls its own)
             const li = document.createElement('div');
             li.className = 'pdx-list-item pdx-list-item-slot';
             li.setAttribute('data-part', 'item');
@@ -217,7 +212,7 @@ component('pdx-list', {
 
             const emptySlot = getEmptySlot();
             if (emptySlot) {
-                // Use empty slot
+                // The parent's empty snippet
                 const content = emptySlot({});
                 el.appendChild(content instanceof DocumentFragment ? content : content);
             } else {
