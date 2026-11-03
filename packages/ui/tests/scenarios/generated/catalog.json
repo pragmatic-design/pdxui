@@ -1654,6 +1654,10 @@
         {
           "id": "form-template-wizard",
           "title": "Form Template — Wizard layout (2 steps)"
+        },
+        {
+          "id": "form-template-sections",
+          "title": "Form Template — Collapsible section"
         }
       ]
     },

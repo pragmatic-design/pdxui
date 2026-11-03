@@ -152,6 +152,21 @@
                 requestAnimationFrame(attempt);
             })();
         }); },
+        "form-template-sections": async function () { 
+        const host = document.querySelector('section:not([hidden]) [data-test="fts"]');
+        if (!host) return;
+        host.showActions = false;
+        host.schema = {
+            sections: [{ name: 'address', label: 'Address', collapsible: true }],
+            fields: [{ name: 'street', type: 'text', label: 'Street', section: 'address' }],
+        };
+        await new Promise((resolve) => {
+            let tries = 0;
+            (function attempt() {
+                if (host.querySelector('.pdx-form-section-toggle') || tries++ > 60) { resolve(); return; }
+                requestAnimationFrame(attempt);
+            })();
+        }); },
         "mention-closed": async function () { 
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "mention-open": async function () { 
@@ -689,6 +704,13 @@
         <h3>Form Template — Wizard layout (2 steps)</h3>
         <div style="max-width: 640px;">
                     <pdx-form-template data-test="ftw"></pdx-form-template>
+                </div>
+    </section>
+
+    <section data-scenario="form-template-sections">
+        <h3>Form Template — Collapsible section</h3>
+        <div style="max-width: 640px;">
+                    <pdx-form-template data-test="fts"></pdx-form-template>
                 </div>
     </section>
 

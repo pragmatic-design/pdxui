@@ -449,6 +449,7 @@ export const scenarioPage: Record<string, string> = {
     "form-section-basic": "tier-2",
     "form-template-grid": "tier-2",
     "form-template-wizard": "tier-2",
+    "form-template-sections": "tier-2",
     "form-basic": "tier-2",
     "icon-decorative": "tier-1a",
     "icon-semantic": "tier-1a",

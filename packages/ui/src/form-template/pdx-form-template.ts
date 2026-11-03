@@ -10,7 +10,7 @@
 //   <pdx-form-template :schema="mySchema" />
 //   <pdx-form-template :schema="mySchema" :form="existingForm" />
 
-import { component, html, signal, effect, event, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames } from '@pdxui/core';
+import { component, html, signal, effect, event, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames, generatedId } from '@pdxui/core';
 import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternals, Validator, ValidatorSchema } from '@pdxui/core';
 // Self-contained: a schema can render ANY field control, so register the full form graph here (the
 // structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
@@ -187,6 +187,9 @@ component('pdx-form-template', {
             return groups;
         }
 
+        /** The ids a collapsible section's toggle points at, apart for two templates on one page. */
+        const _uid = generatedId('pdx-form-template');
+
         // ─── Wizard layout: a pdx-wizard (#293) ──────────────────
         // One stepper in the library: the wizard draws the steps, marks the current one
         // aria-current="step" and says «Step n of N» (A6). This component only refuses a move forward
@@ -309,26 +312,33 @@ component('pdx-form-template', {
 
                         const legend = document.createElement('legend');
                         legend.className = 'pdx-form-section-legend';
-                        legend.textContent = group.section.label;
+                        const content = document.createElement('div');
 
                         if (group.section.collapsible) {
+                            // The disclosure pattern (#847): a real button in the legend, which Tab reaches and
+                            // Enter and Space press, naming the content it shows and hides. A legend with
+                            // role="button" and a click listener was skipped by Tab.
                             fieldset.classList.add('pdx-form-section-collapsible');
-                            legend.style.cursor = 'pointer';
-                            legend.setAttribute('role', 'button');
-                            legend.setAttribute('aria-expanded', group.section.collapsed ? 'false' : 'true');
-                            legend.addEventListener('click', () => {
-                                const content = fieldset.querySelector('.pdx-form-section-content') as HTMLElement;
-                                if (!content) return;
+                            content.id = `${_uid}-section-${gi}`;
+                            const toggle = document.createElement('button');
+                            toggle.type = 'button';
+                            toggle.className = 'pdx-form-section-toggle';
+                            toggle.textContent = group.section.label;
+                            toggle.setAttribute('aria-expanded', group.section.collapsed ? 'false' : 'true');
+                            toggle.setAttribute('aria-controls', content.id);
+                            toggle.addEventListener('click', () => {
                                 const isHidden = content.hidden;
                                 content.hidden = !isHidden;
-                                legend.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+                                toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
                                 fieldset.classList.toggle('collapsed', !isHidden);
                             });
+                            legend.appendChild(toggle);
+                        } else {
+                            legend.textContent = group.section.label;
                         }
 
                         fieldset.appendChild(legend);
 
-                        const content = document.createElement('div');
                         content.className = 'pdx-form-section-content';
                         content.style.cssText = layoutStyle(group.section);
                         if (group.section.collapsed) {
