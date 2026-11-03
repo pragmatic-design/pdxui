@@ -81,15 +81,15 @@ are checked against the manifest above._
 <pdx-breadcrumb :items="longItems" :maxItems="3"></pdx-breadcrumb>
 ```
 
-**Slot Template** — Use the `item` slot to customize how each breadcrumb item is rendered.
+**Slot Template** — Use the `item` snippet, `item(item, index, isLast)`, to customize how each breadcrumb item is rendered.
 
 ```html
 <pdx-breadcrumb :items="items">
-  <slot name="item" let:item let:isLast>
+  &#64;snippet item(item, _index, isLast) {
     <span class="crumb-custom">
-      $&lbrace;isLast ? item.label : item.label + ' &rarr;'&rbrace;
+      {{ isLast ? item.label : item.label + ' →' }}
     </span>
-  </slot>
+  }
 </pdx-breadcrumb>
 
 .crumb-custom {

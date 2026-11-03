@@ -41,13 +41,13 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Basic (Static Array)** — Simple list from a static items array, each item drawn by the `item` slot.
+**Basic (Static Array)** — Simple list from a static items array, each item drawn by the `item` snippet.
 
 ```html
 <pdx-list :items="users" clickable dividers @pdx-click="onUserClick">
-  <slot name="item" let:item>
-    <strong>{item.name}</strong> {item.role}
-  </slot>
+  &#64;snippet item(item) {
+    <strong>{{ item.name }}</strong> {{ item.role }}
+  }
 </pdx-list>
 ```
 
@@ -64,9 +64,9 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :source="ds" clickable dividers>
-  <slot name="item" let:item>
-    <span>{item.name}</span> <span class="role">{item.role}</span>
-  </slot>
+  &#64;snippet item(item) {
+    <span>{{ item.name }}</span> <span class="role">{{ item.role }}</span>
+  }
 </pdx-list>
 ```
 
@@ -80,21 +80,21 @@ const ds = createDataSource({
 </pdx-list>
 ```
 
-**Slot Template (Declarative)** — Scoped slot template — declarative, no render function. The slot receives `item` and `index` from the list.
+**Slot Template (Declarative)** — A snippet — declarative, no render function: `item(item, index)`, called by the list for each row.
 
 ```html
-<!-- Template: slot receives item + index from the list -->
+<!-- Template: the snippet receives item + index from the list -->
 <pdx-list :items="users" clickable dividers>
-  <slot name="item" let:item let:index>
+  &#64;snippet item(item, index) {
     <div class="user-row">
-      <span class="idx">{index + 1}.</span>
+      <span class="idx">{{ index + 1 }}.</span>
       <div class="info">
-        <strong>{item.name}</strong>
-        <span class="muted">{item.email}</span>
+        <strong>{{ item.name }}</strong>
+        <span class="muted">{{ item.email }}</span>
       </div>
-      <span class="badge">{item.dept}</span>
+      <span class="badge">{{ item.dept }}</span>
     </div>
-  </slot>
+  }
 </pdx-list>
 
 <!-- Scoped styles (in <style scoped>) -->
@@ -109,18 +109,17 @@ const ds = createDataSource({
             background: var(--pdx-color-inset); }
 ```
 
-**Custom Empty Slot** — Override the empty state with a custom slot template.
+**Custom Empty State** — Override the empty state with the `empty()` snippet.
 
 ```html
-<!-- Empty slot overrides the default empty state -->
-<!-- Note: let:_ is required (compiler needs at least one let:) -->
+<!-- The empty snippet overrides the default empty state -->
 <pdx-list :items="[]">
-  <slot name="empty" let:_>
+  &#64;snippet empty() {
     <div class="custom-empty">
       <pdx-icon name="search" size="32"></pdx-icon>
       <p>Nothing here yet — try adding some items!</p>
     </div>
-  </slot>
+  }
 </pdx-list>
 
 .custom-empty {
@@ -135,12 +134,12 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :items="richItems" dividers>
-  <slot name="item" let:item>
-    <div class="avatar">{item.initials}</div>
-    <div><strong>{item.name}</strong>
-      <div class="role">{item.role}</div></div>
-    <span class="status">{item.status}</span>
-  </slot>
+  &#64;snippet item(item) {
+    <div class="avatar">{{ item.initials }}</div>
+    <div><strong>{{ item.name }}</strong>
+      <div class="role">{{ item.role }}</div></div>
+    <span class="status">{{ item.status }}</span>
+  }
 </pdx-list>
 ```
 
@@ -156,7 +155,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :source="ds">
-  <slot name="item" let:item><strong>{item.name}</strong></slot>
+  &#64;snippet item(item) { <strong>{{ item.name }}</strong> }
 </pdx-list>
 <pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage">
@@ -168,7 +167,7 @@ const ds = createDataSource({
 ```html
 <pdx-data-source url="/api/users" :page-size="5">
   <pdx-list clickable dividers>
-    <slot name="item" let:item>{item.name}</slot>
+    &#64;snippet item(item) { {{ item.name }} }
   </pdx-list>
   <pdx-pagination></pdx-pagination>
 </pdx-data-source>

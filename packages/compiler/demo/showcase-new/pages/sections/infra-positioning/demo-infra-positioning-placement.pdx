@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { computeFloatingPosition, autoUpdate, offset, flip, shift, hideMiddleware, onMount, onDestroy } from '@pdxui/core';
+import { computeFloatingPosition, autoUpdate, offset, flip, shift, hideMiddleware, onMount, onDestroy, type FloatingPlacement } from '@pdxui/core';
 
 const placements = [
     'top-start', 'top', 'top-end', null,
@@ -49,7 +49,7 @@ const placements = [
     null, 'bottom-start', 'bottom', 'bottom-end',
 ];
 
-let currentPlacement = $signal('bottom');
+let currentPlacement = $signal<FloatingPlacement>('bottom');
 let posLog = $signal('Click a placement');
 let useOffset = $signal(true);
 let useFlip = $signal(true);

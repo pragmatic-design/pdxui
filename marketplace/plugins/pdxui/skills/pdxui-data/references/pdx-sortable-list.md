@@ -47,12 +47,12 @@ function onReorder(e) {
 }
 ```
 
-**Rows you render yourself** — The `item` slot takes over the row's content. The handle stays the component's, so the keyboard path keeps working whatever you put in the row. _(from the live demo)_
+**Rows you render yourself** — The `item` snippet, `item(item, index)`, takes over the row's content. The handle stays the component's, so the keyboard path keeps working whatever you put in the row. _(from the live demo)_
 
 ```html
 <div class="demo-stack narrow">
   <pdx-sortable-list :items="steps" @pdx-reorder="onStepReorder">
-    <slot name="item" let:item let:index>
+    @snippet item(item, index) {
       <div class="step-row">
         <pdx-badge :value="index + 1"></pdx-badge>
         <div>
@@ -60,7 +60,7 @@ function onReorder(e) {
           <div class="pdx-txt-small pdx-ink-muted">{{ item.owner }}</div>
         </div>
       </div>
-    </slot>
+    }
   </pdx-sortable-list>
 </div>
 ```

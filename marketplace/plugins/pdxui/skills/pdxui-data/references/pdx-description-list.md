@@ -171,13 +171,13 @@ function renderValue(item) {
 </div>
 ```
 
-**Slot Template** — Use the `value` slot to customize how each value is rendered. Priority: slot > renderValue > default.
+**Slot Template** — Use the `value` snippet, `value(item, index)`, to customize how each value is rendered. Priority: snippet > renderValue > default.
 
 ```html
 <pdx-description-list :items="items" :columns="2" :bordered="true" label-width="100px">
-  <slot name="value" let:item let:index>
-    <span class="dl-custom-value">$&lbrace;item.value&rbrace;</span>
-  </slot>
+  &#64;snippet value(item, index) {
+    <span class="dl-custom-value">{{ item.value }}</span>
+  }
 </pdx-description-list>
 
 .dl-custom-value {

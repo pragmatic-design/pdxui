@@ -4,7 +4,7 @@
     <p class="pdx-txt-small pdx-ink-muted">Avatar + name + role + badge layout.</p>
     <div class="demo-container">
       <pdx-list :items="richItems" dividers>
-        <slot name="item" let:item>
+        @snippet item(item) {
           <div class="rich-row">
             <div class="rich-avatar">{{ item.initials }}</div>
             <div class="rich-who">
@@ -13,18 +13,18 @@
             </div>
             <span class="rich-status"><span :class="'rich-dot rich-' + item.status.toLowerCase()"></span>{{ item.status }}</span>
           </div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="richItems" dividers&gt;
-  &lt;slot name="item" let:item&gt;
-    &lt;div class="avatar"&gt;{item.initials}&lt;/div&gt;
-    &lt;div&gt;&lt;strong&gt;{item.name}&lt;/strong&gt;
-      &lt;div class="role"&gt;{item.role}&lt;/div&gt;&lt;/div&gt;
-    &lt;span class="status"&gt;{item.status}&lt;/span&gt;
-  &lt;/slot&gt;
+  &#64;snippet item(item) &#123;
+    &lt;div class="avatar"&gt;&#123;&#123; item.initials &#125;&#125;&lt;/div&gt;
+    &lt;div&gt;&lt;strong&gt;&#123;&#123; item.name &#125;&#125;&lt;/strong&gt;
+      &lt;div class="role"&gt;&#123;&#123; item.role &#125;&#125;&lt;/div&gt;&lt;/div&gt;
+    &lt;span class="status"&gt;&#123;&#123; item.status &#125;&#125;&lt;/span&gt;
+  &#125;
 &lt;/pdx-list&gt;</code></pre>
     </details>
   </section>

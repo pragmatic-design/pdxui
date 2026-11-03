@@ -450,23 +450,23 @@ const columns = [
 const ds = createDataSource({ data: bigData, pageSize: 0 });
 ```
 
-**Row Detail (Master-Detail)** — `expandable` adds a chevron to each row. Click to expand and show a detail panel. Use the `detail` slot for custom content.
+**Row Detail (Master-Detail)** — `expandable` adds a chevron to each row. Click to expand and show a detail panel. Use the `detail(row)` snippet for custom content.
 
 ```html
 <pdx-data-grid :source="ds" :columns="columns"
   expandable hover>
 
-  <slot name="detail" let:row let:id>
+  &#64;snippet detail(row) {
     <div style="padding: 16px">
-      <strong>Details for {row.name}</strong>
-      <p>Role: {row.role}</p>
+      <strong>Details for {{ row.name }}</strong>
+      <p>Role: {{ row.role }}</p>
     </div>
-  </slot>
+  }
 
 </pdx-data-grid>
 ```
 
-**Command Column** — `command: true` on a column disables sort/filter/resize/reorder automatically. Use the `col:{field}` slot for custom action buttons.
+**Command Column** — `command: true` on a column disables sort/filter/resize/reorder automatically. Draw its action buttons in the `cell(row, column, value)` snippet, for that column's field.
 
 ```js
 const columns = [
@@ -478,12 +478,14 @@ const columns = [
 
 ```html
 <pdx-data-grid :source="ds" :columns="columns" hover>
-  <slot name="col:_actions" let:row let:id>
-    <pdx-button size="xs" @click="edit(id)">Edit</pdx-button>
-    <pdx-button size="xs" variant="danger" @click="remove(id)">
-      Delete
-    </pdx-button>
-  </slot>
+  &#64;snippet cell(row, column) {
+    &#64;if (column.field === '_actions') {
+      <pdx-button size="xs" @click="edit(row.id)">Edit</pdx-button>
+      <pdx-button size="xs" variant="danger" @click="remove(row.id)">
+        Delete
+      </pdx-button>
+    }
+  }
 </pdx-data-grid>
 ```
 

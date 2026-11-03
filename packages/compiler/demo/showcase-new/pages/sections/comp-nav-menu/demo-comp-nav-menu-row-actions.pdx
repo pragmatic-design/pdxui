@@ -2,22 +2,22 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">Actions Over the Row</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      The <code>actions</code> slot puts controls beside an entry's link. With <code>actions="overlay"</code> they are laid
+      The <code>itemActions</code> snippet puts controls beside an entry's link. With <code>actions="overlay"</code> they are laid
       over the row's end and shown on hover and focus, taking no width from the label at rest.
     </p>
     <div class="demo-sidebar">
       <pdx-nav-menu :items="iconItems" activekey="inbox" actions="overlay">
-        <slot name="actions" let:item>
+        @snippet itemActions(item) {
           <button type="button" class="demo-pin" :aria-label="'Pin ' + item.label">☆</button>
-        </slot>
+        }
       </pdx-nav-menu>
     </div>
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-nav-menu :items="items" actions="overlay"&gt;
-  &lt;slot name="actions" let:item&gt;
+  &#64;snippet itemActions(item) &#123;
     &lt;button type="button" :aria-label="'Pin ' + item.label"&gt;☆&lt;/button&gt;
-  &lt;/slot&gt;
+  &#125;
 &lt;/pdx-nav-menu&gt;</code></pre>
     </details>
   </section>

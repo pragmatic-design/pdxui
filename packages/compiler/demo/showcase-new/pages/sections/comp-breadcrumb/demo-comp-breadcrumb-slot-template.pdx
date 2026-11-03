@@ -1,22 +1,22 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Use the <code>item</code> slot to customize how each breadcrumb item is rendered.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Use the <code>item</code> snippet, <code>item(item, index, isLast)</code>, to customize how each breadcrumb item is rendered.</p>
     <div class="demo-row">
       <pdx-breadcrumb :items="slotCrumbs">
-        <slot name="item" let:item let:isLast>
+        @snippet item(item, _index, isLast) {
           <span class="crumb-custom">{{ isLast ? item.label : item.label + ' \u2192' }}</span>
-        </slot>
+        }
       </pdx-breadcrumb>
     </div>
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-breadcrumb :items="items"&gt;
-  &lt;slot name="item" let:item let:isLast&gt;
+  &#64;snippet item(item, _index, isLast) &#123;
     &lt;span class="crumb-custom"&gt;
-      $&lbrace;isLast ? item.label : item.label + ' &amp;rarr;'&rbrace;
+      &#123;&#123; isLast ? item.label : item.label + ' →' &#125;&#125;
     &lt;/span&gt;
-  &lt;/slot&gt;
+  &#125;
 &lt;/pdx-breadcrumb&gt;
 
 .crumb-custom {

@@ -30,9 +30,9 @@
     <section class="queue" data-test="queue">
       <h2 class="pdx-txt-heading">{{ $t('dashboard.queue') }}</h2>
       <pdx-list :items="queueItems" id-field="id" clickable @pdx-click="openTicket">
-        <slot name="empty" let:_>
+        @snippet empty() {
           <p class="pdx-txt-small pdx-ink-muted" data-test="queue-empty">{{ $t('dashboard.queueEmpty') }}</p>
-        </slot>
+        }
       </pdx-list>
     </section>
 

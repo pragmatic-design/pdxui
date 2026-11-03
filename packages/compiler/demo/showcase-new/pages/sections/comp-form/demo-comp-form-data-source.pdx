@@ -54,12 +54,13 @@ import { createForm, required } from '@pdxui/core';
 // ─── 5. DataSource Form (SessionStorage) ───
 const industryOptions = ['Technology', 'Healthcare', 'Finance', 'Education', 'Manufacturing', 'Retail'];
 
-// Load initial values from sessionStorage
-function loadFromStorage() {
+// Load initial values from sessionStorage, typed as the empty company: the form's fields are its keys.
+const emptyCompany = { companyName: '', industry: '', website: '', active: false };
+function loadFromStorage(): typeof emptyCompany {
   try {
     const raw = sessionStorage.getItem('pdx-demo-company');
-    return raw ? JSON.parse(raw) : { companyName: '', industry: '', website: '', active: false };
-  } catch { return { companyName: '', industry: '', website: '', active: false }; }
+    return raw ? JSON.parse(raw) : { ...emptyCompany };
+  } catch { return { ...emptyCompany }; }
 }
 
 const dsForm = createForm({

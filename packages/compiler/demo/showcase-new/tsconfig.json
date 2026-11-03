@@ -1,0 +1,19 @@
+{
+    // The options every package compiles with, as packages/compiler/tsconfig.json gave the demos'
+    // `.pdx.ts` modules before this file existed: it is the nearest tsconfig for them now, and Vite
+    // reads `target` from it for how it compiles them. Only `paths` is new.
+    "extends": "../../../../tsconfig.base.json",
+    "compilerOptions": {
+        // What the `pdx()` plugin resolves for the bundler, told to the type check as well — the
+        // same two lines as packages/showcase/tsconfig.json, for the same reason. This demo app has
+        // no package.json and no `@pdxui/*` of its own: the plugin points each workspace package at
+        // its `src/index.ts`. Without these, `pdx check --types` and the editor read every import of
+        // core or the router as unresolved, and a type the manifest writes as core's —
+        // `import('@pdxui/core').DataSource<T>` — is unknown, so a snippet on `:source` cannot read
+        // its item (#853).
+        "paths": {
+            "@pdxui/core": ["../../../core/src/index.ts"],
+            "@pdxui/router": ["../../../router/src/index.ts"]
+        }
+    }
+}

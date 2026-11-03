@@ -1,21 +1,21 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Basic (Static Array)</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array, each item drawn by the <code>item</code> slot.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Simple list from a static items array, each item drawn by the <code>item</code> snippet.</p>
     <div class="demo-container">
       <pdx-list :items="basicItems" clickable dividers @pdx-click="onItemClick">
-        <slot name="item" let:item>
+        @snippet item(item) {
           <div class="basic-row"><strong>{{ item.name }}</strong><span class="basic-role">{{ item.role }}</span></div>
-        </slot>
+        }
       </pdx-list>
     </div>
     <div class="event-log pdx-txt-mono pdx-txt-small" id="list-log">{{ listLog }}</div>
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="users" clickable dividers @pdx-click="onUserClick"&gt;
-  &lt;slot name="item" let:item&gt;
-    &lt;strong&gt;{item.name}&lt;/strong&gt; {item.role}
-  &lt;/slot&gt;
+  &#64;snippet item(item) &#123;
+    &lt;strong&gt;&#123;&#123; item.name &#125;&#125;&lt;/strong&gt; &#123;&#123; item.role &#125;&#125;
+  &#125;
 &lt;/pdx-list&gt;</code></pre>
     </details>
   </section>

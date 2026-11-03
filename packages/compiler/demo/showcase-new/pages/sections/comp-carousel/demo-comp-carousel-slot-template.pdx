@@ -1,29 +1,29 @@
 <template>
   <section>
     <h2 class="pdx-txt-heading section-heading">Slot Template</h2>
-    <p class="pdx-txt-small pdx-ink-muted">Custom slide content via scoped slot. Receives <code>slide</code>, <code>index</code>, and <code>isActive</code>.</p>
+    <p class="pdx-txt-small pdx-ink-muted">Custom slide content via the <code>slide</code> snippet: <code>slide(slide, index, active)</code>.</p>
     <div class="demo-container">
       <pdx-carousel :items="slotSlides">
-        <slot name="slide" let:slide let:index>
+        @snippet slide(slide, index) {
           <div class="custom-slide">
             <pdx-badge variant="outline" class="slide-step">Step {{ index + 1 }}</pdx-badge>
             <h3>{{ slide.title }}</h3>
             <p>{{ slide.desc }}</p>
           </div>
-        </slot>
+        }
       </pdx-carousel>
     </div>
     <details class="source-block">
       <summary>Source</summary>
       <pre class="pdx-txt-mono"><code>&lt;!-- Compose PDX components inside carousel slides --&gt;
 &lt;pdx-carousel :items="slides"&gt;
-  &lt;slot name="slide" let:slide let:index&gt;
+  &#64;snippet slide(slide, index) &#123;
     &lt;div class="slide"&gt;
-      &lt;pdx-badge variant="outline"&gt;Step {index + 1}&lt;/pdx-badge&gt;
-      &lt;h3&gt;{slide.title}&lt;/h3&gt;
-      &lt;p&gt;{slide.desc}&lt;/p&gt;
+      &lt;pdx-badge variant="outline"&gt;Step &#123;&#123; index + 1 &#125;&#125;&lt;/pdx-badge&gt;
+      &lt;h3&gt;&#123;&#123; slide.title &#125;&#125;&lt;/h3&gt;
+      &lt;p&gt;&#123;&#123; slide.desc &#125;&#125;&lt;/p&gt;
     &lt;/div&gt;
-  &lt;/slot&gt;
+  &#125;
 &lt;/pdx-carousel&gt;</code></pre>
     </details>
   </section>

@@ -122,13 +122,13 @@ are checked against the manifest above._
 <pdx-nav-menu :items="items" activekey="users" size="sm" indicator="border" chevron="end"></pdx-nav-menu>
 ```
 
-**Actions Over the Row** — The `actions` slot puts controls beside an entry's link. With `actions="overlay"` they are laid over the row's end and shown on hover and focus, taking no width from the label at rest.
+**Actions Over the Row** — The `itemActions` snippet puts controls beside an entry's link. With `actions="overlay"` they are laid over the row's end and shown on hover and focus, taking no width from the label at rest.
 
 ```html
 <pdx-nav-menu :items="items" actions="overlay">
-  <slot name="actions" let:item>
+  &#64;snippet itemActions(item) {
     <button type="button" :aria-label="'Pin ' + item.label">☆</button>
-  </slot>
+  }
 </pdx-nav-menu>
 ```
 
