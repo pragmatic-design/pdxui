@@ -29,7 +29,7 @@ import { RUNE_CALL, readDeclarators } from './rune-declarations';
 import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
 import { liftStoreExports } from './store-exports';
-import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
+import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, compileDevAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
 import { isEventName, eventEmitterName } from './event-names';
 
@@ -127,7 +127,7 @@ function declareRouteNames(route: RouteInfo, exports: ExportDecl[]): void {
  * @param filename - Source filename (for debug naming)
  * @returns Complete analysis used by codegen to produce the final JS module
  */
-export function analyzeScript(script: string, _filename: string, options: { originBase?: number; lineBase?: number } = {}): ScriptAnalysis {
+export function analyzeScript(script: string, _filename: string, options: { originBase?: number; lineBase?: number; production?: boolean } = {}): ScriptAnalysis {
     // Normalize compact single-line scripts: split statements to separate lines
     // so that line-based regex matching works for agent-generated compact code.
     const { text: compact, lineOrigins } = normalizeStatementsWithOrigins(script);
@@ -362,6 +362,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             }
             actions.push({ name: action.decl.name, inputType: action.decl.inputType, ...actionAgentOptions(action.decl.options) });
             pushBody(`    ${compileAction(action.decl)}`, actionAt);
+            // A development build registers the action with the devtools, with its parameter's schema,
+            // for `__PDX_DEVTOOLS__.actions()` and `run()` (#298). A production build emits nothing more.
+            if (!options.production) {
+                pushBody(`    ${compileDevAction(action.decl)}`, actionAt);
+                usedFeatures.add('devAction');
+            }
             if (!action.decl.name.startsWith('_')) exports.push({ name: action.decl.name, kind: 'const' });
             usedFeatures.add('mutation');
             continue;

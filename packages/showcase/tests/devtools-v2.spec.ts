@@ -253,6 +253,57 @@ test('a session of four pages — the shell once, then a card and an outline eac
     expect(session / full).toBeLessThanOrEqual(0.4);
 });
 
+// #298: delta() and forms(). The showcase declares no @action, @fetch, useQuery or loader, so actions(),
+// run() and sources() are measured in core (devtools-members.test.ts) and the router.
+type DevtoolsV2 = Devtools & {
+    delta(): { card: { lists?: unknown }; outline: unknown; full?: true };
+    forms(): { name: string; fields: { name: string; required: boolean; error: string | null }[] }[];
+};
+
+test('delta() after changing the status filter on /customers is smaller than page() plus outline(), and holds the list\'s new state', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/customers');
+    await expect(page.locator('[data-test="customers"] [role="row"]').nth(1)).toBeVisible();
+    const before = await page.evaluate(() => {
+        const dt = (window as unknown as { __PDX_DEVTOOLS__: DevtoolsV2 }).__PDX_DEVTOOLS__;
+        return { card: JSON.stringify(dt.page()), outline: dt.outline() };
+    });
+    expect(before.outline).toContain('"Status"');
+    // The status filter: its quick chip, then Onboarding in its popover.
+    const total = page.locator('[data-test="customers"]').getByText(/\d+ matching/).first();
+    const totalBefore = await total.textContent();
+    await page.locator('[data-test="grid"] .pdx-dg-toolbar-chip-quick[data-field="status"]').click();
+    const popover = page.locator('.pdx-dg-filter-popover');
+    await popover.getByRole('checkbox', { name: 'Onboarding', exact: true }).check();
+    await popover.getByRole('button', { name: 'Apply' }).click();
+    await expect(total).not.toHaveText(totalBefore!);
+
+    const { delta, card, outline } = await page.evaluate(() => {
+        const dt = (window as unknown as { __PDX_DEVTOOLS__: DevtoolsV2 }).__PDX_DEVTOOLS__;
+        const d = dt.delta();
+        return { delta: JSON.stringify(d), card: JSON.stringify(dt.page()), outline: dt.outline() };
+    });
+    const parsed = JSON.parse(delta) as { card: { lists?: unknown }; full?: true };
+    expect(parsed.full, 'the delta was the whole page: there was no baseline').toBeUndefined();
+    expect(parsed.card.lists, 'the list\'s new state is not in the delta').toBeTruthy();
+    console.log(`[devtools-v2] delta ${delta.length} characters against page() + outline() ${card.length + outline.length}`);
+    expect(delta.length).toBeLessThan(card.length + outline.length);
+});
+
+test('forms() on /intake lists the requester and the email as required, and the email\'s error after an invalid value', async ({ page }) => {
+    await page.goto('/intake');
+    await expect(page.locator('[data-test="form-intake"] form')).toBeVisible();
+    const forms = () => page.evaluate(() => (window as unknown as { __PDX_DEVTOOLS__: DevtoolsV2 }).__PDX_DEVTOOLS__.forms());
+    const field = async (name: string) => (await forms()).flatMap((f) => f.fields).find((f) => f.name === name);
+    expect(await field('requester')).toMatchObject({ required: true });
+    expect(await field('email')).toMatchObject({ required: true, error: null });
+
+    const email = page.getByRole('textbox', { name: 'Email', exact: true });
+    await email.fill('not-an-email');
+    await email.blur();
+    await expect.poll(async () => (await field('email'))?.error).toBeTruthy();
+});
+
 test('the API says version 2', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('[data-test="dashboard"]')).toBeVisible();

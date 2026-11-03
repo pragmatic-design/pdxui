@@ -15,6 +15,8 @@ import { DEV } from '../utils/env';
 import { __pdx_debug, connectDevTools } from './inspector';
 import { outlineOf, overlaysOutside, type OutlineOptions } from './outline';
 import { pageCard, routeRoot, type PageCard } from './page-card';
+import { setupOwners, devForgetOwned, devNameOwned } from './devtools-registry';
+import { createDevtoolsMembers, type DevtoolsLoaderSource } from './devtools-members';
 
 // ─── Serialisation ────────────────────────────────────────────────
 
@@ -62,8 +64,6 @@ const instanceIds = new WeakMap<object, number>();
 const instancesById = new Map<number, WeakRef<Element>>();
 const instanceRecords = new WeakMap<object, InstanceRecord>();
 let nextInstanceId = 1;
-/** The components whose setup is running, innermost last: who a named signal belongs to. */
-const setupOwners: object[] = [];
 
 /** The instance's id, stamped the first time it is asked for — at its first connect. */
 export function devInstanceId(el: Element): number {
@@ -91,12 +91,17 @@ export function devSetupBegin(el: object, props: Record<string, Readable>): void
     rec.props = new Map(Object.entries(props));
     rec.state.clear();
     rec.deriveds.clear();
+    devForgetOwned(el);
     setupOwners.push(el);
 }
 
-/** The setup ended — thrown or returned. */
-export function devSetupEnd(): void {
-    setupOwners.pop();
+/**
+ * The setup ended — thrown, or returned `result`: the sources, actions and forms it registered are
+ * named after the variables `result` holds them under (#298).
+ */
+export function devSetupEnd(result?: unknown): void {
+    const owner = setupOwners.pop();
+    if (owner && result) devNameOwned(owner, result);
 }
 
 /**
@@ -264,30 +269,84 @@ function cardRoute(): PageCard['route'] | null {
     return Object.keys(r.params).length ? { path: r.path, matched: r.matched, params: r.params } : { path: r.path, matched: r.matched };
 }
 
+let loaderSource: DevtoolsLoaderSource | null = null;
+
+/** The router says where to read its route loaders from, for `sources()` (#298); null removes it. */
+export function setDevtoolsLoaderSource(source: DevtoolsLoaderSource | null): void {
+    loaderSource = source;
+}
+
+function card(): PageCard {
+    return pageCard(cardRoute(), errorLog.map((e) => e.message));
+}
+
+function routeOutline(options?: OutlineOptions): string {
+    if (typeof document === 'undefined') return '';
+    // And what the route opened over the page, mounted outside it (#273): a popover, a listbox.
+    const route = routeRoot();
+    return [route, ...overlaysOutside(route)].map((el) => outlineOf(el, options)).filter(Boolean).join('\n');
+}
+
+/**
+ * `delta()`, `actions()`, `run()`, `sources()` and `forms()` (#298), over the card and the outline above.
+ * Pure: only `devtoolsApi` reads it, which a production build drops with the global, so the bundler
+ * drops this too.
+ */
+const members = /*#__PURE__*/ createDevtoolsMembers({
+    card,
+    outline: () => routeOutline(),
+    routePath: () => routeSource?.()?.path ?? null,
+    loaders: () => loaderSource?.() ?? [],
+});
+
 /** The object installed as `window.__PDX_DEVTOOLS__` in development. */
 export const devtoolsApi = {
     /**
      * The API's version: what an agent checks before it relies on a shape. 2 adds `page()` and
-     * `outline()` (#271); every member of 1 is unchanged.
+     * `outline()` (#271), `shell()` and `map()` (#272), and `delta()`, `actions()`, `run()`,
+     * `sources()` and `forms()` (#298); every member of 1 is unchanged.
      */
     v: 2 as const,
     /**
      * The page card: the route, the title, the lists shown with their counts, the forms with their
      * required and invalid fields, live messages, errors, the actions available now and the routes
-     * the page links to. A couple of hundred tokens, read from the routed element.
+     * the page links to. A couple of hundred tokens, read from the routed element. It is the card
+     * `delta()` compares against next.
      */
-    page: (): PageCard => pageCard(cardRoute(), errorLog.map((e) => e.message)),
+    page: (): PageCard => members.noteCard(card()),
     /**
      * The outline of the routed content — the router's boundary, not the shell around it: the
      * accessibility tree with data repetition summarised above `maxItems` and a selector on every
-     * actionable node.
+     * actionable node. Called without options, it is the outline `delta()` compares against next.
      */
-    outline: (options?: OutlineOptions): string => {
-        if (typeof document === 'undefined') return '';
-        // And what the route opened over the page, mounted outside it (#273): a popover, a listbox.
-        const route = routeRoot();
-        return [route, ...overlaysOutside(route)].map((el) => outlineOf(el, options)).filter(Boolean).join('\n');
-    },
+    outline: (options?: OutlineOptions): string => (options ? routeOutline(options) : members.noteOutline(routeOutline())),
+    /**
+     * What changed since the last `page()`, `outline()` or `delta()`: the card's changed keys (a key
+     * gone is `null`) and the outline's lines added, removed and changed. The full card and outline,
+     * with `full: true`, when there is nothing to compare with, and with `route: true` after a
+     * navigation.
+     */
+    delta: members.delta,
+    /**
+     * The `@action`s of the components in the route: `{ component, name, enabled, pending, error,
+     * schema }`, `component` the component's selector and `schema` its parameter's JSON schema.
+     */
+    actions: members.actions,
+    /**
+     * Run an action as its control would: `{ state, data, error }` once the call settles. A disabled
+     * action is not called (`error: 'ActionDisabledError'`); an unknown component or name rejects.
+     */
+    run: members.run,
+    /**
+     * The async sources of the components in the route and the route's loaders: `{ component, name,
+     * key, state, pending, stale, error }`, plus `size` when the data is an array. Never the data.
+     */
+    sources: members.sources,
+    /**
+     * The forms of the components in the route: `{ component, name, valid, dirty, submitting,
+     * fields }`, each field `{ name, value, required, error, touched, dirty }`; a password is `'***'`.
+     */
+    forms: members.forms,
     /**
      * The outline of everything outside the route — the navigation, the top bar — with the same
      * rules and selectors: what every page shares, read once per session (#272). An open overlay is

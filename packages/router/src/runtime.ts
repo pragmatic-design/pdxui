@@ -7,13 +7,13 @@
 // loaders and the breadcrumb, `address.ts` owns the address bar and the query, `route-table.ts`
 // holds the build's table.
 
-import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource } from '@pdxui/core';
+import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource, setDevtoolsLoaderSource } from '@pdxui/core';
 import { saveScrollPosition as saveScroll } from '@pdxui/core';
 import { compileMatcher } from './matcher';
 import { clearLoaders } from './loaders';
 import { forgetKeptResults } from './loader-cache';
 import { installRouteTable, toRouteConfig } from './route-table';
-import { isBrowser, _path, _params, _query, _route, _navError, _state } from './state';
+import { isBrowser, _path, _params, _query, _route, _navError, _state, _loaderState, _loaderError, _loaderStale, _loaderData } from './state';
 import { isWritingUrl, writeUrl, primaryOutlet } from './address';
 import { config, handleNavigation, stripBase, onAfterNavigate, guardAnswer } from './navigation';
 import { routeMap } from './devtools-map';
@@ -190,4 +190,15 @@ function reportToDevtools(): void {
     onAfterNavigate((from, to) => recordDevtoolsNavigation({
         from, to, matched: _route.peek()?.config.path ?? null, error: _navError.peek(),
     }));
+    // Each level's loader, by its pattern, for `sources()` (#298): the router's own state, read.
+    setDevtoolsLoaderSource(() => {
+        const states = _loaderState.peek();
+        const errors = _loaderError.peek();
+        const stale = _loaderStale.peek();
+        const data = _loaderData.peek();
+        return Object.keys(states).map((key) => ({
+            key, state: states[key], pending: states[key] === 'pending', stale: stale[key] ?? false,
+            error: errors[key]?.message ?? null, data: data[key],
+        }));
+    });
 }

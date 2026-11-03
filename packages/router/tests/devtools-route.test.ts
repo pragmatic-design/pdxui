@@ -8,6 +8,7 @@ import type { RouteConfig } from '../src/runtime';
 interface Api {
     route(): { path: string; params: Record<string, string>; query: Record<string, string>; matched: string | null } | null;
     navigations(): { time: number; from: string; to: string; matched: string | null; error: string | null }[];
+    sources(): { component: string | null; name: string; key: string | null; state: string; pending: boolean; stale?: boolean; error: string | null; size?: number }[];
 }
 const api = (): Api => (window as unknown as { __PDX_DEVTOOLS__: Api }).__PDX_DEVTOOLS__;
 
@@ -37,6 +38,22 @@ describe('__PDX_DEVTOOLS__ and the router', () => {
         navigate('/users/7');
         await tick();
         expect(api().navigations().at(-1)).toMatchObject({ from: '/', to: '/users/7', matched: '/users/:id', error: null });
+    });
+
+    // v2's sources() (#298): a route's loader is a source too, with no component, by its pattern.
+    it('sources() lists the route\'s loader: pending, then success with the size of its array', async () => {
+        let resolve!: (rows: number[]) => void;
+        createRouter([
+            { path: '/', component: page() },
+            { path: '/users', component: page(), loader: () => new Promise<number[]>((r) => { resolve = r; }) },
+        ]);
+        navigate('/users');
+        await tick();
+        expect(api().sources()).toContainEqual({ component: null, name: '/users', key: '/users', state: 'pending', pending: true, stale: false, error: null });
+        resolve([1, 2]);
+        await tick();
+        await tick();
+        expect(api().sources().find((s) => s.key === '/users')).toMatchObject({ state: 'success', pending: false, size: 2 });
     });
 
     it('and one that found nothing, as a 404', async () => {

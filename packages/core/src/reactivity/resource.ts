@@ -18,6 +18,7 @@ import type { Cache, CacheWriteListener, Flight } from './cache';
 import { joinRequest, leaveRequest, supersedeRequest } from './cache';
 import { isRetryableError, retryDelayMs } from '../http/middleware';
 import { DEV } from '../utils/env';
+import { devTrackSource } from '../debug/devtools-registry';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -451,6 +452,8 @@ export function resource<T>(
     // past `maxEntries` and `gcTime`. `onDispose` is a no-op outside a scope, so a resource created at
     // module level is still disposed by hand; `dispose()` called twice (useQuery's) does nothing more.
     onDispose(() => res.dispose());
+    // In a component's setup, the devtools' `sources()` reads it (#298).
+    if (DEV) devTrackSource(res, res.key);
     return res;
 }
 

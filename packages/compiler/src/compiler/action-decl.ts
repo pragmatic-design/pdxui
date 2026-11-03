@@ -8,6 +8,7 @@
 
 import { maskNonCode } from './tokenizer';
 import { splitAtTopLevelCommas } from './script-analyzer-helpers';
+import { typeToSchema } from './type-schema';
 
 /** A parsed `@action`. Offsets are into the declaration's text. */
 export interface ActionDecl {
@@ -181,4 +182,13 @@ export function compileAction(d: ActionDecl): string {
     if (d.when) parts.push(`enabled: () => (${d.when})`);
     if (d.options) parts.push(`...${d.options}`);
     return `const ${d.name} = mutation({ ${parts.join(', ')} });`;
+}
+
+/**
+ * The line a development build adds after it (#298): the action registered with the devtools under its
+ * name, with its parameter's JSON schema — `{}` with no input, or a type the text alone cannot say.
+ */
+export function compileDevAction(d: ActionDecl): string {
+    const schema = d.hasInput ? typeToSchema(d.inputType) : {};
+    return `devAction(${d.name}, ${JSON.stringify(d.name)}, ${JSON.stringify(schema)});`;
 }
