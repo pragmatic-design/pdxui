@@ -10,8 +10,5 @@ export interface SourceElement { source(): DataSource<Record<string, unknown>> }
 /** An option as the select holds it, whatever shape the caller's options had. */
 export interface Option { label: string; value: unknown; _raw: unknown }
 
-/** The function props that draw an option or the selected value. */
-export type Template = (item: { label: string; value: unknown; raw: unknown; index?: number }) => string | Node;
-
 /** A row of the list: a group header, or an option at its keyboard index. */
 export interface Row { key: string; header: boolean; name: string; item: Option; index: number; style: string }

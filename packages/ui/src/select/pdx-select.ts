@@ -3,7 +3,7 @@
 // `multiple` enables multi-select with chip tags.
 // Consumes DataSource or plain arrays. Virtual scroll auto-activates for >100 items.
 
-import { component, html, signal, computed, effect, prop, model, event, generatedId, slot, snippetOrSlot } from '@pdxui/core';
+import { component, html, signal, computed, effect, prop, model, event, generatedId, slot, declaredSnippet } from '@pdxui/core';
 import { createDataSource, isDataSource, inject } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
@@ -46,8 +46,8 @@ function normaliseOptions(
  * One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple
  * props, fed by an array or a DataSource.
  *
- * @slot item - Renders one option in the list: a snippet `item(option, index)`, or the scoped slot, which receives `{ label, value, raw, index }` (`raw` is the original option).
- * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`, or the scoped slot, which receives `{ label, value, raw }`.
+ * @slot item - Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.
+ * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`.
  *
  * @csspart root - The trigger: the frame, its border, background and the states' colours.
  * @csspart search - The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.
@@ -114,10 +114,6 @@ component('pdx-select', {
         /** The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a
          *  label, after a pdx-label, or with a <label for> the select's id: those name it. */
         label: prop(''),
-        /** Custom render for each option: (item: {label, value, _raw}) => string|Node */
-        itemTemplate: prop<((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null>(null),
-        /** Custom render for selected value in trigger: (item: {label, value, _raw}) => string|Node */
-        selectedTemplate: prop<((item: { label: string; value: unknown; _raw: unknown }) => string | Node) | null>(null),
         /** Where to show search input: 'trigger' (default) or 'dropdown' */
         searchPosition: prop<'trigger' | 'dropdown'>('trigger'),
         /** Allow creating new options when search has no match. Emits pdx-create. */
@@ -140,7 +136,7 @@ component('pdx-select', {
         /** Fired when the user creates an option from the search text. */
         'pdx-create': event<{ value: string; label: string }>(),
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // An option's `raw` is the app's entry, an element of `options` or of `source` (#853): the editor
     // infers `T`.
     generics: { T: { from: 'options', source: 'source' } },
@@ -315,27 +311,21 @@ component('pdx-select', {
             return flatItems().filter(i => sel.has(i.value));
         }
 
-        // Priority: the parent's snippet (#491) > the alpha scoped slot (<slot let:>) > the function prop
-        // > the default label.
+        // Priority: the parent's snippet (#491) > the default label. The alpha scoped slot and the
+        // template props are gone (#492).
 
         function renderItemContent(item: NormalisedOption | null | undefined, index?: number): unknown {
             if (!item) return '';
-            const itemData = { label: item.label, value: item.value, raw: item._raw, index: index ?? 0 };
-            const itemSlot = snippetOrSlot(ctx, 'item', (s) => [{ label: s.label, value: s.value, raw: s.raw }, s.index]);
-            if (itemSlot) return itemSlot(itemData);
-            const tmpl = ctx.itemTemplate() as unknown as ((item: unknown) => unknown) | null;
-            if (tmpl) return tmpl(itemData);
-            return item.label;
+            const option = { label: item.label, value: item.value, raw: item._raw };
+            const itemSnippet = declaredSnippet(ctx, 'item', (s) => [s.option, s.index]);
+            return itemSnippet ? itemSnippet({ option, index: index ?? 0 }) : item.label;
         }
 
         function renderSelectedContent(item: NormalisedOption | null | undefined): unknown {
             if (!item) return '';
-            const itemData = { label: item.label, value: item.value, raw: item._raw };
-            const selectedSlot = snippetOrSlot(ctx, 'selected', (s) => [{ label: s.label, value: s.value, raw: s.raw }]);
-            if (selectedSlot) return selectedSlot(itemData);
-            const tmpl = ctx.selectedTemplate() as unknown as ((item: unknown) => unknown) | null;
-            if (tmpl) return tmpl(itemData);
-            return item.label;
+            const option = { label: item.label, value: item.value, raw: item._raw };
+            const selectedSnippet = declaredSnippet(ctx, 'selected', (s) => [s.option]);
+            return selectedSnippet ? selectedSnippet({ option }) : item.label;
         }
 
         function getSelectedItem(): NormalisedOption | null {
