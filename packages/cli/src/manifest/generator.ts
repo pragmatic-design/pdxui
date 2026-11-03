@@ -2,9 +2,8 @@
 
 import { readFileSync } from 'fs';
 import { relative } from 'pathe';
-import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, importedLocalNames, modelEventName, DEFAULT_TAG_PREFIX } from '@pdxui/compiler';
+import { parseSFC, parseTemplate, analyzeScript, findComponentTags, deriveTag, importedLocalNames, modelEventName, DEFAULT_TAG_PREFIX, typeToSchema } from '@pdxui/compiler';
 import type { ComponentManifest, RouteManifest, FetchManifest, FormManifest, ComponentMetadata } from './schema';
-import { typeToSchema } from './type-schema';
 
 /** The specifier of the import that binds `name`, among the script's import statements; '' when none does. */
 function importedFrom(imports: string[], name: string): string {

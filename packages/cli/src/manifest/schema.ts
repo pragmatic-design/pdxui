@@ -1,7 +1,7 @@
 // Manifest types — output of pdx analyze.
 // Machine-readable component metadata for agent tooling, code generation, and documentation.
 
-import type { JsonSchema } from './type-schema';
+import type { JsonSchema } from '@pdxui/compiler';
 
 export interface PdxManifest {
     version: string;

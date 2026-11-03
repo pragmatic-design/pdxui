@@ -115,7 +115,7 @@ const PROMPTS = {
     description: [
         'You operate a web application in a browser, through one command:',
         '  node scripts/agent-behaviour/tool.mjs <verb> [args]',
-        'Run it with no verb to list the verbs. You read the application only through `map`, `shell`, `page` and `outline`: `map` and `shell` describe the whole app and need reading once; `page` and `outline` describe the page you are on. The outline gives a CSS selector in brackets on each control: act with `click`, `fill` and `press` on those selectors.',
+        'Run it with no verb to list the verbs. You read the application only through `map`, `shell`, `page` and `outline`: `map` and `shell` describe the whole app and need reading once; `page` and `outline` describe the page you are on. The outline gives a CSS selector in brackets on each control: act with `click`, `fill` and `press` on those selectors. After an action, `delta` says what changed instead of reading the page again; `actions`, `sources` and `forms` read the page\'s @actions, async sources and forms, and `run` calls an @action directly.',
     ],
     snapshot: [
         'You operate a web application in a browser, through one command:',

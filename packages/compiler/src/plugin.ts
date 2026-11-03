@@ -874,7 +874,7 @@ export function compile(
             ? descriptor.script.start : undefined;
         // And on which line, so a development build can name an effect `file.pdx:line`.
         const lineBase = originBase === undefined ? undefined : countLines(source, 0, originBase) + 1;
-        cachedAnalysis = analyzeScript(scriptContent, filename, { originBase, lineBase });
+        cachedAnalysis = analyzeScript(scriptContent, filename, { originBase, lineBase, production: options?.production });
         // Collect structural warnings from analyzer (@prop without type, etc.)
         allWarnings.push(...cachedAnalysis.warnings);
         // Cross-check template identifiers against script declarations
@@ -1031,7 +1031,7 @@ function compileScriptOnly(
     // The analysis the code generator reads, with origins. compileSFC runs the plugins'
     // analyzeScript hook on it, once.
     const lineBase = originBase === undefined ? undefined : countLines(source, 0, originBase) + 1;
-    const codegenAnalysis = () => analyzeScript(scriptContent, filename, { originBase, lineBase });
+    const codegenAnalysis = () => analyzeScript(scriptContent, filename, { originBase, lineBase, production: options?.production });
     /** The module without its origin marks, and the map they make. */
     const mapped = (code: string) => {
         const origins = collectOrigins(code);

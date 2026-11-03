@@ -7,6 +7,8 @@ import { onDispose, currentScope, isScopeSuspended, onScopeSuspension } from './
 import { getDefaultCache, requestInFlight } from './cache';
 import type { ResourceOptions, ResourceFetcher, AsyncState } from './resource';
 import type { ReadonlySignal } from '../utils/types';
+import { DEV } from '../utils/env';
+import { devRetarget } from '../debug/devtools-registry';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -181,7 +183,7 @@ export function useQuery<T>(
     };
     onDispose(dispose);
 
-    return {
+    const query: QueryResult<T> = {
         data: res.data,
         error: res.error,
         state: res.state,
@@ -191,4 +193,7 @@ export function useQuery<T>(
         mutate: (value: T) => res.mutate(value),
         dispose,
     };
+    // The setup holds the query, not the resource under it: the one the devtools name (#298).
+    if (DEV) devRetarget(res, query);
+    return query;
 }

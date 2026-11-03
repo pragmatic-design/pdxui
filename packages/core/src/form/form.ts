@@ -12,6 +12,7 @@
 //   - Async validation: a per-field debounce with a stale guard on the current value
 
 import { DEV } from '../utils/env';
+import { devTrackForm } from '../debug/devtools-registry';
 import { signal, computed, batch } from '../reactivity/signal';
 import type { Signal, ReadonlySignal, Dispose } from '../utils/types';
 import type { Validator, AsyncValidator, StandardSchema } from './validators';
@@ -1181,6 +1182,8 @@ export function createForm<T extends Record<string, unknown>>(
         fieldVersion: () => _fieldVersion(),
     } satisfies FormInternals;
 
+    // In a component's setup, the devtools' `forms()` reads it (#298), its fields as the form lists them.
+    if (DEV) devTrackForm(form, () => formFieldNames(form as Form<Record<string, unknown>>).map((n) => [n, formField(form as Form<Record<string, unknown>>, n)]));
     // The fields were put on it above: what the literal lacked for the type.
     return form as Form<T>;
 }

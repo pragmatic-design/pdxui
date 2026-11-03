@@ -11,6 +11,16 @@ semver.
 
 ### Features
 
+- `__PDX_DEVTOOLS__` v2 gains its last five members (#298), in development only. `delta()` returns
+  what changed in the card and the outline since the agent last looked; `actions()` lists the
+  `@action`s of the components in the route, with `enabled`, `pending`, `error` and their parameter's
+  JSON schema, and `run(component, name, input)` calls one; `sources()` lists the `@fetch`,
+  `resource()` and `useQuery` sources and the route's loaders in the async vocabulary; `forms()`
+  lists the forms and their fields, a password as `'***'`. A development build registers every
+  `@action` with `devAction()`; a production build emits nothing for it. The router reports its
+  loaders through `setDevtoolsLoaderSource`. `typeToSchema` moved from the CLI to
+  `@pdxui/compiler`, where both read it.
+
 - `PDX_ONE_WAY_EDITED_FIELD` (warning, #678): a one-way `:value` or `:checked` on an `<input>`,
   `<textarea>` or `<select>` whose own `@input`/`@change` handler — inline, or a script function it
   reaches — writes the bound signal. A one-way binding writes when its value changes (#44, which stays),

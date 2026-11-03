@@ -1,8 +1,11 @@
 // The JSON schema of a TypeScript type, from its text as written (#502): the input an agent sends to an
 // `@action`. Only what the text says by itself is read — `string`, `number`, `boolean`, `T[]`,
 // `Array<T>`, and object literal types `{ a: T; b?: U }` built of those. A name the text cannot
-// resolve (an interface, an import) is `{}`, the schema that accepts anything: the generator reads one
+// resolve (an interface, an import) is `{}`, the schema that accepts anything: the analysis reads one
 // file, without a type checker.
+//
+// Read by the `pdx analyze` manifest (packages/cli) and by the compiler, which emits it for every
+// `@action` of a development build for `__PDX_DEVTOOLS__.actions()` (#298).
 
 /** A JSON schema, as far as these types need. */
 export type JsonSchema =

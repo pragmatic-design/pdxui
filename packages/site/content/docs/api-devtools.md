@@ -7,7 +7,7 @@ parent: api
 
 # Debugging and devtools API
 
-The devtools entry point and overlay, the debug handle, telemetry and navigation recording. 8 exports, from `@pdxui/core` and `@pdxui/core/devtools`.
+The devtools entry point and overlay, the debug handle, telemetry and navigation recording. 10 exports, from `@pdxui/core` and `@pdxui/core/devtools`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -21,6 +21,17 @@ const __pdx_debug
 
 The debug namespace: an export of `@pdxui/core`, and in development the same object as
 `window.__PDX_DEVTOOLS__.debug`, which the devtools overlay and the console read.
+
+## `devAction`
+
+```ts
+import { devAction } from '@pdxui/core';
+
+function devAction(target: object, name: string, schema: unknown): void
+```
+
+A compiled `@action` (#298): the mutation it made, its name, and its parameter's schema. Emitted by
+the compiler after the action's line in a development build.
 
 ## `getTelemetryLevel`
 
@@ -58,6 +69,16 @@ function recordDevtoolsNavigation(entry: Omit<DevtoolsNavigation, 'time'>): void
 ```
 
 The router records a navigation that finished — matched, refused, or not found.
+
+## `setDevtoolsLoaderSource`
+
+```ts
+import { setDevtoolsLoaderSource } from '@pdxui/core';
+
+function setDevtoolsLoaderSource(source: DevtoolsLoaderSource | null): void
+```
+
+The router says where to read its route loaders from, for `sources()` (#298); null removes it.
 
 ## `setDevtoolsMapSource`
 

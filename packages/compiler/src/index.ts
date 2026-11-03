@@ -9,6 +9,7 @@ export { LANGUAGE_CHANGES, languageChanges, removedExport, setLanguageChangesFor
 export { projectTagRenames } from './language/app-prefix';
 export { importedLocalNames } from './compiler/import-names';
 export { parseActionDecl, type ActionDecl } from './compiler/action-decl';
+export { typeToSchema, type JsonSchema } from './compiler/type-schema';
 export { stringContextKeys, contextTokenName, LIBRARY_CONTEXT_TOKENS, type ContextTokenRef } from './language/context-keys';
 export { projectRoutePatterns, routeTypesDts, writeRouteTypes, routeParamsType, ROUTE_TYPES_FILE } from './route-types';
 export type { LanguageChange, LanguageChangeKind, LanguageChangeScope, LanguageChangeFinding, LanguageChangeContext } from './language/changes';

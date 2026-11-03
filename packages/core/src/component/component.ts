@@ -585,9 +585,12 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                 devSetupBegin(this, props);
             }
             pushScope(scope);
+            /** What setup returned: the devtools name what it registered after it (#298). */
+            let setupResult: unknown;
             try {
                 if (options.setup) {
                     const result = options.setup(ctx as TypedComponentContext<P, E, M, V>);
+                    setupResult = result;
                     if (result) Object.assign(ctx, result);
                 }
                 // The host's declared attributes, bindings and listeners (#133), and its variant axes,
@@ -621,7 +624,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                 return msg;
             }
             popScope();
-            if (DEV) devSetupEnd();
+            if (DEV) devSetupEnd(setupResult);
 
             return options.render(ctx as TypedComponentContext<P, E, M, V>);
         }

@@ -46,7 +46,8 @@ starts. A check that already holds at that point would measure nothing, so the t
 Next the agent gets the task in one sentence and one command, `tool.mjs`, which does two things:
 
 - **It keeps the modes apart.** In `description` mode the agent reads only through `map`, `shell`,
-  `page` and `outline`. In `snapshot` mode it reads only through agent-browser's `snapshot`. Both
+  `page` and `outline`, and the members that read a page after a step or by what it holds: `delta`,
+  `actions`, `sources` and `forms`; `run` calls an `@action` directly. In `snapshot` mode it reads only through agent-browser's `snapshot`. Both
   modes act the same way: `open`, `click`, `fill`, `press`, `url` and `wait`.
 - **It counts every answer it gives.** "Characters sent" is the prompt plus every answer of
   `tool.mjs`.

@@ -28,6 +28,11 @@ const READ = mode === 'snapshot'
         shell: '             the outline of what every page shares: the navigation, the top bar',
         page: '             the page card: route, title, lists, forms, live messages, actions, links',
         outline: '[maxItems]   the outline of the page\'s content, a CSS selector on each control',
+        delta: '             what changed since the last page, outline or delta: card keys, outline lines',
+        actions: '             the @actions of the page: component, name, enabled, pending, error, schema',
+        run: '<component> <name> [json]   call an @action as its control would, wait for it to settle',
+        sources: '             the page\'s async sources and route loaders: state, pending, error, size',
+        forms: '             the page\'s forms: valid, dirty, submitting, each field\'s value and error',
     };
 
 function usage() {
@@ -45,6 +50,17 @@ function answer(verb, args) {
         case 'outline': {
             const max = Number(args[0]);
             return evaluate(session, `__PDX_DEVTOOLS__.outline(${Number.isFinite(max) && max > 0 ? `{ maxItems: ${max} }` : ''})`);
+        }
+        case 'delta': return evaluate(session, 'JSON.stringify(__PDX_DEVTOOLS__.delta())');
+        case 'actions': return evaluate(session, 'JSON.stringify(__PDX_DEVTOOLS__.actions())');
+        case 'sources': return evaluate(session, 'JSON.stringify(__PDX_DEVTOOLS__.sources())');
+        case 'forms': return evaluate(session, 'JSON.stringify(__PDX_DEVTOOLS__.forms())');
+        case 'run': {
+            // The input is JSON as the agent wrote it; parsed here, so a typo is the agent's error, not the page's.
+            const raw = args.slice(2).join(' ');
+            const input = raw ? JSON.parse(raw) : undefined;
+            const call = `__PDX_DEVTOOLS__.run(${JSON.stringify(String(args[0]))}, ${JSON.stringify(String(args[1]))}, ${JSON.stringify(input) ?? 'undefined'})`;
+            return evaluate(session, `${call}.then((r) => JSON.stringify(r), (e) => JSON.stringify({ rejected: e.message }))`);
         }
         case 'snapshot': return browser(session, 'snapshot');
         case 'open': {

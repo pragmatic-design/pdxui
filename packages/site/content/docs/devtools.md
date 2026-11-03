@@ -114,6 +114,45 @@ On the showcase the card is 40–130 tokens and the outline 16–29% of agent-br
 the page. A session over four pages — the shell once, then a card and an outline per page — costs a
 quarter of their four full snapshots. Both are measured in `packages/showcase/tests/devtools-v2.spec.ts`.
 
+After a step, ask what changed instead of reading the page again; and read the page's writes, sources
+and forms by what they are:
+
+```js
+__PDX_DEVTOOLS__.delta()           // what changed since the last page(), outline() or delta()
+__PDX_DEVTOOLS__.actions()         // the @actions in the route: [{ component, name, enabled, pending, error, schema }]
+await __PDX_DEVTOOLS__.run('app-orders', 'remove', 7)   // { state, data, error }, once the call settles
+__PDX_DEVTOOLS__.sources()         // the async sources: [{ component, name, key, state, pending, stale, error, size }]
+__PDX_DEVTOOLS__.forms()           // the forms: [{ component, name, valid, dirty, submitting, fields }]
+```
+
+**`delta()`** compares with the last card and outline the agent was given — by `page()`,
+`outline()` or `delta()` itself. `card` holds only the keys whose value changed, a key that is gone
+as `null`; `outline` holds the lines `added`, `removed` and `changed`, a changed line being one whose
+selector was there with other text. With nothing to compare with, it returns the whole card and
+outline and `full: true`; after a navigation, `route: true` as well. On `/customers`, after choosing a
+status in the filter, the delta is about two thirds of `page()` plus `outline()`: the rows changed.
+
+**`actions()`** lists every `@action` of the components in the route: `component` is the component's
+selector, as the outline gives it; `error` the last error's message or `null`; `schema` the JSON schema
+of its parameter, read from its type (`id: number` is `{ type: 'number' }`; a type the file alone
+cannot say is `{}`). A development build registers every `@action`, with a `devAction()` line the
+compiler writes after it; a production build none.
+**`run(component, name, input)`** calls it as its control would, and resolves with `{ state, data,
+error }` once the call settles. A disabled action is not called: `{ state: 'error', error:
+'ActionDisabledError' }`. A component or action that is not there rejects, naming it.
+
+**`sources()`** lists the `@fetch`, `resource()` and `useQuery` sources of the components in the route,
+and the route's loaders (`component: null`, named by their pattern), in the async vocabulary: `state`,
+`pending`, `stale`, the error's message, and `size` when the data is an array. The data itself is not
+in it: read the page for that.
+
+**`forms()`** lists the forms the components in the route created — `@form`, `createForm()` — with
+`valid`, `dirty`, `submitting` and each field's `{ name, value, required, error, touched, dirty }`. A
+field bound to a password control (an `<input type="password">` or a `pdx-password-input` of that
+`name`) reports its value as `'***'`.
+
+A source, an action and a form are named after the variable the component's setup holds them in.
+
 The members of version 1 are unchanged:
 
 ```js
@@ -145,10 +184,11 @@ agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.inspect('pdx-login'))"
 agent-browser eval "JSON.stringify(__PDX_DEVTOOLS__.errors())"
 ```
 
-`@pdxui/router` reports the route and the route graph by itself. A router of your own reports through
-`setDevtoolsRouteSource(() => ({ path, params, query, matched }))`,
-`recordDevtoolsNavigation({ from, to, matched, error })` and
-`setDevtoolsMapSource(() => [{ path, params, title, guard, access }])`, all from `@pdxui/core`.
+`@pdxui/router` reports the route, the route graph and its loaders by itself. A router of your own
+reports through `setDevtoolsRouteSource(() => ({ path, params, query, matched }))`,
+`recordDevtoolsNavigation({ from, to, matched, error })`,
+`setDevtoolsMapSource(() => [{ path, params, title, guard, access }])` and
+`setDevtoolsLoaderSource(() => [{ key, state, pending, stale, error, data }])`, all from `@pdxui/core`.
 
 ## Naming things for readability
 

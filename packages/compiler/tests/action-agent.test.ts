@@ -47,3 +47,30 @@ describe('an @action with agent needs a control a person can use', () => {
         expect(unbound('<p>{{ draft }}</p>', '@action save(dto: string) { await Promise.resolve(dto); }')).toEqual([]);
     });
 });
+
+// `__PDX_DEVTOOLS__.actions()` (#298): a development build registers every @action with its parameter's
+// schema; a production build emits nothing for it.
+describe('an @action in a development build is registered with the devtools', () => {
+    const code = (action: string, production?: boolean) =>
+        compile(file('<p>{{ draft }}</p>', action), 'editor.pdx', [], undefined, { production }).code;
+
+    it('with its name and its parameter\'s schema', () => {
+        const out = code('@action remove(id: number) { return id; }');
+        expect(out).toContain('devAction(remove, "remove", {"type":"number"});');
+        expect(out).toMatch(/import \{[^}]*\bdevAction\b[^}]*\} from '@pdxui\/core'/);
+    });
+
+    it('an object parameter is an object schema; no input, or a named type, is {}', () => {
+        expect(code('@action save(d: { title: string; done?: boolean }) { return d; }'))
+            .toContain('devAction(save, "save", {"type":"object","properties":{"title":{"type":"string"},"done":{"type":"boolean"}},"required":["title"]});');
+        expect(code('@action reload() { return 1; }')).toContain('devAction(reload, "reload", {});');
+        expect(code('@action put(t: Ticket) { return t; }')).toContain('devAction(put, "put", {});');
+    });
+
+    it('a production build emits nothing for it, agent or not', () => {
+        for (const action of ['@action remove(id: number) { return id; }', AGENT]) {
+            const out = code(action, true);
+            expect(out).not.toContain('devAction');
+        }
+    });
+});

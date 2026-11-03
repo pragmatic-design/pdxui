@@ -393,9 +393,12 @@ export type { TC39State, TC39Computed } from './reactivity/tc39-compat';
 // Debug & Telemetry
 export { __pdx_debug, setTelemetryLevel, getTelemetryLevel } from './debug/inspector';
 export type { TelemetryLevel, TraceEntry, ReconcileMetrics, PerfSummary } from './debug/inspector';
-// __PDX_DEVTOOLS__: the router reports its route, navigations and route graph through these.
-export { setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource } from './debug/devtools-api';
+// __PDX_DEVTOOLS__: the router reports its route, navigations, route graph and loaders through these.
+export { setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource, setDevtoolsLoaderSource } from './debug/devtools-api';
 export type { DevtoolsRoute, DevtoolsNavigation, DevtoolsTreeNode, DevtoolsInspection, DevtoolsError, DevtoolsMapRoute, DevtoolsMapParam } from './debug/devtools-api';
+export type { DevtoolsDelta, DevtoolsOutlineDelta, DevtoolsAction, DevtoolsRunResult, DevtoolsSource, DevtoolsForm, DevtoolsFormField, DevtoolsLoaderEntry, DevtoolsLoaderSource } from './debug/devtools-members';
+// A compiled `@action` registers with the devtools in a development build (#298); the compiler emits it.
+export { devAction } from './debug/devtools-registry';
 
 // Responsive
 export { responsive } from './component/responsive';
