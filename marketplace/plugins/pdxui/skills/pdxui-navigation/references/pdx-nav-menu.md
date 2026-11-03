@@ -26,7 +26,7 @@ A multi-level navigation menu.
 
 **Renders:** roles `group` · `navigation`
 
-**Slot:** `item` — Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.; `itemActions` — Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.; `actions` — The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
+**Slot:** `item` — Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`.; `itemActions` — Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.
 
 **States:** `:state(ready)` — Its entries are drawn.; `:state(collapsed)` — `collapsed` is set: icons only, a group in a flyout.
 

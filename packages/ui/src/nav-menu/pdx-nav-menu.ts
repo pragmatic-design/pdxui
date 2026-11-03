@@ -2,7 +2,7 @@
 // Data-driven: items with nesting, icons, badges, collapsible groups, active state.
 // Use inside a sidebar or standalone as vertical navigation.
 
-import { component, html, signal, sanitizeUrl, generatedId, slot, snippetOrSlot, event } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, slot, declaredSnippet, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -63,9 +63,8 @@ type T = { key: string; label: string };
  * A vertical navigation menu for sidebars, with nested collapsible groups, an active entry and a
  * collapsed icon-only mode.
  *
- * @slot item - Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`, or the scoped slot, which receives `{ item, level, expanded, active }`.
+ * @slot item - Renders one navigation entry, a group's included: a snippet `item(item, level, expanded, active)`.
  * @slot itemActions - Controls BESIDE a leaf entry (a pin, an «open in a new tab»), in a `.pdx-nav-row` with its link, never inside it: a link may hold no interactive content. A snippet `itemActions(item, level, active)`, named apart from the `actions` prop.
- * @slot actions - The scoped slot for a leaf entry's controls, which receives `{ item, level, active }`; the snippet `itemActions` is its typed form.
  *
  * @csspart nav - The `role="navigation"` element that holds the entries (`.pdx-nav`).
  * @csspart item - An entry, a link or a button; the current one is `aria-current="page"`, an open group's `aria-expanded="true"`.
@@ -114,8 +113,8 @@ component('pdx-nav-menu', {
         /** Icon set name (for pdx-icon set attribute) */
         iconSet: { type: String, default: '' },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots stay (#595).
-    // The `actions` slot shares its name with the prop above, so its snippet is `itemActions`.
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots are not read
+    // (#492). The controls' snippet is `itemActions`, named apart from the `actions` prop above.
     slots: {
         // Any entry of the tree the menu renders through the snippet: an element of `items`, or a
         // child or grandchild of one through `children`, less the headers and separators it draws
@@ -132,10 +131,10 @@ component('pdx-nav-menu', {
         let _navEl: HTMLElement | null = null;
         let _built = false;
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.level, s.expanded, s.active]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item, s.level, s.expanded, s.active]);
         }
         function getActionsSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'itemActions', (s) => [s.item, s.level, s.active], 'actions');
+            return declaredSnippet(ctx, 'itemActions', (s) => [s.item, s.level, s.active]);
         }
 
         function toggleGroup(key: string): void {

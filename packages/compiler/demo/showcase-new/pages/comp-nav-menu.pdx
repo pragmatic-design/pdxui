@@ -53,13 +53,13 @@
 
     <!-- ═══ Slots ═══ -->
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>item</code></td><td><code>{ item, level, expanded, active }</code></td><td>Custom entry content, a group's included — <code>expanded</code> is the group's state. The chevron stays the menu's</td></tr>
-            <tr><td><code>actions</code></td><td><code>{ item, level, active }</code></td><td>Controls beside a leaf entry's link, in a row with it — never inside it</td></tr>
+            <tr><td><code>item</code></td><td><code>(item, level, expanded, active)</code></td><td>Custom entry content, a group's included — <code>expanded</code> is the group's state. The chevron stays the menu's</td></tr>
+            <tr><td><code>itemActions</code></td><td><code>(item, level, active)</code></td><td>Controls beside a leaf entry's link, in a row with it — never inside it</td></tr>
           </tbody>
         </table>
       </div>
@@ -79,7 +79,7 @@
             <tr><td><code>size</code></td><td>'md' | 'sm'</td><td>'md'</td><td>A compact menu for a dense sidebar</td></tr>
             <tr><td><code>indicator</code></td><td>'fill' | 'border'</td><td>'fill'</td><td>How the current entry is marked: a tint, or a tint and a start-edge bar</td></tr>
             <tr><td><code>chevron</code></td><td>'start' | 'end'</td><td>'start'</td><td>Where a group's chevron sits</td></tr>
-            <tr><td><code>actions</code></td><td>'inline' | 'overlay'</td><td>'inline'</td><td>The <code>actions</code> slot beside the link, or laid over the row's end on hover and focus</td></tr>
+            <tr><td><code>actions</code></td><td>'inline' | 'overlay'</td><td>'inline'</td><td>The <code>itemActions</code> snippet beside the link, or laid over the row's end on hover and focus</td></tr>
           </tbody>
         </table>
       </div>
