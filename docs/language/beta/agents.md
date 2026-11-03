@@ -52,6 +52,13 @@ as with full snapshots — before any other member or any other agent work.
 | `actions()`, `run(component, name, input)` | the `@action`s on the page, `enabled()`, `pending()`, `error()`, input schema; and running one |
 | `sources()`, `forms()` | every async source in the vocabulary; every form's fields, values, errors |
 
+**Landed:** `page()` and `outline()` (#271), `map()` and `shell()` (#272), and `delta()`, `actions()`,
+`run()`, `sources()` and `forms()` (#298). The last five read what the components in the route
+registered while their setup ran, named after the variables holding them. An `@action`'s schema is
+emitted by a development build for every action, read from its parameter's type as `pdx analyze`
+reads it. A route loader is a source with no component, named by its pattern. Their shapes are in
+the site's devtools page (`packages/site/content/docs/devtools.md`).
+
 **Outline rules.** The outline is a projection of the accessibility tree, never a second source:
 - visibility is read from the DOM, never from component state;
 - text that repeats its parent's accessible name, unnamed images and unnamed wrappers are dropped;

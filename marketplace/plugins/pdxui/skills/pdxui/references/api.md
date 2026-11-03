@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-461 value exports.
+463 value exports.
 
 ### `__adoptStyles`
 
@@ -1667,6 +1667,17 @@ True in a development build, false in a production one — a constant, folded by
 Guard a message that teaches the author something with it, and the branch leaves the production
 bundle with its string: `if (DEV) console.warn('…')`. Never guard BEHAVIOUR with it — behaviour
 that only happens in dev is a difference between what you tested and what you shipped.
+
+### `devAction`
+
+```ts
+import { devAction } from '@pdxui/core';
+
+function devAction(target: object, name: string, schema: unknown): void
+```
+
+A compiled `@action` (#298): the mutation it made, its name, and its parameter's schema. Emitted by
+the compiler after the action's line in a development build.
 
 ### `device`
 
@@ -4715,6 +4726,16 @@ function setDefaultIconSet(name: string): void
 ```
 
 Set the default icon set by name.
+
+### `setDevtoolsLoaderSource`
+
+```ts
+import { setDevtoolsLoaderSource } from '@pdxui/core';
+
+function setDevtoolsLoaderSource(source: DevtoolsLoaderSource | null): void
+```
+
+The router says where to read its route loaders from, for `sources()` (#298); null removes it.
 
 ### `setDevtoolsMapSource`
 
