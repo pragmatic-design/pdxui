@@ -6,7 +6,7 @@
 
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
 import '../menu/pdx-menu';
-import { component, html, signal, onDestroy, generatedId, slot, snippetOrSlot, event } from '@pdxui/core';
+import { component, html, signal, onDestroy, generatedId, slot, declaredSnippet, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -34,7 +34,7 @@ interface MenuHost extends HTMLElement {
  *   placed here gets `aria-haspopup`, `aria-expanded`, `aria-controls` while open, the keys (click,
  *   ArrowDown/ArrowUp, and Enter/Space when it is not a native button) and the focus back on close.
  *   `label`, `icon`, `variant` and `size` are for the built-in button, and are ignored with it.
- * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`.
  */
 component('pdx-dropdown-menu', {
     events: {
@@ -65,7 +65,7 @@ component('pdx-dropdown-menu', {
     },
     // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // pdx-menu's, which draws it: an entry or a submenu's, less what the menu draws itself.
         item: slot<(item: Exclude<T | (T extends { children?: readonly (infer C)[] } ? C | (C extends { children?: readonly (infer D)[] } ? D : never) : never), { type: 'separator' | 'label' | 'submenu' }>) => Node>(),
@@ -74,7 +74,7 @@ component('pdx-dropdown-menu', {
         const _open = signal(false);
         const _menuId = generatedId('pdx-dropdown-menu');
         function getItemSlot(): SlotFunction | null {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item]) ?? null;
+            return declaredSnippet(ctx, 'item', (s) => [s.item]) ?? null;
         }
         let _triggerEl: HTMLElement | null = null;
         /** True when the trigger is the author's (the `trigger` slot), not the button built here. */

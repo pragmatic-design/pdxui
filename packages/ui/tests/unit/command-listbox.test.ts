@@ -7,7 +7,7 @@
 // not <button>s, which Tab would walk through one by one. Disabled commands stay in the list, and the
 // shortcut text ("Ctrl P") is not read as part of each command's name.
 import { describe, it, expect, beforeEach } from 'vitest';
-import { html, slotCarrier } from '@pdxui/core';
+import { html } from '@pdxui/core';
 import { cleanup, tick } from './helpers';
 import '../../src/command/pdx-command';
 
@@ -124,11 +124,11 @@ describe('groups, shortcuts, ids', () => {
         expect(settings.getAttribute('aria-keyshortcuts')).toBe('Control+Shift+,');
     });
 
-    it('the item slot draws the commands from the first open, not only after the query changes', async () => {
-        // As a template builds it: items and the slot carrier set before the element connects.
+    it('the item snippet draws the commands from the first open, not only after the query changes', async () => {
+        // As a template builds it: items and the snippet set before the element connects.
         const el = document.createElement('pdx-command') as Cmd;
         el.items = ITEMS;
-        el.appendChild(slotCarrier('item', (scope) => html`<em class="custom">${(scope.item as { label: string }).label}!</em>`));
+        (el as unknown as { item: (item: { label: string }) => Node }).item = (item) => html`<em class="custom">${item.label}!</em>`;
         document.body.appendChild(el);
         await tick();
         el.show();

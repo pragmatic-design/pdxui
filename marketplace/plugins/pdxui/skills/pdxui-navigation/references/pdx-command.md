@@ -23,7 +23,7 @@ A ⌘K command palette.
 
 **Renders:** roles `combobox` · `dialog` · `group` · `listbox` · `option` · `status`
 
-**Slot:** `item` — Renders one command: a snippet `item(item, index, active)`, or the scoped slot, which receives `{ item, active, index }`.
+**Slot:** `item` — Renders one command: a snippet `item(item, index, active)`.
 
 **States:** `:state(open)` — Matched with `:state(open)`.
 

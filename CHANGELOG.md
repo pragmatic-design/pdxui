@@ -428,6 +428,10 @@ semver.
 
 ### Changed
 
+- **Breaking:** `pdx-command`, `pdx-menu`, `pdx-context-menu` and `pdx-dropdown-menu` read their
+  `item` snippet only (#492): a parent's alpha scoped slot draws nothing in them now. `pdx-menu`'s
+  `renderItem` callback is unchanged.
+
 - **Breaking:** `pdx-list`, `pdx-nav-menu`, `pdx-pagination` and `pdx-tree` read their snippets only
   (#492): a parent's alpha scoped slot draws nothing in them now. The two slots named apart from
   their snippet go with it: `pdx-nav-menu`'s `actions` is the `itemActions` snippet, and

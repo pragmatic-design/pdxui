@@ -51,12 +51,12 @@
 
     <!-- ═══ Slots ═══ -->
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>item</code></td><td><code>{ item, key, type }</code></td><td>Custom menu item content (leaf items only, excludes submenus).</td></tr>
+            <tr><td><code>item</code></td><td><code>(item)</code></td><td>Custom menu item content (leaf items only, excludes submenus).</td></tr>
           </tbody>
         </table>
       </div>

@@ -2,7 +2,7 @@
 // Data-driven: pass `items` array. Auto-generates ARIA, keyboard nav, submenu positioning.
 // Used by pdx-dropdown-menu and pdx-context-menu as the rendering engine.
 
-import { component, html, signal, focusGroup, slot, snippetOrSlot, model } from '@pdxui/core';
+import { component, html, signal, focusGroup, slot, declaredSnippet, model } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
@@ -44,7 +44,7 @@ export interface MenuItem {
  * A menu drawn in place from a list of items, with checkbox and radio items, submenus and keyboard
  * navigation, shown while it is open.
  *
- * @slot item - Renders one menu entry: a snippet `item(item)`, or the scoped slot, which receives `{ item, key, type }` (`type` is the item's type, `'item'` when unset).
+ * @slot item - Renders one menu entry: a snippet `item(item)`.
  */
 component('pdx-menu', {
     // `open` is a model (#288): the menu closes itself — Escape, a chosen entry — and its own writes
@@ -75,7 +75,7 @@ component('pdx-menu', {
     },
     // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {
         // Any entry the menu renders through the snippet (#651): an element of `items`, or a child or
         // grandchild of one in a submenu, less the separators, labels and submenu triggers it draws
@@ -93,9 +93,9 @@ component('pdx-menu', {
         let _scrollHandler: (() => void) | null = null;
         let _bound = false;
 
-        // Slot — read lazily (_projectSlots runs after setup)
+        // Read where it draws: a snippet set after mount is the one drawn. `renderItem` takes the scope.
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item]) ?? (ctx.renderItem() as SlotFunction | null) ?? undefined;
+            return declaredSnippet(ctx, 'item', (s) => [s.item]) ?? (ctx.renderItem() as SlotFunction | null) ?? undefined;
         }
 
         // ─── Build menu DOM ──────────────────────────────────
