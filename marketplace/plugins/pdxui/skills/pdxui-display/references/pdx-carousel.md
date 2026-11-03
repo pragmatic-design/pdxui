@@ -33,7 +33,7 @@ A swipeable slideshow.
 
 **Renders:** roles `group` · `region` · `tab` · `tablist`
 
-**Slot:** `slide` — Renders one slide: a snippet `slide(slide, index, active)`, or the scoped slot, which receives `{ slide, index, isActive }`.
+**Slot:** `slide` — Renders one slide: a snippet `slide(slide, index, active)`.
 
 **States:** `:state(fade)` — `animation="fade"`: the slides cross-fade in place instead of sliding.
 
