@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-463 value exports.
+464 value exports.
 
 ### `__adoptStyles`
 
@@ -1585,6 +1585,20 @@ Usage:
   const search = signal('');
   const debouncedSearch = debounced(() => search(), 300);
   effect(() => fetchResults(debouncedSearch()));
+
+### `declaredSnippet`
+
+```ts
+import { declaredSnippet } from '@pdxui/core';
+
+function declaredSnippet(ctx: object, name: string, args: (scope: Record<string, unknown>) => readonly unknown[]): SlotFunction | undefined
+```
+
+The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
+scope object, the arguments taken from it by `args` (#492). Undefined when the parent gave none: the
+alpha scoped slot (`ctx.__slots`) is not read, unlike {@link snippetOrSlot}, which a component left
+on the alpha path still uses. Read where the component draws, so a snippet set after mount is the
+one drawn.
 
 ### `defer`
 

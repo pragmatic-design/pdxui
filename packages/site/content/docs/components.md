@@ -458,9 +458,10 @@ grid's `DataGrid`, and `empty()` replaces the empty state.
 </pdx-pagination>
 ```
 
-A component written in TypeScript reads the parent's template with core's `snippetOrSlot(ctx, name,
-args, slotName?)`: the snippet when the parent gave one, called with the arguments `args` takes from
-the scope, and otherwise the alpha scoped slot, `slotName` when its name differs from the snippet's.
+A component written in TypeScript reads the parent's template with core's `declaredSnippet(ctx,
+name, args)`: the snippet when the parent gave one, called with the arguments `args` takes from the
+scope, and nothing otherwise (#492). `snippetOrSlot(ctx, name, args, slotName?)` falls back on the
+alpha scoped slot, and stays only while the library's own components move off it.
 
 ### Scoped slots (data from the component to the content)
 

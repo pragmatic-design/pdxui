@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 63 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 64 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -282,6 +282,20 @@ position with it, and `scrollTo` corrects itself once the rows it lands on are m
 
 `overscan` (3) is how many rows to draw beyond the viewport: too few and fast scrolling shows
 blank space, too many and the saving disappears.
+
+## `declaredSnippet`
+
+```ts
+import { declaredSnippet } from '@pdxui/core';
+
+function declaredSnippet(ctx: object, name: string, args: (scope: Record<string, unknown>) => readonly unknown[]): SlotFunction | undefined
+```
+
+The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
+scope object, the arguments taken from it by `args` (#492). Undefined when the parent gave none: the
+alpha scoped slot (`ctx.__slots`) is not read, unlike {@link snippetOrSlot}, which a component left
+on the alpha path still uses. Read where the component draws, so a snippet set after mount is the
+one drawn.
 
 ## `defer`
 

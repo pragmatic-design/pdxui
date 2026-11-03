@@ -26,13 +26,27 @@ export function snippetOrSlot(
     args: (scope: Record<string, unknown>) => readonly unknown[],
     slotName: string = name,
 ): SlotFunction | undefined {
-    const c = ctx as Record<string, unknown> & { __slots?: Record<string, SlotFunction | undefined> };
+    return declaredSnippet(ctx, name, args)
+        ?? (ctx as { __slots?: Record<string, SlotFunction | undefined> }).__slots?.[slotName];
+}
+
+/**
+ * The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
+ * scope object, the arguments taken from it by `args` (#492). Undefined when the parent gave none: the
+ * alpha scoped slot (`ctx.__slots`) is not read, unlike {@link snippetOrSlot}, which a component left
+ * on the alpha path still uses. Read where the component draws, so a snippet set after mount is the
+ * one drawn.
+ */
+export function declaredSnippet(
+    ctx: object,
+    name: string,
+    args: (scope: Record<string, unknown>) => readonly unknown[],
+): SlotFunction | undefined {
+    const c = ctx as Record<string, unknown>;
     const declared = typeof c[name] === 'function' ? (c[name] as () => unknown)() : undefined;
-    if (typeof declared === 'function') {
-        const snippet = declared as (...a: readonly unknown[]) => Node | null | undefined;
-        return (scope) => snippet(...args(scope)) ?? document.createDocumentFragment();
-    }
-    return c.__slots?.[slotName];
+    if (typeof declared !== 'function') return undefined;
+    const snippet = declared as (...a: readonly unknown[]) => Node | null | undefined;
+    return (scope) => snippet(...args(scope)) ?? document.createDocumentFragment();
 }
 
 /**
