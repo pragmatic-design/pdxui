@@ -56,8 +56,8 @@ describe('it compiles to eachVirtual', () => {
         expect(code).toMatch(/tag:\s*"tr"/);
     });
 
-    it('on the template path too — a scoped slot\'s body', () => {
-        const { code } = compile(sfc('<pdx-list><slot name="row" let:r><ul>@for (r.posts as p; track p.id) @virtual { <li>{{ p.title }}</li> }</ul></slot></pdx-list>'), 'slot.pdx');
+    it('in a snippet\'s body too', () => {
+        const { code } = compile(sfc('<pdx-list>@snippet item(r) { <ul>@for (r.posts as p; track p.id) @virtual { <li>{{ p.title }}</li> }</ul> }</pdx-list>'), 'slot.pdx');
         expect(code).toMatch(/eachVirtual\(/);
     });
 });

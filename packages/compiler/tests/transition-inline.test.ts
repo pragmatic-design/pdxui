@@ -1,7 +1,7 @@
 // `@transition`, `@stagger`, `@mode` and `@move` on an `@if` or a `@for` reach the runtime: every .pdx's
-// render since #107, and a scoped slot's body since #364. The inline path dropped them once, so an
-// animation that played in dev did not play in the shipped app (#85). The options object must be passed
-// to `when` / `each` / `eachRow`, at the top level and in a slot.
+// render since #107, and a snippet's body. The inline path dropped them once, so an animation that
+// played in dev did not play in the shipped app (#85). The options object must be passed to `when` /
+// `each` / `eachRow`, at the top level and in a snippet.
 
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -12,7 +12,7 @@ function compiled(template: string): { inline: string; slot: string } {
     const src = (body: string) => `<template>${body}</template>\n${SCRIPT}`;
     return {
         inline: compile(src(template), 'transition-probe.pdx', [], undefined, { production: true }).code,
-        slot: compile(src(`<pdx-list><slot name="item" let:row>${template}</slot></pdx-list>`), 'transition-probe.pdx', [], undefined, { production: true }).code,
+        slot: compile(src(`<pdx-list>@snippet item(row) { ${template} }</pdx-list>`), 'transition-probe.pdx', [], undefined, { production: true }).code,
     };
 }
 
@@ -36,7 +36,7 @@ describe('transitions reach the runtime', () => {
         it(name, () => {
             const { inline, slot } = compiled(template);
             expect(options(inline), 'the render dropped the transition').toBe(expected);
-            expect(options(slot), 'a scoped slot body dropped the transition').toBe(expected);
+            expect(options(slot), 'a snippet body dropped the transition').toBe(expected);
         });
     }
 

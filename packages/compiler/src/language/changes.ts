@@ -46,7 +46,7 @@ import { buttonToggleRemoved } from './button-toggle';
 import { listRenderItem } from './list-render-item';
 import { openChangeEvent, selectOverlayVerbs, selectOverlayVerbsScript, cascaderOverlayVerbs, cascaderOverlayVerbsScript, treeSelectOverlayVerbs, treeSelectOverlayVerbsScript, datePickerOverlayVerbs, datePickerOverlayVerbsScript, autocompleteOpenShow, autocompleteOpenUnbound, colorPickerOpenShow, colorPickerOpenUnbound, popoverHideClose, popoverHideUnbound, commandOverlayVerbs, commandOverlayVerbsScript, menuCloseAllClose, menuCloseAllUnbound, tooltipHideClose, tooltipHideUnbound, dropdownMenuOpenShow, dropdownMenuOpenUnbound, contextMenuOpenShow, contextMenuOpenUnbound, fabOpenShow, fabOpenUnbound } from './open-change';
 import { modelGetValue, modelSetValue, modelMethodsUnbound } from './model-methods';
-import { scopedSlotParent, scopedSlotOutlet, scriptSnippetInterpolation, templatePropFlag } from './scoped-slots';
+import { scopedSlotParent, scopedSlotOutlet, slotObjectForm, scriptSnippetInterpolation, templatePropFlag } from './scoped-slots';
 
 /** What a change is, by `migration.md`'s classes. */
 export type LanguageChangeKind = 'removed' | 'changed' | 'fix' | 'target';
@@ -459,12 +459,17 @@ export const LANGUAGE_CHANGES: readonly LanguageChange[] = [
     // #288: pdx-fab's open() is the overlay verb show() (./open-change).
     fabOpenShow,
     fabOpenUnbound,
-    // #492: scoped slots and template props are typed snippets (./scoped-slots). `changed` while the
-    // repository still uses them; the last part of #492 makes them `removed`.
+    // #492: scoped slots and template props are typed snippets (./scoped-slots). The outlet's rewrite
+    // replaces an object form it reads, so it runs before slotObjectForm, which takes what is left.
     scopedSlotParent,
     scopedSlotOutlet,
+    slotObjectForm,
     scriptSnippetInterpolation,
     templatePropFlag,
+    // #492: the alpha scoped slots' runtime leaves the exports with them.
+    removedExport('@pdxui/core', 'snippetOrSlot', '`declaredSnippet(ctx, name, args)`: a component reads its parent\'s snippet only', 492),
+    removedExport('@pdxui/core', 'renderSlot', '`@render name?.(args)` in a .pdx, or `renderSnippet(source, args, fallback)`', 492),
+    removedExport('@pdxui/core', 'slotCarrier', '`@snippet name(params) { … }` inside the component\'s tag, or set the snippet as the element\'s property', 492),
 ];
 
 let active: readonly LanguageChange[] = LANGUAGE_CHANGES;

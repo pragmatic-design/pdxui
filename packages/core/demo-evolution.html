@@ -40,8 +40,8 @@ import {
     exposeOnElement,
     // Error Boundary
     errorBoundary,
-    // Scoped Slot
-    renderSlot,
+    // Snippet
+    renderSnippet,
     // Animation
     keyframes, spring,
     // Style Runtime
@@ -203,42 +203,36 @@ function testErrorBoundary() {
     assert('4.3 errorBoundary: retry recovers', document.querySelector('.retry-ok')?.textContent === 'recovered');
 }
 
-// ─── 5. Scoped Slot ─────────────────────────────────────────────
+// ─── 5. Snippet ─────────────────────────────────────────────────
 
-function testScopedSlot() {
+function testSnippet() {
     const name = signal('Alice');
-    const slots = {
-        greeting: (scope) => {
-            const span = document.createElement('span');
-            span.className = 'slot-result';
-            span.textContent = `Hello ${scope.name}!`;
-            return span;
-        },
+    const greeting = (who) => {
+        const span = document.createElement('span');
+        span.className = 'slot-result';
+        span.textContent = `Hello ${who}!`;
+        return span;
     };
 
-    const frag = renderSlot(
-        slots, 'greeting',
-        () => ({ name: name() }),
-        () => html`<span>default</span>`
-    );
+    const frag = renderSnippet(() => greeting, () => [name()], () => html`<span>default</span>`);
     document.getElementById('test-container').appendChild(frag);
 
-    assert('5.1 scopedSlot: renders with scope data',
+    assert('5.1 snippet: renders with its arguments',
         document.querySelector('.slot-result')?.textContent === 'Hello Alice!');
 
     name.set('Bob');
-    assert('5.2 scopedSlot: re-renders on signal change',
+    assert('5.2 snippet: re-renders on signal change',
         document.querySelector('.slot-result')?.textContent === 'Hello Bob!');
 
-    // Default slot (no function provided)
-    const frag2 = renderSlot(undefined, 'missing', null, () => {
+    // The fallback, when there is no snippet
+    const frag2 = renderSnippet(() => undefined, () => [], () => {
         const d = document.createElement('span');
         d.className = 'default-slot';
         d.textContent = 'default content';
         return d;
     });
     document.getElementById('test-container').appendChild(frag2);
-    assert('5.3 scopedSlot: default when no slot fn',
+    assert('5.3 snippet: the fallback when there is none',
         document.querySelector('.default-slot')?.textContent === 'default content');
 }
 
@@ -354,7 +348,7 @@ window.runAll = function() {
     try { testCommunication(); } catch(e) { assert('2.x communication CRASH', false, e.message); }
     try { testStoreWatch(); } catch(e) { assert('3.x store/watch CRASH', false, e.message); }
     try { testErrorBoundary(); } catch(e) { assert('4.x errorBoundary CRASH', false, e.message); }
-    try { testScopedSlot(); } catch(e) { assert('5.x scopedSlot CRASH', false, e.message); }
+    try { testSnippet(); } catch(e) { assert('5.x snippet CRASH', false, e.message); }
     try { testAnimation(); } catch(e) { assert('6.x animation CRASH', false, e.message); }
     try { testDynamic(); } catch(e) { assert('7.x dynamic CRASH', false, e.message); }
     try { testStyleRuntime(); } catch(e) { assert('8.x styleRuntime CRASH', false, e.message); }

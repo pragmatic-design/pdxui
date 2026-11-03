@@ -310,8 +310,9 @@ const ROWS: Row[] = [
     },
     // The inline path emitted `const __b = ;` for a binding with no value (#200).
     { name: ':name shorthand', expected: '<input></input>', expectedRead: 'a', template: '<input :value>', script: "let value = $signal('a');", read: (h) => h.querySelector('input')!.value },
-    // The inline path wrote a literal <slot> element, with a `row` property, around its default (#200).
-    { name: 'a scoped slot outlet with its default', expected: '<em>none</em>', template: '<slot name="cell" :row="r"><em>none</em></slot>', script: 'let r = $signal(1);' },
+    // The alpha outlet was a literal <slot> element on the inline path, around its default (#200); its
+    // beta form is an optional snippet's fallback (#492).
+    { name: 'an optional snippet with its fallback', expected: '<em>none</em>', template: '@render cell?.(r) @else { <em>none</em> }', script: '@slot cell?: (row: number);\nlet r = $signal(1);' },
     // Neither path wired the gesture: on the template path the handler ran once at render and the count
     // read NaN, on the inline path `.left` was a key filter (#99). Swiped left, both count 1.
     {
@@ -324,10 +325,10 @@ const ROWS: Row[] = [
             pad.dispatchEvent(new PointerEvent('pointerup', { clientX: 100, clientY: 10, bubbles: true }));
         },
     },
-    // A scoped slot outlet's fallback with an interpolation or a block was emitted BESIDE the outlet,
-    // on the template path with an orphan </slot> (#276): both paths now render it inside, once.
-    { name: 'a scoped slot outlet whose fallback interpolates', expected: '<div>none Ada</div>', template: '<div><slot name="row" :item="who">none {{ who }}</slot></div>', script: "let who = $signal('Ada');" },
-    { name: 'a scoped slot outlet whose fallback is a block', expected: '<div><b>x Ada</b></div>', template: '<div><slot name="row" :item="who">@if (who) { <b>x {{ who }}</b> }</slot></div>', script: "let who = $signal('Ada');" },
+    // A fallback with an interpolation or a block was emitted BESIDE the alpha outlet (#276); the
+    // optional snippet's fallback renders it inside, once, on both paths (#492).
+    { name: 'an optional snippet whose fallback interpolates', expected: '<div>none Ada</div>', template: '<div>@render row?.(who) @else {none {{ who }}}</div>', script: "@slot row?: (item: string);\nlet who = $signal('Ada');" },
+    { name: 'an optional snippet whose fallback is a block', expected: '<div><b>x Ada</b></div>', template: '<div>@render row?.(who) @else { @if (who) { <b>x {{ who }}</b> } }</div>', script: "@slot row?: (item: string);\nlet who = $signal('Ada');" },
     // @show false left a root text node on the page on both paths (#265); both now take it out, and
     // put it back current: hidden, renamed, shown.
     {

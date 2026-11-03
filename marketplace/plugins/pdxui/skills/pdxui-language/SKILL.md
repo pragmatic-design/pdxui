@@ -233,9 +233,9 @@ is `$event`.
 name, its `target` the element the handler is on (`$event.target.value` on an `<input>` is fine), or
 the `CustomEvent<Payload>` a `.pdx` component declares with `@event` — `unknown` detail when it gives
 no payload. The error of `@catch (e)` and `@await … @error (e)` is `unknown`: narrow it,
-`e instanceof Error ? e.message : String(e)`, since a template cannot write a cast. A scoped slot's
-`let:` names have the type its component declares with `@slot name: { … }`, `unknown` when it declares
-none. A library component's event details and slot contexts are not typed yet, so they are not checked.
+`e instanceof Error ? e.message : String(e)`, since a template cannot write a cast. A `@snippet`'s
+parameters have the types of the component's `@slot` signature, its generics inferred from the props
+that use them. A library component's event details are not typed yet, so they are not checked.
 An arrow handler's parameter (`@input="e => …"`) is the event too. Template expressions are checked
 under `strict` (the script is not): a possibly-`null` read, `user.name` on a `$signal<User | null>`,
 is an error — write `user?.name` or guard it with `@if`.

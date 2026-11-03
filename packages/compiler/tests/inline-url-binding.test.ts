@@ -53,14 +53,14 @@ describe('the controls', () => {
     });
 });
 
-describe('a scoped slot body, built inline since #364', () => {
+describe('a snippet body, built inline', () => {
     it(':href goes through sanitizeBoundUrl there too', () => {
-        // It was an html`` template, which core's bindProperty sanitised at runtime.
-        const source = "<template>\n<pdx-list><slot name=\"item\" let:row><a :href=\"url\">Go</a></slot></pdx-list>\n</template>\n<script>\nlet url = $signal('/');\n</script>";
+        // The alpha slot body was an html`` template, which core's bindProperty sanitised at runtime (#364).
+        const source = "<template>\n<pdx-list>@snippet item(row) { <a :href=\"url\">Go</a> }</pdx-list>\n</template>\n<script>\nlet url = $signal('/');\n</script>";
         const code = compile(source, 'slot-url.pdx', [], undefined, { production: true }).code;
-        const slot = code.slice(code.indexOf('const __pdxSlot_item_0'));
-        expect(slot).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
-        expect(slot, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
+        // The template's only <a> is the snippet's.
+        expect(code).toMatch(/const __b = ctx\.url\(\);[^\n]*sanitizeBoundUrl\(\w+, "href", __b\)/);
+        expect(code, 'the raw value must not be assigned').not.toMatch(/\["href"\] = (ctx\.|__b)/);
         expect(code).not.toMatch(/html`/);
     });
 });

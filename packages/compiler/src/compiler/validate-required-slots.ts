@@ -24,7 +24,7 @@ function childLists(node: TemplateNode): (TemplateNode[] | undefined)[] {
         case 'try': return [node.body, node.catchBody];
         case 'await': return [node.body, node.loading, node.errorBody];
         case 'render': return [node.fallback];
-        case 'show': case 'portal': case 'slot-template': case 'scoped-slot': case 'snippet': case 'custom-directive':
+        case 'show': case 'portal': case 'snippet': case 'custom-directive':
             return [node.body];
         default: return [];
     }

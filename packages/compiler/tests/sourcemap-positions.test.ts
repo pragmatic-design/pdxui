@@ -182,8 +182,8 @@ function save() { throw new Error('nope'); }
 </script>
 `;
 
-    it('a scoped slot body, built by the inline path since #364: the same six', () => {
-        const SLOT = TEMPLATE.replace('<section>', '<pdx-list><slot name="item" let:row><section>').replace('</section>', '</section></slot></pdx-list>');
+    it('a snippet body, built by the inline path: the same six', () => {
+        const SLOT = TEMPLATE.replace('<section>', '<pdx-list>@snippet item(row) { <section>').replace('</section>', '</section> }</pdx-list>');
         const { code, map } = compile(SLOT, 'tpl.pdx', [], undefined, {});
         expect(probe(SLOT, code, map, [
             ['@click="save"', "__el2.addEventListener('click'"],

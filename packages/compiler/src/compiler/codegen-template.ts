@@ -1,10 +1,10 @@
 // What the inline render path (./codegen-template-inline) shares with the generator that once built a
 // render as an html`` tagged template: the options of a transition, of a virtual list and of an
-// `@await`, the loader of a `@defer`, the hoisting of a scoped slot's function and of a loop's
-// invariant reads. That generator is gone (#526): nothing reached it after the legacy mode (#158).
+// `@await`, the loader of a `@defer`, the hoisting of a loop's invariant reads. That generator is gone
+// (#526): nothing reached it after the legacy mode (#158).
 // All state is passed via CompileContext — no module-level mutable variables.
 
-import type { ForNode, TransitionConfig, AwaitNode, SlotTemplateNode } from '../parser/template';
+import type { ForNode, TransitionConfig, AwaitNode } from '../parser/template';
 import type { CompileContext } from './compile-context';
 import { jsQuote, jsString } from './js-literal';
 import { virtualRowTag } from './validate-virtual';
@@ -110,42 +110,6 @@ export function awaitTimingArg(node: AwaitNode): string {
     if (node.minMs) opts.push(`minMs:${node.minMs}`);
     if (node.maxMs) opts.push(`maxMs:${node.maxMs}`);
     return opts.length ? `{${opts.join(',')}}` : '';
-}
-
-/**
- * Hoist a scoped slot's function, whose statements `body` generates with the slot's scope variables
- * in scope as plain locals, and return the EXPRESSION that carries it (#364).
- */
-export function hoistSlotFunction(node: SlotTemplateNode, imports: Set<string>, ctx: CompileContext, body: () => string): string {
-    imports.add('slotCarrier');
-
-    // The scope vars are locals inside the slot body: no ctx. prefix, and not a @for's row getters.
-    // Membership is restored afterwards, as a loop's is.
-    const before = node.scopeVars.map(n => ({ n, scope: ctx.scopeVars.has(n), row: ctx.rowVars.has(n) }));
-    for (const v of node.scopeVars) { ctx.scopeVars.add(v); ctx.rowVars.delete(v); }
-    let bodyCode: string;
-    try {
-        bodyCode = body();
-    } finally {
-        for (const { n, scope, row } of before) {
-            if (scope) ctx.scopeVars.add(n); else ctx.scopeVars.delete(n);
-            if (row) ctx.rowVars.add(n); else ctx.rowVars.delete(n);
-        }
-    }
-
-    // Unique variable name for hoisted slot function. The slot name is not always an identifier —
-    // the data grid's cell slots are `col:{field}` / `header:{field}`, others use a hyphen — and
-    // `__pdxSlot_col:name_0` is not JavaScript. Only the variable is renamed;
-    // the carrier below keeps the real name, and the index keeps `col:a` and `col-a` apart.
-    const varName = `__pdxSlot_${node.name.replace(/[^\w$]/g, '_')}_${ctx.hoistedSlots.length}`;
-
-    const fnCode = node.scopeVars.length === 0
-        ? `const ${varName} = () => { ${bodyCode} };`
-        : `const ${varName} = (__scope) => { const { ${node.scopeVars.join(', ')} } = __scope; ${bodyCode} };`;
-
-    ctx.hoistedSlots.push([varName, fnCode]);
-
-    return `slotCarrier(${jsQuote(node.name)}, ${varName})`;
 }
 
 /**

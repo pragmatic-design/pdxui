@@ -130,10 +130,10 @@ describe('the slotted elements', () => {
         expect(ifNode.type === 'if' && html(ifNode.elseBody ?? [])).toContain('<p>b</p>');
     });
 
-    it('marks a scoped slot\'s body written inside the tag', () => {
-        const nodes = marked('<pdx-table>@slot(row, { item }) { <td class="cell">{{ item }}</td> }</pdx-table>');
-        const slot = nodes.find((n) => n.type === 'slot-template')!;
-        expect(slot.type === 'slot-template' && html(slot.body)).toContain(`<td class="cell" ${H}-in>`);
+    it('marks a snippet\'s body written inside the tag', () => {
+        const nodes = marked('<pdx-table>@snippet row(item) { <td class="cell">{{ item }}</td> }</pdx-table>');
+        const snippet = nodes.find((n) => n.type === 'snippet')!;
+        expect(snippet.type === 'snippet' && html(snippet.body)).toContain(`<td class="cell" ${H}-in>`);
     });
 
     it('keeps the origins of what follows a mark pointing at the source', () => {

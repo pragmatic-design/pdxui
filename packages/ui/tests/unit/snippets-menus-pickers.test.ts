@@ -4,7 +4,7 @@
 // (`<slot name="x" let:row>`, `ctx.__slots`). It declares the slot in its descriptor,
 // `slot<(…) => Node>()`, so a parent's `@snippet` — which compiles to setting the element's property
 // — reaches it, and since #492 it reads that snippet alone. For each one, the snippet draws the
-// expected entries from its arguments, and a scoped slot given to the same element draws nothing.
+// expected entries from its arguments. The alpha scoped slot is removed (#492).
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
@@ -24,17 +24,15 @@ type Args = unknown[];
 
 interface Case {
     tag: string;
-    /** The slot's name, the same on both sides. */
+    /** The snippet's name. */
     slot: string;
     /** Props set before the element is connected. */
     props: Record<string, unknown>;
     /** What makes the component draw its entries. */
     open(el: HTMLElement): Promise<void> | void;
-    /** The text the alpha scoped slot draws from its scope. */
-    fromScope(scope: Scope): string;
     /** The same text, drawn by the snippet from its arguments. */
     fromArgs(...args: Args): string;
-    /** The entries the snippet draws (#492): the alpha scoped slot draws none. */
+    /** The entries the snippet draws. */
     expected: string[];
 }
 
@@ -54,7 +52,6 @@ const CASES: Case[] = [
             input.value = 'a';
             input.dispatchEvent(new Event('input', { bubbles: true }));
         },
-        fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (o, index) => `${(o as Scope).label}=${(o as Scope).value}#${index}`,
         expected: ['Italy=it#0', 'France=fr#1'],
     },
@@ -62,7 +59,6 @@ const CASES: Case[] = [
         tag: 'pdx-cascader', slot: 'option',
         props: { options: [{ value: 'it', label: 'Italy', children: [{ value: 'lz', label: 'Lazio' }] }] },
         open: (el) => click(el, '[role="combobox"]'),
-        fromScope: (s) => `${(s.node as Scope).label}@${s.level}`,
         fromArgs: (node, level) => `${(node as Scope).label}@${level}`,
         expected: ['Italy@0'],
     },
@@ -70,7 +66,6 @@ const CASES: Case[] = [
         tag: 'pdx-command', slot: 'item',
         props: { items: [{ label: 'Open', value: 'open' }, { label: 'Save', value: 'save' }], open: true },
         open: () => undefined,
-        fromScope: (s) => `${(s.item as Scope).label}#${s.index}`,
         fromArgs: (item, index) => `${(item as Scope).label}#${index}`,
         expected: ['Open#0', 'Save#1'],
     },
@@ -78,7 +73,6 @@ const CASES: Case[] = [
         tag: 'pdx-context-menu', slot: 'item',
         props: { items: MENU_ITEMS },
         open: (el) => (el as unknown as { show(x: number, y: number): void }).show(10, 10),
-        fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
         expected: ['Cut:item', 'Copy:item'],
     },
@@ -86,7 +80,6 @@ const CASES: Case[] = [
         tag: 'pdx-dropdown-menu', slot: 'item',
         props: { items: MENU_ITEMS, label: 'Edit' },
         open: (el) => click(el, 'button'),
-        fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
         expected: ['Cut:item', 'Copy:item'],
     },
@@ -94,7 +87,6 @@ const CASES: Case[] = [
         tag: 'pdx-menu', slot: 'item',
         props: { items: MENU_ITEMS, open: true },
         open: () => undefined,
-        fromScope: (s) => `${(s.item as Scope).label}:${s.type}`,
         fromArgs: (item) => `${(item as Scope).label}:${(item as Scope).type ?? 'item'}`,
         expected: ['Cut:item', 'Copy:item'],
     },
@@ -102,7 +94,6 @@ const CASES: Case[] = [
         tag: 'pdx-select', slot: 'item',
         props: { options: OPTIONS },
         open: (el) => click(el, '.pdx-select-trigger'),
-        fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (o, index) => `${(o as Scope).label}=${(o as Scope).value}#${index}`,
         expected: ['Italy=it#0', 'France=fr#1'],
     },
@@ -110,7 +101,6 @@ const CASES: Case[] = [
         tag: 'pdx-select', slot: 'selected',
         props: { options: OPTIONS, value: 'fr' },
         open: () => undefined,
-        fromScope: (s) => `${s.label}=${s.value}`,
         fromArgs: (o) => `${(o as Scope).label}=${(o as Scope).value}`,
         expected: ['France=fr'],
     },
@@ -118,7 +108,6 @@ const CASES: Case[] = [
         tag: 'pdx-tree-select', slot: 'node',
         props: { options: TREE, expandAll: true },
         open: (el) => click(el, '[role="combobox"]'),
-        fromScope: (s) => `${(s.node as Scope).label}@${s.level}`,
         fromArgs: (node, level) => `${(node as Scope).label}@${level}`,
         expected: ['Fruit@0', 'Apple@1'],
     },
@@ -143,19 +132,6 @@ async function mount(c: Case, give: (el: HTMLElement) => void): Promise<string[]
     return [...document.querySelectorAll('.mine')].map((n) => n.textContent ?? '');
 }
 
-/** The alpha scoped slot: what compiled parent code hands a component for `<slot name="x" let:…>`. */
-function scopedSlot(c: Case) {
-    return (el: HTMLElement) => {
-        const carrier = document.createElement('template') as HTMLTemplateElement & {
-            __pdxSlot?: (scope: Scope) => Node;
-            __pdxSlotName?: string;
-        };
-        carrier.__pdxSlotName = c.slot;
-        carrier.__pdxSlot = (scope) => mark(c.fromScope(scope));
-        el.appendChild(carrier);
-    };
-}
-
 /** The snippet: the element's property, which is what a parent's `@snippet` compiles to setting. */
 function snippet(c: Case) {
     return (el: HTMLElement) => {
@@ -163,14 +139,11 @@ function snippet(c: Case) {
     };
 }
 
-describe('menus and pickers: a snippet draws, a scoped slot does not (#491, #492)', () => {
+describe('menus and pickers: a snippet draws its entries (#491, #492)', () => {
     beforeEach(cleanup);
 
     for (const c of CASES) {
         describe(`${c.tag} — ${c.slot}`, () => {
-            it('the alpha scoped slot draws nothing', async () => {
-                expect(await mount(c, scopedSlot(c))).toEqual([]);
-            });
 
             it('a snippet draws its entries, from its arguments', async () => {
                 expect(await mount(c, snippet(c))).toEqual(c.expected);

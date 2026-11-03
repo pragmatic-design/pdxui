@@ -4,7 +4,7 @@
 // (`<slot name="x" let:row>`, `ctx.__slots`). It declares the slot in its descriptor,
 // `slot<(…) => Node>()`, so a parent's `@snippet` — which compiles to setting the element's property
 // — reaches it, and since #492 it reads that snippet alone. For each one, the snippet draws the
-// expected entries from its arguments, and a scoped slot given to the same element draws nothing.
+// expected entries from its arguments. The alpha scoped slot is removed (#492).
 // Two snippets are named apart from a prop: `pdx-pagination`'s is `item` (the prop is `page`),
 // `pdx-nav-menu`'s controls are `itemActions` (the prop is `actions`).
 
@@ -26,17 +26,15 @@ type Args = unknown[];
 
 interface Case {
     tag: string;
-    /** The alpha scoped slot's name. */
+    /** The slot's name: the snippet's, unless `snippet` says otherwise. */
     slot: string;
     /** The snippet's name, when it differs from the slot's. */
     snippet?: string;
     /** Props set before the element is connected. */
     props: Record<string, unknown>;
-    /** The text the alpha scoped slot draws from its scope. */
-    fromScope(scope: Scope): string;
     /** The same text, drawn by the snippet from its arguments. */
     fromArgs(...args: Args): string;
-    /** The entries the snippet draws (#492): the alpha scoped slot draws none. */
+    /** The entries the snippet draws. */
     expected: string[];
 }
 
@@ -47,70 +45,60 @@ const CASES: Case[] = [
     {
         tag: 'pdx-breadcrumb', slot: 'item',
         props: { items: [{ key: 'home', label: 'Home', href: '/' }, { key: 'docs', label: 'Docs' }] },
-        fromScope: (s) => `${label(s.item)}#${s.index}${s.isLast ? '!' : ''}`,
         fromArgs: (item, index, isLast) => `${label(item)}#${index}${isLast ? '!' : ''}`,
         expected: ['Home#0', 'Docs#1!'],
     },
     {
         tag: 'pdx-description-list', slot: 'value',
         props: { items: [{ label: 'Name', value: 'Ada' }, { label: 'Role', value: 'Engineer' }] },
-        fromScope: (s) => `${s.label}=${s.value}#${s.index}`,
         fromArgs: (item, index) => `${label(item)}=${(item as Scope).value}#${index}`,
         expected: ['Name=Ada#0', 'Role=Engineer#1'],
     },
     {
         tag: 'pdx-list', slot: 'item',
         props: { items: [{ id: 1, name: 'Ada' }, { id: 2, name: 'Bo' }] },
-        fromScope: (s) => `${(s.item as Scope).name}#${s.index}`,
         fromArgs: (item, index) => `${(item as Scope).name}#${index}`,
         expected: ['Ada#0', 'Bo#1'],
     },
     {
         tag: 'pdx-list', slot: 'empty',
         props: { items: [] },
-        fromScope: () => 'nothing here',
         fromArgs: () => 'nothing here',
         expected: ['nothing here'],
     },
     {
         tag: 'pdx-nav-menu', slot: 'item',
         props: { items: NAV, activeKey: 'a' },
-        fromScope: (s) => `${label(s.item)}@${s.level}:${s.expanded}:${s.active}`,
         fromArgs: (item, level, expanded, active) => `${label(item)}@${level}:${expanded}:${active}`,
         expected: ['A@0:false:true', 'G@0:false:false'],
     },
     {
         tag: 'pdx-nav-menu', slot: 'actions', snippet: 'itemActions',
         props: { items: NAV, activeKey: 'a' },
-        fromScope: (s) => `${label(s.item)}@${s.level}:${s.active}`,
         fromArgs: (item, level, active) => `${label(item)}@${level}:${active}`,
         expected: ['A@0:true'],
     },
     {
         tag: 'pdx-pagination', slot: 'page', snippet: 'item',
         props: { total: 30, pageSize: 10, page: 2 },
-        fromScope: (s) => `${s.page}${s.isActive ? '*' : ''}`,
         fromArgs: (page, active) => `${page}${active ? '*' : ''}`,
         expected: ['1', '2*', '3'],
     },
     {
         tag: 'pdx-sortable-list', slot: 'item',
         props: { items: [{ id: 1, label: 'One' }, { id: 2, label: 'Two' }] },
-        fromScope: (s) => `${label(s.item)}#${s.index}`,
         fromArgs: (item, index) => `${label(item)}#${index}`,
         expected: ['One#0', 'Two#1'],
     },
     {
         tag: 'pdx-timeline', slot: 'content',
         props: { items: [{ title: 'Filed' }, { title: 'Shipped', status: 'success' }] },
-        fromScope: (s) => `${(s.item as Scope).title}#${s.index}:${s.status}`,
         fromArgs: (item, index) => `${(item as Scope).title}#${index}:${(item as Scope).status ?? 'default'}`,
         expected: ['Filed#0:default', 'Shipped#1:success'],
     },
     {
         tag: 'pdx-tree', slot: 'node',
         props: { nodes: [{ id: 'f', label: 'Fruit', children: [{ id: 'a', label: 'Apple' }] }], defaultExpandAll: true },
-        fromScope: (s) => `${label(s.node)}@${s.level}:${s.expanded}`,
         fromArgs: (node, level, expanded) => `${label(node)}@${level}:${expanded}`,
         expected: ['Fruit@1:true', 'Apple@2:false'],
     },
@@ -132,19 +120,6 @@ async function mount(c: Case, give: (el: HTMLElement) => void): Promise<string[]
     return [...document.querySelectorAll('.mine')].map((n) => n.textContent ?? '');
 }
 
-/** The alpha scoped slot: what compiled parent code hands a component for `<slot name="x" let:…>`. */
-function scopedSlot(c: Case) {
-    return (el: HTMLElement) => {
-        const carrier = document.createElement('template') as HTMLTemplateElement & {
-            __pdxSlot?: (scope: Scope) => Node;
-            __pdxSlotName?: string;
-        };
-        carrier.__pdxSlotName = c.slot;
-        carrier.__pdxSlot = (scope) => mark(c.fromScope(scope));
-        el.appendChild(carrier);
-    };
-}
-
 /** The snippet: the element's property, which is what a parent's `@snippet` compiles to setting. */
 function snippet(c: Case) {
     return (el: HTMLElement) => {
@@ -152,14 +127,11 @@ function snippet(c: Case) {
     };
 }
 
-describe('lists and navigation: a snippet draws, a scoped slot does not (#595, #492)', () => {
+describe('lists and navigation: a snippet draws its entries (#595, #492)', () => {
     beforeEach(cleanup);
 
     for (const c of CASES) {
         describe(`${c.tag} — ${c.snippet ?? c.slot}`, () => {
-            it('the alpha scoped slot draws nothing', async () => {
-                expect(await mount(c, scopedSlot(c))).toEqual([]);
-            });
 
             it('a snippet draws its entries, from its arguments', async () => {
                 expect(await mount(c, snippet(c))).toEqual(c.expected);

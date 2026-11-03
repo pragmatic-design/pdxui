@@ -1,10 +1,10 @@
-// The scoped-slot forms and their rewrites (#492, part 1): `pdx migrate` turns each alpha form into the
-// typed snippet that replaces it. Registered as `changed` while the repository still uses the alpha
-// forms; part 4 of #492 makes them `removed`, PDX_REMOVED_FORM.
+// The scoped-slot forms and their rewrites (#492): `pdx migrate` turns each alpha form into the typed
+// snippet that replaces it, and the compiler reports each as PDX_REMOVED_FORM. A script `@snippet`'s
+// `${arg}` is not removed: it is valid beta that reads as text, so it stays a `changed` meaning.
 
 import { describe, it, expect } from 'vitest';
 import { scopedSlotParent, scopedSlotOutlet, scriptSnippetInterpolation, templatePropFlag, signatureParamNames } from '../src/language/scoped-slots';
-import { outletSnippetParams } from '../src/language/scoped-slot-outlet';
+import { outletSnippetParams, slotObjectForm } from '../src/language/scoped-slot-outlet';
 import { languageChanges, type LanguageChangeContext } from '../src/language/changes';
 import { ComponentResolver } from '../src/component-resolver';
 import { compile } from '../src/plugin';
@@ -20,6 +20,7 @@ const CONTEXT: LanguageChangeContext = {
 
 const fixParent = (text: string) => (scopedSlotParent.fix as (t: string, c?: LanguageChangeContext) => string)(text, CONTEXT);
 const fixOutlet = (text: string) => (scopedSlotOutlet.fix as (t: string) => string)(text);
+const fixObject = (text: string) => (slotObjectForm.fix as (t: string) => string)(text);
 const errors = (src: string, file = 'm.pdx') => compile(src, file).warnings.filter((w) => w.severity === 'error');
 
 describe('signatureParamNames', () => {
@@ -162,13 +163,47 @@ describe('template-prop: a template prop on a library component is flagged', () 
     });
 });
 
+describe('slot-object-form: the alpha @slot name: { … } is a signature', () => {
+    const fix = fixObject;
+    const pdx = (script: string) => `<template><slot name="row"></slot></template>\n<script>\n${script}</script>\n`;
+
+    it('an object type becomes an optional signature, its keys the parameters in their order', () => {
+        const src = pdx('@prop n: number = 0;\n  @slot row: { item: User; index?: number };\n');
+        expect(slotObjectForm.detect(src).map((f) => f.line)).toEqual([4]);
+        expect(fix(src)).toBe(pdx('@prop n: number = 0;\n  @slot row?: (item: User, index: number);\n'));
+        expect(slotObjectForm.detect(fix(src))).toEqual([]);
+    });
+
+    it('flags, and leaves, a type that is not an object literal', () => {
+        const src = pdx('@slot row: RowScope;\n');
+        expect(fix(src)).toBe(src);
+        expect(slotObjectForm.detect(src)[0].note).toContain('signature');
+    });
+
+    it('control: a signature, a slot with no type, and the text of a .ts module are not touched', () => {
+        expect(slotObjectForm.detect(pdx('@slot row?: (item: User);\n@slot footer;\n'))).toEqual([]);
+        expect(slotObjectForm.detect("const src = '@slot row: { item: User };';\n")).toEqual([]);
+    });
+});
+
 describe('the registry and the resolver', () => {
-    it('the four are registered, as changed — silent at compile until part 4 removes the forms', () => {
+    it('the alpha forms are removed; a script snippet\'s ${} stays a changed meaning', () => {
         const byId = new Map(languageChanges().map((c) => [c.id, c]));
-        for (const c of [scopedSlotParent, scopedSlotOutlet, scriptSnippetInterpolation, templatePropFlag]) {
-            expect(byId.get(c.id)?.kind, c.id).toBe('changed');
+        for (const c of [scopedSlotParent, scopedSlotOutlet, slotObjectForm, templatePropFlag]) {
+            expect(byId.get(c.id)?.kind, c.id).toBe('removed');
         }
-        expect(errors('<template><pdx-list><slot name="item" let:item>{{ item }}</slot></pdx-list></template>')).toEqual([]);
+        expect(byId.get(scriptSnippetInterpolation.id)?.kind).toBe('changed');
+    });
+
+    it('each removed form is PDX_REMOVED_FORM at its line, and its rewrite compiles with no error', () => {
+        const removedAt = (src: string) => compile(src, 'm.pdx').warnings.filter((w) => w.code === 'PDX_REMOVED_FORM').map((w) => w.line);
+        const parent = '<template>\n  <pdx-list :items="u">\n    <slot name="item" let:item>{{ item }}</slot>\n  </pdx-list>\n</template>\n<script>\nlet u = $signal([\'a\']);\n</script>\n';
+        const block = '<template>\n  <pdx-list :items="u">\n    @slot(item, { item }) { {{ item }} }\n  </pdx-list>\n</template>\n<script>\nlet u = $signal([\'a\']);\n</script>\n';
+        const outlet = '<template>\n  <slot name="row" :item="x">-</slot>\n</template>\n<script>\nconst x = 1;\n</script>\n';
+        const object = '<template>\n  <slot name="row"></slot>\n</template>\n<script>\n@slot row: { item: string };\n</script>\n';
+        const prop = '<template>\n  <pdx-select :item-template="t"></pdx-select>\n</template>\n<script>\nconst t = () => null;\n</script>\n';
+        expect([removedAt(parent), removedAt(block), removedAt(outlet), removedAt(object), removedAt(prop)]).toEqual([[3], [3], [2], [5], [2]]);
+        expect([errors(fixParent(parent)), errors(fixParent(block)), errors(fixOutlet(outlet)), errors(fixObject(object))]).toEqual([[], [], [], []]);
     });
 
     it('the resolver reads a library component\'s snippet parameters from its manifest', () => {

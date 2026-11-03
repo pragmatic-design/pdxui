@@ -15,7 +15,7 @@
 // parses.
 
 // Since #107 the render is the inline path's, `{ …; return (() => { … })(); }` in block form, and what
-// is still inserted before its return is a scoped slot's hoisted function; the deduplicated
+// is still inserted before its return is a script `@snippet`'s function; the deduplicated
 // bindings are declared inside the render's own block (#236).
 import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
@@ -27,7 +27,7 @@ const SOURCE = `
   <div>
     <pdx-probe :items="rows.length > keep ? rows : []"></pdx-probe>
     <pdx-probe :items="rows.length > keep ? rows : []"></pdx-probe>
-    <pdx-list><slot name="item" let:row><b>{{ row }}</b></slot></pdx-list>
+    <p>@render badge(1)</p>
     <pre class="doc"><code>// renderFn = (item) =&gt; {
 //   return '&lt;b&gt;' + item + '&lt;/b&gt;';
 // }</code></pre>
@@ -36,19 +36,20 @@ const SOURCE = `
 <script>
 let keep = $signal(0);
 let rows = $signal([1, 2]);
+@snippet badge(n: number) { <b>{{ n }}</b> }
 </script>`;
 
 describe('hoisted declarations target the render return', () => {
-    it('declares the hoisted slot and the deduped binding before they are used, not inside the page', () => {
+    it('declares the hoisted snippet and the deduped binding before they are used, not inside the page', () => {
         const { code } = compile(SOURCE, 'hoist-probe.pdx', undefined, undefined, { production: true });
 
         // Both must actually have run, or this test proves nothing.
         expect(code, 'binding dedup did not trigger — the probe no longer exercises it').toContain('const __bd_0');
-        expect(code, 'no scoped slot was hoisted').toMatch(/const __pdxSlot_item_\d+ =/);
+        expect(code, 'no snippet was hoisted').toMatch(/function badge\(/);
 
         const ret = code.indexOf('return (() => {');
         expect(ret, 'no render return found').toBeGreaterThan(-1);
-        expect(code.search(/const __pdxSlot_item_\d+ =/), 'the slot landed after the render return — inside the page')
+        expect(code.search(/function badge\(/), 'the snippet landed after the render return — inside the page')
             .toBeLessThan(ret);
         expect(code.indexOf('const __bd_0'), 'the shared binding is declared after its first use')
             .toBeLessThan(code.indexOf('__bd_0()'));

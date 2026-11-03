@@ -46,12 +46,17 @@ import { scenarioDist } from './scenarios-build';
  * hello measured 4.0 KB before this file existed: core's form registry registered its built-in
  * controls at load, so every app carried it whether or not it had a form. Its controls are the
  * registry's initial value now, and a bundler drops it from an app that never asks (#244).
+ *
+ * Measured again 2026-11-03 (#492): benchmark js 17.9 → 13.1 KB, dashboard js 23.7 → 19.0 KB.
+ * `component()` imported the html`` engine for `ctx.slot()`'s default, so every app carried it; with
+ * the alpha slots' runtime removed it is not imported, and a bundler drops it from an app that never
+ * writes html``. Measured with the import put back: the two came back to 17.9 and 23.7.
  */
 const BUDGET_KB: Record<string, { js: number; css: number }> = {
     hello: { js: 4.2, css: 0 },
-    benchmark: { js: 18.2, css: 0 },
+    benchmark: { js: 14.4, css: 0 },
     crud: { js: 52.1, css: 1.6 },
-    dashboard: { js: 25.8, css: 21.9 },
+    dashboard: { js: 20.9, css: 21.9 },
 };
 /**
  * How much headroom a budget may keep before it stops measuring anything, as a share of the

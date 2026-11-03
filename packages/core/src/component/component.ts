@@ -13,10 +13,8 @@ import { componentLabel, componentFile } from './global-error';
 import { devSetupBegin, devSetupEnd, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
 import { replacesDomMember } from './reserved-dom-members';
-import { renderSlot } from '../renderer/slot';
 import { bindHost } from './host';
 import type { HostBindings } from './host';
-import { html } from '../renderer/template';
 import type { ComponentScope } from './lifecycle';
 import type { Dispose } from '../utils/types';
 
@@ -108,8 +106,6 @@ export interface ComponentContextBase {
     /** Expose methods/signals on the host element for parent access via ref.
      *  Read-only from the outside (no direct reassignment); configurable for the re-expose on reconnect. */
     expose(api: Record<string, unknown>): void;
-    /** Render a named slot with optional scope data. Falls back to defaultFn if no parent slot. */
-    slot(name: string, scope?: Record<string, unknown>, defaultFn?: () => Node | DocumentFragment): DocumentFragment;
     /**
      * Turn one of the states the descriptor declares in `states` on or off (#132): a custom state of
      * the host, which CSS matches with `:state(name)`.
@@ -407,7 +403,6 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         }
 
         body(): DocumentFragment | Node | null {
-            const slotFns = this._slotFunctions;
             const ctx: Record<string, unknown> = {
                 el: this,
                 emit: (event: string, detail?: unknown, emitOptions?: EmitOptions) => {
@@ -425,8 +420,6 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                 track: (fn: () => void | (() => void), options?: EffectOptions) => this.track(fn, options),
                 frame: (fn: () => void) => this.frame(fn),
                 expose: (api: Record<string, unknown>) => exposeOnElement(this, api),
-                slot: (name: string, scope?: Record<string, unknown>, defaultFn?: () => Node | DocumentFragment) =>
-                    renderSlot(slotFns, name, scope ? () => scope : null, defaultFn ?? (() => html``)),
                 state: (name: string, on: boolean) => {
                     if (!declaredStates?.has(name)) {
                         if (DEV) console.warn(`[pdx] <${tag}> set the state '${name}', which its descriptor does not declare in \`states\` (declared: ${declaredStates ? [...declaredStates].join(', ') : 'none'}). It is not set.`);
@@ -434,7 +427,6 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
                     }
                     if (on) this._customStates?.add(name); else this._customStates?.delete(name);
                 },
-                __slots: slotFns,
             };
             // Form-associated: expose form methods on context
             if (useFormAssociated && this._internals) {

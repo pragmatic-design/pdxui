@@ -1,5 +1,6 @@
 // What `pdx migrate` writes for the scoped-slot forms (#492) renders what the alpha form rendered.
-// Each case compiles the alpha source and the migrated one, mounts both, and compares what they show.
+// The alpha forms are removed: their source is PDX_REMOVED_FORM and renders nothing, so each case
+// holds the migrated source to what the alpha one showed, written out.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as core from '@pdxui/core';
@@ -12,6 +13,10 @@ import '../../src/list/pdx-list';
 
 type Fix = (text: string, context?: LanguageChangeContext) => string;
 const fixWith = (change: { fix: unknown }) => change.fix as Fix;
+
+/** The error codes a `.pdx` compiles with. */
+const errorsOf = (name: string, src: string) =>
+    compile(src, `${name}.pdx`, [], undefined, {}).warnings.filter((w) => w.severity === 'error').map((w) => w.code);
 
 /** Compile a `.pdx` named `name` and define its element, as the app's build would. */
 function define(name: string, src: string): void {
@@ -35,8 +40,7 @@ const text = (el: Element) => el.textContent?.replace(/\s+/g, ' ').trim();
 beforeEach(cleanup);
 
 describe('scoped-slot-parent renders what the let: slot rendered', () => {
-    // pdx-list reads its snippet only since #492's part 3: the alpha parent draws nothing there now,
-    // which is what the rewrite is for. The rows the snippet draws are the ones the slot drew.
+    // The rows the snippet draws are the ones the alpha slot drew.
     it('a pdx-list item slot, migrated to its @snippet, shows the rows', async () => {
         const resolver = new ComponentResolver();
         resolver.registerUiManifest();
@@ -46,12 +50,10 @@ describe('scoped-slot-parent renders what the let: slot rendered', () => {
         const migrated = fixWith(scopedSlotParent)(alpha, context);
         expect(migrated).toContain('@snippet item(item, index) {');
 
-        define('mig-list-alpha', alpha);
+        expect(errorsOf('mig-list-alpha', alpha), 'the alpha let: slot').toEqual(['PDX_REMOVED_FORM']);
         define('mig-list-beta', migrated);
-        const before = [...(await mount('app-mig-list-alpha')).querySelectorAll('b.row')].map(text);
         const after = [...(await mount('app-mig-list-beta')).querySelectorAll('b.row')].map(text);
         expect(after).toEqual(['1. Ada', '2. Grace']);
-        expect(before, 'the alpha let: slot, which pdx-list no longer reads').toEqual([]);
     });
 });
 
@@ -59,18 +61,15 @@ describe('scoped-slot-outlet: the migrated child renders its fallback, and a par
     const CHILD = '<template><ul>@for (items as it; track it) {<li><slot name="row" :item="it">({{ it }})</slot></li>}</ul></template>\n'
         + '<script>\n@prop items: string[] = [];\n</script>\n';
 
-    it('with nothing given, both children show the fallback', async () => {
+    it('with nothing given, the migrated child shows the fallback the outlet showed', async () => {
         const migrated = fixWith(scopedSlotOutlet)(CHILD);
         expect(migrated).toContain('@render row?.(it) @else');
-        define('mig-child-alpha', CHILD);
+        expect(errorsOf('mig-child-alpha', CHILD), 'the alpha outlet').toEqual(['PDX_REMOVED_FORM']);
         define('mig-child-beta', migrated);
-        const a = await mount('app-mig-child-alpha');
         const b = await mount('app-mig-child-beta');
-        (a as unknown as { items: string[] }).items = ['x', 'y'];
         (b as unknown as { items: string[] }).items = ['x', 'y'];
         await tick(20);
-        expect(text(a)).toBe('(x)(y)');
-        expect(text(b)).toBe(text(a));
+        expect(text(b)).toBe('(x)(y)');
     });
 
     it('a parent of the migrated child, with its slot migrated, compiles and renders its snippet', async () => {

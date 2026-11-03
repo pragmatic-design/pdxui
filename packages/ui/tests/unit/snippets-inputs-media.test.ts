@@ -5,7 +5,7 @@
 // (`<slot name="x" let:row>`, `ctx.__slots`). It declares the slot in its descriptor,
 // `slot<(…) => Node>()`, so a parent's `@snippet` — which compiles to setting the element's property
 // — reaches it, and since #492 it reads that snippet alone. For each one, the snippet draws the
-// expected entries from its arguments, and a scoped slot given to the same element draws nothing.
+// expected entries from its arguments. The alpha scoped slot is removed (#492).
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createForm } from '@pdxui/core';
@@ -26,9 +26,8 @@ interface Case {
     props: () => Record<string, unknown>;
     /** What makes the component draw its entries. */
     open?(el: HTMLElement): Promise<void> | void;
-    fromScope(scope: Scope): string;
     fromArgs(...args: Args): string;
-    /** The entries the snippet draws (#492): the alpha scoped slot draws none. */
+    /** The entries the snippet draws. */
     expected: string[];
 }
 
@@ -38,7 +37,6 @@ const CASES: Case[] = [
     {
         tag: 'pdx-carousel', slot: 'slide',
         props: () => ({ items: [{ caption: 'First' }, { caption: 'Second' }], loop: false }),
-        fromScope: (s) => `${field(s.slide, 'caption')}#${s.index}${s.isActive ? '*' : ''}`,
         fromArgs: (slide, index, active) => `${field(slide, 'caption')}#${index}${active ? '*' : ''}`,
         expected: ['First#0*', 'Second#1'],
     },
@@ -49,14 +47,12 @@ const CASES: Case[] = [
             form: createForm({ initialValues: { tags: [{ name: 'alpha' }, { name: 'beta' }] } }),
             itemFields: [{ name: 'name', type: 'text', label: 'Name' }],
         }),
-        fromScope: (s) => `${field(s.item, 'name')}#${s.index}:${typeof s.remove}`,
         fromArgs: (item, index, remove) => `${field(item, 'name')}#${index}:${typeof remove}`,
         expected: ['alpha#0:function', 'beta#1:function'],
     },
     {
         tag: 'pdx-file-upload', slot: 'file',
         props: () => ({ multiple: true, value: [new File(['x'], 'a.txt'), new File(['yy'], 'b.txt')] }),
-        fromScope: (s) => `${(s.file as File).name}:${s.status}:${s.progress}`,
         fromArgs: (file, status, progress) => `${(file as File).name}:${status}:${progress}`,
         expected: ['a.txt:pending:0', 'b.txt:pending:0'],
     },
@@ -70,14 +66,12 @@ const CASES: Case[] = [
             ta.selectionStart = ta.selectionEnd = ta.value.length;
             ta.dispatchEvent(new Event('input', { bubbles: true }));
         },
-        fromScope: (s) => `${field(s.item, 'label')}#${s.index}${s.active ? '*' : ''}`,
         fromArgs: (item, index, active) => `${field(item, 'label')}#${index}${active ? '*' : ''}`,
         expected: ['Alice#0*', 'Albert#1'],
     },
     {
         tag: 'pdx-tag-input', slot: 'tag',
         props: () => ({ value: ['red', 'blue'] }),
-        fromScope: (s) => `${s.tag}#${s.index}`,
         fromArgs: (tag, index) => `${tag}#${index}`,
         expected: ['red#0', 'blue#1'],
     },
@@ -100,19 +94,6 @@ async function mount(c: Case, give: (el: HTMLElement) => void): Promise<string[]
     return [...document.querySelectorAll('.mine')].map((n) => n.textContent ?? '');
 }
 
-/** The alpha scoped slot: what compiled parent code hands a component for `<slot name="x" let:…>`. */
-function scopedSlot(c: Case) {
-    return (el: HTMLElement) => {
-        const carrier = document.createElement('template') as HTMLTemplateElement & {
-            __pdxSlot?: (scope: Scope) => Node;
-            __pdxSlotName?: string;
-        };
-        carrier.__pdxSlotName = c.slot;
-        carrier.__pdxSlot = (scope) => mark(c.fromScope(scope));
-        el.appendChild(carrier);
-    };
-}
-
 /** The snippet: the element's property, which is what a parent's `@snippet` compiles to setting. */
 function snippet(c: Case) {
     return (el: HTMLElement) => {
@@ -120,14 +101,11 @@ function snippet(c: Case) {
     };
 }
 
-describe('carousel, field list, upload, mention, tag input: a snippet draws, a scoped slot does not (#596, #492)', () => {
+describe('carousel, field list, upload, mention, tag input: a snippet draws its entries (#596, #492)', () => {
     beforeEach(cleanup);
 
     for (const c of CASES) {
         describe(`${c.tag} — ${c.slot}`, () => {
-            it('the alpha scoped slot draws nothing', async () => {
-                expect(await mount(c, scopedSlot(c))).toEqual([]);
-            });
 
             it('a snippet draws its entries, from its arguments', async () => {
                 expect(await mount(c, snippet(c))).toEqual(c.expected);

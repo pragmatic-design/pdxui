@@ -24,12 +24,12 @@ describe('content inside <component :is>', () => {
         expect(w.line, 'the warning has no place in the file').toBeGreaterThan(0);
     });
 
-    it('in a scoped slot body, the same', () => {
-        const r = build('<pdx-select :options="[]"><slot name="item" let:label>'
-            + '<component :is="view"><p>inside</p></component></slot></pdx-select>');
+    it('in a snippet body, the same', () => {
+        const r = build('<pdx-select :options="[]">@snippet item(option) { '
+            + '<component :is="view"><p>inside</p></component> }</pdx-select>');
         expect(r.code).toContain('dynamic(');
-        expect(r.code, 'the slot body emitted the content').not.toContain('inside');
-        expect(r.code, 'the slot body emitted a stray </component>').not.toContain('</component>');
+        expect(r.code, 'the snippet body emitted the content').not.toContain('inside');
+        expect(r.code, 'the snippet body emitted a stray </component>').not.toContain('</component>');
     });
 
     it('content spanning an interpolation, the same; what follows the closing tag is kept', () => {

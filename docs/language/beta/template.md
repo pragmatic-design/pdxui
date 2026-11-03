@@ -317,7 +317,7 @@ SlotOutlet ::= "<slot" ( S "name=" AttrValue )? S? ( "/>" | ">" Template "</slot
 
 A plain `<slot>` projects content that carries no data (the children, a named region). Data-carrying
 slots are snippets ([components.md](components.md), #131): `<slot :x>` in the child and
-`<slot let:x>` / `@slot(name, …) { }` in the parent are removed.
+`<slot let:x>` / `@slot(name, …) { }` in the parent are removed (landed, #492: `PDX_REMOVED_FORM`).
 
 ### `@snippet` inside a component's tag, `@render`
 

@@ -91,7 +91,7 @@ function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean 
                     walk(node.body, inFor, inPortal);
                     if (node.elseBody) walk(node.elseBody, inFor, inPortal);
                     break;
-                case 'show': case 'custom-directive': case 'scoped-slot':
+                case 'show': case 'custom-directive':
                     walk(node.body, inFor, inPortal);
                     break;
                 // The fallback of `@render … @else` is the component's own markup (#489).

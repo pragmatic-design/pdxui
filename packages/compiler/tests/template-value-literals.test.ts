@@ -6,7 +6,7 @@
 // The others went through `JSON.stringify`, which leaves `</script>` as it is — a module inlined in
 // a page ends at it — and U+2028/U+2029, which an older parser reads as line breaks.
 //
-// The checks, on the inline path — every .pdx's render since #107, and a scoped slot's body since #364:
+// The checks, on the inline path — every .pdx's render since #107, and a snippet's body:
 //   - the module parses;
 //   - the payload is TEXT: no identifier `__PWNED` exists in the parsed module;
 //   - the module contains no `</script` and no raw U+2028;
@@ -35,10 +35,10 @@ const cases: Case[] = [
     { site: 'static attribute value', template: `<p title="${ATTR}">x</p>`, value: ATTR, markup: true },
 ];
 
-type Path = 'the render' | 'a scoped slot body';
+type Path = 'the render' | 'a snippet body';
 
 function module(template: string, path: Path): string {
-    const body = path === 'the render' ? `<div>${template}</div>` : `<pdx-list><slot name="item" let:row><div>${template}</div></slot></pdx-list>`;
+    const body = path === 'the render' ? `<div>${template}</div>` : `<pdx-list>@snippet item(row) { <div>${template}</div> }</pdx-list>`;
     const src = `<template>\n  ${body}\n</template>\n\n<script>\nlet on = $signal(true);\nlet mode = $signal('a');\n</script>\n`;
     return compile(src, 'probe.pdx', [], undefined, { production: true }).code;
 }
@@ -77,7 +77,7 @@ function attributeValues(html: string): string[] {
 }
 
 describe('template values become string literals in the generated module (#69)', () => {
-    for (const path of ['the render', 'a scoped slot body'] as const) {
+    for (const path of ['the render', 'a snippet body'] as const) {
         for (const c of cases) {
             it(`${c.site}, ${path}: parses, and the value stays text`, () => {
                 const code = module(c.template, path);
