@@ -23,6 +23,12 @@ const _namedByField = new WeakSet<Element>();
 const _markedInvalid = new WeakSet<Element>();
 /** The groups a field described by its hint and error, undescribed again when there is neither. */
 const _describedByField = new WeakSet<Element>();
+/**
+ * The controls whose id a field gave, given again by the field that wires them. A field moved to
+ * another parent sets up again with a new id, which its label's `for` names: the control must take it,
+ * or it keeps the old one and is named by nothing (#293). An id the author wrote is never replaced.
+ */
+const _idByField = new WeakSet<Element>();
 
 /**
  * The library controls that are a button holding their own value: an inline edit's display at rest —
@@ -302,8 +308,9 @@ component('pdx-form-field', {
                 const nativeInput = group || textbox ? null : input.matches('input, textarea, select')
                     ? input
                     : input.querySelector<HTMLElement>('input:not([type="hidden"]), textarea, select');
-                if (nativeInput && !nativeInput.id) {
+                if (nativeInput && (!nativeInput.id || _idByField.has(nativeInput))) {
                     nativeInput.id = inputId;
+                    _idByField.add(nativeInput);
                 }
 
                 // A control that is no labelable element — pdx-select's trigger, a role="combobox"
