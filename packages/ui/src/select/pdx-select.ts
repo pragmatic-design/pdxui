@@ -141,9 +141,12 @@ component('pdx-select', {
         'pdx-create': event<{ value: string; label: string }>(),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#491).
+    // An option's `raw` is the app's entry, an element of `options` or of `source` (#853): the editor
+    // infers `T`.
+    generics: { T: { from: 'options', source: 'source' } },
     slots: {
-        item: slot<(option: { label: string; value: unknown; raw: unknown }, index: number) => Node>(),
-        selected: slot<(option: { label: string; value: unknown; raw: unknown }) => Node>(),
+        item: slot<(option: { label: string; value: unknown; raw: T }, index: number) => Node>(),
+        selected: slot<(option: { label: string; value: unknown; raw: T }) => Node>(),
     },
     setup(ctx) {
         const uid = generatedId('pdx-sel');
@@ -1037,3 +1040,6 @@ component('pdx-select', {
         </div>
     `,
 });
+
+/** An option's `raw`, the app's entry (#853): the editor infers it from `:options` or `:source`. */
+type T = unknown;

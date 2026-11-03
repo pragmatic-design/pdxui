@@ -270,6 +270,21 @@ describe('gen-manifest reads the descriptor\'s generics (#651)', () => {
         expect(decl(plain).generics).toBeUndefined();
         expect(field('items', plain).type).not.toEqual({ text: 'T[]' });
     });
+
+    // #853: a list fed by a DataSource infers `T` from it, as one fed by an array does from `:items`.
+    const withSource = source
+        .replace("from: 'items' }", "from: 'items', source: 'source' }")
+        .replace("        label:", "        source: { type: Object, default: null },\n        label:");
+
+    it('types the DataSource prop it is also inferred from as a DataSource of it', () => {
+        expect(field('source', withSource).type).toEqual({ text: "import('@pdxui/core').DataSource<T> | null" });
+        expect(field('items', withSource).type).toEqual({ text: 'T[]' });
+    });
+
+    it('the control: without `source`, the DataSource prop keeps its declared type', () => {
+        const untyped = withSource.replace(", source: 'source' }", ' }');
+        expect(field('source', untyped).type).toEqual({ text: 'object' });
+    });
 });
 
 describe('gen-manifest reads the descriptor\'s states (#132)', () => {

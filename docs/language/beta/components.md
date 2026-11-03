@@ -282,7 +282,9 @@ i) => node`), so a consumer that is not PDX assigns a function. Plain `<slot>` s
 and `@generic`'s TypeScript form is `generics: { T: { extends: '{ id: string }', from: 'items' } }`
 (#651): metadata for the editor only, naming the constraint and the array prop `T` is inferred from.
 The manifest records `T extends { id: string }` and types that prop `T[]`, so a parent's snippet
-reads the app's own item; for TypeScript in the component's file, `T` is a local alias with the same
+reads the app's own item. A component fed by a DataSource names that prop too, `{ from: 'items',
+source: 'source' }` (#853): the manifest types it `DataSource<T> | null`, and `:source="users"` infers
+`T` as `:items` does; for TypeScript in the component's file, `T` is a local alias with the same
 constraint. A list or menu that also hands its snippet the children of an item writes the signature
 over them, `T | (T extends { children?: readonly (infer C)[] } ? C : never)`, since the editor pastes
 it where no alias is in scope.

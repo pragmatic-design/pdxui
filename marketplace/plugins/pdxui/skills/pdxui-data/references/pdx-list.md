@@ -7,7 +7,7 @@ Data-driven list with custom rows.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `items` | — | T[] | `null` | The data items to render. |
-| `source` | — | object | `null` | The data source to render from. |
+| `source` | — | import('@pdxui/core').DataSource<T> \| null | `null` | The data source to render from. |
 | `idField` | `idfield` | string | `'id'` | Item field used as a unique key. |
 | `dividers` | `dividers` | boolean | `false` | Shows dividers between items. |
 | `clickable` | `clickable` | boolean | `false` | Whether items are clickable. |

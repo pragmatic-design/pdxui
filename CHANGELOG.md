@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- A library component fed by a DataSource types its snippets from it (#853): `pdx-list` and
+  `pdx-data-grid` infer `T` from `:source` as from `:items` and `:data`, so `@snippet item(it) {
+  {{ it.name }} }` reads the source's own item, where it was `unknown`. `pdx-select` is generic over
+  its options: an option's `raw` in the `item` and `selected` snippets is the app's entry, from
+  `:options` or `:source`. A descriptor names its DataSource prop with `generics: { T: { from:
+  'items', source: 'source' } }`, which the manifest types `DataSource<T> | null`.
+
 - `pdx migrate` rewrites the alpha's scoped slots to typed snippets (#492). A child's
   `<slot name="row" :item="it">fallback</slot>` becomes `@slot row?: (item: T);` and
   `@render row?.(it) @else { fallback }`, typed by the alpha object form `@slot row: { … }` when there
