@@ -16,12 +16,12 @@
     <app-demo-comp-breadcrumb-slot-template class="demo-section"></app-demo-comp-breadcrumb-slot-template>
 
     <section>
-      <h2 class="pdx-txt-heading section-heading">Slots</h2>
+      <h2 class="pdx-txt-heading section-heading">Snippets</h2>
       <div class="options-table">
         <table>
-          <thead><tr><th>Slot</th><th>Scope</th><th>Description</th></tr></thead>
+          <thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead>
           <tbody>
-            <tr><td><code>item</code></td><td><code>{ item, index, isFirst, isLast }</code></td><td>Custom breadcrumb item rendering</td></tr>
+            <tr><td><code>item</code></td><td><code>(item, index, isLast)</code></td><td>Custom breadcrumb item rendering</td></tr>
           </tbody>
         </table>
       </div>

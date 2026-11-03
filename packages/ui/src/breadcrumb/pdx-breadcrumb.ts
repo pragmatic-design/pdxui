@@ -1,14 +1,12 @@
 // pdx-breadcrumb — Breadcrumb navigation with overflow collapse and custom separators.
-// Slot: "item" — custom breadcrumb item template (priority: slot > default)
+// Snippet: "item" — custom breadcrumb item template (priority: snippet > default)
 //
 // Usage:
-//   <pdx-breadcrumb :items="${crumbs}">
-//     <slot name="item" let:item let:index let:isLast>
-//       <a :href="${item.href}">${item.label}</a>
-//     </slot>
+//   <pdx-breadcrumb :items="crumbs">
+//     @snippet item(item, index, isLast) { <a :href="item.href">{{ item.label }}</a> }
 //   </pdx-breadcrumb>
 
-import { component, html, sanitizeUrl, routeTrail, slot, snippetOrSlot, event } from '@pdxui/core';
+import { component, html, sanitizeUrl, routeTrail, slot, declaredSnippet, event } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 /** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
@@ -26,7 +24,7 @@ export interface BreadcrumbItem {
 /**
  * Navigation breadcrumbs, with overflow collapse and custom separators.
  *
- * @slot item - Renders one crumb: a snippet `item(item, index, isLast)`, or the scoped slot, which receives `{ item, index, isFirst, isLast }`.
+ * @slot item - Renders one crumb: a snippet `item(item, index, isLast)`.
  *
  * @csspart nav - The `<nav>` that names the trail (`.pdx-breadcrumb`).
  * @csspart list - The `<ol>` of the crumbs.
@@ -51,7 +49,7 @@ component('pdx-breadcrumb', {
         separator: { type: String, default: '' },
         maxItems: { type: Number, default: 0 },
     },
-    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot stays (#595).
+    // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The crumb a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },
     slots: {
@@ -61,7 +59,7 @@ component('pdx-breadcrumb', {
         let built = false;
 
         function getItemSlot(): SlotFunction | undefined {
-            return snippetOrSlot(ctx, 'item', (s) => [s.item, s.index, s.isLast]);
+            return declaredSnippet(ctx, 'item', (s) => [s.item, s.index, s.isLast]);
         }
 
         /**
@@ -126,7 +124,6 @@ component('pdx-breadcrumb', {
                 li.className = 'pdx-breadcrumb-item';
                 li.setAttribute('data-part', 'item');
                 const isLast = i === visibleItems.length - 1;
-                const isFirst = i === 0;
                 const isEllipsis = item.key === '__ellipsis';
 
                 if (isEllipsis) {
@@ -146,8 +143,8 @@ component('pdx-breadcrumb', {
                     });
                     li.appendChild(btn);
                 } else if (getItemSlot()) {
-                    // Use slot template for all non-ellipsis items
-                    const content = getItemSlot()!({ item, index: i, isFirst, isLast });
+                    // The parent's snippet draws every crumb but the ellipsis
+                    const content = getItemSlot()!({ item, index: i, isLast });
                     if (content instanceof DocumentFragment) {
                         li.appendChild(content);
                     } else {
