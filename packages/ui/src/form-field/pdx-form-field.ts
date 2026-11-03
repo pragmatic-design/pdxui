@@ -6,6 +6,9 @@
 
 import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField, untracked } from '@pdxui/core';
 import type { Form, FormField } from '@pdxui/core';
+// Its warning message and the border of a control in warning are drawn by form.css, written where the
+// form is. Imported here so they travel with a field used without a form.
+import '@pdxui/design/components/form';
 
 
 /** The controls a field marked aria-required: only those are unmarked when `required` goes, so a
@@ -49,6 +52,23 @@ function markAttr(el: Element, name: string, on: boolean, marked: WeakSet<Elemen
 /**
  * Layout wrapper for one form control: label, the slotted input, hint and error, with the ARIA
  * wiring between them and no validation of its own.
+ *
+ * @cssstate required - `required`: required by its prop or by its form; the label carries the marker (`--pdx-field-required-marker`).
+ * @cssstate optional - `optional`: the label says the field is optional.
+ * @cssstate disabled - `disabled`: the field and its control are disabled.
+ * @cssstate invalid - `invalid`: its error is shown; the control is aria-invalid and described by it.
+ * @cssstate warning - `warning`: its warning is shown, and no error.
+ * @cssstate success - `success`: its success message is shown, and no error or warning.
+ * @cssstate horizontal - `horizontal`: the label sits beside the control.
+ *
+ * @csspart root - The field's wrapper.
+ * @csspart label - The `<label>`, with `label`.
+ * @csspart description - The description under the label, with `description`.
+ * @csspart control - The box that holds the slotted control.
+ * @csspart error - The error message, while it is shown.
+ * @csspart warning - The warning message, while it is shown.
+ * @csspart success - The success message, while it is shown.
+ * @csspart hint - The hint, while no message takes its place.
  */
 component('pdx-form-field', {
     // The axis forms.css keys by (#627), reflected on the host: the label's text size, the same scale
@@ -96,6 +116,10 @@ component('pdx-form-field', {
          */
         a11yLabel: { type: String, default: '' },
     },
+    // Its conditions are states of the host (#293), which forms.css draws; the wrapper and its label
+    // keep only their base classes, the ones native markup shares with the state classes it adds.
+    states: ['required', 'optional', 'disabled', 'invalid', 'warning', 'success', 'horizontal'],
+    parts: ['root', 'label', 'description', 'control', 'error', 'warning', 'success', 'hint'],
     setup(ctx) {
         const fieldId = generatedId('pdx-ff');
         const inputId = fieldId + '-input';
@@ -197,23 +221,18 @@ component('pdx-form-field', {
             return false;
         }
 
-        function wrapClass(): string {
-            let cls = 'pdx-form-field';
-            if (ctx.horizontal()) cls += ' pdx-form-field-horizontal';
-            if (ctx.disabled()) cls += ' disabled';
-            if (shouldShowError()) cls += ' has-error';
-            else if (resolveWarning()) cls += ' has-warning';
-            else if (ctx.success()) cls += ' has-success';
-            return cls;
-        }
-
-        function labelClass(): string {
-            let cls = 'pdx-field-label';
-            if (isRequired()) cls += ' pdx-field-required';
-            if (ctx.optional()) cls += ' pdx-field-optional';
-            if (ctx.disabled()) cls += ' pdx-field-label-disabled';
-            return cls;
-        }
+        // One message at a time, as the render shows it: the error, else the warning, else the success.
+        ctx.track(() => {
+            const invalid = shouldShowError();
+            const warning = !invalid && !!resolveWarning();
+            ctx.state('invalid', invalid);
+            ctx.state('warning', warning);
+            ctx.state('success', !invalid && !warning && !!(ctx.success() as string));
+            ctx.state('required', isRequired());
+            ctx.state('optional', !!ctx.optional());
+            ctx.state('disabled', !!ctx.disabled());
+            ctx.state('horizontal', !!ctx.horizontal());
+        });
 
         /**
          * A pdx-slider's thumbs are <div>s with the slider role: `for` cannot reach them, and every slider would
@@ -429,27 +448,27 @@ component('pdx-form-field', {
         slotWatch.observe(ctx.el, { childList: true, subtree: true });
         ctx.track(() => () => slotWatch.disconnect());
 
-        return { fieldId, inputId, labelId, hintId, errorId, descId, shouldShowError, resolveError, resolveWarning, wrapClass, labelClass };
+        return { fieldId, inputId, labelId, hintId, errorId, descId, shouldShowError, resolveError, resolveWarning };
     },
     render: (ctx) => html`
-        <div :class="${ctx.wrapClass}" data-part="root">
+        <div class="pdx-form-field" data-part="root">
             ${() => ctx.label() ? html`
-                <label :class="${ctx.labelClass}" :id="${() => ctx.labelId}" :for="${() => ctx.inputId}">${ctx.label}</label>
+                <label class="pdx-field-label" data-part="label" :id="${() => ctx.labelId}" :for="${() => ctx.inputId}">${ctx.label}</label>
             ` : ''}
             ${() => ctx.description() ? html`
-                <span class="pdx-field-description" :id="${() => ctx.descId}">${ctx.description}</span>
+                <span class="pdx-field-description" data-part="description" :id="${() => ctx.descId}">${ctx.description}</span>
             ` : ''}
-            <div class="pdx-form-field-input">
+            <div class="pdx-form-field-input" data-part="control">
                 <slot></slot>
             </div>
             ${() => ctx.shouldShowError() ? html`
-                <span class="pdx-field-error" :id="${() => ctx.errorId}" role="alert">${() => ctx.resolveError()}</span>
+                <span class="pdx-field-error" data-part="error" :id="${() => ctx.errorId}" role="alert">${() => ctx.resolveError()}</span>
             ` : ctx.resolveWarning() ? html`
-                <span class="pdx-field-warning">${() => ctx.resolveWarning()}</span>
+                <span class="pdx-field-warning" data-part="warning">${() => ctx.resolveWarning()}</span>
             ` : ctx.success() ? html`
-                <span class="pdx-field-success">${ctx.success}</span>
+                <span class="pdx-field-success" data-part="success">${ctx.success}</span>
             ` : ctx.hint() ? html`
-                <span class="pdx-field-hint" :id="${() => ctx.hintId}">${ctx.hint}</span>
+                <span class="pdx-field-hint" data-part="hint" :id="${() => ctx.hintId}">${ctx.hint}</span>
             ` : ''}
         </div>
     `,

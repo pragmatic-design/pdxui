@@ -41,7 +41,8 @@ async function mount(root: HTMLElement): Promise<void> {
     await tick(); await tick();
 }
 
-const shown = (f: HTMLElement): boolean => !!f.querySelector('.pdx-form-field.has-error');
+/** The field shows its error: the message part is rendered (a field in error is a state since #293). */
+const shown = (f: HTMLElement): boolean => !!f.querySelector('[data-part="error"]');
 
 describe('form contexts provided after the child that reads them', () => {
     beforeEach(() => { cleanup(); setupOrder.length = 0; });

@@ -23,7 +23,7 @@ const THEMES = ['pragmatic-gold', 'cyberpunk', 'material'];
 // all is an open question, not a defect this check decides.
 const TEXT = [
     '.pdx-badge', '.pdx-chip', '.pdx-banner', '.pdx-banner-action', '.pdx-field-error', '.pdx-field-success',
-    '.pdx-form-field.has-error > .pdx-field-label', '.pdx-menu-danger', '[class*="pdx-ink-"]:not(.pdx-ink-subtle)',
+    '.pdx-form-field.has-error > .pdx-field-label', 'pdx-form-field:state(invalid) > [data-part="root"] > [data-part="label"]', '.pdx-menu-danger', '[class*="pdx-ink-"]:not(.pdx-ink-subtle)',
 ].join(', ');
 
 interface SweepOptions {

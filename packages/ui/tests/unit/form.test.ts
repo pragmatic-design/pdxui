@@ -86,13 +86,14 @@ describe('pdx-form-field', () => {
         expect(desc?.textContent).toContain('A longer explanation');
     });
 
+    // Error, warning, success, horizontal, required and disabled are states of the host since #293,
+    // drawn by forms.css and measured in Chromium (form-b-beta-contract.spec.ts); happy-dom has no
+    // :state(). Here: the message each one shows, and no class for any of them.
     it('shows error when error and touched props are set', async () => {
         const el = await mount('pdx-form-field', { error: 'Required', touched: '' });
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-error')).toBe(true);
-        const errorEl = el.querySelector('.pdx-field-error');
-        expect(errorEl).toBeTruthy();
+        const errorEl = el.querySelector('[data-part="error"]');
+        expect(errorEl?.classList.contains('pdx-field-error')).toBe(true);
         expect(errorEl?.textContent).toContain('Required');
     });
 
@@ -101,54 +102,35 @@ describe('pdx-form-field', () => {
         (el as any).error = 'Forced error';
         (el as any).showError = true;
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-error')).toBe(true);
+        expect(el.querySelector('[data-part="error"]')?.textContent).toContain('Forced error');
     });
 
     it('does not show error when not touched and showError is false', async () => {
         const el = await mount('pdx-form-field');
         (el as any).error = 'Hidden error';
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-error')).toBe(false);
+        expect(el.querySelector('[data-part="error"]')).toBeNull();
     });
 
-    it('shows warning class and message when warning prop is set', async () => {
+    it('shows the warning message when warning prop is set', async () => {
         const el = await mount('pdx-form-field', { warning: 'Consider a longer name' });
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-warning')).toBe(true);
-        const warningEl = el.querySelector('.pdx-field-warning');
-        expect(warningEl).toBeTruthy();
+        const warningEl = el.querySelector('[data-part="warning"]');
+        expect(warningEl?.classList.contains('pdx-field-warning')).toBe(true);
         expect(warningEl?.textContent).toContain('Consider a longer name');
     });
 
-    it('shows success class when success prop is set', async () => {
+    it('shows the success message when success prop is set', async () => {
         const el = await mount('pdx-form-field', { success: 'Looks good!' });
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-success')).toBe(true);
+        expect(el.querySelector('[data-part="success"]')?.textContent).toContain('Looks good!');
     });
 
-    it('applies horizontal class when horizontal prop is set', async () => {
-        const el = await mount('pdx-form-field', { horizontal: '' });
+    it('keeps only the base classes on its wrapper and label, whatever its conditions', async () => {
+        const el = await mount('pdx-form-field', { label: 'Email', required: '', optional: '', disabled: '', horizontal: '', error: 'Bad', touched: '' });
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('pdx-form-field-horizontal')).toBe(true);
-    });
-
-    it('applies required class on label when required prop is set', async () => {
-        const el = await mount('pdx-form-field', { label: 'Email', required: '' });
-        await tick(50);
-        const label = el.querySelector('.pdx-field-label');
-        expect(label?.classList.contains('pdx-field-required')).toBe(true);
-    });
-
-    it('applies disabled class when disabled prop is set', async () => {
-        const el = await mount('pdx-form-field', { disabled: '' });
-        await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('disabled')).toBe(true);
+        expect(el.querySelector('[data-part="root"]')?.getAttribute('class')).toBe('pdx-form-field');
+        expect(el.querySelector('[data-part="label"]')?.getAttribute('class')).toBe('pdx-field-label');
     });
 
     it('error element has role="alert"', async () => {
@@ -164,9 +146,8 @@ describe('pdx-form-field', () => {
         (el as any).warning = 'Warning msg';
         (el as any).touched = true;
         await tick(50);
-        const wrapper = el.querySelector('.pdx-form-field');
-        expect(wrapper?.classList.contains('has-error')).toBe(true);
-        expect(wrapper?.classList.contains('has-warning')).toBe(false);
+        expect(el.querySelector('[data-part="error"]')).not.toBeNull();
+        expect(el.querySelector('[data-part="warning"]')).toBeNull();
     });
 });
 

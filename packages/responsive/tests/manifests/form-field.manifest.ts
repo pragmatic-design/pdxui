@@ -5,9 +5,9 @@
  * and the CSS (packages/design/src/surfaces/forms.css, the .pdx-form-field / .pdx-field-* block).
  *
  * DOM STRUCTURE (Light DOM, render in pdx-form-field.ts):
- *   <pdx-form-field>
- *     <div class="pdx-form-field [pdx-form-field-horizontal] [disabled] [has-error|has-warning|has-success]">
- *       <label class="pdx-field-label ..." for="<inputId>">{label}</label>      ← only when label is set
+ *   <pdx-form-field>                      ← :state(required|optional|disabled|invalid|warning|success|horizontal) (#293)
+ *     <div class="pdx-form-field" data-part="root">
+ *       <label class="pdx-field-label" data-part="label" for="<inputId>">{label}</label>  ← only when label is set
  *       <span class="pdx-field-description" id="<descId>">{description}</span>   ← only with a description
  *       <div class="pdx-form-field-input"><slot></slot></div>                   ← the slotted control
  *       <span class="pdx-field-error"   id="<errorId>" role="alert">{error}</span>  ← when shouldShowError()
@@ -161,12 +161,13 @@ export const formField: ComponentManifest = {
                         count: { op: '==', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="req"] label.pdx-field-required',
+                        // The marker is drawn from the host's state (#293).
+                        selector: 'section:not([hidden]) [data-test="req"]:state(required) > [data-part="root"] > [data-part="label"]',
                         description: 'its label carries the required marker',
                         count: { op: '==', value: 1 },
                     },
                     {
-                        selector: 'section:not([hidden]) [data-test="opt"] [aria-required], section:not([hidden]) [data-test="opt"] .pdx-field-required',
+                        selector: 'section:not([hidden]) [data-test="opt"] [aria-required], section:not([hidden]) [data-test="opt"]:state(required)',
                         description: 'a field the form does not require is marked neither way',
                         count: { op: '==', value: 0 },
                     },

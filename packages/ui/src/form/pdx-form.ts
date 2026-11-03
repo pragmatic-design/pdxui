@@ -70,12 +70,16 @@ component('pdx-form', {
         function scrollToFirstError(): void {
             if (!ctx.scrollToError()) return;
             requestAnimationFrame(() => {
-                const errorEl = ctx.el.querySelector('.has-error, [aria-invalid="true"]') as HTMLElement | null;
+                // The first control in error: a field marks it aria-invalid (A2). A field in error is a
+                // state of its host since #293, no class on its wrapper.
+                const errorEl = ctx.el.querySelector<HTMLElement>('[aria-invalid="true"]');
                 if (errorEl) {
                     errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    // Focus the first input inside the error field
-                    const input = errorEl.querySelector('input, textarea, select') as HTMLElement | null;
-                    if (input) input.focus();
+                    // The control itself, or the first input of a group marked in error (a radio group).
+                    const input = errorEl.matches('input, textarea, select, [tabindex]')
+                        ? errorEl
+                        : errorEl.querySelector<HTMLElement>('input, textarea, select');
+                    input?.focus();
                 }
             });
         }

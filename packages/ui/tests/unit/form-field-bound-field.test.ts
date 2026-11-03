@@ -37,21 +37,21 @@ describe('a form field bound by :field and ::value', () => {
         type(input, 'nope');
         await tick();
         expect(f.email.value()).toBe('nope');
-        expect(host.querySelector('.pdx-form-field.has-error'), 'shown before the input was left').toBeNull();
+        expect(host.querySelector('pdx-form-field [data-part="error"]'), 'shown before the input was left').toBeNull();
         input.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }));
         await tick(); await tick();
         expect(f.email.touched()).toBe(true);
-        expect(host.querySelector('.pdx-form-field.has-error')).not.toBeNull();
+        expect(host.querySelector('pdx-form-field [data-part="error"]')).not.toBeNull();
         expect(host.textContent).toContain('Not an email');
         expect(input.getAttribute('aria-invalid')).toBe('true');
     });
 
-    it('marks the field required from the schema, on the label and the input', async () => {
+    it('marks the field required from the schema, on the input', async () => {
         const host = await mount(signup());
         await tick();
         const input = host.querySelector('pdx-input input') as HTMLInputElement;
         expect(input.getAttribute('aria-required')).toBe('true');
-        // The marker is the class's `::after`, which happy-dom does not compute: the class is the signal.
-        expect(host.querySelector('label.pdx-field-label.pdx-field-required')).not.toBeNull();
+        // The label's marker is drawn from the host's :state(required) since #293, which happy-dom does
+        // not have: form-b-beta-contract.spec.ts measures it in Chromium.
     });
 });
