@@ -79,6 +79,26 @@ const SETUP_GRID = `
             })();
         });`;
 
+// The wizard layout (#293): its sections are the steps of a pdx-wizard. Waits for the wizard's stepper.
+const SETUP_WIZARD = `
+        const host = document.querySelector('section:not([hidden]) [data-test="ftw"]');
+        if (!host) return;
+        host.schema = {
+            layout: 'wizard',
+            sections: [{ name: 'who', label: 'Requester' }, { name: 'what', label: 'Request' }],
+            fields: [
+                { name: 'name', type: 'text', label: 'Name', section: 'who', required: true },
+                { name: 'topic', type: 'text', label: 'Topic', section: 'what' },
+            ],
+        };
+        await new Promise((resolve) => {
+            let tries = 0;
+            (function attempt() {
+                if (host.querySelector('[aria-current="step"]') || tries++ > 60) { resolve(); return; }
+                requestAnimationFrame(attempt);
+            })();
+        });`;
+
 export const formTemplate: ComponentManifest = {
     name: 'form-template',
     tag: 'pdx-form-template',
@@ -98,6 +118,16 @@ export const formTemplate: ComponentManifest = {
                     <pdx-form-template data-test="ft"></pdx-form-template>
                 </div>`,
             setup: SETUP_GRID,
+        },
+        {
+            // The wizard layout: a pdx-wizard, one panel per section (A6 is the wizard's, #293).
+            id: 'form-template-wizard',
+            title: 'Form Template — Wizard layout (2 steps)',
+            html: `
+                <div style="max-width: 640px;">
+                    <pdx-form-template data-test="ftw"></pdx-form-template>
+                </div>`,
+            setup: SETUP_WIZARD,
         },
     ],
 
@@ -172,6 +202,26 @@ export const formTemplate: ComponentManifest = {
                     },
                 ],
             },
+            // One stepper, the wizard's, with one current step; the step in view shows its field.
+            'form-template-wizard': {
+                standalone: [
+                    {
+                        selector: 'section:not([hidden]) [data-test="ftw"] [role="tablist"]',
+                        description: 'the wizard layout has one stepper',
+                        count: { op: '==', value: 1 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="ftw"] [aria-current="step"]',
+                        description: 'one step is the current one (A6)',
+                        count: { op: '==', value: 1 },
+                    },
+                    {
+                        selector: 'section:not([hidden]) [data-test="ftw"] [data-wizard-step]:not([aria-hidden="true"]) .pdx-field-label',
+                        description: 'the step in view shows its field',
+                        height: { op: '>', value: 0 },
+                    },
+                ],
+            },
         },
     },
 
@@ -180,7 +230,8 @@ export const formTemplate: ComponentManifest = {
         // The generated controls are wrapped in <pdx-form-field> with the label bound to the input.
         // If the label↔input association were missing (form-field's async wiring), axe would report
         // the "label" rule. No disableRule: the generated fields' pattern is native and clean.
-        scenarios: ['form-template-grid'],
+        // The wizard layout too: its stepper is pdx-wizard's, tabs naming their panels (#293).
+        scenarios: ['form-template-grid', 'form-template-wizard'],
     },
 
     // ── Dim. 3: style isolation ──

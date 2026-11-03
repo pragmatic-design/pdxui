@@ -10,7 +10,7 @@
 //   <pdx-form-template :schema="mySchema" />
 //   <pdx-form-template :schema="mySchema" :form="existingForm" />
 
-import { component, html, signal, effect, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames } from '@pdxui/core';
+import { component, html, signal, effect, event, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames } from '@pdxui/core';
 import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternals, Validator, ValidatorSchema } from '@pdxui/core';
 // Self-contained: a schema can render ANY field control, so register the full form graph here (the
 // structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
@@ -42,17 +42,16 @@ import '../color-picker/pdx-color-picker';
 import '../file-upload/pdx-file-upload';
 import '../tag-input/pdx-tag-input';
 import '../otp-input/pdx-otp-input';
-import { uiString, format, uiAttr} from '../shared/i18n';
+import '../wizard/pdx-wizard';
+import { format } from '../shared/i18n';
 import { onControlValue } from '../shared/model-event';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';
 
 // Register default English strings for form-template (overridable via setComponentStrings)
+// The wizard layout's buttons and position are pdx-wizard's own strings (#293).
 registerComponentStrings('form-template', {
-    'wizard.back': '← Back',
-    'wizard.next': 'Next →',
-    'wizard.submit': 'Submit',
     'list.add': '+ Add',
     'list.remove': 'Remove',
     // A row's remove button, named after its line, not "×".
@@ -84,10 +83,16 @@ const CHECKED_TYPES = new Set(['checkbox', 'switch']);
 
 /**
  * Renders a complete form from a FormSchema: each field type gets its control, validators run from
- * the schema and sections become fieldsets.
+ * the schema and sections become fieldsets. With `layout: 'wizard'` the sections are the steps of a
+ * `pdx-wizard`, and a step with an error is not left.
  *
- * @fires pdx-submit {{ values }} - Dispatched from the template when the inner `pdx-form` submits and the values validate; an invalid submit fires nothing and scrolls to the first error.
  * @slot actions - Replaces the default actions (the `pdx-form-actions` shown when `showActions`). Not rendered in the wizard layout, which has its own navigation.
+ *
+ * @csspart form - The inner `pdx-form`.
+ * @csspart content - The box the generated fields go in.
+ * @csspart fields - The fields outside any section.
+ * @csspart section - A section's `<fieldset>`, outside the wizard layout.
+ * @csspart wizard - The `pdx-wizard` of the wizard layout; its panels are its `panel` parts.
  */
 component('pdx-form-template', {
     props: {
@@ -102,6 +107,14 @@ component('pdx-form-template', {
         /** Show default submit/reset buttons. Override via slot="actions". */
         showActions: { type: Boolean, default: true },
     },
+    // The inner pdx-form's, dispatched again from the host, where the app listens (#138).
+    events: {
+        /** The form submitted and its values validate; an invalid submit fires nothing and scrolls to the first error. */
+        'pdx-submit': event<{ values: Record<string, unknown>; saved?: boolean }>(),
+        /** The form's `source` refused the save. */
+        'pdx-submit-error': event<{ error: unknown }>(),
+    },
+    parts: ['form', 'content', 'fields', 'section', 'wizard'],
     setup(ctx) {
         // Resolve or create form from schema. An effect + a signal instead of a computed:
         // the factory inside a computed would create a NEW form on every recomputation without
@@ -174,8 +187,14 @@ component('pdx-form-template', {
             return groups;
         }
 
-        // ─── Wizard state ────────────────────────────────────────
-        const _wizardStep = signal(0);
+        // ─── Wizard layout: a pdx-wizard (#293) ──────────────────
+        // One stepper in the library: the wizard draws the steps, marks the current one
+        // aria-current="step" and says «Step n of N» (A6). This component only refuses a move forward
+        // from a step with an error.
+        type Wizard = HTMLElement & { value: number; goTo(n: number): boolean; next(): boolean; prev(): boolean };
+        let _wizardEl: Wizard | null = null;
+        /** A forward move this component validated, let through when the wizard asks again. */
+        let _allowed = -1;
 
         // Expand a step's schema fields to the leaf paths that are fields of the form.
         // A group/list field ('address', 'items') has NO own entry — the form is keyed by leaves
@@ -196,33 +215,51 @@ component('pdx-form-template', {
             return paths;
         }
 
-        async function wizardNext(): Promise<void> {
-            const groups = getFieldsBySection();
-            const step = _wizardStep.peek();
-            if (step >= groups.length - 1) return;
-
+        /** Whether the step at `index` has no error, its fields touched so the errors show. */
+        async function stepValid(index: number): Promise<boolean> {
+            const group = getFieldsBySection()[index];
             const form = _form();
-            if (form) {
-                const paths = stepLeafPaths(groups[step].fields, form);
-                // Touch step fields so their errors become visible.
-                for (const p of paths) formField(form, p)?.onBlur();
-                // Await validation so ASYNC validators resolve before we read errors — reading
-                // field.error() synchronously right after onBlur would miss them.
-                await form.validate();
-                const hasError = paths.some(p => !!formField(form, p)?.error());
-                if (hasError) return; // don't advance if this step has errors
-            }
-            _wizardStep.set(step + 1);
+            if (!group || !form) return true;
+            const paths = stepLeafPaths(group.fields, form);
+            // Touch step fields so their errors become visible.
+            for (const p of paths) formField(form, p)?.onBlur();
+            // Await validation so ASYNC validators resolve before we read errors — reading
+            // field.error() synchronously right after onBlur would miss them.
+            await form.validate();
+            return !paths.some(p => !!formField(form, p)?.error());
         }
 
-        function wizardPrev(): void {
-            const step = _wizardStep.peek();
-            if (step > 0) _wizardStep.set(step - 1);
+        /**
+         * Move the wizard to `target`, through the gate: forward only once the current step is valid.
+         * False when it did not move — an error on the step, or a step the wizard cannot reach.
+         */
+        async function goTo(target: number): Promise<boolean> {
+            const w = _wizardEl;
+            if (!w) return false;
+            const from = w.value;
+            if (target > from && !(await stepValid(from))) return false;
+            _allowed = target;
+            const moved = w.goTo(target);
+            _allowed = -1;
+            return moved;
         }
 
-        function wizardGoTo(step: number): void {
-            const groups = getFieldsBySection();
-            if (step >= 0 && step < groups.length) _wizardStep.set(step);
+        /**
+         * The wizard's cancellable `pdx-before-change` (#289): a move forward is held while the step it
+         * leaves is validated, and made again once it passes. Back is never held.
+         */
+        function onBeforeChange(e: Event): void {
+            const { value, previous } = (e as CustomEvent<{ value: number; previous: number }>).detail;
+            if (value <= previous || value === _allowed) return;
+            e.preventDefault();
+            void goTo(value);
+        }
+
+        /** The last step's button: its step validated, the form submits as a form does. */
+        async function onComplete(): Promise<void> {
+            const w = _wizardEl;
+            if (!w || !(await stepValid(w.value))) return;
+            ctx.el.querySelector('form')?.requestSubmit();
         }
 
         // ─── Imperative rendering ────────────────────────────────
@@ -232,9 +269,6 @@ component('pdx-form-template', {
             const schema = ctx.schema() as FormSchema | null;
             const form = _form();
             if (!schema || !form) return;
-
-            const isWizard = schema.layout === 'wizard';
-            const currentStep = isWizard ? _wizardStep() : -1;
 
             // Cleanup previous visibility effects
             for (const d of _disposeVisibility) d();
@@ -249,57 +283,21 @@ component('pdx-form-template', {
 
                 const groups = getFieldsBySection();
 
-                // Wizard: render stepper navigation
-                if (isWizard && groups.length > 1) {
-                    const stepper = document.createElement('nav');
-                    stepper.className = 'pdx-wizard-stepper';
-                    stepper.setAttribute('role', 'tablist');
-                    uiAttr(stepper, 'aria-label', () => uiString('form-template', 'steps'));
-
-                    for (let si = 0; si < groups.length; si++) {
-                        const step = document.createElement('button');
-                        step.type = 'button';
-                        step.className = 'pdx-wizard-step';
-                        step.setAttribute('role', 'tab');
-                        step.setAttribute('aria-selected', si === currentStep ? 'true' : 'false');
-                        if (si === currentStep) step.classList.add('pdx-wizard-step-active');
-                        if (si < currentStep) step.classList.add('pdx-wizard-step-completed');
-
-                        const num = document.createElement('span');
-                        num.className = 'pdx-wizard-step-number';
-                        num.textContent = si < currentStep ? '✓' : String(si + 1);
-                        step.appendChild(num);
-
-                        const label = document.createElement('span');
-                        label.className = 'pdx-wizard-step-label';
-                        label.textContent = groups[si].section?.label ?? `Step ${si + 1}`;
-                        step.appendChild(label);
-
-                        const idx = si;
-                        step.addEventListener('click', () => {
-                            // Only allow going back or to completed steps
-                            if (idx <= currentStep) wizardGoTo(idx);
-                        });
-
-                        stepper.appendChild(step);
-
-                        // Add connector between steps
-                        if (si < groups.length - 1) {
-                            const connector = document.createElement('span');
-                            connector.className = 'pdx-wizard-connector';
-                            if (si < currentStep) connector.classList.add('pdx-wizard-connector-completed');
-                            stepper.appendChild(connector);
-                        }
-                    }
-
-                    container.appendChild(stepper);
+                // The wizard layout: one pdx-wizard, a panel per section. It is built with the
+                // fields, once per schema and form; the wizard moves between its panels itself.
+                const isWizard = schema.layout === 'wizard' && groups.length > 1;
+                _wizardEl = null;
+                if (isWizard) {
+                    const wizard = document.createElement('pdx-wizard') as Wizard;
+                    wizard.setAttribute('data-part', 'wizard');
+                    wizard.addEventListener('pdx-before-change', onBeforeChange);
+                    wizard.addEventListener('pdx-complete', () => { void onComplete(); });
+                    container.appendChild(wizard);
+                    _wizardEl = wizard;
                 }
 
                 for (let gi = 0; gi < groups.length; gi++) {
                     const group = groups[gi];
-
-                    // Wizard: only show current step
-                    if (isWizard && gi !== currentStep) continue;
 
                     let sectionEl: HTMLElement;
 
@@ -307,6 +305,7 @@ component('pdx-form-template', {
                         // Standard section with fieldset
                         const fieldset = document.createElement('fieldset');
                         fieldset.className = 'pdx-form-section';
+                        fieldset.setAttribute('data-part', 'section');
 
                         const legend = document.createElement('legend');
                         legend.className = 'pdx-form-section-legend';
@@ -340,10 +339,19 @@ component('pdx-form-template', {
 
                         sectionEl = content;
                         container.appendChild(fieldset);
-                    } else {
-                        // Wizard step content or unsectioned fields
+                    } else if (_wizardEl) {
+                        // A step of the wizard: its panel, labelled with the section.
                         sectionEl = document.createElement('div');
-                        sectionEl.className = isWizard ? 'pdx-wizard-step-content' : 'pdx-form-template-fields';
+                        sectionEl.className = 'pdx-wizard-step-content';
+                        sectionEl.setAttribute('data-wizard-step', '');
+                        sectionEl.setAttribute('data-label', group.section?.label ?? `${gi + 1}`);
+                        sectionEl.style.cssText = layoutStyle(group.section);
+                        _wizardEl.appendChild(sectionEl);
+                    } else {
+                        // Unsectioned fields
+                        sectionEl = document.createElement('div');
+                        sectionEl.className = 'pdx-form-template-fields';
+                        sectionEl.setAttribute('data-part', 'fields');
                         sectionEl.style.cssText = layoutStyle(group.section);
                         container.appendChild(sectionEl);
                     }
@@ -365,63 +373,35 @@ component('pdx-form-template', {
                     }
                 }
 
-                // Wizard: add Back/Next/Submit navigation
-                if (isWizard && groups.length > 1) {
-                    const nav = document.createElement('div');
-                    nav.className = 'pdx-wizard-nav';
-
-                    if (currentStep > 0) {
-                        const backBtn = document.createElement('button');
-                        backBtn.type = 'button';
-                        backBtn.className = 'pdx-outline';
-                        backBtn.textContent = getComponentString('form-template', 'wizard.back')();
-                        backBtn.addEventListener('click', wizardPrev);
-                        nav.appendChild(backBtn);
-                    } else {
-                        // Spacer for alignment
-                        nav.appendChild(document.createElement('span'));
-                    }
-
-                    if (currentStep < groups.length - 1) {
-                        const nextBtn = document.createElement('button');
-                        nextBtn.type = 'button';
-                        nextBtn.className = 'pdx-primary';
-                        nextBtn.textContent = getComponentString('form-template', 'wizard.next')();
-                        nextBtn.addEventListener('click', wizardNext);
-                        nav.appendChild(nextBtn);
-                    } else {
-                        // Last step: show Submit
-                        const submitBtn = document.createElement('button');
-                        submitBtn.type = 'submit';
-                        submitBtn.className = 'pdx-primary';
-                        submitBtn.textContent = getComponentString('form-template', 'wizard.submit')();
-                        nav.appendChild(submitBtn);
-                    }
-
-                    container.appendChild(nav);
-                }
             });
         });
 
-        // Expose getForm() and wizard API on the element for external access
-        (ctx.el as any).getForm = () => _form();
-        (ctx.el as any).wizardNext = wizardNext;
-        (ctx.el as any).wizardPrev = wizardPrev;
-        (ctx.el as any).wizardGoTo = wizardGoTo;
+        // The form, and the navigation verbs of the library (#289), through the wizard and its gate:
+        // `next()`, `prev()`, `goTo(n)`, each false when it did not move.
+        ctx.expose({
+            /** The Form the template renders: the `form` prop, or the one created from the schema. */
+            getForm: () => _form(),
+            /** The next step, once the current one is valid. A promise: the validation may be async. */
+            next: () => goTo((_wizardEl?.value ?? 0) + 1),
+            /** The previous step; never held. */
+            prev: () => _wizardEl?.prev() ?? false,
+            /** A step by index; forward only once the current step is valid. */
+            goTo: (n: number) => goTo(n),
+        });
 
         // The inner pdx-form's submit stays on it (#138): the template dispatches it again from its
         // host, which is where the app listens.
-        function relaySubmit(e: Event) { ctx.emit(e.type, (e as CustomEvent).detail); }
+        function relaySubmit(e: Event) { ctx.emit(e.type as 'pdx-submit', (e as CustomEvent).detail); }
 
-        return { _form, layoutStyle, getFieldsBySection, _wizardStep, wizardNext, wizardPrev, wizardGoTo, relaySubmit };
+        return { _form, layoutStyle, getFieldsBySection, relaySubmit };
     },
     render: (ctx) => html`
-        <pdx-form :form="${() => ctx._form?.() ?? ctx.form()}"
+        <pdx-form data-part="form" :form="${() => ctx._form?.() ?? ctx.form()}"
                    :autocomplete="${ctx.autocomplete}"
                    :formClass="${ctx.formClass}"
                    @pdx-submit="${ctx.relaySubmit}"
                    @pdx-submit-error="${ctx.relaySubmit}">
-            <div class="pdx-form-template-content"></div>
+            <div class="pdx-form-template-content" data-part="content"></div>
             ${() => {
                 const schema = ctx.schema() as FormSchema | null;
                 const isWizard = schema?.layout === 'wizard';

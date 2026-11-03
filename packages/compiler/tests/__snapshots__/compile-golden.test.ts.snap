@@ -20717,8 +20717,8 @@ import { assignBoundProperty, component, effect, staticBlock, staticMarkup } fro
   __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-nyywbm]) to ([data-pdx-root] \\u003E *) {:scope .demo-block {\\n    margin-top: var(--pdx-space-lg);\\n    padding: var(--pdx-space-lg);\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-lg);\\n    background: var(--pdx-color-surface);\\n  }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">3. Wizard Layout</h2> <p class="pdx-txt-small pdx-ink-muted"> <code>layout: \\'wizard\\'</code> turns sections into steps with automatic navigation.\\n      Each step validates before advancing. Click a completed step to go back.\\n    </p> <div class="demo-block"> <pdx-form-template></pdx-form-template> </div> </section> '));
-const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild.nextSibling;return [__el5];};
+const __blk0=staticBlock(staticMarkup(' <section> <h2 class="pdx-txt-heading section-heading">3. Wizard Layout</h2> <p class="pdx-txt-small pdx-ink-muted"> <code>layout: \\'wizard\\'</code> turns sections into the steps of a <code>&lt;pdx-wizard&gt;</code>.\\n      Each step validates before advancing; the last step\\'s button submits. Click a completed step to go back,\\n      or drive it with <code>next()</code>, <code>prev()</code> and <code>goTo(n)</code>.\\n    </p> <div class="demo-block"> <pdx-form-template></pdx-form-template> </div> </section> '));
+const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el8=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el9=__el8.firstChild.nextSibling;return [__el9];};
 component('app-demo-comp-form-composition-wizard', {
   props: {},
   setup(ctx) {
@@ -20746,8 +20746,8 @@ component('app-demo-comp-form-composition-wizard', {
   },
   render: (ctx) => (() => {
     const __frag=__blk0();
-    const [__el5]=__walk0(__frag);
-    let __el5w_schema = {}; effect(() => { const __b = ctx.wizardSchema; if (Object.is(__b, __el5w_schema)) return; __el5w_schema = __b; assignBoundProperty(__el5, "schema", __b); });
+    const [__el9]=__walk0(__frag);
+    let __el9w_schema = {}; effect(() => { const __b = ctx.wizardSchema; if (Object.is(__b, __el9w_schema)) return; __el9w_schema = __b; assignBoundProperty(__el9, "schema", __b); });
     return __frag;
   })(),
 });

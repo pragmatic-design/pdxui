@@ -28,9 +28,10 @@ async function mountTemplate(): Promise<HTMLElement> {
     return el;
 }
 
+/** The step pdx-wizard marks current (#293: the template's wizard layout is a pdx-wizard). */
 function activeStep(el: HTMLElement): number {
-    const steps = Array.from(el.querySelectorAll('.pdx-wizard-step'));
-    return steps.findIndex((s) => s.getAttribute('aria-selected') === 'true');
+    const steps = Array.from(el.querySelectorAll('pdx-wizard [data-step-btn]'));
+    return steps.findIndex((s) => s.getAttribute('aria-current') === 'step');
 }
 
 describe('wizard gate validates group-field leaves', () => {
@@ -38,10 +39,10 @@ describe('wizard gate validates group-field leaves', () => {
 
     it('does NOT advance while a required group leaf is empty', async () => {
         const el = await mountTemplate();
-        expect(el.querySelectorAll('.pdx-wizard-step').length).toBe(2);
+        expect(el.querySelectorAll('pdx-wizard [data-step-btn]').length).toBe(2);
         expect(activeStep(el)).toBe(0);
 
-        await (el as any).wizardNext();
+        await (el as any).next();
         await tick(50);
 
         // Old code advanced (form.fields['address'] was undefined → gate skipped).
@@ -54,7 +55,7 @@ describe('wizard gate validates group-field leaves', () => {
         form['address.street'].onChange('123 Main St');
         await tick(20);
 
-        await (el as any).wizardNext();
+        await (el as any).next();
         await tick(50);
 
         expect(activeStep(el)).toBe(1);

@@ -2,8 +2,9 @@
   <section>
     <h2 class="pdx-txt-heading section-heading">3. Wizard Layout</h2>
     <p class="pdx-txt-small pdx-ink-muted">
-      <code>layout: 'wizard'</code> turns sections into steps with automatic navigation.
-      Each step validates before advancing. Click a completed step to go back.
+      <code>layout: 'wizard'</code> turns sections into the steps of a <code>&lt;pdx-wizard&gt;</code>.
+      Each step validates before advancing; the last step's button submits. Click a completed step to go back,
+      or drive it with <code>next()</code>, <code>prev()</code> and <code>goTo(n)</code>.
     </p>
 
     <div class="demo-block">
