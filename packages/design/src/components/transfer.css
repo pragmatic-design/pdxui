@@ -107,8 +107,10 @@ pdx-transfer {
     background: var(--pdx-color-inset);
 }
 
+/* A checked row and its check: the component's tokens (#761), each defaulting to the colour the rule
+   drew before. */
 .pdx-transfer-item.checked {
-    background: color-mix(in oklch, var(--pdx-color-primary) 8%, transparent);
+    background: var(--pdx-transfer-option-bg-selected, color-mix(in oklch, var(--pdx-color-primary) 8%, transparent));
 }
 
 .pdx-transfer-item.disabled {
@@ -129,8 +131,8 @@ pdx-transfer {
     box-sizing: border-box;
 }
 .pdx-transfer-item.checked .pdx-transfer-check {
-    background: var(--pdx-color-primary);
-    border-color: var(--pdx-color-primary);
+    background: var(--pdx-transfer-check-bg-selected, var(--pdx-color-primary));
+    border-color: var(--pdx-transfer-check-bg-selected, var(--pdx-color-primary));
 }
 .pdx-transfer-item.checked .pdx-transfer-check::after {
     content: '';

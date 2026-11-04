@@ -11,6 +11,16 @@ semver.
 
 ### Features
 
+- The five pickers that draw their own surface have tokens for what they paint in a state (#761):
+  `pdx-calendar` `--pdx-calendar-cell-bg-selected`, `-cell-color-selected`, `-cell-bg-in-range` and
+  `-cell-color-today`; `pdx-time-picker` `--pdx-time-picker-segment-bg-focus` and
+  `-segment-color-focus`; `pdx-color-picker` `--pdx-color-picker-preset-ring-active`; `pdx-transfer`
+  `--pdx-transfer-option-bg-selected` and `-check-bg-selected`; `pdx-file-upload`
+  `--pdx-file-upload-border-color-dragover` and `-bg-dragover`. Each is listed in the manifest, and a
+  certification rule sets it on one element and measures what it draws, in every theme. The time
+  picker's focused segment in cupertino, fluent, material and metro, and cupertino's today cell, read
+  the tokens too, with the theme's own colour as the fallback.
+
 - The five pickers drawn by the text input's frame list its tokens in their manifest (#761): the
   trigger of `pdx-select`, `pdx-autocomplete`, `pdx-cascader`, `pdx-tree-select` and `pdx-date-picker`
   is `.pdx-input-wrap`, and keeps pdx-input's names, `--pdx-input-border-color`, `-focus`,

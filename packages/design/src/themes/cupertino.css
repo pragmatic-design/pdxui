@@ -220,7 +220,7 @@
     border-radius: 9999px;
 }
 [pdx-theme="cupertino"] .pdx-cal-today:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    color: var(--pdx-color-primary-ink);
+    color: var(--pdx-calendar-cell-color-today, var(--pdx-color-primary-ink));
 }
 /* Apple range: pill ends */
 [pdx-theme="cupertino"] .pdx-cal-range-start:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
@@ -272,7 +272,7 @@
     border-radius: var(--pdx-radius-md);
 }
 [pdx-theme="cupertino"] .pdx-time-value:focus:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {
-    background: light-dark(oklch(0 0 0 / 0.05), oklch(1 0 0 / 0.08));
+    background: var(--pdx-time-picker-segment-bg-focus, light-dark(oklch(0 0 0 / 0.05), oklch(1 0 0 / 0.08)));
     box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
 }
 [pdx-theme="cupertino"] .pdx-time-arrow:not(:where([pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]), [pdx-theme="cupertino"] [pdx-theme]:not([pdx-theme="cupertino"]) *)) {

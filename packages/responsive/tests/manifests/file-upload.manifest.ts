@@ -76,11 +76,35 @@ export const fileUpload: ComponentManifest = {
                     </pdx-file-upload>
                 </div>`,
         },
+        {
+            // The component's tokens (#761), set on one element: the drop zone's border and fill while a
+            // drag is over it. Both uploads are put in the dragover state by a dragover event; the one
+            // without the tokens keeps the theme's colours.
+            id: 'file-upload-tokens',
+            title: 'File Upload — Component tokens on one element, a drag over it',
+            html: `
+                <div style="display: grid; gap: 12px; width: 360px;">
+                    <pdx-file-upload data-test="tok" style="--pdx-file-upload-border-color-dragover: rgb(14, 24, 34); --pdx-file-upload-bg-dragover: rgb(15, 25, 35)"></pdx-file-upload>
+                    <pdx-file-upload data-test="tok-plain"></pdx-file-upload>
+                </div>`,
+            setup: `
+                for (const zone of document.querySelectorAll('section:not([hidden]) [data-test^="tok"] .pdx-file-dropzone')) {
+                    zone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+                }
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'file-upload-tokens': {
+                standalone: [
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-file-dropzone', description: '--pdx-file-upload-bg-dragover on the element is the drop zone\'s fill under a drag', backgroundColor: { op: 'is', value: 'rgb(15, 25, 35)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-file-dropzone', description: '--pdx-file-upload-border-color-dragover on the element is the drop zone\'s border under a drag', border: { top: { color: { op: 'is', value: 'rgb(14, 24, 34)' } } } },
+                    { selector: 'section:not([hidden]) [data-test="tok-plain"] .pdx-file-dropzone', description: 'control: an upload under a drag without the token keeps the theme\'s fill', backgroundColor: { op: 'isNot', value: 'rgb(15, 25, 35)' } },
+                ],
+            },
             'file-upload-empty': {
                 standalone: [
                     {

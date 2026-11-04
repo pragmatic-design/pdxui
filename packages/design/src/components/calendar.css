@@ -200,10 +200,11 @@
     opacity: 0.4;
 }
 
-/* Today */
+/* Today. The colours of today, of a selected day and of a range are the component's tokens (#761),
+   each defaulting to the colour the rule drew before. */
 .pdx-cal-today {
     font-weight: var(--pdx-weight-bold);
-    color: var(--pdx-color-primary-ink);
+    color: var(--pdx-calendar-cell-color-today, var(--pdx-color-primary-ink));
 }
 
 .pdx-cal-today::after {
@@ -220,8 +221,8 @@
 
 /* Selected */
 .pdx-cal-selected {
-    background: var(--pdx-color-primary) !important;
-    color: var(--pdx-color-primary-text) !important;
+    background: var(--pdx-calendar-cell-bg-selected, var(--pdx-color-primary)) !important;
+    color: var(--pdx-calendar-cell-color-selected, var(--pdx-color-primary-text)) !important;
     font-weight: var(--pdx-weight-semibold);
 }
 
@@ -234,19 +235,19 @@
 
 /* Range */
 .pdx-cal-in-range {
-    background: color-mix(in oklch, var(--pdx-color-primary) 15%, transparent);
+    background: var(--pdx-calendar-cell-bg-in-range, color-mix(in oklch, var(--pdx-color-primary) 15%, transparent));
     border-radius: 0;
 }
 
 .pdx-cal-range-start {
-    background: var(--pdx-color-primary) !important;
-    color: var(--pdx-color-primary-text) !important;
+    background: var(--pdx-calendar-cell-bg-selected, var(--pdx-color-primary)) !important;
+    color: var(--pdx-calendar-cell-color-selected, var(--pdx-color-primary-text)) !important;
     border-radius: var(--pdx-radius-sm) 0 0 var(--pdx-radius-sm);
 }
 
 .pdx-cal-range-end {
-    background: var(--pdx-color-primary) !important;
-    color: var(--pdx-color-primary-text) !important;
+    background: var(--pdx-calendar-cell-bg-selected, var(--pdx-color-primary)) !important;
+    color: var(--pdx-calendar-cell-color-selected, var(--pdx-color-primary-text)) !important;
     border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
 }
 
@@ -325,8 +326,8 @@
 
 .pdx-cal-month-cell.pdx-cal-selected,
 .pdx-cal-year-cell.pdx-cal-selected {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
+    background: var(--pdx-calendar-cell-bg-selected, var(--pdx-color-primary));
+    color: var(--pdx-calendar-cell-color-selected, var(--pdx-color-primary-text));
     font-weight: var(--pdx-weight-semibold);
 }
 

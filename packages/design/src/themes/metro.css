@@ -256,7 +256,7 @@
     border-radius: 0;
 }
 [pdx-theme="metro"] .pdx-time-value:focus:not(:where([pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]), [pdx-theme="metro"] [pdx-theme]:not([pdx-theme="metro"]) *)) {
-    background: var(--pdx-color-inset);
+    background: var(--pdx-time-picker-segment-bg-focus, var(--pdx-color-inset));
     outline: 2px solid var(--pdx-color-primary);
     outline-offset: -2px;
 }

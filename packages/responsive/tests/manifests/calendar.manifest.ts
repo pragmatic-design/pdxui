@@ -135,11 +135,35 @@ export const calendar: ComponentManifest = {
                     <pdx-calendar data-test="cal" inline value="2024-06-15" number-of-months="2"></pdx-calendar>
                 </div>`,
         },
+        {
+            // The component's tokens (#761), set on one element: a selected day's fill and text, the
+            // days inside a range, today's text. A calendar beside it, without them, keeps the theme's.
+            // Today is in the month a calendar with no value shows; its tokens are in colours no theme uses.
+            id: 'calendar-tokens',
+            title: 'Calendar — Component tokens on one element',
+            html: `
+                <div style="display: grid; gap: 12px; grid-template-columns: repeat(2, max-content);">
+                    <pdx-calendar data-test="tok" value="2024-06-15" style="--pdx-calendar-cell-bg-selected: rgb(16, 26, 36); --pdx-calendar-cell-color-selected: rgb(17, 27, 37)"></pdx-calendar>
+                    <pdx-calendar data-test="tok-plain" value="2024-06-15"></pdx-calendar>
+                    <pdx-calendar data-test="tok-range" mode="range" range-start="2024-06-10" range-end="2024-06-14" style="--pdx-calendar-cell-bg-in-range: rgb(18, 28, 38)"></pdx-calendar>
+                    <pdx-calendar data-test="tok-today" style="--pdx-calendar-cell-color-today: rgb(19, 29, 39)"></pdx-calendar>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'calendar-tokens': {
+                standalone: [
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-cal-selected', description: '--pdx-calendar-cell-bg-selected on the element is a selected day\'s fill', backgroundColor: { op: 'is', value: 'rgb(16, 26, 36)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-cal-selected', description: '--pdx-calendar-cell-color-selected on the element is a selected day\'s text', colorVar: '--pdx-calendar-cell-color-selected' },
+                    { selector: 'section:not([hidden]) [data-test="tok-plain"] .pdx-cal-selected', description: 'control: a calendar without the token keeps the theme\'s fill', backgroundColor: { op: 'isNot', value: 'rgb(16, 26, 36)' } },
+                    // A day strictly inside: the range's ends are in-range too, and take the selected fill.
+                    { selector: 'section:not([hidden]) [data-test="tok-range"] .pdx-cal-in-range:not(.pdx-cal-range-start):not(.pdx-cal-range-end)', description: '--pdx-calendar-cell-bg-in-range on the element is the fill of the days inside a range', backgroundColor: { op: 'is', value: 'rgb(18, 28, 38)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok-today"] .pdx-cal-today', description: '--pdx-calendar-cell-color-today on the element is today\'s text', colorVar: '--pdx-calendar-cell-color-today' },
+                ],
+            },
             'calendar-month': {
                 standalone: [
                     {

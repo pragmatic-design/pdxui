@@ -86,9 +86,11 @@
     background: var(--pdx-color-inset);
 }
 
+/* The segment being edited: its colours are the component's tokens (#761), defaulting to what the rule
+   drew before. A theme that draws its own background reads the token too, with its colour as default. */
 .pdx-time-value:focus {
-    background: var(--pdx-color-primary);
-    color: var(--pdx-color-primary-text);
+    background: var(--pdx-time-picker-segment-bg-focus, var(--pdx-color-primary));
+    color: var(--pdx-time-picker-segment-color-focus, var(--pdx-color-primary-text));
 }
 
 .pdx-time-period {

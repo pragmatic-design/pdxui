@@ -4610,6 +4610,20 @@
               "name": "disabled",
               "description": "`disabled` is set."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-calendar-cell-bg-in-range"
+            },
+            {
+              "name": "--pdx-calendar-cell-bg-selected"
+            },
+            {
+              "name": "--pdx-calendar-cell-color-selected"
+            },
+            {
+              "name": "--pdx-calendar-cell-color-today"
+            }
           ]
         }
       ],
@@ -7843,6 +7857,11 @@
             {
               "name": "readonly",
               "description": "`readonly` is set."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-color-picker-preset-ring-active"
             }
           ]
         }
@@ -14035,6 +14054,14 @@
             {
               "name": "dragover",
               "description": "A drag is over the drop zone."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-file-upload-bg-dragover"
+            },
+            {
+              "name": "--pdx-file-upload-border-color-dragover"
             }
           ]
         }
@@ -29121,6 +29148,14 @@
               "name": "disabled",
               "description": "`disabled` is set."
             }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-time-picker-segment-bg-focus"
+            },
+            {
+              "name": "--pdx-time-picker-segment-color-focus"
+            }
           ]
         }
       ],
@@ -30766,6 +30801,14 @@
             {
               "name": "disabled",
               "description": "`disabled` is set."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-transfer-check-bg-selected"
+            },
+            {
+              "name": "--pdx-transfer-option-bg-selected"
             }
           ]
         }
