@@ -14,12 +14,12 @@
  * held to its row's ratio.
  *
  * Measured 2026-11-03 on a production build: the switch 0.74×, the select 0.92× — the 1.4× and 2.5×
- * the pilot saw were the dev server's. The filter popover is not within 1.2×, and why is in its row:
- * a profile of 30 × 100 value lists (CPU, Chromium) gives the TypeScript side 237 ms, 167 of them its
- * buttons, and the `.pdx` side 566 ms — of which ~240 ms are `<pdx-filter-popover>` itself, a component
- * per content where the TypeScript content is built by a function (its setup and lifecycle), and
- * ~190 ms the keyed list, a reactive `@if` branch per row where the TypeScript rows are built once. A
- * popover row is held to today's ratio and some headroom, so it can only get better.
+ * the pilot saw were the dev server's. The filter popover's two conditions were 1.85×: their editors
+ * are in an `@defer (immediate)`, and every popover rendered them a flush after its append, into the
+ * live page, though the code had arrived with the first. A `@defer`'s code is now one loader per
+ * module (core's `deferCode`), and a block whose code has arrived renders in its own task: 1.06–1.14×.
+ *
+ * The value list is not within 1.2×, and why is in its row.
  */
 import { test, expect, type Page } from './fixture';
 import { createServer, type Server } from 'node:http';
@@ -50,16 +50,24 @@ const WARM_UP = 10;
 const SAMPLES = 21;
 
 /**
- * Each row and the ratio it is held to. The popover's two are a component against a function and a
- * reactive branch per row against rows built once (above): their ratio is today's, with the headroom a
- * ratio measured beside other specs needs — the value list measured 2.12× alone and 2.33× beside
- * them, the conditions 1.84× both ways.
+ * Each row and the ratio it is held to. The value list measures 1.96–2.05×, from 2.12–2.33× before an
+ * `@if` chain compiled to one branch (core's `whenChain`). A profile of 30 × 100 value lists (CPU,
+ * Chromium) gives the TypeScript side 257 ms, 163 of them its buttons; the `.pdx` side 577 ms, of
+ * which 313 ms are the content without its buttons against ~90, and 147 ms of that the keyed list
+ * against 31. Each `.pdx` row is a set of reactive bindings — its item and index signals, its branch,
+ * its `checked`, its label — where a TypeScript row is built once; with its list costing what the
+ * TypeScript one does it would still be 1.8×. It is held to its ratio with the headroom of a ratio measured beside other specs
+ * (it moved 10% that way), so it can only get better.
+ *
+ * The conditions are within 1.2×: 1.06, 1.12, 1.14 and 1.18× in four runs of this spec. A ratio a run
+ * beside the other rows puts at 1.18 is held at 1.3, so that the gate fails on a regression and not
+ * on a busy machine.
  */
 const ROWS = [
     { kind: 'switch', name: 'pdx-switch', max: COMPONENT_RATIO },
     { kind: 'select', name: 'pdx-select', max: COMPONENT_RATIO },
-    { kind: 'values', name: 'filter popover, value list', max: 2.8 },
-    { kind: 'conditions', name: 'filter popover, conditions', max: 2.2 },
+    { kind: 'values', name: 'filter popover, value list', max: 2.3 },
+    { kind: 'conditions', name: 'filter popover, conditions', max: 1.3 },
 ] as const;
 
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];

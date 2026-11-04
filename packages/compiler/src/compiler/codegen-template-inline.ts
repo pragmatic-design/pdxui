@@ -20,6 +20,7 @@ import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, rewri
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
 import { soleControlFlow } from './inline-sole-block';
+import { ifChain, type IfChain } from './if-chain';
 import { hasNativeProperty } from './native-properties';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
@@ -839,6 +840,8 @@ class InlineGen {
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
 
     ifN(node: IfNode): void {
+        const chain = ifChain(node);
+        if (chain) { this.ifChainN(node, chain); return; }
         this.imports.add('when');
         const cond = callSignals(prefixCtx(node.condition, this.ctx), this.ctx);
         const then = this.sub(node.body);
@@ -846,6 +849,19 @@ class InlineGen {
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
         this.out(`const ${cf}=when(()=>${cond},()=>{${then}},${els}${generateTransition(node.transition)});`);
+        this.place(cf);
+    }
+
+    /** An `@if` / `@else if` chain (if-chain.ts): one whenChain, picking the first condition that holds. */
+    private ifChainN(node: IfNode, chain: IfChain): void {
+        this.imports.add('whenChain');
+        const picks = chain.links.map((l, i) => `(${callSignals(prefixCtx(l.condition, this.ctx), this.ctx)})?${i}:`).join('');
+        const fallback = chain.elseBody ? String(chain.links.length) : '-1';
+        const branches = chain.links.map((l) => `()=>{${this.sub(l.body)}}`);
+        if (chain.elseBody) branches.push(`()=>{${this.sub(chain.elseBody)}}`);
+        const cf = this.v('cf');
+        this.pending = templateMark(this.ctx, node.exprOffset);
+        this.out(`const ${cf}=whenChain(()=>${picks}${fallback},[${branches.join(',')}]);`);
         this.place(cf);
     }
 
@@ -1030,8 +1046,17 @@ class InlineGen {
         // path reads them off its markup: the block loads its components, or nothing does (#44).
         // Every custom element, the app's too (#136): `deferLoadFn` imports what `importPathOf` resolves.
         const tags = [...created].filter((t) => t.includes('-'));
+        // One loader per @defer, at module level, shared by every block of it: once its code has
+        // arrived, a block renders in the task its trigger fires in (core's defer-code.ts, #685).
+        let load = deferLoadFn(tags, this.ctx);
+        if (load !== 'null') {
+            this.imports.add('deferCode');
+            const n = this.hoists.codes = (this.hoists.codes ?? 0) + 1;
+            this.hoists.lines.push(`const __code${n}=deferCode(${load});`);
+            load = `__code${n}`;
+        }
         const cf = this.v('cf');
-        this.out(`const ${cf}=defer({${opts.join(',')}},${deferLoadFn(tags, this.ctx)},()=>{${body}});`);
+        this.out(`const ${cf}=defer({${opts.join(',')}},${load},()=>{${body}});`);
         this.place(cf);
     }
 

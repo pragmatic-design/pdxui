@@ -20,7 +20,7 @@ describe('a block that is one control-flow node alone', () => {
     it('an @else if branch and a row that is one @if chain clone no marker block', () => {
         const code = render('<ul>@for (rows as r; track r.k) { @if (r.a) { <li>a</li> } @else if (r.b) { <li>b</li> } @else { <li>c</li> } }</ul>');
         expect(markerOnlyBlocks(code)).toEqual([]);
-        expect(code, 'the row is not the @if itself').toMatch(/eachRow\([^]*?\(r\)=>\{const __cf\d+=when\(/);
+        expect(code, 'the row is not the @if itself').toMatch(/eachRow\([^]*?\(r\)=>\{const __cf\d+=whenChain\(/);
     });
 
     it('keeps the whitespace before the node as text (the parser drops the one before the closing brace)', () => {

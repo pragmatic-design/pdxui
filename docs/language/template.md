@@ -957,9 +957,13 @@ IfBlock        ::= "@if" S? Paren S? BlockTransition? Block ( S? "@else" S? ( ( 
 
 `when(() => cond, () => html\`…\`, () => html\`…\`, options)`: the body is rendered while the
 condition is truthy, the `@else` body while it is not, and a branch is built again only when the
-truthiness changes. A branch's effects are disposed with it. `@else if (…)` and `@else @if (…)` nest a
-second `when` in the else branch. In a production build a literal `true` or `false` condition is
-folded away (#236).
+truthiness changes. A branch's effects are disposed with it. A chain, `@if` followed by one or more
+`@else if (…)`, is one choice among its branches: `whenChain(() => c1 ? 0 : c2 ? 1 : …, [branches])`
+renders the first branch whose condition holds, or the `@else`, and builds a branch again only when
+the choice changes (#685). A chain with a `@transition` on any of its links nests a `when` per link
+instead, which runs the transitions. `@else { @if (…) }` with text beside the `@if` is a second
+`when` in the else branch. In a production build a literal `true` or `false` condition is folded away
+(#236).
 
 #### Rules
 
@@ -1391,9 +1395,12 @@ truthy and does not un-fire: a deferred block is never removed by its trigger, a
 that. The expression is in its own parentheses, so a `|` or a `;` inside it is the expression's.
 
 The code is what the body's components need — `loadFn` is `() => Promise.all([import(…)])` for every
-custom-element tag in the body whose module the plugin resolves, so they leave the route's chunk. A
-render shows `@loading` (or the placeholder) while the code is in flight, reuses code a prefetch has
-loaded — at once when it has arrived, when it does when it is in flight — and renders the body. A
+custom-element tag in the body whose module the plugin resolves, so they leave the route's chunk.
+Each `@defer` of a module has one loader, `const __codeN = deferCode(loadFn)` at module level, shared
+by all its blocks: the code is loaded once, and a block whose code has arrived — loaded by an earlier
+block, or by a prefetch — renders its body in the task its trigger fires in (#685). Otherwise a
+render shows `@loading` (or the placeholder) while the code is in flight and renders the body when it
+arrives. A
 prefetch goes through the prefetch queue, which waits for the browser to be idle; a render's load goes
 ahead of it. A prefetch that fails renders nothing; the render trigger loads the code again. A render
 whose load fails shows `@error (err, retry)`: `err` is the load's error, and `retry()` loads the code

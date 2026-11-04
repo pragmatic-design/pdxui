@@ -320,6 +320,18 @@ const ROWS: Row[] = [
         template: "<ul>@for (rows as r; track r.k) { @if (r.t === 'a') { <li>a</li> } @else if (r.t === 'b') { <li>b</li> } @else { <li>c</li> } }</ul>",
         script: "let rows = $signal([{ k: 1, t: 'a' }, { k: 2, t: 'b' }, { k: 3, t: 'c' }]);",
     },
+    // A chain is one branch, whenChain (#685): stepped from its first branch through its second to its
+    // else, it shows one branch at a time, the current one.
+    {
+        name: 'an @if chain that switches', expected: '<u>c</u><button>+</button>',
+        template: '@if (n === 0) { <b>a</b> } @else if (n === 1) { <i>b</i> } @else { <u>c</u> }<button @click="n++">+</button>',
+        script: 'let n = $signal(0);',
+        act: async (h) => {
+            click('button')(h);
+            await new Promise((r) => setTimeout(r, 0));
+            click('button')(h);
+        },
+    },
     // Neither path wired the gesture: on the template path the handler ran once at render and the count
     // read NaN, on the inline path `.left` was a key filter (#99). Swiped left, both count 1.
     {

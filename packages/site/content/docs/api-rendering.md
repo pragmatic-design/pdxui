@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 61 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 63 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -317,6 +317,16 @@ Simple usage (no dynamic import):
   ${defer({ trigger: 'viewport' },
     null,
     () => html`<div class="heavy">Loaded!</div>`)}
+
+## `deferCode`
+
+```ts
+import { deferCode } from '@pdxui/core';
+
+function deferCode(load: () => Promise<unknown>): DeferCode
+```
+
+`load`, run at most once until it fails, and known to have arrived once it has.
 
 ## `delegate`
 
@@ -892,3 +902,15 @@ Usage:
   ${when(() => isOpen(), () => html`<span>Open!</span>`)}
   ${when(() => isOpen(), () => html`<span>Yes</span>`, () => html`<span>No</span>`,
          { enter: 'fade-in', exit: 'fade-out' })}
+
+## `whenChain`
+
+```ts
+import { whenChain } from '@pdxui/core';
+
+function whenChain(select: () => number, branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>): DocumentFragment
+```
+
+Render the branch `select()` picks — `branches[select()]`, or nothing for an index without one —
+between two markers, and rebuild it only when the pick changes. What a transition-less
+`@if` / `@else if` / `@else` chain compiles to.

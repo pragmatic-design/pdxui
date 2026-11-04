@@ -152,6 +152,7 @@ export { renderSnippet, declaredSnippet } from './renderer/snippet';
 export { awaitBlock, awaitTimed, awaitReady, AwaitTimeoutError, type AwaitTiming } from './renderer/await';
 export { when, each, eachDestructured, eachRow, match, pipe as templatePipe, show, portal, dynamic } from './renderer/helpers';
 export type { TransitionOptions, DynamicOptions, PortalOptions } from './renderer/helpers';
+export { whenChain } from './renderer/when-chain';
 
 // Pages (keep-alive page switching)
 export { pages } from './renderer/pages';
@@ -173,6 +174,7 @@ export type { TweenConfig, TweenSignal } from './renderer/tween';
 
 // Defer (lazy loading)
 export { defer } from './renderer/defer';
+export { deferCode, type DeferCode } from './renderer/defer-code';
 export type { DeferOptions, DeferState } from './renderer/defer';
 // The one queue prefetches wait in (#250): the router queues route chunks here.
 export { queuePrefetch, trackUrgentLoad, takePrefetch, cancelPrefetches } from './renderer/load-queue';

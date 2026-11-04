@@ -435,6 +435,18 @@ semver.
   marker to replace with it. The DOM is the same. Measured against the library's TypeScript components
   on a production build, the `.pdx` pilot's switch and select mount at 0.74× and 0.92× of their time.
 
+- A `@defer` block whose code has arrived renders in the task its trigger fires in (#685). Each
+  `@defer` of a module loads its code through one module-level loader, core's new `deferCode`, shared
+  by all its blocks; a block rendered its body a flush after its trigger even when an earlier block had
+  loaded that code, and built it into the live page instead of the fragment being appended. The
+  `.pdx` pilot's filter popover, whose condition editors are in an `@defer (immediate)`, mounts 100 of
+  them at 1.06–1.18× of its TypeScript version, from 1.85×. The first block of a `@defer` still waits
+  for its load.
+- An `@if` / `@else if` / `@else` chain compiles to one branch, core's new `whenChain`, instead of a
+  `when()` nested in the previous one's else for every `@else if` (#685): one effect and two markers
+  for the chain. A chain with a `@transition` on any link keeps the nested form. The pilot's value
+  list, whose rows are each one chain, mounts at 1.96–2.05× of its TypeScript version, from 2.1–2.3×.
+
 - **Breaking:** the alpha's scoped slots are removed (#492). A parent's `<slot name="row" let:item>`
   and `@slot(row, { item }) { … }`, a child's `<slot name="row" :item="it">`, the object form
   `@slot row: { item: T };` and a template prop such as `:item-template` on a library component are

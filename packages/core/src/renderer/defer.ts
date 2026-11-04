@@ -7,6 +7,7 @@ import { pausableTimeout } from '../reactivity/scope-timer';
 import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 import { trackUrgentLoad, queuePrefetch } from './load-queue';
+import type { DeferCode } from './defer-code';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -105,7 +106,12 @@ export function defer(
         state.set('loading');
         cleanupTriggers();
 
-        if (loadFn) {
+        if (loadFn && (loadFn as Partial<DeferCode>).arrived) {
+            // The code has arrived (defer-code.ts): the body renders in this task, as a block with no
+            // code to load does, not a flush later in the live page.
+            loadedModule.set((loadFn as DeferCode).module);
+            state.set('loaded');
+        } else if (loadFn) {
             // The block is on screen and waiting: it goes ahead of the queue, and queued prefetches
             // hold back until it has loaded.
             trackUrgentLoad(load())
