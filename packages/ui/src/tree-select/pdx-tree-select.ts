@@ -49,6 +49,12 @@ export interface TreeSelectNode {
  * @cssstate disabled - `disabled` is set.
  * @cssstate loading - A branch's children are being fetched by `loadChildren`.
  *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail label $event.currentTarget.getLabel()

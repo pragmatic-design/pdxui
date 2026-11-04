@@ -150,6 +150,16 @@
 .pdx-select-trigger:focus-within {
     border-bottom-color: var(--pdx-color-primary);
 }
+/* The accent above is in the themes' layer, and beat the frame's state colours (#519): the trigger is
+   the text input's frame, and its states read the input's tokens, as inputs.css does (#761). After the
+   focus rule, so a field in error stays in its colour while focused. The host's custom state, or the
+   class on native markup. */
+:state(invalid) > .pdx-select-trigger,
+.pdx-select-trigger.error { border-bottom-color: var(--pdx-input-border-color-invalid, var(--pdx-color-danger)); }
+:state(success) > .pdx-select-trigger,
+.pdx-select-trigger.success { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
+:state(warning) > .pdx-select-trigger,
+.pdx-select-trigger.warning { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
 .pdx-select-dropdown {
     border-radius: var(--pdx-radius-sm);
     box-shadow: var(--pdx-shadow-md);

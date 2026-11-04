@@ -64,6 +64,18 @@
  */
 import type { ComponentManifest } from './_types';
 
+// The text input's frame tokens (#761, #287 item 5). The trigger is `.pdx-input-wrap`, the text
+// input's frame, and keeps its token names: the manifest lists the `--pdx-input-*` tokens the frame
+// reads (pickers-beta-contract.test.ts), and these rules measure that it reads them on the select, set
+// on one element. `--pdx-input-min-height` makes the trigger taller than the select beside it; each of
+// invalid, success and warning draws its border in its token, on the bottom border, which every input
+// style reads them on — outlined, filled (material) and underlined (cyberpunk, editorial). The base
+// border colour is not measured: the filled and underlined styles draw the bottom border in a colour
+// of their own, for a pdx-input as well. The same scenario is in autocomplete, cascader, tree-select
+// and date-picker; the colours are ones no theme uses.
+const FRAME_SELECT = (test: string, extra = '') => `<pdx-select data-test="${test}" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' ${extra}></pdx-select>`;
+const FRAME_ROOT = (test: string) => `section:not([hidden]) [data-test="${test}"] > [data-part="root"]`;
+
 export const select: ComponentManifest = {
     name: 'select',
     tag: 'pdx-select',
@@ -122,11 +134,37 @@ export const select: ComponentManifest = {
                     options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]'>
                 </pdx-select>`,
         },
+        {
+            id: 'select-frame-tokens',
+            title: "Select — the text input's frame tokens, set on one element",
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                ${FRAME_SELECT('tok-tall', 'style="--pdx-input-min-height: 5rem"')}
+                ${FRAME_SELECT('tok-plain')}
+                ${FRAME_SELECT('tok-invalid', 'error="Required" style="--pdx-input-border-color-invalid: rgb(11, 21, 31)"')}
+                ${FRAME_SELECT('tok-success', 'success="Looks good" style="--pdx-input-border-color-success: rgb(12, 22, 32)"')}
+                ${FRAME_SELECT('tok-warning', 'warning="Check it" style="--pdx-input-border-color-warning: rgb(13, 23, 33)"')}
+                ${FRAME_SELECT('tok-invalid-plain', 'error="Required"')}
+            </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'select-frame-tokens': {
+                composition: [{
+                    description: '--pdx-input-min-height on the element makes its frame taller than the select beside it',
+                    parent: 'body',
+                    children: { tall: FRAME_ROOT('tok-tall'), plain: FRAME_ROOT('tok-plain') },
+                    relations: [{ description: 'the frame with the token is taller', left: 'tall.height', op: '>', right: 'plain.height' }],
+                }],
+                standalone: [
+                    { selector: FRAME_ROOT('tok-invalid'), description: '--pdx-input-border-color-invalid on the element is its invalid border', border: { bottom: { color: { op: 'is', value: 'rgb(11, 21, 31)' } } } },
+                    { selector: FRAME_ROOT('tok-success'), description: '--pdx-input-border-color-success on the element is its success border', border: { bottom: { color: { op: 'is', value: 'rgb(12, 22, 32)' } } } },
+                    { selector: FRAME_ROOT('tok-warning'), description: '--pdx-input-border-color-warning on the element is its warning border', border: { bottom: { color: { op: 'is', value: 'rgb(13, 23, 33)' } } } },
+                    { selector: FRAME_ROOT('tok-invalid-plain'), description: "control: an invalid select without the token keeps the theme's border", border: { bottom: { color: { op: 'isNot', value: 'rgb(11, 21, 31)' } } } },
+                ],
+            },
             'select-closed': {
                 standalone: [
                     {

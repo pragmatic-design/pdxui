@@ -79,6 +79,11 @@ const TREE = `[
     ]}
 ]`;
 
+// The text input's frame tokens (#761): the trigger is `.pdx-input-wrap`. It has no invalid, success or
+// warning state, so its height is what is measured; why, is in select.manifest.ts.
+const FRAME_TS = (test: string, extra = '') => `<pdx-tree-select data-test="${test}" placeholder="Select…" value="apple" options='${TREE}' ${extra}></pdx-tree-select>`;
+const FRAME_ROOT = (test: string) => `section:not([hidden]) [data-test="${test}"] > [data-part="root"]`;
+
 export const treeSelect: ComponentManifest = {
     name: 'tree-select',
     tag: 'pdx-tree-select',
@@ -135,11 +140,27 @@ export const treeSelect: ComponentManifest = {
                     options='${TREE}'>
                 </pdx-tree-select>`,
         },
+        {
+            id: 'tree-select-frame-tokens',
+            title: "Tree Select — the text input's frame tokens, set on one element",
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                ${FRAME_TS('tok-tall', 'style="--pdx-input-min-height: 5rem"')}
+                ${FRAME_TS('tok-plain')}
+            </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'tree-select-frame-tokens': {
+                composition: [{
+                    description: '--pdx-input-min-height on the element makes its frame taller than the tree select beside it',
+                    parent: 'body',
+                    children: { tall: FRAME_ROOT('tok-tall'), plain: FRAME_ROOT('tok-plain') },
+                    relations: [{ description: 'the frame with the token is taller', left: 'tall.height', op: '>', right: 'plain.height' }],
+                }],
+            },
             'tree-select-closed': {
                 standalone: [
                     {

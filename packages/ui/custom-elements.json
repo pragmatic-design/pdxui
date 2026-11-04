@@ -1813,6 +1813,40 @@
               "description": "A suggestion of the list."
             }
           ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-color",
+              "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-focus",
+              "description": "The frame's border while focused (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-invalid",
+              "description": "The frame's border in the invalid state."
+            },
+            {
+              "name": "--pdx-input-border-color-success",
+              "description": "The frame's border in the success state."
+            },
+            {
+              "name": "--pdx-input-border-color-warning",
+              "description": "The frame's border in the warning state."
+            },
+            {
+              "name": "--pdx-input-border-width",
+              "description": "The frame's bottom border, in the filled input style."
+            },
+            {
+              "name": "--pdx-input-focus-ring",
+              "description": "The ring around the frame while focused."
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "description": "The frame's height, at the md size."
+            }
+          ],
           "cssStates": [
             {
               "name": "open",
@@ -5668,6 +5702,28 @@
             {
               "name": "spinner",
               "description": "The spinner of a branch being fetched by `loadChildren`."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-color",
+              "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-focus",
+              "description": "The frame's border while focused (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-width",
+              "description": "The frame's bottom border, in the filled input style."
+            },
+            {
+              "name": "--pdx-input-focus-ring",
+              "description": "The ring around the frame while focused."
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "description": "The frame's height, at the md size."
             }
           ],
           "cssStates": [
@@ -10285,6 +10341,28 @@
             {
               "name": "calendar",
               "description": "The `pdx-calendar` the picker draws, in the panel or `inline`."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-color",
+              "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-focus",
+              "description": "The frame's border while focused (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-width",
+              "description": "The frame's bottom border, in the filled input style."
+            },
+            {
+              "name": "--pdx-input-focus-ring",
+              "description": "The ring around the frame while focused."
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "description": "The frame's height, at the md size."
             }
           ],
           "cssStates": [
@@ -25204,6 +25282,46 @@
               "description": "An option of the list."
             }
           ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-color",
+              "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-focus",
+              "description": "The frame's border while focused (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-invalid",
+              "description": "The frame's border in the invalid state."
+            },
+            {
+              "name": "--pdx-input-border-color-success",
+              "description": "The frame's border in the success state."
+            },
+            {
+              "name": "--pdx-input-border-color-warning",
+              "description": "The frame's border in the warning state."
+            },
+            {
+              "name": "--pdx-input-border-width",
+              "description": "The frame's bottom border, in the filled input style."
+            },
+            {
+              "name": "--pdx-input-focus-ring",
+              "description": "The ring around the frame while focused."
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "description": "The frame's height, at the md size."
+            },
+            {
+              "name": "--pdx-select-caret-size"
+            },
+            {
+              "name": "--pdx-select-caret-stroke"
+            }
+          ],
           "cssStates": [
             {
               "name": "open",
@@ -25245,15 +25363,7 @@
                 "optional": true
               }
             ]
-          },
-          "cssProperties": [
-            {
-              "name": "--pdx-select-caret-size"
-            },
-            {
-              "name": "--pdx-select-caret-stroke"
-            }
-          ]
+          }
         }
       ],
       "exports": [
@@ -31034,6 +31144,28 @@
             {
               "name": "toggle",
               "description": "A node's expand button; a leaf's is there, hidden, to keep the labels aligned."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-input-border-color",
+              "description": "The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-color-focus",
+              "description": "The frame's border while focused (the outlined input style)."
+            },
+            {
+              "name": "--pdx-input-border-width",
+              "description": "The frame's bottom border, in the filled input style."
+            },
+            {
+              "name": "--pdx-input-focus-ring",
+              "description": "The ring around the frame while focused."
+            },
+            {
+              "name": "--pdx-input-min-height",
+              "description": "The frame's height, at the md size."
             }
           ],
           "cssStates": [

@@ -11,6 +11,16 @@ semver.
 
 ### Features
 
+- The five pickers drawn by the text input's frame list its tokens in their manifest (#761): the
+  trigger of `pdx-select`, `pdx-autocomplete`, `pdx-cascader`, `pdx-tree-select` and `pdx-date-picker`
+  is `.pdx-input-wrap`, and keeps pdx-input's names, `--pdx-input-border-color`, `-focus`,
+  `--pdx-input-border-width`, `--pdx-input-focus-ring` and `--pdx-input-min-height`; select and
+  autocomplete also `--pdx-input-border-color-invalid`, `-success` and `-warning`. A certification rule
+  sets each on one element and measures what it draws, in every theme. In the fluent theme a select in
+  error, success or warning drew its bottom border in the theme's neutral accent instead of the state's
+  colour: the theme's select rule beat the frame's state rules, and now leaves them to the input's
+  tokens.
+
 - `@model … { attribute: string }` says how a model's attribute is read, apart from its type (#753):
   `string`, `number`, `boolean` or `json`, the descriptor's `type`, beside `form` and comma-separated.
   A select's value is one string from the attribute and an array in multiple mode, `@model value:

@@ -328,6 +328,14 @@
                 </pdx-cascader>
     </section>
 
+    <section data-scenario="cascader-frame-tokens">
+        <h3>Cascader — the text input's frame tokens, set on one element</h3>
+        <div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-cascader data-test="tok-tall" value='["it"]' options='[{"value":"it","label":"Italy"},{"value":"fr","label":"France"}]' style="--pdx-input-min-height: 5rem"></pdx-cascader>
+                <pdx-cascader data-test="tok-plain" value='["it"]' options='[{"value":"it","label":"Italy"},{"value":"fr","label":"France"}]' ></pdx-cascader>
+            </div>
+    </section>
+
     <section data-scenario="cascader-size-md">
         <h3>pdx-cascader — size="md"</h3>
         <pdx-cascader data-test="variant" size="md"></pdx-cascader>
@@ -468,6 +476,14 @@
                     ariaLabel="Event date"
                     disabled>
                 </pdx-date-picker>
+    </section>
+
+    <section data-scenario="date-picker-frame-tokens">
+        <h3>Date Picker — the text input's frame tokens, set on one element</h3>
+        <div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-date-picker data-test="tok-tall" value="2024-06-15" ariaLabel="Event date" style="--pdx-input-min-height: 5rem"></pdx-date-picker>
+                <pdx-date-picker data-test="tok-plain" value="2024-06-15" ariaLabel="Event date" ></pdx-date-picker>
+            </div>
     </section>
 
     <section data-scenario="date-picker-size-md">
@@ -970,6 +986,30 @@
     ]}
 ]'>
                 </pdx-tree-select>
+    </section>
+
+    <section data-scenario="tree-select-frame-tokens">
+        <h3>Tree Select — the text input's frame tokens, set on one element</h3>
+        <div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-tree-select data-test="tok-tall" placeholder="Select…" value="apple" options='[
+    {"value":"fruits","label":"Fruits","children":[
+        {"value":"apple","label":"Apple"},
+        {"value":"banana","label":"Banana"}
+    ]},
+    {"value":"veg","label":"Vegetables","children":[
+        {"value":"carrot","label":"Carrot"}
+    ]}
+]' style="--pdx-input-min-height: 5rem"></pdx-tree-select>
+                <pdx-tree-select data-test="tok-plain" placeholder="Select…" value="apple" options='[
+    {"value":"fruits","label":"Fruits","children":[
+        {"value":"apple","label":"Apple"},
+        {"value":"banana","label":"Banana"}
+    ]},
+    {"value":"veg","label":"Vegetables","children":[
+        {"value":"carrot","label":"Carrot"}
+    ]}
+]' ></pdx-tree-select>
+            </div>
     </section>
 
     <section data-scenario="tree-select-size-md">

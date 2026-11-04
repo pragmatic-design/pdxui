@@ -146,6 +146,16 @@
 [pdx-theme="fluent"] .pdx-select-trigger:focus-within:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
     border-bottom-color: var(--pdx-color-primary);
 }
+/* The accent above is in the themes' layer, and beat the frame's state colours (#519): the trigger is
+   the text input's frame, and its states read the input's tokens, as inputs.css does (#761). After the
+   focus rule, so a field in error stays in its colour while focused. The host's custom state, or the
+   class on native markup. */
+[pdx-theme="fluent"] :state(invalid) > .pdx-select-trigger:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)),
+[pdx-theme="fluent"] .pdx-select-trigger.error:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) { border-bottom-color: var(--pdx-input-border-color-invalid, var(--pdx-color-danger)); }
+[pdx-theme="fluent"] :state(success) > .pdx-select-trigger:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)),
+[pdx-theme="fluent"] .pdx-select-trigger.success:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) { border-bottom-color: var(--pdx-input-border-color-success, var(--pdx-color-success)); }
+[pdx-theme="fluent"] :state(warning) > .pdx-select-trigger:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)),
+[pdx-theme="fluent"] .pdx-select-trigger.warning:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) { border-bottom-color: var(--pdx-input-border-color-warning, var(--pdx-color-warning)); }
 [pdx-theme="fluent"] .pdx-select-dropdown:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
     border-radius: var(--pdx-radius-sm);
     box-shadow: var(--pdx-shadow-md);

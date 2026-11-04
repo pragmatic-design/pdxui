@@ -81,6 +81,11 @@
  */
 import type { ComponentManifest } from './_types';
 
+// The text input's frame tokens (#761): the trigger is `.pdx-input-wrap`. It has no invalid, success or
+// warning state, so its height is what is measured; why, is in select.manifest.ts.
+const FRAME_DP = (test: string, extra = '') => `<pdx-date-picker data-test="${test}" value="2024-06-15" ariaLabel="Event date" ${extra}></pdx-date-picker>`;
+const FRAME_ROOT = (test: string) => `section:not([hidden]) [data-test="${test}"] > [data-part="root"]`;
+
 export const datePicker: ComponentManifest = {
     name: 'date-picker',
     tag: 'pdx-date-picker',
@@ -179,11 +184,27 @@ export const datePicker: ComponentManifest = {
                     disabled>
                 </pdx-date-picker>`,
         },
+        {
+            id: 'date-picker-frame-tokens',
+            title: "Date Picker — the text input's frame tokens, set on one element",
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                ${FRAME_DP('tok-tall', 'style="--pdx-input-min-height: 5rem"')}
+                ${FRAME_DP('tok-plain')}
+            </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'date-picker-frame-tokens': {
+                composition: [{
+                    description: '--pdx-input-min-height on the element makes its frame taller than the date picker beside it',
+                    parent: 'body',
+                    children: { tall: FRAME_ROOT('tok-tall'), plain: FRAME_ROOT('tok-plain') },
+                    relations: [{ description: 'the frame with the token is taller', left: 'tall.height', op: '>', right: 'plain.height' }],
+                }],
+            },
             'date-picker-closed': {
                 standalone: [
                     {
