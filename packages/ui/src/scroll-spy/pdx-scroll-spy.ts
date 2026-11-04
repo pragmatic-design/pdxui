@@ -1,7 +1,7 @@
 // pdx-scroll-spy — Highlights navigation items based on which section is in view.
 // Uses IntersectionObserver for efficient scroll detection.
 
-import { component, html, signal, event } from '@pdxui/core';
+import { component, html, signal, event, prop } from '@pdxui/core';
 
 /**
  * Highlights the navigation link of the section currently visible, as the user scrolls.
@@ -19,13 +19,13 @@ component('pdx-scroll-spy', {
     },
     props: {
         /** CSS selector for sections to observe */
-        sectionSelector: { type: String, default: '[data-section]' },
+        sectionSelector: prop('[data-section]'),
         /** CSS selector for nav links to highlight */
-        linkSelector: { type: String, default: '[data-spy-link]' },
+        linkSelector: prop('[data-spy-link]'),
         /** Offset from top for activation threshold (px) */
-        offset: { type: Number, default: 100 },
+        offset: prop(100),
         /** Smooth scroll to section on link click */
-        smoothScroll: { type: Boolean, default: true },
+        smoothScroll: prop(true),
     },
     setup(ctx) {
         const _activeSection = signal('');

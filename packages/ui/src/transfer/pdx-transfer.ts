@@ -11,7 +11,7 @@
 // - simple: click to select (highlight), buttons to move selected
 // - direct: click item to move it immediately (no selection step)
 
-import { component, html, signal, model } from '@pdxui/core';
+import { component, html, signal, model, prop } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -79,37 +79,37 @@ component('pdx-transfer', {
     props: {
         // ── Model 1: Simple (items + value) ──
         /** All items — array of { value, label, disabled? } */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
 
         // ── Model 2/3: DataSource ──
         /** DataSource or raw array of objects */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Field to use as item label (default: 'label') */
-        labelField: { type: String, default: 'label' },
+        labelField: prop('label'),
         /** Field to use as item value/id (default: 'value') */
-        valueField: { type: String, default: 'value' },
+        valueField: prop('value'),
         /** Field that determines left vs right panel (boolean or matched value) */
-        assignedField: { type: String, default: '' },
+        assignedField: prop(''),
         /** Value to match against assignedField for target panel (if omitted, treats as boolean) */
-        assignedValue: { type: String, default: '' },
+        assignedValue: prop(''),
 
         // ── UI Options ──
         /** Selection mode: 'checkbox' (default) | 'simple' (click highlight) | 'direct' (click to move) */
-        mode: { type: String, default: 'checkbox' },
+        mode: prop('checkbox'),
         /** Show search input in panels */
-        searchable: { type: Boolean, default: false },
+        searchable: prop(false),
         /** Left panel title */
-        sourceTitle: { type: String, default: '' },
+        sourceTitle: prop(''),
         /** Right panel title */
-        targetTitle: { type: String, default: '' },
+        targetTitle: prop(''),
         /** Disabled state */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Show "move all" buttons */
-        showAllButtons: { type: Boolean, default: false },
+        showAllButtons: prop(false),
         /** Enable drag and drop */
-        draggable: { type: Boolean, default: false },
+        draggable: prop(false),
         /** Form field name */
-        name: { type: String, default: '' },
+        name: prop(''),
     },
     setup(ctx) {
         const _sourceChecked = signal<Set<string>>(new Set());

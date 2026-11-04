@@ -56,15 +56,15 @@ and `sync()` sends it to the transport.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `url` | `url` | string | `''` | REST endpoint URL. When set, creates a restTransport-backed DataSource. |
-| `data` | — | array | `null` | Static data array. When set, creates an arrayTransport-backed DataSource. |
-| `transport` | — | object | `null` | Custom transport object (IDataTransport). Takes priority over url/data. |
+| `data` | — | unknown[] \| null | `null` | Static data array. When set, creates an arrayTransport-backed DataSource. |
+| `transport` | — | Record<string, unknown> \| null | `null` | Custom transport object (IDataTransport). Takes priority over url/data. |
 | `idField` | `idfield` | string | `'id'` | ID field for identifying items. Default: 'id'. |
 | `pageSize` | `pagesize` | number | `0` | Page size. 0 = no pagination. Default: 0. |
 | `autoLoad` | `autoload` | boolean | `true` | Auto-load on creation. Default: true. |
-| `sort` | — | array | `null` | Initial sort. Array of { field, dir } objects. |
-| `filter` | — | array | `null` | Initial filter. Array of filter descriptors. |
-| `params` | — | object | `null` | Additional params passed to transport.read(). |
-| `token` | — | object | `null` | A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided under too: a component below injects that one by it, past a nearer `<pdx-data-source>`. |
+| `sort` | — | unknown[] \| null | `null` | Initial sort. Array of { field, dir } objects. |
+| `filter` | — | unknown[] \| null | `null` | Initial filter. Array of filter descriptors. |
+| `params` | — | Record<string, unknown> \| null | `null` | Additional params passed to transport.read(). |
+| `token` | — | Record<string, unknown> \| null | `null` | A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided under too: a component below injects that one by it, past a nearer `<pdx-data-source>`. |
 
 **API (via `:ref`)**
 

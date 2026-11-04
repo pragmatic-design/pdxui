@@ -2,7 +2,7 @@
 // Each segment has visible up/down arrow buttons + keyboard + mouse wheel.
 // 12h/24h auto-detected from locale via Intl.DateTimeFormat.
 
-import { component, html, signal, model, event, registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
+import { component, html, signal, model, event, registerComponentStrings, getComponentString, registerFormControl, prop } from '@pdxui/core';
 import { is12HourClock } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -63,16 +63,16 @@ component('pdx-time-picker', {
         size: { md: '.pdx-time-picker-md', sm: '.pdx-time-picker-sm', lg: '.pdx-time-picker-lg' },
     },
     props: {
-        format: { type: String, default: 'auto' },
-        showSeconds: { type: Boolean, default: false },
-        step: { type: Number, default: 1 },
-        min: { type: String, default: '' },
-        max: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        name: { type: String, default: '' },
+        format: prop('auto'),
+        showSeconds: prop(false),
+        step: prop(1),
+        min: prop(''),
+        max: prop(''),
+        disabled: prop(false),
+        name: prop(''),
         /** Locale for the 12h/24h default. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
+        locale: prop(''),
+        ariaLabel: prop(''),
     },
     setup(ctx) {
         const _hour = signal(0);

@@ -2,7 +2,7 @@
 // Cursor-position-aware step, sign toggle, locale formatting.
 // Stepper buttons rendered OUTSIDE the input wrap (input-group style).
 
-import { component, event, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { resolveLocale, numberSeparators } from '../shared/locale';
 import { dispatchCommit } from '../shared/commit-change';
@@ -64,39 +64,39 @@ component('pdx-number-input', {
         size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
     },
     props: {
-        min: { type: Number, default: -Infinity },
-        max: { type: Number, default: Infinity },
-        step: { type: Number, default: 1 },
-        precision: { type: Number, default: -1 },
+        min: prop<number>(-Infinity, { type: Number }),
+        max: prop<number>(Infinity, { type: Number }),
+        step: prop(1),
+        precision: prop(-1),
         /**
          * Show only the decimals the value has, up to `precision`: 29.5 at `precision="3"` is
          * "29.5", not "29.500". The value is still rounded to `precision`, and what the field
          * emits does not change.
          */
-        trimZeros: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        placeholder: { type: String, default: '' },
-        name: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
+        trimZeros: prop(false),
+        disabled: prop(false),
+        readonly: prop(false),
+        error: prop(false),
+        placeholder: prop(''),
+        name: prop(''),
+        ariaLabel: prop(''),
         /** 'both'=−left +right, 'right'=stacked on right, 'none'=hidden */
-        controls: { type: String, default: 'both', enum: ['both', 'right', 'none'] },
+        controls: prop<'both' | 'right' | 'none'>('both'),
         /**
          * What the arrow keys and the wheel step. `fixed`: one `step`. `caret`: the digit
          * before the caret — `12|3` ↑ is 133, `1.2|5` ↑ is 1.35 — and the caret stays on that digit.
          * `auto`, the default: `caret` with `controls="none"`, `fixed` with steppers shown.
          */
-        stepMode: { type: String, default: 'auto', enum: ['auto', 'fixed', 'caret'] },
-        allowWheel: { type: Boolean, default: false },
-        allowNegative: { type: Boolean, default: false },
+        stepMode: prop<'auto' | 'fixed' | 'caret'>('auto'),
+        allowWheel: prop(false),
+        allowNegative: prop(false),
         /** Locale for formatting and for reading a typed value. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
-        currency: { type: String, default: '' },
+        locale: prop(''),
+        currency: prop(''),
         /** Color the number green (positive) / red (negative) */
-        colorBySign: { type: Boolean, default: false },
+        colorBySign: prop(false),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     setup(ctx) {
         const initial = ctx.value() as unknown;

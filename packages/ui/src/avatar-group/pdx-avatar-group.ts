@@ -1,7 +1,7 @@
 // pdx-avatar-group — Stacked avatar group with overflow counter.
 // Shows up to `max` avatars overlapping, with a +N badge for the rest.
 
-import { component, html, event } from '@pdxui/core';
+import { component, html, event, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -44,13 +44,13 @@ component('pdx-avatar-group', {
         size: ['md', 'xs', 'sm', 'lg', 'xl'],
     },
     props: {
-        items: { type: Array, default: null },
-        max: { type: Number, default: 5 },
-        overlap: { type: Number, default: -8 },
-        direction: { type: String, default: 'row' },
+        items: prop<unknown[] | null>(null, { type: Array }),
+        max: prop(5),
+        overlap: prop(-8),
+        direction: prop('row'),
         /** Avatars and the +N become buttons: a click, Enter or Space fires pdx-click / pdx-overflow-click. */
-        clickable: { type: Boolean, default: false },
-        bordered: { type: Boolean, default: true },
+        clickable: prop(false),
+        bordered: prop(true),
     },
     setup(ctx) {
         let _built = false;

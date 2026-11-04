@@ -11,7 +11,7 @@
 //     <pdx-data-heavy-panel />
 //   </pdx-error-boundary>
 
-import { component, html, signal, computed, provide, context, event } from '@pdxui/core';
+import { component, html, signal, computed, provide, context, event, prop } from '@pdxui/core';
 import { errorBoundary } from '@pdxui/core';
 import type { Signal, ReadonlySignal } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -54,14 +54,14 @@ component('pdx-error-boundary', {
     parts: ['fallback', 'message', 'detail', 'retry'],
     props: {
         /** Maximum retries before permanent fallback. 0 = no retry. Default: 3. */
-        maxRetries: { type: Number, default: 3 },
+        maxRetries: prop(3),
         /** Auto-retry on error (no user action needed). Default: false. */
-        autoRetry: { type: Boolean, default: false },
+        autoRetry: prop(false),
         /** Delay between auto-retries in ms. Default: 1000. */
-        retryDelay: { type: Number, default: 1000 },
+        retryDelay: prop(1000),
         /** Fallback message shown on error. Default: 'Something went wrong.' */
         /** The fallback's message. Empty: the error-boundary.message component string, «Something went wrong.». */
-        fallbackMessage: { type: String, default: '' },
+        fallbackMessage: prop(''),
     },
     setup(ctx) {
         const _error = signal<Error | null>(null);

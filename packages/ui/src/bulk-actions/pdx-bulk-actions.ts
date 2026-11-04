@@ -2,7 +2,7 @@
 // Visible while `count > 0`; renders "{count} selected" + one button per action + a clear button.
 // Event-driven and standalone: the parent feeds `count`/`actions` and reacts to pdx-action/pdx-clear.
 
-import { component, html, generatedId, event } from '@pdxui/core';
+import { component, html, generatedId, event, prop } from '@pdxui/core';
 
 /** An action's icon, loading `pdx-icon` the first time one is named: a bar of labels never pays for the set. */
 function actionIcon(name: string) {
@@ -67,13 +67,13 @@ const BAR_STYLE = 'align-items:center;gap:var(--pdx-space-md);flex-wrap:wrap;max
 component('pdx-bulk-actions', {
     props: {
         /** Number of selected items — drives visibility and the default label. */
-        count: { type: Number, default: 0 },
+        count: prop(0),
         /** Actions to offer. */
-        actions: { type: Array, default: [] },
+        actions: prop<unknown[]>([]),
         /** Label template; `{count}` is substituted. Default: the `bulk-actions.selected` component string, "{count} selected". */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Show the trailing clear (✕) button. */
-        clearable: { type: Boolean, default: true },
+        clearable: prop(true),
     },
     // Declared (#138): they stay on the host, which the parent listens on.
     events: {

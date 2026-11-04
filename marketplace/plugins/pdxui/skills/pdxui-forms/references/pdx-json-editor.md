@@ -4,7 +4,7 @@ Edit nested JSON through a schema.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `schema` | — | object | `null` |  |
+| `schema` | — | Record<string, unknown> \| null | `null` |  |
 | `value` | — | unknown | `null` | The current value. |
 
 **Events:** `value-change` → `detail: { value: unknown }` — Fired when the component writes `value`. Does not bubble.

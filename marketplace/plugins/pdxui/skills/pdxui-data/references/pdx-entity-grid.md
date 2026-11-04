@@ -22,15 +22,15 @@ and `pdx-alert-dialog`; extra bulk actions go in `bulkActions` and come back as 
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `columns` | — | array | `[]` | Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly. |
-| `data` | — | array | `[]` | Entity rows. |
-| `schema` | — | object | `null` | FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden. |
+| `columns` | — | unknown[] | `[]` | Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly. |
+| `data` | — | unknown[] | `[]` | Entity rows. |
+| `schema` | — | Record<string, unknown> \| null | `null` | FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden. |
 | `idField` | `idfield` | string | `'id'` |  |
 | `title` | `title` | string | `''` |  |
 | `addLabel` | `addlabel` | string | `''` | The create button's text. Empty: the entity-grid.add component string, «New». |
 | `selection` | `selection` | 'none' \| 'single' \| 'multiple' | `'multiple'` |  |
 | `rowActions` | `rowactions` | boolean | `true` | Show the per-row edit/delete actions column. |
-| `bulkActions` | — | array | `[]` | Extra bulk actions (besides the built-in Delete). |
+| `bulkActions` | — | unknown[] | `[]` | Extra bulk actions (besides the built-in Delete). |
 | `readonly` | `readonly` | boolean | `false` | Hide all mutating affordances (view-only grid). |
 | `confirmDelete` | `confirmdelete` | boolean | `true` | Ask before deleting ("Delete Alice Johnson?", "Delete 3 records?"). `false` for an app that confirms, or offers undo, in its pdx-delete handler: the rows go at once. |
 | `rowLabel` | `rowlabel` | string | `''` | The field that names a row in its action buttons and in the delete confirmation. Empty: the first text column, else the id. |

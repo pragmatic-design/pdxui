@@ -2,7 +2,7 @@
 // Propagates size to children. Uses host element directly (Light DOM).
 // Pattern: same approach as pdx-button-group.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 
 /**
  * Groups inputs, buttons and addons into one control with joined borders, passing its size and
@@ -13,8 +13,8 @@ import { component, html } from '@pdxui/core';
 component('pdx-input-group', {
     props: {
         /** A size its children take; the group draws none of its own, so it is not a variant axis. */
-        size: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
+        size: prop(''),
+        disabled: prop(false),
     },
     // No class on the host (#293): inputs.css selects the tag, `:is(.pdx-input-group, pdx-input-group)`.
     states: ['disabled'],

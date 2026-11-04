@@ -3,7 +3,7 @@
 // 13 calendar systems (display via Intl), week numbers, fiscal year, highlighted dates.
 // Keyboard: Arrow (day), PageUp/Down (month), Shift+PageUp/Down (year), Home/End (week), Enter/Space (select).
 
-import { component, html, signal, model, registerComponentStrings, getComponentString } from '@pdxui/core';
+import { component, html, signal, model, registerComponentStrings, getComponentString, prop } from '@pdxui/core';
 import {
     generateMonthGrid, addMonths, addYears, addDays,
     getMonthNames, formatWithCalendar, getFirstDayOfWeek,
@@ -83,43 +83,43 @@ component('pdx-calendar', {
     parts: ['root', 'nav', 'prev', 'title', 'next', 'grid', 'cell'],
     props: {
         /** Range start (ISO). */
-        rangeStart: { type: String, default: '' },
+        rangeStart: prop(''),
         /** Range end (ISO). */
-        rangeEnd: { type: String, default: '' },
+        rangeEnd: prop(''),
         /** Selection mode. */
-        mode: { type: String, default: 'date' },
+        mode: prop('date'),
         /** Locale for month/day names. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
+        locale: prop(''),
         /** Calendar system for display. */
-        calendar: { type: String, default: 'gregory' },
+        calendar: prop('gregory'),
         /** Number of months to display (1-3). */
-        numberOfMonths: { type: Number, default: 1 },
+        numberOfMonths: prop(1),
         /** Always show 6 weeks per month. */
-        fixedWeeks: { type: Boolean, default: true },
+        fixedWeeks: prop(true),
         /** Show ISO week numbers. */
-        weekNumbers: { type: Boolean, default: false },
+        weekNumbers: prop(false),
         /** Minimum selectable date (ISO). */
-        min: { type: String, default: '' },
+        min: prop(''),
         /** Maximum selectable date (ISO). */
-        max: { type: String, default: '' },
+        max: prop(''),
         /** Function returning true if date should be disabled. */
-        disabledDates: { type: Object, default: null },
+        disabledDates: prop<Record<string, unknown> | null>(null),
         /** Function returning highlight label or false. */
-        highlightedDates: { type: Object, default: null },
+        highlightedDates: prop<Record<string, unknown> | null>(null),
         /** Fiscal year start month (1-12). */
-        fiscalStartMonth: { type: Number, default: 1 },
+        fiscalStartMonth: prop(1),
         /** Compare range start (ISO) for analytics overlay. */
-        compareStart: { type: String, default: '' },
+        compareStart: prop(''),
         /** Compare range end (ISO). */
-        compareEnd: { type: String, default: '' },
+        compareEnd: prop(''),
         /** First day of week override (0=Sun..6=Sat). Auto-detected from locale if -1. */
-        firstDay: { type: Number, default: -1 },
+        firstDay: prop(-1),
         /** Inline mode (no external popover wrapper). */
-        inline: { type: Boolean, default: false },
+        inline: prop(false),
         /** Disabled state. */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Name for form participation: with one, a form submits the value under it. */
-        name: { type: String, default: '' },
+        name: prop(''),
     },
     setup(ctx) {
         const _viewYear = signal(0);

@@ -2,7 +2,7 @@
 // Data-driven: pass `items` array. Auto-generates ARIA, keyboard nav, submenu positioning.
 // Used by pdx-dropdown-menu and pdx-context-menu as the rendering engine.
 
-import { component, html, signal, focusGroup, slot, declaredSnippet, model } from '@pdxui/core';
+import { component, html, signal, focusGroup, slot, declaredSnippet, model, prop } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { warnMisshapenMenuItem } from '../shared/menu-item-shape';
@@ -57,21 +57,21 @@ component('pdx-menu', {
     parts: ['root', 'item', 'separator', 'label'],
     props: {
         /** Menu items (data-driven) */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Minimum width */
-        minWidth: { type: Number, default: 180 },
+        minWidth: prop(180),
         /** The id of the element that is `role="menu"`, for a trigger's `aria-controls`. */
-        menuId: { type: String, default: '' },
+        menuId: prop(''),
         /**
          * Classes added to the element that is `role="menu"`: the dropdown's panel is that element,
          * and `.pdx-dropdown-menu-panel` is what apps and the certification select it by.
          */
-        menuClass: { type: String, default: '' },
+        menuClass: prop(''),
         /**
          * Draws one entry, as the `item` slot does: `({ item, key, type }) => Node`. For a menu built
          * from script — `pdx-dropdown-menu` hands its own `item` slot on through it.
          */
-        renderItem: { type: Function, default: null },
+        renderItem: prop<((...args: unknown[]) => unknown) | null>(null, { type: Function }),
     },
     // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },

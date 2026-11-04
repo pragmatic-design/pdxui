@@ -2,7 +2,7 @@
 // Modes: date | datetime | daterange | datetimerange | time | week | month | year | quarter
 // Structure: input trigger + popover → calendar panel + optional time + presets sidebar.
 
-import { component, html, signal, model, event, untracked, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId } from '@pdxui/core';
+import { component, html, signal, model, event, untracked, usePopover, registerComponentStrings, getComponentString, registerFormControl, generatedId, prop } from '@pdxui/core';
 import type { PopoverReturn } from '@pdxui/core';
 import { formatWithCalendar, today, parseISO, getMonthNames, getFiscalQuarter, getFiscalYear } from '@pdxui/core';
 import type { CalendarSystem } from '@pdxui/core';
@@ -116,71 +116,71 @@ component('pdx-date-picker', {
     },
     props: {
         /** Range start (ISO). */
-        rangeStart: { type: String, default: '' },
+        rangeStart: prop(''),
         /** Range end (ISO). */
-        rangeEnd: { type: String, default: '' },
+        rangeEnd: prop(''),
         /** Picker mode. */
-        mode: { type: String, default: 'date' },
+        mode: prop('date'),
         /** Locale for formatting and i18n. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
+        locale: prop(''),
         /** Calendar system for display. */
-        calendar: { type: String, default: 'gregory' },
+        calendar: prop('gregory'),
         /** Number of calendar months to show (1-3). */
-        numberOfMonths: { type: Number, default: 0 }, // 0 = auto (1 for date, 2 for range)
+        numberOfMonths: prop(0), // 0 = auto (1 for date, 2 for range)
         /** Show week numbers. */
-        weekNumbers: { type: Boolean, default: false },
+        weekNumbers: prop(false),
         /** Minimum date (ISO). */
-        min: { type: String, default: '' },
+        min: prop(''),
         /** Maximum date (ISO). */
-        max: { type: String, default: '' },
+        max: prop(''),
         /** Function: (iso) => boolean for disabled dates. */
-        disabledDates: { type: Object, default: null },
+        disabledDates: prop<Record<string, unknown> | null>(null),
         /** Function: (iso) => string|false for highlighted dates. */
-        highlightedDates: { type: Object, default: null },
+        highlightedDates: prop<Record<string, unknown> | null>(null),
         /** Fiscal year start month (1-12). */
-        fiscalStartMonth: { type: Number, default: 1 },
+        fiscalStartMonth: prop(1),
         /** Preset date options (array of { label, value }). */
-        presets: { type: Array, default: [] },
+        presets: prop<unknown[]>([]),
         /** Show comparison range toggle. */
-        showCompare: { type: Boolean, default: false },
+        showCompare: prop(false),
         /** Compare range start (ISO). */
-        compareStart: { type: String, default: '' },
+        compareStart: prop(''),
         /** Compare range end (ISO). */
-        compareEnd: { type: String, default: '' },
+        compareEnd: prop(''),
         /** Show time picker alongside date. */
-        showTime: { type: Boolean, default: false },
+        showTime: prop(false),
         /** Time format (12h/24h/auto). */
-        timeFormat: { type: String, default: 'auto' },
+        timeFormat: prop('auto'),
         /** Show seconds in time picker. */
-        showSeconds: { type: Boolean, default: false },
+        showSeconds: prop(false),
         /** Time step (1/5/15/30). */
-        timeStep: { type: Number, default: 1 },
+        timeStep: prop(1),
         /** Allow clearing the value. */
-        clearable: { type: Boolean, default: true },
+        clearable: prop(true),
         /** Disabled state. */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Readonly state. */
-        readonly: { type: Boolean, default: false },
+        readonly: prop(false),
         /** Placeholder text. */
-        placeholder: { type: String, default: '' },
+        placeholder: prop(''),
         /** Name for form participation. */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** Size variant (sm/md/lg). */
         /** Inline calendar (no popover, always visible). */
-        inline: { type: Boolean, default: false },
+        inline: prop(false),
         /** Fixed weeks in calendar. */
-        fixedWeeks: { type: Boolean, default: true },
+        fixedWeeks: prop(true),
         /** First day of week (-1 = auto). */
-        firstDay: { type: Number, default: -1 },
+        firstDay: prop(-1),
         /** Aria label. */
-        ariaLabel: { type: String, default: '' },
+        ariaLabel: prop(''),
         /**
          * The date can be typed: the trigger's text is an input (still the combobox), read in the
          * locale's numeric pattern or as ISO, committed on Enter and blur. The calendar icon opens the
          * popup, as does Alt+ArrowDown. Modes `date` and `datetime` (its date part); the others keep
          * the plain trigger.
          */
-        editable: { type: Boolean, default: false },
+        editable: prop(false),
     },
     setup(ctx) {
         let popover: PopoverReturn | null = null;

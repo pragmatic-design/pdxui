@@ -4,7 +4,7 @@ A compact set of exclusive options.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `options` | — | array | `[]` | Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. |
+| `options` | — | unknown[] | `[]` | Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. |
 | `full` | `full` | boolean | `false` | Stretches to the full width of its container. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `name` | `name` | string | `''` | Form field name, submitted with the form. |

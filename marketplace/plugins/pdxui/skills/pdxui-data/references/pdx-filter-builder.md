@@ -6,8 +6,8 @@ Build complex filters visually.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `fields` | — | array | `[]` | Field definitions (FieldDefinition[] or FilterField[]). |
-| `source` | — | object | `null` | DataSource to auto-bind filters. |
+| `fields` | — | unknown[] | `[]` | Field definitions (FieldDefinition[] or FilterField[]). |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource to auto-bind filters. |
 | `value` | — | (FilterDescriptor \| CompositeFilter)[] | `() => []` | The current value. |
 | `logic` | `logic` | 'and' \| 'or' | `'and'` |  |
 

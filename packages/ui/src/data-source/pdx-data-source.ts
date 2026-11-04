@@ -10,7 +10,7 @@
 //     <pdx-table :source="source" />
 //   </pdx-data-source>
 
-import { component, html, signal, computed, provide } from '@pdxui/core';
+import { component, html, signal, computed, provide, prop } from '@pdxui/core';
 import { createDataSource, restTransport, arrayTransport } from '@pdxui/core';
 import type { Context, DataSource } from '@pdxui/core';
 import { DataSourceContext } from './data-source-context';
@@ -24,28 +24,28 @@ export { DataSourceContext };
 component('pdx-data-source', {
     props: {
         /** REST endpoint URL. When set, creates a restTransport-backed DataSource. */
-        url: { type: String, default: '' },
+        url: prop(''),
         /** Static data array. When set, creates an arrayTransport-backed DataSource. */
-        data: { type: Array, default: null },
+        data: prop<unknown[] | null>(null, { type: Array }),
         /** Custom transport object (IDataTransport). Takes priority over url/data. */
-        transport: { type: Object, default: null },
+        transport: prop<Record<string, unknown> | null>(null),
         /** ID field for identifying items. Default: 'id'. */
-        idField: { type: String, default: 'id' },
+        idField: prop('id'),
         /** Page size. 0 = no pagination. Default: 0. */
-        pageSize: { type: Number, default: 0 },
+        pageSize: prop(0),
         /** Auto-load on creation. Default: true. */
-        autoLoad: { type: Boolean, default: true },
+        autoLoad: prop(true),
         /** Initial sort. Array of { field, dir } objects. */
-        sort: { type: Array, default: null },
+        sort: prop<unknown[] | null>(null, { type: Array }),
         /** Initial filter. Array of filter descriptors. */
-        filter: { type: Array, default: null },
+        filter: prop<unknown[] | null>(null, { type: Array }),
         /** Additional params passed to transport.read(). */
-        params: { type: Object, default: null },
+        params: prop<Record<string, unknown> | null>(null),
         /**
          * A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided
          * under too: a component below injects that one by it, past a nearer `<pdx-data-source>`.
          */
-        token: { type: Object, default: null },
+        token: prop<Record<string, unknown> | null>(null),
     },
     setup(ctx) {
         const _ds = signal<DataSource<Record<string, unknown>> | null>(null);

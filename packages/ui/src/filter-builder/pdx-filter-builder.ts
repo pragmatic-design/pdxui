@@ -2,7 +2,7 @@
 // Standalone component: works with DataSource, pdx-data-grid, or any list.
 // Uses shared filter-popover for the condition editor (same as grid filter).
 
-import { component, html, signal, model, DEV } from '@pdxui/core';
+import { component, html, signal, model, DEV, prop } from '@pdxui/core';
 import type { FilterDescriptor, CompositeFilter } from '@pdxui/core';
 import { toFilterFields } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -42,9 +42,9 @@ interface ActiveFilter {
 component('pdx-filter-builder', {
     props: {
         /** Field definitions (FieldDefinition[] or FilterField[]). */
-        fields: { type: Array, default: [] },
+        fields: prop<unknown[]>([]),
         /** DataSource to auto-bind filters. */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
     },
     // The builder writes its own filters, so they are a model (#292): an edit writes `value`, the
     // descriptors one per chip, and the write dispatches `value-change`; setting it restores a saved

@@ -1,7 +1,7 @@
 // pdx-banner — Inline alert/banner with variants, closable, action, auto-dismiss.
 // Uses Pragmatic CSS .pdx-banner classes. Icon auto-matched to variant.
 
-import { component, html, getFocusableElements, event } from '@pdxui/core';
+import { component, html, getFocusableElements, event, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -47,10 +47,10 @@ component('pdx-banner', {
         variant: { info: '.pdx-banner-info', success: '.pdx-banner-success', warning: '.pdx-banner-warning', danger: '.pdx-banner-danger', error: '.pdx-banner-danger' },
     },
     props: {
-        closable: { type: Boolean, default: false },
-        autoDismiss: { type: Number, default: 0 },
-        showIcon: { type: Boolean, default: true },
-        subtle: { type: Boolean, default: false },
+        closable: prop(false),
+        autoDismiss: prop(0),
+        showIcon: prop(true),
+        subtle: prop(false),
     },
     setup(ctx) {
         let dismissTimer: ReturnType<typeof setTimeout> | null = null;

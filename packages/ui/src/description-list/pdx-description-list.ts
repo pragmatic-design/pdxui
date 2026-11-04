@@ -8,7 +8,7 @@
 //     @snippet value(item, index) { <a :href="item.href">{{ item.value }}</a> }
 //   </pdx-description-list>
 
-import { component, html, repeatWithSlot, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, repeatWithSlot, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -42,14 +42,14 @@ component('pdx-description-list', {
         size: { md: '.pdx-dl-md', sm: '.pdx-dl-sm', lg: '.pdx-dl-lg' },
     },
     props: {
-        items: { type: Array, default: null },
-        columns: { type: Number, default: 1 },
-        layout: { type: String, default: 'horizontal' },
-        bordered: { type: Boolean, default: false },
-        striped: { type: Boolean, default: false },
-        labelWidth: { type: String, default: 'auto' },
-        colon: { type: Boolean, default: true },
-        renderValue: { type: Object, default: null },
+        items: prop<unknown[] | null>(null, { type: Array }),
+        columns: prop(1),
+        layout: prop('horizontal'),
+        bordered: prop(false),
+        striped: prop(false),
+        labelWidth: prop('auto'),
+        colon: prop(true),
+        renderValue: prop<Record<string, unknown> | null>(null),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.

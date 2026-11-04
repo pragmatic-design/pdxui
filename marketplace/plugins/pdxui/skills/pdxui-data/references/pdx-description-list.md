@@ -11,7 +11,7 @@ Key/value pairs, neatly aligned.
 | `striped` | `striped` | boolean | `false` | Alternates row backgrounds. |
 | `labelWidth` | `labelwidth` | string | `'auto'` | Fixed width for the label column. |
 | `colon` | `colon` | boolean | `true` | Appends a colon after each label. |
-| `renderValue` | — | object | `null` | Render function for a value. |
+| `renderValue` | — | Record<string, unknown> \| null | `null` | Render function for a value. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg. |
 
 **Slot:** `value` — Renders the value of one entry: a snippet `value(item, index)`.

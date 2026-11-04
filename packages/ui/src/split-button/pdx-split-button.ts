@@ -2,7 +2,7 @@
 // Left side: primary action (click). Right side: chevron that opens a dropdown menu.
 // Reuses menu rendering pattern from pdx-dropdown-menu.
 
-import { component, html, signal, focusGroup, onDestroy, event } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, event, prop } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -41,22 +41,22 @@ component('pdx-split-button', {
     parts: ['root', 'primary', 'trigger', 'menu', 'item', 'separator'],
     props: {
         /** Primary button label */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Primary button icon name */
-        icon: { type: String, default: '', iconName: true },
+        icon: prop('', { iconName: true }),
         /** Dropdown menu items */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Variant: primary, secondary, outline, ghost, danger */
-        variant: { type: String, default: 'primary' },
+        variant: prop('primary'),
         /** Size: xs, sm, md, lg */
-        size: { type: String, default: 'sm' },
+        size: prop('sm'),
         /** Loading state (spinner on primary) */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
         /** Disable entire button */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Accessible name for the dropdown trigger (chevron has no visible text). Empty: the
          *  split-button.menu component string, «More actions» in English. */
-        menuLabel: { type: String, default: '' },
+        menuLabel: prop(''),
     },
     setup(ctx) {
         const _open = signal(false);

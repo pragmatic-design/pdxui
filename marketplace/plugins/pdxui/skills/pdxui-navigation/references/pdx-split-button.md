@@ -6,7 +6,7 @@ A primary action plus a menu.
 |---|---|---|---|---|
 | `label` | `label` | string | `''` | Primary button label |
 | `icon` | `icon` | string | `''` | Primary button icon name |
-| `items` | — | array | `[]` | Dropdown menu items |
+| `items` | — | unknown[] | `[]` | Dropdown menu items |
 | `variant` | `variant` | string | `'primary'` | Variant: primary, secondary, outline, ghost, danger |
 | `size` | `size` | string | `'sm'` | Size: xs, sm, md, lg |
 | `loading` | `loading` | boolean | `false` | Loading state (spinner on primary) |

@@ -2,7 +2,7 @@
 // Maps to .pdx-badge, .pdx-badge-{variant}, .pdx-dot, .pdx-dot-{variant} CSS classes.
 // Features: max overflow (99+), hideZero, dot mode, pulse animation, aria-live.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 
 /**
@@ -30,13 +30,13 @@ component('pdx-badge', {
         shape: { pill: '.pdx-badge-pill', square: '.pdx-badge-square' },
     },
     props: {
-        value: { type: String, default: '' },
-        max: { type: Number, default: 99 },
-        dot: { type: Boolean, default: false },
-        pulse: { type: Boolean, default: false },
-        hideZero: { type: Boolean, default: true },
+        value: prop(''),
+        max: prop(99),
+        dot: prop(false),
+        pulse: prop(false),
+        hideZero: prop(true),
         /** What the badge means, read instead of its colour or its bare number: "Online", "3 unread messages". A dot without it is read as its variant ("success indicator"). */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         function display(): string {

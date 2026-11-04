@@ -2,7 +2,7 @@
 // Compound: discovers [data-wizard-step] children. Auto-generates stepper + footer.
 // Supports: linear/free navigation, vertical/horizontal, validation guard, i18n.
 
-import { component, html, signal, focusGroup, registerComponentStrings, generatedId, model, event } from '@pdxui/core';
+import { component, html, signal, focusGroup, registerComponentStrings, generatedId, model, event, prop } from '@pdxui/core';
 import { watchStepLabels, refreshStepMeta, applyStepLabels, stepName, type StepMeta } from './wizard-step-labels';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -65,15 +65,15 @@ component('pdx-wizard', {
     },
     props: {
         /** Sequential navigation — can't skip ahead */
-        linear: { type: Boolean, default: true },
+        linear: prop(true),
         /** Stepper orientation */
-        orientation: { type: String, default: 'horizontal' },
+        orientation: prop('horizontal'),
         /** Hide the auto-generated navigation footer */
-        hideNav: { type: Boolean, default: false },
+        hideNav: prop(false),
         /** Hide the stepper header */
-        hideStepper: { type: Boolean, default: false },
+        hideStepper: prop(false),
         /** Disabled state — no interaction */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
     },
     setup(ctx) {
         const _step = signal(0);

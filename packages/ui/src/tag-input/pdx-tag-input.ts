@@ -1,7 +1,7 @@
 // pdx-tag-input — Multi-tag input with chip rendering, paste support, keyboard nav.
 // Uses .pdx-input-wrap for consistent border/focus and .pdx-chip for tag rendering.
 
-import { component, html, signal, computed, model, event, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, signal, computed, model, event, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -57,20 +57,20 @@ component('pdx-tag-input', {
         size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
     },
     props: {
-        placeholder: { type: String, default: '' },
-        maxTags: { type: Number, default: 0 },
-        maxLength: { type: Number, default: 0 },
-        separator: { type: String, default: ',' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        allowDuplicates: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        label: { type: String, default: '' },
-        error: { type: Boolean, default: false },
-        success: { type: Boolean, default: false },
-        warning: { type: Boolean, default: false },
+        placeholder: prop(''),
+        maxTags: prop(0),
+        maxLength: prop(0),
+        separator: prop(','),
+        disabled: prop(false),
+        readonly: prop(false),
+        allowDuplicates: prop(false),
+        name: prop(''),
+        label: prop(''),
+        error: prop(false),
+        success: prop(false),
+        warning: prop(false),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {

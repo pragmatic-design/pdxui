@@ -6,7 +6,7 @@
 //     @snippet item(item, index, isLast) { <a :href="item.href">{{ item.label }}</a> }
 //   </pdx-breadcrumb>
 
-import { component, html, sanitizeUrl, routeTrail, slot, declaredSnippet, event } from '@pdxui/core';
+import { component, html, sanitizeUrl, routeTrail, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 /** `pdx-icon` the first time a crumb names an icon: a use that draws none never pays for the icon set. */
@@ -43,11 +43,11 @@ component('pdx-breadcrumb', {
     },
     parts: ['nav', 'list', 'item', 'link', 'current', 'separator', 'ellipsis'],
     props: {
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         // Empty = use the theme's --pdx-breadcrumb-separator (filled via CSS on the
         // empty .pdx-breadcrumb-sep). A non-empty prop is an explicit override.
-        separator: { type: String, default: '' },
-        maxItems: { type: Number, default: 0 },
+        separator: prop(''),
+        maxItems: prop(0),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The crumb a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.

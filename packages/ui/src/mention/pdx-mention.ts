@@ -3,7 +3,7 @@
 // Mentions tracked as ranges — textarea shows clean text, mirror highlights mentions.
 // For persistence: getMentionMarkup() returns @[Label](id) format.
 
-import { component, event, html, signal, model, generatedId, slot, declaredSnippet } from '@pdxui/core';
+import { component, event, html, signal, model, generatedId, slot, declaredSnippet, prop } from '@pdxui/core';
 import { registerComponentStrings, getComponentString } from '@pdxui/core';
 import { computeFloatingPosition, autoUpdate, offset, flip, shift } from '@pdxui/core';
 import type { SlotFunction, VirtualElement } from '@pdxui/core';
@@ -70,38 +70,38 @@ component('pdx-mention', {
     parts: ['root', 'input', 'list', 'option'],
     props: {
         /** Trigger character(s) — comma-separated for multiple (default: '@') */
-        trigger: { type: String, default: '@' },
+        trigger: prop('@'),
         /** Static suggestions array */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** DataSource or raw array for remote search */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Field for display label */
-        labelField: { type: String, default: 'label' },
+        labelField: prop('label'),
         /** Field for value/id */
-        valueField: { type: String, default: 'value' },
+        valueField: prop('value'),
         /** Field for description (optional) */
-        descriptionField: { type: String, default: '' },
+        descriptionField: prop(''),
         /** Minimum chars after trigger before searching (default: 0) */
-        minLength: { type: Number, default: 0 },
+        minLength: prop(0),
         /** Debounce delay in ms for remote search (default: 300) */
-        debounce: { type: Number, default: 300 },
+        debounce: prop(300),
         /** Max suggestions to show */
-        maxItems: { type: Number, default: 10 },
+        maxItems: prop(10),
         /** Textarea rows */
-        rows: { type: Number, default: 3 },
+        rows: prop(3),
         /** Placeholder text */
-        placeholder: { type: String, default: '' },
+        placeholder: prop(''),
         /**
          * The field's accessible name (aria-label on the textarea). A field needs one: give `label`,
          * or put a visible label next to it. Without either, the placeholder stands in.
          */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Disabled */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Readonly */
-        readonly: { type: Boolean, default: false },
+        readonly: prop(false),
         /** Form field name */
-        name: { type: String, default: '' },
+        name: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {

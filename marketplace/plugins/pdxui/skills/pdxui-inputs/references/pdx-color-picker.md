@@ -6,7 +6,7 @@ Choose a color visually.
 |---|---|---|---|---|
 | `format` | `format` | string | `'hex'` | Output format: 'hex', 'rgb' or 'hsl'. |
 | `showAlpha` | `showalpha` | boolean | `false` | Shows the opacity (alpha) slider. |
-| `presets` | — | array | `() => []` | Preset swatch colours. |
+| `presets` | — | unknown[] | `() => []` | Preset swatch colours. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 | `readonly` | `readonly` | boolean | `false` | Makes the value read-only — visible but not editable. |
 | `inline` | `inline` | boolean | `false` | Renders the picker inline instead of in a popover. |

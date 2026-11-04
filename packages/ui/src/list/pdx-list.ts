@@ -9,7 +9,7 @@
 //     @snippet empty() { <div>No users found</div> }
 //   </pdx-list>
 
-import { component, html, inject, repeatWithSlot, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, inject, repeatWithSlot, slot, declaredSnippet, prop } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -51,16 +51,16 @@ component('pdx-list', {
     states: ['bordered', 'dividers', 'loading', 'empty'],
     parts: ['list', 'item', 'empty', 'overlay'],
     props: {
-        items: { type: Array, default: null },
-        source: { type: Object, default: null },
-        idField: { type: String, default: 'id' },
-        dividers: { type: Boolean, default: false },
-        clickable: { type: Boolean, default: false },
-        bordered: { type: Boolean, default: true },
+        items: prop<unknown[] | null>(null, { type: Array }),
+        source: prop<Record<string, unknown> | null>(null),
+        idField: prop('id'),
+        dividers: prop(false),
+        clickable: prop(false),
+        bordered: prop(true),
         /** The empty state's title. Empty: the list.empty component string, «No items». */
-        emptyTitle: { type: String, default: '' },
-        emptyDescription: { type: String, default: '' },
-        emptyIcon: { type: String, default: 'inbox', iconName: true },
+        emptyTitle: prop(''),
+        emptyDescription: prop(''),
+        emptyIcon: prop('inbox', { iconName: true }),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651) or of `source` (#853):

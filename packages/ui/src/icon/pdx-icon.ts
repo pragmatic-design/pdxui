@@ -2,7 +2,7 @@
 // optical size compensation, RTL mirroring, and accessibility.
 // Renders SVG from registered icon sets, inline SVG, or URL.
 
-import { signal, effect, component, html } from '@pdxui/core';
+import { signal, effect, component, html, prop } from '@pdxui/core';
 import { resolveIcon } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { registerPragmaticResolver } from './pragmatic-resolver';
@@ -34,18 +34,18 @@ component('pdx-icon', {
     states: ['spin', 'mirror'],
     parts: ['root'],
     props: {
-        name: { type: String, default: '' },
-        set: { type: String, default: '' },
-        svg: { type: String, default: '' },
-        src: { type: String, default: '' },
-        size: { type: String, default: 'md' },
-        label: { type: String, default: '' },
+        name: prop(''),
+        set: prop(''),
+        svg: prop(''),
+        src: prop(''),
+        size: prop('md'),
+        label: prop(''),
         /** Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'. */
-        weight: { type: String, default: '', enum: ['thin', 'light', 'regular', 'bold'] },
+        weight: prop<'' | 'thin' | 'light' | 'regular' | 'bold'>(''),
         /** RTL behavior: 'mirror' flips in RTL context, 'none' keeps as-is. Default: 'none'. */
-        rtl: { type: String, default: 'none', enum: ['none', 'mirror'] },
+        rtl: prop<'none' | 'mirror'>('none'),
         /** Spin animation for loading indicators. */
-        spin: { type: Boolean, default: false },
+        spin: prop(false),
     },
     setup(ctx) {
         const containerRef = signal<HTMLElement | null>(null);

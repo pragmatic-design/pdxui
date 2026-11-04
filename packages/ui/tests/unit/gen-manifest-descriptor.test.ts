@@ -18,6 +18,11 @@ const SOURCE = [
     '        max: prop.required<number>({ type: Number }),',
     '        options: prop.required<Option[]>(),',
     '        hint: prop.optional<string>({ type: String }),',
+    "        icon: prop('', { iconName: true }),",
+    "        /** Columns, or 'auto'.",
+    "         * @type number | 'auto'",
+    '         */',
+    "        columns: prop('3'),",
     '    },',
     '    events: {',
     '        /** Fired when the widget opens. */',
@@ -50,6 +55,15 @@ describe('gen-manifest reads a typed descriptor', () => {
         expect(attribute('items')).toBeUndefined();
         expect(attribute('source')).toBeUndefined();
         expect(attribute('options')).toBeUndefined();
+    });
+
+    it('a prop whose value names an icon says so, which the compiler reads to import it (#47, #872)', () => {
+        expect(field('icon')).toMatchObject({ iconName: true, attribute: 'icon' });
+        expect(field('count').iconName).toBeUndefined();
+    });
+
+    it('a prop\'s JSDoc @type wins over the type its default implies, as in the constructor form (#872)', () => {
+        expect(field('columns')).toMatchObject({ type: { text: "number | 'auto'" }, default: "'3'", attribute: 'columns' });
     });
 
     it('a required prop has no default', () => {

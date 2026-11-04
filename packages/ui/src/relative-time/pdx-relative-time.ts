@@ -1,7 +1,7 @@
 // pdx-relative-time — Displays relative time ("3 hours ago", "in 2 days")
 // with auto-update. Uses Intl.RelativeTimeFormat for locale-aware output.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, prop } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -63,14 +63,14 @@ function formatAbsoluteDate(date: Date, locale: string): string {
 component('pdx-relative-time', {
     parts: ['root'],
     props: {
-        datetime: { type: String, default: '' },
+        datetime: prop(''),
         /** Locale of the wording. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
+        locale: prop(''),
         // Not `style`, which would replace the element's own CSSStyleDeclaration (#545).
-        formatStyle: { type: String, default: 'long' },
-        numeric: { type: String, default: 'auto' },
-        updateInterval: { type: Number, default: 60000 },
-        showTooltip: { type: Boolean, default: true },
+        formatStyle: prop('long'),
+        numeric: prop('auto'),
+        updateInterval: prop(60000),
+        showTooltip: prop(true),
     },
     setup(ctx) {
         let built = false;

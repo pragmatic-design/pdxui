@@ -4,7 +4,7 @@ Mobile bottom navigation.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | The data items to render. |
+| `items` | — | unknown[] | `[]` | The data items to render. |
 | `activeKey` | `activekey` | string | `''` | Key of the active item. |
 
 **Events:** `pdx-select` → `detail: { key: string; item: BottomNavItem }` — An item was chosen: its `key` and its item.

@@ -65,7 +65,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `output` | `output` | string | `'json'` | Output format: 'html' or 'json'. |
-| `extensions` | — | array | `null` | Editor extensions to enable. |
+| `extensions` | — | unknown[] \| null | `null` | Editor extensions to enable. |
 | `preset` | `preset` | string | `'starter'` | A named toolbar/feature preset. |
 | `toolbar` | `toolbar` | string | `'standard'` | A preset ('full', 'standard', 'compact', 'minimal'), button names with '\|' between groups, or 'false' for none. |
 | `toolbarMode` | `toolbarmode` | string | `'top'` | Toolbar layout: 'top' (a bar above the text) or 'bubble' (floating over the selection). |
@@ -75,7 +75,7 @@ read-only in the same styling. **Not when** it is plain multi-line text → `pdx
 | `height` | `height` | string | `'auto'` | Fixed editor height. |
 | `minHeight` | `minheight` | string | `'120px'` | Minimum editor height. |
 | `maxHeight` | `maxheight` | string | `'none'` | Maximum editor height before scrolling. |
-| `source` | — | object | `null` | A DataSource whose record `record-id` names: the editor edits that record's `field`, follows it when the source changes it, and writes each edit back through the source. With all three given, the record is the document and `value` only reflects it. |
+| `source` | — | Record<string, unknown> \| null | `null` | A DataSource whose record `record-id` names: the editor edits that record's `field`, follows it when the source changes it, and writes each edit back through the source. With all three given, the record is the document and `value` only reflects it. |
 | `field` | `field` | string | `''` | The field of the `source` record that holds the document. |
 | `recordId` | `recordid` | string | `''` | The id of the `source` record to edit, as pdx-form's `record-id`: `"1"` finds `{ id: 1 }`. |
 | `label` | `label` | string | `''` | Accessible name of the editing area. Empty → the `rich-text.label` component string. |

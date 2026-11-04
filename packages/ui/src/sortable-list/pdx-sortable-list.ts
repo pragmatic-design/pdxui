@@ -22,7 +22,7 @@
 // the app's language, the strings come from `uiString`, and `labelOf` reads the ITEM rather than
 // the row's text. Those travel as `a11y` options; the state machine does not.
 
-import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, useSortable, useRovingTabindex, onDestroy, generatedId, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction, Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -53,14 +53,14 @@ component('pdx-sortable-list', {
     states: ['disabled'],
     parts: ['list', 'item', 'handle', 'body'],
     props: {
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** How a row is identified. Empty: the row's index. */
-        idField: { type: String, default: 'id' },
+        idField: prop('id'),
         /** What a row shows without an `item` slot, and what names its handle either way. */
-        labelField: { type: String, default: 'label' },
+        labelField: prop('label'),
         /** A selector inside the row that the POINTER may grab. Empty: the rendered handle. */
-        handle: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
+        handle: prop(''),
+        disabled: prop(false),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.

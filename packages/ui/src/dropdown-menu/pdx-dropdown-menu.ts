@@ -6,7 +6,7 @@
 
 import '@pdxui/design/components/menu'; // the dropdown's rules live in the MENU's file
 import '../menu/pdx-menu';
-import { component, html, signal, onDestroy, generatedId, slot, declaredSnippet, event } from '@pdxui/core';
+import { component, html, signal, onDestroy, generatedId, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -54,14 +54,14 @@ component('pdx-dropdown-menu', {
     // pdx-menu's, with its own parts.
     parts: ['trigger'],
     props: {
-        items: { type: Array, default: [] },
-        label: { type: String, default: '' },
-        variant: { type: String, default: 'outline' },
-        size: { type: String, default: 'sm' },
-        icon: { type: String, default: '', iconName: true },
-        placement: { type: String, default: 'bottom-start' },
-        disabled: { type: Boolean, default: false },
-        minWidth: { type: Number, default: 200 },
+        items: prop<unknown[]>([]),
+        label: prop(''),
+        variant: prop('outline'),
+        size: prop('sm'),
+        icon: prop('', { iconName: true }),
+        placement: prop('bottom-start'),
+        disabled: prop(false),
+        minWidth: prop(200),
     },
     // The item a snippet receives is the app's, from `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },

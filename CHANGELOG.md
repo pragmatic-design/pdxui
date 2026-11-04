@@ -11,6 +11,15 @@ semver.
 
 ### Features
 
+- Every library component declares its props with the descriptor, `prop<T>()` (#872), where 108 of
+  them still used the constructor form `{ type: String, default: '' }`. No prop changed its runtime
+  type, default or attribute: the components observe the same attributes, which a test now records.
+  `prop()` takes `{ iconName: true }` for a prop whose value names an icon, the constructor form's
+  `iconName` key, and the manifest reads it, and a prop's JSDoc `@type`, from a descriptor prop too.
+  In `custom-elements.json` an Object, Array or Function prop's type reads `Record<string, unknown> |
+  null`, `unknown[]` or a function type instead of `object`, `array` or `function`; `pdx-icon`'s
+  `weight` includes its default, `''`.
+
 - The five pickers that draw their own surface have tokens for what they paint in a state (#761):
   `pdx-calendar` `--pdx-calendar-cell-bg-selected`, `-cell-color-selected`, `-cell-bg-in-range` and
   `-cell-color-today`; `pdx-time-picker` `--pdx-time-picker-segment-bg-focus` and

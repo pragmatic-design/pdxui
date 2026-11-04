@@ -1,7 +1,7 @@
 // pdx-fieldset — Semantic form group with native <fieldset>+<legend>.
 // Bordered/filled/plain variants, collapsible, disabled propagation, invalid+error.
 
-import { component, html, generatedId, model } from '@pdxui/core';
+import { component, html, generatedId, model, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 
 /**
@@ -33,12 +33,12 @@ component('pdx-fieldset', {
         size: { md: '.pdx-fieldset-md', sm: '.pdx-fieldset-sm', lg: '.pdx-fieldset-lg' },
     },
     props: {
-        legend: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        invalid: { type: Boolean, default: false },
-        error: { type: String, default: '' },
-        description: { type: String, default: '' },
-        collapsible: { type: Boolean, default: false },
+        legend: prop(''),
+        disabled: prop(false),
+        invalid: prop(false),
+        error: prop(''),
+        description: prop(''),
+        collapsible: prop(false),
     },
     // `collapsed` is a model (#293): the toggle writes it, and `collapsed-change` replaces the `toggle`
     // event, the name of a native one. A parent's write announces nothing.

@@ -1,7 +1,7 @@
 // pdx-otp-input — N-cell code input with auto-advance, paste spread, backspace nav.
 // Uses imperative DOM for dynamic cell count. Each cell is a native <input>.
 
-import { component, event, html, model } from '@pdxui/core';
+import { component, event, html, model, prop } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 
 /**
@@ -37,23 +37,23 @@ component('pdx-otp-input', {
         size: { md: '.pdx-otp-md', sm: '.pdx-otp-sm', lg: '.pdx-otp-lg' },
     },
     props: {
-        length: { type: Number, default: 6 },
-        disabled: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        numeric: { type: Boolean, default: true },
+        length: prop(6),
+        disabled: prop(false),
+        error: prop(false),
+        numeric: prop(true),
         /** Cells shown as dots, for a PIN: the label and autocomplete defaults become the PIN ones. */
-        mask: { type: Boolean, default: false },
-        separator: { type: Number, default: 0 },
+        mask: prop(false),
+        separator: prop(0),
         /**
          * The cells' group name. Empty: the otp-input.label component string, «Verification code»; with
          * `mask`, otp-input.maskedLabel, «PIN».
          */
-        label: { type: String, default: '' },
+        label: prop(''),
         /**
          * The cells' autocomplete. Empty: 'one-time-code', which lets the browser offer a code it received
          * by SMS; with `mask`, 'off' — a PIN is not a code the browser has.
          */
-        autocomplete: { type: String, default: '' },
+        autocomplete: prop(''),
     },
     setup(ctx) {
         let cells: string[] = [];

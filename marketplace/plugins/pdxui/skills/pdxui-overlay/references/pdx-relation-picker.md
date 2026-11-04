@@ -22,8 +22,8 @@ proves nothing a select would not.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `source` | — | object | `null` | The DataSource of the rows to pick from, handed to the grid the picker renders. |
-| `columns` | — | array | `() => []` |  |
+| `source` | — | Record<string, unknown> \| null | `null` | The DataSource of the rows to pick from, handed to the grid the picker renders. |
+| `columns` | — | unknown[] | `() => []` |  |
 | `createLabel` | `createlabel` | string | `''` |  |
 | `addLabel` | `addlabel` | string | `''` | The add button's text. Empty: the relation-picker.add component string. |
 | `idField` | `idfield` | string | `'id'` |  |

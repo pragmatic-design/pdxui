@@ -4,7 +4,7 @@ A desktop-style menu bar.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | Top-level menu items |
+| `items` | — | unknown[] | `[]` | Top-level menu items |
 | `trigger` | `trigger` | string | `'click'` | Open mode: 'click' (default) opens on a click, and then the pointer moves between menus while one is open, as a desktop menubar does; 'hover' opens on mouseenter alone. |
 
 **API (via `:ref`)**

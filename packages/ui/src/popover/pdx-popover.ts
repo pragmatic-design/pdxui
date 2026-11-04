@@ -2,7 +2,7 @@
 // Provides: click/hover/manual trigger, positioning, hover relay, outside click, Escape.
 // Uses core primitive for all logic — no reimplementation.
 
-import { component, html, generatedId, model } from '@pdxui/core';
+import { component, html, generatedId, model, prop } from '@pdxui/core';
 import { usePopover, overlayStack, focusFirst } from '@pdxui/core';
 import type { PopoverTrigger, PopoverPlacement } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -27,16 +27,16 @@ component('pdx-popover', {
     // The floating panel. The trigger is the page's own element, not one the popover renders.
     parts: ['root'],
     props: {
-        trigger: { type: String, default: 'click' },
-        placement: { type: String, default: 'bottom' },
+        trigger: prop('click'),
+        placement: prop('bottom'),
         /** The dialog's name. Empty: its first heading, else the popover.label component string. */
-        ariaLabel: { type: String, default: '' },
-        closeOnOutside: { type: Boolean, default: true },
-        closeOnEscape: { type: Boolean, default: true },
+        ariaLabel: prop(''),
+        closeOnOutside: prop(true),
+        closeOnEscape: prop(true),
         // null, not 8: a numeric default is always passed, and a value that is always passed
         // means `--pdx-float-offset` can never be reached. The sentinel is what makes the
         // token the default and this prop the override.
-        offsetPx: { type: Number, default: null },
+        offsetPx: prop<number | null>(null, { type: Number }),
     },
     setup(ctx) {
         let overlayId = '';

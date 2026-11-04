@@ -25,8 +25,8 @@ no `@click` to write.
 | `label` | `label` | string | `''` | The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. |
 | `ariaLabel` | `arialabel` | string | `''` | The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. |
 | `ariaLabelledby` | `arialabelledby` | string | `''` | The id of an element whose text names the button, forwarded to the inner `<button>`. |
-| `action` | — | object | `null` | A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. |
-| `actionArg` | — | object | `null` | The value a click passes to `action.execute`. |
+| `action` | — | Record<string, unknown> \| null | `null` | A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. |
+| `actionArg` | — | Record<string, unknown> \| null | `null` | The value a click passes to `action.execute`. |
 | `variant` | `variant` | 'primary' \| 'solid' \| 'secondary' \| 'outline' \| 'ghost' \| 'link' \| 'danger' \| 'success' \| 'warning' \| 'info' | `'primary'` | Visual variant. |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input and pdx-select. |
 

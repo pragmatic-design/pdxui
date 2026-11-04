@@ -8,7 +8,7 @@ A list of actions.
 | `minWidth` | `minwidth` | number | `180` | Minimum width |
 | `menuId` | `menuid` | string | `''` | The id of the element that is `role="menu"`, for a trigger's `aria-controls`. |
 | `menuClass` | `menuclass` | string | `''` | Classes added to the element that is `role="menu"`: the dropdown's panel is that element, and `.pdx-dropdown-menu-panel` is what apps and the certification select it by. |
-| `renderItem` | — | function | `null` | Draws one entry, as the `item` slot does: `({ item, key, type }) => Node`. For a menu built from script — `pdx-dropdown-menu` hands its own `item` slot on through it. |
+| `renderItem` | — | ((...args: unknown[]) => unknown) \| null | `null` | Draws one entry, as the `item` slot does: `({ item, key, type }) => Node`. For a menu built from script — `pdx-dropdown-menu` hands its own `item` slot on through it. |
 | `open` | `open` | boolean | `false` | Whether it is open. |
 
 **API (via `:ref`)**

@@ -2,7 +2,7 @@
 // Validates only its own fields (specified by `fields` prop).
 // Validation timing is configurable: onLeave, onSubmit, or blocking.
 
-import { component, html, signal, tryUseForm, formField } from '@pdxui/core';
+import { component, html, signal, tryUseForm, formField, prop } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
@@ -22,15 +22,15 @@ import '@pdxui/design/components/form';
 component('pdx-form-section', {
     props: {
         /** Section name (used for identification). */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** Display label for the section header. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Comma-separated field names that belong to this section. */
-        fields: { type: String, default: '' },
+        fields: prop(''),
         /** When to validate: 'onLeave' | 'onSubmit' | 'blocking'. Default: 'onSubmit'. */
-        validate: { type: String, default: 'onSubmit' },
+        validate: prop('onSubmit'),
         /** Whether the section is currently active/visible. */
-        active: { type: Boolean, default: true },
+        active: prop(true),
     },
     // `active` stays a prop: the section never writes it, its parent does. Its conditions are states
     // of the host (#293), which form.css draws; the fieldset carries no class for them.

@@ -8,7 +8,7 @@
 // one that ends 20 ms after appearing does not blink. `fullscreen` covers the viewport and makes the
 // rest of the document inert, which the libraries that have a full-screen mode do not.
 
-import { component, html, onDestroy, event } from '@pdxui/core';
+import { component, html, onDestroy, event, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/block-ui';
@@ -35,17 +35,17 @@ component('pdx-block-ui', {
     parts: ['overlay', 'spinner', 'message'],
     props: {
         /** Whether the UI is blocked (shows overlay + spinner) */
-        blocked: { type: Boolean, default: false },
+        blocked: prop(false),
         /** Custom message shown below spinner */
-        message: { type: String, default: '' },
+        message: prop(''),
         /** Spinner variant: spinner (default), skeleton, none */
-        variant: { type: String, default: 'spinner' },
+        variant: prop('spinner'),
         /** Cover the viewport, not the element, and make the rest of the document inert. */
-        fullscreen: { type: Boolean, default: false },
+        fullscreen: prop(false),
         /** Ms before the overlay is drawn. The input is blocked from the start either way. */
-        delay: { type: Number, default: 300 },
+        delay: prop(300),
         /** Ms the overlay stays drawn once it is, however soon the block ends. */
-        minDuration: { type: Number, default: 200 },
+        minDuration: prop(200),
     },
     // Emits `pdx-block` when the overlay is DRAWN (past its delay) and `pdx-unblock` when it is taken
     // away: the moments a person sees, not the moments `blocked` changed.

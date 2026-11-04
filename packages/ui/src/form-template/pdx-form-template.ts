@@ -10,7 +10,7 @@
 //   <pdx-form-template :schema="mySchema" />
 //   <pdx-form-template :schema="mySchema" :form="existingForm" />
 
-import { component, html, signal, effect, event, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames, generatedId } from '@pdxui/core';
+import { component, html, signal, effect, event, createFormFromSchema, evaluateVisibility, FORM_INTERNALS, required, email, minLength, maxLength, min, max, integer, url, pattern, getFieldTypeTag, registerComponentStrings, getComponentString, formField, formFieldNames, generatedId, prop } from '@pdxui/core';
 import type { Form, FormSchema, FormFieldSchema, FormSectionSchema, FormInternals, Validator, ValidatorSchema } from '@pdxui/core';
 // Self-contained: a schema can render ANY field control, so register the full form graph here (the
 // structural wrappers + every control getFieldTypeTag() can return). Makes @pdxui/ui/form-template
@@ -97,15 +97,15 @@ const CHECKED_TYPES = new Set(['checkbox', 'switch']);
 component('pdx-form-template', {
     props: {
         /** FormSchema defining fields, sections, layout. */
-        schema: { type: Object, default: null },
+        schema: prop<Record<string, unknown> | null>(null),
         /** Optional pre-existing Form instance. If not provided, one is created from schema. */
-        form: { type: Object, default: null },
+        form: prop<Record<string, unknown> | null>(null),
         /** HTML autocomplete attribute for the generated form. */
-        autocomplete: { type: String, default: 'off' },
+        autocomplete: prop('off'),
         /** CSS class applied to the generated form. */
-        formClass: { type: String, default: '' },
+        formClass: prop(''),
         /** Show default submit/reset buttons. Override via slot="actions". */
-        showActions: { type: Boolean, default: true },
+        showActions: prop(true),
     },
     // The inner pdx-form's, dispatched again from the host, where the app listens (#138).
     events: {

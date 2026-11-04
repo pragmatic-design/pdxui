@@ -1,7 +1,7 @@
 // pdx-autocomplete — Text input with suggestions.
 // Value is FREE TEXT. Supports local array, DataSource, debounce, forceSelection, highlight.
 
-import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId, slot, declaredSnippet } from '@pdxui/core';
+import { signal, computed, effect, html, component, model, event, isDataSource, inject, untracked, generatedId, slot, declaredSnippet, prop } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { DataSource, SlotFunction } from '@pdxui/core';
@@ -105,27 +105,27 @@ component('pdx-autocomplete', {
         size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
     },
     props: {
-        suggestions: { type: Array, default: () => [] },
-        source: { type: Object, default: null },
-        labelField: { type: String, default: 'label' },
-        valueField: { type: String, default: 'value' },
-        placeholder: { type: String, default: '' },
-        label: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        minLength: { type: Number, default: 1 },
-        debounce: { type: Number, default: 200 },
-        forceSelection: { type: Boolean, default: false },
-        highlight: { type: Boolean, default: true },
-        clearable: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        maxItems: { type: Number, default: 10 },
+        suggestions: prop<unknown[]>(() => []),
+        source: prop<Record<string, unknown> | null>(null),
+        labelField: prop('label'),
+        valueField: prop('value'),
+        placeholder: prop(''),
+        label: prop(''),
+        disabled: prop(false),
+        readonly: prop(false),
+        minLength: prop(1),
+        debounce: prop(200),
+        forceSelection: prop(false),
+        highlight: prop(true),
+        clearable: prop(false),
+        loading: prop(false),
+        name: prop(''),
+        maxItems: prop(10),
         /** Enable server-side filtering via DataSource.setFilter() with debounce. */
-        remote: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        success: { type: Boolean, default: false },
-        warning: { type: Boolean, default: false },
+        remote: prop(false),
+        error: prop(false),
+        success: prop(false),
+        warning: prop(false),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // `raw` is the app's suggestion, an element of `suggestions` (#651): the editor infers `T`.

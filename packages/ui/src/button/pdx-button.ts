@@ -3,7 +3,7 @@
 // icon slot. The design system's `@variant pdx-button` rules key on the host's attributes (#512);
 // the inner <button> carries its base class, `pdx-button`, and its state classes.
 
-import { component, html, DEV } from '@pdxui/core';
+import { component, html, DEV, prop } from '@pdxui/core';
 import { guardDisabledClicks } from '../shared/disabled-click';
 import { hasAccessibleName } from '../shared/accessible-name';
 
@@ -33,20 +33,20 @@ component('pdx-button', {
         size: { md: '[size="md"]', xs: '[size="xs"]', sm: '[size="sm"]', lg: '[size="lg"]', xl: '[size="xl"]' },
     },
     props: {
-        disabled: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        type: { type: String, default: 'button', enum: ['button', 'submit', 'reset'] },
-        full: { type: Boolean, default: false },
+        disabled: prop(false),
+        loading: prop(false),
+        type: prop<'button' | 'submit' | 'reset'>('button'),
+        full: prop(false),
         /** The button's text, rendered inside its `<button>` after any slotted content (an icon). Set this — not `textContent`, which replaces the rendered `<button>` with bare text once the button is connected. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** The accessible name of an icon-only button, forwarded to the inner `<button>`: `aria-label` on the host has no role to name. */
-        ariaLabel: { type: String, default: '' },
+        ariaLabel: prop(''),
         /** The id of an element whose text names the button, forwarded to the inner `<button>`. */
-        ariaLabelledby: { type: String, default: '' },
+        ariaLabelledby: prop(''),
         /** A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write. */
-        action: { type: Object, default: null },
+        action: prop<Record<string, unknown> | null>(null),
         /** The value a click passes to `action.execute`. */
-        actionArg: { type: Object, default: null },
+        actionArg: prop<Record<string, unknown> | null>(null),
     },
     setup(ctx) {
         type Action = { execute: (arg?: unknown) => unknown; pending: () => boolean; concurrency?: string };

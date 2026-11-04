@@ -2,7 +2,7 @@
 // Uses manual trigger mode + explicit hover/focus handling for disabled/overflowOnly veto.
 // ARIA: aria-describedby on trigger → floating element with role="tooltip" (WAI).
 
-import { component, html, signal, effect, event, generatedId } from '@pdxui/core';
+import { component, html, signal, effect, event, generatedId, prop } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import type { PopoverPlacement } from '@pdxui/core';
 import { anchorControl } from '../shared/anchor-control';
@@ -30,13 +30,13 @@ component('pdx-tooltip', {
     // The floating element and its arrow. The trigger is the page's own element.
     parts: ['root', 'arrow'],
     props: {
-        text: { type: String, default: '' },
-        placement: { type: String, default: 'top' },
-        delay: { type: Number, default: 200 },
-        hideDelay: { type: Number, default: 100 },
-        arrow: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        overflowOnly: { type: Boolean, default: false },
+        text: prop(''),
+        placement: prop('top'),
+        delay: prop(200),
+        hideDelay: prop(100),
+        arrow: prop(false),
+        disabled: prop(false),
+        overflowOnly: prop(false),
     },
     setup(ctx) {
         const visible = signal(false);

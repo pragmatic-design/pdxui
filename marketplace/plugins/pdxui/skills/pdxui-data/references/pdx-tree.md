@@ -26,7 +26,7 @@ hierarchy → `pdx-tree-select`; a path is chosen through columns → `pdx-casca
 | `selectionMode` | `selectionmode` | 'none' \| 'single' \| 'multiple' | `'none'` | 'none' \| 'single' \| 'multiple'. |
 | `checkable` | `checkable` | boolean | `false` | Show a checkbox per node, tri-state over a branch's subtree. |
 | `defaultExpandAll` | `defaultexpandall` | boolean | `false` | Open every branch on first render. |
-| `loadChildren` | — | function | `null` | Fetch a branch's children the first time it opens. |
+| `loadChildren` | — | ((...args: unknown[]) => unknown) \| null | `null` | Fetch a branch's children the first time it opens. |
 | `label` | `label` | string | `''` | Accessible name for the tree. |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
 

@@ -21,8 +21,8 @@ A drawer holding a schema-driven form.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `open` | `open` | boolean | `false` | Open state (controlled). |
-| `schema` | — | object | `null` | FormSchema describing the entity fields. |
-| `value` | — | object | `null` | Entity to edit, or null to create a new one. |
+| `schema` | — | Record<string, unknown> \| null | `null` | FormSchema describing the entity fields. |
+| `value` | — | Record<string, unknown> \| null | `null` | Entity to edit, or null to create a new one. |
 | `title` | `title` | string | `''` | Drawer title; defaults to "Edit"/"New" by mode. |
 | `position` | `position` | 'left' \| 'right' | `'right'` |  |
 | `size` | `size` | string | `'md'` | Forwarded to pdx-drawer — named preset (sm/md/lg) or a custom CSS width. |

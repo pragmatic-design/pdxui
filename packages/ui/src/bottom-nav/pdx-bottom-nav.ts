@@ -1,6 +1,6 @@
 // pdx-bottom-nav — Mobile bottom tab bar. Fixed at bottom, 3-5 items with icons.
 
-import { component, html, event } from '@pdxui/core';
+import { component, html, event, prop } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -35,8 +35,8 @@ component('pdx-bottom-nav', {
     states: ['ready'],
     parts: ['bar', 'item', 'icon', 'badge', 'label'],
     props: {
-        items: { type: Array, default: [] },
-        activeKey: { type: String, default: '' },
+        items: prop<unknown[]>([]),
+        activeKey: prop(''),
     },
     setup(ctx) {
         let _built = false;

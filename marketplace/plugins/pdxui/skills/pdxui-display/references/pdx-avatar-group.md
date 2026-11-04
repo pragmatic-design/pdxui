@@ -4,7 +4,7 @@ Stacked avatars with an overflow count.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `null` | The data items to render. |
+| `items` | — | unknown[] \| null | `null` | The data items to render. |
 | `max` | `max` | number | `5` | Maximum allowed value. |
 | `overlap` | `overlap` | number | `-8` | How much adjacent avatars overlap. |
 | `direction` | `direction` | string | `'row'` | Stacking direction. |

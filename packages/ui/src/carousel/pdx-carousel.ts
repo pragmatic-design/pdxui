@@ -3,7 +3,7 @@
 // multiple slides per view, dot indicators, keyboard navigation.
 // Snippet: "slide" — custom slide template (priority: snippet > renderSlide > default)
 
-import { component, html, generatedId, slot, declaredSnippet, model, event, signal, untracked } from '@pdxui/core';
+import { component, html, generatedId, slot, declaredSnippet, model, event, signal, untracked, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeHTML } from '../shared/sanitize';
 import { uiString, uiAttr} from '../shared/i18n';
@@ -62,20 +62,20 @@ component('pdx-carousel', {
     states: ['fade'],
     parts: ['root', 'track', 'slide', 'control', 'dots', 'dot'],
     props: {
-        items: { type: Array, default: null },
-        renderSlide: { type: Object, default: null },
-        autoplay: { type: Boolean, default: false },
-        interval: { type: Number, default: 5000 },
-        loop: { type: Boolean, default: true },
-        showArrows: { type: Boolean, default: true },
-        showDots: { type: Boolean, default: true },
-        slidesPerView: { type: Number, default: 1 },
-        gap: { type: Number, default: 0 },
-        swipeable: { type: Boolean, default: true },
-        pauseOnHover: { type: Boolean, default: true },
-        animation: { type: String, default: 'slide' },
+        items: prop<unknown[] | null>(null, { type: Array }),
+        renderSlide: prop<Record<string, unknown> | null>(null),
+        autoplay: prop(false),
+        interval: prop(5000),
+        loop: prop(true),
+        showArrows: prop(true),
+        showDots: prop(true),
+        slidesPerView: prop(1),
+        gap: prop(0),
+        swipeable: prop(true),
+        pauseOnHover: prop(true),
+        animation: prop('slide'),
         /** The region's accessible name. Empty: the component string `carousel.label` ("Carousel"). */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The slide a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.

@@ -14,8 +14,8 @@ A month calendar surface.
 | `weekNumbers` | `weeknumbers` | boolean | `false` | Show ISO week numbers. |
 | `min` | `min` | string | `''` | Minimum selectable date (ISO). |
 | `max` | `max` | string | `''` | Maximum selectable date (ISO). |
-| `disabledDates` | — | object | `null` | Function returning true if date should be disabled. |
-| `highlightedDates` | — | object | `null` | Function returning highlight label or false. |
+| `disabledDates` | — | Record<string, unknown> \| null | `null` | Function returning true if date should be disabled. |
+| `highlightedDates` | — | Record<string, unknown> \| null | `null` | Function returning highlight label or false. |
 | `fiscalStartMonth` | `fiscalstartmonth` | number | `1` | Fiscal year start month (1-12). |
 | `compareStart` | `comparestart` | string | `''` | Compare range start (ISO) for analytics overlay. |
 | `compareEnd` | `compareend` | string | `''` | Compare range end (ISO). |

@@ -1,7 +1,7 @@
 // pdx-kbd — Keyboard shortcut display. Parses keys by + separator.
 // Supports modifier symbols: Cmd→⌘, Alt/Option→⌥, Ctrl→⌃, Shift→⇧.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/kbd';
@@ -31,9 +31,9 @@ component('pdx-kbd', {
         size: { md: '.pdx-kbd-md', sm: '.pdx-kbd-sm', lg: '.pdx-kbd-lg' },
     },
     props: {
-        keys: { type: String, default: '' },
+        keys: prop(''),
         /** Show modifier symbols (⌘⌥⌃⇧) instead of text. Default: false. */
-        symbols: { type: Boolean, default: false },
+        symbols: prop(false),
     },
     setup(ctx) {
         function parts(): string[] {

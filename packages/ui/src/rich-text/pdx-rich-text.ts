@@ -8,7 +8,7 @@
 // setup — before `pdx-ready` and before anything can call it — so it shadows the platform's own
 // Element.prototype.setHTML from the start; calls made before the editor exists are queued.
 
-import { component, event, html, untracked, DEV, isDataSource, model } from '@pdxui/core';
+import { component, event, html, untracked, DEV, isDataSource, model, prop } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 import { EditorView, type EditorViewConfig } from './view/view.js';
@@ -59,29 +59,29 @@ component('pdx-rich-text', {
   states: ['readonly'],
   parts: ['toolbar', 'field', 'input'],
   props: {
-    output: { type: String, default: 'json' },
-    extensions: { type: Array, default: null },
-    preset: { type: String, default: 'starter' },
-    toolbar: { type: String, default: 'standard' },
-    toolbarMode: { type: String, default: 'top' },
-    placeholder: { type: String, default: '' },
-    readonly: { type: Boolean, default: false },
-    autofocus: { type: Boolean, default: false },
-    height: { type: String, default: 'auto' },
-    minHeight: { type: String, default: '120px' },
-    maxHeight: { type: String, default: 'none' },
+    output: prop('json'),
+    extensions: prop<unknown[] | null>(null, { type: Array }),
+    preset: prop('starter'),
+    toolbar: prop('standard'),
+    toolbarMode: prop('top'),
+    placeholder: prop(''),
+    readonly: prop(false),
+    autofocus: prop(false),
+    height: prop('auto'),
+    minHeight: prop('120px'),
+    maxHeight: prop('none'),
     /**
      * A DataSource whose record `record-id` names: the editor edits that record's `field`, follows
      * it when the source changes it, and writes each edit back through the source.
      * With all three given, the record is the document and `value` only reflects it.
      */
-    source: { type: Object, default: null },
+    source: prop<Record<string, unknown> | null>(null),
     /** The field of the `source` record that holds the document. */
-    field: { type: String, default: '' },
+    field: prop(''),
     /** The id of the `source` record to edit, as pdx-form's `record-id`: `"1"` finds `{ id: 1 }`. */
-    recordId: { type: String, default: '' },
+    recordId: prop(''),
     /** Accessible name of the editing area. Empty → the `rich-text.label` component string. */
-    label: { type: String, default: '' },
+    label: prop(''),
   },
 
   setup(ctx: any) {

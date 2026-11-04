@@ -1,6 +1,6 @@
 // pdx-affix — Makes child element sticky when scrolling past a threshold.
 
-import { component, html, signal, DEV, event } from '@pdxui/core';
+import { component, html, signal, DEV, event, prop } from '@pdxui/core';
 
 /**
  * Makes an element sticky once the user scrolls past a threshold, and reports when it is.
@@ -20,11 +20,11 @@ component('pdx-affix', {
     states: ['affixed'],
     props: {
         /** Offset from top when affixed (px) */
-        offsetTop: { type: Number, default: 0 },
+        offsetTop: prop(0),
         /** Offset from bottom when affixed (px) */
-        offsetBottom: { type: Number, default: -1 },
+        offsetBottom: prop(-1),
         /** Target scroll container selector (default: window) */
-        target: { type: String, default: '' },
+        target: prop(''),
     },
     setup(ctx) {
         const _affixed = signal(false);

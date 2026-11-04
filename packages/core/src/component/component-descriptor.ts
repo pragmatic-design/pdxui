@@ -49,6 +49,11 @@ export interface PropOptions {
      * no default that an attribute may set.
      */
     type?: PropType;
+    /**
+     * The value names an icon (#47): the compiler imports the icon a literal value names, as it does
+     * for `pdx-icon`'s `name`. Read from the source by the manifest generator; nothing at runtime.
+     */
+    iconName?: boolean;
 }
 
 /** The runtime type a default implies (see {@link PropOptions.type}). */

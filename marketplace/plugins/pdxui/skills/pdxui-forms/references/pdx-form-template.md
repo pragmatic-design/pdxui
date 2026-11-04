@@ -6,8 +6,8 @@ Render a whole form from a layout.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `schema` | — | object | `null` | FormSchema defining fields, sections, layout. |
-| `form` | — | object | `null` | Optional pre-existing Form instance. If not provided, one is created from schema. |
+| `schema` | — | Record<string, unknown> \| null | `null` | FormSchema defining fields, sections, layout. |
+| `form` | — | Record<string, unknown> \| null | `null` | Optional pre-existing Form instance. If not provided, one is created from schema. |
 | `autocomplete` | `autocomplete` | string | `'off'` | HTML autocomplete attribute for the generated form. |
 | `formClass` | `formclass` | string | `''` | CSS class applied to the generated form. |
 | `showActions` | `showactions` | boolean | `true` | Show default submit/reset buttons. Override via slot="actions". |

@@ -9,7 +9,7 @@
 // non-interactive pill, so no button nests in a button. Disabled goes where it is read: on the
 // toggle, and as `disabled` on the ×. After a removal the app owns focus.
 
-import { component, html, signal, model, event } from '@pdxui/core';
+import { component, html, signal, model, event, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -57,20 +57,20 @@ component('pdx-chip', {
         size: { md: '.pdx-chip-md', sm: '.pdx-chip-sm', lg: '.pdx-chip-lg' },
     },
     props: {
-        label: { type: String, default: '' },
+        label: prop(''),
         /**
          * Shows a × button — the chip's tab stop — named "Remove {label}", which emits pdx-remove. The
          * chip does not remove itself: the app removes it and owns focus afterwards (move it to the
          * next chip's ×, or the previous one), or a keyboard user is left on <body>.
          */
-        removable: { type: Boolean, default: false },
+        removable: prop(false),
         /** A toggle button (role="button", aria-pressed): click, Enter or Space flips the `selected` model. */
-        selectable: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
+        selectable: prop(false),
+        disabled: prop(false),
         /** Value passed in the remove event's detail for identification. */
-        value: { type: String, default: '' },
+        value: prop(''),
         /** Avatar URL — renders a small circle image before the label. */
-        avatar: { type: String, default: '' },
+        avatar: prop(''),
     },
     setup(ctx) {
         ctx.track(() => {

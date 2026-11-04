@@ -3,7 +3,7 @@
 // Detents: array of fractions (0-1) of viewport height. Default: [0.4, 0.85].
 // CSS from @pdxui/design (bottom-sheet.css).
 
-import { component, event, html, model, signal } from '@pdxui/core';
+import { component, event, html, model, signal, prop } from '@pdxui/core';
 import { overlayStack, focusTrap } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
@@ -32,23 +32,23 @@ component('pdx-bottom-sheet', {
     parts: ['root', 'backdrop', 'handle', 'header', 'close', 'body', 'footer'],
     props: {
         /** Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] */
-        detents: { type: Array, default: () => [0.4, 0.85] },
+        detents: prop<unknown[]>(() => [0.4, 0.85]),
         /** Initial detent index. Default: 0 (smallest) */
-        initialDetent: { type: Number, default: 0 },
+        initialDetent: prop(0),
         /** Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it. */
-        backdrop: { type: Boolean, default: true },
+        backdrop: prop(true),
         /** Close on backdrop click. Default: true */
-        closeOnBackdrop: { type: Boolean, default: true },
+        closeOnBackdrop: prop(true),
         /** Close on Escape. Default: true */
-        closeOnEscape: { type: Boolean, default: true },
+        closeOnEscape: prop(true),
         /** Close on swipe down below minimum detent. Default: true */
-        closeOnSwipeDown: { type: Boolean, default: true },
+        closeOnSwipeDown: prop(true),
         /** Show drag handle bar. Default: true */
-        showHandle: { type: Boolean, default: true },
+        showHandle: prop(true),
         /** Show close button. Default: false */
-        showClose: { type: Boolean, default: false },
+        showClose: prop(false),
         /** Label for accessibility. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     events: {
         /** Fired (cancelable) before the sheet closes itself; call preventDefault() to keep it open. */

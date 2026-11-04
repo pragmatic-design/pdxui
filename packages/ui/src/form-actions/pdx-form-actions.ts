@@ -2,7 +2,7 @@
 // Labels are localizable via setComponentStrings('form-actions', { submit: '...', reset: '...' }).
 // To hide the reset button, set resetLabel="none".
 
-import { component, html, tryUseForm, registerComponentStrings, getComponentString } from '@pdxui/core';
+import { component, html, tryUseForm, registerComponentStrings, getComponentString, prop } from '@pdxui/core';
 import type { Form } from '@pdxui/core';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
@@ -27,11 +27,11 @@ registerComponentStrings('form-actions', {
 component('pdx-form-actions', {
     props: {
         /** Submit button label. Uses i18n registry default if not set. */
-        submitLabel: { type: String, default: '' },
+        submitLabel: prop(''),
         /** Reset button label. Set to 'none' to hide. Uses i18n registry default if not set. */
-        resetLabel: { type: String, default: '' },
+        resetLabel: prop(''),
         /** Show loading spinner on submit button while submitting. */
-        showLoading: { type: Boolean, default: true },
+        showLoading: prop(true),
     },
     // The bar's alignment is an axis reflected on the host, which form.css draws (#293); each value
     // maps the class a native bar carries.

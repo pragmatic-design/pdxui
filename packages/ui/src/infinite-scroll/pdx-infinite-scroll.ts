@@ -2,7 +2,7 @@
 // Uses IntersectionObserver on a sentinel element for efficient detection.
 // After each load completes, re-checks if sentinel is still visible to continue loading.
 
-import { component, html, inject, onDestroy } from '@pdxui/core';
+import { component, html, inject, onDestroy, prop } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import { uiString } from '../shared/i18n';
 import type { DataSource } from '@pdxui/core';
@@ -27,19 +27,19 @@ component('pdx-infinite-scroll', {
     parts: ['sentinel', 'loading', 'end'],
     props: {
         /** DataSource instance for auto-paging */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Pixels from bottom to trigger load */
-        threshold: { type: Number, default: 200 },
+        threshold: prop(200),
         /** Disable loading more */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** External loading state override */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
         /** Message when all data loaded. Empty: the infinite-scroll.end component string, «No more data». */
-        endMessage: { type: String, default: '' },
+        endMessage: prop(''),
         /** Loading indicator text. Empty: the infinite-scroll.loading component string, «Loading...». */
-        loadingMessage: { type: String, default: '' },
+        loadingMessage: prop(''),
         /** Show end message when all data loaded */
-        showEndMessage: { type: Boolean, default: true },
+        showEndMessage: prop(true),
     },
     setup(ctx) {
         let _built = false;

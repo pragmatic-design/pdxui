@@ -7,8 +7,8 @@ Type @ to mention people.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `trigger` | `trigger` | string | `'@'` | Trigger character(s) — comma-separated for multiple (default: '@') |
-| `items` | — | array | `[]` | Static suggestions array |
-| `source` | — | object | `null` | DataSource or raw array for remote search |
+| `items` | — | unknown[] | `[]` | Static suggestions array |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource or raw array for remote search |
 | `labelField` | `labelfield` | string | `'label'` | Field for display label |
 | `valueField` | `valuefield` | string | `'value'` | Field for value/id |
 | `descriptionField` | `descriptionfield` | string | `''` | Field for description (optional) |

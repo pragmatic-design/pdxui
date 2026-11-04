@@ -11,7 +11,7 @@
 //       :item-fields="[{ name: 'product', type: 'text', label: 'Product' }]"
 //       :item-default="{ product: '', qty: 1, price: 0 }" />
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, FORM_INTERNALS, registerComponentStrings, getComponentString, required, formField, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { Form, FormInternals, SlotFunction, Validator } from '@pdxui/core';
 import { onControlValue } from '../shared/model-event';
 // Each cell's control is wrapped in a field (#293): named, marked required and described by its error
@@ -84,25 +84,25 @@ export interface FieldListItemSchema {
 component('pdx-field-list', {
     props: {
         /** Array field name in the form (e.g., 'items'). */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** Optional label rendered above the list. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Form instance. If not provided, uses form context. */
-        form: { type: Object, default: null },
+        form: prop<Form<any> | null>(null),
         /** Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot. */
-        itemFields: { type: Array, default: [] },
+        itemFields: prop<unknown[]>([]),
         /** Default values for a new item. */
-        itemDefault: { type: Object, default: null },
+        itemDefault: prop<Record<string, unknown> | null>(null),
         /** Minimum number of items (default: 0). */
-        minItems: { type: Number, default: 0 },
+        minItems: prop(0),
         /** Maximum number of items (default: 999). */
-        maxItems: { type: Number, default: 999 },
+        maxItems: prop(999),
         /** Label for the add button. Empty: the `field-list.add` component string ("+ Add" in English). */
-        addLabel: { type: String, default: '' },
+        addLabel: prop(''),
         /** Allow removing items (default: true). */
-        removable: { type: Boolean, default: true },
+        removable: prop(true),
         /** Display mode: inline (default), dialog. */
-        display: { type: String, default: 'inline' },
+        display: prop('inline'),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {

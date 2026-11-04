@@ -2,7 +2,7 @@
 // Supports: nested submenus, checkbox/radio items, icons, shortcuts, mega menu panels,
 // Arrow L/R between top-level items, Arrow Down to open, full WAI-ARIA menubar pattern.
 
-import { component, html, signal, focusGroup, event } from '@pdxui/core';
+import { component, html, signal, focusGroup, event, prop } from '@pdxui/core';
 // A menubar is painted by menu.css — the rules are named after the MENU, not after this
 // component, so the import is easy to miss, and without it a page that renders a menubar has to
 // load the whole library to paint it.
@@ -61,10 +61,10 @@ component('pdx-menubar', {
     parts: ['bar', 'trigger', 'panel', 'item', 'separator', 'label'],
     props: {
         /** Top-level menu items */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Open mode: 'click' (default) opens on a click, and then the pointer moves between menus
          *  while one is open, as a desktop menubar does; 'hover' opens on mouseenter alone. */
-        trigger: { type: String, default: 'click' },
+        trigger: prop('click'),
     },
     setup(ctx) {
         const _activeKey = signal('');

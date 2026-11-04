@@ -2,7 +2,7 @@
 // Uses CSS columns for simple, SSR-friendly masonry. Items flow top-to-bottom per column.
 // Props: columns (responsive), gap. Auto-adjusts via ResizeObserver.
 
-import { component, html, DEV } from '@pdxui/core';
+import { component, html, DEV, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/masonry';
@@ -43,11 +43,11 @@ component('pdx-masonry', {
          * 0 and negatives mean 'auto' too. Anything else warns and is treated as 'auto'.
          * @type number | 'auto'
          */
-        columns: { type: String, default: '3' },
+        columns: prop('3'),
         /** Minimum column width for auto mode (px) */
-        columnWidth: { type: Number, default: 250 },
+        columnWidth: prop(250),
         /** Gap between items (CSS value) */
-        gap: { type: String, default: '1rem' },
+        gap: prop('1rem'),
     },
     setup(ctx) {
         let _resizeObserver: ResizeObserver | null = null;

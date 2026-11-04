@@ -3,7 +3,7 @@
 // Items support icons, shortcuts, submenus, checkbox/radio, disabled, danger.
 // Dynamic items: pass a function to generate items based on the clicked target.
 
-import { component, html, signal, focusGroup, onDestroy, slot, declaredSnippet, event } from '@pdxui/core';
+import { component, html, signal, focusGroup, onDestroy, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 import type { MenuItem } from '../menu/pdx-menu';
 import { sanitizeSVG } from '../shared/sanitize';
@@ -41,11 +41,11 @@ component('pdx-context-menu', {
     parts: ['root', 'item', 'separator', 'label'],
     props: {
         /** Menu items (static array or function returning items) */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Disabled — prevents context menu from opening */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Min width of the menu panel */
-        minWidth: { type: Number, default: 180 },
+        minWidth: prop(180),
     },
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.
     generics: { T: { extends: '{ key?: string; label?: string; type?: string }', from: 'items' } },

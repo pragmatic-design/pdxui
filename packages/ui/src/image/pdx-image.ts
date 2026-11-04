@@ -1,7 +1,7 @@
 // pdx-image — Rich image component with lazy loading, fallback, zoom, lightbox,
 // and authenticated image loading via fetch + objectURL.
 
-import { component, html, onDestroy, focusTrap, event } from '@pdxui/core';
+import { component, html, onDestroy, focusTrap, event, prop } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -38,41 +38,41 @@ component('pdx-image', {
     parts: ['frame', 'image', 'placeholder', 'fallback', 'caption'],
     props: {
         /** Image URL */
-        src: { type: String, default: '' },
+        src: prop(''),
         /** Alt text for accessibility */
-        alt: { type: String, default: '' },
+        alt: prop(''),
         /** CSS width */
-        width: { type: String, default: 'auto' },
+        width: prop('auto'),
         /** CSS height */
-        height: { type: String, default: 'auto' },
+        height: prop('auto'),
         /** object-fit: cover | contain | fill | none | scale-down */
-        fit: { type: String, default: 'cover' },
+        fit: prop('cover'),
         /** Enable IntersectionObserver lazy loading */
-        lazy: { type: Boolean, default: true },
+        lazy: prop(true),
         /** Fallback image URL on error */
-        fallback: { type: String, default: '' },
+        fallback: prop(''),
         /** Icon name shown on error (pragmatic-icons) */
-        fallbackIcon: { type: String, default: 'image-off', iconName: true },
+        fallbackIcon: prop('image-off', { iconName: true }),
         /** Placeholder style: blur | skeleton | none */
-        placeholder: { type: String, default: 'skeleton' },
+        placeholder: prop('skeleton'),
         /** Aspect ratio e.g. '16/9', '1/1' */
-        ratio: { type: String, default: '' },
+        ratio: prop(''),
         /** Circular border-radius */
-        rounded: { type: Boolean, default: false },
+        rounded: prop(false),
         /** Custom border-radius value */
-        radius: { type: String, default: '' },
+        radius: prop(''),
         /** Click to zoom (scale toggle) */
-        zoomable: { type: Boolean, default: false },
+        zoomable: prop(false),
         /** Click opens fullscreen lightbox overlay */
-        lightbox: { type: Boolean, default: false },
+        lightbox: prop(false),
         /** Caption text below image */
-        caption: { type: String, default: '' },
+        caption: prop(''),
         /** URL requiring authentication (fetched via fetch + objectURL) */
-        authSrc: { type: String, default: '' },
+        authSrc: prop(''),
         /** Function returning HTTP headers for auth requests */
-        authProvider: { type: Object, default: null },
+        authProvider: prop<Record<string, unknown> | null>(null),
         /** Custom fetch function: (url: string) => Promise<Blob> */
-        fetchFn: { type: Object, default: null },
+        fetchFn: prop<Record<string, unknown> | null>(null),
     },
     setup(ctx) {
         let _built = false;
