@@ -254,6 +254,18 @@
                 </pdx-autocomplete>
     </section>
 
+    <section data-scenario="autocomplete-frame-tokens">
+        <h3>Autocomplete — the text input's frame tokens, set on one element</h3>
+        <div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-autocomplete data-test="tok-tall" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' style="--pdx-input-min-height: 5rem"></pdx-autocomplete>
+                <pdx-autocomplete data-test="tok-plain" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' ></pdx-autocomplete>
+                <pdx-autocomplete data-test="tok-invalid" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' error="Required" style="--pdx-input-border-color-invalid: rgb(11, 21, 31)"></pdx-autocomplete>
+                <pdx-autocomplete data-test="tok-success" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' success="Looks good" style="--pdx-input-border-color-success: rgb(12, 22, 32)"></pdx-autocomplete>
+                <pdx-autocomplete data-test="tok-warning" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' warning="Check it" style="--pdx-input-border-color-warning: rgb(13, 23, 33)"></pdx-autocomplete>
+                <pdx-autocomplete data-test="tok-invalid-plain" label="Country" value="Italy" suggestions='["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]' error="Required"></pdx-autocomplete>
+            </div>
+    </section>
+
     <section data-scenario="autocomplete-size-md">
         <h3>pdx-autocomplete — size="md"</h3>
         <pdx-autocomplete data-test="variant" size="md"></pdx-autocomplete>
@@ -817,6 +829,18 @@
                     placeholder="Select…"
                     options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]'>
                 </pdx-select>
+    </section>
+
+    <section data-scenario="select-frame-tokens">
+        <h3>Select — the text input's frame tokens, set on one element</h3>
+        <div style="display: grid; gap: 12px; width: 320px;">
+                <pdx-select data-test="tok-tall" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' style="--pdx-input-min-height: 5rem"></pdx-select>
+                <pdx-select data-test="tok-plain" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' ></pdx-select>
+                <pdx-select data-test="tok-invalid" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' error="Required" style="--pdx-input-border-color-invalid: rgb(11, 21, 31)"></pdx-select>
+                <pdx-select data-test="tok-success" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' success="Looks good" style="--pdx-input-border-color-success: rgb(12, 22, 32)"></pdx-select>
+                <pdx-select data-test="tok-warning" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' warning="Check it" style="--pdx-input-border-color-warning: rgb(13, 23, 33)"></pdx-select>
+                <pdx-select data-test="tok-invalid-plain" label="Country" value="it" options='[{"label":"Italy","value":"it"},{"label":"France","value":"fr"}]' error="Required"></pdx-select>
+            </div>
     </section>
 
     <section data-scenario="select-size-md">

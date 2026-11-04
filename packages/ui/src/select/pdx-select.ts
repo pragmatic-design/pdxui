@@ -67,6 +67,15 @@ function normaliseOptions(
  * @cssstate loading - `loading` is set, or the DataSource is loading.
  * @cssstate multiple - `multiple` is set: the trigger holds tags.
  *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-color-invalid - The frame's border in the invalid state.
+ * @cssprop --pdx-input-border-color-success - The frame's border in the success state.
+ * @cssprop --pdx-input-border-color-warning - The frame's border in the warning state.
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
  * @alphaevent pdx-change
  * @alphadetail value $event.detail.value
  * @alphadetail values $event.detail.value

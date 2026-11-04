@@ -25,8 +25,14 @@ type Named = { name: string };
 type Member = { kind: string; name: string };
 type Decl = {
     tagName?: string; models?: string[]; formAssociated?: boolean;
-    cssStates?: Named[]; cssParts?: Named[]; events?: Named[]; members?: Member[];
+    cssStates?: Named[]; cssParts?: Named[]; cssProperties?: Named[]; events?: Named[]; members?: Member[];
 };
+
+// The tokens of a picker drawn by the text input's frame, `.pdx-input-wrap` (#761): the frame keeps
+// pdx-input's names, and the manifest lists the ones the frame reads for it. A picker with the
+// invalid, success and warning states reads the frame's tokens for them as well.
+const FRAME = ['--pdx-input-border-color', '--pdx-input-border-color-focus', '--pdx-input-border-width', '--pdx-input-focus-ring', '--pdx-input-min-height'];
+const FRAME_STATES = [...FRAME, '--pdx-input-border-color-invalid', '--pdx-input-border-color-success', '--pdx-input-border-color-warning'];
 const decls = (JSON.parse(readFileSync(join(root, 'custom-elements.json'), 'utf8')) as { modules: { declarations: Decl[] }[] })
     .modules.flatMap((m) => m.declarations);
 
@@ -41,6 +47,8 @@ interface Row {
     methods: string[];
     /** Names it set on the element before, now gone: alias methods the overlay verbs replace. */
     removedMethods: string[];
+    /** The custom properties its manifest lists (#761, #287 item 5), all of them. */
+    tokens?: string[];
 }
 
 const DONE: Row[] = [
@@ -52,6 +60,7 @@ const DONE: Row[] = [
         popup: true,
         methods: ['focus', 'blur', 'clear', 'show', 'close', 'toggle'],
         removedMethods: ['openSelect', 'closeSelect', 'toggleSelect'],
+        tokens: [...FRAME_STATES, '--pdx-select-caret-size', '--pdx-select-caret-stroke'],
     },
     {
         tag: 'pdx-autocomplete',
@@ -62,6 +71,7 @@ const DONE: Row[] = [
         methods: ['clear', 'getText', 'getSelectedItem', 'show', 'close', 'toggle'],
         // `open()` is the overlay verb `show()` (#287, decision 50).
         removedMethods: ['open'],
+        tokens: FRAME_STATES,
     },
     {
         tag: 'pdx-cascader',
@@ -74,6 +84,7 @@ const DONE: Row[] = [
         // getValue/setValue duplicated the model, which is the way (#287); openCascader/closeCascader
         // were set on the element undeclared, and are the overlay verbs.
         removedMethods: ['getValue', 'setValue', 'openCascader', 'closeCascader'],
+        tokens: FRAME,
     },
     {
         tag: 'pdx-tree-select',
@@ -84,6 +95,7 @@ const DONE: Row[] = [
         popup: true,
         methods: ['getLabel', 'clear', 'show', 'close', 'toggle'],
         removedMethods: ['getValue', 'setValue', 'openTreeSelect', 'closeTreeSelect'],
+        tokens: FRAME,
     },
     {
         tag: 'pdx-transfer',
@@ -106,6 +118,7 @@ const DONE: Row[] = [
         methods: ['getDate', 'getRange', 'getTime', 'getEndTime', 'focus', 'blur', 'clear', 'show', 'close', 'toggle'],
         // openPopover/closePopover were set on the element undeclared, and are the overlay verbs.
         removedMethods: ['openPopover', 'closePopover'],
+        tokens: FRAME,
     },
     {
         tag: 'pdx-time-picker',
@@ -187,6 +200,10 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     it('declares its methods', () => {
         const methods = (decl?.members ?? []).filter((m) => m.kind === 'method').map((m) => m.name);
         expect(methods.filter((m) => row.methods.includes(m)).sort()).toEqual([...row.methods].sort());
+    });
+
+    it.runIf(row.tokens)('lists its tokens in the manifest (#761)', () => {
+        expect((decl?.cssProperties ?? []).map((p) => p.name).sort()).toEqual([...row.tokens!].sort());
     });
 
     it('sets none of its removed methods on the element', async () => {

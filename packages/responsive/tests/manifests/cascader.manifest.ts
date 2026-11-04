@@ -74,6 +74,11 @@
  */
 import type { ComponentManifest } from './_types';
 
+// The text input's frame tokens (#761): the trigger is `.pdx-input-wrap`. It has no invalid, success or
+// warning state, so its height is what is measured; why, is in select.manifest.ts.
+const FRAME_CASC = (test: string, extra = '') => `<pdx-cascader data-test="${test}" value='["it"]' options='[{"value":"it","label":"Italy"},{"value":"fr","label":"France"}]' ${extra}></pdx-cascader>`;
+const FRAME_ROOT = (test: string) => `section:not([hidden]) [data-test="${test}"] > [data-part="root"]`;
+
 export const cascader: ComponentManifest = {
     name: 'cascader',
     tag: 'pdx-cascader',
@@ -135,11 +140,27 @@ export const cascader: ComponentManifest = {
                     options='[{"value":"it","label":"Italy"},{"value":"fr","label":"France"}]'>
                 </pdx-cascader>`,
         },
+        {
+            id: 'cascader-frame-tokens',
+            title: "Cascader — the text input's frame tokens, set on one element",
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                ${FRAME_CASC('tok-tall', 'style="--pdx-input-min-height: 5rem"')}
+                ${FRAME_CASC('tok-plain')}
+            </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'cascader-frame-tokens': {
+                composition: [{
+                    description: '--pdx-input-min-height on the element makes its frame taller than the cascader beside it',
+                    parent: 'body',
+                    children: { tall: FRAME_ROOT('tok-tall'), plain: FRAME_ROOT('tok-plain') },
+                    relations: [{ description: 'the frame with the token is taller', left: 'tall.height', op: '>', right: 'plain.height' }],
+                }],
+            },
             'cascader-closed': {
                 standalone: [
                     {

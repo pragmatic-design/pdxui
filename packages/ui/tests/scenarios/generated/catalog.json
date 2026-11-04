@@ -128,6 +128,10 @@
           "title": "Autocomplete — Open (suggestions listbox visible below the input)"
         },
         {
+          "id": "autocomplete-frame-tokens",
+          "title": "Autocomplete — the text input's frame tokens, set on one element"
+        },
+        {
           "id": "autocomplete-size-md",
           "title": "pdx-autocomplete — size=\"md\""
         },
@@ -705,6 +709,10 @@
           "title": "Cascader — Disabled"
         },
         {
+          "id": "cascader-frame-tokens",
+          "title": "Cascader — the text input's frame tokens, set on one element"
+        },
+        {
           "id": "cascader-size-md",
           "title": "pdx-cascader — size=\"md\""
         },
@@ -1082,6 +1090,10 @@
         {
           "id": "date-picker-disabled",
           "title": "Date Picker — Disabled"
+        },
+        {
+          "id": "date-picker-frame-tokens",
+          "title": "Date Picker — the text input's frame tokens, set on one element"
         },
         {
           "id": "date-picker-size-md",
@@ -2744,6 +2756,10 @@
           "title": "Select — Disabled"
         },
         {
+          "id": "select-frame-tokens",
+          "title": "Select — the text input's frame tokens, set on one element"
+        },
+        {
           "id": "select-size-md",
           "title": "pdx-select — size=\"md\""
         },
@@ -3601,6 +3617,10 @@
         {
           "id": "tree-select-disabled",
           "title": "Tree Select — Disabled"
+        },
+        {
+          "id": "tree-select-frame-tokens",
+          "title": "Tree Select — the text input's frame tokens, set on one element"
         },
         {
           "id": "tree-select-size-md",

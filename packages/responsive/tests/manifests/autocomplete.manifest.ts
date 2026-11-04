@@ -74,6 +74,10 @@
 import type { ComponentManifest } from './_types';
 
 const SUGGESTIONS = `["Italy","Iceland","India","Indonesia","Ireland","France","Spain","Germany"]`;
+// The text input's frame tokens (#761): the trigger is `.pdx-input-wrap`. What the rules measure, and
+// why the bottom border, is in select.manifest.ts.
+const FRAME_AC = (test: string, extra = '') => `<pdx-autocomplete data-test="${test}" label="Country" value="Italy" suggestions='${SUGGESTIONS}' ${extra}></pdx-autocomplete>`;
+const FRAME_ROOT = (test: string) => `section:not([hidden]) [data-test="${test}"] > [data-part="root"]`;
 
 export const autocomplete: ComponentManifest = {
     name: 'autocomplete',
@@ -120,11 +124,37 @@ export const autocomplete: ComponentManifest = {
                 }
                 await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
         },
+        {
+            id: 'autocomplete-frame-tokens',
+            title: "Autocomplete — the text input's frame tokens, set on one element",
+            html: `<div style="display: grid; gap: 12px; width: 320px;">
+                ${FRAME_AC('tok-tall', 'style="--pdx-input-min-height: 5rem"')}
+                ${FRAME_AC('tok-plain')}
+                ${FRAME_AC('tok-invalid', 'error="Required" style="--pdx-input-border-color-invalid: rgb(11, 21, 31)"')}
+                ${FRAME_AC('tok-success', 'success="Looks good" style="--pdx-input-border-color-success: rgb(12, 22, 32)"')}
+                ${FRAME_AC('tok-warning', 'warning="Check it" style="--pdx-input-border-color-warning: rgb(13, 23, 33)"')}
+                ${FRAME_AC('tok-invalid-plain', 'error="Required"')}
+            </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'autocomplete-frame-tokens': {
+                composition: [{
+                    description: '--pdx-input-min-height on the element makes its frame taller than the autocomplete beside it',
+                    parent: 'body',
+                    children: { tall: FRAME_ROOT('tok-tall'), plain: FRAME_ROOT('tok-plain') },
+                    relations: [{ description: 'the frame with the token is taller', left: 'tall.height', op: '>', right: 'plain.height' }],
+                }],
+                standalone: [
+                    { selector: FRAME_ROOT('tok-invalid'), description: '--pdx-input-border-color-invalid on the element is its invalid border', border: { bottom: { color: { op: 'is', value: 'rgb(11, 21, 31)' } } } },
+                    { selector: FRAME_ROOT('tok-success'), description: '--pdx-input-border-color-success on the element is its success border', border: { bottom: { color: { op: 'is', value: 'rgb(12, 22, 32)' } } } },
+                    { selector: FRAME_ROOT('tok-warning'), description: '--pdx-input-border-color-warning on the element is its warning border', border: { bottom: { color: { op: 'is', value: 'rgb(13, 23, 33)' } } } },
+                    { selector: FRAME_ROOT('tok-invalid-plain'), description: "control: an invalid autocomplete without the token keeps the theme's border", border: { bottom: { color: { op: 'isNot', value: 'rgb(11, 21, 31)' } } } },
+                ],
+            },
             'autocomplete-closed': {
                 standalone: [
                     {
