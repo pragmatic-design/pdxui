@@ -88,11 +88,13 @@ describe('script-snippet-interpolation renders what ${arg} rendered', () => {
         const alpha = "<template><p>@render tag('one') @render tag('two')</p></template>\n<script>\n@snippet tag(label: string) {\n  <span class=\"t\">${label}</span>\n}\n</script>\n";
         const migrated = fixWith(scriptSnippetInterpolation)(alpha);
         expect(migrated).toContain('<span class="t">{{ label }}</span>');
+        // What the alpha's html`` body rendered, ['one', 'two']. That body is gone (#131): unmigrated,
+        // the same source is a template whose `${label}` is text, which the control below shows.
         define('mig-snip-alpha', alpha);
         define('mig-snip-beta', migrated);
-        const before = [...(await mount('app-mig-snip-alpha')).querySelectorAll('span.t')].map(text);
+        const unmigrated = [...(await mount('app-mig-snip-alpha')).querySelectorAll('span.t')].map(text);
         const after = [...(await mount('app-mig-snip-beta')).querySelectorAll('span.t')].map(text);
-        expect(before).toEqual(['one', 'two']);
-        expect(after).toEqual(before);
+        expect(after).toEqual(['one', 'two']);
+        expect(unmigrated).toEqual(['${label}', '${label}']);
     });
 });

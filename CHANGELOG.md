@@ -472,6 +472,13 @@ semver.
 
 ### Changed
 
+- **Breaking:** a script `@snippet` whose body uses `${arg}` is a template like any other (#131): the
+  `${arg}` is its text. The alpha compiled such a body into an `html` tagged template where `${arg}`
+  was the parameter; that path is gone. `pdx migrate` rewrites each `${arg}` to `{{ arg }}`
+  (`script-snippet-interpolation`), which renders what the alpha did. Typed snippets are complete:
+  `@slot`, `@render` and `@snippet` (#489), `@generic` (#490), the library's components (#491), and the
+  alpha's scoped slots and template props removed (#492).
+
 - **Breaking:** the constructor prop form is removed from `component()` (#300). A prop is declared with
   `prop<T>(default, { type? })`, `prop.required<T>()` or `prop.optional<T>()`, and a model with
   `model<T>()`; `props: { label: { type: String, default: '' } }` written by hand is a type error, and in
