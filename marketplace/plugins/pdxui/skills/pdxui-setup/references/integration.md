@@ -52,8 +52,9 @@ is the number 3 — and `event()` an event the element dispatches. They are the 
 `props: { size: prop<'sm' | 'md'>('md'), options: prop.required<Option[]>() }` and
 `events: { changed: event<number>() }`, `ctx.size()` is `'sm' | 'md'`, `ctx.emit('changed', 'x')` is a
 type error, and so is emitting an event the component does not declare. A required prop the page
-does not set, and an undeclared event emitted anyway, are reported in development. The older form,
-`props: { start: { type: Number, default: 0 } }`, still works.
+does not set, and an undeclared event emitted anyway, are reported in development. The alpha form,
+`props: { start: { type: Number, default: 0 } }`, is removed: TypeScript refuses it, and in development
+`component()` throws naming the prop.
 
 **The trade-off, honestly:** without the compiler you don't get the sugar. You write the runtime API
 explicitly — `signal()` instead of `$signal`, `count.set(v => v + 1)` instead of `count++`,

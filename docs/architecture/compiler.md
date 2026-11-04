@@ -165,11 +165,11 @@ Two cases leave code as written:
 The code generator takes the template's AST, the script analysis and the rewritten code, and produces the final JavaScript module. The result is always a call to `component()`:
 
 ```javascript
-import { component, html, signal, useHead } from '@pdxui/core';
+import { component, html, prop, signal, useHead } from '@pdxui/core';
 
 component('pdx-counter', {
     props: {
-        label: { type: String, default: 'Hello' },
+        label: prop('Hello', { type: String }),
     },
     setup(ctx) {
         useHead({ title: 'Counter Example' });

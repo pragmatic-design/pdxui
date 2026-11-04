@@ -8,6 +8,7 @@ import { html } from '../../src/renderer/template';
 import { each } from '../../src/renderer/helpers';
 import { component } from '../../src/component/component';
 import type { Signal } from '../../src/utils/types';
+import { prop } from '../../src/component/component-descriptor';
 
 function measure(label: string, fn: () => void): number {
     const start = performance.now();
@@ -156,7 +157,7 @@ describe('benchmarks', () => {
         let tagId = 900;
         const tag = `bench-comp-${tagId++}`;
         component(tag, {
-            props: { n: { type: Number, default: 0 } },
+            props: { n: prop(0) },
             setup(ctx) {
                 const count = signal((ctx.n as Signal<number>).peek());
                 return { count, inc: () => count.set((v: number) => v + 1) };

@@ -88,7 +88,7 @@ describe('compile with external src=', () => {
             [],
             mockResolver
         );
-        expect(code).toContain("label: { type: String, default: 'Counter' }");
+        expect(code).toContain("label: prop('Counter', { type: String })");
         expect(code).toContain('__count');
         expect(code).toContain('inc');
     });

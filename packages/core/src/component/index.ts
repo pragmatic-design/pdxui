@@ -7,7 +7,7 @@ export type { Context, ContextValue } from './context';
 export { setPermissions, hasPermission, requirePermission } from './permissions';
 export { responsive } from './responsive';
 export { device } from './device';
-export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, PropDefinition, TypedProp, ComponentDeclarations, EventMap, HostOf } from './component';
+export type { ComponentOptions, ComponentOptionsWithSetup, ComponentContext, PropMap, ComponentDeclarations, EventMap, HostOf } from './component';
 export { prop, event, model, slot } from './component-descriptor';
 export type { PropType, PropSpec, PropOptions, EventSpec, ModelSpec, ModelOptions, SlotSpec, EventDetail, EmitOf } from './component-descriptor';
 export type { Breakpoint, BreakpointMap } from './responsive';

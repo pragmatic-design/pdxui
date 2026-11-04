@@ -5,6 +5,7 @@ import { signal, effect } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import { component } from '../src/component/component';
 import { __pdx_debug, setTelemetryLevel } from '../src/debug/inspector';
+import { prop } from '../src/component/component-descriptor';
 
 // Enable full telemetry for debug tests
 beforeEach(() => setTelemetryLevel(2));
@@ -105,7 +106,7 @@ describe('component tree', () => {
     it('includes attributes as props', () => {
         const tag = `test-debug-${tagId++}`;
         component(tag, {
-            props: { label: { type: String, default: '' } },
+            props: { label: prop('') },
             render: () => html`<span>Test</span>`,
         });
 

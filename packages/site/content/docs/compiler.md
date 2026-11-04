@@ -41,7 +41,7 @@ function reset() { count = 5; }
 and here is what the compiler emits for it — not a paraphrase, the actual output:
 
 ```js
-import { bindInterpolation, component, computed, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
+import { bindInterpolation, component, computed, prop, signal, staticBlock, staticMarkup, store } from '@pdxui/core';
 
 // the template's static markup, as HTML → parsed once, on first render, then copied;
 // each <!----> is an empty text node the render binds
@@ -50,7 +50,7 @@ const __blk0=staticBlock(staticMarkup('<div><!----> <!----> <!----></div>'));
 const __walk0=(r)=>{const __el0=r.firstChild;const __t1=__el0.firstChild;const __t2=__t1.nextSibling.nextSibling;const __t3=__t2.nextSibling.nextSibling;return [__t1,__t2,__t3];};
 component('app-counter', {
   props: {
-    label: { type: String, default: 'Hello' }        // @prop → declared prop + attribute sync
+    label: prop('Hello', { type: String })           // @prop → declared prop + attribute sync
   },
   events: { 'changed': {} },                         // @event → declared in the descriptor
   setup(ctx) {

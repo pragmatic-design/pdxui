@@ -31,8 +31,8 @@ describe('the three forms', () => {
     });
     it('the descriptor marks the required one, which core reports in development when it is not set', () => {
         const { code } = compile(child("@prop id: string;\n@prop hint?: string;"), 'card.pdx');
-        expect(code).toMatch(/id: \{ type: String, required: true \}/);
-        expect(code).toMatch(/hint: \{ type: String \}/);
+        expect(code).toContain('id: prop.required({ type: String })');
+        expect(code).toContain('hint: prop.optional({ type: String })');
     });
     it('the .d.ts makes the required one required', () => {
         const dts = generateDts({ tag: 'pdx-card', props, events: [], slots: [] });
@@ -114,7 +114,8 @@ describe('pdx migrate', () => {
         expect(out).toContain('@prop cb?: (v: string) => void;');
         expect(out).toContain("@model value: string = '';");
         expect(change!.detect(src).map(f => f.found)).toEqual(['@prop id: string;', '@prop items: Array<{ a: number }>;', '@prop cb: (v: string) => void;']);
-        const before = compile(src.replace(/required: true/g, ''), 'card.pdx').code.replace(/, required: true/g, '');
+        // The same module, but for the required props: a required one is prop.required, an optional one prop.optional.
+        const before = compile(src, 'card.pdx').code.replace(/prop\.required\(/g, 'prop.optional(');
         expect(compile(out, 'card.pdx').code).toBe(before);
     });
 });

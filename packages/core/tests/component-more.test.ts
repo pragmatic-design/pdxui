@@ -7,6 +7,7 @@ import { html } from '../src/renderer/template';
 import { component, __pdx_hmr_save, __pdx_hmr_restore } from '../src/component/component';
 import { onPropsChange, onError } from '../src/component/lifecycle';
 import type { Signal } from '../src/utils/types';
+import { prop } from '../src/component/component-descriptor';
 
 let tagId = 0;
 const uniqueTag = () => `more-comp-${tagId++}`;
@@ -48,7 +49,7 @@ describe('property-only prop types', () => {
         const tag = uniqueTag();
         let seen: unknown;
         component(tag, {
-            props: { items: { type: Array, default: [] } },
+            props: { items: prop<unknown[]>([]) },
             setup: (ctx) => { seen = (ctx.items as Signal<unknown[]>)(); return {}; },
             render: () => html`<p></p>`,
         });
@@ -64,7 +65,7 @@ describe('property-only prop types', () => {
         const tag = uniqueTag();
         let fn: unknown;
         component(tag, {
-            props: { renderer: { type: Function, default: null } },
+            props: { renderer: prop<((...args: unknown[]) => unknown) | null>(null, { type: Function }) },
             setup: (ctx) => { fn = ctx.renderer; return {}; },
             render: () => html`<p></p>`,
         });
@@ -80,7 +81,7 @@ describe('property-only prop types', () => {
     it('an Object prop is not observed as an attribute', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { config: { type: Object, default: null } },
+            props: { config: prop<Record<string, unknown> | null>(null) },
             render: () => html`<p></p>`,
         });
         const ctor = customElements.get(tag)!;
@@ -93,8 +94,8 @@ describe('property-only prop types', () => {
         const got: Record<string, unknown> = {};
         component(tag, {
             props: {
-                s: { type: String }, n: { type: Number }, b: { type: Boolean },
-                o: { type: Object }, a: { type: Array }, f: { type: Function },
+                s: prop.optional<string>({ type: String }), n: prop.optional<number>({ type: Number }), b: prop.optional<boolean>({ type: Boolean }),
+                o: prop.optional<Record<string, unknown>>({ type: Object }), a: prop.optional<unknown[]>({ type: Array }), f: prop.optional<((...args: unknown[]) => unknown)>({ type: Function }),
             },
             setup: (ctx) => {
                 for (const k of ['s', 'n', 'b', 'o', 'a', 'f']) got[k] = (ctx as unknown as Record<string, Signal<unknown>>)[k]();
@@ -111,7 +112,7 @@ describe('property-only prop types', () => {
         const tag = uniqueTag();
         const seen: unknown[] = [];
         component(tag, {
-            props: { config: { type: Object, default: null } },
+            props: { config: prop<Record<string, unknown> | null>(null) },
             setup: (ctx) => { seen.push((ctx.config as Signal<unknown>)()); return {}; },
             render: () => html`<p></p>`,
         });
@@ -129,7 +130,7 @@ describe('setting a prop back to null', () => {
     it('returns it to its declared default rather than storing null', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { label: { type: String, default: 'fallback' } },
+            props: { label: prop('fallback') },
             render: (ctx) => html`<p>${ctx.label}</p>`,
         });
 
@@ -147,7 +148,7 @@ describe('onPropsChange', () => {
         const tag = uniqueTag();
         const changes: { name: string; oldValue: unknown; newValue: unknown }[] = [];
         component(tag, {
-            props: { label: { type: String, default: 'a' } },
+            props: { label: prop('a') },
             setup: () => { onPropsChange((c) => changes.push(...c)); return {}; },
             render: (ctx) => html`<p>${ctx.label}</p>`,
         });
@@ -166,7 +167,7 @@ describe('onPropsChange', () => {
         const tag = uniqueTag();
         const changes: unknown[] = [];
         component(tag, {
-            props: { label: { type: String, default: 'a' } },
+            props: { label: prop('a') },
             setup: () => { onPropsChange((c) => changes.push(...c)); return {}; },
             render: (ctx) => html`<p>${ctx.label}</p>`,
         });

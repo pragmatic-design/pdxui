@@ -13,11 +13,12 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { html, signal, component } from '../src/index';
 import { waitFor } from '../src/testing/index';
+import { prop } from '../src/component/component-descriptor';
 
 component('probe-native-getter', {
     props: {
-        offsetTop: { type: Number, default: 0 },
-        prefix: { type: String, default: '' },
+        offsetTop: prop(0),
+        prefix: prop(''),
     },
     setup: () => ({}),
     render: (ctx) =>

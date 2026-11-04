@@ -160,42 +160,15 @@ function extractProps(optionsObj, sourceFile, tag) {
     for (const decl of propsProp.initializer.properties) {
         if (!ts.isPropertyAssignment(decl)) continue;
         const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
+        // A prop is a descriptor (#300): `prop<T>(…)`, `prop.required<T>()`, `prop.optional<T>()`.
         const built = builtProp(decl.initializer, sourceFile);
-        if (built) {
-            // `@type` on the prop's JSDoc wins here too, as it does for the constructor form below.
-            const declared = jsdocDeclaredType(decl, sourceFile);
-            props.push({ name, ...built, ...(declared ? { type: declared } : {}), description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
-            continue;
-        }
-        if (!ts.isObjectLiteralExpression(decl.initializer)) continue;
-        let type = 'string';
-        let def;
-        let enumType = null;   // an `enum: [...]` field → string-literal union (drives playground dropdown + IntelliSense)
-        let iconName = false;  // `iconName: true` → the value names an icon: the compiler imports a literal one (#47)
-        for (const field of decl.initializer.properties) {
-            if (!ts.isPropertyAssignment(field)) continue;
-            const key = field.name.getText(sourceFile);
-            if (key === 'type') {
-                const t = field.initializer.getText(sourceFile);
-                type = TYPE_MAP[t] ?? t.toLowerCase();
-            } else if (key === 'default') {
-                def = field.initializer.getText(sourceFile);
-            } else if (key === 'enum' && ts.isArrayLiteralExpression(field.initializer)) {
-                const lits = field.initializer.elements.filter(e => ts.isStringLiteralLike(e)).map(e => `'${e.text}'`);
-                if (lits.length >= 2) enumType = lits.join(' | ');
-            } else if (key === 'iconName') {
-                iconName = field.initializer.kind === ts.SyntaxKind.TrueKeyword;
-            }
-        }
-        // A declared `default: null` on a primitive is part of the type: the prop can hold null, and
-        // does until someone sets it (pdx-number-input's empty value).
-        if (def === 'null' && !enumType && (type === 'number' || type === 'string')) type += ' | null';
-        // `@type number | 'auto'` on the prop's JSDoc wins over the runtime constructor. A prop that
+        if (!built) continue;
+        // `@type number | 'auto'` on the prop's JSDoc wins over the type the builder says. A prop that
         // accepts two shapes has to be DECLARED as one of them — `columns` is String so the word
         // survives the attribute — and without this the catalogue would say `string` beside prose
         // promising a number, leaving an agent no way to know which one the code believes.
-        const declaredType = jsdocDeclaredType(decl, sourceFile);
-        props.push({ name, type: declaredType || enumType || type, runtime: type, default: def, iconName, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
+        const declared = jsdocDeclaredType(decl, sourceFile);
+        props.push({ name, ...built, ...(declared ? { type: declared } : {}), description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
     }
     return props;
 }

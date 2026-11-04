@@ -918,10 +918,10 @@ Define a function-based Web Component.
 Usage:
   component('app-counter', {
     props: {
-      initial: { type: Number, default: 0 },
+      initial: prop(0),
     },
     setup(ctx) {
-      const count = signal((ctx.initial as Signal<number>)());
+      const count = signal(ctx.initial());
       return { count, increment: () => count.set(v => v + 1) };
     },
     render: (ctx) => html`

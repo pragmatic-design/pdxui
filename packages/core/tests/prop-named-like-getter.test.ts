@@ -9,6 +9,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
+import { prop } from '../src/component/component-descriptor';
 
 let n = 0;
 const uniqueTag = () => `getter-prop-${n++}`;
@@ -18,7 +19,7 @@ afterEach(() => { document.body.innerHTML = ''; });
 function formHolder(): string {
     const tag = uniqueTag();
     component(tag, {
-        props: { form: { type: Object, default: null } },
+        props: { form: prop<Record<string, unknown> | null>(null) },
         render: (ctx) => html`<b class="shown">${() => (ctx.form() as { name?: string } | null)?.name ?? 'none'}</b>`,
     });
     return tag;
@@ -40,7 +41,7 @@ describe('a `form` prop set before connect', () => {
         // the html`` clone produced.
         if (!customElements.get('getter-prop-bound')) {
             component('getter-prop-bound', {
-                props: { form: { type: Object, default: null } },
+                props: { form: prop<Record<string, unknown> | null>(null) },
                 render: (ctx) => html`<b class="shown">${() => (ctx.form() as { name?: string } | null)?.name ?? 'none'}</b>`,
             });
         }

@@ -18,18 +18,29 @@ import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 
 // ─── Public API ────────────────────────────────────────────────────
 
-/** Build the props: { ... } object string from PropInfo array. */
+/**
+ * Core's `prop`, imported by name like every runtime name a compiled module uses. Not aliased: the
+ * site's playground runs a module by turning its core import into a destructuring, where `as` is not
+ * valid.
+ */
+export const PROP_BUILDER = 'prop';
+
+/**
+ * Build the props: { ... } object string from PropInfo array: each entry a descriptor (#300), with its
+ * runtime type always written, so the coercion is the one the analyser chose and never an inference.
+ * The caller imports `prop` (see codegen-new) when there is any.
+ */
 export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
-        const parts = [`type: ${p.runtimeType}`];
-        if (p.default !== undefined) parts.push(`default: ${defaultEntry(p.runtimeType, p.default)}`);
+        const type = `{ type: ${p.runtimeType} }`;
         // Core reports a required prop the host did not set, in development (#123, #130).
-        if (p.required) parts.push('required: true');
+        const spec = p.required ? `${PROP_BUILDER}.required(${type})`
+            : p.default !== undefined ? `${PROP_BUILDER}(${defaultEntry(p.runtimeType, p.default)}, ${type})`
+            : `${PROP_BUILDER}.optional(${type})`;
         // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
         // caller imports `wireFormModel` (see codegen-new), and an app without one does not carry it.
-        if (p.form) parts.push('form: wireFormModel');
-        return `    ${p.name}: { ${parts.join(', ')} }`;
+        return `    ${p.name}: ${p.form ? `{ ...${spec}, form: wireFormModel }` : spec}`;
     });
     return `{\n${entries.join(',\n')}\n  }`;
 }

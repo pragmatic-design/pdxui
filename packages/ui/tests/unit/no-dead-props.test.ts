@@ -81,9 +81,8 @@ function deadProps(text: string): { checked: number; dead: string[] } {
 
     let checked = 0;
     const dead: string[] = [];
-    // A prop is declared with the descriptor, `name: prop(…)` (#872), or in the constructor form a
-    // planted case below still uses, `name: { type: … }`.
-    for (const m of block[1].matchAll(/^ {8}'?([\w]+)'?:\s*(?:\{|prop\b)/gm)) {
+    // A prop is declared with the descriptor, `name: prop(…)` (#872): the constructor form is gone (#300).
+    for (const m of block[1].matchAll(/^ {8}'?([\w]+)'?:\s*prop\b/gm)) {
         const name = m[1];
         checked++;
         if (!viaHelpers.has(name) && !new RegExp(`\\b${name}\\b`).test(rest)) dead.push(`${tag}.${name}`);
@@ -95,11 +94,11 @@ describe('the scan can fail', () => {
     // Three shapes, because a scan that only ever returns [] passes the real assertion below.
     const LIVE = [
         "// pdx-probe — a header comment that names 'keyed', and must not count for it.",
-        "import { component, html } from '@pdxui/core';",
+        "import { component, html, prop } from '@pdxui/core';",
         "component('pdx-probe', {",
         '    props: {',
-        '        used: { type: String, default: null },',
-        '        keyed: { type: Boolean, default: false },',
+        '        used: prop<string | null>(null, { type: String }),',
+        '        keyed: prop(false),',
         '    },',
         '    setup(ctx) {',
         "        const ns = 'http://www.w3.org/2000/svg'; const k = (ctx as any)['keyed'];",
@@ -109,26 +108,26 @@ describe('the scan can fail', () => {
     ].join('\n');
 
     it('sees a prop that is never mentioned again', () => {
-        const planted = LIVE.replace('        used: {', '        forgotten: { type: String, default: null },\n        used: {');
+        const planted = LIVE.replace('        used: prop', '        forgotten: prop<string | null>(null, { type: String }),\n        used: prop');
         expect(deadProps(planted).dead).toContain('pdx-probe.forgotten');
     });
 
     it('sees a prop that is only mentioned in a comment', () => {
         const planted = LIVE
-            .replace('        used: {', '        promised: { type: Boolean, default: false },\n        used: {')
+            .replace('        used: prop', '        promised: prop(false),\n        used: prop')
             .replace('    setup(ctx) {', '    setup(ctx) {\n        // promised propagation — a word, not a read.\n        /* promised, again */');
         expect(deadProps(planted).dead).toEqual(['pdx-probe.promised']);
     });
 
     it('counts a shared helper that reads the prop, and not the same helper named in a comment', () => {
-        const withName = LIVE.replace('        used: {', '        name: { type: String, default: null },\n        used: {');
+        const withName = LIVE.replace('        used: prop', '        name: prop<string | null>(null, { type: String }),\n        used: prop');
         expect(deadProps(withName.replace('    setup(ctx) {', '    setup(ctx) {\n        reflectNameToHost(ctx);')).dead).toEqual([]);
         expect(deadProps(withName.replace('    setup(ctx) {', '    setup(ctx) {\n        // reflectNameToHost(ctx) one day')).dead)
             .toEqual(['pdx-probe.name']);
     });
 
     it('counts a model declared { form: true } as reading value, and not the words in a comment', () => {
-        const withValue = LIVE.replace('        used: {', '        value: { type: String, default: null },\n        used: {');
+        const withValue = LIVE.replace('        used: prop', '        value: prop<string | null>(null, { type: String }),\n        used: prop');
         expect(deadProps(withValue.replace('    props: {', '    models: { on: model(false, { form: true }) },\n    props: {')).dead).toEqual([]);
         expect(deadProps(withValue.replace('    props: {', '    // one day: form: true\n    props: {')).dead)
             .toEqual(['pdx-probe.value']);
@@ -143,8 +142,8 @@ describe('the scan can fail', () => {
     });
 
     it('sees a prop declared with the descriptor, prop<T>() and prop.optional<T>()', () => {
-        const planted = LIVE.replace('        used: {',
-            "        forgotten: prop<'a' | 'b'>('a'),\n        unset: prop.optional<number>({ type: Number }),\n        used: {");
+        const planted = LIVE.replace('        used: prop',
+            "        forgotten: prop<'a' | 'b'>('a'),\n        unset: prop.optional<number>({ type: Number }),\n        used: prop");
         expect(deadProps(planted).dead).toEqual(['pdx-probe.forgotten', 'pdx-probe.unset']);
     });
 });

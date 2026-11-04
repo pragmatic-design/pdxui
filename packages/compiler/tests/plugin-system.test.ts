@@ -29,7 +29,7 @@ describe('compiler plugin system', () => {
         };
 
         const { code } = compile(minimalPdx, 'test.pdx', [plugin]);
-        expect(code).toContain("extra: { type: String, default: \"injected\" }");
+        expect(code).toContain("extra: prop(\"injected\", { type: String })");
     });
 
     it('analyzeScript hook can augment analysis', () => {

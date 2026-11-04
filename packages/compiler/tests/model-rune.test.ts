@@ -26,7 +26,7 @@ for (const [name, opts] of Object.entries({ dev: {}, build: { production: true }
     describe(`@model — ${name}`, () => {
         it('goes into the descriptor\'s models, not its props', () => {
             const { code } = compile(sfc(FIELD), 'field.pdx', [], undefined, opts);
-            expect(code).toMatch(/models: \{\s*value: \{ type: String, default: '' \}\s*\}/);
+            expect(code).toMatch(/models: \{\s*value: prop\('', \{ type: String \}\)\s*\}/);
             const props = code.match(/props: (\{[\s\S]*?\n {2}\}|\{\})/)?.[1] ?? '';
             expect(props).toContain('label');
             expect(props).not.toContain('value');
@@ -182,7 +182,7 @@ describe('@model … { form }', () => {
     for (const [name, opts] of Object.entries({ dev: {}, build: { production: true } })) {
         it(`goes into the descriptor with core's form wiring, imported — ${name}`, () => {
             const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, opts);
-            expect(code).toMatch(/models: \{\s*value: \{ type: String, default: '', form: wireFormModel \}\s*\}/);
+            expect(code).toMatch(/models: \{\s*value: \{ \.\.\.prop\('', \{ type: String \}\), form: wireFormModel \}\s*\}/);
             expect(code).toMatch(/import \{[^}]*\bwireFormModel\b[^}]*\} from '@pdxui\/core'/);
         });
     }
@@ -204,7 +204,7 @@ describe('@model … { form: () => expr }', () => {
 
     it('compiles to ctx.formValue with the expression, its signals rewritten as the script\'s are', () => {
         const { code } = compile(sfc("@model value: string | null = null { form: () => value ?? '' };\nlet extra = $signal('x');\n@model other: string = '' { form: () => other + extra };"), 'field.pdx', [], undefined, {});
-        expect(code).toMatch(/models: \{\s*value: \{[^}]*form: wireFormModel/);
+        expect(code).toMatch(/models: \{\s*value: \{ \.\.\.prop\([^\n]*\), form: wireFormModel/);
         // Optional: with no ElementInternals (happy-dom) core installs no formValue, and setup must not throw.
         expect(code).toContain("ctx.formValue?.(() => __value() ?? '');");
         expect(code).toContain('ctx.formValue?.(() => __other() + __extra());');

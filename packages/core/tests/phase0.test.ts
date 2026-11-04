@@ -6,6 +6,7 @@ import { html } from '../src/renderer/template';
 import { announce, destroyAnnouncer } from '../src/a11y/announcer';
 import { focusFirst, focusLast, saveFocus, getFocusableElements } from '../src/a11y/focus';
 import { roving } from '../src/a11y/roving';
+import { prop } from '../src/component/component-descriptor';
 
 // ═══════════════════════════════════════════════════════════════
 // 0.1: Form-Associated Custom Elements
@@ -14,7 +15,7 @@ import { roving } from '../src/a11y/roving';
 describe('Form-Associated CE', () => {
     it('component with formAssociated creates ElementInternals', () => {
         component('pdx-test-input-fa', {
-            props: { value: { type: String, default: '' } },
+            props: { value: prop('') },
             formAssociated: true,
             setup(ctx) {
                 return { value: ctx.value };

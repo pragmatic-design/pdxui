@@ -257,8 +257,8 @@ describe('gen-manifest reads the descriptor\'s generics (#651)', () => {
         "component('pdx-widget', {",
         "    generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },",
         '    props: {',
-        '        items: { type: Array, default: [] },',
-        "        label: { type: String, default: '' },",
+        '        items: prop([]),',
+        "        label: prop(''),",
         '    },',
         '    slots: {',
         '        item: slot<(item: T, index: number) => Node>(),',
@@ -288,7 +288,7 @@ describe('gen-manifest reads the descriptor\'s generics (#651)', () => {
     // #853: a list fed by a DataSource infers `T` from it, as one fed by an array does from `:items`.
     const withSource = source
         .replace("from: 'items' }", "from: 'items', source: 'source' }")
-        .replace("        label:", "        source: { type: Object, default: null },\n        label:");
+        .replace("        label:", "        source: prop(null),\n        label:");
 
     it('types the DataSource prop it is also inferred from as a DataSource of it', () => {
         expect(field('source', withSource).type).toEqual({ text: "import('@pdxui/core').DataSource<T> | null" });

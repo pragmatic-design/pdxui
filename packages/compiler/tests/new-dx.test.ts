@@ -129,8 +129,8 @@ describe('compile new mode', () => {
 </script>`, 'counter.pdx');
 
         // Props generated correctly
-        expect(code).toContain("label: { type: String, default: 'Counter' }");
-        expect(code).toContain('initial: { type: Number, default: 0 }');
+        expect(code).toContain("label: prop('Counter', { type: String })");
+        expect(code).toContain('initial: prop(0, { type: Number })');
 
         // Signal declaration with debug name
         expect(code).toContain('__count = signal(');

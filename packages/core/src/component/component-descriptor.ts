@@ -7,37 +7,31 @@
 //     …
 //   });
 //
-// A builder returns what `component()` already reads at runtime — a prop is a PropDefinition, with the
-// runtime type an attribute is coerced to — and carries the TypeScript type the context is typed from.
+// A builder returns what `component()` reads at runtime — a prop's runtime type, which an attribute is
+// coerced to, and its default — marked as a builder's, and carries the TypeScript type the context is
+// typed from. The constructor form, `{ type: String, default: '' }` written by hand, is gone (#300).
 // `states` are the host's custom states, set with `ctx.state` (#132); `host` its attributes and
 // listeners (#133); `parts` its public elements, for the manifest (#134); `models` the props it may
 // write, which `::name` binds both ways (#124). `slots`, `expose` and `variants` are part of the
 // descriptor's type now; each gets its behaviour in its own issue (docs/language/beta/components.md).
 
 import { wireFormModel } from '../form/form-model';
+import { PROP_SPEC } from './prop-spec';
 
 /** The runtime type an attribute value is coerced to. Object, Array and Function are property-only. */
 export type PropType = typeof String | typeof Number | typeof Boolean | typeof Object | typeof Array | typeof Function;
 
-/** A prop as `component()` reads it: its runtime type and its default. */
-export interface PropDefinition {
-    type: PropType;
+/** A prop declared with {@link prop}: its runtime type and default, typed as `T`, possibly required. */
+export interface PropSpec<T> {
+    /** The runtime type an attribute is coerced to. */
+    readonly type: PropType;
     /** The default, or for an Array or Object prop a factory called once per instance. */
-    default?: unknown;
-}
-
-/**
- * A prop whose TypeScript type is `T`. Written by hand on a constructor-form prop
- * (`{ type: Array, default: null } as TypedProp<Item[] | null>`), or returned by {@link prop}.
- */
-export interface TypedProp<T> extends PropDefinition {
-    readonly __brand?: T;
-}
-
-/** A prop declared with {@link prop}: typed, and possibly required. */
-export interface PropSpec<T> extends TypedProp<T> {
+    readonly default?: unknown;
     /** No default: a host that does not set it is reported in development. */
     readonly required?: boolean;
+    /** Made by a builder; an object literal does not have it, so it is not a prop declaration. */
+    readonly [PROP_SPEC]: true;
+    readonly __brand?: T;
 }
 
 /** Options of {@link prop}. */
@@ -73,12 +67,12 @@ function inferType(value: unknown): PropType {
  */
 function propBuilder<T>(defaultValue?: T | (() => T), options?: PropOptions): PropSpec<T> {
     const type = options?.type ?? inferType(defaultValue);
-    return defaultValue === undefined ? { type } : { type, default: defaultValue };
+    return defaultValue === undefined ? { type, [PROP_SPEC]: true } : { type, default: defaultValue, [PROP_SPEC]: true };
 }
 
 /** A prop of type `T` with no default, that the host must set: reported in development when it does not. */
 function requiredProp<T>(options?: PropOptions): PropSpec<T> {
-    return { type: options?.type ?? Object, required: true };
+    return { type: options?.type ?? Object, required: true, [PROP_SPEC]: true };
 }
 
 /**
@@ -86,7 +80,7 @@ function requiredProp<T>(options?: PropOptions): PropSpec<T> {
  * type's empty value (`''`, `0`, `false`, `null`, `[]`), and is not reported.
  */
 function optionalProp<T>(options?: PropOptions): PropSpec<T | undefined> {
-    return { type: options?.type ?? Object };
+    return { type: options?.type ?? Object, [PROP_SPEC]: true };
 }
 
 /** Declare a prop: `prop<T>(default, { type? })`, `prop.required<T>({ type? })` or `prop.optional<T>({ type? })`. */
