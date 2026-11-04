@@ -39,7 +39,10 @@ function pilotRedirect(): Plugin {
     };
 }
 
-/** The redirect, and the compiler for the .pdx it redirects to. */
-export function pilotPlugins(): Plugin[] {
-    return [pilotRedirect(), ...pdx({ prefix: 'pdx' })];
+/**
+ * The redirect, and the compiler for the .pdx it redirects to. `options` go to `pdx()` beside the
+ * prefix: the mount scenario builds with `devtools: false`, as an app ships (#685).
+ */
+export function pilotPlugins(options: Omit<Parameters<typeof pdx>[0] & object, 'prefix'> = {}): Plugin[] {
+    return [pilotRedirect(), ...pdx({ ...options, prefix: 'pdx' })];
 }

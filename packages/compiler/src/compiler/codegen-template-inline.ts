@@ -19,6 +19,8 @@ import { BindingDedup } from './inline-dedup';
 import { buildEventHandler, buildScopedEventHandler, dynamicComponentCall, rewriteTwoWayAccessor } from './codegen-template-rewrite';
 import { expandAttributeForms, gestureOf, gestureValue, type Gesture } from './codegen-attribute-forms';
 import { isSingleElementBody, withoutEdgeWhitespace } from './show-single-element';
+import { soleControlFlow } from './inline-sole-block';
+import { hasNativeProperty } from './native-properties';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
@@ -220,6 +222,11 @@ class InlineGen {
     private pending = '';
     /** The condition of a one-element `@show`, bound on the next element opened (#129). */
     private showNext: string | null = null;
+    /**
+     * Set (to null) when this generator writes a block that is one control-flow node alone: `place`
+     * then records the node's expression here instead of putting it in the markup (#685).
+     */
+    private sole: string | null | undefined = undefined;
     private out(line: string): void {
         if (!this.tree.discarding()) this.lines.push(this.pending + line);
         this.pending = '';
@@ -232,6 +239,8 @@ class InlineGen {
      */
     private place(expr: string, guard = false): void {
         if (this.tree.discarding()) return;
+        // A block that is this node alone returns it, unplaced (`soleBlock`, #685).
+        if (this.sole !== undefined && !guard) { this.sole = expr; return; }
         const m = this.v('m');
         this.tree.anchor(m);
         this.out(guard
@@ -625,6 +634,9 @@ class InlineGen {
         const plainProperty = url
             ? property
             : `const __v = ${value}; if (__v == null) clearBoundProperty(${el}, ${jsString(prop)}, ${p}); else ${el}[${p}] = __v;`;
+        // An element that certainly has the property answers `in` with yes every time: the attribute
+        // branch never runs, and the question is not written (native-properties.ts, #685).
+        if (hasNativeProperty(kind.tag, propName(prop, kind))) return plainProperty;
         return `if (${p} in ${el}) { ${plainProperty} } else { ${this.attributeWrite(el, prop, value, url)} }`;
     }
 
@@ -804,6 +816,20 @@ class InlineGen {
         // A block inside an <svg> builds SVG elements too.
         // A block placed in a table-internal element — a @for row in <tbody> — is table-internal too.
         const g = new InlineGen(this.imports, this.idx, this.ctx, this.childrenSvg(), this.hoists, this.inTable(), opaque || this.opaque());
+        const sole = soleControlFlow(nodes);
+        if (sole) {
+            g.sole = null;
+            g.walk([sole.node]);
+            this.idx = g.idx;
+            for (const t of g.tags) this.tags.add(t);
+            // Whitespace-only text is one space, and none in a table-internal element (`html`).
+            const edges = this.inTable() ? [] : sole.edges;
+            const placed = g.sole ?? 'document.createDocumentFragment()';
+            const result = edges.length === 0
+                ? `return ${placed};`
+                : `const __frag=document.createDocumentFragment();__frag.append(${[edges.includes('lead') ? "' '" : '', placed, edges.includes('trail') ? "' '" : ''].filter(Boolean).join(',')});return __frag;`;
+            return { code: `${g.lines.join('')}${result}`, tags: g.tags };
+        }
         g.walk(nodes);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);

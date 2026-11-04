@@ -15,7 +15,11 @@
  *     10,000 rows and one theme of @pdxui/design (#245);
  *   - `benchmark`, the js-framework-benchmark app, built from `scripts/bench-jfb/` with its own
  *     `vite.config.js`, so what is weighed here is the app `pnpm bench:jfb` measures. Its output goes
- *     under this package, not into `scripts/`.
+ *     under this package, not into `scripts/`;
+ *   - `pilot-ts` and `pilot-pdx`, under `scenarios/pilot-mount/`: one page that mounts the `.pdx`
+ *     pilot's components, built with the library's TypeScript components and with the pilot's `.pdx`
+ *     rewrites in their place (`vite.pilot.config.ts`), timed against each other by
+ *     `scenario-pilot-mount.spec.ts` (#685).
  *
  * Every build lands in `scenarios/dist/<name>/` (ignored by git), emptied first: a stale build would
  * be weighed as if it were today's.
@@ -39,6 +43,8 @@ export const SCENARIOS: { name: string; root: string; config: string }[] = [
     { name: 'crud', root: join(packageDir, 'scenarios', 'crud'), config: 'vite.config.ts' },
     { name: 'dashboard', root: join(packageDir, 'scenarios', 'dashboard'), config: 'vite.config.ts' },
     { name: 'benchmark', root: join(repoDir, 'scripts', 'bench-jfb'), config: 'vite.config.js' },
+    { name: 'pilot-ts', root: join(packageDir, 'scenarios', 'pilot-mount'), config: 'vite.config.ts' },
+    { name: 'pilot-pdx', root: join(packageDir, 'scenarios', 'pilot-mount'), config: 'vite.pilot.config.ts' },
 ];
 
 export default async function buildScenarios(): Promise<void> {

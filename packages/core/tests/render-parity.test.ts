@@ -313,6 +313,13 @@ const ROWS: Row[] = [
     // The alpha outlet was a literal <slot> element on the inline path, around its default (#200); its
     // beta form is an optional snippet's fallback (#492).
     { name: 'an optional snippet with its fallback', expected: '<em>none</em>', template: '@render cell?.(r) @else { <em>none</em> }', script: '@slot cell?: (row: number);\nlet r = $signal(1);' },
+    // A row that is one @if chain returns the chain, with no marker block of its own (#685): the
+    // three branches render where the rows are, in their order.
+    {
+        name: 'an @if chain as a @for row', expected: '<ul><li>a</li><li>b</li><li>c</li></ul>',
+        template: "<ul>@for (rows as r; track r.k) { @if (r.t === 'a') { <li>a</li> } @else if (r.t === 'b') { <li>b</li> } @else { <li>c</li> } }</ul>",
+        script: "let rows = $signal([{ k: 1, t: 'a' }, { k: 2, t: 'b' }, { k: 3, t: 'c' }]);",
+    },
     // Neither path wired the gesture: on the template path the handler ran once at render and the count
     // read NaN, on the inline path `.left` was a key filter (#99). Swiped left, both count 1.
     {
