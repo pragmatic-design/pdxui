@@ -1,6 +1,6 @@
 // awaitBlock() — what `@await (x as name) { … } @loading { … } @error (e, retry) { … }` compiles to (#145).
 //
-// The beta spec (docs/language/beta/template.md → «`@await` — on a resource, with `as`»; data.md, E4
+// The beta spec (docs/language/template.md → «`@await`, `@loading`, `@error`»; data.md, E4
 // and E5): `@await` understands a source that speaks the async vocabulary — `state()`, `data()`,
 // `error()`, `refetch()` — as well as a promise, binds the result in the body, and decides by the
 // state, never by the value's truthiness. `{ minMs, maxMs }`: `minMs` is a delay before `@loading`,

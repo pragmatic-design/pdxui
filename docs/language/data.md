@@ -5,6 +5,78 @@ from a server, `@form` holds what a user enters, `@store` makes a file a store s
 app, and `$store` is a deep reactive object. Each one is a statement of a `<script>`
 ([script.md](script.md)) that the analyzer reads line by line, starting at the beginning of the line.
 
+## The async vocabulary and its execution contract
+
+Every asynchronous source speaks **one vocabulary** (#141), so a template written against one works
+against the others: a resource (`@fetch`, `resource()`), `useQuery`, a mutation (`mutation()`,
+`@action`) and a route loader (`@loader`) all expose
+
+| Member | Meaning |
+|---|---|
+| `data(): T \| undefined` | the last successful value (a mutation: its last result) |
+| `error(): Error \| null` | the last error, cleared by the next success |
+| `state(): 'idle' \| 'pending' \| 'success' \| 'error'` | where the source is |
+| `pending(): boolean` | any request in flight, first load or refresh |
+| `stale(): boolean` | resource, `useQuery` and route loader (not a mutation or an action): the data shown is no longer known to be current |
+
+A refresh with data is `state() === 'success' && pending()`. An optimistic value is `data()` until
+the request settles. `stale()`, for the three sources that cache:
+
+| Situation | `data()` | `stale()` | `state()` |
+|---|---|---|---|
+| never loaded, or first load in flight | `undefined` | `false` | `'idle'` / `'pending'` |
+| loaded, younger than `staleTime`, not invalidated | the value | `false` | `'success'` |
+| loaded, older than `staleTime` (with `staleTime: 0`, as soon as a consumer mounts on the key or selects it again) | the kept value | `true` | `'success'` |
+| invalidated (an `invalidate` that matches it) | the kept value | `true` | `'success'` |
+| refreshing a stale or invalidated value | the kept value | `true` until the new value arrives | `'success'`, `pending()` true |
+| refreshing a fresh value (`refetch()` by hand) | the kept value | `false` | `'success'`, `pending()` true |
+| a refresh failed, a value was kept | the kept value | `true` | `'error'` |
+| refreshing again after a failed refresh | the kept value | `true` | `'error'`, `pending()` true |
+| a first load failed | `undefined` | `false` | `'error'` |
+| a failed first load waiting for or running its retry | `undefined` | `false` | `'pending'` |
+
+A new success sets `stale()` to `false`, clears `error()` and restarts the `staleTime` clock; nothing
+else clears `error()`, and a request starting does not. A retry is part of its request: while it waits
+or runs, `pending()` is true and `state()` is the row's. The alpha names (`loading`, `isPending`,
+`status`, `isLoading`, the extra `state` values) are removed forms ([migration.md](migration.md)).
+
+The vocabulary says what a source shows; the **execution contract** says what it does when requests
+overlap, fail, are cancelled or outlive their consumer. It holds for every source that reads, and
+where it says so for an `@action`. It adds no syntax.
+
+| # | Rule | |
+|---|---|---|
+| E1 | **Latest wins.** A response for a request that is no longer the current one for its source — the key changed, or a newer request started — writes nothing: not `data()`, not `error()`, not `state()`, not the cache. | alpha (a generation per request, `resource.ts`) |
+| E2 | **Cancellation reaches the transport.** Each request has an `AbortSignal`, passed to the HTTP client by `@fetch` and as `{ signal }` to a `resource(fetcher)`; a request superseded (E1), cancelled or disposed is aborted on the network, not only ignored. | #256 |
+| E3 | **Cancelling is not failing.** `abort()` / `cancel()` returns the source to its last settled state and leaves `error()` as it was. A transport timeout is a failure: the client raises an `HttpTimeoutError`, which becomes `error()`. | #255 |
+| E4 | **A failed refresh keeps the data**: `state()` `'error'`, `data()` the last value, `stale()` `true`, `pending()` `false`. `@await` keeps its body. | #141, #145 |
+| E5 | **Absence is `undefined`; `null`, `0`, `false` and `''` are data.** Whether there is a result is `state()`, not the value's truthiness: a source that resolved `null` is `'success'`, and `@await` renders its body. A fetcher that resolves `undefined` settles `'success'` with no data, with a warning in development. | #141, #145 |
+| E6 | **One layer retries, and only reads.** A read source retries a network failure, a 5xx, a 408 or a 429 (honouring `Retry-After`), with backoff and jitter; its requests go out with the transport's retry off, so attempts do not multiply. Writes are not retried implicitly: the transport retries `GET`, `HEAD` and `OPTIONS` only. | #257 |
+| E7 | **Concurrent reads of one key share one request**, aborted only when its last consumer cancels or goes; a value one consumer writes — its answer, its `refetch()`, its `mutate()` — reaches the others on the key. | #258 |
+| E8 | **A read dies with its owner.** A read source created in a component's setup or a template scope is disposed with it: its request aborted, its retry chain stopped, its cache subscription released. | #254 |
+| E9 | **Every cache is bounded.** The resource cache keeps at most `maxEntries` (LRU, 200) and collects an unsubscribed entry after `gcTime` (5 min); kept-alive route pages and `<component :is @keepAlive>` instances have a maximum and an LRU ([lifecycle.md](lifecycle.md)). | #270 |
+
+Polling and the refetch on focus or reconnect (`useQuery`) never start a request while one is in flight
+for the key — they join it (E7) — and pause while their scope is suspended, a frozen route page, and
+while the document is hidden (#259).
+
+One shared suite, `packages/core/tests/async-contract.test.ts`, holds the rules against `resource()`,
+a compiled `@fetch`, `useQuery` and a loader:
+1. key A then key B, A answering after B: `data()` is B's, and the cache holds nothing for A from that
+   request;
+2. a superseded, cancelled or disposed request has its `AbortSignal` aborted;
+3. `abort()` during a first load gives `'idle'` and `error()` `null`, during a refresh `'success'` with
+   the data kept; a transport timeout gives `'error'` with an `HttpTimeoutError`;
+4. a refresh that fails gives `'error'`, the data kept, `stale()` true, `pending()` false, and `@await`
+   keeps the body;
+5. a fetcher that resolves `null`, `0` or `false` gives `'success'`, and the body renders that value;
+6. a read that fails twice then succeeds with `retry: 2` makes three transport calls; an action whose
+   `PUT` fails makes one;
+7. two components mounting with the same key make one transport call and both receive the value; the
+   request goes on when the first unmounts and is aborted when the second does;
+8. a component with `@fetch` destroyed brings its cache subscription count to zero, and the entry is
+   collected after `gcTime`.
+
 ## Fetching
 
 ### @fetch
@@ -176,6 +248,27 @@ built yet.
   each such action with its `agent`, `consequential` and the JSON schema of its input.
 - In the editor `save` is core's `Mutation`, typed by the first parameter and by what the body
   returns: `save.execute(1)` on an action that takes a `Dto` is a type error.
+- **Concurrency** (#500 in `mutation()`, #501 for the rune), what a call made while another is pending does:
+
+  | `concurrency` | A call while one is pending | For |
+  |---|---|---|
+  | `'queue'` (default) | runs after it, in call order; a rejection does not stop the next | ordered writes: a list of edits |
+  | `'drop'` | is ignored; `execute()` returns the pending call's promise | a submit: a second click must not send twice |
+  | `'coalesce'` | replaces any call waiting behind the running one; the running one is not touched | autosave: only the latest draft needs to reach the server |
+  | `'parallel'` | runs at once; `data()` and `error()` are those of the last call to settle | independent writes: toggling several rows |
+
+  Aborting the running write is never a policy: a write the server may already have applied is not
+  taken back by aborting its request; `cancel()` is the explicit way to stop one, and `{ signal }` is
+  how the body honours it. In every mode `pending()` is true while any call runs or waits,
+  `optimistic` is applied when a call starts, not when it is queued, and rolled back if that call
+  fails, and `invalidate` runs after each success; a coalesced call settles with the call that
+  replaced it. Under `'parallel'` a rollback restores only what the failing call changed: each call's
+  optimistic value is an overlay. `cancel()` aborts the running call's `signal` and removes every call
+  waiting behind it; their promises reject with an `AbortError`, and none becomes `error()` (E3).
+- `<pdx-button :action>` follows the policy: under `'drop'` and `'queue'` it is `loading` and refuses
+  clicks while the action is pending; under `'coalesce'` and `'parallel'` it stays clickable and shows
+  `loading` while any call runs. The cases are `packages/core/tests/mutation-concurrency.test.ts` and
+  `packages/ui/tests/unit/button-action.test.ts`.
 
 #### Examples
 
@@ -271,7 +364,7 @@ generated from it. This is not the `parent` option, which makes a NEW form a chi
 runs sends nothing and returns the running one's. An autosave (`saveMode` other than `onSubmit`)
 whose `onFieldSave` callback returns its save's promise keeps one save per field in flight and at
 most one waiting, which starts with the field's newest value when the one in flight settles —
-rules F2 and F7 of the beta reference (#279). A submit rejected with RFC 9457 field errors (an
+rules F2 and F7 below (#279). A submit rejected with RFC 9457 field errors (an
 `errors` map of path → messages, in an `HttpError`'s body or thrown as it is) puts each message on
 the field the path names — as written, else ignoring case — and the rest in `formError()`; a field's
 clears on its next edit, and all of them when a submit starts — rule F5 (#280).
@@ -306,7 +399,18 @@ clears on its next edit, and all of them when a submit starts — rule F5 (#280)
   the markup is a second place to say it that validation does not read. `pdx migrate` flags it
   (`form-required-in-markup`).
 - A value still waiting in a `::x.debounce(ms)` binding to a field is written to it before
-  `handleSubmit` validates and before `validate()` (beta rule F6), whether or not a `submit` event started them.
+  `handleSubmit` validates and before `validate()` (rule F6), whether or not a `submit` event started them.
+- **Asynchronous validation and submit**, rules with no syntax of their own:
+
+  | # | Rule | |
+  |---|---|---|
+  | F1 | An async validator's answer is written only if the field still holds the value it was asked about. | alpha |
+  | F2 | A second submit while one is validating or submitting is dropped — `concurrency: 'drop'`, applied by the form's `handleSubmit(fn)` — and resolves when the running one does. | #279 |
+  | F3 | Submit flushes first: a debounced async validation still waiting runs now, and submit waits for every async validation of the current values before deciding. | alpha |
+  | F4 | A value that changes while submit is validating stops that submit: it returns invalid, and the user submits again. Submit never sends a value it did not validate. | #253 |
+  | F5 | When the submit handler rejects with RFC 9457 field errors, each message lands on its field's `error()`, a path with no field on `formError()`; a field's server error clears on its next edit. | #280 |
+  | F6 | A pending value from a `::x.debounce(ms)` binding is written to its field before submit validates or reads the values. | #128 |
+  | F7 | The form's autosave (`saveMode`, `saveDebounce`) is a write with the `'coalesce'` policy: a save waiting behind a running one is replaced by the newest values. | #279 |
 - A rule on a field of a rows field is parsed and dropped: `PDX_FORM_ARRAY_RULES_IGNORED`. A row's
   rules are registered by `<pdx-field-list :item-fields>`.
 - A form that no `handleSubmit(` and no `<pdx-form :form="name">` submits is `PDX_FORM_NO_SUBMIT`

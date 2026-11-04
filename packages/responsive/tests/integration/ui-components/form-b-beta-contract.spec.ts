@@ -1,6 +1,6 @@
 // The form family's second batch on the beta contract (#293): pdx-form-field, pdx-field-group and
 // pdx-field-list. Their conditions are states of the host and the design CSS draws them from there; their
-// pieces are parts. A1 and A2 are asserted per component (docs/language/beta/agents.md). Measured in Chromium.
+// pieces are parts. A1 and A2 are asserted per component (docs/language/agents.md). Measured in Chromium.
 import { test, expect, type Page } from './contracts/fixture';
 import { openPage } from './contracts/measure';
 

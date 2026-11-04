@@ -11,7 +11,7 @@ produces. The head declarations (`@title`, `@meta`) work on any component.
 `@page` is the one home of every route field (#277): its further paths and its options carry what
 `@route { … }`, `@alias`, `@prefetch`, the script's `@transition` and `@meta { … }` carried in the
 alpha, and `@head { … }` is `@title` and `@meta`. Those six are removed forms, `PDX_REMOVED_FORM`,
-and `pdx migrate` rewrites each ([overview.md](overview.md#removed-forms-and-browser-targets)).
+and `pdx migrate` rewrites each ([file.md](file.md#one-language-no-levels)).
 
 The registration is the same in both modes of the build: the page module registers its route when it
 is imported, and the plugin scans every `.pdx` that has an `@page` line with the same analyzer and
@@ -244,6 +244,16 @@ under the route's pattern, its own params and its query in a canonical order, an
 the same key takes it instead of calling the loader. The prefetched call gets the same context, with
 a signal of its own: the navigation that takes it aborts it when superseded, and a call that expires
 unused is aborted as it is dropped.
+
+**The identity of a loader call.** Everything a loader receives decides its result, so a call is
+identified by all of it, `LoaderKey ::= routePattern "|" canonicalParams "|" canonicalQuery`:
+`routePattern` is the level's pattern as declared (`/users/:id(number)`), not the URL;
+`canonicalParams` is the level's own params after coercion, keys sorted (`{"id":42}`);
+`canonicalQuery` is the query string's pairs sorted by key, the values of a repeated key kept in their
+URL order, each pair percent-decoded then re-encoded (`a=1&a=2&q=bob`). An absent query and `?` are
+both empty, and the fragment is never part of it. So `/search?q=alice` and `/search?q=bob` are two
+calls. Every consumer uses the same key: the reuse of a mounted level, `@page`'s `prefetch` (#119),
+the cache below, and invalidation.
 
 **Outcomes** (#147). A loader ends a navigation by what it throws. `throw redirect(to, { replace? })`
 from `@pdxui/router` sends it to `to` before the route is published, and the route never renders;

@@ -1,4 +1,4 @@
-// Silent script misreadings become errors (#278; decisions 12 and 14; docs/language/beta/script.md →
+// Silent script misreadings become errors (#278; decisions 12 and 14; docs/language/script.md →
 // «The script and its rewrite», data.md → «@store, $store — one rule added»).
 //
 // - A `$` rune outside its position was left as written — `$signal` names nothing when the function

@@ -1,7 +1,7 @@
 # Styles
 
 A `.pdx` file carries its CSS in `<style>` blocks, any number of them, in source order. This page
-defines the `Css` production that [overview.md](overview.md) leaves open, what `scoped` does to a
+defines the `Css` production that [file.md](file.md) leaves open, what `scoped` does to a
 selector, where each block's CSS ends up in development and in a build, and the two CSS functions the
 compiler rewrites. The source is `packages/compiler/src/compiler/codegen-styles.ts`; the block is read
 by `packages/compiler/src/parser/sfc.ts`.
@@ -392,7 +392,7 @@ An axis of two words is reflected, and named in a rule, in kebab-case (#834): th
 `connectorStyle` would have become a second attribute, `connectorstyle`. In the library the same
 holds, `@variant pdx-timeline connector-style(dashed)`, checked against the manifest's `connectorStyle`.
 
-**In the library** (specified by #626, lands with #512). A library component declares its axes in its
+**In the library** (specified by #626, landed with #512, the whole library by #627–#633). A library component declares its axes in its
 descriptor instead of a script. An axis is a list of values, `size: ['md', 'sm', 'lg']`, or a record
 from each value to the selector that draws the same look on native HTML,
 `variant: { primary: '.pdx-primary', solid: '.pdx-primary', ghost: '.pdx-ghost' }`; the first entry
@@ -566,7 +566,7 @@ It compiles to `:where(pdx-checkbox[size="sm"]) > .pdx-checkbox-wrap > [data-par
 
 #### Since
 
-beta (#153). The library form is specified by #626 and lands with #512; several hosts in one rule
+beta (#153). The library form is specified by #626 and landed with #512; several hosts in one rule
 with #627; the native form of a chain from its root part's compound with #629.
 
 ### Component tokens
@@ -715,7 +715,7 @@ a component, a subtree:
 ```pdx
 <template>
   <section pdx-density="comfort">
-    <pdx-input label="Name"></pdx-input>
+    <pdx-input placeholder="Name"></pdx-input>
   </section>
 </template>
 ```
@@ -723,3 +723,101 @@ a component, a subtree:
 #### Since
 
 alpha; overriding a theme's own factor since #157.
+
+### `@pdx-theme` blocks
+
+#### Syntax
+
+```ebnf
+ThemeBlock ::= "@pdx-theme" S KebabName S? "{" CssText "}"
+```
+
+#### Semantics
+
+In a theme source, a theme's overrides are written inside `@pdx-theme <name> { … }`, with no root
+and no guard: the design generator writes the root before each selector, or where the selector writes
+`&` as CSS nesting places it, and the nested-theme guard after it:
+`[pdx-theme="<name>"] sel:not(:where(<guard>))` (#155). So a subtree with another `pdx-theme` inside
+a themed page takes its own theme's rules, not its ancestor's. `[pdx-tab-style="pill"]& .pdx-tab`
+becomes `[pdx-tab-style="pill"][pdx-theme="<name>"] .pdx-tab:not(…)`.
+
+#### Rules
+
+- The block's opening line is `@pdx-theme <name> {` alone, and its `}` starts a line.
+- The theme files reach the browser as written, so the expansion is a generator, not a build step:
+  the sources are `packages/design/theme-sources/<name>.css`, `scripts/gen-themes.mjs` writes
+  `src/themes/<name>.css` through the engine's `expandThemeBlocks`, and
+  `packages/cli/tests/theme-sources.test.ts` fails when the two disagree. The generated files are not
+  edited by hand.
+- A library `@variant` inside the block is expanded first, so its selectors take the root and the guard
+  like any other theme rule ([`@variants` and `@variant`](#variants-and-variant)).
+
+#### Examples
+
+```css
+/* packages/design/theme-sources/material.css */
+@pdx-theme material {
+    .pdx-surface-card { border-radius: var(--pdx-radius-lg); }
+}
+```
+
+A themed subtree inside a page of another theme takes its own rules:
+
+```pdx
+<template>
+  <section pdx-theme="material">
+    <pdx-card>Material, inside a page of another theme</pdx-card>
+  </section>
+</template>
+```
+
+#### Since
+
+beta (#155)
+
+### Theme behaviours
+
+#### Syntax
+
+```ebnf
+BehaviourToken ::= "--pdx-" KebabName "-style" S? ":" S? Word   /* --pdx-card-style: elevated */
+```
+
+#### Semantics
+
+A theme declares its behaviours as custom properties (`--pdx-card-style: elevated`,
+`--pdx-input-style: filled`, …). Under `baseline-2026` the component CSS reads them with container
+style queries, `@container style(--pdx-card-style: elevated) { … }`, so a nested `pdx-theme` subtree
+gets its own behaviours with no script and in the same frame (#156). Under `baseline-2024`, `setTheme`
+mirrors them as attributes on `<html>`, as the alpha did.
+
+The design CSS is written in the `baseline-2024` form, `[pdx-card-style="elevated"]
+.pdx-surface-card`, and reaches the browser as written in development. `pdx()` returns two Vite
+plugins, and the second rewrites each stylesheet of `@pdxui/design` under `baseline-2026` into
+`@container style(--pdx-card-style: elevated) { :is(:root, *) .pdx-surface-card { … } }`
+(`packages/compiler/src/compiler/behaviour-queries.ts`). `:is(:root, *)` stands where the attribute
+stood and keeps its weight, so a rewritten rule wins and loses where it did.
+
+#### Rules
+
+- A behaviour attribute anywhere but a selector's leading compound is refused at build time.
+- The plugin defines `__PDX_TARGET__`, and `setTheme` mirrors the attributes only when it is not
+  `baseline-2026`: an app without the plugin keeps the alpha behaviour.
+- The style query reads the value an element inherits from its parent, so an element that carries
+  `pdx-theme` itself takes its parent's behaviours, and its descendants take its own.
+- Measured in Chromium, in a build and in development: `packages/showcase/tests/theme-behaviours.spec.ts`;
+  certified by the `input-nested-theme` scenario.
+
+#### Examples
+
+```pdx
+<template>
+  <div pdx-theme="material">
+    <pdx-input placeholder="Filled, as material's --pdx-input-style says"></pdx-input>
+  </div>
+</template>
+```
+
+#### Since
+
+alpha (the attributes); the style queries, beta (#156)

@@ -1,7 +1,7 @@
-# The beta grammar
+# The grammar
 
-The productions of the `.pdx` language in its beta form, in the W3C EBNF notation of
-`docs/language/overview.md`. The other pages give each construct its semantics and rules; this page
+The productions of the `.pdx` language, in the W3C EBNF notation of
+[README.md](README.md). The other pages give each construct its semantics and rules; this page
 is the grammar they share. A few productions local to one construct live on its page
 (`ScopedStyle` and `ComponentToken` in styles.md, `StoreRune` in data.md, `DerivedDecl` in
 script.md). A production marked
@@ -164,8 +164,8 @@ ActionParams   ::= Identifier ( S? ":" S? Type )? ( S? "," S? "{" S? "signal" S?
                  | "{" S? "signal" S? "}"
 ActionOptions  ::= "{" S? ActionOption ( S? "," S? ActionOption )* ( S? "," )? S? "}"
 ActionOption   ::= ( "invalidate" | "optimistic" | "onSuccess" | "onError" ) S? ":" S? Expression
-                 | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote      (proposed — decisions.md 24)
-                 | "agent" S? ":" S? StringLiteral | "consequential" S? ":" S? ( "true" | "false" )             (proposed — decisions.md 31)
+                 | "concurrency" S? ":" S? Quote ( "queue" | "drop" | "coalesce" | "parallel" ) Quote      (landed — #500, #501; decisions.md 24)
+                 | "agent" S? ":" S? StringLiteral | "consequential" S? ":" S? ( "true" | "false" )             (landed — #501, #502; decisions.md 31)
 FormDecl       ::= "@form" S Word S? ":" S? ( InlineSchema | Word ) ( S? FormOptions )? End
 InlineSchema   ::= "{" S? Field ( S? "," S? Field )* ( S? "," )? S? "}"
 Field          ::= ScalarField | ObjectField | RowsField
@@ -248,7 +248,7 @@ TwoWayValue    ::= Identifier ( "." Identifier )*
 
 ```ebnf
 DynamicComponent ::= "<component" S ":is=" AttrValue ( S DynamicOption )* S? ( "/>" | ">" )
-DynamicOption    ::= PropBinding | "@keepAlive" ( S? "(" S? Digits S? ")" )? | "keep-alive"               (proposed: the maximum — decisions.md 28)
+DynamicOption    ::= PropBinding | "@keepAlive" ( S? "(" S? Digits S? ")" )? | "keep-alive"               (the maximum: landed — #270; decisions.md 28)
                    | "@transition" S? "(" StringLiteral ( S? "," S? StringLiteral )? ")"
                    | "@mode" S? "(" StringLiteral ")"
 SlotOutlet       ::= "<slot" ( S "name=" AttrValue )? S? ( "/>" | ">" Template "</slot>" )             (β #131: no `:x` scope, no `let:` — landed #492)
@@ -265,7 +265,7 @@ Directive      ::= IfBlock | ForBlock | SwitchBlock | RequireBlock | ShowBlock |
 IfBlock        ::= "@if" S? Paren S? BlockTransition? Block
                    ( S? "@else" S? ( ( "@if" | "if" ) S? Paren S? BlockTransition? Block | Block ) )*
 ForBlock       ::= "@for" S? "(" S? Expression S "as" S ForBinding ( S? "," S? Identifier )? S? ";" S? "track" S Expression S? ")"
-                   S? BlockTransition? ( S? "@virtual" ( S? "(" S? Number S? ")" )? )? Block ( S? "@empty" Block )?   (proposed: @virtual — decisions.md 29)
+                   S? BlockTransition? ( S? "@virtual" ( S? "(" S? Number S? ")" )? )? Block ( S? "@empty" Block )?   (@virtual: landed — #283; decisions.md 29)
 ForBinding     ::= Identifier | /* an object or array destructuring pattern */
 BlockTransition ::= "@transition" S? "(" TName ( S? "," S? TName )? ")" ( S? "@stagger" S? "(" Number ")" )?
                     ( S? "@mode" S? "(" TName ")" )? ( S? Move )?
@@ -282,7 +282,7 @@ DeferBlock     ::= "@defer" S? "(" Triggers ( S? ";" S? "prefetch" S Triggers )?
 Triggers       ::= Trigger ( S? "|" S? Trigger )*
 Trigger        ::= "viewport" | "idle" ( "(" Digits ")" )? | "interaction" | "timer(" Digits ")" | "immediate"   /* † `hover` removed — decisions.md 37, landed #281 */
                  | "when" S? "(" S? Expression S? ")"                                                      (decisions.md 27, landed #281)
-AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")" S? AwaitTiming? Block       (β #145: `as`; disambiguation proposed — decisions.md 18)
+AwaitBlock     ::= "@await" S? "(" S? Expression ( S "as" S Identifier )? S? ")" S? AwaitTiming? Block       (β #145: `as`, and its disambiguation — landed; decisions.md 18)
                    ( S? ( "@loading" Block | "@error" ( S? ErrorNames )? Block ) )*
 AwaitTiming    ::= "{" S? TimingOption ( S? "," S? TimingOption )? S? "}"
 TimingOption   ::= ( "minMs" | "maxMs" ) S? ":" S? Digits

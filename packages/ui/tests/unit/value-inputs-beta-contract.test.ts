@@ -1,6 +1,6 @@
 // The value-input components brought to the beta contract (#286): each declares its model, its visual
 // states and its public parts, and the manifest lists them, which is what a theme and an agent's page
-// card read (docs/language/beta/library.md, «Done, for one component»). A row joins `DONE` in the
+// card read (docs/language/library.md, «Done, for one component»). A row joins `DONE` in the
 // pull request that brings its component over; the rest of the family follows the same table.
 
 import { describe, it, expect } from 'vitest';
@@ -177,7 +177,7 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
     });
 
     // No name the migration removed for these components is still declared: the alpha events (#125,
-    // docs/language/beta/migration.md). pdx-pin-input's absence is pin-input-removed.test.ts's.
+    // docs/language/migration.md). pdx-pin-input's absence is pin-input-removed.test.ts's.
     it('declares no alpha event', () => {
         expect((decl?.events ?? []).map((e) => e.name).filter((n) => ALPHA.includes(n))).toEqual([]);
     });

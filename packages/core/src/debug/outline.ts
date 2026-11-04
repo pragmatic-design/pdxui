@@ -1,6 +1,6 @@
 // `__PDX_DEVTOOLS__.outline()` (#271): the route's `main`, described for an agent in a fraction of a
 // full accessibility snapshot. A projection of the accessibility tree — never a second source — with
-// the rules of docs/language/beta/agents.md:
+// the rules of docs/language/agents.md:
 //
 //   · visibility is read from the DOM;
 //   · text that repeats its parent's name, unnamed images and unnamed wrappers are dropped;

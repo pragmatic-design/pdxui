@@ -1,5 +1,5 @@
 // PDX_RUNE_POSITION: a `$` rune where the compiler does not read it (#278; decision 12,
-// docs/language/beta/script.md → «The script and its rewrite»).
+// docs/language/script.md → «The script and its rewrite»).
 //
 // A rune is rewritten only in its position: `$signal`, `$derived`, `$store` as the whole initialiser of
 // a top-level declaration, `$effect` and `$watch` as a top-level statement. Anywhere else — a function

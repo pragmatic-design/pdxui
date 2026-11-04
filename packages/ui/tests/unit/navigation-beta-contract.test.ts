@@ -2,7 +2,7 @@
 // itself (a tab, a page, a step) is a model, announced with `<name>-change` `{ value }` in place of
 // `pdx-change`; they share one set of verbs, `next()`, `prev()` and `goTo(n)`; and each lists its
 // states and parts in the manifest, which is what a theme and an agent's page card read
-// (docs/language/beta/library.md, «Done, for one component»). A row joins `DONE` in the pull request
+// (docs/language/library.md, «Done, for one component»). A row joins `DONE` in the pull request
 // that brings its component over.
 
 import { describe, it, expect } from 'vitest';

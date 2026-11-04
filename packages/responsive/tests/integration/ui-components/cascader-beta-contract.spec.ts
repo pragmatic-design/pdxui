@@ -1,7 +1,7 @@
 // pdx-cascader on the beta contract (#287): its visual states are custom states, `:state(name)` on the
 // host, and its trigger carries no state class of its own; its popup is announced as an overlay's,
 // `open-change` `{ value }` and `:state(open)`, and driven by the overlay verbs. And the A-rules that
-// apply to it (docs/language/beta/agents.md):
+// apply to it (docs/language/agents.md):
 //   - A1, a required field marks the combobox `aria-required`;
 //   - A2, a field in error marks it `aria-invalid` and describes it by the message;
 //   - A4, while a lazy branch loads, the list it is in is `aria-busy` and the host `:state(loading)`.

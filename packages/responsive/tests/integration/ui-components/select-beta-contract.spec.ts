@@ -1,7 +1,7 @@
 // pdx-select on the beta contract (#287): its visual states are custom states, `:state(name)` on the
 // host, and its frame and popup carry no state class of their own; its popup is announced as an
 // overlay's, `open-change` `{ value }` and `:state(open)`. And the A-rules that apply to a picker
-// (docs/language/beta/agents.md):
+// (docs/language/agents.md):
 //   - A1, a required field marks the combobox `aria-required`;
 //   - A2, a field in error marks it `aria-invalid` and describes it by the message;
 //   - A3, a list that renders part of its options gives each its position among all of them;

@@ -1,7 +1,7 @@
 // The layout components brought to the beta contract (#290): a prop the component writes itself is a
 // model; a read-only output is announced by `<name>-change` `{ value }` without being one; the carousel
 // takes the library's navigation verbs; each lists its states and parts in the manifest, which is what
-// a theme and an agent's page card read (docs/language/beta/library.md, «Done, for one component»). A row
+// a theme and an agent's page card read (docs/language/library.md, «Done, for one component»). A row
 // joins `DONE` in the pull request that brings its component over.
 
 import { describe, it, expect } from 'vitest';

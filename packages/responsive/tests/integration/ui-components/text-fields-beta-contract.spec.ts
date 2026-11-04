@@ -1,7 +1,7 @@
 // The text fields after pdx-input on the beta contract (#286): pdx-textarea, pdx-password-input,
 // pdx-search-input and pdx-masked-input. Each shows its visual states as custom states on the host,
 // `:state(name)`, and its frame carries no state class of its own. The A-rules that apply to it hold
-// in a browser (docs/language/beta/agents.md):
+// in a browser (docs/language/agents.md):
 //   - A1, inside a required pdx-form-field the textbox is aria-required;
 //   - A2, inside a field in error it is aria-invalid and described by the message, and a component's
 //     own `error` marks it outside a field;

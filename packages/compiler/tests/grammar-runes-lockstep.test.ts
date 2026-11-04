@@ -1,6 +1,6 @@
 // The grammar and RUNES name the same runes (#159, part 2).
 //
-// `docs/language/beta/grammar.md` defines the script's declarations and runes; `RUNES`
+// `docs/language/grammar.md` defines the script's declarations and runes; `RUNES`
 // (`src/compiler/runes.ts`) is the one list the analyzer, the language server and the editor grammar
 // read. language-reference.test.ts checks one way, that every rune has a section. This is the other:
 // a declaration an issue added to the grammar but not to RUNES has no completion and reaches
@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { RUNES } from '../src/compiler/runes';
 
-const GRAMMAR = join(__dirname, '..', '..', '..', 'docs', 'language', 'beta', 'grammar.md');
+const GRAMMAR = join(__dirname, '..', '..', '..', 'docs', 'language', 'grammar.md');
 
 /** The EBNF of the page, its ```ebnf blocks joined, with each production's continuation lines on its first. */
 function productions(markdown: string): Map<string, string> {

@@ -1,7 +1,7 @@
 // pdx-dialog on the beta contract (#288): `open` is a model, so the dialog's own closes — Escape, its
 // close button — announce `open-change` `{ value }` and `::open` follows them; its states are custom
 // states, `:state(name)` on the host, and its backdrop and body carry no state attribute or class of
-// their own; its pieces are parts. And the A-rule that applies (docs/language/beta/agents.md): A4,
+// their own; its pieces are parts. And the A-rule that applies (docs/language/agents.md): A4,
 // while loading the panel is `aria-busy`. Measured in Chromium: `:state()`, focus and the invoker
 // command are not happy-dom's to tell.
 import { test, expect, type Page } from './contracts/fixture';

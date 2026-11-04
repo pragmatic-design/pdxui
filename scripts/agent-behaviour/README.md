@@ -11,7 +11,7 @@ set of tasks on the showcase and runs each one twice:
 The description API passes when the agent completes **at least as many tasks** with it as with
 snapshots, over two runs.
 
-It runs a model, so it stays outside CI and outside the gate, as `docs/language/beta/decisions.md`
+It runs a model, so it stays outside CI and outside the gate, as `docs/language/decisions.md`
 (point 41) decides. Run it when you change the description API, and put its JSON result in the
 pull request.
 

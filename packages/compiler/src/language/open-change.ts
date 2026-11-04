@@ -1,7 +1,7 @@
 // A popup's open state is announced as an overlay's: `open-change` `{ value }`, `true` on open and
 // `false` on close, in place of `pdx-open` and `pdx-close` (#287, #288; decision 50).
 //
-// `pdx migrate` rewrites the listeners mechanically, as `docs/language/beta/migration.md` says. The
+// `pdx migrate` rewrites the listeners mechanically, as `docs/language/migration.md` says. The
 // handler becomes a statement list that starts with a guard, because the template's handler rewriter
 // rewrites signal writes statement by statement, not inside an expression. With `S'` a handler's
 // statements, and a bare reference `fn` written `fn($event)` (the runtime calls a bare reference with

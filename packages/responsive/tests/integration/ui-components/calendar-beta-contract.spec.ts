@@ -2,7 +2,7 @@
 // host, and its frame carries no state class of its own. It has no popup. It becomes form-associated:
 // with a `name` it submits its model as the date picker does, a range as two entries, and a form's
 // reset restores it; without one it submits nothing (the date picker's own calendar has none). And
-// the A-rules that apply to it (docs/language/beta/agents.md). Its frame is a `group`, which may carry
+// the A-rules that apply to it (docs/language/agents.md). Its frame is a `group`, which may carry
 // neither aria-required nor aria-invalid (axe's aria-allowed-attr):
 //   - A1, inside a required pdx-form-field the group is named by the label, its marker with it;
 //   - A2, inside a pdx-form-field in error the group is described by the message.

@@ -1,6 +1,6 @@
 // pdx-input on the beta contract (#286): its visual states are custom states, `:state(name)` on the
 // host, and its frame carries no state class of its own; the design CSS draws each state from the
-// custom state. And the A-rules that apply to a text field (docs/language/beta/agents.md):
+// custom state. And the A-rules that apply to a text field (docs/language/agents.md):
 //   - A1, a required field marks the textbox `aria-required`;
 //   - A2, a field in error marks it `aria-invalid` and describes it by the message, and the input's own
 //     `error` marks it outside a field too;

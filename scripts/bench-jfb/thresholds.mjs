@@ -20,7 +20,7 @@
 // between them. One is lowered when a render-path
 // change improves the number, never raised without a commit that says why; a night that goes red
 // on an unchanged tree is the signal that a margin is too narrow. PDX's absolute numbers are printed beside the specification's targets on every run, so the
-// distance to them stays visible (docs/language/beta/performance.md, O1/O2 and «Bounded memory»).
+// distance to them stays visible (docs/language/performance.md, O1/O2 and «Bounded memory»).
 
 import { appendFileSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';

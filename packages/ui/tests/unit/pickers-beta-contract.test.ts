@@ -1,6 +1,6 @@
 // The picker components brought to the beta contract (#287): each declares its model, its visual
 // states and its public parts, and the manifest lists them, which is what a theme and an agent's page
-// card read (docs/language/beta/library.md, «Done, for one component»). A picker with a popup announces
+// card read (docs/language/library.md, «Done, for one component»). A picker with a popup announces
 // it as an overlay does: an `open` state and `open-change` `{ value }`, in place of `pdx-open` and
 // `pdx-close`, and drives it with the overlay verbs. A row joins `DONE` in the pull request that brings
 // its component over; the rest of the family follows the same table.

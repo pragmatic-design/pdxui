@@ -3,7 +3,7 @@
 //
 // Only the `required` prop did either. A form that declared `email: [required()]` left the control
 // announced as «Email, edit text» with no «required», and no asterisk, until an error appeared
-// (#249). The rule (docs/language/beta/agents.md, A1): aria-required whenever the schema OR the prop
+// (#249). The rule (docs/language/agents.md, A1): aria-required whenever the schema OR the prop
 // requires the field.
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createForm, required, minLength } from '@pdxui/core';

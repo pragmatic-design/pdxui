@@ -1,6 +1,6 @@
 // mutation() concurrency (#500): the policy for a call made while another is pending, the call's own
 // AbortSignal, cancel(), enabled(), and the optimistic value kept as one overlay per running call.
-// The acceptance cases of docs/language/beta/data.md → «@action», each with calls the test settles
+// The acceptance cases of docs/language/data.md → «@action», each with calls the test settles
 // by hand, so «at once» and «after» are what the test says, not what a timer happens to do.
 
 import { describe, it, expect } from 'vitest';

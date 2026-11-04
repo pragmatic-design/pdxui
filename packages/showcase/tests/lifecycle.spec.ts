@@ -1,5 +1,5 @@
 /**
- * The lifecycle suite (docs/language/beta/lifecycle.md → «Acceptance cases»), in Chromium.
+ * The lifecycle suite (docs/language/lifecycle.md → «Acceptance cases»), in Chromium.
  *
  * Case 3, the composite: an `@if` removes a block holding `<input :ref="field" attach:probe>` and a
  * child component whose `@fetch` has not been answered. Removing it must reset the ref (#262), run

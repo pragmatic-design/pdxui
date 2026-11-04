@@ -3,7 +3,7 @@
 // Inside the parentheses, `x as T` is also a TypeScript type assertion. One rule keeps both: the
 // binding is the LAST top-level `as` followed by a bare identifier and the closing parenthesis; a
 // type assertion in the expression is written in its own parentheses,
-// `@await ((x as Resource<User[]>) as list)` (docs/language/beta/decisions.md, point 18).
+// `@await ((x as Resource<User[]>) as list)` (docs/language/decisions.md, point 18).
 
 /** The awaited expression and, when there is one, the name its result is bound to. */
 export interface AwaitBinding {

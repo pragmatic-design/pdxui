@@ -2,7 +2,7 @@
  * `__PDX_DEVTOOLS__` v2 on the showcase (#271): `page()` and `outline()` describe a page for an agent
  * in a fraction of a full accessibility snapshot, and lose nothing it can act on.
  *
- * The baselines are docs/language/beta/agents.md → «Acceptance criteria», measured on these four pages
+ * The baselines are docs/language/agents.md → «Acceptance criteria», measured on these four pages
  * by the prototype of 2026-10-11, at ~4 characters per token:
  *
  *   · every named control of `main` is reachable from the outline — listed, or inside a row of data

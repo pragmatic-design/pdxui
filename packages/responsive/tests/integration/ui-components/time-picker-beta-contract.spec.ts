@@ -1,7 +1,7 @@
 // pdx-time-picker on the beta contract (#287): `disabled` is a custom state, `:state(disabled)` on the
 // host, and its frame carries no state class of its own. It has no popup: its segments are spinbuttons
 // in a `group`, so it has neither an `open` state nor `open-change`. And the A-rules that apply to it
-// (docs/language/beta/agents.md). Its frame is a `group`, which may carry neither aria-required nor
+// (docs/language/agents.md). Its frame is a `group`, which may carry neither aria-required nor
 // aria-invalid (axe's aria-allowed-attr):
 //   - A1, inside a required pdx-form-field the group is named by the label, its marker with it;
 //   - A2, inside a pdx-form-field in error the group is described by the message.

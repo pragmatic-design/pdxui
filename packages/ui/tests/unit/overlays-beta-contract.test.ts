@@ -1,7 +1,7 @@
 // The overlay components brought to the beta contract (#288): each announces its open state with
 // `open-change` `{ value }` and an `open` custom state, in place of `pdx-open` and `pdx-close`, drives
 // it with `show()`, `close()` and `toggle()`, and lists its states and parts in the manifest, which is
-// what a theme and an agent's page card read (docs/language/beta/library.md, «Done, for one
+// what a theme and an agent's page card read (docs/language/library.md, «Done, for one
 // component»). An overlay that closes itself, and has an `open` prop, has it as a model, so `::open`
 // follows it. A row joins `DONE` in the pull request that brings its component over.
 

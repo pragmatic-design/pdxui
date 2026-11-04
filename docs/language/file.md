@@ -13,13 +13,30 @@ StyleBlock     ::= "<style" ( S "scoped" )? ( S "src=" StringLiteral S? "/>" | "
 
 ### Semantics
 
-A `.pdx` file is a single-file component: at most one template, at most one script, any number of
-style blocks. **The script has one grammar** (#158 — landed): there is no `setup` attribute that changes the
-meaning, and no legacy mode. A `<script>` is always read for declarations and runes, whatever it
-contains; a script with none of them is a component that returns every top-level name to its
-template. `src=`, `<template shadow>`, `lang="js"` and type erasure are unchanged from alpha
-(`docs/language/overview.md`). A `.pdx.ts` file is a script-only module (a store, or functions that
-use runes), unchanged.
+A `.pdx` file is a single-file component: up to three kinds of block, each optional. `Template` is
+defined in [template.md](template.md), `Script` in [script.md](script.md), `Css` in
+[styles.md](styles.md).
+
+- **At most one `<template>` and one `<script>`.** `<style>` may appear more than once: a component
+  can carry its scoped CSS and the page-level CSS it owns side by side.
+- **`src`** reads the block from another file, as if its contents were written inline: bindings,
+  form wiring and scoping work unchanged, in development and in a production build.
+- **`<template shadow>`** renders into a shadow root instead of light DOM; the component's CSS is
+  adopted into the root, unrewritten, and `scoped` makes no difference there. Light DOM is the default.
+- **`<script>`** has one grammar (#158): it is read for its declarations and runes whatever it
+  contains, and a script with none of them is a component that returns every top-level name to its
+  template. There is no `setup` attribute that changes the meaning, and no legacy mode. A file without
+  a `<script>` compiles like one with an empty one.
+- **`<script lang="js">`** compiles the script as written. Without it the script is TypeScript:
+  annotations, `as`, generics, `import type`, `interface` and `type` are erased (replaced by spaces, so
+  lines and columns stay where they were). TypeScript with a runtime meaning — `enum`, `namespace`, a
+  constructor parameter property, `import x = require()` — stops the compile with
+  `PDX_TS_UNSUPPORTED`. So does a module generated from a script that parses when the module itself
+  does not: that code is the compiler's, and the error names its line instead of reaching the browser
+  unerased (#675). A script with a syntax error of its own is `PDX_SCRIPT_SYNTAX_ERROR`.
+- **A `.pdx.ts` file** is a script with no template: a store (`@store`, [data.md](data.md)) or a module
+  of functions that uses runes. It is compiled with the same rewrites as a `<script>` and exports what
+  it declares.
 
 ### Rules
 
@@ -31,7 +48,24 @@ use runes), unchanged.
 - **One reading rule for declarations** (decisions.md 11 — landed, #524): any declaration may span
   lines when it opens a balanced `{ … }` or `( … )` on its first line; it ends at its `;` or at the end
   of that block. Alpha allowed it declaration by declaration. The full rule, bodies included, is in
-  [script.md](../script.md#the-script-and-its-rewrite).
+  [script.md](script.md#the-script-and-its-rewrite).
+
+### Examples
+
+```pdx
+<template>
+  <p>{{ count }} of {{ total }}</p>
+</template>
+
+<script>
+@prop total: number = 10;
+let count = $signal(0);
+</script>
+
+<style scoped>
+  p { margin: 0; }
+</style>
+```
 
 ### Since
 
@@ -42,9 +76,11 @@ alpha → beta (#158)
 ### Semantics
 
 The file name is the tag, lowercased, prefixed with the **application prefix** (#136 — landed):
-`pdx({ prefix })`, default `'app'`. `user-card.pdx` → `<app-user-card>`; `admin/_layout.pdx` →
-`<app-admin-layout>` (the folder rule of alpha is unchanged). `@tag 'x-y'` names the tag explicitly.
-The prefix `pdx-` is reserved for the `@pdxui/*` packages.
+`pdx({ prefix })`, default `'app'`. `user-card.pdx` → `<app-user-card>`, `App.pdx` → `<app-app>`. A
+name that already starts with the prefix keeps it. A file whose name starts with `_` keeps its parent
+folder for uniqueness: `admin/_layout.pdx` → `<app-admin-layout>` (but `pages/_layout.pdx`, `src/…`,
+`routes/…` and `components/…` → `<app-layout>`). `@tag 'x-y'` ([script.md](script.md)) names the tag
+explicitly. The prefix `pdx-` is reserved for the `@pdxui/*` packages.
 
 ### Rules
 
@@ -83,8 +119,25 @@ the beta removes is registered once in the compiler with how to detect it, its m
 mechanical fix when there is one, and is an error, `PDX_REMOVED_FORM`, whose message names the beta
 form and `pdx migrate`.
 
-`pdx migrate [paths] [--dry]` applies every mechanical fix, writes the files, and reports the changes
-it could only flag. It is idempotent. It exists to move code written in alpha — the repository's own
+Every form the beta removes or changes is registered once (`packages/compiler/src/language/changes.ts`),
+with how to find it, what to write instead and, when there is one, the mechanical rewrite. Each entry
+is one of four kinds, migration.md's:
+
+- `removed` — a language change: the old form is an error, `PDX_REMOVED_FORM`, whose message names
+  the beta form and `pdx migrate`. A form that already has a code of its own (an unknown `@defer`
+  trigger, `PDX_DEFER_UNKNOWN_TRIGGER`) keeps it. A removed export of a `@pdxui/*` package leaves the
+  package; an import of it in a `.pdx` script is `PDX_REMOVED_FORM`, naming its replacement. Each
+  removed entry also names a `marker`, a substring or regex every instance of the form contains: the
+  compiler looks for the form only in a file that has it (#648), and the compiler's tests fail when a
+  detected fixture lacks it;
+- `changed` — still valid source with a new meaning: the compiler says nothing;
+- `fix` — a behaviour that changed because the old one was a defect: nothing is an error;
+- `target` — compiled output that depends on the browser target, with nothing to rewrite.
+
+`pdx migrate [paths] [--dry]` reads the same registry. It rewrites every `removed` and `changed` form
+that has a mechanical rewrite, writes the files, and lists each place a person has to rewrite: a form
+with no mechanical rewrite, and every `fix`. It reads `.pdx` files, scripts and `vite.config.*`. It is
+idempotent; `--dry` writes nothing. It exists to move code written in alpha — the repository's own
 showcase, site, examples and skills first — and the full list is migration.md.
 
 ### Rules
@@ -108,7 +161,8 @@ older browsers: it emits today's mechanisms where the beta output depends on a 2
 maintained frozen — fixed, not developed — with a reduced certification run, and retired when `@scope`
 is Baseline widely available (September 2028); #121 carries the details (decisions.md 16). The
 reduced run is a CI job of its own (#509 — landed): Dim 1, the contract math, on the 13 themes, with
-the scenario pages building the design CSS for `baseline-2024` (`PDX_TARGET=baseline-2024`). DOM, ARIA
+the scenario pages building the design CSS for `baseline-2024` (the environment names the target,
+`packages/responsive/tests/certify-target.ts`). DOM, ARIA
 and keyboard do not depend on the target, so Dims 2, 4 and 5 are not run for it. A scenario that
 asserts what only `baseline-2026` gives declares `onlyOn` in its manifest, with the reason, and is left
 out of that run.
@@ -127,8 +181,8 @@ it without per-element attributes.
 
 ### Since
 
-beta (#121 — **landed**: the option and `ctx.target`; the scoped-style outputs with #152 — landed;
-the others in the table above land with #132, #153 and #156)
+beta (#121 — **landed**: the option and `ctx.target`; the scoped-style outputs with #152, custom
+states with #132, variants with #153, theme behaviours with #156 — all landed)
 
 ## The render model
 
