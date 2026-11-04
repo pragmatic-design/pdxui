@@ -36,6 +36,7 @@
         import '@pdxui/ui/empty-state';
         import '@pdxui/ui/entity-grid';
         import '@pdxui/ui/infinite-scroll';
+        import '@pdxui/ui/input';
         import '@pdxui/ui/list';
         import '@pdxui/ui/relation-picker';
         import '@pdxui/ui/relative-time';
@@ -200,7 +201,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-bulk-actions","pdx-data-source","pdx-description-list","pdx-edit-drawer","pdx-empty-state","pdx-entity-grid","pdx-infinite-scroll","pdx-list","pdx-relation-picker","pdx-relative-time","pdx-sortable-list","pdx-statistic","pdx-timeline","pdx-transfer","pdx-tree"];
+        const __tags = ["pdx-bulk-actions","pdx-data-source","pdx-description-list","pdx-edit-drawer","pdx-empty-state","pdx-entity-grid","pdx-infinite-scroll","pdx-input","pdx-list","pdx-relation-picker","pdx-relative-time","pdx-sortable-list","pdx-statistic","pdx-timeline","pdx-transfer","pdx-tree"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -596,6 +597,53 @@
                         value='["banana"]'>
                     </pdx-transfer>
                 </div>
+    </section>
+
+    <section data-scenario="transfer-sizes">
+        <h3>Transfer — sm, md and lg, each beside a pdx-input of its size</h3>
+        <style>[data-scenario="transfer-sizes"] .pdx-transfer-panel { min-height: 0; }</style>
+                <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                    <div style="width: 160px; flex: none;"><pdx-input data-test="in-sm" size="sm" placeholder="Search"></pdx-input></div>
+                    <div style="width: 640px; flex: none;"><pdx-transfer data-test="tr-sm" size="sm" searchable
+                        source-title="Available"
+                        target-title="Selected"
+                        items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]'
+                        value='["banana"]'>
+                    </pdx-transfer></div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                    <div style="width: 160px; flex: none;"><pdx-input data-test="in-md" size="md" placeholder="Search"></pdx-input></div>
+                    <div style="width: 640px; flex: none;"><pdx-transfer data-test="tr-md" size="md" searchable
+                        source-title="Available"
+                        target-title="Selected"
+                        items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]'
+                        value='["banana"]'>
+                    </pdx-transfer></div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                    <div style="width: 160px; flex: none;"><pdx-input data-test="in-lg" size="lg" placeholder="Search"></pdx-input></div>
+                    <div style="width: 640px; flex: none;"><pdx-transfer data-test="tr-lg" size="lg" searchable
+                        source-title="Available"
+                        target-title="Selected"
+                        items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]'
+                        value='["banana"]'>
+                    </pdx-transfer></div>
+                </div>
+    </section>
+
+    <section data-scenario="transfer-size-md">
+        <h3>pdx-transfer — size="md"</h3>
+        <pdx-transfer data-test="variant" size="md"></pdx-transfer>
+    </section>
+
+    <section data-scenario="transfer-size-sm">
+        <h3>pdx-transfer — size="sm"</h3>
+        <pdx-transfer data-test="variant" size="sm"></pdx-transfer>
+    </section>
+
+    <section data-scenario="transfer-size-lg">
+        <h3>pdx-transfer — size="lg"</h3>
+        <pdx-transfer data-test="variant" size="lg"></pdx-transfer>
     </section>
 
     <section data-scenario="tree-basic">

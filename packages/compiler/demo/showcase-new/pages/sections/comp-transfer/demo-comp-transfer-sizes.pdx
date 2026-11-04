@@ -1,0 +1,34 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Sizes</h2>
+    <p class="pdx-txt-small pdx-ink-muted">
+      <code>size</code> is sm, md (the default) or lg, as the form fields beside it: the search field is as
+      tall as a <code>pdx-input</code> of the same size, and the rows and the move buttons follow.
+    </p>
+
+    <div class="demo-stack">
+      @for (sizes as s; track s) {
+        <div class="demo-stack">
+          <pdx-input :size="s" :placeholder="s + ' field'"></pdx-input>
+          <pdx-transfer
+            :size="s"
+            searchable
+            :items="items"
+            :value="['b']"
+            sourcetitle="Available"
+            targettitle="Selected"
+          ></pdx-transfer>
+        </div>
+      }
+    </div>
+  </section>
+</template>
+
+<script>
+const sizes = ['sm', 'md', 'lg'];
+const items = [
+  { value: 'a', label: 'Apple' },
+  { value: 'b', label: 'Banana' },
+  { value: 'c', label: 'Cherry' },
+];
+</script>

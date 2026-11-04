@@ -3535,6 +3535,22 @@
         {
           "id": "transfer-narrow",
           "title": "Transfer — in a box narrower than its two lists"
+        },
+        {
+          "id": "transfer-sizes",
+          "title": "Transfer — sm, md and lg, each beside a pdx-input of its size"
+        },
+        {
+          "id": "transfer-size-md",
+          "title": "pdx-transfer — size=\"md\""
+        },
+        {
+          "id": "transfer-size-sm",
+          "title": "pdx-transfer — size=\"sm\""
+        },
+        {
+          "id": "transfer-size-lg",
+          "title": "pdx-transfer — size=\"lg\""
         }
       ]
     },

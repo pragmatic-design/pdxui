@@ -8,7 +8,7 @@
  *
  * ── DOM structure (light DOM, built in a rAF — pdx-transfer.ts:350) ──
  *   <pdx-transfer>                                          ← host
- *     <div class="pdx-transfer [pdx-transfer-{size}] [pdx-transfer-draggable]" data-part="root"   ← disabled is the host's :state(disabled) (#287)
+ *     <div class="pdx-transfer [pdx-transfer-draggable]" data-part="root"   ← disabled is the host's :state(disabled) (#287); size is the host's [size] (#748)
  *          role="group" aria-label="Transfer">              ← ROOT: display inline-flex (CSS:4), align stretch
  *
  *       <!-- SOURCE PANEL (left) -->
@@ -22,7 +22,7 @@
  *           <!-- mode 'simple'/'direct': <span class="pdx-transfer-title">{title}</span> -->
  *           <span class="pdx-transfer-count">N/M</span>      ← the "checked/total" counter
  *         </div>
- *         <!-- with searchable: <div class="pdx-transfer-search"><input type="text"></div> -->
+ *         <!-- with searchable: <div class="pdx-transfer-search"><input type="text" class="pdx-input [pdx-input-{size}]" data-part="search"></div> -->
  *         <div class="pdx-transfer-list" role="listbox">     ← the INNER list, flex:1, overflow-y auto (CSS:79)
  *           <div class="pdx-transfer-item [checked] [disabled] [clickable]"
  *                role="option" aria-selected="true|false">   ← one per item NOT in the target
@@ -86,7 +86,7 @@ export const transfer: ComponentManifest = {
     tag: 'pdx-transfer',
     tier: '5B',
     status: 'wip',
-    imports: ['@pdxui/ui/transfer'],
+    imports: ['@pdxui/ui/transfer', '@pdxui/ui/input'],
 
     // ── Scenarios ──
     scenarios: [
@@ -119,6 +119,25 @@ export const transfer: ComponentManifest = {
                         value='["banana"]'>
                     </pdx-transfer>
                 </div>`,
+        },
+        {
+            // The size axis (#748): each size beside a pdx-input of that size, whose height its search
+            // field takes. The rows have `content-visibility: auto`: a row below the 800px viewport is
+            // not laid out, and measures its estimate, `contain-intrinsic-size`, not its height. The
+            // panels' 280px min-height is lifted here, in this scenario only, so the three sizes' rows
+            // are all on screen and measured as drawn.
+            id: 'transfer-sizes',
+            title: 'Transfer — sm, md and lg, each beside a pdx-input of its size',
+            html: `<style>[data-scenario="transfer-sizes"] .pdx-transfer-panel { min-height: 0; }</style>` + ['sm', 'md', 'lg'].map((s) => `
+                <div style="display: flex; align-items: flex-start; gap: 16px; margin-bottom: 16px;">
+                    <div style="width: 160px; flex: none;"><pdx-input data-test="in-${s}" size="${s}" placeholder="Search"></pdx-input></div>
+                    <div style="width: 640px; flex: none;"><pdx-transfer data-test="tr-${s}" size="${s}" searchable
+                        source-title="Available"
+                        target-title="Selected"
+                        items='${ITEMS}'
+                        value='["banana"]'>
+                    </pdx-transfer></div>
+                </div>`).join(''),
         },
     ],
 
@@ -229,6 +248,32 @@ export const transfer: ComponentManifest = {
                     },
                 ],
             },
+            // The size axis (#748): the rows step up with the size, and the search field is as tall as
+            // a pdx-input of the same size, whatever height the theme gives a text field.
+            'transfer-sizes': {
+                composition: [
+                    {
+                        description: 'size hierarchy: row height sm < md < lg',
+                        parent: 'body',
+                        children: Object.fromEntries(['sm', 'md', 'lg'].map((s) => [s,
+                            `section:not([hidden]) [data-test="tr-${s}"] .pdx-transfer-panel:nth-of-type(1) .pdx-transfer-item:first-child`])),
+                        relations: [
+                            { description: 'sm row < md row', left: 'sm.height', op: '<', right: 'md.height' },
+                            { description: 'md row < lg row', left: 'md.height', op: '<', right: 'lg.height' },
+                        ],
+                    },
+                    {
+                        description: 'the search field is as tall as a pdx-input of the same size',
+                        parent: 'body',
+                        children: Object.fromEntries(['sm', 'md', 'lg'].flatMap((s) => [
+                            [`search${s}`, `section:not([hidden]) [data-test="tr-${s}"] [data-part="search"]`],
+                            [`input${s}`, `section:not([hidden]) [data-test="in-${s}"] [data-part="root"]`],
+                        ])),
+                        relations: ['sm', 'md', 'lg'].map((s) => (
+                            { description: `${s}: search field height == pdx-input height`, left: `search${s}.height`, op: '==' as const, right: `input${s}.height`, tolerance: 1 })),
+                    },
+                ],
+            },
         },
     },
 
@@ -277,9 +322,10 @@ export const transfer: ComponentManifest = {
         ],
     },
 
-    // ── Dim. 5: visual regression (Docker) — 1 scenario ──
+    // ── Dim. 5: visual regression (Docker) — the basic transfer, and the three sizes with their search
+    // fields and a pdx-input of each size beside them (#748) ──
     visual: {
-        scenarios: ['transfer-basic'],
+        scenarios: ['transfer-basic', 'transfer-sizes'],
     },
 };
 

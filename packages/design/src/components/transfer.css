@@ -1,3 +1,4 @@
+/* GENERATED from packages/design/variant-sources/components/transfer.css by packages/design/scripts/gen-variants.mjs — edit the source, then run it. */
 /* pdx-transfer — Dual-list shuttle (move items between two panels) */
 
 /* The host is the container the lists are laid out against: a block as wide as its parent, so the
@@ -66,26 +67,12 @@ pdx-transfer {
     white-space: nowrap;
 }
 
-/* Search input inside panel */
+/* Search input inside panel. The field is a native text field, `<input class="pdx-input">`, with the
+   text fields' size class away from md (`.pdx-input-sm`): it is drawn, sized and focused as a
+   pdx-input of the transfer's size is, in every theme (#748). */
 .pdx-transfer-search {
     padding: var(--pdx-space-xs) var(--pdx-space-sm);
     border-bottom: 1px solid var(--pdx-color-border);
-}
-
-.pdx-transfer-search input {
-    width: 100%;
-    padding: var(--pdx-space-xs) var(--pdx-space-sm);
-    border: 1px solid var(--pdx-color-border);
-    border-radius: var(--pdx-radius-sm);
-    background: var(--pdx-color-surface);
-    font-size: var(--pdx-text-xs);
-    color: var(--pdx-color-text);
-    outline: none;
-}
-
-.pdx-transfer-search input:focus {
-    border-color: var(--pdx-color-focus);
-    box-shadow: 0 0 0 2px color-mix(in oklch, var(--pdx-color-focus) 20%, transparent);
 }
 
 /* Item list */
@@ -258,6 +245,31 @@ pdx-transfer {
     .pdx-transfer-actions { flex-direction: row; }
     .pdx-transfer-btn { rotate: 90deg; }
 }
+
+/* Sizes, keyed on the host's `size` (#748); on native markup `.pdx-transfer-{size}` on the frame.
+   md is the base rules' look. A size moves the text a step of the type scale and the spacing a step
+   of the space scale, and the move buttons with it. The search fields are sized by the text fields'
+   own rule, through their `.pdx-input-{size}` class (above). A rule on a part weighs (0,2,0), one
+   class over the base rule it changes; the one on the root weighs (0,1,0), as `.pdx-transfer` does,
+   and comes after it. A row's `contain-intrinsic-size` is its content box at that size, measured as
+   the base rule's is (Chromium, neutral theme, normal density): 19px in sm, 26px in lg. */
+:where(pdx-transfer[size="sm"]) > [data-part="root"], .pdx-transfer-sm { font-size: var(--pdx-text-xs); }
+    :where(pdx-transfer[size="sm"]) > [data-part="root"] .pdx-transfer-item, .pdx-transfer-sm .pdx-transfer-item {
+        padding: var(--pdx-space-2xs) var(--pdx-space-xs);
+        contain-intrinsic-size: auto 19px;
+    }
+    :where(pdx-transfer[size="sm"]) > [data-part="root"] .pdx-transfer-header, .pdx-transfer-sm .pdx-transfer-header { padding: var(--pdx-space-2xs) var(--pdx-space-xs); }
+    :where(pdx-transfer[size="sm"]) > [data-part="root"] .pdx-transfer-search, .pdx-transfer-sm .pdx-transfer-search { padding: var(--pdx-space-2xs) var(--pdx-space-xs); }
+    :where(pdx-transfer[size="sm"]) > [data-part="root"] .pdx-transfer-btn, .pdx-transfer-sm .pdx-transfer-btn { width: 28px; height: 28px; font-size: var(--pdx-text-xs); }
+
+:where(pdx-transfer[size="lg"]) > [data-part="root"], .pdx-transfer-lg { font-size: var(--pdx-text-base); }
+    :where(pdx-transfer[size="lg"]) > [data-part="root"] .pdx-transfer-item, .pdx-transfer-lg .pdx-transfer-item {
+        padding: var(--pdx-space-sm) var(--pdx-space-md);
+        contain-intrinsic-size: auto 26px;
+    }
+    :where(pdx-transfer[size="lg"]) > [data-part="root"] .pdx-transfer-header, .pdx-transfer-lg .pdx-transfer-header { padding: var(--pdx-space-sm) var(--pdx-space-md); font-size: var(--pdx-text-sm); }
+    :where(pdx-transfer[size="lg"]) > [data-part="root"] .pdx-transfer-search, .pdx-transfer-lg .pdx-transfer-search { padding: var(--pdx-space-sm) var(--pdx-space-md); }
+    :where(pdx-transfer[size="lg"]) > [data-part="root"] .pdx-transfer-btn, .pdx-transfer-lg .pdx-transfer-btn { width: 40px; height: 40px; font-size: var(--pdx-text-base); }
 
 /* Panel footer (optional, for item count or custom actions) */
 .pdx-transfer-footer {

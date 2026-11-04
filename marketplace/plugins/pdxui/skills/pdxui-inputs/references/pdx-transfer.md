@@ -23,10 +23,10 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 | `sourceTitle` | `sourcetitle` | string | `''` | Left panel title |
 | `targetTitle` | `targettitle` | string | `''` | Right panel title |
 | `disabled` | `disabled` | boolean | `false` | Disabled state |
-| `size` | `size` | string | `''` | Component size |
 | `showAllButtons` | `showallbuttons` | boolean | `false` | Show "move all" buttons |
 | `draggable` | `draggable` | boolean | `false` | Enable drag and drop |
 | `name` | `name` | string | `''` | Form field name |
+| `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the rows, the search fields and the move buttons. |
 | `value` | — | string[] | `() => []` | The current value. |
 
 **API (via `:ref`)**
@@ -76,6 +76,26 @@ are checked against the manifest above._
     sourcetitle="Available"
     targettitle="Selected"
   ></pdx-transfer>
+</div>
+```
+
+**Sizes** — `size` is sm, md (the default) or lg, as the form fields beside it: the search field is as tall as a `pdx-input` of the same size, and the rows and the move buttons follow. _(from the live demo)_
+
+```html
+<div class="demo-stack">
+  @for (sizes as s; track s) {
+    <div class="demo-stack">
+      <pdx-input :size="s" :placeholder="s + ' field'"></pdx-input>
+      <pdx-transfer
+        :size="s"
+        searchable
+        :items="items"
+        :value="['b']"
+        sourcetitle="Available"
+        targettitle="Selected"
+      ></pdx-transfer>
+    </div>
+  }
 </div>
 ```
 

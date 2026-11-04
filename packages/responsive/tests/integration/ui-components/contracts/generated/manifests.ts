@@ -173,6 +173,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
     "toggle-button": [{"name":"variant","values":["outline","ghost","solid"],"default":"outline","native":{"outline":".pdx-toggle-btn.pdx-outline","ghost":".pdx-toggle-btn.pdx-ghost","solid":".pdx-toggle-btn.pdx-solid"}}],
     "toggle-group": [{"name":"orientation","values":["horizontal","vertical"],"default":"horizontal"}],
     "toggle": [{"name":"size","values":["md","sm","lg"],"default":"md","native":{"md":".pdx-toggle-md","sm":".pdx-toggle-sm","lg":".pdx-toggle-lg"}}],
+    "transfer": [{"name":"size","values":["md","sm","lg"],"default":"md","native":{"md":".pdx-transfer-md","sm":".pdx-transfer-sm","lg":".pdx-transfer-lg"}}],
     "tree-select": [{"name":"size","values":["md","xs","sm","lg","xl"],"default":"md","native":{"md":".pdx-input-md","xs":".pdx-input-xs","sm":".pdx-input-sm","lg":".pdx-input-lg","xl":".pdx-input-xl"}}],
     "wizard": [{"name":"size","values":["md","sm"],"default":"md","native":{"md":".pdx-stepper-md","sm":".pdx-stepper-sm"}}],
 };
@@ -752,6 +753,10 @@ export const scenarioPage: Record<string, string> = {
     "tooltip-open": "tier-2a",
     "transfer-basic": "tier-5b",
     "transfer-narrow": "tier-5b",
+    "transfer-sizes": "tier-5b",
+    "transfer-size-md": "tier-5b",
+    "transfer-size-sm": "tier-5b",
+    "transfer-size-lg": "tier-5b",
     "tree-select-closed": "tier-3",
     "tree-select-open": "tier-3",
     "tree-select-disabled": "tier-3",
