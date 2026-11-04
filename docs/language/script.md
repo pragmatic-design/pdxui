@@ -169,7 +169,9 @@ alpha; required props and `?` since beta (#130)
 #### Syntax
 
 ```ebnf
-ModelDecl ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? S? ";"?
+ModelDecl     ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? ModelOptions )? S? ";"?
+ModelOptions  ::= "{" S? ModelOption ( S? "," S? ModelOption )* S? "}"
+ModelOption   ::= "form" ( S? ":" S? Expression )? | "attribute" S? ":" S? ( "string" | "number" | "boolean" | "json" )
 ```
 
 The analyzer's form: `@model name: Type = default;`
@@ -198,6 +200,17 @@ component's `models`.
   the default are read, with or without a default. `{ form: () => expr }` (#751) also says what the
   form submits: it compiles to `ctx.formValue?.(() => expr);` at the end of the setup, rewritten as the
   script is.
+- `{ attribute: string }` (#753) says how the attribute is read — `string`, `number`, `boolean` or
+  `json` — apart from the type: it is the descriptor entry's `type`, `String`, `Number`, `Boolean` or
+  `Object`, and the `.d.ts` keeps the type as written. Without it the reading is derived from the type,
+  as for a `@prop`: `string` is a string, `number` a number, `boolean` a boolean, an array or anything
+  else JSON. The options are comma-separated, in any order, beside `form`. Another word is
+  `PDX_MODEL_ATTRIBUTE_UNKNOWN` (error).
+- A model whose type unites values whose attribute is read differently — two or more of a string, a
+  number, a boolean and an array of them, `null` and `undefined` aside, as `string | string[] | null` —
+  with no `{ attribute }`, is `PDX_MODEL_ATTRIBUTE_AMBIGUOUS` (warning): the type alone reads it as JSON,
+  so `value="1"` is the number 1. A union of literals of one kind (`'sm' | 'md'`) is not. A `@prop` has
+  no such option.
 
 #### Examples
 
@@ -213,9 +226,21 @@ function clear() { value = ''; }
 </script>
 ```
 
+A value that is one string from the attribute, or an array of them set on the property:
+
+```pdx
+<template>
+  <p>{{ Array.isArray(value) ? value.join(', ') : value }}</p>
+</template>
+
+<script>
+@model value: string | string[] | null = null { attribute: string };
+</script>
+```
+
 #### Since
 
-beta (#124)
+beta (#124); `{ attribute }` beta (#753)
 
 ### @event
 

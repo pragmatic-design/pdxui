@@ -35,6 +35,8 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_PROP_NO_TYPE` | error | `@prop` without a type annotation. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_INVALID_TYPE` | warn | A `@prop`'s type annotation is malformed. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_TYPE_MISMATCH` | warn | A `@prop`'s default does not match its type. | `@prop`, [script.md](script.md) |
+| `PDX_MODEL_ATTRIBUTE_AMBIGUOUS` | warn | A `@model`'s type unites values whose attribute is read differently, and no `{ attribute }` says how to read it. | `@model`, [script.md](script.md) |
+| `PDX_MODEL_ATTRIBUTE_UNKNOWN` | error | A `@model`'s `{ attribute: … }` is not `string`, `number`, `boolean` or `json`. | `@model`, [script.md](script.md) |
 | `PDX_DUP_PROP` | error | The same `@prop` declared twice. | `@prop`, [script.md](script.md) |
 | `PDX_PROP_WRITE` | warn | A component writes one of its own props (CD-A2). | `@prop`, [script.md](script.md) |
 | `PDX_MALFORMED_EVENT` | error | `@event` written in a shape the compiler does not recognise. | `@event`, [script.md](script.md) |

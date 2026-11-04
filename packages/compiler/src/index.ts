@@ -52,6 +52,7 @@ export { parseDeferTriggers } from './compiler/defer-triggers';
 export type { DeferTriggers, DeferPhase } from './compiler/defer-triggers';
 // The axes of `@variants` (#153), read by the language server as the analyzer reads them.
 export { parseVariantsBlock } from './compiler/variants';
+export { readModelOptions } from './compiler/model-options';
 export type { VariantAxis } from './compiler/variants';
 /**
  * The one reading of an `@params` / `@search` block: the LSP declares each param, and `searchParams`,

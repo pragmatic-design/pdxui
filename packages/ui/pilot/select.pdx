@@ -153,7 +153,8 @@ import type { Option, Row, SourceElement } from './select-types';
 /** The selection (#481): the option's value, or null; in multiple mode the array of values. */
 // What the form submits (#751): with nothing chosen a native select with an empty placeholder submits
 // an empty entry, where the model (null) would submit none; in multiple mode, every selected value.
-@model value: string = null { form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
+// The attribute is one value, a string (#753): the type says the rest.
+@model value: string | string[] | null = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md, xs, sm, lg, xl } = md; }
 @part root;

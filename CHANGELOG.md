@@ -11,6 +11,13 @@ semver.
 
 ### Features
 
+- `@model … { attribute: string }` says how a model's attribute is read, apart from its type (#753):
+  `string`, `number`, `boolean` or `json`, the descriptor's `type`, beside `form` and comma-separated.
+  A select's value is one string from the attribute and an array in multiple mode, `@model value:
+  string | string[] | null = null { attribute: string };`, where the type alone read the attribute as
+  JSON (`value="1"` the number 1). Such a union with no option is the new warning
+  `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`; a reading that does not exist is `PDX_MODEL_ATTRIBUTE_UNKNOWN`.
+
 - `pdx-transfer`'s `size` now draws sm, md and lg (#748). It was a prop that put a
   `pdx-transfer-{size}` class on the frame, which no rule drew; it is now a variant axis on the host,
   md by default, and that class is no longer written there (native markup takes `.pdx-transfer-sm` /

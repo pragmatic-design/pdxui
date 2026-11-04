@@ -148,7 +148,10 @@ an array as repeated entries), `form.reset()` restores it through the model, its
 `error` props are its validity, and a disabled fieldset sets its `disabled` prop. Leave the inner
 `<input>` unnamed, or the value goes twice. When the form should receive something other than the
 model as it is (a clamped number, a selection), say it on the model: `{ form: () => value ?? '' }`
-(in a TypeScript component, `ctx.formValue(() => …)` in the setup).
+(in a TypeScript component, `ctx.formValue(() => …)` in the setup). When the type unites values the
+attribute reads differently — a select's `string | string[] | null` — say how the attribute is read:
+`{ attribute: string }` (or `number`, `boolean`, `json`; beside `form`, comma-separated). Without it
+such a union reads the attribute as JSON (`value="1"` is the number 1), `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`.
 
 **A button that runs a component's method needs no script**: every `@expose`d method is an invoker
 command. `<button commandfor="d" command="--show">` calls `show()` on `<pdx-dialog id="d">`. The

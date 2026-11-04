@@ -21,6 +21,7 @@ import {
     routeTitleOf,
 } from './script-analyzer-helpers';
 import { readLoaderOptions } from './loader-options';
+import { readModelOptions, attributeReadingIsAmbiguous, ATTRIBUTE_READINGS } from './model-options';
 import { maskNonCode, skipNonCode, findClosing } from './tokenizer';
 import { importedLocalNames } from './import-names';
 import { coreRuntimeNames } from './core-import-names';
@@ -395,19 +396,19 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const name = propPrefix[2];
             const optional = propPrefix[3] === '?';
             const colonPos = propPrefix[0].length - 1; // position of `:` in trimmed
-            // `@model name: T = d { form }` (#135): the trailing option is taken off before the type
-            // and the default are read, which would otherwise swallow it. `{ form: () => expr }` (#751)
-            // also says what the form submits when it is not the model.
-            // Match: ` { form }` or ` { form: <expression> }` at the end, before an optional `;`.
-            // Groups: [1]=the expression, when written
-            const formOption = rune === 'model' ? /\s*\{\s*form\s*(?::\s*([\s\S]+?))?\s*\}\s*;?\s*$/.exec(trimmed) : null;
+            // `@model name: T = d { form }` (#135): the trailing options are taken off before the type
+            // and the default are read, which would otherwise swallow them. `{ form: () => expr }`
+            // (#751) also says what the form submits when it is not the model, and `{ attribute: x }`
+            // (#753) how the attribute is read, apart from the type (model-options.ts).
+            const modelOptions = rune === 'model' ? readModelOptions(trimmed) : null;
+            const options = modelOptions?.options;
             // The expression becomes a statement of the setup: rewritten as the script is, and read by
             // core's form wiring whenever what it reads changes. Kept for the end of the body, so it may
             // read what the script declares after the model.
             // Optional: core installs `formValue` with the form wiring, which a runtime with no
             // ElementInternals (happy-dom) does not run, and the component must still set up there.
-            if (formOption?.[1]) formValueCalls.push({ text: `ctx.formValue?.(${formOption[1]});`, line: i });
-            const declaration = formOption ? trimmed.slice(0, formOption.index) + ';' : trimmed;
+            if (options?.formExpr) formValueCalls.push({ text: `ctx.formValue?.(${options.formExpr});`, line: i });
+            const declaration = modelOptions ? trimmed.slice(0, modelOptions.start).trimEnd() + ';' : trimmed;
             const { type: tsType, rest } = extractTypeAnnotation(declaration, colonPos);
             if (tsType) {
                 if (isMalformedTsType(tsType)) {
@@ -422,13 +423,29 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 if (rest.startsWith('=')) {
                     defaultVal = rest.slice(1).replace(/;?\s*$/, '').trim();
                 }
+                const reading = options?.attribute !== undefined ? ATTRIBUTE_READINGS[options.attribute] : undefined;
+                if (options?.attribute !== undefined && !reading) {
+                    warnings.push({
+                        code: 'PDX_MODEL_ATTRIBUTE_UNKNOWN',
+                        severity: 'error',
+                        message: `@model '${name}' reads its attribute as '${options.attribute}', which is not one of string, number, boolean, json.`,
+                        hint: `Write { attribute: string }, number, boolean or json.`,
+                    });
+                } else if (rune === 'model' && options?.attribute === undefined && attributeReadingIsAmbiguous(tsType)) {
+                    warnings.push({
+                        code: 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS',
+                        severity: 'warn',
+                        message: `@model '${name}': its type, '${tsType}', unites values whose attribute is read differently, so the type alone does not say how its attribute is read; it is read as JSON.`,
+                        hint: `Say how: @model ${name}: ${tsType}${defaultVal !== undefined ? ` = ${defaultVal}` : ''} { attribute: string }; (or number, boolean, json).`,
+                    });
+                }
                 props.push({
                     name,
                     tsType,
-                    runtimeType: tsToRuntimeType(tsType),
+                    runtimeType: reading ?? tsToRuntimeType(tsType),
                     default: defaultVal,
                     ...(rune === 'model' ? { model: true } : {}),
-                    ...(formOption ? { form: true } : {}),
+                    ...(options?.form ? { form: true } : {}),
                     ...(rune === 'prop' && !optional && defaultVal === undefined ? { required: true } : {}),
                 });
                 continue;

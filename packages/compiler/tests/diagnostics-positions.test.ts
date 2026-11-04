@@ -42,6 +42,8 @@ const ROWS: Record<string, Row> = {
     PDX_PROP_NO_TYPE: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@prop label;'), at: '@prop label;' },
     PDX_PROP_INVALID_TYPE: { src: pdx('<p>{{ items }}</p>', '@prop items: Array<string = [];'), at: '@prop items' },
     PDX_PROP_TYPE_MISMATCH: { src: pdx('<p>{{ n }}</p>', "let a = $signal(1);\n@prop n: number = 'x';"), at: '@prop n: number' },
+    PDX_MODEL_ATTRIBUTE_AMBIGUOUS: { src: pdx('<p>{{ value }}</p>', 'let a = $signal(1);\n@model value: string | number = 1;'), at: '@model value' },
+    PDX_MODEL_ATTRIBUTE_UNKNOWN: { src: pdx('<p>{{ value }}</p>', "let a = $signal(1);\n@model value: string = '' { attribute: date };"), at: '@model value' },
     PDX_DUP_PROP: { src: pdx('<p>{{ a }}</p>', "@prop a: string = 'x';\n@prop a: string = 'y';"), at: "@prop a: string = 'y';" },
     PDX_MALFORMED_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event (saved): number;'), at: '@event (saved)' },
     PDX_DUP_EVENT: { src: pdx('<p>x</p>', 'let a = $signal(1);\n@event changed: number;\n@event changed: string;'), at: '@event changed: string;' },

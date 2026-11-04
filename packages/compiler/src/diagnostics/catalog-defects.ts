@@ -185,6 +185,23 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Balance the type: `@prop items: Array<string> = [];`',
         reproducedIn: `${T}prop-type-validation.test.ts`,
     },
+    PDX_MODEL_ATTRIBUTE_AMBIGUOUS: {
+        severity: 'warn', category: 'defect',
+        summary: "A `@model`'s type unites values whose attribute is read differently, and nothing says how to read it.",
+        explanation: 'A model of `string | string[] | null` reads its attribute as JSON: `value="1"` becomes the number 1. The type cannot say whether the attribute is a string, a number, a boolean or JSON when it unites several of them (#753).',
+        fix: 'Say how the attribute is read: `@model value: string | string[] | null = null { attribute: string };`',
+        example: {
+            bad: pdx('<p>{{ value }}</p>', '@model value: string | string[] | null = null;'),
+            good: pdx('<p>{{ value }}</p>', '@model value: string | string[] | null = null { attribute: string };'),
+        },
+    },
+    PDX_MODEL_ATTRIBUTE_UNKNOWN: {
+        severity: 'error', category: 'defect',
+        summary: "A `@model`'s `{ attribute: … }` names a reading that does not exist.",
+        explanation: 'An attribute is read as `string`, `number`, `boolean` or `json`; any other word leaves the model with no reading to compile (#753).',
+        fix: '`{ attribute: string }`, `number`, `boolean` or `json`.',
+        reproducedIn: `${T}model-attribute-option.test.ts`,
+    },
     PDX_PROP_TYPE_MISMATCH: {
         severity: 'warn', category: 'defect',
         summary: "A `@prop`'s default does not match its type.",
