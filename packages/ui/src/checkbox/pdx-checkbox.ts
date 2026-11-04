@@ -2,7 +2,7 @@
 // Maps to .pdx-checkbox CSS class from design system (forms.css).
 // tristate=true: click cycles unchecked → checked → indeterminate → unchecked.
 
-import { component, html, model } from '@pdxui/core';
+import { component, html, model, prop } from '@pdxui/core';
 // A container rule in form.css (`.has-warning .pdx-checkbox`) styles this element, and it owns
 // no stylesheet of its own, so nothing else would carry it.
 import '@pdxui/design/components/form';
@@ -43,16 +43,16 @@ component('pdx-checkbox', {
         size: { md: '.pdx-checkbox-md', sm: '.pdx-checkbox-sm', lg: '.pdx-checkbox-lg' },
     },
     props: {
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Enable 3-state cycle: unchecked → checked → indeterminate → unchecked */
-        tristate: { type: Boolean, default: false },
-        label: { type: String, default: '' },
-        description: { type: String, default: '' },
-        value: { type: String, default: '' },
-        name: { type: String, default: '' },
-        error: { type: Boolean, default: false },
-        required: { type: Boolean, default: false },
-        labelPosition: { type: String, default: 'right' },
+        tristate: prop(false),
+        label: prop(''),
+        description: prop(''),
+        value: prop(''),
+        name: prop(''),
+        error: prop(false),
+        required: prop(false),
+        labelPosition: prop('right'),
     },
     setup(ctx) {
         // Tristate cycle: unchecked(0) → checked(1) → indeterminate(2) → unchecked(0)

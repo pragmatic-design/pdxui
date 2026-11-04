@@ -4,7 +4,7 @@
 // validates onChange.
 // ZERO validation built-in — validation lives in @form rune or dev code.
 
-import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField, untracked } from '@pdxui/core';
+import { component, html, signal, tryUseForm, useFieldGroupPath, resolveValidationMessage, onLocaleChange, generatedId, formField, untracked, prop } from '@pdxui/core';
 import type { Form, FormField } from '@pdxui/core';
 // Its warning message and the border of a control in warning are drawn by form.css, written where the
 // form is. Imported here so they travel with a field used without a form.
@@ -88,39 +88,39 @@ component('pdx-form-field', {
          * The form field this field shows (#128): `:field="f.email"`. Its error, warning, touched state and
          * required-ness, with no `name` and no surrounding `<pdx-form>`.
          */
-        field: { type: Object, default: null },
+        field: prop<Record<string, unknown> | null>(null),
         /** Field name — if set and inside <pdx-form>, auto-wires error/touched from form context. */
-        name: { type: String, default: '' },
-        label: { type: String, default: '' },
-        hint: { type: String, default: '' },
-        description: { type: String, default: '' },
+        name: prop(''),
+        label: prop(''),
+        hint: prop(''),
+        description: prop(''),
         /**
          * The error message. Shown only when the field is touched, when `show-error` is set, or when
          * its form validates onChange: an error decided by code (a server rejection, a check on save)
          * goes with `show-error`.
          */
-        error: { type: String, default: '' },
+        error: prop(''),
         /** Non-blocking warning message (yellow, below error). */
-        warning: { type: String, default: '' },
-        success: { type: String, default: '' },
+        warning: prop(''),
+        success: prop(''),
         /**
          * Marks the field required: `aria-required` on its control and the required marker on its
          * label. Not needed for a field the form requires — one whose validators include
          * `required()` is marked the same way without it.
          */
-        required: { type: Boolean, default: false },
-        optional: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        touched: { type: Boolean, default: false },
+        required: prop(false),
+        optional: prop(false),
+        disabled: prop(false),
+        touched: prop(false),
         /** Force error display even if not touched */
-        showError: { type: Boolean, default: false },
+        showError: prop(false),
         /** Horizontal layout: label left, input right */
-        horizontal: { type: Boolean, default: false },
+        horizontal: prop(false),
         /**
          * The control's name when the field shows no `label`: set as its aria-label. A visible label
          * wins, and a control that names itself keeps its own name.
          */
-        a11yLabel: { type: String, default: '' },
+        a11yLabel: prop(''),
     },
     // Its conditions are states of the host (#293), which forms.css draws; the wrapper and its label
     // keep only their base classes, the ones native markup shares with the state classes it adds.

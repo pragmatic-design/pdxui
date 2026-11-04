@@ -6,7 +6,7 @@ A floating action button.
 |---|---|---|---|---|
 | `icon` | `icon` | string | `'plus'` | Main button icon name |
 | `label` | `label` | string | `''` | Main button label (screen reader). Empty: the fab.label component string, «Actions». |
-| `actions` | — | array | `[]` | Speed dial actions |
+| `actions` | — | unknown[] | `[]` | Speed dial actions |
 | `direction` | `direction` | string | `'up'` | Speed dial direction: up (default), down, left, right |
 | `type` | `type` | string | `'linear'` | Speed dial layout: linear (default), circle, semi-circle, quarter-circle |
 | `showTooltip` | `showtooltip` | boolean | `true` | Show tooltip labels next to actions |

@@ -6,7 +6,7 @@ Load more as you scroll.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `source` | — | object | `null` | DataSource instance for auto-paging |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource instance for auto-paging |
 | `threshold` | `threshold` | number | `200` | Pixels from bottom to trigger load |
 | `disabled` | `disabled` | boolean | `false` | Disable loading more |
 | `loading` | `loading` | boolean | `false` | External loading state override |

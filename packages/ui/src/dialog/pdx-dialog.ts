@@ -2,7 +2,7 @@
 // Uses overlayStack for z-index management and Escape coordination.
 // Same pattern as pdx-drawer: backdrop + panel in render template, CSS visibility.
 
-import { component, event, html, model } from '@pdxui/core';
+import { component, event, html, model, prop } from '@pdxui/core';
 import { focusTrap, overlayStack } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -39,14 +39,14 @@ component('pdx-dialog', {
         size: { md: '.pdx-dialog-md', sm: '.pdx-dialog-sm', lg: '.pdx-dialog-lg', xl: '.pdx-dialog-xl', full: '.pdx-dialog-full' },
     },
     props: {
-        title: { type: String, default: '' },
-        closeOnBackdrop: { type: Boolean, default: true },
-        closeOnEscape: { type: Boolean, default: true },
-        showClose: { type: Boolean, default: true },
-        initialfocus: { type: String, default: '' },
-        preventClose: { type: Boolean, default: false },
+        title: prop(''),
+        closeOnBackdrop: prop(true),
+        closeOnEscape: prop(true),
+        showClose: prop(true),
+        initialfocus: prop(''),
+        preventClose: prop(false),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     events: {
         /** Fired (cancelable) before closing; call preventDefault() to block it. */

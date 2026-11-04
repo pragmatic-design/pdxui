@@ -5,7 +5,7 @@ A swipeable slideshow.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `items` | — | T[] | `null` | The data items to render. |
-| `renderSlide` | — | object | `null` | Render function for each slide. |
+| `renderSlide` | — | Record<string, unknown> \| null | `null` | Render function for each slide. |
 | `autoplay` | `autoplay` | boolean | `false` | Advances slides automatically. |
 | `interval` | `interval` | number | `5000` | Autoplay interval in milliseconds. |
 | `loop` | `loop` | boolean | `true` | Wraps around from the last slide to the first. |

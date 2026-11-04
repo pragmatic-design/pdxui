@@ -3,7 +3,7 @@
 // Supports: H/V orientation, min/max per pane, collapsible, keyboard resize,
 // autoSaveId persistence, double-click to collapse/reset, nested splits.
 
-import { component, html, signal, generatedId, event } from '@pdxui/core';
+import { component, html, signal, generatedId, event, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -47,15 +47,15 @@ component('pdx-splitter', {
     parts: ['pane', 'gutter'],
     props: {
         /** Orientation: horizontal (side-by-side) or vertical (stacked) */
-        orientation: { type: String, default: 'horizontal' },
+        orientation: prop('horizontal'),
         /** Pane configurations — array matching child elements */
-        panes: { type: Array, default: [] },
+        panes: prop<unknown[]>([]),
         /** Gutter size in px */
-        gutterSize: { type: Number, default: 6 },
+        gutterSize: prop(6),
         /** localStorage key for persistence (empty = no save) */
-        autoSaveId: { type: String, default: '' },
+        autoSaveId: prop(''),
         /** Keyboard step size in % */
-        keyboardStep: { type: Number, default: 2 },
+        keyboardStep: prop(2),
     },
     setup(ctx) {
         const _uid = generatedId('pdx-splitter');

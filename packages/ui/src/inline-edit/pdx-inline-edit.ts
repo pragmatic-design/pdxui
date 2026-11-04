@@ -3,7 +3,7 @@
 // Supports: text, number, currency, date, datetime, boolean, select, multiselect,
 // color, rating, textarea.
 
-import { component, event, html, signal, untracked, model } from '@pdxui/core';
+import { component, event, html, signal, untracked, model, prop } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl } from '@pdxui/core';
 import { resolveLocale } from '../shared/locale';
 import { onControlValue } from '../shared/model-event';
@@ -68,33 +68,33 @@ component('pdx-inline-edit', {
     parts: ['root', 'display', 'edit', 'editor', 'save', 'cancel'],
     props: {
         /** Data type — determines which editor to show */
-        type: { type: String, default: 'text' },
+        type: prop('text'),
         /** Options for select/multiselect: [{ value, label }] */
-        options: { type: Array, default: [] },
+        options: prop<unknown[]>([]),
         /** Placeholder when value is empty */
-        placeholder: { type: String, default: '' },
+        placeholder: prop(''),
         /** What opens the editor: a click on the value, a double click, or only the pencil button ('icon'). */
-        editOn: { type: String, default: 'click', enum: ['click', 'dblclick', 'icon'] },
+        editOn: prop<'click' | 'dblclick' | 'icon'>('click'),
         /** When to save: 'blur' (auto-save on blur/Enter) | 'action' (confirm/cancel buttons) */
-        saveOn: { type: String, default: 'blur' },
+        saveOn: prop('blur'),
         /** Disabled */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Readonly */
-        readonly: { type: Boolean, default: false },
+        readonly: prop(false),
         /** Component size */
-        size: { type: String, default: '' },
+        size: prop(''),
         /** Currency code for type=currency (default: 'EUR') */
-        currency: { type: String, default: 'EUR' },
+        currency: prop('EUR'),
         /** Decimals kept by the number and currency editors. -1: the currency's own (2 for EUR, 0 for JPY), or what the number display shows (3). */
-        precision: { type: Number, default: -1 },
+        precision: prop(-1),
         /** Locale for formatting. Empty: the page's language (`lang`), then the browser's. */
-        locale: { type: String, default: '' },
+        locale: prop(''),
         /** Form field name */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** Show edit icon on hover */
-        showIcon: { type: Boolean, default: true },
+        showIcon: prop(true),
         /** The field's name, for the editor's accessible name. Empty: the inline-edit.edit component string, «Edit {value}». */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         const _editing = signal(false);

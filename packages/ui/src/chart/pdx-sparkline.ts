@@ -1,7 +1,7 @@
 // pdx-sparkline — Inline mini chart for tables, cards, KPIs.
 // Minimal: just a line/area/bar in a small space. No axes, no tooltip.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 import { resolveTheme } from './core/theme';
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
@@ -15,19 +15,19 @@ import { resolveLocale } from '../shared/locale';
 component('pdx-sparkline', {
     props: {
         /** Comma-separated values or array */
-        data: { type: String, default: '' },
+        data: prop(''),
         /** Chart type: line, area, bar */
-        type: { type: String, default: 'line' },
+        type: prop('line'),
         /** Width (CSS) */
-        width: { type: String, default: '120px' },
+        width: prop('120px'),
         /** Height (CSS) */
-        height: { type: String, default: '32px' },
+        height: prop('32px'),
         /** Line/fill color (CSS color or design token name) */
-        color: { type: String, default: '' },
+        color: prop(''),
         /** Smooth line */
-        smooth: { type: Boolean, default: true },
+        smooth: prop(true),
         /** Accessible name. Empty: the series in words, from the data. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     parts: ['canvas'],
     setup(ctx) {

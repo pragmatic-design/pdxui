@@ -162,7 +162,9 @@ function extractProps(optionsObj, sourceFile, tag) {
         const name = decl.name.getText(sourceFile).replace(/^['"]|['"]$/g, '');
         const built = builtProp(decl.initializer, sourceFile);
         if (built) {
-            props.push({ name, ...built, iconName: false, description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
+            // `@type` on the prop's JSDoc wins here too, as it does for the constructor form below.
+            const declared = jsdocDeclaredType(decl, sourceFile);
+            props.push({ name, ...built, ...(declared ? { type: declared } : {}), description: jsdocDescription(decl) || PROP_DESC[`${tag}:${name}`] || describeProp(name) });
             continue;
         }
         if (!ts.isObjectLiteralExpression(decl.initializer)) continue;
@@ -316,7 +318,15 @@ function builtProp(initializer, sourceFile) {
         ? (optionsRuntime(first, sourceFile) ?? 'object')
         : (optionsRuntime(second, sourceFile) ?? inferredRuntime(first));
     const def = noDefault || !first ? undefined : first.getText(sourceFile);
-    return { type: typeArg || runtime, runtime, default: def, ...(required ? { required: true } : {}) };
+    const iconName = optionsFlag(noDefault ? first : second, sourceFile, 'iconName');
+    return { type: typeArg || runtime, runtime, default: def, iconName, ...(required ? { required: true } : {}) };
+}
+
+/** A boolean field of a builder's options argument (`{ iconName: true }`): true only when written `true`. */
+function optionsFlag(arg, sourceFile, name) {
+    if (!arg || !ts.isObjectLiteralExpression(arg)) return false;
+    const field = arg.properties.find(p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === name);
+    return !!field && field.initializer.kind === ts.SyntaxKind.TrueKeyword;
 }
 
 /** The string literals of a descriptor's array field, `parts: ['trigger', 'popup']` → their values. */

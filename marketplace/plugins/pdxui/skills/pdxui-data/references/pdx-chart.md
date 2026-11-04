@@ -21,7 +21,7 @@ tiny inline trend in a table cell or a KPI card → `pdx-sparkline`.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `type` | `type` | string | `'line'` | Chart type: line, bar, area, pie, doughnut, scatter, gauge, radar |
-| `data` | — | array | `[]` | Data array (array of objects) |
+| `data` | — | unknown[] | `[]` | Data array (array of objects) |
 | `xField` | `xfield` | string | `''` | X-axis field name (auto-detected if omitted) |
 | `yField` | `yfield` | string | `''` | Y-axis field name(s) — string or comma-separated |
 | `seriesNames` | `seriesnames` | string | `''` | Series display names (comma-separated) |
@@ -46,7 +46,7 @@ tiny inline trend in a table cell or a KPI card → `pdx-sparkline`.
 | `max` | `max` | number | `100` | Gauge: maximum value |
 | `value` | `value` | number | `0` | Gauge: current value (alternative to data) |
 | `format` | `format` | string | `''` | Gauge: value format (e.g. "{value}%") |
-| `source` | — | object | `null` | DataSource binding (duck-typed) |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource binding (duck-typed) |
 
 **Renders:** roles `group`
 

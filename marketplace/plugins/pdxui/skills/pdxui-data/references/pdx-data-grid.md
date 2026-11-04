@@ -93,7 +93,7 @@ nothing on a narrow viewport.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `source` | — | import('@pdxui/core').DataSource<T> \| null | `null` | The data source to render from. |
-| `columns` | — | array | `null` | Column definitions: field, header, width, sortable, render, etc. |
+| `columns` | — | unknown[] \| null | `null` | Column definitions: field, header, width, sortable, render, etc. |
 | `data` | — | T[] | `null` | The row data to display. |
 | `striped` | `striped` | boolean | `false` | Alternates row background colours. |
 | `hover` | `hover` | boolean | `true` | Highlights the row under the pointer. |
@@ -113,10 +113,10 @@ nothing on a narrow viewport.
 | `search` | `search` | boolean | `false` | A search field at the toolbar's right: the term is looked for in the columns marked `searchable`. |
 | `showGroupBar` | `showgroupbar` | boolean | `false` | Shows the drag-to-group bar. |
 | `paginationPosition` | `paginationposition` | string | `'bottom'` | Where the pager sits: 'top', 'bottom' or 'both'. |
-| `pageSizes` | — | array | `[]` | The rows-per-page choices the footer's pager offers; empty, it offers none. |
+| `pageSizes` | — | unknown[] | `[]` | The rows-per-page choices the footer's pager offers; empty, it offers none. |
 | `expandable` | `expandable` | boolean | `false` | Allows rows to expand into a detail panel. |
 | `rowReorder` | `rowreorder` | boolean | `false` |  |
-| `groupBy` | — | array | `null` | Fields to group rows by. |
+| `groupBy` | — | unknown[] \| null | `null` | Fields to group rows by. |
 | `virtualScroll` | `virtualscroll` | boolean | `false` | Renders only visible rows for large datasets. |
 | `rowHeight` | `rowheight` | number | `0` | Row height in px for virtual scrolling (42 when unset); ignored otherwise. |
 | `maxHeight` | `maxheight` | number | `0` | Caps the grid height in px; the body scrolls beyond it. 0 = no cap (a virtual grid uses 400). |

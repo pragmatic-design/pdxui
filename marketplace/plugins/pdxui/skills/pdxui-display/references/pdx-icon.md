@@ -37,7 +37,7 @@ Any other set: `registerIconSet(name, resolver)` from `@pdxui/core`, then `set="
 | `src` | `src` | string | `''` | URL of an external SVG to load. |
 | `size` | `size` | string | `'md'` | Size of the control (e.g. sm, md, lg). |
 | `label` | `label` | string | `''` | Visible label text. |
-| `weight` | `weight` | 'thin' \| 'light' \| 'regular' \| 'bold' | `''` | Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'. |
+| `weight` | `weight` | '' \| 'thin' \| 'light' \| 'regular' \| 'bold' | `''` | Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'. |
 | `rtl` | `rtl` | 'none' \| 'mirror' | `'none'` | RTL behavior: 'mirror' flips in RTL context, 'none' keeps as-is. Default: 'none'. |
 | `spin` | `spin` | boolean | `false` | Spin animation for loading indicators. |
 

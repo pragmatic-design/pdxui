@@ -2,7 +2,7 @@
 // Maps to .pdx-toggle CSS class from design system (forms.css).
 // Uses role="switch" for proper a11y semantics.
 
-import { component, html, model } from '@pdxui/core';
+import { component, html, model, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 
 /**
@@ -35,16 +35,16 @@ component('pdx-switch', {
         size: { md: '.pdx-toggle-md', sm: '.pdx-toggle-sm', lg: '.pdx-toggle-lg' },
     },
     props: {
-        disabled: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        label: { type: String, default: '' },
-        description: { type: String, default: '' },
+        disabled: prop(false),
+        loading: prop(false),
+        label: prop(''),
+        description: prop(''),
         /** Accessible name when there is no visible label (forwarded to the inner input) */
-        ariaLabel: { type: String, default: '' },
-        labelPosition: { type: String, default: 'right' },
-        error: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        value: { type: String, default: '' },
+        ariaLabel: prop(''),
+        labelPosition: prop('right'),
+        error: prop(false),
+        name: prop(''),
+        value: prop(''),
     },
     setup(ctx) {
         // `checked` is the live state and the model: a toggle writes it, and the write dispatches its event.

@@ -2,7 +2,7 @@
 // Supports DataSource binding: auto-reads total/page/pageSize from DataSource.
 // Priority: explicit props > :source prop > injected DataSource from context.
 
-import { component, html, signal, inject, slot, declaredSnippet, model } from '@pdxui/core';
+import { component, html, signal, inject, slot, declaredSnippet, model, prop } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { SlotFunction } from '@pdxui/core';
 import type { DataSource } from '@pdxui/core';
@@ -47,19 +47,19 @@ component('pdx-pagination', {
     parts: ['nav', 'page', 'first', 'prev', 'next', 'last', 'ellipsis', 'range', 'position', 'size'],
     props: {
         /** DataSource instance — auto-binds total, page, pageSize */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Total number of items (overrides DataSource) */
-        total: { type: Number, default: -1 },
+        total: prop(-1),
         /** Show first/last buttons */
-        showEdges: { type: Boolean, default: true },
+        showEdges: prop(true),
         /** Show page size selector */
-        showPageSize: { type: Boolean, default: false },
+        showPageSize: prop(false),
         /** Page size options */
-        pageSizes: { type: Array, default: [10, 20, 50, 100] },
+        pageSizes: prop<unknown[]>([10, 20, 50, 100]),
         /** Simple mode (prev/next only, no page numbers) */
-        simple: { type: Boolean, default: false },
+        simple: prop(false),
         /** Show total info text */
-        showTotal: { type: Boolean, default: false },
+        showTotal: prop(false),
     },
     // A parent's `@snippet` sets this, positional arguments; the alpha scoped slot is not read
     // (#492). The snippet is `item`, named apart from the `page` prop above.

@@ -81,7 +81,9 @@ function deadProps(text: string): { checked: number; dead: string[] } {
 
     let checked = 0;
     const dead: string[] = [];
-    for (const m of block[1].matchAll(/^ {8}'?([\w]+)'?:\s*\{/gm)) {
+    // A prop is declared with the descriptor, `name: prop(…)` (#872), or in the constructor form a
+    // planted case below still uses, `name: { type: … }`.
+    for (const m of block[1].matchAll(/^ {8}'?([\w]+)'?:\s*(?:\{|prop\b)/gm)) {
         const name = m[1];
         checked++;
         if (!viaHelpers.has(name) && !new RegExp(`\\b${name}\\b`).test(rest)) dead.push(`${tag}.${name}`);
@@ -138,6 +140,12 @@ describe('the scan can fail', () => {
 
     it('counts the props it looked at', () => {
         expect(deadProps(LIVE).checked).toBe(2);
+    });
+
+    it('sees a prop declared with the descriptor, prop<T>() and prop.optional<T>()', () => {
+        const planted = LIVE.replace('        used: {',
+            "        forgotten: prop<'a' | 'b'>('a'),\n        unset: prop.optional<number>({ type: Number }),\n        used: {");
+        expect(deadProps(planted).dead).toEqual(['pdx-probe.forgotten', 'pdx-probe.unset']);
     });
 });
 

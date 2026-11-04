@@ -2,7 +2,7 @@
 // Supports: direction (up/down/left/right), type (linear/circle/semi-circle/quarter-circle),
 // tooltip labels, mask overlay, trigger (click/hover), animation stagger.
 
-import { component, html, signal, event } from '@pdxui/core';
+import { component, html, signal, event, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -51,21 +51,21 @@ component('pdx-fab', {
     },
     props: {
         /** Main button icon name */
-        icon: { type: String, default: 'plus', iconName: true },
+        icon: prop('plus', { iconName: true }),
         /** Main button label (screen reader). Empty: the fab.label component string, «Actions». */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Speed dial actions */
-        actions: { type: Array, default: [] },
+        actions: prop<unknown[]>([]),
         /** Speed dial direction: up (default), down, left, right */
-        direction: { type: String, default: 'up' },
+        direction: prop('up'),
         /** Speed dial layout: linear (default), circle, semi-circle, quarter-circle */
-        type: { type: String, default: 'linear' },
+        type: prop('linear'),
         /** Show tooltip labels next to actions */
-        showTooltip: { type: Boolean, default: true },
+        showTooltip: prop(true),
         /** Show mask overlay when open */
-        mask: { type: Boolean, default: false },
+        mask: prop(false),
         /** Trigger mode: click (default), hover */
-        trigger: { type: String, default: 'click' },
+        trigger: prop('click'),
     },
     setup(ctx) {
         const _open = signal(false);

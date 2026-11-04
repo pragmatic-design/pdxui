@@ -2,7 +2,7 @@
 // Works inside pdx-row (WC) or any flex container. 12-column system.
 // Breakpoint props (sm/md/lg/xl) override span at viewport thresholds.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/col';
@@ -17,19 +17,19 @@ const BP = { sm: 640, md: 768, lg: 1024, xl: 1280 } as const;
 component('pdx-col', {
     props: {
         /** Column span 1-12 (default: 12 = full width) */
-        span: { type: Number, default: 12 },
+        span: prop(12),
         /** Span override at >= 640px */
-        sm: { type: Number, default: 0 },
+        sm: prop(0),
         /** Span override at >= 768px */
-        md: { type: Number, default: 0 },
+        md: prop(0),
         /** Span override at >= 1024px */
-        lg: { type: Number, default: 0 },
+        lg: prop(0),
         /** Span override at >= 1280px */
-        xl: { type: Number, default: 0 },
+        xl: prop(0),
         /** Column offset (0-11) — pushes column to the right */
-        offset: { type: Number, default: 0 },
+        offset: prop(0),
         /** CSS order override */
-        order: { type: Number, default: 0 },
+        order: prop(0),
     },
     setup(ctx) {
         let _built = false;

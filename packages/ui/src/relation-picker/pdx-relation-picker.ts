@@ -8,7 +8,7 @@
 //   el.addEventListener('pdx-pick',   e => link(e.detail.items));   // [{...row}, ...]
 //   el.addEventListener('pdx-create', () => openCreateForm());
 
-import { component, html, event } from '@pdxui/core';
+import { component, html, event, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import '../data-grid/pdx-data-grid';
 import '../button/pdx-button';
@@ -29,12 +29,12 @@ import '@pdxui/design/components/relation-picker';
 component('pdx-relation-picker', {
     props: {
         /** The DataSource of the rows to pick from, handed to the grid the picker renders. */
-        source: { type: Object, default: null },
-        columns: { type: Array, default: () => [] },
-        createLabel: { type: String, default: '' },
+        source: prop<Record<string, unknown> | null>(null),
+        columns: prop<unknown[]>(() => []),
+        createLabel: prop(''),
         /** The add button's text. Empty: the relation-picker.add component string. */
-        addLabel: { type: String, default: '' },
-        idField: { type: String, default: 'id' },
+        addLabel: prop(''),
+        idField: prop('id'),
         /**
          * Let the user narrow the list — the one thing a picker exists for.
          *
@@ -47,7 +47,7 @@ component('pdx-relation-picker', {
          * search. Whether the picker should also carry a search field of its OWN, above the grid
          * and across every column, is a design decision and is still open.
          */
-        searchable: { type: Boolean, default: false },
+        searchable: prop(false),
     },
     // Declared (#138): they stay on the host, which the parent listens on.
     events: {

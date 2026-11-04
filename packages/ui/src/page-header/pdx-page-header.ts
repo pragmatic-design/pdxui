@@ -8,7 +8,7 @@
 //     <pdx-button slot="actions">New</pdx-button>
 //   </pdx-page-header>
 
-import { component, html, event } from '@pdxui/core';
+import { component, html, event, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -40,11 +40,11 @@ component('pdx-page-header', {
     },
     parts: ['root', 'breadcrumb', 'title', 'subtitle', 'actions'],
     props: {
-        title: { type: String, default: '' },
-        subtitle: { type: String, default: '' },
-        crumbs: { type: Array, default: () => [] },
+        title: prop(''),
+        subtitle: prop(''),
+        crumbs: prop<unknown[]>(() => []),
         /** The title's heading level, 1-6. Default 1; lower it for a header inside a dialog or a section. */
-        headingLevel: { type: Number, default: 1 },
+        headingLevel: prop(1),
     },
     setup(ctx) {
         /**

@@ -3,7 +3,7 @@
 // Uses focusGroup for keyboard nav between triggers.
 // mode="single" (one open at a time) or mode="multiple" (free).
 
-import { component, html, focusGroup, generatedId, event } from '@pdxui/core';
+import { component, html, focusGroup, generatedId, event, prop } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -32,11 +32,11 @@ component('pdx-accordion', {
     parts: ['item', 'trigger', 'panel'],
     props: {
         /** "single" = one open at a time (default), "multiple" = any number open */
-        mode: { type: String, default: 'single' },
+        mode: prop('single'),
         /** Disable all items */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     setup(ctx) {
         let focusGroupDispose: Dispose | null = null;

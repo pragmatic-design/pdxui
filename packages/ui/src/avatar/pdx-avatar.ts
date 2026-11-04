@@ -2,7 +2,7 @@
 // Sizes: xs(24) sm(32) md(40) lg(48) xl(64). Shapes: circle, square.
 // Auto-color: generates consistent background color from name hash.
 
-import { component, html, signal } from '@pdxui/core';
+import { component, html, signal, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/avatar';
@@ -48,11 +48,11 @@ component('pdx-avatar', {
     states: ['broken'],
     parts: ['root', 'image', 'fallback'],
     props: {
-        src: { type: String, default: '' },
+        src: prop(''),
         /** The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden). */
-        alt: { type: String, default: '' },
+        alt: prop(''),
         /** 'auto' generates color from name. Or pass a CSS color. Default: 'auto'. */
-        color: { type: String, default: 'auto' },
+        color: prop('auto'),
     },
     setup(ctx) {
         const imgError = signal(false);

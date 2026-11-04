@@ -3,7 +3,7 @@
 // Features: sizes, full width, vertical, disabled per-item, form name,
 // animated indicator (Mantine/Ark pattern), roving tabindex keyboard nav.
 
-import { component, html, DEV, model } from '@pdxui/core';
+import { component, html, DEV, model, prop } from '@pdxui/core';
 import { reflectNameToHost } from '../shared/own-prop';
 import { nameGroup } from '../shared/group-name';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -53,11 +53,11 @@ component('pdx-segmented', {
     },
     props: {
         /** Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute. */
-        options: { type: Array, default: [] },
-        full: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        label: { type: String, default: '' },
+        options: prop<unknown[]>([]),
+        full: prop(false),
+        disabled: prop(false),
+        name: prop(''),
+        label: prop(''),
     },
     setup(ctx) {
         // An array, from a binding or from a JSON attribute (core parses the attribute of an Array

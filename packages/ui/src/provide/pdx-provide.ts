@@ -21,7 +21,7 @@
 //     </pdx-provide>
 //   </pdx-provide>
 
-import { component, html, provide } from '@pdxui/core';
+import { component, html, provide, prop } from '@pdxui/core';
 import type { Context } from '@pdxui/core';
 
 /**
@@ -31,11 +31,11 @@ import type { Context } from '@pdxui/core';
 component('pdx-provide', {
     props: {
         /** The context token the value is provided under (single value mode): `context<T>('name')`. */
-        token: { type: Object, default: null },
+        token: prop<Record<string, unknown> | null>(null),
         /** Value to provide (for single value mode). Reactive if signal. */
-        value: { type: Object, default: null },
+        value: prop<Record<string, unknown> | null>(null),
         /** Multiple values, a `Map` of token → value. Takes priority over token/value. */
-        values: { type: Object, default: null },
+        values: prop<Record<string, unknown> | null>(null),
     },
     setup(ctx) {
         // Track changes to token/value/values and re-provide

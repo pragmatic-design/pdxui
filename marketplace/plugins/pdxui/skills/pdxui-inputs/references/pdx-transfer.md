@@ -12,8 +12,8 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `items` | — | array | `[]` | All items — array of { value, label, disabled? } |
-| `source` | — | object | `null` | DataSource or raw array of objects |
+| `items` | — | unknown[] | `[]` | All items — array of { value, label, disabled? } |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource or raw array of objects |
 | `labelField` | `labelfield` | string | `'label'` | Field to use as item label (default: 'label') |
 | `valueField` | `valuefield` | string | `'value'` | Field to use as item value/id (default: 'value') |
 | `assignedField` | `assignedfield` | string | `''` | Field that determines left vs right panel (boolean or matched value) |

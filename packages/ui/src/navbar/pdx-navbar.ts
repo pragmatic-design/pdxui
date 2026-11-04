@@ -2,7 +2,7 @@
 // Props for brand + nav. Discovers existing children for actions area.
 // Responsive: hamburger + drawer on mobile breakpoint.
 
-import { component, html, signal, sanitizeUrl, generatedId, event } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, event, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -46,20 +46,20 @@ component('pdx-navbar', {
     parts: ['bar', 'brand', 'toggle', 'nav', 'item', 'actions', 'drawer'],
     props: {
         /** Brand text */
-        brand: { type: String, default: '' },
+        brand: prop(''),
         /** Brand icon name */
-        brandIcon: { type: String, default: '', iconName: true },
+        brandIcon: prop('', { iconName: true }),
         /** Navigation items */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Sticky */
-        sticky: { type: Boolean, default: false },
+        sticky: prop(false),
         /** Compact height */
-        compact: { type: Boolean, default: false },
+        compact: prop(false),
         /**
          * The navigation landmark's name. Empty: the navbar.mainNav component string, «Main
          * navigation». Give each navbar on a page its own: a sub-nav, a footer nav.
          */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         const _mobileOpen = signal(false);

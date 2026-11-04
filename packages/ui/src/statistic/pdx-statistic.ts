@@ -1,7 +1,7 @@
 // pdx-statistic — Display numeric KPI values with labels, trends, icons.
 // Useful for dashboard cards, analytics summaries, stat panels.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/statistic';
@@ -35,33 +35,33 @@ component('pdx-statistic', {
     },
     props: {
         /** Label text above the value */
-        title: { type: String, default: '' },
+        title: prop(''),
         /** Main display value */
-        value: { type: String, default: '0' },
+        value: prop('0'),
         /** Text/symbol before value (e.g. '$') */
-        prefix: { type: String, default: '' },
+        prefix: prop(''),
         /** Text/symbol after value (e.g. '%') */
-        suffix: { type: String, default: '' },
+        suffix: prop(''),
         /** Icon name (left of title) */
-        icon: { type: String, default: '', iconName: true },
+        icon: prop('', { iconName: true }),
         /** Trend direction: 'up' | 'down' | 'flat' | '' */
-        trend: { type: String, default: '' },
+        trend: prop(''),
         /** Trend text e.g. '+12.5%' */
-        trendValue: { type: String, default: '' },
+        trendValue: prop(''),
         /** Auto-color trend (green up, red down) */
-        trendColor: { type: Boolean, default: true },
+        trendColor: prop(true),
         /** Show skeleton placeholder */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
         /** Decimal places for formatting (-1 = no format) */
-        precision: { type: Number, default: -1 },
+        precision: prop(-1),
         /** Thousands separator */
-        groupSeparator: { type: String, default: ',' },
+        groupSeparator: prop(','),
         /** Comparison/previous value (shown muted below main value) */
-        compareValue: { type: String, default: '' },
+        compareValue: prop(''),
         /** Compare label (e.g. "vs last month") */
-        compareLabel: { type: String, default: '' },
+        compareLabel: prop(''),
         /** Description text below value */
-        description: { type: String, default: '' },
+        description: prop(''),
     },
     setup(ctx) {
         let _built = false;

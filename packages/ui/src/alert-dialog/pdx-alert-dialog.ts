@@ -3,7 +3,7 @@
 // Cannot close via backdrop or Escape by default. Auto-focuses cancel button.
 // Supports: danger variant, type-to-confirm, timer-gated confirm, loading state.
 
-import { component, event, html, model, signal, generatedId } from '@pdxui/core';
+import { component, event, html, model, signal, generatedId, prop } from '@pdxui/core';
 // The stylesheet of the dialog classes this renders, as pdx-dialog imports it. Without it, a page
 // with no pdx-dialog of its own would draw a CLOSED confirmation inline.
 import '@pdxui/design/components/dialog';
@@ -28,17 +28,17 @@ component('pdx-alert-dialog', {
     parts: ['root', 'backdrop', 'header', 'body', 'footer', 'cancel', 'confirm', 'confirm-input'],
     props: {
         /** The dialog's title. Empty: the alert-dialog.title component string, «Are you sure?». */
-        title: { type: String, default: '' },
-        message: { type: String, default: '' },
-        variant: { type: String, default: 'default' },
+        title: prop(''),
+        message: prop(''),
+        variant: prop('default'),
         /** Label of the confirm button. Empty: the alert-dialog.confirm component string, «Confirm». */
-        confirmLabel: { type: String, default: '' },
+        confirmLabel: prop(''),
         /** Label of the cancel button. Empty: the alert-dialog.cancel component string, «Cancel». */
-        cancelLabel: { type: String, default: '' },
-        confirmText: { type: String, default: '' },
-        confirmDelay: { type: Number, default: 0 },
-        loading: { type: Boolean, default: false },
-        closeOnEscape: { type: Boolean, default: false },
+        cancelLabel: prop(''),
+        confirmText: prop(''),
+        confirmDelay: prop(0),
+        loading: prop(false),
+        closeOnEscape: prop(false),
     },
     events: {
         /** The user confirmed; the dialog has closed. */

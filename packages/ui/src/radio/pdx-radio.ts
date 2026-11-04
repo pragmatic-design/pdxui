@@ -2,7 +2,7 @@
 // Maps to .pdx-radio CSS class from design system (forms.css).
 // Use inside <pdx-radio-group> for managed selection + keyboard nav.
 
-import { component, html, untracked, model } from '@pdxui/core';
+import { component, html, untracked, model, prop } from '@pdxui/core';
 import { setOwnProp } from '../shared/own-prop';
 
 // One submitter per radio: the host. The inner <input type="radio"> stays, because the
@@ -48,13 +48,13 @@ component('pdx-radio', {
         size: { md: '.pdx-radio-md', sm: '.pdx-radio-sm', lg: '.pdx-radio-lg' },
     },
     props: {
-        disabled: { type: Boolean, default: false },
-        label: { type: String, default: '' },
-        description: { type: String, default: '' },
-        value: { type: String, default: '' },
-        name: { type: String, default: '' },
-        error: { type: Boolean, default: false },
-        labelPosition: { type: String, default: 'right' },
+        disabled: prop(false),
+        label: prop(''),
+        description: prop(''),
+        value: prop(''),
+        name: prop(''),
+        error: prop(false),
+        labelPosition: prop('right'),
     },
     setup(ctx) {
         // `checked` is the live state: selecting this radio writes it.

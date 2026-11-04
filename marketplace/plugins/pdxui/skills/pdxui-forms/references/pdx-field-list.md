@@ -36,9 +36,9 @@ inside a step) · `pdx-select` and other components in the `row` slot.
 |---|---|---|---|---|
 | `name` | `name` | string | `''` | Array field name in the form (e.g., 'items'). |
 | `label` | `label` | string | `''` | Optional label rendered above the list. |
-| `form` | — | object | `null` | Form instance. If not provided, uses form context. |
-| `itemFields` | — | array | `[]` | Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot. |
-| `itemDefault` | — | object | `null` | Default values for a new item. |
+| `form` | — | Form<any> \| null | `null` | Form instance. If not provided, uses form context. |
+| `itemFields` | — | unknown[] | `[]` | Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot. |
+| `itemDefault` | — | Record<string, unknown> \| null | `null` | Default values for a new item. |
 | `minItems` | `minitems` | number | `0` | Minimum number of items (default: 0). |
 | `maxItems` | `maxitems` | number | `999` | Maximum number of items (default: 999). |
 | `addLabel` | `addlabel` | string | `''` | Label for the add button. Empty: the `field-list.add` component string ("+ Add" in English). |

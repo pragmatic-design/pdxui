@@ -6,7 +6,7 @@ Breadcrumb, title and page actions.
 |---|---|---|---|---|
 | `title` | `title` | string | `''` |  |
 | `subtitle` | `subtitle` | string | `''` |  |
-| `crumbs` | — | array | `() => []` |  |
+| `crumbs` | — | unknown[] | `() => []` |  |
 | `headingLevel` | `headinglevel` | number | `1` | The title's heading level, 1-6. Default 1; lower it for a header inside a dialog or a section. |
 
 **Events:** `pdx-crumb` → `detail: { key: string; item: PageHeaderCrumb }` — A crumb with a link was chosen: its `key` and the crumb.

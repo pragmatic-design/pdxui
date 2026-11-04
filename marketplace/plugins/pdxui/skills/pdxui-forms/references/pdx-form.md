@@ -27,12 +27,12 @@ is one `<pdx-form name>` each under `createFormCoordinator()` (recipes: *A long 
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `form` | — | object | `null` | The Form instance (from createForm()). Required. |
+| `form` | — | Record<string, unknown> \| null | `null` | The Form instance (from createForm()). Required. |
 | `name` | `name` | string | `''` | Optional name for nested form registration with parent coordinator. |
 | `autocomplete` | `autocomplete` | string | `'off'` | HTML autocomplete attribute. |
 | `scrollToError` | `scrolltoerror` | boolean | `true` | Scroll to first error field on failed validation. |
 | `formClass` | `formclass` | string | `''` | CSS class for the inner <form> element. |
-| `source` | — | object | `null` | DataSource for auto-load/save. When set, submit saves via DS. |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource for auto-load/save. When set, submit saves via DS. |
 | `recordId` | `recordid` | string | `''` | Record ID to load from the DataSource. |
 
 **Events:** `pdx-submit` → `detail: { values: Record<string, unknown>; saved?: boolean }` — A submit passed validation: the values, and `saved` when a `source` stored them.; `pdx-submit-error` → `detail: { error: unknown }` — The `source` refused the save.

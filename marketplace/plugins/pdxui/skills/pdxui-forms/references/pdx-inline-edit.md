@@ -15,7 +15,7 @@ numbers). The number editor shows the value with that many decimals while you ed
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `type` | `type` | string | `'text'` | Data type — determines which editor to show |
-| `options` | — | array | `[]` | Options for select/multiselect: [{ value, label }] |
+| `options` | — | unknown[] | `[]` | Options for select/multiselect: [{ value, label }] |
 | `placeholder` | `placeholder` | string | `''` | Placeholder when value is empty |
 | `editOn` | `editon` | 'click' \| 'dblclick' \| 'icon' | `'click'` | What opens the editor: a click on the value, a double click, or only the pencil button ('icon'). |
 | `saveOn` | `saveon` | string | `'blur'` | When to save: 'blur' (auto-save on blur/Enter) \| 'action' (confirm/cancel buttons) |

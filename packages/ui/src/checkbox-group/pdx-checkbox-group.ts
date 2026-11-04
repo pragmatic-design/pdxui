@@ -8,7 +8,7 @@
 // track would re-run on every click and put the selection back to the stale prop. Its own classes go
 // through classList, so the author's classes survive.
 
-import { component, html, createSelection, untracked, DEV, model } from '@pdxui/core';
+import { component, html, createSelection, untracked, DEV, model, prop } from '@pdxui/core';
 import { interceptChildEvent } from '../shared/child-event';
 import { nameGroup, authoredName } from '../shared/group-name';
 import '../checkbox/pdx-checkbox'; // rendered by this component, and registered by nobody else
@@ -36,11 +36,11 @@ component('pdx-checkbox-group', {
         orientation: ['vertical', 'horizontal'],
     },
     props: {
-        size: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
+        size: prop(''),
+        disabled: prop(false),
+        error: prop(false),
         /** Accessible name of the group. Without it, a <pdx-label> right before the group names it. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         let _syncing = false; // a value set from outside is applied without emitting

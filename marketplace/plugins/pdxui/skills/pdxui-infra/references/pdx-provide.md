@@ -4,9 +4,9 @@ Provide context to a subtree.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `token` | — | object | `null` | The context token the value is provided under (single value mode): `context<T>('name')`. |
-| `value` | — | object | `null` | Value to provide (for single value mode). Reactive if signal. |
-| `values` | — | object | `null` | Multiple values, a `Map` of token → value. Takes priority over token/value. |
+| `token` | — | Record<string, unknown> \| null | `null` | The context token the value is provided under (single value mode): `context<T>('name')`. |
+| `value` | — | Record<string, unknown> \| null | `null` | Value to provide (for single value mode). Reactive if signal. |
+| `values` | — | Record<string, unknown> \| null | `null` | Multiple values, a `Map` of token → value. Takes priority over token/value. |
 
 **Provides:** the token in `:token`
 

@@ -2,7 +2,7 @@
 // One tab stop: the arrow keys (and Home/End) move between its controls, as the WAI-ARIA toolbar
 // pattern asks. A control that uses those keys itself — a text field, a select — keeps them.
 
-import { component, html, focusGroup, DEV } from '@pdxui/core';
+import { component, html, focusGroup, DEV, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { anchorControl } from '../shared/anchor-control';
 import { hasAccessibleName } from '../shared/accessible-name';
@@ -66,13 +66,13 @@ component('pdx-toolbar', {
     states: ['compact', 'bordered', 'vertical'],
     props: {
         /** Compact mode (less padding) */
-        compact: { type: Boolean, default: false },
+        compact: prop(false),
         /** Show border */
-        bordered: { type: Boolean, default: false },
+        bordered: prop(false),
         /** Vertical orientation: ↑/↓ move between the controls instead of ←/→ */
-        vertical: { type: Boolean, default: false },
+        vertical: prop(false),
         /** The toolbar's accessible name ("Text formatting"). Empty: the toolbar.label component string. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         ctx.track(() => {

@@ -4,7 +4,7 @@
 // Propagates variant/size/disabled to child <pdx-button> elements.
 // Uses host element directly (no wrapper div) — Light DOM requires it.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 
 /**
  * Groups action buttons visually, and passes variant, size and disabled on to its buttons. To select
@@ -12,12 +12,12 @@ import { component, html } from '@pdxui/core';
  */
 component('pdx-button-group', {
     props: {
-        orientation: { type: String, default: 'horizontal' },
-        variant: { type: String, default: '' },
-        size: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
+        orientation: prop('horizontal'),
+        variant: prop(''),
+        size: prop(''),
+        disabled: prop(false),
         /** The group's accessible name ("Text alignment"), set as `aria-label` on the group. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         let labelled = false;

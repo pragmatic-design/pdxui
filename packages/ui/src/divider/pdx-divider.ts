@@ -1,7 +1,7 @@
 // pdx-divider — Separator with optional label.
 // Label position: left/center/right. Variants: solid/dashed/dotted.
 
-import { component, html, signal, onMount, onDestroy } from '@pdxui/core';
+import { component, html, signal, onMount, onDestroy, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/divider';
@@ -27,10 +27,10 @@ component('pdx-divider', {
     states: ['vertical', 'label-left', 'label-right'],
     parts: ['line', 'label'],
     props: {
-        orientation: { type: String, default: 'horizontal' },
+        orientation: prop('horizontal'),
         /** The label. Unset, the element's text content is the label: `<pdx-divider>OR</pdx-divider>`. */
-        label: { type: String, default: '' },
-        labelPosition: { type: String, default: 'center' },
+        label: prop(''),
+        labelPosition: prop('center'),
     },
     setup(ctx) {
         // The text the author wrote inside the tag is the label when `label` is not set, rather than

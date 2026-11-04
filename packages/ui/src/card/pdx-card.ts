@@ -1,7 +1,7 @@
 // pdx-card — Structured card with header/body/footer/media slots.
 // Enhances Pragmatic CSS cards with: loading skeleton, clickable, selectable, link overlay.
 
-import { component, html, sanitizeUrl, event } from '@pdxui/core';
+import { component, html, sanitizeUrl, event, prop } from '@pdxui/core';
 
 /**
  * A structured card with header, body, footer and media slots, which can show a loading skeleton
@@ -35,28 +35,28 @@ component('pdx-card', {
     },
     props: {
         /** Show loading skeleton state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
         /** Make entire card clickable (emits pdx-click) */
-        clickable: { type: Boolean, default: false },
+        clickable: prop(false),
         /** Hoverable elevation effect */
-        hoverable: { type: Boolean, default: false },
+        hoverable: prop(false),
         /** Horizontal layout (media + content side by side) */
-        horizontal: { type: Boolean, default: false },
+        horizontal: prop(false),
         /** Compact padding */
-        compact: { type: Boolean, default: false },
+        compact: prop(false),
         /** Selectable card (radio/checkbox style). On a clickable card, announced as pressed (`aria-pressed`). */
-        selected: { type: Boolean, default: false },
+        selected: prop(false),
         /** Disabled state */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /**
          * Makes the card a link: it renders an `<a>` overlay across the card, so middle-click,
          * open-in-a-new-tab, copy-link-address and the status bar all work, and the address is in
          * the DOM. An interactive element inside the card stays clickable (it sits above the
          * overlay). The URL is sanitised before it is written.
          */
-        href: { type: String, default: '' },
+        href: prop(''),
         /** Shadow elevation: 0 (none), 1 (sm), 2 (md), 3 (lg), 4 (xl) */
-        elevation: { type: Number, default: -1 },
+        elevation: prop(-1),
     },
     setup(ctx) {
         // States, not classes on the box (#290). The elevation stays a class: it is a level, 0 to 4,

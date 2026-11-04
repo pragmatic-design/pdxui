@@ -2,7 +2,7 @@
 // Each selection opens the next column of children (Country → Region → City).
 // Supports lazy loading, search, disabled nodes, clearable.
 
-import { component, html, signal, model, event, generatedId, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -87,25 +87,25 @@ component('pdx-cascader', {
     },
     props: {
         /** Tree of options */
-        options: { type: Array, default: [] },
+        options: prop<unknown[]>([]),
         /** Placeholder text */
-        placeholder: { type: String, default: '' },
+        placeholder: prop(''),
         /** Accessible name (aria-label) for the trigger; falls back to placeholder */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Show search input for filtering */
-        searchable: { type: Boolean, default: false },
+        searchable: prop(false),
         /** Separator for display text (default: ' / ') */
-        separator: { type: String, default: ' / ' },
+        separator: prop(' / '),
         /** Clearable */
-        clearable: { type: Boolean, default: true },
+        clearable: prop(true),
         /** Disabled */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Allow selecting non-leaf nodes */
-        changeOnSelect: { type: Boolean, default: false },
+        changeOnSelect: prop(false),
         /** Lazy load function: (node) => Promise<CascaderNode[]> */
-        loadChildren: { type: Function, default: null },
+        loadChildren: prop<((...args: unknown[]) => unknown) | null>(null, { type: Function }),
         /** Form field name */
-        name: { type: String, default: '' },
+        name: prop(''),
     },
     // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
     generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },

@@ -1,7 +1,7 @@
 // pdx-file-upload — Drag-and-drop file upload with validation, preview, and XHR upload.
 // Supports accept filter, size/count limits, image thumbnails, progress tracking.
 
-import { component, html, signal, computed, generatedId, model, untracked, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, signal, computed, generatedId, model, untracked, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -95,16 +95,16 @@ component('pdx-file-upload', {
     states: ['disabled', 'dragover'],
     parts: ['root', 'dropzone', 'list', 'file', 'remove', 'progress'],
     props: {
-        accept: { type: String, default: '' },
-        multiple: { type: Boolean, default: false },
-        maxSize: { type: Number, default: 0 },
-        maxFiles: { type: Number, default: 0 },
-        disabled: { type: Boolean, default: false },
+        accept: prop(''),
+        multiple: prop(false),
+        maxSize: prop(0),
+        maxFiles: prop(0),
+        disabled: prop(false),
         /** The dropzone's text and name. Empty: the file-upload.drop component string. */
-        label: { type: String, default: '' },
-        name: { type: String, default: '' },
-        auto: { type: Boolean, default: false },
-        action: { type: String, default: '' },
+        label: prop(''),
+        name: prop(''),
+        auto: prop(false),
+        action: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     slots: {

@@ -20,7 +20,7 @@
 //     DOM is partial. The pattern requires them exactly in the two cases this component is for
 //     (lazy branches, and virtualization later), and they cost nothing in the others.
 
-import { component, html, onDestroy, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, onDestroy, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders.
 import '@pdxui/design/components/tree';
@@ -56,24 +56,24 @@ component('pdx-tree', {
     parts: ['root', 'item', 'group', 'twisty', 'check', 'label'],
     props: {
         /** The roots. Children are read from `childrenField`. */
-        nodes: { type: Array, default: () => [] },
+        nodes: prop<unknown[]>(() => []),
         /** The field that identifies a node. */
-        idField: { type: String, default: 'id' },
+        idField: prop('id'),
         /** The field rendered as the node's text, when there is no `node` slot. */
-        labelField: { type: String, default: 'label' },
+        labelField: prop('label'),
         /** The field holding a node's children. */
-        childrenField: { type: String, default: 'children' },
+        childrenField: prop('children'),
         /** 'none' | 'single' | 'multiple'. */
-        selectionMode: { type: String, default: 'none', enum: ['none', 'single', 'multiple'] },
+        selectionMode: prop<'none' | 'single' | 'multiple'>('none'),
         /** Show a checkbox per node, tri-state over a branch's subtree. */
-        checkable: { type: Boolean, default: false },
+        checkable: prop(false),
         /** Open every branch on first render. */
-        defaultExpandAll: { type: Boolean, default: false },
+        defaultExpandAll: prop(false),
         /** Fetch a branch's children the first time it opens. */
-        loadChildren: { type: Function, default: null },
+        loadChildren: prop<((...args: unknown[]) => unknown) | null>(null, { type: Function }),
         /** Accessible name for the tree. */
-        label: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
+        label: prop(''),
+        disabled: prop(false),
     },
     // The node a snippet receives is the app's, from `nodes` (#651): the editor infers `T`.
     generics: { T: { from: 'nodes' } },

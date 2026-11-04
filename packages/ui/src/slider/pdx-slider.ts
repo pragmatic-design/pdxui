@@ -2,7 +2,7 @@
 // Custom DOM (not <input type="range">) for full control over track/fill/thumb styling.
 // Uses PointerEvents for unified mouse/touch/pen. ARIA slider role.
 
-import { component, html, signal, model } from '@pdxui/core';
+import { component, html, signal, model, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
 
@@ -44,26 +44,26 @@ component('pdx-slider', {
         orientation: { horizontal: '.pdx-slider-horizontal', vertical: '.pdx-slider-vertical' },
     },
     props: {
-        min: { type: Number, default: 0 },
-        max: { type: Number, default: 100 },
-        step: { type: Number, default: 1 },
-        disabled: { type: Boolean, default: false },
-        ariaLabel: { type: String, default: '' },
+        min: prop(0),
+        max: prop(100),
+        step: prop(1),
+        disabled: prop(false),
+        ariaLabel: prop(''),
         /** What the slider sets ("Volume"): the thumb's name, and in range mode "{label}, minimum" /
          *  "{label}, maximum". Not needed after a pdx-label, which names it. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Comma-separated mark values, or "step" to show all steps */
-        marks: { type: String, default: '' },
+        marks: prop(''),
         /** Show value label on thumb while dragging */
-        showLabel: { type: Boolean, default: false },
+        showLabel: prop(false),
         /** Always show label (not just on drag) */
-        labelAlways: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        error: { type: Boolean, default: false },
+        labelAlways: prop(false),
+        name: prop(''),
+        error: prop(false),
         /** Range mode: value is "min,max" */
-        range: { type: Boolean, default: false },
+        range: prop(false),
         /** Minimum gap between thumbs in range mode */
-        minGap: { type: Number, default: 0 },
+        minGap: prop(0),
     },
     setup(ctx) {
         let _value = 0;

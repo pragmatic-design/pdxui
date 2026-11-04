@@ -1,7 +1,7 @@
 // pdx-masked-input — Input with pattern mask (phone, credit card, date, custom).
 // Auto-formats as user types, manages cursor position around mask chars.
 
-import { component, event, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model, prop } from '@pdxui/core';
 import { dispatchCommit } from '../shared/commit-change';
 
 /**
@@ -103,14 +103,14 @@ component('pdx-masked-input', {
          * country code, read from its prefix), card, date (MM/DD/YYYY), time (HH:MM), ssn, zip,
          * zip-ext. A complete date or time out of range sets aria-invalid.
          */
-        mask: { type: String, default: '' },
-        placeholder: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        name: { type: String, default: '' },
+        mask: prop(''),
+        placeholder: prop(''),
+        ariaLabel: prop(''),
+        disabled: prop(false),
+        error: prop(false),
+        name: prop(''),
         /** Character shown for unfilled positions */
-        placeholderChar: { type: String, default: '_' },
+        placeholderChar: prop('_'),
     },
     setup(ctx) {
         const displayValue = signal('');

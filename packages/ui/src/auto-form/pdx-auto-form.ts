@@ -1,7 +1,7 @@
 // pdx-auto-form — JSON-driven form that accepts FieldDefinition[] or FormSchema.
 // Wraps pdx-form-template with DataSource integration for load/save.
 
-import { component, html, isDataSource, createFormFromSchema, event } from '@pdxui/core';
+import { component, html, isDataSource, createFormFromSchema, event, prop } from '@pdxui/core';
 import type { DataSource, FormSchema, Form } from '@pdxui/core';
 import { toFormFields } from '@pdxui/core';
 import type { FieldDefinition } from '@pdxui/core';
@@ -22,23 +22,23 @@ import '../form-template/pdx-form-template'; // rendered by this component, and 
 component('pdx-auto-form', {
     props: {
         /** Field definitions (FieldDefinition[]). Converted to FormSchema internally. */
-        fields: { type: Array, default: null },
+        fields: prop<unknown[] | null>(null, { type: Array }),
         /** FormSchema JSON (alternative to fields). */
-        schema: { type: Object, default: null },
+        schema: prop<Record<string, unknown> | null>(null),
         /** DataSource for auto-load/save. */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Record ID to load from DataSource. */
-        recordId: { type: String, default: '' },
+        recordId: prop(''),
         /** Form layout. */
-        layout: { type: String, default: 'stack' },
+        layout: prop('stack'),
         /** Grid columns (when layout='grid'). */
-        columns: { type: Number, default: 12 },
+        columns: prop(12),
         /** Show submit/reset buttons. */
-        showActions: { type: Boolean, default: true },
+        showActions: prop(true),
         /** Submit button label. Empty: the auto-form.submit component string, «Save». */
-        submitLabel: { type: String, default: '' },
+        submitLabel: prop(''),
         /** Reset button label. Empty: the auto-form.reset component string, «Reset». */
-        resetLabel: { type: String, default: '' },
+        resetLabel: prop(''),
     },
     // Declared (#138): it stays on the host, which the parent listens on.
     events: {

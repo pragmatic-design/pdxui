@@ -3,7 +3,7 @@
 // Features: fuzzy filter, grouped items, keyboard shortcuts display, empty state, focus trap.
 // Uses overlayStack for z-index coordination + Escape handling.
 
-import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, declaredSnippet, model } from '@pdxui/core';
+import { component, html, signal, computed, effect, overlayStack, focusTrap, onMount, untracked, generatedId, slot, declaredSnippet, model, prop } from '@pdxui/core';
 import type { Dispose, SlotFunction } from '@pdxui/core';
 
 /** A command's icon, loading `pdx-icon` the first time one is named: a list of labels never pays for the set. */
@@ -45,12 +45,12 @@ component('pdx-command', {
     parts: ['root', 'backdrop', 'input', 'list', 'group', 'option', 'empty', 'footer'],
     props: {
         /** The search input's placeholder. Empty: the command.placeholder component string, «Type a command...». */
-        placeholder: { type: String, default: '' },
-        items: { type: Array, default: [] },
+        placeholder: prop(''),
+        items: prop<unknown[]>([]),
         /** The message when nothing matches. Empty: the command.empty component string, «No results found.». */
-        emptyText: { type: String, default: '' },
+        emptyText: prop(''),
         /** Global keyboard shortcut to open (default: Ctrl+K / Cmd+K) */
-        hotkey: { type: Boolean, default: true },
+        hotkey: prop(true),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651): the editor infers `T`.

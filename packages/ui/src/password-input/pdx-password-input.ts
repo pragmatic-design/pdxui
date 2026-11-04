@@ -1,7 +1,7 @@
 // pdx-password-input — Input with toggle visibility and optional strength meter.
 // Uses pdx-input wrapper pattern. Toggle button in suffix position.
 
-import { component, event, html, signal, generatedId, model } from '@pdxui/core';
+import { component, event, html, signal, generatedId, model, prop } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
@@ -43,17 +43,17 @@ component('pdx-password-input', {
         size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
     },
     props: {
-        placeholder: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        required: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
+        placeholder: prop(''),
+        disabled: prop(false),
+        readonly: prop(false),
+        required: prop(false),
+        error: prop(false),
+        name: prop(''),
+        ariaLabel: prop(''),
         /** Show strength meter below input */
-        showStrength: { type: Boolean, default: false },
+        showStrength: prop(false),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     setup(ctx) {
         // The inner field submits; a form reset puts it and the model back to the mounted text (#135).

@@ -3,7 +3,7 @@
 // Supports: left/right/alternate/horizontal mode, status colors,
 // icons, pending state, clickable items, connector styles.
 
-import { component, html, slot, declaredSnippet, event } from '@pdxui/core';
+import { component, html, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -54,12 +54,12 @@ const STATUS_CLASS: Record<string, string> = {
  */
 component('pdx-timeline', {
     props: {
-        items: { type: Array, default: [] },
-        reverse: { type: Boolean, default: false },
-        pending: { type: Boolean, default: false },
+        items: prop<unknown[]>([]),
+        reverse: prop(false),
+        pending: prop(false),
         /** The pending row's text. Empty: the timeline.pending component string. */
-        pendingLabel: { type: String, default: '' },
-        clickable: { type: Boolean, default: false },
+        pendingLabel: prop(''),
+        clickable: prop(false),
     },
     // Its looks are variant axes reflected on the host, where the design CSS draws them (#512); the two
     // of two words in kebab-case, `connector-style` and `dot-align` (#834).

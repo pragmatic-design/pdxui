@@ -5,7 +5,7 @@ Resizable panes.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `orientation` | `orientation` | string | `'horizontal'` | Orientation: horizontal (side-by-side) or vertical (stacked) |
-| `panes` | — | array | `[]` | Pane configurations — array matching child elements |
+| `panes` | — | unknown[] | `[]` | Pane configurations — array matching child elements |
 | `gutterSize` | `guttersize` | number | `6` | Gutter size in px |
 | `autoSaveId` | `autosaveid` | string | `''` | localStorage key for persistence (empty = no save) |
 | `keyboardStep` | `keyboardstep` | number | `2` | Keyboard step size in % |

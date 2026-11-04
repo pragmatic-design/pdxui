@@ -4,7 +4,7 @@
 // Accessibility: role="status" + aria-live="polite" + visible label option.
 
 import { uiString } from '../shared/i18n';
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more: the indicator's sizes and the ring's keyframe.
 import '@pdxui/design/components/spinner';
@@ -33,7 +33,7 @@ component('pdx-spinner', {
          * component renders, and spinner.css has nothing to key by it (decision 51's reasoning for
          * pdx-button-group's own props).
          */
-        variant: { type: String, default: 'spinner' },
+        variant: prop('spinner'),
         /**
          * The accessible name. Empty means "use the translated default" — a prop default cannot be
          * a literal here, because the spinners the LIBRARY builds have no author to pass one: a
@@ -41,8 +41,8 @@ component('pdx-spinner', {
          * reaches the spinner inside it. An app in Italian would be left with an English "Loading"
          * it could not override.
          */
-        label: { type: String, default: '' },
-        showLabel: { type: Boolean, default: false },
+        label: prop(''),
+        showLabel: prop(false),
     },
     setup() {
         return {};

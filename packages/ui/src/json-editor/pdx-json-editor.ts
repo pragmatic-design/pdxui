@@ -10,7 +10,7 @@
 //   <pdx-json-editor :schema="schema" ::value="profile"></pdx-json-editor>
 //   el.addEventListener('value-change', e => save(e.detail.value));
 
-import { component, html, focusTrap, focusFirst, generatedId, model } from '@pdxui/core';
+import { component, html, focusTrap, focusFirst, generatedId, model, prop } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -246,7 +246,7 @@ component('pdx-json-editor', {
     models: { value: model<unknown>(null, { type: Object, form: true }) },
     parts: ['entry', 'branch', 'dialog'],
     props: {
-        schema: { type: Object, default: null },
+        schema: prop<Record<string, unknown> | null>(null),
     },
     setup(ctx) {
         ctx.formValue?.(() => {

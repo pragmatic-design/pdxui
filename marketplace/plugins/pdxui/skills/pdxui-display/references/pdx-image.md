@@ -31,8 +31,8 @@ Two asymmetries the policy's name does not give away:
 | `lightbox` | `lightbox` | boolean | `false` | Click opens fullscreen lightbox overlay |
 | `caption` | `caption` | string | `''` | Caption text below image |
 | `authSrc` | `authsrc` | string | `''` | URL requiring authentication (fetched via fetch + objectURL) |
-| `authProvider` | — | object | `null` | Function returning HTTP headers for auth requests |
-| `fetchFn` | — | object | `null` | Custom fetch function: (url: string) => Promise<Blob> |
+| `authProvider` | — | Record<string, unknown> \| null | `null` | Function returning HTTP headers for auth requests |
+| `fetchFn` | — | Record<string, unknown> \| null | `null` | Custom fetch function: (url: string) => Promise<Blob> |
 
 **Events:** `pdx-error` → `detail: Record<string, never>` — The source failed, or the authenticated fetch did.; `pdx-load` → `detail: Record<string, never>` — The image arrived and is drawn.; `pdx-zoom` → `detail: { zoomed: boolean }` — A zoomable image was zoomed in or out.
 

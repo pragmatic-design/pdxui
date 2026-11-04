@@ -2,7 +2,7 @@
 // Data-driven: items with nesting, icons, badges, collapsible groups, active state.
 // Use inside a sidebar or standalone as vertical navigation.
 
-import { component, html, signal, sanitizeUrl, generatedId, slot, declaredSnippet, event } from '@pdxui/core';
+import { component, html, signal, sanitizeUrl, generatedId, slot, declaredSnippet, event, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { uiString, format, uiAttr} from '../shared/i18n';
@@ -103,15 +103,15 @@ component('pdx-nav-menu', {
     generics: { T: { extends: '{ key: string; label: string }', from: 'items' } },
     props: {
         /** Menu items */
-        items: { type: Array, default: [] },
+        items: prop<unknown[]>([]),
         /** Currently active item key */
-        activeKey: { type: String, default: '' },
+        activeKey: prop(''),
         /** Collapsed mode (show only icons, hide labels) */
-        collapsed: { type: Boolean, default: false },
+        collapsed: prop(false),
         /** Indent per nesting level (px) */
-        indent: { type: Number, default: 36 },
+        indent: prop(36),
         /** Icon set name (for pdx-icon set attribute) */
-        iconSet: { type: String, default: '' },
+        iconSet: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots are not read
     // (#492). The controls' snippet is `itemActions`, named apart from the `actions` prop above.

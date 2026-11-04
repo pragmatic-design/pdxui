@@ -3,7 +3,7 @@
 // Positions: left/right/top/bottom. Modes: overlay/push. Sizes: sm/md/lg/custom.
 // CSS classes from @pdxui/design (drawer.css). Resizable via drag handle.
 
-import { component, event, html, model } from '@pdxui/core';
+import { component, event, html, model, prop } from '@pdxui/core';
 import { overlayStack, focusTrap } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -34,24 +34,24 @@ component('pdx-drawer', {
     parts: ['root', 'backdrop', 'header', 'close', 'body', 'footer', 'resize'],
     props: {
         /** Position: left, right (default), top, bottom */
-        position: { type: String, default: 'right', enum: ['left', 'right', 'top', 'bottom'] },
+        position: prop<'left' | 'right' | 'top' | 'bottom'>('right'),
         /** Size: sm (280px), md (380px), lg (520px), or ANY custom CSS width (e.g. "640px").
          *  Open-ended on purpose → NOT declared as a closed enum. */
-        size: { type: String, default: 'md' },
+        size: prop('md'),
         /** Mode: overlay (default) or push (shifts page content) */
-        mode: { type: String, default: 'overlay', enum: ['overlay', 'push'] },
+        mode: prop<'overlay' | 'push'>('overlay'),
         /** Close on backdrop click */
-        closeOnBackdrop: { type: Boolean, default: true },
+        closeOnBackdrop: prop(true),
         /** Close on Escape */
-        closeOnEscape: { type: Boolean, default: true },
+        closeOnEscape: prop(true),
         /** Show close button in header */
-        showClose: { type: Boolean, default: true },
+        showClose: prop(true),
         /** Show resize handle on edge */
-        resizable: { type: Boolean, default: false },
+        resizable: prop(false),
         /** Label for screen readers */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     events: {
         /** Fired (cancelable) before the drawer closes itself; call preventDefault() to keep it open. */

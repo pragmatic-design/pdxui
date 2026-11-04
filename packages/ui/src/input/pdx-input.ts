@@ -2,7 +2,7 @@
 // Uses .pdx-input-wrap pattern: border on wrapper, not on input.
 // Foundation for all specialized inputs (number, password, search, masked, date).
 
-import { component, event, html, model } from '@pdxui/core';
+import { component, event, html, model, prop } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { uiString } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
@@ -73,27 +73,27 @@ component('pdx-input', {
         // enum lists them so the validator does not warn about `<pdx-input type="date">` on a page
         // where it works. `<pdx-date-picker>` remains the component
         // for a calendar, a format and a locale — this is the plain field.
-        type: { type: String, default: 'text', enum: ['text', 'email', 'password', 'number', 'tel', 'url', 'search', 'date', 'time'] },
-        placeholder: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        required: { type: Boolean, default: false },
-        error: { type: Boolean, default: false },
-        success: { type: Boolean, default: false },
-        warning: { type: Boolean, default: false },
-        clearable: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        maxlength: { type: Number, default: 0 },
-        showCount: { type: Boolean, default: false },
-        autofocus: { type: Boolean, default: false },
-        autocomplete: { type: String, default: '' },
-        inputmode: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
+        type: prop<'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search' | 'date' | 'time'>('text'),
+        placeholder: prop(''),
+        disabled: prop(false),
+        readonly: prop(false),
+        required: prop(false),
+        error: prop(false),
+        success: prop(false),
+        warning: prop(false),
+        clearable: prop(false),
+        loading: prop(false),
+        name: prop(''),
+        maxlength: prop(0),
+        showCount: prop(false),
+        autofocus: prop(false),
+        autocomplete: prop(''),
+        inputmode: prop(''),
+        ariaLabel: prop(''),
         /** Prefix text (e.g. "$", "https://"). For icons use slot. */
-        prefix: { type: String, default: '' },
+        prefix: prop(''),
         /** Suffix text (e.g. "kg", ".com"). For icons use slot. */
-        suffix: { type: String, default: '' },
+        suffix: prop(''),
     },
     setup(ctx) {
         // The inner field submits; a form reset puts it and the model back to the mounted text (#135).

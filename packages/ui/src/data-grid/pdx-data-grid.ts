@@ -11,7 +11,7 @@
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
 
-import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV, slot } from '@pdxui/core';
+import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV, slot, prop } from '@pdxui/core';
 import type { DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
@@ -146,11 +146,11 @@ function warnRowHeightIgnored(el: Element): void {
  */
 component('pdx-data-grid', {
     props: {
-        source: { type: Object, default: null },
-        columns: { type: Array, default: null },
-        data: { type: Array, default: null },
-        striped: { type: Boolean, default: false },
-        hover: { type: Boolean, default: true },
+        source: prop<Record<string, unknown> | null>(null),
+        columns: prop<unknown[] | null>(null, { type: Array }),
+        data: prop<unknown[] | null>(null, { type: Array }),
+        striped: prop(false),
+        hover: prop(true),
         /**
          * The rows open something: a click on a row is handled (`pdx-row-click`), so the row takes
          * a pointer, so a page does not write its own `.pdx-dg-row { cursor: pointer }`, reaching into
@@ -158,10 +158,10 @@ component('pdx-data-grid', {
          * editable grid and does nothing otherwise, so give a keyboard reader a way in of its own
          * (an `actions()` column).
          */
-        rowClickable: { type: Boolean, default: false },
-        compact: { type: Boolean, default: false },
-        stickyHeader: { type: Boolean, default: true },
-        selection: { type: String, default: 'none' },
+        rowClickable: prop(false),
+        compact: prop(false),
+        stickyHeader: prop(true),
+        selection: prop('none'),
         /**
          * A class for the whole row: a string, or `(row, index) => string`. Marks a row invalid,
          * new, stale — what `cellClass` could only do one column at a time.
@@ -170,37 +170,37 @@ component('pdx-data-grid', {
          * a single constructor. A function assigned as a JS property arrives untouched: `coerce`
          * returns a non-string value as it is (`component.ts:448`).
          */
-        rowClass: { type: String, default: '' },
-        idField: { type: String, default: 'id' },
-        stateKey: { type: String, default: '' },
+        rowClass: prop(''),
+        idField: prop('id'),
+        stateKey: prop(''),
         /** The empty state's text. Unset, it is the grid string `empty.title`. */
-        emptyTitle: { type: String, default: '' },
-        emptyIcon: { type: String, default: 'inbox', iconName: true },
-        showFooter: { type: Boolean, default: true },
-        filterable: { type: Boolean, default: false },
-        filterMode: { type: String, default: 'none' },
-        showToolbar: { type: Boolean, default: false },
+        emptyTitle: prop(''),
+        emptyIcon: prop('inbox', { iconName: true }),
+        showFooter: prop(true),
+        filterable: prop(false),
+        filterMode: prop('none'),
+        showToolbar: prop(false),
         /** A search field at the toolbar's right: the term is looked for in the columns marked `searchable`. */
-        search: { type: Boolean, default: false },
-        showGroupBar: { type: Boolean, default: false },
-        paginationPosition: { type: String, default: 'bottom' },
+        search: prop(false),
+        showGroupBar: prop(false),
+        paginationPosition: prop('bottom'),
         /** The rows-per-page choices the footer's pager offers; empty, it offers none. */
-        pageSizes: { type: Array, default: [] },
-        expandable: { type: Boolean, default: false },
-        rowReorder: { type: Boolean, default: false },
-        groupBy: { type: Array, default: null },
-        virtualScroll: { type: Boolean, default: false },
+        pageSizes: prop<unknown[]>([]),
+        expandable: prop(false),
+        rowReorder: prop(false),
+        groupBy: prop<unknown[] | null>(null, { type: Array }),
+        virtualScroll: prop(false),
         /** Row height in px for virtual scrolling (42 when unset); ignored otherwise. */
-        rowHeight: { type: Number, default: 0 },
+        rowHeight: prop(0),
         /** Caps the grid height in px; the body scrolls beyond it. 0 = no cap (a virtual grid uses 400). */
-        maxHeight: { type: Number, default: 0 },
+        maxHeight: prop(0),
         /** Fill the parent's height (flex) instead of growing with content. The page no longer
          *  scrolls — only the grid body scrolls (virtualized). Pair with virtual-scroll for large sets. */
-        fillHeight: { type: Boolean, default: false },
-        editable: { type: Boolean, default: false },
-        editMode: { type: String, default: 'cell' },
+        fillHeight: prop(false),
+        editable: prop(false),
+        editMode: prop('cell'),
         /** The grid's accessible name (its aria-label). */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     // A parent's `@snippet` sets these (#597): one `cell` and one `header` for every column, rather
     // than a slot per column, since a snippet's name is an identifier and `cell:price` is not one.

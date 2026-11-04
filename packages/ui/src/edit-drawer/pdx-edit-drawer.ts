@@ -5,7 +5,7 @@
 // The form-template is mounted IMPERATIVELY (schema/form set as properties), matching pdx-auto-form:
 // passing an object prop down two declarative-binding levels does not reliably reach the child.
 
-import { component, html, createFormFromSchema, event } from '@pdxui/core';
+import { component, html, createFormFromSchema, event, prop } from '@pdxui/core';
 import type { FormSchema, Form } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // Self-contained: ensure the composed custom elements are registered when this entry is imported
@@ -31,22 +31,22 @@ import '@pdxui/design/components/drawer';
 component('pdx-edit-drawer', {
     props: {
         /** Open state (controlled). */
-        open: { type: Boolean, default: false },
+        open: prop(false),
         /** FormSchema describing the entity fields. */
-        schema: { type: Object, default: null },
+        schema: prop<Record<string, unknown> | null>(null),
         /** Entity to edit, or null to create a new one. */
-        value: { type: Object, default: null },
+        value: prop<Record<string, unknown> | null>(null),
         /** Drawer title; defaults to "Edit"/"New" by mode. */
-        title: { type: String, default: '' },
-        position: { type: String, default: 'right', enum: ['left', 'right'] },
+        title: prop(''),
+        position: prop<'left' | 'right'>('right'),
         /** Forwarded to pdx-drawer — named preset (sm/md/lg) or a custom CSS width. */
-        size: { type: String, default: 'md' },
+        size: prop('md'),
         /** Label of the save button. Empty: the edit-drawer.save component string, «Save». */
-        saveLabel: { type: String, default: '' },
+        saveLabel: prop(''),
         /** Label of the cancel button. Empty: the edit-drawer.cancel component string, «Cancel». */
-        cancelLabel: { type: String, default: '' },
+        cancelLabel: prop(''),
         /** Disable the footer buttons while the parent is persisting. */
-        busy: { type: Boolean, default: false },
+        busy: prop(false),
     },
     // `open` stays a prop the host writes: the drawer never writes it, it asks with `pdx-cancel`.
     // Declared (#138): they stay on the host, which the parent listens on.

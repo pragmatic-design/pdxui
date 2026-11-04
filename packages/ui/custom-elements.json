@@ -1036,7 +1036,7 @@
               "name": "fields",
               "description": "Field definitions (FieldDefinition[]). Converted to FormSchema internally.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -1045,7 +1045,7 @@
               "name": "schema",
               "description": "FormSchema JSON (alternative to fields).",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -1054,7 +1054,7 @@
               "name": "source",
               "description": "DataSource for auto-load/save.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -1278,7 +1278,7 @@
               "name": "source",
               "description": "The data source to render from.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -1916,7 +1916,7 @@
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -2965,7 +2965,7 @@
               "name": "items",
               "description": "The data items to render.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -3075,7 +3075,7 @@
               "name": "detents",
               "description": "Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85]",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "() => [0.4, 0.85]"
             },
@@ -3563,7 +3563,7 @@
               "name": "actions",
               "description": "Actions to offer.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -3899,7 +3899,7 @@
               "name": "action",
               "description": "A write the button runs: anything with `execute(arg?)` and `pending()` — a `mutation()`. A click calls `execute(actionArg)`; while `pending()` the button shows loading, and refuses clicks unless the action's `concurrency` is `'coalesce'` or `'parallel'`, so a double click sends one write.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -3908,7 +3908,7 @@
               "name": "actionArg",
               "description": "The value a click passes to `action.execute`.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -4251,7 +4251,7 @@
               "name": "disabledDates",
               "description": "Function returning true if date should be disabled.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -4260,7 +4260,7 @@
               "name": "highlightedDates",
               "description": "Function returning highlight label or false.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -4978,7 +4978,7 @@
               "name": "renderSlide",
               "description": "Render function for each slide.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -5452,7 +5452,7 @@
               "name": "loadChildren",
               "description": "Lazy load function: (node) => Promise<CascaderNode[]>",
               "type": {
-                "text": "function"
+                "text": "((...args: unknown[]) => unknown) | null"
               },
               "default": "null"
             },
@@ -5795,7 +5795,7 @@
               "name": "data",
               "description": "Data array (array of objects)",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -6044,7 +6044,7 @@
               "name": "source",
               "description": "DataSource binding (duck-typed)",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             }
@@ -7526,7 +7526,7 @@
               "name": "presets",
               "description": "Preset swatch colours.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "() => []"
             },
@@ -8333,7 +8333,7 @@
               "name": "columns",
               "description": "Column definitions: field, header, width, sortable, render, etc.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -8532,7 +8532,7 @@
               "name": "pageSizes",
               "description": "The rows-per-page choices the footer's pager offers; empty, it offers none.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -8560,7 +8560,7 @@
               "name": "groupBy",
               "description": "Fields to group rows by.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -9453,7 +9453,7 @@
               "name": "data",
               "description": "Static data array. When set, creates an arrayTransport-backed DataSource.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -9462,7 +9462,7 @@
               "name": "transport",
               "description": "Custom transport object (IDataTransport). Takes priority over url/data.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -9501,7 +9501,7 @@
               "name": "sort",
               "description": "Initial sort. Array of { field, dir } objects.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -9510,7 +9510,7 @@
               "name": "filter",
               "description": "Initial filter. Array of filter descriptors.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -9519,7 +9519,7 @@
               "name": "params",
               "description": "Additional params passed to transport.read().",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -9528,7 +9528,7 @@
               "name": "token",
               "description": "A context token of your own, `context<DataSource<Order>>('orders')`, the source is provided\nunder too: a component below injects that one by it, past a nearer `<pdx-data-source>`.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -9709,7 +9709,7 @@
               "name": "disabledDates",
               "description": "Function: (iso) => boolean for disabled dates.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -9718,7 +9718,7 @@
               "name": "highlightedDates",
               "description": "Function: (iso) => string|false for highlighted dates.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -9737,7 +9737,7 @@
               "name": "presets",
               "description": "Preset date options (array of { label, value }).",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -10501,7 +10501,7 @@
               "name": "renderValue",
               "description": "Render function for a value.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -11744,7 +11744,7 @@
               "name": "schema",
               "description": "FormSchema describing the entity fields.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -11753,7 +11753,7 @@
               "name": "value",
               "description": "Entity to edit, or null to create a new one.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -12155,7 +12155,7 @@
               "name": "columns",
               "description": "Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -12164,7 +12164,7 @@
               "name": "data",
               "description": "Entity rows.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -12173,7 +12173,7 @@
               "name": "schema",
               "description": "FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -12229,7 +12229,7 @@
               "name": "bulkActions",
               "description": "Extra bulk actions (besides the built-in Delete).",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -12624,7 +12624,7 @@
               "name": "actions",
               "description": "Speed dial actions",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -13144,7 +13144,7 @@
               "name": "form",
               "description": "Form instance. If not provided, uses form context.",
               "type": {
-                "text": "object"
+                "text": "Form<any> | null"
               },
               "default": "null"
             },
@@ -13153,7 +13153,7 @@
               "name": "itemFields",
               "description": "Field definitions per array item. Builds one plain control per `type` — text, email, number, textarea, checkbox, switch (a `select` gets no options; anything else is a text input). A row that needs a component of its own, a picker or a select with options, goes in the `row` slot.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -13162,7 +13162,7 @@
               "name": "itemDefault",
               "description": "Default values for a new item.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -14095,7 +14095,7 @@
               "name": "fields",
               "description": "Field definitions (FieldDefinition[] or FilterField[]).",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -14104,7 +14104,7 @@
               "name": "source",
               "description": "DataSource to auto-bind filters.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -14372,7 +14372,7 @@
               "name": "field",
               "description": "The form field this field shows (#128): `:field=\"f.email\"`. Its error, warning, touched state and\nrequired-ness, with no `name` and no surrounding `<pdx-form>`.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -14944,7 +14944,7 @@
               "name": "schema",
               "description": "FormSchema defining fields, sections, layout.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -14953,7 +14953,7 @@
               "name": "form",
               "description": "Optional pre-existing Form instance. If not provided, one is created from schema.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -15128,7 +15128,7 @@
               "name": "form",
               "description": "The Form instance (from createForm()). Required.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -15177,7 +15177,7 @@
               "name": "source",
               "description": "DataSource for auto-load/save. When set, submit saves via DS.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -15378,7 +15378,7 @@
               "name": "weight",
               "description": "Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'.",
               "type": {
-                "text": "'thin' | 'light' | 'regular' | 'bold'"
+                "text": "'' | 'thin' | 'light' | 'regular' | 'bold'"
               },
               "default": "''",
               "attribute": "weight"
@@ -15467,7 +15467,7 @@
               "fieldName": "weight",
               "description": "Weight override: thin(1) light(1.5) regular(2) bold(2.5). Default: inherit from --pdx-icon-weight or 'regular'.",
               "type": {
-                "text": "'thin' | 'light' | 'regular' | 'bold'"
+                "text": "'' | 'thin' | 'light' | 'regular' | 'bold'"
               },
               "default": "''"
             },
@@ -15703,7 +15703,7 @@
               "name": "authProvider",
               "description": "Function returning HTTP headers for auth requests",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -15712,7 +15712,7 @@
               "name": "fetchFn",
               "description": "Custom fetch function: (url: string) => Promise<Blob>",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             }
@@ -15960,7 +15960,7 @@
               "name": "source",
               "description": "DataSource instance for auto-paging",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -16177,7 +16177,7 @@
               "name": "options",
               "description": "Options for select/multiselect: [{ value, label }]",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -17255,7 +17255,7 @@
               "kind": "field",
               "name": "schema",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -18368,7 +18368,7 @@
               "name": "items",
               "description": "Static suggestions array",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -18377,7 +18377,7 @@
               "name": "source",
               "description": "DataSource or raw array for remote search",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -18819,7 +18819,7 @@
               "name": "renderItem",
               "description": "Draws one entry, as the `item` slot does: `({ item, key, type }) => Node`. For a menu built\nfrom script — `pdx-dropdown-menu` hands its own `item` slot on through it.",
               "type": {
-                "text": "function"
+                "text": "((...args: unknown[]) => unknown) | null"
               },
               "default": "null"
             },
@@ -19020,7 +19020,7 @@
               "name": "items",
               "description": "Top-level menu items",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -19555,7 +19555,7 @@
               "name": "items",
               "description": "Navigation items",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -20723,7 +20723,7 @@
               "kind": "field",
               "name": "crumbs",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "() => []"
             },
@@ -20847,7 +20847,7 @@
               "name": "source",
               "description": "DataSource instance — auto-binds total, page, pageSize",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -20886,7 +20886,7 @@
               "name": "pageSizes",
               "description": "Page size options",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[10, 20, 50, 100]"
             },
@@ -21960,7 +21960,7 @@
               "name": "token",
               "description": "The context token the value is provided under (single value mode): `context<T>('name')`.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -21969,7 +21969,7 @@
               "name": "value",
               "description": "Value to provide (for single value mode). Reactive if signal.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -21978,7 +21978,7 @@
               "name": "values",
               "description": "Multiple values, a `Map` of token → value. Takes priority over token/value.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             }
@@ -22851,7 +22851,7 @@
               "name": "source",
               "description": "The DataSource of the rows to pick from, handed to the grid the picker renders.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -22859,7 +22859,7 @@
               "kind": "field",
               "name": "columns",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "() => []"
             },
@@ -23167,7 +23167,7 @@
               "name": "extensions",
               "description": "Editor extensions to enable.",
               "type": {
-                "text": "array"
+                "text": "unknown[] | null"
               },
               "default": "null"
             },
@@ -23266,7 +23266,7 @@
               "name": "source",
               "description": "A DataSource whose record `record-id` names: the editor edits that record's `field`, follows\nit when the source changes it, and writes each edit back through the source.\nWith all three given, the record is the document and `value` only reflects it.",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -24426,7 +24426,7 @@
               "name": "options",
               "description": "Options: string[] or {label,value,disabled?,icon?}[] — bound as an array, or written as a static JSON attribute.",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -26410,7 +26410,7 @@
               "name": "items",
               "description": "Dropdown menu items",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -26661,7 +26661,7 @@
               "name": "panes",
               "description": "Pane configurations — array matching child elements",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -30419,7 +30419,7 @@
               "name": "items",
               "description": "All items — array of { value, label, disabled? }",
               "type": {
-                "text": "array"
+                "text": "unknown[]"
               },
               "default": "[]"
             },
@@ -30428,7 +30428,7 @@
               "name": "source",
               "description": "DataSource or raw array of objects",
               "type": {
-                "text": "object"
+                "text": "Record<string, unknown> | null"
               },
               "default": "null"
             },
@@ -30924,7 +30924,7 @@
               "name": "loadChildren",
               "description": "Lazy load: (node) => Promise<TreeSelectNode[]>",
               "type": {
-                "text": "function"
+                "text": "((...args: unknown[]) => unknown) | null"
               },
               "default": "null"
             },
@@ -31328,7 +31328,7 @@
               "name": "loadChildren",
               "description": "Fetch a branch's children the first time it opens.",
               "type": {
-                "text": "function"
+                "text": "((...args: unknown[]) => unknown) | null"
               },
               "default": "null"
             },

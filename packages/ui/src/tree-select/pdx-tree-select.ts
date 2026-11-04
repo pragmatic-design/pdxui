@@ -2,7 +2,7 @@
 // Renders a hierarchical tree inside the dropdown panel.
 // Supports single/multi select, search filter, lazy children, checkboxes.
 
-import { component, html, signal, model, event, generatedId, slot, declaredSnippet } from '@pdxui/core';
+import { component, html, signal, model, event, generatedId, slot, declaredSnippet, prop } from '@pdxui/core';
 import type { SlotFunction } from '@pdxui/core';
 import { registerComponentStrings, getComponentString, registerFormControl, usePopover } from '@pdxui/core';
 import { onPressOutside } from '../shared/press-outside';
@@ -86,26 +86,26 @@ component('pdx-tree-select', {
     },
     props: {
         /** Tree of options */
-        options: { type: Array, default: [] },
+        options: prop<unknown[]>([]),
         /** Allow multiple selection */
-        multiple: { type: Boolean, default: false },
+        multiple: prop(false),
         /** Placeholder */
-        placeholder: { type: String, default: '' },
+        placeholder: prop(''),
         /** Accessible name (aria-label) for the trigger; falls back to placeholder */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Show search filter */
-        searchable: { type: Boolean, default: false },
+        searchable: prop(false),
         /** Clearable */
-        clearable: { type: Boolean, default: true },
+        clearable: prop(true),
         /** Disabled */
-        disabled: { type: Boolean, default: false },
+        disabled: prop(false),
         /** Expand all nodes initially */
-        expandAll: { type: Boolean, default: false },
+        expandAll: prop(false),
         /** Lazy load: (node) => Promise<TreeSelectNode[]> */
-        loadChildren: { type: Function, default: null },
+        loadChildren: prop<((...args: unknown[]) => unknown) | null>(null, { type: Function }),
         /** Size */
         /** Form field name */
-        name: { type: String, default: '' },
+        name: prop(''),
     },
     // The node a snippet receives is the app's, from `options` (#651): the editor infers `T`.
     generics: { T: { extends: '{ value: string; label: string }', from: 'options' } },

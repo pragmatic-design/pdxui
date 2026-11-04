@@ -1,7 +1,7 @@
 // pdx-textarea — Multi-line input with auto-resize, char/word count, sizes, states.
 // Uses .pdx-input-wrap pattern for consistency with pdx-input.
 
-import { component, event, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model, prop } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 import { dispatchCommit } from '../shared/commit-change';
 
@@ -48,24 +48,24 @@ component('pdx-textarea', {
         size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' },
     },
     props: {
-        placeholder: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        required: { type: Boolean, default: false },
-        rows: { type: Number, default: 3 },
-        minRows: { type: Number, default: 0 },
-        maxRows: { type: Number, default: 0 },
-        maxlength: { type: Number, default: 0 },
-        showCount: { type: Boolean, default: false },
-        wordCount: { type: Boolean, default: false },
-        resize: { type: String, default: 'vertical' },
-        error: { type: Boolean, default: false },
-        success: { type: Boolean, default: false },
-        warning: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
+        placeholder: prop(''),
+        disabled: prop(false),
+        readonly: prop(false),
+        required: prop(false),
+        rows: prop(3),
+        minRows: prop(0),
+        maxRows: prop(0),
+        maxlength: prop(0),
+        showCount: prop(false),
+        wordCount: prop(false),
+        resize: prop('vertical'),
+        error: prop(false),
+        success: prop(false),
+        warning: prop(false),
+        name: prop(''),
+        ariaLabel: prop(''),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     setup(ctx) {
         // The inner field submits; a form reset puts it and the model back to the mounted text (#135).

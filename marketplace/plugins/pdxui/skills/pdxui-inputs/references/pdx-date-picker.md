@@ -32,10 +32,10 @@ leaves both the field and its panel).
 | `weekNumbers` | `weeknumbers` | boolean | `false` | Show week numbers. |
 | `min` | `min` | string | `''` | Minimum date (ISO). |
 | `max` | `max` | string | `''` | Maximum date (ISO). |
-| `disabledDates` | — | object | `null` | Function: (iso) => boolean for disabled dates. |
-| `highlightedDates` | — | object | `null` | Function: (iso) => string\|false for highlighted dates. |
+| `disabledDates` | — | Record<string, unknown> \| null | `null` | Function: (iso) => boolean for disabled dates. |
+| `highlightedDates` | — | Record<string, unknown> \| null | `null` | Function: (iso) => string\|false for highlighted dates. |
 | `fiscalStartMonth` | `fiscalstartmonth` | number | `1` | Fiscal year start month (1-12). |
-| `presets` | — | array | `[]` | Preset date options (array of { label, value }). |
+| `presets` | — | unknown[] | `[]` | Preset date options (array of { label, value }). |
 | `showCompare` | `showcompare` | boolean | `false` | Show comparison range toggle. |
 | `compareStart` | `comparestart` | string | `''` | Compare range start (ISO). |
 | `compareEnd` | `compareend` | string | `''` | Compare range end (ISO). |

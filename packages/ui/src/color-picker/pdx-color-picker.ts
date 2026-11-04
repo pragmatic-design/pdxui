@@ -2,7 +2,7 @@
 // Popup mode (default): swatch triggers floating panel. Inline mode: panel always visible.
 // Internal state in HSV for natural spectrum mapping. Output in hex/rgb/hsl.
 
-import { component, html, signal, computed, effect, model, event, generatedId } from '@pdxui/core';
+import { component, html, signal, computed, effect, model, event, generatedId, prop } from '@pdxui/core';
 import { usePopover, overlayStack } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { dispatchCommit } from '../shared/commit-change';
@@ -133,15 +133,15 @@ component('pdx-color-picker', {
         size: { md: '.pdx-color-swatch-md', sm: '.pdx-color-swatch-sm', lg: '.pdx-color-swatch-lg' },
     },
     props: {
-        format:   { type: String, default: 'hex' },
-        showAlpha: { type: Boolean, default: false },
-        presets:   { type: Array, default: () => [] },
-        disabled:  { type: Boolean, default: false },
-        readonly:  { type: Boolean, default: false },
-        inline:    { type: Boolean, default: false },
-        label:     { type: String, default: '' },
-        name:      { type: String, default: '' },
-        clearable: { type: Boolean, default: false },
+        format:   prop('hex'),
+        showAlpha: prop(false),
+        presets:   prop<unknown[]>(() => []),
+        disabled:  prop(false),
+        readonly:  prop(false),
+        inline:    prop(false),
+        label:     prop(''),
+        name:      prop(''),
+        clearable: prop(false),
     },
     setup(ctx) {
         const uid = generatedId('pdx-cp');

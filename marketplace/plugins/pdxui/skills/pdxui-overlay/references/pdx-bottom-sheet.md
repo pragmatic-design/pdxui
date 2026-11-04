@@ -4,7 +4,7 @@ A panel that rises from the bottom.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `detents` | — | array | `() => [0.4, 0.85]` | Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] |
+| `detents` | — | unknown[] | `() => [0.4, 0.85]` | Snap points as fractions of viewport height (0-1). Default: [0.4, 0.85] |
 | `initialDetent` | `initialdetent` | number | `0` | Initial detent index. Default: 0 (smallest) |
 | `backdrop` | `backdrop` | boolean | `true` | Show the backdrop. With `false` nothing behind the sheet is dimmed, and no backdrop click closes it. |
 | `closeOnBackdrop` | `closeonbackdrop` | boolean | `true` | Close on backdrop click. Default: true |

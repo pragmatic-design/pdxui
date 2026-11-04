@@ -1,7 +1,7 @@
 // pdx-search-input — Input with search icon, clear, debounce, Escape to clear.
 // Uses pdx-input wrapper pattern. Emits pdx-search after debounce.
 
-import { component, event, html, signal, model } from '@pdxui/core';
+import { component, event, html, signal, model, prop } from '@pdxui/core';
 import { submitThroughInnerField } from '../shared/inner-field';
 // The search glyph is a <pdx-icon> in this component's own template, so it is registered
 // here: on a page that does not import the whole library the tag would never upgrade and the
@@ -56,15 +56,15 @@ component('pdx-search-input', {
     },
     props: {
         /** The input's placeholder. Empty: the search-input.placeholder component string, «Search...». */
-        placeholder: { type: String, default: '' },
-        ariaLabel: { type: String, default: '' },
-        disabled: { type: Boolean, default: false },
-        loading: { type: Boolean, default: false },
-        name: { type: String, default: '' },
+        placeholder: prop(''),
+        ariaLabel: prop(''),
+        disabled: prop(false),
+        loading: prop(false),
+        name: prop(''),
         /** Debounce delay in ms for pdx-search event (0 = no debounce) */
-        debounce: { type: Number, default: 300 },
+        debounce: prop(300),
         /** Keyboard shortcut hint displayed in suffix (e.g. "Ctrl+K") */
-        shortcut: { type: String, default: '' },
+        shortcut: prop(''),
     },
     setup(ctx) {
         // The inner field submits; a form reset puts it and the model back to the mounted text (#135).

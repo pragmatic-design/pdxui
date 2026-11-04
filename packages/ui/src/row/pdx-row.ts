@@ -2,7 +2,7 @@
 // Provides 12-column grid context via CSS custom properties.
 // Enhances CSS-only pdx-row with gutter, column count, and alignment props.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 
 /**
  * A responsive row that lays out pdx-col columns on a 12-column grid, with gutter, column count and
@@ -11,15 +11,15 @@ import { component, html } from '@pdxui/core';
 component('pdx-row', {
     props: {
         /** Number of columns in the grid system (default: 12) */
-        cols: { type: Number, default: 12 },
+        cols: prop(12),
         /** Gutter between columns: 2xs|xs|sm|md|lg|xl|2xl or CSS value */
-        gutter: { type: String, default: 'md' },
+        gutter: prop('md'),
         /** Vertical alignment of children */
-        align: { type: String, default: '' },
+        align: prop(''),
         /** Horizontal distribution */
-        justify: { type: String, default: '' },
+        justify: prop(''),
         /** Allow wrapping (default: true) */
-        wrap: { type: Boolean, default: true },
+        wrap: prop(true),
     },
     setup(ctx) {
         // Named spacing tokens → CSS values

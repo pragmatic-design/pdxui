@@ -2,7 +2,7 @@
 // Compound: discovers [data-tab] and [data-tab-panel] children linked by value.
 // Supports: vertical, lazy mount, closable tabs, scroll overflow.
 
-import { component, html, focusGroup, generatedId, model, event } from '@pdxui/core';
+import { component, html, focusGroup, generatedId, model, event, prop } from '@pdxui/core';
 import type { Dispose } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -46,17 +46,17 @@ component('pdx-tabs', {
     },
     props: {
         /** Orientation: horizontal (default) or vertical */
-        orientation: { type: String, default: 'horizontal' },
+        orientation: prop('horizontal'),
         /** Add border around entire tabs + panels */
-        bordered: { type: Boolean, default: false },
+        bordered: prop(false),
         /** Mount strategy: eager (all mounted), lazy (mount on first activate), unmount (destroy on deactivate) */
-        mount: { type: String, default: 'eager' },
+        mount: prop('eager'),
         /** Activation: automatic (activate on focus) or manual (Enter/Space to activate) */
-        activation: { type: String, default: 'automatic' },
+        activation: prop('automatic'),
         /** The tablist's accessible name ("Account settings"). */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Show loading state */
-        loading: { type: Boolean, default: false },
+        loading: prop(false),
     },
     setup(ctx) {
         // Generated ids carry a per-instance uid: as `pdx-tab-${value}`, two tabs on a page with a

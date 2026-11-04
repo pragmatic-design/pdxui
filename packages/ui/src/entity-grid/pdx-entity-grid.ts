@@ -4,7 +4,7 @@
 // the parent can persist. Composes Track A (exposed grid methods), B1 (typed `actions` cell) and
 // B2 (reactive `data` swap).
 
-import { component, html, signal, computed, actions, event } from '@pdxui/core';
+import { component, html, signal, computed, actions, event, prop } from '@pdxui/core';
 import type { ColumnDef } from '@pdxui/core';
 import type { BulkAction } from '../bulk-actions/pdx-bulk-actions';
 import { uiString, format } from '../shared/i18n';
@@ -50,28 +50,28 @@ function firstTextField(cols: ColumnDef[], idField: string): string | undefined 
 component('pdx-entity-grid', {
     props: {
         /** Grid columns (ColumnDef[]). An edit/delete actions column is appended unless readonly. */
-        columns: { type: Array, default: [] },
+        columns: prop<unknown[]>([]),
         /** Entity rows. */
-        data: { type: Array, default: [] },
+        data: prop<unknown[]>([]),
         /** FormSchema for the create/edit drawer. Without it the CRUD affordances are hidden. */
-        schema: { type: Object, default: null },
-        idField: { type: String, default: 'id' },
-        title: { type: String, default: '' },
+        schema: prop<Record<string, unknown> | null>(null),
+        idField: prop('id'),
+        title: prop(''),
         /** The create button's text. Empty: the entity-grid.add component string, «New». */
-        addLabel: { type: String, default: '' },
-        selection: { type: String, default: 'multiple', enum: ['none', 'single', 'multiple'] },
+        addLabel: prop(''),
+        selection: prop<'none' | 'single' | 'multiple'>('multiple'),
         /** Show the per-row edit/delete actions column. */
-        rowActions: { type: Boolean, default: true },
+        rowActions: prop(true),
         /** Extra bulk actions (besides the built-in Delete). */
-        bulkActions: { type: Array, default: [] },
+        bulkActions: prop<unknown[]>([]),
         /** Hide all mutating affordances (view-only grid). */
-        readonly: { type: Boolean, default: false },
+        readonly: prop(false),
         /** Ask before deleting ("Delete Alice Johnson?", "Delete 3 records?"). `false` for an app that
          *  confirms, or offers undo, in its pdx-delete handler: the rows go at once. */
-        confirmDelete: { type: Boolean, default: true },
+        confirmDelete: prop(true),
         /** The field that names a row in its action buttons and in the delete confirmation. Empty:
          *  the first text column, else the id. */
-        rowLabel: { type: String, default: '' },
+        rowLabel: prop(''),
     },
     // Declared (#138): they stay on the host, which the app listens on to persist.
     events: {

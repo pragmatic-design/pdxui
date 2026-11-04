@@ -11,7 +11,7 @@
 //   - panel: collapsible fieldset; the legend holds a disclosure button (not a
 //     <legend role="button"> with no tabindex, which Tab would skip)
 
-import { component, html, signal, provideFieldGroupPath, useFieldGroupPath, generatedId, model } from '@pdxui/core';
+import { component, html, signal, provideFieldGroupPath, useFieldGroupPath, generatedId, model, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
@@ -33,14 +33,14 @@ import '../dialog/pdx-dialog'; // rendered by this component, and registered by 
 component('pdx-field-group', {
     props: {
         /** Group name — maps to a nested object key in the form data. */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** Optional label rendered as a fieldset legend. */
-        label: { type: String, default: '' },
+        label: prop(''),
         /**
          * Display mode: inline (default), dialog, panel. A mode renders its own markup, each with its
          * fixed class, so it is no variant axis; what changes within one, collapsed, is a state.
          */
-        display: { type: String, default: 'inline' },
+        display: prop('inline'),
     },
     // `collapsed` is a model (#293): the panel's toggle writes it.
     models: {

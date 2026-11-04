@@ -6,11 +6,11 @@ Page through long results.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
-| `source` | — | object | `null` | DataSource instance — auto-binds total, page, pageSize |
+| `source` | — | Record<string, unknown> \| null | `null` | DataSource instance — auto-binds total, page, pageSize |
 | `total` | `total` | number | `-1` | Total number of items (overrides DataSource) |
 | `showEdges` | `showedges` | boolean | `true` | Show first/last buttons |
 | `showPageSize` | `showpagesize` | boolean | `false` | Show page size selector |
-| `pageSizes` | — | array | `[10, 20, 50, 100]` | Page size options |
+| `pageSizes` | — | unknown[] | `[10, 20, 50, 100]` | Page size options |
 | `simple` | `simple` | boolean | `false` | Simple mode (prev/next only, no page numbers) |
 | `showTotal` | `showtotal` | boolean | `false` | Show total info text |
 | `page` | `page` | number | `-1` | Current page 1-based (overrides DataSource) |

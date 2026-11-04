@@ -2,7 +2,7 @@
 // CSS Grid layout with responsive collapse. Semantic HTML elements.
 // Props: navbarWidth, navbarCollapsed, navbarBreakpoint, asideWidth, headerHeight, footerHeight.
 
-import { component, html, signal, moveMounted, DEV, model } from '@pdxui/core';
+import { component, html, signal, moveMounted, DEV, model, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -48,25 +48,25 @@ component('pdx-app-layout', {
     parts: ['header', 'navbar', 'aside', 'main', 'footer', 'overlay'],
     props: {
         /** Header height (CSS value). Empty = no header. */
-        headerHeight: { type: String, default: '52px' },
+        headerHeight: prop('52px'),
         /** Footer height (CSS value). Empty = no footer. */
-        footerHeight: { type: String, default: '' },
+        footerHeight: prop(''),
         /** Navbar (left sidebar) width (CSS value) */
-        navbarWidth: { type: String, default: '260px' },
+        navbarWidth: prop('260px'),
         /** Navbar collapsed width for mini mode. A non-zero rail keeps icon-only nav visible
          *  when collapsed (set to '0px' explicitly for a fully-hidden navbar). */
-        navbarCollapsedWidth: { type: String, default: '60px' },
+        navbarCollapsedWidth: prop('60px'),
         /** Breakpoint (px) below which navbar auto-collapses to overlay */
-        navbarBreakpoint: { type: Number, default: 768 },
+        navbarBreakpoint: prop(768),
         /** Aside (right sidebar) width. Empty = no aside. */
-        asideWidth: { type: String, default: '' },
+        asideWidth: prop(''),
         /** Full-height navbar: the left sidebar spans header+main+footer (logo lives in the
          *  navbar), and the header only sits above main. Default false = header spans full width. */
-        navbarFullHeight: { type: Boolean, default: false },
+        navbarFullHeight: prop(false),
         /** Show border between regions */
-        withBorder: { type: Boolean, default: true },
+        withBorder: prop(true),
         /** Transition duration (ms) */
-        transitionDuration: { type: Number, default: 200 },
+        transitionDuration: prop(200),
     },
     setup(ctx) {
         // A named handler + teardown: otherwise the listener on the MediaQueryList survives

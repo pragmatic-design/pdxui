@@ -6,7 +6,7 @@ A top navigation bar.
 |---|---|---|---|---|
 | `brand` | `brand` | string | `''` | Brand text |
 | `brandIcon` | `brandicon` | string | `''` | Brand icon name |
-| `items` | — | array | `[]` | Navigation items |
+| `items` | — | unknown[] | `[]` | Navigation items |
 | `sticky` | `sticky` | boolean | `false` | Sticky |
 | `compact` | `compact` | boolean | `false` | Compact height |
 | `label` | `label` | string | `''` | The navigation landmark's name. Empty: the navbar.mainNav component string, «Main navigation». Give each navbar on a page its own: a sub-nav, a footer nav. |

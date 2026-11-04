@@ -3,7 +3,7 @@
 // Props: type (auto/always/hover/scroll/never), axis, scrollHideDelay.
 // API: scrollTo, scrollBy, scrollIntoView. Events: pdx-scroll.
 
-import { component, html, event } from '@pdxui/core';
+import { component, html, event, prop } from '@pdxui/core';
 import { useScrollbar } from '@pdxui/core';
 import type { ScrollbarReturn } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -39,18 +39,18 @@ component('pdx-scroll-area', {
     parts: ['viewport', 'scrollbar', 'thumb'],
     props: {
         /** Scrollbar visibility: auto (show on scroll+hover), always, hover (show on hover only), never */
-        type: { type: String, default: 'auto' },
+        type: prop('auto'),
         /** Axis: vertical (default), horizontal, both */
-        axis: { type: String, default: 'vertical' },
+        axis: prop('vertical'),
         /** Auto-hide delay in ms (0 = never hide). Used when type=auto */
-        scrollHideDelay: { type: Number, default: 1200 },
+        scrollHideDelay: prop(1200),
         /** Max height (CSS value). Enables scroll when content overflows */
-        maxHeight: { type: String, default: '' },
+        maxHeight: prop(''),
         /** Height (CSS value) */
-        height: { type: String, default: '' },
+        height: prop(''),
         /** Names the scrollable area ("Release notes") and makes it a region landmark. Empty: no
          *  landmark — the area stays focusable (tabindex 0) so the keyboard can scroll it. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         let _built = false;

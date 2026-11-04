@@ -2,7 +2,7 @@
 // Determinate (value 0-100) or indeterminate (animated).
 // Uses Pragmatic CSS classes + enhances with label, sizes, circular mode.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -28,21 +28,21 @@ component('pdx-progress', {
     },
     props: {
         /** Current value (0-100). Omit or -1 for indeterminate. */
-        value: { type: Number, default: -1 },
+        value: prop(-1),
         /** Max value (default 100) */
-        max: { type: Number, default: 100 },
+        max: prop(100),
         /** Color variant: primary (default), success, warning, danger */
-        variant: { type: String, default: '' },
+        variant: prop(''),
         /** Show percentage label */
-        showLabel: { type: Boolean, default: false },
+        showLabel: prop(false),
         /** Custom label text (overrides percentage). Also the value in words for assistive technology (aria-valuetext). */
-        label: { type: String, default: '' },
+        label: prop(''),
         /** Striped animation on the bar */
-        striped: { type: Boolean, default: false },
+        striped: prop(false),
         /** Circular/ring mode instead of linear bar */
-        circular: { type: Boolean, default: false },
+        circular: prop(false),
         /** Accessible label for screen readers. Empty: the progress.label component string. */
-        ariaLabel: { type: String, default: '' },
+        ariaLabel: prop(''),
     },
     setup(ctx) {
         function percent(): number {

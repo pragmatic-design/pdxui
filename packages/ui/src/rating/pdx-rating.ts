@@ -3,7 +3,7 @@
 // threshold colors (Element+), hover preview, readonly vs disabled.
 // Uses aria-valuenow/min/max on role="slider" (WAI pattern).
 
-import { component, html, signal, effect, model } from '@pdxui/core';
+import { component, html, signal, effect, model, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 import { reflectNameToHost } from '../shared/own-prop';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -38,20 +38,20 @@ component('pdx-rating', {
         size: { md: '.pdx-rating-md', sm: '.pdx-rating-sm', lg: '.pdx-rating-lg' },
     },
     props: {
-        count: { type: Number, default: 5 },
-        precision: { type: Number, default: 1 },
-        disabled: { type: Boolean, default: false },
-        readonly: { type: Boolean, default: false },
-        name: { type: String, default: '' },
-        color: { type: String, default: '' },
+        count: prop(5),
+        precision: prop(1),
+        disabled: prop(false),
+        readonly: prop(false),
+        name: prop(''),
+        color: prop(''),
         /** Comma-separated tooltip labels, e.g. "Bad,Poor,OK,Good,Great" */
-        tooltips: { type: String, default: '' },
+        tooltips: prop(''),
         /** Comma-separated threshold:color pairs, e.g. "2:red,3:orange,5:green" */
-        colors: { type: String, default: '' },
+        colors: prop(''),
         /** Allow clearing to 0 by clicking current value */
-        clearable: { type: Boolean, default: false },
+        clearable: prop(false),
         /** Accessible name. Empty: the rating.label component string, «Rating» in English. */
-        label: { type: String, default: '' },
+        label: prop(''),
     },
     setup(ctx) {
         const hoverValue = signal(-1);

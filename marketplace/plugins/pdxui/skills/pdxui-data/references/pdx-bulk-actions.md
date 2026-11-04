@@ -5,7 +5,7 @@ An action bar for the current selection.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `count` | `count` | number | `0` | Number of selected items — drives visibility and the default label. |
-| `actions` | — | array | `[]` | Actions to offer. |
+| `actions` | — | unknown[] | `[]` | Actions to offer. |
 | `label` | `label` | string | `''` | Label template; `{count}` is substituted. Default: the `bulk-actions.selected` component string, "{count} selected". |
 | `clearable` | `clearable` | boolean | `true` | Show the trailing clear (✕) button. |
 

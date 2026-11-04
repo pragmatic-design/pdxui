@@ -2,7 +2,7 @@
 // Zero dependencies. Canvas-rendered. Design-token native.
 // Auto-resize, animated transitions, DataSource binding.
 
-import { component, html, generatedId } from '@pdxui/core';
+import { component, html, generatedId, prop } from '@pdxui/core';
 import { ChartEngine, type ChartConfig } from './core/engine';
 import { chartDataTable, chartSeries, gaugeReading, pointText, type ChartDataTable } from './core/describe';
 import { chartNumbers } from './core/numbers';
@@ -23,59 +23,59 @@ import '@pdxui/design/components/chart';
 component('pdx-chart', {
     props: {
         /** Chart type: line, bar, area, pie, doughnut, scatter, gauge, radar */
-        type: { type: String, default: 'line' },
+        type: prop('line'),
         /** Data array (array of objects) */
-        data: { type: Array, default: [] },
+        data: prop<unknown[]>([]),
         /** X-axis field name (auto-detected if omitted) */
-        xField: { type: String, default: '' },
+        xField: prop(''),
         /** Y-axis field name(s) — string or comma-separated */
-        yField: { type: String, default: '' },
+        yField: prop(''),
         /** Series display names (comma-separated) */
-        seriesNames: { type: String, default: '' },
+        seriesNames: prop(''),
         /** Chart title */
-        title: { type: String, default: '' },
+        title: prop(''),
         /** Smooth line interpolation */
-        smooth: { type: Boolean, default: false },
+        smooth: prop(false),
         /** Stack series */
-        stacked: { type: Boolean, default: false },
+        stacked: prop(false),
         /** Show tooltip on hover */
-        tooltip: { type: Boolean, default: true },
+        tooltip: prop(true),
         /** Show legend */
-        legend: { type: Boolean, default: true },
+        legend: prop(true),
         /** Legend position: top, bottom, left, right */
-        legendPosition: { type: String, default: 'top' },
+        legendPosition: prop('top'),
         /** Chart height (CSS value) */
-        height: { type: String, default: '' },
+        height: prop(''),
         /** X-axis label */
-        xAxisName: { type: String, default: '' },
+        xAxisName: prop(''),
         /** Y-axis label */
-        yAxisName: { type: String, default: '' },
+        yAxisName: prop(''),
         /** Right Y-axis label (dual axis) */
-        yAxisRightName: { type: String, default: '' },
+        yAxisRightName: prop(''),
         /** X-axis format: currency, percent, compact, or template '{value}%' */
-        xFormat: { type: String, default: '' },
+        xFormat: prop(''),
         /** Left Y-axis format */
-        yFormat: { type: String, default: '' },
+        yFormat: prop(''),
         /** Right Y-axis format */
-        yRightFormat: { type: String, default: '' },
+        yRightFormat: prop(''),
         /** Locale the chart prints numbers in (BCP 47). Empty: the nearest `lang`, then the browser. */
-        locale: { type: String, default: '' },
+        locale: prop(''),
         /** Currency of the `currency` format (ISO 4217, e.g. "EUR"). Empty: "USD". */
-        currency: { type: String, default: '' },
+        currency: prop(''),
         /** Enable zoom: 'inside' (mouse wheel + drag pan) */
-        zoom: { type: String, default: '' },
+        zoom: prop(''),
         /** Advanced: per-series config JSON string */
-        seriesConfig: { type: String, default: '' },
+        seriesConfig: prop(''),
         /** Gauge: minimum value */
-        min: { type: Number, default: 0 },
+        min: prop(0),
         /** Gauge: maximum value */
-        max: { type: Number, default: 100 },
+        max: prop(100),
         /** Gauge: current value (alternative to data) */
-        value: { type: Number, default: 0 },
+        value: prop(0),
         /** Gauge: value format (e.g. "{value}%") */
-        format: { type: String, default: '' },
+        format: prop(''),
         /** DataSource binding (duck-typed) */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
     },
     parts: ['legend', 'legend-item', 'swatch', 'canvas'],
     setup(ctx) {

@@ -1,7 +1,7 @@
 // pdx-sidebar — Collapsible sidebar container. Wraps pdx-nav-menu or any content.
 // Supports: expanded/collapsed/mini modes, header/footer slots, responsive.
 
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -27,13 +27,13 @@ component('pdx-sidebar', {
     },
     props: {
         /** Sidebar open/expanded state */
-        open: { type: Boolean, default: true },
+        open: prop(true),
         /** Mini mode: show only icons when collapsed */
-        mini: { type: Boolean, default: false },
+        mini: prop(false),
         /** Width when expanded (px) */
-        width: { type: Number, default: 260 },
+        width: prop(260),
         /** Width when collapsed/mini (px) */
-        collapsedWidth: { type: Number, default: 60 },
+        collapsedWidth: prop(60),
     },
     setup(ctx) {
         let _built = false;

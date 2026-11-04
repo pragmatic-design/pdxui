@@ -2,7 +2,7 @@
 // Renders a .pdx-field-label with .pdx-field-hint and .pdx-field-description; required, optional and
 // disabled are states of the host, which forms.css draws beside the native .pdx-field-required classes.
 
-import { component, html, signal, generatedId } from '@pdxui/core';
+import { component, html, signal, generatedId, prop } from '@pdxui/core';
 
 /**
  * An accessible form label, with a required or optional indicator, a hint and a description.
@@ -23,13 +23,13 @@ component('pdx-label', {
         size: { md: '.pdx-field-label-md', xs: '.pdx-field-label-xs', sm: '.pdx-field-label-sm', lg: '.pdx-field-label-lg', xl: '.pdx-field-label-xl' },
     },
     props: {
-        for: { type: String, default: '' },
-        text: { type: String, default: '' },
-        required: { type: Boolean, default: false },
-        optional: { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        hint: { type: String, default: '' },
-        description: { type: String, default: '' },
+        for: prop(''),
+        text: prop(''),
+        required: prop(false),
+        optional: prop(false),
+        disabled: prop(false),
+        hint: prop(''),
+        description: prop(''),
     },
     // Its conditions are states of the host (#293), which forms.css draws; the <label> keeps only its
     // base class, the one a native label shares.

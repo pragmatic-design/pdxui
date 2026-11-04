@@ -5,7 +5,7 @@
 // Children (<pdx-form-field>, custom inputs) inject the form via useForm().
 // The form prop is required — create it with createForm() or @form rune.
 
-import { component, html, provideForm, useFormCoordinator, onDestroy, DEV, signal, event } from '@pdxui/core';
+import { component, html, provideForm, useFormCoordinator, onDestroy, DEV, signal, event, prop } from '@pdxui/core';
 import type { Form, DataSource, FormCoordinator } from '@pdxui/core';
 import { findRecord } from '../shared/find-record';
 // This component's styles travel with it, so an app ships the CSS of what it renders
@@ -26,19 +26,19 @@ import '@pdxui/design/components/form';
 component('pdx-form', {
     props: {
         /** The Form instance (from createForm()). Required. */
-        form: { type: Object, default: null },
+        form: prop<Record<string, unknown> | null>(null),
         /** Optional name for nested form registration with parent coordinator. */
-        name: { type: String, default: '' },
+        name: prop(''),
         /** HTML autocomplete attribute. */
-        autocomplete: { type: String, default: 'off' },
+        autocomplete: prop('off'),
         /** Scroll to first error field on failed validation. */
-        scrollToError: { type: Boolean, default: true },
+        scrollToError: prop(true),
         /** CSS class for the inner <form> element. */
-        formClass: { type: String, default: '' },
+        formClass: prop(''),
         /** DataSource for auto-load/save. When set, submit saves via DS. */
-        source: { type: Object, default: null },
+        source: prop<Record<string, unknown> | null>(null),
         /** Record ID to load from the DataSource. */
-        recordId: { type: String, default: '' },
+        recordId: prop(''),
     },
     // Declared (#138): they stay on the host, which the parent listens on.
     events: {

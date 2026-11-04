@@ -2,7 +2,7 @@
 // Shows icon + title + description + optional action button.
 // Used inside List, Table, DataGrid when data is empty.
 
-import { component, html, onDestroy, event } from '@pdxui/core';
+import { component, html, onDestroy, event, prop } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
@@ -30,18 +30,18 @@ component('pdx-empty-state', {
     parts: ['icon', 'title', 'description', 'action'],
     props: {
         /** Icon name */
-        icon: { type: String, default: 'inbox', iconName: true },
+        icon: prop('inbox', { iconName: true }),
         /** Title text. Empty: the empty-state.title component string, «No data». */
-        title: { type: String, default: '' },
+        title: prop(''),
         /** Description text */
-        description: { type: String, default: '' },
+        description: prop(''),
         /** Action button label (empty = no button) */
-        actionLabel: { type: String, default: '' },
+        actionLabel: prop(''),
         /** Icon size */
-        iconSize: { type: Number, default: 48 },
+        iconSize: prop(48),
         /** The title's heading level (1-6). Default 3: an empty state usually sits in a section
          *  whose own heading is level 2. */
-        headingLevel: { type: Number, default: 3 },
+        headingLevel: prop(3),
     },
     setup(ctx) {
         let _built = false;
