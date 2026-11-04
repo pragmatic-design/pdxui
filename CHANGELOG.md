@@ -11,6 +11,14 @@ semver.
 
 ### Features
 
+- `pdx-transfer`'s `size` now draws sm, md and lg (#748). It was a prop that put a
+  `pdx-transfer-{size}` class on the frame, which no rule drew; it is now a variant axis on the host,
+  md by default, and that class is no longer written there (native markup takes `.pdx-transfer-sm` /
+  `-lg` on the frame). The rows, the panel headers and the move buttons step with the size. The search
+  fields are native text fields, `.pdx-input` with the text fields' size class, so each is as tall as
+  a `pdx-input` of the same size in every theme: in md too, where the search field is now the size of
+  a pdx-input (40px in the neutral theme, 56px in material) instead of its own smaller field.
+
 - A library component fed by a DataSource types its snippets from it (#853): `pdx-list` and
   `pdx-data-grid` infer `T` from `:source` as from `:items` and `:data`, so `@snippet item(it) {
   {{ it.name }} }` reads the source's own item, where it was `unknown`. `pdx-select` is generic over

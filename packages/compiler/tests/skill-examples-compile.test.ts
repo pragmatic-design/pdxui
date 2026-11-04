@@ -42,8 +42,9 @@ describe('the .pdx examples in the skills', () => {
         // + a form section in its own .pdx injecting the form with useForm(): the framework does
         // not pass `form` down as a prop — `<pdx-form>` provides it and the child injects.
         // + the component pages' examples from the demos that use a block directive:
-        // pdx-checkbox and pdx-chip (@for/@if), and pdx-error-boundary's two @try blocks.
-        expect(COMPILED.map(e => e.where)).toHaveLength(23);
+        // pdx-checkbox and pdx-chip (@for/@if), pdx-error-boundary's two @try blocks, and pdx-transfer's
+        // sizes (@for, #748).
+        expect(COMPILED.map(e => e.where)).toHaveLength(24);
     });
 
     it('skips only what says it is partial — and nothing does today', () => {

@@ -30379,16 +30379,6 @@
             },
             {
               "kind": "field",
-              "name": "size",
-              "description": "Component size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''",
-              "attribute": "size"
-            },
-            {
-              "kind": "field",
               "name": "showAllButtons",
               "description": "Show \"move all\" buttons",
               "type": {
@@ -30416,6 +30406,16 @@
               },
               "default": "''",
               "attribute": "name"
+            },
+            {
+              "kind": "field",
+              "name": "size",
+              "description": "sm, md (the default) or lg: the rows, the search fields and the move buttons.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'",
+              "attribute": "size"
             },
             {
               "kind": "field",
@@ -30449,6 +30449,22 @@
             "value"
           ],
           "formAssociated": true,
+          "variants": [
+            {
+              "name": "size",
+              "values": [
+                "md",
+                "sm",
+                "lg"
+              ],
+              "default": "md",
+              "native": {
+                "md": ".pdx-transfer-md",
+                "sm": ".pdx-transfer-sm",
+                "lg": ".pdx-transfer-lg"
+              }
+            }
+          ],
           "alphaEvents": [
             "pdx-change"
           ],
@@ -30563,15 +30579,6 @@
               "default": "false"
             },
             {
-              "name": "size",
-              "fieldName": "size",
-              "description": "Component size",
-              "type": {
-                "text": "string"
-              },
-              "default": "''"
-            },
-            {
               "name": "showallbuttons",
               "fieldName": "showAllButtons",
               "description": "Show \"move all\" buttons",
@@ -30597,6 +30604,15 @@
                 "text": "string"
               },
               "default": "''"
+            },
+            {
+              "name": "size",
+              "fieldName": "size",
+              "description": "sm, md (the default) or lg: the rows, the search fields and the move buttons.",
+              "type": {
+                "text": "'md' | 'sm' | 'lg'"
+              },
+              "default": "'md'"
             }
           ],
           "shapes": [

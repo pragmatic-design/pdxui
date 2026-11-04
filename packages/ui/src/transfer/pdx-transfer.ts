@@ -67,6 +67,13 @@ component('pdx-transfer', {
     // persist is getChanges(). A form submits the target values, one entry each, and resets them (#135).
     models: { value: model<string[]>(() => [], { type: Array, form: true }) },
     // The visual state, on the host as a custom state (#132, #287): the frame carries no class for it.
+    // sm, md (the default) or lg (#748): the design CSS's `@variant` rules size the rows, the headers
+    // and the move buttons from the host's `size`; the search fields are native `.pdx-input`s that
+    // take the text fields' own size class, so they match a pdx-input of the same size.
+    variants: {
+        /** sm, md (the default) or lg: the rows, the search fields and the move buttons. */
+        size: { md: '.pdx-transfer-md', sm: '.pdx-transfer-sm', lg: '.pdx-transfer-lg' },
+    },
     states: ['disabled'],
     parts: ['root', 'panel', 'search', 'list', 'option', 'move'],
     props: {
@@ -97,8 +104,6 @@ component('pdx-transfer', {
         targetTitle: { type: String, default: '' },
         /** Disabled state */
         disabled: { type: Boolean, default: false },
-        /** Component size */
-        size: { type: String, default: '' },
         /** Show "move all" buttons */
         showAllButtons: { type: Boolean, default: false },
         /** Enable drag and drop */
@@ -399,7 +404,6 @@ component('pdx-transfer', {
             const el = ctx.el;
             const searchable = ctx.searchable() as boolean;
             const showAll = ctx.showAllButtons() as boolean;
-            const size = ctx.size() as string;
             const mode = getMode();
             const isDraggable = ctx.draggable() as boolean;
             const srcTitle = (ctx.sourceTitle() as string) || getComponentString('transfer', 'source')();
@@ -407,7 +411,7 @@ component('pdx-transfer', {
 
             const root = document.createElement('div');
             // No state class: `disabled` is the host's :state(disabled) (#287).
-            root.className = 'pdx-transfer' + (size ? ` pdx-transfer-${size}` : '') + (isDraggable ? ' pdx-transfer-draggable' : '');
+            root.className = 'pdx-transfer' + (isDraggable ? ' pdx-transfer-draggable' : '');
             root.setAttribute('role', 'group');
             root.setAttribute('data-part', 'root');
             uiAttr(root, 'aria-label', () => uiString('transfer', 'label'));
@@ -459,6 +463,15 @@ component('pdx-transfer', {
 
             el.appendChild(root);
             _domReady.set(true);
+        });
+
+        // The search fields are native text fields of the transfer's size (#748): `.pdx-input`, and the
+        // native size class away from md, which the text fields' own `@variant` rule draws.
+        ctx.track(() => {
+            const size = ctx.size() as string;
+            if (!_domReady()) return;
+            const cls = size && size !== 'md' ? `pdx-input pdx-input-${size}` : 'pdx-input';
+            for (const field of ctx.el.querySelectorAll<HTMLInputElement>(':scope > [data-part="root"] [data-part="search"]')) field.className = cls;
         });
 
         // ── Reactive update ──
