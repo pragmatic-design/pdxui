@@ -32,7 +32,7 @@ scope attribute is `data-pdx-HASH`, where `HASH` is six base-36 characters hashe
 the compiler was given; the setup the compiler generates calls `ctx.el.setAttribute('data-pdx-HASH',
 '')` on the host when at least one block of the file is scoped. Comments are removed and
 `responsive()` and `bind()` rewritten first. What follows depends on `pdx({ target })`
-([file.md, Browser targets](beta/file.md#browser-targets)):
+([file.md, Browser targets](file.md#browser-targets)):
 
 - **`'baseline-2026'`, the default** — the rules are wrapped in a donut scope,
   `@scope ([data-pdx-HASH], [data-pdx-HASH-in]) to ([data-pdx-root] > *) { … }`. Core sets

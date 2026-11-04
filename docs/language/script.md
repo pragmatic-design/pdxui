@@ -196,7 +196,7 @@ component's `models`.
 - Assigning a model is the point of it: it never raises `PDX_PROP_WRITE`.
 - `@model name: T = d { form };` (form association, #135) is the same model with `form: true` in its
   descriptor entry; core makes the component form-associated through it
-  ([beta/components.md](beta/components.md) → «@model»). The option is taken off before the type and
+  ([components.md](components.md) → «@model»). The option is taken off before the type and
   the default are read, with or without a default. `{ form: () => expr }` (#751) also says what the
   form submits: it compiles to `ctx.formValue?.(() => expr);` at the end of the setup, rewritten as the
   script is.
