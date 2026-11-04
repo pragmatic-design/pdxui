@@ -35,6 +35,8 @@ export interface TemplateHoists {
     /** Module-level declarations, one per line: `const __blkN=staticBlock(…);`, `const __walkN=…;`. */
     readonly lines: string[];
     count: number;
+    /** The `@defer` code loaders hoisted so far, `const __codeN=deferCode(…);` (#685). */
+    codes?: number;
 }
 
 /** The static markup of one block, as the generator walks it. */

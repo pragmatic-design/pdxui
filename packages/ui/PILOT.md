@@ -115,11 +115,13 @@ What the numbers mean:
     included.
 - **Mount.** On the dev server the `.pdx` versions were slower everywhere: 1.4× the switch, 2.5× the
   select, 2.1–2.6× the popover. On a production build (#685) they are not: the switch mounts at 0.74×
-  and the select at 0.92× of their TypeScript versions. The popover stays slower, 2.1–2.3× the value
-  list and 1.85× the conditions, because its `.pdx` content is a component where the TypeScript one is
-  a function, and its list a reactive branch per row; the profile is in
-  `packages/showcase/tests/scenario-pilot-mount.spec.ts`, which measures the four rows in the
-  pre-push and holds each to its ratio.
+  and the select at 0.92× of their TypeScript versions. The popover's conditions were 1.85×, because
+  every popover rendered its editors' `@defer` a flush after its append; with a `@defer`'s code
+  loaded once per module and a block whose code has arrived rendered at once, they mount at
+  1.06–1.18×. The value list stays slower, 1.96–2.05× (2.1–2.3× before an `@if` chain compiled to one
+  branch), because each of its rows is a set of reactive bindings where a TypeScript row is built
+  once. The profile is in `packages/showcase/tests/scenario-pilot-mount.spec.ts`, which measures the
+  four rows in the pre-push and holds each to its ratio.
 - **The one red that went away.** With the switch and the select piloted, `navigation-live-prop`'s
   page-size test was red. The pagination imports the select lazily and clicks it 50 ms after mounting,
   and a cold `.pdx` select is defined 301 ms after its import, against 69 ms. With the filter popover
@@ -157,7 +159,7 @@ What the pilot found that the language or the toolchain does not do yet.
 | 11 | A cold `.pdx` compiles slowly in the dev transform: 301 ms for the first select against 69 ms | open: #685 measured the mount on a production build, not the dev transform |
 | 12 | A script function named `valueOf` is taken for a core function: the lookup reads `Object.prototype` | #681 |
 | 13 | A `$signal` initialiser that reads another `$signal` is left as written, and throws | #682 |
-| 14 | `@defer` renders after its load resolves even when the code is there, so a box measured right after the append is empty | #686, noted |
+| 14 | `@defer` renders after its load resolves even when the code is there, so a box measured right after the append is empty | fixed after the first block, #685: a `@defer`'s code is one loader per module, and a block whose code has arrived renders in its trigger's task. The first block of a `@defer` still waits for its load, so the popover keeps observing its size |
 | 15 | `PDX_UNUSED_REACTIVE` misses the reads inside a script `@snippet` | #683 |
 
 Two things in the pilot's own wiring are worth knowing for the next run:

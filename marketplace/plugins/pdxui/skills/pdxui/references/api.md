@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-461 value exports.
+463 value exports.
 
 ### `__adoptStyles`
 
@@ -1620,6 +1620,16 @@ Simple usage (no dynamic import):
   ${defer({ trigger: 'viewport' },
     null,
     () => html`<div class="heavy">Loaded!</div>`)}
+
+### `deferCode`
+
+```ts
+import { deferCode } from '@pdxui/core';
+
+function deferCode(load: () => Promise<unknown>): DeferCode
+```
+
+`load`, run at most once until it fails, and known to have arrived once it has.
 
 ### `define`
 
@@ -6167,6 +6177,18 @@ Usage:
   ${when(() => isOpen(), () => html`<span>Open!</span>`)}
   ${when(() => isOpen(), () => html`<span>Yes</span>`, () => html`<span>No</span>`,
          { enter: 'fade-in', exit: 'fade-out' })}
+
+### `whenChain`
+
+```ts
+import { whenChain } from '@pdxui/core';
+
+function whenChain(select: () => number, branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>): DocumentFragment
+```
+
+Render the branch `select()` picks — `branches[select()]`, or nothing for an index without one —
+between two markers, and rebuild it only when the pick changes. What a transition-less
+`@if` / `@else if` / `@else` chain compiles to.
 
 ### `wireFormModel`
 
