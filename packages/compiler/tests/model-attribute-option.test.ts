@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest';
 import { compile } from '../src/plugin';
 import { analyzeScript } from '../src/compiler/script-analyzer';
 import { generateDts } from '../src/compiler/dts-generator';
+import { readModelOptions } from '../src/compiler/model-options';
 
 const analyse = (line: string) => analyzeScript(`${line}\n`, 'pick.pdx');
 const model = (line: string) => analyse(line).props.find(p => p.name === 'value')!;
@@ -46,6 +47,14 @@ describe('@model … { attribute }', () => {
         const a = analyse('@model value: string | string[] | null = null { attribute: string };');
         const dts = generateDts({ tag: 'pdx-pick', props: a.props, events: a.events, slots: [] });
         expect(dts).toMatch(/value\??: string \| string\[\] \| null;/);
+    });
+
+    // CodeQL js/polynomial-redos: the trailing `;` was taken off with a backtracking regex. Written out,
+    // a long run of whitespace is read in one pass; a quadratic reading of 100k characters would run
+    // past the test's timeout. The time itself is not measured here (suite-hygiene.test.ts).
+    it('reads a declaration with a long run of whitespace', () => {
+        expect(readModelOptions('@model value: string = \'\'' + ' \t'.repeat(50_000) + 'x')).toBeNull();
+        expect(readModelOptions(`@model value: string = ''${' \t'.repeat(50_000)}{ attribute: string }${' \t'.repeat(50_000)};`)?.options.attribute).toBe('string');
     });
 
     it('an attribute reading the option does not know is PDX_MODEL_ATTRIBUTE_UNKNOWN, an error', () => {

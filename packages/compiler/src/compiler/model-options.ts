@@ -23,9 +23,20 @@ export interface ModelOptions {
     attribute?: string;
 }
 
+/**
+ * `text` without its trailing whitespace, one `;` and the whitespace before it. Written out, not as
+ * `/\s*;?\s*$/`, whose backtracking is polynomial on a long run of whitespace (CodeQL
+ * js/polynomial-redos): a declaration is the author's text.
+ */
+export function withoutStatementEnd(text: string): string {
+    let end = text.trimEnd();
+    if (end.endsWith(';')) end = end.slice(0, -1).trimEnd();
+    return end;
+}
+
 /** The options block at the end of `declaration`, and the index it starts at; null when there is none. */
 export function readModelOptions(declaration: string): { options: ModelOptions; start: number } | null {
-    const text = declaration.replace(/\s*;?\s*$/, '');
+    const text = withoutStatementEnd(declaration);
     if (!text.endsWith('}')) return null;
     // Forward scan, so that strings and nested groups are skipped the way the tokenizer reads them.
     let depth = 0;

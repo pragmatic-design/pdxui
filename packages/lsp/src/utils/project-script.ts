@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, readModelOptions, routeParamsType } from '@pdxui/compiler';
+import { DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -171,7 +171,7 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
                 const line = s.slice(m.index, lineEnd < 0 ? s.length : lineEnd);
                 const options = readModelOptions(line);
                 if (options) {
-                    const end = line.replace(/\s*;?\s*$/, '').length;
+                    const end = withoutStatementEnd(line).length;
                     for (let o = options.start; o < end; o++) out[m.index + o] = ' ';
                 }
             }
