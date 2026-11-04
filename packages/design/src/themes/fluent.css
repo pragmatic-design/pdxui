@@ -272,7 +272,7 @@
     border-radius: var(--pdx-radius-md);
 }
 [pdx-theme="fluent"] .pdx-time-value:focus:not(:where([pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]), [pdx-theme="fluent"] [pdx-theme]:not([pdx-theme="fluent"]) *)) {
-    background: var(--pdx-color-inset);
+    background: var(--pdx-time-picker-segment-bg-focus, var(--pdx-color-inset));
     outline: 2px solid var(--pdx-color-focus);
     outline-offset: -2px;
 }

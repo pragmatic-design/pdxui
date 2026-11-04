@@ -395,7 +395,7 @@
     border-radius: var(--pdx-radius-lg);
 }
 [pdx-theme="material"] .pdx-time-value:focus:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {
-    background: oklch(from var(--pdx-color-primary) l c h / 0.12);
+    background: var(--pdx-time-picker-segment-bg-focus, oklch(from var(--pdx-color-primary) l c h / 0.12));
     border-radius: var(--pdx-radius-md);
 }
 [pdx-theme="material"] .pdx-time-arrow:hover:not(:where([pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]), [pdx-theme="material"] [pdx-theme]:not([pdx-theme="material"]) *)) {

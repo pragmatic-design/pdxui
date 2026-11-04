@@ -101,6 +101,11 @@
                     el.dispatchEvent(new Event('input', { bubbles: true }));
                     el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
                 } },
+        "file-upload-tokens": async function () { 
+                for (const zone of document.querySelectorAll('section:not([hidden]) [data-test^="tok"] .pdx-file-dropzone')) {
+                    zone.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true }));
+                }
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         "filter-builder-empty": async function () { 
                 const fb = document.querySelector('section:not([hidden]) [data-test="filter-builder"]');
                 if (fb) {
@@ -262,6 +267,16 @@
                 </div>
     </section>
 
+    <section data-scenario="calendar-tokens">
+        <h3>Calendar — Component tokens on one element</h3>
+        <div style="display: grid; gap: 12px; grid-template-columns: repeat(2, max-content);">
+                    <pdx-calendar data-test="tok" value="2024-06-15" style="--pdx-calendar-cell-bg-selected: rgb(16, 26, 36); --pdx-calendar-cell-color-selected: rgb(17, 27, 37)"></pdx-calendar>
+                    <pdx-calendar data-test="tok-plain" value="2024-06-15"></pdx-calendar>
+                    <pdx-calendar data-test="tok-range" mode="range" range-start="2024-06-10" range-end="2024-06-14" style="--pdx-calendar-cell-bg-in-range: rgb(18, 28, 38)"></pdx-calendar>
+                    <pdx-calendar data-test="tok-today" style="--pdx-calendar-cell-color-today: rgb(19, 29, 39)"></pdx-calendar>
+                </div>
+    </section>
+
     <section data-scenario="carousel-basic">
         <h3>Carousel — 3 slides (autoplay off)</h3>
         <div style="width: 640px; max-width: 100%;">
@@ -404,6 +419,16 @@
                     value="#4a6fa5"></pdx-color-picker>
     </section>
 
+    <section data-scenario="cp-tokens">
+        <h3>Color Picker — Component token on native markup</h3>
+        <div style="display: flex; gap: 12px; padding: 8px;">
+                    <div style="--pdx-color-picker-preset-ring-active: rgb(22, 32, 42)">
+                        <button class="pdx-color-preset active" data-test="tok-preset" type="button" aria-label="Blue" style="background: #3b82f6"></button>
+                    </div>
+                    <button class="pdx-color-preset active" data-test="tok-plain" type="button" aria-label="Blue" style="background: #3b82f6"></button>
+                </div>
+    </section>
+
     <section data-scenario="color-picker-size-md">
         <h3>pdx-color-picker — size="md"</h3>
         <pdx-color-picker data-test="variant" size="md"></pdx-color-picker>
@@ -532,6 +557,14 @@
                         label="Upload disabled"
                         disabled>
                     </pdx-file-upload>
+                </div>
+    </section>
+
+    <section data-scenario="file-upload-tokens">
+        <h3>File Upload — Component tokens on one element, a drag over it</h3>
+        <div style="display: grid; gap: 12px; width: 360px;">
+                    <pdx-file-upload data-test="tok" style="--pdx-file-upload-border-color-dragover: rgb(14, 24, 34); --pdx-file-upload-bg-dragover: rgb(15, 25, 35)"></pdx-file-upload>
+                    <pdx-file-upload data-test="tok-plain"></pdx-file-upload>
                 </div>
     </section>
 

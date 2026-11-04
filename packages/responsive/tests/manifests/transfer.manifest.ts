@@ -139,6 +139,25 @@ export const transfer: ComponentManifest = {
                     </pdx-transfer></div>
                 </div>`).join(''),
         },
+        {
+            // The component's tokens (#761), set on one element: a checked row's fill and its check's.
+            // The setup checks the first source row of both transfers; the one without the tokens keeps
+            // the theme's colours.
+            id: 'transfer-tokens',
+            title: 'Transfer — Component tokens on one element, a row checked',
+            html: `
+                <div style="display: grid; gap: 12px; width: 640px;">
+                    <pdx-transfer data-test="tok" source-title="Available" target-title="Selected" items='${ITEMS}' value='["banana"]'
+                        style="--pdx-transfer-option-bg-selected: rgb(23, 33, 43); --pdx-transfer-check-bg-selected: rgb(24, 34, 44)"></pdx-transfer>
+                    <pdx-transfer data-test="tok-plain" source-title="Available" target-title="Selected" items='${ITEMS}' value='["banana"]'></pdx-transfer>
+                </div>`,
+            setup: `
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                for (const t of ['tok', 'tok-plain']) {
+                    document.querySelector('section:not([hidden]) [data-test="' + t + '"] .pdx-transfer-panel [role="option"]')?.click();
+                }
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
@@ -146,6 +165,13 @@ export const transfer: ComponentManifest = {
     // the other rAF components (select, for instance). Every selector is section-scoped.
     contracts: {
         scenarios: {
+            'transfer-tokens': {
+                standalone: [
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-transfer-item.checked', description: '--pdx-transfer-option-bg-selected on the element is a checked row\'s fill', backgroundColor: { op: 'is', value: 'rgb(23, 33, 43)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-transfer-item.checked .pdx-transfer-check', description: '--pdx-transfer-check-bg-selected on the element is a checked row\'s check', backgroundColor: { op: 'is', value: 'rgb(24, 34, 44)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok-plain"] .pdx-transfer-item.checked', description: 'control: a checked row without the token keeps the theme\'s fill', backgroundColor: { op: 'isNot', value: 'rgb(23, 33, 43)' } },
+                ],
+            },
             'transfer-basic': {
                 standalone: [
                     {

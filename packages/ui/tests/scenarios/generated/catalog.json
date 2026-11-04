@@ -622,6 +622,10 @@
         {
           "id": "calendar-two-months-narrow",
           "title": "Calendar — two months in a box narrower than both"
+        },
+        {
+          "id": "calendar-tokens",
+          "title": "Calendar — Component tokens on one element"
         }
       ]
     },
@@ -943,6 +947,10 @@
         {
           "id": "cp-disabled",
           "title": "Color Picker — Disabled swatch"
+        },
+        {
+          "id": "cp-tokens",
+          "title": "Color Picker — Component token on native markup"
         },
         {
           "id": "color-picker-size-md",
@@ -1504,6 +1512,10 @@
         {
           "id": "file-upload-disabled",
           "title": "File Upload — Disabled dropzone"
+        },
+        {
+          "id": "file-upload-tokens",
+          "title": "File Upload — Component tokens on one element, a drag over it"
         },
         {
           "id": "file-upload-size-md",
@@ -3261,6 +3273,10 @@
           "title": "Time Picker — Disabled"
         },
         {
+          "id": "time-picker-tokens",
+          "title": "Time Picker — Component tokens on one element, a segment focused"
+        },
+        {
           "id": "time-picker-size-md",
           "title": "pdx-time-picker — size=\"md\""
         },
@@ -3555,6 +3571,10 @@
         {
           "id": "transfer-sizes",
           "title": "Transfer — sm, md and lg, each beside a pdx-input of its size"
+        },
+        {
+          "id": "transfer-tokens",
+          "title": "Transfer — Component tokens on one element, a row checked"
         },
         {
           "id": "transfer-size-md",

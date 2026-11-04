@@ -224,7 +224,7 @@ details.pdx-accordion[open] summary::after {
     border-radius: 9999px;
 }
 .pdx-cal-today {
-    color: var(--pdx-color-primary-ink);
+    color: var(--pdx-calendar-cell-color-today, var(--pdx-color-primary-ink));
 }
 /* Apple range: pill ends */
 .pdx-cal-range-start {
@@ -276,7 +276,7 @@ details.pdx-accordion[open] summary::after {
     border-radius: var(--pdx-radius-md);
 }
 .pdx-time-value:focus {
-    background: light-dark(oklch(0 0 0 / 0.05), oklch(1 0 0 / 0.08));
+    background: var(--pdx-time-picker-segment-bg-focus, light-dark(oklch(0 0 0 / 0.05), oklch(1 0 0 / 0.08)));
     box-shadow: 0 0 0 3px oklch(from var(--pdx-color-primary) l c h / 0.2);
 }
 .pdx-time-arrow {

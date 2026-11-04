@@ -47,8 +47,12 @@ interface Row {
     methods: string[];
     /** Names it set on the element before, now gone: alias methods the overlay verbs replace. */
     removedMethods: string[];
-    /** The custom properties its manifest lists (#761, #287 item 5), all of them. */
-    tokens?: string[];
+    /**
+     * The custom properties its manifest lists (#761, #287 item 5), all of them: the text input's frame
+     * tokens for a picker drawn by it, its own for one that draws its own surface — the colours of its
+     * states and of what it shows selected, each defaulting to the global token its rule read before.
+     */
+    tokens: string[];
 }
 
 const DONE: Row[] = [
@@ -106,6 +110,8 @@ const DONE: Row[] = [
         popup: false,
         methods: ['clear', 'getChanges', 'getDirection'],
         removedMethods: ['getValue', 'setValue'],
+        // A checked row, and its check.
+        tokens: ['--pdx-transfer-option-bg-selected', '--pdx-transfer-check-bg-selected'],
     },
     {
         tag: 'pdx-date-picker',
@@ -129,6 +135,8 @@ const DONE: Row[] = [
         popup: false,
         methods: ['focus', 'blur', 'clear'],
         removedMethods: [],
+        // The segment being edited.
+        tokens: ['--pdx-time-picker-segment-bg-focus', '--pdx-time-picker-segment-color-focus'],
     },
     {
         tag: 'pdx-calendar',
@@ -139,6 +147,8 @@ const DONE: Row[] = [
         popup: false,
         methods: ['focusView', 'getRange', 'getQuarter'],
         removedMethods: [],
+        // A selected day (and a range's ends, and a selected month or year), the days inside a range, today.
+        tokens: ['--pdx-calendar-cell-bg-selected', '--pdx-calendar-cell-color-selected', '--pdx-calendar-cell-bg-in-range', '--pdx-calendar-cell-color-today'],
     },
     {
         tag: 'pdx-color-picker',
@@ -150,6 +160,8 @@ const DONE: Row[] = [
         methods: ['focus', 'blur', 'clear', 'getHex', 'getRgb', 'getHsl', 'show', 'close', 'toggle'],
         // `open()` was set on the element undeclared, and is the overlay verb `show()`; `close()` stays.
         removedMethods: ['open'],
+        // The chosen preset's ring.
+        tokens: ['--pdx-color-picker-preset-ring-active'],
     },
     {
         tag: 'pdx-file-upload',
@@ -160,6 +172,8 @@ const DONE: Row[] = [
         popup: false,
         methods: ['addFiles', 'removeFile', 'uploadAll', 'clear'],
         removedMethods: [],
+        // A drag over the drop zone.
+        tokens: ['--pdx-file-upload-border-color-dragover', '--pdx-file-upload-bg-dragover'],
     },
 ];
 
@@ -202,8 +216,8 @@ describe.each(DONE)('$tag, on the beta contract', (row) => {
         expect(methods.filter((m) => row.methods.includes(m)).sort()).toEqual([...row.methods].sort());
     });
 
-    it.runIf(row.tokens)('lists its tokens in the manifest (#761)', () => {
-        expect((decl?.cssProperties ?? []).map((p) => p.name).sort()).toEqual([...row.tokens!].sort());
+    it('lists its tokens in the manifest (#761)', () => {
+        expect((decl?.cssProperties ?? []).map((p) => p.name).sort()).toEqual([...row.tokens].sort());
     });
 
     it('sets none of its removed methods on the element', async () => {

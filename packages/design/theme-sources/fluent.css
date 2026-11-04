@@ -276,7 +276,7 @@ details.pdx-accordion[open] summary::after {
     border-radius: var(--pdx-radius-md);
 }
 .pdx-time-value:focus {
-    background: var(--pdx-color-inset);
+    background: var(--pdx-time-picker-segment-bg-focus, var(--pdx-color-inset));
     outline: 2px solid var(--pdx-color-focus);
     outline-offset: -2px;
 }

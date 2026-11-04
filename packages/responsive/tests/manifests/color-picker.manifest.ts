@@ -114,11 +114,31 @@ export const colorPicker: ComponentManifest = {
                     disabled
                     value="#4a6fa5"></pdx-color-picker>`,
         },
+        {
+            // The component's token (#761): the ring of the chosen preset. The component does not mark a
+            // preset chosen; native markup does, with `.active`, and that is what is measured, the token set
+            // on a container. The preset beside it, without the token, keeps the theme's ring.
+            id: 'cp-tokens',
+            title: 'Color Picker — Component token on native markup',
+            html: `
+                <div style="display: flex; gap: 12px; padding: 8px;">
+                    <div style="--pdx-color-picker-preset-ring-active: rgb(22, 32, 42)">
+                        <button class="pdx-color-preset active" data-test="tok-preset" type="button" aria-label="Blue" style="background: #3b82f6"></button>
+                    </div>
+                    <button class="pdx-color-preset active" data-test="tok-plain" type="button" aria-label="Blue" style="background: #3b82f6"></button>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'cp-tokens': {
+                standalone: [
+                    { selector: 'section:not([hidden]) [data-test="tok-preset"]', description: '--pdx-color-picker-preset-ring-active is the chosen preset\'s ring', boxShadow: { op: 'contains', value: 'rgb(22, 32, 42)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok-plain"]', description: 'control: a chosen preset without the token keeps the theme\'s ring', boxShadow: { op: 'matches', value: '^(?!.*rgb\\(22, 32, 42\\))' } },
+                ],
+            },
             'cp-closed': {
                 standalone: [
                     {

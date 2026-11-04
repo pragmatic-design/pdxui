@@ -252,9 +252,11 @@ pdx-color-picker {
     box-shadow: 0 0 0 2px var(--pdx-color-focus);
 }
 
+/* The chosen preset, on native markup: its ring is the component's token (#761), defaulting to the
+   colour the rule drew before. */
 .pdx-color-preset[aria-selected="true"],
 .pdx-color-preset.active {
-    box-shadow: 0 0 0 2px var(--pdx-color-primary);
+    box-shadow: 0 0 0 2px var(--pdx-color-picker-preset-ring-active, var(--pdx-color-primary));
 }
 
 /* ===== Mobile / coarse pointer ===== */

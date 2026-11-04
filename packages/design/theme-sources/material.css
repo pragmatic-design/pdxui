@@ -419,7 +419,7 @@ details.pdx-accordion[open] summary::after {
     border-radius: var(--pdx-radius-lg);
 }
 .pdx-time-value:focus {
-    background: oklch(from var(--pdx-color-primary) l c h / 0.12);
+    background: var(--pdx-time-picker-segment-bg-focus, oklch(from var(--pdx-color-primary) l c h / 0.12));
     border-radius: var(--pdx-radius-md);
 }
 .pdx-time-arrow:hover {

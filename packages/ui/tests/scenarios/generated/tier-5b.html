@@ -197,6 +197,12 @@
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(
         () => requestAnimationFrame(() => requestAnimationFrame(r)))));
  },
+        "transfer-tokens": async function () { 
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+                for (const t of ['tok', 'tok-plain']) {
+                    document.querySelector('section:not([hidden]) [data-test="' + t + '"] .pdx-transfer-panel [role="option"]')?.click();
+                }
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); },
         };
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
@@ -628,6 +634,15 @@
                         items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]'
                         value='["banana"]'>
                     </pdx-transfer></div>
+                </div>
+    </section>
+
+    <section data-scenario="transfer-tokens">
+        <h3>Transfer — Component tokens on one element, a row checked</h3>
+        <div style="display: grid; gap: 12px; width: 640px;">
+                    <pdx-transfer data-test="tok" source-title="Available" target-title="Selected" items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]' value='["banana"]'
+                        style="--pdx-transfer-option-bg-selected: rgb(23, 33, 43); --pdx-transfer-check-bg-selected: rgb(24, 34, 44)"></pdx-transfer>
+                    <pdx-transfer data-test="tok-plain" source-title="Available" target-title="Selected" items='[{"value":"apple","label":"Apple"},{"value":"banana","label":"Banana"},{"value":"cherry","label":"Cherry"},{"value":"date","label":"Date"}]' value='["banana"]'></pdx-transfer>
                 </div>
     </section>
 

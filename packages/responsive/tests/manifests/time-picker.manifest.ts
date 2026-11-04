@@ -98,11 +98,33 @@ export const timePicker: ComponentManifest = {
                     disabled>
                 </pdx-time-picker>`,
         },
+        {
+            // The component's tokens (#761), set on one element: the fill and text of the segment being
+            // edited. The setup focuses that picker's first segment; the one beside it, unfocused, is the
+            // control.
+            id: 'time-picker-tokens',
+            title: 'Time Picker — Component tokens on one element, a segment focused',
+            html: `
+                <div style="display: grid; gap: 12px; width: 240px;">
+                    <pdx-time-picker data-test="tok" value="09:30" style="--pdx-time-picker-segment-bg-focus: rgb(20, 30, 40); --pdx-time-picker-segment-color-focus: rgb(21, 31, 41)"></pdx-time-picker>
+                    <pdx-time-picker data-test="tok-plain" value="09:30"></pdx-time-picker>
+                </div>`,
+            setup: `
+                document.querySelector('section:not([hidden]) [data-test="tok"] .pdx-time-value')?.focus();
+                await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract (universal, every theme) ──
     contracts: {
         scenarios: {
+            'time-picker-tokens': {
+                standalone: [
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-time-value', description: '--pdx-time-picker-segment-bg-focus on the element is the focused segment\'s fill', backgroundColor: { op: 'is', value: 'rgb(20, 30, 40)' } },
+                    { selector: 'section:not([hidden]) [data-test="tok"] .pdx-time-value', description: '--pdx-time-picker-segment-color-focus on the element is the focused segment\'s text', colorVar: '--pdx-time-picker-segment-color-focus' },
+                    { selector: 'section:not([hidden]) [data-test="tok-plain"] .pdx-time-value', description: 'control: an unfocused segment does not take the focus fill', backgroundColor: { op: 'isNot', value: 'rgb(20, 30, 40)' } },
+                ],
+            },
             'time-picker-default': {
                 standalone: [
                     {

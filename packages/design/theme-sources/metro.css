@@ -262,7 +262,7 @@ details.pdx-accordion[open] summary::after {
     border-radius: 0;
 }
 .pdx-time-value:focus {
-    background: var(--pdx-color-inset);
+    background: var(--pdx-time-picker-segment-bg-focus, var(--pdx-color-inset));
     outline: 2px solid var(--pdx-color-primary);
     outline-offset: -2px;
 }
