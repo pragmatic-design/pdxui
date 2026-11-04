@@ -4,7 +4,7 @@ exports[`compile golden — demo corpus > color-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, bindTwoWay, clearBoundProperty, component, computed, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, bindTwoWay, clearBoundProperty, component, computed, effect, prop, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tdfsr4");
@@ -16,7 +16,7 @@ const __blk0=staticBlock(staticMarkup(' <div class="color-card"> <h3>bind() CSS 
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el2=__el0.firstChild.nextSibling.nextSibling.nextSibling;const __el3=__el2.firstChild.nextSibling;const __t4=__el3.firstChild;const __el6=__el2.nextSibling.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el8=__el7.firstChild.nextSibling;const __el9=__el7.nextSibling.nextSibling;const __t10=__el9.firstChild.nextSibling;const __el11=__t10.nextSibling.nextSibling;const __el12=__el9.nextSibling.nextSibling;const __t13=__el12.firstChild.nextSibling;const __el14=__t13.nextSibling.nextSibling;return [__el2,__t4,__el8,__t10,__el11,__t13,__el14];};
 component('app-color-card', {
   props: {
-    emoji: { type: String, default: '🎨' }
+    emoji: prop('🎨', { type: String })
   },
   setup(ctx) {
     const __color = signal('#3b82f6', { name: 'color-card:color' });
@@ -124,7 +124,7 @@ exports[`compile golden — demo corpus > counter.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, computed, onMount, safeHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, component, computed, onMount, prop, safeHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-up7pim");
@@ -138,8 +138,8 @@ const __blk2=staticBlock(staticMarkup(' <div class="counter-card"> <h3><!----></
 const __walk2=(r)=>{const __el0=r.firstChild.nextSibling;const __el1=__el0.firstChild.nextSibling;const __t2=__el1.firstChild;const __el3=__el1.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el4.nextSibling.nextSibling;const __t6=__el5.firstChild;const __el7=__el5.nextSibling.nextSibling;const __el8=__el3.nextSibling.nextSibling;const __t9=__el8.firstChild.nextSibling;const __m13=__el8.nextSibling.nextSibling;return [__t2,__el4,__t6,__el7,__t9,__m13];};
 component('app-counter', {
   props: {
-    label: { type: String, default: 'Counter' },
-    initial: { type: Number, default: 0 }
+    label: prop('Counter', { type: String }),
+    initial: prop(0, { type: Number })
   },
   setup(ctx) {
     const label = ctx.label;
@@ -172,7 +172,7 @@ exports[`compile golden — demo corpus > effect-test.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, computed, effect, onMount, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { batchHandler, bindInterpolation, component, computed, effect, onMount, prop, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-tt8bks");
@@ -184,7 +184,7 @@ const __blk0=staticBlock(staticMarkup(' <div class="effect-demo"> <h3>Effect/Lif
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el2=__el0.firstChild.nextSibling.nextSibling.nextSibling;const __t3=__el2.firstChild.nextSibling;const __el4=__el2.nextSibling.nextSibling;const __t5=__el4.firstChild.nextSibling;const __el6=__el4.nextSibling.nextSibling;const __t7=__el6.firstChild.nextSibling;const __el8=__el6.nextSibling.nextSibling;return [__t3,__t5,__t7,__el8];};
 component('app-effect-test', {
   props: {
-    initial: { type: Number, default: 0 }
+    initial: prop(0, { type: Number })
   },
   setup(ctx) {
     const initial = ctx.initial;
@@ -2880,7 +2880,7 @@ exports[`compile golden — demo corpus > showcase/_404.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { $t, batchHandler, bindInterpolation, component, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
+import { $t, batchHandler, bindInterpolation, component, prop, safeHandler, staticBlock, staticMarkup } from '@pdxui/core';
 import { navigate } from '@pdxui/router';
 
 {
@@ -2893,8 +2893,8 @@ const __blk0=staticBlock(staticMarkup(' <div class="not-found"> <h1 class="code"
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el2=__el0.firstChild.nextSibling.nextSibling.nextSibling;const __t3=__el2.firstChild;const __el4=__el2.nextSibling.nextSibling;const __el5=__el4.firstChild;const __t6=__el5.firstChild;const __el7=__el4.nextSibling.nextSibling;const __t8=__el7.firstChild.nextSibling;return [__t3,__t6,__el7,__t8];};
 component('app-showcase-404', {
   props: {
-    code: { type: String, default: '404' },
-    path: { type: String, default: '' }
+    code: prop('404', { type: String }),
+    path: prop('', { type: String })
   },
   setup(ctx) {
 function goHome() {
@@ -3217,7 +3217,7 @@ exports[`compile golden — demo corpus > showcase/stats-card.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { bindInterpolation, clearBoundProperty, component, computed, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { bindInterpolation, clearBoundProperty, component, computed, effect, prop, staticBlock, staticMarkup } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-u033yi");
@@ -3229,8 +3229,8 @@ const __blk0=staticBlock(staticMarkup(' <div class="stats-card"> <h2>Quick Stats
 const __walk0=(r)=>{const __el0=r.firstChild.nextSibling;const __el2=__el0.firstChild.nextSibling.nextSibling.nextSibling;const __el3=__el2.firstChild.nextSibling;const __el4=__el3.firstChild.nextSibling;const __t5=__el4.firstChild;const __el7=__el3.nextSibling.nextSibling;const __el8=__el7.firstChild.nextSibling;const __t9=__el8.firstChild;const __el11=__el7.nextSibling.nextSibling;const __el12=__el11.firstChild.nextSibling;const __t13=__el12.firstChild;const __el15=__el11.nextSibling.nextSibling;const __el16=__el15.firstChild.nextSibling;const __t17=__el16.firstChild;const __el19=__el2.nextSibling.nextSibling;const __el20=__el19.firstChild.nextSibling;return [__t5,__t9,__t13,__t17,__el20];};
 component('app-stats-card', {
   props: {
-    total: { type: Number, default: 0 },
-    done: { type: Number, default: 0 }
+    total: prop(0, { type: Number }),
+    done: prop(0, { type: Number })
   },
   setup(ctx) {
     const total = ctx.total;
@@ -3342,7 +3342,7 @@ exports[`compile golden — demo corpus > showcase/task-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, delegate, eachRow, effect, linkedSignal, safeHandler, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, clearBoundProperty, component, computed, delegate, eachRow, effect, linkedSignal, prop, safeHandler, staticBlock, staticMarkup, when } from '@pdxui/core';
 import { useTasks } from './task-store.pdx';
 
 {
@@ -3360,7 +3360,7 @@ const __blk4=staticBlock((__frag,__d)=>{__frag.appendChild(__d.createTextNode(" 
 const __walk4=(r)=>{const __el0=r.firstChild.nextSibling;const __el1=__el0.firstChild.nextSibling;const __el2=__el1.firstChild.nextSibling;const __t3=__el2.firstChild;const __el4=__el2.nextSibling.nextSibling;const __t5=__el4.firstChild;const __el6=__el1.nextSibling.nextSibling;const __el7=__el6.firstChild.nextSibling;const __el8=__el7.firstChild.nextSibling;const __el9=__el8.firstChild.nextSibling;const __el10=__el9.nextSibling.nextSibling;const __el11=__el10.nextSibling.nextSibling;const __el12=__el7.nextSibling.nextSibling;const __t13=__el12.firstChild.nextSibling;const __el14=__el12.nextSibling.nextSibling;const __el15=__el14.nextSibling.nextSibling;const __m18=__el6.nextSibling.nextSibling;const __m31=__m18.nextSibling;return [__t3,__t5,__el8,__el9,__el10,__el11,__t13,__el14,__el15,__m18,__m31];};
 component('app-task-list', {
   props: {
-    title: { type: String, default: 'Tasks' }
+    title: prop('Tasks', { type: String })
   },
   setup(ctx) {
 const store = useTasks();
@@ -39099,7 +39099,7 @@ exports[`compile golden — demo corpus > todo-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, bindTwoWay, component, computed, delegate, eachRow, safeHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, bindTwoWay, component, computed, delegate, eachRow, prop, safeHandler, signal, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-9864yt");
@@ -39114,7 +39114,7 @@ const __blk2=staticBlock(staticMarkup(' <div class="todo"> <h3><!----></h3> <div
 const __walk2=(r)=>{const __el0=r.firstChild.nextSibling;const __el1=__el0.firstChild.nextSibling;const __t2=__el1.firstChild;const __el3=__el1.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __el5=__el4.nextSibling.nextSibling;const __el6=__el3.nextSibling.nextSibling;const __t7=__el6.firstChild;const __m14=__el6.nextSibling.nextSibling;const __m17=__m14.nextSibling;return [__t2,__el4,__el5,__t7,__m14,__m17];};
 component('app-todo-list', {
   props: {
-    title: { type: String, default: 'Todo List' }
+    title: prop('Todo List', { type: String })
   },
   setup(ctx) {
     const __items = signal([
@@ -39164,7 +39164,7 @@ exports[`compile golden — demo corpus > user-list.pdx 1`] = `
 "// 0 warning(s)
 
 ============================================================
-import { batchHandler, bindInterpolation, component, computed, eachRow, effect, interpolationText, resource, safeHandler, staticBlock, staticMarkup, when } from '@pdxui/core';
+import { batchHandler, bindInterpolation, component, computed, eachRow, effect, interpolationText, prop, resource, safeHandler, staticBlock, staticMarkup, when } from '@pdxui/core';
 
 {
   let __pdx_style = document.getElementById("pdx-s-q0t8c6");
@@ -39182,7 +39182,7 @@ const __blk4=staticBlock(staticMarkup(' <div class="user-list"> <h3><!----></h3>
 const __walk4=(r)=>{const __el0=r.firstChild.nextSibling;const __el1=__el0.firstChild.nextSibling;const __t2=__el1.firstChild;const __el3=__el1.nextSibling.nextSibling;const __el4=__el3.firstChild.nextSibling;const __t5=__el4.firstChild;const __el6=__el4.nextSibling.nextSibling;const __t7=__el6.firstChild;const __m10=__el3.nextSibling.nextSibling;const __m18=__m10.nextSibling;const __m21=__m18.nextSibling;const __el22=__m21.nextSibling;const __el23=__el22.firstChild.nextSibling;const __el24=__el23.nextSibling.nextSibling;return [__t2,__el4,__t5,__t7,__m10,__m18,__m21,__el23,__el24];};
 component('app-user-list', {
   props: {
-    title: { type: String, default: 'Users' }
+    title: prop('Users', { type: String })
   },
   setup(ctx) {
 let users = resource(() => {

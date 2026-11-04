@@ -5,6 +5,7 @@
 import { describe, it, expect } from 'vitest';
 import { toFormValue, isUnsupportedFormValue, wireFormModel } from '../src/form/form-model';
 import { model } from '../src/component/component-descriptor';
+import { PROP_SPEC } from '../src/component/prop-spec';
 
 const entries = (v: unknown): [string, string][] =>
     [...(v as FormData).entries()].map(([k, x]) => [k, typeof x === 'string' ? x : (x as File).name]);
@@ -52,8 +53,8 @@ describe('toFormValue — the model\'s value as the form submits it', () => {
 
 describe('model(d, { form: true })', () => {
     it('carries the form wiring; without it the model does not', () => {
-        expect(model<string>('', { form: true })).toEqual({ type: String, default: '', model: true, form: wireFormModel });
-        expect(model<string>('')).toEqual({ type: String, default: '', model: true });
-        expect(model<string>('', { form: false })).toEqual({ type: String, default: '', model: true });
+        expect(model<string>('', { form: true })).toEqual({ type: String, default: '', model: true, form: wireFormModel, [PROP_SPEC]: true });
+        expect(model<string>('')).toEqual({ type: String, default: '', model: true, [PROP_SPEC]: true });
+        expect(model<string>('', { form: false })).toEqual({ type: String, default: '', model: true, [PROP_SPEC]: true });
     });
 });

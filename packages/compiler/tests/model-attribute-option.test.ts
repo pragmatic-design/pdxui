@@ -40,7 +40,7 @@ describe('@model … { attribute }', () => {
 
     it('the descriptor carries the type the option names', () => {
         const { code } = compile('<template><p>{{ value }}</p></template>\n<script>\n@model value: string | string[] | null = null { attribute: string };\n</script>\n', 'pick.pdx');
-        expect(code).toMatch(/value: \{ type: String, default: null \}/);
+        expect(code).toContain('value: prop(null, { type: String })');
     });
 
     it('the .d.ts declares the type as written', () => {

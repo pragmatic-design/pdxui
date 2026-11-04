@@ -50,7 +50,7 @@
  * ── DETERMINISM (a critical rule) ──
  *
  *   1. A FIXED `value`: a doc JSON with a single "Hello world" paragraph is passed.
- *      The `value` prop is `type: Object` (ts:17) and parseValue accepts a JSONNode (ts:50-59).
+ *      The `value` model is declared `{ type: Object }` and parseValue accepts a JSONNode.
  *      The doc model's shape: { type:'doc', content:[{type:'paragraph', content:[{type:'text', text:…}]}] }.
  *      It is passed as a JSON-string ATTRIBUTE: the runtime's setProp parses it → an object.
  *      Stable content = no random layout reflow.

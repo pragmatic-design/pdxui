@@ -4,6 +4,7 @@
 import { describe, it, expect, expectTypeOf, vi, afterEach } from 'vitest';
 import { component } from '../src/component/component';
 import { prop, event, model, slot } from '../src/component/component-descriptor';
+import { PROP_SPEC } from '../src/component/prop-spec';
 import { html } from '../src/renderer/template';
 import type { Signal } from '../src/utils/types';
 
@@ -136,7 +137,7 @@ describe('the descriptor at runtime', () => {
         mount(name);
         expect(seen).toBe('');
         expect(warn.mock.calls.flat().join(' ')).not.toContain('required prop');
-        expect(prop.optional<number[]>()).toEqual({ type: Object });
+        expect(prop.optional<number[]>()).toEqual({ type: Object, [PROP_SPEC]: true });
     });
 
     it('emitting an event the descriptor does not declare is reported, and still dispatched', () => {

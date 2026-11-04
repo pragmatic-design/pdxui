@@ -10,6 +10,7 @@ import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
 import { initDevTools, toggle } from '../src/devtools/overlay';
 import { getTelemetryLevel, setTelemetryLevel } from '../src/debug/inspector';
+import { prop } from '../src/component/component-descriptor';
 
 let before: ReturnType<typeof getTelemetryLevel>;
 let panel: HTMLElement;
@@ -40,7 +41,7 @@ describe('the devtools overlay over the real inspector', () => {
     });
 
     it('shows a component and its props, read through tree() and inspect()', () => {
-        component('pdx-805-widget', { props: { foo: { type: String, default: '' } }, render: () => html`<p></p>` });
+        component('pdx-805-widget', { props: { foo: prop('') }, render: () => html`<p></p>` });
         const widget = document.createElement('pdx-805-widget');
         widget.setAttribute('foo', 'bar');
         document.body.appendChild(widget);

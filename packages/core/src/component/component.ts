@@ -51,28 +51,24 @@ export function __pdx_hmr_restore(tag: string): void {
 
 // The prop and event shapes live with the descriptor's builders (#123); re-exported from here, where
 // they have always been imported from.
-import type { PropType, PropDefinition, TypedProp, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
+import { PROP_SPEC } from './prop-spec';
+import type { PropType, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
 import { modelEvent } from '../utils/model-event';
 import type { FormModelCallbacks } from '../form/form-model';
-export type { PropType, PropDefinition, TypedProp } from './component-descriptor';
+export type { PropType } from './component-descriptor';
 
-/** Map PropType constructor to its JS type. */
-type PropTypeToJS<T extends PropType> =
-    T extends typeof String ? string :
-    T extends typeof Number ? number :
-    T extends typeof Boolean ? boolean :
-    T extends typeof Array ? unknown[] :
-    T extends typeof Object ? Record<string, unknown> :
-    T extends typeof Function ? (...args: unknown[]) => unknown :
-    unknown;
+/** The props a component declares, each with the descriptor: `prop<T>()`, `prop.required<T>()`, `prop.optional<T>()`. */
+export type PropMap = Record<string, PropSpec<unknown>>;
 
-/** Infer the TS type from a prop definition — uses TypedProp brand if present, else PropTypeToJS. */
-type InferPropType<D extends PropDefinition> =
-    D extends TypedProp<infer T> ? T : PropTypeToJS<D['type']>;
+/** A prop as `component()` reads it at runtime: its type, which an attribute is coerced to, and its default. */
+interface PropRuntime {
+    type: PropType;
+    default?: unknown;
+}
 
-/** Infer Signal accessors from a props definition record. */
-type PropSignals<P extends Record<string, PropDefinition>> = {
-    [K in keyof P]: Signal<InferPropType<P[K]>>;
+/** Signal accessors typed from the props' declarations. */
+type PropSignals<P extends PropMap> = {
+    [K in keyof P]: Signal<P[K] extends PropSpec<infer T> ? T : never>;
 };
 
 /**
@@ -123,7 +119,7 @@ export type ModelMap = Record<string, ModelSpec<unknown>>;
  * Typed component context — its declared props and models as signals, and `emit` typed from its
  * declared events (any name when it declares none).
  */
-export type TypedComponentContext<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>> =
+export type TypedComponentContext<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>> =
     Omit<ComponentContextBase, 'emit'> & { emit: EmitOf<E> } & PropSignals<P> & PropSignals<M> & VariantSignals<V>;
 
 /**
@@ -181,7 +177,7 @@ export interface ComponentDeclarations<E extends EventMap = EventMap, M extends 
  */
 export type HostOf<C> = Record<string, string | ((ctx: C, event: Event) => unknown)>;
 
-export interface ComponentOptions<P extends Record<string, PropDefinition> = Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>>
+export interface ComponentOptions<P extends PropMap = PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, V extends VariantMap = Record<never, never>>
     extends ComponentDeclarations<E, M, V> {
     props?: P;
     /** Use Shadow DOM instead of Light DOM. Default: false (Light DOM). */
@@ -203,7 +199,7 @@ export interface ComponentOptions<P extends Record<string, PropDefinition> = Rec
 
 /** Options with typed setup return — render ctx includes both props and setup exports. */
 export interface ComponentOptionsWithSetup<
-    P extends Record<string, PropDefinition>,
+    P extends PropMap,
     S extends Record<string, unknown>,
     E extends EventMap = Record<never, never>,
     M extends ModelMap = Record<never, never>,
@@ -229,10 +225,10 @@ export interface ComponentOptionsWithSetup<
  * Usage:
  *   component('app-counter', {
  *     props: {
- *       initial: { type: Number, default: 0 },
+ *       initial: prop(0),
  *     },
  *     setup(ctx) {
- *       const count = signal((ctx.initial as Signal<number>)());
+ *       const count = signal(ctx.initial());
  *       return { count, increment: () => count.set(v => v + 1) };
  *     },
  *     render: (ctx) => html`
@@ -242,12 +238,12 @@ export interface ComponentOptionsWithSetup<
  *   });
  */
 /** Overload: setup returns a typed record → render ctx merges props + setup exports. */
-export function component<P extends Record<string, PropDefinition>, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+export function component<P extends PropMap, S extends Record<string, unknown>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
     tag: string, options: ComponentOptionsWithSetup<P, S, E, M, V>): void;
 /** Overload: no setup or setup returns void → render ctx has only props. */
-export function component<P extends Record<string, PropDefinition>, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
+export function component<P extends PropMap, E extends EventMap = Record<never, never>, M extends ModelMap = Record<never, never>, const V extends VariantMap = Record<never, never>>(
     tag: string, options: ComponentOptions<P, E, M, V>): void;
-export function component<P extends Record<string, PropDefinition>, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>): void {
+export function component<P extends PropMap, E extends EventMap, M extends ModelMap, V extends VariantMap>(tag: string, options: ComponentOptions<P, E, M, V>): void {
     // A model is a prop (#124): the same attribute, property and coercion, plus the event its own
     // writes dispatch. A prop and a model of one name would be two accessors on one property.
     const modelDefs = (options.models ?? {}) as Record<string, ModelSpec<unknown>>;
@@ -256,18 +252,26 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         for (const name of modelNames) {
             if (options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a model; the model wins.`);
         }
+        // The constructor form is gone (#300): a prop or a model is what a builder returns. TypeScript
+        // refuses the object literal; this is JavaScript passing one anyway.
+        for (const [name, def] of Object.entries(options.props ?? {})) {
+            if (!(def && typeof def === 'object' && PROP_SPEC in def)) throw new Error(`[pdx] <${tag}>'s prop '${name}' is not a prop declaration: the constructor form ({ type: String, default: … }) is removed. Declare it with prop<T>(default, { type? }), prop.required<T>() or prop.optional<T>().`);
+        }
+        for (const [name, def] of Object.entries(modelDefs)) {
+            if (!(def && typeof def === 'object' && PROP_SPEC in def)) throw new Error(`[pdx] <${tag}>'s model '${name}' is not a model declaration: the constructor form ({ type: String, default: … }) is removed. Declare it with model<T>(default, { type?, form? }).`);
+        }
     }
     // A typed snippet (#489) is a property of the element too: a function, which `@render` calls. As a
     // Function prop it has the accessor, the value set before the upgrade, and a signal on the context
     // (`ctx.row`), so a function assigned after the render renders as well.
-    const slotDefs: Record<string, PropDefinition> = {};
+    const slotDefs: Record<string, PropRuntime> = {};
     for (const name of Object.keys(options.slots ?? {})) slotDefs[name] = { type: Function };
     // A variant axis (#512) is a String prop defaulting to its first value — a list's first member, a
     // record's first key — reflected on the host as a bound host attribute, where the design CSS's
     // `@variant` rules read it. A value outside the axis reflects the default. The attribute is the
     // kebab-case of the axis (#834), the name an author writes and an alias the prop already observes:
     // `connectorStyle` is `connector-style`, where the camelCase name would become `connectorstyle`.
-    const variantDefs: Record<string, PropDefinition> = {};
+    const variantDefs: Record<string, PropRuntime> = {};
     const host: HostBindings = {};
     for (const [name, spec] of Object.entries((options.variants ?? {}) as VariantMap)) {
         if (DEV && options.props && name in options.props) console.warn(`[pdx] <${tag}> declares '${name}' as both a prop and a variant axis; the axis wins.`);
@@ -276,7 +280,7 @@ export function component<P extends Record<string, PropDefinition>, E extends Ev
         host[':' + name.replace(/[A-Z]/g, m => `-${m.toLowerCase()}`)] = (c: Record<string, () => string>) => values.includes(c[name]()) ? c[name]() : values[0];
     }
     Object.assign(host, options.host);
-    const propDefs = { ...(options.props ?? {}), ...variantDefs, ...modelDefs, ...slotDefs } as Record<string, PropDefinition>;
+    const propDefs: Record<string, PropRuntime> = { ...(options.props ?? {}), ...variantDefs, ...modelDefs, ...slotDefs };
     const propNames = Object.keys(propDefs);
     // Declared events (#123): with any declared, a name that is not one is reported in development.
     // A model's event counts as declared.

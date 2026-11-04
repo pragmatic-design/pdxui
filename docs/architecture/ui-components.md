@@ -12,14 +12,14 @@ Every component is a single TypeScript file that calls `component()` from core:
 
 ```typescript
 // packages/ui/src/switch-toggle/pdx-switch.ts
-import { component, html } from '@pdxui/core';
+import { component, html, prop } from '@pdxui/core';
 
 component('pdx-switch', {
     props: {
-        checked:  { type: Boolean, default: false },
-        disabled: { type: Boolean, default: false },
-        label:    { type: String,  default: '' },
-        size:     { type: String,  default: '' },
+        checked:  prop(false),
+        disabled: prop(false),
+        label:    prop(''),
+        size:     prop(''),
     },
     setup(ctx) {
         function onChange(e: Event) {

@@ -10,9 +10,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { html, signal, component } from '../src/index';
 import { tick } from '../src/testing/index';
+import { prop } from '../src/component/component-descriptor';
 
 component('probe-typed', {
-    props: { value: { type: String, default: '' } },
+    props: { value: prop('') },
     setup: () => ({}),
     render: (ctx) => html`<span class="v">${() => ctx.value()}</span>`,
 });

@@ -5,6 +5,7 @@
 // surface, available from page load in development with no level change.
 import { describe, it, expect, afterEach } from 'vitest';
 import { component, html, signal, computed, safeHandler } from '../src/index';
+import { prop } from '../src/component/component-descriptor';
 
 interface TreeNode { id: number; tag: string; file?: string; children: TreeNode[] }
 interface Inspected {
@@ -27,7 +28,7 @@ const TAG = 'pdx-807-counter';
 // What the compiler emits for `@prop label`, `let count = $signal(0)` and a `$derived`, in dev.
 component(TAG, {
     file: 'src/pages/counter.pdx',
-    props: { label: { type: String, default: '' } },
+    props: { label: prop('') },
     setup() {
         const __count = signal(0, { name: 'counter:count' });
         const doubled = computed(() => __count() * 2, { name: 'counter:doubled' });

@@ -88,7 +88,7 @@ describe('@generic (#490)', () => {
         expect(warnings.filter((w) => w.severity === 'error')).toEqual([]);
         expect(code).not.toContain('@generic');
         // The prop as any other `T[] = []`: an array default is a factory, one array per instance (#677).
-        expect(code).toMatch(/items: \{ type: Array, default: \(\) => \(\[\]\) \}/);
+        expect(code).toContain('items: prop(() => ([]), { type: Array })');
     });
 
     it('with no type parameter is PDX_UNKNOWN_DECLARATION', () => {

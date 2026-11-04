@@ -6,6 +6,7 @@ import { html } from '../src/renderer/template';
 import { when, each, match, pipe } from '../src/renderer/helpers';
 import { component } from '../src/component/component';
 import type { Signal } from '../src/utils/types';
+import { prop } from '../src/component/component-descriptor';
 
 // ─── Signal Stress ─────────────────────────────────────────────────
 
@@ -253,8 +254,8 @@ describe('complex component scenarios', () => {
         const tag = `test-complex-${tagId++}`;
         component(tag, {
             props: {
-                min: { type: Number, default: 0 },
-                max: { type: Number, default: 100 },
+                min: prop(0),
+                max: prop(100),
             },
             setup(ctx) {
                 const value = signal(50);
@@ -311,7 +312,7 @@ describe('complex component scenarios', () => {
         const tag = `test-list-${tagId++}`;
         component(tag, {
             props: {
-                filter: { type: String, default: 'all' },
+                filter: prop('all'),
             },
             setup(ctx) {
                 const items = signal([
@@ -385,7 +386,7 @@ describe('complex component scenarios', () => {
     it('10 component instances rendered simultaneously', () => {
         const tag = `test-multi-${tagId++}`;
         component(tag, {
-            props: { n: { type: Number, default: 0 } },
+            props: { n: prop(0) },
             setup(ctx) {
                 const count = signal((ctx.n as Signal<number>).peek());
                 return { count, inc: () => count.set(v => v + 1) };

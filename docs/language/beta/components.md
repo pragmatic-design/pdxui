@@ -665,7 +665,8 @@ The library's components are written in TypeScript with this descriptor (owner d
 compiles into the same descriptor, so the behaviour exists once, in core. `ctx` is typed from it
 (`ctx.size()` is the union; `ctx.emit('nope')` is a type error), and the manifest reads props, events,
 slots, states, parts and variants from its types, not from JSDoc. The constructor form of alpha
-(`props: { x: { type: String } }`) is a language change. Whether the library moves to `.pdx` is decided
+(`props: { x: { type: String } }`) is removed: a prop is a builder's, `prop<T>()`, `prop.required<T>()` or
+`prop.optional<T>()`, and a model `model<T>()`. Whether the library moves to `.pdx` is decided
 by a measured pilot on three components (#137): if the medium one (`pdx-select`) needs no escape
 hatch, `.pdx` becomes the default for the library.
 
@@ -682,8 +683,14 @@ is a function property of the element, which `@render` calls; `variants`, #512: 
 prop typed with its values, defaulting to the first, and reflected on the host as an attribute — a
 value outside the axis reflects the default — and the manifest lists the axes, from which
 certification generates one scenario per value; the design build half is in [styles.md](styles.md)).
-The constructor form is still accepted.
+
+**Landed** (#300): the constructor form is removed. `props` and `models` take what a builder returns,
+which carries a mark an object literal does not have: `{ type: String, default: '' }` written by hand is a
+type error, and in development `component()` throws, naming the prop or the model and the builder to
+use. Every library component declares its props with `prop<T>()` (#872), and a `.pdx` compiles each
+`@prop` and `@model` into `prop(default, { type })`, `prop.required({ type })` or
+`prop.optional({ type })`.
 
 ### Since
 
-beta (#123, #137)
+beta (#123, #137, #300)

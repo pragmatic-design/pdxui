@@ -24,9 +24,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { html, signal, component } from '../src/index';
 import { tick } from '../src/testing/index';
+import { prop } from '../src/component/component-descriptor';
 
 component('probe-clearable', {
-    props: { error: { type: String, default: '' } },
+    props: { error: prop('') },
     setup: () => ({}),
     render: (ctx) => html`<span class="msg">${() => ctx.error()}</span>`,
 });

@@ -14,15 +14,15 @@ const descriptorOf = (script: string) =>
 describe('an array or object prop default', () => {
     it('a literal array or object is emitted as a factory', () => {
         const code = descriptorOf("@prop tags: string[] = [];\n@prop opts: { a: number } = { a: 1 };\n@model picked: string[] = ['x'] { form };");
-        expect(code).toContain('tags: { type: Array, default: () => ([]) }');
-        expect(code).toContain('opts: { type: Object, default: () => ({ a: 1 }) }');
-        expect(code).toMatch(/picked: \{ type: Array, default: \(\) => \(\['x'\]\)/);
+        expect(code).toContain('tags: prop(() => ([]), { type: Array })');
+        expect(code).toContain('opts: prop(() => ({ a: 1 }), { type: Object })');
+        expect(code).toMatch(/picked: \{ \.\.\.prop\(\(\) => \(\['x'\]\), \{ type: Array \}\), form: wireFormModel \}/);
     });
 
     it('control — a name, a primitive or a function default stays as written', () => {
         const code = descriptorOf("import { EMPTY } from './empty';\n@prop shared: string[] = EMPTY;\n@prop label: string = 'x';\n@prop n: number = 2;\n@prop on: boolean = false;");
-        expect(code).toContain('shared: { type: Array, default: EMPTY }');
-        expect(code).toContain("label: { type: String, default: 'x' }");
-        expect(code).toContain('n: { type: Number, default: 2 }');
+        expect(code).toContain('shared: prop(EMPTY, { type: Array })');
+        expect(code).toContain("label: prop('x', { type: String })");
+        expect(code).toContain('n: prop(2, { type: Number })');
     });
 });

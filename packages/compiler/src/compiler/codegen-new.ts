@@ -6,7 +6,7 @@ import type { SFCDescriptor } from '../parser/sfc';
 import { generateInlineNodes, generateScriptSnippets } from './codegen-template-inline';
 import type { analyzeScript } from './script-analyzer';
 import type { PluginRunner } from '../plugin-system';
-import { buildSetupBody, buildPropsObject } from './codegen-setup';
+import { buildSetupBody, buildPropsObject, PROP_BUILDER } from './codegen-setup';
 import { hostDescriptor } from './codegen-host';
 import { liftStoreExports } from './store-exports';
 import { dropScriptExports } from './script-exports';
@@ -170,6 +170,8 @@ export function compileNewMode(
     const modelsCode = models.length > 0 ? buildPropsObject(models) : '';
     // A model `{ form }` (#135) names core's form wiring in its entry.
     if (models.some(p => p.form)) imports.add('wireFormModel');
+    // Each prop and model is a descriptor (#300), built with core's `prop`.
+    if (analysis.props.length > 0) imports.add(PROP_BUILDER);
     // An `export` inside setup() is a syntax error at load: reported as PDX_SCRIPT_EXPORT, emitted without it (#551).
     // A .pdx.ts module (scriptOnly) unwraps the setup into the module itself, where its exports belong.
     const body = scriptOnly ? analysis.body : dropScriptExports(analysis.body);

@@ -7,6 +7,7 @@ import { describe, it, expect, expectTypeOf, vi, afterEach } from 'vitest';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
 import type { Signal } from '../src/utils/types';
+import { prop } from '../src/component/component-descriptor';
 
 let seq = 0;
 const tag = () => `x-variants-${++seq}`;
@@ -113,7 +114,7 @@ describe('a variant axis', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
         const name = tag();
         component(name, {
-            props: { size: { type: String, default: 'xl' } },
+            props: { size: prop('xl') },
             variants: { size: ['md', 'sm'] },
             render: () => html`<p>x</p>`,
         });

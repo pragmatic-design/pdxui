@@ -9,6 +9,7 @@
 import { describe, it, expect, afterEach } from 'vitest';
 import { html } from '../src/renderer/template';
 import { component } from '../src/component/component';
+import { prop } from '../src/component/component-descriptor';
 
 let tagId = 0;
 
@@ -19,10 +20,10 @@ function define(): string {
     const handler = () => 'the handler';
     component(tag, {
         props: {
-            items: { type: Array, default: () => [] },
-            config: { type: Object, default: () => ({ mode: 'auto' }) },
-            handler: { type: Function, default: handler },
-            plain: { type: Array, default: ['a'] },
+            items: prop<unknown[]>(() => []),
+            config: prop<Record<string, unknown>>(() => ({ mode: 'auto' }), { type: Object }),
+            handler: prop<((...args: unknown[]) => unknown)>(handler, { type: Function }),
+            plain: prop<unknown[]>(['a']),
         },
         setup() { return {}; },
         render: () => html`<span></span>`,

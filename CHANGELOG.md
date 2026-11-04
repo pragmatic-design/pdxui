@@ -472,6 +472,14 @@ semver.
 
 ### Changed
 
+- **Breaking:** the constructor prop form is removed from `component()` (#300). A prop is declared with
+  `prop<T>(default, { type? })`, `prop.required<T>()` or `prop.optional<T>()`, and a model with
+  `model<T>()`; `props: { label: { type: String, default: '' } }` written by hand is a type error, and in
+  development `component()` throws, naming the prop and the builder to use. The types `PropDefinition`
+  and `TypedProp` are gone from `@pdxui/core`; `PropMap` names a component's props. A compiled `.pdx`
+  declares each `@prop` and `@model` the same way, `prop(default, { type })`, and imports `prop` from
+  `@pdxui/core` like the other runtime names it uses.
+
 - A compiled render does less at mount (#685). A binding on a property the native element certainly
   has — `:value`, `:disabled`, `:checked` on an `<input>`, and the like — is the assignment alone, no
   longer a property-or-attribute question asked on every update. A block that is one control-flow node

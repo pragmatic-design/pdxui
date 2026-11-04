@@ -4,6 +4,7 @@ import { html } from '../src/renderer/template';
 import { component } from '../src/component/component';
 import type { Signal } from '../src/utils/types';
 import { waitUntil } from './wait-until';
+import { prop } from '../src/component/component-descriptor';
 
 let tagId = 0;
 function uniqueTag() { return `test-comp-${tagId++}`; }
@@ -36,7 +37,7 @@ describe('component()', () => {
         const tag = uniqueTag();
         component(tag, {
             props: {
-                label: { type: String, default: 'default' },
+                label: prop('default'),
             },
             render: (ctx) => html`<span>${ctx.label as Signal<string>}</span>`,
         });
@@ -50,7 +51,7 @@ describe('component()', () => {
         const tag = uniqueTag();
         component(tag, {
             props: {
-                label: { type: String, default: '' },
+                label: prop(''),
             },
             render: (ctx) => html`<span>${ctx.label as Signal<string>}</span>`,
         });
@@ -67,8 +68,8 @@ describe('component()', () => {
         const tag = uniqueTag();
         component(tag, {
             props: {
-                ariaLabel: { type: String, default: '' },
-                maxLength: { type: Number, default: 0 },
+                ariaLabel: prop(''),
+                maxLength: prop(0),
             },
             render: (ctx) => html`<span>${ctx.ariaLabel as Signal<string>}|${() => String((ctx.maxLength as Signal<number>)())}</span>`,
         });
@@ -83,7 +84,7 @@ describe('component()', () => {
     it('reactively updates camelCase prop when kebab attribute changes', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { ariaLabel: { type: String, default: 'x' } },
+            props: { ariaLabel: prop('x') },
             render: (ctx) => html`<span>${ctx.ariaLabel as Signal<string>}</span>`,
         });
         const el = document.createElement(tag);
@@ -100,8 +101,8 @@ describe('component()', () => {
             const tag = uniqueTag();
             component(tag, {
                 props: {
-                    fooBar: { type: Array, default: () => [] },
-                    optsMap: { type: Object, default: () => ({}) },
+                    fooBar: prop<unknown[]>(() => []),
+                    optsMap: prop<Record<string, unknown>>(() => ({}), { type: Object }),
                 },
                 render: () => html`<span></span>`,
             });
@@ -138,7 +139,7 @@ describe('component()', () => {
         const tag = uniqueTag();
         component(tag, {
             props: {
-                count: { type: Number, default: 0 },
+                count: prop(0),
             },
             render: (ctx) => html`<span>${() => String((ctx.count as Signal<number>)())}</span>`,
         });
@@ -155,7 +156,7 @@ describe('component()', () => {
 
         component(tag, {
             props: {
-                open: { type: Boolean, default: false },
+                open: prop(false),
             },
             render: (ctx) => {
                 propValue = (ctx.open as Signal<boolean>).peek();
@@ -219,7 +220,7 @@ describe('component()', () => {
         const tag = uniqueTag();
         component(tag, {
             props: {
-                label: { type: String, default: '' },
+                label: prop(''),
             },
             render: (ctx) => html`<span>${ctx.label as Signal<string>}</span>`,
         });
@@ -256,7 +257,7 @@ describe('prop persistence across disconnect/reconnect', () => {
     it('a default-true boolean set to false stays false after the re-parent', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { flag: { type: Boolean, default: true } },
+            props: { flag: prop(true) },
             render: () => html`<span></span>`,
         });
         const host = document.createElement('div');
@@ -278,7 +279,7 @@ describe('prop persistence across disconnect/reconnect', () => {
     it('a string prop set from JS survives a re-parent', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { label: { type: String, default: 'default' } },
+            props: { label: prop('default') },
             render: () => html`<span></span>`,
         });
         const host = document.createElement('div');
@@ -296,7 +297,7 @@ describe('removeAttribute semantics for a Boolean prop', () => {
     it('an attribute present and then removed → false, default true or not', async () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { flag: { type: Boolean, default: true } },
+            props: { flag: prop(true) },
             render: () => html`<span></span>`,
         });
         const el = document.createElement(tag) as HTMLElement & { flag: boolean };
@@ -312,7 +313,7 @@ describe('removeAttribute semantics for a Boolean prop', () => {
     it('an attribute that was never there → the default stands', () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { flag: { type: Boolean, default: true } },
+            props: { flag: prop(true) },
             render: () => html`<span></span>`,
         });
         const el = document.createElement(tag) as HTMLElement & { flag: boolean };
@@ -323,7 +324,7 @@ describe('removeAttribute semantics for a Boolean prop', () => {
     it('an attribute changed after the mount updates the prop (attr→prop sync preserved)', async () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { count: { type: Number, default: 0 } },
+            props: { count: prop(0) },
             render: () => html`<span></span>`,
         });
         const el = document.createElement(tag) as HTMLElement & { count: number };
@@ -342,8 +343,8 @@ describe('a prop named after a global attribute leaves no attribute on the host'
     // A fixed tag name: html`` cannot interpolate one, and the binding test needs it in a template.
     component('x-global-attr-prop', {
         props: {
-            title: { type: String, default: '' },
-            hidden: { type: Boolean, default: false },
+            title: prop(''),
+            hidden: prop(false),
         },
         render: (ctx) => html`<h3>${ctx.title as Signal<string>}</h3>`,
     });

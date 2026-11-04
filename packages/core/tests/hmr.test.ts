@@ -7,6 +7,7 @@ import { signal } from '../src/reactivity/signal';
 import { html } from '../src/renderer/template';
 import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
+import { prop } from '../src/component/component-descriptor';
 
 // Generate unique tags per test to avoid CE registry collisions
 let tagCounter = 0;
@@ -18,7 +19,7 @@ describe('HMR state save/restore', () => {
     it('saves and restores signal state via __pdx_saveState', async () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { initial: { type: Number, default: 0 } },
+            props: { initial: prop(0) },
             setup(ctx) {
                 const count = signal(ctx.initial());
                 return { count };
@@ -101,7 +102,7 @@ describe('HMR prototype swapping', () => {
     it('full HMR cycle preserves prop values', async () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { label: { type: String, default: 'hello' } },
+            props: { label: prop('hello') },
             render: (ctx) => html`<span>${() => ctx.label()}</span>`,
         });
 
@@ -117,7 +118,7 @@ describe('HMR prototype swapping', () => {
         __pdx_hmr_save(tag);
 
         component(tag, {
-            props: { label: { type: String, default: 'hello' } },
+            props: { label: prop('hello') },
             render: (ctx) => html`<b>${() => ctx.label()}</b>`,
         });
 
@@ -136,7 +137,7 @@ describe('HMR prototype swapping', () => {
     it('handles multiple instances', async () => {
         const tag = uniqueTag();
         component(tag, {
-            props: { name: { type: String, default: '' } },
+            props: { name: prop('') },
             render: (ctx) => html`<span>${() => ctx.name()}</span>`,
         });
 
@@ -152,7 +153,7 @@ describe('HMR prototype swapping', () => {
         __pdx_hmr_save(tag);
 
         component(tag, {
-            props: { name: { type: String, default: '' } },
+            props: { name: prop('') },
             render: (ctx) => html`<b>${() => ctx.name()}</b>`,
         });
 
@@ -179,7 +180,7 @@ describe('HMR prototype swapping', () => {
 
         // V1: counter component with increment
         component(tag, {
-            props: { step: { type: Number, default: 1 } },
+            props: { step: prop(1) },
             setup(ctx) {
                 const count = signal(0);
                 function inc() { count.set(count() + (ctx.step as () => number)()); }
@@ -202,7 +203,7 @@ describe('HMR prototype swapping', () => {
         __pdx_hmr_save(tag);
 
         component(tag, {
-            props: { step: { type: Number, default: 1 } },
+            props: { step: prop(1) },
             setup(ctx) {
                 const count = signal(0);
                 const label = signal('Count');

@@ -47,7 +47,7 @@ const CRLF_SOURCE = [
     '         * Fill the parent height instead of growing with content. The page no longer',
     '         * scrolls — only the body does.',
     '         */',
-    "        fill: { type: Boolean, default: false },",
+    "        fill: prop(false),",
     '    },',
     '});',
 ].join('\r\n');
