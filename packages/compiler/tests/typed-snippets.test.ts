@@ -113,10 +113,12 @@ describe('@snippet in the script', () => {
         expect(code).not.toMatch(/\bhtml`/);
     });
 
-    it('with a `${arg}` body is still the alpha html`` function, until #131 migrates it', () => {
+    it('with a `${arg}` body is a template too: the alpha html`` function is gone (#131), `${name}` is its text', () => {
         const { code } = compile(child('@snippet greet(name) {\n  <em>${name}</em>\n}', '<p>@render greet(\'x\')</p>'), 'card.pdx');
-        expect(code).toContain('function greet(name) { return html`');
-        expect(code).toContain("renderSnippet(()=>ctx.greet,()=>['x'])");
+        expect(code).toContain('function greet(name)');
+        expect(code).toContain("renderSnippet(()=>greet,()=>['x'])");
+        expect(code).not.toMatch(/\bhtml`/);
+        expect(code).toContain('${name}');
     });
 });
 

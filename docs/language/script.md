@@ -816,9 +816,9 @@ decision 9): `{{ arg }}`, `:attr` bindings and blocks are read, and the paramete
 It is a function of the render, so the template may also call it in an expression, `{{ name(value) }}`.
 A parameter's type is for the reader; the function receives what `@render` passes.
 
-A body that uses `${arg}` is the alpha form: it is copied as written into an `html` tagged template,
-where `{{ }}` is not read, and the setup returns the function. It keeps working until #131's removal
-part, where `pdx migrate` turns `${arg}` into `{{ arg }}`.
+A `${arg}` in the body is text, like anywhere in a template: the alpha form, a body copied into an
+`html` tagged template where `${arg}` was the parameter, is gone (#131). `pdx migrate` turns `${arg}`
+into `{{ arg }}` (`script-snippet-interpolation`).
 
 #### Rules
 

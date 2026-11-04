@@ -322,19 +322,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
                 }
             }
             const snippetBody = snippetLines.join('\n');
-            // A template body (#489, decision 9) is compiled with the component's template, where
-            // `{{ }}`, bindings and blocks are read. A `${arg}` body is the alpha form, an html``
-            // literal, which keeps working until `pdx migrate` turns it into `{{ arg }}` (#131).
-            if (!snippetBody.includes('${')) {
-                // Each parameter's name, without its type: `name: string` → `name`.
-                const names = splitAtTopLevelCommas(params).map(p => p.split(':')[0].trim()).filter(Boolean);
-                snippets.push({ name: snippetName, params: names, body: snippetBody, line: snippetAt });
-                continue;
-            }
-            // The alpha form: a function that returns an html`` template
-            pushBody(`    function ${snippetName}(${params}) { return html\`${snippetBody}\`; }`, snippetAt);
-            exports.push({ name: snippetName, kind: 'function' as const });
-            usedFeatures.add('html');
+            // The body is a template (#489, decision 9), compiled with the component's template, where
+            // `{{ }}`, bindings and blocks are read. A `${arg}` in it is text: the alpha html`` body is
+            // gone (#131), and `pdx migrate` turns `${arg}` into `{{ arg }}` (script-snippet-interpolation).
+            // Each parameter's name, without its type: `name: string` → `name`.
+            const names = splitAtTopLevelCommas(params).map(p => p.split(':')[0].trim()).filter(Boolean);
+            snippets.push({ name: snippetName, params: names, body: snippetBody, line: snippetAt });
             continue;
         }
 

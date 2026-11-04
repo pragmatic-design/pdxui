@@ -71,7 +71,7 @@ ModelDecl      ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )
 ModelOptions   ::= "{" S? ModelOption ( S? "," S? ModelOption )* S? "}"                                     (#751: what the form submits; #753: the attribute's reading)
 ModelOption    ::= "form" ( S? ":" S? Expression )? | "attribute" S? ":" S? ( "string" | "number" | "boolean" | "json" )
 EventDecl      ::= "@event" ( "(" S? "bubbles" S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? End      (β #138: `(bubbles)`; #749: a quoted name)
-SlotDecl       ::= "@slot" S Identifier "?"? ( S? ":" S? SlotSignature )? End                     (β #131: a signature)
+SlotDecl       ::= "@slot" S Identifier "?"? ( S? ":" S? SlotSignature )? End                     (β #131: a signature — landed #489)
 SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type
 GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
@@ -193,7 +193,7 @@ Comment        ::= "<!--" /* any text */ "-->"
 AtEscape       ::= "@@"
 Element        ::= "<" ElementName ( S Attribute )* S? ( "/>" | ">" ElementContent "</" ElementName S? ">" )
                  | DynamicComponent | SlotOutlet
-ElementContent ::= ( Template | SnippetFill )*                                                          (β #131)
+ElementContent ::= ( Template | SnippetFill )*                                                          (β #131 — landed #489)
 ElementName    ::= [A-Za-z] [A-Za-z0-9-]*
 Block          ::= S? "{" Template "}"
 ```
@@ -251,9 +251,9 @@ DynamicComponent ::= "<component" S ":is=" AttrValue ( S DynamicOption )* S? ( "
 DynamicOption    ::= PropBinding | "@keepAlive" ( S? "(" S? Digits S? ")" )? | "keep-alive"               (proposed: the maximum — decisions.md 28)
                    | "@transition" S? "(" StringLiteral ( S? "," S? StringLiteral )? ")"
                    | "@mode" S? "(" StringLiteral ")"
-SlotOutlet       ::= "<slot" ( S "name=" AttrValue )? S? ( "/>" | ">" Template "</slot>" )             (β #131: no `:x` scope, no `let:`)
-SnippetFill      ::= "@snippet" S Identifier S? "(" S? ( Identifier ( S? "," S? Identifier )* )? S? ")" Block   (β #131)
-RenderDirective  ::= "@render" S Identifier "?."? S? "(" S? ( Expression ( S? "," S? Expression )* )? S? ")"  (β #131)
+SlotOutlet       ::= "<slot" ( S "name=" AttrValue )? S? ( "/>" | ">" Template "</slot>" )             (β #131: no `:x` scope, no `let:` — landed #492)
+SnippetFill      ::= "@snippet" S Identifier S? "(" S? ( Identifier ( S? "," S? Identifier )* )? S? ")" Block   (β #131 — landed #489)
+RenderDirective  ::= "@render" S Identifier "?."? S? "(" S? ( Expression ( S? "," S? Expression )* )? S? ")"  (β #131 — landed #489)
                      ( S? "@else" Block )?          /* fallback of an optional slot (decisions.md 22 — landed, #489) */
 ```
 
