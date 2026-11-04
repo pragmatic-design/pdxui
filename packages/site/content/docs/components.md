@@ -293,6 +293,27 @@ restore and `required` stay on the model. A TypeScript component says it in its 
 one that has a form model, as a `pdx-checkbox` inside a `pdx-checkbox-group`, is part of it: the group
 resets, and the checkbox follows the group instead of resetting itself.
 
+### `{ attribute }` — how the attribute is read
+
+A model's type also says how its attribute is read: `string` as a string, `number` as a number,
+`boolean` as a boolean, anything else as JSON. A select's value is one string from the attribute and
+an array in multiple mode, and `string | string[] | null` alone would read `value="1"` as the number 1.
+Say how the attribute is read, and keep the type true:
+
+```pdx
+<template>
+  <p>{{ Array.isArray(value) ? value.join(', ') : value }}</p>
+</template>
+
+<script>
+@model value: string | string[] | null = null { attribute: string };
+</script>
+```
+
+The reading is `string`, `number`, `boolean` or `json`, beside `form` and comma-separated:
+`{ attribute: string, form }`. A union like that with no option is `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`. In
+TypeScript: `model<string | string[] | null>(null, { type: String })`.
+
 ## @event — what a component communicates
 
 A component shouldn't know *what* the parent does when something happens: it just **emits an event**.

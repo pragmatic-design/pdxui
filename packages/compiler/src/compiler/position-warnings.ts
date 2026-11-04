@@ -113,6 +113,8 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
         // A `@model` is a prop (#124): its findings are found the same way.
         case 'PDX_PROP_INVALID_TYPE':
         case 'PDX_PROP_TYPE_MISMATCH':
+        case 'PDX_MODEL_ATTRIBUTE_AMBIGUOUS':
+        case 'PDX_MODEL_ATTRIBUTE_UNKNOWN':
             return name ? find(source, script, new RegExp(`@(?:prop|model)\\s+${escape(name)}\\b`)) : undefined;
         // The second declaration is the one the author adds by mistake; the first was there.
         case 'PDX_DUP_PROP':

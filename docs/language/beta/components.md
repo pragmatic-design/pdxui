@@ -112,7 +112,16 @@ rules; reset, restore and `required` stay on the model. The expression is a func
 read again whenever what it reads changes, its signals rewritten as the script's are; it compiles to
 `ctx.formValue(…)` at the end of the setup, so it may read what the script declares after the model.
 `@model value: string | null = null { form: () => value ?? '' };` submits an empty entry where a null
-model would submit none, as a native select with an empty placeholder does. A control inside another control with a form model is part
+model would submit none, as a native select with an empty placeholder does.
+
+`{ attribute: string }` (#753 — landed; or `number`, `boolean`, `json`) says how the attribute is read,
+apart from the model's type: a select's value is one string from the attribute and an array in
+multiple mode, `@model value: string | string[] | null = null { attribute: string };`. Descriptor:
+`model<T>(d, { type: String })`. Without it the type decides, as for a prop; a union of differently read
+values with no option is `PDX_MODEL_ATTRIBUTE_AMBIGUOUS`, because it would read the attribute as JSON.
+The options are comma-separated, beside `form`: `{ attribute: string, form: () => expr }`.
+
+A control inside another control with a form model is part
 of it, as a checkbox in a checkbox group: the outer one resets and restores through its own model, and
 the inner one does not reset or restore itself after it.
 
