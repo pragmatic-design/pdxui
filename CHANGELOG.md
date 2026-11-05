@@ -1536,6 +1536,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   `pdx-icon` and every menu icon goes through it. A `pdx-rich-text`, whose toolbar draws about 20,
   mounts in 0.59× the time it did, 100 editors from 133.5 to 79.4 ms until drawn. It keeps the
   sanitised output of its last 256 distinct inputs.
+- A virtual list (`@for … @virtual`, and `pdx-select`'s long lists) no longer sums every row again
+  for each row it measures (#900). A measurement equal to the estimate changes nothing, and a
+  changed row recomputes the offsets after it once, when they are next read. Scrolling the
+  `dashboard` scenario's 10,000 events through rows not yet measured costs half the script time,
+  46.5 against 23.2 ms.
 - `pdx-calendar` and `pdx-date-picker` draw four to five times faster (#894): 100 calendars
   from 826 to 190 ms until drawn, 100 date pickers from 795 to 147 ms, timed against each other in one
   run. The calendar engine (`formatWithCalendar`, `getMonthNames`, `getDayNames`,
