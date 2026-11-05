@@ -260,14 +260,21 @@ export function uiString(component: string, key: string): string {
  *     uiAttr(el, 'aria-label', () => uiString('breadcrumb', 'label'));  // and kept
  *
  * ONE effect for the whole library, not one per attribute: a locale switch is rare and an effect
- * per element would cost more to keep than the writes cost to repeat. The entries hold their
- * element WEAKLY, so nothing here keeps a removed component alive, and a `<pdx-router-outlet>` that
- * freezes a page into a DocumentFragment (keepAlive) keeps its translations — which is why a
- * disconnected element is NOT dropped: only a collected one is.
+ * per element would cost more to keep than the writes cost to repeat. Nothing here keeps a removed
+ * component alive, and a `<pdx-router-outlet>` that freezes a page into a DocumentFragment
+ * (keepAlive) keeps its translations — which is why a disconnected element is NOT dropped: only a
+ * collected one is.
+ *
+ * The element is held weakly, and so is its `read`: `_readers` is a WeakMap keyed by the element. A
+ * `read` written inside a component's setup keeps alive the closure it was made in, and through it
+ * `ctx` and the element itself; held in the list beside a WeakRef, it kept every instance that ever
+ * called this, and the WeakRef never cleared (#881). A WeakMap's value lives only as long as its key
+ * is reachable from somewhere else, so the `read` that reaches its own element no longer holds it.
  */
-interface BoundAttr { ref: WeakRef<Element>; attr: string; read: () => string }
+interface BoundAttr { ref: WeakRef<Element>; attr: string }
 
 const _bound: BoundAttr[] = [];
+const _readers = new WeakMap<Element, Map<string, () => string>>();
 let _watching = false;
 
 /** Re-apply every live binding and forget the collected ones. */
@@ -275,8 +282,9 @@ function reapplyUiAttrs(): void {
     let live = 0;
     for (const entry of _bound) {
         const el = entry.ref.deref();
-        if (!el) continue;
-        el.setAttribute(entry.attr, entry.read());
+        const read = el && _readers.get(el)?.get(entry.attr);
+        if (!el || !read) continue;
+        el.setAttribute(entry.attr, read());
         _bound[live++] = entry;
     }
     _bound.length = live;
@@ -284,7 +292,13 @@ function reapplyUiAttrs(): void {
 
 export function uiAttr(el: Element, attr: string, read: () => string): void {
     el.setAttribute(attr, read());
-    _bound.push({ ref: new WeakRef(el), attr, read });
+    let readers = _readers.get(el);
+    if (!readers) {
+        readers = new Map();
+        _readers.set(el, readers);
+    }
+    readers.set(attr, read);
+    _bound.push({ ref: new WeakRef(el), attr });
     // A long list writes thousands of these; without an occasional sweep the array only grows.
     if (_bound.length % 512 === 0) reapplyUiAttrs();
     if (_watching) return;

@@ -48,34 +48,16 @@ const INSTANCES = 100;
 
 /**
  * Tags known to keep their removed instances, and the issue that says why. Measured 2026-11-05: 25 of
- * 114, most of them through `uiAttr`, which holds each `read` function strongly (#881).
+ * 114 at first; 19 of them through `uiAttr`, which held each `read` function strongly, and no longer
+ * do. These six keep theirs for a reason of their own (#881).
  */
 const RETAINED: Record<string, string> = {
-    'pdx-bottom-nav': '#881',
-    'pdx-breadcrumb': '#881',
-    'pdx-calendar': '#881',
     'pdx-carousel': '#881',
-    'pdx-cascader': '#881',
     'pdx-col': '#881',
-    'pdx-context-menu': '#881',
-    'pdx-data-grid': '#881',
-    'pdx-date-picker': '#881',
-    'pdx-entity-grid': '#881',
     'pdx-error-boundary': '#881',
-    'pdx-filter-builder': '#881',
     'pdx-form-field': '#881',
-    'pdx-menubar': '#881',
-    'pdx-mention': '#881',
-    'pdx-nav-menu': '#881',
-    'pdx-navbar': '#881',
-    'pdx-otp-input': '#881',
-    'pdx-pagination': '#881',
-    'pdx-popover': '#881',
     'pdx-rich-text': '#881',
     'pdx-select': '#881',
-    'pdx-sidebar': '#881',
-    'pdx-toolbar': '#881',
-    'pdx-transfer': '#881',
 };
 
 /** Live instances of `tag` after a forced GC, and the used heap in KB. */
