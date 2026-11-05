@@ -1541,6 +1541,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   `pdx-icon` and every menu icon goes through it. A `pdx-rich-text`, whose toolbar draws about 20,
   mounts in 0.59× the time it did, 100 editors from 133.5 to 79.4 ms until drawn. It keeps the
   sanitised output of its last 256 distinct inputs.
+- `pdx-tree` marks the rows on screen to select or check a node, instead of building the whole tree
+  again (#904): the clicked row keeps the focus, and a lookup by id or a branch's check state no
+  longer walks the tree. On a tree of 1,110 expanded nodes, 20 selections cost 0.12× the script
+  time (120.5 against 14.4 ms) and 20 checks 0.13× (169.8 against 22.3 ms).
 - A virtual list (`@for … @virtual`, and `pdx-select`'s long lists) no longer sums every row again
   for each row it measures (#900). A measurement equal to the estimate changes nothing, and a
   changed row recomputes the offsets after it once, when they are next read. Scrolling the

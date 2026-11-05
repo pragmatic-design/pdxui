@@ -119,42 +119,86 @@ component('pdx-tree', {
             }
         }
 
+        // Two views of the tree, each built by one walk when first asked and dropped when what they
+        // were built from changes (#904). Before, every lookup by id walked the tree, and every
+        // check state walked its subtree — once per row drawn, and once per id in a `pdx-check`.
+        //   byId: id → node, loaded children included; dropped by every rebuild.
+        //   states: every node's check state; dropped when `checked` changes, and by every rebuild.
+        let byId: Map<string, TreeNode> | null = null;
+        let states: Map<string, CheckState> | null = null;
+
+        function indexNodes(): Map<string, TreeNode> {
+            if (byId) return byId;
+            const map = new Map<string, TreeNode>();
+            const visit = (list: TreeNode[]): void => {
+                for (const n of list) {
+                    const id = idOf(n);
+                    if (!map.has(id)) map.set(id, n);
+                    visit(childrenOf(n) ?? []);
+                }
+            };
+            visit(ctx.nodes() as TreeNode[]);
+            return (byId = map);
+        }
+
         /**
          * A branch's check state, computed from its subtree rather than stored.
          *
          * Storing it is how a parent ends up saying `true` while one of its children is not
          * checked — the state has one source, and it is the leaves.
          */
+        function stateFrom(node: TreeNode, total: number, on: number): CheckState {
+            if (!isBranch(node) || total === 0) return checked.has(idOf(node)) ? 'true' : 'false';
+            if (on === 0) return 'false';
+            return on === total ? 'true' : 'mixed';
+        }
+
+        /** Every node's check state, from one walk: a node's counts are its children's, summed. */
+        function computeStates(): Map<string, CheckState> {
+            const map = new Map<string, CheckState>();
+            const visit = (node: TreeNode): { total: number; on: number } => {
+                let total = 0;
+                let on = 0;
+                for (const child of childrenOf(node) ?? []) {
+                    const below = visit(child);
+                    total += 1 + below.total;
+                    on += (checked.has(idOf(child)) ? 1 : 0) + below.on;
+                }
+                const id = idOf(node);
+                if (!map.has(id)) map.set(id, stateFrom(node, total, on));
+                return { total, on };
+            };
+            for (const root of ctx.nodes() as TreeNode[]) visit(root);
+            return map;
+        }
+
         function checkStateOf(node: TreeNode): CheckState {
-            if (!isBranch(node)) return checked.has(idOf(node)) ? 'true' : 'false';
+            const known = (states ??= computeStates()).get(idOf(node));
+            if (known) return known;
+            // A node outside the tree the walk saw: its own subtree, as it always was.
             let total = 0;
             let on = 0;
             eachDescendant(node, (n) => { total++; if (checked.has(idOf(n))) on++; });
-            if (total === 0) return checked.has(idOf(node)) ? 'true' : 'false';
-            if (on === 0) return 'false';
-            return on === total ? 'true' : 'mixed';
+            return stateFrom(node, total, on);
         }
 
         function setChecked(node: TreeNode, on: boolean): void {
             const apply = (n: TreeNode) => { if (on) checked.add(idOf(n)); else checked.delete(idOf(n)); };
             apply(node);
             eachDescendant(node, apply);
+            states = null;
             // `checked` holds the LEAVES and the fully-checked branches; a mixed branch is not in
             // it, which is what the event has to say.
             ctx.emit('pdx-check', { checked: [...checked].filter(id => {
                 const n = findNode(id);
                 return !n || !isBranch(n) || checkStateOf(n) === 'true';
             }) });
-            rebuild();
+            // Checking moves no row: the rows on screen are marked again, not built again.
+            refreshMarks();
         }
 
-        function findNode(id: string, list = ctx.nodes() as TreeNode[]): TreeNode | null {
-            for (const n of list) {
-                if (idOf(n) === id) return n;
-                const found = findNode(id, childrenOf(n) ?? []);
-                if (found) return found;
-            }
-            return null;
+        function findNode(id: string): TreeNode | null {
+            return indexNodes().get(id) ?? null;
         }
 
         // ─── Expanding ──────────────────────────────────────────
@@ -207,7 +251,31 @@ component('pdx-tree', {
                 selected.add(id);
             }
             ctx.emit('pdx-select', { selected: [...selected] });
-            rebuild();
+            // Selecting moves no row: the rows on screen are marked again, not built again.
+            refreshMarks();
+        }
+
+        /** Write each row's selected or checked state, where it differs from what the row says. */
+        function refreshMarks(): void {
+            if (!rootEl) return;
+            const mode = ctx.selectionMode() as string;
+            const checkable = !!ctx.checkable();
+            for (const row of rowsOnScreen()) {
+                const node = findNode(row.dataset.nodeId ?? '');
+                if (!node) continue;
+                if (checkable) {
+                    const state = checkStateOf(node);
+                    if (row.getAttribute('aria-checked') !== state) row.setAttribute('aria-checked', state);
+                    const box = row.querySelector<HTMLInputElement>('[data-part="check"]');
+                    if (box) {
+                        box.checked = state === 'true';
+                        box.indeterminate = state === 'mixed';
+                    }
+                } else if (mode !== 'none') {
+                    const sel = String(selected.has(idOf(node)));
+                    if (row.getAttribute('aria-selected') !== sel) row.setAttribute('aria-selected', sel);
+                }
+            }
         }
 
         // ─── Rendering ──────────────────────────────────────────
@@ -295,6 +363,10 @@ component('pdx-tree', {
 
         function rebuild(): void {
             if (!rootEl) return;
+            // What the tree is made of may have changed — other nodes, a loaded branch, children
+            // pushed into a node: both views are built again when next asked.
+            byId = null;
+            states = null;
             rootEl.innerHTML = '';
             const mode = ctx.selectionMode() as string;
             rootEl.setAttribute('role', 'tree');
