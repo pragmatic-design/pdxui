@@ -1529,8 +1529,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   `pdx-toolbar` and `pdx-transfer`. Each of them kept every instance ever mounted, 4 to 108 KB of heap
   apiece, so a page that mounted and removed them grew without end: the translated attributes they
   write were held in a list with a strong reference to the function that reads them, and that
-  function reached the component. Six more still keep theirs, each for a reason of its own, tracked
+  function reached the component. Five more still keep theirs, each for a reason of its own, tracked
   in the same issue.
+- A function binding of `html` that returns a template — `${() => open() ? html`…` : ''}` — now owns
+  the effects of that template (#881). Only its first run's belonged to anything before: each later
+  run left the previous template's bindings running on nodes taken out of the page, and created new
+  ones that nothing would dispose. A binding of that kind which read a long-lived signal, a library
+  string, kept its component alive: `pdx-select` kept every instance, 43 KB each. A hand-written
+  component that builds its content this way now releases it when the content changes or the
+  component is removed.
 - A collapsible section of `pdx-form-template` (#847) is opened and closed by a real button in its
   legend, named by the section, with `aria-expanded` and `aria-controls`: Tab reaches it, Enter and
   Space toggle it. It was a `<legend role="button">` with a click listener, which Tab went past, so a
