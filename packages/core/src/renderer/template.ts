@@ -11,6 +11,9 @@ import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
 import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup, type TwoWayField } from './two-way-value';
 import { attach, type Attachment } from './attach';
+import {
+    PLACEHOLDER, COMMENT_PH_PREFIX, PH_REGEX, buildBindingPlan, nodeAt, type BindingPlan,
+} from './template-plan';
 
 // Properties whose value becomes a navigable/fetchable URL — a runtime-controlled value
 // (API/user data) must never be assigned raw (`javascript:`, `//evil.com`). Lowercased.
@@ -22,21 +25,15 @@ const URL_PROPS = new Set(['href', 'src', 'action', 'formaction', 'xlink:href', 
 const isBrowser = typeof document !== 'undefined';
 
 // Placeholder must survive innerHTML parsing — no null bytes (browsers strip \u200B).
-// Text placeholder for ATTRIBUTE values (comments aren't valid in attributes).
-const PLACEHOLDER = '\u200BPDX';
-// Comment placeholder for TEXT CONTENT — survives innerHTML in table context
+// Text placeholder (PLACEHOLDER) for ATTRIBUTE values (comments aren't valid in attributes).
+// Comment placeholder (COMMENT_PH_PREFIX) for TEXT CONTENT — survives innerHTML in table context
 // (text nodes inside <tbody> get moved by the parser, comment nodes don't).
-const COMMENT_PH_PREFIX = 'pdx-';
+// Both are defined in template-plan.ts, which finds them in a parsed template.
 
 type TemplateValue = unknown;
 
-// Cache: TemplateStringsArray identity → parsed HTMLTemplateElement
-const templateCache = new WeakMap<TemplateStringsArray, HTMLTemplateElement>();
-
-// Pre-compiled regex (avoid re-creating per call)
-const PH_REGEX = new RegExp(`(${escapeRegex(PLACEHOLDER)}\\d+\u200B)`, 'g');
-const PH_EXTRACT = new RegExp(`${escapeRegex(PLACEHOLDER)}(\\d+)\u200B`);
-const COMMENT_PH_RE = new RegExp(`^${COMMENT_PH_PREFIX}(\\d+)$`);
+// Cache: TemplateStringsArray identity → parsed template, and where its bindings are
+const templateCache = new WeakMap<TemplateStringsArray, { tpl: HTMLTemplateElement; plan: BindingPlan }>();
 
 /**
  * Tagged template literal that produces reactive DOM. It needs a DOM: where there is none it throws,
@@ -48,8 +45,8 @@ export function html(strings: TemplateStringsArray, ...values: TemplateValue[]):
         throw new Error('html`` needs a DOM; it was called in an environment without one (Node, a build tool)');
     }
 
-    let tpl = templateCache.get(strings);
-    if (!tpl) {
+    let cached = templateCache.get(strings);
+    if (!cached) {
         // Build raw HTML with context-aware placeholders:
         // - Inside tag (attribute context) → text placeholder (comments invalid in attrs)
         // - Outside tag (content) → comment placeholder (survives innerHTML table parsing)
@@ -70,7 +67,7 @@ export function html(strings: TemplateStringsArray, ...values: TemplateValue[]):
             cumulative += strings[i + 1];
             advanceTagState(cumulative, tagState);
         }
-        tpl = document.createElement('template');
+        const tpl = document.createElement('template');
         raw = expandSelfClosingTags(raw);
 
         // Table context fix: if the template starts with <tr, <td, <th, or <caption,
@@ -106,19 +103,56 @@ export function html(strings: TemplateStringsArray, ...values: TemplateValue[]):
         } else {
             tpl.innerHTML = raw;
         }
-        templateCache.set(strings, tpl);
+        cached = { tpl, plan: buildBindingPlan(tpl.content) };
+        templateCache.set(strings, cached);
     }
 
-    const frag = tpl.content.cloneNode(true) as DocumentFragment;
-
-    // Hydrate attributes — scan all elements for placeholder values
-    hydrateAttributes(frag, values);
-    // Hydrate comment nodes — replace <!--pdx-N--> with reactive bindings
-    hydrateComments(frag, values);
-    // Hydrate text nodes — find and replace placeholder text (attribute fallback)
-    hydrateText(frag, values);
-
+    const frag = cached.tpl.content.cloneNode(true) as DocumentFragment;
+    bindPlan(frag, cached.plan, values);
     return frag;
+}
+
+/**
+ * Bind a fresh clone's values where its template's plan says they go. Every target is reached
+ * before any is bound: binding inserts and removes nodes, which would shift the paths after it.
+ * The order is the one the scan had: attributes, then comments, then text.
+ */
+function bindPlan(root: DocumentFragment, plan: BindingPlan, values: TemplateValue[]): void {
+    const { attributes, comments, texts } = plan;
+    const attrEls = attributes.map(b => nodeAt(root, b.path) as Element);
+    const commentNodes = comments.map(b => nodeAt(root, b.path) as Comment);
+    const textNodes = texts.map(p => nodeAt(root, p) as Text);
+
+    for (let i = 0; i < attributes.length; i++) bindPlannedAttribute(attrEls[i], attributes[i], values);
+    // A comment or text node an attribute binding took out of the clone (an `innerHTML` prop) is
+    // not bound: the scan that this plan replaces did not find it either.
+    for (let i = 0; i < comments.length; i++) {
+        if (root.contains(commentNodes[i])) replaceCommentNode(commentNodes[i], values[comments[i].index]);
+    }
+    for (let i = 0; i < textNodes.length; i++) {
+        if (root.contains(textNodes[i])) replaceTextNode(textNodes[i], values);
+    }
+}
+
+function bindPlannedAttribute(el: Element, b: BindingPlan['attributes'][number], values: TemplateValue[]): void {
+    el.removeAttribute(b.name);
+    if (b.pure >= 0) {
+        bindAttribute(el, b.name, values[b.pure]);
+        return;
+    }
+    // Mixed static + dynamic content — concatenate the parts, reactively when one is a function.
+    const { segments, slots } = b;
+    const hasFunctions = slots.some(s => s >= 0 && typeof values[s] === 'function');
+    if (hasFunctions) {
+        bindAttribute(el, b.name, () => segments.map((seg, i) => {
+            const s = slots[i];
+            if (s < 0) return seg;
+            const v = values[s];
+            return typeof v === 'function' ? String((v as () => unknown)() ?? '') : String(v ?? '');
+        }).join(''));
+    } else {
+        bindAttribute(el, b.name, segments.map((seg, i) => (slots[i] < 0 ? seg : String(values[slots[i]] ?? ''))).join(''));
+    }
 }
 
 /** The HTML void elements: no content, no closing tag. `<x />` of any other is expanded. */
@@ -174,88 +208,6 @@ function isAsciiLetter(c: number): boolean {
 /** `[\w-]`, by character code: what may follow the first letter of a tag name. */
 function isTagNameChar(c: number): boolean {
     return isAsciiLetter(c) || (c >= 48 && c <= 57) || c === 95 || c === 45;
-}
-
-/** Walk all elements, find attributes with placeholders, bind values. */
-function hydrateAttributes(root: DocumentFragment, values: TemplateValue[]): void {
-    const els = root.querySelectorAll('*');
-    for (let e = 0; e < els.length; e++) {
-        const el = els[e];
-        for (const attr of Array.from(el.attributes)) {
-            const firstMatch = attr.value.match(PH_EXTRACT);
-            if (!firstMatch) continue;
-            const key = attr.name;
-            const attrValue = attr.value;
-            el.removeAttribute(key);
-
-            // Check if attribute is PURE placeholder (no static text around it)
-            // Pure: exactly one placeholder, nothing else
-            const purePh = attrValue.match(new RegExp(`^${escapeRegex(PLACEHOLDER)}(\\d+)\u200B$`));
-            if (purePh) {
-                // Single placeholder — bind directly (existing behavior)
-                bindAttribute(el, key, values[parseInt(purePh[1])]);
-            } else {
-                // Mixed static + dynamic content — concatenate parts reactively
-                // Split attribute value into static and placeholder segments
-                const segments = attrValue.split(PH_REGEX);
-                const hasFunctions = segments.some(seg => {
-                    const m = seg.match(PH_EXTRACT);
-                    return m && typeof values[parseInt(m[1])] === 'function';
-                });
-
-                if (hasFunctions) {
-                    // At least one reactive value — create reactive concatenation
-                    const buildString = () => {
-                        return segments.map(seg => {
-                            const m = seg.match(PH_EXTRACT);
-                            if (m) {
-                                const v = values[parseInt(m[1])];
-                                return typeof v === 'function' ? String((v as () => unknown)() ?? '') : String(v ?? '');
-                            }
-                            return seg;
-                        }).join('');
-                    };
-                    bindAttribute(el, key, buildString);
-                } else {
-                    // All static — just concatenate and set once
-                    const str = segments.map(seg => {
-                        const m = seg.match(PH_EXTRACT);
-                        return m ? String(values[parseInt(m[1])] ?? '') : seg;
-                    }).join('');
-                    bindAttribute(el, key, str);
-                }
-            }
-        }
-    }
-}
-
-/** Walk text nodes, find placeholders, replace with reactive bindings. */
-function hydrateText(root: DocumentFragment, values: TemplateValue[]): void {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const toProcess: Text[] = [];
-    let node: Text | null;
-    while ((node = walker.nextNode() as Text | null)) {
-        if (node.data.includes(PLACEHOLDER)) toProcess.push(node);
-    }
-    for (let i = 0; i < toProcess.length; i++) {
-        replaceTextNode(toProcess[i], values);
-    }
-}
-
-/** Walk comment nodes, find <!--pdx-N--> placeholders, replace with reactive bindings. */
-function hydrateComments(root: DocumentFragment, values: TemplateValue[]): void {
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_COMMENT);
-    const toProcess: Comment[] = [];
-    let node: Comment | null;
-    while ((node = walker.nextNode() as Comment | null)) {
-        if (node.data.startsWith(COMMENT_PH_PREFIX)) toProcess.push(node);
-    }
-    for (const comment of toProcess) {
-        const m = comment.data.match(COMMENT_PH_RE);
-        if (!m) continue;
-        const idx = parseInt(m[1]);
-        replaceCommentNode(comment, values[idx]);
-    }
 }
 
 /** Replace a comment placeholder with static or reactive content. */
