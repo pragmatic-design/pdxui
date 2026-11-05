@@ -52,12 +52,10 @@ const INSTANCES = 100;
  * `pdx-select` through a function binding of `html` that did not own its template's effects, `pdx-col`
  * and `pdx-form-field` through a global listener never removed, `pdx-carousel` and `pdx-rich-text`
  * through a `[data-part] + [data-part]` rule that made Chromium keep their detached root (see
- * `core/tests/design-sibling-attribute.test.ts`). None of them do any more. This one keeps its last
- * batch for a reason not found yet (#881).
+ * `core/tests/design-sibling-attribute.test.ts`), and `pdx-error-boundary` through the owner resolver
+ * that kept the first boundary's closure. None of them do any more, so the list is empty (#881).
  */
-const RETAINED: Record<string, string> = {
-    'pdx-error-boundary': '#881',
-};
+const RETAINED: Record<string, string> = {};
 
 /** Live instances of `tag` after a forced GC, and the used heap in KB. */
 async function liveInstances(page: Page, tag: string): Promise<{ live: number; heapKb: number }> {

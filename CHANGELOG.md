@@ -1549,6 +1549,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   component: `pdx-carousel`, `pdx-rich-text` and `pdx-avatar-group` set theirs after inserting them,
   and kept every removed root, the first two their whole component through it. The dividers now
   select by position, `:nth-child(n + 2 of [data-part="item"])`, and draw the same.
+- The first error boundary of a page — `pdx-error-boundary`, `@try`, `@await` — is no longer kept for
+  the life of the page once it is removed (#881). The resolver that finds the boundary enclosing a
+  failing component was a function created inside the first boundary, and it kept that boundary's
+  fallback, its component, and the container it was removed with, siblings included.
 - A collapsible section of `pdx-form-template` (#847) is opened and closed by a real button in its
   legend, named by the section, with `aria-expanded` and `aria-controls`: Tab reaches it, Enter and
   Space toggle it. It was a `<legend role="button">` with a click listener, which Tab went past, so a
