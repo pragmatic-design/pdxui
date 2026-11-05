@@ -224,5 +224,4 @@ function onBulkAction(e) {
   .page { display: flex; flex-direction: column; gap: var(--pdx-space-md); }
   .list { display: flex; flex-direction: column; }
   .bulk { display: block; width: 100%; }
-  .undo-bar { display: flex; align-items: center; gap: var(--pdx-space-sm); }
 </style>

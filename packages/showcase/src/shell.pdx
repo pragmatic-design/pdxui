@@ -531,19 +531,6 @@ applyDensity(storedDensity());
     white-space: nowrap;
   }
 
-  /* The nav is the item that gives. `min-width: 0` is what lets it shrink below its content at
-     all — a flex item's floor is `min-content` until you say otherwise — and the scroll is where
-     it goes instead of pushing the document sideways. */
-  /* `:not(.pdx-nav)`: the rail is a `pdx-nav-menu`, whose `<nav>` is a column `nav.css` dresses;
-     this rule would turn it into a clipped row and its entries' colour into muted. */
-  nav:not(:where(.pdx-nav)) {
-    display: flex; gap: var(--pdx-space-md);
-    flex: 1 1 auto; min-width: 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  nav:not(:where(.pdx-nav))::-webkit-scrollbar { display: none; }
-
   /* `nowrap`: a label is a label. Without it the header's height depends on the language — 73px
      in English, 110px in Italian, measured — which is the same defect seen from above. */
   /* A control in the bar has the BAR's rhythm, stated once above — the links and the language

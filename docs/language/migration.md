@@ -190,20 +190,20 @@ proposals the implementing issue may change.
 | `@store x { persist: 'other' }` | `'local'` or `'session'` | flagged — landed: `store-persist` | #278 (decision 14) |
 
 **Runtime behaviour that changes with the execution contract** (data.md E1–E9, F1–F7). These are
-runtime fixes, not syntax: they apply when they land, and `pdx migrate`
+runtime fixes, not syntax: all of them have landed, and `pdx migrate`
 has nothing to rewrite. They are listed because code may rely on the old behaviour.
 
 | Before | After | Who notices | Source |
 |---|---|---|---|
-| `abort()` leaves the source pending | back to its last settled state | code that waited for a pending source after aborting it | † E3 |
-| a transport timeout is an `AbortError` | an `HttpTimeoutError`, shown by `error()` | a `catch` that tested `AbortError` for timeouts | † E3 |
+| `abort()` leaves the source pending | back to its last settled state | code that waited for a pending source after aborting it | #255 (E3) |
+| a transport timeout is an `AbortError` | an `HttpTimeoutError`, shown by `error()` | a `catch` that tested `AbortError` for timeouts | #255 (E3) |
 | a failed refresh is `state() === 'stale'` | `'error'`, data kept | code comparing to `'stale'` (already a #141 alias) | #141, E4 |
-| `error()` is `undefined` when there is none, cleared when a request starts | `null`, cleared only by a success | strict comparisons with `undefined` | #141, † E3 |
-| `PUT` / `DELETE` retried by the transport by default | retried only when the request asks | an app that relied on the retry | † E6 |
-| `useQuery` retry on top of the transport's | the source's retry only | fewer attempts against a flaky endpoint | † E6 |
-| two consumers of one key, two requests | one shared request | a test that counted requests | † E7 |
-| a fetcher resolving `undefined` | a development warning | — | † E5 |
-| submit sends a value changed during its validation | the submit returns invalid | a form submitted while typing | † F4 |
+| `error()` is `undefined` when there is none, cleared when a request starts | `null`, cleared only by a success | strict comparisons with `undefined` | #141, #255 (E3) |
+| `PUT` / `DELETE` retried by the transport by default | retried only when the request asks | an app that relied on the retry | #257 (E6) |
+| `useQuery` retry on top of the transport's | the source's retry only | fewer attempts against a flaky endpoint | #257 (E6) |
+| two consumers of one key, two requests | one shared request | a test that counted requests | #258 (E7) |
+| a fetcher resolving `undefined` | a development warning | — | #141 (E5) |
+| submit sends a value changed during its validation | the submit returns invalid | a form submitted while typing | #253, rule F4 |
 
 ## Styles and themes
 
