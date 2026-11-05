@@ -282,7 +282,7 @@ effect(() => {
 .cmp-section { margin-top: 2.6rem; }
 .cmp-h2 { font-size: 1.35rem; margin: 0 0 0.6rem; }
 .cmp-lead { color: var(--ink-muted); font-size: 0.92rem; margin: 0 0 0.4rem; }
-/* The placeholder and the keyboard table are styled by pdx-cmp-fallback and pdx-cmp-a11y, which
+/* The placeholder and the keyboard table are styled by app-cmp-fallback and app-cmp-a11y, which
    render them: a scoped style stops at nested components (#152). */
 
 /* TOC */

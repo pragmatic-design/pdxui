@@ -9,6 +9,11 @@ semver.
 
 ## Unreleased
 
+The beta: its release notes are [docs/releases/beta.md](docs/releases/beta.md) — how to upgrade with
+`pdx migrate`, what it cannot detect, the removed exports, the runtime behaviour that changed and the
+browser targets — and the language reference, [docs/language](docs/language/README.md), describes it
+(#159).
+
 ### Features
 
 - Every library component declares its props with the descriptor, `prop<T>()` (#872), where 108 of
