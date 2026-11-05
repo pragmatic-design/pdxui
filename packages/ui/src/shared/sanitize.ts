@@ -146,14 +146,31 @@ function getParser(): DOMParser {
 }
 
 /**
+ * The sanitised output of the last inputs (#896). Every named `pdx-icon` and every menu icon goes
+ * through `sanitizeSVG`, so the same handful of icons was parsed again for every instance that drew
+ * one: 23% of a `pdx-rich-text` mount. The function is pure and this holds strings only. Bounded, so an
+ * app that sanitises arbitrary SVG does not grow it without end: past the bound the oldest goes.
+ */
+const SVG_CACHE_SIZE = 256;
+const _svgCache = new Map<string, string>();
+
+/**
  * Sanitize SVG markup — strips script tags, event handlers, foreignObject,
  * and any non-whitelisted SVG tags/attributes.
  */
 export function sanitizeSVG(input: string): string {
     if (!input || !input.includes('<')) return input;
+    const cached = _svgCache.get(input);
+    if (cached !== undefined) return cached;
     const doc = getParser().parseFromString(input, 'text/html');
     walkAndSanitize(doc.body, SVG_TAGS, SVG_ATTRS);
-    return doc.body.innerHTML;
+    const output = doc.body.innerHTML;
+    if (_svgCache.size >= SVG_CACHE_SIZE) {
+        const oldest = _svgCache.keys().next();
+        if (!oldest.done) _svgCache.delete(oldest.value);
+    }
+    _svgCache.set(input, output);
+    return output;
 }
 
 /**
