@@ -2,7 +2,7 @@
 // and the action a page is measured by. See README.md.
 import { createServer } from 'node:http';
 import { existsSync, readFileSync } from 'node:fs';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, normalize, resolve, sep } from 'node:path';
 import { chromium } from '@playwright/test';
 
 export const packageDir = resolve(import.meta.dirname, '..', '..');
@@ -15,12 +15,13 @@ const TYPES = {
     '.svg': 'image/svg+xml', '.woff2': 'font/woff2',
 };
 
-/** Serve `dir` on a free port; `index.html` for `/`. */
+/** Serve `dir` on a free port; `index.html` for `/`. Nothing outside `dir` is served. */
 export function serve(dir) {
+    const root = resolve(dir);
     const server = createServer((req, res) => {
         const path = normalize(decodeURIComponent((req.url ?? '/').split('?')[0]));
-        const file = join(dir, path === '/' || path === '\\' ? 'index.html' : path);
-        if (!existsSync(file)) {
+        const file = resolve(root, '.' + sep + (path === '/' || path === '\\' ? 'index.html' : path));
+        if (!file.startsWith(root + sep) || !existsSync(file)) {
             res.writeHead(404).end();
             return;
         }
