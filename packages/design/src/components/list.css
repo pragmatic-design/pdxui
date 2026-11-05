@@ -53,9 +53,12 @@ pdx-list { display: block; position: relative; }
     margin: 0;
 }
 
-/* CSS-based dividers (no DOM elements needed): a native .pdx-list takes the class, pdx-list the state */
+/* CSS-based dividers (no DOM elements needed): a native .pdx-list takes the class, pdx-list the state.
+   The parts are matched by position among the items, not with `[data-part] + [data-part]`: a sibling
+   combinator on an attribute makes Chromium keep, after its removal, every element whose `data-part`
+   was set while it was in the page — any part of any component (#881). */
 .pdx-list-dividers > .pdx-list-item + .pdx-list-item,
-:where(pdx-list):state(dividers) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
+:where(pdx-list):state(dividers) > [data-part="list"] > :nth-child(n + 2 of [data-part="item"]) {
     border-top: 1px solid var(--pdx-color-border);
 }
 

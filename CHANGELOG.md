@@ -1542,6 +1542,13 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   listener to something global and never took it off: `pdx-col` a `change` listener on four media
   query lists, `pdx-form-field` a callback on the validation locale. Both are removed when the
   component is destroyed now, and a `pdx-col` removed before its first frame adds none.
+- The dividers of `pdx-list` and `pdx-sortable-list` no longer make Chromium keep removed elements
+  (#881). They were drawn with `[data-part="item"] + [data-part="item"]`, and in Chromium a sibling
+  combinator beside an attribute selector keeps alive, after its removal, every element whose
+  attribute of that name was set while it was in the page. With `data-part`, that is any part of any
+  component: `pdx-carousel`, `pdx-rich-text` and `pdx-avatar-group` set theirs after inserting them,
+  and kept every removed root, the first two their whole component through it. The dividers now
+  select by position, `:nth-child(n + 2 of [data-part="item"])`, and draw the same.
 - A collapsible section of `pdx-form-template` (#847) is opened and closed by a real button in its
   legend, named by the section, with `aria-expanded` and `aria-controls`: Tab reaches it, Enter and
   Space toggle it. It was a `<legend role="button">` with a click listener, which Tab went past, so a

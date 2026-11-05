@@ -50,13 +50,13 @@ const INSTANCES = 100;
  * Tags known to keep their removed instances, and the issue that says why. Measured 2026-11-05: 25 of
  * 114 at first; 19 of them through `uiAttr`, which held each `read` function strongly, and
  * `pdx-select` through a function binding of `html` that did not own its template's effects, `pdx-col`
- * and `pdx-form-field` through a global listener never removed. None of them do any more. These three
- * keep theirs for a reason of their own (#881).
+ * and `pdx-form-field` through a global listener never removed, `pdx-carousel` and `pdx-rich-text`
+ * through a `[data-part] + [data-part]` rule that made Chromium keep their detached root (see
+ * `core/tests/design-sibling-attribute.test.ts`). None of them do any more. This one keeps its last
+ * batch for a reason not found yet (#881).
  */
 const RETAINED: Record<string, string> = {
-    'pdx-carousel': '#881',
     'pdx-error-boundary': '#881',
-    'pdx-rich-text': '#881',
 };
 
 /** Live instances of `tag` after a forced GC, and the used heap in KB. */
