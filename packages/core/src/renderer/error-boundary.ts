@@ -39,6 +39,15 @@ function findEnclosingBoundary(node: Node): ((err: unknown) => void) | null {
 // and the module stays free of load-time effects (sideEffects guard).
 let resolverInstalled = false;
 
+/**
+ * The resolver, declared here and not inside `errorBoundary()`: a closure keeps the context of the
+ * function it is created in, and one created there kept the first boundary's `fallbackFn` — and through
+ * it that boundary's component, its container and every sibling in it — for as long as the page lives
+ * (#881).
+ */
+const resolveOwner = (owner: object): ((err: unknown) => void) | null =>
+    owner instanceof Node ? findEnclosingBoundary(owner) : null;
+
 export interface ErrorBoundaryOptions {
     /** Maximum number of retries before showing permanent fallback. Default: Infinity (manual only). */
     maxRetries?: number;
@@ -88,7 +97,7 @@ export function errorBoundary(
     let resetWatch: Dispose | null = null;
 
     if (!resolverInstalled) {
-        setErrorOwnerResolver((owner) => (owner instanceof Node ? findEnclosingBoundary(owner) : null));
+        setErrorOwnerResolver(resolveOwner);
         resolverInstalled = true;
     }
     boundaryStarts.set(start, {
