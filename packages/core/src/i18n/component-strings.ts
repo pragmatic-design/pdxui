@@ -1,7 +1,7 @@
 // Component String Registry — translatable default strings for UI components.
 // Each component registers its default strings. Consumers override per-locale.
 
-import { signal, computed } from '../reactivity/signal';
+import { signal, computed, collectDisposers } from '../reactivity/signal';
 import type { ReadonlySignal } from '../utils/types';
 
 // ─── Types ─────────────────────────────────────────────────────
@@ -60,6 +60,14 @@ export function setComponentStrings(component: string, strings: ComponentStrings
 }
 
 /**
+ * One computed per string, not one per read (#889). `uiString()` reads a string every time a component
+ * asks for one; a new computed per read, outside a component's scope, belonged to nothing, and the two
+ * registry signals it subscribed to kept it for the life of the page. The cache is bounded by the
+ * strings the library and the app have.
+ */
+const _strings = new Map<string, ReadonlySignal<string>>();
+
+/**
  * Get a reactive string for a component.
  * Returns the override if set, otherwise the default.
  *
@@ -68,10 +76,18 @@ export function setComponentStrings(component: string, strings: ComponentStrings
  * // In template: {{ placeholder() }}
  */
 export function getComponentString(component: string, key: string, fallback?: string): ReadonlySignal<string> {
-    return computed(() => _overrides().get(component)?.[key]
-        ?? _defaults().get(component)?.[key]
-        ?? fallback
-        ?? key);
+    const id = `${component}\u0001${key}\u0001${fallback ?? ''}\u0001${fallback === undefined ? 0 : 1}`;
+    let string = _strings.get(id);
+    if (!string) {
+        // In a scope of its own, never disposed: created in the scope of the component that first asks,
+        // it would be disposed with that component and handed, dead, to the next reader.
+        [string] = collectDisposers(() => computed(() => _overrides().get(component)?.[key]
+            ?? _defaults().get(component)?.[key]
+            ?? fallback
+            ?? key));
+        _strings.set(id, string);
+    }
+    return string;
 }
 
 /**
