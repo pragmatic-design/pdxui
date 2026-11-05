@@ -115,3 +115,55 @@ describe('computed — disposed with the ownership scope', () => {
         expect(c()).toBe(20);
     });
 });
+
+// A function binding of `html` that returns a template owns the effects that template creates
+// (#881). Hand-written components build their content this way — `${() => cond() ? html`…` : ''}` —
+// and before, only the FIRST run's nested effects belonged to anything: they fell into the scope that
+// was collecting while the component mounted. A re-run created its template with no scope, so its
+// effects were never disposed, and the previous run's were not disposed either. One that read a
+// long-lived signal — a library string — kept the removed component alive.
+
+describe('a function binding owns the effects of the template it returns', () => {
+    beforeEach(() => { document.body.innerHTML = ''; });
+
+    it('disposes the previous run’s nested effects when it runs again', () => {
+        const show = signal(true);
+        const value = signal(0);
+        let reads = 0;
+        document.body.appendChild(html`<div>${() => show() ? html`<span>${() => { reads++; return value(); }}</span>` : ''}</div>`);
+
+        show.set(false);
+        const before = reads;
+        value.set(1);
+        value.set(2);
+        expect(reads, 'the removed span’s binding still runs').toBe(before);
+    });
+
+    it('disposes, with the scope it was mounted in, the nested effects a later run created', () => {
+        const show = signal(true);
+        const value = signal(0);
+        let reads = 0;
+        const [, dispose] = collectF3(() => {
+            document.body.appendChild(html`<div>${() => show() ? html`<span>${() => { reads++; return value(); }}</span>` : ''}</div>`);
+        });
+
+        // A run after the mount, outside any collecting scope: the template it returns is new.
+        show.set(false);
+        show.set(true);
+        dispose();
+        const before = reads;
+        value.set(1);
+        value.set(2);
+        expect(reads, 'a nested binding created by a re-run outlived its component').toBe(before);
+    });
+
+    it('keeps the current run’s nested effects working', () => {
+        const show = signal(true);
+        const value = signal(0);
+        document.body.appendChild(html`<div>${() => show() ? html`<span>${() => value()}</span>` : ''}</div>`);
+        show.set(false);
+        show.set(true);
+        value.set(7);
+        expect(document.body.querySelector('span')?.textContent).toBe('7');
+    });
+});

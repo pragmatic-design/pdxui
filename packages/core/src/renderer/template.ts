@@ -3,7 +3,7 @@
 // Template caching: same template strings → reuse parsed HTMLTemplateElement.
 // Importable without a DOM; calling html`` needs one (#93).
 
-import { effect, onDispose, signal, untracked } from '../reactivity/signal';
+import { collectDisposers, effect, onDispose, signal, untracked } from '../reactivity/signal';
 import { setProp, bindGesture } from './dom';
 import { placePartNode } from './part-nodes';
 import { sanitizeBoundUrl } from '../security/sanitize-url';
@@ -269,7 +269,12 @@ function replaceCommentNode(comment: Comment, value: TemplateValue): void {
         let currentNodes: Node[] = [anchor];
 
         effect(() => {
-            const result = (value as () => unknown)();
+            // This run owns the effects of the template it returns, and gives them back before the next
+            // run and when the binding is disposed. Without a scope of its own, only the FIRST run's
+            // nested effects belonged to anything (the scope collecting while the component mounted):
+            // a later run's were disposed by nothing, and one that read a long-lived signal kept the
+            // removed component alive (#881).
+            const [result, disposeRun] = collectDisposers(() => (value as () => unknown)());
             // Remove all current nodes except the anchor (first)
             for (let i = 1; i < currentNodes.length; i++) {
                 currentNodes[i].parentNode?.removeChild(currentNodes[i]);
@@ -296,6 +301,7 @@ function replaceCommentNode(comment: Comment, value: TemplateValue): void {
                 for (const n of newNodes) placePartNode(liveParent, n, refNext);
                 currentNodes = newNodes;
             }
+            return disposeRun;
         });
     } else {
         // Static value — insert nodes and remove comment
