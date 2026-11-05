@@ -1,6 +1,6 @@
 # Performance guarantees
 
-What the beta promises about cost, each with the measurement that holds it. A guarantee here is a
+What the language promises about cost, each with the measurement that holds it. A guarantee here is a
 test that fails when the number is crossed, not a property of the design. Everything is **proposed**
 (decisions.md, point 29) unless it says **landed**. The render-path and reactivity work already
 in the roadmap (#107, #109–#119) is not repeated. The order of the work this page adds (decisions.md
@@ -43,7 +43,7 @@ held to the benchmark (`pnpm bench:jfb`):
 | L2 | A cold load fetches its JavaScript in **at most two waves**: the landing route's chunk and its static imports are named in `modulepreload` | `showcase/tests/first-paint-waves.spec.ts` | **landed** |
 | L3 | A route's stylesheets start with the entry, not after it | `first-paint-waves.spec.ts` | **landed** |
 | L4 | **A navigation with data costs two waves, not three**: a route's `@loader` starts in parallel with its chunk, not after it | `first-paint-waves.spec.ts`, extended to count the data request | **landed**: the parallel start (#119, `router/tests/loader-parallel.test.ts`), and the measure in the browser (#507): a navigation to the showcase's `/tickets/:id`, whose `@loader` fetches its record, costs two waves at CPU 4×. A cold load of that route waits for the data too: its LCP budget rose with it (`first-paint.spec.ts`) |
-| L5 | A component used only inside a `@defer` body ships in that body's chunk (#98 — **landed**); `; prefetch` loads it before the render trigger (template.md); prefetches go through one bounded queue (below) | bundle inspection, request timing | partly proposed |
+| L5 | A component used only inside a `@defer` body ships in that body's chunk (#98 — **landed**); `; prefetch` loads it before the render trigger (template.md); prefetches go through one bounded queue (below, #250) | bundle inspection, request timing | **landed** (#98, #281, #250) |
 | L6 | The entry carries only the components the shell renders, and only the active locale | `showcase/tests/entry-attribution.spec.ts:95,126` | **landed** for the showcase |
 | L7 | A route's chunk is fetched on hover, focus or when its link is in view, by policy, so the click needs no further request; off under Save-Data and 2G | `showcase/tests/prefetch.spec.ts`; `router/src/prefetch.ts:134-139` | **landed** |
 
@@ -62,15 +62,15 @@ held to the benchmark (`pnpm bench:jfb`):
 
 ## Virtualized lists
 
-### Syntax (proposed)
+### Syntax
 
 ```ebnf
 ForBlock ::= /* the beta @for */ ( S? "@virtual" ( S? "(" S? Number S? ")" )? )? Block ( S? "@empty" Block )?
 ```
 
 `@virtual` goes after `track` and any `@transition`; its number is the estimated item size in px
-(default: measured from the first item). Diagnostics (proposed): `@virtual` with `@move` or
-`@stagger` is `PDX_VIRTUAL_TRANSITION` (an item leaving the window is not leaving the list);
+(default: measured from the first item). Diagnostics: `@virtual` with `@transition`, `@mode`, `@move`
+or `@stagger` is `PDX_VIRTUAL_TRANSITION` (an item leaving the window is not leaving the list);
 a virtual list whose container has no bounded height is a development warning at runtime, since
 the compiler cannot see the layout.
 
@@ -89,8 +89,8 @@ element with `overflow` — never an element the compiler adds, so lists and tab
 **Landed** (#283): the grammar, `PDX_VIRTUAL_SHAPE`, and core's `eachVirtual`
 (`core/src/renderer/virtual-list.ts`). Both render paths emit the same call. Rows are keyed over the
 window by `track`, each measured by `measureElement`, and a `DataSource` pages through `loadMore()`.
-`PDX_VIRTUAL_TRANSITION` is wider than proposed above: it refuses `@transition` and `@mode` too,
-since a row scrolling into view is not arriving either. Measured in Chromium
+`PDX_VIRTUAL_TRANSITION` refuses `@transition` and `@mode` as well as `@move` and `@stagger`, since a
+row scrolling into view is not arriving either. Measured in Chromium
 (`responsive/…/virtual-list.spec.ts`):
 - 10 000 items in a 400 px `ul` keep at most the visible rows plus 2 × overscan, besides the two
   `aria-hidden` spacers;
@@ -129,7 +129,7 @@ move onto this one; that move is not part of the beta.
 | Criterion | Measured by |
 |---|---|
 | In-flight dedupe: N consumers of one key → one request (data.md E7) | transport call count |
-| **Prefetch budget**: route prefetch and `@defer` prefetch go through one queue with a concurrency limit (proposed default 2, idle-priority), behind navigations, first loads and `@defer` render loads (polling and background refreshes do not hold it back); a navigation cancels the queued prefetches that are not for its target. Today each prefetch starts at once — a page with many `eager`/`viewport` links starts every `import()` together (`router/src/prefetch.ts`), and `@defer` has no limit | number of concurrent `import()`s in a page with 50 `viewport` links |
+| **Prefetch budget**: route prefetch and `@defer` prefetch go through one queue in core, two at a time and none while a navigation is waited for, behind navigations, first loads and `@defer` render loads (polling and background refreshes do not hold it back); a navigation takes its target's prefetch and cancels the others (**landed**, #250: `queuePrefetch`, `takePrefetch`, `cancelPrefetches`; `router/src/prefetch.ts`) | number of concurrent `import()`s in a page with 50 `viewport` links |
 | Save-Data and 2G turn prefetch off (**landed**, `router/src/prefetch.ts:134-139`) | — |
 
 ## Heavy work that does not block input

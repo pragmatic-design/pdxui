@@ -3,7 +3,7 @@
 // supersedes it. A prefetched call gets the same context; a failure is kept in loaderError(path);
 // levels still run outermost first, so a child reads its parent's data.
 //
-// The loader leg of the execution contract (docs/language/beta/data.md → «The execution contract»)
+// The loader leg of the execution contract (docs/language/data.md → «The async vocabulary and its execution contract»)
 // is the last block: the read sources' legs are core/tests/async-contract.test.ts, and the router's
 // is here, beside the router, since core does not import it.
 

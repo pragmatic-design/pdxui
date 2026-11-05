@@ -18,7 +18,16 @@ import { DIAGNOSTICS } from '../src/diagnostics/catalog';
 import { LANGUAGE, languageExamples, resolveStub } from './support/published-examples';
 import { expandLibraryVariants, libraryVariantTests, type LibraryAxis } from '../src/compiler/variant-css';
 
-const PAGES = ['overview.md', 'script.md', 'template.md', 'styles.md', 'routing.md', 'data.md', 'diagnostics.md'];
+/**
+ * Every page of the reference (#159: the beta specification promoted into it). The construct pages
+ * below hold each construct in its five parts; the others define the file, the grammar, the
+ * component contract, the execution model and the migration, and their examples are checked too.
+ */
+const PAGES = [
+    'README.md', 'file.md', 'grammar.md', 'script.md', 'components.md', 'template.md', 'styles.md',
+    'routing.md', 'data.md', 'lifecycle.md', 'server.md', 'performance.md', 'agents.md', 'library.md',
+    'diagnostics.md', 'migration.md', 'decisions.md',
+];
 /** The pages whose `###` sections are constructs, each with the five parts. */
 const CONSTRUCT_PAGES = ['script.md', 'template.md', 'styles.md', 'routing.md', 'data.md'];
 const PARTS = ['Syntax', 'Semantics', 'Rules', 'Examples', 'Since'];
@@ -47,7 +56,8 @@ const names = (heading: string, token: string): boolean =>
 const escapeRegExp = (text: string): string => text.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 
 describe('docs/language, the formal reference', () => {
-    it('has its seven pages', () => {
+    it('has its pages, and no beta folder beside them', () => {
+        expect(existsSync(join(LANGUAGE, 'beta')), 'docs/language/beta is promoted into docs/language (#159)').toBe(false);
         const missing = PAGES.filter(p => !existsSync(join(LANGUAGE, p)));
         expect(missing, 'pages the reference is missing').toEqual([]);
         const extra = existsSync(LANGUAGE) ? readdirSync(LANGUAGE).filter(f => f.endsWith('.md') && !PAGES.includes(f)) : [];

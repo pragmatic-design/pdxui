@@ -1,4 +1,4 @@
-// `__PDX_DEVTOOLS__.outline()` (#271): the rules of docs/language/beta/agents.md, one test each.
+// `__PDX_DEVTOOLS__.outline()` (#271): the rules of docs/language/agents.md, one test each.
 // Only DATA repetition is summarised — the rows the runtime marks — and a run of controls sharing a
 // role is kept whole: the prototype's role-based rule hid toolbar buttons until it was narrowed.
 

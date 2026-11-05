@@ -209,7 +209,7 @@ function wholeParam(s: string): Segment | null {
 }
 
 /**
- * The four named constraints of the grammar (`docs/language/beta/routing.md`), or the developer's own
+ * The four named constraints of the grammar (`docs/language/routing.md`), or the developer's own
  * pattern. A name missing here is read as a pattern that matches only itself (#305).
  */
 function constraintSource(constraint: string): string {

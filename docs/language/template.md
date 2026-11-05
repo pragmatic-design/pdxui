@@ -2,7 +2,7 @@
 
 The `<template>` block is HTML with three additions: interpolation (`{{ }}`), bound attributes (`:`,
 `::`, `@` in front of an attribute name) and block directives (`@if`, `@for`, …). This page defines the
-`Template` production that [overview.md](overview.md) leaves open. The parser is
+`Template` production that [file.md](file.md) leaves open. The parser is
 `packages/compiler/src/parser/template.ts`; attributes are rewritten by
 `codegen-template-rewrite.ts` and bound at runtime by core's `renderer/template.ts`.
 
@@ -129,6 +129,9 @@ function the script imports is called by its own name, `fmt`, not `ctx.fmt`.
 - A pipe name that the script neither declares nor imports raises `PDX_UNDECLARED_REF`.
 - `{{ money(price) }}` is the same call written directly; a pipe chain reads left to right where nested
   calls read inside out.
+- Pipes are for **chains** of two or more formatters, where left to right reads better than nested
+  calls. A single pipe is `PDX_PIPE_SINGLE` (info), whose fix is the call, applied by
+  `pdx check --fix` (decisions.md 4, #129).
 
 #### Examples
 
@@ -149,7 +152,7 @@ function currency(value: number, code: string) { return `${value.toFixed(2)} ${c
 
 #### Since
 
-alpha
+alpha; a single pipe reported, beta (#129)
 
 ## Attributes
 
@@ -1421,6 +1424,18 @@ again. The names are the author's, `err` and `retry` when none are written.
 - `@placeholder`, `@loading` or `@error` with no `@defer` or `@await` before it stops the compile.
 - `retry` loads the code again: whether the browser fetches a module again after its first `import()`
   failed is the browser's.
+- **Removal while loading.** When the block is removed — an `@if` around it, the component destroyed —
+  before its code arrives, its triggers are released and the late module mounts nothing. Everything the
+  body mounted is disposed with the block: each state renders in its own scope, disposed when the state
+  changes and when the block is removed (#261, `packages/core/tests/defer-body-dispose.test.ts`).
+- **A deferred template does not defer its parent's data.** A `@fetch` or a `@loader` of the component
+  that contains the `@defer` starts when that component mounts. Three orders, each with its form:
+  data before code, the usual one — the `@fetch` stays in the parent and the deferred child receives
+  the resource as a prop; code and data together — the parent gates both on one signal,
+  `@fetch sales: '…' { enabled: () => showChart }` and `@defer (when (showChart))`, so the `import()`
+  and the request start in the same turn; code then data, a waterfall acceptable only when the data
+  is not needed without the code — the `@fetch` is declared inside the deferred component. A built-in
+  trigger (`viewport`, `interaction`) cannot enable a fetch: that stays open (decisions.md).
 
 #### Examples
 

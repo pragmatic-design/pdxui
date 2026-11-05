@@ -32,10 +32,10 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
   to its balanced `}`. A `//` comment on a line read onto another is dropped. A declaration with no
   block (`@guard 'x';`, `@tag 'app-x';`) is written on one line.
 - **One grammar.** Every script is read this way, with or without `setup`, whatever it contains
-  ([overview.md](overview.md#one-script-grammar)); the legacy markers and `@mixin` are removed forms.
+  ([file.md](file.md#the-file)); the legacy markers and `@mixin` are removed forms.
 - **What the template sees.** Every top-level `const`, `let`, `function`, rune and declared name is
   returned from `setup` to the template, except a name that starts with `_`.
-- **The rest is TypeScript**, type-erased (overview.md). A syntax error raises
+- **The rest is TypeScript**, type-erased (file.md). A syntax error raises
   `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, functions,
   classes, variables) raise `PDX_DUP_DECLARATION`.
 - **Nothing is exported.** The script is the body of the component's setup, run once per instance.
@@ -196,7 +196,7 @@ component's `models`.
 - Assigning a model is the point of it: it never raises `PDX_PROP_WRITE`.
 - `@model name: T = d { form };` (form association, #135) is the same model with `form: true` in its
   descriptor entry; core makes the component form-associated through it
-  ([beta/components.md](beta/components.md) → «@model»). The option is taken off before the type and
+  ([components.md](components.md) → «@model»). The option is taken off before the type and
   the default are read, with or without a default. `{ form: () => expr }` (#751) also says what the
   form submits: it compiles to `ctx.formValue?.(() => expr);` at the end of the setup, rewritten as the
   script is.
@@ -733,7 +733,7 @@ The analyzer's form: `@tag 'app-other-name';`
 #### Semantics
 
 Registers the component under the given tag instead of the one derived from its file name
-([overview.md](overview.md#the-tag)): `component('app-other-name', …)`. The component resolver reads
+([file.md](file.md#the-tag)): `component('app-other-name', …)`. The component resolver reads
 the same line, so the tag is auto-imported where a template uses it.
 
 #### Rules
@@ -947,7 +947,7 @@ alpha
 
 ```ebnf
 SignalDecl  ::= ( "let" | "const" | "var" ) S RuneBinding ( S? "," S? ( RuneBinding | Binding ) )* S? ";"?
-RuneBinding ::= Identifier S? ( ":" S? Type S? )? "=" S? Rune S? ( "<" Type ">" )? "(" Expression ")"
+RuneBinding ::= Identifier S? ( ":" S? Type S? )? "=" S? Rune S? ( "<" Type ">" )? "(" Expression? ")"   /* only $signal may omit it (#186) */
 Rune        ::= "$signal" | "$derived" | "$store"
 Binding     ::= Identifier ( S? "=" S? Expression )?
 ```
@@ -956,7 +956,7 @@ The analyzer's form: `let count = $signal(0);`
 
 #### Semantics
 
-Declares a reactive value. The declaration becomes
+Declares a reactive value. `$signal()` with no argument starts at `undefined` (#186). The declaration becomes
 `const __count = signal(0, { name: 'file:count' })` (the debug name is dropped in a production build),
 emitted before the setup body — or, when the initialiser reads a variable the body declares, right
 after that declaration. A prop read in the initialiser is `ctx.prop.peek()`, and a `$signal` read

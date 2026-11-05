@@ -1,6 +1,6 @@
 // The data components brought to the beta contract (#292): a prop the component writes itself is a
 // model; each lists its states and parts in the manifest, which is what a theme and an agent's page card
-// read (docs/language/beta/library.md, «Done, for one component»); its alpha forms are gone. A row joins
+// read (docs/language/library.md, «Done, for one component»); its alpha forms are gone. A row joins
 // `DONE` in the pull request that brings its component over.
 
 import { describe, it, expect } from 'vitest';

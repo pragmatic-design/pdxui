@@ -145,7 +145,7 @@ export interface CompileContext {
 }
 
 /**
- * What the compiled output may rely on in the browser (`docs/language/beta/file.md` → «Browser
+ * What the compiled output may rely on in the browser (`docs/language/file.md` → «Browser
  * targets»). `'baseline-2024'` emits today's mechanisms where the beta's output needs a 2026 feature;
  * it is maintained frozen and retired when `@scope` is Baseline widely available.
  */

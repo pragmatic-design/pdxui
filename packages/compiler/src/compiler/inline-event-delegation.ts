@@ -16,7 +16,7 @@
 import type { TemplateNode } from '../parser/template';
 import { VOID_ELEMENTS } from './codegen-template-inline';
 
-/** The bubbling events delegation is for (docs/language/beta/file.md, «The render model»). */
+/** The bubbling events delegation is for (docs/language/file.md, «The render model»). */
 export const DELEGABLE = new Set(['click', 'dblclick', 'input', 'change', 'keydown', 'keyup', 'pointerdown', 'pointerup', 'contextmenu']);
 
 /** The modifiers a delegated handler cannot honour: its listener is on the component, in bubble phase. */

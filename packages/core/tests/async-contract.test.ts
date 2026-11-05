@@ -1,4 +1,4 @@
-// The execution contract of a read source (beta spec, docs/language/beta/data.md → «The execution
+// The execution contract of a read source (beta spec, docs/language/data.md → «The async vocabulary and its execution
 // contract»), one suite for every source: `resource()`, a compiled `@fetch`, `useQuery`.
 //
 // Each source is driven through a fake transport that records every call and answers when the test

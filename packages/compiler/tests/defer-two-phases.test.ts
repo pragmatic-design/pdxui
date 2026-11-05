@@ -1,4 +1,4 @@
-// `@defer` in two phases, compiled (#281; docs/language/beta/template.md → «`@defer` — two phases»).
+// `@defer` in two phases, compiled (#281; docs/language/template.md → «`@defer`, `@placeholder`, `@loading`, `@error`»).
 //
 // The render path reads `@defer (<render>; prefetch <prefetch>)`, `when (expr)` and `@error (err, retry)`
 // and emits them as `defer()`'s options. `hover` is a removed form, rewritten to `interaction`. The

@@ -1,5 +1,5 @@
 /**
- * A frozen page costs no CPU (#269; `docs/language/beta/lifecycle.md` → «The matrix», column frozen,
+ * A frozen page costs no CPU (#269; `docs/language/lifecycle.md` → «The matrix», column frozen,
  * and «Acceptance cases» 1 and 6).
  *
  * The `lifecycle` scenario (`scenarios/lifecycle/`, built by `scenarios-build.ts`) has a kept-alive

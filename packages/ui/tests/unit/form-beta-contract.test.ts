@@ -1,6 +1,6 @@
 // The form-structure components brought to the beta contract (#293): a prop the component writes itself
 // is a model; each lists its states, parts and variant axes in the manifest, which is what a theme and an
-// agent's page card read (docs/language/beta/library.md, «Done, for one component»); no component of the
+// agent's page card read (docs/language/library.md, «Done, for one component»); no component of the
 // family declares an event named `toggle`, the name of a native event. A row joins `DONE` in the pull
 // request that brings its component over.
 

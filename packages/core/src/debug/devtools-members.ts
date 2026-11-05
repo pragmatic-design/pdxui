@@ -1,4 +1,4 @@
-// `__PDX_DEVTOOLS__` v2's last members (#298, docs/language/beta/agents.md): `delta()`, `actions()` and
+// `__PDX_DEVTOOLS__` v2's last members (#298, docs/language/agents.md): `delta()`, `actions()` and
 // `run()`, `sources()`, `forms()`. Each reads what the components in the route registered while their
 // setup ran (devtools-registry.ts), or the card and the outline the API already builds.
 //

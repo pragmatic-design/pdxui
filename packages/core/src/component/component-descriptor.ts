@@ -13,7 +13,7 @@
 // `states` are the host's custom states, set with `ctx.state` (#132); `host` its attributes and
 // listeners (#133); `parts` its public elements, for the manifest (#134); `models` the props it may
 // write, which `::name` binds both ways (#124). `slots`, `expose` and `variants` are part of the
-// descriptor's type now; each gets its behaviour in its own issue (docs/language/beta/components.md).
+// descriptor's type now; each gets its behaviour in its own issue (docs/language/components.md).
 
 import { wireFormModel } from '../form/form-model';
 import { PROP_SPEC } from './prop-spec';

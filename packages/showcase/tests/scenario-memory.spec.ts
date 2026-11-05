@@ -1,5 +1,5 @@
 /**
- * A page mounted and destroyed 100 times gives its memory back (#243; `docs/language/beta/performance.md`
+ * A page mounted and destroyed 100 times gives its memory back (#243; `docs/language/performance.md`
  * → «Bounded memory», the second criterion).
  *
  * Leaks are invisible to functional tests: the page renders the same every time. The `memory` scenario

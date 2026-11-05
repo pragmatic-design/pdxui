@@ -1,9 +1,9 @@
 # Agents
 
 How a PDX application is read and operated by an agent — a browser agent, a test agent, a model
-judging a page. Everything on this page is **proposed** (decisions.md, points 30–32), except what
-says **landed**: the `@action` agent options and their build check (#502, «Capabilities in
-production»); the WebMCP adapter stays proposed. The
+judging a page (decisions.md, points 30–32). Each rule says what holds it: the accessibility rules A1–A6,
+the description API (#271, #272, #298) and the `@action` agent options with their build check (#502,
+«Capabilities in production») are **landed**; the WebMCP adapter stays **proposed**. The
 baselines below come from a prototype run on four pages of the showcase application on 2026-10-11.
 
 ## Principles
@@ -28,7 +28,7 @@ rules first; agents benefit because they read the same tree. Each is measured in
 
 | # | The DOM carries | From | Today (read on 2026-10-11) |
 |---|---|---|---|
-| A1 | `required` / `aria-required` on a control bound to a required field | the `@form` schema | missing: `showcase/src/pages/intake.pdx:83-84` declares `requester` and `email` required; their `<input>` has neither |
+| A1 | `required` / `aria-required` on a control bound to a required field | the `@form` schema | holds since #249: a field its schema requires marks its control `aria-required` and its label's marker, as the `required` prop does (`ui/tests/unit/form-field-schema-required.test.ts`) |
 | A2 | `aria-invalid` and `aria-describedby` → the message, on a field in error | the field's `error()` | measured, holds (#274, `showcase/tests/a11y-rules.spec.ts`): on `/intake` an invalid email is `aria-invalid="true"` and its `aria-describedby` reaches the error shown on screen |
 | A3 | `aria-rowcount` / `aria-setsize` with the source's total when a list shows a part of it | the data source, the pager | holds on the showcase, measured (#299, `showcase/tests/a11y-rules.spec.ts`): the partial lists are `pdx-data-grid`s, and `/customers`' grid, showing its first page, has `aria-rowcount` = the 24 customers + its header row; the dashboard's two lists (four KPI tiles, the queue's three tickets) render their whole source, and no item carries an `aria-setsize` that says otherwise |
 | A4 | `aria-busy="true"` on the region whose source is pending; a `status` with text only while it is | the async vocabulary | holds since #299: `pdx-list`'s loading overlay — a spinner, `role="status"` «Loading» — stayed in the tree when idle, so the dashboard's loaded queue announced «Loading»; it is now `aria-hidden` unless drawn and the list is `aria-busy` only while its source loads, as `pdx-block-ui` does (`ui/tests/unit/list-busy-state.test.ts`, `showcase/tests/a11y-rules.spec.ts`) |
@@ -122,9 +122,20 @@ The selector then falls to the next candidate.
 An `@action` is offered to agents only when it says so:
 
 ```pdx
+<template>
+  <button @click="deleteUser.execute(id)">Delete</button>
+</template>
+
+<script>
+import { api } from './api';
+
+@prop id: number;
+const canDelete = $derived(id > 0);
+
 @action deleteUser(id: number) when canDelete with { agent: 'Deletes a user account', consequential: true } {
   await api.deleteUser(id);
 }
+</script>
 ```
 
 - `agent` is the description the tool carries; `consequential` maps to the tool's

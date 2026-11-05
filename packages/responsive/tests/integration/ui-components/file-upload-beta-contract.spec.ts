@@ -1,6 +1,6 @@
 // pdx-file-upload on the beta contract (#287): its visual states are custom states, `:state(name)` on
 // the host, and its drop zone carries no state class of its own; its parts are reached by `data-part`;
-// it has no popup. The A-rules that apply to it (docs/language/beta/agents.md). Its drop zone is a
+// it has no popup. The A-rules that apply to it (docs/language/agents.md). Its drop zone is a
 // button, which carries neither aria-required nor aria-invalid:
 //   - A1, inside a required pdx-form-field the drop zone is named by the label, its marker with it;
 //   - A2, inside a pdx-form-field in error the drop zone is described by the message;

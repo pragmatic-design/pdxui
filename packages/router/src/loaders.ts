@@ -37,7 +37,7 @@ const asError = (reason: unknown): Error => (reason instanceof Error ? reason : 
 
 /**
  * The identity each level's loader last ran with: `pattern | own params | canonical query`, the key
- * `docs/language/beta/routing.md` defines in «The identity of a loader call».
+ * `docs/language/routing.md` defines in «The identity of a loader call».
  *
  * This is what makes a sibling move cheap: `/tickets/7/notes/1` → `/tickets/7/notes/2` leaves the
  * ticket's own `:id` untouched, so its loader does not run again and the page it feeds does not

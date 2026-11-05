@@ -1,5 +1,5 @@
 // The `@defer` triggers the runtime reads (`core/src/renderer/defer.ts`, `activateTrigger`), and the
-// grammar of the parentheses that hold them (#281; docs/language/beta/template.md → «`@defer` — two
+// grammar of the parentheses that hold them (#281; docs/language/template.md → «`@defer` — two
 // phases»):
 //
 //   @defer ( <render triggers> [ ; prefetch <prefetch triggers> ] )

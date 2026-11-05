@@ -1,7 +1,7 @@
 // The data a prefetch loaded ahead of the click, kept for the navigation that follows (#119).
 //
 // A prefetch under the `hover` or `viewport` policy starts the target's loader as well as its chunk.
-// Its result is kept under the loader call's identity — the key `docs/language/beta/routing.md`
+// Its result is kept under the loader call's identity — the key `docs/language/routing.md`
 // defines in «The identity of a loader call» — so two links that differ only in the order or the
 // encoding of their query share one call, and two that differ in a value do not. A navigation within
 // `PREFETCH_TTL_MS` with the same key takes the result; after that it is dropped, and the navigation

@@ -2,7 +2,7 @@
 // the host, and its swatch carries no state class of its own; its popup is announced as an overlay's,
 // `open-change` `{ value }` and `:state(open)`, and driven by the overlay verbs. Inline, it has no
 // popup and never enters `:state(open)`. And the A-rules that apply to it
-// (docs/language/beta/agents.md). Its swatch is a button, which carries neither aria-required nor
+// (docs/language/agents.md). Its swatch is a button, which carries neither aria-required nor
 // aria-invalid:
 //   - A1, inside a required pdx-form-field the swatch is named by the label, its marker with it;
 //   - A2, inside a pdx-form-field in error the swatch is described by the message.

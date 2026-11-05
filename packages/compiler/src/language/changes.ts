@@ -1,13 +1,13 @@
 // The registry of language changes: every form the beta removes or changes, in one place (#121).
 //
 // The beta replaces the alpha; there is no language level to keep an old form compiling
-// (`docs/language/beta/file.md` → «One language, no levels»). So each change is registered once, with
+// (`docs/language/file.md` → «One language, no levels»). So each change is registered once, with
 // how to find it, what to say and, when one exists, the mechanical rewrite, and two consumers read it:
 //
 //   - the compiler, which reports a `removed` form as PDX_REMOVED_FORM (error), naming the beta form;
 //   - `pdx migrate`, which applies every mechanical rewrite and reports the rest.
 //
-// The four kinds are `docs/language/beta/migration.md`'s:
+// The four kinds are `docs/language/migration.md`'s:
 //   removed — a language change: the old form is an error, and the message names the new one;
 //   changed — a language change whose old spelling is still valid beta with another meaning: the
 //             compiler says nothing, `pdx migrate` rewrites it to keep the old meaning, or flags it;

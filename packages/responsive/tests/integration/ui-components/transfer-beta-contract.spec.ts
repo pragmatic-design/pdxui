@@ -1,6 +1,6 @@
 // pdx-transfer on the beta contract (#287): `disabled` is a custom state, `:state(disabled)` on the
 // host, and its frame carries no state class of its own; the target values are the model, `value`,
-// which replaces getValue()/setValue(). And the A-rules that apply to it (docs/language/beta/agents.md).
+// which replaces getValue()/setValue(). And the A-rules that apply to it (docs/language/agents.md).
 // Its frame is a `group`, which may carry neither aria-required nor aria-invalid (axe's
 // aria-allowed-attr):
 //   - A1, inside a required pdx-form-field the group is named by the label, its marker with it;

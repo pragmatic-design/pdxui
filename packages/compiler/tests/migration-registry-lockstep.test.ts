@@ -1,6 +1,6 @@
 // migration.md and the registry of language changes say the same thing (#159, part 1).
 //
-// `docs/language/beta/migration.md` is the human table of every alpha form the beta changes or removes;
+// `docs/language/migration.md` is the human table of every alpha form the beta changes or removes;
 // `LANGUAGE_CHANGES` (#121) is what `pdx migrate` applies and the compiler reports. Both are written by
 // hand, so each can lose a line the other keeps: a change registered with no row is a rewrite nobody
 // reads about, and a row naming an id the registry no longer has promises a rewrite that is gone.
@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { LANGUAGE_CHANGES } from '../src/language/changes';
 
-const MIGRATION = join(__dirname, '..', '..', '..', 'docs', 'language', 'beta', 'migration.md');
+const MIGRATION = join(__dirname, '..', '..', '..', 'docs', 'language', 'migration.md');
 
 /** The table rows of a markdown page, as cells; the header and separator rows are skipped. */
 function rows(markdown: string): string[][] {

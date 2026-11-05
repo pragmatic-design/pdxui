@@ -1,4 +1,4 @@
-// `@defer` in two phases (#281; docs/language/beta/template.md → «`@defer` — two phases»).
+// `@defer` in two phases (#281; docs/language/template.md → «`@defer`, `@placeholder`, `@loading`, `@error`»).
 //
 // The prefetch triggers load the code without rendering, the render triggers render — reusing the
 // prefetched code, waiting for it in flight, or loading it again if the prefetch failed, which shows

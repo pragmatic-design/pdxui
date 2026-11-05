@@ -1,4 +1,4 @@
-// `@page` is the one home of every route field, and `@head` is gone (#277; docs/language/beta/routing.md,
+// `@page` is the one home of every route field, and `@head` is gone (#277; docs/language/routing.md,
 // «@page — alpha → beta», «Removed: @route, @alias, @prefetch, the script @transition», «The document
 // head»). The alpha forms are PDX_REMOVED_FORM naming their replacement, and `pdx migrate` rewrites
 // each into `@page` and the declarations that stay.
