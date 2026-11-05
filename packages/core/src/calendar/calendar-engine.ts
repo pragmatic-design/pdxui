@@ -406,13 +406,31 @@ export function getYearRange(year: number): DateRange {
 
 // ─── Intl-based Localization ──────────────────────────────────
 
+const _formatters = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * One `Intl.DateTimeFormat` per locale and options (#894). Building a formatter costs far more than
+ * formatting with one, and `pdx-calendar` formats a date for every day cell it draws: a formatter per
+ * call was 52% of a calendar's mount, 787 ms for 100 calendars against 200 ms with this cache. A
+ * formatter is immutable, so one is shared by every caller with the same arguments.
+ */
+function dateFormatter(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+    const key = `${locale}\u0001${JSON.stringify(options)}`;
+    let fmt = _formatters.get(key);
+    if (!fmt) {
+        fmt = new Intl.DateTimeFormat(locale, options);
+        _formatters.set(key, fmt);
+    }
+    return fmt;
+}
+
 /** Get localized month names. */
 export function getMonthNames(
     locale: string = 'en',
     calendar: CalendarSystem = 'gregory',
     format: 'long' | 'short' | 'narrow' = 'long',
 ): string[] {
-    const fmt = new Intl.DateTimeFormat(locale, { month: format, calendar });
+    const fmt = dateFormatter(locale, { month: format, calendar });
     const names: string[] = [];
     for (let m = 0; m < 12; m++) {
         names.push(fmt.format(new Date(2024, m, 15)));
@@ -426,7 +444,7 @@ export function getDayNames(
     format: 'narrow' | 'short' | 'long' = 'short',
     firstDay: number = 0,
 ): string[] {
-    const fmt = new Intl.DateTimeFormat(locale, { weekday: format });
+    const fmt = dateFormatter(locale, { weekday: format });
     const names: string[] = [];
     // Jan 7, 2024 is a Sunday (dow=0)
     for (let i = 0; i < 7; i++) {
@@ -453,13 +471,12 @@ export function formatWithCalendar(
         delete opts.timeStyle;
         opts = { year: 'numeric', month: 'long', day: 'numeric', calendar };
     }
-    const fmt = new Intl.DateTimeFormat(locale, opts);
-    return fmt.format(date);
+    return dateFormatter(locale, opts).format(date);
 }
 
 /** Get the date format order for a locale (e.g. ['day', 'month', 'year']). */
 export function getDateFormatOrder(locale: string = 'en'): Array<'day' | 'month' | 'year' | 'literal'> {
-    const fmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'numeric', year: 'numeric' });
+    const fmt = dateFormatter(locale, { day: 'numeric', month: 'numeric', year: 'numeric' });
     return fmt.formatToParts(new Date(2024, 5, 15)).map(p => {
         if (p.type === 'day') return 'day';
         if (p.type === 'month') return 'month';
@@ -471,7 +488,7 @@ export function getDateFormatOrder(locale: string = 'en'): Array<'day' | 'month'
 /** Detect if a locale uses 12-hour clock. */
 export function is12HourClock(locale: string): boolean {
     try {
-        const resolved = new Intl.DateTimeFormat(locale, { hour: 'numeric' }).resolvedOptions();
+        const resolved = dateFormatter(locale, { hour: 'numeric' }).resolvedOptions();
         return resolved.hour12 === true;
     } catch {
         return false;

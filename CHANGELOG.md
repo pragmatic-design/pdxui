@@ -1522,6 +1522,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `pdx-calendar` and `pdx-date-picker` draw four to five times faster (#894): 100 calendars
+  from 826 to 190 ms until drawn, 100 date pickers from 795 to 147 ms, timed against each other in one
+  run. The calendar engine (`formatWithCalendar`, `getMonthNames`, `getDayNames`,
+  `getDateFormatOrder`, `is12HourClock`) built a new `Intl.DateTimeFormat` on every call, once per day
+  cell, and that construction was 52% of a calendar's mount. It now keeps one per locale and options.
 - A library string read outside a component's scope no longer leaks (#889). `getComponentString()` —
   what `uiString()` in `@pdxui/ui` reads — created a new computed on every call; one read in a
   frame's build or an event handler belonged to nothing, and the string registry kept it for the life
