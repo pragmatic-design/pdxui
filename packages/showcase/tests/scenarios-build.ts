@@ -19,7 +19,10 @@
  *   - `pilot-ts` and `pilot-pdx`, under `scenarios/pilot-mount/`: one page that mounts the `.pdx`
  *     pilot's components, built with the library's TypeScript components and with the pilot's `.pdx`
  *     rewrites in their place (`vite.pilot.config.ts`), timed against each other by
- *     `scenario-pilot-mount.spec.ts` (#685).
+ *     `scenario-pilot-mount.spec.ts` (#685);
+ *   - `component-mount`, under `scenarios/component-mount/`: every component of @pdxui/ui on one page,
+ *     mounted 100 at a time and removed by `scenario-component-retention.spec.ts`, which holds each one
+ *     to keeping no instance after its removal (#865, #881).
  *
  * Every build lands in `scenarios/dist/<name>/` (ignored by git), emptied first: a stale build would
  * be weighed as if it were today's.
@@ -45,6 +48,7 @@ export const SCENARIOS: { name: string; root: string; config: string }[] = [
     { name: 'benchmark', root: join(repoDir, 'scripts', 'bench-jfb'), config: 'vite.config.js' },
     { name: 'pilot-ts', root: join(packageDir, 'scenarios', 'pilot-mount'), config: 'vite.config.ts' },
     { name: 'pilot-pdx', root: join(packageDir, 'scenarios', 'pilot-mount'), config: 'vite.pilot.config.ts' },
+    { name: 'component-mount', root: join(packageDir, 'scenarios', 'component-mount'), config: 'vite.config.ts' },
 ];
 
 export default async function buildScenarios(): Promise<void> {
