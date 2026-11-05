@@ -28,11 +28,14 @@ pdx-sortable-list { display: block; position: relative; }
     box-sizing: border-box;
 }
 
-:where(pdx-sortable-list[axis="vertical"]) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
+/* The items after the first, by position among the items: not `[data-part] + [data-part]`, a sibling
+   combinator on an attribute, which makes Chromium keep every removed element whose `data-part` was set
+   while it was in the page (#881). */
+:where(pdx-sortable-list[axis="vertical"]) > [data-part="list"] > :nth-child(n + 2 of [data-part="item"]) {
         border-top: 1px solid var(--pdx-color-border);
     }
 :where(pdx-sortable-list[axis="horizontal"]) > [data-part="list"] { flex-direction: row; }
-    :where(pdx-sortable-list[axis="horizontal"]) > [data-part="list"] > [data-part="item"] + [data-part="item"] {
+    :where(pdx-sortable-list[axis="horizontal"]) > [data-part="list"] > :nth-child(n + 2 of [data-part="item"]) {
         border-left: 1px solid var(--pdx-color-border);
     }
 
