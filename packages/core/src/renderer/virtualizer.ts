@@ -89,62 +89,68 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
     }
 
     // ── Prefix-sum cache (Tier 3) ──
-    // prefix[i] = cumulative offset of item i (sum of sizes+gap for items 0..i-1).
-    // Length is prefix.length = (cachedCount + 1); prefix[n] = total content size.
-    // Invalidated when count changes or a measurement updates (measureElement).
-    // getCumulativeOffset / getTotalSize then read in O(1); findStartIndex stays
-    // O(log n) (was O(n log n) when each probe recomputed the offset linearly).
-    let prefix: number[] = [];
+    // prefix[i] = cumulative offset of item i (sum of sizes+gap for items 0..i-1); prefix[n] = total
+    // content size. Only prefix[0..validTo] is known: a measurement that changes item i drops what
+    // follows it, and a read extends the known part only as far as it needs. Measuring the rows in
+    // view therefore costs the rows up to the scroll position, and the rest is summed once, when the
+    // total is next read — not once per measured row (#900).
+    const prefix: number[] = [0];
+    let validTo = 0;
     let cachedCount = -1;
-    let dirty = true;
 
-    function invalidateOffsets(): void {
-        dirty = true;
+    /** Item `index` changed size: every offset after it is unknown. */
+    function invalidateFrom(index: number): void {
+        if (index < validTo) validTo = index;
     }
 
-    function rebuildPrefix(n: number): void {
-        prefix = new Array(n + 1);
-        prefix[0] = 0;
-        for (let i = 0; i < n; i++) {
-            prefix[i + 1] = prefix[i] + getItemSize(i) + gap;
-        }
-        cachedCount = n;
-        dirty = false;
-    }
-
-    function ensurePrefix(): void {
+    /** The item count, with the offsets dropped when it changed: they were summed for other items. */
+    function syncCount(): number {
         const n = count();
-        if (dirty || n !== cachedCount) rebuildPrefix(n);
+        if (n !== cachedCount) {
+            cachedCount = n;
+            prefix.length = n + 1;
+            validTo = 0;
+        }
+        return n;
     }
 
-    // ── Cumulative offset calculation (O(1) via prefix sum) ──
+    /** Extend the known offsets to prefix[k]. */
+    function extendTo(k: number): void {
+        for (let i = validTo; i < k; i++) prefix[i + 1] = prefix[i] + getItemSize(i) + gap;
+        if (k > validTo) validTo = k;
+    }
+
+    // ── Cumulative offset calculation ──
     function getCumulativeOffset(index: number): number {
-        ensurePrefix();
+        const n = syncCount();
         if (index <= 0) return 0;
-        if (index >= prefix.length) {
-            // Beyond cached range — extrapolate defensively (shouldn't normally hit).
-            return prefix[prefix.length - 1] ?? 0;
-        }
-        return prefix[index];
+        // Beyond the last item: the total, as before (shouldn't normally hit).
+        const k = Math.min(index, n);
+        extendTo(k);
+        return prefix[k];
     }
 
     function getTotalSize(): number {
-        const n = count();
+        const n = syncCount();
         if (n === 0) return 0;
-        ensurePrefix();
+        extendTo(n);
         // prefix[n] includes a trailing gap; subtract it to match the previous
         // formula (offset(n-1) + size(n-1)) which has no trailing gap.
         return prefix[n] - gap;
     }
 
     // ── Binary search for first visible item ──
+    // Over the known offsets, extended first until they pass the scroll position: the item it falls
+    // in is then among them, and nothing after it is summed.
     function findStartIndex(scrollOffset: number, total: number): number {
+        syncCount();
+        while (validTo < total && prefix[validTo] <= scrollOffset) extendTo(validTo + 1);
         let lo = 0;
-        let hi = total - 1;
+        let hi = Math.min(total, validTo) - 1;
 
         while (lo <= hi) {
             const mid = (lo + hi) >>> 1;
-            const midOffset = getCumulativeOffset(mid);
+            const midOffset = prefix[mid];
             const midEnd = midOffset + getItemSize(mid);
 
             if (midEnd <= scrollOffset) {
@@ -308,13 +314,17 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
      */
     function applySize(index: number, size: number): void {
         const prev = getItemSize(index);
-        if (measuredSizes.get(index) === size) return;
+        // The size the offsets were summed with: nothing moves, and nothing is told.
+        if (size === prev) {
+            measuredSizes.set(index, size);
+            return;
+        }
         const scrollEl = getScrollElement();
         const above = scrollEl !== null && index < findStartIndex(getScrollPos(scrollEl), count());
         measuredSizes.set(index, size);
-        invalidateOffsets(); // measured size changed → prefix sum is stale
+        invalidateFrom(index); // the offsets after this item are stale
         _measureVersion.set(v => v + 1); // notifies _items/_totalSize
-        if (above && size !== prev) {
+        if (above) {
             setScrollPos(scrollEl!, getScrollPos(scrollEl!) + (size - prev));
             _scrollOffset.set(getScrollPos(scrollEl!));
         }
