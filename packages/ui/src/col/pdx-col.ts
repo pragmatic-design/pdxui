@@ -33,6 +33,7 @@ component('pdx-col', {
     },
     setup(ctx) {
         let _built = false;
+        let _destroyed = false;
         let _mqCleanups: (() => void)[] = [];
 
         /** Resolve effective span: largest matching breakpoint, or base span. */
@@ -106,6 +107,8 @@ component('pdx-col', {
                 _built = true;
                 // The host carries no class (#290): col.css styles the tag, and nothing read `.pdx-col`.
                 requestAnimationFrame(() => {
+                    // Removed before this frame: nothing to style, and no listener to leave behind.
+                    if (_destroyed) return;
                     applyStyles();
                     setupBreakpointListeners();
                 });
@@ -113,6 +116,13 @@ component('pdx-col', {
             }
 
             requestAnimationFrame(applyStyles);
+        });
+
+        // The media query lists hold their listeners, and each listener reaches this column: without
+        // removing them when it is destroyed, every column ever mounted stayed alive (#881).
+        ctx.track(() => () => {
+            _destroyed = true;
+            cleanupListeners();
         });
 
         return {};

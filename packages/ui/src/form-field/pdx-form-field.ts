@@ -175,7 +175,12 @@ component('pdx-form-field', {
 
         // Reactive locale tracking — bump signal when locale changes to re-resolve messages
         const _localeVer = signal(0);
-        void onLocaleChange(() => _localeVer.set(v => v + 1));
+        // Unsubscribed when the field is destroyed: the listener set is global, and the callback reaches
+        // this field, so a field never unsubscribed stayed alive with everything it holds (#881).
+        ctx.track(() => {
+            const unsubscribe = onLocaleChange(() => _localeVer.set(v => v + 1));
+            return () => { unsubscribe(); };
+        });
 
         function resolveError(): string {
             _localeVer(); // read to create reactive dependency
