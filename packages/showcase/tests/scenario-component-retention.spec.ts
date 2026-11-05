@@ -49,14 +49,13 @@ const INSTANCES = 100;
 /**
  * Tags known to keep their removed instances, and the issue that says why. Measured 2026-11-05: 25 of
  * 114 at first; 19 of them through `uiAttr`, which held each `read` function strongly, and
- * `pdx-select` through a function binding of `html` that did not own its template's effects. None of
- * them do any more. These five keep theirs for a reason of their own (#881).
+ * `pdx-select` through a function binding of `html` that did not own its template's effects, `pdx-col`
+ * and `pdx-form-field` through a global listener never removed. None of them do any more. These three
+ * keep theirs for a reason of their own (#881).
  */
 const RETAINED: Record<string, string> = {
     'pdx-carousel': '#881',
-    'pdx-col': '#881',
     'pdx-error-boundary': '#881',
-    'pdx-form-field': '#881',
     'pdx-rich-text': '#881',
 };
 
