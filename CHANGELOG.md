@@ -1532,6 +1532,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `sanitizeSVG` parses an icon once, not once per instance that draws it (#896): every named
+  `pdx-icon` and every menu icon goes through it. A `pdx-rich-text`, whose toolbar draws about 20,
+  mounts in 0.59× the time it did, 100 editors from 133.5 to 79.4 ms until drawn. It keeps the
+  sanitised output of its last 256 distinct inputs.
 - `pdx-calendar` and `pdx-date-picker` draw four to five times faster (#894): 100 calendars
   from 826 to 190 ms until drawn, 100 date pickers from 795 to 147 ms, timed against each other in one
   run. The calendar engine (`formatWithCalendar`, `getMonthNames`, `getDayNames`,
