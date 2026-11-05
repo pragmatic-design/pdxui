@@ -256,6 +256,9 @@ component('pdx-drawer', {
                         if (mode === 'push') drawerEl.setAttribute('push', '');
                         else drawerEl.removeAttribute('push');
                     }
+                    // The backdrop carries the mode itself: its CSS reads `.pdx-drawer-backdrop[push]`, and
+                    // not a sibling combinator from the panel, which made Chromium keep the panel (#891).
+                    backdropEl?.toggleAttribute('push', mode === 'push');
 
                     if (restoreTimer) { clearTimeout(restoreTimer); restoreTimer = 0; }
                     if (mode === 'overlay') portalToBody();

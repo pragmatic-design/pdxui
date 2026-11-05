@@ -159,7 +159,7 @@ details.pdx-accordion[open] summary::after {
 /* ── Progress/Stepper: blue accent ── */
 .pdx-progress-bar { background: var(--pdx-color-primary); }
 .pdx-step[data-status="done"] .pdx-step-number { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
-.pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+.pdx-step-connector[data-status="done"] { background: var(--pdx-color-primary); }
 
 /* ── Alert/Badge: blue accent ── */
 .pdx-alert-info { border-left-color: var(--pdx-color-primary); }

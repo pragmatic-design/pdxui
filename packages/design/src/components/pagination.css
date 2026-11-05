@@ -128,7 +128,10 @@ pdx-pagination { display: block; }
     margin-inline: var(--pdx-space-sm);
 }
 
-.pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+/* The connector carries its step's status itself: `.pdx-step[data-status="done"] + .pdx-step-connector`,
+   a sibling combinator beside an attribute, made Chromium keep removed steps whose status was set while
+   they were in the page (#891). */
+.pdx-step-connector[data-status="done"] { background: var(--pdx-color-primary); }
 
 /* Error state */
 .pdx-step[data-status="error"] .pdx-step-number {

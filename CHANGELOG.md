@@ -477,6 +477,16 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Changed
 
+- **Breaking, for CSS written with the classes alone:** a stepper connector and a push-mode drawer
+  backdrop are styled by their own attribute (#891). `.pdx-step-connector[data-status="done"]` replaces
+  `.pdx-step[data-status="done"] + .pdx-step-connector`, and `.pdx-drawer-backdrop[push]` replaces
+  `.pdx-drawer[push] ~ .pdx-drawer-backdrop`. A sibling combinator beside an attribute can make
+  Chromium keep removed elements whose attribute was set while they were in the page, depending on
+  how they sit in the tree (#887). Measured, the wizard and the drawer kept nothing with the old
+  rules; they change so that `core/tests/design-sibling-attribute.test.ts` allows the shape nowhere
+  in the design system, with no exception to judge case by case. Both components set the new
+  attributes themselves; markup written by hand adds them, as `docs/releases/beta.md` says.
+
 - **Breaking:** a script `@snippet` whose body uses `${arg}` is a template like any other (#131): the
   `${arg}` is its text. The alpha compiled such a body into an `html` tagged template where `${arg}`
   was the parameter; that path is gone. `pdx migrate` rewrites each `${arg}` to `{{ arg }}`
@@ -1549,10 +1559,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   component is destroyed now, and a `pdx-col` removed before its first frame adds none.
 - The dividers of `pdx-list` and `pdx-sortable-list` no longer make Chromium keep removed elements
   (#881). They were drawn with `[data-part="item"] + [data-part="item"]`, and in Chromium a sibling
-  combinator beside an attribute selector keeps alive, after its removal, every element whose
-  attribute of that name was set while it was in the page. With `data-part`, that is any part of any
-  component: `pdx-carousel`, `pdx-rich-text` and `pdx-avatar-group` set theirs after inserting them,
-  and kept every removed root, the first two their whole component through it. The dividers now
+  combinator beside an attribute selector can keep alive, after their removal, elements whose
+  attribute of that name was set while they were in the page, depending on how they sit in the tree.
+  `pdx-carousel`, `pdx-rich-text` and `pdx-avatar-group` set their `data-part` after inserting the
+  element, and kept every removed root, the first two their whole component through it. The dividers now
   select by position, `:nth-child(n + 2 of [data-part="item"])`, and draw the same.
 - The first error boundary of a page — `pdx-error-boundary`, `@try`, `@await` — is no longer kept for
   the life of the page once it is removed (#881). The resolver that finds the boundary enclosing a

@@ -225,7 +225,10 @@
 
 /* ===== Push Mode ===== */
 
-.pdx-drawer[push] ~ .pdx-drawer-backdrop {
+/* The backdrop carries `push` itself, as the panel does: `.pdx-drawer[push] ~ .pdx-drawer-backdrop`, a
+   sibling combinator beside an attribute, made Chromium keep a removed panel whose `push` was set while
+   it was in the page (#891). */
+.pdx-drawer-backdrop[push] {
     background: transparent;
     backdrop-filter: none;
     pointer-events: none;
