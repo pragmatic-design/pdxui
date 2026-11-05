@@ -581,7 +581,7 @@ ${buttonVariantRule('secondary', ':hover')} { border-color: var(--pdx-color-prim
 & .pdx-radio:checked { border-color: var(--pdx-color-primary); box-shadow: inset 0 0 0 4px var(--pdx-color-primary); }
 & .pdx-progress-bar { background: var(--pdx-color-primary); }
 & .pdx-step[data-status="done"] .pdx-step-number { background: var(--pdx-color-primary); border-color: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
-& .pdx-step[data-status="done"] + .pdx-step-connector { background: var(--pdx-color-primary); }
+& .pdx-step-connector[data-status="done"] { background: var(--pdx-color-primary); }
 & .pdx-alert-info { border-left-color: var(--pdx-color-primary); }
 & .pdx-badge-primary { background: var(--pdx-color-primary); color: var(--pdx-color-primary-text); }
 & .pdx-table th { text-transform: none; letter-spacing: normal; font-weight: var(--pdx-weight-semibold); color: var(--pdx-color-text); border-bottom-color: var(--pdx-color-primary); border-bottom-width: 2px; }

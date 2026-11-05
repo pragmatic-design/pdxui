@@ -92,6 +92,14 @@ An import of one of these in a `.pdx` script is `PDX_REMOVED_FORM`, naming the r
   an ancestor, `<section @pdx-change>`, hears nothing: put it on the component itself.
 - **The context's `ctx.slot()`.** A hand-written component reads its parent's snippet with
   `declaredSnippet(ctx, name, args)` (#131, #492).
+- **A stepper or a push drawer written with the design system's classes alone** (#891). The attribute
+  moves to the element it styles. A connector after a done step carries the status itself,
+  `<div class="pdx-step-connector" data-status="done">`, where `.pdx-step[data-status="done"] +
+  .pdx-step-connector` coloured it from the step before. A push-mode backdrop carries `push`,
+  `<div class="pdx-drawer-backdrop" push>`, where `.pdx-drawer[push] ~ .pdx-drawer-backdrop` found it
+  from the panel. Without the attribute, the connector keeps the border colour and the backdrop dims
+  the page. `pdx-wizard` and `pdx-drawer` set both themselves: nothing changes for an app that uses
+  the components.
 
 ## Fixes `pdx migrate` only reports
 

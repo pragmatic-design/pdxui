@@ -1,16 +1,18 @@
 // No selector of the design system puts a sibling combinator next to an attribute selector (#881).
 //
-// Chromium keeps an element alive after its removal when two things meet: the page's CSS has a
+// Chromium can keep an element alive after its removal when two things meet: the page's CSS has a
 // sibling combinator (`+` or `~`) beside an attribute selector — `[data-part="item"] + [data-part="item"]`
 // — and that attribute was set while the element was in the page. Measured on about:blank with
-// nothing but such a rule: 20 of 20 detached elements stayed alive, and none without the rule, or with
-// `>`, a descendant combinator, `:nth-child()` or `:has()` in its place. It goes by the attribute's
-// NAME: one `[data-part] + [data-part]` rule kept every element of the page whose `data-part` was set
-// after insertion. That is how `pdx-carousel`, `pdx-rich-text` and `pdx-avatar-group` kept their
-// removed nodes, and through them two whole components.
+// nothing but such a rule: up to 20 of 20 detached elements stayed alive, and none without the rule,
+// or with `>`, a descendant combinator, `:nth-child()` or `:has()` in its place. Whether it happens
+// depends on how the elements sit in the tree — `[a] + [a]` kept 20 elements removed one by one and
+// none removed together with their siblings, while `[a] + .y`, the attribute left of the combinator,
+// kept them both ways (#891). A `[data-part] + [data-part]` rule is how `pdx-carousel`, `pdx-rich-text` and
+// `pdx-avatar-group` kept their removed nodes, and through them two whole components (#881).
 //
-// A position among siblings is written with `:nth-child(n + 2 of [data-part="item"])` instead, which
-// says the same thing and keeps nothing.
+// Since which tree it bites cannot be told from the rule, the shape is allowed nowhere. A position
+// among siblings is written with `:nth-child(n + 2 of [data-part="item"])` instead, which says the
+// same thing and keeps nothing, and a style that followed a sibling's attribute reads one of its own.
 
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
@@ -65,13 +67,11 @@ function siblingBesideAttribute(selector: string): boolean {
 }
 
 /**
- * Public CSS that has the shape, kept until the owner decides on changing it: a page written with the
- * design system's classes alone puts `data-status` on the step and `push` on the drawer (#881).
+ * Selectors allowed the shape anyway, each with the reason. Empty: the wizard's connector and the
+ * drawer's backdrop were the last two, public CSS that moved to the element they style before the beta
+ * (#891).
  */
-const KNOWN = [
-    '.pdx-step[data-status="done"] + .pdx-step-connector',
-    '.pdx-drawer[push] ~ .pdx-drawer-backdrop',
-];
+const KNOWN: string[] = [];
 
 describe('the design system\'s sibling combinators', () => {
     it('none sits beside an attribute selector', () => {

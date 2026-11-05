@@ -54,6 +54,22 @@ describe('pdx-drawer', () => {
         expect(drawer?.getAttribute('aria-label')).toBe('Settings');
     });
 
+    // The push-mode backdrop is styled by its own attribute, `.pdx-drawer-backdrop[push]`, not by a
+    // sibling combinator from the panel: `.pdx-drawer[push] ~ .pdx-drawer-backdrop` made Chromium keep
+    // the removed panel (#891).
+    it('marks the backdrop push in push mode, and not in overlay mode', async () => {
+        const el = await mount('pdx-drawer', { mode: 'push' });
+        (el as any).open = true;
+        await tick(50);
+        expect(document.querySelector('.pdx-drawer-backdrop')?.hasAttribute('push'), 'push mode: the backdrop is not marked').toBe(true);
+
+        cleanup();
+        const overlay = await mount('pdx-drawer', { mode: 'overlay' });
+        (overlay as any).open = true;
+        await tick(50);
+        expect(document.querySelector('.pdx-drawer-backdrop')?.hasAttribute('push'), 'overlay mode: the backdrop is marked push').toBe(false);
+    });
+
     it('rAF is cancelled on rapid open/close', async () => {
         const el = await mount('pdx-drawer');
         // Rapid toggle should not throw or leave stale state
