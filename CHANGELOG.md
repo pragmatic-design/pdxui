@@ -1532,6 +1532,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `html` finds a template's bindings once, not again in every clone (#898). The places a template's
+  values go are kept with the parsed template as paths, and a clone reaches them directly instead of
+  scanning its elements, attributes, comments and text. Every component of the library renders
+  through it: 100 `pdx-button`s and 100 `pdx-input`s mount in 0.82× the time, 100 `pdx-select`s in
+  0.91×, 100 `pdx-entity-grid`s in 0.92×.
 - `sanitizeSVG` parses an icon once, not once per instance that draws it (#896): every named
   `pdx-icon` and every menu icon goes through it. A `pdx-rich-text`, whose toolbar draws about 20,
   mounts in 0.59× the time it did, 100 editors from 133.5 to 79.4 ms until drawn. It keeps the
