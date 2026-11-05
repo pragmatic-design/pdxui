@@ -1522,6 +1522,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A library string read outside a component's scope no longer leaks (#889). `getComponentString()` —
+  what `uiString()` in `@pdxui/ui` reads — created a new computed on every call; one read in a
+  frame's build or an event handler belonged to nothing, and the string registry kept it for the life
+  of the page. `pdx-rich-text` grew the heap by 7.6 KB per mounted instance that way, 14 computeds a
+  mount, without end. It now gives one cached computed per component, key and fallback.
 - 19 components no longer stay in memory after they are removed (#881): `pdx-bottom-nav`,
   `pdx-breadcrumb`, `pdx-calendar`, `pdx-cascader`, `pdx-context-menu`, `pdx-data-grid`,
   `pdx-date-picker`, `pdx-entity-grid`, `pdx-filter-builder`, `pdx-menubar`, `pdx-mention`,
