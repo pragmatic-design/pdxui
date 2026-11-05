@@ -1522,6 +1522,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- 19 components no longer stay in memory after they are removed (#881): `pdx-bottom-nav`,
+  `pdx-breadcrumb`, `pdx-calendar`, `pdx-cascader`, `pdx-context-menu`, `pdx-data-grid`,
+  `pdx-date-picker`, `pdx-entity-grid`, `pdx-filter-builder`, `pdx-menubar`, `pdx-mention`,
+  `pdx-nav-menu`, `pdx-navbar`, `pdx-otp-input`, `pdx-pagination`, `pdx-popover`, `pdx-sidebar`,
+  `pdx-toolbar` and `pdx-transfer`. Each of them kept every instance ever mounted, 4 to 108 KB of heap
+  apiece, so a page that mounted and removed them grew without end: the translated attributes they
+  write were held in a list with a strong reference to the function that reads them, and that
+  function reached the component. Six more still keep theirs, each for a reason of its own, tracked
+  in the same issue.
 - A collapsible section of `pdx-form-template` (#847) is opened and closed by a real button in its
   legend, named by the section, with `aria-expanded` and `aria-controls`: Tab reaches it, Enter and
   Space toggle it. It was a `<legend role="button">` with a click listener, which Tab went past, so a
