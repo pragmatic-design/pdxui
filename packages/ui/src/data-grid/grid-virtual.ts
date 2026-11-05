@@ -60,9 +60,19 @@ export function setupVirtualScroll(
 
     let lastStart = -1;
     let lastEnd = -1;
-    // The disposer of the effects created by the cell slots of the last rendered range:
-    // without it, every scroll range change would leak the slots' reactive bindings.
-    let rowsDispose: (() => void) | null = null;
+    // The rows of the last rendered range by index, each with the disposer of the effects its cell
+    // slots created: a row that leaves the range is disposed with it, or its bindings would leak.
+    const live = new Map<number, { el: HTMLElement; dispose: () => void }>();
+    // What the live rows were built from: other rows or other columns, or an explicit update, build
+    // them all again.
+    let builtRows: unknown = null;
+    let builtCols: unknown = null;
+
+    function clearRows(): void {
+        for (const r of live.values()) r.dispose();
+        live.clear();
+        rowContainer.innerHTML = '';
+    }
 
     function render(): void {
         const rows = getRows();
@@ -73,9 +83,8 @@ export function setupVirtualScroll(
         spacer.style.height = `${totalRows * rowHeight}px`;
 
         if (totalRows === 0) {
-            rowsDispose?.();
-            rowsDispose = null;
-            rowContainer.innerHTML = '';
+            clearRows();
+            builtRows = null;
             lastStart = -1;
             lastEnd = -1;
             return;
@@ -92,20 +101,34 @@ export function setupVirtualScroll(
         lastStart = startIdx;
         lastEnd = endIdx;
 
-        // Render visible rows — in an ownership scope: the reactive bindings of the previous
-        // range's cell slots are disposed before the rebuild.
-        rowsDispose?.();
-        rowsDispose = null;
-        rowContainer.innerHTML = '';
+        // A row is built once while it stays in the range (#902): one that leaves it is disposed and
+        // removed, and only the ones that enter are built, each in its own ownership scope.
+        if (rows !== builtRows || cols !== builtCols) {
+            clearRows();
+            builtRows = rows;
+            builtCols = cols;
+        } else {
+            for (const [i, r] of live) {
+                if (i >= startIdx && i < endIdx) continue;
+                r.dispose();
+                r.el.remove();
+                live.delete(i);
+            }
+        }
         rowContainer.style.transform = `translateY(${startIdx * rowHeight}px)`;
 
         const visibleCols = cols.filter(c => c.visible);
         const idFieldName = gc.getIdField();
 
-        const [, disposeRows] = collectDisposers(() => {
+        // The kept rows are one run of indices: a row that enters above it goes before it, the
+        // others after it.
+        const keptMin = live.size ? Math.min(...live.keys()) : Infinity;
+        const above = document.createDocumentFragment();
+        const below = document.createDocumentFragment();
         for (let i = startIdx; i < endIdx; i++) {
             const row = rows[i];
-            if (!row) continue;
+            if (!row || live.has(i)) continue;
+            const [built, dispose] = collectDisposers(() => {
 
             const rowEl = document.createElement('div');
             rowEl.className = 'pdx-dg-row';
@@ -169,10 +192,13 @@ export function setupVirtualScroll(
                 rowEl.appendChild(td);
             }
 
-            rowContainer.appendChild(rowEl);
+            return rowEl;
+            });
+            live.set(i, { el: built, dispose });
+            (i < keptMin ? above : below).appendChild(built);
         }
-        });
-        rowsDispose = disposeRows;
+        rowContainer.insertBefore(above, rowContainer.firstChild);
+        rowContainer.appendChild(below);
         // A new window: its rows need their indices and the tab stop.
         gc.afterRender?.();
     }
@@ -180,14 +206,22 @@ export function setupVirtualScroll(
     // Initial render
     render();
 
-    // Scroll listener
-    const onScroll = () => requestAnimationFrame(render);
+    // Scroll listener: one frame for every scroll event that arrives before it runs.
+    let frame = 0;
+    const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+            render();
+        });
+    };
     bodyEl.addEventListener('scroll', onScroll, { passive: true });
 
     /** Force re-render (invalidate range cache — used by column toggle, etc). */
     function forceRender(): void {
         lastStart = -1;
         lastEnd = -1;
+        builtRows = null;
         render();
     }
 
@@ -203,9 +237,11 @@ export function setupVirtualScroll(
         update: forceRender,
         dispose: () => {
             bodyEl.removeEventListener('scroll', onScroll);
+            if (frame) cancelAnimationFrame(frame);
+            frame = 0;
             resizeObs?.disconnect();
-            rowsDispose?.();
-            rowsDispose = null;
+            for (const r of live.values()) r.dispose();
+            live.clear();
         },
     };
 }
