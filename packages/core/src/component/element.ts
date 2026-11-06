@@ -57,6 +57,48 @@ function keptAliveAncestor(el: Element): boolean {
     return false;
 }
 
+/** Each component class's observed attributes grouped by canonical name, in declaration order. */
+const formsByClass = new WeakMap<object, Map<string, string[]>>();
+
+/** The observed forms of each canonical attribute of `ctor` — `arialabel` → [arialabel, aria-label]. */
+function attrForms(ctor: typeof PdxElement): Map<string, string[]> {
+    let forms = formsByClass.get(ctor);
+    if (!forms) {
+        forms = new Map();
+        for (const attr of ctor.attrs) {
+            const canonical = ctor.attrCanonical?.get(attr) ?? attr;
+            const list = forms.get(canonical);
+            if (list) list.push(attr); else forms.set(canonical, [attr]);
+        }
+        formsByClass.set(ctor, forms);
+    }
+    return forms;
+}
+
+/**
+ * The value of an observed attribute of `el`: the canonical form (`arialabel`) or one of its aliases
+ * (`aria-label`), the alias winning when both are written. An attribute that is not observed is read
+ * as written.
+ */
+export function attrValue(el: PdxElement, canonical: string): string | null {
+    const forms = attrForms(el.constructor as typeof PdxElement).get(canonical);
+    if (!forms) return el.getAttribute(canonical);
+    let value: string | null = null;
+    for (const attr of forms) {
+        const v = el.getAttribute(attr);
+        if (v !== null) value = v;
+    }
+    return value;
+}
+
+/**
+ * Call `fn` with the new value whenever the observed attribute `canonical` of `el`, or an alias of
+ * it, changes, until the element's next destroying disconnect.
+ */
+export function watchAttr(el: PdxElement, canonical: string, fn: (raw: string | null) => void): void {
+    (el._attrHandlers ??= new Map()).set(canonical, fn);
+}
+
 /** Base class for PDX UI Web Components. */
 export abstract class PdxElement extends HTMLElementBase {
     /** Override to declare observed attributes that auto-map to signals. */
@@ -162,28 +204,22 @@ export abstract class PdxElement extends HTMLElementBase {
     /** The <slot> elements this component's own template rendered — the only ones it projects into. */
     private _ownSlots: Element[] = [];
 
-    constructor() {
-        super();
-        // Create signals for declared attributes. Alias attributes (aria-label, say)
-        // share the CANONICAL signal (arialabel, say) that the prop reads: a single
-        // source of truth, initialized from whichever form is present in the markup.
-        const ctor = this.constructor as typeof PdxElement;
-        const canonicalMap = ctor.attrCanonical;
-        for (const attr of ctor.attrs) {
-            const canonical = canonicalMap?.get(attr) ?? attr;
-            if (!this._attrSignals.has(canonical)) {
-                this._attrSignals.set(canonical, signal<string | null>(null));
-            }
-            const v = this.getAttribute(attr);
-            if (v != null) this._attrSignals.get(canonical)!.set(v);
-        }
-    }
+    /**
+     * What a prop does when its observed attribute changes, by canonical attribute name: set in
+     * `body()` by {@link watchAttr}, called by `attributeChangedCallback`, dropped by the destroying
+     * disconnect. A call, not a signal and an effect per prop: a component with fifteen props made
+     * fifteen of each on every mount. A field, not a method: a member is a name no prop may take.
+     */
+    _attrHandlers: Map<string, (raw: string | null) => void> | null = null;
 
-    /** Returns the attribute signal for reactive attribute reading. */
+    /**
+     * Returns the attribute signal for reactive attribute reading, made on first use. Alias
+     * attributes (aria-label, say) share the CANONICAL signal (arialabel, say).
+     */
     attr(name: string): Signal<string | null> {
         let sig = this._attrSignals.get(name);
         if (!sig) {
-            sig = signal<string | null>(this.getAttribute(name));
+            sig = signal<string | null>(attrValue(this, name));
             this._attrSignals.set(name, sig);
         }
         return sig;
@@ -344,6 +380,7 @@ export abstract class PdxElement extends HTMLElementBase {
         emitDevTools('component:unmount', { tag: this.tagName.toLowerCase(), id: DEV ? devInstanceId(this) : undefined });
         for (const d of this._disposers) d();
         this._disposers = [];
+        this._attrHandlers = null;
         this._scope = null;
 
         // Reset so a re-append re-mounts (re-renders) instead of staying dead.
@@ -384,6 +421,7 @@ export abstract class PdxElement extends HTMLElementBase {
     attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
         const ctor = this.constructor as typeof PdxElement;
         const canonical = ctor.attrCanonical?.get(name) ?? name;
+        this._attrHandlers?.get(canonical)?.(value);
         const sig = this._attrSignals.get(canonical);
         if (sig) sig.set(value);
     }

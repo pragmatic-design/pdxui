@@ -4,7 +4,7 @@
 import { signal, getTopErrorHandler } from '../reactivity/signal';
 import type { Signal } from '../utils/types';
 import type { EffectOptions } from '../reactivity/signal';
-import { PdxElement } from './element';
+import { PdxElement, attrValue, watchAttr } from './element';
 import type { EmitOptions } from './element';
 import { define } from './define';
 import { pushScope, popScope } from './lifecycle';
@@ -446,8 +446,9 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
             //   <pdx-stats :total="store.stats().total"> → JS property via bindProperty
             for (const name of propNames) {
                 const def = propDefs[name];
-                // HTML lowercases attributes — read from lowercase key
-                const attrSig = this.attr(name.toLowerCase());
+                const isPropOnly = PROP_ONLY_TYPES.has(def.type);
+                // HTML lowercases attributes — read from lowercase key, or from an alias of it
+                const attrRaw = isPropOnly ? this.getAttribute(name.toLowerCase()) : attrValue(this, name.toLowerCase());
 
                 // Re-parent/reconnect: an earlier mount has already defined the accessor.
                 // Attributes survive the move in the DOM, values set through a JS property
@@ -460,14 +461,13 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                     : null;
 
                 const kebab = jsonPropKebab.get(name);
-                const initialRaw = attrSig.peek() ?? (kebab ? this.getAttribute(kebab) : null);
+                const initialRaw = attrRaw ?? (kebab ? this.getAttribute(kebab) : null);
                 const initial = carriedFromPrevMount
                     ? carriedFromPrevMount.value
                     : initialRaw !== null
                         ? coerce(initialRaw, def)
                         : resolveDefault(def);
                 const propSig = signal(initial);
-                const isPropOnly = PROP_ONLY_TYPES.has(def.type);
                 // A global attribute the browser acts on is read into the prop, then taken off the
                 // host. `stripping` marks our own removal, which Sync 1 must not read as
                 // the author's: removing an attribute resets a prop, or sets a Boolean to false.
@@ -479,17 +479,17 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                     this.removeAttribute(name);
                 };
 
-                // Sync 1: HTML attribute CHANGES → update prop signal.
-                // We apply only the CHANGES (not the initial value, already in `initial`): the first
-                // run must not clobber a value carried over from the previous mount.
+                // Sync 1: HTML attribute CHANGES → update prop signal, called by
+                // attributeChangedCallback (watchAttr), as the JS setter below is by a property set.
+                // We apply only the CHANGES (not the initial value, already in `initial`): a value
+                // carried over from the previous mount is not clobbered.
                 // Explicitly removing a Boolean attribute that is present → false, not the default:
                 // its initial absence means "use the default", its removal is an action.
                 if (!isPropOnly) {
-                    let prevRaw = attrSig.peek();
-                    this.track(() => {
-                        const raw = attrSig();
+                    let prevRaw = attrRaw;
+                    watchAttr(this, name.toLowerCase(), (raw) => {
                         if (raw === null && stripping) { stripping = false; prevRaw = null; return; }
-                        if (raw === prevRaw) return; // no attribute change (the first run included)
+                        if (raw === prevRaw) return; // no attribute change
                         const wasPresent = prevRaw !== null;
                         prevRaw = raw;
                         const val = raw !== null
