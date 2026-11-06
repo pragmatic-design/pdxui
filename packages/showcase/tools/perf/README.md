@@ -17,6 +17,7 @@ runs from the repository root; the outputs are from one run on the `pilot-mount`
 | `tree.mjs <profile> <root> [minMs] [depth]` | the top-down call tree from a function, merged by function |
 | `callers.mjs <profile> <fn> [depth]` | bottom-up: the caller chains a function's self time is spent under |
 | `compare.mjs <action> <dirA> <dirB> […] [--samples <n>]` | several builds of one page, timed alternated in one run |
+| `mount-budgets.mjs <component-mount build> [--out <json>]` | every component's mount over the calibration: the measurements the mount budgets are set from |
 | `detached.mjs <dir> [tag …] [--mounts <n>]` | detached elements each component leaves alive after its removal ([Memory](#memory)) |
 | `retainers.mjs <dir> <tag> [paths] [--mounts <n>]` | the strong reference chains that keep a removed component alive |
 | `heap-diff.mjs <dir> <tag> [rounds]` | the kinds of object that grow between two heap snapshots of a tag's mounts |
@@ -164,6 +165,30 @@ packages/showcase/scenarios/dist/perf/pilot-pdx     97.50 ms  1.07×
 **A ratio is read only against a baseline timed in the same run**: two runs of the same pair move by
 about 10% against each other. To estimate a change before writing it, copy an unminified build, patch
 the copy's bundle by hand, and compare the copy with the build it was copied from.
+
+## mount-budgets.mjs
+
+```
+node packages/showcase/tools/perf/build-scenario.mjs component-mount packages/showcase/scenarios/dist/perf/component-mount
+node packages/showcase/tools/perf/mount-budgets.mjs packages/showcase/scenarios/dist/perf/component-mount
+```
+
+Writes the measurements `tests/scenario-component-mount.spec.ts` holds each component to, into
+`tests/scenario-component-mount.json`. Run it on a minified build, the one the spec mounts. For every
+tag of `packages/ui/custom-elements.json`, in a fresh page: a warm-up, then pairs of
+`__calibrate(units)` and `__mount(tag, instances)`. A tag's measurement is the median of its pairs'
+ratios: the component's milliseconds over the calibration's, measured beside it. `samples`, `units`,
+`instances` and `warmUp` are read from that JSON, so the spec and the tool measure the same way.
+Run it again when the spec says a row is stale, or when a component is added.
+
+```
+pdx-accordion                1.30
+pdx-affix                    1.26
+pdx-alert-dialog             4.29
+…
+pdx-wizard                   1.47
+114 tags → packages\showcase\tests\scenario-component-mount.json
+```
 
 ## Memory
 

@@ -19,9 +19,10 @@
 // `window.__drawnMs`, for whoever reads a slow row.
 //
 // `window.__calibrate(n)` is a fixed piece of DOM work timed the same way: a component's time divided
-// by it, measured beside it, holds on a machine slower or faster than the one it was measured on. The
-// ratio is not yet steady enough for a budget: run to run, the calibration slowed by up to 5× while
-// the heap was swollen by components that keep their removed instances (#881).
+// by it, measured beside it, holds on a machine slower or faster than the one it was measured on. It
+// was not steady while the heap was swollen by components that kept their removed instances (#881):
+// run to run, the calibration slowed by up to 5×. Since they no longer do, it is what
+// `tests/scenario-component-mount.spec.ts` holds each component to.
 //
 // The whole library is registered before any mount, so no lazy load is timed.
 import '../../../../ui/src/index';
