@@ -14,7 +14,8 @@ const build = (template: string) => compile(
 ).code;
 
 /** The HTML of every static block of a module, in order. */
-const markups = (code: string) => [...code.matchAll(/staticMarkup\('((?:\\.|[^'])*)'\)/g)].map((m) => m[1]);
+// Match: staticMarkup('…'), an escape or any character but a quote or a backslash inside.
+const markups = (code: string) => [...code.matchAll(/staticMarkup\('((?:\\.|[^'\\])*)'\)/g)].map((m) => m[1]);
 
 describe('whitespace at the edges', () => {
     it('is dropped inside an element, and the space between two children stays one', () => {
