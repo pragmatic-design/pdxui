@@ -247,6 +247,14 @@ export abstract class PdxElement extends HTMLElementBase {
             this.setAttribute('data-pdx-root', '');
             // The id `__PDX_DEVTOOLS__.tree()` and `inspect()` know this instance by.
             if (DEV) devInstanceId(this);
+            // A pre-rendered host (static generation, #160): its children are the build's render of
+            // this component, not content to project. Projected, the page would draw it twice, the
+            // build's copy inside the client's slot. They go, with the mark, and the client render
+            // below replaces them in this same task.
+            if (this.hasAttribute('data-pdx-ssr')) {
+                this.removeAttribute('data-pdx-ssr');
+                while (this.firstChild) this.removeChild(this.firstChild);
+            }
             this._projectedChildren = Array.from(this.childNodes);
             this._lightChildren = this._projectedChildren.slice();
             const target = this._renderTarget;
