@@ -11,6 +11,7 @@ import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
 import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup, type TwoWayField } from './two-way-value';
 import { attach, type Attachment } from './attach';
+import { isServerRender, serverTemplate } from '../server/mode';
 import {
     PLACEHOLDER, COMMENT_PH_PREFIX, PH_REGEX, buildBindingPlan, nodeAt, type BindingPlan,
 } from './template-plan';
@@ -41,6 +42,11 @@ const templateCache = new WeakMap<TemplateStringsArray, { tpl: HTMLTemplateEleme
  * calls it, so a module that uses it still imports.
  */
 export function html(strings: TemplateStringsArray, ...values: TemplateValue[]): DocumentFragment {
+    // Rendering to a string (#160): the template's strings and values, nothing built. Opaque to the
+    // code that called html``, which only hands it back to another template or to renderToString, so
+    // it travels under the type the client returns — the one cast of the server path, approved by the
+    // owner (2026-11-06) over changing html``'s public return type.
+    if (isServerRender()) return serverTemplate(strings, values) as unknown as DocumentFragment;
     if (!isBrowser) {
         throw new Error('html`` needs a DOM; it was called in an environment without one (Node, a build tool)');
     }
