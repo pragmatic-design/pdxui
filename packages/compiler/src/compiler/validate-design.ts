@@ -41,11 +41,19 @@ function lineAt(source: string, offset: number): number {
  * The script as TypeScript can parse it, same length and same lines. A line opening with a PDX
  * declaration (`@prop x: T = v;`, `@page '/x';`) is not TypeScript, so it is blanked; the parser
  * recovers from what follows a multi-line declaration, and nothing this file looks for lives there.
+ *
+ * The last parse is kept, keyed by the content: the design checks of one compile all read the same
+ * script, and each parsed it again (#915). The callers only read the tree.
  */
 export function parseableScript(content: string): ts.SourceFile {
+    if (lastParse?.content === content) return lastParse.file;
     const blanked = content.replace(/^[ \t]*@[^\n]*/gm, (line) => ' '.repeat(line.length));
-    return ts.createSourceFile('__pdx_design.ts', blanked, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    const file = ts.createSourceFile('__pdx_design.ts', blanked, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS);
+    lastParse = { content, file };
+    return file;
 }
+
+let lastParse: { content: string; file: ts.SourceFile } | null = null;
 
 /** True when a parameter or a local declaration between `node` and the file scope names `name`. */
 function isShadowed(node: ts.Node, name: string): boolean {

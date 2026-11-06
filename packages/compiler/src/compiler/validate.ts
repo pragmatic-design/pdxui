@@ -57,22 +57,42 @@ function offsetToLineColumn(text: string, offset: number, base: SourceLoc): { li
  */
 function isReferencedInBody(body: string, name: string): boolean {
     if (!body.includes(name)) return false;
+    const names = referencedNamesOf(body);
+    return names === null || names.has(name);
+}
+
+/** Bodies already read, and the names each references: `null` for a body that does not parse. */
+const referencedByBody = new Map<string, Set<string> | null>();
+/** How many bodies are kept: one compile looks up the same few, and a file edited again is new text. */
+const REFERENCED_KEPT = 64;
+
+/**
+ * Every identifier `body` references, collected in one visit, with the exclusions `isReferencedInBody`
+ * documents. The check asks it once per name, and parsed the same body again for each (#915).
+ */
+function referencedNamesOf(body: string): Set<string> | null {
+    const known = referencedByBody.get(body);
+    if (known !== undefined) return known;
     const sf = ts.createSourceFile('__pdx_check.ts', body, ts.ScriptTarget.Latest, /*setParentNodes*/ true, ts.ScriptKind.TS);
     const diags = (sf as unknown as { parseDiagnostics?: readonly ts.Diagnostic[] }).parseDiagnostics;
-    if (diags?.length) return true;
-    let found = false;
-    const visit = (n: ts.Node): void => {
-        if (found) return;
-        if (ts.isIdentifier(n) && n.text === name) {
-            const p = n.parent;
-            const isMemberName = p && ts.isPropertyAccessExpression(p) && p.name === n;
-            const isPropKey = p && ts.isPropertyAssignment(p) && p.name === n;
-            if (!isMemberName && !isPropKey) { found = true; return; }
-        }
-        ts.forEachChild(n, visit);
-    };
-    visit(sf);
-    return found;
+    let names: Set<string> | null = null;
+    if (!diags?.length) {
+        const found = new Set<string>();
+        const visit = (n: ts.Node): void => {
+            if (ts.isIdentifier(n)) {
+                const p = n.parent;
+                const isMemberName = p && ts.isPropertyAccessExpression(p) && p.name === n;
+                const isPropKey = p && ts.isPropertyAssignment(p) && p.name === n;
+                if (!isMemberName && !isPropKey) found.add(n.text);
+            }
+            ts.forEachChild(n, visit);
+        };
+        visit(sf);
+        names = found;
+    }
+    if (referencedByBody.size >= REFERENCED_KEPT) referencedByBody.clear();
+    referencedByBody.set(body, names);
+    return names;
 }
 
 /**

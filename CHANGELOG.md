@@ -1539,6 +1539,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A `.pdx` compiles with one parse of its script for the design checks, and one per body for the
+  unused-variable check (#915). The six design checks each parsed the same script again, and the
+  unused-variable check parsed a body again for every name it looked up: together 11.5% of a dev
+  compile, now 2.5%. The diagnostics are the same.
 - A virtual list reads its total height without summing every row (#913). The total is the sum of
   the estimates, taken once per item count, plus what the measured rows changed. It used to be the
   row offsets extended to the last row, so each measurement that changed a row's size summed the
