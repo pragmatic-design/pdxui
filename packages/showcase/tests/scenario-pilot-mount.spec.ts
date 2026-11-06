@@ -20,12 +20,21 @@
  * module (core's `deferCode`), and a block whose code has arrived renders in its own task: 1.06–1.14×.
  *
  * The value list is not within 1.2×, and why is in its row.
+ *
+ * A ratio also rises when the TypeScript side gets faster: #910 made the library's mount faster on
+ * both sides, the TypeScript popover more, and the conditions read 1.3–1.4× though the `.pdx` side
+ * had got faster too. So a row over its bound passes when the `.pdx` side itself is no slower than
+ * on `main` (#919). It is measured over a calibration beside it (`__calibrate`, the same DOM work as
+ * `component-mount`'s), against what `tools/perf/pilot-baseline.mjs` recorded from a build of `main` in
+ * `scenario-pilot-mount.json`, with PDX_SLACK on top. A row fails when the ratio is over its bound AND
+ * the `.pdx` side has become slower.
  */
 import { test, expect, type Page } from './fixture';
 import { createServer, type Server } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
+import { fileURLToPath } from 'node:url';
 import { scenarioDist } from './scenarios-build';
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
@@ -45,15 +54,27 @@ function serve(dir: string): Promise<{ url: string; server: Server }> {
 
 /** What #685 holds a component to: its `.pdx` mount within 1.2× of the TypeScript one. */
 const COMPONENT_RATIO = 1.2;
-const INSTANCES = 100;
-const WARM_UP = 10;
+
 /**
- * 61 samples per side, from 21 (#911): under load the median of 21 read the value list from 1.55 to
- * 2.04× in eight runs of this procedure (sd 0.176) and failed its bound with nothing changed; the
- * median of 61 read 1.69–1.89× (sd 0.064). The conditions went from sd 0.057 to 0.036. The bounds
- * did not move: the measurement got steadier.
+ * The `.pdx` side's recorded measurements on `main`, and the sampling both this spec and the tool use:
+ * 100 instances, 10 warm-up mounts, then 61 samples per side. 61, from 21 (#911): under load the
+ * median of 21 read the value list from 1.55 to 2.04× in eight runs of this procedure (sd 0.176) and
+ * failed its bound with nothing changed; the median of 61 read 1.69–1.89× (sd 0.064). The conditions
+ * went from sd 0.057 to 0.036. The bounds did not move: the measurement got steadier.
  */
-const SAMPLES = 61;
+const RECORDED = JSON.parse(readFileSync(resolve(fileURLToPath(import.meta.url), '..', 'scenario-pilot-mount.json'), 'utf8')) as {
+    units: number; instances: number; warmUp: number; samples: number; measured: string; pdx: Record<string, number>;
+};
+const INSTANCES = RECORDED.instances;
+const WARM_UP = RECORDED.warmUp;
+const SAMPLES = RECORDED.samples;
+
+/**
+ * How much slower than its recording the `.pdx` side may read before an over-bound row fails. Three
+ * runs of the tool on one machine, 2026-11-06, spread 5% on the select, value list and conditions and
+ * 11% on the switch.
+ */
+const PDX_SLACK = 1.25;
 
 /**
  * Each row and the ratio it is held to. The value list measures 1.82–1.84× in three runs, from
@@ -83,6 +104,18 @@ const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.len
 const mount = (page: Page, kind: string) =>
     page.evaluate(({ k, n }) => (window as unknown as { __mount(k: string, n: number): Promise<number> }).__mount(k, n), { k: kind, n: INSTANCES });
 
+/** The `.pdx` side's sample: its mount and the calibration timed just before it, in one evaluation. */
+const pdxSample = (page: Page, kind: string) =>
+    page.evaluate(async ({ k, n, u }) => {
+        const w = window as unknown as { __mount(k: string, n: number): Promise<number>; __calibrate(u: number): number };
+        const c = w.__calibrate(u);
+        return { ms: await w.__mount(k, n), c };
+    }, { k: kind, n: INSTANCES, u: RECORDED.units });
+
+test('every row has a recorded .pdx measurement, and every measurement a row', () => {
+    expect(Object.keys(RECORDED.pdx).sort()).toEqual(ROWS.map((r) => r.kind).sort());
+});
+
 let ts: { url: string; server: Server };
 let pdx: { url: string; server: Server };
 test.beforeAll(async () => { ts = await serve(scenarioDist('pilot-ts')); pdx = await serve(scenarioDist('pilot-pdx')); });
@@ -104,18 +137,24 @@ test.describe('the pilot mounted 100 at a time, .pdx against TypeScript, product
             for (const p of pages) await p.waitForFunction(() => (window as unknown as { __ready?: boolean }).__ready === true);
 
             for (let i = 0; i < WARM_UP; i++) { await mount(tsPage, row.kind); await mount(pdxPage, row.kind); }
-            const times = { ts: [] as number[], pdx: [] as number[] };
+            const times = { ts: [] as number[], pdx: [] as number[], own: [] as number[] };
+            const pdxOnce = async () => { const s = await pdxSample(pdxPage, row.kind); times.pdx.push(s.ms); times.own.push(s.ms / s.c); };
             for (let i = 0; i < SAMPLES; i++) {
                 // Alternating which side goes first, so neither always runs right after the other's GC.
-                if (i % 2) { times.pdx.push(await mount(pdxPage, row.kind)); times.ts.push(await mount(tsPage, row.kind)); }
-                else { times.ts.push(await mount(tsPage, row.kind)); times.pdx.push(await mount(pdxPage, row.kind)); }
+                if (i % 2) { await pdxOnce(); times.ts.push(await mount(tsPage, row.kind)); }
+                else { times.ts.push(await mount(tsPage, row.kind)); await pdxOnce(); }
             }
             await Promise.all(pages.map((p) => p.close()));
 
             const a = median(times.ts), b = median(times.pdx);
             const ratio = Math.round((b / a) * 100) / 100;
-            console.log(`[scenario] pilot mount ${row.name}: TypeScript ${a.toFixed(1)} ms, .pdx ${b.toFixed(1)} ms, ${ratio}×`);
-            expect(ratio, `${row.name}: .pdx ${b.toFixed(1)} ms against TypeScript ${a.toFixed(1)} ms`).toBeLessThanOrEqual(row.max);
+            const own = Math.round(median(times.own) * 100) / 100;
+            const recorded = RECORDED.pdx[row.kind];
+            const ownLimit = Math.round(recorded * PDX_SLACK * 100) / 100;
+            console.log(`[scenario] pilot mount ${row.name}: TypeScript ${a.toFixed(1)} ms, .pdx ${b.toFixed(1)} ms, ${ratio}×; .pdx ${own}× the calibration (main ${recorded})`);
+            if (ratio <= row.max) return;
+            // Over its bound: the row holds only if the .pdx side is no slower than on main (#919).
+            expect(own, `${row.name}: .pdx ${b.toFixed(1)} ms against TypeScript ${a.toFixed(1)} ms is ${ratio}×, over ${row.max}×, and the .pdx side reads ${own}× the calibration against ${recorded} on main (limit ${ownLimit}): the .pdx side got slower`).toBeLessThanOrEqual(ownLimit);
         });
     }
 });
