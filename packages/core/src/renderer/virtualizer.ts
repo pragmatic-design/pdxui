@@ -92,8 +92,8 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
     // prefix[i] = cumulative offset of item i (sum of sizes+gap for items 0..i-1); prefix[n] = total
     // content size. Only prefix[0..validTo] is known: a measurement that changes item i drops what
     // follows it, and a read extends the known part only as far as it needs. Measuring the rows in
-    // view therefore costs the rows up to the scroll position, and the rest is summed once, when the
-    // total is next read — not once per measured row (#900).
+    // view therefore costs the rows up to the scroll position, not once per measured row (#900). The
+    // total does not read these offsets: it is kept apart, below (#913).
     const prefix: number[] = [0];
     let validTo = 0;
     let cachedCount = -1;
@@ -130,13 +130,29 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
         return prefix[k];
     }
 
+    // ── Total size, kept apart from the offsets (#913) ──
+    // The sum of the estimates, once per count, plus what the measurements changed: the total is read
+    // after every measurement, and extending the offsets to the last row summed the whole list again,
+    // rows never drawn included.
+    let totalsFor = -1;
+    let estimatedSum = 0;
+    let measuredDelta = 0;
+
+    function syncTotals(n: number): void {
+        if (totalsFor === n) return;
+        totalsFor = n;
+        estimatedSum = 0;
+        for (let i = 0; i < n; i++) estimatedSum += estimateSize(i);
+        measuredDelta = 0;
+        for (const [i, size] of measuredSizes) if (i < n) measuredDelta += size - estimateSize(i);
+    }
+
     function getTotalSize(): number {
         const n = syncCount();
         if (n === 0) return 0;
-        extendTo(n);
-        // prefix[n] includes a trailing gap; subtract it to match the previous
-        // formula (offset(n-1) + size(n-1)) which has no trailing gap.
-        return prefix[n] - gap;
+        syncTotals(n);
+        // No trailing gap after the last item.
+        return estimatedSum + measuredDelta + n * gap - gap;
     }
 
     // ── Binary search for first visible item ──
@@ -321,6 +337,7 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
         }
         const scrollEl = getScrollElement();
         const above = scrollEl !== null && index < findStartIndex(getScrollPos(scrollEl), count());
+        if (index < totalsFor) measuredDelta += size - prev;
         measuredSizes.set(index, size);
         invalidateFrom(index); // the offsets after this item are stale
         _measureVersion.set(v => v + 1); // notifies _items/_totalSize
@@ -380,6 +397,7 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
             itemObserver = null;
             scrollToRun++;
             measuredSizes.clear();
+            totalsFor = -1;
         },
     };
 }
