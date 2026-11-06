@@ -48,15 +48,6 @@ export function sanitizeMediaUrl(raw: unknown): string | null {
 /** Elements whose `src` loads media, rather than a document (iframe, embed) or a script. */
 const MEDIA_SRC_TAGS = new Set(['img', 'source', 'video', 'audio']);
 
-/**
- * A custom element (its name has a hyphen) whose `src` is a prop it owns: pdx-avatar and pdx-image
- * hand it to an <img> of their own, and the element that finally loads the URL decides again. With
- * the link policy here, `<pdx-image :src=${previewUrl}>` would never receive the preview.
- */
-function isCustomElementName(el: Element): boolean {
-    return el.localName.includes('-');
-}
-
 /** Elements and attributes already warned about, so a reactive binding warns once, not per value. */
 const warned = new WeakMap<Element, Set<string>>();
 
@@ -69,11 +60,28 @@ const warned = new WeakMap<Element, Set<string>>();
  */
 export function sanitizeBoundUrl(el: Element, attr: string, raw: unknown): string | null {
     const name = attr.toLowerCase();
-    const media = name === 'poster'
-        || (name === 'src' && (MEDIA_SRC_TAGS.has(el.localName) || isCustomElementName(el)));
+    const media = isMediaUrl(el.localName, name);
     const safe = media ? sanitizeMediaUrl(raw) : sanitizeUrl(raw);
     if (safe === null && DEV) warnDropped(el, name, String(raw ?? '').trim(), media);
     return safe;
+}
+
+/**
+ * The same policy for an element known only by its tag name: the server renderer (#160), which has no
+ * element to warn about. A dropped value is reported by the client's render of the same binding.
+ */
+export function sanitizeUrlForTag(localName: string, attr: string, raw: unknown): string | null {
+    return isMediaUrl(localName, attr.toLowerCase()) ? sanitizeMediaUrl(raw) : sanitizeUrl(raw);
+}
+
+/**
+ * Whether `attr` (lowercased) on a `localName` element loads media: the policy above. A custom element
+ * (its name has a hyphen) counts for `src`: it is a prop it owns — pdx-avatar and pdx-image hand it to
+ * an <img> of their own, and the element that finally loads the URL decides again. With the link
+ * policy, `<pdx-image :src=${previewUrl}>` would never receive the preview.
+ */
+function isMediaUrl(localName: string, attr: string): boolean {
+    return attr === 'poster' || (attr === 'src' && (MEDIA_SRC_TAGS.has(localName) || localName.includes('-')));
 }
 
 function warnDropped(el: Element, attr: string, url: string, media: boolean): void {
