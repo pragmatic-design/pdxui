@@ -1539,6 +1539,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A virtual list reads its total height without summing every row (#913). The total is the sum of
+  the estimates, taken once per item count, plus what the measured rows changed. It used to be the
+  row offsets extended to the last row, so each measurement that changed a row's size summed the
+  whole list again on the next read, rows never drawn included. The `dashboard` scenario's 10,000
+  events summed 29,986 rows per mount of the board; the board now mounts in 0.80× the time.
 - `html` finds a template's bindings once, not again in every clone (#898). The places a template's
   values go are kept with the parsed template as paths, and a clone reaches them directly instead of
   scanning its elements, attributes, comments and text. Every component of the library renders
