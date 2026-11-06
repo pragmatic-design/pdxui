@@ -426,13 +426,31 @@ export function signal<T>(initial: T, options?: SignalOptions<T>): Signal<T> | H
     return createSignal(initial, options?.name, options?.equals);
 }
 
+/**
+ * A signal that can say whether anything is subscribed to it. The cache's per-key version uses it:
+ * a version nothing reads and no entry needs can be dropped, where it was kept for the cache's whole
+ * life (#906). Not part of the public API.
+ * @internal
+ */
+export function observedSignal<T>(initial: T): { signal: Signal<T>; observed: () => boolean } {
+    let subscribers: Set<Subscriber> | null = null;
+    const s = createSignal(initial, undefined, undefined, (set) => { subscribers = set; });
+    return { signal: s, observed: () => subscribers!.size > 0 };
+}
+
 /** Core signal factory — optimized hot path with Set subscribers for correctness. */
-function createSignal<T>(initial: T, debugName?: string, equals?: (prev: T, next: T) => boolean): Signal<T> {
+function createSignal<T>(
+    initial: T,
+    debugName?: string,
+    equals?: (prev: T, next: T) => boolean,
+    exposeSubscribers?: (set: Set<Subscriber>) => void,
+): Signal<T> {
     let value = initial;
     const subscribers = new Set<Subscriber>();
     const name = debugName ?? '';
     /** The one question both writers ask: is this a change? `Object.is` unless told otherwise. */
     const unchanged = (next: T): boolean => (equals ? equals(value, next) : Object.is(value, next));
+    exposeSubscribers?.(subscribers);
 
     if (name) registerSignal(name, () => value, () => subscribers.size);
 

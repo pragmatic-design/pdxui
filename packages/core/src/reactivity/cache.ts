@@ -9,8 +9,8 @@
 // Design: inspired by TanStack Query's QueryCache but integrated with
 // our signal system. Tags enable SvelteKit-style semantic invalidation.
 
-import { signal, batch } from './signal';
-import type { ReadonlySignal, Dispose } from '../utils/types';
+import { signal, batch, observedSignal } from './signal';
+import type { ReadonlySignal, Dispose, Signal } from '../utils/types';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -120,6 +120,9 @@ function matchesTags(entryTags: readonly string[], matchTags: string[]): boolean
 
 // ─── createCache ───────────────────────────────────────────────────
 
+/** Every key version's value: each one taken from here once, so no two versions share a value. */
+let versionClock = 0;
+
 /**
  * A cache for resource results: keyed entries with a staleness clock, tag-based invalidation, an
  * LRU cap and a garbage collector.
@@ -141,7 +144,17 @@ export function createCache(config: CacheConfig = {}): Cache {
     // The value channel, next to the version (invalidation) channel: who is told a key's new value.
     const writeListeners = new Map<string, Set<CacheWriteListener>>();
     const _version = signal(0);
-    const _keyVersions = new Map<string, ReturnType<typeof signal<number>>>();
+    // One version signal per key a reader asked about. A version no entry needs and nothing reads is
+    // dropped (#906) — where the entry is evicted or removed, and by gc() — or a session that goes
+    // through many keys (a search, a key per query) keeps one per key it ever saw. A version asked
+    // for again is a new signal, whose value comes from `versionClock` and so repeats no value an
+    // earlier reader may hold.
+    const _keyVersions = new Map<string, { signal: Signal<number>; observed: () => boolean }>();
+
+    function dropIfUnused(key: string): void {
+        const kv = _keyVersions.get(key);
+        if (kv && !entries.has(key) && !kv.observed()) _keyVersions.delete(key);
+    }
 
     // LRU tracking: most recently accessed keys at the end
     const accessOrder: string[] = [];
@@ -170,16 +183,17 @@ export function createCache(config: CacheConfig = {}): Cache {
             rotations = 0;
             accessOrder.shift();
             entries.delete(oldest);
-            // Bump but KEEP the keyVersion signal alive: a resource subscribed to it via
-            // cache.keyVersion() holds THIS signal instance. Deleting it would orphan the
-            // subscription, and later invalidations would never notify again.
+            // Bump but KEEP the keyVersion signal while anything reads it: a resource subscribed
+            // to it via cache.keyVersion() holds THIS signal instance. Deleting it would orphan
+            // the subscription, and later invalidations would never notify again.
             bumpKeyVersion(oldest);
+            dropIfUnused(oldest);
         }
     }
 
     function bumpKeyVersion(key: string): void {
         const kv = _keyVersions.get(key);
-        if (kv) kv.set(v => v + 1);
+        if (kv) kv.signal.set(++versionClock);
     }
 
     // GC timer
@@ -338,6 +352,7 @@ export function createCache(config: CacheConfig = {}): Cache {
             // resource that had subscribed via cache.keyVersion(key). `silent` is used by a
             // resource's own refetch, which drives its reload directly.
             if (!silent) bumpKeyVersion(key);
+            dropIfUnused(key);
             const idx = accessOrder.indexOf(key);
             if (idx !== -1) accessOrder.splice(idx, 1);
             return true;
@@ -358,6 +373,8 @@ export function createCache(config: CacheConfig = {}): Cache {
                     }
                 }
             }
+            // The versions whose entry is gone and whose last reader has since left.
+            for (const key of [..._keyVersions.keys()]) dropIfUnused(key);
             return removed;
         },
 
@@ -377,10 +394,10 @@ export function createCache(config: CacheConfig = {}): Cache {
         keyVersion(key: string): ReadonlySignal<number> {
             let kv = _keyVersions.get(key);
             if (!kv) {
-                kv = signal(0);
+                kv = observedSignal(++versionClock);
                 _keyVersions.set(key, kv);
             }
-            return kv as unknown as ReadonlySignal<number>;
+            return kv.signal as unknown as ReadonlySignal<number>;
         },
 
         get size(): number {

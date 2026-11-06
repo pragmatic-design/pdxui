@@ -1557,6 +1557,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   changed row recomputes the offsets after it once, when they are next read. Scrolling the
   `dashboard` scenario's 10,000 events through rows not yet measured costs half the script time,
   46.5 against 23.2 ms.
+- The cache no longer keeps a version signal for every key it ever saw (#906). A key's version is
+  dropped once the key has no entry and nothing reads the version: where its entry is evicted or
+  removed, and by `gc()`. A session that went through 100,000 distinct keys, a resource's way,
+  kept 62 MB in versions; it now keeps 290 KB, the versions of its 200 entries.
 - `pdx-calendar` and `pdx-date-picker` draw four to five times faster (#894): 100 calendars
   from 826 to 190 ms until drawn, 100 date pickers from 795 to 147 ms, timed against each other in one
   run. The calendar engine (`formatWithCalendar`, `getMonthNames`, `getDayNames`,
