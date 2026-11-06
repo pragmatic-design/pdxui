@@ -47,7 +47,13 @@ function serve(dir: string): Promise<{ url: string; server: Server }> {
 const COMPONENT_RATIO = 1.2;
 const INSTANCES = 100;
 const WARM_UP = 10;
-const SAMPLES = 21;
+/**
+ * 61 samples per side, from 21 (#911): under load the median of 21 read the value list from 1.55 to
+ * 2.04× in eight runs of this procedure (sd 0.176) and failed its bound with nothing changed; the
+ * median of 61 read 1.69–1.89× (sd 0.064). The conditions went from sd 0.057 to 0.036. The bounds
+ * did not move: the measurement got steadier.
+ */
+const SAMPLES = 61;
 
 /**
  * Each row and the ratio it is held to. The value list measures 1.82–1.84× in three runs, from
@@ -83,9 +89,11 @@ test.beforeAll(async () => { ts = await serve(scenarioDist('pilot-ts')); pdx = a
 test.afterAll(async () => { await Promise.all([ts, pdx].map((s) => new Promise((r) => s.server.close(r)))); });
 
 test.describe('the pilot mounted 100 at a time, .pdx against TypeScript, production builds', () => {
-    // Each row's two sides alternate in one test, so a slower moment hits both: a row is a ratio, and
-    // it does not need the suite to itself. One row's failure does not hide the next row's.
-    test.describe.configure({ timeout: 180_000 });
+    // Each row's two sides alternate in one test, so a slower moment hits both. The rows run one after
+    // another, in one worker (#911): run side by side, each row measured the others' load, which does
+    // not hit both sides evenly. The conditions read 1.32× with the four rows in parallel and 1.15–1.25×
+    // run one at a time. 'default', not 'serial': one row's failure does not skip the next row.
+    test.describe.configure({ mode: 'default', timeout: 180_000 });
 
     for (const row of ROWS) {
         test(`${row.name}: within ${row.max}× of the TypeScript version`, async ({ browser }) => {
