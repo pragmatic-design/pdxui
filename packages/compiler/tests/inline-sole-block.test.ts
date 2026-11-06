@@ -23,14 +23,15 @@ describe('a block that is one control-flow node alone', () => {
         expect(code, 'the row is not the @if itself').toMatch(/eachRow\([^]*?\(r\)=>\{const __cf\d+=whenChain\(/);
     });
 
-    it('keeps the whitespace before the node as text (the parser drops the one before the closing brace)', () => {
+    it('returns the node itself: the whitespace around it is the block\'s edge, which keeps none (#907)', () => {
         const code = render('<p>@if (on) { <b>x</b> } @else { @if (!on) { <i>y</i> } }</p>');
         expect(markerOnlyBlocks(code)).toEqual([]);
-        expect(code).toMatch(/__frag\.append\(' ',__cf\d+\);return __frag;/);
+        expect(code).toMatch(/\(\)=>\{const __cf\d+=when\([^]*?\);return __cf\d+;\}/);
+        expect(code).not.toMatch(/__frag\.append\(/);
     });
 
     it('control: a block with content of its own beside the node still clones its markup', () => {
         const code = render('<ul>@for (rows as r; track r.k) { <li>{{ r.k }}</li> @if (r.a) { <i>a</i> } }</ul>');
-        expect(code).toMatch(/staticMarkup\(' <li><!----><\/li> <!---->'\)/);
+        expect(code).toMatch(/staticMarkup\('<li><!----><\/li> <!---->'\)/);
     });
 });

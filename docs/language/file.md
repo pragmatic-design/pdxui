@@ -205,6 +205,11 @@ What the compiler guarantees about the emitted code, as observable rules:
   (#110).
 - Whitespace-only text between table-internal elements (`table`, `thead`, `tbody`, `tfoot`, `tr`,
   `colgroup`) is not emitted (#111).
+- Whitespace at the start and the end of an element's content, and of a block's — the space between
+  `{` and the markup of an `@if` branch or a `@for` row — is not emitted; between two nodes a run of
+  it is one space (#907, the rule of Svelte 5). `<pre>`, `<textarea>`, `<listing>`, `<plaintext>`,
+  `<script>` and `<style>` keep their text as written, so does `@raw` text, and `&nbsp;` is not
+  whitespace. Text that must start or end with a space writes it as `&nbsp;` or `{{ ' ' }}`.
 - Bubbling events inside a `@for` body — `click`, `dblclick`, `input`, `change`, `keydown`, `keyup`,
   `pointerdown`, `pointerup`, `contextmenu`, without `.capture`, `.once`, `.passive`, `.self` — are
   delegated to one listener per type on the component's host (#113). The handler is declared once,

@@ -136,14 +136,13 @@ describe('the markup details the inline path has to get right on its own', () =>
         expect(code).not.toContain('a note');
     });
 
-    it('whitespace between elements becomes one space, as the parser keeps it in dev', () => {
-        // Dropped altogether, it would run two inline siblings together in a build.
-        // Four runs of whitespace here: around the <div> at the template's root, and inside it.
-        const code = inline('<div>\n    <span>x</span>\n</div>');
+    it('whitespace at an element\'s edges is dropped, between two nodes it becomes one space (#907)', () => {
+        // Dropped between two siblings, it would run two inline elements together.
+        const code = inline('<div>\n    <span>x</span>\n    <span>y</span>\n</div>');
         parses(code);
-        // In the block's HTML (#369): one space each, where the parser keeps them.
-        // A run of whitespace is kept as one space, not as typed.
-        expect(markup(code).join('')).toBe(' <div> <span>x</span> </div> ');
+        // In the block's HTML (#369): the runs around the <div> and inside its edges are gone,
+        // the run between the spans is one space, not as typed.
+        expect(markup(code).join('')).toBe('<div><span>x</span> <span>y</span></div>');
     });
 
     it('a named key modifier becomes the key the browser reports', () => {

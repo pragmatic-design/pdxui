@@ -349,7 +349,7 @@ class InlineGen {
                 // emitted: a node per gap on every row of a table (#111).
                 const blank = /^\s+$/.test(text);
                 if (text && !(blank && this.inTable())) {
-                    this.tree.text(blank ? ' ' : decodeEntities(text));
+                    this.tree.text(blank ? ' ' : decodeEntities(text), raw);
                 }
                 i = next === -1 ? content.length : next;
                 continue;
@@ -823,13 +823,8 @@ class InlineGen {
             g.walk([sole.node]);
             this.idx = g.idx;
             for (const t of g.tags) this.tags.add(t);
-            // Whitespace-only text is one space, and none in a table-internal element (`html`).
-            const edges = this.inTable() ? [] : sole.edges;
-            const placed = g.sole ?? 'document.createDocumentFragment()';
-            const result = edges.length === 0
-                ? `return ${placed};`
-                : `const __frag=document.createDocumentFragment();__frag.append(${[edges.includes('lead') ? "' '" : '', placed, edges.includes('trail') ? "' '" : ''].filter(Boolean).join(',')});return __frag;`;
-            return { code: `${g.lines.join('')}${result}`, tags: g.tags };
+            // The whitespace around it is the block's edge, which keeps none (#907).
+            return { code: `${g.lines.join('')}return ${g.sole ?? 'document.createDocumentFragment()'};`, tags: g.tags };
         }
         g.walk(nodes);
         this.idx = g.idx;

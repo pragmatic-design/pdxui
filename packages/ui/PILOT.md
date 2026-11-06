@@ -118,8 +118,9 @@ What the numbers mean:
   and the select at 0.92× of their TypeScript versions. The popover's conditions were 1.85×, because
   every popover rendered its editors' `@defer` a flush after its append; with a `@defer`'s code
   loaded once per module and a block whose code has arrived rendered at once, they mount at
-  1.06–1.18×. The value list stays slower, 1.96–2.05× (2.1–2.3× before an `@if` chain compiled to one
-  branch), because each of its rows is a set of reactive bindings where a TypeScript row is built
+  1.06–1.18×. The value list stays slower, 1.82–1.84× (1.96–2.05× before whitespace at an element's
+  edges stopped being a text node, #907; 2.1–2.3× before an `@if` chain compiled to one branch),
+  because each of its rows is a set of reactive bindings where a TypeScript row is built
   once. The profile is in `packages/showcase/tests/scenario-pilot-mount.spec.ts`, which measures the
   four rows in the pre-push and holds each to its ratio.
 - **The one red that went away.** With the switch and the select piloted, `navigation-live-prop`'s
