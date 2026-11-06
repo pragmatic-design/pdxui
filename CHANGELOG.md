@@ -1539,6 +1539,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A component's mount no longer makes an attribute signal and an effect for every prop (#910): an
+  attribute change reaches its prop by a call from `attributeChangedCallback`, as a property set
+  reaches it by the setter, and `attr()` makes its signal on first use. 500 `pdx-input`s mount in
+  0.79–0.91× the time, 500 `pdx-select`s in 0.86–0.95×.
 - A `.pdx` compiles with one parse of its script for the design checks, and one per body for the
   unused-variable check (#915). The six design checks each parsed the same script again, and the
   unused-variable check parsed a body again for every name it looked up: together 11.5% of a dev

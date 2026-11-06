@@ -90,6 +90,7 @@ interface HmrInternals {
     _beforeLeaveCallbacks: unknown[];
     _routeChangeCallbacks: unknown[];
     _disposers?: Array<() => void>;
+    _attrHandlers?: Map<string, unknown> | null;
 }
 
 /**
@@ -128,6 +129,8 @@ export function __pdx_hmr_rerender(tag: string): void {
             for (const d of disposers) d();
             inst._disposers = [];
         }
+        // The props' attribute handlers belong to the body that is being replaced.
+        inst._attrHandlers = null;
 
         // Trigger connectedCallback which will call body() again
         el.connectedCallback();
