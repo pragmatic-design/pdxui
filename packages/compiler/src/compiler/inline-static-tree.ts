@@ -28,7 +28,15 @@ interface StaticNode extends MarkupNode {
     sink?: boolean;
     /** A static text's statement in the builder, rewritten when more text joins it. */
     mk?: number;
+    /** Text from `@raw`: kept exactly as written, edges included. */
+    verbatim?: boolean;
 }
+
+/** The whitespace HTML collapses — not U+00A0, which `&nbsp;` writes to be kept. */
+const LEADING_SPACE = /^[ \t\n\r\f]+/;
+const TRAILING_SPACE = /[ \t\n\r\f]+$/;
+/** Elements whose content is laid out or read as written: their text keeps its edges. */
+const VERBATIM_ELEMENTS = new Set(['pre', 'listing', 'textarea', 'plaintext', 'script', 'style']);
 
 /** Where a module's builders and walks go, and the counter that names them. */
 export interface TemplateHoists {
@@ -100,16 +108,42 @@ export class StaticTree {
      * in a parse, as in dev where the browser parses the markup (#369). The markup splits text where a
      * comment was dropped, or where two fragments meet.
      */
-    text(data: string): void {
+    text(data: string, verbatim = false): void {
         if (this.discarding()) return;
         const parent = this.parent();
         const last = parent.kids[parent.kids.length - 1];
         if (last?.kind === 'text' && last.mk !== undefined) {
             last.data += data;
+            if (verbatim) last.verbatim = true;
             this.mk[last.mk] = `${parent.v}.appendChild(__d.createTextNode(${jsString(last.data)}));`;
             return;
         }
-        this.add({ kind: 'text', v: '', kids: [], target: false, data, mk: this.mk.length }, `__d.createTextNode(${jsString(data)})`);
+        this.add({ kind: 'text', v: '', kids: [], target: false, data, mk: this.mk.length, verbatim }, `__d.createTextNode(${jsString(data)})`);
+    }
+
+    /**
+     * Whitespace at the start and end of an element's content, and of the block's, is not content
+     * (#907, the rule of Svelte 5): the space a source puts between `{` and the markup, or between a
+     * tag and its first child, is dropped. Between two nodes it stays, one space. `<pre>`, `<textarea>`
+     * and the like keep theirs, and so does `@raw` text; U+00A0 is never whitespace here.
+     */
+    private trimEdges(node: StaticNode): void {
+        if (node.kind === 'element' && node.tag && VERBATIM_ELEMENTS.has(node.tag.toLowerCase())) return;
+        const trim = (at: number, re: RegExp): void => {
+            const kid = node.kids[at];
+            if (kid?.kind !== 'text' || kid.verbatim || kid.mk === undefined) return;
+            const data = (kid.data ?? '').replace(re, '');
+            if (data === '') {
+                node.kids.splice(at, 1);
+                this.mk[kid.mk] = '';
+                return;
+            }
+            kid.data = data;
+            this.mk[kid.mk] = `${node.v}.appendChild(__d.createTextNode(${jsString(data)}));`;
+        };
+        trim(0, LEADING_SPACE);
+        trim(node.kids.length - 1, TRAILING_SPACE);
+        for (const kid of node.kids) if (kid.kind === 'element') this.trimEdges(kid);
     }
 
     /** A static comment. */
@@ -136,6 +170,7 @@ export class StaticTree {
      * nodes it binds — after declaring the builder and the walk in `hoists`.
      */
     prologue(hoists: TemplateHoists, imports: Set<string>, asHtml: boolean): string[] {
+        this.trimEdges(this.root);
         if (this.root.kids.length === 0) return ['const __frag=document.createDocumentFragment();'];
         const n = hoists.count++;
         // core's staticBlock: built on first use in an inert document, imported per render. The

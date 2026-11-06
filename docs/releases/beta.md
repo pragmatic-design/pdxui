@@ -100,6 +100,11 @@ An import of one of these in a `.pdx` script is `PDX_REMOVED_FORM`, naming the r
   from the panel. Without the attribute, the connector keeps the border colour and the backdrop dims
   the page. `pdx-wizard` and `pdx-drawer` set both themselves: nothing changes for an app that uses
   the components.
+- **Whitespace at the edges of an element or a block** (#907). `<li> <b>x</b> </li>` renders
+  `<li><b>x</b></li>`, and `@if (c) { <b>x</b> }` places no space around the `<b>`; the space between
+  two nodes stays. An `inline-block` or inline element whose layout relied on a space at its parent's
+  edge, or a test that reads `textContent` with those spaces, changes. Write `&nbsp;` where a space at
+  an edge is meant. `<pre>`, `<textarea>` and `@raw` text are unchanged.
 
 ## Fixes `pdx migrate` only reports
 

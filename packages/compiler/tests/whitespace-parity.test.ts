@@ -97,7 +97,7 @@ describe('whitespace inside a table is not emitted', () => {
         expect(code).not.toContain('__d.createTextNode(" ")');
     });
 
-    it('the control: a <p> with spaced <b>s keeps its spaces', () => {
-        expect(renderTree('<p> <b>a</b> <b>b</b> </p>')).toBe('p[" ",b["a"]," ",b["b"]," "]');
+    it('the control: a <p> with spaced <b>s keeps the space between them, not at its edges (#907)', () => {
+        expect(renderTree('<p> <b>a</b> <b>b</b> </p>')).toBe('p[b["a"]," ",b["b"]]');
     });
 });

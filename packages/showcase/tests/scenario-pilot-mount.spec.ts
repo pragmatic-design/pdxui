@@ -50,8 +50,10 @@ const WARM_UP = 10;
 const SAMPLES = 21;
 
 /**
- * Each row and the ratio it is held to. The value list measures 1.96–2.05×, from 2.12–2.33× before an
- * `@if` chain compiled to one branch (core's `whenChain`). A profile of 30 × 100 value lists (CPU,
+ * Each row and the ratio it is held to. The value list measures 1.82–1.84× in three runs, from
+ * 1.96–2.05× before whitespace at an element's or a block's edges stopped being a text node (#907:
+ * four of them on every row), and from 2.12–2.33× before an `@if` chain compiled to one branch (core's
+ * `whenChain`). The profile below is from before #907. A profile of 30 × 100 value lists (CPU,
  * Chromium) gives the TypeScript side 257 ms, 163 of them its buttons; the `.pdx` side 577 ms, of
  * which 313 ms are the content without its buttons against ~90, and 147 ms of that the keyed list
  * against 31. Each `.pdx` row is a set of reactive bindings — its item and index signals, its branch,
@@ -59,14 +61,14 @@ const SAMPLES = 21;
  * TypeScript one does it would still be 1.8×. It is held to its ratio with the headroom of a ratio measured beside other specs
  * (it moved 10% that way), so it can only get better.
  *
- * The conditions are within 1.2×: 1.06, 1.12, 1.14 and 1.18× in four runs of this spec. A ratio a run
- * beside the other rows puts at 1.18 is held at 1.3, so that the gate fails on a regression and not
- * on a busy machine.
+ * The conditions measured 1.06, 1.12, 1.14 and 1.18× in four runs of this spec, and 1.19–1.28× since
+ * the TypeScript side got faster (#899, a template's bindings found once). They are held at 1.3, so
+ * that the gate fails on a regression and not on a busy machine.
  */
 const ROWS = [
     { kind: 'switch', name: 'pdx-switch', max: COMPONENT_RATIO },
     { kind: 'select', name: 'pdx-select', max: COMPONENT_RATIO },
-    { kind: 'values', name: 'filter popover, value list', max: 2.3 },
+    { kind: 'values', name: 'filter popover, value list', max: 2.0 },
     { kind: 'conditions', name: 'filter popover, conditions', max: 1.3 },
 ] as const;
 

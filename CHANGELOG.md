@@ -477,6 +477,13 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Changed
 
+- **Breaking:** whitespace at the start and the end of an element's content, and of a block's, is
+  no longer a text node (#907, the rule of Svelte 5). `<li> <b>x</b> </li>` renders
+  `<li><b>x</b></li>`; between two nodes a run of whitespace is still one space. `<pre>`,
+  `<textarea>`, `@raw` text and `&nbsp;` keep what was written. Every row of a list that spaced its
+  markup cloned, walked past and laid out those nodes: the `.pdx` pilot's value list, four of them per
+  row, mounts at 1.82–1.84× of its TypeScript version, from 1.96–2.05×. `docs/releases/beta.md` says
+  what may change for an app.
 - **Breaking, for CSS written with the classes alone:** a stepper connector and a push-mode drawer
   backdrop are styled by their own attribute (#891). `.pdx-step-connector[data-status="done"]` replaces
   `.pdx-step[data-status="done"] + .pdx-step-connector`, and `.pdx-drawer-backdrop[push]` replaces
