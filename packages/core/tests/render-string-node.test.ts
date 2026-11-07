@@ -12,6 +12,8 @@ type Core = {
     component: typeof import('../src/component/component').component;
     prop: typeof import('../src/component/component-descriptor').prop;
     signal: typeof import('../src/reactivity/signal').signal;
+    when: typeof import('../src/renderer/helpers').when;
+    each: typeof import('../src/renderer/helpers').each;
     PART_OPEN: string;
     PART_CLOSE: string;
 };
@@ -20,14 +22,15 @@ let core: Core;
 beforeAll(async () => {
     expect(typeof document, 'this suite runs with no DOM').toBe('undefined');
     installServerDom();
-    const [template, render, comp, descriptor, signals] = await Promise.all([
+    const [template, render, comp, descriptor, signals, helpers] = await Promise.all([
         import('../src/renderer/template'), import('../src/server/render-string'),
         import('../src/component/component'), import('../src/component/component-descriptor'),
-        import('../src/reactivity/signal'),
+        import('../src/reactivity/signal'), import('../src/renderer/helpers'),
     ]);
     core = {
         html: template.html, renderToStringWithReport: render.renderToStringWithReport, component: comp.component,
         prop: descriptor.prop, signal: signals.signal, PART_OPEN: render.PART_OPEN, PART_CLOSE: render.PART_CLOSE,
+        when: helpers.when, each: helpers.each,
     };
 });
 
@@ -57,6 +60,23 @@ describe('renderToString in Node', () => {
         expect(markup).toContain(`<span>${PART_OPEN}4${PART_CLOSE}</span>`);
         expect(markup, 'the child is projected where the slot was').toContain('<em>child</em></div>');
         expect(markup).not.toContain('<slot');
+    });
+
+    it('renders a component whose template has a when() and an each(), with no document', () => {
+        const { html, component, prop, when, each } = core;
+        component('node-list', {
+            props: { rows: prop<{ id: number; name: string }[]>([]) },
+            render: (ctx) => html`<ul>${when(() => ctx.rows().length > 0,
+                () => html`${each(() => ctx.rows(), 'id', (r) => html`<li>${r.name}</li>`)}`,
+                () => html`<li class="empty">none</li>`)}</ul>`,
+        });
+        const { html: markup, skipped } = core.renderToStringWithReport(() =>
+            html`<node-list :rows=${[{ id: 1, name: 'one' }, { id: 2, name: 'two' }]}></node-list>`);
+        expect(skipped).toEqual([]);
+        expect(markup).toContain('<!--when-->');
+        expect(markup).toContain('<!--repeat-start-->');
+        expect(markup).toContain('two');
+        expect(markup).not.toContain('none');
     });
 
     it('a component that reaches for document renders as an empty host, and is reported', () => {

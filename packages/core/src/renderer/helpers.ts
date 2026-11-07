@@ -6,6 +6,7 @@ import { effect, signal, collectDisposers, onDispose } from '../reactivity/signa
 import { repeat, repeatRows } from './list';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
+import { isServerRender, serverBlock } from '../server/mode';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -46,6 +47,8 @@ export function when(
     elseFn?: (() => Node | DocumentFragment | null) | null,
     options?: TransitionOptions
 ): DocumentFragment {
+    // On the server: the branch the condition picks now, between the client's markers (#160).
+    if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
@@ -195,6 +198,12 @@ export function match<T extends string | number>(
     value: () => T,
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
+    if (isServerRender()) {
+        return serverBlock('match', '/match', () => {
+            const caseFn = caseFor(cases, String(value()));
+            return caseFn ? [caseFn()] : [];
+        });
+    }
     const frag = document.createDocumentFragment();
     const start = document.createComment('match');
     const end = document.createComment('/match');
@@ -222,7 +231,7 @@ export function match<T extends string | number>(
         for (const n of nodesBetween(start, end)) parent.removeChild(n);
 
         // Render matching case (or default)
-        const caseFn = (cases as Record<string, (() => Node | DocumentFragment) | undefined>)[key] ?? cases._;
+        const caseFn = caseFor(cases, key);
         if (caseFn) {
             const [content, dispose] = collectDisposers(() => caseFn());
             childDispose = dispose;
@@ -239,6 +248,11 @@ export function match<T extends string | number>(
     return frag;
 }
 
+/** The case `match()` renders for `key`: its own, or the `_` default. */
+function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
+    return cases[key] ?? cases._;
+}
+
 /**
  * Show/hide without removing from DOM. Toggles display:none.
  * Unlike when(), preserves element state (scroll, canvas, form values).
@@ -250,6 +264,8 @@ export function show(
     condition: () => boolean,
     content: Node | DocumentFragment
 ): DocumentFragment {
+    // On the server: the content, hidden as the client hides it when the condition is false (#160).
+    if (isServerRender()) return serverBlock(null, null, () => [content], condition() ? null : { item: false, hidden: true });
     const frag = document.createDocumentFragment();
     const nodes = content instanceof DocumentFragment
         ? Array.from(content.childNodes)

@@ -14,11 +14,11 @@
 // (render-component.ts). Text and attribute values are escaped, bound URLs sanitised as the client
 // sanitises them.
 
-import { untracked } from '../reactivity/signal';
+import { untracked, collectDisposers } from '../reactivity/signal';
 import { sanitizeUrlForTag } from '../security/sanitize-url';
 import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
 import { templateTree, type TreeNode, type TreeAttribute } from './template-tree';
-import { withServerRender, isServerFragment, type ServerFragment } from './mode';
+import { withServerRender, isServerFragment, isServerBlock, type ServerFragment, type ServerBlock, type BlockMark } from './mode';
 import { renderHost, type SkippedComponent } from './render-component';
 
 export type { SkippedComponent } from './render-component';
@@ -53,27 +53,48 @@ export function renderToStringWithReport(fn: () => unknown): { html: string; ski
     }
 }
 
-/** A value in content: what the client's `toNodes`/`bindInterpolation` would put there, as markup. */
-function content(value: unknown, slots: Projection | null): string {
-    if (typeof value === 'function') return content(untracked(value as () => unknown), slots);
-    if (isServerFragment(value)) return renderTemplate(value, slots);
-    if (Array.isArray(value)) return value.map((v) => content(v, slots)).join('');
+/**
+ * A value in content: what the client's `toNodes`/`bindInterpolation` would put there, as markup.
+ * `mark` is what an enclosing helper does to the nodes this value places at its top level.
+ */
+function content(value: unknown, slots: Projection | null, mark: BlockMark | null = null): string {
+    if (typeof value === 'function') return content(untracked(value as () => unknown), slots, mark);
+    if (isServerFragment(value)) return renderTemplate(value, slots, mark);
+    if (isServerBlock(value)) return renderBlock(value, slots, mark);
+    if (Array.isArray(value)) return value.map((v) => content(v, slots, mark)).join('');
     if (value == null || value === false) return '';
     if (typeof value === 'object') return '';
-    return escapeText(String(value));
+    return mark?.hidden ? SHOW_PLACEHOLDER : escapeText(String(value));
 }
 
-function renderTemplate(t: ServerFragment, slots: Projection | null): string {
-    return nodes(templateTree(t.strings), t.values, slots);
+/** The comment a false `show()` puts in place of a top-level text node. */
+const SHOW_PLACEHOLDER = '<!--show-->';
+
+function renderTemplate(t: ServerFragment, slots: Projection | null, mark: BlockMark | null): string {
+    return nodes(templateTree(t.strings), t.values, slots, mark);
 }
 
-function nodes(list: TreeNode[], values: readonly unknown[], slots: Projection | null): string {
+/**
+ * A helper's content between its markers. The branch or the rows render inside an ownership scope
+ * disposed at the end, as the client disposes a branch it removes: nothing they create outlives the
+ * render. The block's mark joins the one around it — a list inside a false `show()` has rows that are
+ * both items and hidden, as on the client.
+ */
+function renderBlock(b: ServerBlock, slots: Projection | null, outer: BlockMark | null): string {
+    const mark = b.mark && outer ? { item: b.mark.item || outer.item, hidden: b.mark.hidden || outer.hidden } : (b.mark ?? outer);
+    const [inner, dispose] = collectDisposers(() => untracked(() => b.parts().map((part) => content(part, slots, mark)).join('')));
+    dispose();
+    return (b.open === null ? '' : `<!--${b.open}-->`) + inner + (b.close === null ? '' : `<!--${b.close}-->`);
+}
+
+/** A node list; `mark` applies to these nodes only, not to their children. */
+function nodes(list: TreeNode[], values: readonly unknown[], slots: Projection | null, mark: BlockMark | null = null): string {
     let out = '';
     for (const n of list) {
-        if (n.kind === 'text') out += n.raw;
+        if (n.kind === 'text') out += mark?.hidden ? SHOW_PLACEHOLDER : n.raw;
         else if (n.kind === 'comment') out += `<!--${n.raw}-->`;
-        else if (n.kind === 'hole') out += PART_OPEN + content(values[n.index], slots) + PART_CLOSE;
-        else out += element(n, values, slots);
+        else if (n.kind === 'hole') out += PART_OPEN + content(values[n.index], slots, mark) + PART_CLOSE;
+        else out += element(n, values, slots, mark);
     }
     return out;
 }
@@ -94,7 +115,7 @@ interface ElementState {
     props: Map<string, unknown>;
 }
 
-function element(n: ElementNode, values: readonly unknown[], slots: Projection | null): string {
+function element(n: ElementNode, values: readonly unknown[], slots: Projection | null, mark: BlockMark | null): string {
     // The slot this template rendered, with the content projected into it (element.ts `_projectSlots`):
     // replaced by it, or left with its own default content when it has none.
     if (n.name === 'slot' && slots) {
@@ -104,9 +125,13 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     }
     const s: ElementState = { tag: n.name, attributes: new Map(), classes: [], style: [], text: null, props: new Map() };
     for (const a of n.attributes) attribute(s, a, values);
+    // What the enclosing helper sets on a top-level element (list.ts `createRow`, helpers.ts `show`):
+    // after the element's own bindings, as the client sets it after the template built the element.
+    if (mark?.item) s.attributes.set('data-pdx-item', '');
+    if (mark?.hidden && n.name !== 'svg' && n.name !== 'math') s.style.push('display: none;');
     const attrs = new Map(s.attributes);
     if (s.classes.length) attrs.set('class', [attrs.get('class'), ...s.classes].filter(Boolean).join(' '));
-    if (s.style.length) attrs.set('style', [attrs.get('style'), ...s.style].filter(Boolean).join(' '));
+    if (s.style.length) attrs.set('style', joinStyle([attrs.get('style'), ...s.style]));
 
     if (n.name.includes('-')) {
         const host = renderHost(n.name, attrs, s.props, (rendered) => content(rendered, project(n, values, slots)), skipped);
@@ -221,6 +246,15 @@ function setUrlOrString(s: ElementState, key: string, value: unknown): void {
         return;
     }
     s.attributes.set(key, String(value));
+}
+
+/**
+ * Declarations from the static attribute and the bindings, as one style attribute: each piece closed
+ * with its `;`, since an author's `style="color: red"` has none and the next declaration must not run
+ * into its value.
+ */
+function joinStyle(pieces: ReadonlyArray<string | null | undefined>): string {
+    return pieces.map((p) => (p ?? '').trim()).filter(Boolean).map((p) => (p.endsWith(';') ? p : `${p};`)).join(' ');
 }
 
 function styleObject(value: object): string {

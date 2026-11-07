@@ -9,62 +9,11 @@
 import { describe, it, expect } from 'vitest';
 import { html } from '../src/renderer/template';
 import { renderToString, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
+import { children, parity } from './string-parity';
 import { signal } from '../src/reactivity/signal';
 import { component } from '../src/component/component';
 import { prop } from '../src/component/component-descriptor';
 
-/** A node as a canonical string: what both renders must agree on. */
-function canonical(node: Node): string {
-    if (node.nodeType === 3) return (node as Text).data;
-    if (node.nodeType === 8) {
-        const data = (node as Comment).data;
-        return data === 'pdx' || data === '/pdx' ? '' : `<!--${data}-->`;
-    }
-    if (node.nodeType !== 1) return '';
-    const el = node as HTMLElement;
-    const attrs = Array.from(el.attributes).map((a) => {
-        if (a.name === 'class') return `class="${a.value.split(/\s+/).filter(Boolean).sort().join(' ')}"`;
-        if (a.name === 'style') return `style="${el.style.cssText}"`;
-        return `${a.name}="${a.value}"`;
-    }).sort();
-    return `<${el.localName}${attrs.length ? ' ' + attrs.join(' ') : ''}>${children(el)}</${el.localName}>`;
-}
-
-function children(parent: Node): string {
-    const box = parent.cloneNode(true);
-    // Merge adjacent text after the markers are gone: the parser merged it in the string's DOM.
-    box.childNodes.forEach(() => {});
-    const strip = (n: Node): void => {
-        for (const c of Array.from(n.childNodes)) {
-            if (c.nodeType === 8 && ((c as Comment).data === 'pdx' || (c as Comment).data === '/pdx')) n.removeChild(c);
-            else strip(c);
-        }
-    };
-    strip(box);
-    box.normalize();
-    return Array.from(box.childNodes).map(canonical).join('');
-}
-
-/** The client's DOM and the string's, canonically. */
-function both(render: () => DocumentFragment): { client: string; server: string; markup: string } {
-    const built = document.createElement('div');
-    built.appendChild(render());
-    // Read back through its own serialisation: happy-dom keeps getAttribute('class') and classList at
-    // the pre-binding value on an element whose `:class` attribute was removed by name (it parses the
-    // colon as a namespace prefix), while outerHTML holds what the DOM has — template-more.test.ts.
-    const a = document.createElement('div');
-    a.innerHTML = built.innerHTML;
-    const markup = renderToString(render);
-    const b = document.createElement('div');
-    b.innerHTML = markup;
-    return { client: children(a), server: children(b), markup };
-}
-
-function parity(render: () => DocumentFragment): string {
-    const { client, server, markup } = both(render);
-    expect(server, `markup: ${markup}`).toBe(client);
-    return markup;
-}
 
 describe('html`` to a string matches the client', () => {
     it('static markup, void elements, comments and a self-closed element', () => {
@@ -137,6 +86,7 @@ describe('html`` to a string matches the client', () => {
         parity(() => html`<div :style.color=${'red'} :style.width=${() => '10px'}></div>`);
         parity(() => html`<div :show=${false}>hidden</div><div :show=${true}>shown</div>`);
     });
+it('a static style with no closing semicolon, merged with a bound one', () => {        const m = parity(() => html`<div style="color: red" :style.width=${'10px'} :show=${false}>x</div>`);        expect(m).toContain('color: red; width: 10px; display: none;');    });
 
     it('events, refs and attachments write nothing', () => {
         const ref = signal<Element | null>(null);

@@ -1,6 +1,6 @@
 // Whether templates are being rendered to a string (#160). The one thing the client path reads of the
 // server renderer: html`` checks it and, while it is set, returns a ServerFragment instead of building
-// DOM. Everything else of the renderer lives in render-string.ts, which the client bundle never
+// DOM; the helpers (`when`, `match`, `show`, the lists) return a ServerBlock. Everything else of the renderer lives in render-string.ts, which the client bundle never
 // imports.
 
 /**
@@ -37,11 +37,15 @@ export function withServerRender<T>(fn: () => T): T {
  */
 let ServerFragmentClass: (new (strings: TemplateStringsArray, values: readonly unknown[]) => ServerFragment) | null = null;
 
-/** The ServerFragment html`` returns while the mode is set. */
-export function serverFragment(strings: TemplateStringsArray, values: readonly unknown[]): ServerFragment {
+function requireFragment(): void {
     if (typeof DocumentFragment === 'undefined') {
         throw new Error('renderToString needs a DOM or the server DOM: call installServerDom() (core/server/dom-shim) before importing the app\'s modules');
     }
+}
+
+/** The ServerFragment html`` returns while the mode is set. */
+export function serverFragment(strings: TemplateStringsArray, values: readonly unknown[]): ServerFragment {
+    requireFragment();
     ServerFragmentClass ??= class extends DocumentFragment {
         constructor(readonly strings: TemplateStringsArray, readonly values: readonly unknown[]) { super(); }
     };
@@ -51,4 +55,49 @@ export function serverFragment(strings: TemplateStringsArray, values: readonly u
 /** Whether `value` is a ServerFragment. */
 export function isServerFragment(value: unknown): value is ServerFragment {
     return ServerFragmentClass !== null && value instanceof ServerFragmentClass;
+}
+
+/**
+ * What a helper does to the top-level nodes of the content it places, as its client side does:
+ * `item` marks a list row's elements `data-pdx-item` (list.ts, development only), `hidden` is a false
+ * `show()` — its elements take `display: none` and its text becomes a `show` comment.
+ */
+export interface BlockMark {
+    readonly item: boolean;
+    readonly hidden: boolean;
+}
+
+/**
+ * A helper's content rendered to a string — `when`, `match`, `show`, a list: the comments the client
+ * brackets it with (`null` for none), and the parts it places between them, in order. `parts` is called
+ * by the string renderer inside an ownership scope it disposes, so what the branch or the rows create
+ * while they render does not outlive the render. Like a ServerFragment, it IS a DocumentFragment, which
+ * is what the helpers return.
+ */
+export type ServerBlock = DocumentFragment & {
+    readonly open: string | null;
+    readonly close: string | null;
+    readonly parts: () => readonly unknown[];
+    readonly mark: BlockMark | null;
+};
+
+let ServerBlockClass: (new (open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null) => ServerBlock) | null = null;
+
+/** The ServerBlock a helper returns while the mode is set. */
+export function serverBlock(open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null = null): ServerBlock {
+    requireFragment();
+    ServerBlockClass ??= class extends DocumentFragment {
+        constructor(
+            readonly open: string | null,
+            readonly close: string | null,
+            readonly parts: () => readonly unknown[],
+            readonly mark: BlockMark | null,
+        ) { super(); }
+    };
+    return new ServerBlockClass(open, close, parts, mark);
+}
+
+/** Whether `value` is a ServerBlock. */
+export function isServerBlock(value: unknown): value is ServerBlock {
+    return ServerBlockClass !== null && value instanceof ServerBlockClass;
 }
