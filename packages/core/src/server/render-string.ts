@@ -131,19 +131,55 @@ export const CAUGHT = '<!--pdx-caught-->';
 const NO_CHILDREN: Projected = { default: '', named: new Map() };
 
 /**
- * An element a helper created by its tag (ServerElement): its attributes and, on a component, the
- * properties the client assigns it. It has no children of its own.
+ * An element created by its tag (ServerElement): its attributes, on a component the properties the
+ * client assigns it, and its children — projected into a component's default slot.
  */
 function createdElement(e: ServerElement, mark: BlockMark | null): string {
     const attrs = new Map<string, string | null>(Object.entries(e.attributes));
     if (mark?.item) attrs.set('data-pdx-item', '');
     if (mark?.hidden && e.tag !== 'svg' && e.tag !== 'math') attrs.set('style', joinStyle([attrs.get('style'), 'display: none;']));
     if (e.tag.includes('-')) {
-        const host = componentHost(e.tag, attrs, new Map(Object.entries(e.props)), () => NO_CHILDREN, () => '');
+        const children = (): string => content(e.inner, null);
+        const host = componentHost(e.tag, attrs, new Map(Object.entries(e.props)),
+            () => (e.inner == null ? NO_CHILDREN : { default: children(), named: new Map() }), children);
         if (host !== null) return host;
+        const own = serverElements.get(e.tag);
+        if (own) return ownRender(e.tag, attrs, own);
     }
     const open = openTag(e.tag, attrs);
-    return VOID_ELEMENTS.has(e.tag) ? open : `${open}</${e.tag}>`;
+    return VOID_ELEMENTS.has(e.tag) ? open : `${open}${content(e.inner, null)}</${e.tag}>`;
+}
+
+/**
+ * What a custom element that is no component of ours writes when it is rendered to a string: the
+ * attributes it adds, and its content (#160). The router's outlet writes the route it shows.
+ */
+export interface ServerRender {
+    readonly attributes?: Readonly<Record<string, string>>;
+    readonly content: unknown;
+    /**
+     * Run while its content is written: what the element knows about the elements inside it — the
+     * outlet counts the outlets around a nested one.
+     */
+    readonly around?: (write: () => string) => string;
+}
+
+const serverElements = new Map<string, (attributes: ReadonlyMap<string, string | null>) => ServerRender>();
+
+/**
+ * Render `tag` — a custom element that is not a component — to a string with `render`, given the
+ * attributes its template wrote. Without one, it renders as a plain element with its template's children.
+ */
+export function registerServerElement(tag: string, render: (attributes: ReadonlyMap<string, string | null>) => ServerRender): void {
+    serverElements.set(tag, render);
+}
+
+function ownRender(tag: string, attrs: ReadonlyMap<string, string | null>, render: (attributes: ReadonlyMap<string, string | null>) => ServerRender): string {
+    const rendered = render(attrs);
+    const all = new Map(attrs);
+    for (const [name, value] of Object.entries(rendered.attributes ?? {})) all.set(name, value);
+    const write = (): string => content(rendered.content, null);
+    return `${openTag(tag, all)}${rendered.around ? rendered.around(write) : write()}</${tag}>`;
 }
 
 /**
@@ -215,6 +251,8 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     if (n.name.includes('-')) {
         const host = componentHost(n.name, attrs, s.props, () => project(n, values, slots), () => nodes(n.children, values, slots));
         if (host !== null) return host;
+        const own = serverElements.get(n.name);
+        if (own) return ownRender(n.name, attrs, own);
     }
     const open = openTag(n.name, attrs);
     if (n.void) return open;

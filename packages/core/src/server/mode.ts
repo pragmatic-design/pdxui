@@ -119,21 +119,24 @@ export type ServerElement = DocumentFragment & {
     readonly tag: string;
     readonly attributes: Readonly<Record<string, string>>;
     readonly props: Readonly<Record<string, unknown>>;
+    /** What it holds: rendered inside it, and projected into its default slot on a component. */
+    readonly inner: unknown;
 };
 
-let ServerElementClass: (new (tag: string, attributes: Readonly<Record<string, string>>, props: Readonly<Record<string, unknown>>) => ServerElement) | null = null;
+let ServerElementClass: (new (tag: string, attributes: Readonly<Record<string, string>>, props: Readonly<Record<string, unknown>>, inner: unknown) => ServerElement) | null = null;
 
-/** The ServerElement a helper returns while the mode is set. */
-export function serverElement(tag: string, attributes: Readonly<Record<string, string>> = {}, props: Readonly<Record<string, unknown>> = {}): ServerElement {
+/** An element by its tag, rendered to a string: what a helper, or an element's server render, creates. */
+export function serverElement(tag: string, attributes: Readonly<Record<string, string>> = {}, props: Readonly<Record<string, unknown>> = {}, inner: unknown = null): ServerElement {
     requireFragment();
     ServerElementClass ??= class extends DocumentFragment {
         constructor(
             readonly tag: string,
             readonly attributes: Readonly<Record<string, string>>,
             readonly props: Readonly<Record<string, unknown>>,
+            readonly inner: unknown,
         ) { super(); }
     };
-    return new ServerElementClass(tag, attributes, props);
+    return new ServerElementClass(tag, attributes, props, inner);
 }
 
 /** Whether `value` is a ServerElement. */

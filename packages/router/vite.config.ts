@@ -11,6 +11,8 @@ export default defineConfig({
                 index: 'src/index.ts',
                 outlet: 'src/outlet.ts',
                 link: 'src/link.ts',
+                server: 'src/server.ts',
+                hydrate: 'src/hydrate.ts',
             },
             formats: ['es'],
             fileName: (_, name) => `${name}.js`,
@@ -19,7 +21,7 @@ export default defineConfig({
         sourcemap: true,
         target: 'es2022',
         rollupOptions: {
-            external: ['@pdxui/core', '@pdxui/compiler'],
+            external: ['@pdxui/core', '@pdxui/core/server', '@pdxui/compiler'],
         },
     },
     test: {
