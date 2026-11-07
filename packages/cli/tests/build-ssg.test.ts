@@ -116,6 +116,39 @@ describe('what the build refuses, and what it leaves out', () => {
     }, 180_000);
 });
 
+describe('how an app is entered and built', () => {
+    it('an inline module script is the app\'s entry too, its relative imports from the root', async () => {
+        // The banner is in the page's own markup, outside every route, and only the inline script imports it.
+        const inline = app('inline', {
+            ...FILES,
+            'src/banner.pdx': '<template><p class="banner">{{ text }}</p></template>\n<script>\n@prop text: string = \'welcome\';\n</script>\n',
+            'index.html': '<!doctype html><html><head><title>Shop</title></head><body><app-banner></app-banner><pdx-router-outlet></pdx-router-outlet>'
+                + "<script type=\"module\">\n  import '@pdxui/router';\n  import './src/banner.pdx';\n</script></body></html>",
+        });
+        roots.push(inline);
+        const result = await buildSsg(inline, resolveConfig({}, inline), join(inline, 'dist'), false);
+        expect(result.pages.map((p) => p.file)).toContain('index.html');
+        const home = readFileSync(join(inline, 'dist', 'index.html'), 'utf-8');
+        expect(home, 'the banner is empty: the inline entry did not run on the server').toContain('<p class="banner"><!--pdx-->welcome<!--/pdx--></p>');
+        expect(home).toContain('<h1>Home</h1>');
+    }, 180_000);
+
+    it('builds with the config it is handed, beside the one the app builds its client with', async () => {
+        const compiler = join(__dirname, '..', '..', 'compiler', 'src', 'index.ts').replace(/\\/g, '/');
+        const variant = app('variant', {
+            ...FILES,
+            // The app's own config: no hydrate, which a static build refuses.
+            'vite.config.mjs': `import { pdx } from '${compiler}';\nexport default { plugins: [pdx({ devtools: false })] };\n`,
+            'vite.ssg.config.mjs': `import { pdx } from '${compiler}';\nexport default { plugins: [pdx({ devtools: false, hydrate: true })] };\n`,
+        });
+        roots.push(variant);
+        const refused = await buildSsg(variant, resolveConfig({}, variant), join(variant, 'dist'), false).then(() => null, (e: unknown) => e);
+        expect((refused as Error | null)?.message ?? '', 'the app\'s config without hydrate was not refused').toContain('hydrate');
+        const result = await buildSsg(variant, resolveConfig({}, variant), join(variant, 'dist'), false, join(variant, 'vite.ssg.config.mjs'));
+        expect(result.pages.map((p) => p.file)).toContain('about/index.html');
+    }, 180_000);
+});
+
 describe('an app that reads the browser when a module is imported', () => {
     it('stops the build, and says which file', async () => {
         const broken = app('broken', { ...FILES, 'src/main.js': "import '@pdxui/router';\nimport './title.js';\n", 'src/title.js': "document.title = 'Shop · ' + document.title;\n" });
@@ -124,5 +157,19 @@ describe('an app that reads the browser when a module is imported', () => {
         expect(err).toBeInstanceOf(SsgError);
         expect((err as Error).message).toContain('document is not defined');
         expect((err as Error).message).toContain('title.js');
+    }, 180_000);
+
+    it('or in work it starts and does not await, as an entry that sets up its locale does', async () => {
+        const late = app('late', {
+            ...FILES,
+            'src/main.js': "import '@pdxui/router';\nimport { setup } from './locale.js';\nvoid setup();\n",
+            'src/locale.js': "export async function setup() { await Promise.resolve(); document.documentElement.lang = 'en'; }\n",
+        });
+        roots.push(late);
+        const err = await buildSsg(late, resolveConfig({}, late), join(late, 'dist'), false).then(() => null, (e: unknown) => e);
+        expect(err).toBeInstanceOf(SsgError);
+        expect((err as Error).message).toContain('could not run on the server');
+        expect((err as Error).message).toContain('document is not defined');
+        expect((err as Error).message).toContain('locale.js');
     }, 180_000);
 });

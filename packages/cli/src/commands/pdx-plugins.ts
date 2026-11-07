@@ -15,8 +15,10 @@ export async function pdxPluginsFor(
     cwd: string,
     resolved: ReturnType<typeof resolveConfig>,
     hydrate: boolean,
+    /** The config file to read instead of the one Vite finds at `cwd`. */
+    configFile?: string,
 ): Promise<PluginOption[]> {
-    const names = await configPluginNames(vite, cwd, { command: 'build', mode: 'production' });
+    const names = await configPluginNames(vite, cwd, { command: 'build', mode: 'production' }, configFile);
     if (names.includes(PDX_PLUGIN_NAME)) {
         if (hydrate && !names.includes(PDX_HYDRATE_PLUGIN_NAME)) {
             throw new PdxConfigError('the project\'s vite.config registers pdx() without hydrate: a generated page would be rendered over, not taken over. Use pdx({ hydrate: true }) there.');

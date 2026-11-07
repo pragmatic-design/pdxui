@@ -6,11 +6,12 @@ import { appEntries } from '../src/commands/ssg-entry';
 import { bodyParts, generatedPage, pageFile, renderableMarkup } from '../src/commands/ssg-page';
 
 describe('the app\'s entry scripts', () => {
-    it('are the module scripts with a src, from the root', () => {
+    it('are the module scripts, loaded or inline, in the order the page runs them, from the root', () => {
         const html = '<head><script type="module" src="/@pdx/hydrate.js"></script></head><body>'
-            + '<script type="module" src="./src/main.js"></script><script type="module" src="/src/b.ts"></script>'
+            + '<script type="module" src="./src/main.js"></script><script type="module">import \'./src/app.pdx\';</script>'
+            + '<script type="module" src="/src/b.ts"></script><script type="module">  </script>'
             + '<script src="/legacy.js"></script><script type="module" src="https://cdn.example/x.js"></script></body>';
-        expect(appEntries(html)).toEqual(['/src/main.js', '/src/b.ts']);
+        expect(appEntries(html)).toEqual([{ src: '/src/main.js' }, { inline: "import './src/app.pdx';" }, { src: '/src/b.ts' }]);
     });
 });
 

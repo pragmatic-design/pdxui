@@ -51,3 +51,13 @@ const QUOTE_ESCAPES: Record<string, string> = {
 function escapeQuoted(ch: string): string {
     return QUOTE_ESCAPES[ch] ?? `\\u${ch.charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}`;
 }
+
+/**
+ * An arrow that returns `body`, an expression: `()=>body`, parenthesised when the expression starts with
+ * `{` — there the arrow would read it as a block of statements, and `()=>{ a: 1 }.a` does not parse. Only
+ * then, so the code every other binding compiles to is what it was.
+ */
+export function arrowOf(body: string): string {
+    // Match: an expression whose first character, past spaces, is `{`.
+    return /^\s*\{/.test(body) ? `()=>(${body})` : `()=>${body}`;
+}

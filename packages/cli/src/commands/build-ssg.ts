@@ -42,13 +42,16 @@ export async function buildSsg(
     resolved: ReturnType<typeof resolveConfig>,
     outDir: string,
     sourcemap: boolean | 'hidden',
+    /** The Vite config to build with, instead of the one Vite finds at `cwd`: an app's SSG variant. */
+    configFile?: string,
 ): Promise<SsgReport> {
     const vite = await import('vite');
-    const plugins = await pdxPluginsFor(vite, cwd, resolved, true);
+    const plugins = await pdxPluginsFor(vite, cwd, resolved, true, configFile);
     const sourceHtml = readFileSync(resolve(cwd, 'index.html'), 'utf-8');
 
     await vite.build({
         root: cwd,
+        configFile,
         plugins,
         build: { outDir, minify: 'esbuild', target: resolved.target, sourcemap },
     });
@@ -57,8 +60,9 @@ export async function buildSsg(
     try {
         await vite.build({
             root: cwd,
+            configFile,
             logLevel: 'warn',
-            plugins: [...plugins, ssgEntryPlugin(appEntries(sourceHtml))],
+            plugins: [...plugins, ssgEntryPlugin(appEntries(sourceHtml), cwd)],
             ssr: { noExternal: true },
             // Core's `DEV` is `process.env.NODE_ENV`, which a server build leaves to the process that
             // runs it. Fixed here to what the client build saw, so the markup the server writes is the
