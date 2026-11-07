@@ -10,6 +10,7 @@
 // ones its `index.html` loads — and every lazy page.
 
 import type { Plugin } from 'vite';
+import { join } from 'pathe';
 
 export const SSG_ENTRY_ID = 'virtual:pdx-ssg-entry';
 const SSG_DOM_ID = 'virtual:pdx-ssg-dom';
@@ -29,6 +30,7 @@ export interface SsgRender {
  * every route without parameters and every path in `extraPaths`, and says what it did not render.
  */
 export function ssgEntryModule(appEntries: readonly string[]): string {
+    // An inline script is imported as the module the plugin serves for it (`inlineEntryId`).
     const imports = appEntries.map((src) => `        await import(${JSON.stringify(src)});`).join('\n');
     return `import ${JSON.stringify(SSG_DOM_ID)};
 import { html } from '@pdxui/core';
@@ -99,38 +101,76 @@ export const SSG_RUNNER = `import { readFileSync, writeFileSync } from 'node:fs'
 import { pathToFileURL } from 'node:url';
 const [entry, input, output] = process.argv.slice(2);
 const { markup, extraPaths } = JSON.parse(readFileSync(input, 'utf-8'));
+// An entry script that starts work it does not await (void setupI18n()) fails after it has run:
+// reported as an import that failed, with its file and line, not as a crash of this process.
+const failed = (e) => {
+    const frames = e instanceof Error ? (e.stack ?? '').split('\\n').slice(1, 4).map((l) => l.trim()).join('\\n    ') : '';
+    writeFileSync(output, JSON.stringify({ error: (e instanceof Error ? e.message : String(e)) + '\\n    ' + frames, pages: [], skippedRoutes: [] }));
+    process.exit(0);
+};
+process.on('unhandledRejection', failed);
+process.on('uncaughtException', failed);
 const { renderAll } = await import(pathToFileURL(entry).href);
 writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths)));
 `;
 
 /** The plugin that answers for the entry and for the module that installs the server DOM. */
-export function ssgEntryPlugin(appEntries: readonly string[]): Plugin {
+export function ssgEntryPlugin(entries: readonly AppEntry[], root: string): Plugin {
+    // An inline script's module is at a path of the root — one no file has — so that its relative
+    // imports (`./src/app.pdx`) resolve as they do from the index.html it was written in.
+    const inline = entries.flatMap((e) => ('inline' in e ? [e.inline] : []));
+    const inlinePath = (i: number): string => join(root, `__pdx-ssg-inline-${i}.js`);
+    // In the page's order: an inline script after a loaded one runs after it, here as there.
+    let n = 0;
+    const ids = entries.map((e) => ('src' in e ? e.src : inlineEntryId(n++)));
     return {
         name: 'pragmatic-pdx-ssg-entry',
         resolveId(id: string) {
             if (id === SSG_ENTRY_ID) return RESOLVED_ENTRY;
             if (id === SSG_DOM_ID) return RESOLVED_DOM;
+            const at = inline.findIndex((_, i) => id === inlineEntryId(i));
+            if (at !== -1) return inlinePath(at);
             return undefined;
         },
         load(id: string) {
-            if (id === RESOLVED_ENTRY) return ssgEntryModule(appEntries);
+            if (id === RESOLVED_ENTRY) return ssgEntryModule(ids);
             if (id === RESOLVED_DOM) return `import { installServerDom } from '@pdxui/core/server-dom';\ninstallServerDom();\n`;
+            const at = inline.findIndex((_, i) => id === inlinePath(i));
+            if (at !== -1) return inline[at];
             return undefined;
         },
     };
 }
 
-// Match: a module script with a src, in an index.html. Groups: [1]=the src.
-const MODULE_SCRIPT = /<script\b(?=[^>]*\btype=["']module["'])[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi;
+/** The id the entry imports the `i`-th inline module script by. */
+function inlineEntryId(i: number): string {
+    return `virtual:pdx-ssg-inline-${i}`;
+}
+
+// Match: a module script, its attributes and its body. Groups: [1]=the attributes [2]=the body
+const MODULE_SCRIPT = /<script\b([^>]*\btype=["']module["'][^>]*)>([\s\S]*?)<\/script\s*>/gi;
+// Match: a src attribute. Groups: [1]=its value
+const SRC = /\bsrc=["']([^"']+)["']/i;
 
 /**
- * The module scripts an `index.html` loads, from the root (`./src/main.js` → `/src/main.js`: the
- * entry that imports them is a virtual module, with no folder of its own to be relative to), minus
- * the ones the plugin adds and any on another origin.
+ * A module script an `index.html` runs: one it loads by `src` — from the root, `./src/main.js` →
+ * `/src/main.js` — or one written inline, by its body.
  */
-export function appEntries(indexHtml: string): string[] {
-    return [...indexHtml.matchAll(MODULE_SCRIPT)]
-        .map((m) => m[1])
-        .filter((src) => !src.startsWith('/@') && !/^[a-z]+:|^\/\//i.test(src))
-        .map((src) => (src.startsWith('/') ? src : `/${src.replace(/^\.\//, '')}`));
+export type AppEntry = { readonly src: string } | { readonly inline: string };
+
+/**
+ * The module scripts of an `index.html`, in the order the page runs them, minus the ones the plugin
+ * adds and any on another origin.
+ */
+export function appEntries(indexHtml: string): AppEntry[] {
+    const entries: AppEntry[] = [];
+    for (const [, attrs, body] of indexHtml.matchAll(MODULE_SCRIPT)) {
+        const url = SRC.exec(attrs)?.[1];
+        if (url === undefined) {
+            if (body.trim()) entries.push({ inline: body });
+        } else if (!url.startsWith('/@') && !/^[a-z]+:|^\/\//i.test(url)) {
+            entries.push({ src: url.startsWith('/') ? url : `/${url.replace(/^\.\//, '')}` });
+        }
+    }
+    return entries;
 }

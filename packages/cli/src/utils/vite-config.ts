@@ -33,8 +33,8 @@ export async function configRegistersPdx(vite: typeof import('vite'), root: stri
 export const PDX_HYDRATE_PLUGIN_NAME = 'pragmatic-pdx-hydrate';
 
 /** The names of the plugins the Vite config Vite would load from `root` registers; none without a file. */
-export async function configPluginNames(vite: typeof import('vite'), root: string, env: ConfigEnv): Promise<string[]> {
-    const loaded = await vite.loadConfigFromFile(env, undefined, root, 'silent');
+export async function configPluginNames(vite: typeof import('vite'), root: string, env: ConfigEnv, configFile?: string): Promise<string[]> {
+    const loaded = await vite.loadConfigFromFile(env, configFile, root, 'silent');
     if (!loaded) return [];
     return (await flatten(loaded.config.plugins)).flatMap((p) => (p?.name ? [p.name] : []));
 }

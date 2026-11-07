@@ -81,7 +81,9 @@ the elements stay the same ones, and they become interactive.
 
 The app is built with `pdx({ hydrate: true })`. If your `vite.config` registers `pdx()` itself, the
 option has to be there; without it the build stops and says so. The routes are rendered in Node, in
-a process of their own, with the app compiled for the server. A route with parameters is generated
+a process of their own, with the app compiled for the server. The module scripts of `index.html`
+run there first, in the page's order, whether they load a file or are written inline. A route with
+parameters is generated
 for the paths you list in `pdx.config`:
 
 ```ts
