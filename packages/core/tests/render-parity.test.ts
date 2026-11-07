@@ -21,6 +21,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
+import { renderToStringWithReport } from '../src/server/render-string';
 
 /** The module a lazily loaded component resolves to here: a name, not a file. */
 const DEFERRED_MODULE = 'virtual:deferred-probe';
@@ -53,6 +54,12 @@ interface Row {
     read?: (host: HTMLElement) => unknown;
     /** The issue that owns a known difference from the expectation. */
     owner?: number;
+    /**
+     * Why the server's string is not the row's expectation (#160): what the client does only after it
+     * has mounted — a promise resolved, an enter transition started — or what does not exist on the
+     * server. The rule is `owner`'s: a row that comes to match fails, and its reason is removed.
+     */
+    serverDiffers?: string;
 }
 
 /** The mount a host belongs to: its tag less the `pdx-` prefix, which names the deferred load it asked for. */
@@ -205,8 +212,8 @@ const ROWS: Row[] = [
     // #283: no template-path recording exists — it landed after #238. happy-dom lays nothing out, so
     // the window is the overscan, three rows: all of these. A `ul` is a list: each row says the set's
     // size and its place (#284).
-    { name: '@for … @virtual', expected: '<ul><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li aria-posinset="1" aria-setsize="3" data-virtual-index="0">a</li><li aria-posinset="2" aria-setsize="3" data-virtual-index="1">b</li><li aria-posinset="3" aria-setsize="3" data-virtual-index="2">c</li><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li></ul>', template: '<ul>@for (items as it; track it) @virtual(20) { <li>{{ it }}</li> }</ul>', script: "let items = $signal(['a', 'b', 'c']);" },
-    { name: '@for … @virtual with @empty', expected: '<ul><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li>none</li></ul>', template: '<ul>@for (items as it; track it) @virtual { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
+    { name: '@for … @virtual', serverDiffers: 'a virtual list has no server mode yet (#930)', expected: '<ul><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li aria-posinset="1" aria-setsize="3" data-virtual-index="0">a</li><li aria-posinset="2" aria-setsize="3" data-virtual-index="1">b</li><li aria-posinset="3" aria-setsize="3" data-virtual-index="2">c</li><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li></ul>', template: '<ul>@for (items as it; track it) @virtual(20) { <li>{{ it }}</li> }</ul>', script: "let items = $signal(['a', 'b', 'c']);" },
+    { name: '@for … @virtual with @empty', serverDiffers: 'a virtual list has no server mode yet (#930)', expected: '<ul><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li aria-hidden="true" style="padding: 0px; border: 0px; margin: 0px; height: 0px;"></li><li>none</li></ul>', template: '<ul>@for (items as it; track it) @virtual { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
     // Whitespace between table-internal elements renders nothing and is not emitted (#111): the read
     // counts the text nodes inside the table that are not in a cell.
     {
@@ -251,7 +258,7 @@ const ROWS: Row[] = [
     { name: '@click.enter', expected: '<p>1</p><button>+</button>', template: '<p>{{ n }}</p><button @click.enter="n++">+</button>', script: 'let n = $signal(0);', act: click('button') },
     // The body, once the promise has settled. (The body reads the promise itself, not its value, on
     // both paths: binding the value is #145.)
-    { name: '@await', expected: '<p>ready</p>', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
+    { name: '@await', serverDiffers: 'the server writes @loading, the promise not resolved yet', expected: '<p>ready</p>', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
     // Two phases (#281): the render waits for `when ( … )`, whatever the prefetch phase does.
     {
         name: '@defer (when (…); prefetch idle), after the condition turns true', expected: '<p>in</p><button>go</button>',
@@ -279,12 +286,12 @@ const ROWS: Row[] = [
     },
     { name: '@try / @catch', expected: '<p>caught</p>', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.
-    { name: '@if with @transition', expected: '<p class="pdx-enter-active pdx-fade">x</p>', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
-    { name: '@for with @transition', expected: '<ul><li class="pdx-enter-active pdx-fade">a</li></ul>', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
+    { name: '@if with @transition', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<p class="pdx-enter-active pdx-fade">x</p>', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
+    { name: '@for with @transition', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<ul><li class="pdx-enter-active pdx-fade">a</li></ul>', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },
     // The inline path read the @let name as a signal and threw at mount (#162).
     { name: '@let', expected: '<p>3</p>', template: '@let total = a + b; <p>{{ total }}</p>', script: 'let a = $signal(1); let b = $signal(2);' },
-    { name: 'an interpolated Node', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
-    { name: 'an interpolated Node in a signal', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
+    { name: 'an interpolated Node', serverDiffers: 'a DOM node the script builds exists on the client only', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const node = document.createElement('em'); node.textContent = 'n';" },
+    { name: 'an interpolated Node in a signal', serverDiffers: 'a DOM node the script builds exists on the client only', expected: '<div><em>n</em></div>', template: '<div>{{ node }}</div>', script: "const el = document.createElement('em'); el.textContent = 'n'; let node = $signal(el);" },
     // The inline path wrote the array as its string, "a,b" (#100).
     { name: 'an interpolated array', expected: '<div>ab</div>', template: '<div>{{ list }}</div>', script: "const list = ['a', 'b'];" },
     { name: 'content inside a component tag', expected: '<x-probe><span>child</span></x-probe>', template: '<x-probe><span>child</span></x-probe>' },
@@ -387,6 +394,47 @@ const ROWS: Row[] = [
         template: '<x-snip>@snippet row(v, i) { <b>{{ v }}{{ i }}</b> }</x-snip>',
     },
 ];
+
+/**
+ * The row compiled for the server (#160) and rendered to a string: the host's content, normalised as
+ * the client's mount is.
+ */
+function serverRender(row: Row): string {
+    const name = `sparity${++seq}`;
+    const src = `<template>${row.template}</template>\n<script>\n${row.script ?? ''}\n</script>\n`;
+    const { code } = compile(src, `${name}.pdx`, [], undefined, { production: true, ssr: true });
+    const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
+    new Function('__core', body)(core);
+    const tag = `app-${name}`;
+    const { html } = renderToStringWithReport(() => new Function('html', `return html\`<${tag}></${tag}>\``)(core.html));
+    const box = document.createElement('div');
+    box.innerHTML = html;
+    const host = box.firstElementChild as HTMLElement | null;
+    return host ? content(host) : `no host: ${html}`;
+}
+
+/**
+ * The rows the server renders: those the client renders by mounting alone, with no act on it, no
+ * property read back, and no element that is not a component — `x-probe`, `x-field`, `x-snip` and the
+ * deferred probe are plain custom elements made for the client's test, which the server cannot render.
+ */
+const SERVER_ROWS = ROWS.filter((row) => !row.act && !row.read && !row.owner
+    && !/<(x-probe|x-field|x-snip|pdx-deferred-probe)\b|'x-(probe|field)'/.test(row.template + (row.script ?? '')));
+
+describe('a .pdx compiled for the server writes the same markup (#160)', () => {
+    it('renders the rows the client renders by mounting alone', () => {
+        // 29 of the 68 on 2026-11-07; the others act on the mount, read a property, or use a plain
+        // custom element. Fewer means the filter lost rows it should keep.
+        expect(SERVER_ROWS.length).toBeGreaterThanOrEqual(29);
+    });
+    for (const row of SERVER_ROWS) {
+        it(row.serverDiffers ? `${row.name} — differs: ${row.serverDiffers}` : row.name, () => {
+            const rendered = serverRender(row);
+            if (row.serverDiffers) expect(rendered, 'the row now renders its expectation: remove serverDiffers').not.toBe(row.expected);
+            else expect(rendered).toBe(row.expected);
+        });
+    }
+});
 
 describe('a .pdx puts in the page what the template path did (#92, #237)', () => {
     for (const row of ROWS) {

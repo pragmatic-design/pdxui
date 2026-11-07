@@ -336,8 +336,9 @@ class InlineGen {
         const body = withPlainLocals(node.params, this.ctx, () => this.block(node.body, true).code);
         const snippet = `(${node.params.join(',')})=>{${body}}`;
         // On the server the template is the component's property, handed to it as its parent's
-        // other properties are (#160).
-        if (this.ctx.ssr) { this.serverBind(host.v, `:${node.name}`, snippet); return; }
+        // other properties are (#160): through a getter, as every bound value is, so that the string
+        // renderer reads the function instead of calling it.
+        if (this.ctx.ssr) { this.serverBind(host.v, `:${node.name}`, `()=>${snippet}`); return; }
         this.tree.target(host.v);
         this.out(`${host.v}[${jsQuote(node.name)}]=${snippet};`);
     }
