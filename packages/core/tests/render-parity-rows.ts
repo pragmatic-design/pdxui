@@ -217,6 +217,10 @@ export const ROWS: Row[] = [
         template: '@defer (immediate) { <pdx-deferred-probe></pdx-deferred-probe> }',
         read: (h) => lazyLoads.some((u) => u.endsWith(`?for=${mountName(h)}`)),
     },
+    // A bound value that starts with an object literal (#160): on the server it was written as the body
+    // of an arrow, `()=>{ a: 'x' }['a']`, which reads as a block and does not parse.
+    { name: ':attr with an object literal first', expected: '<p title="x">t</p>', template: "<p :title=\"{ a: 'x' }['a']\">t</p>" },
+    { name: '{{ }} with an object literal first', expected: '<p>x</p>', template: "<p>{{ { a: 'x' }['a'] }}</p>" },
     // @hydrate (#160, part 4d): mounted, the part is live at once. Hydrated, it waits for its trigger;
     // its first event takes it over and runs again, and a value changed meanwhile is the one it shows.
     { name: '@hydrate (idle)', expected: '<p>5</p>', template: '@hydrate (idle) { <p>{{ n }}</p> }', script: 'let n = $signal(5);' },

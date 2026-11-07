@@ -24,7 +24,7 @@ import { ifChain, type IfChain } from './if-chain';
 import { hasNativeProperty } from './native-properties';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
-import { jsQuote, jsString } from './js-literal';
+import { arrowOf, jsQuote, jsString } from './js-literal';
 import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
@@ -562,7 +562,7 @@ class InlineGen {
     private propBind(el: string, prop: string, expr: string, kind: ElementKind, preRewritten = false): void {
         if (this.ctx.ssr) {
             const name = prop.endsWith('.once') ? prop.slice(0, -'.once'.length) : prop;
-            this.serverBind(el, `:${this.boundName(name, kind)}`, preRewritten ? expr : `()=>${this.read(expr)}`);
+            this.serverBind(el, `:${this.boundName(name, kind)}`, preRewritten ? expr : arrowOf(this.read(expr)));
             return;
         }
         // `:x.once` (#126): the value is read now, untracked, and assigned once.
@@ -609,7 +609,7 @@ class InlineGen {
      * instead (`inline-class-binding.ts`, #112).
      */
     private classBind(el: string, expr: string, staticClass: string, preRewritten: boolean, toggled: string[], kind: ElementKind): void {
-        if (this.ctx.ssr) { this.serverBind(el, ':class', preRewritten ? expr : `()=>${this.read(expr)}`); return; }
+        if (this.ctx.ssr) { this.serverBind(el, ':class', preRewritten ? expr : arrowOf(this.read(expr))); return; }
         this.imports.add('effect');
         const statics = staticClass.split(/\s+/).filter(Boolean);
         if (!preRewritten) {
@@ -790,19 +790,19 @@ class InlineGen {
     }
 
     private classToggle(el: string, cls: string, expr: string): void {
-        if (this.ctx.ssr) { this.serverBind(el, `:class.${cls}`, `()=>${this.read(expr)}`); return; }
+        if (this.ctx.ssr) { this.serverBind(el, `:class.${cls}`, arrowOf(this.read(expr))); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.classList.toggle(${jsString(cls)},!!(${this.shared(this.read(expr))}));});`);
     }
 
     private styleProp(el: string, prop: string, expr: string): void {
-        if (this.ctx.ssr) { this.serverBind(el, `:style.${prop}`, `()=>${this.read(expr)}`); return; }
+        if (this.ctx.ssr) { this.serverBind(el, `:style.${prop}`, arrowOf(this.read(expr))); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.style.setProperty(${jsString(prop)},String(${this.shared(this.read(expr))}??''));});`);
     }
 
     private showBind(el: string, expr: string): void {
-        if (this.ctx.ssr) { this.serverBind(el, ':show', `()=>${this.read(expr)}`); return; }
+        if (this.ctx.ssr) { this.serverBind(el, ':show', arrowOf(this.read(expr))); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.style.display=(${this.shared(this.read(expr))})?'':'none';});`);
     }
@@ -826,7 +826,7 @@ class InlineGen {
         const fn = prefixCtx(name, this.ctx);
         if (!expr && !preRewritten) { this.out(`attach(${el},${fn});`); return; }
         const value = preRewritten ? `(${expr})` : `(${this.read(expr)})`;
-        this.out(`attach(${el},${fn},()=>${value});`);
+        this.out(`attach(${el},${fn},${arrowOf(value)});`);
     }
 
     // ─── Interpolation ────────────────────────────────────────
@@ -839,7 +839,7 @@ class InlineGen {
         if (this.ctx.ssr) {
             // A hole of the block's html``: core renders the value as bindInterpolation would (#160).
             if (node.pipes?.length > 0) this.imports.add('templatePipe');
-            this.tree.hole(node.pipes?.length > 0 ? `()=>${pipeChain(expr, node.pipes, this.ctx)}` : `()=>${expr}`);
+            this.tree.hole(arrowOf(node.pipes?.length > 0 ? pipeChain(expr, node.pipes, this.ctx) : expr));
             return;
         }
         this.imports.add('bindInterpolation');
@@ -849,12 +849,12 @@ class InlineGen {
         if (node.pipes?.length > 0) {
             // The same chain as the template path, the value first in every pipe (#199).
             this.imports.add('templatePipe');
-            this.out(`bindInterpolation(${t},()=>${pipeChain(expr, node.pipes, this.ctx)});`);
+            this.out(`bindInterpolation(${t},${arrowOf(pipeChain(expr, node.pipes, this.ctx))});`);
         } else if (isConstantBinding(node.expr, this.ctx)) {
             // Cannot change: core writes it once, by the same rule, with no effect (#110).
-            this.out(`bindInterpolation(${t},()=>${expr},true);`);
+            this.out(`bindInterpolation(${t},${arrowOf(expr)},true);`);
         } else {
-            this.out(`bindInterpolation(${t},()=>${this.shared(expr)});`);
+            this.out(`bindInterpolation(${t},${arrowOf(this.shared(expr))});`);
         }
     }
 
@@ -907,7 +907,7 @@ class InlineGen {
         const els = node.elseBody ? `()=>{${this.sub(node.elseBody)}}` : 'null';
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
-        this.out(`const ${cf}=when(()=>${cond},()=>{${then}},${els}${generateTransition(node.transition)});`);
+        this.out(`const ${cf}=when(${arrowOf(cond)},()=>{${then}},${els}${generateTransition(node.transition)});`);
         this.place(cf);
     }
 
@@ -938,7 +938,7 @@ class InlineGen {
         const params = node.index ? `${node.item},${node.index}` : node.item;
         const cf = this.v('cf');
         this.pending = templateMark(this.ctx, node.exprOffset);
-        this.out(`const ${cf}=eachVirtual(()=>${items},${keyArg},(${params})=>{${body}},${virtualOptions(node, rows, node.emptyBody ? `()=>{${this.sub(node.emptyBody)}}` : null)});`);
+        this.out(`const ${cf}=eachVirtual(${arrowOf(items)},${keyArg},(${params})=>{${body}},${virtualOptions(node, rows, node.emptyBody ? `()=>{${this.sub(node.emptyBody)}}` : null)});`);
         this.place(cf);
     }
 
@@ -1008,12 +1008,12 @@ class InlineGen {
             const emptyBody = this.sub(node.emptyBody);
             const wf = this.v('wf');
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
-            this.out(`const ${wf}=when(()=>${items}?.length>0,()=>{const f=document.createDocumentFragment();f.appendChild(${cf});return f;},()=>{${emptyBody}});`);
+            this.out(`const ${cf}=${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition});`);
+            this.out(`const ${wf}=when(${arrowOf(`${items}?.length>0`)},()=>{const f=document.createDocumentFragment();f.appendChild(${cf});return f;},()=>{${emptyBody}});`);
             this.place(wf);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(()=>${items},${keyArg},(${params})=>{${body}}${transition});`);
+            this.out(`const ${cf}=${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition});`);
             this.place(cf);
         }
     }
@@ -1052,7 +1052,7 @@ class InlineGen {
         const cases = node.cases.map(c => `${jsString(c.value)}:()=>{${this.sub(c.body)}}`);
         if (node.defaultBody) cases.push(`_:()=>{${this.sub(node.defaultBody)}}`);
         const cf = this.v('cf');
-        this.out(`const ${cf}=match(()=>${expr},{${cases.join(',')}});`);
+        this.out(`const ${cf}=match(${arrowOf(expr)},{${cases.join(',')}});`);
         this.place(cf);
     }
 
@@ -1084,11 +1084,11 @@ class InlineGen {
             this.imports.add('placePart');
             const m = this.v('m');
             this.tree.anchor(m);
-            this.out(`const ${cf}=(offerPart(${m}),show(()=>${cond},(()=>{${body}})()));`);
+            this.out(`const ${cf}=(offerPart(${m}),show(${arrowOf(cond)},(()=>{${body}})()));`);
             this.out(`placePart(${m},${cf});`);
             return;
         }
-        this.out(`const ${cf}=show(()=>${cond},(()=>{${body}})());`);
+        this.out(`const ${cf}=show(${arrowOf(cond)},(()=>{${body}})());`);
         this.place(cf);
     }
 
@@ -1170,7 +1170,7 @@ class InlineGen {
         }
         const opts = awaitTimingArg(node);
         const cf = this.v('cf');
-        this.out(`const ${cf}=awaitBlock(()=>${awaited},(${bound ?? ''})=>{${body}},${loading},${error}${opts ? `,${opts}` : ''});`);
+        this.out(`const ${cf}=awaitBlock(${arrowOf(awaited)},(${bound ?? ''})=>{${body}},${loading},${error}${opts ? `,${opts}` : ''});`);
         this.place(cf);
     }
 
