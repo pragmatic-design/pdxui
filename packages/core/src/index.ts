@@ -178,6 +178,7 @@ export type { TweenConfig, TweenSignal } from './renderer/tween';
 export { defer } from './renderer/defer';
 export { deferCode, type DeferCode } from './renderer/defer-code';
 export type { DeferOptions, DeferState } from './renderer/defer';
+export { hydrateOn, type HydrateOnOptions } from './renderer/hydrate-on';
 // The one queue prefetches wait in (#250): the router queues route chunks here.
 export { queuePrefetch, trackUrgentLoad, takePrefetch, cancelPrefetches } from './renderer/load-queue';
 // A long loop over data in slices that yield to input (#240).

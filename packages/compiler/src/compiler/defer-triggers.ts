@@ -92,6 +92,27 @@ export function deferTriggerOptions(raw: string, expr: (source: string) => strin
 }
 
 /**
+ * The trigger options of `hydrateOn()` (#160, part 4d): `@defer`'s render phase, `trigger` and
+ * `when`. A `@hydrate` loads nothing, so it has no `; prefetch` — reported as not a trigger.
+ */
+export function hydrateTriggerOptions(raw: string, expr: (source: string) => string): string[] {
+    const t = parseDeferTriggers(raw);
+    const opts: string[] = [];
+    const render = [...t.render.triggers, ...t.unknown];
+    if (render.length > 0) opts.push(`trigger:${jsQuote(render.join(' | '))}`);
+    if (t.render.when.length > 0) opts.push(`when:()=>${t.render.when.map((e) => `(${expr(e)})`).join(' || ')}`);
+    return opts;
+}
+
+/** The parts of a `@hydrate (…)` that are not triggers: `@defer`'s, and a `; prefetch` with what follows. */
+export function unknownHydrateTriggers(trigger: string): string[] {
+    const t = parseDeferTriggers(trigger);
+    const prefetch = t.prefetch ? [`; prefetch ${[...t.prefetch.triggers, ...t.prefetch.when.map((e) => `when (${e})`)].join(' | ')}`] : [];
+    // `hover` too: `@defer` reports it as a form the beta removed; a `@hydrate` never had it.
+    return [...t.unknown, ...prefetch];
+}
+
+/**
  * The parts of a `@defer (…)` trigger that are not triggers, in order — `hover` aside: it is a form the
  * beta removed, reported and rewritten as such (`language/defer-hover.ts`).
  */

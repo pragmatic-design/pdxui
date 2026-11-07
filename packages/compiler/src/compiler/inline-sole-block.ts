@@ -11,7 +11,7 @@ import type { TemplateNode } from '../parser/template';
 import { isSingleElementBody } from './show-single-element';
 
 /** The control-flow nodes whose generator puts exactly one node where they stand (`place`). */
-const PLACED = new Set<TemplateNode['type']>(['if', 'for', 'switch', 'require', 'portal', 'defer', 'try', 'await', 'render']);
+const PLACED = new Set<TemplateNode['type']>(['if', 'for', 'switch', 'require', 'portal', 'defer', 'hydrate', 'try', 'await', 'render']);
 
 /** An `html` node of whitespace alone. */
 const blank = (n: TemplateNode | undefined): boolean => n?.type === 'html' && !n.raw && /^\s*$/.test(n.content);

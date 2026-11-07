@@ -277,7 +277,11 @@ export function arrivedCode(loadFn: (() => Promise<unknown>) | null): DeferCode 
 
 // ─── Trigger Activation ────────────────────────────────────────────
 
-function activateTrigger(
+/**
+ * Arm one trigger of a block, before `before` in `parent`: `onTrigger` runs when it fires. Returns what
+ * disarms it, or null for one that fired at once. Shared with `@hydrate`'s blocks (hydrate/later.ts).
+ */
+export function activateTrigger(
     trigger: string,
     parent: Node,
     before: Node,
@@ -331,7 +335,7 @@ function activateTrigger(
  * is never removed by its trigger. Once fired, the next run reads nothing, and the effect is subscribed
  * to nothing.
  */
-function activateWhen(condition: () => unknown, onTrigger: () => void): () => void {
+export function activateWhen(condition: () => unknown, onTrigger: () => void): () => void {
     let fired = false;
     return effect(() => {
         if (fired) return;

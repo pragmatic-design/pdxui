@@ -217,6 +217,24 @@ export const ROWS: Row[] = [
         template: '@defer (immediate) { <pdx-deferred-probe></pdx-deferred-probe> }',
         read: (h) => lazyLoads.some((u) => u.endsWith(`?for=${mountName(h)}`)),
     },
+    // @hydrate (#160, part 4d): mounted, the part is live at once. Hydrated, it waits for its trigger;
+    // its first event takes it over and runs again, and a value changed meanwhile is the one it shows.
+    { name: '@hydrate (idle)', expected: '<p>5</p>', template: '@hydrate (idle) { <p>{{ n }}</p> }', script: 'let n = $signal(5);' },
+    {
+        name: '@hydrate (interaction), clicked before it is live', expected: '<button>1</button>',
+        template: '@hydrate (interaction) { <button @click="n++">{{ n }}</button> }', script: 'let n = $signal(0);', act: click('button'),
+    },
+    {
+        name: '@hydrate (when (…)), taken over after the value changed', expected: '<p>1</p><button>go</button>',
+        template: '@hydrate (when (on)) { <p>{{ n }}</p> }<button @click="n++; on = true">go</button>',
+        script: 'let on = $signal(false);\nlet n = $signal(0);', act: click('button'),
+    },
+    {
+        name: '@hydrate (timer(…)), before its trigger',
+        hydrateDiffers: 'a part not taken over yet stands as the server wrote it: the value changed since does not reach it until its trigger fires',
+        expected: '<p>1</p><button>+</button>',
+        template: '@hydrate (timer(100000)) { <p>{{ n }}</p> }<button @click="n++">+</button>', script: 'let n = $signal(0);', act: click('button'),
+    },
     {
         // A row replaced by a new object whose field kept its value — another field's save landing.
         // The binding writes when ITS value changes, so what the component holds since (a field being

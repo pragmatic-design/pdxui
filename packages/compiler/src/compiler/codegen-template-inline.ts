@@ -6,7 +6,7 @@
 import { awaitTimingArg, deferLoadFn, extractLoopInvariants, generateTransition, virtualOptions } from './codegen-template';
 import type {
     TemplateNode, IfNode, ForNode, SwitchNode, RequireNode,
-    InterpolationNode, ShowNode, PortalNode, DeferNode, TryNode, AwaitNode, LetNode,
+    InterpolationNode, ShowNode, PortalNode, DeferNode, HydrateNode, TryNode, AwaitNode, LetNode,
     CustomDirectiveNode, RenderNode, SnippetNode,
 } from '../parser/template';
 import { parseTemplate } from '../parser/template';
@@ -25,7 +25,7 @@ import { hasNativeProperty } from './native-properties';
 import { templateMark, htmlOriginOf, attributeOrigins } from './codegen-origins';
 import { originMark } from './sourcemap';
 import { jsQuote, jsString } from './js-literal';
-import { deferTriggerOptions } from './defer-triggers';
+import { deferTriggerOptions, hydrateTriggerOptions } from './defer-triggers';
 import { StaticTree, type TemplateHoists } from './inline-static-tree';
 import { isConstantBinding, withRowKey } from './codegen-constant-bindings';
 import { specialisedClassBinding } from './inline-class-binding';
@@ -298,6 +298,7 @@ class InlineGen {
                 case 'show': this.showN(node); break;
                 case 'portal': this.portalN(node); break;
                 case 'defer': this.deferN(node); break;
+                case 'hydrate': this.hydrateN(node); break;
                 case 'try': this.tryN(node); break;
                 case 'await': this.awaitN(node); break;
                 case 'let': this.letN(node); break;
@@ -1127,6 +1128,16 @@ class InlineGen {
         }
         const cf = this.v('cf');
         this.out(`const ${cf}=defer({${opts.join(',')}},${load},()=>{${body}});`);
+        this.place(cf);
+    }
+
+    /** `@hydrate (trigger) { … }` (#160, part 4d): the content, taken over later on a generated page. */
+    hydrateN(node: HydrateNode): void {
+        this.imports.add('hydrateOn');
+        const body = this.sub(node.body);
+        const opts = hydrateTriggerOptions(node.trigger, (e) => callSignals(prefixCtx(e, this.ctx), this.ctx));
+        const cf = this.v('cf');
+        this.out(`const ${cf}=hydrateOn({${opts.join(',')}},()=>{${body}});`);
         this.place(cf);
     }
 

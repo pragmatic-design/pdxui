@@ -39,6 +39,7 @@ export type TemplateNode =
     | ShowNode
     | PortalNode
     | DeferNode
+    | HydrateNode
     | TryNode
     | AwaitNode
     | LetNode
@@ -159,6 +160,18 @@ export interface DeferNode {
     error?: TemplateNode[];
     errorVar?: string;        // the error's name (from @error (err)); `err` when omitted
     retryVar?: string;        // the retry function's name (from @error (err, again)); `retry` when omitted
+    loc?: SourceLoc;
+}
+
+/**
+ * `@hydrate (trigger) { … }` (#160, part 4d): content a generated page's client takes over when the
+ * trigger fires, instead of at boot. The triggers are `@defer`'s render triggers.
+ */
+export interface HydrateNode {
+    type: 'hydrate';
+    /** What the parentheses hold, as written. */
+    trigger: string;
+    body: TemplateNode[];
     loc?: SourceLoc;
 }
 
@@ -562,7 +575,7 @@ function matchUnknownDirective(ctx: ParseContext): string | null {
 
 // Directives worth suggesting — the block directives an author actually types (excludes
 // sub-clauses like @case/@else/@empty that only appear inside another block).
-const SUGGESTABLE_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await', 'slot'];
+const SUGGESTABLE_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'hydrate', 'try', 'await', 'slot'];
 
 /** Nearest suggestable directive to `word` by Levenshtein distance (≤ 2), or null. A tight
  *  threshold keeps CSS at-rules and arbitrary `@word` text from being falsely flagged. */
@@ -602,6 +615,7 @@ function parseDirective(ctx: ParseContext, directive: string): TemplateNode | nu
         case 'show': return parseShow(ctx, loc);
         case 'portal': return parsePortal(ctx, loc);
         case 'defer': return parseDefer(ctx, loc);
+        case 'hydrate': return parseHydrate(ctx, loc);
         case 'await': return parseAwait(ctx, loc);
         case 'try': return parseTry(ctx, loc);
         case 'let': return parseLet(ctx, loc);
@@ -935,6 +949,16 @@ function parseDefer(ctx: ParseContext, loc: SourceLoc): DeferNode {
     }
 
     return { type: 'defer', trigger, body, placeholder, loading, error, errorVar, retryVar, loc };
+}
+
+// ─── @hydrate ─────────────────────────────────────────────────────
+
+/** `@hydrate (trigger) { content }`: no sub-blocks — the content is what the server wrote. */
+function parseHydrate(ctx: ParseContext, loc: SourceLoc): HydrateNode {
+    const trigger = parseParenthesized(ctx);
+    skipWhitespace(ctx);
+    const body = parseBlock(ctx);
+    return { type: 'hydrate', trigger, body, loc };
 }
 
 // ─── @await ───────────────────────────────────────────────────────

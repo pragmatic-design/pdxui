@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 109 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 110 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -695,6 +695,36 @@ write:
 </template>
 <script>
 @host { role="button" }
+</script>
+```
+
+### PDX_HYDRATE_UNKNOWN_TRIGGER
+
+*error* — A `@hydrate` trigger the runtime does not know (`@hydrate (visible)`), or a `; prefetch` in one.
+
+On a generated page, the client takes a `@hydrate` part over when its trigger fires. A trigger it does not recognise fires at once: the part is taken over at boot, which is what the block was written to avoid. The triggers are `@defer`'s; a `@hydrate` loads no code, so it has no prefetch phase.
+
+**Fix.** Use `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `timer(ms)` or `when (expression)`, combined with `|`.
+
+Instead of:
+
+```html
+<template>
+  @hydrate (visible) { <p>reviews</p> }
+</template>
+<script>
+
+</script>
+```
+
+write:
+
+```html
+<template>
+  @hydrate (viewport) { <p>reviews</p> }
+</template>
+<script>
+
 </script>
 ```
 

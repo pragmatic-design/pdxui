@@ -31,6 +31,7 @@ const BUTTON_PROPS = new Set(['variant', 'size', 'disabled', 'maxItems']);
 const ROWS: Record<string, Row> = {
     PDX_RAW_INTERPOLATION: { src: pdx('<p title="${n}">x</p>', 'let n = $signal(1);'), at: 'title="${n}"' },
     PDX_DEFER_UNKNOWN_TRIGGER: { src: pdx('@defer (viewprt) { <p>x</p> }', ''), at: '@defer (viewprt)' },
+    PDX_HYDRATE_UNKNOWN_TRIGGER: { src: pdx('<p>x</p>\n  @hydrate (visible) { <p>y</p> }', ''), at: '@hydrate (visible)' },
     PDX_KEEPALIVE_MAX: { src: pdx('<p>x</p>\n  <component :is="view" @keepAlive(0)></component>', "let view = $signal('pdx-a');"), at: '@keepAlive(0)' },
     PDX_DYNAMIC_CONTENT: { src: pdx('<p>x</p>\n  <component :is="view"><b>lost</b></component>', "let view = $signal('pdx-a');"), at: '<b>lost</b>' },
     PDX_UNKNOWN_DIRECTIVE: { src: pdx("<p>first</p>\n  <p>@tooltip ('a') { x }</p>", ''), at: '@tooltip' },

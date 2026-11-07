@@ -3,10 +3,14 @@
   <app-card label="written by the server"></app-card>
   <button data-test="count" @click="count++">{{ count }}</button>
   <pdx-link to="/about" data-test="to-about">About</pdx-link>
+  @hydrate (timer(600000)) {
+    <button data-test="later" @click="later++">{{ later }}</button>
+  }
 </template>
 
 <script>
 @page '/';
 @layout 'shell';
 let count = $signal(0);
+let later = $signal(0);
 </script>
