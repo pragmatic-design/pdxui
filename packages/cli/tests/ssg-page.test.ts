@@ -34,6 +34,13 @@ describe('a built page around a route', () => {
         expect(page).toContain('<pdx-router-outlet data-pdx-ssg="/"><h1>x</h1></pdx-router-outlet>\n<script type="module" src="/assets/a.js"></script>\n</body></html>');
     });
 
+    it('finds a script\'s end as the HTML parser does, with a space or a slash before the >', () => {
+        const parts = bodyParts('<html><body><p>a</p><SCRIPT type="module">x()</SCRIPT ><p>b</p>'
+            + '<script>y()</script\n><scripts-list></scripts-list></body></html>')!;
+        expect(parts.scripts).toEqual(['<SCRIPT type="module">x()</SCRIPT >', '<script>y()</script\n>']);
+        expect(parts.markup).toBe('<p>a</p><p>b</p><scripts-list></scripts-list>');
+    });
+
     it('has no body to split when there is none', () => {
         expect(bodyParts('<html><head></head></html>')).toBeNull();
     });

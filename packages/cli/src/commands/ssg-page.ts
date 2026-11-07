@@ -13,8 +13,6 @@ export interface BodyParts {
     readonly after: string;
 }
 
-// Match: a <script …>…</script> element. The content of a script is never markup.
-const SCRIPT = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
 // Match: the start-up splash the plugin paints (`compiler/src/splash.ts`), its style, and the
 // `aria-busy` it puts on the body.
 const SPLASH_ELEMENT = /<div id="pdx-splash"[^>]*>[\s\S]*?<\/div>\s*/;
@@ -27,13 +25,38 @@ export function bodyParts(html: string): BodyParts | null {
     const close = html.toLowerCase().lastIndexOf('</body>');
     if (!open || close < open.index) return null;
     const start = open.index + open[0].length;
-    const inner = html.slice(start, close);
-    return {
-        before: html.slice(0, start),
-        markup: inner.replace(SCRIPT, '').trim(),
-        scripts: inner.match(SCRIPT) ?? [],
-        after: html.slice(close),
-    };
+    const { markup, scripts } = splitScripts(html.slice(start, close));
+    return { before: html.slice(0, start), markup: markup.trim(), scripts, after: html.slice(close) };
+}
+
+/**
+ * The body cut into its markup and its script elements, read the way the HTML parser reads them: a
+ * script runs from `<script` to the first `</script` followed by a space, a slash or `>`, whatever
+ * its content says. Split, not filtered — every character lands on one side or the other.
+ */
+function splitScripts(inner: string): { markup: string; scripts: string[] } {
+    const lower = inner.toLowerCase();
+    const scripts: string[] = [];
+    let markup = '';
+    let at = 0;
+    for (let open = tagAt(lower, '<script', at); open !== -1; open = tagAt(lower, '<script', at)) {
+        const close = tagAt(lower, '</script', open);
+        const gt = close === -1 ? -1 : lower.indexOf('>', close);
+        const end = gt === -1 ? inner.length : gt + 1;
+        markup += inner.slice(at, open);
+        scripts.push(inner.slice(open, end));
+        at = end;
+    }
+    return { markup: markup + inner.slice(at), scripts };
+}
+
+/** Where `name` opens a tag from `from` on: followed by a space, `/`, `>` or the end, not `<scripts-list`. */
+function tagAt(lower: string, name: string, from: number): number {
+    for (let i = lower.indexOf(name, from); i !== -1; i = lower.indexOf(name, i + 1)) {
+        const next = lower.charAt(i + name.length);
+        if (next === '' || next === '>' || next === '/' || /\s/.test(next)) return i;
+    }
+    return -1;
 }
 
 /**
