@@ -56,6 +56,7 @@ import type { PropType, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from 
 import { modelEvent } from '../utils/model-event';
 import type { FormModelCallbacks } from '../form/form-model';
 import type { HydrateOnOptions } from '../renderer/hydrate-on';
+import { isServerRender } from '../server/mode';
 export type { PropType } from './component-descriptor';
 
 /** The props a component declares, each with the descriptor: `prop<T>()`, `prop.required<T>()`, `prop.optional<T>()`. */
@@ -623,7 +624,9 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                 // Inside an error boundary, the boundary's fallback is what the author asked for:
                 // hand the error up, and connectedCallback routes it there. The inline
                 // span below is for a component with no boundary around it.
-                if (getTopErrorHandler()) throw err;
+                // Rendered to a string (#160), the error is the server's to report, as it was thrown: the
+                // span is the browser's, and building it there would throw again, over the real reason.
+                if (getTopErrorHandler() || isServerRender()) throw err;
                 console.error(`[pdx] Component ${componentLabel(tag)} setup failed:`, err);
                 const msg = document.createElement('span');
                 msg.textContent = `Error in <${tag}>: ${err instanceof Error ? err.message : String(err)}`;

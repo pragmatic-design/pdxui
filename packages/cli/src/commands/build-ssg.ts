@@ -105,6 +105,17 @@ async function generate(serverDir: string, outDir: string, extraPaths: readonly 
         throw new SsgError(`the app's modules could not run on the server, where there is no document or window: ${rendered.error}\n  Move what reads the browser into onMount, or behind a check that it is there.`);
     }
 
+    // A setup or a render that reads a browser global stops the build, before any page is written: on
+    // the server it is a component written as an empty host, and the read belongs in onMount (#160).
+    const reads = new Map<string, Set<string>>();
+    for (const page of rendered.pages) {
+        for (const s of page.skipped) if (s.global) reads.set(s.tag, (reads.get(s.tag) ?? new Set()).add(s.global));
+    }
+    if (reads.size > 0) {
+        const list = [...reads].map(([tag, globals]) => `<${tag}> reads ${[...globals].map((g) => `\`${g}\``).join(', ')}`).join('; ');
+        throw new SsgError(`${list} in its setup or render, which runs on the server too, where there is no browser.\n  Move the read into onMount, which runs only in the browser, or guard it: typeof window !== 'undefined'.`);
+    }
+
     const report: SsgReport = { pages: [], skippedRoutes: [...rendered.skippedRoutes] };
     for (const page of rendered.pages) {
         const file = pageFile(page.path);

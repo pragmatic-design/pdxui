@@ -91,5 +91,6 @@ describe('renderToString in Node', () => {
         expect(skipped).toHaveLength(1);
         expect(skipped[0].tag).toBe('node-imperative');
         expect(skipped[0].reason).toMatch(/document/);
+        expect(skipped[0].global, 'the global it read, which a static build stops on').toBe('document');
     });
 });
