@@ -55,6 +55,7 @@ import { PROP_SPEC } from './prop-spec';
 import type { PropType, PropSpec, EventSpec, ModelSpec, SlotSpec, EmitOf } from './component-descriptor';
 import { modelEvent } from '../utils/model-event';
 import type { FormModelCallbacks } from '../form/form-model';
+import type { HydrateOnOptions } from '../renderer/hydrate-on';
 export type { PropType } from './component-descriptor';
 
 /** The props a component declares, each with the descriptor: `prop<T>()`, `prop.required<T>()`, `prop.optional<T>()`. */
@@ -186,6 +187,12 @@ export interface ComponentOptions<P extends PropMap = PropMap, E extends EventMa
     static?: boolean;
     /** Make this a form-associated custom element. Enables ElementInternals. */
     formAssociated?: boolean;
+    /**
+     * On a generated page, take the host over when one of these triggers fires instead of at boot
+     * (#160, part 4d): `@hydrate viewport;` in a `.pdx`. The triggers are `@defer`'s, without
+     * `when`, which would read a setup that has not run. Elsewhere the component mounts as always.
+     */
+    hydrate?: HydrateOnOptions;
     /**
      * The `.pdx` this component was compiled from, relative to the app root. The compiler passes it
      * in development builds only, and an unhandled runtime error names it.
@@ -339,6 +346,8 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
         if (kebab !== name.toLowerCase()) jsonPropKebab.set(name, kebab);
     }
 
+    const hydrateLater = options.hydrate ?? null;
+
     class Comp extends PdxElement {
         static attrs = attrNames;
         static attrCanonical = attrCanonical;
@@ -349,6 +358,8 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
 
         /** The host's custom states, when the descriptor declares any and the browser has them. */
         _customStates: CustomStateSet | null = null;
+
+        override get _hydrateLater(): HydrateOnOptions | null { return hydrateLater; }
 
         /** The form lifecycle of a model declared `{ form }` (#135), once the body has wired it. */
         _formModel: FormModelCallbacks | null = null;

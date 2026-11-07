@@ -583,6 +583,56 @@ let open = $signal(false);
 
 beta (#133)
 
+### @hydrate
+
+#### Syntax
+
+```ebnf
+HydrateDecl ::= "@hydrate" S Triggers S? ";"?
+```
+
+`Triggers` is `@defer`'s (template.md), without `when (…)`.
+
+The analyzer's form: `@hydrate viewport;`
+
+#### Semantics
+
+On a page that static generation wrote (`pdx build --ssg`), the component's host is taken over when a
+trigger fires, instead of at boot (#160). The descriptor carries the triggers (`hydrate: { trigger }`).
+Until a trigger fires, the host stands as the server wrote it: its setup has not run, nothing in it is
+bound, and the components inside it wait for it. The first `click`, `submit`, `input`, `change` or
+`keydown` on the host does not wait. It takes the host over at once and is dispatched again on the
+same element, as in a `@hydrate` block of a template.
+
+A page is a component, so `@hydrate` on a page puts off the whole route. The layout around the page
+is taken over at boot, as always.
+
+Mounted, with no generated markup, the component mounts at once: the declaration changes nothing.
+
+#### Rules
+
+- A trigger the runtime does not know, and `when (…)`, raise `PDX_HYDRATE_UNKNOWN_TRIGGER`. A `when`
+  would read the script, which runs only once the host is taken over.
+
+#### Examples
+
+```pdx
+<template>
+  <section class="comments">
+    <button @click="open = !open">Comments</button>
+  </section>
+</template>
+
+<script>
+@hydrate viewport;
+let open = $signal(false);
+</script>
+```
+
+#### Since
+
+beta (#160)
+
 ### @state
 
 #### Syntax

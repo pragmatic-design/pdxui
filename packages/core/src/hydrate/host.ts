@@ -13,6 +13,7 @@ import { DEV } from '../utils/env';
 import { adoptPartValue, hydrateChildren } from './adopt';
 import { regionNodes, regionsOf, release as releaseRegion, takeRegions } from './regions';
 import { installPartAdoption } from './compiled';
+import { replay, waitForTrigger } from './later';
 
 /** Hydrate pre-rendered components from now on, instead of rendering them over their markup. */
 export function installHydration(): void {
@@ -31,10 +32,40 @@ const waiting = new WeakMap<Element, HydratingHost[]>();
 function waits(host: HydratingHost): boolean {
     if (!host.hasAttribute('data-pdx-ssr')) return false;
     const ancestor = host.parentElement?.closest('[data-pdx-ssr]');
-    if (!ancestor) return false;
-    const list = waiting.get(ancestor);
-    if (list) list.push(host);
-    else waiting.set(ancestor, [host]);
+    if (ancestor) {
+        const list = waiting.get(ancestor);
+        if (list) list.push(host);
+        else waiting.set(ancestor, [host]);
+        return true;
+    }
+    return waitsForTrigger(host);
+}
+
+/** The generated hosts whose `@hydrate` trigger has fired, or is being waited for: what stops the wait. */
+const triggered = new WeakSet<HydratingHost>();
+const armed = new WeakMap<HydratingHost, () => void>();
+
+/**
+ * A host whose component says `@hydrate trigger;` (#160, part 4d) is taken over when the trigger fires,
+ * or at the first event on it, which is dispatched again once it is live. Until then it stands as the
+ * server wrote it, and the hosts inside it wait for it as for any ancestor not hydrated yet.
+ */
+function waitsForTrigger(host: HydratingHost): boolean {
+    const options = host._hydrateLater;
+    if (!options || triggered.has(host)) return false;
+    if (armed.has(host)) return true;
+    armed.set(host, waitForTrigger({
+        listener: host,
+        inPart: (target) => target instanceof Node && host.contains(target),
+        elements: () => [host],
+    }, options, null, (first) => {
+        armed.delete(host);
+        // Gone from the page before its trigger: it waits again when it comes back.
+        if (!host.isConnected) return;
+        triggered.add(host);
+        host.connectedCallback();
+        if (first) replay(first);
+    }));
     return true;
 }
 

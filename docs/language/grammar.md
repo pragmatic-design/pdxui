@@ -55,7 +55,7 @@ ScriptItem     ::= Declaration | RuneStatement | Statement
 Declaration    ::= ComponentDecl | RouteDecl | DataDecl | ModuleDecl
 
 ComponentDecl  ::= PropDecl | ModelDecl | EventDecl | SlotDecl | GenericDecl | StateDecl | PartDecl
-                 | HostDecl | ExposeDecl | ProvideDecl | InjectDecl | VariantsDecl | TagDecl
+                 | HostDecl | ExposeDecl | ProvideDecl | InjectDecl | VariantsDecl | TagDecl | HydrateDecl
 ModuleDecl     ::= UseDecl | SnippetDecl | I18nDecl | RawScriptBlock                                    († `@mixin` removed — decisions.md 6)
 RouteDecl      ::= PageDecl | GuardDecl | LoaderDecl | LayoutDecl | OutletDecl | ScrollDecl | RedirectDecl
                  | ParamsDecl | SearchDecl | TitleDecl | MetaDecl
@@ -76,6 +76,7 @@ SlotSignature  ::= "(" S? ( SlotParam ( S? "," S? SlotParam )* )? S? ")"
 SlotParam      ::= Identifier S? ":" S? Type
 GenericDecl    ::= "@generic" S TypeParameter ( S? "," S? TypeParameter )* End                    (β #131 — landed #490)
 StateDecl      ::= "@state" S Identifier S? "=" S? Expression End                                   (β #132)
+HydrateDecl    ::= "@hydrate" S Triggers End                                                       (β #160: @defer's triggers, no `when`)
 PartDecl       ::= "@part" S Identifier ( S? "," S? Identifier )* End                               (β #134)
 HostDecl       ::= "@host" ( S Identifier )? ( S? "{" ( S? Attribute )* S? "}" | End )          (β #133: the template's attribute grammar; #750: a name)
 ExposeDecl     ::= "@expose" S Identifier ( S? "," S? Identifier )* End

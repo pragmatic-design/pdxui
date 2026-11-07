@@ -26,6 +26,7 @@ const EXAMPLES: Record<string, { decl: string; script?: string; page?: boolean }
     host: { decl: '@host { role="switch" :aria-checked="on" }', script: 'let on = $signal(false);' },
     variants: { decl: '@variants { variant: { primary, ghost } = primary; size: { sm, md } = md; }' },
     state: { decl: '@state busy = (count > 0 && count < 9);', script: 'let count = $signal(0);' },
+    hydrate: { decl: '@hydrate viewport | idle(2000);' },
     form: { decl: '@form login: { user: string { required }, pass: string };' },
     action: { decl: "@action save(dto: string, { signal }) with { invalidate: ['GET:/api/x'], concurrency: 'drop' } { await fetch('/api/x', { method: 'POST', body: dto, signal }); }" },
     fetch: { decl: "@fetch users: 'GET /api/users' as string[] { staleTime: 5000 };" },

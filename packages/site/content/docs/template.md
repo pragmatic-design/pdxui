@@ -428,6 +428,9 @@ submit or keystroke on it does not wait: it hydrates the part on the spot and is
 same element, so nothing the visitor did is lost. On a page that is not generated, the part renders
 as if the block were not there. The compiler emits a `hydrateOn()` call; you never write it yourself.
 
+A whole component, or a whole page, is put off the same way from its script: `@hydrate viewport;`
+leaves the component as the server wrote it until it comes into view, or until the first click on it.
+
 ## Waiting for data: `@await`
 
 `@defer` waits for code; `@await` waits for data. It takes an `@fetch`, a resource, `useQuery` or a

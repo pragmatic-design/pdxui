@@ -24,16 +24,24 @@ const entry = (subpath: string): string => {
 };
 
 type ServerApi = typeof import('../src/server/index');
-type CoreApi = typeof import('../src/index');
 let server: ServerApi;
-let core: CoreApi;
+// What the component is written with, from the modules the barrel re-exports: the whole barrel,
+// transformed cold inside this hook, took more than its 10 s under the pre-push gate's load.
+let core: {
+    html: typeof import('../src/renderer/template').html;
+    component: typeof import('../src/component/component').component;
+    prop: typeof import('../src/component/component-descriptor').prop;
+};
 
 beforeAll(async () => {
     expect(typeof HTMLElement, 'this suite runs with no DOM').toBe('undefined');
     const dom = (await import(/* @vite-ignore */ entry('./server-dom'))) as { installServerDom(): void };
     dom.installServerDom();
     server = (await import(/* @vite-ignore */ entry('./server'))) as ServerApi;
-    core = (await import(/* @vite-ignore */ entry('.'))) as CoreApi;
+    const [template, comp, descriptor] = await Promise.all([
+        import('../src/renderer/template'), import('../src/component/component'), import('../src/component/component-descriptor'),
+    ]);
+    core = { html: template.html, component: comp.component, prop: descriptor.prop };
 });
 
 describe('the server DOM, installed through its entry', () => {

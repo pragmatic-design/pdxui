@@ -290,6 +290,8 @@ export interface ScriptAnalysis {
     forms: FormDecl[];       // @form declarations
     exposes: string[];       // names declared via @expose
     states: StateDecl[];     // @state name = expr;
+    /** `@hydrate viewport;` (#160, part 4d): the triggers a generated host waits for, as written. */
+    hydrate?: string;
     host?: HostAttr[];       // @host { role="x" :aria-expanded="open" @keydown="onKey" }
     /** `@host el;` / `@host el { … }` (#750): the name the script and the template give the host element. */
     hostName?: string;

@@ -246,7 +246,8 @@ export function compileNewMode(
         ctx.tagPrefix,
         ctx.target,
         typedSlots,
-        ctx.ssr);
+        ctx.ssr,
+        analysis.hydrate ?? '');
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

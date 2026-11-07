@@ -94,6 +94,23 @@ test('a @hydrate part waits, and the first click on it takes it over and counts 
     expect(errors).toEqual([]);
 });
 
+test('a page that hydrates later waits, and the first click on it takes it over and counts once', async ({ page }) => {
+    const errors = await watch(page);
+    await page.goto(`${site.url}/about`);
+    // The layout around it is live; the page itself says `@hydrate timer(600000);`.
+    const about = page.locator('app-about');
+    await expect(page.locator('pdx-router-outlet')).not.toHaveAttribute('data-pdx-ssg');
+    await expect(about, 'the page was taken over before its trigger').toHaveAttribute('data-pdx-ssr', /\d+/);
+    const count = page.locator('[data-test="about-count"]');
+    await count.click();
+    await expect(count, 'the click before the page was live was lost, or counted twice').toHaveText('1');
+    await expect(about).not.toHaveAttribute('data-pdx-ssr');
+    await count.click();
+    await expect(count).toHaveText('2');
+    expect(await removed(page), 'elements the server wrote were removed').toEqual([]);
+    expect(errors).toEqual([]);
+});
+
 test('a page entered directly is taken over too', async ({ page }) => {
     const errors = await watch(page);
     await page.goto(`${site.url}/about`);

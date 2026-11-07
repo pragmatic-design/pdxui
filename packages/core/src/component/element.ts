@@ -11,6 +11,7 @@ import { watchPartNodes, unwatchPartNodes } from '../renderer/part-nodes';
 import { componentLabel, componentFile } from './global-error';
 import { devInstanceId, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
+import type { HydrateOnOptions } from '../renderer/hydrate-on';
 
 /**
  * How a pre-rendered host takes over the markup the build wrote for it (#160, part 4), set by the
@@ -33,9 +34,11 @@ export interface HostHydration {
     release(host: HydratingHost): void;
 }
 
-/** A host as hydration sees it: an element that connects. */
+/** A host as hydration sees it: an element that connects, and the triggers it waits for, if any. */
 export interface HydratingHost extends Element {
     connectedCallback(): void;
+    /** `@hydrate trigger;` (#160, part 4d): a generated host is taken over when one fires. */
+    readonly _hydrateLater: HydrateOnOptions | null;
 }
 
 let hostHydration: HostHydration | null = null;
@@ -262,6 +265,9 @@ export abstract class PdxElement extends HTMLElementBase {
 
     /** Override in subclass for Shadow DOM support. Default: this (Light DOM). */
     get _renderTarget(): Node { return this; }
+
+    /** The triggers a generated host waits for before it is taken over (#160); none by default. */
+    get _hydrateLater(): HydrateOnOptions | null { return null; }
 
     connectedCallback(): void {
         // A connectedCallback can arrive after the element has left the document. The case that

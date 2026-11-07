@@ -22,5 +22,5 @@ export const RESERVED_ELEMENT_NAMES: ReadonlySet<string> = new Set<string>([
     'setValidity', 'validationMessage', 'validity',
     // its internals, and the ones component() adds
     '__pdx_restoreState', '__pdx_saveState', '_captureChildren', '_disposeUnprojected', '_ownsNode',
-    '_projectSlots', '_renderTarget', '_restoreLightChildren', '_watchLateSlots',
+    '_hydrateLater', '_projectSlots', '_renderTarget', '_restoreLightChildren', '_watchLateSlots',
 ]);

@@ -247,6 +247,8 @@ export function assembleModule(
     slots: readonly string[] = [],
     /** Compiled for the server (#160): no document to inject a `<style>` into, so styles are imported. */
     ssr = false,
+    /** `@hydrate trigger;` (#160, part 4d): the triggers a generated host waits for; '' for none. */
+    hydrate = '',
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -339,6 +341,8 @@ export function assembleModule(
     // The descriptor's `slots` (#489): each typed snippet is a property of the element, a function
     // the parent's `@snippet` (or a script) assigns and the component's `@render` calls.
     if (slots.length > 0) code += `  slots: { ${slots.map(s => `${s}: slot()`).join(', ')} },\n`;
+    // The descriptor's `hydrate` (#160, part 4d): a generated host waits for these triggers.
+    if (hydrate) code += `  hydrate: { trigger: ${jsQuote(hydrate)} },\n`;
     code += sourceFileOption(sourceFile);
     // Shadow DOM opt-in via <template shadow>
     if (descriptor.template && 'shadow' in descriptor.template && descriptor.template.shadow) {
