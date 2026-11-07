@@ -11,7 +11,7 @@ import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
 import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup, type TwoWayField } from './two-way-value';
 import { attach, type Attachment } from './attach';
-import { isServerRender, serverFragment } from '../server/mode';
+import { isServerRender, deferredTemplate } from '../server/mode';
 import {
     PLACEHOLDER, COMMENT_PH_PREFIX, PH_REGEX, buildBindingPlan, nodeAt, type BindingPlan,
 } from './template-plan';
@@ -44,7 +44,7 @@ const templateCache = new WeakMap<TemplateStringsArray, { tpl: HTMLTemplateEleme
 export function html(strings: TemplateStringsArray, ...values: TemplateValue[]): DocumentFragment {
     // Rendering to a string (#160): a DocumentFragment that holds the template's strings and values,
     // nothing built; renderToString turns it into markup.
-    if (isServerRender()) return serverFragment(strings, values);
+    if (isServerRender()) return deferredTemplate(strings, values);
     if (!isBrowser) {
         throw new Error('html`` needs a DOM; it was called in an environment without one (Node, a build tool)');
     }

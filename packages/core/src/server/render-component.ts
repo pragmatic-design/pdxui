@@ -12,7 +12,7 @@
 import { collectDisposers, untracked } from '../reactivity/signal';
 import { PdxElement } from '../component/element';
 import { assignBoundProperty } from '../renderer/template';
-import { isServerFragment } from './mode';
+import { isDeferredContent } from './mode';
 
 /** A component the server could not render, and why. */
 export interface SkippedComponent {
@@ -63,9 +63,9 @@ export function renderHost(
     });
     let markup = '';
     try {
-        if (rendered !== null && !isServerFragment(rendered)) {
+        if (rendered !== null && !isDeferredContent(rendered)) {
             // A render that built DOM itself, or the error the client draws for a failed setup.
-            skipped.push({ tag, reason: 'its render built DOM instead of returning an html`` template' });
+            skipped.push({ tag, reason: 'its render built DOM instead of returning an html`` template or a helper\'s block' });
         } else if (rendered !== null) {
             markup = inner(rendered);
         }

@@ -19,7 +19,7 @@ import { sanitizeUrlForTag } from '../security/sanitize-url';
 import { twoWayAccessor } from '../renderer/two-way-value';
 import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
 import { templateTree, VOID_ELEMENTS, type TreeNode, type TreeAttribute } from './template-tree';
-import { withServerRender, isServerFragment, isServerBlock, isServerElement, type ServerFragment, type ServerBlock, type ServerElement, type BlockMark } from './mode';
+import { withServerRender, isDeferredTemplate, isServerBlock, isServerElement, type DeferredTemplate, type ServerBlock, type ServerElement, type BlockMark } from './mode';
 import { renderHost, type SkippedComponent } from './render-component';
 
 export type { SkippedComponent } from './render-component';
@@ -60,7 +60,7 @@ export function renderToStringWithReport(fn: () => unknown): { html: string; ski
  */
 function content(value: unknown, slots: Projection | null, mark: BlockMark | null = null): string {
     if (typeof value === 'function') return content(untracked(value as () => unknown), slots, mark);
-    if (isServerFragment(value)) return renderTemplate(value, slots, mark);
+    if (isDeferredTemplate(value)) return renderTemplate(value, slots, mark);
     if (isServerBlock(value)) return renderBlock(value, slots, mark);
     if (isServerElement(value)) return createdElement(value, mark);
     if (Array.isArray(value)) return value.map((v) => content(v, slots, mark)).join('');
@@ -72,7 +72,7 @@ function content(value: unknown, slots: Projection | null, mark: BlockMark | nul
 /** The comment a false `show()` puts in place of a top-level text node. */
 const SHOW_PLACEHOLDER = '<!--show-->';
 
-function renderTemplate(t: ServerFragment, slots: Projection | null, mark: BlockMark | null): string {
+function renderTemplate(t: DeferredTemplate, slots: Projection | null, mark: BlockMark | null): string {
     return nodes(templateTree(t.strings), t.values, slots, mark);
 }
 

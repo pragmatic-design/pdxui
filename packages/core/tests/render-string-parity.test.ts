@@ -8,7 +8,8 @@
 
 import { describe, it, expect } from 'vitest';
 import { html } from '../src/renderer/template';
-import { renderToString, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
+import { renderToString, renderToStringWithReport, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
+import { when } from '../src/renderer/helpers';
 import { children, parity } from './string-parity';
 import { signal } from '../src/reactivity/signal';
 import { component } from '../src/component/component';
@@ -155,6 +156,17 @@ describe('a component to a string matches the client\'s mount', () => {
         });
         const markup = mountParity(() => html`<parity-outer msg="hello">x</parity-outer>`);
         expect(markup).toMatch(/<parity-inner[^>]*><i><!--pdx-->hello<!--\/pdx--><\/i><\/parity-inner>/);
+    });
+
+    it('a component whose render is a helper\'s block alone, not a template', () => {
+        component('parity-choice', {
+            props: { on: prop(true, { type: Boolean }) },
+            render: (ctx) => when(() => ctx.on(), () => html`<b>yes</b>`, () => html`<i>no</i>`),
+        });
+        const { html: markup, skipped } = renderToStringWithReport(() => html`<parity-choice></parity-choice>`);
+        expect(skipped).toEqual([]);
+        expect(markup).toContain('<!--when--><b>yes</b><!--/when-->');
+        mountParity(() => html`<parity-choice></parity-choice>`);
     });
 });
 
