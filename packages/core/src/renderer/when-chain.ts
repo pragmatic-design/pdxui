@@ -9,7 +9,7 @@
 // any): the selector returns the index of the first condition that holds, or the `@else`'s, or -1
 // for none; the branch is rebuilt only when that index changes, and its effects are disposed with it.
 
-import { effect, collectDisposers, onDispose, untracked } from '../reactivity/signal';
+import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock } from '../server/mode';
 import { isHydrating, hydrationBlock } from '../hydrate/mode';
@@ -27,16 +27,8 @@ export function whenChain(
     // On the server: the branch picked now, between the markers when() uses too (#160).
     if (isServerRender()) return serverBlock('when', '/when', () => { const branch = branches[select()]; return branch ? [branch()] : []; });
     if (isHydrating()) {
-        return hydrationBlock(['when', '/when'], () => whenChain(select, branches), (a, parent, at) => {
-            // The branch the server rendered is the one picked now: adopted, then followed.
-            const start = a.expect(at, 'when');
-            const end = a.close(start, 'when', '/when');
-            const index = untracked(select);
-            const branch = branches[index];
-            const [, dispose] = collectDisposers(() => a.between(branch ? branch() : null, parent, start, end));
-            followChain(start, end, select, branches, { index, dispose });
-            return end.nextSibling;
-        });
+        return hydrationBlock(['when', '/when'], () => whenChain(select, branches),
+            (a, parent, at) => a.blocks.chain(a, parent, at, select, branches));
     }
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
@@ -48,7 +40,7 @@ export function whenChain(
 }
 
 /** Keep the branch `select()` picks between the markers; `adopted`: the one already there, hydrated. */
-function followChain(
+export function followChain(
     start: Comment,
     end: Comment,
     select: () => number,

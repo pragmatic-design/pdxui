@@ -18,6 +18,7 @@ import { isDeferredTemplate } from '../server/mode';
 import { attributeBinding, PH_EXTRACT } from '../renderer/template-plan';
 import { bindAdoptedValue, bindPlannedAttribute, html, interpolationText } from '../renderer/template';
 import { isHydrationBlock, withHydration, withoutHydration, type Adopter, type HydrationBlock } from './mode';
+import { blockAdopters } from './blocks';
 
 /** The server's markup is not what the template renders: the component renders instead. */
 export class HydrationMismatch extends Error {
@@ -146,6 +147,7 @@ const adopter: Adopter = {
     close: (start, open, close) => blockClose(start, open, close),
     expect: (at, data) => expectComment(at, data),
     fail: (what) => { throw new HydrationMismatch(what); },
+    blocks: blockAdopters,
     between: (content, parent, start, end) => {
         // Nothing — a false condition with no else, a case with no default — is no node at all.
         const rest = content == null ? start.nextSibling : adoptValue(content, parent, start.nextSibling, end, null);

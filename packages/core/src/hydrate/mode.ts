@@ -3,6 +3,9 @@
 // HydrationBlock, because a template's values are evaluated before the template that holds them, and
 // built at once there would be nothing left to adopt. adopt.ts walks the server's nodes against them.
 
+import type { TransitionOptions } from '../renderer/helpers';
+import type { RepeatOptions, RowRenderer } from '../renderer/list';
+
 let depth = 0;
 
 /** True while a pre-rendered component's render is being adopted. */
@@ -51,10 +54,29 @@ export interface Adopter {
     expect(at: Node | null, data: string): Comment;
     /** Stop the hydration: the markup is not what the render says. */
     fail(what: string): never;
+    /** How the helpers' blocks adopt their markup. */
+    readonly blocks: BlockAdopters;
     /** Adopt a block's content between its markers `start` and `end`, all of what lies there. */
     between(content: unknown, parent: Node, start: Comment, end: Comment): void;
     /** `node` as the client builds it, out of a hydration: a template, with the values it holds, or a block. */
     build(node: Node): Node;
+}
+
+/**
+ * The adoptions of the blocks that take over their markup (hydrate/blocks.ts), which a helper reaches
+ * through the Adopter it is handed: an app that does not hydrate carries none of them. Each takes over
+ * the block's markers from `at` on in `parent` and returns the node after them.
+ */
+export interface BlockAdopters {
+    when(a: Adopter, parent: Node, at: Node | null, condition: () => boolean, thenFn: () => Node | DocumentFragment,
+        elseFn: (() => Node | DocumentFragment | null) | null | undefined, options: TransitionOptions | undefined): Node | null;
+    chain(a: Adopter, parent: Node, at: Node | null, select: () => number,
+        branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>): Node | null;
+    match<T extends string | number>(a: Adopter, parent: Node, at: Node | null, value: () => T,
+        cases: Record<string, () => Node | DocumentFragment>): Node | null;
+    show(a: Adopter, parent: Node, at: Node | null, end: Node | null, condition: () => boolean, content: Node): Node | null;
+    list<T>(a: Adopter, parent: Node, at: Node | null, items: () => T[], keyFn: (item: T, index: number) => unknown,
+        renderer: RowRenderer<T>, options: RepeatOptions | undefined): Node | null;
 }
 
 /**

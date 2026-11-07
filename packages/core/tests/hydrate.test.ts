@@ -5,15 +5,19 @@
 // canonically, string-parity.ts), with the server's markers gone, every element the server wrote still
 // the same object, and the bindings live: a signal changed afterwards changes the adopted node.
 
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll } from 'vitest';
 import { html } from '../src/renderer/template';
 import { when, show, each, eachRow, match } from '../src/renderer/helpers';
 import { whenChain } from '../src/renderer/when-chain';
 import { dynamic } from '../src/renderer/dynamic';
 import { renderToString } from '../src/server/render-string';
 import { hydrateChildren, HydrationMismatch } from '../src/hydrate/adopt';
+import { installHydration } from '../src/hydrate/host';
 import { signal } from '../src/reactivity/signal';
 import { children } from './string-parity';
+
+// The blocks adopt through what the app that hydrates installs.
+beforeAll(() => installHydration());
 
 const pages: HTMLElement[] = [];
 afterEach(() => { for (const p of pages.splice(0)) p.remove(); });

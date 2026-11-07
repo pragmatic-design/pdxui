@@ -9,7 +9,7 @@ import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
 import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock, type Adopter } from '../hydrate/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
 
@@ -17,7 +17,7 @@ export { LIST_SLICE_THRESHOLD };
 
 let _warnedStableKeyMutation = false;
 
-interface MappedItem<T> {
+export interface MappedItem<T> {
     key: unknown;
     item: T;
     nodes: Node[];
@@ -26,14 +26,14 @@ interface MappedItem<T> {
     row?: RowSignals<T>;
 }
 
-interface RowSignals<T> { item: Signal<T>; index: Signal<number> }
+export interface RowSignals<T> { item: Signal<T>; index: Signal<number> }
 
 /**
  * How a row is rendered. `value` hands it the item — what hand-written `each()` code expects.
  * `getters` hands it `item()` and `index()`, backed by per-row signals the reconciler updates
  * when it reuses the row: what `@for` compiles to.
  */
-type RowRenderer<T> =
+export type RowRenderer<T> =
     | { mode: 'value'; render: (item: T, index: number) => Node }
     | { mode: 'getters'; render: (item: () => T, index: () => number) => Node };
 
@@ -89,21 +89,8 @@ function mountList<T>(
     // Hydrating (#160): the rows the server rendered are the list as it is now, adopted one by one in
     // order, each with its key; the list is then followed as a mounted one is.
     if (isHydrating()) {
-        return hydrationBlock(['repeat-start', 'repeat-end'], () => mountList(items, keyFn, renderer, options), (a, parent, at) => {
-            const start = a.expect(at, 'repeat-start');
-            const end = a.close(start, 'repeat-start', 'repeat-end');
-            const list = untracked(items);
-            const keys = list.map((item, i) => keyFn(item, i));
-            let next: Node | null = start.nextSibling;
-            const mapped = list.map((item, i) => {
-                const row = adoptRow(a, renderer, keys[i], item, i, parent, next, end);
-                next = row.next;
-                return row.mapped;
-            });
-            if (next !== end) a.fail('the list has markup its rows do not');
-            followList(start, end, items, keyFn, renderer, options, { mapped, keys });
-            return end.nextSibling;
-        });
+        return hydrationBlock(['repeat-start', 'repeat-end'], () => mountList(items, keyFn, renderer, options),
+            (a, parent, at) => a.blocks.list(a, parent, at, items, keyFn, renderer, options));
     }
     // On the server: every row of the list as it is now, between the client's markers, each marked as
     // createRow marks it (#160). A sliced append ends in the same rows, so slices do not apply.
@@ -125,7 +112,7 @@ function mountList<T>(
  * Keep the list's rows between its markers, reconciled by key. `adopted`: the rows already there,
  * hydrated, and their keys; null when none is rendered yet.
  */
-function followList<T>(
+export function followList<T>(
     startMarker: Comment,
     endMarker: Comment,
     items: (() => T[]),
@@ -208,40 +195,6 @@ function followList<T>(
         for (const m of mapped) m.dispose?.();
         mapped = [];
     });
-}
-
-/**
- * A row the server rendered, adopted from `at` on as `createRow` would have made it: in its own
- * scope, with its signals in row mode. Returns the row and the node after it.
- */
-function adoptRow<T>(
-    a: Adopter,
-    renderer: RowRenderer<T>,
-    key: unknown,
-    item: T,
-    i: number,
-    parent: Node,
-    at: Node | null,
-    end: Node,
-): { mapped: MappedItem<T>; next: Node | null } {
-    // What the adoption puts in before `at` — an empty text — is the row's too.
-    const before = (at ?? end).previousSibling;
-    let row: RowSignals<T> | undefined;
-    let next: Node | null = at;
-    const [, dispose] = collectDisposers(() => {
-        let content: Node;
-        if (renderer.mode === 'getters') {
-            const r: RowSignals<T> = { item: signal(item), index: signal(i) };
-            row = r;
-            content = untracked(() => renderer.render(r.item, r.index));
-        } else {
-            content = renderer.render(item, i);
-        }
-        next = a.value(content, parent, at, end);
-    });
-    const nodes: Node[] = [];
-    for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(n);
-    return { mapped: { key, item, nodes, dispose, row }, next };
 }
 
 /**

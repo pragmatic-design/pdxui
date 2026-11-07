@@ -2,12 +2,12 @@
 // Zero compilation — pure JS functions that return reactive DOM.
 
 import { DEV } from '../utils/env';
-import { effect, signal, collectDisposers, onDispose, untracked } from '../reactivity/signal';
+import { effect, signal, collectDisposers, onDispose } from '../reactivity/signal';
 import { repeat, repeatRows } from './list';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock, type Adopter } from '../hydrate/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -51,16 +51,8 @@ export function when(
     // On the server: the branch the condition picks now, between the client's markers (#160).
     if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
     if (isHydrating()) {
-        return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options), (a, parent, at) => {
-            // The branch the server rendered is the one the condition picks now: adopted in its scope,
-            // and followed from there as a mounted when() follows it.
-            const start = a.expect(at, 'when');
-            const end = a.close(start, 'when', '/when');
-            const show = !!untracked(condition);
-            const [, dispose] = collectDisposers(() => a.between(show ? thenFn() : (elseFn?.() ?? null), parent, start, end));
-            followWhen(start, end, condition, thenFn, elseFn, options, { show, dispose });
-            return end.nextSibling;
-        });
+        return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options),
+            (a, parent, at) => a.blocks.when(a, parent, at, condition, thenFn, elseFn, options));
     }
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
@@ -75,7 +67,7 @@ export function when(
  * Keep the branch `condition` picks between `start` and `end`. `adopted`: the branch already there,
  * hydrated, and what disposes it; null when nothing is rendered yet.
  */
-function followWhen(
+export function followWhen(
     start: Comment,
     end: Comment,
     condition: () => boolean,
@@ -226,16 +218,8 @@ export function match<T extends string | number>(
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
     if (isHydrating()) {
-        return hydrationBlock(['match', '/match'], () => match(value, cases), (a, parent, at) => {
-            // The case the server rendered is the one the value picks now: adopted, then followed.
-            const start = a.expect(at, 'match');
-            const end = a.close(start, 'match', '/match');
-            const key = String(untracked(value));
-            const caseFn = caseFor(cases, key);
-            const [, dispose] = collectDisposers(() => a.between(caseFn ? caseFn() : null, parent, start, end));
-            followMatch(start, end, value, cases, { key, dispose });
-            return end.nextSibling;
-        });
+        return hydrationBlock(['match', '/match'], () => match(value, cases),
+            (a, parent, at) => a.blocks.match(a, parent, at, value, cases));
     }
     if (isServerRender()) {
         return serverBlock('match', '/match', () => {
@@ -253,7 +237,7 @@ export function match<T extends string | number>(
 }
 
 /** Keep the case `value()` picks between the markers; `adopted`: the one already there, hydrated. */
-function followMatch<T extends string | number>(
+export function followMatch<T extends string | number>(
     start: Comment,
     end: Comment,
     value: () => T,
@@ -297,7 +281,7 @@ function followMatch<T extends string | number>(
 }
 
 /** The case `match()` renders for `key`: its own, or the `_` default. */
-function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
+export function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
     return cases[key] ?? cases._;
 }
 
@@ -316,7 +300,7 @@ export function show(
     if (isServerRender()) return serverBlock(null, null, () => [content], condition() ? null : { item: false, hidden: true });
     if (isHydrating()) {
         return hydrationBlock(['show', null], (a) => show(condition, a.build(content)),
-            (a, parent, at, end) => adoptShow(a, condition, content, parent, at, end));
+            (a, parent, at, end) => a.blocks.show(a, parent, at, end, condition, content));
     }
     const frag = document.createDocumentFragment();
     const nodes = content instanceof DocumentFragment
@@ -334,27 +318,8 @@ export function show(
     return frag;
 }
 
-/**
- * Hydrating (#160): the content as the server wrote it — hidden, its texts are the `show` comments —
- * adopted, then kept shown or hidden as a mounted `show()` keeps it.
- */
-function adoptShow(a: Adopter, condition: () => boolean, content: Node, parent: Node, at: Node | null, end: Node | null): Node | null {
-    const hidden = untracked(condition) ? undefined : new Map<Text, Comment>();
-    const before = at ? at.previousSibling : (end ? end.previousSibling : parent.lastChild);
-    const next = a.value(content, parent, at, end, hidden);
-    // The content's top-level nodes, with each hidden text in the place its comment keeps.
-    const byPlaceholder = new Map<Node, Text>();
-    for (const [text, placeholder] of hidden ?? []) byPlaceholder.set(placeholder, text);
-    const nodes: Node[] = [];
-    for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(byPlaceholder.get(n) ?? n);
-    const placeholders = new Map<Text, Comment>(hidden);
-    for (const n of nodes) if (n instanceof Text && !placeholders.has(n)) placeholders.set(n, document.createComment('show'));
-    showNodes(nodes, condition, placeholders);
-    return next;
-}
-
 /** Keep `nodes` shown or hidden as `condition` says: an element by its display, a text by its placeholder. */
-function showNodes(nodes: readonly Node[], condition: () => boolean, placeholders: Map<Text, Comment>): void {
+export function showNodes(nodes: readonly Node[], condition: () => boolean, placeholders: Map<Text, Comment>): void {
     effect(() => {
         const visible = condition();
         for (const n of nodes) {
