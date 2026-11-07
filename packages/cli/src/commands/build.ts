@@ -1,4 +1,4 @@
-// pdx build — production build (SPA via Vite, or standalone per-component).
+// pdx build — production build (SPA via Vite, its routes generated with --ssg, or standalone per-component).
 
 import { defineCommand } from 'citty';
 import { readFileSync, writeFileSync, mkdirSync } from 'fs';
@@ -8,12 +8,14 @@ import { loadConfigOrExit, resolveConfig } from '../config/loader';
 import { scanPdxFiles } from '../manifest/scanner';
 import { analyzeComponent } from '../manifest/generator';
 import { logger } from '../utils/logger';
-import { configRegistersPdx } from '../utils/vite-config';
+import { pdxPluginsFor, PdxConfigError } from './pdx-plugins';
+import { buildSsg, SsgError, type SsgReport } from './build-ssg';
 
 export default defineCommand({
     meta: { name: 'build', description: 'Production build' },
     args: {
         standalone: { type: 'boolean', default: false, description: 'Compile individual .pdx files without Vite' },
+        ssg: { type: 'boolean', default: false, description: 'Generate a page for every static route, which the app hydrates' },
         outDir: { type: 'string', description: 'Output directory' },
         minify: { type: 'boolean', default: true, description: 'Minify output' },
         sourcemap: { type: 'string', default: 'false', description: 'Source maps: true | hidden (no sourceMappingURL comment) | false' },
@@ -32,6 +34,8 @@ export default defineCommand({
 
         if (args.standalone) {
             await buildStandalone(resolved, outDir, args.minify as boolean, sourcemap);
+        } else if (args.ssg) {
+            await runSsg(cwd, resolved, outDir, sourcemap);
         } else {
             await buildSpa(cwd, resolved, outDir, sourcemap);
         }
@@ -67,14 +71,9 @@ async function buildSpa(
         process.exit(1);
     }
 
-    const { pdx } = await import('@pdxui/compiler');
-    // The project's vite.config may register pdx() itself, as `pdx new project` writes it: adding a
-    // second one compiles every module twice and the app renders nothing (#197).
-    const own = await configRegistersPdx(vite, cwd, { command: 'build', mode: 'production' });
-
     await vite.build({
         root: cwd,
-        plugins: own ? [] : [pdx({ plugins: resolved.plugins, minify: true, components: [resolved.components], prefix: resolved.prefix })],
+        plugins: await pdxPluginsFor(vite, cwd, resolved, false),
         build: {
             outDir,
             minify: 'esbuild',
@@ -84,6 +83,29 @@ async function buildSpa(
     });
 
     logger.success(`SPA build complete → ${outDir}/`);
+}
+
+/** The SSG build, and its report: what was written, what was not and why. Exit 1 when it cannot run. */
+async function runSsg(
+    cwd: string,
+    resolved: ReturnType<typeof resolveConfig>,
+    outDir: string,
+    sourcemap: SourcemapMode,
+): Promise<void> {
+    let report: SsgReport;
+    try {
+        report = await buildSsg(cwd, resolved, outDir, sourcemap);
+    } catch (e) {
+        if (!(e instanceof SsgError) && !(e instanceof PdxConfigError)) throw e;
+        logger.error(`pdx build --ssg: ${e.message}`);
+        process.exit(1);
+        return;
+    }
+    for (const page of report.pages) {
+        for (const c of page.skipped) logger.warn(`${page.path}: <${c.tag}> written as an empty host, rendered by the client — ${c.reason}`);
+    }
+    for (const r of report.skippedRoutes) logger.warn(`${r.path}: not generated — ${r.reason}`);
+    logger.success(`SSG build complete: ${report.pages.length} page(s) → ${outDir}/`);
 }
 
 /** Standalone build — compile individual .pdx files without Vite. */

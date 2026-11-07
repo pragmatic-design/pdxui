@@ -7,7 +7,7 @@ parent: api
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching, and the outlet rendered on the server. 33 exports, from `@pdxui/router` and `@pdxui/router/hydrate` and `@pdxui/router/server`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching, and the outlet rendered on the server. 35 exports, from `@pdxui/router` and `@pdxui/router/hydrate` and `@pdxui/router/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -195,6 +195,17 @@ function loaderState(routePath: string): LoaderState
 
 The same, for the state. 'idle' for a level that is not loading and has nothing.
 
+## `loadServerPages`
+
+```ts
+import { loadServerPages } from '@pdxui/router/server';
+
+function loadServerPages(): Promise<void>
+```
+
+Import every lazy page's module, so each page is a component the server can render: in the
+browser a page loads when it is first shown, and on the server it would be an empty host.
+
 ## `navigate`
 
 ```ts
@@ -352,6 +363,16 @@ function serverRoute(path: string): ServerRoute
 
 The URL the outlets render, set before `renderToString`. The route table is read here, so the
 table — or the pages' registrations — must be in place first.
+
+## `serverRoutes`
+
+```ts
+import { serverRoutes } from '@pdxui/router/server';
+
+function serverRoutes(): string[]
+```
+
+The patterns of the registered routes, in the order they were declared.
 
 ## `setQuery`
 

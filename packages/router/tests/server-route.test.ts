@@ -2,7 +2,7 @@
 // layouts, each with the host its page goes into, then the page with its params — with the outlet
 // marked by the route it rendered. A route the server cannot answer for renders nothing, and says why.
 
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { html, component, prop } from '@pdxui/core';
 import { renderToString } from '@pdxui/core/server';
 
@@ -15,10 +15,10 @@ import { renderToString } from '@pdxui/core/server';
         { path: '/secret', tag: 'sr-home', guard: 'admin' },
         { path: '/old', tag: 'sr-home', redirect: '/' },
     ],
-    pageModules: {},
+    pageModules: { '/admin/users': vi.fn(async () => {}) },
 };
 
-import { serverRoute } from '../src/server';
+import { serverRoute, serverRoutes, loadServerPages } from '../src/server';
 
 beforeAll(() => {
     component('sr-shell', { render: () => html`<header>Shell</header><main><slot></slot></main>` });
@@ -73,5 +73,17 @@ describe('the outlet on the server', () => {
         serverRoute('/');
         expect(renderToString(() => html`<pdx-router-outlet name="side"></pdx-router-outlet>`))
             .toBe('<pdx-router-outlet name="side"></pdx-router-outlet>');
+    });
+});
+
+describe('the routes a build generates', () => {
+    it('lists the registered patterns, in their order', () => {
+        expect(serverRoutes()).toEqual(['/', '/admin/users', '/owners/:id', '/owners/:id/pets', '/secret', '/old']);
+    });
+
+    it('imports every lazy page before rendering, so none is an empty host', async () => {
+        const table = (globalThis as Record<string, unknown>).__pdx_route_table as { pageModules: Record<string, () => Promise<void>> };
+        await loadServerPages();
+        expect(table.pageModules['/admin/users']).toHaveBeenCalledTimes(1);
     });
 });

@@ -107,7 +107,9 @@ components that could only be written as empty hosts, with the reason. A custom 
 a component writes itself through `registerServerElement(tag, render)`, building what it holds with
 `serverElement(tag, attributes, props, inner)`. The router's outlet is one: import
 `@pdxui/router/server`, call `serverRoute(path)` with the URL being generated, and the outlet writes
-that route's layouts and page. In the browser, `installRouteAdoption()` from `@pdxui/router/hydrate`
+that route's layouts and page. `serverRoutes()` lists the registered patterns, and
+`loadServerPages()` imports every lazy page first, so that none is written as an empty host.
+`pdx build --ssg` does all of this for you (see the CLI page). In the browser, `installRouteAdoption()` from `@pdxui/router/hydrate`
 has every outlet keep what the server wrote at boot instead of building it again; an app that is not
 generated does not import it, and carries none of it.
 

@@ -28,6 +28,7 @@
  * be weighed as if it were today's.
  */
 import { build } from 'vite';
+import { rmSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -51,6 +52,13 @@ export const SCENARIOS: { name: string; root: string; config: string }[] = [
     { name: 'component-mount', root: join(packageDir, 'scenarios', 'component-mount'), config: 'vite.config.ts' },
 ];
 
+/**
+ * `ssg`, under `scenarios/ssg/`: a generated app (#160), built by `pdx build --ssg` itself rather than
+ * by Vite alone, and opened by `scenario-ssg.spec.ts`. Not in SCENARIOS: that table is the one the
+ * budgets are held against, and what this app is held to is that its pages are taken over.
+ */
+export const SSG_ROOT = join(packageDir, 'scenarios', 'ssg');
+
 export default async function buildScenarios(): Promise<void> {
     for (const { name, root, config } of SCENARIOS) {
         await build({
@@ -60,4 +68,11 @@ export default async function buildScenarios(): Promise<void> {
             build: { outDir: scenarioDist(name), emptyOutDir: true },
         });
     }
+    // The CLI's own build, from its sources: the showcase does not depend on the CLI's package.
+    const { buildSsg } = await import('../../cli/src/commands/build-ssg');
+    const { resolveConfig } = await import('../../cli/src/config/loader');
+    // Outside the app's root, so Vite does not empty it: a page left from an earlier build would be
+    // opened as if this one had written it.
+    rmSync(scenarioDist('ssg'), { recursive: true, force: true });
+    await buildSsg(SSG_ROOT, resolveConfig({}, SSG_ROOT), scenarioDist('ssg'), false);
 }
