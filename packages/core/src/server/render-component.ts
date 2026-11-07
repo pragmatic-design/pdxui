@@ -27,6 +27,12 @@ function isDeferredContent(value: unknown): boolean {
 export interface SkippedComponent {
     tag: string;
     reason: string;
+    /**
+     * The global its setup or render read that Node does not have — `window`, `document`,
+     * `localStorage` — when that is why (#160). A static build stops on it: the read belongs in
+     * onMount, or behind `typeof window !== 'undefined'`.
+     */
+    global?: string;
 }
 
 /** What a host renders as: its attributes after its body ran, and its content. */
@@ -69,7 +75,8 @@ export function renderHost(
         try {
             rendered = untracked(() => host.body());
         } catch (error) {
-            skipped.push({ tag, reason: message(error) });
+            const global = undefinedGlobal(error);
+            skipped.push(global ? { tag, reason: message(error), global } : { tag, reason: message(error) });
             rendered = null;
             failed = true;
         }
@@ -89,6 +96,17 @@ export function renderHost(
     const out = new Map<string, string | null>();
     for (const name of host.getAttributeNames()) out.set(name, host.getAttribute(name));
     return { attributes: out, inner: markup, skipped: failed };
+}
+
+/**
+ * The name a `ReferenceError` says is not defined — on the server, a global of the browser the
+ * component reached for: in the browser the same name resolves.
+ */
+function undefinedGlobal(error: unknown): string | null {
+    if (!(error instanceof ReferenceError)) return null;
+    // Match: V8's `<name> is not defined`. Groups: [1]=the name
+    const m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(error.message);
+    return m ? m[1] : null;
 }
 
 function message(error: unknown): string {

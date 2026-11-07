@@ -20,7 +20,7 @@ const RESOLVED_DOM = '\0' + SSG_DOM_ID;
 export interface SsgRender {
     /** Set when the app's modules could not run on the server: the message and the first frames. */
     readonly error?: string;
-    readonly pages: { readonly path: string; readonly html: string; readonly skipped: { tag: string; reason: string }[] }[];
+    readonly pages: { readonly path: string; readonly html: string; readonly skipped: { tag: string; reason: string; global?: string }[] }[];
     readonly skippedRoutes: { readonly path: string; readonly reason: string }[];
 }
 
@@ -84,7 +84,7 @@ ${imports}
             continue;
         }
         const { html: rendered, skipped } = renderToStringWithReport(() => html(strings));
-        pages.push({ path, html: rendered, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason })) });
+        pages.push({ path, html: rendered, skipped: skipped.map((s) => (s.global ? { tag: s.tag, reason: s.reason, global: s.global } : { tag: s.tag, reason: s.reason })) });
     }
     return { pages, skippedRoutes };
 }

@@ -92,6 +92,30 @@ describe('pdx build --ssg', () => {
     });
 });
 
+describe('what the build refuses, and what it leaves out', () => {
+    it('a component that reads a browser global in its setup stops the build, naming it and the global', async () => {
+        const reader = app('reader', {
+            ...FILES,
+            'src/home.pdx': '<template><h1>{{ width }}</h1></template>\n<script>\n@page \'/\';\nconst width = window.innerWidth;\n</script>\n',
+        });
+        roots.push(reader);
+        const err = await buildSsg(reader, resolveConfig({}, reader), join(reader, 'dist'), false).then(() => null, (e: unknown) => e);
+        expect(err).toBeInstanceOf(SsgError);
+        expect((err as Error).message).toContain('<app-home>');
+        expect((err as Error).message).toContain('`window`');
+        expect((err as Error).message).toContain('onMount');
+        expect(existsSync(join(reader, 'dist', 'about', 'index.html')), 'a page was written by a build that failed').toBe(false);
+    }, 180_000);
+
+    it('a route with parameters that ssg.routes does not list is reported, and has no file', async () => {
+        const unlisted = app('unlisted', FILES);
+        roots.push(unlisted);
+        const result = await buildSsg(unlisted, resolveConfig({}, unlisted), join(unlisted, 'dist'), false);
+        expect(result.skippedRoutes).toContainEqual({ path: '/posts/:id', reason: 'it has parameters, and ssg.routes names no path for it' });
+        expect(existsSync(join(unlisted, 'dist', 'posts')), 'an unlisted route was written').toBe(false);
+    }, 180_000);
+});
+
 describe('an app that reads the browser when a module is imported', () => {
     it('stops the build, and says which file', async () => {
         const broken = app('broken', { ...FILES, 'src/main.js': "import '@pdxui/router';\nimport './title.js';\n", 'src/title.js': "document.title = 'Shop · ' + document.title;\n" });

@@ -94,9 +94,12 @@ The build says what it did not write, and why:
 - a guarded route, whose content depends on the visitor;
 - a redirect.
 
-A component that can only be written as an empty host is named with the reason, and the client
-renders it at boot. A module that reads `document` or `window` when it is imported stops the build,
-naming the file and the line. That work belongs in `onMount`, which the server never runs.
+Reading the browser stops the build. If a component's setup or render reads a browser global such as
+`window`, `document` or `localStorage`, the build names the component and the global. If a module
+reads one when it is imported, the build names the file and the line. That work belongs in `onMount`,
+which the server never runs, or behind `typeof window !== 'undefined'`. A component that cannot be
+written for another reason (its render builds DOM by hand) is named with the reason, and the client
+renders it at boot.
 
 ## pdx check — the quality gate
 
