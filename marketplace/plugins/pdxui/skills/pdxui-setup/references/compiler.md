@@ -88,7 +88,8 @@ part of the page it is handed, if any. With one, it walks those nodes by the sam
 template has, `partText` makes a value's place the text node the binding follows, and
 `projectedNode` finds a child in the slot of the component it was given to — and it answers
 `adoptedRange(range)` instead of a fragment. `placePart` puts a block where its marker is, or has it
-take over what the server wrote there. Without a range it copies its markup as above. The option is
+take over what the server wrote there; `offerPart` hands that place to content built before its block
+is, as `@show`'s is. Without a range it copies its markup as above. The option is
 off unless the app is built to hydrate, and then the module is otherwise the same.
 
 The same holds for the higher-level runes: `@page` generates the route entry and the lazy import,

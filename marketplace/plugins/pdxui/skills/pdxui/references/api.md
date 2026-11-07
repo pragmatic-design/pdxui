@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-470 value exports.
+471 value exports.
 
 ### `__adoptStyles`
 
@@ -3536,6 +3536,18 @@ clicks while `pending()`, under the policies that wait.
 
 `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
 an item is created without the caller wiring the two together.
+
+### `offerPart`
+
+```ts
+import { offerPart } from '@pdxui/core';
+
+function offerPart(marker: Node): void
+```
+
+Offer what the server wrote in the value's place `marker` to the next compiled block that starts: a
+block built before the helper that places it is called — `show()`'s content — takes it over. Outside a
+hydration, or for a marker that is no value's place, nothing.
 
 ### `OfflineError`
 
