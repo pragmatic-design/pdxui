@@ -10,6 +10,12 @@ export interface CompileContext {
     /** Production mode flag — enables constant folding, loop invariant hoisting, dead code elimination. */
     readonly production: boolean;
 
+    /**
+     * The module is compiled for the server (#160): Vite loads it with `ssr`, and static generation
+     * renders it to a string. The render is written as html``, which core renders to markup.
+     */
+    readonly ssr: boolean;
+
     /** Scope variable stack — tracks @for loop vars, @try catch vars. Not prefixed with ctx. */
     readonly scopeVars: Set<string>;
 
@@ -157,6 +163,7 @@ export type PropsLookup = (tag: string) => ReadonlySet<string> | null | undefine
 /** Create a fresh CompileContext for a single compilation. */
 export function createCompileContext(options?: {
     production?: boolean;
+    ssr?: boolean;
     customDirectiveHandlers?: Map<string, TemplateDirectiveHandler>;
     customDirectives?: Set<string>;
     /** Sink the caller owns; codegen diagnostics are appended to it. A fresh array if omitted. */
@@ -172,6 +179,7 @@ export function createCompileContext(options?: {
 }): CompileContext {
     return {
         production: options?.production ?? false,
+        ssr: options?.ssr ?? false,
         scopeVars: new Set(),
         rowVars: new Set(),
         rowKeys: [],

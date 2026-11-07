@@ -162,7 +162,8 @@ export function generateInlineNodes(nodes: TemplateNode[], imports: Set<string>,
     const own: TemplateHoists = hoists ?? { lines: [], count: 0 };
     const gen = new InlineGen(imports, 0, ctx, false, own);
     // A production build shares a binding repeated at the top level of the render (inline-dedup.ts).
-    if (ctx?.production) gen.dedup = new BindingDedup();
+    // Not on the server (#160): its render runs once, and its bindings are written into the html``.
+    if (ctx?.production && !ctx.ssr) gen.dedup = new BindingDedup();
     gen.walk(nodes);
     return gen.build(hoists ? [] : own.lines);
 }
@@ -242,6 +243,9 @@ class InlineGen {
         if (this.tree.discarding()) return;
         // A block that is this node alone returns it, unplaced (`soleBlock`, #685).
         if (this.sole !== undefined && !guard) { this.sole = expr; return; }
+        // On the server (#160) the place is a hole of the block's html``; what is not a fragment —
+        // the only nodes there are — renders nothing, as the client removes the marker.
+        if (this.ctx.ssr) { this.tree.hole(guard ? `${expr} instanceof DocumentFragment?${expr}:null` : expr); return; }
         const m = this.v('m');
         this.tree.anchor(m);
         this.out(guard
@@ -263,6 +267,13 @@ class InlineGen {
     }
     /** A binding's value as written: shared with its repeats when this generator deduplicates. */
     private shared(value: string): string { return this.dedup ? this.dedup.share(value) : value; }
+
+    /**
+     * On the server (#160): a binding written into the element's tag in the block's html``,
+     * `name=${value}`, which core renders as its client binds it. Listeners, refs, gestures and
+     * attachments are the client's and write nothing.
+     */
+    private serverBind(el: string, name: string, value: string): void { this.tree.bound(el, name, value); }
 
     walk(nodes: TemplateNode[]): void {
         for (const node of nodes) {
@@ -322,9 +333,13 @@ class InlineGen {
         if (!host || !host.tag.includes('-')) {
             throw new Error(`@snippet ${node.name} is not inside a component's tag: it fills a slot of the component it is written in.`);
         }
-        this.tree.target(host.v);
         const body = withPlainLocals(node.params, this.ctx, () => this.block(node.body, true).code);
-        this.out(`${host.v}[${jsQuote(node.name)}]=(${node.params.join(',')})=>{${body}};`);
+        const snippet = `(${node.params.join(',')})=>{${body}}`;
+        // On the server the template is the component's property, handed to it as its parent's
+        // other properties are (#160).
+        if (this.ctx.ssr) { this.serverBind(host.v, `:${node.name}`, snippet); return; }
+        this.tree.target(host.v);
+        this.out(`${host.v}[${jsQuote(node.name)}]=${snippet};`);
     }
 
     /** A script `@snippet` with a template body (#489): a function of the render, hoisted. */
@@ -534,6 +549,11 @@ class InlineGen {
     }
 
     private propBind(el: string, prop: string, expr: string, kind: ElementKind, preRewritten = false): void {
+        if (this.ctx.ssr) {
+            const name = prop.endsWith('.once') ? prop.slice(0, -'.once'.length) : prop;
+            this.serverBind(el, `:${this.boundName(name, kind)}`, preRewritten ? expr : `()=>${this.read(expr)}`);
+            return;
+        }
         // `:x.once` (#126): the value is read now, untracked, and assigned once.
         if (prop.endsWith('.once')) {
             this.imports.add('untracked');
@@ -578,6 +598,7 @@ class InlineGen {
      * instead (`inline-class-binding.ts`, #112).
      */
     private classBind(el: string, expr: string, staticClass: string, preRewritten: boolean, toggled: string[], kind: ElementKind): void {
+        if (this.ctx.ssr) { this.serverBind(el, ':class', preRewritten ? expr : `()=>${this.read(expr)}`); return; }
         this.imports.add('effect');
         const statics = staticClass.split(/\s+/).filter(Boolean);
         if (!preRewritten) {
@@ -656,6 +677,7 @@ class InlineGen {
      * filtered by the ArrowLeft key.
      */
     private gestureBind(el: string, gesture: Gesture, expr: string, preRewritten = false): void {
+        if (this.ctx.ssr) return;
         this.imports.add('bindGesture');
         if (!preRewritten) this.imports.add('batchHandler');
         const handler = preRewritten ? expr : buildEventHandler(expr, this.ctx);
@@ -664,6 +686,7 @@ class InlineGen {
 
     /** `opaque`: the element is a component, under one, or in a @portal — never delegated (#113). */
     private eventBind(el: string, desc: string, expr: string, preRewritten = false, opaque = false): void {
+        if (this.ctx.ssr) return;
         const parts = desc.split('.');
         const ev = parts[0], mods = new Set(parts.slice(1));
         // A type this component delegates (inline-event-delegation.ts): stored on the element, called by
@@ -746,27 +769,35 @@ class InlineGen {
         this.imports.add('bindTwoWay');
         const [name, ...mods] = desc.split('.');
         const resolved = [this.boundName(name, kind), ...mods].join('.');
+        if (this.ctx.ssr) {
+            this.serverBind(el, `::${resolved}`, rewriteTwoWayAccessor(expr, this.ctx) ?? prefixCtx(expr, this.ctx));
+            return;
+        }
         // The general form `{ get, set }` (#126): its functions are rewritten as handlers are.
         const value = rewriteTwoWayAccessor(expr, this.ctx) ?? prefixCtx(expr, this.ctx);
         this.out(`bindTwoWay(${el}, ${jsQuote(resolved)}, ${value});`);
     }
 
     private classToggle(el: string, cls: string, expr: string): void {
+        if (this.ctx.ssr) { this.serverBind(el, `:class.${cls}`, `()=>${this.read(expr)}`); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.classList.toggle(${jsString(cls)},!!(${this.shared(this.read(expr))}));});`);
     }
 
     private styleProp(el: string, prop: string, expr: string): void {
+        if (this.ctx.ssr) { this.serverBind(el, `:style.${prop}`, `()=>${this.read(expr)}`); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.style.setProperty(${jsString(prop)},String(${this.shared(this.read(expr))}??''));});`);
     }
 
     private showBind(el: string, expr: string): void {
+        if (this.ctx.ssr) { this.serverBind(el, ':show', `()=>${this.read(expr)}`); return; }
         this.imports.add('effect');
         this.out(`effect(()=>{${el}.style.display=(${this.shared(this.read(expr))})?'':'none';});`);
     }
 
     private refBind(el: string, expr: string): void {
+        if (this.ctx.ssr) return;
         // core's bindRef, the template path's own: it sets the ref and resets it to null when the
         // rendering scope is disposed (#262).
         this.imports.add('bindRef');
@@ -779,6 +810,7 @@ class InlineGen {
      * script does not declare is in `importedNames`, put there by codegen-new.
      */
     private attachBind(el: string, name: string, expr: string, preRewritten: boolean): void {
+        if (this.ctx.ssr) return;
         this.imports.add('attach');
         const fn = prefixCtx(name, this.ctx);
         if (!expr && !preRewritten) { this.out(`attach(${el},${fn});`); return; }
@@ -792,9 +824,15 @@ class InlineGen {
         // core's bindInterpolation, the template path's own: a primitive is the text node's text
         // (null, undefined and false empty), a Node or an array is put in as nodes. Writing only
         // `.data`, an array read `a,b` in a build and `ab` in dev (#100).
+        const expr = this.read(node.expr);
+        if (this.ctx.ssr) {
+            // A hole of the block's html``: core renders the value as bindInterpolation would (#160).
+            if (node.pipes?.length > 0) this.imports.add('templatePipe');
+            this.tree.hole(node.pipes?.length > 0 ? `()=>${pipeChain(expr, node.pipes, this.ctx)}` : `()=>${expr}`);
+            return;
+        }
         this.imports.add('bindInterpolation');
         const t = this.v('t');
-        const expr = this.read(node.expr);
         this.tree.anchor(t);
         this.pending = templateMark(this.ctx, node.exprOffset);
         if (node.pipes?.length > 0) {
@@ -824,15 +862,23 @@ class InlineGen {
             this.idx = g.idx;
             for (const t of g.tags) this.tags.add(t);
             // The whitespace around it is the block's edge, which keeps none (#907).
-            return { code: `${g.lines.join('')}return ${g.sole ?? 'document.createDocumentFragment()'};`, tags: g.tags };
+            const empty = this.ctx.ssr ? this.serverEmpty() : 'document.createDocumentFragment()';
+            return { code: `${g.lines.join('')}return ${g.sole ?? empty};`, tags: g.tags };
         }
         g.walk(nodes);
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
+        if (this.ctx.ssr) return { code: `${g.lines.join('')}return ${g.tree.serverLiteral(this.imports)};`, tags: g.tags };
         return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup).join('')}${g.lines.join('')}return __frag;`, tags: g.tags };
     }
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
+
+    /** On the server (#160), the empty block: an html`` with nothing in it. */
+    private serverEmpty(): string {
+        this.imports.add('html');
+        return 'html``';
+    }
 
     ifN(node: IfNode): void {
         const chain = ifChain(node);
@@ -1118,11 +1164,13 @@ class InlineGen {
             if (shared.decls.length > 0) this.imports.add('computed');
             lines = [...shared.decls, ...shared.lines];
         }
-        const prologue = this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup);
+        // On the server (#160) the render returns its markup as html``, with no builder or walk.
+        const ret = this.ctx.ssr ? this.tree.serverLiteral(this.imports) : '__frag';
+        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup);
         // One keyed selector per signal a @for compares its key with (#117), owned by the render.
         const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
         if (selectors.length > 0) this.imports.add('selector');
         const body = [...leading, ...prologue, ...selectors, ...lines].map(l => '    ' + l).join('\n');
-        return `(() => {\n${body}\n    return __frag;\n  })()`;
+        return `(() => {\n${body}\n    return ${ret};\n  })()`;
     }
 }

@@ -454,8 +454,10 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
             return html;
         },
 
-        transform(code: string, id: string) {
+        transform(code: string, id: string, transformOptions?: { ssr?: boolean }) {
             if (!extensions.some(ext => id.endsWith(ext))) return null;
+            // Vite loads the module for the server (#160): compiled to render to a string.
+            const ssr = transformOptions?.ssr === true;
 
             // A blank source is never a component, and compiling it is worse than refusing it:
             // `compile('')` produces a module that REGISTERS the tag and renders an empty <div>, so
@@ -493,7 +495,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // Determine minify: explicit option wins, otherwise auto-detect from build mode
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
-                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, prefix,
+                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, prefix, ssr,
                     // The file a runtime error names, as the app knows it.
                     sourceFile: isDevMode ? relative(projectRoot, normalize(id)).replace(/\\/g, '/') : undefined,
                     defaultLayout,
@@ -543,7 +545,9 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
 
                 // HMR: inject hot module replacement for dev mode, and keep the source this module
                 // was compiled from, which a save is compared with (#246).
-                if (isDevMode) {
+                // Not for the server's copy of the module: it is rendered, never hot-replaced, and the
+                // source a save is compared with is the client's.
+                if (isDevMode && !ssr) {
                     if (tagMatch) output = injectHMR(output, tagMatch[1]);
                     compiledSources.set(id, code);
                 }
@@ -679,6 +683,11 @@ export interface CompileOptions {
     target?: BrowserTarget;
     /** The app's component tag prefix, `pdx({ prefix })` (#136). Default: 'app'. */
     prefix?: string;
+    /**
+     * Compile for the server (#160): what Vite asks for a module it loads with `ssr`. The render is
+     * written as html``, which core renders to a string, and the styles are imported, not injected.
+     */
+    ssr?: boolean;
     /**
      * The .pdx as the app knows it, relative to its root (`src/pages/login.pdx`). Registered with the
      * component so a runtime error names its file. The dev server passes it; a production
@@ -952,6 +961,7 @@ export function compile(
         descriptor, ast, filename, runner,
         { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
           sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.prefix,
+          ssr: options?.ssr,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
           templateOrigin: descriptor.template && !descriptor.template.src && !options?.minify ? descriptor.template.start : null },

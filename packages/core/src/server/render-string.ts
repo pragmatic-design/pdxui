@@ -16,6 +16,7 @@
 
 import { untracked, collectDisposers } from '../reactivity/signal';
 import { sanitizeUrlForTag } from '../security/sanitize-url';
+import { twoWayAccessor } from '../renderer/two-way-value';
 import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
 import { templateTree, type TreeNode, type TreeAttribute } from './template-tree';
 import { withServerRender, isServerFragment, isServerBlock, type ServerFragment, type ServerBlock, type BlockMark } from './mode';
@@ -187,7 +188,8 @@ function attribute(s: ElementState, a: TreeAttribute, values: readonly unknown[]
 /** A bound attribute by its prefix, as template.ts routes it. */
 function binding(s: ElementState, key: string, value: unknown): void {
     if (key.startsWith('@') || key === ':ref' || key.startsWith('attach:')) return;
-    if (key.startsWith('::')) { property(s, key.slice(2).split('.')[0], read(value)); return; }
+    // A two-way value is read as the client's bindTwoWay reads it: a field, a signal, or `{ get, set }`.
+    if (key.startsWith('::')) { property(s, key.slice(2).split('.')[0], twoWayAccessor(value)?.get() ?? read(value)); return; }
     if (key === ':show') { if (!read(value)) s.style.push('display: none;'); return; }
     if (key.startsWith(':class.')) { if (read(value)) s.classes.push(key.slice(7)); return; }
     if (key.startsWith(':style.')) { s.style.push(`${key.slice(7)}: ${String(read(value) ?? '')};`); return; }

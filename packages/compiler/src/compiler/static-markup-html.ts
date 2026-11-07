@@ -16,7 +16,7 @@
 
 /** One node of a block's static markup, as the HTML form needs to know it. */
 export interface MarkupNode {
-    kind: 'root' | 'element' | 'text' | 'comment' | 'anchor' | 'sink';
+    kind: 'root' | 'element' | 'text' | 'comment' | 'anchor' | 'sink' | 'hole';
     kids: MarkupNode[];
     /** An element's tag, as written. */
     tag?: string;
@@ -31,7 +31,7 @@ export interface MarkupNode {
 }
 
 /** The elements the parser treats as void: no content, no closing tag. */
-const PARSER_VOID = new Set([
+export const PARSER_VOID = new Set([
     'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr',
     'param', 'keygen', 'frame', 'basefont', 'bgsound',
 ]);
@@ -179,7 +179,7 @@ function keeps(n: MarkupNode, parent: string | null = null): boolean {
         return d !== '' && !d.includes('--') && !d.startsWith('>') && !d.startsWith('->') && !d.endsWith('-') && !/[\r\0]/.test(d);
     }
     if (n.kind === 'text') return (n.data ?? '') !== '' && !/[\r\0]/.test(n.data!);
-    if (n.kind === 'anchor') return true;
+    if (n.kind === 'anchor' || n.kind === 'hole') return true;
     if (n.kind === 'element') {
         const tag = n.tag!;
         const lower = tag.toLowerCase();
@@ -225,8 +225,8 @@ function keeps(n: MarkupNode, parent: string | null = null): boolean {
     return n.kids.every((k) => keeps(k, context));
 }
 
-const escapeText = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-const escapeAttr = (s: string): string => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+export const escapeText = (s: string): string => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+export const escapeAttr = (s: string): string => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
 /**
  * The markup as HTML, whether or not the parser keeps it. `blockHtml` is the one to emit; this is

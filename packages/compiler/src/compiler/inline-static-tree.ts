@@ -15,6 +15,7 @@
 // exactly as this tree (static-markup-html.ts says when); one DOM call per node otherwise.
 
 import { blockHtml, htmlLiteral, type MarkupNode } from './static-markup-html';
+import { serverTemplate } from './server-template';
 import { jsString } from './js-literal';
 
 /** One node of a block's static markup: what the walk needs, and what the HTML form needs. */
@@ -30,6 +31,10 @@ interface StaticNode extends MarkupNode {
     mk?: number;
     /** Text from `@raw`: kept exactly as written, edges included. */
     verbatim?: boolean;
+    /** A hole's value, the expression the server's html`` puts in its place (#160). */
+    expr?: string;
+    /** An element's bindings on the server, `[name, expression]`: html`` attributes with a value (#160). */
+    bound?: Array<[string, string]>;
 }
 
 /** The whitespace HTML collapses — not U+00A0, which `&nbsp;` writes to be kept. */
@@ -155,6 +160,30 @@ export class StaticTree {
     anchor(v: string): void {
         this.add({ kind: 'anchor', v, kids: [], target: false }, `__d.createTextNode('')`);
         this.target(v);
+    }
+
+    /**
+     * On the server (#160), the place a value goes in content — an interpolation, a block a helper
+     * renders — written as a hole of the block's html``, `${expr}`.
+     */
+    hole(expr: string): void {
+        if (this.discarding()) return;
+        // No builder statement: the server's html`` is all a hole is written into.
+        this.parent().kids.push({ kind: 'hole', v: '', kids: [], target: false, expr });
+    }
+
+    /** On the server (#160), a binding of the element named `el`: written `name=${expr}` in its tag. */
+    bound(el: string, name: string, expr: string): void {
+        if (this.discarding()) return;
+        const node = this.byVar.get(el);
+        if (node) (node.bound ??= []).push([name, expr]);
+    }
+
+    /** The block's markup as an html`` literal, for the server's render (#160). */
+    serverLiteral(imports: Set<string>): string {
+        this.trimEdges(this.root);
+        imports.add('html');
+        return serverTemplate(this.root);
     }
 
     /** The render binds the node named `v`: the walk returns it. */

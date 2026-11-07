@@ -188,7 +188,7 @@ component('pdx-counter', {
 The codegen's sub-modules each own one responsibility:
 
 - **codegen-setup.ts**: builds the body of `setup()` — prop accessors, signals, lifecycle hooks, CSS scoping
-- **codegen-template-inline.ts**: turns the template AST into imperative DOM code, the one render path (#107)
+- **codegen-template-inline.ts**: turns the template AST into imperative DOM code, the one render path (#107). For a module Vite loads with `ssr` (#160) the same generator writes each block's static tree as an `html\`\`` instead (**server-template.ts**), with holes where the client places a value and bindings in the tags, which core renders to a string
 - **codegen-template.ts**: what the render shares with other generators — transition, virtual-list and `@await` options, a `@defer`'s loader, the hoisting of a loop's invariant reads (the `html\`\`` generator is removed, #526)
 - **codegen-template-rewrite.ts**: event handlers, a two-way accessor, the `dynamic(…)` call
 - **codegen-prefix.ts**: adds `ctx.` to the free identifiers in the template (the template reaches the component's scope through the context)
