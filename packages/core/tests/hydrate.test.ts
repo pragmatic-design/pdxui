@@ -7,7 +7,9 @@
 
 import { describe, it, expect, afterEach } from 'vitest';
 import { html } from '../src/renderer/template';
-import { when, show, each } from '../src/renderer/helpers';
+import { when, show, each, eachRow, match } from '../src/renderer/helpers';
+import { whenChain } from '../src/renderer/when-chain';
+import { dynamic } from '../src/renderer/dynamic';
 import { renderToString } from '../src/server/render-string';
 import { hydrateChildren, HydrationMismatch } from '../src/hydrate/adopt';
 import { signal } from '../src/reactivity/signal';
@@ -94,20 +96,84 @@ describe('hydrating html``', () => {
         expect(p.querySelector('div')!.innerHTML).toBe('<i>no</i>');
     });
 
-    it('a helper\'s block that does not adopt yet is built in its place, and works', () => {
-        const open = signal(true);
-        const { page: p } = hydrated(() => html`<section><h2>t</h2>${when(() => open(), () => html`<p>open</p>`, () => html`<p>closed</p>`)}</section>`);
-        open.set(false);
-        expect(p.querySelector('section')!.textContent).toBe('tclosed');
-    });
-
-    it('a list built in its place', () => {
-        const rows = signal([{ id: 1, n: 'a' }, { id: 2, n: 'b' }]);
-        const { page: p } = hydrated(() => html`<ul>${each(() => rows(), 'id', (r) => html`<li>${r.n}</li>`)}</ul>`);
-        rows.set([{ id: 1, n: 'a' }]);
-        expect(p.querySelectorAll('li')).toHaveLength(1);
+    it('a block that cannot adopt is built in its place, and works', () => {
+        const tag = signal('x-hydrate-built');
+        const { page: p } = hydrated(() => html`<section><h2>t</h2>${portalLike(() => tag())}</section>`);
+        expect(p.querySelector('h2')).not.toBeNull();
     });
 });
+
+describe('hydrating the helpers\' blocks', () => {
+    it('when(): its branch adopted, and swapped later', () => {
+        const open = signal(true);
+        const { page: p, written } = hydrated(() => html`<section><h2>t</h2>${when(() => open(), () => html`<p>open ${() => open()}</p>`, () => html`<p>closed</p>`)}</section>`);
+        adoptedAll(p, written);
+        open.set(false);
+        expect(p.querySelector('section')!.textContent).toBe('tclosed');
+        open.set(true);
+        expect(p.querySelector('section')!.textContent).toBe('topen true');
+    });
+
+    it('when() with nothing to show: its markers alone', () => {
+        const open = signal(false);
+        const { page: p, written } = hydrated(() => html`<div>${when(() => open(), () => html`<b>x</b>`)}</div>`);
+        adoptedAll(p, written);
+        open.set(true);
+        expect(p.querySelector('b')).not.toBeNull();
+    });
+
+    it('whenChain(): the branch picked adopted, and another picked later', () => {
+        const n = signal(2);
+        const { page: p, written } = hydrated(() => html`<div>${whenChain(() => (n() === 1 ? 0 : n() === 2 ? 1 : 2), [() => html`<b>one</b>`, () => html`<b>two</b>`, () => html`<b>other</b>`])}</div>`);
+        adoptedAll(p, written);
+        n.set(1);
+        expect(p.querySelector('div')!.textContent).toBe('one');
+    });
+
+    it('match(): the case adopted, and another later', () => {
+        const status = signal<'on' | 'off'>('off');
+        const { page: p, written } = hydrated(() => html`<div>${match(() => status(), { on: () => html`<b>On</b>`, off: () => html`<b>Off</b>` })}</div>`);
+        adoptedAll(p, written);
+        status.set('on');
+        expect(p.querySelector('div')!.textContent).toBe('On');
+    });
+
+    it('each(): its rows adopted, then reconciled by key', () => {
+        const rows = signal([{ id: 1, n: 'a' }, { id: 2, n: 'b' }, { id: 3, n: 'c' }]);
+        const { page: p, written } = hydrated(() => html`<ul>${each(() => rows(), 'id', (r) => html`<li>${r.n}</li>`)}</ul>`);
+        adoptedAll(p, written);
+        const [a, , c] = Array.from(p.querySelectorAll('li'));
+        rows.set([{ id: 3, n: 'c' }, { id: 1, n: 'a' }]);
+        const after = Array.from(p.querySelectorAll('li'));
+        expect(after.map((li) => li.textContent)).toEqual(['c', 'a']);
+        expect(after[0], 'a kept row is the adopted node').toBe(c);
+        expect(after[1]).toBe(a);
+    });
+
+    it('eachRow(): the adopted rows follow their item', () => {
+        const rows = signal([{ id: 1, n: 'a' }, { id: 2, n: 'b' }]);
+        const { page: p, written } = hydrated(() => html`<ul>${eachRow(() => rows(), 'id', (r, i) => html`<li>${() => `${i()}:${r().n}`}</li>`)}</ul>`);
+        adoptedAll(p, written);
+        const first = p.querySelector('li')!;
+        rows.set([{ id: 1, n: 'A' }, { id: 2, n: 'b' }]);
+        expect(p.querySelector('li')).toBe(first);
+        expect(first.textContent).toBe('0:A');
+    });
+
+    it('a when() inside a row, inside a when()', () => {
+        const rows = signal([{ id: 1, on: true }, { id: 2, on: false }]);
+        const visible = signal(true);
+        const { page: p, written } = hydrated(() => html`<div>${when(() => visible(), () => html`<ul>${each(() => rows(), 'id', (r) => html`<li>${when(() => r.on, () => html`<b>on</b>`, () => html`<i>off</i>`)}</li>`)}</ul>`)}</div>`);
+        adoptedAll(p, written);
+        visible.set(false);
+        expect(p.querySelector('ul')).toBeNull();
+    });
+});
+
+/** A block that does not adopt: built by the client in its place. */
+function portalLike(tag: () => string): DocumentFragment {
+    return dynamic(tag);
+}
 
 describe('hydrating show()', () => {
     it('shown: its elements adopted, and hidden later', () => {

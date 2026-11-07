@@ -50,19 +50,46 @@ export function when(
 ): DocumentFragment {
     // On the server: the branch the condition picks now, between the client's markers (#160).
     if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
-    if (isHydrating()) return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options));
+    if (isHydrating()) {
+        return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options), (a, parent, at) => {
+            // The branch the server rendered is the one the condition picks now: adopted in its scope,
+            // and followed from there as a mounted when() follows it.
+            const start = a.expect(at, 'when');
+            const end = a.close(start, 'when', '/when');
+            const show = !!untracked(condition);
+            const [, dispose] = collectDisposers(() => a.between(show ? thenFn() : (elseFn?.() ?? null), parent, start, end));
+            followWhen(start, end, condition, thenFn, elseFn, options, { show, dispose });
+            return end.nextSibling;
+        });
+    }
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
     frag.appendChild(start);
     frag.appendChild(end);
+    followWhen(start, end, condition, thenFn, elseFn, options, null);
+    return frag;
+}
 
+/**
+ * Keep the branch `condition` picks between `start` and `end`. `adopted`: the branch already there,
+ * hydrated, and what disposes it; null when nothing is rendered yet.
+ */
+function followWhen(
+    start: Comment,
+    end: Comment,
+    condition: () => boolean,
+    thenFn: () => Node | DocumentFragment,
+    elseFn: (() => Node | DocumentFragment | null) | null | undefined,
+    options: TransitionOptions | undefined,
+    adopted: { show: boolean; dispose: Dispose } | null,
+): void {
     // Disposer for the effects created inside the currently-rendered branch.
     // Disposed when the branch actually swaps and on teardown — prevents leaked
     // bindings re-running on detached nodes.
-    let childDispose: Dispose | null = null;
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
     // Memoized last-rendered condition. `undefined` = nothing rendered yet.
-    let prevShow: boolean | undefined;
+    let prevShow: boolean | undefined = adopted?.show;
     // A generation token: a .then() of an out-in exit overtaken by a more recent run
     // must neither render stale content nor overwrite the disposer.
     let renderGen = 0;
@@ -123,8 +150,6 @@ export function when(
     // Final teardown: dispose the current branch when the enclosing scope is removed.
     // No per-re-run cleanup — that would fight the memoization above.
     onDispose(() => { renderGen++; childDispose?.(); childDispose = null; });
-
-    return frag;
 }
 
 /**
@@ -200,7 +225,18 @@ export function match<T extends string | number>(
     value: () => T,
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
-    if (isHydrating()) return hydrationBlock(['match', '/match'], () => match(value, cases));
+    if (isHydrating()) {
+        return hydrationBlock(['match', '/match'], () => match(value, cases), (a, parent, at) => {
+            // The case the server rendered is the one the value picks now: adopted, then followed.
+            const start = a.expect(at, 'match');
+            const end = a.close(start, 'match', '/match');
+            const key = String(untracked(value));
+            const caseFn = caseFor(cases, key);
+            const [, dispose] = collectDisposers(() => a.between(caseFn ? caseFn() : null, parent, start, end));
+            followMatch(start, end, value, cases, { key, dispose });
+            return end.nextSibling;
+        });
+    }
     if (isServerRender()) {
         return serverBlock('match', '/match', () => {
             const caseFn = caseFor(cases, String(value()));
@@ -212,10 +248,21 @@ export function match<T extends string | number>(
     const end = document.createComment('/match');
     frag.appendChild(start);
     frag.appendChild(end);
+    followMatch(start, end, value, cases, null);
+    return frag;
+}
 
-    let childDispose: Dispose | null = null;
+/** Keep the case `value()` picks between the markers; `adopted`: the one already there, hydrated. */
+function followMatch<T extends string | number>(
+    start: Comment,
+    end: Comment,
+    value: () => T,
+    cases: Record<string, () => Node | DocumentFragment>,
+    adopted: { key: string; dispose: Dispose } | null,
+): void {
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
     // Memoized last-rendered case key. `undefined` = nothing rendered yet.
-    let prevKey: string | undefined;
+    let prevKey: string | undefined = adopted?.key;
 
     effect(() => {
         const key = String(value());
@@ -247,8 +294,6 @@ export function match<T extends string | number>(
 
     // Final teardown: dispose the current case when the enclosing scope is removed.
     onDispose(() => { childDispose?.(); childDispose = null; });
-
-    return frag;
 }
 
 /** The case `match()` renders for `key`: its own, or the `_` default. */

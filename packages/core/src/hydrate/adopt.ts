@@ -49,6 +49,12 @@ const adopter: Adopter = {
     value: (value, parent, at, end, hidden) => adoptValue(value, parent, at, end, hidden ?? null),
     close: (start, open, close) => blockClose(start, open, close),
     expect: (at, data) => expectComment(at, data),
+    fail: (what) => { throw new HydrationMismatch(what); },
+    between: (content, parent, start, end) => {
+        // Nothing — a false condition with no else, a case with no default — is no node at all.
+        const rest = content == null ? start.nextSibling : adoptValue(content, parent, start.nextSibling, end, null);
+        if (rest !== end) throw new HydrationMismatch(`the block <!--${start.data}--> has markup its content does not: ${describe(rest)}`);
+    },
     build: (node) => withoutHydration(() => buildNode(node)),
 };
 
