@@ -53,6 +53,7 @@ import type { RequiredPropsLookup } from './compiler/validate-required-props';
 import type { RequiredSlotsLookup } from './compiler/validate-required-slots';
 import { jsQuote } from './compiler/js-literal';
 import { designTargetPlugin } from './design-target';
+import { hydrateEntryPlugin } from './hydrate-entry';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
 /**
@@ -150,6 +151,18 @@ export interface PdxPluginOptions {
      * and a splash nothing takes away is a blank app.
      */
     splash?: SplashOptions | false;
+
+    /**
+     * Build the app to take over pages generated ahead of time (#160) instead of rendering over them.
+     * Each `.pdx` is compiled to walk the markup a pre-rendered component holds, and the page
+     * installs hydration — and, with `@page` routes, the outlet's adoption of the route the page
+     * holds — before the app's own script runs. Off by default: an app that is not generated carries
+     * none of it.
+     *
+     * The same in dev and in a build, so the two render alike; a page with no generated markup
+     * renders as it would without the option.
+     */
+    hydrate?: boolean;
 }
 
 /**
@@ -175,6 +188,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
     const splash = options?.splash === false ? null : (options?.splash ?? {});
     const target = options?.target ?? 'baseline-2026';
     const prefix = options?.prefix ?? DEFAULT_TAG_PREFIX;
+    const hydrate = options?.hydrate ?? false;
     let isDevMode = false;
     // Vite's `base`, for the preload hrefs: an app served under a sub-path has to name its chunks
     // the way the browser will ask for them.
@@ -496,6 +510,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
                     minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, prefix, ssr,
+                    // The client's copy takes over the markup; the server's writes it.
+                    hydrate: hydrate && !ssr,
                     // The file a runtime error names, as the app knows it.
                     sourceFile: isDevMode ? relative(projectRoot, normalize(id)).replace(/\\/g, '/') : undefined,
                     defaultLayout,
@@ -635,7 +651,9 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
             }
         },
     };
-    return [main, designTargetPlugin(target)];
+    return hydrate
+        ? [main, designTargetPlugin(target), hydrateEntryPlugin(() => scannedRoutes.length > 0)]
+        : [main, designTargetPlugin(target)];
 }
 
 /** Result of compiling a .pdx file. */

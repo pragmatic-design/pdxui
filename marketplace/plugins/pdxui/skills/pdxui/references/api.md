@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-476 value exports.
+477 value exports.
 
 ### `__adoptStyles`
 
@@ -3040,6 +3040,16 @@ function installContextProtocol(): void
 
 Install global Context Protocol listener (for global providers).
 Responds to context-request events with values from the global registry.
+
+### `installHydration`
+
+```ts
+import { installHydration } from '@pdxui/core/hydrate';
+
+function installHydration(): void
+```
+
+Hydrate pre-rendered components from now on, instead of rendering them over their markup.
 
 ### `installServerDom`
 

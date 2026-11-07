@@ -96,6 +96,13 @@ take over what the server wrote there; `offerPart` hands that place to content b
 is, as `@show`'s is. Without a range it copies its markup as above. The option is
 off unless the app is built to hydrate, and then the module is otherwise the same.
 
+`pdx({ hydrate: true })` builds the app that way, in dev as in a build, so the two render alike. The
+page then runs `installHydration()` from `@pdxui/core/hydrate` before the app's own script, so that a
+pre-rendered component takes over its markup instead of rendering over it. With `@page` routes it
+also runs the outlet's `installRouteAdoption()`, described below. A page with no generated markup
+renders as it would without the option. An app built without the plugin calls `installHydration()`
+itself, before anything else.
+
 That markup comes from `@pdxui/core/server`, kept out of the barrel so a client bundle carries none
 of it. In Node, `installServerDom()` goes first, before the app's modules are imported; then
 `renderToString(fn)` renders what `fn` returns, and `renderToStringWithReport(fn)` also lists the
