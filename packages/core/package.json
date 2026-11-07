@@ -43,6 +43,12 @@
       "import": "./dist/devtools.es.js",
       "require": "./dist/devtools.cjs"
     },
+    "./server": {
+"development": "./src/server/index.ts",
+      "types": "./dist/server/index.d.ts",
+      "import": "./dist/server.es.js",
+      "require": "./dist/server.cjs"
+    },
     "./testing": {
 "development": "./src/testing/index.ts",
       "types": "./dist/testing/index.d.ts",

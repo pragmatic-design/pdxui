@@ -1,13 +1,13 @@
 ---
 title: Rendering API
-description: "Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls."
+description: "Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls."
 order: 24
 parent: api
 ---
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls. 71 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 76 exports, from `@pdxui/core` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -544,6 +544,17 @@ function insert(parent: Node, node: Node, before?: Node | null): void
 
 Insert a node before a marker, or append to parent.
 
+## `installServerDom`
+
+```ts
+import { installServerDom } from '@pdxui/core/server';
+
+function installServerDom(): void
+```
+
+Install the server DOM as globals, each only where the environment has none: Node's own `Event`,
+`EventTarget` and `CustomEvent` are kept. Call it before importing the app's modules. Idempotent.
+
 ## `interpolationText`
 
 ```ts
@@ -717,6 +728,17 @@ function recordPositions(nodes: Node[]): Map<Element, Rect>
 Record positions of elements before a DOM mutation.
 Returns a map of element → bounding rect.
 
+## `registerServerElement`
+
+```ts
+import { registerServerElement } from '@pdxui/core/server';
+
+function registerServerElement(tag: string, render: (attributes: ReadonlyMap<string, string | null>) => ServerRender): void
+```
+
+Render `tag` — a custom element that is not a component — to a string with `render`, given the
+attributes its template wrote. Without one, it renders as a plain element with its template's children.
+
 ## `remove`
 
 ```ts
@@ -739,6 +761,26 @@ Render the snippet `source()` returns, called with `args()`, between two markers
 function or an argument changes, and `fallback` (the optional slot's `@else`) or nothing while there
 is no function. The snippet's own effects and bindings belong to this render, not to the code that
 wrote the snippet: they are disposed when it renders again and when the block around it goes.
+
+## `renderToString`
+
+```ts
+import { renderToString } from '@pdxui/core/server';
+
+function renderToString(fn: () => unknown): string
+```
+
+Render what `fn` returns — an html`` template, typically — to a string.
+
+## `renderToStringWithReport`
+
+```ts
+import { renderToStringWithReport } from '@pdxui/core/server';
+
+function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[] }
+```
+
+The same, with the components that rendered as empty hosts and why.
 
 ## `repeat`
 
@@ -777,6 +819,16 @@ it does NOT create a separate effect per item.
 @param defaultFn - Built-in default renderer
 @param scopeMapper - Converts (item, index) to the slot scope object
 @param options - Transition options for enter/exit/move animations
+
+## `serverElement`
+
+```ts
+import { serverElement } from '@pdxui/core/server';
+
+function serverElement(tag: string, attributes: Readonly<Record<string, string>> = {}, props: Readonly<Record<string, unknown>> = {}, inner: unknown = null): ServerElement
+```
+
+An element by its tag, rendered to a string: what a helper, or an element's server render, creates.
 
 ## `setProp`
 

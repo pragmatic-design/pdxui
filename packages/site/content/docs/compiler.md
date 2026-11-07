@@ -96,6 +96,17 @@ take over what the server wrote there; `offerPart` hands that place to content b
 is, as `@show`'s is. Without a range it copies its markup as above. The option is
 off unless the app is built to hydrate, and then the module is otherwise the same.
 
+That markup comes from `@pdxui/core/server`, kept out of the barrel so a client bundle carries none
+of it. In Node, `installServerDom()` goes first, before the app's modules are imported; then
+`renderToString(fn)` renders what `fn` returns, and `renderToStringWithReport(fn)` also lists the
+components that could only be written as empty hosts, with the reason. A custom element that is not
+a component writes itself through `registerServerElement(tag, render)`, building what it holds with
+`serverElement(tag, attributes, props, inner)`. The router's outlet is one: import
+`@pdxui/router/server`, call `serverRoute(path)` with the URL being generated, and the outlet writes
+that route's layouts and page. In the browser, `installRouteAdoption()` from `@pdxui/router/hydrate`
+has every outlet keep what the server wrote at boot instead of building it again; an app that is not
+generated does not import it, and carries none of it.
+
 The same holds for the higher-level runes: `@page` generates the route entry and the lazy import,
 `@fetch` a typed `resource()`, `@form` a validated form from the schema. In every case the pattern is
 identical: *you declare the intent, the compiler writes the wiring.*

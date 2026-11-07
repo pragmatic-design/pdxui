@@ -14,11 +14,13 @@
 // Default: DESTROY component on navigate away (full mount/destroy lifecycle)
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
-import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV, trackUrgentLoad } from '@pdxui/core';
+import { registeredRoutes, type RegisteredRoute } from './registered-routes';
+import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV } from '@pdxui/core';
 import { RouteParams } from './route-types';
-import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, routeTable, pageModule, toRouteConfig, retryNavigation } from './active';
+import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, pageModule, toRouteConfig, retryNavigation } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
-import { takeRoutePrefetch, cancelOtherPrefetches } from './prefetch';
+import { loadPage } from './page-load';
+import { adoption } from './adoption';
 
 // The router paints two things a user reads — the loading placeholder and the error page — so their
 // text is registered strings, not literals: an app in another language can replace
@@ -53,46 +55,6 @@ function resolveTransition(name?: string): { enter?: string; exit?: string } {
     if (!name || name === 'none') return {};
     const preset = TRANSITION_PRESETS[name];
     return preset ?? { enter: name, exit: name };
-}
-
-interface RegisteredRoute {
-    path: string;
-    tag: string;
-    guard?: string;
-    keepAlive?: boolean | number;
-    preload?: boolean;
-    lazy?: boolean;
-    file?: string;       // relative file path for lazy import()
-    prefetch?: string;
-    transition?: string;  // CSS transition preset: 'fade', 'slide-left', etc.
-    /**
-     * The shell this page renders inside, as tags, outermost first.
-     *
-     * Written by the compiler from `@layout 'admin'`, which resolves the name to the tag
-     * (`codegen-shared.ts` → `layoutChain`).
-     */
-    layouts?: string[];
-    redirect?: string;    // route-level redirect target
-    scroll?: 'preserve' | 'top';  // @scroll: what the scroll position does when this route is entered
-    /** The page renders a <pdx-router-outlet>, so routes below its path nest inside it. */
-    hasOutlet?: boolean;
-    /** What this route is called in a breadcrumb; a function of the params when it needs them. */
-    label?: string | ((params: Record<string, string>) => string);
-    /** The crumb as a dictionary key, translated with the params. */
-    labelKey?: string;
-    /** The page's `@title` as a string, or as a dictionary key (#389). */
-    title?: string;
-    titleKey?: string;
-    meta?: Record<string, unknown>;  // route metadata
-    /**
-     * The @loader function. A FUNCTION, not its name: the module the compiler generates hoists the
-     * declaration to module scope and registers the reference, so `createRouter` receives something
-     * it can actually call.
-     */
-    loader?: () => Promise<unknown>;
-    /** `@loader user: loadUser { staleTime: 30_000 };` — how long its result is used again, in ms (#148). */
-    loaderStaleTime?: number;
-    outlets?: { name: string; tag: string }[];  // named outlet mappings
 }
 
 // ─── Layout Nesting ─────────────────────────────────────────────────
@@ -161,10 +123,7 @@ function autoInitRouter(): void {
     // outlet performs would resolve to a module already in the entry chunk. The compiler emits the
     // whole table from the same `@page` declarations, in dev and in a build, and the outlet imports
     // a page the first time it shows it. The registrations are what an app without the plugin has.
-    const compiled = routeTable() as readonly RegisteredRoute[] | null;
-    const registered = (compiled && compiled.length > 0)
-        ? compiled
-        : globalThis.__pdx_routes as RegisteredRoute[] | undefined;
+    const registered = registeredRoutes();
     if (!registered || registered.length === 0) return;
 
     for (const r of registered) routeConfigMap.set(r.path, r);
@@ -576,6 +535,8 @@ class PdxRouterOutlet extends HTMLElement {
         this._previousRoute = route;
         // Update provided routeParams signal for new route
         routeParams.set(route?.params ?? {});
+        // The route a generated page holds, when the app hydrates (`hydrate.ts`).
+        const server = adoption.take?.(this, route, route ? routeConfigMap.get(route.config.path) : undefined, this._depth) ?? null;
         if (!route) {
             if (prevRoute) await this._deactivate(prevRoute.config.path, destroyPrev);
             this._teardownLayouts(0);
@@ -614,11 +575,15 @@ class PdxRouterOutlet extends HTMLElement {
         // shell around that page was already built one level up.
         const newConfig = routeConfigMap.get(route.config.path);
         const newLayouts = this._depth === 0 ? (newConfig?.layouts ?? []) : [];
-        this._diffLayouts(newLayouts);
+        if (!server) this._diffLayouts(newLayouts);
 
         // Use View Transitions API for smooth cross-fade/slide (baseline 2024)
         const hasTransition = prevRoute && routeConfigMap.get(prevRoute.config.path)?.transition;
-        if (hasTransition && 'startViewTransition' in document) {
+        if (server) {
+            this._layoutStack.push(...server.layouts);
+            this._activeElement = server.page;
+            this._applyParams(server.page, route.params);
+        } else if (hasTransition && 'startViewTransition' in document) {
             this._withViewTransition(() => {
                 if (prevRoute) this._deactivateImmediate(prevRoute.config.path, destroyPrev);
                 this._activateImmediate(route);
@@ -858,12 +823,7 @@ class PdxRouterOutlet extends HTMLElement {
             // The navigation is what the visitor waits for (#250): its prefetch is taken — a queued
             // one starts now — every other queued prefetch is dropped, and its own load holds the
             // queue back until it lands.
-            const prefetched = takeRoutePrefetch(route.path);
-            cancelOtherPrefetches(route.path);
-            const load = prefetched
-                ? () => prefetched
-                : tableLoad ?? (() => import(/* @vite-ignore */ config.file!));
-            trackUrgentLoad(load()).then(async () => {
+            loadPage(route, config, tableLoad).then(async () => {
                 clearTimeout(reveal);
                 // Superseded while importing: drop the result. Don't mount, don't clobber
                 // activeElement (a newer page now owns it). Remove our stale placeholder.

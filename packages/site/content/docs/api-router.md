@@ -1,13 +1,13 @@
 ---
 title: Router API
-description: "Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching."
+description: "Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching, and the outlet rendered on the server."
 order: 24
 parent: api
 ---
 
 # Router API
 
-Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching. 31 exports, from `@pdxui/router`.
+Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching, and the outlet rendered on the server. 33 exports, from `@pdxui/router` and `@pdxui/router/hydrate` and `@pdxui/router/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -135,6 +135,16 @@ function destroyRouter(): void
 
 Tear down the active router: removes the popstate/navigation listener.
 Call on app teardown or before re-creating the router (HMR). Idempotent.
+
+## `installRouteAdoption`
+
+```ts
+import { installRouteAdoption } from '@pdxui/router/hydrate';
+
+function installRouteAdoption(): void
+```
+
+Have every outlet keep the route a generated page holds, instead of building it again.
 
 ## `loaderData`
 
@@ -331,6 +341,17 @@ const RouteParams: Context<Signal<Record<string, string>>>
 The context token the router outlet provides the current route's params under (#495): a signal of
 the raw params, read below the outlet with `inject(RouteParams, el, null)`. The same name as the type
 above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `RouteParams` the token.
+
+## `serverRoute`
+
+```ts
+import { serverRoute } from '@pdxui/router/server';
+
+function serverRoute(path: string): ServerRoute
+```
+
+The URL the outlets render, set before `renderToString`. The route table is read here, so the
+table — or the pages' registrations — must be in place first.
 
 ## `setQuery`
 

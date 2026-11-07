@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-471 value exports.
+476 value exports.
 
 ### `__adoptStyles`
 
@@ -3041,6 +3041,17 @@ function installContextProtocol(): void
 Install global Context Protocol listener (for global providers).
 Responds to context-request events with values from the global registry.
 
+### `installServerDom`
+
+```ts
+import { installServerDom } from '@pdxui/core/server';
+
+function installServerDom(): void
+```
+
+Install the server DOM as globals, each only where the environment has none: Node's own `Event`,
+`EventTarget` and `CustomEvent` are kept. Call it before importing the app's modules. Idempotent.
+
 ### `integer`
 
 ```ts
@@ -4251,6 +4262,17 @@ registerIconSet('heroicons', async (name) =>
 );
 ```
 
+### `registerServerElement`
+
+```ts
+import { registerServerElement } from '@pdxui/core/server';
+
+function registerServerElement(tag: string, render: (attributes: ReadonlyMap<string, string | null>) => ServerRender): void
+```
+
+Render `tag` — a custom element that is not a component — to a string with `render`, given the
+attributes its template wrote. Without one, it renders as a plain element with its template's children.
+
 ### `RELATIVE_DATE_OPS`
 
 ```ts
@@ -4283,6 +4305,26 @@ Render the snippet `source()` returns, called with `args()`, between two markers
 function or an argument changes, and `fallback` (the optional slot's `@else`) or nothing while there
 is no function. The snippet's own effects and bindings belong to this render, not to the code that
 wrote the snippet: they are disposed when it renders again and when the block around it goes.
+
+### `renderToString`
+
+```ts
+import { renderToString } from '@pdxui/core/server';
+
+function renderToString(fn: () => unknown): string
+```
+
+Render what `fn` returns — an html`` template, typically — to a string.
+
+### `renderToStringWithReport`
+
+```ts
+import { renderToStringWithReport } from '@pdxui/core/server';
+
+function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[] }
+```
+
+The same, with the components that rendered as empty hosts and why.
 
 ### `repeat`
 
@@ -4765,6 +4807,16 @@ function selector(source: () => T): Selector<T>
 ```
 
 A selector over `source`, compared with `Object.is`.
+
+### `serverElement`
+
+```ts
+import { serverElement } from '@pdxui/core/server';
+
+function serverElement(tag: string, attributes: Readonly<Record<string, string>> = {}, props: Readonly<Record<string, unknown>> = {}, inner: unknown = null): ServerElement
+```
+
+An element by its tag, rendered to a string: what a helper, or an element's server render, creates.
 
 ### `setComponentStrings`
 
@@ -6295,7 +6347,7 @@ form model carries none of it (#135).
 
 ## @pdxui/router
 
-31 value exports.
+33 value exports.
 
 ### `configureRouter`
 
@@ -6421,6 +6473,16 @@ function destroyRouter(): void
 
 Tear down the active router: removes the popstate/navigation listener.
 Call on app teardown or before re-creating the router (HMR). Idempotent.
+
+### `installRouteAdoption`
+
+```ts
+import { installRouteAdoption } from '@pdxui/router/hydrate';
+
+function installRouteAdoption(): void
+```
+
+Have every outlet keep the route a generated page holds, instead of building it again.
 
 ### `loaderData`
 
@@ -6617,6 +6679,17 @@ const RouteParams: Context<Signal<Record<string, string>>>
 The context token the router outlet provides the current route's params under (#495): a signal of
 the raw params, read below the outlet with `inject(RouteParams, el, null)`. The same name as the type
 above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `RouteParams` the token.
+
+### `serverRoute`
+
+```ts
+import { serverRoute } from '@pdxui/router/server';
+
+function serverRoute(path: string): ServerRoute
+```
+
+The URL the outlets render, set before `renderToString`. The route table is read here, so the
+table — or the pages' registrations — must be in place first.
 
 ### `setQuery`
 

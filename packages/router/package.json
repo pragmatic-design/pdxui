@@ -39,14 +39,26 @@
 "development": "./src/link.ts",
       "types": "./dist/link.d.ts",
       "import": "./dist/link.js"
+    },
+    "./hydrate": {
+"development": "./src/hydrate.ts",
+      "types": "./dist/hydrate.d.ts",
+      "import": "./dist/hydrate.js"
+    },
+    "./server": {
+"development": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "import": "./dist/server.js"
     }
   },
   "sideEffects": [
       "src/outlet.ts",
       "src/link.ts",
+      "src/server.ts",
       "dist/index.js",
       "dist/outlet.js",
-      "dist/link.js"
+      "dist/link.js",
+      "dist/server.js"
   ],
   "scripts": {
     "build": "vite build && tsc --emitDeclarationOnly",

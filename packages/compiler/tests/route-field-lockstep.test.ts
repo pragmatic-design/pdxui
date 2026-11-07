@@ -7,7 +7,7 @@
 //   2. `codegen-shared.ts` → `routeParts`, the page module's own `__pdx_pushRoute({…})`.
 //      Missed: it is there until the page loads, then disappears — the worst of the three, because
 //      the manifest in the bundle plainly contains the value.
-//   3. `router/src/outlet.ts`, which reads the registration, and `router/src/route-table.ts` →
+//   3. `router/src/registered-routes.ts`, the registration the outlet reads, and `router/src/route-table.ts` →
 //      `toRouteConfig`, which turns it into what the router reads. Missed: the router never sees it.
 //
 // A missed field fails silently: a missing `loader` makes the page's `user.data()` undefined forever;
@@ -40,6 +40,7 @@ const PLUGIN_UTILS = read('../src/plugin-utils.ts');
 const ROUTE_TABLE = read('../src/route-table.ts');
 const CODEGEN_SHARED = read('../src/compiler/codegen-shared.ts');
 const OUTLET = read('../../router/src/outlet.ts');
+const REGISTERED_ROUTES = read('../../router/src/registered-routes.ts');
 const ROUTER_TYPES = read('../../router/src/types.ts');
 const ROUTER_TABLE = read('../../router/src/route-table.ts');
 
@@ -63,7 +64,7 @@ const TABLE_LEVEL = new Set(['redirects']);
 /**
  * Fields a PAGE registers that the scanned table does not carry — the same drift, the other way
  * round. In a production build the compiled table REPLACES the registrations wholesale
- * (`outlet.ts`: `compiled.length > 0 ? compiled : globalThis.__pdx_routes`), so a field emitted
+ * (`registered-routes.ts`: `compiled.length > 0 ? compiled : globalThis.__pdx_routes`), so a field emitted
  * only here exists in dev and nowhere else.
  *
  * Each is measured, not assumed — `grep` over `packages/router/src` and `packages/core/src` finds
@@ -124,7 +125,7 @@ const routePartsFields = () => emittedKeys(
     CODEGEN_SHARED, 'const routeParts: string[] =', '__pdx_pushRoute({${routeParts', /[`'](\w+):/g);
 
 /** `RegisteredRoute` — what the outlet knows a registration can carry. */
-const registeredFields = () => interfaceFields(OUTLET, 'RegisteredRoute');
+const registeredFields = () => interfaceFields(REGISTERED_ROUTES, 'RegisteredRoute');
 
 /** `RouteConfig` — what the router reads, and therefore what `toRouteConfig` must build. */
 const routeConfigFields = () => interfaceFields(ROUTER_TYPES, 'RouteConfig');
@@ -155,7 +156,7 @@ export function drift(field: string, lists: {
     if (!lists.routeParts.includes(field))
         missing.push("the page's own registration (codegen-shared.ts → routeParts): present until the page loads, then gone");
     if (!lists.registered.includes(field))
-        missing.push('the outlet\'s RegisteredRoute (router/src/outlet.ts): the outlet cannot read it');
+        missing.push('the outlet\'s RegisteredRoute (router/src/registered-routes.ts): the outlet cannot read it');
     if (lists.routeConfig.includes(field) && !lists.outletMap.includes(field))
         missing.push('the map into RouteConfig (router/src/route-table.ts → toRouteConfig): RouteConfig declares it, so the router expects it and gets undefined');
     return missing;

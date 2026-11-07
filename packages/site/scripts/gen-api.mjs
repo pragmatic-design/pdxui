@@ -40,8 +40,8 @@ export const MODULE_PAGES = [
       description: 'Signals, computed values, effects, stores, watchers, signal operators, events and observers as signals, resources, queries, mutations and the cache.' },
     { slug: 'api-components', title: 'Components', sources: ['core/component'],
       description: 'Defining components, lifecycle hooks, provide and inject, slots, themes and schemes, permissions, icons, overlays and positioning, dialog and toast queues, selection, drag, sorting and gestures.' },
-    { slug: 'api-rendering', title: 'Rendering', sources: ['core/renderer', 'core/hydrate'],
-      description: 'Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls.' },
+    { slug: 'api-rendering', title: 'Rendering', sources: ['core/renderer', 'core/hydrate', 'core/server'],
+      description: 'Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls.' },
     { slug: 'api-forms', title: 'Forms', sources: ['core/form'],
       description: 'Forms, fields, field arrays, validators, schemas and form-associated custom elements.' },
     { slug: 'api-data', title: 'Data and HTTP', sources: ['core/data', 'core/http', 'core/auth'],
@@ -61,7 +61,7 @@ export const MODULE_PAGES = [
     { slug: 'api-utilities', title: 'Security and utilities', sources: ['core/security', 'core/utils'],
       description: 'URL sanitising and the development flag.' },
     { slug: 'api-router', title: 'Router', sources: ['router/*'],
-      description: 'Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching.' },
+      description: 'Creating the router, navigation, the current route with its params, query and loader data, guards, the outlet, links and prefetching, and the outlet rendered on the server.' },
 ];
 
 /**
