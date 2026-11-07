@@ -17,8 +17,9 @@ import { templateTree, type TreeNode } from '../server/template-tree';
 import { isDeferredTemplate } from '../server/mode';
 import { attributeBinding, PH_EXTRACT } from '../renderer/template-plan';
 import { bindAdoptedValue, bindPlannedAttribute, html, interpolationText } from '../renderer/template';
-import { isHydrationBlock, withHydration, withoutHydration, type Adopter, type HydrationBlock } from './mode';
-import { blockAdopters } from './blocks';
+import { withHydration, withoutHydration, type Adopter } from './mode';
+import { hydrationBlocks, builders } from './blocks';
+import { isDeferredBlock } from '../renderer/deferred-block';
 
 /** The server's markup is not what the template renders: the component renders instead. */
 export class HydrationMismatch extends Error {
@@ -37,18 +38,22 @@ const SHOW_PLACEHOLDER = 'show';
  * Adopt `render()`'s result over the children of `container`, which must be exactly what the server
  * wrote for it. Throws a HydrationMismatch, having bound part of it, when they differ: the caller
  * disposes what was bound and renders afresh. `slots`: the regions of the component whose render it
- * is (`regionsOf`), which its `<slot>`s step over.
+ * is (`regionsOf`), which its `<slot>`s step over. Returns the slots that received nothing.
  */
-export function hydrateChildren(container: Node, render: () => unknown, slots: ReadonlyMap<string, Region> | null = null): void {
+export function hydrateChildren(container: Node, render: () => unknown, slots: ReadonlyMap<string, Region> | null = null): Element[] {
     const outer = ownSlots;
+    const outerLeft = leftSlots;
     ownSlots = slots;
+    leftSlots = [];
     try {
         withHydration(() => {
             const next = adoptValue(render(), container, container.firstChild, null, null);
             if (next !== null) throw new HydrationMismatch(`markup left after the render: ${describe(next)}`);
         });
+        return leftSlots;
     } finally {
         ownSlots = outer;
+        leftSlots = outerLeft;
     }
 }
 
@@ -147,7 +152,6 @@ const adopter: Adopter = {
     close: (start, open, close) => blockClose(start, open, close),
     expect: (at, data) => expectComment(at, data),
     fail: (what) => { throw new HydrationMismatch(what); },
-    blocks: blockAdopters,
     between: (content, parent, start, end) => {
         // Nothing — a false condition with no else, a case with no default — is no node at all.
         const rest = content == null ? start.nextSibling : adoptValue(content, parent, start.nextSibling, end, null);
@@ -163,15 +167,17 @@ const adopter: Adopter = {
  */
 function adoptValue(value: unknown, parent: Node, at: Node | null, end: Node | null, hidden: Map<Text, Comment> | null): Node | null {
     if (isDeferredTemplate(value)) return adoptNodes(templateTree(value.strings), value.values, parent, at, end, hidden);
-    if (isHydrationBlock(value)) return adoptBlock(value, parent, at, end);
+    // A helper's block takes over its own markers, or is built in their place (hydrate/blocks.ts).
+    if (isDeferredBlock(value)) return value.visit(hydrationBlocks)(adopter, parent, at, end);
     if (Array.isArray(value)) {
         let next = at;
         for (const item of value) next = adoptValue(item, parent, next, end, hidden);
         return next;
     }
     if (value instanceof Node) {
-        // A node the script built: the server could not write it, and the client puts it here.
-        parent.insertBefore(value, at);
+        // A node the script built: the server could not write it, and the client puts it here — out of
+        // the hydration, so that a component in it mounts.
+        withoutHydration(() => parent.insertBefore(value, at));
         return at;
     }
     return adoptText(interpolationText(value), parent, at, hidden);
@@ -228,8 +234,12 @@ function adoptSlot(n: ElementNode, values: readonly unknown[], node: Node | null
         release(region);
         return next;
     }
+    if (node instanceof Element) leftSlots.push(node);
     return adoptElement(n, values, node);
 }
+
+/** The `<slot>`s of the component being adopted that received nothing, kept with their content. */
+let leftSlots: Element[] = [];
 
 type ElementNode = Extract<TreeNode, { kind: 'element' }>;
 
@@ -357,26 +367,6 @@ function partClose(open: Comment): Comment {
     throw new HydrationMismatch('a value\'s place is not closed');
 }
 
-/**
- * A helper's block: it takes over its own markers when it can; otherwise it is built as the client
- * builds it and put where the server's copy was.
- */
-function adoptBlock(b: HydrationBlock, parent: Node, at: Node | null, end: Node | null): Node | null {
-    if (b.adopt) return b.adopt(adopter, parent, at, end);
-    const [open, close] = b.markers;
-    const start = expectComment(at, open);
-    const last = close === null ? start : blockClose(start, open, close);
-    const next = last.nextSibling;
-    const built = withoutHydration(() => b.build(adopter));
-    for (let n: Node | null = start; n && n !== next;) {
-        const following: Node | null = n.nextSibling;
-        parent.removeChild(n);
-        n = following;
-    }
-    parent.insertBefore(built, next);
-    return next;
-}
-
 /** The comment that closes a block opened by `start`, past blocks of the same kind nested in it. */
 function blockClose(start: Comment, open: string, close: string): Comment {
     let depth = 0;
@@ -408,7 +398,7 @@ function build(value: unknown): unknown {
 
 function buildNode(node: Node): Node {
     if (isDeferredTemplate(node)) return html(node.strings, ...node.values.map(build));
-    if (isHydrationBlock(node)) return node.build(adopter);
+    if (isDeferredBlock(node)) return node.visit(builders(buildNode));
     return node;
 }
 

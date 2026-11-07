@@ -4,8 +4,7 @@
 import { effect, onDispose } from '../reactivity/signal';
 import { enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock, serverElement } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -41,21 +40,8 @@ export function dynamic(
 ): DocumentFragment {
     // On the server (#160): the element of the tag there is now, with the props applyProps gives it —
     // a primitive as an attribute, anything else as a property.
-    if (isHydrating()) return hydrationBlock(['dynamic', '/dynamic'], () => dynamic(tagFn, propsFn, options));
-    if (isServerRender()) {
-        return serverBlock('dynamic', '/dynamic', () => {
-            const tag = tagFn();
-            if (!tag) return [];
-            const attributes: Record<string, string> = {};
-            const props: Record<string, unknown> = {};
-            for (const [key, value] of Object.entries(propsFn?.() ?? {})) {
-                if (value === null || value === undefined) continue;
-                if (typeof value === 'function' || typeof value === 'object') props[key] = value;
-                else attributes[key] = String(value);
-            }
-            return [serverElement(tag, attributes, props)];
-        });
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.dynamic(tagFn, propsFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('dynamic');
     const end = document.createComment('/dynamic');

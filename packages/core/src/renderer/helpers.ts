@@ -6,8 +6,7 @@ import { effect, signal, collectDisposers, onDispose } from '../reactivity/signa
 import { repeat, repeatRows } from './list';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -48,12 +47,8 @@ export function when(
     elseFn?: (() => Node | DocumentFragment | null) | null,
     options?: TransitionOptions
 ): DocumentFragment {
-    // On the server: the branch the condition picks now, between the client's markers (#160).
-    if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
-    if (isHydrating()) {
-        return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options),
-            (a, parent, at) => a.blocks.when(a, parent, at, condition, thenFn, elseFn, options));
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.when(condition, thenFn, elseFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
@@ -217,16 +212,8 @@ export function match<T extends string | number>(
     value: () => T,
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
-    if (isHydrating()) {
-        return hydrationBlock(['match', '/match'], () => match(value, cases),
-            (a, parent, at) => a.blocks.match(a, parent, at, value, cases));
-    }
-    if (isServerRender()) {
-        return serverBlock('match', '/match', () => {
-            const caseFn = caseFor(cases, String(value()));
-            return caseFn ? [caseFn()] : [];
-        });
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.match(value, cases));
     const frag = document.createDocumentFragment();
     const start = document.createComment('match');
     const end = document.createComment('/match');
@@ -296,12 +283,8 @@ export function show(
     condition: () => boolean,
     content: Node | DocumentFragment
 ): DocumentFragment {
-    // On the server: the content, hidden as the client hides it when the condition is false (#160).
-    if (isServerRender()) return serverBlock(null, null, () => [content], condition() ? null : { item: false, hidden: true });
-    if (isHydrating()) {
-        return hydrationBlock(['show', null], (a) => show(condition, a.build(content)),
-            (a, parent, at, end) => a.blocks.show(a, parent, at, end, condition, content));
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.show(condition, content));
     const frag = document.createDocumentFragment();
     const nodes = content instanceof DocumentFragment
         ? Array.from(content.childNodes)
@@ -365,10 +348,8 @@ export function portal(
     target: string | Element,
     options?: PortalOptions,
 ): DocumentFragment {
-    // On the server (#160): the marker it leaves in place. The content goes to another part of the
-    // document, which the server does not render: the client puts it there when it mounts.
-    if (isServerRender()) return serverBlock('portal', null, () => []);
-    if (isHydrating()) return hydrationBlock(['portal', null], () => portal(contentFn, target, options));
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.portal(contentFn, target, options));
     const frag = document.createDocumentFragment();
     const marker = document.createComment('portal');
     frag.appendChild(marker);

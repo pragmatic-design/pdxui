@@ -9,8 +9,7 @@ import { effect, collectDisposers, onDispose, untracked } from '../reactivity/si
 import { nodesBetween } from './helpers';
 import type { Dispose } from '../utils/types';
 import type { SlotFunction } from './slot';
-import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 
 /**
  * The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
@@ -31,7 +30,7 @@ export function declaredSnippet(
 }
 
 /** What a snippet renders: `fn` called with `values` when it is a function, else the fallback or nothing. */
-function snippetContent(fn: unknown, values: readonly unknown[], fallback: (() => Node | null) | null | undefined): Node | null | undefined {
+export function snippetContent(fn: unknown, values: readonly unknown[], fallback: (() => Node | null) | null | undefined): Node | null | undefined {
     return typeof fn === 'function'
         ? (fn as (...a: readonly unknown[]) => Node | null | undefined)(...values)
         : (fallback?.() ?? null);
@@ -50,13 +49,8 @@ export function renderSnippet(
 ): DocumentFragment {
     // On the server (#160): the snippet called with its arguments now, or the fallback. A value that
     // is not a fragment renders nothing, as the client places only a node.
-    if (isHydrating()) return hydrationBlock(['snippet', '/snippet'], () => renderSnippet(source, args, fallback));
-    if (isServerRender()) {
-        return serverBlock('snippet', '/snippet', () => {
-            const content = snippetContent(source(), args(), fallback);
-            return content instanceof DocumentFragment ? [content] : [];
-        });
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.snippet(source, args, fallback));
     const frag = document.createDocumentFragment();
     const start = document.createComment('snippet');
     const end = document.createComment('/snippet');

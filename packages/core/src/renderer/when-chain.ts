@@ -11,8 +11,7 @@
 
 import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -24,12 +23,8 @@ export function whenChain(
     select: () => number,
     branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>,
 ): DocumentFragment {
-    // On the server: the branch picked now, between the markers when() uses too (#160).
-    if (isServerRender()) return serverBlock('when', '/when', () => { const branch = branches[select()]; return branch ? [branch()] : []; });
-    if (isHydrating()) {
-        return hydrationBlock(['when', '/when'], () => whenChain(select, branches),
-            (a, parent, at) => a.blocks.chain(a, parent, at, select, branches));
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.chain(select, branches));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');

@@ -8,8 +8,7 @@ import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 import { trackUrgentLoad, queuePrefetch } from './load-queue';
 import type { DeferCode } from './defer-code';
-import { isServerRender, serverBlock, serverElement } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -64,8 +63,8 @@ export function defer(
     loadFn: (() => Promise<unknown>) | null,
     renderFn: (module?: unknown) => Node | DocumentFragment
 ): DocumentFragment {
-    if (isServerRender()) return serverDefer(options, loadFn, renderFn);
-    if (isHydrating()) return hydrationBlock(['defer', '/defer'], () => defer(options, loadFn, renderFn));
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.defer(options, loadFn, renderFn));
     const frag = document.createDocumentFragment();
     const start = document.createComment('defer');
     const end = document.createComment('/defer');
@@ -222,38 +221,8 @@ export function defer(
 }
 
 /** `loadFn` as a DeferCode whose code has arrived (defer-code.ts), or null. */
-function arrivedCode(loadFn: (() => Promise<unknown>) | null): DeferCode | null {
+export function arrivedCode(loadFn: (() => Promise<unknown>) | null): DeferCode | null {
     return loadFn && (loadFn as Partial<DeferCode>).arrived ? (loadFn as DeferCode) : null;
-}
-
-/** The triggers that fire later: the others — `immediate`, and a trigger unknown — fire at once. */
-const LATER_TRIGGER = /^(viewport|interaction|idle(\(\d+\))?|timer\(\d+\))$/;
-
-/**
- * On the server (#160): what the client's block shows when it has just mounted. A trigger that fires
- * at once — `immediate`, an unknown one, a `when` already true — renders the body if its code needs
- * no load or has arrived, `@loading` (or the placeholder) while it loads; otherwise the placeholder,
- * after the sentinel a `viewport` trigger puts there.
- */
-function serverDefer(
-    options: DeferOptions,
-    loadFn: (() => Promise<unknown>) | null,
-    renderFn: (module?: unknown) => Node | DocumentFragment,
-): DocumentFragment {
-    return serverBlock('defer', '/defer', () => {
-        const triggers = (options.trigger ?? '').split('|').map((t) => t.trim()).filter(Boolean);
-        const fires = triggers.some((t) => !LATER_TRIGGER.test(t)) || Boolean(options.when?.());
-        if (fires) {
-            if (!loadFn) return [renderFn(undefined)];
-            const arrived = arrivedCode(loadFn);
-            if (arrived) return [renderFn(arrived.module)];
-            return [options.loading?.() ?? options.placeholder?.() ?? null];
-        }
-        const sentinel = triggers.includes('viewport')
-            ? [serverElement('span', { style: 'display: block; height: 1px; visibility: hidden;' })]
-            : [];
-        return [...sentinel, options.placeholder?.() ?? null];
-    });
 }
 
 // ─── Trigger Activation ────────────────────────────────────────────

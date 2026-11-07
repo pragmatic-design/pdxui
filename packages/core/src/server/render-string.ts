@@ -21,6 +21,8 @@ import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
 import { templateTree, VOID_ELEMENTS, type TreeNode, type TreeAttribute } from './template-tree';
 import { withServerRender, isDeferredTemplate, isServerBlock, isServerElement, type DeferredTemplate, type ServerBlock, type ServerElement, type BlockMark } from './mode';
 import { renderHost, type SkippedComponent } from './render-component';
+import { serverBlocks } from './blocks';
+import { isDeferredBlock } from '../renderer/deferred-block';
 
 export type { SkippedComponent } from './render-component';
 
@@ -80,6 +82,7 @@ export function renderToStringWithReport(fn: () => unknown): { html: string; ski
 function content(value: unknown, slots: Projection | null, mark: BlockMark | null = null): string {
     if (typeof value === 'function') return content(untracked(value as () => unknown), slots, mark);
     if (isDeferredTemplate(value)) return renderTemplate(value, slots, mark);
+    if (isDeferredBlock(value)) return renderBlock(value.visit(serverBlocks), slots, mark);
     if (isServerBlock(value)) return renderBlock(value, slots, mark);
     if (isServerElement(value)) return createdElement(value, mark);
     if (Array.isArray(value)) return value.map((v) => content(v, slots, mark)).join('');

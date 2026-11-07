@@ -8,8 +8,7 @@ import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
 import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
-import { isServerRender, serverBlock } from '../server/mode';
-import { isHydrating, hydrationBlock } from '../hydrate/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
 
@@ -80,25 +79,14 @@ export function repeatRows<T>(
     return mountList(items, keyFn, { mode: 'getters', render: renderFn }, options);
 }
 
-function mountList<T>(
+export function mountList<T>(
     items: (() => T[]),
     keyFn: (item: T, index: number) => unknown,
     renderer: RowRenderer<T>,
     options?: RepeatOptions
 ): DocumentFragment {
-    // Hydrating (#160): the rows the server rendered are the list as it is now, adopted one by one in
-    // order, each with its key; the list is then followed as a mounted one is.
-    if (isHydrating()) {
-        return hydrationBlock(['repeat-start', 'repeat-end'], () => mountList(items, keyFn, renderer, options),
-            (a, parent, at) => a.blocks.list(a, parent, at, items, keyFn, renderer, options));
-    }
-    // On the server: every row of the list as it is now, between the client's markers, each marked as
-    // createRow marks it (#160). A sliced append ends in the same rows, so slices do not apply.
-    if (isServerRender()) {
-        return serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
-            ? renderer.render(() => item, () => i)
-            : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null);
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.list(items, keyFn, renderer, options));
     const frag = document.createDocumentFragment();
     const startMarker = document.createComment('repeat-start');
     const endMarker = document.createComment('repeat-end');

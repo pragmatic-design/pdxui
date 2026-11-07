@@ -11,7 +11,6 @@ import { watchPartNodes, unwatchPartNodes } from '../renderer/part-nodes';
 import { componentLabel, componentFile } from './global-error';
 import { devInstanceId, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
-import { withoutHydration } from '../hydrate/mode';
 
 /**
  * How a pre-rendered host takes over the markup the build wrote for it (#160, part 4), set by the
@@ -20,10 +19,10 @@ import { withoutHydration } from '../hydrate/mode';
 export interface HostHydration {
     /**
      * Adopt `render()` over the host's markup. Returns the host's light children — the nodes its parent
-     * projected into it — when it did; null when the markup is not the render, the host then holding
-     * those children alone, for a mount to project.
+     * projected into it — and the slots its render left with their own content, when it did; null when
+     * the markup is not the render, the host then holding those children alone, for a mount to project.
      */
-    adopt(host: Element, render: () => unknown): Node[] | null;
+    adopt(host: Element, render: () => unknown): { light: Node[]; slots: Element[] } | null;
 }
 
 let hostHydration: HostHydration | null = null;
@@ -296,18 +295,16 @@ export abstract class PdxElement extends HTMLElementBase {
                 const [rendered, disposeBody, scope] = collectScope(() => {
                     try {
                         if (hydrating) {
-                            const light = hostHydration!.adopt(this, () => this.body());
-                            if (light) {
-                                this._lightChildren = light;
-                                return { content: null, hydrated: true };
+                            const adopted = hostHydration!.adopt(this, () => this.body());
+                            if (adopted) {
+                                this._lightChildren = adopted.light;
+                                return { content: null, slots: adopted.slots };
                             }
                             // The build's markup is not this render: the host now holds the children
                             // its parent projected, and mounts as it would have without the build.
                             this._captureChildren(target);
                         }
-                        // Built, not adopted: a template's values evaluated while a parent adopts its
-                        // own (a block that could not adopt, building this component) are built too.
-                        return { content: withoutHydration(() => this.body()) };
+                        return { content: this.body() };
                     } catch (error) {
                         return { content: null, error, threw: true };
                     }
@@ -332,10 +329,8 @@ export abstract class PdxElement extends HTMLElementBase {
                 this._scope = scope;
                 // The slots this template rendered — taken NOW, while the content is detached and
                 // no child component has rendered its own <slot> into it. A hydrated render is in place
-                // already: its own slots are the ones left, which received nothing.
-                this._ownSlots = 'hydrated' in rendered
-                    ? Array.from(this.querySelectorAll('slot')).filter((s) => this._ownsNode(s))
-                    : slotsIn(content);
+                // already: its own slots are the ones the adoption left, which received nothing.
+                this._ownSlots = rendered.slots ?? slotsIn(content);
                 if (content) {
                     target.appendChild(content);
                 }

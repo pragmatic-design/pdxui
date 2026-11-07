@@ -140,12 +140,3 @@ export function serverElement(tag: string, attributes: Readonly<Record<string, s
 export function isServerElement(value: unknown): value is ServerElement {
     return ServerElementClass !== null && value instanceof ServerElementClass;
 }
-
-/**
- * Whether `value` is what a render returns while templates are not built: a template, a helper's
- * block, or an element a helper creates. A component's render may return any of them — a template, or
- * a `when()` alone.
- */
-export function isDeferredContent(value: unknown): boolean {
-    return isDeferredTemplate(value) || isServerBlock(value) || isServerElement(value);
-}

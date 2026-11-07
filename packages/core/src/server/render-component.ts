@@ -12,7 +12,16 @@
 import { collectDisposers, untracked } from '../reactivity/signal';
 import { PdxElement } from '../component/element';
 import { assignBoundProperty } from '../renderer/template';
-import { isDeferredContent } from './mode';
+import { isDeferredTemplate } from './mode';
+import { isDeferredBlock } from '../renderer/deferred-block';
+
+/**
+ * Whether `value` is what a render returns while templates are not built: a template, or a helper's
+ * block — a component's render may return a `when()` alone.
+ */
+function isDeferredContent(value: unknown): boolean {
+    return isDeferredTemplate(value) || isDeferredBlock(value);
+}
 
 /** A component the server could not render, and why. */
 export interface SkippedComponent {

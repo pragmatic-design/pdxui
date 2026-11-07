@@ -17,7 +17,7 @@ export function installHydration(): void {
     installHostHydration({ adopt: adoptHost });
 }
 
-function adoptHost(host: Element, render: () => unknown): Node[] | null {
+function adoptHost(host: Element, render: () => unknown): { light: Node[]; slots: Element[] } | null {
     const regions = regionsOf(host);
     host.removeAttribute('data-pdx-ssr');
     // A component the server could not render has no markup of its own to take over, only the light
@@ -28,19 +28,18 @@ function adoptHost(host: Element, render: () => unknown): Node[] | null {
     }
     // Taken now: the regions' markers go as the walks finish with them.
     const light = [...regions.values()].flatMap(regionNodes);
-    const [adopted, dispose] = collectDisposers(() => {
+    const [slots, dispose] = collectDisposers(() => {
         try {
-            hydrateChildren(host, render, regions);
-            return true;
+            return hydrateChildren(host, render, regions);
         } catch (error) {
             // A mismatch, or a render that threw: rendered afresh, which shows a real error again.
             if (DEV) console.warn(`[pdx] <${host.localName}> renders afresh: ${error instanceof Error ? error.message : String(error)}`);
-            return false;
+            return null;
         }
     });
-    if (adopted) {
+    if (slots) {
         onDispose(dispose);
-        return light;
+        return { light, slots };
     }
     dispose();
     host.replaceChildren(...takeRegions(host));
