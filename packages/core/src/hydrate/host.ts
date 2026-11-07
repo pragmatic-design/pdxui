@@ -7,14 +7,43 @@
 // disposed, the host is left holding those children alone, and it mounts as it would have without the
 // build — in development, saying which component and where the markup differed.
 
-import { installHostHydration } from '../component/element';
+import { installHostHydration, type HydratingHost } from '../component/element';
 import { collectDisposers, onDispose } from '../reactivity/signal';
 import { DEV } from '../utils/env';
-import { hydrateChildren, regionNodes, regionsOf, takeRegions } from './adopt';
+import { adoptPartValue, hydrateChildren } from './adopt';
+import { regionNodes, regionsOf, release as releaseRegion, takeRegions } from './regions';
+import { installPartAdoption } from './compiled';
 
 /** Hydrate pre-rendered components from now on, instead of rendering them over their markup. */
 export function installHydration(): void {
-    installHostHydration({ adopt: adoptHost });
+    installHostHydration({ adopt: adoptHost, waits, release });
+    installPartAdoption(adoptPartValue);
+}
+
+/** The pre-rendered hosts waiting for an ancestor, by that ancestor. */
+const waiting = new WeakMap<Element, HydratingHost[]>();
+
+/**
+ * A pre-rendered host under a pre-rendered ancestor not hydrated yet waits for it: what the ancestor
+ * passes it — a prop is a property, not in the markup — is bound when the ancestor adopts its render.
+ * Components upgrade in the order their definitions run, so a child can connect first.
+ */
+function waits(host: HydratingHost): boolean {
+    if (!host.hasAttribute('data-pdx-ssr')) return false;
+    const ancestor = host.parentElement?.closest('[data-pdx-ssr]');
+    if (!ancestor) return false;
+    const list = waiting.get(ancestor);
+    if (list) list.push(host);
+    else waiting.set(ancestor, [host]);
+    return true;
+}
+
+/** `host` has mounted: the hosts that waited for it connect again, now that it has bound them. */
+function release(host: HydratingHost): void {
+    const list = waiting.get(host);
+    if (!list) return;
+    waiting.delete(host);
+    for (const child of list) if (child.isConnected) child.connectedCallback();
 }
 
 function adoptHost(host: Element, render: () => unknown): { light: Node[]; slots: Element[] } | null {
@@ -39,6 +68,8 @@ function adoptHost(host: Element, render: () => unknown): { light: Node[]; slots
     });
     if (slots) {
         onDispose(dispose);
+        // The component's walk is through its regions — a compiled one steps over them without a word.
+        for (const r of regions.values()) releaseRegion(r, 'owner');
         return { light, slots };
     }
     dispose();

@@ -689,6 +689,11 @@ export interface CompileOptions {
      */
     ssr?: boolean;
     /**
+     * Compile the client's module to take over the markup static generation wrote (#160, part 4b):
+     * each block walks the server's nodes when it is handed them, and clones its markup otherwise.
+     */
+    hydrate?: boolean;
+    /**
      * The .pdx as the app knows it, relative to its root (`src/pages/login.pdx`). Registered with the
      * component so a runtime error names its file. The dev server passes it; a production
      * build ignores it.
@@ -962,6 +967,7 @@ export function compile(
         { production: options?.production, warnings: allWarnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: true,
           sourceFile: options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.prefix,
           ssr: options?.ssr,
+          hydrate: options?.hydrate,
           // The template's code is marked too — not when minifying rewrote it, nor when
           // it was read from another file: its offsets would not be the .pdx's.
           templateOrigin: descriptor.template && !descriptor.template.src && !options?.minify ? descriptor.template.start : null },
