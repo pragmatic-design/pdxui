@@ -12,6 +12,7 @@
 import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -25,6 +26,7 @@ export function whenChain(
 ): DocumentFragment {
     // On the server: the branch picked now, between the markers when() uses too (#160).
     if (isServerRender()) return serverBlock('when', '/when', () => { const branch = branches[select()]; return branch ? [branch()] : []; });
+    if (isHydrating()) return hydrationBlock(['when', '/when'], () => whenChain(select, branches));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');

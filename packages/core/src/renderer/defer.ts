@@ -9,6 +9,7 @@ import { DEV } from '../utils/env';
 import { trackUrgentLoad, queuePrefetch } from './load-queue';
 import type { DeferCode } from './defer-code';
 import { isServerRender, serverBlock, serverElement } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -64,6 +65,7 @@ export function defer(
     renderFn: (module?: unknown) => Node | DocumentFragment
 ): DocumentFragment {
     if (isServerRender()) return serverDefer(options, loadFn, renderFn);
+    if (isHydrating()) return hydrationBlock(['defer', '/defer'], () => defer(options, loadFn, renderFn));
     const frag = document.createDocumentFragment();
     const start = document.createComment('defer');
     const end = document.createComment('/defer');

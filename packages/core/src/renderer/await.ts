@@ -17,6 +17,7 @@ import { nodesBetween } from './helpers';
 import { errorBoundary } from './error-boundary';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 
 /** `@await`'s `maxMs` ran out with no result. The source is not cancelled; a later result replaces it. */
 export class AwaitTimeoutError extends Error {
@@ -138,6 +139,7 @@ export function awaitBlock<T = unknown>(
     options: AwaitTiming = {},
 ): DocumentFragment {
     if (isServerRender()) return serverAwait(source, thenFn, loadingFn, errorFn, options);
+    if (isHydrating()) return hydrationBlock(['await', '/await'], () => awaitBlock(source, thenFn, loadingFn, errorFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('await');
     const end = document.createComment('/await');

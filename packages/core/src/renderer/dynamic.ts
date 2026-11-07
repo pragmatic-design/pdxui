@@ -5,6 +5,7 @@ import { effect, onDispose } from '../reactivity/signal';
 import { enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock, serverElement } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 
 // ─── Types ─────────────────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ export function dynamic(
 ): DocumentFragment {
     // On the server (#160): the element of the tag there is now, with the props applyProps gives it —
     // a primitive as an attribute, anything else as a property.
+    if (isHydrating()) return hydrationBlock(['dynamic', '/dynamic'], () => dynamic(tagFn, propsFn, options));
     if (isServerRender()) {
         return serverBlock('dynamic', '/dynamic', () => {
             const tag = tagFn();

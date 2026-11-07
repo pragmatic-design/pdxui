@@ -2,11 +2,12 @@
 // Zero compilation — pure JS functions that return reactive DOM.
 
 import { DEV } from '../utils/env';
-import { effect, signal, collectDisposers, onDispose } from '../reactivity/signal';
+import { effect, signal, collectDisposers, onDispose, untracked } from '../reactivity/signal';
 import { repeat, repeatRows } from './list';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
 import { isServerRender, serverBlock } from '../server/mode';
+import { isHydrating, hydrationBlock, type Adopter } from '../hydrate/mode';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -49,6 +50,7 @@ export function when(
 ): DocumentFragment {
     // On the server: the branch the condition picks now, between the client's markers (#160).
     if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
+    if (isHydrating()) return hydrationBlock(['when', '/when'], () => when(condition, thenFn, elseFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
@@ -198,6 +200,7 @@ export function match<T extends string | number>(
     value: () => T,
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
+    if (isHydrating()) return hydrationBlock(['match', '/match'], () => match(value, cases));
     if (isServerRender()) {
         return serverBlock('match', '/match', () => {
             const caseFn = caseFor(cases, String(value()));
@@ -266,6 +269,10 @@ export function show(
 ): DocumentFragment {
     // On the server: the content, hidden as the client hides it when the condition is false (#160).
     if (isServerRender()) return serverBlock(null, null, () => [content], condition() ? null : { item: false, hidden: true });
+    if (isHydrating()) {
+        return hydrationBlock(['show', null], (a) => show(condition, a.build(content)),
+            (a, parent, at, end) => adoptShow(a, condition, content, parent, at, end));
+    }
     const frag = document.createDocumentFragment();
     const nodes = content instanceof DocumentFragment
         ? Array.from(content.childNodes)
@@ -278,7 +285,31 @@ export function show(
     // element keeps its node and takes display:none, so its state, focus and component survive.
     const placeholders = new Map<Text, Comment>();
     for (const n of nodes) if (n instanceof Text) placeholders.set(n, document.createComment('show'));
+    showNodes(nodes, condition, placeholders);
+    return frag;
+}
 
+/**
+ * Hydrating (#160): the content as the server wrote it — hidden, its texts are the `show` comments —
+ * adopted, then kept shown or hidden as a mounted `show()` keeps it.
+ */
+function adoptShow(a: Adopter, condition: () => boolean, content: Node, parent: Node, at: Node | null, end: Node | null): Node | null {
+    const hidden = untracked(condition) ? undefined : new Map<Text, Comment>();
+    const before = at ? at.previousSibling : (end ? end.previousSibling : parent.lastChild);
+    const next = a.value(content, parent, at, end, hidden);
+    // The content's top-level nodes, with each hidden text in the place its comment keeps.
+    const byPlaceholder = new Map<Node, Text>();
+    for (const [text, placeholder] of hidden ?? []) byPlaceholder.set(placeholder, text);
+    const nodes: Node[] = [];
+    for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(byPlaceholder.get(n) ?? n);
+    const placeholders = new Map<Text, Comment>(hidden);
+    for (const n of nodes) if (n instanceof Text && !placeholders.has(n)) placeholders.set(n, document.createComment('show'));
+    showNodes(nodes, condition, placeholders);
+    return next;
+}
+
+/** Keep `nodes` shown or hidden as `condition` says: an element by its display, a text by its placeholder. */
+function showNodes(nodes: readonly Node[], condition: () => boolean, placeholders: Map<Text, Comment>): void {
     effect(() => {
         const visible = condition();
         for (const n of nodes) {
@@ -291,8 +322,6 @@ export function show(
             }
         }
     });
-
-    return frag;
 }
 
 /**
@@ -329,6 +358,7 @@ export function portal(
     // On the server (#160): the marker it leaves in place. The content goes to another part of the
     // document, which the server does not render: the client puts it there when it mounts.
     if (isServerRender()) return serverBlock('portal', null, () => []);
+    if (isHydrating()) return hydrationBlock(['portal', null], () => portal(contentFn, target, options));
     const frag = document.createDocumentFragment();
     const marker = document.createComment('portal');
     frag.appendChild(marker);

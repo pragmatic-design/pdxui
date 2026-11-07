@@ -78,7 +78,8 @@ export function buildBindingPlan(content: DocumentFragment): BindingPlan {
     return plan;
 }
 
-function attributeBinding(path: number[], name: string, value: string): AttributeBinding {
+/** The binding of attribute `name` with `value`, a value that carries placeholders. */
+export function attributeBinding(path: number[], name: string, value: string): AttributeBinding {
     const pure = value.match(PH_PURE);
     if (pure) return { path, name, pure: parseInt(pure[1]), segments: [], slots: [] };
     const segments = value.split(PH_REGEX);

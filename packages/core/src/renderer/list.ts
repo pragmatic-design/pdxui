@@ -9,6 +9,7 @@ import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
 import { isServerRender, serverBlock } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
 
@@ -87,6 +88,7 @@ function mountList<T>(
 ): DocumentFragment {
     // On the server: every row of the list as it is now, between the client's markers, each marked as
     // createRow marks it (#160). A sliced append ends in the same rows, so slices do not apply.
+    if (isHydrating()) return hydrationBlock(['repeat-start', 'repeat-end'], () => mountList(items, keyFn, renderer, options));
     if (isServerRender()) {
         return serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
             ? renderer.render(() => item, () => i)

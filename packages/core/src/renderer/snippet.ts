@@ -10,6 +10,7 @@ import { nodesBetween } from './helpers';
 import type { Dispose } from '../utils/types';
 import type { SlotFunction } from './slot';
 import { isServerRender, serverBlock } from '../server/mode';
+import { isHydrating, hydrationBlock } from '../hydrate/mode';
 
 /**
  * The parent's snippet for the declared slot `name`, as the `SlotFunction` the component calls with a
@@ -49,6 +50,7 @@ export function renderSnippet(
 ): DocumentFragment {
     // On the server (#160): the snippet called with its arguments now, or the fallback. A value that
     // is not a fragment renders nothing, as the client places only a node.
+    if (isHydrating()) return hydrationBlock(['snippet', '/snippet'], () => renderSnippet(source, args, fallback));
     if (isServerRender()) {
         return serverBlock('snippet', '/snippet', () => {
             const content = snippetContent(source(), args(), fallback);
