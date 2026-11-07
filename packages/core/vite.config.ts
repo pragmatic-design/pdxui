@@ -12,11 +12,12 @@ export default defineConfig({
             // The barrel, and the devtools overlay on its own: `@pdxui/core/devtools` cannot point at
             // the barrel in a build, which has no `initDevTools`. The string renderer too (#160):
             // `@pdxui/core/server` is for static generation, and no client bundle carries it. Shared
-            // code is a shared chunk.
+            // code is a shared chunk. Hydration too: `@pdxui/core/hydrate` is for a generated app only.
             entry: {
                 'pragmatic-core': 'src/index.ts',
                 devtools: 'src/devtools/overlay.ts',
                 server: 'src/server/index.ts',
+                hydrate: 'src/hydrate/index.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one
             // artefact with no bundler after it: it needs `process.env.NODE_ENV` replaced, and

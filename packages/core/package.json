@@ -43,6 +43,12 @@
       "import": "./dist/devtools.es.js",
       "require": "./dist/devtools.cjs"
     },
+    "./hydrate": {
+"development": "./src/hydrate/index.ts",
+      "types": "./dist/hydrate/index.d.ts",
+      "import": "./dist/hydrate.es.js",
+      "require": "./dist/hydrate.cjs"
+    },
     "./server": {
 "development": "./src/server/index.ts",
       "types": "./dist/server/index.d.ts",
