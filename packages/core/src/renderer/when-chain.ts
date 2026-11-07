@@ -11,6 +11,7 @@
 
 import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
+import { isServerRender, serverBlock } from '../server/mode';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -22,6 +23,8 @@ export function whenChain(
     select: () => number,
     branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>,
 ): DocumentFragment {
+    // On the server: the branch picked now, between the markers when() uses too (#160).
+    if (isServerRender()) return serverBlock('when', '/when', () => { const branch = branches[select()]; return branch ? [branch()] : []; });
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');

@@ -245,7 +245,8 @@ export function compileNewMode(
         modelsCode,
         ctx.tagPrefix,
         ctx.target,
-        typedSlots);
+        typedSlots,
+        ctx.ssr);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */

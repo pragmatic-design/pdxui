@@ -245,6 +245,8 @@ export function assembleModule(
     target: BrowserTarget = 'baseline-2026',
     /** The typed snippets the script declares with `@slot name: (…)` (#489), written into the descriptor. */
     slots: readonly string[] = [],
+    /** Compiled for the server (#160): no document to inject a `<style>` into, so styles are imported. */
+    ssr = false,
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -318,7 +320,7 @@ export function assembleModule(
     if (userImports.length > 0) code += userImports.join('\n') + '\n';
     for (const path of layoutImports) code += `import ${jsQuote(path)};\n`;
     code += '\n';
-    code += generateStyles(descriptor, filename, production, target);
+    code += generateStyles(descriptor, filename, production || ssr, target);
     code += hoistedLoader;
     if (hasModuleHoists) code += MODULE_HOISTS_SLOT + '\n';
     code += `component(${jsQuote(tag)}, {\n`;
