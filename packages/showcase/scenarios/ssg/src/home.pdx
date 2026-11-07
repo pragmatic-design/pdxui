@@ -1,0 +1,12 @@
+<template>
+  <h1 data-test="title">Home</h1>
+  <app-card label="written by the server"></app-card>
+  <button data-test="count" @click="count++">{{ count }}</button>
+  <pdx-link to="/about" data-test="to-about">About</pdx-link>
+</template>
+
+<script>
+@page '/';
+@layout 'shell';
+let count = $signal(0);
+</script>

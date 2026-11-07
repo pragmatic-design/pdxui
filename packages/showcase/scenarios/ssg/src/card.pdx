@@ -1,0 +1,7 @@
+<template>
+  <p class="card" data-test="card">{{ label }}</p>
+</template>
+
+<script>
+@prop label: string = '';
+</script>

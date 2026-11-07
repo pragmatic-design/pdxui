@@ -1,0 +1,4 @@
+<template>
+  <header data-test="header">Shop</header>
+  <main data-test="main"><slot></slot></main>
+</template>

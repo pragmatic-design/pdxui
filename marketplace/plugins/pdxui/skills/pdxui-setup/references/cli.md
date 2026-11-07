@@ -68,6 +68,36 @@ for the maps. With `--standalone`, each component gets a `<name>.js.map` beside 
 `--outDir` writes somewhere other than the config's (`dist` by default); `--minify` is on by
 default, and `--no-minify` leaves the output readable.
 
+### Static generation: `--ssg`
+
+```bash
+npx pdx build --ssg
+```
+
+`--ssg` writes a page for every route: `/` as `index.html`, `/about` as `about/index.html`. Each
+page is the built `index.html` with the route's content already in its body. A visitor sees that
+content before any JavaScript runs, and the app then takes it over instead of rendering it again:
+the elements stay the same ones, and they become interactive.
+
+The app is built with `pdx({ hydrate: true })`. If your `vite.config` registers `pdx()` itself, the
+option has to be there; without it the build stops and says so. The routes are rendered in Node, in
+a process of their own, with the app compiled for the server. A route with parameters is generated
+for the paths you list in `pdx.config`:
+
+```ts
+export default defineConfig({ ssg: { routes: ['/posts/1', '/posts/2'] } });
+```
+
+The build says what it did not write, and why:
+
+- a route with parameters and no path listed;
+- a guarded route, whose content depends on the visitor;
+- a redirect.
+
+A component that can only be written as an empty host is named with the reason, and the client
+renders it at boot. A module that reads `document` or `window` when it is imported stops the build,
+naming the file and the line. That work belongs in `onMount`, which the server never runs.
+
 ## pdx check — the quality gate
 
 ```bash

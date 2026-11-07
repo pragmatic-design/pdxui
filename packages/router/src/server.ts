@@ -18,6 +18,7 @@
 
 import { DEV } from '@pdxui/core';
 import { registerServerElement, serverElement } from '@pdxui/core/server';
+import { pageModule } from './active';
 import { compileMatcher } from './matcher';
 import { registeredRoutes, type RegisteredRoute } from './registered-routes';
 
@@ -54,6 +55,19 @@ export function serverRoute(path: string): ServerRoute {
     if (refused) return { path, route: null, skipped: refused.guard ? 'guard' : 'redirect' };
     level = { chain, params: found.params };
     return { path, route: found.route.path };
+}
+
+/** The patterns of the registered routes, in the order they were declared. */
+export function serverRoutes(): string[] {
+    return (registeredRoutes() ?? []).map((r) => r.path);
+}
+
+/**
+ * Import every lazy page's module, so each page is a component the server can render: in the
+ * browser a page loads when it is first shown, and on the server it would be an empty host.
+ */
+export async function loadServerPages(): Promise<void> {
+    await Promise.all((registeredRoutes() ?? []).map((r) => pageModule(r.path)?.()));
 }
 
 registerServerElement('pdx-router-outlet', (attributes) => {
