@@ -54,11 +54,11 @@ describe('renderToString in Node', () => {
             html`<node-card label="Hi" count="2" size="lg" :items=${['a', 'b']}><em>child</em></node-card>`);
         expect(skipped).toEqual([]);
         expect(markup).toContain('<node-card');
-        expect(markup).toContain('data-pdx-ssr=""');
+        expect(markup).toMatch(/data-pdx-ssr="\d+"/);
         expect(markup).toContain('size="lg"');
         expect(markup).toContain(`<h2>${PART_OPEN}Hi${PART_CLOSE}</h2>`);
         expect(markup).toContain(`<span>${PART_OPEN}4${PART_CLOSE}</span>`);
-        expect(markup, 'the child is projected where the slot was').toContain('<em>child</em></div>');
+        expect(markup, 'the child is projected where the slot was').toContain('<!--pdx-slot:1:--><em>child</em><!--/pdx-slot--></div>');
         expect(markup).not.toContain('<slot');
     });
 

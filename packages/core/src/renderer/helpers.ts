@@ -6,7 +6,7 @@ import { effect, signal, collectDisposers, onDispose } from '../reactivity/signa
 import { repeat, repeatRows } from './list';
 import { insertWithTransition, removeWithTransition, enter, exit } from './transitions';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock } from '../server/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -47,20 +47,36 @@ export function when(
     elseFn?: (() => Node | DocumentFragment | null) | null,
     options?: TransitionOptions
 ): DocumentFragment {
-    // On the server: the branch the condition picks now, between the client's markers (#160).
-    if (isServerRender()) return serverBlock('when', '/when', () => [condition() ? thenFn() : (elseFn?.() ?? null)]);
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.when(condition, thenFn, elseFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
     frag.appendChild(start);
     frag.appendChild(end);
+    followWhen(start, end, condition, thenFn, elseFn, options, null);
+    return frag;
+}
 
+/**
+ * Keep the branch `condition` picks between `start` and `end`. `adopted`: the branch already there,
+ * hydrated, and what disposes it; null when nothing is rendered yet.
+ */
+export function followWhen(
+    start: Comment,
+    end: Comment,
+    condition: () => boolean,
+    thenFn: () => Node | DocumentFragment,
+    elseFn: (() => Node | DocumentFragment | null) | null | undefined,
+    options: TransitionOptions | undefined,
+    adopted: { show: boolean; dispose: Dispose } | null,
+): void {
     // Disposer for the effects created inside the currently-rendered branch.
     // Disposed when the branch actually swaps and on teardown — prevents leaked
     // bindings re-running on detached nodes.
-    let childDispose: Dispose | null = null;
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
     // Memoized last-rendered condition. `undefined` = nothing rendered yet.
-    let prevShow: boolean | undefined;
+    let prevShow: boolean | undefined = adopted?.show;
     // A generation token: a .then() of an out-in exit overtaken by a more recent run
     // must neither render stale content nor overwrite the disposer.
     let renderGen = 0;
@@ -121,8 +137,6 @@ export function when(
     // Final teardown: dispose the current branch when the enclosing scope is removed.
     // No per-re-run cleanup — that would fight the memoization above.
     onDispose(() => { renderGen++; childDispose?.(); childDispose = null; });
-
-    return frag;
 }
 
 /**
@@ -198,21 +212,28 @@ export function match<T extends string | number>(
     value: () => T,
     cases: Record<string, () => Node | DocumentFragment> & { _?: () => Node | DocumentFragment }
 ): DocumentFragment {
-    if (isServerRender()) {
-        return serverBlock('match', '/match', () => {
-            const caseFn = caseFor(cases, String(value()));
-            return caseFn ? [caseFn()] : [];
-        });
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.match(value, cases));
     const frag = document.createDocumentFragment();
     const start = document.createComment('match');
     const end = document.createComment('/match');
     frag.appendChild(start);
     frag.appendChild(end);
+    followMatch(start, end, value, cases, null);
+    return frag;
+}
 
-    let childDispose: Dispose | null = null;
+/** Keep the case `value()` picks between the markers; `adopted`: the one already there, hydrated. */
+export function followMatch<T extends string | number>(
+    start: Comment,
+    end: Comment,
+    value: () => T,
+    cases: Record<string, () => Node | DocumentFragment>,
+    adopted: { key: string; dispose: Dispose } | null,
+): void {
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
     // Memoized last-rendered case key. `undefined` = nothing rendered yet.
-    let prevKey: string | undefined;
+    let prevKey: string | undefined = adopted?.key;
 
     effect(() => {
         const key = String(value());
@@ -244,12 +265,10 @@ export function match<T extends string | number>(
 
     // Final teardown: dispose the current case when the enclosing scope is removed.
     onDispose(() => { childDispose?.(); childDispose = null; });
-
-    return frag;
 }
 
 /** The case `match()` renders for `key`: its own, or the `_` default. */
-function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
+export function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
     return cases[key] ?? cases._;
 }
 
@@ -264,8 +283,8 @@ export function show(
     condition: () => boolean,
     content: Node | DocumentFragment
 ): DocumentFragment {
-    // On the server: the content, hidden as the client hides it when the condition is false (#160).
-    if (isServerRender()) return serverBlock(null, null, () => [content], condition() ? null : { item: false, hidden: true });
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.show(condition, content));
     const frag = document.createDocumentFragment();
     const nodes = content instanceof DocumentFragment
         ? Array.from(content.childNodes)
@@ -278,7 +297,12 @@ export function show(
     // element keeps its node and takes display:none, so its state, focus and component survive.
     const placeholders = new Map<Text, Comment>();
     for (const n of nodes) if (n instanceof Text) placeholders.set(n, document.createComment('show'));
+    showNodes(nodes, condition, placeholders);
+    return frag;
+}
 
+/** Keep `nodes` shown or hidden as `condition` says: an element by its display, a text by its placeholder. */
+export function showNodes(nodes: readonly Node[], condition: () => boolean, placeholders: Map<Text, Comment>): void {
     effect(() => {
         const visible = condition();
         for (const n of nodes) {
@@ -291,8 +315,6 @@ export function show(
             }
         }
     });
-
-    return frag;
 }
 
 /**
@@ -326,9 +348,8 @@ export function portal(
     target: string | Element,
     options?: PortalOptions,
 ): DocumentFragment {
-    // On the server (#160): the marker it leaves in place. The content goes to another part of the
-    // document, which the server does not render: the client puts it there when it mounts.
-    if (isServerRender()) return serverBlock('portal', null, () => []);
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.portal(contentFn, target, options));
     const frag = document.createDocumentFragment();
     const marker = document.createComment('portal');
     frag.appendChild(marker);

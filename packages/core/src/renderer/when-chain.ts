@@ -11,7 +11,7 @@
 
 import { effect, collectDisposers, onDispose } from '../reactivity/signal';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock } from '../server/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { Dispose } from '../utils/types';
 
 /**
@@ -23,17 +23,28 @@ export function whenChain(
     select: () => number,
     branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>,
 ): DocumentFragment {
-    // On the server: the branch picked now, between the markers when() uses too (#160).
-    if (isServerRender()) return serverBlock('when', '/when', () => { const branch = branches[select()]; return branch ? [branch()] : []; });
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.chain(select, branches));
     const frag = document.createDocumentFragment();
     const start = document.createComment('when');
     const end = document.createComment('/when');
     frag.appendChild(start);
     frag.appendChild(end);
+    followChain(start, end, select, branches, null);
+    return frag;
+}
 
-    let childDispose: Dispose | null = null;
+/** Keep the branch `select()` picks between the markers; `adopted`: the one already there, hydrated. */
+export function followChain(
+    start: Comment,
+    end: Comment,
+    select: () => number,
+    branches: ReadonlyArray<(() => Node | DocumentFragment | null) | null>,
+    adopted: { index: number; dispose: Dispose } | null,
+): void {
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
     // The index rendered; `undefined` is nothing rendered yet, so the first run always renders.
-    let prev: number | undefined;
+    let prev: number | undefined = adopted?.index;
 
     effect(() => {
         const index = select();
@@ -60,6 +71,4 @@ export function whenChain(
     });
 
     onDispose(() => { childDispose?.(); childDispose = null; });
-
-    return frag;
 }

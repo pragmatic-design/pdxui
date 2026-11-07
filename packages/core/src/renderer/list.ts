@@ -8,7 +8,7 @@ import { enterRow, exit, recordPositions, flipAnimate } from './transitions';
 import { placePartNode, placePartNodes } from './part-nodes';
 import { trackReconcile, isReconcileTrackingEnabled } from '../debug/inspector';
 import { DEV } from '../utils/env';
-import { isServerRender, serverBlock } from '../server/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 import type { TransitionOptions } from './helpers';
 import { appendInSlices, LIST_SLICE_THRESHOLD, LIST_FIRST_SLICE } from './list-slices';
 
@@ -16,7 +16,7 @@ export { LIST_SLICE_THRESHOLD };
 
 let _warnedStableKeyMutation = false;
 
-interface MappedItem<T> {
+export interface MappedItem<T> {
     key: unknown;
     item: T;
     nodes: Node[];
@@ -25,14 +25,14 @@ interface MappedItem<T> {
     row?: RowSignals<T>;
 }
 
-interface RowSignals<T> { item: Signal<T>; index: Signal<number> }
+export interface RowSignals<T> { item: Signal<T>; index: Signal<number> }
 
 /**
  * How a row is rendered. `value` hands it the item — what hand-written `each()` code expects.
  * `getters` hands it `item()` and `index()`, backed by per-row signals the reconciler updates
  * when it reuses the row: what `@for` compiles to.
  */
-type RowRenderer<T> =
+export type RowRenderer<T> =
     | { mode: 'value'; render: (item: T, index: number) => Node }
     | { mode: 'getters'; render: (item: () => T, index: () => number) => Node };
 
@@ -79,27 +79,38 @@ export function repeatRows<T>(
     return mountList(items, keyFn, { mode: 'getters', render: renderFn }, options);
 }
 
-function mountList<T>(
+export function mountList<T>(
     items: (() => T[]),
     keyFn: (item: T, index: number) => unknown,
     renderer: RowRenderer<T>,
     options?: RepeatOptions
 ): DocumentFragment {
-    // On the server: every row of the list as it is now, between the client's markers, each marked as
-    // createRow marks it (#160). A sliced append ends in the same rows, so slices do not apply.
-    if (isServerRender()) {
-        return serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
-            ? renderer.render(() => item, () => i)
-            : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null);
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.list(items, keyFn, renderer, options));
     const frag = document.createDocumentFragment();
     const startMarker = document.createComment('repeat-start');
     const endMarker = document.createComment('repeat-end');
     frag.appendChild(startMarker);
     frag.appendChild(endMarker);
+    followList(startMarker, endMarker, items, keyFn, renderer, options, null);
+    return frag;
+}
 
-    let mapped: MappedItem<T>[] = [];
-    let prevKeys: unknown[] = [];
+/**
+ * Keep the list's rows between its markers, reconciled by key. `adopted`: the rows already there,
+ * hydrated, and their keys; null when none is rendered yet.
+ */
+export function followList<T>(
+    startMarker: Comment,
+    endMarker: Comment,
+    items: (() => T[]),
+    keyFn: (item: T, index: number) => unknown,
+    renderer: RowRenderer<T>,
+    options: RepeatOptions | undefined,
+    adopted: { mapped: MappedItem<T>[]; keys: unknown[] } | null,
+): void {
+    let mapped: MappedItem<T>[] = adopted?.mapped ?? [];
+    let prevKeys: unknown[] = adopted?.keys ?? [];
     // The slices of a large append still to run (#242); `mapped` holds only the rows made so far.
     let pending: AbortController | null = null;
     // Only what `@for` compiles to slices — row getters, or value rows that asked for it (#398): a
@@ -172,8 +183,6 @@ function mountList<T>(
         for (const m of mapped) m.dispose?.();
         mapped = [];
     });
-
-    return frag;
 }
 
 /**

@@ -1,0 +1,171 @@
+// The helpers' blocks while hydrating (#160, part 4): how each takes over what the server wrote for it,
+// read from the call a helper defers (renderer/deferred-block.ts). Only hydrate/adopt.ts reads it, so a
+// page that does not hydrate carries none of it.
+//
+// A block that can adopts its markers and the content between them in the state it is in now — the
+// branch the condition picks, the case, the rows — in the scope a mount would give it, and hands what it
+// adopted to the helper's own follow function, which keeps it current from there as a mounted block.
+// The others are built as the client builds them and put in place of the server's copy.
+
+import { collectDisposers, signal, untracked } from '../reactivity/signal';
+import { when, match, show, portal, followWhen, followMatch, showNodes, caseFor } from '../renderer/helpers';
+import { whenChain, followChain } from '../renderer/when-chain';
+import { followList, mountList, type MappedItem, type RowRenderer, type RowSignals } from '../renderer/list';
+import { defer } from '../renderer/defer';
+import { awaitBlock } from '../renderer/await';
+import { errorBoundary } from '../renderer/error-boundary';
+import { renderSnippet } from '../renderer/snippet';
+import { dynamic } from '../renderer/dynamic';
+import type { BlockVisitor } from '../renderer/deferred-block';
+import { withoutHydration, type Adopter } from './mode';
+
+/** A block's adoption: from `at` on in `parent`, before `end`; returns the node after what it took. */
+export type BlockAdopt = (a: Adopter, parent: Node, at: Node | null, end: Node | null) => Node | null;
+
+export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
+    when: (condition, thenFn, elseFn, options) => (a, parent, at) => {
+        const start = a.expect(at, 'when');
+        const end = a.close(start, 'when', '/when');
+        const shown = !!untracked(condition);
+        const [, dispose] = collectDisposers(() => a.between(shown ? thenFn() : (elseFn?.() ?? null), parent, start, end));
+        followWhen(start, end, condition, thenFn, elseFn, options, { show: shown, dispose });
+        return end.nextSibling;
+    },
+
+    chain: (select, branches) => (a, parent, at) => {
+        const start = a.expect(at, 'when');
+        const end = a.close(start, 'when', '/when');
+        const index = untracked(select);
+        const branch = branches[index];
+        const [, dispose] = collectDisposers(() => a.between(branch ? branch() : null, parent, start, end));
+        followChain(start, end, select, branches, { index, dispose });
+        return end.nextSibling;
+    },
+
+    match: (value, cases) => (a, parent, at) => {
+        const start = a.expect(at, 'match');
+        const end = a.close(start, 'match', '/match');
+        const key = String(untracked(value));
+        const caseFn = caseFor(cases, key);
+        const [, dispose] = collectDisposers(() => a.between(caseFn ? caseFn() : null, parent, start, end));
+        followMatch(start, end, value, cases, { key, dispose });
+        return end.nextSibling;
+    },
+
+    show: (condition, content) => (a, parent, at, end) => {
+        // Hidden, the server wrote each top-level text as the `show` comment that keeps its place.
+        const hidden = untracked(condition) ? undefined : new Map<Text, Comment>();
+        const before = at ? at.previousSibling : (end ? end.previousSibling : parent.lastChild);
+        const next = a.value(content, parent, at, end, hidden);
+        // The content's top-level nodes, with each hidden text in the place its comment keeps.
+        const byPlaceholder = new Map<Node, Text>();
+        for (const [text, placeholder] of hidden ?? []) byPlaceholder.set(placeholder, text);
+        const nodes: Node[] = [];
+        for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(byPlaceholder.get(n) ?? n);
+        const placeholders = new Map<Text, Comment>(hidden);
+        for (const n of nodes) if (n instanceof Text && !placeholders.has(n)) placeholders.set(n, document.createComment('show'));
+        showNodes(nodes, condition, placeholders);
+        return next;
+    },
+
+    list: (items, keyFn, renderer, options) => (a, parent, at) => {
+        const start = a.expect(at, 'repeat-start');
+        const end = a.close(start, 'repeat-start', 'repeat-end');
+        const list = untracked(items);
+        const keys = list.map((item, i) => keyFn(item, i));
+        let next: Node | null = start.nextSibling;
+        const mapped = list.map((item, i) => {
+            const row = adoptRow(a, renderer, keys[i], item, i, parent, next, end);
+            next = row.next;
+            return row.mapped;
+        });
+        if (next !== end) a.fail('the list has markup its rows do not');
+        followList(start, end, items, keyFn, renderer, options, { mapped, keys });
+        return end.nextSibling;
+    },
+
+    defer: (options, loadFn, renderFn) => built('defer', '/defer', () => defer(options, loadFn, renderFn)),
+    await: (source, thenFn, loadingFn, errorFn, options) => built('await', '/await', () => awaitBlock(source, thenFn, loadingFn, errorFn, options)),
+    boundary: (contentFn, fallbackFn, options) => built('error-boundary', '/error-boundary', () => errorBoundary(contentFn, fallbackFn, options)),
+    portal: (contentFn, target, options) => built('portal', null, () => portal(contentFn, target, options)),
+    snippet: (source, args, fallback) => built('snippet', '/snippet', () => renderSnippet(source, args, fallback)),
+    dynamic: (tagFn, propsFn, options) => built('dynamic', '/dynamic', () => dynamic(tagFn, propsFn, options)),
+};
+
+/**
+ * Each helper's call made as the client makes it, out of a hydration: what a value adopted while
+ * hydrating becomes when it has to be built. `build` builds the content a call holds already made —
+ * `show()`'s.
+ */
+export function builders(build: (node: Node) => Node): BlockVisitor<DocumentFragment> {
+    return {
+        when: (condition, thenFn, elseFn, options) => when(condition, thenFn, elseFn, options),
+        chain: (select, branches) => whenChain(select, branches),
+        match: (value, cases) => match(value, cases),
+        show: (condition, content) => show(condition, build(content)),
+        list: (items, keyFn, renderer, options) => mountList(items, keyFn, renderer, options),
+        defer: (options, loadFn, renderFn) => defer(options, loadFn, renderFn),
+        await: (source, thenFn, loadingFn, errorFn, options) => awaitBlock(source, thenFn, loadingFn, errorFn, options),
+        boundary: (contentFn, fallbackFn, options) => errorBoundary(contentFn, fallbackFn, options),
+        portal: (contentFn, target, options) => portal(contentFn, target, options),
+        snippet: (source, args, fallback) => renderSnippet(source, args, fallback),
+        dynamic: (tagFn, propsFn, options) => dynamic(tagFn, propsFn, options),
+    };
+}
+
+/**
+ * A block that does not adopt: built as the client builds it, out of the hydration, and put where the
+ * server's copy was, between its markers `open` and `close` (null for a single marker).
+ */
+function built(open: string, close: string | null, build: () => DocumentFragment): BlockAdopt {
+    return (a, parent, at) => {
+        const start = a.expect(at, open);
+        const last = close === null ? start : a.close(start, open, close);
+        const next = last.nextSibling;
+        // Built and put in out of the hydration: a component in it connects there, and mounts.
+        withoutHydration(() => {
+            const fresh = build();
+            for (let n: Node | null = start; n && n !== next;) {
+                const following: Node | null = n.nextSibling;
+                parent.removeChild(n);
+                n = following;
+            }
+            parent.insertBefore(fresh, next);
+        });
+        return next;
+    };
+}
+
+/**
+ * A row the server rendered, adopted from `at` on as list.ts `createRow` would have made it: in its
+ * own scope, with its signals in row mode. Returns the row and the node after it.
+ */
+function adoptRow<T>(
+    a: Adopter,
+    renderer: RowRenderer<T>,
+    key: unknown,
+    item: T,
+    i: number,
+    parent: Node,
+    at: Node | null,
+    end: Node,
+): { mapped: MappedItem<T>; next: Node | null } {
+    // What the adoption puts in before `at` — an empty text — is the row's too.
+    const before = (at ?? end).previousSibling;
+    let row: RowSignals<T> | undefined;
+    let next: Node | null = at;
+    const [, dispose] = collectDisposers(() => {
+        let content: Node;
+        if (renderer.mode === 'getters') {
+            const r: RowSignals<T> = { item: signal(item), index: signal(i) };
+            row = r;
+            content = untracked(() => renderer.render(r.item, r.index));
+        } else {
+            content = renderer.render(item, i);
+        }
+        next = a.value(content, parent, at, end);
+    });
+    const nodes: Node[] = [];
+    for (let n = before ? before.nextSibling : parent.firstChild; n && n !== next; n = n.nextSibling) nodes.push(n);
+    return { mapped: { key, item, nodes, dispose, row }, next };
+}

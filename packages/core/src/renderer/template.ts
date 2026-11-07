@@ -11,7 +11,8 @@ import type { Signal } from '../utils/types';
 import { modelEvent } from '../utils/model-event';
 import { parseTwoWay, twoWayAccessor, twoWayWriter, bindGroup, type TwoWayField } from './two-way-value';
 import { attach, type Attachment } from './attach';
-import { isServerRender, serverFragment } from '../server/mode';
+import { isServerRender, deferredTemplate } from '../server/mode';
+import { isHydrating } from '../hydrate/mode';
 import {
     PLACEHOLDER, COMMENT_PH_PREFIX, PH_REGEX, buildBindingPlan, nodeAt, type BindingPlan,
 } from './template-plan';
@@ -44,7 +45,8 @@ const templateCache = new WeakMap<TemplateStringsArray, { tpl: HTMLTemplateEleme
 export function html(strings: TemplateStringsArray, ...values: TemplateValue[]): DocumentFragment {
     // Rendering to a string (#160): a DocumentFragment that holds the template's strings and values,
     // nothing built; renderToString turns it into markup.
-    if (isServerRender()) return serverFragment(strings, values);
+    // Hydrating (#160, part 4): the same, for the code that adopts the server's nodes.
+    if (isServerRender() || isHydrating()) return deferredTemplate(strings, values);
     if (!isBrowser) {
         throw new Error('html`` needs a DOM; it was called in an environment without one (Node, a build tool)');
     }
@@ -138,7 +140,7 @@ function bindPlan(root: DocumentFragment, plan: BindingPlan, values: TemplateVal
     }
 }
 
-function bindPlannedAttribute(el: Element, b: BindingPlan['attributes'][number], values: TemplateValue[]): void {
+export function bindPlannedAttribute(el: Element, b: BindingPlan['attributes'][number], values: TemplateValue[]): void {
     el.removeAttribute(b.name);
     if (b.pure >= 0) {
         bindAttribute(el, b.name, values[b.pure]);
@@ -231,32 +233,7 @@ function replaceCommentNode(comment: Comment, value: TemplateValue): void {
             // a later run's were disposed by nothing, and one that read a long-lived signal kept the
             // removed component alive (#881).
             const [result, disposeRun] = collectDisposers(() => (value as () => unknown)());
-            // Remove all current nodes except the anchor (first)
-            for (let i = 1; i < currentNodes.length; i++) {
-                currentNodes[i].parentNode?.removeChild(currentNodes[i]);
-            }
-            const newNodes = toNodes(result);
-            const ref = currentNodes[0];
-            // Use ref.parentNode (live parent in DOM), NOT the captured `parent`
-            // (which may be the original DocumentFragment, now empty after appendTo DOM)
-            // The text cases change the anchor in place and need no parent: a text node taken out of
-            // the page — `@show` false hides a root text that way (#265) — must still be current when
-            // it is put back. Only replacing the anchor with other nodes needs one.
-            const liveParent = ref.parentNode;
-            if (newNodes.length === 0) {
-                if (ref instanceof Text) ref.data = '';
-                currentNodes = [ref];
-            } else if (newNodes.length === 1 && newNodes[0] instanceof Text && ref instanceof Text) {
-                ref.data = (newNodes[0] as Text).data;
-                currentNodes = [ref];
-            } else if (!liveParent) {
-                currentNodes = [ref];
-            } else {
-                const refNext = ref.nextSibling;
-                liveParent.removeChild(ref);
-                for (const n of newNodes) placePartNode(liveParent, n, refNext);
-                currentNodes = newNodes;
-            }
+            currentNodes = placeValueNodes(currentNodes, result);
             return disposeRun;
         });
     } else {
@@ -265,6 +242,59 @@ function replaceCommentNode(comment: Comment, value: TemplateValue): void {
         for (const n of nodes) parent.insertBefore(n, comment);
         parent.removeChild(comment);
     }
+}
+
+/**
+ * Put what a reactive value returned where its nodes are: `currentNodes`, the first of which marks the
+ * place. Returns the nodes that stand there now.
+ */
+function placeValueNodes(currentNodes: Node[], result: unknown): Node[] {
+    // Remove all current nodes except the anchor (first)
+    for (let i = 1; i < currentNodes.length; i++) {
+        currentNodes[i].parentNode?.removeChild(currentNodes[i]);
+    }
+    const newNodes = toNodes(result);
+    const ref = currentNodes[0];
+    // Use ref.parentNode (live parent in DOM), NOT the captured `parent`
+    // (which may be the original DocumentFragment, now empty after appendTo DOM)
+    // The text cases change the anchor in place and need no parent: a text node taken out of
+    // the page — `@show` false hides a root text that way (#265) — must still be current when
+    // it is put back. Only replacing the anchor with other nodes needs one.
+    const liveParent = ref.parentNode;
+    if (newNodes.length === 0) {
+        if (ref instanceof Text) ref.data = '';
+        return [ref];
+    }
+    if (newNodes.length === 1 && newNodes[0] instanceof Text && ref instanceof Text) {
+        ref.data = (newNodes[0] as Text).data;
+        return [ref];
+    }
+    if (!liveParent) return [ref];
+    const refNext = ref.nextSibling;
+    liveParent.removeChild(ref);
+    for (const n of newNodes) placePartNode(liveParent, n, refNext);
+    return newNodes;
+}
+
+/**
+ * A reactive template value whose first result is already on the page (#160, hydration): `adopt`
+ * takes over the nodes the server wrote for it and returns them; every later run puts its result in
+ * their place as a mounted binding does. Each run owns what it creates, as in `replaceCommentNode`.
+ */
+export function bindAdoptedValue(value: () => unknown, adopt: (result: unknown) => Node[]): void {
+    let currentNodes: Node[] = [];
+    let first = true;
+    effect(() => {
+        const [result, disposeRun] = collectDisposers(() => {
+            const r = value();
+            // Adopted inside this run's scope: what the adoption binds belongs to it.
+            if (first) currentNodes = adopt(r);
+            return r;
+        });
+        if (first) first = false;
+        else currentNodes = placeValueNodes(currentNodes, result);
+        return disposeRun;
+    });
 }
 
 /** The tag/quote/comment mini-parser's state for the incremental scan. */

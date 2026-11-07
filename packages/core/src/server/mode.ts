@@ -1,15 +1,15 @@
 // Whether templates are being rendered to a string (#160). The one thing the client path reads of the
-// server renderer: html`` checks it and, while it is set, returns a ServerFragment instead of building
-// DOM; the helpers (`when`, `match`, `show`, the lists) return a ServerBlock. Everything else of the renderer lives in render-string.ts, which the client bundle never
-// imports.
+// server renderer: html`` checks it and, while it is set, returns a DeferredTemplate instead of building
+// DOM; the helpers (`when`, `match`, `show`, the lists) return a ServerBlock. Everything else of the
+// renderer lives in render-string.ts, which the client bundle never imports.
 
 /**
- * A template rendered to a string: a DocumentFragment that holds nothing but the template's strings
- * and values. It IS a DocumentFragment — the server DOM's (dom-shim.ts) in Node, the page's in a test —
- * so html`` returns what its type says, and the code that called it hands it back to another template
- * or to renderToString as it would a fragment.
+ * A template not built: a DocumentFragment that holds nothing but the template's strings and values,
+ * for the code that writes it later — renderToString as markup. It IS a DocumentFragment — the server
+ * DOM's (dom-shim.ts) in Node, the page's in a test — so html`` returns what its type says, and the
+ * code that called it hands it back to another template as it would a fragment.
  */
-export type ServerFragment = DocumentFragment & {
+export type DeferredTemplate = DocumentFragment & {
     readonly strings: TemplateStringsArray;
     readonly values: readonly unknown[];
 };
@@ -35,7 +35,7 @@ export function withServerRender<T>(fn: () => T): T {
  * The class, defined at the first server render: `DocumentFragment` exists by then (the server DOM
  * installs it), and not necessarily when this module is imported.
  */
-let ServerFragmentClass: (new (strings: TemplateStringsArray, values: readonly unknown[]) => ServerFragment) | null = null;
+let DeferredTemplateClass: (new (strings: TemplateStringsArray, values: readonly unknown[]) => DeferredTemplate) | null = null;
 
 function requireFragment(): void {
     if (typeof DocumentFragment === 'undefined') {
@@ -43,18 +43,18 @@ function requireFragment(): void {
     }
 }
 
-/** The ServerFragment html`` returns while the mode is set. */
-export function serverFragment(strings: TemplateStringsArray, values: readonly unknown[]): ServerFragment {
+/** The DeferredTemplate html`` returns while templates are not built. */
+export function deferredTemplate(strings: TemplateStringsArray, values: readonly unknown[]): DeferredTemplate {
     requireFragment();
-    ServerFragmentClass ??= class extends DocumentFragment {
+    DeferredTemplateClass ??= class extends DocumentFragment {
         constructor(readonly strings: TemplateStringsArray, readonly values: readonly unknown[]) { super(); }
     };
-    return new ServerFragmentClass(strings, values);
+    return new DeferredTemplateClass(strings, values);
 }
 
-/** Whether `value` is a ServerFragment. */
-export function isServerFragment(value: unknown): value is ServerFragment {
-    return ServerFragmentClass !== null && value instanceof ServerFragmentClass;
+/** Whether `value` is a DeferredTemplate. */
+export function isDeferredTemplate(value: unknown): value is DeferredTemplate {
+    return DeferredTemplateClass !== null && value instanceof DeferredTemplateClass;
 }
 
 /**
@@ -71,7 +71,7 @@ export interface BlockMark {
  * A helper's content rendered to a string — `when`, `match`, `show`, a list: the comments the client
  * brackets it with (`null` for none), and the parts it places between them, in order. `parts` is called
  * by the string renderer inside an ownership scope it disposes, so what the branch or the rows create
- * while they render does not outlive the render. Like a ServerFragment, it IS a DocumentFragment, which
+ * while they render does not outlive the render. Like a DeferredTemplate, it IS a DocumentFragment, which
  * is what the helpers return.
  */
 export type ServerBlock = DocumentFragment & {

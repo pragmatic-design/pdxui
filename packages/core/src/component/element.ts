@@ -12,6 +12,26 @@ import { componentLabel, componentFile } from './global-error';
 import { devInstanceId, devRecordError } from '../debug/devtools-api';
 import { DEV } from '../utils/env';
 
+/**
+ * How a pre-rendered host takes over the markup the build wrote for it (#160, part 4), set by the
+ * hydration module when the app hydrates (hydrate/host.ts): an app that does not carries none of it.
+ */
+export interface HostHydration {
+    /**
+     * Adopt `render()` over the host's markup. Returns the host's light children — the nodes its parent
+     * projected into it — and the slots its render left with their own content, when it did; null when
+     * the markup is not the render, the host then holding those children alone, for a mount to project.
+     */
+    adopt(host: Element, render: () => unknown): { light: Node[]; slots: Element[] } | null;
+}
+
+let hostHydration: HostHydration | null = null;
+
+/** Install how pre-rendered hosts hydrate (hydrate/host.ts). */
+export function installHostHydration(hydration: HostHydration): void {
+    hostHydration = hydration;
+}
+
 /** Options of `emit()`. */
 export interface EmitOptions {
     /** Default false: the event stays on the component. True lets its ancestors see it (#138). */
@@ -248,33 +268,16 @@ export abstract class PdxElement extends HTMLElementBase {
             // The id `__PDX_DEVTOOLS__.tree()` and `inspect()` know this instance by.
             if (DEV) devInstanceId(this);
             // A pre-rendered host (static generation, #160): its children are the build's render of
-            // this component, not content to project. Projected, the page would draw it twice, the
-            // build's copy inside the client's slot. They go, with the mark, and the client render
-            // below replaces them in this same task.
-            if (this.hasAttribute('data-pdx-ssr')) {
+            // this component, not content to project. Where the app hydrates, the render below takes
+            // them over. Otherwise they go, with the mark, and the client render below replaces them
+            // in this same task.
+            const hydrating = this.hasAttribute('data-pdx-ssr') && hostHydration !== null;
+            if (this.hasAttribute('data-pdx-ssr') && !hydrating) {
                 this.removeAttribute('data-pdx-ssr');
                 while (this.firstChild) this.removeChild(this.firstChild);
             }
-            this._projectedChildren = Array.from(this.childNodes);
-            this._lightChildren = this._projectedChildren.slice();
             const target = this._renderTarget;
-            // Light DOM: remove children for slot projection.
-            // Mark ALL descendant PdxElements as keepAlive to prevent their
-            // disconnectedCallback from destroying them during the move.
-            if (target === this) {
-                const descendants = this.querySelectorAll('*');
-                for (let i = 0; i < descendants.length; i++) {
-                    if (descendants[i] instanceof PdxElement) {
-                        (descendants[i] as PdxElement)._keepAlive = true;
-                    }
-                }
-                while (this.firstChild) this.removeChild(this.firstChild);
-                for (let i = 0; i < descendants.length; i++) {
-                    if (descendants[i] instanceof PdxElement) {
-                        (descendants[i] as PdxElement)._keepAlive = false;
-                    }
-                }
-            }
+            if (!hydrating) this._captureChildren(target);
             // Effects created while mounting report their errors to the boundary that encloses
             // this element in the DOM — the one whose content this is, which popped its own
             // handler before we connected.
@@ -291,6 +294,16 @@ export abstract class PdxElement extends HTMLElementBase {
                 // this.track(), so without this they would leak on unmount.
                 const [rendered, disposeBody, scope] = collectScope(() => {
                     try {
+                        if (hydrating) {
+                            const adopted = hostHydration!.adopt(this, () => this.body());
+                            if (adopted) {
+                                this._lightChildren = adopted.light;
+                                return { content: null, slots: adopted.slots };
+                            }
+                            // The build's markup is not this render: the host now holds the children
+                            // its parent projected, and mounts as it would have without the build.
+                            this._captureChildren(target);
+                        }
                         return { content: this.body() };
                     } catch (error) {
                         return { content: null, error, threw: true };
@@ -315,8 +328,9 @@ export abstract class PdxElement extends HTMLElementBase {
                 this._disposers.push(disposeBody);
                 this._scope = scope;
                 // The slots this template rendered — taken NOW, while the content is detached and
-                // no child component has rendered its own <slot> into it.
-                this._ownSlots = slotsIn(content);
+                // no child component has rendered its own <slot> into it. A hydrated render is in place
+                // already: its own slots are the ones the adoption left, which received nothing.
+                this._ownSlots = rendered.slots ?? slotsIn(content);
                 if (content) {
                     target.appendChild(content);
                 }
@@ -511,6 +525,32 @@ export abstract class PdxElement extends HTMLElementBase {
      * them back as the element's children.
      */
     private _lightChildren: Node[] = [];
+
+    /**
+     * Take the host's children as the ones to project: kept as its light children, and moved out of
+     * the render target, the components among them kept alive through the move.
+     */
+    private _captureChildren(target: Node): void {
+        this._projectedChildren = Array.from(this.childNodes);
+        this._lightChildren = this._projectedChildren.slice();
+        // Light DOM: remove children for slot projection.
+        // Mark ALL descendant PdxElements as keepAlive to prevent their
+        // disconnectedCallback from destroying them during the move.
+        if (target === this) {
+            const descendants = this.querySelectorAll('*');
+            for (let i = 0; i < descendants.length; i++) {
+                if (descendants[i] instanceof PdxElement) {
+                    (descendants[i] as PdxElement)._keepAlive = true;
+                }
+            }
+            while (this.firstChild) this.removeChild(this.firstChild);
+            for (let i = 0; i < descendants.length; i++) {
+                if (descendants[i] instanceof PdxElement) {
+                    (descendants[i] as PdxElement)._keepAlive = false;
+                }
+            }
+        }
+    }
 
     /** Replace <slot> placeholders with projected children. */
     private _projectSlots(): void {

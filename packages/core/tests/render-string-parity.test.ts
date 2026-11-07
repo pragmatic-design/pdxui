@@ -8,7 +8,8 @@
 
 import { describe, it, expect } from 'vitest';
 import { html } from '../src/renderer/template';
-import { renderToString, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
+import { renderToString, renderToStringWithReport, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
+import { when } from '../src/renderer/helpers';
 import { children, parity } from './string-parity';
 import { signal } from '../src/reactivity/signal';
 import { component } from '../src/component/component';
@@ -142,8 +143,9 @@ describe('a component to a string matches the client\'s mount', () => {
             render: () => html`<header><slot name="title">Untitled</slot></header><main><slot></slot></main><footer><slot name="foot">none</slot></footer>`,
         });
         const markup = mountParity(() => html`<parity-panel><b slot="title">T</b><p>body</p></parity-panel>`);
-        expect(markup).toContain('<header><b slot="title">T</b></header>');
-        expect(markup).toContain('<main><p>body</p></main>');
+        // What each slot received, bracketed for hydration with the host's id and the slot's name.
+        expect(markup).toContain('<header><!--pdx-slot:1:title--><b slot="title">T</b><!--/pdx-slot--></header>');
+        expect(markup).toContain('<main><!--pdx-slot:1:--><p>body</p><!--/pdx-slot--></main>');
         expect(markup).toContain('<footer><slot name="foot">none</slot></footer>');
     });
 
@@ -155,6 +157,17 @@ describe('a component to a string matches the client\'s mount', () => {
         });
         const markup = mountParity(() => html`<parity-outer msg="hello">x</parity-outer>`);
         expect(markup).toMatch(/<parity-inner[^>]*><i><!--pdx-->hello<!--\/pdx--><\/i><\/parity-inner>/);
+    });
+
+    it('a component whose render is a helper\'s block alone, not a template', () => {
+        component('parity-choice', {
+            props: { on: prop(true, { type: Boolean }) },
+            render: (ctx) => when(() => ctx.on(), () => html`<b>yes</b>`, () => html`<i>no</i>`),
+        });
+        const { html: markup, skipped } = renderToStringWithReport(() => html`<parity-choice></parity-choice>`);
+        expect(skipped).toEqual([]);
+        expect(markup).toContain('<!--when--><b>yes</b><!--/when-->');
+        mountParity(() => html`<parity-choice></parity-choice>`);
     });
 });
 

@@ -5,7 +5,7 @@ import { pushErrorHandler, popErrorHandler, collectDisposers, onDispose, setErro
 import type { Dispose } from '../utils/types';
 import { nodesBetween } from './helpers';
 import { placePartNode } from './part-nodes';
-import { isServerRender, serverBlock } from '../server/mode';
+import { isDeferring, deferredBlock } from './deferred-block';
 
 // A boundary's range is the nodes between its two comments. Marking them lets an error find its
 // boundary through the DOM, which is what encloses a component: the handler stack only covers the
@@ -80,10 +80,8 @@ export function errorBoundary(
 ): DocumentFragment {
     // On the server (#160): the content, or — when rendering it throws — the fallback with the error.
     // A retry has nothing to do there.
-    if (isServerRender()) {
-        return serverBlock('error-boundary', '/error-boundary', () => [contentFn()], null,
-            (err) => [fallbackFn(err instanceof Error ? err : new Error(String(err)), () => {})]);
-    }
+    // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
+    if (isDeferring()) return deferredBlock((v) => v.boundary(contentFn, fallbackFn, options));
     const frag = document.createDocumentFragment();
     const start = document.createComment('error-boundary');
     const end = document.createComment('/error-boundary');
