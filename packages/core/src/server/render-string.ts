@@ -117,10 +117,15 @@ function renderBlock(b: ServerBlock, slots: Projection | null, outer: BlockMark 
         // An error boundary: what the content threw while it rendered — its parts or anything they
         // render — renders the fallback in its place, as the client's boundary shows it.
         const fallback = b.fallback;
-        try { inner = render(b.parts); } catch (error) { inner = render(() => fallback(error)); }
+        // The fallback is marked `pdx-caught`: hydration adopts it instead of the content, which the
+        // markup would not tell apart.
+        try { inner = render(b.parts); } catch (error) { inner = CAUGHT + render(() => fallback(error)); }
     }
     return (b.open === null ? '' : `<!--${b.open}-->`) + inner + (b.close === null ? '' : `<!--${b.close}-->`);
 }
+
+/** What an error boundary rendered its fallback after, for hydration (#160): the comment it starts with. */
+export const CAUGHT = '<!--pdx-caught-->';
 
 /** A component's children: none. */
 const NO_CHILDREN: Projected = { default: '', named: new Map() };

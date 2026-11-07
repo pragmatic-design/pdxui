@@ -74,7 +74,7 @@ const adopter: Adopter = {
         const content = offerRange({ parent, at: start.nextSibling, next: null }, render);
         // Nothing — a false condition with no else, a case with no default — is no node at all.
         const rest = content == null ? start.nextSibling : adoptValue(content, parent, start.nextSibling, end, null);
-        if (rest !== end) throw new HydrationMismatch(`the block <!--${start.data}--> has markup its content does not: ${describe(rest)}`);
+        if (rest !== end) throw new HydrationMismatch(`the block before ${describe(end)} has markup its content does not: ${describe(rest)}`);
     },
     build: (node) => withoutHydration(() => buildNode(node)),
 };
@@ -94,6 +94,12 @@ function adoptValue(value: unknown, parent: Node, at: Node | null, end: Node | n
         let next = at;
         for (const item of value) next = adoptValue(item, parent, next, end, hidden);
         return next;
+    }
+    if (value instanceof Comment && at instanceof Comment && at.data === value.data) {
+        // A comment the client makes where the server wrote the same — a block's `await-pending` —
+        // stands in its place: it is the one the client's block knows.
+        parent.replaceChild(value, at);
+        return value.nextSibling;
     }
     if (value instanceof Node) {
         // A node the script built: the server could not write it, and the client puts it here — out of

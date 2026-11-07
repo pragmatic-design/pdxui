@@ -10,6 +10,9 @@ import { html } from '../src/renderer/template';
 import { when, show, each, eachRow, match } from '../src/renderer/helpers';
 import { whenChain } from '../src/renderer/when-chain';
 import { dynamic } from '../src/renderer/dynamic';
+import { errorBoundary } from '../src/renderer/error-boundary';
+import { defer } from '../src/renderer/defer';
+import { awaitBlock } from '../src/renderer/await';
 import { renderToString } from '../src/server/render-string';
 import { hydrateChildren, HydrationMismatch } from '../src/hydrate/adopt';
 import { installHydration } from '../src/hydrate/host';
@@ -178,6 +181,62 @@ describe('hydrating the helpers\' blocks', () => {
 function portalLike(tag: () => string): DocumentFragment {
     return dynamic(tag);
 }
+
+describe('hydrating an error boundary', () => {
+    it('the content the server rendered is adopted', () => {
+        const { page: p, written } = hydrated(() => html`<div>${errorBoundary(() => html`<p>fine</p>`, () => html`<p>caught</p>`)}</div>`);
+        adoptedAll(p, written);
+    });
+
+    it('the fallback the server rendered is adopted, and its retry renders the content', () => {
+        let broken = true;
+        const render = () => html`<div>${errorBoundary(
+            () => { if (broken) throw new Error('down'); return html`<p>back</p>`; },
+            (err, retry) => html`<p class="err">${err.message}</p><button @click=${retry}>retry</button>`,
+        )}</div>`;
+        const { page: p, written } = hydrated(render);
+        adoptedAll(p, written);
+        expect(p.querySelector('.err')!.textContent).toBe('down');
+        broken = false;
+        p.querySelector('button')!.click();
+        expect(p.querySelector('div')!.textContent).toBe('back');
+    });
+});
+
+describe('hydrating a deferred block', () => {
+    it('a viewport trigger takes the sentinel the server wrote, and the placeholder is adopted', () => {
+        const { page: p, written } = hydrated(() => html`<div>${defer({ trigger: 'viewport', placeholder: () => html`<p class="wait">wait</p>` }, null, () => html`<p>in</p>`)}</div>`);
+        adoptedAll(p, written);
+        expect(p.querySelectorAll('span'), 'one sentinel, the server\'s').toHaveLength(1);
+    });
+
+    it('a trigger that fires at once: the body the server rendered is adopted', () => {
+        const { page: p, written } = hydrated(() => html`<div>${defer({ trigger: 'immediate' }, null, () => html`<p>in ${'x'}</p>`)}</div>`);
+        adoptedAll(p, written);
+    });
+});
+
+describe('hydrating an await block', () => {
+    it('a value there is: the body the server rendered is adopted', () => {
+        const { page: p, written } = hydrated(() => html`<div>${awaitBlock(() => 'done', (v) => html`<p>ready ${() => v()}</p>`, () => html`<p>…</p>`, null)}</div>`);
+        adoptedAll(p, written);
+    });
+
+    it('a promise: the @loading the server wrote is adopted, and the body follows it', async () => {
+        const data = Promise.resolve('done');
+        const { page: p, written } = hydrated(() => html`<div>${awaitBlock(() => data, (v) => html`<p>ready ${() => v()}</p>`, () => html`<p class="wait">…</p>`, null)}</div>`);
+        adoptedAll(p, written);
+        await data;
+        await new Promise((r) => setTimeout(r, 0));
+        expect(p.querySelector('div')!.textContent).toBe('ready done');
+    });
+
+    it('with minMs, the pending comment the server wrote is the one the block keeps', () => {
+        const data = new Promise(() => {});
+        const { page: p } = hydrated(() => html`<div>${awaitBlock(() => data, () => html`<p>x</p>`, () => html`<p>…</p>`, null, { minMs: 50 })}</div>`);
+        expect(p.querySelector('div')!.innerHTML).toBe('<!--await--><!--await-pending--><!--/await-->');
+    });
+});
 
 describe('hydrating show()', () => {
     it('shown: its elements adopted, and hidden later', () => {

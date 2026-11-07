@@ -10,7 +10,7 @@ import { renderToString } from '../src/server/render-string';
 export function isHydrationMarker(node: Node): boolean {
     if (node.nodeType !== 8) return false;
     const data = (node as Comment).data;
-    return data === 'pdx' || data === '/pdx' || data === '/pdx-slot' || data.startsWith('pdx-slot:');
+    return data === 'pdx' || data === '/pdx' || data === 'pdx-caught' || data === '/pdx-slot' || data.startsWith('pdx-slot:');
 }
 
 /** A node as a canonical string: what both renders must agree on. */

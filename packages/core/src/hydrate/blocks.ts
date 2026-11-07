@@ -11,11 +11,12 @@ import { collectDisposers, signal, untracked } from '../reactivity/signal';
 import { when, match, show, portal, followWhen, followMatch, showNodes, caseFor } from '../renderer/helpers';
 import { whenChain, followChain } from '../renderer/when-chain';
 import { followList, mountList, type MappedItem, type RowRenderer, type RowSignals } from '../renderer/list';
-import { defer } from '../renderer/defer';
-import { awaitBlock } from '../renderer/await';
-import { errorBoundary } from '../renderer/error-boundary';
+import { defer, followDefer } from '../renderer/defer';
+import { awaitBlock, followAwait } from '../renderer/await';
+import { errorBoundary, followBoundary } from '../renderer/error-boundary';
+import { pushErrorHandler, popErrorHandler } from '../reactivity/signal';
 import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippet';
-import { dynamic } from '../renderer/dynamic';
+import { dynamic, followDynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { withoutHydration, type Adopter } from './mode';
 import { offerRange } from './compiled';
@@ -85,9 +86,41 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         return end.nextSibling;
     },
 
-    defer: (options, loadFn, renderFn) => built('defer', '/defer', () => defer(options, loadFn, renderFn)),
-    await: (source, thenFn, loadingFn, errorFn, options) => built('await', '/await', () => awaitBlock(source, thenFn, loadingFn, errorFn, options)),
-    boundary: (contentFn, fallbackFn, options) => built('error-boundary', '/error-boundary', () => errorBoundary(contentFn, fallbackFn, options)),
+    defer: (options, loadFn, renderFn) => (a, parent, at) => {
+        const start = a.expect(at, 'defer');
+        const end = a.close(start, 'defer', '/defer');
+        // The span the server writes for a viewport trigger, first: the trigger takes it.
+        const first = start.nextSibling;
+        const sentinel = first instanceof HTMLElement && first.localName === 'span' && first.style.visibility === 'hidden'
+            && (options.trigger ?? '').split('|').some((t) => t.trim() === 'viewport') ? first : null;
+        followDefer(start, end, options, loadFn, renderFn, { sentinel, adopt: (render) => a.between(render, parent, sentinel ?? start, end) });
+        return end.nextSibling;
+    },
+    await: (source, thenFn, loadingFn, errorFn, options) => (a, parent, at) => {
+        const start = a.expect(at, 'await');
+        const end = a.close(start, 'await', '/await');
+        followAwait(start, end, source, thenFn, loadingFn, errorFn, options, (render) => a.between(render, parent, start, end));
+        return end.nextSibling;
+    },
+    boundary: (contentFn, fallbackFn, options) => (a, parent, at) => {
+        const start = a.expect(at, 'error-boundary');
+        const end = a.close(start, 'error-boundary', '/error-boundary');
+        // The server marks a fallback `pdx-caught`: the markup would not tell it from the content.
+        const mark = start.nextSibling;
+        let caught: Error | null = null;
+        if (mark && mark.nodeType === 8 && (mark as Comment).data === CAUGHT) {
+            parent.removeChild(mark);
+            caught = errorOf(contentFn);
+            // The content renders here, where it threw on the server: the client renders it afresh.
+            if (!caught) {
+                for (let n = start.nextSibling; n && n !== end; n = start.nextSibling) parent.removeChild(n);
+                withoutHydration(() => followBoundary(start, end, contentFn, fallbackFn, options, null));
+                return end.nextSibling;
+            }
+        }
+        followBoundary(start, end, contentFn, fallbackFn, options, { caught, adopt: (render) => a.between(render, parent, start, end) });
+        return end.nextSibling;
+    },
     portal: (contentFn, target, options) => built('portal', null, () => portal(contentFn, target, options)),
     snippet: (source, args, fallback) => (a, parent, at) => {
         const start = a.expect(at, 'snippet');
@@ -100,7 +133,18 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         followSnippet(start, end, source, args, fallback, { dispose });
         return end.nextSibling;
     },
-    dynamic: (tagFn, propsFn, options) => built('dynamic', '/dynamic', () => dynamic(tagFn, propsFn, options)),
+    dynamic: (tagFn, propsFn, options) => (a, _parent, at) => {
+        const start = a.expect(at, 'dynamic');
+        const end = a.close(start, 'dynamic', '/dynamic');
+        // The element the server wrote for the tag named now, or nothing for no tag.
+        const tag = untracked(tagFn);
+        const el = start.nextSibling;
+        if (tag ? !(el instanceof Element) || el.localName !== tag || el.nextSibling !== end : el !== end) {
+            a.fail(`<component :is> expected ${tag ? `<${tag}>` : 'nothing'} in its place`);
+        }
+        followDynamic(end, tagFn, propsFn, options, tag ? (el as Element) : null);
+        return end.nextSibling;
+    },
 };
 
 /**
@@ -145,6 +189,28 @@ function built(open: string, close: string | null, build: () => DocumentFragment
         });
         return next;
     };
+}
+
+/** The comment the server starts a boundary's fallback with (server/render-string.ts). */
+const CAUGHT = 'pdx-caught';
+
+/**
+ * The error the content throws when it renders, for a fallback the server rendered: it is rendered out of
+ * the hydration and dropped, what it threw kept — thrown, or reported by one of its effects.
+ */
+function errorOf(contentFn: () => Node | DocumentFragment): Error | null {
+    let caught: Error | null = null;
+    const keep = (err: unknown): void => { caught ??= err instanceof Error ? err : new Error(String(err)); };
+    pushErrorHandler(keep);
+    try {
+        const [, dispose] = collectDisposers(() => withoutHydration(contentFn));
+        dispose();
+    } catch (err) {
+        keep(err);
+    } finally {
+        popErrorHandler();
+    }
+    return caught;
 }
 
 /**

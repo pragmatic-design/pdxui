@@ -70,7 +70,36 @@ export function defer(
     const end = document.createComment('/defer');
     frag.appendChild(start);
     frag.appendChild(end);
+    followDefer(start, end, options, loadFn, renderFn, null);
+    return frag;
+}
 
+/**
+ * What a hydration hands a deferred block the server rendered (#160): the viewport sentinel it wrote,
+ * if any, and how to take over the content of the state the block starts in.
+ */
+export interface DeferAdoption {
+    readonly sentinel: HTMLElement | null;
+    /** Adopt what `render` makes over the server's content, after the sentinel (hydrate/adopt.ts). */
+    adopt(render: () => unknown): void;
+}
+
+/**
+ * The deferred block between `start` and `end`: its triggers, its load and the content of each state. `adoption`:
+ * the server's markup, whose sentinel the viewport trigger takes and whose content the first render
+ * takes over instead of rendering. The triggers run first, so a trigger that fires at once has the
+ * block in the state the server rendered by then.
+ */
+export function followDefer(
+    start: Comment,
+    end: Comment,
+    options: DeferOptions,
+    loadFn: (() => Promise<unknown>) | null,
+    renderFn: (module?: unknown) => Node | DocumentFragment,
+    adoption: DeferAdoption | null,
+): void {
+    let adopting = adoption;
+    let sentinelToTake = adoption?.sentinel ?? null;
     const state = signal<DeferState>('placeholder');
     const loadedModule = signal<unknown>(null);
     const loadError = signal<Error | null>(null);
@@ -155,7 +184,10 @@ export function defer(
         // The prefetch triggers first: an `immediate` render must not leave a prefetch armed after it.
         const arm = (triggers: string | undefined, when: (() => unknown) | undefined, fire: () => void): void => {
             for (const trigger of (triggers ?? '').split('|').map(t => t.trim()).filter(Boolean)) {
-                const cleanup = activateTrigger(trigger, parent, end, scope, fire);
+                // A sentinel the server wrote is the viewport trigger's, once.
+                const taken = trigger === 'viewport' ? sentinelToTake : null;
+                if (taken) sentinelToTake = null;
+                const cleanup = activateTrigger(trigger, parent, end, scope, fire, taken);
                 if (cleanup) cleanups.push(cleanup);
             }
             if (when) cleanups.push(activateWhen(when, fire));
@@ -180,6 +212,13 @@ export function defer(
         for (const n of currentNodes) n.parentNode?.removeChild(n);
         currentNodes = [];
 
+        // Hydrating: the first render takes over the content the server wrote for this state.
+        if (adopting) {
+            const a = adopting;
+            adopting = null;
+            return untracked(() => adoptState(s, a, parent));
+        }
+
         // Built and placed UNTRACKED: this effect follows the block's state and nothing else. Tracked,
         // every signal the body read while it was built — and every one a component it mounted read in
         // its setup — rebuilt the whole body when it changed, and a form in it lost what had been typed
@@ -187,25 +226,38 @@ export function defer(
         return untracked(() => renderState(s, parent));
     });
 
+    /** What state `s` renders. */
+    function stateContent(s: DeferState): Node | DocumentFragment | null | undefined {
+        switch (s) {
+            case 'placeholder':
+                return options.placeholder?.();
+            case 'loading':
+                return options.loading?.() ?? options.placeholder?.();
+            case 'loaded':
+                return renderFn(loadedModule.peek());
+            case 'error': {
+                const err = loadError.peek();
+                return err ? options.error?.(err, retry) : null;
+            }
+        }
+        return null;
+    }
+
+    /** The content the server wrote for state `s`, taken over in the state's own scope. */
+    function adoptState(s: DeferState, a: DeferAdoption, parent: Node): () => void {
+        const [, disposeState] = collectDisposers(() => a.adopt(() => stateContent(s) ?? null));
+        // The content is after the sentinel the server wrote, or after the block's marker.
+        const first = (a.sentinel && a.sentinel.parentNode === parent ? a.sentinel : start).nextSibling;
+        for (let n = first; n && n !== end; n = n.nextSibling) currentNodes.push(n);
+        return disposeState;
+    }
+
     /** One state's nodes, built and put before the end marker; returns what disposes them. */
     function renderState(s: DeferState, parent: Node): () => void {
         // Each state renders in its own scope, disposed when the state changes and when the block is
         // removed (#261). A later run — the body once the load has resolved — happens in a flush, where
         // no scope is current: without its own, what the body created belonged to nobody.
-        const [content, disposeState] = collectDisposers((): Node | DocumentFragment | null | undefined => {
-            switch (s) {
-                case 'placeholder':
-                    return options.placeholder?.();
-                case 'loading':
-                    return options.loading?.() ?? options.placeholder?.();
-                case 'loaded':
-                    return renderFn(loadedModule.peek());
-                case 'error': {
-                    const err = loadError.peek();
-                    return err ? options.error?.(err, retry) : null;
-                }
-            }
-        });
+        const [content, disposeState] = collectDisposers(() => stateContent(s));
 
         if (content) {
             const nodes = content instanceof DocumentFragment
@@ -216,8 +268,6 @@ export function defer(
         }
         return disposeState;
     }
-
-    return frag;
 }
 
 /** `loadFn` as a DeferCode whose code has arrived (defer-code.ts), or null. */
@@ -232,7 +282,8 @@ function activateTrigger(
     parent: Node,
     before: Node,
     scope: OwnerScope | null,
-    onTrigger: () => void
+    onTrigger: () => void,
+    sentinel: HTMLElement | null = null,
 ): (() => void) | null {
     if (!isBrowser) return null;
 
@@ -245,7 +296,7 @@ function activateTrigger(
     }
 
     if (trigger === 'viewport') {
-        return setupViewportTrigger(parent, before, onTrigger);
+        return setupViewportTrigger(parent, before, onTrigger, sentinel);
     }
 
     if (idleMatch) {
@@ -294,16 +345,20 @@ function activateWhen(condition: () => unknown, onTrigger: () => void): () => vo
 /** The unknown triggers already warned about, so a list of deferred rows warns once. */
 const warnedTriggers = new Set<string>();
 
+/** `existing`: the sentinel the server wrote (#160), taken instead of a new one. */
 function setupViewportTrigger(
     parent: Node,
     before: Node,
-    onTrigger: () => void
+    onTrigger: () => void,
+    existing: HTMLElement | null = null,
 ): () => void {
-    const sentinel = document.createElement('span');
-    sentinel.style.display = 'block';
-    sentinel.style.height = '1px';
-    sentinel.style.visibility = 'hidden';
-    (parent as Element).insertBefore(sentinel, before);
+    const sentinel = existing ?? document.createElement('span');
+    if (!existing) {
+        sentinel.style.display = 'block';
+        sentinel.style.height = '1px';
+        sentinel.style.visibility = 'hidden';
+        (parent as Element).insertBefore(sentinel, before);
+    }
 
     const observer = new IntersectionObserver((entries) => {
         if (entries.some(e => e.isIntersecting)) {
