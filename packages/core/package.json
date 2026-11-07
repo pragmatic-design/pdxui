@@ -49,6 +49,12 @@
       "import": "./dist/hydrate.es.js",
       "require": "./dist/hydrate.cjs"
     },
+    "./server-dom": {
+"development": "./src/server/dom-shim.ts",
+      "types": "./dist/server/dom-shim.d.ts",
+      "import": "./dist/server-dom.es.js",
+      "require": "./dist/server-dom.cjs"
+    },
     "./server": {
 "development": "./src/server/index.ts",
       "types": "./dist/server/index.d.ts",

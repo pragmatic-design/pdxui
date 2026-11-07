@@ -100,8 +100,9 @@ renders as it would without the option. An app built without the plugin calls `i
 itself, before anything else.
 
 That markup comes from `@pdxui/core/server`, kept out of the barrel so a client bundle carries none
-of it. In Node, `installServerDom()` goes first, before the app's modules are imported; then
-`renderToString(fn)` renders what `fn` returns, and `renderToStringWithReport(fn)` also lists the
+of it. In Node, `installServerDom()` from `@pdxui/core/server-dom` goes first, before anything of
+core or of the app is imported: a component's class extends the `HTMLElement` it finds when its
+module is evaluated, so the server DOM has to be there by then. Then `renderToString(fn)` renders what `fn` returns, and `renderToStringWithReport(fn)` also lists the
 components that could only be written as empty hosts, with the reason. A custom element that is not
 a component writes itself through `registerServerElement(tag, render)`, building what it holds with
 `serverElement(tag, attributes, props, inner)`. The router's outlet is one: import
