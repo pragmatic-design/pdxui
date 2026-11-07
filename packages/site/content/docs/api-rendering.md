@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls. 70 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls. 71 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -603,6 +603,18 @@ Usage:
       inactive: () => html`<span class="red">Inactive</span>`,
       _: () => html`<span>Unknown</span>`,
   })}
+
+## `offerPart`
+
+```ts
+import { offerPart } from '@pdxui/core';
+
+function offerPart(marker: Node): void
+```
+
+Offer what the server wrote in the value's place `marker` to the next compiled block that starts: a
+block built before the helper that places it is called — `show()`'s content — takes it over. Outside a
+hydration, or for a marker that is no value's place, nothing.
 
 ## `pages`
 

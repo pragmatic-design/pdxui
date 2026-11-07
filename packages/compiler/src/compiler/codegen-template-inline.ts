@@ -1075,6 +1075,18 @@ class InlineGen {
         const cond = callSignals(prefixCtx(node.condition, this.ctx), this.ctx);
         const body = this.sub(node.body);
         const cf = this.v('cf');
+        // Hydrating (#160), placed in its own value's place: the content is built before show() is
+        // called, so the place is offered to it first (core's offerPart), and it takes over what the
+        // server wrote there. Alone in its block, the block's own range reaches it the same way.
+        if (this.ctx.hydrate && this.sole === undefined && !this.tree.discarding()) {
+            this.imports.add('offerPart');
+            this.imports.add('placePart');
+            const m = this.v('m');
+            this.tree.anchor(m);
+            this.out(`const ${cf}=(offerPart(${m}),show(()=>${cond},(()=>{${body}})()));`);
+            this.out(`placePart(${m},${cf});`);
+            return;
+        }
         this.out(`const ${cf}=show(()=>${cond},(()=>{${body}})());`);
         this.place(cf);
     }

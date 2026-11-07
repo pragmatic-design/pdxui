@@ -33,6 +33,15 @@ export function offerRange<T>(range: HydrationRange, render: () => T): T {
 }
 
 /**
+ * Offer what the server wrote in the value's place `marker` to the next compiled block that starts: a
+ * block built before the helper that places it is called — `show()`'s content — takes it over. Outside a
+ * hydration, or for a marker that is no value's place, nothing.
+ */
+export function offerPart(marker: Node): void {
+    if (isHydrating() && isPartOpen(marker)) pending = { parent: marker.parentNode!, at: marker.nextSibling, next: null };
+}
+
+/**
  * The range a compiled block is to take over, or null when it builds its markup: outside a hydration,
  * or inside one where nothing handed it a range (a block the client renders afresh).
  */

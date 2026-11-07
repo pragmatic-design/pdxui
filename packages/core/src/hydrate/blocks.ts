@@ -14,7 +14,7 @@ import { followList, mountList, type MappedItem, type RowRenderer, type RowSigna
 import { defer } from '../renderer/defer';
 import { awaitBlock } from '../renderer/await';
 import { errorBoundary } from '../renderer/error-boundary';
-import { renderSnippet } from '../renderer/snippet';
+import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippet';
 import { dynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { withoutHydration, type Adopter } from './mode';
@@ -89,7 +89,17 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
     await: (source, thenFn, loadingFn, errorFn, options) => built('await', '/await', () => awaitBlock(source, thenFn, loadingFn, errorFn, options)),
     boundary: (contentFn, fallbackFn, options) => built('error-boundary', '/error-boundary', () => errorBoundary(contentFn, fallbackFn, options)),
     portal: (contentFn, target, options) => built('portal', null, () => portal(contentFn, target, options)),
-    snippet: (source, args, fallback) => built('snippet', '/snippet', () => renderSnippet(source, args, fallback)),
+    snippet: (source, args, fallback) => (a, parent, at) => {
+        const start = a.expect(at, 'snippet');
+        const end = a.close(start, 'snippet', '/snippet');
+        // What the snippet renders now, as the client's first run renders it: a node, or nothing.
+        const [, dispose] = collectDisposers(() => a.between(() => {
+            const content = untracked(() => snippetContent(source(), args(), fallback));
+            return content instanceof Node ? content : null;
+        }, parent, start, end));
+        followSnippet(start, end, source, args, fallback, { dispose });
+        return end.nextSibling;
+    },
     dynamic: (tagFn, propsFn, options) => built('dynamic', '/dynamic', () => dynamic(tagFn, propsFn, options)),
 };
 

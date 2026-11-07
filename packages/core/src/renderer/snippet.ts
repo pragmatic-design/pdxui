@@ -47,8 +47,6 @@ export function renderSnippet(
     args: () => readonly unknown[],
     fallback?: (() => Node | null) | null,
 ): DocumentFragment {
-    // On the server (#160): the snippet called with its arguments now, or the fallback. A value that
-    // is not a fragment renders nothing, as the client places only a node.
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.snippet(source, args, fallback));
     const frag = document.createDocumentFragment();
@@ -56,12 +54,29 @@ export function renderSnippet(
     const end = document.createComment('/snippet');
     frag.appendChild(start);
     frag.appendChild(end);
+    followSnippet(start, end, source, args, fallback, null);
+    return frag;
+}
 
-    let childDispose: Dispose | null = null;
+/**
+ * Keep the snippet `source()` returns, called with `args()`, between the markers. `adopted`: the content
+ * already there, hydrated, and what disposes it; the first run then only follows what it reads.
+ */
+export function followSnippet(
+    start: Comment,
+    end: Comment,
+    source: () => unknown,
+    args: () => readonly unknown[],
+    fallback: (() => Node | null) | null | undefined,
+    adopted: { dispose: Dispose } | null,
+): void {
+    let childDispose: Dispose | null = adopted?.dispose ?? null;
+    let keep = adopted !== null;
 
     effect(() => {
         const fn = source();
         const values = args();
+        if (keep) { keep = false; return; }
         const parent = end.parentNode;
         if (!parent) return;
         for (const node of nodesBetween(start, end)) parent.removeChild(node);
@@ -74,6 +89,4 @@ export function renderSnippet(
     });
 
     onDispose(() => { childDispose?.(); childDispose = null; });
-
-    return frag;
 }
