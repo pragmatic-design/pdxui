@@ -29,10 +29,26 @@ export const PART_OPEN = '<!--pdx-->';
 export const PART_CLOSE = '<!--/pdx-->';
 
 /** A component's children, as the markup each of its slots receives. */
-interface Projection {
+interface Projected {
     readonly default: string;
     readonly named: ReadonlyMap<string, string>;
 }
+
+/** The children projected into a component's slots, and the component, by the id its host carries. */
+interface Projection extends Projected {
+    readonly owner: number;
+}
+
+/**
+ * Brackets what a slot received, so that hydration (#160, part 4) tells the component's own nodes from
+ * the ones projected into it — which its parent's template rendered and binds. `owner` is the id of the
+ * host whose slot it is (`data-pdx-ssr`), `name` the slot's name, empty for the default one.
+ */
+export const slotOpen = (owner: number, name: string): string => `<!--pdx-slot:${owner}:${name}-->`;
+export const SLOT_CLOSE = '<!--/pdx-slot-->';
+
+/** The ids of the hosts the current render has written, so that each slot names its own. */
+let hostSeq = 0;
 
 /** Where the current render reports the components it could not render. */
 let skipped: SkippedComponent[] = [];
@@ -45,12 +61,15 @@ export function renderToString(fn: () => unknown): string {
 /** The same, with the components that rendered as empty hosts and why. */
 export function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[] } {
     const outer = skipped;
+    const outerSeq = hostSeq;
     skipped = [];
+    hostSeq = 0;
     try {
         const html = withServerRender(() => untracked(() => content(fn(), null)));
         return { html, skipped };
     } finally {
         skipped = outer;
+        hostSeq = outerSeq;
     }
 }
 
@@ -101,7 +120,7 @@ function renderBlock(b: ServerBlock, slots: Projection | null, outer: BlockMark 
 }
 
 /** A component's children: none. */
-const NO_CHILDREN: Projection = { default: '', named: new Map() };
+const NO_CHILDREN: Projected = { default: '', named: new Map() };
 
 /**
  * An element a helper created by its tag (ServerElement): its attributes and, on a component, the
@@ -112,7 +131,7 @@ function createdElement(e: ServerElement, mark: BlockMark | null): string {
     if (mark?.item) attrs.set('data-pdx-item', '');
     if (mark?.hidden && e.tag !== 'svg' && e.tag !== 'math') attrs.set('style', joinStyle([attrs.get('style'), 'display: none;']));
     if (e.tag.includes('-')) {
-        const host = componentHost(e.tag, attrs, new Map(Object.entries(e.props)), () => NO_CHILDREN);
+        const host = componentHost(e.tag, attrs, new Map(Object.entries(e.props)), () => NO_CHILDREN, () => '');
         if (host !== null) return host;
     }
     const open = openTag(e.tag, attrs);
@@ -123,11 +142,19 @@ function createdElement(e: ServerElement, mark: BlockMark | null): string {
  * A component as its host, marked pre-rendered (`data-pdx-ssr`), with its own render inside and
  * `children` projected into its slots; null when the tag is no component of ours (render-component.ts).
  */
-function componentHost(tag: string, attrs: ReadonlyMap<string, string | null>, props: ReadonlyMap<string, unknown>, children: () => Projection): string | null {
+function componentHost(tag: string, attrs: ReadonlyMap<string, string | null>, props: ReadonlyMap<string, unknown>, children: () => Projected, light: () => string): string | null {
+    const owner = ++hostSeq;
     // The children render after the component's own render, inside its scope, as its slots receive them.
-    const host = renderHost(tag, attrs, props, (rendered) => content(rendered, children()), skipped);
+    const host = renderHost(tag, attrs, props, (rendered) => content(rendered, { ...children(), owner }), skipped);
     if (!host) return null;
-    host.attributes.set('data-pdx-ssr', '');
+    host.attributes.set('data-pdx-ssr', String(owner));
+    // A component the server could not render: its children are written as the client finds them
+    // before it mounts — its light DOM, which the client projects — in a region of their own (`*`), so
+    // that hydration lets its parent bind them where they are.
+    if (host.skipped) {
+        const children = light();
+        if (children) host.inner = slotOpen(owner, '*') + children + SLOT_CLOSE;
+    }
     return `${openTag(tag, host.attributes)}${host.inner}</${tag}>`;
 }
 
@@ -165,7 +192,7 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     if (n.name === 'slot' && slots) {
         const name = n.attributes.find((a) => a.name === 'name')?.value ?? null;
         const projected = name ? slots.named.get(name) : slots.default;
-        if (projected) return projected;
+        if (projected) return slotOpen(slots.owner, name ?? '') + projected + SLOT_CLOSE;
     }
     const s: ElementState = { tag: n.name, attributes: new Map(), classes: [], style: [], text: null, props: new Map() };
     for (const a of n.attributes) attribute(s, a, values);
@@ -178,7 +205,7 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     if (s.style.length) attrs.set('style', joinStyle([attrs.get('style'), ...s.style]));
 
     if (n.name.includes('-')) {
-        const host = componentHost(n.name, attrs, s.props, () => project(n, values, slots));
+        const host = componentHost(n.name, attrs, s.props, () => project(n, values, slots), () => nodes(n.children, values, slots));
         if (host !== null) return host;
     }
     const open = openTag(n.name, attrs);
@@ -188,7 +215,7 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
 }
 
 /** A component element's children, grouped as its slots receive them, rendered in its parent's context. */
-function project(n: ElementNode, values: readonly unknown[], slots: Projection | null): Projection {
+function project(n: ElementNode, values: readonly unknown[], slots: Projection | null): Projected {
     const named = new Map<string, TreeNode[]>();
     const rest: TreeNode[] = [];
     for (const child of n.children) {

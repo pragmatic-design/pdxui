@@ -35,14 +35,110 @@ const SHOW_PLACEHOLDER = 'show';
 /**
  * Adopt `render()`'s result over the children of `container`, which must be exactly what the server
  * wrote for it. Throws a HydrationMismatch, having bound part of it, when they differ: the caller
- * disposes what was bound and renders afresh.
+ * disposes what was bound and renders afresh. `slots`: the regions of the component whose render it
+ * is (`regionsOf`), which its `<slot>`s step over.
  */
-export function hydrateChildren(container: Node, render: () => unknown): void {
-    withHydration(() => {
-        const next = adoptValue(render(), container, container.firstChild, null, null);
-        if (next !== null) throw new HydrationMismatch(`markup left after the render: ${describe(next)}`);
-    });
+export function hydrateChildren(container: Node, render: () => unknown, slots: ReadonlyMap<string, Region> | null = null): void {
+    const outer = ownSlots;
+    ownSlots = slots;
+    try {
+        withHydration(() => {
+            const next = adoptValue(render(), container, container.firstChild, null, null);
+            if (next !== null) throw new HydrationMismatch(`markup left after the render: ${describe(next)}`);
+        });
+    } finally {
+        ownSlots = outer;
+    }
 }
+
+// ─── Slots ────────────────────────────────────────────────────────
+//
+// What a component's slot received is its parent's: the server brackets it, in the place of the
+// `<slot>`, with `<!--pdx-slot:<host id>:<name>-->` … `<!--/pdx-slot-->`. Two walks meet there — the
+// parent's, which binds those nodes, and the component's, which steps over them — in either order, as
+// the components' definitions upgrade them. Each region is read once per host and kept, and its
+// markers go when both walks have been through it.
+
+/** The nodes a slot of a pre-rendered host received, between the server's markers. */
+export interface Region {
+    readonly open: Comment;
+    readonly close: Comment;
+    /** The walks that have been through it: the parent's and the component's. */
+    uses: number;
+    /**
+     * The region's nodes, when a host that renders afresh took them out to project them: they are then
+     * in its slots, each slot's in a run of their own, where the parent's walk finds them.
+     */
+    taken: Node[] | null;
+}
+
+const SLOT_PREFIX = 'pdx-slot:';
+const SLOT_CLOSE = '/pdx-slot';
+
+const regionsByHost = new WeakMap<Element, Map<string, Region>>();
+
+/** The regions of a pre-rendered host, by slot name — `*` for the light DOM of one the server skipped. */
+export function regionsOf(host: Element): Map<string, Region> {
+    let regions = regionsByHost.get(host);
+    if (regions) return regions;
+    regions = new Map();
+    const id = host.getAttribute('data-pdx-ssr');
+    if (id !== null) {
+        const prefix = `${SLOT_PREFIX}${id}:`;
+        const walker = document.createTreeWalker(host, NodeFilter.SHOW_COMMENT);
+        for (let c = walker.nextNode() as Comment | null; c; c = walker.nextNode() as Comment | null) {
+            if (c.data.startsWith(prefix)) regions.set(c.data.slice(prefix.length), { open: c, close: slotClose(c), uses: 0, taken: null });
+        }
+    }
+    regionsByHost.set(host, regions);
+    return regions;
+}
+
+/** The `<!--/pdx-slot-->` that closes `open`, past the regions of other hosts nested at its level. */
+function slotClose(open: Comment): Comment {
+    let depth = 0;
+    for (let n = open.nextSibling; n; n = n.nextSibling) {
+        if (!(n instanceof Comment)) continue;
+        if (n.data.startsWith(SLOT_PREFIX)) depth++;
+        else if (n.data === SLOT_CLOSE) {
+            if (depth === 0) return n;
+            depth--;
+        }
+    }
+    throw new HydrationMismatch('a slot\'s region is not closed');
+}
+
+/** A walk is done with `r`: the second one removes its markers. */
+function release(r: Region): void {
+    if (++r.uses < 2) return;
+    r.open.remove();
+    r.close.remove();
+}
+
+/**
+ * The nodes of the host's regions, taken out with their markers: what a host that renders afresh
+ * projects. The parent's walk, if it has not been through them yet, then renders afresh too.
+ */
+export function takeRegions(host: Element): Node[] {
+    const out: Node[] = [];
+    for (const r of regionsOf(host).values()) {
+        r.taken = regionNodes(r);
+        out.push(...r.taken);
+        r.open.remove();
+        r.close.remove();
+    }
+    return out;
+}
+
+/** The nodes in a region, as they stand. */
+export function regionNodes(r: Region): Node[] {
+    const out: Node[] = [];
+    for (let n = r.open.nextSibling; n && n !== r.close; n = n.nextSibling) out.push(n);
+    return out;
+}
+
+/** The regions of the component whose render is being adopted, which its `<slot>`s step over. */
+let ownSlots: ReadonlyMap<string, Region> | null = null;
 
 /** The walk a helper's block adopts its content with. */
 const adopter: Adopter = {
@@ -112,9 +208,25 @@ function adoptNodes(list: readonly TreeNode[], values: readonly unknown[], paren
             if (!(next instanceof Comment)) throw new HydrationMismatch(`expected a comment, found ${describe(next)}`);
             next = next.nextSibling;
         } else if (n.kind === 'hole') next = adoptHole(values[n.index], parent, next, hidden);
+        else if (n.name === 'slot' && ownSlots) next = adoptSlot(n, values, next);
         else next = adoptElement(n, values, next);
     }
     return next;
+}
+
+/**
+ * A `<slot>` of the component being adopted: what it received is its parent's, stepped over; one that
+ * received nothing is still there, with its own content.
+ */
+function adoptSlot(n: ElementNode, values: readonly unknown[], node: Node | null): Node | null {
+    const name = n.attributes.find((a) => a.name === 'name')?.value ?? '';
+    const region = ownSlots?.get(name);
+    if (region && node === region.open) {
+        const next = region.close.nextSibling;
+        release(region);
+        return next;
+    }
+    return adoptElement(n, values, node);
 }
 
 type ElementNode = Extract<TreeNode, { kind: 'element' }>;
@@ -132,11 +244,76 @@ function adoptElement(n: ElementNode, values: readonly unknown[], node: Node | n
         // A binding that writes the content itself: what the template has inside is not rendered.
         if (/^:(textcontent|innertext|innerhtml)$/.test(a.name)) ownsChildren = false;
     }
-    if (ownsChildren && !n.void && !n.name.includes('-')) {
-        const rest = adoptNodes(n.children, values, node, node.firstChild, null, null);
-        if (rest !== null) throw new HydrationMismatch(`<${n.name}> has markup the template does not: ${describe(rest)}`);
+    if (!ownsChildren || n.void) return next;
+    if (n.name.includes('-') && (regionsByHost.has(node) || node.hasAttribute('data-pdx-ssr'))) {
+        adoptProjected(n, values, node);
+        return next;
     }
+    const rest = adoptNodes(n.children, values, node, node.firstChild, null, null);
+    if (rest !== null) throw new HydrationMismatch(`<${n.name}> has markup the template does not: ${describe(rest)}`);
     return next;
+}
+
+/**
+ * The children a template gives a pre-rendered component: its own render is the component's, and
+ * they are where its slots put them, in the regions the server bracketed — grouped by `slot` as the
+ * server and the client project them. A group with no region went to no slot: the client drops it.
+ */
+function adoptProjected(n: ElementNode, values: readonly unknown[], host: Element): void {
+    const regions = regionsOf(host);
+    if ([...regions.values()].some((r) => r.taken)) {
+        adoptTaken(n, values, regions);
+        return;
+    }
+    const light = regions.get('*');
+    const groups = light ? new Map([['*', n.children]]) : slotGroups(n.children);
+    for (const [name, group] of groups) {
+        const region = regions.get(name);
+        if (!region) continue;
+        const parent = region.open.parentNode!;
+        const rest = adoptNodes(group, values, parent, region.open.nextSibling, region.close, null);
+        if (rest !== region.close) throw new HydrationMismatch(`<${n.name}>'s slot "${name}" has markup the template does not: ${describe(rest)}`);
+        release(region);
+    }
+}
+
+/**
+ * The children a template gives a component that rendered afresh before this walk reached it: its
+ * mount projected the parent's nodes, each slot's in a run before the slot, and each group is adopted
+ * there. A group no slot took is out of the page, as the client drops it: nothing to bind.
+ */
+function adoptTaken(n: ElementNode, values: readonly unknown[], regions: ReadonlyMap<string, Region>): void {
+    const runs = new Map<string, Node[]>();
+    for (const [name, r] of regions) {
+        if (name !== '*') { runs.set(name, r.taken ?? []); continue; }
+        // A skipped component's light DOM, which its mount split by slot.
+        for (const node of r.taken ?? []) {
+            const slot = node instanceof Element ? (node.getAttribute('slot') ?? '') : '';
+            runs.set(slot, [...(runs.get(slot) ?? []), node]);
+        }
+    }
+    for (const [name, group] of slotGroups(n.children)) {
+        const run = runs.get(name);
+        if (!run || run.length === 0 || !run[0].parentNode) continue;
+        for (let i = 1; i < run.length; i++) {
+            if (run[i - 1].nextSibling !== run[i]) throw new HydrationMismatch(`<${n.name}>'s slot "${name}" is not where its mount projected it`);
+        }
+        const end = run[run.length - 1].nextSibling;
+        const rest = adoptNodes(group, values, run[0].parentNode, run[0], end, null);
+        if (rest !== end) throw new HydrationMismatch(`<${n.name}>'s slot "${name}" has markup the template does not: ${describe(rest)}`);
+    }
+}
+
+/** Children grouped by the slot they go to, as the server's `project` groups them: `''` the default. */
+function slotGroups(children: readonly TreeNode[]): Map<string, TreeNode[]> {
+    const groups = new Map<string, TreeNode[]>([['', []]]);
+    for (const child of children) {
+        const name = child.kind === 'element' ? (child.attributes.find((a) => a.name === 'slot')?.value ?? '') : '';
+        const group = groups.get(name);
+        if (group) group.push(child);
+        else groups.set(name, [child]);
+    }
+    return groups;
 }
 
 /** A value's place: the server's markers around what it wrote, which go once the value is adopted. */

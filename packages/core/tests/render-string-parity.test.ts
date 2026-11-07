@@ -143,8 +143,9 @@ describe('a component to a string matches the client\'s mount', () => {
             render: () => html`<header><slot name="title">Untitled</slot></header><main><slot></slot></main><footer><slot name="foot">none</slot></footer>`,
         });
         const markup = mountParity(() => html`<parity-panel><b slot="title">T</b><p>body</p></parity-panel>`);
-        expect(markup).toContain('<header><b slot="title">T</b></header>');
-        expect(markup).toContain('<main><p>body</p></main>');
+        // What each slot received, bracketed for hydration with the host's id and the slot's name.
+        expect(markup).toContain('<header><!--pdx-slot:1:title--><b slot="title">T</b><!--/pdx-slot--></header>');
+        expect(markup).toContain('<main><!--pdx-slot:1:--><p>body</p><!--/pdx-slot--></main>');
         expect(markup).toContain('<footer><slot name="foot">none</slot></footer>');
     });
 

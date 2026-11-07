@@ -1,17 +1,22 @@
 // The client's DOM and renderToString's markup, compared canonically (#160): attributes sorted, classes
-// sorted, styles as the browser reads them, adjacent text merged, and the string's `<!--pdx-->` part
-// markers set aside. Shared by the parity suites of the string renderer.
+// sorted, styles as the browser reads them, adjacent text merged, and the string's markers for
+// hydration set aside — `<!--pdx-->` around a value, `<!--pdx-slot:…-->` around what a slot received.
+// Shared by the parity suites of the string renderer.
 
 import { expect } from 'vitest';
 import { renderToString } from '../src/server/render-string';
 
+/** A comment the server writes for hydration only, which the client's DOM does not have. */
+export function isHydrationMarker(node: Node): boolean {
+    if (node.nodeType !== 8) return false;
+    const data = (node as Comment).data;
+    return data === 'pdx' || data === '/pdx' || data === '/pdx-slot' || data.startsWith('pdx-slot:');
+}
+
 /** A node as a canonical string: what both renders must agree on. */
 export function canonical(node: Node): string {
     if (node.nodeType === 3) return (node as Text).data;
-    if (node.nodeType === 8) {
-        const data = (node as Comment).data;
-        return data === 'pdx' || data === '/pdx' ? '' : `<!--${data}-->`;
-    }
+    if (node.nodeType === 8) return isHydrationMarker(node) ? '' : `<!--${(node as Comment).data}-->`;
     if (node.nodeType !== 1) return '';
     const el = node as HTMLElement;
     const attrs = Array.from(el.attributes).map((a) => {
@@ -28,7 +33,7 @@ export function children(parent: Node): string {
     box.childNodes.forEach(() => {});
     const strip = (n: Node): void => {
         for (const c of Array.from(n.childNodes)) {
-            if (c.nodeType === 8 && ((c as Comment).data === 'pdx' || (c as Comment).data === '/pdx')) n.removeChild(c);
+            if (isHydrationMarker(c)) n.removeChild(c);
             else strip(c);
         }
     };

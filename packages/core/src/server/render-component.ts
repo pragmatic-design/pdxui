@@ -24,6 +24,8 @@ export interface SkippedComponent {
 export interface RenderedHost {
     attributes: Map<string, string | null>;
     inner: string;
+    /** It could not be rendered on the server and is an empty host, reported in `skipped`. */
+    skipped: boolean;
 }
 
 /**
@@ -45,7 +47,7 @@ export function renderHost(
         host = new Ctor();
     } catch (error) {
         skipped.push({ tag, reason: `its constructor threw: ${message(error)}` });
-        return { attributes: new Map(attributes), inner: '' };
+        return { attributes: new Map(attributes), inner: '', skipped: true };
     }
     if (!(host instanceof PdxElement)) return null;
     for (const [name, value] of attributes) host.setAttribute(name, value ?? '');
@@ -53,12 +55,14 @@ export function renderHost(
     // What connectedCallback writes before the body runs: the boundary a parent's scoped style stops at.
     host.setAttribute('data-pdx-root', '');
     let rendered: unknown = null;
+    let failed = false;
     const [, dispose] = collectDisposers(() => {
         try {
             rendered = untracked(() => host.body());
         } catch (error) {
             skipped.push({ tag, reason: message(error) });
             rendered = null;
+            failed = true;
         }
     });
     let markup = '';
@@ -66,6 +70,7 @@ export function renderHost(
         if (rendered !== null && !isDeferredContent(rendered)) {
             // A render that built DOM itself, or the error the client draws for a failed setup.
             skipped.push({ tag, reason: 'its render built DOM instead of returning an html`` template or a helper\'s block' });
+            failed = true;
         } else if (rendered !== null) {
             markup = inner(rendered);
         }
@@ -74,7 +79,7 @@ export function renderHost(
     }
     const out = new Map<string, string | null>();
     for (const name of host.getAttributeNames()) out.set(name, host.getAttribute(name));
-    return { attributes: out, inner: markup };
+    return { attributes: out, inner: markup, skipped: failed };
 }
 
 function message(error: unknown): string {
