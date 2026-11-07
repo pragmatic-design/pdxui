@@ -35,6 +35,8 @@ interface StaticNode extends MarkupNode {
     expr?: string;
     /** An element's bindings on the server, `[name, expression]`: html`` attributes with a value (#160). */
     bound?: Array<[string, string]>;
+    /** An anchor an interpolation binds as its text, not one a block takes the place of. */
+    text?: boolean;
 }
 
 /** The whitespace HTML collapses — not U+00A0, which `&nbsp;` writes to be kept. */
@@ -156,9 +158,12 @@ export class StaticTree {
         this.add({ kind: 'comment', v: '', kids: [], target: false, data }, `__d.createComment(${jsString(data)})`);
     }
 
-    /** An empty text node named `v` that the render reaches: an interpolation's text, or a marker. */
-    anchor(v: string): void {
-        this.add({ kind: 'anchor', v, kids: [], target: false }, `__d.createTextNode('')`);
+    /**
+     * An empty text node named `v` that the render reaches: an interpolation's text (`text`), or the
+     * marker a block takes the place of.
+     */
+    anchor(v: string, text = false): void {
+        this.add({ kind: 'anchor', v, kids: [], target: false, text }, `__d.createTextNode('')`);
         this.target(v);
     }
 
@@ -198,9 +203,13 @@ export class StaticTree {
      * The lines that start the block's render — a copy of the static markup, and the walk to the
      * nodes it binds — after declaring the builder and the walk in `hoists`.
      */
-    prologue(hoists: TemplateHoists, imports: Set<string>, asHtml: boolean): string[] {
+    prologue(hoists: TemplateHoists, imports: Set<string>, asHtml: boolean, hydrate = false): string[] {
         this.trimEdges(this.root);
-        if (this.root.kids.length === 0) return ['const __frag=document.createDocumentFragment();'];
+        if (this.root.kids.length === 0) {
+            if (!hydrate) return ['const __frag=document.createDocumentFragment();'];
+            imports.add('hydrationRange');
+            return ['const __h=hydrationRange();if(__h)__h.next=__h.at;', 'const __frag=__h?null:document.createDocumentFragment();'];
+        }
         const n = hoists.count++;
         // core's staticBlock: built on first use in an inert document, imported per render. The
         // builder is the markup as HTML where the parser keeps it exactly, DOM calls otherwise.
@@ -212,12 +221,87 @@ export class StaticTree {
         } else {
             hoists.lines.push(`const __blk${n}=staticBlock((__frag,__d)=>{${this.mk.join('')}});`);
         }
-        const lines = [`const __frag=__blk${n}();`];
+        if (!hydrate) {
+            const lines = [`const __frag=__blk${n}();`];
+            if (this.targets.length > 0) {
+                hoists.lines.push(`const __walk${n}=${this.walk()};`);
+                lines.push(`const [${this.targets.join(',')}]=__walk${n}(__frag);`);
+            }
+            return lines;
+        }
+        // Hydrating (#160): the block takes over the range it is handed instead of cloning, when it is
+        // handed one, and walks it with the same paths (`hydrationWalk`).
+        imports.add('hydrationRange');
+        hoists.lines.push(`const __hwalk${n}=${this.hydrationWalk(imports)};`);
+        const lines = ['const __h=hydrationRange();', `const __frag=__h?null:__blk${n}();`];
         if (this.targets.length > 0) {
             hoists.lines.push(`const __walk${n}=${this.walk()};`);
-            lines.push(`const [${this.targets.join(',')}]=__walk${n}(__frag);`);
+            lines.push(`const [${this.targets.join(',')}]=__h?__hwalk${n}(__h):__walk${n}(__frag);`);
+        } else {
+            lines.push(`if(__h)__hwalk${n}(__h);`);
         }
         return lines;
+    }
+
+    /**
+     * `(r)=>{…}`, the walk of the server's markup for this block (#160): from `r.at`, the first node of
+     * the range it is handed, to every node the render binds — the paths of `walk`, with a value's place
+     * the server bracketed counting as one node (core's `skipNode`). Each element it reaches must be the
+     * one the template has (`checkNode`); an interpolation's anchor is the text the server wrote
+     * (`partText`). It sets `r.next`, the node after the block, before it changes anything.
+     */
+    private hydrationWalk(imports: Set<string>): string {
+        imports.add('skipNode');
+        const step = (from: string, count: number): string => {
+            let out = from;
+            for (let k = 0; k < count; k++) out = `skipNode(${out})`;
+            return out;
+        };
+        const decls: string[] = [`r.next=${step('r.at', this.root.kids.length)};`];
+        const reaches = (n: StaticNode): boolean => n.target || n.kids.some(reaches);
+        // A component's children are where its slots put them in the server's markup: each reached from
+        // the region of its slot (core's `projectedNode`), grouped by `slot` as the server groups them.
+        const slotOf = (kid: StaticNode): string => (kid.kind === 'element' ? kid.attrs?.find(([name]) => name === 'slot')?.[1] ?? '' : '');
+        const visit = (n: StaticNode, expr: string, top: boolean): void => {
+            const projected = n.kind === 'element' && !n.svg && (n.tag ?? '').includes('-');
+            let prev: string | null = null;
+            let prevAt = -1;
+            // In a component: the last child reached in each slot's group, and the counts so far.
+            const lastIn = new Map<string, { v: string; at: number }>();
+            const countIn = new Map<string, number>();
+            n.kids.forEach((kid, i) => {
+                const group = projected ? slotOf(kid) : '';
+                const inGroup = countIn.get(group) ?? 0;
+                countIn.set(group, inGroup + 1);
+                if (!reaches(kid)) return;
+                let from: string;
+                if (projected) {
+                    const last = lastIn.get(group);
+                    if (last) from = step(last.v, inGroup - last.at);
+                    else {
+                        imports.add('projectedNode');
+                        from = `projectedNode(${expr},${jsString(group)},${inGroup},${i})`;
+                    }
+                    lastIn.set(group, { v: kid.v, at: inGroup });
+                } else {
+                    from = prev === null ? step(top ? 'r.at' : `${expr}.firstChild`, i) : step(prev, i - prevAt);
+                }
+                let value = from;
+                if (kid.kind === 'element') {
+                    imports.add('checkNode');
+                    value = `checkNode(${from},${jsString(kid.svg ? kid.tag! : kid.tag!.toLowerCase())})`;
+                } else if (kid.kind === 'anchor' && kid.text) {
+                    imports.add('partText');
+                    value = `partText(${from})`;
+                }
+                decls.push(`const ${kid.v}=${value};`);
+                prev = kid.v;
+                prevAt = i;
+                visit(kid, kid.v, false);
+            });
+        };
+        visit(this.root, 'r', true);
+        return `(r)=>{${decls.join('')}return [${this.targets.join(',')}];}`;
     }
 
     /** `(r)=>{…; return [targets]}`: from the block's root to every node the render binds. */

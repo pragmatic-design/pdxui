@@ -61,6 +61,8 @@ export function compileSFC(
         tagPrefix?: string;
         /** Compile the module for the server (#160): the render as html``, no style injection. */
         ssr?: boolean;
+        /** Compile the client's module to take over the server's markup too (#160, part 4b). */
+        hydrate?: boolean;
     },
     precomputedAnalysis?: ReturnType<typeof analyzeScript> | null,
 ): string {
@@ -76,7 +78,7 @@ export function compileSFC(
             for (const name of directives.keys()) customDirectives.add(name);
         }
     }
-    const ctx = createCompileContext({ production, ssr: options?.ssr, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
+    const ctx = createCompileContext({ production, ssr: options?.ssr, hydrate: options?.hydrate, customDirectiveHandlers, customDirectives, warnings: options?.warnings, propsOf: options?.propsOf, importPathOf: options?.importPathOf, mapOrigins: options?.mapOrigins, templateOrigin: options?.templateOrigin, sourceFile: production ? null : options?.sourceFile, staticMarkup: options?.staticMarkup, target: options?.target, tagPrefix: options?.tagPrefix });
 
     // A scoped block under baseline-2026 stops at nested components (#152): what the template writes
     // inside a child's tag is marked as this component's, so the donut scope still reaches it.

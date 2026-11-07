@@ -23,6 +23,19 @@ export interface HostHydration {
      * the markup is not the render, the host then holding those children alone, for a mount to project.
      */
     adopt(host: Element, render: () => unknown): { light: Node[]; slots: Element[] } | null;
+    /**
+     * Whether a pre-rendered host is to wait for a pre-rendered ancestor that has not hydrated yet: the
+     * ancestor binds what it passes it, its props first, so the host renders with them. It connects
+     * again when the ancestor has mounted (`release`).
+     */
+    waits(host: HydratingHost): boolean;
+    /** `host` has mounted: the pre-rendered hosts that waited for it connect again. */
+    release(host: HydratingHost): void;
+}
+
+/** A host as hydration sees it: an element that connects. */
+export interface HydratingHost extends Element {
+    connectedCallback(): void;
 }
 
 let hostHydration: HostHydration | null = null;
@@ -260,6 +273,7 @@ export abstract class PdxElement extends HTMLElementBase {
         // never shows this; Chromium does.
         if (!this.isConnected) return;
         if (!this._mounted) {
+            if (hostHydration?.waits(this)) return;
             // First mount: render component
             this._mounted = true;
             // Every component host is a boundary a parent's scoped style stops at (#152): the donut
@@ -347,6 +361,8 @@ export abstract class PdxElement extends HTMLElementBase {
                 // After the pop: the boundary renders its fallback now, and effects created there must
                 // not take this failed element — about to be removed — as their error owner.
                 if (failed) failed.boundary(failed.error);
+                // The pre-rendered hosts that waited for this one connect now, mounted or failed.
+                hostHydration?.release(this);
             }
 
             // Listen for route param changes (same page, different params).

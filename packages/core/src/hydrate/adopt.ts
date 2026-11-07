@@ -20,6 +20,8 @@ import { bindAdoptedValue, bindPlannedAttribute, html, interpolationText } from 
 import { withHydration, withoutHydration, type Adopter } from './mode';
 import { hydrationBlocks, builders } from './blocks';
 import { isDeferredBlock } from '../renderer/deferred-block';
+import { offerRange, partClose, isAdoptedRange } from './compiled';
+import { hasRegions, regionsOf, release, type Region } from './regions';
 
 /** The server's markup is not what the template renders: the component renders instead. */
 export class HydrationMismatch extends Error {
@@ -30,7 +32,6 @@ export class HydrationMismatch extends Error {
 }
 
 const PART_OPEN = 'pdx';
-const PART_CLOSE = '/pdx';
 /** The comment a false `show()` puts in place of a top-level text (helpers.ts). */
 const SHOW_PLACEHOLDER = 'show';
 
@@ -47,7 +48,9 @@ export function hydrateChildren(container: Node, render: () => unknown, slots: R
     leftSlots = [];
     try {
         withHydration(() => {
-            const next = adoptValue(render(), container, container.firstChild, null, null);
+            // A compiled render takes over the container's children itself (hydrate/compiled.ts).
+            const rendered = offerRange({ parent: container, at: container.firstChild, next: null }, render);
+            const next = adoptValue(rendered, container, container.firstChild, null, null);
             if (next !== null) throw new HydrationMismatch(`markup left after the render: ${describe(next)}`);
         });
         return leftSlots;
@@ -55,92 +58,6 @@ export function hydrateChildren(container: Node, render: () => unknown, slots: R
         ownSlots = outer;
         leftSlots = outerLeft;
     }
-}
-
-// ─── Slots ────────────────────────────────────────────────────────
-//
-// What a component's slot received is its parent's: the server brackets it, in the place of the
-// `<slot>`, with `<!--pdx-slot:<host id>:<name>-->` … `<!--/pdx-slot-->`. Two walks meet there — the
-// parent's, which binds those nodes, and the component's, which steps over them — in either order, as
-// the components' definitions upgrade them. Each region is read once per host and kept, and its
-// markers go when both walks have been through it.
-
-/** The nodes a slot of a pre-rendered host received, between the server's markers. */
-export interface Region {
-    readonly open: Comment;
-    readonly close: Comment;
-    /** The walks that have been through it: the parent's and the component's. */
-    uses: number;
-    /**
-     * The region's nodes, when a host that renders afresh took them out to project them: they are then
-     * in its slots, each slot's in a run of their own, where the parent's walk finds them.
-     */
-    taken: Node[] | null;
-}
-
-const SLOT_PREFIX = 'pdx-slot:';
-const SLOT_CLOSE = '/pdx-slot';
-
-const regionsByHost = new WeakMap<Element, Map<string, Region>>();
-
-/** The regions of a pre-rendered host, by slot name — `*` for the light DOM of one the server skipped. */
-export function regionsOf(host: Element): Map<string, Region> {
-    let regions = regionsByHost.get(host);
-    if (regions) return regions;
-    regions = new Map();
-    const id = host.getAttribute('data-pdx-ssr');
-    if (id !== null) {
-        const prefix = `${SLOT_PREFIX}${id}:`;
-        const walker = document.createTreeWalker(host, NodeFilter.SHOW_COMMENT);
-        for (let c = walker.nextNode() as Comment | null; c; c = walker.nextNode() as Comment | null) {
-            if (c.data.startsWith(prefix)) regions.set(c.data.slice(prefix.length), { open: c, close: slotClose(c), uses: 0, taken: null });
-        }
-    }
-    regionsByHost.set(host, regions);
-    return regions;
-}
-
-/** The `<!--/pdx-slot-->` that closes `open`, past the regions of other hosts nested at its level. */
-function slotClose(open: Comment): Comment {
-    let depth = 0;
-    for (let n = open.nextSibling; n; n = n.nextSibling) {
-        if (!(n instanceof Comment)) continue;
-        if (n.data.startsWith(SLOT_PREFIX)) depth++;
-        else if (n.data === SLOT_CLOSE) {
-            if (depth === 0) return n;
-            depth--;
-        }
-    }
-    throw new HydrationMismatch('a slot\'s region is not closed');
-}
-
-/** A walk is done with `r`: the second one removes its markers. */
-function release(r: Region): void {
-    if (++r.uses < 2) return;
-    r.open.remove();
-    r.close.remove();
-}
-
-/**
- * The nodes of the host's regions, taken out with their markers: what a host that renders afresh
- * projects. The parent's walk, if it has not been through them yet, then renders afresh too.
- */
-export function takeRegions(host: Element): Node[] {
-    const out: Node[] = [];
-    for (const r of regionsOf(host).values()) {
-        r.taken = regionNodes(r);
-        out.push(...r.taken);
-        r.open.remove();
-        r.close.remove();
-    }
-    return out;
-}
-
-/** The nodes in a region, as they stand. */
-export function regionNodes(r: Region): Node[] {
-    const out: Node[] = [];
-    for (let n = r.open.nextSibling; n && n !== r.close; n = n.nextSibling) out.push(n);
-    return out;
 }
 
 /** The regions of the component whose render is being adopted, which its `<slot>`s step over. */
@@ -152,7 +69,9 @@ const adopter: Adopter = {
     close: (start, open, close) => blockClose(start, open, close),
     expect: (at, data) => expectComment(at, data),
     fail: (what) => { throw new HydrationMismatch(what); },
-    between: (content, parent, start, end) => {
+    between: (render, parent, start, end) => {
+        // A compiled branch takes over what lies between the markers itself (hydrate/compiled.ts).
+        const content = offerRange({ parent, at: start.nextSibling, next: null }, render);
         // Nothing — a false condition with no else, a case with no default — is no node at all.
         const rest = content == null ? start.nextSibling : adoptValue(content, parent, start.nextSibling, end, null);
         if (rest !== end) throw new HydrationMismatch(`the block <!--${start.data}--> has markup its content does not: ${describe(rest)}`);
@@ -167,6 +86,8 @@ const adopter: Adopter = {
  */
 function adoptValue(value: unknown, parent: Node, at: Node | null, end: Node | null, hidden: Map<Text, Comment> | null): Node | null {
     if (isDeferredTemplate(value)) return adoptNodes(templateTree(value.strings), value.values, parent, at, end, hidden);
+    // A compiled block that took over its range itself.
+    if (isAdoptedRange(value)) return value.range.next;
     // A helper's block takes over its own markers, or is built in their place (hydrate/blocks.ts).
     if (isDeferredBlock(value)) return value.visit(hydrationBlocks)(adopter, parent, at, end);
     if (Array.isArray(value)) {
@@ -231,7 +152,7 @@ function adoptSlot(n: ElementNode, values: readonly unknown[], node: Node | null
     const region = ownSlots?.get(name);
     if (region && node === region.open) {
         const next = region.close.nextSibling;
-        release(region);
+        release(region, 'owner');
         return next;
     }
     if (node instanceof Element) leftSlots.push(node);
@@ -257,7 +178,7 @@ function adoptElement(n: ElementNode, values: readonly unknown[], node: Node | n
         if (/^:(textcontent|innertext|innerhtml)$/.test(a.name)) ownsChildren = false;
     }
     if (!ownsChildren || n.void) return next;
-    if (n.name.includes('-') && (regionsByHost.has(node) || node.hasAttribute('data-pdx-ssr'))) {
+    if (n.name.includes('-') && (hasRegions(node) || node.hasAttribute('data-pdx-ssr'))) {
         adoptProjected(n, values, node);
         return next;
     }
@@ -285,7 +206,7 @@ function adoptProjected(n: ElementNode, values: readonly unknown[], host: Elemen
         const parent = region.open.parentNode!;
         const rest = adoptNodes(group, values, parent, region.open.nextSibling, region.close, null);
         if (rest !== region.close) throw new HydrationMismatch(`<${n.name}>'s slot "${name}" has markup the template does not: ${describe(rest)}`);
-        release(region);
+        release(region, 'parent');
     }
 }
 
@@ -353,19 +274,6 @@ function adoptRange(result: unknown, parent: Node, open: Comment, close: Comment
     return nodes;
 }
 
-/** The `<!--/pdx-->` that closes `open`, past the places nested in it. */
-function partClose(open: Comment): Comment {
-    let depth = 0;
-    for (let n = open.nextSibling; n; n = n.nextSibling) {
-        if (!(n instanceof Comment)) continue;
-        if (n.data === PART_OPEN) depth++;
-        else if (n.data === PART_CLOSE) {
-            if (depth === 0) return n;
-            depth--;
-        }
-    }
-    throw new HydrationMismatch('a value\'s place is not closed');
-}
 
 /** The comment that closes a block opened by `start`, past blocks of the same kind nested in it. */
 function blockClose(start: Comment, open: string, close: string): Comment {
@@ -422,4 +330,17 @@ function describe(node: Node | null): string {
     if (node instanceof Comment) return `<!--${node.data}-->`;
     if (node instanceof Text) return `the text ${JSON.stringify(node.data.slice(0, 40))}`;
     return node.nodeName;
+}
+
+/**
+ * A compiled block's anchor while hydrating: the value's place the server wrote, `open` … its close,
+ * adopted by `value` — a helper's block, typically — and its markers removed (placePart).
+ */
+export function adoptPartValue(open: Comment, value: unknown): void {
+    const close = partClose(open);
+    const parent = open.parentNode!;
+    const rest = adoptValue(value, parent, open.nextSibling, close, null);
+    if (rest !== close) throw new HydrationMismatch(`a value's place has markup the value does not: ${describe(rest)}`);
+    parent.removeChild(open);
+    parent.removeChild(close);
 }

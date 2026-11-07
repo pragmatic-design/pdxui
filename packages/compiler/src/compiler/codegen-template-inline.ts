@@ -248,6 +248,15 @@ class InlineGen {
         if (this.ctx.ssr) { this.tree.hole(guard ? `${expr} instanceof DocumentFragment?${expr}:null` : expr); return; }
         const m = this.v('m');
         this.tree.anchor(m);
+        if (this.ctx.hydrate) {
+            // Hydrating (#160): core's placePart puts the block in place, or has it take over what the
+            // server wrote there.
+            this.imports.add('placePart');
+            this.out(guard
+                ? `placePart(${m},${expr} instanceof Node?${expr}:document.createDocumentFragment());`
+                : `placePart(${m},${expr});`);
+            return;
+        }
         this.out(guard
             ? `if(${expr} instanceof Node)${m}.replaceWith(${expr});else ${m}.remove();`
             : `${m}.replaceWith(${expr});`);
@@ -834,7 +843,7 @@ class InlineGen {
         }
         this.imports.add('bindInterpolation');
         const t = this.v('t');
-        this.tree.anchor(t);
+        this.tree.anchor(t, true);
         this.pending = templateMark(this.ctx, node.exprOffset);
         if (node.pipes?.length > 0) {
             // The same chain as the template path, the value first in every pipe (#199).
@@ -870,10 +879,17 @@ class InlineGen {
         this.idx = g.idx;
         for (const t of g.tags) this.tags.add(t);
         if (this.ctx.ssr) return { code: `${g.lines.join('')}return ${g.tree.serverLiteral(this.imports)};`, tags: g.tags };
-        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup).join('')}${g.lines.join('')}return __frag;`, tags: g.tags };
+        return { code: `${g.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate).join('')}${g.lines.join('')}return ${this.blockResult()};`, tags: g.tags };
     }
 
     private sub(nodes: TemplateNode[]): string { return this.block(nodes).code; }
+
+    /** What a block returns: its fragment, or — hydrating, when it took over its range — that range. */
+    private blockResult(): string {
+        if (!this.ctx.hydrate) return '__frag';
+        this.imports.add('adoptedRange');
+        return '__h?adoptedRange(__h):__frag';
+    }
 
     /** On the server (#160), the empty block: an html`` with nothing in it. */
     private serverEmpty(): string {
@@ -1166,8 +1182,8 @@ class InlineGen {
             lines = [...shared.decls, ...shared.lines];
         }
         // On the server (#160) the render returns its markup as html``, with no builder or walk.
-        const ret = this.ctx.ssr ? this.tree.serverLiteral(this.imports) : '__frag';
-        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup);
+        const ret = this.ctx.ssr ? this.tree.serverLiteral(this.imports) : this.blockResult();
+        const prologue = this.ctx.ssr ? [] : this.tree.prologue(this.hoists, this.imports, this.ctx.staticMarkup, this.ctx.hydrate);
         // One keyed selector per signal a @for compares its key with (#117), owned by the render.
         const selectors = [...this.ctx.selectors].map(n => `const ${selectorName(n)}=selector(()=>ctx.${n}());`);
         if (selectors.length > 0) this.imports.add('selector');

@@ -139,6 +139,8 @@ export type { Attachment } from './renderer/attach';
 export { repeat } from './renderer/list';
 export { repeatWithSlot } from './renderer/slot-repeat';
 export { setProp, bindGesture, insert, remove, text, marker, staticBlock, staticMarkup, __staticHTML } from './renderer/dom';
+// What a .pdx compiled to hydrate calls (#160): a block takes over the server's markup it is handed.
+export { hydrationRange, skipNode, checkNode, partText, adoptedRange, placePart, projectedNode } from './hydrate/compiled';
 export { delegate } from './renderer/delegate';
 
 // Error Boundary

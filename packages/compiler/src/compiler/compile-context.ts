@@ -16,6 +16,13 @@ export interface CompileContext {
      */
     readonly ssr: boolean;
 
+    /**
+     * The client's module can take over the markup static generation wrote (#160, part 4b): each
+     * block's render walks the server's nodes when it is handed a range, and clones its markup
+     * otherwise. Off, the module is as it always was.
+     */
+    readonly hydrate: boolean;
+
     /** Scope variable stack — tracks @for loop vars, @try catch vars. Not prefixed with ctx. */
     readonly scopeVars: Set<string>;
 
@@ -164,6 +171,7 @@ export type PropsLookup = (tag: string) => ReadonlySet<string> | null | undefine
 export function createCompileContext(options?: {
     production?: boolean;
     ssr?: boolean;
+    hydrate?: boolean;
     customDirectiveHandlers?: Map<string, TemplateDirectiveHandler>;
     customDirectives?: Set<string>;
     /** Sink the caller owns; codegen diagnostics are appended to it. A fresh array if omitted. */
@@ -180,6 +188,7 @@ export function createCompileContext(options?: {
     return {
         production: options?.production ?? false,
         ssr: options?.ssr ?? false,
+        hydrate: (options?.hydrate ?? false) && !(options?.ssr ?? false),
         scopeVars: new Set(),
         rowVars: new Set(),
         rowKeys: [],

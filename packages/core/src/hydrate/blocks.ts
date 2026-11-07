@@ -18,6 +18,7 @@ import { renderSnippet } from '../renderer/snippet';
 import { dynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { withoutHydration, type Adopter } from './mode';
+import { offerRange } from './compiled';
 
 /** A block's adoption: from `at` on in `parent`, before `end`; returns the node after what it took. */
 export type BlockAdopt = (a: Adopter, parent: Node, at: Node | null, end: Node | null) => Node | null;
@@ -27,7 +28,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         const start = a.expect(at, 'when');
         const end = a.close(start, 'when', '/when');
         const shown = !!untracked(condition);
-        const [, dispose] = collectDisposers(() => a.between(shown ? thenFn() : (elseFn?.() ?? null), parent, start, end));
+        const [, dispose] = collectDisposers(() => a.between(() => (shown ? thenFn() : (elseFn?.() ?? null)), parent, start, end));
         followWhen(start, end, condition, thenFn, elseFn, options, { show: shown, dispose });
         return end.nextSibling;
     },
@@ -37,7 +38,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         const end = a.close(start, 'when', '/when');
         const index = untracked(select);
         const branch = branches[index];
-        const [, dispose] = collectDisposers(() => a.between(branch ? branch() : null, parent, start, end));
+        const [, dispose] = collectDisposers(() => a.between(() => (branch ? branch() : null), parent, start, end));
         followChain(start, end, select, branches, { index, dispose });
         return end.nextSibling;
     },
@@ -47,7 +48,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         const end = a.close(start, 'match', '/match');
         const key = String(untracked(value));
         const caseFn = caseFor(cases, key);
-        const [, dispose] = collectDisposers(() => a.between(caseFn ? caseFn() : null, parent, start, end));
+        const [, dispose] = collectDisposers(() => a.between(() => (caseFn ? caseFn() : null), parent, start, end));
         followMatch(start, end, value, cases, { key, dispose });
         return end.nextSibling;
     },
@@ -155,13 +156,15 @@ function adoptRow<T>(
     let row: RowSignals<T> | undefined;
     let next: Node | null = at;
     const [, dispose] = collectDisposers(() => {
+        // A compiled row takes over its run itself (hydrate/compiled.ts).
+        const range = { parent, at, next: null };
         let content: Node;
         if (renderer.mode === 'getters') {
             const r: RowSignals<T> = { item: signal(item), index: signal(i) };
             row = r;
-            content = untracked(() => renderer.render(r.item, r.index));
+            content = offerRange(range, () => untracked(() => renderer.render(r.item, r.index)));
         } else {
-            content = renderer.render(item, i);
+            content = offerRange(range, () => renderer.render(item, i));
         }
         next = a.value(content, parent, at, end);
     });

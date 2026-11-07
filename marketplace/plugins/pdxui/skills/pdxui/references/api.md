@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-463 value exports.
+470 value exports.
 
 ### `__adoptStyles`
 
@@ -279,6 +279,16 @@ Shift an ISO date by whole years, clamping the day the same way {@link addMonths
 
 2024-02-29 plus one year is 2025-02-28: the only date where this is visible, and the only reason
 this is not `addMonths(iso, years * 12)`.
+
+### `adoptedRange`
+
+```ts
+import { adoptedRange } from '@pdxui/core';
+
+function adoptedRange(range: HydrationRange): AdoptedRange
+```
+
+A compiled block's answer once it has taken over `range`.
 
 ### `aggregateColumn`
 
@@ -660,6 +670,16 @@ function catchError(handler: (error: unknown) => T): SignalOperator<T, T>
 ```
 
 Catch errors in the pipeline and recover with a fallback value.
+
+### `checkNode`
+
+```ts
+import { checkNode } from '@pdxui/core';
+
+function checkNode(node: Node | null, tag: string): Element
+```
+
+`node`, which must be the element `tag`: what the walk reaches is what the template binds.
 
 ### `clampDate`
 
@@ -2894,6 +2914,17 @@ function humanizeField(field: string): string
 
 Humanize a field name: 'firstName' → 'First Name', 'address.city' → 'City'.
 
+### `hydrationRange`
+
+```ts
+import { hydrationRange } from '@pdxui/core';
+
+function hydrationRange(): HydrationRange | null
+```
+
+The range a compiled block is to take over, or null when it builds its markup: outside a hydration,
+or inside one where nothing handed it a range (a block the client renders afresh).
+
 ### `inheritedForm`
 
 ```ts
@@ -3855,6 +3886,18 @@ function parseISO(iso: string): CalendarDate
 
 Parse ISO date string (YYYY-MM-DD) to CalendarDate.
 
+### `partText`
+
+```ts
+import { partText } from '@pdxui/core';
+
+function partText(open: Node | null): Text
+```
+
+An interpolation's place, `open`, as the text node the client binds: the text the server wrote, or
+an empty one where it wrote none. The markers go. A place that holds more than a text — a template
+the value returned — is emptied: the binding renders it, as a mount does.
+
 ### `pattern`
 
 ```ts
@@ -3895,6 +3938,17 @@ Usage:
     map(q => q.trim().toLowerCase()),
     filter(q => q.length > 2)
   );
+
+### `placePart`
+
+```ts
+import { placePart } from '@pdxui/core';
+
+function placePart(marker: ChildNode, block: Node): void
+```
+
+Put a block where its anchor `marker` is: in a mount, in its place; while hydrating, `marker` is the
+open of the value's place the server wrote, and the block takes over what is in it (hydrate/adopt.ts).
 
 ### `playKeyframes`
 
@@ -3960,6 +4014,18 @@ function processInSlices(items: ArrayLike<T>, work: (item: T, index: number) => 
 Call `work(item, index)` for every item, in order, yielding to input after each slice of about
 5 ms. Resolves when every item has been processed; rejects with the signal's reason when
 `options.signal` aborts (no later item is processed), or with the error `work` throws.
+
+### `projectedNode`
+
+```ts
+import { projectedNode } from '@pdxui/core';
+
+function projectedNode(host: Element, slot: string, inGroup: number, inAll: number): Node | null
+```
+
+A child the template gives the component `host`: where its slot put it in the server's markup — the
+`inGroup`-th node of the region of slot `slot`, or the `inAll`-th of the light DOM of a component the
+server could not render. A host that is not a pre-rendered component has its children in place.
 
 ### `prop`
 
@@ -5015,6 +5081,17 @@ function skip(count: number): SignalOperator<T, T>
 ```
 
 Skip the first N changes after initial value.
+
+### `skipNode`
+
+```ts
+import { skipNode } from '@pdxui/core';
+
+function skipNode(node: Node | null): Node | null
+```
+
+The node after `node` in the client's static markup: a value's place counts as one node, and so does
+what a `<slot>` received, which the server wrote in the slot's place.
 
 ### `skipUntil`
 

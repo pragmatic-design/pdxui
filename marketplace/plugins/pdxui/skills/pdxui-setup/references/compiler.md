@@ -81,6 +81,16 @@ parsed once and copied per render (a block the HTML parser would not keep exactl
 `ctx`, which is why you never write `count()` in markup; and `$store` is the one
 that is *not* rewritten, because a store is a proxy and its keys are properties, not signals.
 
+A module can also be compiled to take over markup that static generation wrote for it, instead of
+building its own: that is hydration. Then each block's render starts with `hydrationRange()`, the
+part of the page it is handed, if any. With one, it walks those nodes by the same paths as its copy —
+`skipNode` steps over a value's place as one node, `checkNode` checks that an element is the one the
+template has, `partText` makes a value's place the text node the binding follows, and
+`projectedNode` finds a child in the slot of the component it was given to — and it answers
+`adoptedRange(range)` instead of a fragment. `placePart` puts a block where its marker is, or has it
+take over what the server wrote there. Without a range it copies its markup as above. The option is
+off unless the app is built to hydrate, and then the module is otherwise the same.
+
 The same holds for the higher-level runes: `@page` generates the route entry and the lazy import,
 `@fetch` a typed `resource()`, `@form` a validated form from the schema. In every case the pattern is
 identical: *you declare the intent, the compiler writes the wiring.*

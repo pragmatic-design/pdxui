@@ -1,13 +1,13 @@
 ---
 title: Rendering API
-description: "Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer."
+description: "Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls."
 order: 24
 parent: api
 ---
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens and the virtualizer. 63 exports, from `@pdxui/core`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, and what a .pdx compiled to hydrate calls. 70 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -21,6 +21,16 @@ function __staticHTML(content: string): DocumentFragment
 
 Pre-compile static HTML into a cached template. Faster than html`` for fully static content.
  Used by the compiler in production mode for components with no reactive bindings.
+
+## `adoptedRange`
+
+```ts
+import { adoptedRange } from '@pdxui/core';
+
+function adoptedRange(range: HydrationRange): AdoptedRange
+```
+
+A compiled block's answer once it has taken over `range`.
 
 ## `animateSharedElement`
 
@@ -232,6 +242,16 @@ Used for: list reorder, modal open from card, page transitions.
 const first = captureRect(sourceEl);
 // ... DOM changes (move element, change route) ...
 animateSharedElement(targetEl, first, { duration: 400 });
+
+## `checkNode`
+
+```ts
+import { checkNode } from '@pdxui/core';
+
+function checkNode(node: Node | null, tag: string): Element
+```
+
+`node`, which must be the element `tag`: what the walk reaches is what the template binds.
 
 ## `clearBoundProperty`
 
@@ -489,6 +509,17 @@ Tagged template literal that produces reactive DOM. It needs a DOM: where there 
 naming the call, instead of returning something that is not a fragment. Module evaluation never
 calls it, so a module that uses it still imports.
 
+## `hydrationRange`
+
+```ts
+import { hydrationRange } from '@pdxui/core';
+
+function hydrationRange(): HydrationRange | null
+```
+
+The range a compiled block is to take over, or null when it builds its markup: outside a hydration,
+or inside one where nothing handed it a range (a block the client renders afresh).
+
 ## `injectTransitionCSS`
 
 ```ts
@@ -588,6 +619,29 @@ Pages are created lazily on first visit and hidden (not destroyed) when inactive
 @param pageMap - Map of page key → render function.
 @returns DocumentFragment with all cached pages (only active one is visible).
 
+## `partText`
+
+```ts
+import { partText } from '@pdxui/core';
+
+function partText(open: Node | null): Text
+```
+
+An interpolation's place, `open`, as the text node the client binds: the text the server wrote, or
+an empty one where it wrote none. The markers go. A place that holds more than a text — a template
+the value returned — is emptied: the binding renders it, as a mount does.
+
+## `placePart`
+
+```ts
+import { placePart } from '@pdxui/core';
+
+function placePart(marker: ChildNode, block: Node): void
+```
+
+Put a block where its anchor `marker` is: in a mount, in its place; while hydrating, `marker` is the
+open of the value's place the server wrote, and the block takes over what is in it (hydrate/adopt.ts).
+
 ## `playKeyframes`
 
 ```ts
@@ -616,6 +670,18 @@ effects are disposed with this subtree even though the nodes live elsewhere; tha
 reason to use this rather than `document.body.appendChild`.
 
 `enter`/`exit` name CSS classes for the transitions.
+
+## `projectedNode`
+
+```ts
+import { projectedNode } from '@pdxui/core';
+
+function projectedNode(host: Element, slot: string, inGroup: number, inAll: number): Node | null
+```
+
+A child the template gives the component `host`: where its slot put it in the server's markup — the
+`inGroup`-th node of the region of slot `slot`, or the `inAll`-th of the light DOM of a component the
+server could not render. A host that is not a pre-rendered component has its children in place.
 
 ## `queuePrefetch`
 
@@ -723,6 +789,17 @@ Unlike when(), preserves element state (scroll, canvas, form values).
 
 Usage:
   ${show(() => isVisible(), html`<div class="panel">...</div>`)}
+
+## `skipNode`
+
+```ts
+import { skipNode } from '@pdxui/core';
+
+function skipNode(node: Node | null): Node | null
+```
+
+The node after `node` in the client's static markup: a value's place counts as one node, and so does
+what a `<slot>` received, which the server wrote in the slot's place.
 
 ## `spring`
 
