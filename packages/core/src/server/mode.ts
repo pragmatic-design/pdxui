@@ -39,7 +39,7 @@ let DeferredTemplateClass: (new (strings: TemplateStringsArray, values: readonly
 
 function requireFragment(): void {
     if (typeof DocumentFragment === 'undefined') {
-        throw new Error('renderToString needs a DOM or the server DOM: call installServerDom() (core/server/dom-shim) before importing the app\'s modules');
+        throw new Error('renderToString needs a DOM or the server DOM: call installServerDom() from @pdxui/core/server-dom before importing anything of core or the app');
     }
 }
 

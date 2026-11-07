@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 77 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 77 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -557,7 +557,7 @@ Hydrate pre-rendered components from now on, instead of rendering them over thei
 ## `installServerDom`
 
 ```ts
-import { installServerDom } from '@pdxui/core/server';
+import { installServerDom } from '@pdxui/core/server-dom';
 
 function installServerDom(): void
 ```

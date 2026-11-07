@@ -17,6 +17,8 @@ export default defineConfig({
                 'pragmatic-core': 'src/index.ts',
                 devtools: 'src/devtools/overlay.ts',
                 server: 'src/server/index.ts',
+                // Its own entry, importing nothing of core: installed before core is evaluated.
+                'server-dom': 'src/server/dom-shim.ts',
                 hydrate: 'src/hydrate/index.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one

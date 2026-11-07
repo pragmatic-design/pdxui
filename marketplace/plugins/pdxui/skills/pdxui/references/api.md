@@ -3054,7 +3054,7 @@ Hydrate pre-rendered components from now on, instead of rendering them over thei
 ### `installServerDom`
 
 ```ts
-import { installServerDom } from '@pdxui/core/server';
+import { installServerDom } from '@pdxui/core/server-dom';
 
 function installServerDom(): void
 ```
