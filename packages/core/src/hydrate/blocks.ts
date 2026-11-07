@@ -18,7 +18,9 @@ import { pushErrorHandler, popErrorHandler } from '../reactivity/signal';
 import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippet';
 import { dynamic, followDynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
+import { hydrateOn } from '../renderer/hydrate-on';
 import { withoutHydration, type Adopter } from './mode';
+import { takeOverLater } from './later';
 import { offerRange } from './compiled';
 
 /** A block's adoption: from `at` on in `parent`, before `end`; returns the node after what it took. */
@@ -133,6 +135,12 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         followSnippet(start, end, source, args, fallback, { dispose });
         return end.nextSibling;
     },
+    hydrateOn: (options, renderFn) => (a, parent, at) => {
+        const start = a.expect(at, 'hydrate');
+        const end = a.close(start, 'hydrate', '/hydrate');
+        takeOverLater(start, end, options, renderFn, (render) => a.between(render, parent, start, end));
+        return end.nextSibling;
+    },
     dynamic: (tagFn, propsFn, options) => (a, _parent, at) => {
         const start = a.expect(at, 'dynamic');
         const end = a.close(start, 'dynamic', '/dynamic');
@@ -165,6 +173,7 @@ export function builders(build: (node: Node) => Node): BlockVisitor<DocumentFrag
         portal: (contentFn, target, options) => portal(contentFn, target, options),
         snippet: (source, args, fallback) => renderSnippet(source, args, fallback),
         dynamic: (tagFn, propsFn, options) => dynamic(tagFn, propsFn, options),
+        hydrateOn: (options, renderFn) => hydrateOn(options, renderFn),
     };
 }
 

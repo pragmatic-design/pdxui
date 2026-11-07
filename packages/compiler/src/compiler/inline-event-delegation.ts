@@ -84,6 +84,7 @@ function collect(nodes: TemplateNode[]): { handlers: Handler[]; twoWay: boolean 
                     for (const b of [node.body, node.placeholder, node.loading, node.error]) if (b) walk(b, inFor, inPortal);
                     break;
                 case 'try': walk(node.body, inFor, inPortal); walk(node.catchBody, inFor, inPortal); break;
+                case 'hydrate': walk(node.body, inFor, inPortal); break;
                 case 'await':
                     for (const b of [node.body, node.loading, node.errorBody]) if (b) walk(b, inFor, inPortal);
                     break;

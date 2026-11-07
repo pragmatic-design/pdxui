@@ -5,7 +5,7 @@
 // directives, `:class`, `:style`, `:ref`, `:show`.
 
 /** The block directives and their clauses, which the parser reads where a node may start. */
-export const BLOCK_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'try', 'await',
+export const BLOCK_DIRECTIVES = ['if', 'for', 'switch', 'require', 'show', 'portal', 'defer', 'hydrate', 'try', 'await',
     'let', 'slot', 'render', 'snippet', 'raw', 'else', 'catch', 'case', 'default', 'placeholder', 'loading', 'error', 'empty'] as const;
 
 /**

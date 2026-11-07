@@ -41,6 +41,9 @@ export const serverBlocks: BlockVisitor<ServerBlock> = {
         ? renderer.render(() => item, () => i)
         : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null),
 
+    /** The content as the client mounts it: its trigger says when the client takes it over, not what it is. */
+    hydrateOn: (_options, renderFn) => serverBlock('hydrate', '/hydrate', () => [renderFn()]),
+
     /**
      * A trigger that fires at once — `immediate`, an unknown one, a `when` already true — renders the
      * body if its code needs no load or has arrived, `@loading` (or the placeholder) while it loads;

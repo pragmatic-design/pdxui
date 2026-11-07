@@ -77,6 +77,23 @@ test('after taking over, a link navigates inside the app and the layout stays', 
     expect(errors).toEqual([]);
 });
 
+test('a @hydrate part waits, and the first click on it takes it over and counts once', async ({ page }) => {
+    const errors = await watch(page);
+    await page.goto(`${site.url}/`);
+    // The page is live: the part's trigger is ten minutes away, so only the click can take it over.
+    const count = page.locator('[data-test="count"]');
+    await count.click();
+    await expect(count).toHaveText('1');
+    const later = page.locator('[data-test="later"]');
+    await expect(later).toHaveText('0');
+    await later.click();
+    await expect(later, 'the click before the part was live was lost, or counted twice').toHaveText('1');
+    await later.click();
+    await expect(later).toHaveText('2');
+    expect(await removed(page), 'elements the server wrote were removed').toEqual([]);
+    expect(errors).toEqual([]);
+});
+
 test('a page entered directly is taken over too', async ({ page }) => {
     const errors = await watch(page);
     await page.goto(`${site.url}/about`);

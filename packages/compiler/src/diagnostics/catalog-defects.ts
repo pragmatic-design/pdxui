@@ -30,6 +30,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Use one of `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `hover`, `timer(ms)`; write `immediate` to load at once.',
         example: { bad: pdx('@defer (viewprt) { <p>chart</p> }', ''), good: pdx('@defer (viewport) { <p>chart</p> }', '') },
     },
+    PDX_HYDRATE_UNKNOWN_TRIGGER: {
+        severity: 'error', category: 'defect',
+        summary: 'A `@hydrate` trigger the runtime does not know (`@hydrate (visible)`), or a `; prefetch` in one.',
+        explanation: 'On a generated page, the client takes a `@hydrate` part over when its trigger fires. A trigger it does not recognise fires at once: the part is taken over at boot, which is what the block was written to avoid. The triggers are `@defer`\'s; a `@hydrate` loads no code, so it has no prefetch phase.',
+        fix: 'Use `immediate`, `viewport`, `idle`, `idle(ms)`, `interaction`, `timer(ms)` or `when (expression)`, combined with `|`.',
+        example: { bad: pdx('@hydrate (visible) { <p>reviews</p> }', ''), good: pdx('@hydrate (viewport) { <p>reviews</p> }', '') },
+    },
     PDX_VIRTUAL_SHAPE: {
         severity: 'error', category: 'defect',
         summary: 'A `@for … @virtual` without the shape it needs: alone in a native element, with one root element per row.',

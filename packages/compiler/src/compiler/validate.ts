@@ -9,7 +9,7 @@ import { findComponentTags, selfDefinedTags } from './resolve';
 import { onlyNear } from './edit-distance';
 import { checkUndeclaredRefs } from './validate-refs';
 import { checkFormRules, checkFormFieldNames } from './form-rules';
-import { DEFER_TRIGGERS, unknownDeferTriggers, parseDeferTriggers } from './defer-triggers';
+import { DEFER_TRIGGERS, unknownDeferTriggers, unknownHydrateTriggers, parseDeferTriggers } from './defer-triggers';
 import { checkEnumValues, type EnumLookup } from './validate-enums';
 import type { TemplateNode, SourceLoc } from '../parser/template';
 import { skipNonCode, findClosing } from './tokenizer';
@@ -888,6 +888,18 @@ function checkDeferTriggers(nodes: TemplateNode[], warnings: ValidationWarning[]
                     }
                     walk(node.body); walk(node.placeholder); walk(node.loading); walk(node.error);
                     break;
+                case 'hydrate':
+                    for (const part of unknownHydrateTriggers(node.trigger)) {
+                        warnings.push({
+                            code: 'PDX_HYDRATE_UNKNOWN_TRIGGER',
+                            severity: 'error',
+                            message: `@hydrate (${node.trigger}): '${part}' is not a trigger. The runtime would take the part over at once — the opposite of putting it off.`,
+                            hint: `The triggers are @defer's: ${DEFER_TRIGGERS.join(', ')} and when (<expression>), combined with |. A @hydrate loads nothing, so it has no \`; prefetch\`.`,
+                            ...(node.loc ? { line: node.loc.line, column: node.loc.column } : {}),
+                        });
+                    }
+                    walk(node.body);
+                    break;
                 case 'if': walk(node.body); walk(node.elseBody); break;
                 case 'for': walk(node.body); walk(node.emptyBody); break;
                 case 'switch': for (const c of node.cases) walk(c.body); walk(node.defaultBody); break;
@@ -948,6 +960,7 @@ function checkRawInterpolation(nodes: TemplateNode[], warnings: ValidationWarnin
                 case 'require': walk(node.body); if (node.elseBody) walk(node.elseBody); break;
                 case 'show': walk(node.body); break;
                 case 'portal': walk(node.body); break;
+                case 'hydrate': walk(node.body); break;
                 case 'defer': walk(node.body); if (node.placeholder) walk(node.placeholder); if (node.loading) walk(node.loading); if (node.error) walk(node.error); break;
                 case 'try': walk(node.body); walk(node.catchBody); break;
                 case 'await': walk(node.body); if (node.loading) walk(node.loading); if (node.errorBody) walk(node.errorBody); break;
@@ -1029,6 +1042,11 @@ function walkNodes(
                 walkNodes(node.body, ids, loopVars);
                 break;
             case 'portal':
+                walkNodes(node.body, ids, loopVars);
+                break;
+            case 'hydrate':
+                // `when ( … )` reads the script's names, as `@defer`'s does.
+                for (const e of parseDeferTriggers(node.trigger).render.when) extractIdentifiers(e, ids);
                 walkNodes(node.body, ids, loopVars);
                 break;
             case 'defer': {

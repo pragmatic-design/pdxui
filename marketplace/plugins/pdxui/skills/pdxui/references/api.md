@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-477 value exports.
+478 value exports.
 
 ### `__adoptStyles`
 
@@ -2913,6 +2913,16 @@ function humanizeField(field: string): string
 ```
 
 Humanize a field name: 'firstName' → 'First Name', 'address.city' → 'City'.
+
+### `hydrateOn`
+
+```ts
+import { hydrateOn } from '@pdxui/core';
+
+function hydrateOn(options: HydrateOnOptions, renderFn: () => Node | DocumentFragment): DocumentFragment
+```
+
+The content `renderFn` makes, taken over when a trigger in `options` fires if the page was generated.
 
 ### `hydrationRange`
 

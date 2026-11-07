@@ -35,6 +35,27 @@ export function withoutHydration<T>(fn: () => T): T {
     }
 }
 
+let late = 0;
+
+/**
+ * True while a `@hydrate` part is taken over after the page has moved on (hydrate/later.ts): a value
+ * that changed since the server wrote it is no mismatch — its text is set to what it is now, on the
+ * node the server wrote.
+ */
+export function isLateAdoption(): boolean {
+    return late > 0;
+}
+
+/** Run `fn` as a late adoption. */
+export function withLateAdoption<T>(fn: () => T): T {
+    late++;
+    try {
+        return fn();
+    } finally {
+        late--;
+    }
+}
+
 /** What a block's adoption (hydrate/blocks.ts) is handed: the adopter's own walk. */
 export interface Adopter {
     /**

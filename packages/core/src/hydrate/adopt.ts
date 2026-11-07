@@ -17,7 +17,7 @@ import { templateTree, type TreeNode } from '../server/template-tree';
 import { isDeferredTemplate } from '../server/mode';
 import { attributeBinding, PH_EXTRACT } from '../renderer/template-plan';
 import { bindAdoptedValue, bindPlannedAttribute, html, interpolationText } from '../renderer/template';
-import { withHydration, withoutHydration, type Adopter } from './mode';
+import { withHydration, withoutHydration, isLateAdoption, type Adopter } from './mode';
 import { hydrationBlocks, builders } from './blocks';
 import { isDeferredBlock } from '../renderer/deferred-block';
 import { offerRange, partClose, isAdoptedRange } from './compiled';
@@ -261,7 +261,7 @@ function adoptHole(value: unknown, parent: Node, at: Node | null, hidden: Map<Te
     const close = partClose(open);
     if (typeof value === 'function') {
         bindAdoptedValue(value as () => unknown, (result) => adoptRange(result, parent, open, close, hidden));
-    } else {
+    } else if (!lateText(value, open, close, hidden)) {
         const rest = adoptValue(value, parent, open.nextSibling, close, hidden);
         if (rest !== close) throw new HydrationMismatch(`a value's place has markup the value does not: ${describe(rest)}`);
     }
@@ -273,13 +273,37 @@ function adoptHole(value: unknown, parent: Node, at: Node | null, hidden: Map<Te
 
 /** The first result of a reactive value, adopted between its markers: the nodes that stand there. */
 function adoptRange(result: unknown, parent: Node, open: Comment, close: Comment, hidden: Map<Text, Comment> | null): Node[] {
-    const rest = adoptValue(result, parent, open.nextSibling, close, hidden);
-    if (rest !== close) throw new HydrationMismatch(`a value's place has markup the value does not: ${describe(rest)}`);
+    if (!lateText(result, open, close, hidden)) {
+        const rest = adoptValue(result, parent, open.nextSibling, close, hidden);
+        if (rest !== close) throw new HydrationMismatch(`a value's place has markup the value does not: ${describe(rest)}`);
+    }
     const nodes: Node[] = [];
     for (let n = open.nextSibling; n && n !== close; n = n.nextSibling) nodes.push(n);
     return nodes;
 }
 
+
+/**
+ * In a late adoption (a `@hydrate` part, hydrate/later.ts), a value written as text that is not the
+ * text it has now: the server's text node takes the value's text, and is kept. True when it did. Not
+ * for a value that is markup — a template, a block, a node — whose difference is a mismatch still.
+ */
+function lateText(value: unknown, open: Comment, close: Comment, hidden: Map<Text, Comment> | null): boolean {
+    if (!isLateAdoption() || hidden || value instanceof Node || Array.isArray(value)
+        || isDeferredTemplate(value) || isDeferredBlock(value) || isAdoptedRange(value)) return false;
+    const text = interpolationText(value);
+    const at = open.nextSibling;
+    if (at instanceof Text && at.nextSibling === close) {
+        if (at.data !== text) at.data = text;
+        return true;
+    }
+    // The server wrote no text — the value was empty — and it has some now.
+    if (at === close) {
+        open.parentNode?.insertBefore(document.createTextNode(text), close);
+        return true;
+    }
+    return false;
+}
 
 /** The comment that closes a block opened by `start`, past blocks of the same kind nested in it. */
 function blockClose(start: Comment, open: string, close: string): Comment {

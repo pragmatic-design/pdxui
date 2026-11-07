@@ -315,6 +315,11 @@ export function projectTemplate(
                     if (node.error) { emit('{ const ' + (node.errorVar || 'err') + ': unknown = 0; const ' + (node.retryVar || 'retry') + ' = (): void => {};\n'); walk(node.error); emit('}\n'); }
                     break;
                 }
+                case 'hydrate':
+                    // `when ( … )` is an expression of the script's names, as `@defer`'s.
+                    for (const e of parseDeferTriggers(node.trigger).render.when) { emit('if ('); verbatim(e.trim()); emit(') {}\n'); }
+                    walk(node.body);
+                    break;
                 case 'require': case 'portal':
                     walk(node.body ?? []);
                     if ('elseBody' in node && node.elseBody) walk(node.elseBody);

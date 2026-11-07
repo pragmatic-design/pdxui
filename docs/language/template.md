@@ -1475,6 +1475,73 @@ let tab = $signal('overview');
 
 alpha; `; prefetch`, `when (…)` and `@error (err, retry)`, beta (#281)
 
+### `@hydrate`
+
+#### Syntax
+
+```ebnf
+HydrateBlock   ::= "@hydrate" S? "(" Triggers ")" Block
+```
+
+`Triggers` is `@defer`'s, without `; prefetch`.
+
+#### Semantics
+
+`hydrateOn({ trigger, when }, () => …)`. On a page that static generation wrote (`pdx build --ssg`), the
+client takes the block's content over when a trigger fires, instead of at boot (#160). Until then the
+server's markup stands as it was written, with no binding and no handler: it is readable, and it does
+not move. When the trigger fires, the content is taken over like any block's, with every element the
+server wrote kept. A value that changed in the meantime is shown with its current value, on the server's
+own text node.
+
+The triggers are `@defer`'s, read by the same runtime: `idle` (`idle(ms)`), `timer(ms)`, `immediate` and
+`when (expr)`. Two of them watch the block's content itself. `viewport` fires when one of the
+content's elements comes within 100px of the viewport; `interaction` fires when the pointer comes over
+the content or the focus goes into it.
+
+The first `click`, `submit`, `input`, `change` or `keydown` on the content does not wait for the
+trigger. It takes the content over at once and is dispatched again on the same element, once the
+handlers are there:
+
+- a `click` or a `submit` is held until then, so its default runs with the replay: a link still
+  navigates, a button still submits;
+- typing is not held: the field already has its value, and the replayed `input` hands it to the
+  binding.
+
+Mounted, with no generated markup, the block changes nothing: the content renders at once, between
+the two markers the server writes too.
+
+#### Rules
+
+- A trigger the runtime does not know, an empty `when ()`, or a `; prefetch` is
+  `PDX_HYDRATE_UNKNOWN_TRIGGER`, an error. A `@hydrate` loads no code, so it has no prefetch phase.
+- A markup that is not what the content renders, or a content that throws, is rendered afresh in its
+  place, which shows a real error again.
+- Removed before its trigger fires — an `@if` around it, the component destroyed — the block stops
+  watching, and nothing is taken over.
+
+#### Examples
+
+```pdx
+<template>
+  <h1>{{ title }}</h1>
+  @hydrate (viewport) {
+    <section class="reviews">
+      <button @click="more = !more">Show all reviews</button>
+    </section>
+  }
+</template>
+
+<script>
+let title = $signal('Product');
+let more = $signal(false);
+</script>
+```
+
+#### Since
+
+beta (#160)
+
 ### `@await`, `@loading`, `@error`
 
 #### Syntax

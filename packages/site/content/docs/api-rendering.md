@@ -7,7 +7,7 @@ parent: api
 
 # Rendering API
 
-Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 77 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
+Templates, lists, conditional and deferred blocks, error boundaries, portals, transitions, keyframes, springs, tweens, the virtualizer, rendering to a string for static generation, and what a .pdx compiled to hydrate calls. 78 exports, from `@pdxui/core` and `@pdxui/core/hydrate` and `@pdxui/core/server-dom` and `@pdxui/core/server`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -508,6 +508,16 @@ function html(strings: TemplateStringsArray, ...values: TemplateValue[]): Docume
 Tagged template literal that produces reactive DOM. It needs a DOM: where there is none it throws,
 naming the call, instead of returning something that is not a fragment. Module evaluation never
 calls it, so a module that uses it still imports.
+
+## `hydrateOn`
+
+```ts
+import { hydrateOn } from '@pdxui/core';
+
+function hydrateOn(options: HydrateOnOptions, renderFn: () => Node | DocumentFragment): DocumentFragment
+```
+
+The content `renderFn` makes, taken over when a trigger in `options` fires if the page was generated.
 
 ## `hydrationRange`
 

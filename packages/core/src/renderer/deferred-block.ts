@@ -12,6 +12,7 @@ import type { DeferOptions } from './defer';
 import type { AwaitTiming } from './await';
 import type { ErrorBoundaryOptions } from './error-boundary';
 import type { DynamicOptions } from './dynamic';
+import type { HydrateOnOptions } from './hydrate-on';
 
 type Content = Node | DocumentFragment;
 
@@ -29,6 +30,7 @@ export interface BlockVisitor<R> {
     portal(contentFn: () => Content, target: string | Element, options: PortalOptions | undefined): R;
     snippet(source: () => unknown, args: () => readonly unknown[], fallback: (() => Node | null) | null | undefined): R;
     dynamic(tagFn: () => string, propsFn: (() => Record<string, unknown>) | null | undefined, options: DynamicOptions | undefined): R;
+    hydrateOn(options: HydrateOnOptions, renderFn: () => Content): R;
 }
 
 /** A helper's block not built: a DocumentFragment, as the helpers return, holding its call. */
