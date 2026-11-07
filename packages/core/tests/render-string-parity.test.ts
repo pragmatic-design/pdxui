@@ -10,6 +10,8 @@ import { describe, it, expect } from 'vitest';
 import { html } from '../src/renderer/template';
 import { renderToString, PART_OPEN, PART_CLOSE } from '../src/server/render-string';
 import { signal } from '../src/reactivity/signal';
+import { component } from '../src/component/component';
+import { prop } from '../src/component/component-descriptor';
 
 /** A node as a canonical string: what both renders must agree on. */
 function canonical(node: Node): string {
@@ -148,6 +150,61 @@ describe('html`` to a string matches the client', () => {
 
     it('a component prop writes no attribute, as the client assigns it as a property', () => {
         parity(() => html`<x-card :items=${[1, 2]} :label=${'L'}></x-card>`);
+    });
+});
+
+describe('a component to a string matches the client\'s mount', () => {
+    /** The client mounts `render()` into the page; the server renders it. Hosts compared without the server's mark. */
+    function mountParity(render: () => DocumentFragment): string {
+        const page = document.createElement('div');
+        document.body.appendChild(page);
+        page.appendChild(render());
+        const a = document.createElement('div');
+        a.innerHTML = page.innerHTML;
+        page.remove();
+        const markup = renderToString(render);
+        const b = document.createElement('div');
+        b.innerHTML = markup;
+        for (const el of Array.from(b.querySelectorAll('[data-pdx-ssr]'))) el.removeAttribute('data-pdx-ssr');
+        expect(children(b), `markup: ${markup}`).toBe(children(a));
+        return markup;
+    }
+
+    it('props from attributes, setup, its template, a host binding and a variant axis', () => {
+        component('parity-card', {
+            props: { label: prop('none'), count: prop(0, { type: Number }) },
+            variants: { size: ['md', 'lg'] },
+            host: { role: 'group', ':aria-label': (c: { label: () => string }) => c.label() },
+            setup: (ctx) => ({ double: () => ctx.count() * 2 }),
+            render: (ctx) => html`<div class="card"><h2>${ctx.label}</h2><span>${() => ctx.double()}</span></div>`,
+        });
+        const markup = mountParity(() => html`<parity-card label="Hi" count="3" size="lg"></parity-card>`);
+        // Rendered, not two empty hosts that agree.
+        expect(markup).toContain('data-pdx-ssr');
+        expect(markup).toMatch(/<h2><!--pdx-->Hi<!--\/pdx--><\/h2>/);
+        expect(markup).toMatch(/<span><!--pdx-->6<!--\/pdx--><\/span>/);
+        expect(markup).toMatch(/role="group"/);
+        expect(markup).toMatch(/aria-label="Hi"/);
+    });
+
+    it('a default and a named slot, and a slot left with its own content', () => {
+        component('parity-panel', {
+            render: () => html`<header><slot name="title">Untitled</slot></header><main><slot></slot></main><footer><slot name="foot">none</slot></footer>`,
+        });
+        const markup = mountParity(() => html`<parity-panel><b slot="title">T</b><p>body</p></parity-panel>`);
+        expect(markup).toContain('<header><b slot="title">T</b></header>');
+        expect(markup).toContain('<main><p>body</p></main>');
+        expect(markup).toContain('<footer><slot name="foot">none</slot></footer>');
+    });
+
+    it('a component inside a component, with a value through the parent\'s template', () => {
+        component('parity-inner', { props: { text: prop('') }, render: (ctx) => html`<i>${ctx.text}</i>` });
+        component('parity-outer', {
+            props: { msg: prop('m') },
+            render: (ctx) => html`<section><parity-inner :text=${ctx.msg}></parity-inner><slot></slot></section>`,
+        });
+        const markup = mountParity(() => html`<parity-outer msg="hello">x</parity-outer>`);
+        expect(markup).toMatch(/<parity-inner[^>]*><i><!--pdx-->hello<!--\/pdx--><\/i><\/parity-inner>/);
     });
 });
 
