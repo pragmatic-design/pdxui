@@ -38,8 +38,6 @@ export function dynamic(
     propsFn?: (() => Record<string, unknown>) | null,
     options?: DynamicOptions
 ): DocumentFragment {
-    // On the server (#160): the element of the tag there is now, with the props applyProps gives it —
-    // a primitive as an attribute, anything else as a property.
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.dynamic(tagFn, propsFn, options));
     const frag = document.createDocumentFragment();
@@ -47,12 +45,30 @@ export function dynamic(
     const end = document.createComment('/dynamic');
     frag.appendChild(start);
     frag.appendChild(end);
+    followDynamic(end, tagFn, propsFn, options, null);
+    return frag;
+}
 
-    let currentEl: Element | null = null;
-    let currentTag = '';
+/**
+ * The element of the tag `tagFn()` names, before `end`, created and replaced as it changes.
+ * `adopted`: hydrating (#160), the element the server wrote for it, which the block keeps.
+ */
+export function followDynamic(
+    end: Comment,
+    tagFn: () => string,
+    propsFn: (() => Record<string, unknown>) | null | undefined,
+    options: DynamicOptions | undefined,
+    adopted: Element | null,
+): void {
+    let currentEl: Element | null = adopted;
+    let currentTag = adopted?.localName ?? '';
 
     const cache = options?.keepAlive ? new Map<string, Element>() : null;
     const cacheOrder: string[] = [];
+    if (cache && adopted) {
+        cache.set(currentTag, adopted);
+        cacheOrder.push(currentTag);
+    }
     const maxAlive = options?.maxAlive ?? 10;
 
     function removeCurrentElement(parent: Node): Promise<void> {
@@ -188,8 +204,6 @@ export function dynamic(
             cache.clear();
         });
     }
-
-    return frag;
 }
 
 /** An element the keep-alive freezes: a component reads the flag in its disconnect. */

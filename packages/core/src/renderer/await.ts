@@ -144,7 +144,25 @@ export function awaitBlock<T = unknown>(
     const end = document.createComment('/await');
     frag.appendChild(start);
     frag.appendChild(end);
+    followAwait(start, end, source, thenFn, loadingFn, errorFn, options, null);
+    return frag;
+}
 
+/**
+ * The `@await` block between `start` and `end`. `adopt`: hydrating (#160), how the first branch takes
+ * over what the server wrote for it — the branch the source gives now, as the server picked it.
+ */
+export function followAwait<T>(
+    start: Comment,
+    end: Comment,
+    source: () => unknown,
+    thenFn: (value: () => T) => Node | DocumentFragment,
+    loadingFn: (() => Node | DocumentFragment | null) | null,
+    errorFn: ((error: unknown, retry: () => void) => Node | DocumentFragment) | null,
+    options: AwaitTiming,
+    adopt: ((render: () => unknown) => void) | null,
+): void {
+    let adopting = adopt;
     const minMs = options.minMs ?? 0;
     const maxMs = options.maxMs ?? 0;
 
@@ -229,6 +247,13 @@ export function awaitBlock<T = unknown>(
         untracked(() => {
             childDispose?.();
             childDispose = null;
+            // Hydrating: the first branch takes over what the server wrote for it.
+            if (adopting) {
+                const take = adopting;
+                adopting = null;
+                childDispose = collectDisposers(() => take(() => make(branch)))[1];
+                return;
+            }
             for (const n of nodesBetween(start, end)) parent.removeChild(n);
             const [content, dispose] = collectDisposers(() => make(branch));
             childDispose = dispose;
@@ -239,8 +264,6 @@ export function awaitBlock<T = unknown>(
     });
 
     onDispose(() => { clearTimers(); childDispose?.(); childDispose = null; });
-
-    return frag;
 }
 
 /**

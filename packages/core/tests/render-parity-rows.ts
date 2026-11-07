@@ -208,7 +208,7 @@ export const ROWS: Row[] = [
     { name: '@await', hydrateDiffers: 'the promise resolves after hydrating: the @loading the server wrote gives way to the body', serverDiffers: 'the server writes @loading, the promise not resolved yet', expected: '<p>ready</p>', template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }', script: "let data = $signal(Promise.resolve('done'));" },
     // Two phases (#281): the render waits for `when ( … )`, whatever the prefetch phase does.
     {
-        name: '@defer (when (…); prefetch idle), after the condition turns true', hydrateDiffers: 'built in its place, not adopted yet (#160, part 4c)', expected: '<p>in</p><button>go</button>',
+        name: '@defer (when (…); prefetch idle), after the condition turns true', expected: '<p>in</p><button>go</button>',
         template: '@defer (when (on); prefetch idle) { <p>in</p> } @placeholder { <p>wait</p> }<button @click="on = true">go</button>',
         script: 'let on = $signal(false);', act: click('button'),
     },
@@ -231,7 +231,7 @@ export const ROWS: Row[] = [
         },
         read: (h) => (h.querySelector('x-probe') as unknown as { value: unknown }).value,
     },
-    { name: '@try / @catch', hydrateDiffers: 'built in its place, not adopted yet (#160, part 4c)', expected: '<p>caught</p>', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
+    { name: '@try / @catch', expected: '<p>caught</p>', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
     // Both paths pass the transition options to when()/each() since #85: the enter classes match.
     { name: '@if with @transition', hydrateDiffers: 'the element the server wrote stays where it is: it does not enter', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<p class="pdx-enter-active pdx-fade">x</p>', template: "@if (on) @transition('fade') { <p>x</p> }", script: 'let on = $signal(true);' },
     { name: '@for with @transition', hydrateDiffers: 'the element the server wrote stays where it is: it does not enter', serverDiffers: 'the client starts an enter transition at mount; the server writes the element as it stays', expected: '<ul><li class="pdx-enter-active pdx-fade">a</li></ul>', template: "<ul>@for (items as it; track it) @transition('fade') { <li>{{ it }}</li> }</ul>", script: "let items = $signal(['a']);" },

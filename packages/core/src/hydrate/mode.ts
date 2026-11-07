@@ -50,10 +50,11 @@ export interface Adopter {
     /** Stop the hydration: the markup is not what the render says. */
     fail(what: string): never;
     /**
-     * Adopt a block's content between its markers `start` and `end`, all of what lies there: `render`
-     * makes it, and a compiled block it calls takes over that range itself.
+     * Adopt a block's content between `start` — its marker, or a node the block keeps before it — and
+     * `end`, all of what lies there: `render` makes it, and a compiled block it calls takes over that
+     * range itself.
      */
-    between(render: () => unknown, parent: Node, start: Comment, end: Comment): void;
+    between(render: () => unknown, parent: Node, start: Node, end: Comment): void;
     /** `node` as the client builds it, out of a hydration: a template, with the values it holds, or a block. */
     build(node: Node): Node;
 }

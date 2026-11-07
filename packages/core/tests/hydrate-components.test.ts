@@ -17,6 +17,7 @@ import { signal } from '../src/reactivity/signal';
 import { component } from '../src/component/component';
 import { prop } from '../src/component/component-descriptor';
 import { children } from './string-parity';
+import { dynamic } from '../src/renderer/dynamic';
 
 beforeAll(() => {
     installHydration();
@@ -106,6 +107,16 @@ describe('hydrating a component', () => {
         const { page: p, written } = hydrated(() => html`<hy-outer msg="hello">x</hy-outer>`);
         adoptedAll(p, written);
         expect(p.querySelector('hy-inner i')!.textContent).toBe('hello');
+    });
+
+    it('<component :is>: the element the server wrote is kept, and swapped when the tag changes', () => {
+        const tag = signal('hy-inner');
+        const { page: p, written } = hydrated(() => html`<section>${dynamic(() => tag(), () => ({ text: 'hi' }))}</section>`);
+        adoptedAll(p, written);
+        expect(p.querySelector('hy-inner i')!.textContent).toBe('hi');
+        tag.set('hy-card');
+        expect(p.querySelector('hy-inner')).toBeNull();
+        expect(p.querySelector('hy-card')).not.toBeNull();
     });
 
     it('markup that is not its render: rendered afresh, keeping the children its parent gave it', () => {

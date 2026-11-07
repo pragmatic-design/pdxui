@@ -78,8 +78,6 @@ export function errorBoundary(
     fallbackFn: (error: Error, retry: () => void) => Node | DocumentFragment,
     options?: ErrorBoundaryOptions,
 ): DocumentFragment {
-    // On the server (#160): the content, or — when rendering it throws — the fallback with the error.
-    // A retry has nothing to do there.
     // Rendered to a string or hydrating (#160): the call, for the code that writes the block.
     if (isDeferring()) return deferredBlock((v) => v.boundary(contentFn, fallbackFn, options));
     const frag = document.createDocumentFragment();
@@ -87,6 +85,45 @@ export function errorBoundary(
     const end = document.createComment('/error-boundary');
     frag.appendChild(start);
     frag.appendChild(end);
+    followBoundary(start, end, contentFn, fallbackFn, options, null);
+    return frag;
+}
+
+/**
+ * What a hydration hands a boundary the server rendered (#160): how to take over what is between its
+ * markers, and the error when the server rendered its fallback.
+ */
+export interface BoundaryAdoption {
+    /** Adopt what `render` makes over the markup between the markers (hydrate/adopt.ts). */
+    adopt(render: () => unknown): void;
+    /** The error the content throws, when the server rendered the fallback; null for the content. */
+    caught: Error | null;
+}
+
+/**
+ * The boundary between `start` and `end`: its content, or its fallback once the content throws.
+ * `adoption`: the branch the server rendered, taken over instead of rendered by the first render.
+ */
+export function followBoundary(
+    start: Comment,
+    end: Comment,
+    contentFn: () => Node | DocumentFragment,
+    fallbackFn: (error: Error, retry: () => void) => Node | DocumentFragment,
+    options: ErrorBoundaryOptions | undefined,
+    adoption: BoundaryAdoption | null,
+): void {
+    // The branch the server rendered, taken over by the first render instead of inserted.
+    let adopting = adoption;
+    /** The render's result in place: adopted the first time while hydrating, inserted otherwise. */
+    function take(render: () => Node | DocumentFragment): void {
+        if (adopting) {
+            const a = adopting;
+            adopting = null;
+            a.adopt(render);
+            return;
+        }
+        insertNodes(render());
+    }
 
     // Disposer for the effects created inside the currently-rendered content — disposed on
     // every re-render and on teardown so retries don't leak effects and unmount is clean.
@@ -142,7 +179,7 @@ export function errorBoundary(
         resetWatch = null;
         childDispose?.();  // dispose the previous render's effects
         childDispose = null;
-        clearContent();
+        if (!adopting) clearContent();
         showingFallback = false;
 
         let caught: Error | null = null;
@@ -155,9 +192,8 @@ export function errorBoundary(
 
         pushErrorHandler(errorHandler);
         try {
-            const [content, dispose] = collectDisposers(() => contentFn());
+            const [, dispose] = collectDisposers(() => take(contentFn));
             childDispose = dispose;
-            insertNodes(content);
             retryCount = 0; // Reset on success
         } catch (err) {
             caught = err instanceof Error ? err : new Error(String(err));
@@ -188,12 +224,11 @@ export function errorBoundary(
         // stayed subscribed to its promise and re-ran on nodes nobody could see.
         childDispose?.();
         childDispose = null;
-        clearContent();
+        if (!adopting) clearContent();
         showingFallback = true;
         const canRetry = retryCount < maxRetries;
         try {
-            const fallback = fallbackFn(error, canRetry ? retry : () => {});
-            insertNodes(fallback);
+            take(() => fallbackFn(error, canRetry ? retry : () => {}));
         } catch {
             const msg = document.createTextNode(`Error: ${error.message}`);
             const parent = end.parentNode;
@@ -225,8 +260,12 @@ export function errorBoundary(
         renderContent();
     }
 
-    renderContent();
+    // The server rendered the fallback: the content threw there, as it does here, and is handled so.
+    if (adoption?.caught) {
+        handleError(adoption.caught);
+    } else {
+        renderContent();
+    }
     // Teardown: dispose the current content's effects when the enclosing scope is removed.
     onDispose(() => { childDispose?.(); childDispose = null; resetWatch?.(); resetWatch = null; });
-    return frag;
 }
