@@ -1,7 +1,7 @@
-// A part taken over later (#160, part 4d): `@hydrate (trigger) { … }` on a generated page. Until its
-// trigger fires, the server's markup stands as it was written — no binding, no handler. Then it is
-// adopted as any block's content is, in the scope of the component that holds it, so it is disposed
-// with it.
+// A part taken over later (#160, part 4d): `@hydrate (trigger) { … }` in a template, and `@hydrate
+// trigger;` in a script, for the component's whole host (hydrate/host.ts). Until its trigger fires,
+// the server's markup stands as it was written — no binding, no handler. Then it is adopted as any
+// block's content is, in the scope of the component that holds it, so it is disposed with it.
 //
 // The triggers are `@defer`'s, read by `@defer`'s own code — but `viewport` watches the part's own
 // elements, not a sentinel: the markup here is the content, and a span put in it would be one more
@@ -13,7 +13,7 @@
 // button still submits, through the handlers the part now has. Typing is not held: the field has its
 // value, and the replayed `input` hands it to the binding.
 
-import { collectDisposers, currentScope, onDispose, runInScope } from '../reactivity/signal';
+import { collectDisposers, currentScope, onDispose, runInScope, type OwnerScope } from '../reactivity/signal';
 import { activateTrigger, activateWhen } from '../renderer/defer';
 import type { HydrateOnOptions } from '../renderer/hydrate-on';
 import { DEV } from '../utils/env';
@@ -25,6 +25,65 @@ const REPLAYED = ['click', 'submit', 'input', 'change', 'keydown'] as const;
 const HELD: ReadonlySet<string> = new Set(['click', 'submit']);
 /** What `interaction` means here: the pointer over the part, the focus in it. */
 const INTERACTION = ['pointerover', 'focusin'] as const;
+
+/** A part waiting for its trigger: where its events are heard, which of them are its, what shows it. */
+export interface WaitingPart {
+    /** The element whose descendants the part's events reach. */
+    readonly listener: Element;
+    /** Whether an event's target is in the part. */
+    inPart(target: EventTarget | null): boolean;
+    /** The elements `viewport` watches. */
+    elements(): Element[];
+}
+
+/**
+ * Wait for a trigger in `options`, or for the first event on `part`: `fire` runs once, with that
+ * event or null. Returns what stops the wait. A trigger that fires at once (`immediate`, an unknown
+ * one) fires before this returns.
+ */
+export function waitForTrigger(
+    part: WaitingPart,
+    options: HydrateOnOptions,
+    scope: OwnerScope | null,
+    fire: (first: Event | null) => void,
+): () => void {
+    const disarm: (() => void)[] = [];
+    let done = false;
+    const stop = (): void => {
+        done = true;
+        for (const off of disarm.splice(0)) off();
+    };
+    const fireOnce = (first: Event | null): void => {
+        if (done) return;
+        stop();
+        fire(first);
+    };
+
+    const onEvent = (e: Event): void => {
+        if (done || !part.inPart(e.target)) return;
+        if (HELD.has(e.type)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+        fireOnce(e);
+    };
+    for (const type of REPLAYED) {
+        part.listener.addEventListener(type, onEvent, true);
+        disarm.push(() => part.listener.removeEventListener(type, onEvent, true));
+    }
+
+    for (const trigger of (options.trigger ?? '').split('|').map((t) => t.trim()).filter(Boolean)) {
+        if (done) break;
+        if (trigger === 'viewport') disarm.push(watchViewport(part, () => fireOnce(null)));
+        else if (trigger === 'interaction') disarm.push(watchInteraction(part, () => fireOnce(null)));
+        else {
+            const off = activateTrigger(trigger, part.listener, part.listener.lastChild ?? part.listener, scope, () => fireOnce(null));
+            if (off) disarm.push(off);
+        }
+    }
+    if (options.when && !done) disarm.push(activateWhen(options.when, () => fireOnce(null)));
+    return stop;
+}
 
 /**
  * Take over the content between `start` and `end` when a trigger in `options` fires, or at the first
@@ -40,9 +99,6 @@ export function takeOverLater(
 ): void {
     const parent = end.parentNode;
     const scope = currentScope();
-    const disarm: (() => void)[] = [];
-    let done = false;
-    let first: Event | null = null;
 
     const takeOver = (): void => {
         const [adopted, dispose] = collectDisposers(() => {
@@ -62,84 +118,55 @@ export function takeOverLater(
         for (let n = start.nextSibling; n && n !== end; n = start.nextSibling) n.parentNode?.removeChild(n);
         withoutHydration(() => end.parentNode?.insertBefore(renderFn(), end));
     };
-
-    const fire = (): void => {
-        if (done) return;
-        done = true;
-        for (const off of disarm.splice(0)) off();
+    const fire = (first: Event | null): void => {
         if (scope) runInScope(scope, takeOver);
         else takeOver();
         if (first) replay(first);
     };
 
-    // Taken from the page with the component before it fired: nothing waits for it any more.
-    onDispose(() => {
-        done = true;
-        for (const off of disarm.splice(0)) off();
-    });
-
+    // Not in an element (a fragment the page never placed): nothing to watch, nothing to put off.
     if (!(parent instanceof Element)) {
-        // Not in an element (a fragment the page never placed): nothing to watch, nothing to put off.
-        fire();
+        fire(null);
         return;
     }
-
-    const inPart = (target: EventTarget | null): boolean => {
-        if (!(target instanceof Node)) return false;
-        let top: Node | null = target;
-        while (top && top.parentNode !== parent) top = top.parentNode;
-        for (let n = start.nextSibling; n && n !== end; n = n.nextSibling) if (n === top) return true;
-        return false;
+    const nodes = (): Node[] => {
+        const list: Node[] = [];
+        for (let n = start.nextSibling; n && n !== end; n = n.nextSibling) list.push(n);
+        return list;
     };
-
-    const onEvent = (e: Event): void => {
-        if (done || !inPart(e.target)) return;
-        if (HELD.has(e.type)) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-        }
-        first = e;
-        fire();
-    };
-    for (const type of REPLAYED) {
-        parent.addEventListener(type, onEvent, true);
-        disarm.push(() => parent.removeEventListener(type, onEvent, true));
-    }
-
-    for (const trigger of (options.trigger ?? '').split('|').map((t) => t.trim()).filter(Boolean)) {
-        if (done) return;
-        if (trigger === 'viewport') disarm.push(watchViewport(start, end, parent, fire));
-        else if (trigger === 'interaction') disarm.push(watchInteraction(parent, inPart, fire));
-        else {
-            const off = activateTrigger(trigger, parent, end, scope, fire);
-            if (off) disarm.push(off);
-        }
-    }
-    if (options.when && !done) disarm.push(activateWhen(options.when, fire));
+    const stop = waitForTrigger({
+        listener: parent,
+        inPart: (target) => {
+            if (!(target instanceof Node)) return false;
+            let top: Node | null = target;
+            while (top && top.parentNode !== parent) top = top.parentNode;
+            return top !== null && nodes().includes(top);
+        },
+        elements: () => nodes().filter((n): n is Element => n instanceof Element),
+    }, options, scope, fire);
+    // Taken from the page with the component before it fired: nothing waits for it any more.
+    onDispose(stop);
 }
 
-/** Fire when any element of the part comes near the viewport; the part's container when it has none. */
-function watchViewport(start: Comment, end: Comment, parent: Element, fire: () => void): () => void {
+/** Fire when any element of the part comes near the viewport; the listener when it has none. */
+function watchViewport(part: WaitingPart, fire: () => void): () => void {
     const observer = new IntersectionObserver((entries) => {
         if (entries.some((e) => e.isIntersecting)) fire();
     }, { rootMargin: '100px' });
-    let watched = 0;
-    for (let n = start.nextSibling; n && n !== end; n = n.nextSibling) {
-        if (n instanceof Element) { observer.observe(n); watched++; }
-    }
-    if (watched === 0) observer.observe(parent);
+    const elements = part.elements();
+    for (const el of elements.length > 0 ? elements : [part.listener]) observer.observe(el);
     return () => observer.disconnect();
 }
 
 /** Fire when the pointer comes over the part or the focus goes into it. */
-function watchInteraction(parent: Element, inPart: (target: EventTarget | null) => boolean, fire: () => void): () => void {
-    const onEvent = (e: Event): void => { if (inPart(e.target)) fire(); };
-    for (const type of INTERACTION) parent.addEventListener(type, onEvent, true);
-    return () => { for (const type of INTERACTION) parent.removeEventListener(type, onEvent, true); };
+function watchInteraction(part: WaitingPart, fire: () => void): () => void {
+    const onEvent = (e: Event): void => { if (part.inPart(e.target)) fire(); };
+    for (const type of INTERACTION) part.listener.addEventListener(type, onEvent, true);
+    return () => { for (const type of INTERACTION) part.listener.removeEventListener(type, onEvent, true); };
 }
 
 /** The first event again, on the element it happened on, now that the part has its handlers. */
-function replay(e: Event): void {
+export function replay(e: Event): void {
     const target = e.target;
     // Rendered afresh, the element is gone: the event had no part left to reach.
     if (!(target instanceof Element) || !target.isConnected) return;

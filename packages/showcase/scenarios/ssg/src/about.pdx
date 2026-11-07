@@ -1,8 +1,11 @@
 <template>
   <h1 data-test="title">About us</h1>
+  <button data-test="about-count" @click="visits++">{{ visits }}</button>
 </template>
 
 <script>
 @page '/about';
 @layout 'shell';
+@hydrate timer(600000);
+let visits = $signal(0);
 </script>

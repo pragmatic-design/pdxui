@@ -29,6 +29,7 @@ import { destructuredNames } from './destructured-names';
 import { RUNE_CALL, readDeclarators } from './rune-declarations';
 import { misplacedRunes } from './validate-rune-position';
 import { DECORATOR_RUNES } from './runes';
+import { DEFER_TRIGGERS, parseDeferTriggers, unknownHydrateTriggers } from './defer-triggers';
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, compileDevAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
@@ -193,6 +194,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     const forms: FormDecl[] = [];
     const exposes: string[] = [];
     const states: StateDecl[] = [];
+    let hydrate: string | undefined;
     let host: HostAttr[] | undefined;
     let hostName: string | undefined;
     const variants: VariantAxis[] = [];
@@ -775,6 +777,27 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             continue;
         }
 
+        // ─── @hydrate trigger; — a generated host taken over when the trigger fires (#160, part 4d) ───
+        // Match: @hydrate viewport | idle(2000);
+        // Groups: [1]=the triggers
+        const hydrateMatch = trimmed.match(/^@hydrate\s+([^;]+?)\s*;?\s*$/);
+        if (hydrateMatch) {
+            const triggers = hydrateMatch[1];
+            // `when (…)` reads the script's names, and the script has not run before the host is taken over.
+            const unknown = [...unknownHydrateTriggers(triggers), ...parseDeferTriggers(triggers).render.when.map((e) => `when (${e})`)];
+            if (unknown.length > 0) {
+                warnings.push({
+                    code: 'PDX_HYDRATE_UNKNOWN_TRIGGER',
+                    severity: 'error' as const,
+                    message: `@hydrate ${triggers}: ${unknown.map((u) => `'${u}'`).join(', ')} ${unknown.length > 1 ? 'are' : 'is'} not a trigger here. The runtime would take the component over at once — the opposite of putting it off.`,
+                    hint: `The triggers are @defer's: ${DEFER_TRIGGERS.join(', ')}, combined with |. In a script there is no when (…): it would read the script, which runs only once the component is taken over.`,
+                });
+            } else {
+                hydrate = triggers.trim();
+            }
+            continue;
+        }
+
         // ─── @state name = expression; — a visual state of the host (#132) ───
         // Match: @state expanded = open;
         // Groups: [1]=name [2]=expression
@@ -1350,6 +1373,7 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         forms,
         exposes,
         states,
+        ...(hydrate ? { hydrate } : {}),
         ...(host ? { host } : {}),
         ...(hostName ? { hostName } : {}),
         ...(variants.length ? { variants } : {}),
