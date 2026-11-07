@@ -326,6 +326,9 @@ export function portal(
     target: string | Element,
     options?: PortalOptions,
 ): DocumentFragment {
+    // On the server (#160): the marker it leaves in place. The content goes to another part of the
+    // document, which the server does not render: the client puts it there when it mounts.
+    if (isServerRender()) return serverBlock('portal', null, () => []);
     const frag = document.createDocumentFragment();
     const marker = document.createComment('portal');
     frag.appendChild(marker);

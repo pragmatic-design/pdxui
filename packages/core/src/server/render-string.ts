@@ -18,8 +18,8 @@ import { untracked, collectDisposers } from '../reactivity/signal';
 import { sanitizeUrlForTag } from '../security/sanitize-url';
 import { twoWayAccessor } from '../renderer/two-way-value';
 import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
-import { templateTree, type TreeNode, type TreeAttribute } from './template-tree';
-import { withServerRender, isServerFragment, isServerBlock, type ServerFragment, type ServerBlock, type BlockMark } from './mode';
+import { templateTree, VOID_ELEMENTS, type TreeNode, type TreeAttribute } from './template-tree';
+import { withServerRender, isServerFragment, isServerBlock, isServerElement, type ServerFragment, type ServerBlock, type ServerElement, type BlockMark } from './mode';
 import { renderHost, type SkippedComponent } from './render-component';
 
 export type { SkippedComponent } from './render-component';
@@ -62,6 +62,7 @@ function content(value: unknown, slots: Projection | null, mark: BlockMark | nul
     if (typeof value === 'function') return content(untracked(value as () => unknown), slots, mark);
     if (isServerFragment(value)) return renderTemplate(value, slots, mark);
     if (isServerBlock(value)) return renderBlock(value, slots, mark);
+    if (isServerElement(value)) return createdElement(value, mark);
     if (Array.isArray(value)) return value.map((v) => content(v, slots, mark)).join('');
     if (value == null || value === false) return '';
     if (typeof value === 'object') return '';
@@ -83,9 +84,51 @@ function renderTemplate(t: ServerFragment, slots: Projection | null, mark: Block
  */
 function renderBlock(b: ServerBlock, slots: Projection | null, outer: BlockMark | null): string {
     const mark = b.mark && outer ? { item: b.mark.item || outer.item, hidden: b.mark.hidden || outer.hidden } : (b.mark ?? outer);
-    const [inner, dispose] = collectDisposers(() => untracked(() => b.parts().map((part) => content(part, slots, mark)).join('')));
-    dispose();
+    const render = (parts: () => readonly unknown[]): string => {
+        const [inner, dispose] = collectDisposers(() => untracked(() => parts().map((part) => content(part, slots, mark)).join('')));
+        dispose();
+        return inner;
+    };
+    let inner: string;
+    if (b.fallback === null) inner = render(b.parts);
+    else {
+        // An error boundary: what the content threw while it rendered — its parts or anything they
+        // render — renders the fallback in its place, as the client's boundary shows it.
+        const fallback = b.fallback;
+        try { inner = render(b.parts); } catch (error) { inner = render(() => fallback(error)); }
+    }
     return (b.open === null ? '' : `<!--${b.open}-->`) + inner + (b.close === null ? '' : `<!--${b.close}-->`);
+}
+
+/** A component's children: none. */
+const NO_CHILDREN: Projection = { default: '', named: new Map() };
+
+/**
+ * An element a helper created by its tag (ServerElement): its attributes and, on a component, the
+ * properties the client assigns it. It has no children of its own.
+ */
+function createdElement(e: ServerElement, mark: BlockMark | null): string {
+    const attrs = new Map<string, string | null>(Object.entries(e.attributes));
+    if (mark?.item) attrs.set('data-pdx-item', '');
+    if (mark?.hidden && e.tag !== 'svg' && e.tag !== 'math') attrs.set('style', joinStyle([attrs.get('style'), 'display: none;']));
+    if (e.tag.includes('-')) {
+        const host = componentHost(e.tag, attrs, new Map(Object.entries(e.props)), () => NO_CHILDREN);
+        if (host !== null) return host;
+    }
+    const open = openTag(e.tag, attrs);
+    return VOID_ELEMENTS.has(e.tag) ? open : `${open}</${e.tag}>`;
+}
+
+/**
+ * A component as its host, marked pre-rendered (`data-pdx-ssr`), with its own render inside and
+ * `children` projected into its slots; null when the tag is no component of ours (render-component.ts).
+ */
+function componentHost(tag: string, attrs: ReadonlyMap<string, string | null>, props: ReadonlyMap<string, unknown>, children: () => Projection): string | null {
+    // The children render after the component's own render, inside its scope, as its slots receive them.
+    const host = renderHost(tag, attrs, props, (rendered) => content(rendered, children()), skipped);
+    if (!host) return null;
+    host.attributes.set('data-pdx-ssr', '');
+    return `${openTag(tag, host.attributes)}${host.inner}</${tag}>`;
 }
 
 /** A node list; `mark` applies to these nodes only, not to their children. */
@@ -135,11 +178,8 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     if (s.style.length) attrs.set('style', joinStyle([attrs.get('style'), ...s.style]));
 
     if (n.name.includes('-')) {
-        const host = renderHost(n.name, attrs, s.props, (rendered) => content(rendered, project(n, values, slots)), skipped);
-        if (host) {
-            host.attributes.set('data-pdx-ssr', '');
-            return `${openTag(n.name, host.attributes)}${host.inner}</${n.name}>`;
-        }
+        const host = componentHost(n.name, attrs, s.props, () => project(n, values, slots));
+        if (host !== null) return host;
     }
     const open = openTag(n.name, attrs);
     if (n.void) return open;

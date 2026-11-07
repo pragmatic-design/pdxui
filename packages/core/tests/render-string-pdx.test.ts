@@ -9,6 +9,7 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as core from '../src/index';
 import { compile } from '../../compiler/src/plugin';
+import type { CompilerPlugin } from '../../compiler/src/plugin-system';
 import { renderToStringWithReport } from '../src/server/render-string';
 import { children } from './string-parity';
 
@@ -18,6 +19,13 @@ interface Row {
     script?: string;
     /** Text the rendered content must hold, so that two empty renders do not agree. */
     shows: string;
+    /**
+     * Compare the client's DOM as it is when it has just mounted, with no settling: a block that
+     * changes by itself afterwards — a promise, a trigger — is written as it starts.
+     */
+    sync?: boolean;
+    /** Compiler plugins: a custom template directive. */
+    plugins?: CompilerPlugin[];
 }
 
 let seq = 0;
@@ -26,7 +34,7 @@ let seq = 0;
 function define(row: Row, prefix: string, ssr: boolean): string {
     const name = `${prefix}${++seq}`;
     const src = `<template>${row.template}</template>\n<script>\n${row.script ?? ''}\n</script>\n`;
-    const { code } = compile(src, `${name}.pdx`, [], undefined, { production: true, ssr });
+    const { code } = compile(src, `${name}.pdx`, row.plugins ?? [], undefined, { production: true, ssr });
     const body = code.replace(/^\s*import\s*\{([^}]*)\}\s*from\s*'@pdxui\/core';?\s*$/gm, 'const {$1} = __core;');
     new Function('__core', body)(core);
     return `app-${name}`;
@@ -45,7 +53,7 @@ async function both(row: Row): Promise<{ client: string; server: string; markup:
     const clientTag = define(row, 'c', false);
     const host = document.createElement(clientTag);
     document.body.appendChild(host);
-    await settle();
+    if (!row.sync) await settle();
     const a = document.createElement('div');
     a.innerHTML = host.innerHTML;
     host.remove();
@@ -65,12 +73,22 @@ async function both(row: Row): Promise<{ client: string; server: string; markup:
 beforeAll(() => {
     // A TypeScript component a .pdx renders, with a prop and a default and a named slot.
     if (!customElements.get('x-ssr-card')) {
+        // A component that renders the snippet it is given, as `@render row('a', 0)` would (#489).
+        core.component('x-ssr-snip', {
+            props: { row: core.prop<((v: string, i: number) => unknown) | null>(null) },
+            render: (ctx) => core.html`<div class="snip">${() => ctx.row()?.('a', 0)}</div>`,
+        });
         core.component('x-ssr-card', {
             props: { heading: core.prop('none') },
             render: (ctx) => core.html`<div class="card"><h3>${ctx.heading}</h3><slot name="head"></slot><slot></slot></div>`,
         });
     }
 });
+
+/** A plugin with one template directive, generating the expression `generate` returns. */
+function directive(name: string, generate: (expr: string, body: string) => string): CompilerPlugin {
+    return { name: `directive-${name}`, templateDirectives: { [name]: { generate: (expr, body) => generate(expr, body) } } };
+}
 
 const rows: Row[] = [
     { name: 'static markup and whitespace', shows: 'Title', template: '\n  <section class="a">\n    <h2 id="t">Title</h2>\n    <p>text <b>bold</b> end</p>\n  </section>\n' },
@@ -90,6 +108,20 @@ const rows: Row[] = [
     { name: '@let', shows: '6', template: '@let total = n * 2;\n<p>{{ total }}</p>', script: 'let n = $signal(3);' },
     { name: 'a component with a prop, a named and a default slot', shows: 'Card', template: '<x-ssr-card :heading="h"><span slot="head">top</span><p>body {{ n }}</p></x-ssr-card>', script: "let h = $signal('Card'); let n = $signal(1);" },
     { name: 'SVG', shows: 'svg', template: '<svg viewBox="0 0 10 10"><path :d="d"></path></svg><p>svg</p>', script: "let d = $signal('M0 0L10 10');" },
+    { name: '@defer (viewport) shows its placeholder after the sentinel', shows: 'wait', sync: true, template: '@defer (viewport) { <p>in</p> } @placeholder { <p>wait</p> }' },
+    { name: '@defer (immediate) with no code to load renders the body', shows: 'in', template: '@defer (immediate) { <p>in</p> } @placeholder { <p>wait</p> }' },
+    { name: '@defer (when (…)) already true renders the body', shows: 'in', template: '@defer (when (on)) { <p>in</p> } @placeholder { <p>wait</p> }', script: 'let on = $signal(true);' },
+    { name: '@await over a value there is', shows: 'ready done', template: '@await (data as d) { <p>ready {{ d }}</p> } @loading { <p>…</p> }', script: "let data = $signal('done');" },
+    { name: '@await over a promise shows @loading', shows: '…', sync: true, template: '@await (data) { <p>ready</p> } @loading { <p>…</p> }<p>end</p>', script: "let data = $signal(Promise.resolve('done'));" },
+    { name: '@try / @catch, the body throwing while it renders', shows: 'caught', template: '@try { <p>{{ boom() }}</p> } @catch (e) { <p>caught</p> }', script: "function boom() { throw new Error('x'); }" },
+    { name: '@try / @catch, the body rendering', shows: 'fine', template: '@try { <p>fine</p> } @catch (e) { <p>caught</p> }' },
+    { name: '@portal leaves its marker in place', shows: 'here', template: "<div>@portal ('body') { <p>away</p> }<p>here</p></div>" },
+    { name: '<component :is> renders the component it names', shows: 'none', template: '<component :is="tag"></component><p>after</p>', script: "let tag = $signal('x-ssr-card');" },
+    { name: '@render of a script @snippet', shows: 'hi x', template: "<p>@render greet('x')</p>", script: '@snippet greet(name) {\n  <em>hi {{ name }}</em>\n}' },
+    { name: '@snippet in a component tag, rendered by the component', shows: 'a0', template: '<x-ssr-snip>@snippet row(v, i) { <b>{{ v }}{{ i }}</b> }</x-ssr-snip>' },
+    { name: 'a custom directive whose expression is the body', shows: 'boxed', template: '<div>@boxed (1) { <p>boxed</p> }</div>', plugins: [directive('boxed', (_expr, body) => body)] },
+    { name: 'a custom directive whose expression is no node renders nothing', shows: 'after', template: "<div>@noted (1) { <p>never</p> }<p>after</p></div>", plugins: [directive('noted', () => "'a note'")] },
+    { name: '@raw text', shows: 'as written', template: '<pre>@raw { {{ as written }} }</pre>' },
 ];
 
 describe('a .pdx compiled for the server renders what the client mounts', () => {

@@ -79,12 +79,19 @@ export type ServerBlock = DocumentFragment & {
     readonly close: string | null;
     readonly parts: () => readonly unknown[];
     readonly mark: BlockMark | null;
+    /**
+     * What renders between the markers instead when rendering the parts throws — an error
+     * boundary's fallback, given the error. Without one the error goes on to the block around it.
+     */
+    readonly fallback: ((error: unknown) => readonly unknown[]) | null;
 };
 
-let ServerBlockClass: (new (open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null) => ServerBlock) | null = null;
+type Fallback = ((error: unknown) => readonly unknown[]) | null;
+
+let ServerBlockClass: (new (open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null, fallback: Fallback) => ServerBlock) | null = null;
 
 /** The ServerBlock a helper returns while the mode is set. */
-export function serverBlock(open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null = null): ServerBlock {
+export function serverBlock(open: string | null, close: string | null, parts: () => readonly unknown[], mark: BlockMark | null = null, fallback: Fallback = null): ServerBlock {
     requireFragment();
     ServerBlockClass ??= class extends DocumentFragment {
         constructor(
@@ -92,12 +99,44 @@ export function serverBlock(open: string | null, close: string | null, parts: ()
             readonly close: string | null,
             readonly parts: () => readonly unknown[],
             readonly mark: BlockMark | null,
+            readonly fallback: Fallback,
         ) { super(); }
     };
-    return new ServerBlockClass(open, close, parts, mark);
+    return new ServerBlockClass(open, close, parts, mark, fallback);
 }
 
 /** Whether `value` is a ServerBlock. */
 export function isServerBlock(value: unknown): value is ServerBlock {
     return ServerBlockClass !== null && value instanceof ServerBlockClass;
+}
+
+/**
+ * An element a helper creates by its tag — `<component :is>`'s component, `defer`'s viewport
+ * sentinel — rendered to a string (#160): its attributes, and the properties the client assigns it,
+ * which a component receives as its parent's. A DocumentFragment, as the helpers return.
+ */
+export type ServerElement = DocumentFragment & {
+    readonly tag: string;
+    readonly attributes: Readonly<Record<string, string>>;
+    readonly props: Readonly<Record<string, unknown>>;
+};
+
+let ServerElementClass: (new (tag: string, attributes: Readonly<Record<string, string>>, props: Readonly<Record<string, unknown>>) => ServerElement) | null = null;
+
+/** The ServerElement a helper returns while the mode is set. */
+export function serverElement(tag: string, attributes: Readonly<Record<string, string>> = {}, props: Readonly<Record<string, unknown>> = {}): ServerElement {
+    requireFragment();
+    ServerElementClass ??= class extends DocumentFragment {
+        constructor(
+            readonly tag: string,
+            readonly attributes: Readonly<Record<string, string>>,
+            readonly props: Readonly<Record<string, unknown>>,
+        ) { super(); }
+    };
+    return new ServerElementClass(tag, attributes, props);
+}
+
+/** Whether `value` is a ServerElement. */
+export function isServerElement(value: unknown): value is ServerElement {
+    return ServerElementClass !== null && value instanceof ServerElementClass;
 }

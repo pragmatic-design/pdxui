@@ -16,6 +16,7 @@ import type { Dispose } from '../utils/types';
 import { nodesBetween } from './helpers';
 import { errorBoundary } from './error-boundary';
 import { placePartNode } from './part-nodes';
+import { isServerRender, serverBlock } from '../server/mode';
 
 /** `@await`'s `maxMs` ran out with no result. The source is not cancelled; a later result replaces it. */
 export class AwaitTimeoutError extends Error {
@@ -136,6 +137,7 @@ export function awaitBlock<T = unknown>(
     errorFn: ((error: unknown, retry: () => void) => Node | DocumentFragment) | null,
     options: AwaitTiming = {},
 ): DocumentFragment {
+    if (isServerRender()) return serverAwait(source, thenFn, loadingFn, errorFn, options);
     const frag = document.createDocumentFragment();
     const start = document.createComment('await');
     const end = document.createComment('/await');
@@ -238,6 +240,33 @@ export function awaitBlock<T = unknown>(
     onDispose(() => { clearTimers(); childDispose?.(); childDispose = null; });
 
     return frag;
+}
+
+/**
+ * On the server (#160): the branch the client's block shows when it has just mounted — the body with
+ * the result there is now, `@error` for a failure, and while it waits `@loading` (with no `minMs`)
+ * or the pending comment.
+ */
+function serverAwait<T>(
+    source: () => unknown,
+    thenFn: (value: () => T) => Node | DocumentFragment,
+    loadingFn: (() => Node | DocumentFragment | null) | null,
+    errorFn: ((error: unknown, retry: () => void) => Node | DocumentFragment) | null,
+    options: AwaitTiming,
+): DocumentFragment {
+    return serverBlock('await', '/await', () => {
+        const o = outcomeOf(source());
+        if (o.kind === 'result') {
+            const value = (): T => o.value as T;
+            return [errorFn ? errorBoundary(() => thenFn(value), errorFn) : thenFn(value)];
+        }
+        if (o.kind === 'error') {
+            if (!errorFn) throw asError(o.error);
+            return [errorFn(o.error, () => {})];
+        }
+        if ((options.minMs ?? 0) > 0) return [serverBlock('await-pending', null, () => [])];
+        return [loadingFn?.() ?? serverBlock('await-loading', null, () => [])];
+    });
 }
 
 /**

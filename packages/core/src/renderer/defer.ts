@@ -8,6 +8,7 @@ import { placePartNode } from './part-nodes';
 import { DEV } from '../utils/env';
 import { trackUrgentLoad, queuePrefetch } from './load-queue';
 import type { DeferCode } from './defer-code';
+import { isServerRender, serverBlock, serverElement } from '../server/mode';
 
 
 const isBrowser = typeof window !== 'undefined';
@@ -62,6 +63,7 @@ export function defer(
     loadFn: (() => Promise<unknown>) | null,
     renderFn: (module?: unknown) => Node | DocumentFragment
 ): DocumentFragment {
+    if (isServerRender()) return serverDefer(options, loadFn, renderFn);
     const frag = document.createDocumentFragment();
     const start = document.createComment('defer');
     const end = document.createComment('/defer');
@@ -106,10 +108,11 @@ export function defer(
         state.set('loading');
         cleanupTriggers();
 
-        if (loadFn && (loadFn as Partial<DeferCode>).arrived) {
+        const arrived = arrivedCode(loadFn);
+        if (arrived) {
             // The code has arrived (defer-code.ts): the body renders in this task, as a block with no
             // code to load does, not a flush later in the live page.
-            loadedModule.set((loadFn as DeferCode).module);
+            loadedModule.set(arrived.module);
             state.set('loaded');
         } else if (loadFn) {
             // The block is on screen and waiting: it goes ahead of the queue, and queued prefetches
@@ -214,6 +217,41 @@ export function defer(
     }
 
     return frag;
+}
+
+/** `loadFn` as a DeferCode whose code has arrived (defer-code.ts), or null. */
+function arrivedCode(loadFn: (() => Promise<unknown>) | null): DeferCode | null {
+    return loadFn && (loadFn as Partial<DeferCode>).arrived ? (loadFn as DeferCode) : null;
+}
+
+/** The triggers that fire later: the others — `immediate`, and a trigger unknown — fire at once. */
+const LATER_TRIGGER = /^(viewport|interaction|idle(\(\d+\))?|timer\(\d+\))$/;
+
+/**
+ * On the server (#160): what the client's block shows when it has just mounted. A trigger that fires
+ * at once — `immediate`, an unknown one, a `when` already true — renders the body if its code needs
+ * no load or has arrived, `@loading` (or the placeholder) while it loads; otherwise the placeholder,
+ * after the sentinel a `viewport` trigger puts there.
+ */
+function serverDefer(
+    options: DeferOptions,
+    loadFn: (() => Promise<unknown>) | null,
+    renderFn: (module?: unknown) => Node | DocumentFragment,
+): DocumentFragment {
+    return serverBlock('defer', '/defer', () => {
+        const triggers = (options.trigger ?? '').split('|').map((t) => t.trim()).filter(Boolean);
+        const fires = triggers.some((t) => !LATER_TRIGGER.test(t)) || Boolean(options.when?.());
+        if (fires) {
+            if (!loadFn) return [renderFn(undefined)];
+            const arrived = arrivedCode(loadFn);
+            if (arrived) return [renderFn(arrived.module)];
+            return [options.loading?.() ?? options.placeholder?.() ?? null];
+        }
+        const sentinel = triggers.includes('viewport')
+            ? [serverElement('span', { style: 'display: block; height: 1px; visibility: hidden;' })]
+            : [];
+        return [...sentinel, options.placeholder?.() ?? null];
+    });
 }
 
 // ─── Trigger Activation ────────────────────────────────────────────
