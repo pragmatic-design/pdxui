@@ -19,12 +19,18 @@
 // through the same bridge the outlet installs in the browser. A hook is the app's when a module
 // registers it: one registered in a component's setup arrives with the render, after this.
 //
+// Then the chain's loaders run, outermost first, and the page is written with their data (#239). A
+// loader that fails stops the build, naming the route.
+//
 // What renders nothing, `serverRoute` says why: a hook that refused the path, a guard the app's
-// permissions deny, a redirect, and a path no route matches.
+// permissions deny, a redirect — a route's or a loader's `redirect()` — and a path no route matches or
+// a loader says is not found.
 
 import { DEV } from '@pdxui/core';
 import { registerServerElement, serverElement } from '@pdxui/core/server';
-import { pageModule } from './active';
+import { pageModule, toRouteConfig } from './active';
+import { clearLoaders, planLoaders, runLoaders } from './loaders';
+import { loaderError } from './state';
 import { compileMatcher } from './matcher';
 import { beforeNavigateHooks, chainAllowed } from './navigation';
 import { permissionGuard } from './permission-guard';
@@ -36,7 +42,7 @@ export interface ServerRoute {
     /** The pattern of the route the path matched; null when nothing will be rendered. */
     readonly route: string | null;
     /** Why nothing will be rendered. */
-    readonly skipped?: 'not-found' | 'refused' | 'guard' | 'redirect';
+    readonly skipped?: 'not-found' | 'refused' | 'guard' | 'redirect' | 'loader-redirect' | 'loader-not-found';
 }
 
 interface Level {
@@ -65,6 +71,18 @@ export async function serverRoute(path: string): Promise<ServerRoute> {
         if (await hook('', path, { redirected: false }) === false) return { path, route: null, skipped: 'refused' };
     }
     if (!await chainAllowed(chain, permissionGuard)) return { path, route: null, skipped: 'guard' };
+    // The chain's loaders, outermost first, as a navigation runs them (#239): the page is written with
+    // their data. Each route starts from nothing of the one before it.
+    clearLoaders();
+    const configs = chain.map(toRouteConfig);
+    const plan = planLoaders(configs, found.params, '');
+    // A kept result is not shown stale on a page a build writes: its loader runs again.
+    const outcome = await runLoaders([...plan.pending, ...plan.revalidate], () => true, { params: found.params });
+    if (outcome.kind === 'redirect') return { path, route: null, skipped: 'loader-redirect' };
+    if (outcome.kind === 'notFound') return { path, route: null, skipped: 'loader-not-found' };
+    if (outcome.kind === 'error') {
+        throw new Error(`the loader of ${outcome.level.path} failed for ${path}: ${loaderError(outcome.level.path)?.message ?? 'unknown error'}`);
+    }
     level = { chain, params: found.params };
     return { path, route: found.route.path };
 }

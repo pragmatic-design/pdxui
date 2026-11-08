@@ -168,6 +168,31 @@ describe('how an app is entered and built', () => {
     }, 180_000);
 });
 
+describe('a route\'s loader at build time (#239)', () => {
+    const ITEM = '<template>@await (item as it) { <h1 class="item">{{ it.name }}</h1> } @loading { <p class="wait">loading</p> }</template>\n'
+        + '<script>\n@page \'/items/:id\';\n@prop id: string = \'\';\n@loader item: loadItem;\n'
+        + 'async function loadItem({ params }) { return { name: \'Item \' + params.id }; }\n</script>\n';
+
+    it('writes the page with the data its loader returned, not its loading branch', async () => {
+        const loaded = app('loaded', { ...FILES, 'src/item.pdx': ITEM });
+        roots.push(loaded);
+        const result = await buildSsg(loaded, resolveConfig({ ssg: { routes: ['/items/3'] } }, loaded), join(loaded, 'dist'), false);
+        expect(result.pages.map((p) => p.file)).toContain('items/3/index.html');
+        const html = readFileSync(join(loaded, 'dist', 'items', '3', 'index.html'), 'utf-8');
+        expect(html).toMatch(/<h1 class="item">[^<]*(<!--[^>]*-->)?Item 3/);
+        expect(html, 'the loading branch was written').not.toContain('class="wait"');
+    }, 180_000);
+
+    it('a loader that throws stops the build, naming the path', async () => {
+        const failing = app('failing', { ...FILES, 'src/item.pdx': ITEM.replace("return { name: 'Item ' + params.id };", "throw new Error('the database is down');") });
+        roots.push(failing);
+        const err = await buildSsg(failing, resolveConfig({ ssg: { routes: ['/items/3'] } }, failing), join(failing, 'dist'), false).then(() => null, (e: unknown) => e);
+        expect(err).toBeInstanceOf(SsgError);
+        expect((err as Error).message).toContain('/items/3');
+        expect((err as Error).message).toContain('the database is down');
+    }, 180_000);
+});
+
 describe('a route prepared before it renders', () => {
     // The app's own session: a hook registered by a module lets in only a signed-in visitor, and the
     // guard asks the permissions. What `ssg.setup` does is what a build session is.

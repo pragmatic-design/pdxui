@@ -141,6 +141,9 @@ async function generate(
         throw new SsgError(`rendering on the server failed: ${(e as { stderr?: string }).stderr?.trim() || (e as Error).message}`);
     }
     const rendered = JSON.parse(readFileSync(output, 'utf-8')) as SsgRender;
+    if (rendered.failed) {
+        throw new SsgError(`generating ${rendered.failed.path} failed: ${rendered.failed.message}`);
+    }
     if (rendered.error) {
         throw new SsgError(`the app's modules could not run on the server, where there is no document or window: ${rendered.error}\n  Move what reads the browser into onMount, or behind a check that it is there.`);
     }

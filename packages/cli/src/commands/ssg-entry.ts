@@ -28,6 +28,8 @@ export interface PageHead {
 export interface SsgRender {
     /** Set when the app's modules could not run on the server: the message and the first frames. */
     readonly error?: string;
+    /** Set when preparing a path failed, a loader that threw (#239): the path, and the error. */
+    readonly failed?: { readonly path: string; readonly message: string };
     readonly pages: {
         readonly path: string;
         /** The pattern of the route the path matched. */
@@ -59,6 +61,8 @@ const SKIPPED = {
     refused: 'an onBeforeNavigate hook refused it',
     guard: 'its guard is denied: the build has set no permission that grants it',
     redirect: 'its route redirects',
+    'loader-redirect': 'its loader redirected with redirect()',
+    'loader-not-found': 'its loader said notFound()',
 };
 
 /** A pattern a build can write as it is: no :param, no wildcard. */
@@ -98,7 +102,13 @@ ${imports}
     }
     for (const p of extraPaths) if (!paths.includes(p)) paths.push(p);
     for (const path of paths) {
-        const route = await serverRoute(path);
+        let route;
+        try {
+            route = await serverRoute(path);
+        } catch (e) {
+            // A loader that failed (#239): the build stops, naming the path it was generating.
+            return { failed: { path, message: stackHead(e) }, pages: [], skippedRoutes: [] };
+        }
         if (route.skipped) {
             skippedRoutes.push({ path, reason: SKIPPED[route.skipped] });
             continue;
@@ -130,6 +140,12 @@ process.on('unhandledRejection', failed);
 process.on('uncaughtException', failed);
 const { renderAll } = await import(pathToFileURL(entry).href);
 writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths)));
+// Done once the result is written: the CLI waits for this process to exit, and the app's modules may
+// keep it alive — an interval, a socket a fetch kept open — which is theirs to keep (#239: a build of
+// a route with a loader did not exit, with no handle Node lists). Exited in the next macrotask, not
+// this one: Node reports an unhandled rejection once the microtasks have drained, before the
+// setImmediate phase, so work an entry started and did not await still fails the build above.
+setImmediate(() => process.exit(0));
 `;
 
 /** The plugin that answers for the entry and for the module that installs the server DOM. */
