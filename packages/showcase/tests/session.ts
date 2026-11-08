@@ -29,7 +29,11 @@ export const GUEST = { cookies: [], origins: [] };
 const AUTH_KEY = 'showcase.auth';
 
 export default async function globalSetup(config: FullConfig): Promise<void> {
-    const baseURL = String(config.projects[0].use.baseURL);
+    await signIn(String(config.projects[0].use.baseURL));
+}
+
+/** Sign in as the admin against the server at `baseURL`, and write its state to `sessionFile(port)`. */
+export async function signIn(baseURL: string): Promise<void> {
     const res = await fetch(`${baseURL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

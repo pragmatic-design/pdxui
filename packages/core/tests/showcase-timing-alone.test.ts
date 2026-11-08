@@ -16,7 +16,8 @@ import { join } from 'node:path';
 
 const ROOT = join(__dirname, '..', '..', '..');
 const TESTS = join(ROOT, 'packages', 'showcase', 'tests');
-const TIMED = ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts'];
+// `ssg-pages.spec.ts` (#160) times the generated showcase against the client build, for the same reason.
+const TIMED = ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'];
 
 const read = (path: string): string => readFileSync(path, 'utf8');
 /** The quoted file names inside `<key>: [ … ]` of a config. */

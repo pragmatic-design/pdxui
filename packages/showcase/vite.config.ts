@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type UserConfig } from 'vite';
 // A relative import (not through the package name): esbuild bundles this config and resolves the
 // compiler's extensionless internal imports. Importing '@pdxui/compiler' would externalise it
 // and Node ESM would fail on './plugin'. The same pattern as the site.
@@ -19,33 +19,41 @@ import { mockTickets } from './mock-tickets';
  * No `inlineBindings` override either: a production build takes the inline render path by default,
  * and so does every app built with `pdx build` — the mode this bench has to measure
  * (`tests/render-path.spec.ts` reads it off the built chunk).
+ *
+ * `hydrate`: the same app built to take over the pages `pdx build --ssg` generates (#160) —
+ * `vite.ssg.config.ts`. One function for both, so the two builds cannot drift apart.
  */
-export default defineConfig({
-    // `mockAttachments` serves `/api/attachments` in dev AND in preview, slowly on purpose: a
-    // TransferHandle's `progress` only means something if it can be watched moving.
-    // `mockAuth` serves `/api/auth` and `/api/account`: it signs a real JWT and verifies it on
-    // every protected call, so the login slice exercises the store rather than a stub.
-    // `mockTickets` serves `GET /api/tickets/:id`, what the ticket page's `@loader` fetches.
-    plugins: [
-        // `defaultLayout`: the rail and the bar (`src/shell.pdx`) around every page that declares no
-        // layout, and none around the sign-in, which says `@layout 'none'`.
-        pdx({ devtools: false, defaultLayout: 'shell' }),
-        mockAttachments(), mockAuth(), mockTickets(),
-    ],
-    server: { port: 5310 },
-    build: {
-        outDir: 'dist',
-        target: 'es2022',
-        sourcemap: false,
-        rollupOptions: {
-            // An import of a name its module does not export fails the build, as it fails in dev,
-            // where the browser refuses the module. Rollup only WARNS when the binding is unused, so
-            // `import type { DataSource }`, merged into the runtime import, would build clean and
-            // break `/tickets` in dev only. Every other warning is Rollup's.
-            onwarn(warning, warn) {
-                if (warning.code === 'MISSING_EXPORT') throw new Error(warning.message);
-                warn(warning);
+export function showcaseConfig({ hydrate }: { hydrate: boolean }): UserConfig {
+    return {
+        // `mockAttachments` serves `/api/attachments` in dev AND in preview, slowly on purpose: a
+        // TransferHandle's `progress` only means something if it can be watched moving.
+        // `mockAuth` serves `/api/auth` and `/api/account`: it signs a real JWT and verifies it on
+        // every protected call, so the login slice exercises the store rather than a stub.
+        // `mockTickets` serves `GET /api/tickets/:id`, what the ticket page's `@loader` fetches.
+        plugins: [
+            // `defaultLayout`: the rail and the bar (`src/shell.pdx`) around every page that declares no
+            // layout, and none around the sign-in, which says `@layout 'none'`.
+            pdx({ devtools: false, defaultLayout: 'shell', hydrate }),
+            mockAttachments(), mockAuth(), mockTickets(),
+        ],
+        server: { port: 5310 },
+        build: {
+            // The generated site apart from the client build: the build suite's preview serves `dist`.
+            outDir: hydrate ? 'dist-ssg' : 'dist',
+            target: 'es2022',
+            sourcemap: false,
+            rollupOptions: {
+                // An import of a name its module does not export fails the build, as it fails in dev,
+                // where the browser refuses the module. Rollup only WARNS when the binding is unused, so
+                // `import type { DataSource }`, merged into the runtime import, would build clean and
+                // break `/tickets` in dev only. Every other warning is Rollup's.
+                onwarn(warning, warn) {
+                    if (warning.code === 'MISSING_EXPORT') throw new Error(warning.message);
+                    warn(warning);
+                },
             },
         },
-    },
-});
+    };
+}
+
+export default defineConfig(showcaseConfig({ hydrate: false }));

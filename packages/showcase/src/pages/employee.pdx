@@ -91,6 +91,7 @@
 // No `@title` here: this page is the frame around a SECTION, and the section names the tab. A
 // dynamic title on the frame re-runs when the record arrives and writes over the section's.
 
+import { effect } from '@pdxui/core';
 import { navigate, currentPath } from '@pdxui/router';
 import { employeeById, employeeTransport, employeeWalk, employmentStatus, contractEndingSoon } from '../data/employees';
 import { createEmployeeDocuments } from '../data/employee-documents';
@@ -144,8 +145,10 @@ const contractsAttention = $derived(!!record && contractEndingSoon(record));
 // again after a change — so the count on the menu is the section's list (CD-D1).
 const employeeDocs = createEmployeeDocuments(() => id);
 @provide EmployeeDocumentsContext = employeeDocs;
-// An effect: `id` is read inside it, so the list follows the route.
-$effect(() => { void employeeDocs.reload(); });
+// An effect: `id` is read inside it, so the list follows the route. Started once the page is
+// mounted, not in the setup: it asks the server, and a build that generates this page (#160) runs
+// the setup in Node, with no server to ask. The cleanup onMount is returned disposes it.
+onMount(() => effect(() => { void employeeDocs.reload(); }));
 const documentCount = $derived(employeeDocs.documents().length);
 const documentsAttention = $derived(employeeDocs.documents().some(d => d.expires !== '' && d.expires < new Date().toISOString().slice(0, 10)));
 

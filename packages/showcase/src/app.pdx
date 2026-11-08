@@ -21,10 +21,13 @@
 // does not live there.
 import '@pdxui/router';
 import { localeReady, stringsReady, ensureSections } from './i18n';
-import { currentPath, onBeforeNavigate, prefetchRoute } from '@pdxui/router';
+import { currentPath, prefetchRoute } from '@pdxui/router';
 // The session: importing it here is what puts `guardFailRedirect` and the user → permissions
 // effect in place before the outlet boots the router and the first guarded route is matched.
 import './auth';
+// The navigation's dictionary, fetched before the page: a module's hook, so a build runs it too.
+// After the session's, as before: a path the session refuses fetches no strings.
+import './route-strings';
 
 // The app declares no @page, so it is a component and not a route — which is also why the outlet
 // it renders marks no route as a parent.
@@ -45,17 +48,7 @@ const ready = $derived(localeReady() && stringsReady(currentPath()));
 // then the chunk's dependencies — four waves.
 onMount(() => { prefetchRoute(currentPath()); void ensureSections(currentPath()); });
 
-// Every navigation after that holds until its dictionary is in — the NAVIGATION, not the paint.
-//
-// The outlet is not gated on it: `@if (ready)` going false for one tick UNMOUNTS the whole tree,
-// so a ticket's billing tab would tear down the ticket underneath it and build it again —
-// `master-detail.spec.ts` counts the parent's mounts and wants 1. `onBeforeNavigate` is awaited before the address changes, so the screen the visitor
-// is on stays put while the strings for the next one arrive.
-onBeforeNavigate(async (_from, to) => {
-  prefetchRoute(to);   // the chunk alongside the strings, as at boot
-  await ensureSections(to);
-  return true;
-});
+// Every navigation after that holds until its dictionary is in: `./route-strings`, imported above.
 
 // And on the same gesture the ROUTER prefetches a route's chunk on: a dictionary the screen cannot
 // render without is part of that screen, and fetching it only on the click puts a request between

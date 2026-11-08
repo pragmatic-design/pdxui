@@ -10,6 +10,10 @@
  *
  * The build is the same: `vite build` and `vite preview`, on a port of its own. The cap is the build
  * suite's, as `playwright-worker-budget.test.ts` asks.
+ *
+ * `ssg-pages.spec.ts` measures the generated showcase (#160) against that client build: what paints
+ * first, how much shifts, when it answers. Here for the same reason the first-paint specs are, and its
+ * site is generated and served by `ssg-site.ts`, a second global setup.
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
@@ -22,12 +26,12 @@ const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
     testDir: '.',
-    testMatch: ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts'],
+    testMatch: ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'],
     fullyParallel: true,
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
     reporter: [['list']],
     timeout: 30_000,
-    globalSetup: './session.ts',
+    globalSetup: ['./session.ts', './ssg-site.ts'],
     use: {
         baseURL: `http://localhost:${PORT}`,
         storageState: sessionFile(PORT),
