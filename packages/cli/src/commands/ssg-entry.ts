@@ -83,7 +83,18 @@ function stackHead(e) {
     return e.message + '\\n    ' + frames;
 }
 
-export async function renderAll(markup, extraPaths) {
+/**
+ * A fetch of a path — \`/api/tickets/1\`, what a loader writes for the app's own server — resolved
+ * against \`origin\` (#239): in Node there is no page a relative URL is relative to.
+ */
+function resolveFetchAgainst(origin) {
+    const fetchOf = globalThis.fetch;
+    const relative = (url) => typeof url === 'string' && url.startsWith('/') && !url.startsWith('//');
+    globalThis.fetch = (input, init) => fetchOf(relative(input) ? new URL(input, origin) : input, init);
+}
+
+export async function renderAll(markup, extraPaths, origin) {
+    if (origin) resolveFetchAgainst(origin);
     try {
 ${imports}
         await loadServerPages();
@@ -132,7 +143,7 @@ ${imports}
 export const SSG_RUNNER = `import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 const [entry, input, output] = process.argv.slice(2);
-const { markup, extraPaths } = JSON.parse(readFileSync(input, 'utf-8'));
+const { markup, extraPaths, origin } = JSON.parse(readFileSync(input, 'utf-8'));
 // An entry script that starts work it does not await (void setupI18n()) fails after it has run:
 // reported as an import that failed, with its file and line, not as a crash of this process.
 const failed = (e) => {
@@ -143,7 +154,7 @@ const failed = (e) => {
 process.on('unhandledRejection', failed);
 process.on('uncaughtException', failed);
 const { renderAll } = await import(pathToFileURL(entry).href);
-writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths)));
+writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths, origin)));
 // Done once the result is written: the CLI waits for this process to exit, and the app's modules may
 // keep it alive — an interval, a socket a fetch kept open — which is theirs to keep (#239: a build of
 // a route with a loader did not exit, with no handle Node lists). Exited in the next macrotask, not

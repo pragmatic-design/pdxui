@@ -122,12 +122,33 @@ setLocale('en');
 A private page written this way shows what that session sees. A visitor without the session is
 sent where your app sends them, as on any first load.
 
+A route's `@loader` runs during the build, before its page is rendered, and the page is written with
+the data it returned, not its loading branch. The page also carries that data, in a `pdx-ssg-data`
+script that `ssgDataScript` (from `@pdxui/router/server`) writes. When the app starts,
+`installRouteAdoption()` keeps it as the loader's result, so the first visit does not wait for the
+loader. While the build
+is younger than the loader's `staleTime` the loader does not run again; once the build is older, the
+page shows the data it carries while the loader runs once behind it.
+
+A loader that fetches a path of your own server, `fetch('/api/…')`, needs to know where that server
+answers during the build, because Node has no page a relative URL could be relative to. Name it, and
+have the API running there while you build:
+
+```ts
+export default defineConfig({ ssg: { origin: 'http://localhost:3000' } });
+```
+
+A loader that throws stops the build, naming the path. So does a result that JSON would not bring
+back as it is, such as a `Date`, a class instance, a function or a cycle: the page carries the data as
+JSON.
+
 The build says what it did not write, and why:
 
 - a route with parameters and no path listed;
 - a path an `onBeforeNavigate` hook refused;
 - a guarded route the permissions you have set do not grant;
-- a redirect.
+- a redirect, a route's or a loader's `redirect()`;
+- a path a loader answered with `notFound()`.
 
 Reading the browser stops the build. If a component's setup, its render or a value in its template
 reads a browser global such as `window`, `document` or `localStorage`, the build names the component

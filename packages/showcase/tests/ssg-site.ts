@@ -15,6 +15,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import { preview } from 'vite';
+import type { FullConfig } from '@playwright/test';
 import { signIn } from './session';
 
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -27,12 +28,16 @@ export const SSG_REPORT = join(packageDir, 'test-results', '.ssg', 'report.json'
 const SSG_DIST = join(packageDir, 'dist-ssg');
 const SSG_CONFIG = join(packageDir, 'vite.ssg.config.ts');
 
-export default async function generateSite(): Promise<() => Promise<void>> {
+export default async function generateSite(config: FullConfig): Promise<() => Promise<void>> {
     const { buildSsg } = await import('../../cli/src/commands/build-ssg');
     const { loadConfig, resolveConfig } = await import('../../cli/src/config/loader');
     // A stale page from an earlier build would be opened as if this one had written it.
     rmSync(SSG_DIST, { recursive: true, force: true });
-    const report = await buildSsg(packageDir, resolveConfig(await loadConfig(packageDir), packageDir), SSG_DIST, false, SSG_CONFIG);
+    // The ticket page's loader fetches `/api/tickets/:id` (#239): the showcase's API is the mock server
+    // Vite serves beside a build, and the config's own preview — the client build, started before any
+    // global setup — is one. It is the build's `ssg.origin`, so a generated ticket holds its record.
+    const resolved = { ...resolveConfig(await loadConfig(packageDir), packageDir), ssgOrigin: String(config.projects[0].use.baseURL) };
+    const report = await buildSsg(packageDir, resolved, SSG_DIST, false, SSG_CONFIG);
     mkdirSync(dirname(SSG_REPORT), { recursive: true });
     writeFileSync(SSG_REPORT, JSON.stringify(report, null, 2));
 

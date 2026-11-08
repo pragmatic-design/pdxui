@@ -7,6 +7,8 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { createServer } from 'http';
+import type { AddressInfo } from 'net';
 import { buildSsg, SsgError, type SsgReport } from '../src/commands/build-ssg';
 import { resolveConfig } from '../src/config/loader';
 import { removeTree } from './remove-tree';
@@ -188,6 +190,29 @@ describe('a route\'s loader at build time (#239)', () => {
         expect(carried.results).toEqual([expect.objectContaining({ key: '/items/:id|id=3|', value: { name: 'Item 3' } })]);
         expect(Date.now() - carried.builtAt).toBeLessThan(10 * 60_000);
     }, 180_000);
+
+    it('a loader\'s fetch of a path is resolved against ssg.origin, where the app\'s API answers', async () => {
+        const api = createServer((req, res) => {
+            res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ name: `Served ${req.url}` }));
+        });
+        await new Promise<void>((done) => api.listen(0, '127.0.0.1', () => done()));
+        const origin = `http://127.0.0.1:${(api.address() as AddressInfo).port}`;
+        try {
+            const fetching = ITEM.replace("return { name: 'Item ' + params.id };", "return (await fetch('/api/items/' + params.id)).json();");
+            const served = app('served', { ...FILES, 'src/item.pdx': fetching });
+            roots.push(served);
+            await buildSsg(served, resolveConfig({ ssg: { routes: ['/items/3'], origin } }, served), join(served, 'dist'), false);
+            expect(readFileSync(join(served, 'dist', 'items', '3', 'index.html'), 'utf-8')).toContain('Served /api/items/3');
+
+            // Without it, the fetch has nothing to be relative to: the build says what to set.
+            const unserved = app('unserved', { ...FILES, 'src/item.pdx': fetching });
+            roots.push(unserved);
+            const err = await buildSsg(unserved, resolveConfig({ ssg: { routes: ['/items/3'] } }, unserved), join(unserved, 'dist'), false).then(() => null, (e: unknown) => e);
+            expect((err as Error | null)?.message ?? '').toContain('ssg: { origin }');
+        } finally {
+            await new Promise((done) => api.close(done));
+        }
+    }, 240_000);
 
     it('a loader that throws stops the build, naming the path', async () => {
         const failing = app('failing', { ...FILES, 'src/item.pdx': ITEM.replace("return { name: 'Item ' + params.id };", "throw new Error('the database is down');") });

@@ -29,7 +29,8 @@ with no second render and no external dependency.
   `$derived`, and each `$effect` once, as at the client's setup, so that the markup is the one the
   client would build (owner decision 2026-11-08). No listener is attached and no `onMount` runs. An
   `@if` or `@for` is evaluated once; a `@defer` renders its `@placeholder` unless its trigger fires at
-  once; an `@await` renders its `@loading` branch.
+  once; an `@await` renders its `@loading` branch, except over a route's `@loader`, whose data the
+  build has fetched (below).
 - `pdx build --ssg` renders every `@page` route without dynamic parameters, plus the paths listed in
   `pdx.config`'s `ssg.routes`, to `dist/<route>/index.html`. Each page is the built `index.html` with
   the route's content in its body, and its `@title` and `@meta` in its head.
@@ -76,14 +77,30 @@ Held by `packages/showcase/tests/ssg-pages.spec.ts` on the generated showcase:
 - CLS after the takeover < 0.02, the same bound as R2 in performance.md; the time to interactive is
   not worse than the client build's.
 
-### Data at build time
+### Data at build time (#239)
 
-A page whose content comes from `@fetch` or `@loader` pre-renders its loading branch: the skeleton
-paints early, the data does not. For content pages — documentation, a catalogue — the value is in the
-data. **Proposed** (decisions.md, point 33; #239): for a route listed in `ssg.routes`,
-`pdx build --ssg` runs its `@loader` at build time with that route's parameters, and the server
-renders the loaded branch. `@fetch` stays client-side. The page then ships its data in the HTML, and
-the client loader starts with that value as fresh data (`staleTime` from the build).
+- Every generated route runs its chain's `@loader`s after its hooks and guards, outermost first, with
+  each level's `LoaderContext`: the path's params coerced by their constraints, an empty query, and a
+  signal that is never aborted. The page renders the loaded branch. This applies to every generated
+  route, not only those `ssg.routes` lists: a page written without its data would not be the markup the
+  client takes over.
+- The page carries each level's result in `<script type="application/json" id="pdx-ssg-data">`, under
+  its call identity (`pattern | params | query`), with its pattern, its `staleTime` and the build's
+  time. `installRouteAdoption()` keeps them as the levels' results before the first navigation. While
+  the build is younger than a level's `staleTime`, the level uses the result and does not run its
+  loader. Once the build is older, the level shows the result with `stale()` true while the loader runs
+  again. That is the cache's ordinary rule (#148), with the age counted from the build.
+- A loader's `fetch` of a path is resolved against `ssg.origin`, where the app's API answers while the
+  build runs (owner decision 2026-11-08). Without it, such a fetch fails, and the build says what to
+  set.
+- A loader that throws stops the build, naming the path. A loader's `redirect()` or `notFound()`
+  skips the route and reports it. A result JSON would not bring back as it is (a `Date`, a class
+  instance, a function, a cycle) stops the build, naming the level.
+- `@fetch` stays client-side: its branch renders as loading.
+
+Held by `packages/router/tests/server-route-loaders.test.ts` and `ssg-data-seed.test.ts`, by the
+cases in `packages/cli/tests/build-ssg.test.ts`, and on the showcase's `/tickets/1` by
+`ssg-pages.spec.ts`.
 
 ## The separate roadmap
 

@@ -39,6 +39,61 @@ test.describe('the generated showcase', () => {
     });
 });
 
+test.describe('a route\'s loader at build time (#239)', () => {
+    /** The data a page carries, as `pdx-ssg-data` holds it. */
+    const carried = (html: string): { builtAt: number; results: { key: string; value: { id?: number; reference?: string } }[] } | null => {
+        const m = /<script type="application\/json" id="pdx-ssg-data">(.*?)<\/script>/.exec(html);
+        return m ? JSON.parse(m[1]) : null;
+    };
+
+    test('/tickets/1 is written with its record, not its loading branch, and carries it', async ({ request }) => {
+        const html = await (await request.get(`${SSG_URL}/tickets/1`)).text();
+        expect(html, 'the loading branch was written').not.toContain('data-test="ticket-pending"');
+        const data = carried(html);
+        expect(data, 'no pdx-ssg-data script in the page').not.toBeNull();
+        expect(data!.results.map((r) => [r.key, r.value.reference])).toEqual([['/tickets/:id(number)|id=1|', 'T-1000']]);
+    });
+
+    test('the client shows that record at once, and asks for it again behind it once, its staleTime past', async ({ browser, locale }) => {
+        // The ticket's loader has no staleTime, so the build is always older than it: the kept result is
+        // shown stale while the loader runs once. A loader with a staleTime the build is younger than
+        // asks nothing; that side is held by the router's `ssg-data-seed.test.ts`.
+        // Kept, the navigation does not wait for the loader: the outlet takes the page over first, and
+        // the request lands behind it. Not kept, the first navigation waits for the loader before it
+        // shows anything — no loading branch either, so that is not what tells them apart: the order is.
+        // The API answers 2 s late, and the page says whether it was taken over before the answer.
+        const context = await browser.newContext({ baseURL: SSG_URL, storageState: sessionFor(SSG_URL), locale });
+        const page = await context.newPage();
+        const asked: string[] = [];
+        await page.route('**/api/tickets/1', async (route) => {
+            asked.push(route.request().url());
+            await new Promise((done) => setTimeout(done, 2_000));
+            await route.continue();
+        });
+        await page.addInitScript(() => {
+            const w = window as unknown as { __takenOverBeforeAnswer?: boolean; __pending?: boolean };
+            new MutationObserver(() => {
+                if (document.querySelector('[data-test="ticket-pending"]')) w.__pending = true;
+                const outlet = document.querySelector('pdx-router-outlet');
+                if (w.__takenOverBeforeAnswer === undefined && outlet && !outlet.hasAttribute('data-pdx-ssg') && document.querySelector('[data-test="ticket"]')) {
+                    w.__takenOverBeforeAnswer = !performance.getEntriesByType('resource').some((e) => /\/api\/tickets\/1$/.test(e.name));
+                }
+            }).observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-pdx-ssg'] });
+        });
+        await page.goto('/tickets/1');
+        await expect(page.locator('[data-test="ticket"]')).toBeVisible();
+        await page.waitForLoadState('networkidle');
+        const seen = await page.evaluate(() => {
+            const w = window as unknown as { __takenOverBeforeAnswer?: boolean; __pending?: boolean };
+            return { before: w.__takenOverBeforeAnswer, pending: w.__pending === true };
+        });
+        expect(seen.before, 'the page was taken over only once the loader answered: the record it carries was not kept').toBe(true);
+        expect(seen.pending, 'the page showed the loading branch').toBe(false);
+        expect(asked, 'the loader ran more than once, or not at all behind the kept result').toHaveLength(1);
+        await context.close();
+    });
+});
+
 /** Routes the comparison opens, with the root their page renders. */
 const ROUTES = [
     { route: '/', root: 'dashboard', tag: 'app-dashboard' },

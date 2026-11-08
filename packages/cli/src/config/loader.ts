@@ -78,6 +78,7 @@ export function resolveConfig(raw: PdxConfig, cwd: string): ResolvedConfig {
         plugins: raw.plugins ?? [],
         ssgRoutes: raw.ssg?.routes ?? [],
         ssgSetup: raw.ssg?.setup ? resolve(cwd, raw.ssg.setup) : null,
+        ssgOrigin: raw.ssg?.origin ?? null,
         cwd,
     };
 }

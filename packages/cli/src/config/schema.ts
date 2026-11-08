@@ -32,6 +32,12 @@ export interface PdxConfig {
          * the locale of a page nobody asked for in a language.
          */
         setup?: string;
+        /**
+         * Where the app's API answers while the build runs, as `https://api.example.com`: a loader's
+         * `fetch('/api/…')` is resolved against it (#239). Node has no page a relative URL could be
+         * relative to, so without it such a fetch fails the build.
+         */
+        origin?: string;
     };
 }
 
@@ -48,6 +54,8 @@ export interface ResolvedConfig {
     ssgRoutes: string[];
     /** The module `ssg.setup` names, as an absolute path; null without. */
     ssgSetup: string | null;
+    /** The origin `ssg.origin` names; null without. */
+    ssgOrigin: string | null;
     cwd: string;
 }
 
