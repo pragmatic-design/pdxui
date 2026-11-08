@@ -5,7 +5,7 @@
 // and the bundle called `component("app-app", …)` with `component` bound to nothing — a page that threw
 // at load and rendered nothing. The CLI now adds its plugin only when the project's config has none.
 
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import buildCmd from '../src/commands/build';
@@ -17,12 +17,6 @@ const APP = '<template><p>{{ title }}</p></template>\n<script>\nlet title = $sig
 // one does, through node_modules: a project under the system temp directory resolves neither.
 const tmpRoot = (name: string): string =>
     join(__dirname, `.tmp-${name}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
-
-beforeAll(async () => {
-    // esbuild's service starts in the current directory on first use and holds it (see build-sourcemap).
-    const { transformWithEsbuild } = await import('vite');
-    await transformWithEsbuild('export {}', 'warmup.js');
-});
 
 describe('pdx build with the project\'s own pdx()', () => {
     let root: string;

@@ -39,9 +39,6 @@ let report: SsgReport;
 const page = (file: string): string => readFileSync(join(root, 'dist', file), 'utf-8');
 
 beforeAll(async () => {
-    // esbuild's service starts in the current directory and holds it: start it from here (#923).
-    const { transformWithEsbuild } = await import('vite');
-    await transformWithEsbuild('export {}', 'warmup.js');
     root = app('shop', FILES);
     roots.push(root);
     const resolved = { ...resolveConfig({}, root), ssgRoutes: ['/posts/1'] };
