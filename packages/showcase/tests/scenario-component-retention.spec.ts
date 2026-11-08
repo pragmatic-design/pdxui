@@ -20,6 +20,7 @@ import { extname, join, normalize, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
 import { scenarioDist } from './scenarios-build';
+import { retainerPath } from './retainer-path';
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 
@@ -91,6 +92,19 @@ test('RETAINED names only tags of the manifest', () => {
     expect(Object.keys(RETAINED).filter((t) => !TAGS.includes(t))).toEqual([]);
 });
 
+// #937: a row once counted a live round under the gate's load, and nothing it kept said what held it.
+// A row that counts a live instance now attaches the retainer path of one, read from a heap snapshot.
+// Here an instance is kept on purpose by a global, and the path must name that global.
+test('the retainer path of a kept instance names what keeps it', async ({ page }) => {
+    await page.goto(site.url);
+    await page.waitForFunction(() => (window as unknown as { __ready?: boolean }).__ready === true);
+    await page.evaluate(() => { (window as unknown as { __keptOnPurpose: Element }).__keptOnPurpose = document.createElement('pdx-badge'); });
+    expect((await liveInstances(page, 'pdx-badge')).live).toBe(1);
+    const path = await retainerPath(page, 'pdx-badge');
+    await test.info().attach('retainer path of the kept pdx-badge', { body: path, contentType: 'text/plain' });    expect(path).toContain('__keptOnPurpose');
+    expect(path.split('\n').at(-1)).toContain('pdx-badge');
+});
+
 test.describe('a removed component is collected', () => {
     for (const tag of TAGS) {
         const known = RETAINED[tag];
@@ -103,6 +117,11 @@ test.describe('a removed component is collected', () => {
             const before = await liveInstances(page, tag);
             for (let i = 0; i < ROUNDS; i++) await mount();
             const after = await liveInstances(page, tag);
+            // A row that counts a live instance, unexpectedly, attaches what holds one (#937). It still
+            // fails below: the path is the data for the fix, not a reason to pass.
+            if (!known && after.live > 0) {
+                await test.info().attach(`retainer path of a live ${tag}`, { body: await retainerPath(page, tag), contentType: 'text/plain' });
+            }
             await page.close();
 
             const mounted = (WARM_UP + ROUNDS) * INSTANCES;
