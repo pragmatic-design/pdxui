@@ -4341,7 +4341,7 @@ Render what `fn` returns — an html`` template, typically — to a string.
 ```ts
 import { renderToStringWithReport } from '@pdxui/core/server';
 
-function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[] }
+function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[]; head: ServerHead }
 ```
 
 The same, with the components that rendered as empty hosts and why.

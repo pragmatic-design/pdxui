@@ -79,12 +79,15 @@ function onLocalePick(e) {
 }
 
 // Where the visitor was going: `?next=`, checked to be a path of this app. Read ONCE,
-// at setup: signing in navigates, and the address is not this page's after that.
-const destination = nextAfterSignIn(location.search);
+// at setup: signing in navigates, and the address is not this page's after that. The server renders
+// a static page (#160) for no address in particular: no query there, and the browser reads it again
+// when it takes the page over.
+const search = typeof location !== 'undefined' ? location.search : '';
+const destination = nextAfterSignIn(search);
 
 // `ttl` is not a field: it is a lever the expiry test pulls, through the query string, and it is
 // the only way to watch a session lapse without waiting an hour. Clamped by the server.
-const ttl = Number(new URLSearchParams(location.search).get('ttl')) || undefined;
+const ttl = Number(new URLSearchParams(search).get('ttl')) || undefined;
 
 @form credentials: {
   username: string { required },

@@ -23,6 +23,17 @@ import { withServerRender, isDeferredTemplate, isServerBlock, isServerElement, t
 import { renderHost, type SkippedComponent } from './render-component';
 import { serverBlocks } from './blocks';
 import { isDeferredBlock } from '../renderer/deferred-block';
+import { serverHeadSink, setServerHeadSink, type HeadConfig, type MetaTag, type LinkTag } from '../browser/head';
+
+/**
+ * The head a page's components set while it renders on the server (#160): what a static build writes
+ * into the page. The last title set wins, as in the browser, where a page's title replaces its layout's.
+ */
+export interface ServerHead {
+    title: string | null;
+    meta: MetaTag[];
+    link: LinkTag[];
+}
 
 export type { SkippedComponent } from './render-component';
 
@@ -61,15 +72,25 @@ export function renderToString(fn: () => unknown): string {
 }
 
 /** The same, with the components that rendered as empty hosts and why. */
-export function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[] } {
+export function renderToStringWithReport(fn: () => unknown): { html: string; skipped: SkippedComponent[]; head: ServerHead } {
     const outer = skipped;
     const outerSeq = hostSeq;
     skipped = [];
     hostSeq = 0;
+    // The head this render's components set (`useHead`, `useTitle`, a `.pdx`'s `@title` and `@meta`).
+    const head: ServerHead = { title: null, meta: [], link: [] };
+    const collect = (set: HeadConfig): void => {
+        if (set.title !== undefined) head.title = set.title;
+        head.meta.push(...(set.meta ?? []));
+        head.link.push(...(set.link ?? []));
+    };
+    const outerSink = serverHeadSink;
+    setServerHeadSink(collect);
     try {
         const html = withServerRender(() => untracked(() => content(fn(), null)));
-        return { html, skipped };
+        return { html, skipped, head };
     } finally {
+        setServerHeadSink(outerSink);
         skipped = outer;
         hostSeq = outerSeq;
     }

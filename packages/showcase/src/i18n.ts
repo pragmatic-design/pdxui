@@ -139,8 +139,9 @@ export async function applyComponentStrings(locale: string): Promise<void> {
     // English — in its own right a defect, and here also the one honest signal that the
     // dictionary has landed: the second locale is FETCHED, and between
     // the first paint and its arrival the library's strings are still the English the components
-    // registered with. Set last, once both registries hold the locale.
-    document.documentElement.lang = locale;
+    // registered with. Set last, once both registries hold the locale. Not on the server, which
+    // renders a static page (#160) and has no document: the page keeps `index.html`'s `lang`.
+    if (typeof document !== 'undefined') document.documentElement.lang = locale;
 }
 
 // ─── A screen's strings travel with the screen ──────────────────────

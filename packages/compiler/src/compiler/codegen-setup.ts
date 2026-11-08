@@ -603,11 +603,12 @@ export function buildSetupBody(
         analysis.usedFeatures.add('onShow');
     }
 
-    // @title — head management (static: useHead, dynamic: effect on document.title)
+    // @title — head management (static: useHead, dynamic: useTitle). Both through core, which on the
+    // server records the title a static page is written with (#160) instead of reaching for a document.
     if (analysis.head.title) {
         const titleValue = analysis.head.title.value;
         if (analysis.head.title.isDynamic) {
-            parts.push(`    ctx.track(() => { document.title = ${rewriteAll(titleValue)}; });`);
+            parts.push(`    useTitle(() => ${rewriteAll(titleValue)});`);
         } else {
             parts.push(`    useHead({ title: ${jsString(titleValue)} });`);
         }

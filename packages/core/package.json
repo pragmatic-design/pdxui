@@ -50,8 +50,8 @@
       "require": "./dist/hydrate.cjs"
     },
     "./server-dom": {
-"development": "./src/server/dom-shim.ts",
-      "types": "./dist/server/dom-shim.d.ts",
+"development": "./src/server/dom-entry.ts",
+      "types": "./dist/server/dom-entry.d.ts",
       "import": "./dist/server-dom.es.js",
       "require": "./dist/server-dom.cjs"
     },

@@ -59,14 +59,43 @@ function tagAt(lower: string, name: string, from: number): number {
     return -1;
 }
 
+/** What a route's components put in the head (`@title`, `@meta`, `useHead`), as the server collected it. */
+export interface Head {
+    readonly title: string | null;
+    readonly meta: readonly { name?: string; property?: string; content: string }[];
+    readonly link: readonly { rel: string; href: string; type?: string; crossorigin?: string }[];
+}
+
+// Match: the page's <title> element. Groups: [1]=its opening tag
+const TITLE = /(<title\b[^>]*>)[\s\S]*?<\/title\s*>/i;
+
 /**
- * The page with the body's markup replaced by what the server rendered for a route. The splash goes:
- * it covers a page with nothing in it yet, and this one has its content.
+ * The page with the body's markup replaced by what the server rendered for a route, and the route's
+ * head — its title in place of the page's, its meta and links before `</head>` — so a search engine,
+ * a link preview and the tab read what the client would set. The splash goes: it covers a page with
+ * nothing in it yet, and this one has its content.
  */
-export function generatedPage(parts: BodyParts, rendered: string): string {
-    const before = parts.before.replace(SPLASH_STYLE, '').replace(BODY_BUSY, '$1');
+export function generatedPage(parts: BodyParts, rendered: string, head: Head = { title: null, meta: [], link: [] }): string {
+    let before = parts.before.replace(SPLASH_STYLE, '').replace(BODY_BUSY, '$1');
+    if (head.title !== null) {
+        const title = escapeText(head.title);
+        before = TITLE.test(before) ? before.replace(TITLE, (_, open: string) => `${open}${title}</title>`) : before.replace(/<\/head\s*>/i, `<title>${title}</title>\n</head>`);
+    }
+    const tags = [
+        ...head.meta.map((m) => `<meta${m.name ? ` name="${escapeAttr(m.name)}"` : ''}${m.property ? ` property="${escapeAttr(m.property)}"` : ''} content="${escapeAttr(m.content)}">`),
+        ...head.link.map((l) => `<link rel="${escapeAttr(l.rel)}" href="${escapeAttr(l.href)}"${l.type ? ` type="${escapeAttr(l.type)}"` : ''}${l.crossorigin ? ` crossorigin="${escapeAttr(l.crossorigin)}"` : ''}>`),
+    ];
+    if (tags.length > 0) before = before.replace(/<\/head\s*>/i, `${tags.join('\n')}\n</head>`);
     const scripts = parts.scripts.length > 0 ? `\n${parts.scripts.join('\n')}` : '';
     return `${before}\n${rendered}${scripts}\n${parts.after}`;
+}
+
+function escapeText(text: string): string {
+    return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escapeAttr(text: string): string {
+    return escapeText(text).replace(/"/g, '&quot;');
 }
 
 /** The body's markup without the splash, which the server does not render. */

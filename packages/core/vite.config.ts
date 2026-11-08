@@ -18,7 +18,7 @@ export default defineConfig({
                 devtools: 'src/devtools/overlay.ts',
                 server: 'src/server/index.ts',
                 // Its own entry, importing nothing of core: installed before core is evaluated.
-                'server-dom': 'src/server/dom-shim.ts',
+                'server-dom': 'src/server/dom-entry.ts',
                 hydrate: 'src/hydrate/index.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one

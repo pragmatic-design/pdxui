@@ -79,7 +79,8 @@ npx pdx build --ssg
 ```
 
 `--ssg` writes a page for every route: `/` as `index.html`, `/about` as `about/index.html`. Each
-page is the built `index.html` with the route's content already in its body. A visitor sees that
+page is the built `index.html` with the route's content already in its body, and its `@title` and
+`@meta` in the head. A visitor sees that
 content before any JavaScript runs, and the app then takes it over instead of rendering it again:
 the elements stay the same ones, and they become interactive.
 
