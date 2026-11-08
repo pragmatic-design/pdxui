@@ -141,7 +141,7 @@ export const ROWS: Row[] = [
         read: (h) => h.querySelector('input')!.value,
     },
     {
-        name: '::value on a <select>', hydrateDiffers: 'the server writes a field\'s value as its attribute, which a mount holds as a property, and on a <select> it is no attribute (#934)', expected: '<select><option value="a">A</option><option value="b">B</option></select><p>b</p>', expectedRead: 'b',
+        name: '::value on a <select>', hydrateDiffers: 'the server marks the option its value names `selected`, which a mount sets as the property: the attribute stays on the option of the first value (#934)', expected: '<select><option value="a">A</option><option value="b">B</option></select><p>b</p>', expectedRead: 'b',
         template: '<select ::value="s"><option value="a">A</option><option value="b">B</option></select><p>{{ s }}</p>',
         script: "let s = $signal('a');",
         act: (h) => { const s = h.querySelector('select')!; s.value = 'b'; s.dispatchEvent(new Event('change', { bubbles: true })); },
