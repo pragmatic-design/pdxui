@@ -227,7 +227,11 @@ describe('the agent loop: check --json --fix, then check --json', () => {
         await codes(true);
         const after = await codes(false);
         expect(MISTAKES.filter((c) => after.includes(c)), `left after --fix: ${after.join(', ')}`).toEqual([]);
-    });
+        // Three runs of `pdx check` over a project: work counted in seconds, held to the time a command
+        // takes, as the other tests here that run one are (#953). Measured 2026-11-08: 1.08–1.23 s alone,
+        // 1.6–2.3 s with core's suite beside it, past vitest's default 5 s once in the pre-push gate,
+        // which runs every package at once.
+    }, 60_000);
 });
 
 describe('applyFixes', () => {
