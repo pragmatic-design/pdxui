@@ -2,7 +2,7 @@
 // `build.sourcemap`; the standalone build writes the compiler's map beside each `.js`. Absent, the
 // output has no `.map` anywhere.
 
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -23,14 +23,6 @@ async function runBuild(args: Record<string, unknown>): Promise<void> {
 function filesIn(dir: string): string[] {
     return existsSync(dir) ? readdirSync(dir) : [];
 }
-
-// esbuild starts its service process on first use, in the current directory, and keeps it. Started
-// inside a test project, that process holds the directory and Windows refuses to remove it (EBUSY):
-// start it here, from where the suite runs.
-beforeAll(async () => {
-    const { transformWithEsbuild } = await import('vite');
-    await transformWithEsbuild('export {}', 'warmup.js');
-});
 
 describe('pdx build --sourcemap', () => {
     let root: string;
