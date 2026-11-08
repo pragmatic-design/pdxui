@@ -11,7 +11,7 @@
 //   grid-selection.ts — checkbox, select-all, range
 //   grid-footer.ts   — pdx-pagination integration
 
-import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, DEV, slot, prop } from '@pdxui/core';
+import { component, html, useDataGrid, isDataSource, createDataSource, effect, onDestroy, onMount, DEV, slot, prop } from '@pdxui/core';
 import type { DataSource, ColumnDef, Dispose, GridState } from '@pdxui/core';
 import type { GridContext, AnyColumn } from './grid-context';
 import { buildHeader } from './grid-header';
@@ -394,8 +394,10 @@ component('pdx-data-grid', {
             }
         }
 
-        // A lone modifier held for the next click draws no focus ring.
-        const stopModality = trackInputModality(ctx.el);
+        // A lone modifier held for the next click draws no focus ring. Listened for once mounted: the
+        // keys are the document's, and a grid written by the server (#160) has none.
+        let stopModality = (): void => {};
+        onMount(() => { stopModality = trackInputModality(ctx.el); });
 
         // Internal event routing (from sub-modules): the host's listeners, declared in `host` below.
         /** A group opened or closed, or a detail row: the body is drawn again. */

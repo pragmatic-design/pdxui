@@ -14,6 +14,8 @@ const FIRST_FAVOURITES = ['tickets', 'board', 'customers'];
  * dropped, and the storage with it, not kept as a row with nothing to draw.
  */
 function readPins(): string[] {
+    // The server renders a static page (#160): no visitor, the first-visit favourites.
+    if (typeof localStorage === 'undefined') return [...FIRST_FAVOURITES];
     const stored: string[] = JSON.parse(localStorage.getItem(PIN_KEY) ?? JSON.stringify(FIRST_FAVOURITES));
     const kept = stored.filter(k => ALL_LINKS.some(i => i.key === k));
     if (kept.length !== stored.length) localStorage.setItem(PIN_KEY, JSON.stringify(kept));

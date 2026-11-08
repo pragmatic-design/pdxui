@@ -25,14 +25,19 @@ export function createRecents(
     const key = (): string => 'showcase.recents.' + (user() || 'guest');
     const list = signal<string[]>([]);
 
-    // Whose recents: read again when the person changes.
-    effect(() => { list.set(JSON.parse(localStorage.getItem(key()) ?? '[]')); });
+    // Whose recents: read again when the person changes. None on the server (#160), which renders
+    // a static page for no visitor.
+    effect(() => {
+        const name = key();
+        if (typeof localStorage === 'undefined') return;
+        list.set(JSON.parse(localStorage.getItem(name) ?? '[]'));
+    });
 
     function note(p: string): void {
         const recent = listOf(p);
         if (!recent) return;
         const next = [recent, ...list().filter(k => k !== recent)].slice(0, RECENTS_KEPT);
-        localStorage.setItem(key(), JSON.stringify(next));
+        if (typeof localStorage !== 'undefined') localStorage.setItem(key(), JSON.stringify(next));
         list.set(next);
     }
     watch(path, (p) => note(p), { immediate: true });

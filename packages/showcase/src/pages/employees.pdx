@@ -60,7 +60,9 @@ const source = createDataSource({ transport: employeeTransport, pageSize: 10 });
 
 // The order a record's pager walks: this list's sort and filter as the reader left
 // them. The session's, not the browser's: a pager that walks yesterday's filter is a surprise.
+// Not on the server, which renders a static page (#160) and has no session.
 $watch([source.sort, source.filter], ([sort, filter]) => {
+  if (typeof sessionStorage === 'undefined') return;
   sessionStorage.setItem(EMPLOYEE_WALK_KEY, JSON.stringify({ sort: sort ?? [], filter: filter ?? [] }));
 }, { immediate: true });
 

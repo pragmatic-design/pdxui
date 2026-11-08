@@ -179,7 +179,9 @@ onMount(() => {
 // Persisted, because a navigation that forgets how it was left is a navigation the visitor sets
 // again on every reload.
 const SIDE_KEY = 'showcase.side';
-let side = $signal(localStorage.getItem(SIDE_KEY) === 'collapsed' ? 'collapsed' : 'expanded');
+// The server renders a static page (#160): no visitor, no storage, the rail expanded; the browser
+// reads the visitor's choice when it takes the page over.
+let side = $signal(typeof localStorage !== 'undefined' && localStorage.getItem(SIDE_KEY) === 'collapsed' ? 'collapsed' : 'expanded');
 
 // On a phone the rail is ICONS, whatever the visitor last chose on a desktop: 300px of a 390px
 // screen is not a navigation, it is the screen — measured as 130px of sideways scroll, which is
@@ -255,7 +257,8 @@ function closeCatalog() {
 // object and not a signal: a toggle is the menu's own change, and making it rebuild its items for
 // it would be the menu drawing twice.
 const GROUPS_KEY = 'showcase.navGroups';
-const groupsOpen = JSON.parse(localStorage.getItem(GROUPS_KEY) ?? '{}');
+// On the server (#160) no visitor has opened any: the menu's own defaults.
+const groupsOpen = JSON.parse((typeof localStorage !== 'undefined' ? localStorage.getItem(GROUPS_KEY) : null) ?? '{}');
 
 function onNavToggle(e) {
     groupsOpen[e.detail.key] = e.detail.expanded;

@@ -22,6 +22,9 @@ const ATTRIBUTE: Record<Density, string | null> = { compact: 'compact', normal: 
 
 /** What the visitor chose, or `normal`, as it is in storage. */
 export function storedDensity(): Density {
+    // The server renders a static page (#160): no visitor, no storage, the theme's own density. The
+    // visitor's choice is applied in the browser, at boot.
+    if (typeof localStorage === 'undefined') return 'normal';
     const saved = localStorage.getItem(DENSITY_KEY);
     return (DENSITIES as readonly string[]).includes(saved ?? '') ? (saved as Density) : 'normal';
 }
@@ -35,6 +38,8 @@ export const density: ReadonlySignal<Density> = _density;
 
 /** Put a density on the page without remembering it — the boot applies the stored one this way. */
 export function applyDensity(key: string): void {
+    // The server writes the page with the theme's own density (#160); the browser applies the choice.
+    if (typeof document === 'undefined') return;
     const value = key in ATTRIBUTE ? ATTRIBUTE[key as Density] : null;
     if (value) document.documentElement.setAttribute('pdx-density', value);
     else document.documentElement.removeAttribute('pdx-density');
