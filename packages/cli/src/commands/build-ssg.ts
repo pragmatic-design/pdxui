@@ -23,7 +23,10 @@ import { promisify } from 'util';
 import { tmpdir } from 'os';
 import { dirname, join, resolve } from 'pathe';
 import type { resolveConfig } from '../config/loader';
+import type { Plugin } from 'vite';
+import type { HydrateApi } from '@pdxui/compiler';
 import { pdxPluginsFor } from './pdx-plugins';
+import { PDX_HYDRATE_PLUGIN_NAME } from '../utils/vite-config';
 import { SSG_ENTRY_ID, SSG_RUNNER, appEntries, ssgEntryPlugin, type SsgRender } from './ssg-entry';
 import { bodyParts, generatedPage, pageFile, renderableMarkup } from './ssg-page';
 
@@ -56,10 +59,11 @@ export async function buildSsg(
     const plugins = await pdxPluginsFor(vite, cwd, resolved, true, configFile);
     const sourceHtml = readFileSync(resolve(cwd, 'index.html'), 'utf-8');
 
+    const preloads = hydrateApiReader();
     await vite.build({
         root: cwd,
         configFile,
-        plugins,
+        plugins: [...plugins, preloads.plugin],
         build: { outDir, minify: 'esbuild', target: resolved.target, sourcemap },
     });
 
@@ -86,17 +90,42 @@ export async function buildSsg(
                 rollupOptions: { input: SSG_ENTRY_ID, output: { entryFileNames: 'ssg-entry.mjs', format: 'es' } },
             },
         });
-        return await generate(serverDir, outDir, resolved.ssgRoutes);
+        return await generate(serverDir, outDir, resolved.ssgRoutes, (html, route) => preloads.api()?.retargetPreloads(html, route) ?? html);
     } finally {
         rmSync(serverDir, { recursive: true, force: true });
     }
 }
 
 /**
+ * The pdx plugin's offer to a static build (its `api`, `HydrateApi`), from the client build's
+ * resolved plugins: the project's own config may register pdx(), and then this build holds no
+ * instance of it.
+ */
+function hydrateApiReader(): { plugin: Plugin; api(): HydrateApi | null } {
+    let found: HydrateApi | null = null;
+    return {
+        plugin: {
+            name: 'pragmatic-pdx-ssg-preloads',
+            configResolved(config) {
+                const hydrate = config.plugins.find((p) => p.name === PDX_HYDRATE_PLUGIN_NAME) as { api?: HydrateApi } | undefined;
+                found = hydrate?.api ?? null;
+            },
+        },
+        api: () => found,
+    };
+}
+
+/**
  * Render every route in a node process of its own, then write each page. Source maps are on there, so
  * a failure names the app's file and line, not the bundle's.
  */
-async function generate(serverDir: string, outDir: string, extraPaths: readonly string[]): Promise<SsgReport> {
+async function generate(
+    serverDir: string,
+    outDir: string,
+    extraPaths: readonly string[],
+    /** A page for `route` announcing that route's chunks instead of the landing route's. */
+    retarget: (html: string, route: string) => string,
+): Promise<SsgReport> {
     const built = readFileSync(join(outDir, 'index.html'), 'utf-8');
     const parts = bodyParts(built);
     if (!parts) throw new SsgError('the built index.html has no <body> to render the routes into.');
@@ -135,7 +164,7 @@ async function generate(serverDir: string, outDir: string, extraPaths: readonly 
     for (const page of rendered.pages) {
         const file = pageFile(page.path);
         mkdirSync(dirname(join(outDir, file)), { recursive: true });
-        writeFileSync(join(outDir, file), generatedPage(parts, page.html, page.head));
+        writeFileSync(join(outDir, file), retarget(generatedPage(parts, page.html, page.head), page.route));
         report.pages.push({ path: page.path, file, skipped: page.skipped });
     }
     return report;

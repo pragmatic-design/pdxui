@@ -86,8 +86,9 @@ function detectLocale(config: I18nConfig): string {
         if (resolved !== defaultLocale || persisted === defaultLocale) return resolved;
     }
 
-    // 2. Auto-detect from browser
-    if (config.detect !== false && typeof navigator !== 'undefined') {
+    // 2. Auto-detect from browser. Not on the server, where Node's own `navigator` (v21+) speaks the
+    // build machine's language: no visitor asked for a page a build generates, so it is the default.
+    if (config.detect !== false && typeof window !== 'undefined' && typeof navigator !== 'undefined') {
         const browserLocales = navigator.languages ?? [navigator.language];
         for (const bl of browserLocales) {
             const resolved = resolveLocale(bl);

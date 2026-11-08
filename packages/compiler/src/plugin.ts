@@ -53,7 +53,7 @@ import type { RequiredPropsLookup } from './compiler/validate-required-props';
 import type { RequiredSlotsLookup } from './compiler/validate-required-slots';
 import { jsQuote } from './compiler/js-literal';
 import { designTargetPlugin } from './design-target';
-import { hydrateEntryPlugin } from './hydrate-entry';
+import { hydrateEntryPlugin, type RoutePreloads } from './hydrate-entry';
 /** The route table (`route-table.ts`): data the router reads, in dev and in a build. */
 const RESOLVED_ROUTE_TABLE_ID = '\0' + ROUTE_TABLE_ID;
 /**
@@ -189,6 +189,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
     const target = options?.target ?? 'baseline-2026';
     const prefix = options?.prefix ?? DEFAULT_TAG_PREFIX;
     const hydrate = options?.hydrate ?? false;
+    /** The preloads a build wrote, and each route's: what a generated page swaps (#160). */
+    let routePreloads: RoutePreloads | null = null;
     let isDevMode = false;
     // Vite's `base`, for the preload hrefs: an app served under a sub-path has to name its chunks
     // the way the browser will ask for them.
@@ -449,6 +451,15 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // In the head, before the entry's own script: the browser starts them together
                 // rather than after it.
                 if (tags) html = html.replace('</head>', `${tags}\n</head>`);
+                // A generated page is its own route's first screen (#160): `pdx build --ssg` swaps these
+                // tags for that route's (`hydrateEntryPlugin`'s `api`).
+                if (hydrate) {
+                    const bundle = ctx.bundle;
+                    routePreloads = {
+                        landing: tags,
+                        routes: new Map(scannedRoutes.map((r) => [r.path, preloadTags(routePreloadFiles(bundle, scannedRoutes, [r.path]), viteBase)])),
+                    };
+                }
             }
             // The splash, in dev as in a build: a cold load is a cold load either way.
             if (splash && scannedRoutes.length > 0) html = injectSplash(html, splash);
@@ -652,7 +663,7 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
         },
     };
     return hydrate
-        ? [main, designTargetPlugin(target), hydrateEntryPlugin(() => scannedRoutes.length > 0)]
+        ? [main, designTargetPlugin(target), hydrateEntryPlugin(() => scannedRoutes.length > 0, () => routePreloads)]
         : [main, designTargetPlugin(target)];
 }
 

@@ -93,4 +93,21 @@ describe('renderToString in Node', () => {
         expect(skipped[0].reason).toMatch(/document/);
         expect(skipped[0].global, 'the global it read, which a static build stops on').toBe('document');
     });
+
+    it('so does one whose template reads it — in a value, a condition — and the page around it renders', () => {
+        // The template's values are read while its markup is written, after the body returned: a read
+        // there is the component's as much as one in its setup.
+        const { html, component, when } = core;
+        component('node-reads-in-template', {
+            render: () => html`<p>${when(() => document.visibilityState === 'visible', () => html`<b>seen</b>`)}</p>`,
+        });
+        const { html: markup, skipped } = core.renderToStringWithReport(() =>
+            html`<main><h1>Page</h1><node-reads-in-template></node-reads-in-template></main>`);
+        expect(markup).toContain('<h1>Page</h1>');
+        expect(markup).toMatch(/<node-reads-in-template [^>]*data-pdx-ssr="\d+"[^>]*><\/node-reads-in-template>/);
+        expect(skipped).toHaveLength(1);
+        expect(skipped[0].tag).toBe('node-reads-in-template');
+        expect(skipped[0].global).toBe('document');
+        expect(skipped[0].at, 'where it read it').toMatch(/render-string-node\.test\.ts:\d+:\d+/);
+    });
 });
