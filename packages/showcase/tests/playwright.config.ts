@@ -37,9 +37,10 @@ export default defineConfig({
     // And `lifecycle.spec.ts`, `scoped-styles.spec.ts` and `form-model.spec.ts`: their fixtures, under `fixtures/`, are pages
     // the dev server compiles on request; the preview serves only the showcase's build (#143, #152).
     // And the timed specs, which measured this suite's load with the page: `playwright.timing.config.ts`
-    // runs them after it, with nothing else running (#606).
+    // runs them after it, with nothing else running (#606). So does it run `ssg-pages.spec.ts`, which
+    // measures the generated site against this build (#160).
     testIgnore: ['dev-server.spec.ts', 'permissions-edit.spec.ts', 'devtools-v2.spec.ts', 'hmr.spec.ts', 'scenario-*.spec.ts', 'lifecycle.spec.ts', 'scoped-styles.spec.ts', 'form-model.spec.ts',
-        'first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts'],
+        'first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'],
     fullyParallel: true,
     workers: WORKERS,
     reporter: [['list']],

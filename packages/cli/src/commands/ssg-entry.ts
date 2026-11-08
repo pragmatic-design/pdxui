@@ -30,6 +30,8 @@ export interface SsgRender {
     readonly error?: string;
     readonly pages: {
         readonly path: string;
+        /** The pattern of the route the path matched. */
+        readonly route: string;
         readonly html: string;
         readonly skipped: { tag: string; reason: string; global?: string; at?: string }[];
         /** The head the route's components set: `@title`, `@meta`, `useHead`. */
@@ -102,7 +104,7 @@ ${imports}
             continue;
         }
         const { html: rendered, skipped, head } = renderToStringWithReport(() => html(strings));
-        pages.push({ path, html: rendered, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
+        pages.push({ path, route: route.route, html: rendered, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
     }
     return { pages, skippedRoutes };
 }

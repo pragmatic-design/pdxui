@@ -35,6 +35,21 @@ function pick(ac: HTMLElement, label: string): void {
 
 const CITIES = [{ name: 'Milan', code: 'MXP' }, { name: 'Rome', code: 'FCO' }];
 
+describe('pdx-autocomplete highlight', () => {
+    beforeEach(cleanup);
+
+    it('marks the part of each suggestion the query matches, the label written as text', async () => {
+        const { ac, input } = await autocomplete({}, ['Milan', 'a <b>bold</b> mile']);
+        type(input, 'mil');
+        await tick(20);
+        const options = [...ac.querySelectorAll('[role="option"]')];
+        expect(options.map((o) => o.querySelector('mark')?.textContent)).toEqual(['Mil', 'mil']);
+        expect(options[0].textContent?.trim()).toBe('Milan');
+        expect(options[1].querySelector('b'), 'a label is text, never markup').toBeNull();
+        expect(options[1].textContent?.trim()).toBe('a <b>bold</b> mile');
+    });
+});
+
 describe('pdx-autocomplete value field', () => {
     beforeEach(cleanup);
 

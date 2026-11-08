@@ -158,7 +158,7 @@ const initials = $derived(reference.replace('T-', ''));
 @scroll 'top';
 
 // The upload, and its `uploadFile` and `effect`, are `src/attachment-upload.pdx`'s.
-import { downloadFile, saveBlob } from '@pdxui/core';
+import { downloadFile, saveBlob, effect } from '@pdxui/core';
 // The store, for the crumb above: the label runs at module scope, so what it reads has to live
 // there too.
 import { ticketById, type Ticket } from '../data/tickets';
@@ -234,7 +234,11 @@ async function reload() {
 // one-shot and runs while `id` is still the prop's default, so the first request would ask for the
 // attachments of ticket "" — every ticket would get the same list, and nothing would say so. Reading `id`
 // inside an effect subscribes to it, so the list follows the route.
-$effect(() => { void reload(); });
+//
+// The effect is started once the page is mounted, not in the setup: it asks the server, and a build
+// that generates this page (#160) runs the setup in Node, with no server to ask. Still an effect, so
+// the point above holds; the cleanup onMount is returned disposes it.
+onMount(() => effect(() => { void reload(); }));
 
 /**
  * Download, and save under the name the SERVER sent.

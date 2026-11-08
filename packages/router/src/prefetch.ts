@@ -22,6 +22,7 @@ import { config, chainAllowed } from './navigation';
 import { loaderIdentity, parseLoaderQuery, prefetchLoaderCall } from './loader-prefetch';
 import { keepResult } from './loader-cache';
 import { coerceParams } from './matcher';
+import { isBrowser } from './state';
 
 /**
  * What a route says about being fetched ahead of time: on a hover, focus or press of a link to it
@@ -163,6 +164,9 @@ export function prefetchAllowed(): boolean {
  */
 export function prefetchRoute(url: string | null | undefined): boolean {
     if (!url) return false;
+    // On the server (#160) there is no next click to make faster: a build imports every page itself,
+    // and a loader started here would be a request made for no visitor.
+    if (!isBrowser) return false;
     if (!prefetchAllowed()) return false;
 
     // The data first: it does not depend on whether the chunk is already in.

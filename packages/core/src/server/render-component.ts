@@ -79,15 +79,19 @@ export function renderHost(
     host.setAttribute('data-pdx-root', '');
     let rendered: unknown = null;
     let failed = false;
+    /** Why this host renders empty: what its setup, its render or its template's values threw. */
+    const fail = (error: unknown): void => {
+        const global = undefinedGlobal(error);
+        const at = global ? firstFrame(error) : null;
+        skipped.push(global ? { tag, reason: message(error), global, ...(at ? { at } : {}) } : { tag, reason: message(error) });
+        failed = true;
+    };
     const [, dispose] = collectDisposers(() => {
         try {
             rendered = untracked(() => host.body());
         } catch (error) {
-            const global = undefinedGlobal(error);
-            const at = global ? firstFrame(error) : null;
-            skipped.push(global ? { tag, reason: message(error), global, ...(at ? { at } : {}) } : { tag, reason: message(error) });
+            fail(error);
             rendered = null;
-            failed = true;
         }
     });
     let markup = '';
@@ -101,6 +105,13 @@ export function renderHost(
             rendering.push(host);
             try {
                 markup = inner(rendered);
+            } catch (error) {
+                // Its template's values are read while the markup is written, after the body returned:
+                // a value or a condition that reads the browser is the component's as much as its setup.
+                // A component inside it that fails is caught by its own host, so what arrives here is
+                // this one's. An empty host, as for a setup that throws.
+                fail(error);
+                markup = '';
             } finally {
                 rendering.pop();
             }

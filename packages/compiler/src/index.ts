@@ -2,6 +2,7 @@
 
 export { pdx, compile } from './plugin';
 export type { PdxPluginOptions, CompileResult, CompileOptions } from './plugin';
+export type { HydrateApi } from './hydrate-entry';
 export type { BrowserTarget } from './compiler/compile-context';
 
 // The registry of language changes (#121): what `pdx migrate` applies and PDX_REMOVED_FORM reports.

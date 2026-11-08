@@ -26,20 +26,15 @@ function normalize(items: any[], labelField: string, valueField: string): Normal
     });
 }
 
-/** Build a highlighted span using DOM API (no innerHTML). */
-function buildHighlight(label: string, query: string): HTMLSpanElement {
-    const span = document.createElement('span');
+/**
+ * A label with the query's match marked. A template, not elements built by hand: its values are text,
+ * escaped as `textContent` was, and the server can render it (#160) — a suggestion list open with a
+ * query is part of a page a build writes.
+ */
+function buildHighlight(label: string, query: string) {
     const matchIdx = label.toLowerCase().indexOf(query.toLowerCase());
-    if (matchIdx === -1) {
-        span.textContent = label;
-        return span;
-    }
-    span.append(document.createTextNode(label.slice(0, matchIdx)));
-    const mark = document.createElement('mark');
-    mark.textContent = label.slice(matchIdx, matchIdx + query.length);
-    span.append(mark);
-    span.append(document.createTextNode(label.slice(matchIdx + query.length)));
-    return span;
+    if (matchIdx === -1) return html`<span>${label}</span>`;
+    return html`<span>${label.slice(0, matchIdx)}<mark>${label.slice(matchIdx, matchIdx + query.length)}</mark>${label.slice(matchIdx + query.length)}</span>`;
 }
 
 /**

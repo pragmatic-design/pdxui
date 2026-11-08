@@ -1003,13 +1003,15 @@ class InlineGen {
             }
         }
         if (node.emptyBody) {
-            // @empty fallback — when() wraps each + empty
+            // @empty fallback — when() picks the rows or the empty body. The list is built INSIDE its
+            // branch, as any branch's content is: built once outside, it was a fragment that emptied
+            // into the page the first time it was shown, so a list emptied and filled again showed
+            // nothing; and the server (#160) could not render a branch that built a fragment by hand.
             this.imports.add('when');
             const emptyBody = this.sub(node.emptyBody);
             const wf = this.v('wf');
             this.pending = templateMark(this.ctx, node.exprOffset);
-            this.out(`const ${cf}=${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition});`);
-            this.out(`const ${wf}=when(${arrowOf(`${items}?.length>0`)},()=>{const f=document.createDocumentFragment();f.appendChild(${cf});return f;},()=>{${emptyBody}});`);
+            this.out(`const ${wf}=when(${arrowOf(`${items}?.length>0`)},()=>${helper}(${arrowOf(items)},${keyArg},(${params})=>{${body}}${transition}),()=>{${emptyBody}});`);
             this.place(wf);
         } else {
             this.pending = templateMark(this.ctx, node.exprOffset);

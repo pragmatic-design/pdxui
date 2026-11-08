@@ -88,6 +88,16 @@ describe('pdx build --ssg', () => {
         expect(page('index.html'), 'a route with no title keeps the page\'s').toContain('<title>Shop</title>');
     });
 
+    it('has each page announce its own route\'s chunk, not the landing route\'s', () => {
+        // The built index.html preloads `/`'s chunk (the plugin's `preloadRoutes`). A page generated for
+        // another route is that route's first screen: its chunk is the one the browser should start.
+        const preloads = (file: string): string[] => [...page(file).matchAll(/<link rel="modulepreload"[^>]*href="\/assets\/([a-z]+)-[^"]*\.js"/g)].map((m) => m[1]);
+        expect(preloads('index.html')).toContain('home');
+        expect(preloads('about/index.html')).toContain('about');
+        expect(preloads('about/index.html'), 'the landing route\'s chunk, preloaded on another route\'s page').not.toContain('home');
+        expect(preloads('posts/1/index.html')).toContain('post');
+    });
+
     it('writes the production markup, the one the production client hydrates with', () => {
         expect(page('index.html'), 'a development attribute in a production page').not.toContain('data-pdx-route');
     });

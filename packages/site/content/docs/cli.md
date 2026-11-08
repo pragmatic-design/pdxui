@@ -129,8 +129,9 @@ The build says what it did not write, and why:
 - a guarded route the permissions you have set do not grant;
 - a redirect.
 
-Reading the browser stops the build. If a component's setup or render reads a browser global such as
-`window`, `document` or `localStorage`, the build names the component and the global. If a module
+Reading the browser stops the build. If a component's setup, its render or a value in its template
+reads a browser global such as `window`, `document` or `localStorage`, the build names the component
+and the global. If a module
 reads one when it is imported, the build names the file and the line. That work belongs in `onMount`,
 which the server never runs, or behind `typeof window !== 'undefined'`. A component that cannot be
 written for another reason (its render builds DOM by hand) is named with the reason, and the client
