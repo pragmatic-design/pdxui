@@ -28,7 +28,8 @@
  * be weighed as if it were today's.
  */
 import { build } from 'vite';
-import { rmSync } from 'node:fs';
+import { rmSync, writeFileSync } from 'node:fs';
+import { mainWorktree } from './pilot-main';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 
@@ -59,6 +60,13 @@ export const SCENARIOS: { name: string; root: string; config: string }[] = [
  */
 export const SSG_ROOT = join(packageDir, 'scenarios', 'ssg');
 
+/**
+ * `pilot-pdx-main`: the `.pdx` pilot as `origin/main` builds it, from a worktree of it (`pilot-main.ts`),
+ * which `scenario-pilot-mount.spec.ts` measures beside this tree's (#938). Not in SCENARIOS, which the
+ * budgets weigh; the commit it was built from is written beside it.
+ */
+export const PILOT_MAIN = 'pilot-pdx-main';
+
 export default async function buildScenarios(): Promise<void> {
     for (const { name, root, config } of SCENARIOS) {
         await build({
@@ -68,6 +76,15 @@ export default async function buildScenarios(): Promise<void> {
             build: { outDir: scenarioDist(name), emptyOutDir: true },
         });
     }
+    const main = mainWorktree();
+    const pilotRoot = join(main.root, 'packages', 'showcase', 'scenarios', 'pilot-mount');
+    await build({
+        root: pilotRoot,
+        configFile: join(pilotRoot, 'vite.pilot.config.ts'),
+        logLevel: 'warn',
+        build: { outDir: scenarioDist(PILOT_MAIN), emptyOutDir: true },
+    });
+    writeFileSync(join(scenarioDist(PILOT_MAIN), 'commit.txt'), main.commit);
     // The CLI's own build, from its sources: the showcase does not depend on the CLI's package.
     const { buildSsg } = await import('../../cli/src/commands/build-ssg');
     const { resolveConfig } = await import('../../cli/src/config/loader');

@@ -18,7 +18,6 @@ runs from the repository root; the outputs are from one run on the `pilot-mount`
 | `callers.mjs <profile> <fn> [depth]` | bottom-up: the caller chains a function's self time is spent under |
 | `compare.mjs <action> <dirA> <dirB> […] [--samples <n>]` | several builds of one page, timed alternated in one run |
 | `mount-budgets.mjs <component-mount build> [--out <json>]` | every component's mount over the calibration: the measurements the mount budgets are set from |
-| `pilot-baseline.mjs <pilot-pdx build of main> [--out <json>]` | the `.pdx` pilot's rows over the calibration on `main`: what a pilot row over its ratio is held to |
 | `detached.mjs <dir> [tag …] [--mounts <n>]` | detached elements each component leaves alive after its removal ([Memory](#memory)) |
 | `retainers.mjs <dir> <tag> [paths] [--mounts <n>]` | the strong reference chains that keep a removed component alive |
 | `heap-diff.mjs <dir> <tag> [rounds]` | the kinds of object that grow between two heap snapshots of a tag's mounts |
@@ -191,26 +190,10 @@ pdx-wizard                   1.47
 114 tags → packages\showcase\tests\scenario-component-mount.json
 ```
 
-## pilot-baseline.mjs
-
-```
-node packages/showcase/tools/perf/build-scenario.mjs pilot-pdx packages/showcase/scenarios/dist/perf/pilot-pdx-main
-node packages/showcase/tools/perf/pilot-baseline.mjs packages/showcase/scenarios/dist/perf/pilot-pdx-main
-```
-
-Writes, into `tests/scenario-pilot-mount.json`, each pilot row's `.pdx` mount over `__calibrate(units)`
-measured beside it: the median of `samples` pairs after `warmUp`, read from that JSON. Build it from
-`main`. `scenario-pilot-mount.spec.ts` holds a row over its ratio to this measurement × its slack, so
-that a row fails when the `.pdx` side gets slower, not when the TypeScript side gets faster (#919). Run
-it again when a change makes the `.pdx` side faster on purpose.
-
-```
-switch       1.88
-select       5.31
-values       6.87
-conditions   56.29
-4 rows → packages\showcase\tests\scenario-pilot-mount.json
-```
+A pilot row over its ratio is not held to a recording: `scenario-pilot-mount.spec.ts` mounts `main`'s
+pilot beside this tree's, built from a worktree of `origin/main` (`tests/pilot-main.ts`), and fails when
+this tree's `.pdx` side is the slower of the two (#938). A recording of `main` over a calibration moved
+up to 38% between runs of an unchanged build.
 
 ## Memory
 

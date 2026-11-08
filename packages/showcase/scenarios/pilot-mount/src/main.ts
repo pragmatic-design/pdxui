@@ -5,9 +5,7 @@
 // (packages/ui/pilot/plugin.ts). The imports are the same in both; what they resolve to is not.
 //
 // `window.__mount(kind, n)` mounts n of `kind` into a fresh container, waits until each one has drawn
-// what it is measured by, and returns the milliseconds; it removes the container after.
-// `window.__calibrate(units)` times a fixed piece of DOM work, against which the `.pdx` side is held
-// when a row's ratio is over its bound (#919). The filter
+// what it is measured by, and returns the milliseconds; it removes the container after. The filter
 // popover is not a tag: it is 100 contents built through `buildFilterPopoverContent`, as the pilot
 // measured it. The controls a condition is edited with are defined before any mount, so that no lazy
 // load is timed; and so is `pdx-button`, which the TypeScript popover creates without importing — the
@@ -96,40 +94,4 @@ async function mount(kind: Kind, n: number): Promise<number> {
     return ms;
 }
 
-/** The rows of one calibration unit, as `component-mount`'s: a unit is well above the clock's 0.1 ms grain. */
-const CALIBRATION_ROWS = 20;
-
-/**
- * A fixed piece of DOM work, timed with its style and layout forced: `units` wrappers of
- * CALIBRATION_ROWS rows, each a label and a button with two attributes and a listener — the same as
- * `component-mount`'s. A `.pdx` row's time over it, measured beside it, holds on a slower or faster
- * machine, so the spec can tell the `.pdx` side getting slower from the TypeScript side getting faster
- * (#919).
- */
-function calibrate(units: number): number {
-    const host = document.createElement('div');
-    document.getElementById('host')!.appendChild(host);
-    const start = performance.now();
-    for (let i = 0; i < units; i++) {
-        const box = document.createElement('div');
-        box.className = 'box';
-        for (let r = 0; r < CALIBRATION_ROWS; r++) {
-            const row = document.createElement('div');
-            const label = document.createElement('span');
-            label.textContent = `Item ${i}.${r}`;
-            const button = document.createElement('button');
-            button.type = 'button';
-            button.setAttribute('aria-label', `Remove item ${i}.${r}`);
-            button.addEventListener('click', () => row.remove());
-            row.append(label, button);
-            box.appendChild(row);
-        }
-        host.appendChild(box);
-    }
-    host.getBoundingClientRect();
-    const ms = performance.now() - start;
-    host.remove();
-    return ms;
-}
-
-Object.assign(window, { __mount: mount, __calibrate: calibrate, __ready: true });
+Object.assign(window, { __mount: mount, __ready: true });
