@@ -18,7 +18,8 @@ describe('match() with a key the cases do not have', () => {
             const host = document.createElement('div');
             host.appendChild(html`<p>${match(() => key, cases)}</p>` as unknown as Node);
             document.body.appendChild(host);
-            expect(host.querySelector('p')?.innerHTML.replace(/<!--[^>]*-->/g, '')).toBe('<b>default</b>');
+            expect(host.querySelector('p > b')?.textContent).toBe('default');
+            expect(host.querySelector('p')?.children).toHaveLength(1);
             expect(renderToString(() => html`<p>${match(() => key, cases)}</p>`)).toContain('<b>default</b>');
         });
     }
@@ -27,7 +28,8 @@ describe('match() with a key the cases do not have', () => {
         const own = { toString: () => html`<i>own</i>`, _: () => html`<b>default</b>` };
         const host = document.createElement('div');
         host.appendChild(html`<p>${match(() => 'toString', own)}</p>` as unknown as Node);
-        expect(host.querySelector('p')?.innerHTML.replace(/<!--[^>]*-->/g, '')).toBe('<i>own</i>');
+        expect(host.querySelector('p > i')?.textContent).toBe('own');
+        expect(host.querySelector('p')?.children).toHaveLength(1);
         expect(renderToString(() => html`<p>${match(() => 'toString', own)}</p>`)).toContain('<i>own</i>');
     });
 });
