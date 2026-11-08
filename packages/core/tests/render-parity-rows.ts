@@ -156,6 +156,17 @@ export const ROWS: Row[] = [
     { name: '@if / @else', expected: '<p>no</p><button>t</button>', template: '@if (on) { <p>yes</p> } @else { <p>no</p> }<button @click="on = !on">t</button>', script: 'let on = $signal(true);', act: click('button') },
     { name: '@for with track', expected: '<ul><li>a</li><li>b</li></ul>', template: '<ul>@for (items as it; track it.id) { <li>{{ it.label }}</li> }</ul>', script: "let items = $signal([{ id: 1, label: 'a' }, { id: 2, label: 'b' }]);" },
     { name: '@for with @empty', expected: '<ul><li>none</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: 'let items = $signal([]);' },
+    // The rows' branch again after the empty one: the list is the same block, shown a second time.
+    {
+        name: '@for with @empty, emptied and filled again', expected: '<ul><li>b</li></ul><button>a</button><button>z</button><button>b</button>',
+        template: "<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul><button @click=\"items = ['a']\">a</button><button @click=\"items = []\">z</button><button @click=\"items = ['b']\">b</button>",
+        script: 'let items = $signal([]);',
+        act: async (h) => {
+            for (const n of [1, 2, 3]) { click(`button:nth-of-type(${n})`)(h); await settle(); }
+        },
+    },
+    // With rows, as the server renders it (#160): the rows' branch is what a build writes.
+    { name: '@for with @empty, with rows', expected: '<ul><li>a</li></ul>', template: '<ul>@for (items as it; track it) { <li>{{ it }}</li> } @empty { <li>none</li> }</ul>', script: "let items = $signal(['a']);" },
     // #283: no template-path recording exists — it landed after #238. happy-dom lays nothing out, so
     // the window is the overscan, three rows: all of these. A `ul` is a list: each row says the set's
     // size and its place (#284).
