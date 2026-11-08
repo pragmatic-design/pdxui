@@ -28,6 +28,8 @@ export interface PageHead {
 export interface SsgRender {
     /** Set when the app's modules could not run on the server: the message and the first frames. */
     readonly error?: string;
+    /** Set when preparing a path failed, a loader that threw (#239): the path, and the error. */
+    readonly failed?: { readonly path: string; readonly message: string };
     readonly pages: {
         readonly path: string;
         /** The pattern of the route the path matched. */
@@ -52,13 +54,15 @@ export function ssgEntryModule(appEntries: readonly string[], setup: string | nu
     return `import ${JSON.stringify(SSG_DOM_ID)};
 import { html } from '@pdxui/core';
 import { renderToStringWithReport } from '@pdxui/core/server';
-import { serverRoute, serverRoutes, loadServerPages } from '@pdxui/router/server';
+import { serverRoute, serverRoutes, loadServerPages, ssgDataScript } from '@pdxui/router/server';
 
 const SKIPPED = {
     'not-found': 'no route matches it',
     refused: 'an onBeforeNavigate hook refused it',
     guard: 'its guard is denied: the build has set no permission that grants it',
     redirect: 'its route redirects',
+    'loader-redirect': 'its loader redirected with redirect()',
+    'loader-not-found': 'its loader said notFound()',
 };
 
 /** A pattern a build can write as it is: no :param, no wildcard. */
@@ -79,7 +83,18 @@ function stackHead(e) {
     return e.message + '\\n    ' + frames;
 }
 
-export async function renderAll(markup, extraPaths) {
+/**
+ * A fetch of a path — \`/api/tickets/1\`, what a loader writes for the app's own server — resolved
+ * against \`origin\` (#239): in Node there is no page a relative URL is relative to.
+ */
+function resolveFetchAgainst(origin) {
+    const fetchOf = globalThis.fetch;
+    const relative = (url) => typeof url === 'string' && url.startsWith('/') && !url.startsWith('//');
+    globalThis.fetch = (input, init) => fetchOf(relative(input) ? new URL(input, origin) : input, init);
+}
+
+export async function renderAll(markup, extraPaths, origin) {
+    if (origin) resolveFetchAgainst(origin);
     try {
 ${imports}
         await loadServerPages();
@@ -97,14 +112,24 @@ ${imports}
         }
     }
     for (const p of extraPaths) if (!paths.includes(p)) paths.push(p);
+    // When the loaders' results were fetched: one time for the build, from which their staleTime counts.
+    const builtAt = Date.now();
     for (const path of paths) {
-        const route = await serverRoute(path);
+        let route;
+        try {
+            route = await serverRoute(path);
+        } catch (e) {
+            // A loader that failed (#239): the build stops, naming the path it was generating.
+            return { failed: { path, message: stackHead(e) }, pages: [], skippedRoutes: [] };
+        }
         if (route.skipped) {
             skippedRoutes.push({ path, reason: SKIPPED[route.skipped] });
             continue;
         }
         const { html: rendered, skipped, head } = renderToStringWithReport(() => html(strings));
-        pages.push({ path, route: route.route, html: rendered, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
+        // The loaders' results, after the markup they rendered: the client keeps them at boot (#239).
+        const data = route.data && route.data.length > 0 ? ssgDataScript(route.data, builtAt) : '';
+        pages.push({ path, route: route.route, html: rendered + data, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
     }
     return { pages, skippedRoutes };
 }
@@ -118,7 +143,7 @@ ${imports}
 export const SSG_RUNNER = `import { readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 const [entry, input, output] = process.argv.slice(2);
-const { markup, extraPaths } = JSON.parse(readFileSync(input, 'utf-8'));
+const { markup, extraPaths, origin } = JSON.parse(readFileSync(input, 'utf-8'));
 // An entry script that starts work it does not await (void setupI18n()) fails after it has run:
 // reported as an import that failed, with its file and line, not as a crash of this process.
 const failed = (e) => {
@@ -129,7 +154,13 @@ const failed = (e) => {
 process.on('unhandledRejection', failed);
 process.on('uncaughtException', failed);
 const { renderAll } = await import(pathToFileURL(entry).href);
-writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths)));
+writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths, origin)));
+// Done once the result is written: the CLI waits for this process to exit, and the app's modules may
+// keep it alive — an interval, a socket a fetch kept open — which is theirs to keep (#239: a build of
+// a route with a loader did not exit, with no handle Node lists). Exited in the next macrotask, not
+// this one: Node reports an unhandled rejection once the microtasks have drained, before the
+// setImmediate phase, so work an entry started and did not await still fails the build above.
+setImmediate(() => process.exit(0));
 `;
 
 /** The plugin that answers for the entry and for the module that installs the server DOM. */

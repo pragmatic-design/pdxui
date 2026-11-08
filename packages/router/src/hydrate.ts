@@ -16,10 +16,16 @@
 import { pageModule } from './active';
 import { adoption, type ServerLayout, type ServerTree, type TakeServerTree } from './adoption';
 import { loadPage } from './page-load';
+import { seedFromPage } from './ssg-data';
 
-/** Have every outlet keep the route a generated page holds, instead of building it again. */
+/**
+ * Have every outlet keep the route a generated page holds, instead of building it again; and keep the
+ * loader results the page carries as its levels' results (#239), so the first navigation renders the
+ * data the server rendered instead of asking for it.
+ */
 export function installRouteAdoption(): void {
     adoption.take = takeServerTree;
+    seedFromPage();
 }
 
 const takeServerTree: TakeServerTree = (outlet, route, config, depth) => {

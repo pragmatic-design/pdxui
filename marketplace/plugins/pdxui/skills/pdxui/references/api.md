@@ -6367,7 +6367,7 @@ form model carries none of it (#135).
 
 ## @pdxui/router
 
-35 value exports.
+37 value exports.
 
 ### `configureRouter`
 
@@ -6502,7 +6502,9 @@ import { installRouteAdoption } from '@pdxui/router/hydrate';
 function installRouteAdoption(): void
 ```
 
-Have every outlet keep the route a generated page holds, instead of building it again.
+Have every outlet keep the route a generated page holds, instead of building it again; and keep the
+loader results the page carries as its levels' results (#239), so the first navigation renders the
+data the server rendered instead of asking for it.
 
 ### `loaderData`
 
@@ -6751,3 +6753,24 @@ function setQueryParam(key: string, value: string | null): void
 ```
 
 Set or remove a single query param. Pass null to remove.
+
+### `SSG_DATA_ID`
+
+```ts
+import { SSG_DATA_ID } from '@pdxui/router/server';
+
+const SSG_DATA_ID
+```
+
+The id of the script that carries the data.
+
+### `ssgDataScript`
+
+```ts
+import { ssgDataScript } from '@pdxui/router/server';
+
+function ssgDataScript(results: readonly SsgLoaderResult[], builtAt: number): string
+```
+
+The script for `results`, fetched at `builtAt` (ms since the epoch). `<` is written as `<`, so
+nothing in the data — a `</script>` in a text — ends the script early; JSON reads it back the same.

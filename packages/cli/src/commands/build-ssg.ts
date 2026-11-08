@@ -90,7 +90,7 @@ export async function buildSsg(
                 rollupOptions: { input: SSG_ENTRY_ID, output: { entryFileNames: 'ssg-entry.mjs', format: 'es' } },
             },
         });
-        return await generate(serverDir, outDir, resolved.ssgRoutes, (html, route) => preloads.api()?.retargetPreloads(html, route) ?? html);
+        return await generate(serverDir, outDir, resolved.ssgRoutes, resolved.ssgOrigin, (html, route) => preloads.api()?.retargetPreloads(html, route) ?? html);
     } finally {
         rmSync(serverDir, { recursive: true, force: true });
     }
@@ -123,6 +123,8 @@ async function generate(
     serverDir: string,
     outDir: string,
     extraPaths: readonly string[],
+    /** `ssg.origin`: what a relative fetch is resolved against while the routes render (#239). */
+    origin: string | null,
     /** A page for `route` announcing that route's chunks instead of the landing route's. */
     retarget: (html: string, route: string) => string,
 ): Promise<SsgReport> {
@@ -134,13 +136,20 @@ async function generate(
     const input = join(serverDir, 'ssg-input.json');
     const output = join(serverDir, 'ssg-output.json');
     writeFileSync(runner, SSG_RUNNER);
-    writeFileSync(input, JSON.stringify({ markup: renderableMarkup(parts), extraPaths }));
+    writeFileSync(input, JSON.stringify({ markup: renderableMarkup(parts), extraPaths, origin }));
     try {
         await promisify(execFile)(process.execPath, ['--enable-source-maps', runner, join(serverDir, 'ssg-entry.mjs'), input, output]);
     } catch (e) {
         throw new SsgError(`rendering on the server failed: ${(e as { stderr?: string }).stderr?.trim() || (e as Error).message}`);
     }
     const rendered = JSON.parse(readFileSync(output, 'utf-8')) as SsgRender;
+    if (rendered.failed) {
+        // A fetch to a path of the app's own server, with nothing to resolve it against in Node.
+        const hint = !origin && /Failed to parse URL from \//.test(rendered.failed.message)
+            ? '\n  A loader fetched a path of the app\'s own server: name where its API answers during the build, ssg: { origin } in pdx.config.'
+            : '';
+        throw new SsgError(`generating ${rendered.failed.path} failed: ${rendered.failed.message}${hint}`);
+    }
     if (rendered.error) {
         throw new SsgError(`the app's modules could not run on the server, where there is no document or window: ${rendered.error}\n  Move what reads the browser into onMount, or behind a check that it is there.`);
     }

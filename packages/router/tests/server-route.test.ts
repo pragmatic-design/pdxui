@@ -36,7 +36,7 @@ const app = () => html`<pdx-router-outlet></pdx-router-outlet>`;
 
 describe('the outlet on the server', () => {
     it('writes the layout chain with its hosts, and the page inside the innermost one', async () => {
-        expect(await serverRoute('/admin/users')).toEqual({ path: '/admin/users', route: '/admin/users' });
+        expect(await serverRoute('/admin/users')).toEqual({ path: '/admin/users', route: '/admin/users', data: [] });
         const markup = renderToString(app);
         expect(markup).toMatch(/^<pdx-router-outlet data-pdx-ssg="\/admin\/users" style="display: block;"><sr-shell style="display: contents;"/);
         expect(markup).toContain('<header>Shell</header>');
@@ -48,7 +48,7 @@ describe('the outlet on the server', () => {
     });
 
     it('gives the page its params as attributes, and an outlet inside it the next level', async () => {
-        expect(await serverRoute('/owners/7/pets')).toEqual({ path: '/owners/7/pets', route: '/owners/:id/pets' });
+        expect(await serverRoute('/owners/7/pets')).toEqual({ path: '/owners/7/pets', route: '/owners/:id/pets', data: [] });
         const markup = renderToString(app);
         expect(markup).toMatch(/^<pdx-router-outlet data-pdx-ssg="\/owners\/:id" style="display: block;"><sr-owner data-pdx-route="" id="7"/);
         expect(markup).toMatch(/<pdx-router-outlet data-pdx-ssg="\/owners\/:id\/pets" style="display: block;"><sr-pets data-pdx-route="" id="7"[^>]*><p>pets of <!--pdx-->7<!--\/pdx--><\/p><\/sr-pets><\/pdx-router-outlet>/);
