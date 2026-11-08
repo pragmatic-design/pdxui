@@ -37,6 +37,16 @@ export interface CacheConfig {
     gcInterval?: number;
 }
 
+/** How {@link Cache.set} writes an entry. */
+export interface CacheSetOptions {
+    tags?: string[];
+    staleTime?: number;
+    silent?: boolean;
+    writer?: CacheWriteListener;
+    /** When the value was fetched, in ms since the epoch: its age counts from then. Default: now. */
+    fetchedAt?: number;
+}
+
 /** Told the value written to a cache key by someone else (see {@link Cache.subscribe}). */
 export type CacheWriteListener = (data: unknown) => void;
 
@@ -53,9 +63,10 @@ export interface Cache {
     /**
      * Set a cache entry. `silent` skips the key's version bump, so nothing refetches (a resource
      * storing its own result). Every `onWrite` listener of the key is told either way, except
-     * `writer`'s — the listener of whoever wrote.
+     * `writer`'s — the listener of whoever wrote. `fetchedAt`, when the value was fetched before it
+     * is written: its age counts from then (the data a generated page carries, from the build, #239).
      */
-    set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean; writer?: CacheWriteListener }): void;
+    set<T>(key: string, data: T, options?: CacheSetOptions): void;
 
     /** Check if a non-expired entry exists. */
     has(key: string): boolean;
@@ -213,16 +224,16 @@ export function createCache(config: CacheConfig = {}): Cache {
         // `silent` skips the keyVersion bump — used by a resource storing its OWN freshly
         // fetched data (it already holds it; bumping would re-trigger its own auto-fetch).
         // External/optimistic writes omit it so resources reading the key observe the change.
-        set<T>(key: string, data: T, options?: { tags?: string[]; staleTime?: number; silent?: boolean; writer?: CacheWriteListener }): void {
-            const now = Date.now();
+        set<T>(key: string, data: T, options?: CacheSetOptions): void {
+            const fetchedAt = options?.fetchedAt ?? Date.now();
             const ttl = options?.staleTime ?? staleTime;
             const existing = entries.get(key);
 
             entries.set(key, {
                 key,
                 data,
-                timestamp: now,
-                staleAt: now + ttl,
+                timestamp: fetchedAt,
+                staleAt: fetchedAt + ttl,
                 tags: Object.freeze(options?.tags ?? []),
                 subscribers: existing?.subscribers ?? 0,
                 unsubscribedAt: existing?.unsubscribedAt ?? 0,

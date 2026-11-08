@@ -54,7 +54,7 @@ export function ssgEntryModule(appEntries: readonly string[], setup: string | nu
     return `import ${JSON.stringify(SSG_DOM_ID)};
 import { html } from '@pdxui/core';
 import { renderToStringWithReport } from '@pdxui/core/server';
-import { serverRoute, serverRoutes, loadServerPages } from '@pdxui/router/server';
+import { serverRoute, serverRoutes, loadServerPages, ssgDataScript } from '@pdxui/router/server';
 
 const SKIPPED = {
     'not-found': 'no route matches it',
@@ -101,6 +101,8 @@ ${imports}
         }
     }
     for (const p of extraPaths) if (!paths.includes(p)) paths.push(p);
+    // When the loaders' results were fetched: one time for the build, from which their staleTime counts.
+    const builtAt = Date.now();
     for (const path of paths) {
         let route;
         try {
@@ -114,7 +116,9 @@ ${imports}
             continue;
         }
         const { html: rendered, skipped, head } = renderToStringWithReport(() => html(strings));
-        pages.push({ path, route: route.route, html: rendered, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
+        // The loaders' results, after the markup they rendered: the client keeps them at boot (#239).
+        const data = route.data && route.data.length > 0 ? ssgDataScript(route.data, builtAt) : '';
+        pages.push({ path, route: route.route, html: rendered + data, head, skipped: skipped.map((s) => ({ tag: s.tag, reason: s.reason, ...(s.global ? { global: s.global } : {}), ...(s.at ? { at: s.at } : {}) })) });
     }
     return { pages, skippedRoutes };
 }

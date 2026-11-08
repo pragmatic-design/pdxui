@@ -20,6 +20,9 @@ const calls: unknown[] = [];
         { path: '/moved', tag: 'sl-ticket', loader: async () => { const { redirect } = await import('../src/active'); throw redirect('/tickets/1'); } },
         { path: '/gone', tag: 'sl-ticket', loader: async () => { const { notFound } = await import('../src/active'); throw notFound(); } },
         { path: '/broken', tag: 'sl-ticket', loader: async () => { throw new Error('the database is down'); } },
+        { path: '/dated', tag: 'sl-ticket', loader: async () => ({ when: new Date(0) }) },
+        { path: '/callable', tag: 'sl-ticket', loader: async () => ({ open: () => {} }) },
+        { path: '/fresh', tag: 'sl-ticket', loaderStaleTime: 30_000, loader: async () => ({ title: 'kept', tags: ['a'], none: null }) },
     ],
 };
 
@@ -36,7 +39,7 @@ const app = () => html`<pdx-router-outlet></pdx-router-outlet>`;
 
 describe('a route\'s loaders on the server', () => {
     it('run before the render, with the route\'s params coerced, so the page holds their data', async () => {
-        expect(await serverRoute('/tickets/7')).toEqual({ path: '/tickets/7', route: '/tickets/:id(number)' });
+        expect(await serverRoute('/tickets/7')).toMatchObject({ path: '/tickets/7', route: '/tickets/:id(number)' });
         expect(calls).toHaveLength(1);
         const ctx = calls[0] as { params: Record<string, unknown>; query: Record<string, unknown>; signal: AbortSignal };
         expect(ctx.params).toEqual({ id: 7 });
@@ -48,6 +51,16 @@ describe('a route\'s loaders on the server', () => {
     it('a redirect() or a notFound() leaves the route out, and says which', async () => {
         expect(await serverRoute('/moved')).toEqual({ path: '/moved', route: null, skipped: 'loader-redirect' });
         expect(await serverRoute('/gone')).toEqual({ path: '/gone', route: null, skipped: 'loader-not-found' });
+    });
+
+    it('hands back each level\'s result, under its identity and staleTime, for the page to carry', async () => {
+        const route = await serverRoute('/fresh');
+        expect(route.data).toEqual([{ key: '/fresh||', pattern: '/fresh', staleTime: 30_000, value: { title: 'kept', tags: ['a'], none: null } }]);
+    });
+
+    it('a result JSON would not carry back as it is stops the build, naming the level', async () => {
+        await expect(serverRoute('/dated')).rejects.toThrow(/\/dated.*when.*Date/);
+        await expect(serverRoute('/callable')).rejects.toThrow(/\/callable.*open.*function/);
     });
 
     it('a loader that fails stops the build, naming the route and the error', async () => {

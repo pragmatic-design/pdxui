@@ -42,7 +42,7 @@ describe('a route prepared on the server', () => {
             strings = { title: 'Welcome' };
             return true;
         }));
-        expect(await serverRoute('/')).toEqual({ path: '/', route: '/' });
+        expect(await serverRoute('/')).toEqual({ path: '/', route: '/', data: [] });
         expect(seen).toEqual([['', '/', { redirected: false }]]);
         expect(renderToString(app)).toContain('<h1><!--pdx-->Welcome<!--/pdx--></h1>');
     });
@@ -58,7 +58,7 @@ describe('a route prepared on the server', () => {
         expect(renderToString(app)).toBe('<pdx-router-outlet></pdx-router-outlet>');
 
         setPermissions(['account.view']);
-        expect(await serverRoute('/account')).toEqual({ path: '/account', route: '/account' });
+        expect(await serverRoute('/account')).toEqual({ path: '/account', route: '/account', data: [] });
         expect(renderToString(app)).toContain('<h1>Account</h1>');
     });
 });

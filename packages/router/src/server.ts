@@ -30,7 +30,9 @@ import { DEV } from '@pdxui/core';
 import { registerServerElement, serverElement } from '@pdxui/core/server';
 import { pageModule, toRouteConfig } from './active';
 import { clearLoaders, planLoaders, runLoaders } from './loaders';
-import { loaderError } from './state';
+import { loaderData, loaderError } from './state';
+import { loaderIdentity } from './loader-prefetch';
+import type { SsgLoaderResult } from './ssg-data';
 import { compileMatcher } from './matcher';
 import { beforeNavigateHooks, chainAllowed } from './navigation';
 import { permissionGuard } from './permission-guard';
@@ -43,7 +45,11 @@ export interface ServerRoute {
     readonly route: string | null;
     /** Why nothing will be rendered. */
     readonly skipped?: 'not-found' | 'refused' | 'guard' | 'redirect' | 'loader-redirect' | 'loader-not-found';
+    /** Each level's loader result, for the page to carry to the client (#239, `ssgDataScript`). */
+    readonly data?: readonly SsgLoaderResult[];
 }
+
+export { ssgDataScript, SSG_DATA_ID, type SsgLoaderResult } from './ssg-data';
 
 interface Level {
     readonly chain: readonly RegisteredRoute[];
@@ -83,8 +89,50 @@ export async function serverRoute(path: string): Promise<ServerRoute> {
     if (outcome.kind === 'error') {
         throw new Error(`the loader of ${outcome.level.path} failed for ${path}: ${loaderError(outcome.level.path)?.message ?? 'unknown error'}`);
     }
+    // What the page carries to the client, which keeps it as the level's result instead of asking again.
+    const data: SsgLoaderResult[] = [];
+    for (const config of configs) {
+        if (!config.loader) continue;
+        const value = loaderData(config.path);
+        const fault = jsonFault(value, 'its result');
+        if (fault) throw new Error(`the loader of ${config.path} returned what a page cannot carry to the client, for ${path}: ${fault}`);
+        data.push({ key: loaderIdentity(config.path, found.params, ''), pattern: config.path, staleTime: config.loaderStaleTime ?? 0, value });
+    }
     level = { chain, params: found.params };
-    return { path, route: found.route.path };
+    return { path, route: found.route.path, data };
+}
+
+/**
+ * Why `value` would not come back the same from JSON — what the page carries a loader's result in —
+ * or null when it would. `at` names where it is, for the message.
+ */
+function jsonFault(value: unknown, at: string, seen: Set<object> = new Set()): string | null {
+    if (value === null || typeof value === 'string' || typeof value === 'boolean') return null;
+    if (typeof value === 'number') return Number.isFinite(value) ? null : `${at} is ${String(value)}, which JSON writes as null`;
+    if (typeof value === 'function') return `${at} is a function`;
+    if (typeof value !== 'object') return `${at} is ${typeof value === 'undefined' ? 'undefined' : `a ${typeof value}`}`;
+    if (seen.has(value)) return `${at} refers back to itself`;
+    seen.add(value);
+    try {
+        if (Array.isArray(value)) {
+            for (let i = 0; i < value.length; i++) {
+                const fault = jsonFault(value[i], `${at}[${i}]`, seen);
+                if (fault) return fault;
+            }
+            return null;
+        }
+        const proto = Object.getPrototypeOf(value) as object | null;
+        if (proto !== Object.prototype && proto !== null) return `${at} is a ${(value as object).constructor?.name ?? 'class instance'}, not a plain object`;
+        for (const [key, v] of Object.entries(value)) {
+            // A property that is undefined is left out by JSON, and reads as undefined all the same.
+            if (v === undefined) continue;
+            const fault = jsonFault(v, `${at}.${key}`, seen);
+            if (fault) return fault;
+        }
+        return null;
+    } finally {
+        seen.delete(value);
+    }
 }
 
 /** The patterns of the registered routes, in the order they were declared. */

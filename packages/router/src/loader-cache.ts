@@ -27,6 +27,17 @@ export function keepResult(level: RouteConfig, identity: string, result: unknown
 }
 
 /**
+ * Keep results a generated page carries (#239), each under its call identity, as fetched at
+ * `fetchedAt`: the build's time, from which their staleTime counts.
+ */
+export function seedKeptResults(results: readonly { key: string; pattern: string; staleTime: number; value: unknown }[], fetchedAt: number): void {
+    const cache = getDefaultCache();
+    for (const r of results) {
+        cache.set(cacheKey(r.key), r.value, { tags: [loaderTag(r.pattern)], staleTime: r.staleTime, silent: true, fetchedAt });
+    }
+}
+
+/**
  * Call `onDropped` when the result kept for `identity` is dropped — an invalidation. A write of the
  * level's own result is silent and bumps nothing. Returns the disposer.
  */

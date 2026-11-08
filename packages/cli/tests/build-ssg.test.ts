@@ -181,6 +181,12 @@ describe('a route\'s loader at build time (#239)', () => {
         const html = readFileSync(join(loaded, 'dist', 'items', '3', 'index.html'), 'utf-8');
         expect(html).toMatch(/<h1 class="item">[^<]*(<!--[^>]*-->)?Item 3/);
         expect(html, 'the loading branch was written').not.toContain('class="wait"');
+        // And carries the result, for the client to keep instead of asking again.
+        const data = /<script type="application\/json" id="pdx-ssg-data">(.*?)<\/script>/.exec(html);
+        expect(data, 'no pdx-ssg-data script in the page').not.toBeNull();
+        const carried = JSON.parse(data![1]) as { builtAt: number; results: { key: string; value: unknown }[] };
+        expect(carried.results).toEqual([expect.objectContaining({ key: '/items/:id|id=3|', value: { name: 'Item 3' } })]);
+        expect(Date.now() - carried.builtAt).toBeLessThan(10 * 60_000);
     }, 180_000);
 
     it('a loader that throws stops the build, naming the path', async () => {
