@@ -18,11 +18,8 @@
 // What a later frame draws is left out of the budget; how long until the last change is still kept, in
 // `window.__drawnMs`, for whoever reads a slow row.
 //
-// `window.__calibrate(n)` is a fixed piece of DOM work timed the same way: a component's time divided
-// by it, measured beside it, holds on a machine slower or faster than the one it was measured on. It
-// was not steady while the heap was swollen by components that kept their removed instances (#881):
-// run to run, the calibration slowed by up to 5×. Since they no longer do, it is what
-// `tests/scenario-component-mount.spec.ts` holds each component to.
+// `tests/scenario-component-mount.spec.ts` holds a component's mount against `main`'s, measured beside
+// it (#950), so no calibration is timed here.
 //
 // The whole library is registered before any mount, so no lazy load is timed.
 import '../../../../ui/src/index';
@@ -74,29 +71,4 @@ function mount(tag: string, n: number): Promise<number> {
     });
 }
 
-/** The rows of one calibration unit: enough work that a unit is well above the clock's 0.1 ms grain. */
-const CALIBRATION_ROWS = 20;
-
-/** n times: a wrapper of CALIBRATION_ROWS rows, each a label and a button with two attributes and a listener. */
-function calibrate(n: number): Promise<number> {
-    return timed((host) => {
-        for (let i = 0; i < n; i++) {
-            const box = document.createElement('div');
-            box.className = 'box';
-            for (let r = 0; r < CALIBRATION_ROWS; r++) {
-                const row = document.createElement('div');
-                const label = document.createElement('span');
-                label.textContent = `Item ${i}.${r}`;
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.setAttribute('aria-label', `Remove item ${i}.${r}`);
-                button.addEventListener('click', () => row.remove());
-                row.append(label, button);
-                box.appendChild(row);
-            }
-            host.appendChild(box);
-        }
-    });
-}
-
-Object.assign(window, { __mount: mount, __calibrate: calibrate, __ready: true });
+Object.assign(window, { __mount: mount, __ready: true });
