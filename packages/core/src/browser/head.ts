@@ -23,12 +23,28 @@ export interface HeadConfig {
 }
 
 /**
+ * Where useHead and useTitle send what they set while a page renders on the server (#160), which
+ * has no document to set it on: the string renderer installs it for the render, and keeps the
+ * collecting itself (server/render-string.ts). Null in a browser, and nothing more of it is there.
+ */
+export let serverHeadSink: ((head: HeadConfig) => void) | null = null;
+
+/** Install the sink for a render on the server, or take it away with null. */
+export function setServerHeadSink(sink: ((head: HeadConfig) => void) | null): void {
+    serverHeadSink = sink;
+}
+
+/**
  * Set document head tags (title, meta, link).
  * Returns a dispose function that removes the created tags.
  *
  * For reactive titles, use useTitle() from browser/title.ts instead.
  */
 export function useHead(config: HeadConfig): Dispose {
+    if (serverHeadSink) {
+        serverHeadSink(config);
+        return () => {};
+    }
     const createdElements: Element[] = [];
 
     // Title — static set with restore on dispose

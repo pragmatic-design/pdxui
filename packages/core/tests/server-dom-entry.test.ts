@@ -46,8 +46,10 @@ beforeAll(async () => {
 
 describe('the server DOM, installed through its entry', () => {
     it('is an entry that brings nothing of core with it', () => {
-        const source = readFileSync(entry('./server-dom'), 'utf8');
-        expect(source.match(/^\s*(import|export)\b[^;]*\bfrom\s+['"]/gm) ?? [], 'the shim imports a module').toEqual([]);
+        // The entry re-exports the shim, and the shim imports nothing.
+        const specifiers = (source: string): string[] => [...source.matchAll(/^\s*(?:import|export)\b[^;]*?\bfrom\s+['"]([^'"]+)['"]/gm)].map((m) => m[1]);
+        expect(specifiers(readFileSync(entry('./server-dom'), 'utf8')), 'the entry imports more than the shim').toEqual(['./dom-shim']);
+        expect(specifiers(readFileSync(join(here, '..', 'src', 'server', 'dom-shim.ts'), 'utf8')), 'the shim imports a module').toEqual([]);
     });
 
     it('is not offered by @pdxui/core/server, where it would come too late', () => {

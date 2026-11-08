@@ -14,6 +14,10 @@ import { PdxElement } from '../component/element';
 import { assignBoundProperty } from '../renderer/template';
 import { isDeferredTemplate } from './mode';
 import { isDeferredBlock } from '../renderer/deferred-block';
+import { setServerParent } from './dom-shim';
+
+/** The hosts whose content is being rendered, innermost last: a host built now is the last one's child. */
+const rendering: HTMLElement[] = [];
 
 /**
  * Whether `value` is what a render returns while templates are not built: a template, or a helper's
@@ -33,6 +37,8 @@ export interface SkippedComponent {
      * onMount, or behind `typeof window !== 'undefined'`.
      */
     global?: string;
+    /** Where it read it: the first frame of the error's stack — the source's, where source maps are on. */
+    at?: string;
 }
 
 /** What a host renders as: its attributes after its body ran, and its content. */
@@ -65,6 +71,8 @@ export function renderHost(
         return { attributes: new Map(attributes), inner: '', skipped: true };
     }
     if (!(host instanceof PdxElement)) return null;
+    // Its parent, before its setup runs: an inject() there looks up through it.
+    setServerParent(host, rendering[rendering.length - 1] ?? null);
     for (const [name, value] of attributes) host.setAttribute(name, value ?? '');
     for (const [name, value] of props) assignBoundProperty(host, name, value);
     // What connectedCallback writes before the body runs: the boundary a parent's scoped style stops at.
@@ -76,7 +84,8 @@ export function renderHost(
             rendered = untracked(() => host.body());
         } catch (error) {
             const global = undefinedGlobal(error);
-            skipped.push(global ? { tag, reason: message(error), global } : { tag, reason: message(error) });
+            const at = global ? firstFrame(error) : null;
+            skipped.push(global ? { tag, reason: message(error), global, ...(at ? { at } : {}) } : { tag, reason: message(error) });
             rendered = null;
             failed = true;
         }
@@ -88,7 +97,13 @@ export function renderHost(
             skipped.push({ tag, reason: 'its render built DOM instead of returning an html`` template or a helper\'s block' });
             failed = true;
         } else if (rendered !== null) {
-            markup = inner(rendered);
+            // The hosts its content builds — its template's, and the children it projects — are its.
+            rendering.push(host);
+            try {
+                markup = inner(rendered);
+            } finally {
+                rendering.pop();
+            }
         }
     } finally {
         dispose();
@@ -107,6 +122,16 @@ function undefinedGlobal(error: unknown): string | null {
     // Match: V8's `<name> is not defined`. Groups: [1]=the name
     const m = /^([A-Za-z_$][\w$]*) is not defined$/.exec(error.message);
     return m ? m[1] : null;
+}
+
+/** The place the first frame of an error's stack names, without the function's name: `file:line:column`. */
+function firstFrame(error: unknown): string | null {
+    if (!(error instanceof Error)) return null;
+    const frame = (error.stack ?? '').split('\n').find((line) => /^\s+at /.test(line));
+    if (!frame) return null;
+    // Match: `at name (place)` or `at place`. Groups: [1]=the place
+    const m = /\(([^)]+)\)\s*$/.exec(frame) ?? /^\s+at (.+)$/.exec(frame);
+    return m ? m[1].trim() : null;
 }
 
 function message(error: unknown): string {

@@ -111,20 +111,24 @@ async function generate(serverDir: string, outDir: string, extraPaths: readonly 
 
     // A setup or a render that reads a browser global stops the build, before any page is written: on
     // the server it is a component written as an empty host, and the read belongs in onMount (#160).
-    const reads = new Map<string, Set<string>>();
+    // One line per component and global, with where it read it, the first time it did.
+    const reads = new Map<string, string>();
     for (const page of rendered.pages) {
-        for (const s of page.skipped) if (s.global) reads.set(s.tag, (reads.get(s.tag) ?? new Set()).add(s.global));
+        for (const s of page.skipped) {
+            const key = `<${s.tag}> reads \`${s.global}\``;
+            if (s.global && !reads.has(key)) reads.set(key, s.at ? ` at ${s.at}` : '');
+        }
     }
     if (reads.size > 0) {
-        const list = [...reads].map(([tag, globals]) => `<${tag}> reads ${[...globals].map((g) => `\`${g}\``).join(', ')}`).join('; ');
-        throw new SsgError(`${list} in its setup or render, which runs on the server too, where there is no browser.\n  Move the read into onMount, which runs only in the browser, or guard it: typeof window !== 'undefined'.`);
+        const list = [...reads].map(([what, at]) => `  ${what}${at}`).join('\n');
+        throw new SsgError(`a setup or a render reads the browser, and it runs on the server too, where there is no browser:\n${list}\n  Move the read into onMount, which runs only in the browser, or guard it: typeof window !== 'undefined'.`);
     }
 
     const report: SsgReport = { pages: [], skippedRoutes: [...rendered.skippedRoutes] };
     for (const page of rendered.pages) {
         const file = pageFile(page.path);
         mkdirSync(dirname(join(outDir, file)), { recursive: true });
-        writeFileSync(join(outDir, file), generatedPage(parts, page.html));
+        writeFileSync(join(outDir, file), generatedPage(parts, page.html, page.head));
         report.pages.push({ path: page.path, file, skipped: page.skipped });
     }
     return report;

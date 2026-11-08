@@ -37,8 +37,10 @@ let name = $signal('Widget');
 @title name;
 </script>
         `);
-        // Dynamic title should use ctx.track effect, not useHead
-        expect(code).toContain('document.title =');
+        // A dynamic title is core's useTitle, which follows the expression — and, on the server,
+        // records the title a static page is written with (#160). Not useHead, and no document here.
+        expect(code).toContain('useTitle(() => ');
+        expect(code).not.toContain('document.title =');
         expect(code).not.toContain("useHead({ title:");
     });
 

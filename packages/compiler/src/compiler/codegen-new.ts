@@ -51,6 +51,7 @@ export function compileNewMode(
     if (analysis.head.meta.length > 0 || (analysis.head.title && !analysis.head.title.isDynamic)) {
         imports.add('useHead');
     }
+    if (analysis.head.title?.isDynamic) imports.add('useTitle');
     // Lifecycle hooks: onMount is used directly (not wrapped in ctx.track)
     if (analysis.lifecycle.onMount.length > 0) imports.add('onMount');
     // keepAlive pages need onShow for resume lifecycle

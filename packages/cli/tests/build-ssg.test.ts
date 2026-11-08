@@ -18,8 +18,8 @@ const FILES: Record<string, string> = {
     'src/main.js': "import '@pdxui/router';\n",
     'src/card.pdx': '<template><p class="card">{{ label }}</p></template>\n<script>\n@prop label: string = \'\';\n</script>\n',
     'src/home.pdx': '<template><h1>Home</h1><app-card label="first"></app-card></template>\n<script>\n@page \'/\';\n</script>\n',
-    'src/about.pdx': '<template><h1>About us</h1></template>\n<script>\n@page \'/about\';\n</script>\n',
-    'src/post.pdx': '<template><h1>Post {{ id }}</h1></template>\n<script>\n@page \'/posts/:id\';\n@prop id: string = \'\';\n</script>\n',
+    'src/about.pdx': '<template><h1>About us</h1></template>\n<script>\n@page \'/about\';\n@title \'About us & the <shop>\';\n@meta description: \'Who runs the shop\';\n</script>\n',
+    'src/post.pdx': '<template><h1>Post {{ id }}</h1></template>\n<script>\n@page \'/posts/:id\';\n@prop id: string = \'\';\nconst heading = $derived(\'Post \' + id);\n@title heading;\n</script>\n',
     'src/admin.pdx': '<template><h1>Admin</h1></template>\n<script>\n@page \'/admin\';\n@guard \'admin.access\';\n</script>\n',
 };
 
@@ -77,6 +77,15 @@ describe('pdx build --ssg', () => {
         expect(home).toMatch(/<script type="module"[^>]*src="\/assets\/[^"]+\.js"/);
         expect(home).not.toContain('id="pdx-splash"');
         expect(home).not.toContain('aria-busy="true"');
+    });
+
+    it('writes each route\'s head: its @title in place of the page\'s, its @meta, escaped', () => {
+        const about = page('about/index.html');
+        expect(about).toContain('<title>About us &amp; the &lt;shop&gt;</title>');
+        expect(about).not.toContain('<title>Shop</title>');
+        expect(about).toContain('<meta name="description" content="Who runs the shop">');
+        expect(page('posts/1/index.html'), 'a dynamic title is read with the route\'s params').toContain('<title>Post 1</title>');
+        expect(page('index.html'), 'a route with no title keeps the page\'s').toContain('<title>Shop</title>');
     });
 
     it('writes the production markup, the one the production client hydrates with', () => {

@@ -15,3 +15,4 @@
 
 export { renderToString, renderToStringWithReport, registerServerElement, type ServerRender, type SkippedComponent } from './render-string';
 export { serverElement, type ServerElement } from './mode';
+export type { ServerHead } from './render-string';
