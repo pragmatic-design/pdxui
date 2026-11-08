@@ -15,11 +15,12 @@
 // Opt-in: @page '/path' { keepAlive } -> freeze/resume pattern
 
 import { registeredRoutes, type RegisteredRoute } from './registered-routes';
-import { effect, enter, injectTransitionCSS, hasPermission, signal, provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV } from '@pdxui/core';
+import { effect, enter, injectTransitionCSS, signal,provide, announce, registerComponentStrings, getComponentString, splashReady, isSplashUp, DEV } from '@pdxui/core';
 import { RouteParams } from './route-types';
 import { createRouter, navigate, currentRoute, currentNavError, currentNavErrorDepth, currentPath, registerGuardChecker, onBeforeNavigate, pageModule, toRouteConfig, retryNavigation } from './active';
 import type { RouteConfig, ResolvedRoute, NavigationHop } from './active';
 import { loadPage } from './page-load';
+import { permissionGuard } from './permission-guard';
 import { adoption } from './adoption';
 
 // The router paints two things a user reads — the loading placeholder and the error page — so their
@@ -102,18 +103,8 @@ const routeConfigMap = new Map<string, RegisteredRoute>();
 function autoInitRouter(): void {
     if (routerInitialized) return;
 
-    // Auto-bridge guard system with core permission system
     // Auto-bridge: router guards use core's permission system (deny by default on error)
-    registerGuardChecker((name) => {
-        try {
-            return hasPermission(name)();
-        } catch (err) {
-            // Deny by default, but surface the cause — a silent false makes guard
-            // denials impossible to diagnose.
-            console.warn(`[pdx-router] Guard "${name}" check threw; denying access.`, err);
-            return false;
-        }
-    });
+    registerGuardChecker(permissionGuard);
 
     // The project's route table first, the modules' registrations second.
     //

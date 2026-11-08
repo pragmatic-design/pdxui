@@ -13,13 +13,21 @@
 // An outlet inside a page renders the next level of the chain, as it does in the browser: the
 // depth is the number of outlets around it, counted while they write their content.
 //
-// A route the server cannot know the answer for renders nothing, and `serverRoute` says why: a
-// guard (the permissions are the visitor's) and a redirect. So does a path no route matches.
+// Before the page renders, the path is prepared as a navigation to it would be (#160, part 6b-2): the
+// app's `onBeforeNavigate` hooks run, each awaited — a hook that loads what the page reads (its
+// strings, say) has loaded it — and the route's guards are asked the permissions the app has set,
+// through the same bridge the outlet installs in the browser. A hook is the app's when a module
+// registers it: one registered in a component's setup arrives with the render, after this.
+//
+// What renders nothing, `serverRoute` says why: a hook that refused the path, a guard the app's
+// permissions deny, a redirect, and a path no route matches.
 
 import { DEV } from '@pdxui/core';
 import { registerServerElement, serverElement } from '@pdxui/core/server';
 import { pageModule } from './active';
 import { compileMatcher } from './matcher';
+import { beforeNavigateHooks, chainAllowed } from './navigation';
+import { permissionGuard } from './permission-guard';
 import { registeredRoutes, type RegisteredRoute } from './registered-routes';
 
 /** What the outlet will render for the path handed to `serverRoute`. */
@@ -28,7 +36,7 @@ export interface ServerRoute {
     /** The pattern of the route the path matched; null when nothing will be rendered. */
     readonly route: string | null;
     /** Why nothing will be rendered. */
-    readonly skipped?: 'not-found' | 'guard' | 'redirect';
+    readonly skipped?: 'not-found' | 'refused' | 'guard' | 'redirect';
 }
 
 interface Level {
@@ -41,18 +49,22 @@ let level: Level | null = null;
 let depth = 0;
 
 /**
- * The URL the outlets render, set before `renderToString`. The route table is read here, so the
- * table — or the pages' registrations — must be in place first.
+ * The URL the outlets render, prepared and set before `renderToString`. The route table is read
+ * here, so the table — or the pages' registrations — must be in place first.
  */
-export function serverRoute(path: string): ServerRoute {
+export async function serverRoute(path: string): Promise<ServerRoute> {
     level = null;
     const routes = registeredRoutes() ?? [];
     const matcher = compileMatcher(routes);
     const found = matcher.match(path);
     if (!found) return { path, route: null, skipped: 'not-found' };
     const chain = matcher.chain(found.route);
-    const refused = chain.find((r) => r.guard || r.redirect);
-    if (refused) return { path, route: null, skipped: refused.guard ? 'guard' : 'redirect' };
+    if (chain.some((r) => r.redirect)) return { path, route: null, skipped: 'redirect' };
+    // In order, as a navigation runs them; the server has no page it comes from.
+    for (const hook of beforeNavigateHooks()) {
+        if (await hook('', path, { redirected: false }) === false) return { path, route: null, skipped: 'refused' };
+    }
+    if (!await chainAllowed(chain, permissionGuard)) return { path, route: null, skipped: 'guard' };
     level = { chain, params: found.params };
     return { path, route: found.route.path };
 }

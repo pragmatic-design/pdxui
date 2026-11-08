@@ -6716,11 +6716,11 @@ above, as a value: `RouteParams<'/users/:id'>` is a route's typed params, `Route
 ```ts
 import { serverRoute } from '@pdxui/router/server';
 
-function serverRoute(path: string): ServerRoute
+function serverRoute(path: string): Promise<ServerRoute>
 ```
 
-The URL the outlets render, set before `renderToString`. The route table is read here, so the
-table — or the pages' registrations — must be in place first.
+The URL the outlets render, prepared and set before `renderToString`. The route table is read
+here, so the table — or the pages' registrations — must be in place first.
 
 ### `serverRoutes`
 

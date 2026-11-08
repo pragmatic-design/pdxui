@@ -28,7 +28,7 @@ let outlet: HTMLElement;
 let writtenShell: Element;
 
 beforeAll(async () => {
-    serverRoute('/a');
+    await serverRoute('/a');
     const markup = renderToString(() => html`<pdx-router-outlet></pdx-router-outlet>`);
     history.replaceState(null, '', '/b');
     const box = document.createElement('div');

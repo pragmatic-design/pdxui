@@ -26,7 +26,7 @@ let outlet: HTMLElement;
 let written: Element;
 
 beforeAll(async () => {
-    serverRoute('/lazy');
+    await serverRoute('/lazy');
     const markup = renderToString(() => html`<pdx-router-outlet></pdx-router-outlet>`);
     history.replaceState(null, '', '/lazy');
     const box = document.createElement('div');

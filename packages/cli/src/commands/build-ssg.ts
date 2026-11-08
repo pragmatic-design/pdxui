@@ -8,12 +8,16 @@
 //    `index.html` rendered for each route without parameters and each path `ssg.routes` names.
 // 3. Each rendered body written into the built page, at the route's path.
 //
-// What the server cannot answer for is reported and not written: a guarded route (the permissions
-// are the visitor's), a redirect, a pattern with parameters no path was given for. A component that
+// Each path is prepared as a navigation to it would be: the app's `onBeforeNavigate` hooks, awaited,
+// then the route's guards against the permissions the app has set. `ssg.setup`, imported before the
+// app's entries, is where the app sets what no visitor brings: a build session, a locale.
+//
+// What is not rendered is reported and not written: a path a hook refuses, a guard the permissions
+// deny, a redirect, a pattern with parameters no path was given for. A component that
 // renders as an empty host is reported with its reason, and the page is written: the client renders
 // that component at boot.
 
-import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { existsSync, mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { tmpdir } from 'os';
@@ -45,6 +49,9 @@ export async function buildSsg(
     /** The Vite config to build with, instead of the one Vite finds at `cwd`: an app's SSG variant. */
     configFile?: string,
 ): Promise<SsgReport> {
+    if (resolved.ssgSetup && !existsSync(resolved.ssgSetup)) {
+        throw new SsgError(`ssg.setup names ${resolved.ssgSetup}, and there is no such file.`);
+    }
     const vite = await import('vite');
     const plugins = await pdxPluginsFor(vite, cwd, resolved, true, configFile);
     const sourceHtml = readFileSync(resolve(cwd, 'index.html'), 'utf-8');
@@ -62,7 +69,7 @@ export async function buildSsg(
             root: cwd,
             configFile,
             logLevel: 'warn',
-            plugins: [...plugins, ssgEntryPlugin(appEntries(sourceHtml), cwd)],
+            plugins: [...plugins, ssgEntryPlugin(appEntries(sourceHtml), cwd, resolved.ssgSetup)],
             ssr: { noExternal: true },
             // Core's `DEV` is `process.env.NODE_ENV`, which a server build leaves to the process that
             // runs it. Fixed here to what the client build saw, so the markup the server writes is the
