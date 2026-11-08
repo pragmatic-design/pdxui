@@ -26,6 +26,12 @@ export interface PdxConfig {
          * like `/posts/:id`, as `/posts/1`.
          */
         routes?: string[];
+        /**
+         * A module the server imports before the app's entries, relative to the project: where the
+         * app prepares what no visitor brings — the session a build renders its private pages with,
+         * the locale of a page nobody asked for in a language.
+         */
+        setup?: string;
     };
 }
 
@@ -40,6 +46,8 @@ export interface ResolvedConfig {
     plugins: CompilerPlugin[];
     /** The paths `ssg.routes` names; [] without. */
     ssgRoutes: string[];
+    /** The module `ssg.setup` names, as an absolute path; null without. */
+    ssgSetup: string | null;
     cwd: string;
 }
 

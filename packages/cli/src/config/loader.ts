@@ -77,6 +77,7 @@ export function resolveConfig(raw: PdxConfig, cwd: string): ResolvedConfig {
         target: raw.build?.target ?? 'es2022',
         plugins: raw.plugins ?? [],
         ssgRoutes: raw.ssg?.routes ?? [],
+        ssgSetup: raw.ssg?.setup ? resolve(cwd, raw.ssg.setup) : null,
         cwd,
     };
 }

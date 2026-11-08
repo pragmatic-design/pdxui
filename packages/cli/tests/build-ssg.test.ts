@@ -94,7 +94,7 @@ describe('pdx build --ssg', () => {
 
     it('reports what it did not write, and why', () => {
         expect(report.skippedRoutes).toEqual([
-            { path: '/admin', reason: 'its route is guarded: what it shows depends on the visitor' },
+            { path: '/admin', reason: 'its guard is denied: the build has set no permission that grants it' },
         ]);
         expect(existsSync(join(root, 'dist', 'admin', 'index.html'))).toBe(false);
         expect(report.pages.every((p) => p.skipped.length === 0), 'a component was written as an empty host').toBe(true);
@@ -155,6 +155,45 @@ describe('how an app is entered and built', () => {
         expect((refused as Error | null)?.message ?? '', 'the app\'s config without hydrate was not refused').toContain('hydrate');
         const result = await buildSsg(variant, resolveConfig({}, variant), join(variant, 'dist'), false, join(variant, 'vite.ssg.config.mjs'));
         expect(result.pages.map((p) => p.file)).toContain('about/index.html');
+    }, 180_000);
+});
+
+describe('a route prepared before it renders', () => {
+    // The app's own session: a hook registered by a module lets in only a signed-in visitor, and the
+    // guard asks the permissions. What `ssg.setup` does is what a build session is.
+    const SESSION: Record<string, string> = {
+        ...FILES,
+        'src/session.js': 'let user = null;\nexport const signIn = (name) => { user = name; };\nexport const signedIn = () => user !== null;\n',
+        'src/main.js': "import { onBeforeNavigate } from '@pdxui/router';\nimport { signedIn } from './session.js';\n"
+            + "onBeforeNavigate(async (_from, to) => { await Promise.resolve(); return to === '/' || signedIn(); });\n",
+        'src/ssg.js': "import { setPermissions } from '@pdxui/core';\nimport { signIn } from './session.js';\nsignIn('build');\nsetPermissions(['admin.access']);\n",
+    };
+
+    it('a path a before-navigation hook refuses is reported, and has no file', async () => {
+        const closed = app('closed', SESSION);
+        roots.push(closed);
+        const result = await buildSsg(closed, resolveConfig({}, closed), join(closed, 'dist'), false);
+        expect(result.pages.map((p) => p.file)).toEqual(['index.html']);
+        expect(result.skippedRoutes).toContainEqual({ path: '/about', reason: 'an onBeforeNavigate hook refused it' });
+        expect(existsSync(join(closed, 'dist', 'about')), 'a refused route was written').toBe(false);
+    }, 180_000);
+
+    it('ssg.setup runs before the app\'s entries: a session it opens renders the pages behind it', async () => {
+        const open = app('open', SESSION);
+        roots.push(open);
+        const result = await buildSsg(open, resolveConfig({ ssg: { setup: 'src/ssg.js' } }, open), join(open, 'dist'), false);
+        expect(result.pages.map((p) => p.file).sort()).toEqual(['about/index.html', 'admin/index.html', 'index.html']);
+        expect(readFileSync(join(open, 'dist', 'admin', 'index.html'), 'utf-8')).toContain('<h1>Admin</h1>');
+        expect(readFileSync(join(open, 'dist', 'about', 'index.html'), 'utf-8')).toContain('<h1>About us</h1>');
+    }, 180_000);
+
+    it('a setup module that is not there stops the build, naming it', async () => {
+        const missing = app('missing', FILES);
+        roots.push(missing);
+        const err = await buildSsg(missing, resolveConfig({ ssg: { setup: 'src/nowhere.js' } }, missing), join(missing, 'dist'), false).then(() => null, (e: unknown) => e);
+        expect(err).toBeInstanceOf(SsgError);
+        expect((err as Error).message).toContain('ssg.setup');
+        expect((err as Error).message).toContain('nowhere.js');
     }, 180_000);
 });
 

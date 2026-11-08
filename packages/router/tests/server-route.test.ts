@@ -35,8 +35,8 @@ beforeAll(() => {
 const app = () => html`<pdx-router-outlet></pdx-router-outlet>`;
 
 describe('the outlet on the server', () => {
-    it('writes the layout chain with its hosts, and the page inside the innermost one', () => {
-        expect(serverRoute('/admin/users')).toEqual({ path: '/admin/users', route: '/admin/users' });
+    it('writes the layout chain with its hosts, and the page inside the innermost one', async () => {
+        expect(await serverRoute('/admin/users')).toEqual({ path: '/admin/users', route: '/admin/users' });
         const markup = renderToString(app);
         expect(markup).toMatch(/^<pdx-router-outlet data-pdx-ssg="\/admin\/users" style="display: block;"><sr-shell style="display: contents;"/);
         expect(markup).toContain('<header>Shell</header>');
@@ -47,30 +47,30 @@ describe('the outlet on the server', () => {
             .toBeGreaterThan(markup.indexOf('<header>Shell</header>'));
     });
 
-    it('gives the page its params as attributes, and an outlet inside it the next level', () => {
-        expect(serverRoute('/owners/7/pets')).toEqual({ path: '/owners/7/pets', route: '/owners/:id/pets' });
+    it('gives the page its params as attributes, and an outlet inside it the next level', async () => {
+        expect(await serverRoute('/owners/7/pets')).toEqual({ path: '/owners/7/pets', route: '/owners/:id/pets' });
         const markup = renderToString(app);
         expect(markup).toMatch(/^<pdx-router-outlet data-pdx-ssg="\/owners\/:id" style="display: block;"><sr-owner data-pdx-route="" id="7"/);
         expect(markup).toMatch(/<pdx-router-outlet data-pdx-ssg="\/owners\/:id\/pets" style="display: block;"><sr-pets data-pdx-route="" id="7"[^>]*><p>pets of <!--pdx-->7<!--\/pdx--><\/p><\/sr-pets><\/pdx-router-outlet>/);
     });
 
-    it('leaves the nested outlet empty when the path ends at the parent', () => {
-        serverRoute('/owners/7');
+    it('leaves the nested outlet empty when the path ends at the parent', async () => {
+        await serverRoute('/owners/7');
         const markup = renderToString(app);
         expect(markup).toContain('<h1><!--pdx-->7<!--/pdx--></h1><pdx-router-outlet></pdx-router-outlet>');
     });
 
-    it('renders nothing for a path it cannot answer for, and says why', () => {
-        expect(serverRoute('/nowhere')).toEqual({ path: '/nowhere', route: null, skipped: 'not-found' });
+    it('renders nothing for a path it cannot answer for, and says why', async () => {
+        expect(await serverRoute('/nowhere')).toEqual({ path: '/nowhere', route: null, skipped: 'not-found' });
         expect(renderToString(app)).toBe('<pdx-router-outlet></pdx-router-outlet>');
-        expect(serverRoute('/secret')).toEqual({ path: '/secret', route: null, skipped: 'guard' });
+        expect(await serverRoute('/secret')).toEqual({ path: '/secret', route: null, skipped: 'guard' });
         expect(renderToString(app)).toBe('<pdx-router-outlet></pdx-router-outlet>');
-        expect(serverRoute('/old')).toEqual({ path: '/old', route: null, skipped: 'redirect' });
+        expect(await serverRoute('/old')).toEqual({ path: '/old', route: null, skipped: 'redirect' });
         expect(renderToString(app)).toBe('<pdx-router-outlet></pdx-router-outlet>');
     });
 
-    it('leaves a named outlet to the browser', () => {
-        serverRoute('/');
+    it('leaves a named outlet to the browser', async () => {
+        await serverRoute('/');
         expect(renderToString(() => html`<pdx-router-outlet name="side"></pdx-router-outlet>`))
             .toBe('<pdx-router-outlet name="side"></pdx-router-outlet>');
     });

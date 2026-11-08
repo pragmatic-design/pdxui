@@ -91,10 +91,38 @@ for the paths you list in `pdx.config`:
 export default defineConfig({ ssg: { routes: ['/posts/1', '/posts/2'] } });
 ```
 
+Each path is prepared as a navigation to it would be before it is rendered. Your `onBeforeNavigate`
+hooks run, and each one is awaited, so a hook that loads what the page reads (its strings, say) has
+loaded it by the time the page is written. Then the route's guards are checked against the
+permissions your app has set. A hook the page needs has to be registered by a module, not in a
+component's setup: a setup runs during the render, which is too late.
+
+No visitor comes with a build, so there is no session and no language choice. Set what one would bring
+in a module that `ssg.setup` names. The server imports it before your entry scripts:
+
+```ts
+export default defineConfig({ ssg: { setup: './src/ssg.ts' } });
+```
+
+```ts
+// src/ssg.ts: the session a build renders the private pages with, and the language of a page
+// nobody asked for in a language
+import { setLocale } from '@pdxui/core';
+import { auth } from './auth';
+import { buildTokens } from './build-session'; // your own: tokens for an account made for builds
+
+auth.setTokens(buildTokens());
+setLocale('en');
+```
+
+A private page written this way shows what that session sees. A visitor without the session is
+sent where your app sends them, as on any first load.
+
 The build says what it did not write, and why:
 
 - a route with parameters and no path listed;
-- a guarded route, whose content depends on the visitor;
+- a path an `onBeforeNavigate` hook refused;
+- a guarded route the permissions you have set do not grant;
 - a redirect.
 
 Reading the browser stops the build. If a component's setup or render reads a browser global such as

@@ -31,7 +31,7 @@ let outlet: HTMLElement;
 let written: { shell: Element; admin: Element; page: Element };
 
 beforeAll(async () => {
-    serverRoute('/admin/users');
+    await serverRoute('/admin/users');
     const markup = renderToString(() => html`<pdx-router-outlet></pdx-router-outlet>`);
     history.replaceState(null, '', '/admin/users');
     const box = document.createElement('div');

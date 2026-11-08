@@ -54,6 +54,11 @@ and its styles; PDX does not.
   emitter.)
 - A route with dynamic parameters that is not listed in `ssg.routes` is skipped and reported, not
   rendered with empty parameters.
+- Each path is prepared as a navigation to it before it is rendered. The `onBeforeNavigate` hooks
+  are run and awaited in order, and then the route's guards are checked against the permissions the
+  app has set. A path a hook refuses, or a guard denies, is skipped and reported. What no visitor
+  brings, such as a session or a locale, is set by the module that `ssg.setup` names. The server
+  imports it before the app's entries.
 
 ### Acceptance criteria (from #160)
 

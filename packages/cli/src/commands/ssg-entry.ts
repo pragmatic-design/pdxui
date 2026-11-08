@@ -6,8 +6,8 @@
 // The order of the entry's imports is the one thing it must get right. The server DOM is installed by
 // the FIRST import, a module that brings nothing of core: `PdxElement` extends the `HTMLElement` it
 // finds when its module is evaluated, and an ES module's imports are evaluated in the order they are
-// written. Only then come core, the router and, in `renderAll`, the app's own entry scripts — the
-// ones its `index.html` loads — and every lazy page.
+// written. Only then come core, the router and, in `renderAll`, the module `ssg.setup` names, the app's
+// own entry scripts — the ones its `index.html` loads — and every lazy page.
 
 import type { Plugin } from 'vite';
 import { join } from 'pathe';
@@ -41,10 +41,12 @@ export interface SsgRender {
 /**
  * The entry's source. `renderAll(markup, extraPaths)` renders `markup` — the built page's body — for
  * every route without parameters and every path in `extraPaths`, and says what it did not render.
+ * `setup`, the module `ssg.setup` names, is imported before the app's entries.
  */
-export function ssgEntryModule(appEntries: readonly string[]): string {
+export function ssgEntryModule(appEntries: readonly string[], setup: string | null): string {
     // An inline script is imported as the module the plugin serves for it (`inlineEntryId`).
-    const imports = appEntries.map((src) => `        await import(${JSON.stringify(src)});`).join('\n');
+    const imports = [...(setup ? [setup] : []), ...appEntries]
+        .map((src) => `        await import(${JSON.stringify(src)});`).join('\n');
     return `import ${JSON.stringify(SSG_DOM_ID)};
 import { html } from '@pdxui/core';
 import { renderToStringWithReport } from '@pdxui/core/server';
@@ -52,7 +54,8 @@ import { serverRoute, serverRoutes, loadServerPages } from '@pdxui/router/server
 
 const SKIPPED = {
     'not-found': 'no route matches it',
-    guard: 'its route is guarded: what it shows depends on the visitor',
+    refused: 'an onBeforeNavigate hook refused it',
+    guard: 'its guard is denied: the build has set no permission that grants it',
     redirect: 'its route redirects',
 };
 
@@ -93,7 +96,7 @@ ${imports}
     }
     for (const p of extraPaths) if (!paths.includes(p)) paths.push(p);
     for (const path of paths) {
-        const route = serverRoute(path);
+        const route = await serverRoute(path);
         if (route.skipped) {
             skippedRoutes.push({ path, reason: SKIPPED[route.skipped] });
             continue;
@@ -128,7 +131,7 @@ writeFileSync(output, JSON.stringify(await renderAll(markup, extraPaths)));
 `;
 
 /** The plugin that answers for the entry and for the module that installs the server DOM. */
-export function ssgEntryPlugin(entries: readonly AppEntry[], root: string): Plugin {
+export function ssgEntryPlugin(entries: readonly AppEntry[], root: string, setup: string | null): Plugin {
     // An inline script's module is at a path of the root — one no file has — so that its relative
     // imports (`./src/app.pdx`) resolve as they do from the index.html it was written in.
     const inline = entries.flatMap((e) => ('inline' in e ? [e.inline] : []));
@@ -146,7 +149,7 @@ export function ssgEntryPlugin(entries: readonly AppEntry[], root: string): Plug
             return undefined;
         },
         load(id: string) {
-            if (id === RESOLVED_ENTRY) return ssgEntryModule(ids);
+            if (id === RESOLVED_ENTRY) return ssgEntryModule(ids, setup);
             if (id === RESOLVED_DOM) return `import { installServerDom } from '@pdxui/core/server-dom';\ninstallServerDom();\n`;
             const at = inline.findIndex((_, i) => id === inlinePath(i));
             if (at !== -1) return inline[at];

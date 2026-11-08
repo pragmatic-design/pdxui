@@ -74,10 +74,10 @@ export function guardAnswer(guard: string): boolean | null {
  * ahead of one. A prefetch asks before it runs a loader (#119): a declared guard with nothing to
  * evaluate it is a no, as it is for a navigation.
  */
-export async function chainAllowed(chain: RouteConfig[]): Promise<boolean> {
+export async function chainAllowed(chain: readonly Pick<RouteConfig, 'guard'>[], checker: GuardChecker | null = guardChecker): Promise<boolean> {
     for (const level of chain) {
         if (!level.guard) continue;
-        if (!guardChecker || !await guardChecker(level.guard)) return false;
+        if (!checker || !await checker(level.guard)) return false;
     }
     return true;
 }
@@ -96,6 +96,14 @@ export function onBeforeNavigate(hook: BeforeNavigateHook): () => void {
         const idx = beforeHooks.indexOf(hook);
         if (idx >= 0) beforeHooks.splice(idx, 1);
     };
+}
+
+/**
+ * The before-hooks registered now, in their order: what the server runs to prepare a route it
+ * generates (`server.ts`). A copy: a hook that removes itself while they run skips no other.
+ */
+export function beforeNavigateHooks(): readonly BeforeNavigateHook[] {
+    return beforeHooks.slice();
 }
 
 export function onAfterNavigate(hook: AfterNavigateHook): () => void {
