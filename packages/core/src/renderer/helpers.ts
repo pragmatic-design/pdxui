@@ -267,9 +267,13 @@ export function followMatch<T extends string | number>(
     onDispose(() => { childDispose?.(); childDispose = null; });
 }
 
-/** The case `match()` renders for `key`: its own, or the `_` default. */
+/**
+ * The case `match()` renders for `key`: its own, or the `_` default. An own property only (#927): a
+ * key such as 'toString' or 'constructor' would otherwise find Object.prototype's method, and call it
+ * as a case.
+ */
 export function caseFor(cases: Record<string, () => Node | DocumentFragment>, key: string): (() => Node | DocumentFragment) | undefined {
-    return cases[key] ?? cases._;
+    return (Object.hasOwn(cases, key) ? cases[key] : undefined) ?? cases._;
 }
 
 /**
