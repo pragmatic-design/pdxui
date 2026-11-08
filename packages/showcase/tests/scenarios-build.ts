@@ -66,6 +66,14 @@ export const SSG_ROOT = join(packageDir, 'scenarios', 'ssg');
  * budgets weigh; the commit it was built from is written beside it.
  */
 export const PILOT_MAIN = 'pilot-pdx-main';
+/** `component-mount-main`: the same for `scenario-component-mount.spec.ts`, every component (#950). */
+export const COMPONENT_MOUNT_MAIN = 'component-mount-main';
+
+/** What is built from `main`'s worktree: a scenario of it, by its config, into its dist. */
+const FROM_MAIN = [
+    { dir: 'pilot-mount', config: 'vite.pilot.config.ts', out: PILOT_MAIN },
+    { dir: 'component-mount', config: 'vite.config.ts', out: COMPONENT_MOUNT_MAIN },
+];
 
 export default async function buildScenarios(): Promise<void> {
     for (const { name, root, config } of SCENARIOS) {
@@ -77,14 +85,11 @@ export default async function buildScenarios(): Promise<void> {
         });
     }
     const main = mainWorktree();
-    const pilotRoot = join(main.root, 'packages', 'showcase', 'scenarios', 'pilot-mount');
-    await build({
-        root: pilotRoot,
-        configFile: join(pilotRoot, 'vite.pilot.config.ts'),
-        logLevel: 'warn',
-        build: { outDir: scenarioDist(PILOT_MAIN), emptyOutDir: true },
-    });
-    writeFileSync(join(scenarioDist(PILOT_MAIN), 'commit.txt'), main.commit);
+    for (const { dir, config, out } of FROM_MAIN) {
+        const root = join(main.root, 'packages', 'showcase', 'scenarios', dir);
+        await build({ root, configFile: join(root, config), logLevel: 'warn', build: { outDir: scenarioDist(out), emptyOutDir: true } });
+        writeFileSync(join(scenarioDist(out), 'commit.txt'), main.commit);
+    }
     // The CLI's own build, from its sources: the showcase does not depend on the CLI's package.
     const { buildSsg } = await import('../../cli/src/commands/build-ssg');
     const { resolveConfig } = await import('../../cli/src/config/loader');

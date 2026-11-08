@@ -3,29 +3,30 @@
  *
  * The `component-mount` scenario (`scenarios/component-mount/`, built by `scenarios-build.ts`) mounts
  * 100 of a tag in its default state and returns the milliseconds of the synchronous mount, its style
- * and layout forced (the scenario's own comment says why that part and not "until drawn"). Beside it,
- * `__calibrate(units)` times a fixed piece of DOM work the same way. A row is the component's time over
- * the calibration's, in pairs that alternate in one page, so a machine twice as slow is twice as slow
- * on both sides and the ratio is what is held, as `scenario-pilot-mount.spec.ts` holds its own.
+ * and layout forced (the scenario's own comment says why that part and not "until drawn").
  *
- * Each tag's measurement is in `scenario-component-mount.json`, written by
- * `tools/perf/mount-budgets.mjs` from the same build (`samples` pairs after `warmUp`, read from that
- * file here too). The budget is the measurement × SLACK. SLACK is wide because a row is noisy: two
- * full runs of the tool on one machine, 2026-11-06, put a tag's second measurement at 0.89–1.13× its
- * first for 80% of the tags, and at 0.70–1.78× at the extremes (`pdx-data-grid` 2.33 then 4.15). So a
- * row catches a component that has become several times slower — the calendar's formatters were 4.3×
- * before #894 — and not one that is 20% slower: that is what `tools/perf/compare.mjs` is for.
+ * A row is held against `main`'s mount of the same tag, measured beside it (#950): `main`'s scenario is
+ * built from a worktree of `origin/main` (`pilot-main.ts`) and the two are timed in one test, in pages
+ * that alternate, so a slower moment hits both and their ratio is what is held — as
+ * `scenario-pilot-mount.spec.ts` holds its `.pdx` side (#938). Until then a row was held to a
+ * recording of the tag over a calibration: a synchronous calibration does not take the event loop's
+ * waits a mount does, and `pdx-radio-group` read 1.37× it alone and 3.67× under the pre-push's load on
+ * one unchanged build.
  *
- * A row also fails when it measures under its measurement ÷ STALE: the component has become much
- * faster, its budget no longer measures anything, and the tool is run again.
+ * SLACK is wide because a row is noisy and its sampling short (WARM_UP, SAMPLES): two full runs on one
+ * machine, 2026-11-06, put a tag's second measurement at 0.89–1.13× its first for 80% of the tags and
+ * 0.70–1.78× at the extremes. So a row catches a component that has become several times slower — the
+ * calendar's formatters were 4.3× before #894 — and not one that is 20% slower: that is what
+ * `tools/perf/compare.mjs` is for. A tag that `main` does not have yet is measured and reported, and
+ * held once it is merged.
  */
-import { test, expect } from './fixture';
+import { test, expect, type Page } from './fixture';
 import { createServer, type Server } from 'node:http';
 import { readFileSync, existsSync } from 'node:fs';
 import { extname, join, normalize, resolve } from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { fileURLToPath } from 'node:url';
-import { scenarioDist } from './scenarios-build';
+import { scenarioDist, COMPONENT_MOUNT_MAIN } from './scenarios-build';
 
 const TYPES: Record<string, string> = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css' };
 
@@ -48,51 +49,55 @@ const here = resolve(fileURLToPath(import.meta.url), '..');
 const manifest = JSON.parse(readFileSync(resolve(here, '..', '..', 'ui', 'custom-elements.json'), 'utf8')) as { modules: { declarations?: { tagName?: string }[] }[] };
 const TAGS = manifest.modules.flatMap((m) => (m.declarations ?? []).flatMap((d) => (d.tagName ? [d.tagName] : []))).sort();
 
-const MEASURED = JSON.parse(readFileSync(resolve(here, 'scenario-component-mount.json'), 'utf8')) as {
-    instances: number; units: number; warmUp: number; samples: number; measured: string; ratio: Record<string, number>;
-};
-
-/** A row's budget is its measurement times this. */
+const INSTANCES = 100;
+const WARM_UP = 2;
+const SAMPLES = 7;
+/** A row fails when this tree's mount is more than this many times `main`'s, beside it. */
 const SLACK = 2.5;
-/** A row under its measurement divided by this is stale. */
-const STALE = 3;
 
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
-let site: { url: string; server: Server };
-test.beforeAll(async () => { site = await serve(scenarioDist('component-mount')); });
-test.afterAll(async () => { await new Promise((r) => site.server.close(r)); });
+const mount = (page: Page, tag: string) =>
+    page.evaluate(({ t, n }) => (window as unknown as { __mount(t: string, n: number): Promise<number> }).__mount(t, n), { t: tag, n: INSTANCES });
 
-test('every tag of the manifest has a measurement, and every measurement a tag', () => {
-    const tool = 'run tools/perf/mount-budgets.mjs on a component-mount build';
-    expect(TAGS.filter((t) => !(t in MEASURED.ratio)), `tags with no measurement: ${tool}`).toEqual([]);
-    expect(Object.keys(MEASURED.ratio).filter((t) => !TAGS.includes(t)), `measurements of tags the manifest no longer has: ${tool}`).toEqual([]);
+const mainCommit = (): string => readFileSync(join(scenarioDist(COMPONENT_MOUNT_MAIN), 'commit.txt'), 'utf8').trim().slice(0, 8);
+
+let site: { url: string; server: Server };
+let main: { url: string; server: Server };
+test.beforeAll(async () => {
+    site = await serve(scenarioDist('component-mount'));
+    main = await serve(scenarioDist(COMPONENT_MOUNT_MAIN));
 });
+test.afterAll(async () => { await Promise.all([site, main].map((s) => new Promise((r) => s.server.close(r)))); });
 
 test.describe('a component mounts within its budget', () => {
     for (const tag of TAGS) {
-        const measured = MEASURED.ratio[tag];
-        test(`${tag} within ${SLACK}× its measurement of ${MEASURED.measured}`, async ({ browser }) => {
-            test.skip(measured === undefined, 'no measurement: the test above fails for it');
-            const page = await browser.newPage();
-            await page.goto(site.url);
-            await page.waitForFunction(() => (window as unknown as { __ready?: boolean }).__ready === true);
-            const pair = () => page.evaluate(async ({ t, units, n }) => {
-                const w = window as unknown as { __calibrate(u: number): Promise<number>; __mount(t: string, n: number): Promise<number> };
-                const c = await w.__calibrate(units);
-                return (await w.__mount(t, n)) / c;
-            }, { t: tag, units: MEASURED.units, n: MEASURED.instances });
-            for (let i = 0; i < MEASURED.warmUp; i++) await pair();
-            const ratios: number[] = [];
-            for (let i = 0; i < MEASURED.samples; i++) ratios.push(await pair());
-            await page.close();
+        test(`${tag} within ${SLACK}× main's mount, beside it`, async ({ browser }) => {
+            const [here, there] = await Promise.all([browser.newPage(), browser.newPage()]);
+            for (const [page, url] of [[here, site.url], [there, main.url]] as const) {
+                await page.goto(url);
+                await page.waitForFunction(() => (window as unknown as { __ready?: boolean }).__ready === true);
+            }
+            const onMain = await there.evaluate((t) => customElements.get(t) !== undefined, tag);
+            const times = { here: [] as number[], main: [] as number[] };
+            for (let i = 0; i < WARM_UP; i++) { await mount(here, tag); if (onMain) await mount(there, tag); }
+            for (let i = 0; i < SAMPLES; i++) {
+                // Each sample starts from the other side, so neither always runs right after the other's GC.
+                if (i % 2 || !onMain) { times.here.push(await mount(here, tag)); if (onMain) times.main.push(await mount(there, tag)); }
+                else { times.main.push(await mount(there, tag)); times.here.push(await mount(here, tag)); }
+            }
+            await Promise.all([here.close(), there.close()]);
 
-            const ratio = Math.round(median(ratios) * 100) / 100;
-            console.log(`[scenario] mount ${tag}: ${ratio}× the calibration (measured ${measured}, budget ${(measured * SLACK).toFixed(2)})`);
-            expect(ratio, `${tag} mounts in ${ratio}× the calibration, over its budget of ${SLACK} × ${measured}: say in the commit why it grew`)
-                .toBeLessThanOrEqual(measured * SLACK);
-            expect(ratio, `${tag} mounts in ${ratio}× the calibration, under a third of its measurement ${measured}: run tools/perf/mount-budgets.mjs again`)
-                .toBeGreaterThanOrEqual(measured / STALE);
+            const a = median(times.here);
+            if (!onMain) {
+                console.log(`[scenario] mount ${tag}: ${a.toFixed(1)} ms; main (${mainCommit()}) has no ${tag} yet, so nothing to hold it to`);
+                return;
+            }
+            const m = median(times.main);
+            const ratio = Math.round((a / m) * 100) / 100;
+            console.log(`[scenario] mount ${tag}: ${a.toFixed(1)} ms, main's ${m.toFixed(1)} ms beside it, ${ratio}× (main ${mainCommit()})`);
+            expect(ratio, `${tag} mounts in ${a.toFixed(1)} ms, ${ratio}× main's ${m.toFixed(1)} ms measured beside it, over ${SLACK}×: say in the commit why it grew`)
+                .toBeLessThanOrEqual(SLACK);
         });
     }
 });
