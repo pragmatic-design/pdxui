@@ -171,6 +171,46 @@ describe('a component to a string matches the client\'s mount', () => {
     });
 });
 
+describe('a bound <select> value on the server (#934)', () => {
+    /** The markup, parsed as a page would be. */
+    const parsed = (markup: string): HTMLSelectElement => {
+        const box = document.createElement('div');
+        box.innerHTML = markup;
+        return box.querySelector('select')!;
+    };
+
+    it('marks the option it names selected, and writes no value on the <select>', () => {
+        const markup = renderToString(() => html`<select :value=${'b'}><option value="a">A</option><option value="b">B</option></select>`);
+        expect(markup).toContain('<option value="b" selected>');
+        expect(markup).not.toMatch(/<select[^>]*\svalue=/);
+        expect(markup).not.toContain('<option value="a" selected');
+        expect(parsed(markup).value).toBe('b');
+    });
+
+    it('a two-way value, and options a list renders', () => {
+        const choice = signal('c');
+        const options = ['a', 'b', 'c'];
+        const markup = renderToString(() => html`<select ::value=${choice}>${options.map((o) => html`<option value=${o}>${o.toUpperCase()}</option>`)}</select>`);
+        // The option that carries `selected`: happy-dom's select.value misreads options between the
+        // part markers a list writes, where a browser selects the marked one.
+        expect([...parsed(markup).querySelectorAll('option[selected]')].map((o) => o.getAttribute('value'))).toEqual(['c']);
+    });
+
+    it('an option without a value is named by its text, inside an <optgroup> too', () => {
+        const markup = renderToString(() => html`<select :value=${'Two'}><optgroup label="g"><option>One</option><option> Two </option></optgroup></select>`);
+        // The option, not select.value: happy-dom does not collapse the text into the value as a
+        // browser does, which is the match the server makes.
+        expect([...parsed(markup).querySelectorAll('option[selected]')].map((o) => o.textContent)).toEqual([' Two ']);
+        expect(markup).toContain('<option selected> Two </option>');
+    });
+
+    it('an option the author marked selected keeps it only when it is the value', () => {
+        const markup = renderToString(() => html`<select :value=${'b'}><option value="a" selected>A</option><option value="b">B</option></select>`);
+        expect(parsed(markup).value).toBe('b');
+        expect(markup).toContain('<option value="a">');
+    });
+});
+
 describe('the part markers', () => {
     it('bracket every value put in content, so hydration finds text the parser merged', () => {
         const markup = renderToString(() => html`<p>a${'b'}c</p>`);

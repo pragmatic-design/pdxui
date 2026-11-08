@@ -249,7 +249,16 @@ interface ElementState {
     text: string | null;
     /** What `:prop` bindings hand a component, by property name. */
     props: Map<string, unknown>;
+    /** A `<select>`'s bound value: written on the option it names, not on the select (#934). */
+    selectValue: string | null;
 }
+
+/**
+ * The value of the `<select>` whose options are being written, while they are: the option it names is
+ * marked `selected`. `value` is no attribute of a `<select>`, so the page would show its first option
+ * until the client set the property. Undefined outside a select with a bound value.
+ */
+let selectValue: string | undefined;
 
 function element(n: ElementNode, values: readonly unknown[], slots: Projection | null, mark: BlockMark | null): string {
     // The slot this template rendered, with the content projected into it (element.ts `_projectSlots`):
@@ -259,7 +268,7 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
         const projected = name ? slots.named.get(name) : slots.default;
         if (projected) return slotOpen(slots.owner, name ?? '') + projected + SLOT_CLOSE;
     }
-    const s: ElementState = { tag: n.name, attributes: new Map(), classes: [], style: [], text: null, props: new Map() };
+    const s: ElementState = { tag: n.name, attributes: new Map(), classes: [], style: [], text: null, props: new Map(), selectValue: null };
     for (const a of n.attributes) attribute(s, a, values);
     // What the enclosing helper sets on a top-level element (list.ts `createRow`, helpers.ts `show`):
     // after the element's own bindings, as the client sets it after the template built the element.
@@ -268,6 +277,13 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     const attrs = new Map(s.attributes);
     if (s.classes.length) attrs.set('class', [attrs.get('class'), ...s.classes].filter(Boolean).join(' '));
     if (s.style.length) attrs.set('style', joinStyle([attrs.get('style'), ...s.style]));
+    // An option of a select with a bound value: selected when it is the one the value names — by its
+    // `value`, or by its text when it has none, as the browser matches it.
+    if (n.name === 'option' && selectValue !== undefined) {
+        const own = attrs.has('value') ? (attrs.get('value') ?? '') : optionText(n, values);
+        if (own === selectValue) attrs.set('selected', null);
+        else attrs.delete('selected');
+    }
 
     if (n.name.includes('-')) {
         const host = componentHost(n.name, attrs, s.props, () => project(n, values, slots), () => nodes(n.children, values, slots));
@@ -277,8 +293,31 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     }
     const open = openTag(n.name, attrs);
     if (n.void) return open;
-    const inner = s.text !== null ? escapeText(s.text) : nodes(n.children, values, slots);
+    let inner: string;
+    if (s.text !== null) inner = escapeText(s.text);
+    else if (n.name === 'select' && s.selectValue !== null) {
+        // Its options — written by this template, through an <optgroup>, by a list — know the value.
+        const outer = selectValue;
+        selectValue = s.selectValue;
+        try { inner = nodes(n.children, values, slots); } finally { selectValue = outer; }
+    } else inner = nodes(n.children, values, slots);
     return `${open}${inner}</${n.name}>`;
+}
+
+/**
+ * An `<option>`'s text, as the browser takes it for the value of one with no `value` attribute: its
+ * text and its values' text, whitespace collapsed and trimmed.
+ */
+function optionText(n: ElementNode, values: readonly unknown[]): string {
+    const text = (list: TreeNode[]): string => list.map((c) => {
+        if (c.kind === 'text') return decodeEntities(c.raw);
+        if (c.kind === 'hole') {
+            const v = read(values[c.index]);
+            return typeof v === 'string' || typeof v === 'number' ? String(v) : '';
+        }
+        return c.kind === 'element' ? text(c.children) : '';
+    }).join('');
+    return text(n.children).replace(/\s+/g, ' ').trim();
 }
 
 /** A component element's children, grouped as its slots receive them, rendered in its parent's context. */
@@ -369,6 +408,7 @@ function property(s: ElementState, prop: string, value: unknown): void {
     if (UNREFLECTED.has(camel)) return;
     if (camel === 'style') { if (value != null) s.style.push(String(value)); return; }
     if (camel === 'value' && s.tag === 'textarea') { s.text = textOf(value); return; }
+    if (camel === 'value' && s.tag === 'select') { s.selectValue = value == null ? null : String(value); return; }
     const attr = aria ? prop : prop.toLowerCase();
     if (value == null || value === false) { s.attributes.delete(attr); return; }
     if (value === true) { s.attributes.set(attr, ''); return; }
