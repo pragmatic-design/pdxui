@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 110 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 111 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -857,6 +857,42 @@ The listener outlives the component and keeps acting on a screen that is gone.
 The route is registered without a loader, so the page renders with no data.
 
 **Fix.** Declare it: `async function loadUser() { … }`.
+
+### PDX_LOADER_READS_SETUP
+
+*error* — A `@loader` or a route's label function reads a name the component's setup declares.
+
+Both are lifted to module scope: the router calls a loader before the component exists, and a breadcrumb builds its label outside any component. A prop, a signal, a constant or a function of the script lives in the setup, so the route throws a ReferenceError the first time it is visited.
+
+**Fix.** Move the value into a module and import it, or take it from the route: a loader reads `ctx.params` and `ctx.query`, a label its `params`.
+
+Instead of:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@page '/t';
+@loader rows: load;
+const base = '/api';
+async function load() { return fetch(base + '/t'); }
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>x</p>
+</template>
+<script>
+@page '/t';
+@loader rows: load;
+import { base } from './api';
+async function load() { return fetch(base + '/t'); }
+</script>
+```
 
 ### PDX_LOADER_UNKNOWN_OPTION
 

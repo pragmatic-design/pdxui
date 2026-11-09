@@ -663,6 +663,17 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it: `function crumb(params) { … }`, or write the crumb as a string.',
         reproducedIn: `${T}route-label-fn.test.ts`,
     },
+    PDX_LOADER_READS_SETUP: {
+        severity: 'error', category: 'defect',
+        summary: "A `@loader` or a route's label function reads a name the component's setup declares.",
+        explanation: 'Both are lifted to module scope: the router calls a loader before the component exists, and a breadcrumb builds its label outside any component. A prop, a signal, a constant or a function of the script lives in the setup, so the route throws a ReferenceError the first time it is visited.',
+        fix: 'Move the value into a module and import it, or take it from the route: a loader reads `ctx.params` and `ctx.query`, a label its `params`.',
+        example: {
+            bad: pdx('<p>x</p>', "@page '/t';\n@loader rows: load;\nconst base = '/api';\nasync function load() { return fetch(base + '/t'); }"),
+            good: pdx('<p>x</p>', "@page '/t';\n@loader rows: load;\nimport { base } from './api';\nasync function load() { return fetch(base + '/t'); }"),
+        },
+        reproducedIn: `${T}loader-reads-setup.test.ts`,
+    },
     PDX_INLINE_NODE_UNSUPPORTED: {
         severity: 'warn', category: 'defect',
         summary: 'A template node the inline render path cannot compile.',

@@ -32,6 +32,7 @@ import { checkAttachments } from './validate-attach';
 import { isAssertionOperator, skipAssertedType } from './asserted-type';
 import { checkAwaitTiming } from './validate-await';
 import { snippetReads } from './validate-snippet-reads';
+import { checkRouteFnReads } from './validate-route-fn-reads';
 
 /**
  * Map a character offset inside a node's text to an absolute source {line, column}, given the
@@ -347,6 +348,8 @@ export function validate(
     const templateIds = collectTemplateIdentifiers(ast, declaredNames);
     // A name read and declared nowhere.
     checkUndeclaredRefs(analysis, templateIds, warnings);
+    // A @loader or @page label function, lifted to module scope, that reads the setup (#977).
+    checkRouteFnReads(analysis, warnings);
     // A @form rule that is neither core's nor the script's.
     checkFormRules(analysis, warnings);
     // A @form field named like a member of the form.

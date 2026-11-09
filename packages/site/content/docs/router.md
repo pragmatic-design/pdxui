@@ -226,7 +226,9 @@ the loader after its function, `@loader loadUser: loadUser;`, and turns the page
 The function is declared in the same `<script>`, and the compiler lifts it to module scope so the
 route can call it. It therefore runs **before the component exists**: it cannot read props or
 signals, and takes what it needs from the URL. A `@loader` naming a function that is not declared
-is reported as `PDX_LOADER_NOT_FOUND` rather than silently registering nothing.
+is reported as `PDX_LOADER_NOT_FOUND` rather than silently registering nothing, and a loader that
+reads a prop, a signal or a constant of the script is an error, `PDX_LOADER_READS_SETUP`, rather than
+a ReferenceError on the first visit.
 
 The data does not wait for the page's code. The compiler gives the loader a small module of its
 own, and a navigation starts it together with the page's chunk: on a real network that is one round
