@@ -25,6 +25,8 @@ const PORT = 5314;
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     testMatch: ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'],
     fullyParallel: true,

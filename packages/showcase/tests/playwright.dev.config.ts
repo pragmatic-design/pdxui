@@ -20,6 +20,8 @@ const PORT = 5312;
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     // `permissions-edit.spec.ts` edits the mock server's roles: here, on a server of its
     // own, so a revoked grant cannot race the build's specs that read it.

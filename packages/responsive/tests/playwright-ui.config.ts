@@ -6,6 +6,8 @@ const excluded = CERTIFY_EXCLUSIONS.map((e) => `**/${e.file}`);
 const named = CERTIFY_PROJECTS.flatMap((p) => (p.files === 'rest' ? [] : p.files));
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration/ui-components',
     // Everything in the folder runs, except what is listed — with a reason and an issue — in
     // certify-exclusions.ts. Naming the runners instead would leave every other spec here in no

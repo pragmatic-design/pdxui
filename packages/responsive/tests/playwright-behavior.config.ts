@@ -4,6 +4,8 @@ import { defineConfig } from '@playwright/test';
 // and dir so it never touches the component-contract config owned elsewhere; shares the scenarios
 // web server on :5220.
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration/behavior',
     // By test, not by file, as the certify config does: by file, five files would mean five workers,
     // and `pnpm certify` runs this suite too. Every test mounts its own page.

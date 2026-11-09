@@ -2,7 +2,8 @@
 //
 // A test that failed after 26.6 s spent creating its page said so only in its trace. For a failed
 // test, every fixture over 5 s is written to `slow-fixtures.txt` in the run's output folder, which
-// the global teardown keeps (keep-failures.ts): the next occurrence says whether it was the page again.
+// the global teardown keeps (scripts/lib/keep-failed-runs.mjs): the next occurrence says whether it
+// was the page again.
 
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';

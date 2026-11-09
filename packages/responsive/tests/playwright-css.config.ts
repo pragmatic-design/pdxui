@@ -3,6 +3,8 @@ import { defineConfig } from '@playwright/test';
 // CSS-system contracts (contrast + scales across themes). Separate config so it does not touch the
 // component-contract config (owned elsewhere); shares the same scenarios web server on :5220.
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration/css-system',
     timeout: 30_000,
     retries: process.env.CI ? 2 : 1,
