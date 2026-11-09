@@ -16,6 +16,7 @@ import { maskNonCode } from './tokenizer';
 import { jsQuote, jsString } from './js-literal';
 import { formRuleNames, CORE_FORM_RULES } from './form-rules';
 import { splitUnion } from './model-options';
+import { escapeForRegExp } from './regexp-escape';
 
 // ─── Public API ────────────────────────────────────────────────────
 
@@ -108,15 +109,11 @@ export function buildSetupBody(
     // A `@model` (#124) is a signal of the script, as a `$signal` is: reads are calls and an
     // assignment is `.set()`, on the context's model signal, whose writes dispatch `<name>-change`.
     for (const p of analysis.props) if (p.model) parts.push(`    const __${p.name} = ctx.${p.name};`);
-    for (const p of analysis.props) {
-        if (p.model) continue;
-        // Always generate accessor if prop is used in body, signals, deriveds, or is a common pattern
-        const namePattern = new RegExp(`\\b${p.name}\\b`);
-        if (namePattern.test(bodyText) || analysis.signals.some(s => namePattern.test(s.initialExpr)) ||
-            analysis.deriveds.some(d => namePattern.test(d.expr))) {
-            parts.push(`    const ${p.name} = ctx.${p.name};`);
-        }
-    }
+    // The accessors of the other props are decided once the setup is written (below, before the join):
+    // a rune's code reads a prop too — `@state invalid = !!error;`, a dynamic `@title`, an `@expose` —
+    // and an accessor left out made the mount throw `ReferenceError` (#980).
+    const accessorsAt = parts.length;
+    parts.push(PROP_ACCESSORS_SLOT);
 
     // @inject — declarative context consumer (walks up DOM tree). BEFORE the body, with the props: the
     // body reads what it injects, and emitted after it a top-level read would be in the name's TDZ.
@@ -678,7 +675,34 @@ export function buildSetupBody(
     }
     parts.push(generateAutoReturn(returned));
 
+    const accessors = propAccessors(analysis, bodyText, parts.slice(accessorsAt + 1).join('\n'));
+    if (accessors) parts[accessorsAt] = accessors;
+    else parts.splice(accessorsAt, 1);
     return parts.join('\n');
+}
+
+/** The line `buildSetupBody` reserves for the props' accessors, filled once the rest is written. */
+const PROP_ACCESSORS_SLOT = '/*__pdx_prop_accessors__*/';
+
+/**
+ * The accessor of every prop the setup reads, `const name = ctx.name;`, in the props' order. A prop is
+ * read when the script reads it (the body, the effects, the lifecycle, the watches, a reactive @fetch
+ * URL, a signal's or a derived's initialiser) or when the code generated after the accessors names it
+ * as an identifier: a rune's expression, rewritten to a call of the accessor (#980). A name after a dot
+ * is a property, `ctx.error()`, not a read of the accessor.
+ */
+function propAccessors(analysis: ScriptAnalysis, bodyText: string, generated: string): string {
+    const lines: string[] = [];
+    for (const p of analysis.props) {
+        if (p.model) continue;
+        const word = new RegExp(`\\b${escapeForRegExp(p.name)}\\b`);
+        const read = new RegExp(`(?<![\\w$.])${escapeForRegExp(p.name)}(?![\\w$])`);
+        if (word.test(bodyText) || analysis.signals.some(s => word.test(s.initialExpr))
+            || analysis.deriveds.some(d => word.test(d.expr)) || read.test(generated)) {
+            lines.push(`    const ${p.name} = ctx.${p.name};`);
+        }
+    }
+    return lines.join('\n');
 }
 
 // ─── Internal Helpers ──────────────────────────────────────────────
