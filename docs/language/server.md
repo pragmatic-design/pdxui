@@ -44,7 +44,10 @@ with no second render and no external dependency.
   not set.
 - `pdx build --ssg` renders every `@page` route without dynamic parameters, plus the paths listed in
   `pdx.config`'s `ssg.routes`, to `dist/<route>/index.html`. Each page is the built `index.html` with
-  the route's content in its body, and its `@title` and `@meta` in its head.
+  the route's content in its body, and its `@title` and `@meta` in its head. The head announces the
+  route's own chunks (`modulepreload`), and holds the route's stylesheets inline, in a
+  `<style data-pdx-route-css>` each: the content paints at once, styled, with no round trip of its own
+  (#966).
 - A rendered host carries `data-pdx-ssr`. At boot the client **adopts** its nodes: each binding finds
   the node it binds, and the router's outlet keeps the page the server wrote. At the first difference
   between a component's markup and what its template says, that component renders as it would have

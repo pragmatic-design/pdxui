@@ -339,6 +339,8 @@ export interface BundleChunk {
     imports?: string[];
     /** Vite's record of the CSS files the chunk imports, which its loader waits for. */
     viteMetadata?: { importedCss?: Set<string> };
+    /** An asset's content — a stylesheet's text — which a generated page inlines (#966). */
+    source?: string | Uint8Array;
 }
 
 /**
@@ -419,6 +421,29 @@ export function preloadTags(files: string[], base: string): string {
     return files.map((f) => f.endsWith('.css')
         ? `<link rel="preload" as="style" crossorigin href="${prefix}${f}">`
         : `<link rel="modulepreload" crossorigin href="${prefix}${f}">`).join('\n');
+}
+
+/**
+ * The tags of a page generated with its route's content in it (#966): what {@link preloadTags}
+ * writes — the scripts, and each stylesheet preloaded — and each stylesheet INLINE as well, in a
+ * `<style>` that names its file. The content paints at once, so its styles have to be there: a
+ * preload alone lets it paint unstyled and shift, and a `<link rel="stylesheet">` holds the first
+ * paint for a round trip (~170 ms on slow 4G, measured on `showcase/scenarios/ssg-virtual`). The
+ * preload stays for Vite's loader, which waits for the route chunk's stylesheet before it mounts the
+ * route: started with the entry, the file is in the cache by then. Without it the take-over of the
+ * showcase's generated `/` came 130 ms later (1201 ms against 1069).
+ */
+export function pageTags(bundle: Record<string, BundleChunk>, files: string[], base: string): string {
+    const scripts = preloadTags(files, base);
+    const styles = files.filter((f) => f.endsWith('.css')).map((f) => {
+        const asset = Object.values(bundle).find((c) => c.fileName === f);
+        const source = asset?.source;
+        const css = typeof source === 'string' ? source : source ? new TextDecoder().decode(source) : '';
+        // `</style` ends the element in HTML; inside CSS it can only be in a string or a comment, where
+        // the escaped form reads the same.
+        return css ? `<style data-pdx-route-css="${f}">${css.replace(/<\/style/gi, '<\\/style')}</style>` : '';
+    }).filter(Boolean);
+    return [scripts, ...styles].filter(Boolean).join('\n');
 }
 
 /**

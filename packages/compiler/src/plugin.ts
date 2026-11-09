@@ -37,7 +37,7 @@ import { collectOrigins, mapFromOrigins, insertMapLines } from './compiler/sourc
 import type { SourceMapJSON } from './compiler/sourcemap';
 import { PluginRunner } from './plugin-system';
 import type { CompilerPlugin } from './plugin-system';
-import { discoverPragmaticAliases, scanForStores, scanForRoutes, scanRouteFile, isScannedFile, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
+import { discoverPragmaticAliases, scanForStores, scanForRoutes, scanRouteFile, isScannedFile, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, pageTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
 import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
 import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { writeRouteTypes } from './route-types';
@@ -474,12 +474,13 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // rather than after it.
                 if (tags) html = html.replace('</head>', `${tags}\n</head>`);
                 // A generated page is its own route's first screen (#160): `pdx build --ssg` swaps these
-                // tags for that route's (`hydrateEntryPlugin`'s `api`).
+                // tags for that route's (`hydrateEntryPlugin`'s `api`), its stylesheets inline, since
+                // the page paints the route's content at once (#966).
                 if (hydrate) {
                     const bundle = ctx.bundle;
                     routePreloads = {
                         landing: tags,
-                        routes: new Map(scannedRoutes.map((r) => [r.path, preloadTags(routePreloadFiles(bundle, scannedRoutes, [r.path]), viteBase)])),
+                        routes: new Map(scannedRoutes.map((r) => [r.path, pageTags(bundle, routePreloadFiles(bundle, scannedRoutes, [r.path]), viteBase)])),
                     };
                 }
             }

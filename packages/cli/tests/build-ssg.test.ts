@@ -134,6 +134,50 @@ describe('what the build refuses, and what it leaves out', () => {
     }, 180_000);
 });
 
+// #966: a generated page paints its route's content at once, so that content's styles have to be in the
+// page. A `preload as="style"` let it paint unstyled first; the owner chose them inline over a
+// render-blocking `<link>`, which held the first paint for a round trip.
+describe('a generated page carries its route\'s stylesheet', () => {
+    const styled = (pdx: string) => pdx + '<style scoped>\nh1 { margin: 0; }\n</style>\n';
+    async function built(name: string, files: Record<string, string>): Promise<(file: string) => string> {
+        const at = app(name, files);
+        roots.push(at);
+        const nodeEnv = process.env.NODE_ENV;
+        process.env.NODE_ENV = 'production';
+        try {
+            await buildSsg(at, resolveConfig({}, at), join(at, 'dist'), false);
+        } finally {
+            process.env.NODE_ENV = nodeEnv;
+        }
+        return (file) => readFileSync(join(at, 'dist', file), 'utf-8');
+    }
+    const linked = (html: string, rel: string, ext: string): string[] =>
+        [...html.matchAll(new RegExp(`<link rel="${rel}"[^>]*href="/assets/([a-z]+)-[^"]*\\.${ext}"`, 'g'))].map((m) => m[1]);
+    /** The route stylesheets written into the page, by route name, with their text. */
+    const inlined = (html: string): Map<string, string> =>
+        new Map([...html.matchAll(/<style data-pdx-route-css="assets\/([a-z]+)-[^"]*\.css">([\s\S]*?)<\/style>/g)].map((m) => [m[1], m[2]]));
+
+    it('inline in its head, not a preload: the page paints with it', async () => {
+        const page = await built('styled', { ...FILES, 'src/about.pdx': styled(FILES['src/about.pdx']) });
+        const about = page('about/index.html');
+        const css = inlined(about).get('about');
+        expect(css, 'the about page does not carry its route\'s stylesheet').toBeDefined();
+        expect(css, 'the stylesheet in the page is not the route\'s').toMatch(/margin:\s*0/);
+        expect(about.indexOf('data-pdx-route-css'), 'the styles are not in the head').toBeLessThan(about.indexOf('</head>'));
+        // Preloaded as well, for Vite's loader, which waits for it before it mounts the route.
+        expect(linked(about, 'preload', 'css'), 'the route\'s stylesheet is not preloaded for the loader').toContain('about');
+        expect(linked(about, 'stylesheet', 'css'), 'a render-blocking link holds the first paint for a round trip').not.toContain('about');
+    }, 180_000);
+
+    it('in an app with no `/` route, whose index.html announces no landing route, too', async () => {
+        const { 'src/home.pdx': _home, ...rest } = FILES;
+        const page = await built('nolanding', { ...rest, 'src/about.pdx': styled(FILES['src/about.pdx']) });
+        const about = page('about/index.html');
+        expect(linked(about, 'modulepreload', 'js'), 'the page does not announce its route\'s chunk').toContain('about');
+        expect(inlined(about).has('about'), 'the page does not carry its route\'s stylesheet').toBe(true);
+    }, 180_000);
+});
+
 describe('how an app is entered and built', () => {
     it('an inline module script is the app\'s entry too, its relative imports from the root', async () => {
         // The banner is in the page's own markup, outside every route, and only the inline script imports it.

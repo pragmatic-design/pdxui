@@ -105,6 +105,23 @@ async function coldLoad(browser: Browser, route: string, viewport: { width: numb
 
 const median = (xs: number[]) => [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)];
 
+// #966: each page carries its route's stylesheet inline, so it paints styled with no round trip of its
+// own; the file is fetched once, by Vite's loader when the page is taken over, not twice.
+test('each page carries its route\'s stylesheet inline, and the file is fetched once', async ({ page }) => {
+    for (const count of COUNTS) {
+        const route = `/rows-${count}`;
+        const html = await (await page.request.get(`${site.url}${route}`)).text();
+        expect(html, `${route}: its route's stylesheet is not in the page`).toMatch(new RegExp(`<style data-pdx-route-css="assets/rows-${count}-[^"]+\\.css">`));
+        const fetched: string[] = [];
+        const onRequest = (r: { url(): string }) => { if (new RegExp(`/assets/rows-${count}-[^/]+\\.css$`).test(r.url())) fetched.push(r.url()); };
+        page.on('request', onRequest);
+        await page.goto(`${site.url}${route}`);
+        await expect(page.locator('pdx-router-outlet')).not.toHaveAttribute('data-pdx-ssg');
+        page.off('request', onRequest);
+        expect(fetched, `${route}: its stylesheet was fetched ${fetched.length} times`).toHaveLength(1);
+    }
+});
+
 for (const viewport of VIEWPORTS) {
     test.describe(`at ${viewport.width} × ${viewport.height}`, () => {
         test('each count: what the file paints, what a cold load measures, and what it costs', async ({ browser }) => {
