@@ -11,7 +11,7 @@
 // This file measures the choice — which chunks, and which deliberately not. The effect on the
 // browser is `packages/showcase/tests/first-paint-waves.spec.ts`, which counts the waves.
 import { describe, it, expect } from 'vitest';
-import { routePreloadFiles, preloadTags, type BundleChunk, type ScannedRoute } from '../src/plugin-utils';
+import { routePreloadFiles, preloadTags, pageTags, type BundleChunk, type ScannedRoute } from '../src/plugin-utils';
 
 const route = (path: string, file: string): ScannedRoute => ({ path, file, tag: `pdx-${path.slice(1) || 'home'}` });
 
@@ -119,6 +119,32 @@ describe('the tags', () => {
         // paint, which a `rel=stylesheet` here would.
         expect(preloadTags(['assets/a.css'], '/'))
             .toBe('<link rel="preload" as="style" crossorigin href="/assets/a.css">');
+    });
+});
+
+// #966: a generated page paints its route's content at once, so its stylesheets go in the page.
+describe('the tags of a generated page', () => {
+    const asset = (fileName: string, source: string | Uint8Array): BundleChunk => ({ type: 'asset', fileName, source });
+
+    it('preload the scripts as the client page does, and write each stylesheet inline, named by its file', () => {
+        const bundle = { 'assets/a.css': asset('assets/a.css', 'h1{margin:0}') };
+        expect(pageTags(bundle, ['assets/a.js', 'assets/a.css'], '/')).toBe(
+            '<link rel="modulepreload" crossorigin href="/assets/a.js">\n<style data-pdx-route-css="assets/a.css">h1{margin:0}</style>');
+    });
+
+    it('read a stylesheet the bundle holds as bytes', () => {
+        const bundle = { 'assets/b.css': asset('assets/b.css', new TextEncoder().encode('p{color:red}')) };
+        expect(pageTags(bundle, ['assets/b.css'], '/')).toContain('>p{color:red}</style>');
+    });
+
+    it('a `</style` in the stylesheet does not end the element', () => {
+        const bundle = { 'assets/c.css': asset('assets/c.css', 'p::after{content:"</style>"}') };
+        const tags = pageTags(bundle, ['assets/c.css'], '/');
+        expect(tags.match(/<\/style/gi), 'the stylesheet closed its element early').toHaveLength(1);
+    });
+
+    it('control — a stylesheet the bundle does not hold is left out, not written empty', () => {
+        expect(pageTags({}, ['assets/a.js', 'assets/missing.css'], '/')).toBe('<link rel="modulepreload" crossorigin href="/assets/a.js">');
     });
 });
 

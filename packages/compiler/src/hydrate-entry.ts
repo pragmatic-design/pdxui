@@ -40,8 +40,10 @@ export interface RoutePreloads {
 export interface HydrateApi {
     /**
      * `html`, a page generated for the route `route`, announcing that route's chunks in place of the
-     * landing route's: a generated page is the first screen of its own route. Unchanged before a
-     * build has written the tags, or when the app announces none (`preloadRoutes: []`).
+     * landing route's — or, when the page announced none because no landing route was found (an app
+     * with no `/`), before `</head>`, where those would be (#966). A generated page is the first screen
+     * of its own route. Unchanged before a build has written the tags, or when the app announces none
+     * (`preloadRoutes: []`).
      */
     retargetPreloads(html: string, route: string): string;
 }
@@ -58,8 +60,10 @@ export function hydrateEntryPlugin(hasRoutes: () => boolean, preloads: () => Rou
             retargetPreloads(html: string, route: string): string {
                 const p = preloads();
                 const own = p?.routes.get(route);
-                if (!p || !p.landing || own === undefined || !html.includes(p.landing)) return html;
-                return html.replace(p.landing, () => own);
+                if (!p || own === undefined) return html;
+                if (p.landing) return html.includes(p.landing) ? html.replace(p.landing, () => own) : html;
+                // No landing tags to replace: the route's own go where the plugin puts them.
+                return own && html.includes('</head>') ? html.replace('</head>', () => `${own}\n</head>`) : html;
             },
         },
         transformIndexHtml: {

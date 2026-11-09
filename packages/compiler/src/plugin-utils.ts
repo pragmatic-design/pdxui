@@ -339,6 +339,8 @@ export interface BundleChunk {
     imports?: string[];
     /** Vite's record of the CSS files the chunk imports, which its loader waits for. */
     viteMetadata?: { importedCss?: Set<string> };
+    /** An asset's content — a stylesheet's text — which a generated page inlines (#966). */
+    source?: string | Uint8Array;
 }
 
 /**
@@ -419,6 +421,27 @@ export function preloadTags(files: string[], base: string): string {
     return files.map((f) => f.endsWith('.css')
         ? `<link rel="preload" as="style" crossorigin href="${prefix}${f}">`
         : `<link rel="modulepreload" crossorigin href="${prefix}${f}">`).join('\n');
+}
+
+/**
+ * The tags of a page generated with its route's content in it (#966): the scripts as
+ * {@link preloadTags} writes them, and each stylesheet INLINE, in a `<style>` that names its file.
+ * The content paints at once, so its styles have to be there: a `preload` lets it paint unstyled and
+ * shift, and a `<link rel="stylesheet">` holds the first paint for a round trip (~170 ms on slow 4G,
+ * measured on `showcase/scenarios/ssg-virtual`). Vite's loader still fetches the file when the route's
+ * chunk imports it, after the page is taken over; the rules are the same, so nothing on screen changes.
+ */
+export function pageTags(bundle: Record<string, BundleChunk>, files: string[], base: string): string {
+    const scripts = preloadTags(files.filter((f) => !f.endsWith('.css')), base);
+    const styles = files.filter((f) => f.endsWith('.css')).map((f) => {
+        const asset = Object.values(bundle).find((c) => c.fileName === f);
+        const source = asset?.source;
+        const css = typeof source === 'string' ? source : source ? new TextDecoder().decode(source) : '';
+        // `</style` ends the element in HTML; inside CSS it can only be in a string or a comment, where
+        // the escaped form reads the same.
+        return css ? `<style data-pdx-route-css="${f}">${css.replace(/<\/style/gi, '<\\/style')}</style>` : '';
+    }).filter(Boolean);
+    return [scripts, ...styles].filter(Boolean).join('\n');
 }
 
 /**
