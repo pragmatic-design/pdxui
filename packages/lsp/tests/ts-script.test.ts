@@ -2,6 +2,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { join } from 'path';
+import { pathToFileURL } from 'url';
 import ts from 'typescript';
 import { projectScript, PdxTsService } from '../src/utils/ts-service';
 import { getTsDiagnostics } from '../src/capabilities/ts-diagnostics';
@@ -123,11 +124,14 @@ describe('getScriptDiagnostics', () => {
     });
 
     // A diagnostic run over `sc` as a script block.
-    const diagnose = (sc: string) => {
+    const diagnose = (sc: string, uri = URI) => {
         const src = '<template></template>\n<script>' + sc + '</script>';
         const start = src.indexOf('<script>') + '<script>'.length;
-        return (getTsDiagnostics(svc, URI, buildVirtualFile(sc, start, [], '', -1), src) as { message: string }[]).map((d) => d.message);
+        return (getTsDiagnostics(svc, uri, buildVirtualFile(sc, start, [], '', -1), src) as { message: string }[]).map((d) => d.message);
     };
+    // A file of an app that installs @pdxui/core, where `import('@pdxui/core')` resolves: from the
+    // repository's root it does not, and a core type is `any` there.
+    const APP_URI = pathToFileURL(join(ROOT, 'packages', 'showcase', 'src', 'x.pdx')).href;
 
     it('a quoted @event (#749) declares its camelCase function, typed by its payload', () => {
         const sc = "\n@event 'open-change': { value: boolean };\nfunction f() { openChange({ value: true }); openChange({ value: 'no' }); }\n";
@@ -137,9 +141,14 @@ describe('getScriptDiagnostics', () => {
     });
 
     it('@host el (#750) declares the host element, typed, alone or with attributes', () => {
-        expect(diagnose('\n@host el;\nconst id: string = el.id;\nel.focus();\n')).toEqual([]);
-        expect(diagnose('\n@host me { role="group" }\nconst w: number = me.offsetWidth;\n')).toEqual([]);
-        expect(diagnose('\n@host el;\nconst n: number = el.id;\n').some((m) => /string/i.test(m) && /number/i.test(m)), 'el is not typed').toBe(true);
+        expect(diagnose('\n@host el;\nconst id: string = el.id;\nel.focus();\n', APP_URI)).toEqual([]);
+        expect(diagnose('\n@host me { role="group" }\nconst w: number = me.offsetWidth;\n', APP_URI)).toEqual([]);
+        expect(diagnose('\n@host el;\nconst n: number = el.id;\n', APP_URI).some((m) => /string/i.test(m) && /number/i.test(m)), 'el is not typed').toBe(true);
+    });
+
+    it('@host el is a PdxElement: its labels are the <label>s that name it (#987)', () => {
+        expect(diagnose('\n@host el;\nconst first: HTMLLabelElement | undefined = el.labels[0];\nconst n: number = el.labels.length;\n', APP_URI)).toEqual([]);
+        expect(diagnose('\n@host el;\nconst s: string = el.labels;\n', APP_URI).some((m) => /NodeListOf<HTMLLabelElement>/.test(m)), 'el.labels is not typed').toBe(true);
     });
 
     it('the @event payload is typed: a string where a number belongs is an error', () => {

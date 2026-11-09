@@ -70,6 +70,15 @@ const HTMLElementBase: typeof HTMLElement = (typeof HTMLElement !== 'undefined'
     ? HTMLElement
     : (class {} as unknown as typeof HTMLElement));
 
+/**
+ * An empty NodeList of labels, the platform's own type: what `labels` is for an element with no
+ * internals. Made from a detached fragment, once, when first asked for.
+ */
+let noLabels: NodeListOf<HTMLLabelElement> | null = null;
+function emptyLabels(): NodeListOf<HTMLLabelElement> {
+    return noLabels ??= document.createDocumentFragment().querySelectorAll('label');
+}
+
 /** Every <slot> in a rendered template, the root included. */
 function slotsIn(content: Node | null): Element[] {
     if (!content) return [];
@@ -175,6 +184,22 @@ export abstract class PdxElement extends HTMLElementBase {
      */
     set form(value: unknown) {
         Object.defineProperty(this, 'form', { value, writable: true, configurable: true, enumerable: true });
+    }
+
+    /**
+     * The labels that name this element (#987): for a form-associated component, the `<label for>`
+     * pointing at its id and a `<label>` wrapping it, read from its ElementInternals, live as the
+     * platform keeps them. A component names its inner control after them — a `.pdx` writes
+     * `self.labels` with `@host self;` — with no query on the document. Empty for one that is not
+     * form-associated: the platform associates a label only with a labelable element.
+     */
+    get labels(): NodeListOf<HTMLLabelElement> {
+        return this._internals?.labels as NodeListOf<HTMLLabelElement> | undefined ?? emptyLabels();
+    }
+
+    /** A component may declare a `labels` prop: the same as `form`, kept as an own property. */
+    set labels(value: unknown) {
+        Object.defineProperty(this, 'labels', { value, writable: true, configurable: true, enumerable: true });
     }
 
     /** Get the validation message. */

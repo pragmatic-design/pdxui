@@ -148,12 +148,9 @@ describe('pdx-select: named by its label, not by its value', () => {
         expect(nameOf(combobox(document.body))).toBe('Role');
     });
 
-    it('a <label for> the host names the combobox, not only the host', async () => {
-        document.body.innerHTML = '<label for="size-select">Size</label><pdx-select id="size-select" placeholder="Pick one"></pdx-select>';
-        await tick(50);
-        await tick(50);
-        expect(nameOf(combobox(document.body))).toBe('Size');
-    });
+    // A <label for> the host names the combobox: measured in Chromium, packages/showcase/tests/
+    // host-labels.spec.ts. The select reads its host's labels from ElementInternals (#987), which
+    // happy-dom does not have.
 
     it('after a <pdx-label>, a plain select is named by it', async () => {
         document.body.innerHTML = '<pdx-label text="Country"></pdx-label><pdx-select placeholder="Pick one"></pdx-select>';

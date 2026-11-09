@@ -559,7 +559,10 @@ render's context:
 
 A name (#750) binds the element itself: `@host el;` compiles to `const el = ctx.el;`, declared before
 the rest of the setup and returned to the template, so `el.id` and `:for="el.id"` read the host. It
-is a constant typed `HTMLElement`, not a signal.
+is a constant typed `PdxElement`, core's element class, not a signal. A form-associated component (a
+`@model` with `{ form }`) reads the `<label>`s that name it as `el.labels`, from its ElementInternals
+(#987): the label for a `<label for>` the page wrote, live, with no document query. Any other host's
+`labels` is an empty list.
 
 #### Rules
 

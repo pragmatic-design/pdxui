@@ -6,7 +6,7 @@
 // "Cannot set property form … which has only a getter". Neither may the template engine binding
 // `<pdx-form :form="form">` wherever the element is upgraded before it is bound: happy-dom, the
 // production inline generator, any code that creates the element and sets the prop first.
-import { describe, it, expect, afterEach } from 'vitest';
+import { describe, it, expect, afterEach, vi } from 'vitest';
 import { component } from '../src/component/component';
 import { html } from '../src/renderer/template';
 import { prop } from '../src/component/component-descriptor';
@@ -70,5 +70,33 @@ describe('a `form` prop set before connect', () => {
         // happy-dom may not implement ElementInternals.form; the assertion is that nothing replaced
         // the getter with a stored value when no one assigned it.
         expect(Object.getOwnPropertyDescriptor(el, 'form')).toBeUndefined();
+    });
+});
+
+describe('a `labels` prop set before connect (#987)', () => {
+    // PdxElement's `get labels()` is the host's <label>s; a chart whose data is its labels declares the
+    // prop, and the getter must not refuse the assignment, nor core warn about the name.
+    it('does not throw, arrives, and is not warned about', () => {
+        const tag = uniqueTag();
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+        component(tag, {
+            props: { labels: prop<string[]>([]) },
+            render: (ctx) => html`<b class="shown">${() => (ctx.labels() as string[]).join(',')}</b>`,
+        });
+        const el = document.createElement(tag) as HTMLElement & { labels: unknown };
+        expect(() => { el.labels = ['a', 'b']; }, 'the prototype getter rejected the assignment').not.toThrow();
+        document.body.appendChild(el);
+        expect(el.querySelector('.shown')?.textContent).toBe('a,b');
+        expect(warn.mock.calls.flat().join(' ')).not.toMatch(/'labels'/);
+        warn.mockRestore();
+    });
+
+    it('control — with no such prop, `labels` is an empty list, not undefined', () => {
+        const tag = uniqueTag();
+        component(tag, { formAssociated: true, render: () => html`<i></i>` });
+        const el = document.createElement(tag) as HTMLElement & { labels: NodeListOf<HTMLLabelElement> };
+        document.body.appendChild(el);
+        expect(el.labels.length).toBe(0);
+        expect(Object.getOwnPropertyDescriptor(el, 'labels')).toBeUndefined();
     });
 });

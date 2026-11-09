@@ -566,6 +566,11 @@ const wide = $derived(() => el.offsetWidth > 320);
 function focusMe() { el.focus(); }
 ```
 
+A form component (a `@model` with `{ form }`) finds the `<label>`s that name it in `el.labels`: the
+page's `<label for="email">` for `<my-field id="email">`, read from the element's form association,
+so the component never searches the document for it. `el.labels[0]` is the first, and the list is
+empty when no label points at the element.
+
 ## @state — a visual state of the host
 
 Open, selected, invalid, loading: a state the outside styles. Declare it with the condition it is on
