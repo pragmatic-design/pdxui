@@ -26,9 +26,9 @@ function setupNames(analysis: ScriptAnalysis): Set<string> {
     for (const f of analysis.forms) s.add(f.name);
     for (const f of analysis.fetches) s.add(f.name);
     for (const inj of analysis.injects) s.add(inj.name);
-    for (const st of analysis.states) s.add(st.name);
     for (const a of analysis.actions ?? []) s.add(a.name);
-    for (const sn of analysis.snippets) s.add(sn.name);
+    // Not a `@state` (#981): it sets a custom state of the host, `ctx.state('name', …)`, and binds no
+    // name. Not a `@snippet`: it is a function of the render, not of the setup.
     // What the setup returns: its own constants, functions and plain variables, and a loader's source.
     for (const e of analysis.exports) s.add(e.name);
     if (analysis.route.loaderName) s.add(analysis.route.loaderName);

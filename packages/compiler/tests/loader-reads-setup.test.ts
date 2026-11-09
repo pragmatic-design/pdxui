@@ -51,6 +51,15 @@ describe('what a loader may read', () => {
             "const signal = 'not this one';",
             'async function load({ params, signal }) { return fetch(encodeURIComponent(params.id), { signal }); }',
         ]],
+        ['a global named like a @state, which declares no name (#981)', '', [
+            'let isOpen = $signal(false);',
+            '@state open = isOpen;',
+            'async function load() { open("/help"); return fetch("/t"); }',
+        ]],
+        ['a global named like a @snippet, which the setup does not declare (#981)', '', [
+            '@snippet open(x) { <b>{{ x }}</b> }',
+            'async function load() { open("/help"); return fetch("/t"); }',
+        ]],
         ['the label function', '', [
             'function crumb(params) { return `T ${params.id}`; }',
             'async function load({ params }) { document.title = crumb(params); return fetch("/t"); }',
