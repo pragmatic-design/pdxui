@@ -266,7 +266,7 @@ Directive      ::= IfBlock | ForBlock | SwitchBlock | RequireBlock | ShowBlock |
 IfBlock        ::= "@if" S? Paren S? BlockTransition? Block
                    ( S? "@else" S? ( ( "@if" | "if" ) S? Paren S? BlockTransition? Block | Block ) )*
 ForBlock       ::= "@for" S? "(" S? Expression S "as" S ForBinding ( S? "," S? Identifier )? S? ";" S? "track" S Expression S? ")"
-                   S? BlockTransition? ( S? "@virtual" ( S? "(" S? Number S? ")" )? )? Block ( S? "@empty" Block )?   (@virtual: landed — #283; decisions.md 29)
+                   S? BlockTransition? ( S? "@virtual" ( S? "(" S? VirtualArgs S? ")" )? )? Block ( S? "@empty" Block )?   (@virtual: landed — #283; decisions.md 29)
 ForBinding     ::= Identifier | /* an object or array destructuring pattern */
 BlockTransition ::= "@transition" S? "(" TName ( S? "," S? TName )? ")" ( S? "@stagger" S? "(" Number ")" )?
                     ( S? "@mode" S? "(" TName ")" )? ( S? Move )?

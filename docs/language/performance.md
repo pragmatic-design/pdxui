@@ -65,11 +65,12 @@ held to the benchmark (`pnpm bench:jfb`):
 ### Syntax
 
 ```ebnf
-ForBlock ::= /* the beta @for */ ( S? "@virtual" ( S? "(" S? Number S? ")" )? )? Block ( S? "@empty" Block )?
+ForBlock ::= /* the beta @for */ ( S? "@virtual" ( S? "(" S? VirtualArgs S? ")" )? )? Block ( S? "@empty" Block )?
 ```
 
 `@virtual` goes after `track` and any `@transition`; its number is the estimated item size in px
-(default: measured from the first item). Diagnostics: `@virtual` with `@transition`, `@mode`, `@move`
+(default: measured from the first item), and `serverRows: n` after it how many rows a page rendered on
+the server writes (`VirtualArgs` in [template.md](template.md), #930). Diagnostics: `@virtual` with `@transition`, `@mode`, `@move`
 or `@stagger` is `PDX_VIRTUAL_TRANSITION` (an item leaving the window is not leaving the list);
 a virtual list whose container has no bounded height is a development warning at runtime, since
 the compiler cannot see the layout.

@@ -300,7 +300,8 @@ input. Do not read the DOM for the last row right after the write: wait for it. 
 
 **A long list is `@for … @virtual`.** `@for (posts as p; track p.id) @virtual(64) { <li>…</li> }`
 renders only the rows in view; the number is the estimated row height in px, and without it the
-first row is measured. The shape is fixed, and the compiler checks it (`PDX_VIRTUAL_SHAPE`):
+first row is measured. A page generated on the server writes the first 20 rows;
+`@virtual(64, serverRows: 40)` says how many (the only named option). The shape is fixed, and the compiler checks it (`PDX_VIRTUAL_SHAPE`):
 - the `@for` is the **only** content of a **native** element — that element scrolls, so give it a
   height and `overflow: auto`;
 - each row is **one** element.

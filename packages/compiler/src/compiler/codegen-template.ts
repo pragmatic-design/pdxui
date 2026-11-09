@@ -10,12 +10,14 @@ import { jsQuote, jsString } from './js-literal';
 import { virtualRowTag } from './validate-virtual';
 
 /**
- * The options object of an `eachVirtual` call (#283): the estimate written in `@virtual(n)`, the rows'
- * tag for the spacers, getters for a plain item, and `@empty`.
+ * The options object of an `eachVirtual` call (#283): the estimate written in `@virtual(n)`, the rows
+ * the server writes (`serverRows`, #930), the rows' tag for the spacers, getters for a plain item, and
+ * `@empty`.
  */
 export function virtualOptions(node: ForNode, getters: boolean, empty: string | null): string {
     const parts = [
         node.virtual?.estimate !== undefined ? `estimate:${node.virtual.estimate}` : '',
+        node.virtual?.serverRows !== undefined ? `serverRows:${node.virtual.serverRows}` : '',
         `tag:${jsString(virtualRowTag(node))}`,
         getters ? 'getters:true' : '',
         empty ? `empty:${empty}` : '',
