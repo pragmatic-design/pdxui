@@ -5,7 +5,7 @@
 // canonically, string-parity.ts), with the server's markers gone, every element the server wrote still
 // the same object, and the bindings live: a signal changed afterwards changes the adopted node.
 
-import { describe, it, expect, afterEach, beforeAll } from 'vitest';
+import { describe, it, expect, afterEach, beforeAll, afterAll } from 'vitest';
 import { html } from '../src/renderer/template';
 import { when, show, each, eachRow, match } from '../src/renderer/helpers';
 import { whenChain } from '../src/renderer/when-chain';
@@ -13,6 +13,7 @@ import { dynamic } from '../src/renderer/dynamic';
 import { errorBoundary } from '../src/renderer/error-boundary';
 import { defer } from '../src/renderer/defer';
 import { awaitBlock } from '../src/renderer/await';
+import { eachVirtual } from '../src/renderer/virtual-list';
 import { renderToString } from '../src/server/render-string';
 import { hydrateChildren, HydrationMismatch } from '../src/hydrate/adopt';
 import { installHydration } from '../src/hydrate/host';
@@ -181,6 +182,90 @@ describe('hydrating the helpers\' blocks', () => {
 function portalLike(tag: () => string): DocumentFragment {
     return dynamic(tag);
 }
+
+// #930: the server writes a virtual list's first window; hydrating, the list keeps the rows its own first
+// window holds. A virtual list knows its container a microtask after it is built, so the client's mount
+// is compared once it has settled. happy-dom lays nothing out, so the layout the list reads is given here:
+// a row is 20 px and a `ul` 60 px tall. Its first window is then rows 0 to 2 in view and 3 of overscan,
+// rows 0 to 6, as a page that has not scrolled shows it.
+describe('hydrating a virtual list', () => {
+    const settle = () => new Promise<void>((r) => setTimeout(r, 0));
+    const layout: Array<[string, PropertyDescriptor | undefined]> = [];
+    beforeAll(() => {
+        const give = (name: 'offsetHeight' | 'clientHeight', get: (el: HTMLElement) => number) => {
+            layout.push([name, Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)]);
+            Object.defineProperty(HTMLElement.prototype, name, { configurable: true, get(this: HTMLElement) { return get(this); } });
+        };
+        give('offsetHeight', (el) => ('virtualIndex' in el.dataset ? 20 : 0));
+        give('clientHeight', (el) => (el.localName === 'ul' ? 60 : 0));
+    });
+    afterAll(() => {
+        for (const [name, own] of layout.splice(0)) {
+            if (own) Object.defineProperty(HTMLElement.prototype, name, own);
+            else delete (HTMLElement.prototype as unknown as Record<string, unknown>)[name];
+        }
+    });
+    async function hydratedVirtual(render: () => DocumentFragment): Promise<{ page: HTMLElement; written: Element[] }> {
+        const mounted = page();
+        mounted.appendChild(render());
+        await settle();
+        const markup = renderToString(render);
+        const p = page(markup);
+        const written = Array.from(p.querySelectorAll('*'));
+        hydrateChildren(p, render);
+        await settle();
+        expect(children(p), `markup: ${markup}`).toBe(children(mounted));
+        return { page: p, written };
+    }
+    const letters = Array.from({ length: 10 }, (_, i) => `r${i}`);
+
+    it('a short list: every row is the server\'s node', async () => {
+        const { page: p, written } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => letters.slice(0, 3), (r) => r, (r: string) => html`<li>${r}</li>`, { estimate: 20, tag: 'li' })}</ul>`);
+        adoptedAll(p, written);
+        expect(p.querySelectorAll('[data-virtual-index]')).toHaveLength(3);
+    });
+
+    it('a window that starts at 0 keeps the server\'s rows it holds; the server\'s others are let go', async () => {
+        const { page: p, written } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => letters, (r) => r, (r: string) => html`<li>${r}</li>`, { estimate: 20, tag: 'li', serverRows: 10 })}</ul>`);
+        const serverRows = written.filter((el) => el.hasAttribute('data-virtual-index'));
+        expect(serverRows).toHaveLength(10);
+        const rows = Array.from(p.querySelectorAll('[data-virtual-index]'));
+        expect(rows.map((li) => li.textContent)).toEqual(['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6']);
+        rows.forEach((li, i) => expect(li, `row ${i} is the server's node`).toBe(serverRows[i]));
+        const spacers = written.filter((el) => el.getAttribute('aria-hidden') === 'true');
+        for (const spacer of spacers) expect(p.contains(spacer), 'the server\'s spacers are the list\'s').toBe(true);
+    });
+
+    it('rows the window holds that the server did not write are built, with their content', async () => {
+        const { page: p, written } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => letters, (r) => r, (r: string) => html`<li>${r}</li>`, { estimate: 20, tag: 'li', serverRows: 2 })}</ul>`);
+        const serverRows = written.filter((el) => el.hasAttribute('data-virtual-index'));
+        const rows = Array.from(p.querySelectorAll('[data-virtual-index]'));
+        expect(rows.map((li) => li.textContent)).toEqual(['r0', 'r1', 'r2', 'r3', 'r4', 'r5', 'r6']);
+        expect(rows.slice(0, 2)).toEqual(serverRows);
+        for (const li of rows.slice(2)) expect(written.includes(li), `${li.textContent} is built`).toBe(false);
+    });
+
+    it('the adopted list follows its data, by key', async () => {
+        const items = signal(letters.slice(0, 3));
+        const { page: p } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => items(), (r) => r, (r: string) => html`<li>${r}</li>`, { estimate: 20, tag: 'li' })}</ul>`);
+        const kept = p.querySelector('[data-virtual-index="1"]');
+        items.set(['new', ...letters.slice(1, 3)]);
+        await settle();
+        expect(Array.from(p.querySelectorAll('[data-virtual-index]')).map((li) => li.textContent)).toEqual(['new', 'r1', 'r2']);
+        expect(p.querySelector('[data-virtual-index="1"]'), 'a kept key keeps its node').toBe(kept);
+    });
+
+    it('@empty adopted, then rows in its place', async () => {
+        const items = signal<string[]>([]);
+        const { page: p, written } = await hydratedVirtual(() => html`<ul>${eachVirtual(() => items(), (r) => r, (r: string) => html`<li>${r}</li>`, { tag: 'li', empty: () => html`<li class="none">none</li>` })}</ul>`);
+        const none = written.find((el) => el.classList.contains('none'));
+        expect(p.querySelector('.none'), 'the server\'s @empty').toBe(none);
+        items.set(['a']);
+        await settle();
+        expect(p.querySelector('.none')).toBeNull();
+        expect(p.querySelector('[data-virtual-index="0"]')?.textContent).toBe('a');
+    });
+});
 
 describe('hydrating an error boundary', () => {
     it('the content the server rendered is adopted', () => {

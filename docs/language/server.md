@@ -36,8 +36,10 @@ with no second render and no external dependency.
   written by the row estimate, so the page has the list's height (#930). With nothing to show it writes
   `@empty`. Each row carries what the client's row says of itself (`aria-setsize` and `aria-posinset`
   in a list, the roving `tabindex` under a composite role), except `aria-rowindex`: the header rows
-  around a table's list are not known while it is written. When it hydrates, the client builds the
-  list again in place of the server's window. The number of rows the server writes is
+  around a table's list are not known while it is written. When it hydrates, the list measures its
+  container at once and keeps the server's rows its first window holds, by key — all of them in a window
+  that starts at 0, as a page that has not scrolled — builds the ones it holds that the server did not
+  write, and lets the others go; an adopted `@empty` stays until rows come. The number of rows the server writes is
   `VirtualListOptions.serverRows`, 20 when it is not set.
 - `pdx build --ssg` renders every `@page` route without dynamic parameters, plus the paths listed in
   `pdx.config`'s `ssg.routes`, to `dist/<route>/index.html`. Each page is the built `index.html` with

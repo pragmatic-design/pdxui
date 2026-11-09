@@ -47,12 +47,28 @@ export interface VirtualCall<T> {
     readonly options: VirtualListOptions;
 }
 
-interface Row<T> {
+/** A rendered row of the window: built by the list, or adopted from the server's markup (#930). */
+export interface VirtualRow<T> {
     key: unknown;
     node: HTMLElement;
     dispose: () => void;
     item?: Signal<T>;
     index?: Signal<number>;
+}
+type Row<T> = VirtualRow<T>;
+
+/** The list's own nodes: its markers, and the spacers before and after the window. */
+export interface VirtualNodes {
+    readonly start: Comment;
+    readonly end: Comment;
+    readonly before: HTMLElement;
+    readonly after: HTMLElement;
+}
+
+/** What a hydration hands the list: the rows it adopted, by key, and `@empty` if it adopted that. */
+export interface VirtualAdopted<T> {
+    readonly rows: ReadonlyArray<VirtualRow<T>>;
+    readonly empty: Node | null;
 }
 
 /** What Tab can reach in a row. */
@@ -80,27 +96,44 @@ export function eachVirtual<T>(
     options: VirtualListOptions = {},
 ): DocumentFragment {
     const keyFn = typeof key === 'string' ? (item: T) => (item as Record<string, unknown>)[key] : key;
+    const call: VirtualCall<T> = { items, keyFn, render, options };
     // Rendered to a string or hydrating (#930): the call, for the block visitor that writes or adopts it.
-    if (isDeferring()) return deferredBlock((v) => v.virtual<T>({ items, keyFn, render, options }));
-    const tag = options.tag ?? 'div';
+    if (isDeferring()) return deferredBlock((v) => v.virtual<T>(call));
     const frag = document.createDocumentFragment();
-    const start = document.createComment('virtual');
-    const end = document.createComment('/virtual');
-    const spacer = (): HTMLElement => {
-        const el = document.createElement(tag);
-        el.setAttribute('aria-hidden', 'true');
-        el.style.padding = '0';
-        el.style.border = '0';
-        el.style.margin = '0';
-        return el;
+    const nodes: VirtualNodes = {
+        start: document.createComment('virtual'),
+        end: document.createComment('/virtual'),
+        before: spacerFor(options),
+        after: spacerFor(options),
     };
-    const before = spacer();
-    const after = spacer();
-    // The third spacer: between a focused row kept outside the window and the window (#284).
-    const middle = spacer();
-    frag.append(start, before, after, end);
+    frag.append(nodes.start, nodes.before, nodes.after, nodes.end);
+    followVirtual(call, nodes, null);
+    return frag;
+}
 
-    // The container is the element the markers end up in: known once the fragment has been placed.
+/** A spacer: an element of the rows' tag, hidden from assistive technology, with no box of its own. */
+function spacerFor(options: VirtualListOptions): HTMLElement {
+    const el = document.createElement(options.tag ?? 'div');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.padding = '0';
+    el.style.border = '0';
+    el.style.margin = '0';
+    return el;
+}
+
+/**
+ * Keep a virtual list's window current between `nodes`: the rows in view, the spacers sized around
+ * them, what the list says of itself, and its keys. `adopted` is what a hydration took over from the
+ * server's markup (#930): its rows are kept where the window holds their keys, and `@empty` stays.
+ */
+export function followVirtual<T>(call: VirtualCall<T>, nodes: VirtualNodes, adopted: VirtualAdopted<T> | null): void {
+    const { items, keyFn, render, options } = call;
+    const { start, before, after } = nodes;
+    // The third spacer: between a focused row kept outside the window and the window (#284).
+    const middle = spacerFor(options);
+
+    // The container is the element the markers are in: known now when they are in place already — a
+    // hydration — and otherwise once the fragment has been placed.
     const container = signal<HTMLElement | null>(null);
     let role: string | null = null;
     let roleEl: HTMLElement | null = null;
@@ -115,7 +148,10 @@ export function eachVirtual<T>(
         }
         if (++attempts <= 10) requestAnimationFrame(resolve);
     };
-    queueMicrotask(resolve);
+    // In place already, the container is known before the virtualizer is made, so its first window is
+    // measured against the container's height: the window an adopted list starts at.
+    if (start.parentElement) resolve();
+    else queueMicrotask(resolve);
 
     // The source: an array, or a paged source whose data is read.
     const source = (): PagedSource<T> | null => {
@@ -133,9 +169,10 @@ export function eachVirtual<T>(
     });
 
     const rows = new Map<unknown, Row<T>>();
+    for (const row of adopted?.rows ?? []) rows.set(row.key, row);
     /** The row that holds focus while it is outside the window, kept where it was. */
     let pinned: Row<T> | null = null;
-    let emptyNode: Node | null = null;
+    let emptyNode: Node | null = adopted?.empty ?? null;
     let loadRequestedAt = -1;
     let warnedUnbounded = false;
     /** The item the roving tabindex rests on, under a composite role. */
@@ -369,8 +406,6 @@ export function eachVirtual<T>(
         pinned = null;
         virt.dispose();
     });
-
-    return frag;
 }
 
 /** The rows of the table or grid that are not the list's: a header row is counted in each index. */

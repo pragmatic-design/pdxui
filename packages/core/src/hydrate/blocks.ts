@@ -19,7 +19,8 @@ import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippe
 import { dynamic, followDynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { hydrateOn } from '../renderer/hydrate-on';
-import { eachVirtual } from '../renderer/virtual-list';
+import { eachVirtual, followVirtual, type VirtualCall, type VirtualRow } from '../renderer/virtual-list';
+import { listOf, isPaged, type PagedSource } from '../renderer/virtual-set';
 import { withoutHydration, type Adopter } from './mode';
 import { takeOverLater } from './later';
 import { offerRange } from './compiled';
@@ -89,9 +90,7 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         return end.nextSibling;
     },
 
-    // A virtual list is built as the client builds it, in place of the server's window (#930): the window
-    // the client renders depends on its measured container.
-    virtual: (call) => built('virtual', '/virtual', () => eachVirtual(call.items, call.keyFn, call.render, call.options)),
+    virtual: (call) => (a, parent, at) => adoptVirtual(a, parent, at, call),
 
     defer: (options, loadFn, renderFn) => (a, parent, at) => {
         const start = a.expect(at, 'defer');
@@ -204,6 +203,56 @@ function built(open: string, close: string | null, build: () => DocumentFragment
         });
         return next;
     };
+}
+
+/**
+ * A virtual list the server wrote (#930): its markers, the spacer before, the rows of its first window —
+ * each marked with its index —, the spacer after, and `@empty` when there was nothing to show. Each row
+ * is adopted as a list row is, in its own scope, and handed to the list with the spacers: the list keeps
+ * those its first window holds, by key, and builds or drops the others. A window that starts at 0, as a
+ * page that has not scrolled does, keeps the rows the server wrote.
+ */
+function adoptVirtual<T>(a: Adopter, parent: Node, at: Node | null, call: VirtualCall<T>): Node | null {
+    const start = a.expect(at, 'virtual');
+    const end = a.close(start, 'virtual', '/virtual');
+    const isSpacer = (n: Node | null): n is HTMLElement => n instanceof HTMLElement && n.getAttribute('aria-hidden') === 'true' && !('virtualIndex' in n.dataset);
+    const before = start.nextSibling;
+    if (!isSpacer(before)) a.fail('a virtual list without the spacer before its rows');
+    const source = untracked(call.items);
+    const data = listOf(source);
+    const renderer = (call.options.getters
+        ? { mode: 'getters', render: call.render }
+        : { mode: 'value', render: call.render }) as RowRenderer<T>;
+    const rows: VirtualRow<T>[] = [];
+    let next: Node | null = before.nextSibling;
+    while (next instanceof HTMLElement && 'virtualIndex' in next.dataset) {
+        const index = Number(next.dataset.virtualIndex);
+        if (index !== rows.length || index >= data.length) a.fail(`a virtual list's row ${index}, where its data has row ${rows.length} of ${data.length}`);
+        const node = next;
+        const item = data[index];
+        const key = call.keyFn(item, index);
+        const row = adoptRow(a, renderer, key, item, index, parent, node, end);
+        rows.push({ key, node, dispose: row.mapped.dispose ?? (() => {}), item: row.mapped.row?.item, index: row.mapped.row?.index });
+        next = row.next;
+    }
+    if (!isSpacer(next)) a.fail('a virtual list without the spacer after its rows');
+    const after = next;
+    // `@empty`, as the server wrote it with nothing to show: adopted as one node, which the list removes
+    // when rows come, as it removes the one it builds.
+    let empty: Node | null = null;
+    if (after.nextSibling !== end) {
+        const loading = isPaged<T>(source) && ((source as PagedSource<T>).isLoading?.() ?? false);
+        if (data.length > 0 || loading || !call.options.empty) a.fail('a virtual list has markup after its rows that is not its @empty');
+        empty = after.nextSibling;
+        // A compiled `@empty` takes its run over itself, as a compiled row does (hydrate/compiled.ts).
+        const emptyFn = call.options.empty;
+        const content = offerRange({ parent, at: empty, next: null }, () => emptyFn());
+        if (a.value(content, parent, empty, end) !== end) a.fail('a virtual list has markup after its @empty');
+    }
+    // Out of the hydration: the list's first run builds the rows its window holds that the server did not
+    // write, as a mount builds them.
+    withoutHydration(() => followVirtual(call, { start, end, before, after }, { rows, empty }));
+    return end.nextSibling;
 }
 
 /** The comment the server starts a boundary's fallback with (server/render-string.ts). */
