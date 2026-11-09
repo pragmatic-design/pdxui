@@ -21,6 +21,8 @@ const PORT = 5319;
 const showcaseDir = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', 'showcase');
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './design-score',
     fullyParallel: false,
     workers: 1,

@@ -39,6 +39,8 @@ const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const WORKERS = process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8));
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     testMatch: ['static-build.spec.ts'],
     fullyParallel: true,

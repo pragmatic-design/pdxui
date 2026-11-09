@@ -43,8 +43,9 @@ export default defineConfig({
     // The first navigation pays for Vite transforming the app; under the parallel gate that cost
     // exceeds a test's budget. Paid once, on the app's readiness condition — see warm-up.ts.
     globalSetup: resolve(packageDir, 'tests/warm-up.ts'),
-    // The saved themes' directory goes away with the run (see custom-themes-dir.ts).
-    globalTeardown: resolve(packageDir, 'tests/custom-themes-teardown.ts'),
+    // The saved themes' directory goes away with the run (see custom-themes-dir.ts), and a failed run's
+    // traces are copied where the next run cannot empty them (#975).
+    globalTeardown: [resolve(packageDir, 'tests/custom-themes-teardown.ts'), '../../../scripts/lib/keep-failed-runs.mjs'],
     use: {
         baseURL: `http://localhost:${PORT}`,
         trace: 'off',

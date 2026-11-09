@@ -18,6 +18,8 @@ const PORT = 5313;
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
+    // A failed run's traces are copied where the next run cannot empty them (#975).
+    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     testMatch: ['hmr.spec.ts'],
     fullyParallel: false,

@@ -15,7 +15,7 @@ import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { keepFailures } from './keep-failures';
+import { keepFailures } from '../../../scripts/lib/keep-failed-runs.mjs';
 
 const SITE = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const CLI = createRequire(join(SITE, 'package.json')).resolve('@playwright/test/cli');
