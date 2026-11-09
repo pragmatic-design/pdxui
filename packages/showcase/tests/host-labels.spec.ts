@@ -33,6 +33,12 @@ test('the .pdx reads it as self.labels, and names its inner field after it, with
     await expect(page.locator('#name input.inner')).toHaveAttribute('aria-labelledby', 'name-label');
 });
 
+test('one with no id, inside a <label>, holds that label', async ({ page }) => {
+    // The getter skips the platform's list for a host no label can name (no id, in no label): this is
+    // the other way a label names it.
+    expect(await labelsOf(page, '#wrap > hl-unlabelled')).toEqual(['Wrapped ']);
+});
+
 test('one named by no label holds an empty list', async ({ page }) => {
     expect(await labelsOf(page, '#other')).toEqual([]);
 });

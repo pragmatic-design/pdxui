@@ -191,10 +191,16 @@ export abstract class PdxElement extends HTMLElementBase {
      * pointing at its id and a `<label>` wrapping it, read from its ElementInternals, live as the
      * platform keeps them. A component names its inner control after them — a `.pdx` writes
      * `self.labels` with `@host self;` — with no query on the document. Empty for one that is not
-     * form-associated: the platform associates a label only with a labelable element.
+     * form-associated: the platform associates a label only with a labelable element. Empty too, and
+     * not live, for one no label can name, with no id and in no label: read it again after giving it one.
      */
     get labels(): NodeListOf<HTMLLabelElement> {
-        return this._internals?.labels as NodeListOf<HTMLLabelElement> | undefined ?? emptyLabels();
+        // A label names an element by its `for` matching the element's id, or by holding it (HTML,
+        // "labeled control"): with neither, none can, and the platform's list is not asked for.
+        // Asking costs a walk of the document after each change to it, which a hundred mounts in a
+        // row pay a hundred times (scenario-pilot-mount.spec.ts measured the select at 2× main).
+        if (!this._internals || (!this.id && !this.closest('label'))) return emptyLabels();
+        return this._internals.labels as NodeListOf<HTMLLabelElement>;
     }
 
     /** A component may declare a `labels` prop: the same as `form`, kept as an own property. */
