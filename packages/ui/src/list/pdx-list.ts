@@ -26,7 +26,9 @@ import '@pdxui/design/components/block-ui';
 // `pdx-icon` is imported where the empty state SHOWS, not here: the list's one icon is the empty
 // state's, and a list with rows would pay for the whole icon set without ever drawing it — 16.3 KB
 // of the showcase's first paint. It stays the list's own import.
-import '../spinner/pdx-spinner'; // rendered by this component, and registered by nobody else
+// `pdx-spinner` the same way, where the overlay SHOWS (`showBusy`): since it draws from a stylesheet
+// of its own (#821), importing it here put that stylesheet in the first wave of every page with a
+// list, and the route waited for it — ~70 ms of the showcase's `/` on slow 4G (#963).
 
 export interface ListItem {
     [key: string]: unknown;
@@ -92,6 +94,8 @@ component('pdx-list', {
         function showBusy(loading: boolean): void {
             ctx.state('loading', loading);
             if (!blockEl) return;
+            // Its element is in the overlay already; it upgrades when its module lands.
+            if (loading && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
             blockEl.classList.toggle('pdx-block-ui-visible', loading);
             if (loading) blockEl.removeAttribute('aria-hidden');
             else blockEl.setAttribute('aria-hidden', 'true');
