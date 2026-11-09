@@ -51,7 +51,9 @@ import '../pagination/pdx-pagination';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/data-grid';
-import '../spinner/pdx-spinner'; // rendered by this component, and registered by nobody else
+// `pdx-spinner` is imported where the loading overlay SHOWS (`showLoading`), as `pdx-list` does: it
+// draws from a stylesheet of its own (#821), and a static import put that stylesheet in the first wave
+// of every page with a grid, where the route waited for it (#963, #969).
 
 // Measured once: width the OS reserves for a classic scrollbar (0 on overlay-scrollbar systems).
 // Used in fill mode to reserve the same gutter on the header/filter row as the body's vertical
@@ -240,6 +242,24 @@ component('pdx-data-grid', {
         let groupBarEl: HTMLElement | null = null;
         let loadingEl: HTMLElement | null = null;
         let emptyEl: HTMLElement | null = null;
+
+        /**
+         * Show or hide the loading overlay; the first time it is still shown a frame later, load
+         * `pdx-spinner`. A grid over `data` reads it through a promise, so it is loading for a microtask
+         * as it mounts: an overlay never painted has no spinner to draw, and a grid at rest would have
+         * fetched the spinner and its stylesheet every time.
+         */
+        function showLoading(loading: boolean): void {
+            if (!loadingEl) return;
+            loadingEl.style.display = loading ? '' : 'none';
+            if (!loading || customElements.get('pdx-spinner')) return;
+            // Its element is in the overlay already; it upgrades when its module lands. The source is
+            // asked, not the overlay: the grid writes the overlay in a frame of its own, which may come
+            // after this one.
+            requestAnimationFrame(() => {
+                if (gc.grid?.isLoading.peek() && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
+            });
+        }
 
         /**
          * Show or hide the empty state; the first time it shows its icon, load `pdx-icon`. It is a
@@ -606,7 +626,7 @@ component('pdx-data-grid', {
             loadingEl.className = 'pdx-dg-loading';
             loadingEl.dataset.part = 'loading';
             loadingEl.innerHTML = '<pdx-spinner size="24"></pdx-spinner>';
-            loadingEl.style.display = loading ? '' : 'none';
+            showLoading(loading);
             wrap.appendChild(loadingEl);
 
             // Footer bottom — hide when virtual scroll (all rows visible, no pagination)
@@ -679,9 +699,7 @@ component('pdx-data-grid', {
                     rebuildSummary(newCols);
 
                     showEmpty(newRows.length === 0 && !newLoading);
-                    if (loadingEl) {
-                        loadingEl.style.display = newLoading ? '' : 'none';
-                    }
+                    showLoading(newLoading);
                     if (footerEl) updateFooter(gc, footerEl);
                     if (footerTopEl) updateFooter(gc, footerTopEl);
                     if (toolbarEl) updateToolbar(gc, toolbarEl);

@@ -12,7 +12,10 @@ import { component, html, onDestroy, event, prop } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/block-ui';
-import '../spinner/pdx-spinner'; // rendered by this component, and registered by nobody else
+// `pdx-spinner` is imported where the input is first blocked (`block`), not here. Its element is built
+// with the overlay at mount, but drawn only past `delay` while blocked, and it draws from a stylesheet
+// of its own (#821): a static import put that stylesheet in the first wave of every page with a
+// block-ui, where the route waited for it (#963, #969).
 
 /**
  * A loading overlay that wraps content and, while blocked, stops interaction with it and covers it
@@ -125,6 +128,9 @@ component('pdx-block-ui', {
 
         /** The input: blocked or given back, at once. */
         function block(on: boolean): void {
+            // The spinner is drawn past `delay` from here on; its element is in the overlay already and
+            // upgrades when its module lands. `variant: 'none'` builds none.
+            if (on && ctx.variant() !== 'none' && !customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
             // Busy while blocked and not otherwise (A4): no `aria-busy="false"` on a region at rest.
             if (on) ctx.el.setAttribute('aria-busy', 'true'); else ctx.el.removeAttribute('aria-busy');
             ctx.state('blocked', on);

@@ -9,7 +9,9 @@ import type { DataSource } from '@pdxui/core';
 // This component's styles travel with it, so an app ships the CSS of what it renders
 // and no more.
 import '@pdxui/design/components/infinite-scroll';
-import '../spinner/pdx-spinner'; // rendered by this component, and registered by nobody else
+// `pdx-spinner` is imported where the loading status draws it (`paint`), as `pdx-list` does: it draws
+// from a stylesheet of its own (#821), and a static import put that stylesheet in the first wave of
+// every page with an infinite scroll, where the route waited for it (#963, #969).
 
 /**
  * Loads more data as the user scrolls to the bottom, paging a DataSource or firing
@@ -185,6 +187,8 @@ component('pdx-infinite-scroll', {
             if (_loadingEl) {
                 _loadingEl.style.display = loading ? '' : 'none';
                 if (loading && !_loadingEl.firstChild) {
+                    // The element upgrades when its module lands.
+                    if (!customElements.get('pdx-spinner')) void import('../spinner/pdx-spinner');
                     const spinner = document.createElement('pdx-spinner');
                     spinner.setAttribute('size', 'sm');
                     const text = document.createElement('span');
