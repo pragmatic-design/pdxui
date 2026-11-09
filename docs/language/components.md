@@ -460,7 +460,8 @@ already set it (the consumer's `role` or `tabindex` wins). Descriptor:
 `host: { role: 'combobox', ':aria-expanded': (ctx) => ctx.open(), '@keydown': (ctx, e) => … }`.
 
 A name (#750 — landed), `@host el { … }` or `@host el;`, binds the element itself to a constant of
-the script and the template, typed `HTMLElement`: its `id` for a `<label for>`, itself to measure, to
+the script and the template, typed `PdxElement`: its `id` for a `<label for>`, its `labels` — the
+`<label>`s that name a form-associated host, from its ElementInternals (#987) — itself to measure, to
 focus, or to anchor a popup to. The host exists before setup runs, so the name is there from the
 first line of the script. It is not a signal and is never rewritten.
 

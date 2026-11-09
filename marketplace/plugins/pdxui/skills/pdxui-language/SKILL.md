@@ -172,7 +172,8 @@ Use it instead of `ctx.el.setAttribute(…)` or `ctx.el.addEventListener(…)` i
 attribute is set only if the page did not set it (the page's `role` wins); a binding follows its signal;
 a listener keeps the template's handler forms and modifiers. `::x`, `data-part` and `T="…"` are
 `PDX_HOST_INVALID_ATTRIBUTE`. **`@host el { … }`** or **`@host el;`** also names the element itself —
-use `el` (its `id`, its size, `el.focus()`) instead of `ctx.el`.
+use `el` (its `id`, its size, `el.focus()`) instead of `ctx.el`. A form-associated host's
+`el.labels` is the `<label for>`s that name it: never query the document for its label.
 
 **`@state name = condition;`** is a visual state of the host — open, selected, invalid — held in the
 platform's custom states and matched in CSS with `:state(name)` (`my-menu:state(expanded) button { … }`,

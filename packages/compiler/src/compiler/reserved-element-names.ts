@@ -9,8 +9,11 @@
 // HTMLElement's own members are not here. Several are props on purpose — `title`, `id` (a route's
 // `:id`), `prefix`, `offsetTop`; the ones refused are `reserved-dom-names.ts` (#545).
 
-/** Members of the element class kept on purpose: a form component's `form` replaces the form getter. */
-export const ELEMENT_NAMES_KEPT: ReadonlySet<string> = new Set(['form']);
+/**
+ * Members of the element class kept on purpose: a form component's `form` replaces the form getter,
+ * and `labels` (#987), the host's <label>s, is a name a component's data takes too — a chart's labels.
+ */
+export const ELEMENT_NAMES_KEPT: ReadonlySet<string> = new Set(['form', 'labels']);
 
 /** The element class's members a prop, model or typed snippet may not be named after. */
 export const RESERVED_ELEMENT_NAMES: ReadonlySet<string> = new Set<string>([

@@ -379,11 +379,10 @@ component('pdx-select', {
 
         // A <label for="{host id}"> names the host, which is labelable because it is form-associated,
         // and not the combobox inside it, which would stay unnamed. The label's id goes on the
-        // combobox, unless something already names it.
+        // combobox, unless something already names it. The host's labels come from its
+        // ElementInternals (#987), with no query on the document.
         ctx.frame(() => {
-            const id = ctx.el.id;
-            if (!id) return;
-            const label = document.querySelector<HTMLLabelElement>(`label[for="${id.replace(/["\\]/g, '\\$&')}"]`);
+            const label = ctx.el.labels[0];
             const cb = ctx.el.querySelector('[role="combobox"]');
             if (!label || !cb || cb.hasAttribute('aria-labelledby') || cb.hasAttribute('aria-label')) return;
             if (!label.id) label.id = uid + '-label';

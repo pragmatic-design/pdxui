@@ -78,8 +78,8 @@ type PropSignals<P extends PropMap> = {
  * Use this when writing typed handwritten components with known props.
  */
 export interface ComponentContextBase {
-    /** The host element. */
-    el: HTMLElement;
+    /** The host element: a PdxElement, with its labels and its form association (#987). */
+    el: PdxElement;
     /** Dispatch a custom event. It stays on the host unless `{ bubbles: true }` (#138). */
     /** False when the event was `cancelable` and a listener prevented it. */
     emit(event: string, detail?: unknown, options?: EmitOptions): boolean;
@@ -645,10 +645,11 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
     // one named after a member of this class or PdxElement replaces it, and one named after `style`, an
     // `on*` handler or the other HTMLElement members of `reserved-dom-members.ts` breaks the element for
     // code outside the component (#545). A `.pdx` is refused at compile time (PDX_NAME_RESERVED); a
-    // TypeScript descriptor is told here. `form` replaces the form getter on purpose, for a form component.
+    // TypeScript descriptor is told here. `form` replaces the form getter on purpose, for a form component,
+    // and `labels` the labels getter, for a component whose data is called that (#987).
     if (DEV) {
         for (const name of propNames) {
-            if (name === 'form') continue;
+            if (name === 'form' || name === 'labels') continue;
             const member = Object.prototype.hasOwnProperty.call(Comp.prototype, name)
                 || Object.prototype.hasOwnProperty.call(PdxElement.prototype, name);
             if (member) console.warn(`[pdx] <${tag}> declares '${name}', which is a member of the element: the declaration replaces it, and the component may not render. Rename it.`);

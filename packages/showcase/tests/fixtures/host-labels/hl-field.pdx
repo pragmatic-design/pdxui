@@ -1,0 +1,19 @@
+<template>
+  <input class="inner" :aria-labelledby="labelledBy" />
+</template>
+
+<script>
+// A form-associated component named by a <label for> (#987): it reads its labels through `self.labels`,
+// the host's ElementInternals labels, with no query on the document.
+@model value: string = '' { form };
+@host self;
+
+let labelledBy = $signal(null);
+
+onMount(() => {
+  const label = self.labels[0];
+  if (!label) return;
+  if (!label.id) label.id = self.id + '-label';
+  labelledBy = label.id;
+});
+</script>

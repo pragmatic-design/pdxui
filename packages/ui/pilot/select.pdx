@@ -376,10 +376,9 @@ function openOnOption(fallback: number): void {
 }
 
 // A <label for="{host id}"> names the host, not the combobox inside it: its id goes on the combobox.
+// The host's labels come from its ElementInternals (#987), with no query on the document.
 onMount(() => {
-  const id = self.id;
-  if (!id) return;
-  const lab = document.querySelector<HTMLLabelElement>(`label[for="${id.replace(/["\\]/g, '\\$&')}"]`);
+  const lab = self.labels[0];
   const cb = (inputInTrigger ? triggerSearchEl : triggerEl) as HTMLElement | null;
   if (!lab || !cb || cb.hasAttribute('aria-labelledby') || cb.hasAttribute('aria-label')) return;
   if (!lab.id) lab.id = uid + '-label';

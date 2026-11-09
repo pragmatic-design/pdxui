@@ -42,5 +42,7 @@ describe('PDX_NAME_RESERVED', () => {
         expect(reserved('@prop title: string;')).toEqual([]);
         // A form component's `form` replaces the form-associated getter on purpose.
         expect(reserved('@prop form: object;')).toEqual([]);
+        // A chart's `labels` replaces the host's labels getter (#987) on purpose too.
+        expect(reserved('@prop labels: string[] = [];')).toEqual([]);
     });
 });
