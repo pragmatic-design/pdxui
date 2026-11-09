@@ -256,6 +256,11 @@ test('and the components that chunk imports, which is the same wave', () => {
     // has rows. It is loaded when an icon is drawn, so it is NOT preloaded.
     expect(modules.some((source) => source.endsWith('ui/src/icon/pdx-icon.ts')),
         'the icon set is preloaded again: something on the landing route imports pdx-icon statically').toBe(false);
+    // `pdx-spinner` the same (#963): `pdx-list` draws it only while it loads. Imported statically, it
+    // and the stylesheet it draws from since #821 were in the first wave, and the route waited for
+    // that stylesheet: `/` measured 1052–1064 ms against 976–984 without it, on slow 4G.
+    expect(modules.some((source) => source.endsWith('ui/src/spinner/pdx-spinner.ts')),
+        'the spinner is preloaded again: something on the landing route imports pdx-spinner statically').toBe(false);
     // The control: the lookup can say no. `pdx-select` is rendered by other routes, not this one.
     expect(modules.some((source) => source.endsWith('ui/src/select/pdx-select.ts')),
         'the preloaded modules include one no landing chunk imports: the lookup reads everything').toBe(false);
