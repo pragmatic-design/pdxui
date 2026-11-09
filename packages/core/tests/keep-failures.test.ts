@@ -48,6 +48,16 @@ describe('keepFailures', () => {
         expect(keepFailures(results, join(root, 'test-results-kept'), 'x')).toBeNull();
     });
 
+    it('a green run\'s empty test folders keep nothing', () => {
+        // A passing spec that asks for an output path leaves an empty folder named after its test: the
+        // showcase's retention and SSG specs did, and a gate that passed kept a run (#975).
+        const results = join(root, 'test-results');
+        mkdirSync(join(results, 'scenario-component-retention-names-what-keeps-it', 'nested'), { recursive: true });
+        mkdirSync(join(results, '.auth'), { recursive: true });
+        writeFileSync(join(results, '.auth', 'admin.json'), '{}');
+        expect(keepFailures(results, join(root, 'test-results-kept'), 'x')).toBeNull();
+    });
+
     it('keeps the last ten runs, not every run since the machine was set up', () => {
         const results = join(root, 'test-results');
         const keptRoot = join(root, 'test-results-kept');

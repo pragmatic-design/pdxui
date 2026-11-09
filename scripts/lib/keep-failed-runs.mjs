@@ -7,28 +7,39 @@
 // #587 and an earlier issue lost their evidence that way.
 //
 // Every Playwright config names this module as a global teardown. After each run it copies each
-// project's output folder, when the run left a failure in it, to `<output folder>-kept/<stamp>/`, keeps
+// project's output folder, when the run left a failure's files in it, to `<output folder>-kept/<stamp>/`, keeps
 // the last ten, and prints where. `packages/core/tests/keep-failures.test.ts` holds both: the copy, and
 // that no config is without it.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** How many kept runs stay per output folder: enough for a few re-runs, not a growing folder. */
 const KEEP = 10;
 
-/**
- * Whether a run left a failure in `results`. A failed test leaves a folder named after it; what
- * every run writes, failed or not, is dot-named: Playwright's `.last-run.json`, and the setups'
- * `.auth/`, `.ssg/`, `.h2-cert/`.
- * @param {string} results
- */
-function leftFailure(results) {
-    return existsSync(results) && readdirSync(results).some((name) => !name.startsWith('.'));
+/** Whether `path` is a file, or a folder with a file somewhere in it. @param {string} path */
+function holdsAFile(path) {
+    if (!statSync(path).isDirectory()) return true;
+    return readdirSync(path).some((name) => holdsAFile(join(path, name)));
 }
 
 /**
- * Copy `results` to `<keptRoot>/<stamp>` when the run left a failure in it, drop the oldest beyond the
+ * Whether a run left evidence in `results`: a file in an entry that is not dot-named.
+ *
+ * Not the run's status: a global teardown runs before the reporters' `onEnd`, so `.last-run.json` is
+ * still the previous run's when it does. Not a folder alone: a passing test whose spec asks for an
+ * output path leaves an empty folder named after it (the showcase's retention and SSG specs do).
+ * What a failure leaves is files: its trace, its error context, a fixture's record. And what every
+ * run writes, failed or not, is dot-named: Playwright's `.last-run.json`, the setups' `.auth/`,
+ * `.ssg/`, `.h2-cert/`. A failure that leaves no file has nothing for a rerun to lose.
+ * @param {string} results
+ */
+function leftEvidence(results) {
+    return existsSync(results) && readdirSync(results).some((name) => !name.startsWith('.') && holdsAFile(join(results, name)));
+}
+
+/**
+ * Copy `results` to `<keptRoot>/<stamp>` when the run left evidence in it, drop the oldest beyond the
  * last ten, and return where it went; null when there was nothing to keep.
  * @param {string} results
  * @param {string} keptRoot
@@ -36,7 +47,7 @@ function leftFailure(results) {
  * @returns {string | null}
  */
 export function keepFailures(results, keptRoot, stamp) {
-    if (!leftFailure(results)) return null;
+    if (!leftEvidence(results)) return null;
     const target = join(keptRoot, stamp);
     mkdirSync(keptRoot, { recursive: true });
     cpSync(results, target, { recursive: true });
