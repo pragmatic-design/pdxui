@@ -6,8 +6,9 @@
   each place says so with ESCAPE HATCH: those are what the pilot counts.
 -->
 <template>
-  <div :class="triggerClass" data-part="root" :ref="triggerEl"
+  <div class="pdx-select-trigger pdx-input-wrap" data-part="root" :ref="triggerEl"
     :role="inputInTrigger ? null : 'combobox'"
+    :aria-invalid="!inputInTrigger && error ? 'true' : null"
     :aria-haspopup="inputInTrigger ? null : 'listbox'"
     :aria-expanded="inputInTrigger ? null : String(isOpen)"
     :aria-controls="inputInTrigger ? null : listboxId"
@@ -20,10 +21,10 @@
     @if (multiple) {
       <div class="pdx-select-tags">
         @if (tagSummary) {
-          <span class="pdx-chip pdx-chip-sm pdx-chip-summary">{{ format(uiString('select', 'selected'), { n: selectedItems.length }) }}</span>
+          <span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">{{ format(uiString('select', 'selected'), { n: selectedItems.length }) }}</span>
         } @else {
           @for (shownTags as tag; track tag.value) {
-            <span class="pdx-chip pdx-chip-sm">
+            <span class="pdx-chip pdx-chip-sm" data-part="tag">
               <span>{{ tag.label }}</span>
               <button class="pdx-chip-remove" type="button" tabindex="-1"
                 :aria-label="format(uiString('select', 'remove'), { label: tag.label })"
@@ -31,19 +32,20 @@
             </span>
           }
           @if (tagOverflow > 0) {
-            <span class="pdx-chip pdx-chip-sm pdx-chip-summary">+{{ tagOverflow }}</span>
+            <span class="pdx-chip pdx-chip-sm pdx-chip-summary" data-part="tag">+{{ tagOverflow }}</span>
           }
         }
         @if (searchable) {
-          <input class="pdx-select-tag-search" :ref="triggerSearchEl"
+          <input class="pdx-select-tag-search" data-part="search" :ref="triggerSearchEl"
             type="text"
             autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
             role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+            :aria-invalid="error ? 'true' : null"
             :aria-expanded="String(isOpen)"
             :aria-controls="listboxId"
             :aria-activedescendant="activeId"
             :aria-label="label || null"
-            :value="query"
+            ::value="query"
             :placeholder="selectedValues.size === 0 ? placeholder : ''"
             :disabled="disabled"
             @input="onSearchInput"
@@ -54,10 +56,11 @@
       </div>
     } @else if (searchable && searchPosition !== 'dropdown') {
       <!-- Its keys reach onTriggerKeydown by bubbling to the trigger: a handler of its own ran every key twice. -->
-      <input class="pdx-select-search" :ref="triggerSearchEl"
+      <input class="pdx-select-search" data-part="search" :ref="triggerSearchEl"
         type="text"
         autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
         role="combobox" aria-autocomplete="list" aria-haspopup="listbox"
+        :aria-invalid="error ? 'true' : null"
         :aria-expanded="String(isOpen)"
         :aria-controls="listboxId"
         :aria-activedescendant="activeId"
@@ -75,24 +78,24 @@
     }
 
     @if (clearable && !disabled && !readonly && selectedValues.size > 0) {
-      <button class="pdx-input-clear pdx-input-suffix-interactive" type="button" :aria-label="uiString('select', 'clear')" tabindex="-1"
+      <button class="pdx-input-clear pdx-input-suffix-interactive" data-part="clear" type="button" :aria-label="uiString('select', 'clear')" tabindex="-1"
         @click.stop="clearSelection()">×</button>
     }
     @if (isLoading) {
-      <span class="pdx-input-loading" role="status" :aria-label="uiString('select', 'loading')"></span>
+      <span class="pdx-input-loading" data-part="spinner" role="status" :aria-label="uiString('select', 'loading')"></span>
     }
     <span class="pdx-select-caret"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg></span>
   </div>
 
-  <div :class="'pdx-select-dropdown' + (isOpen ? ' open' : '')" :ref="dropdownEl">
+  <div class="pdx-select-dropdown" data-part="popup" :ref="dropdownEl">
     @if (searchable && searchPosition === 'dropdown') {
       <div class="pdx-select-search-wrap">
-        <input class="pdx-select-dropdown-search" :ref="dropdownSearchEl"
+        <input class="pdx-select-dropdown-search" data-part="search" :ref="dropdownSearchEl"
           type="text"
           autocomplete="off" data-lpignore="true" data-1p-ignore="" data-form-type="other"
           :aria-controls="listboxId"
           :aria-activedescendant="activeId"
-          :value="query"
+          ::value="query"
           :placeholder="uiString('select', 'search')"
           @input="onSearchInput"
           @keydown="onTriggerKeydown" />
@@ -100,7 +103,8 @@
     }
     <span class="pdx-sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }}</span>
     <div :class="'pdx-select-list' + (useVirtual ? ' virtual' : '')" :ref="listEl"
-      role="listbox"
+      role="listbox" data-part="list"
+      :aria-busy="isLoading ? 'true' : null"
       :id="listboxId"
       :aria-label="label || uiString('select', 'listbox')"
       :aria-multiselectable="multiple ? 'true' : null"
@@ -114,7 +118,9 @@
             <div class="pdx-select-group-header" role="presentation">{{ row.name }}</div>
           } @else {
             <div :class="'pdx-select-option' + (activeIndex === row.index ? ' active' : '')"
-              role="option"
+              role="option" data-part="option"
+              :aria-setsize="useVirtual ? String(displayItems.length) : null"
+              :aria-posinset="useVirtual ? String(row.index + 1) : null"
               :id="uid + '-opt-' + row.index"
               :data-option-index="row.index"
               :aria-selected="isItemSelected(row.item.value) ? 'true' : 'false'"
@@ -132,7 +138,7 @@
         }
       }
       @if (showCreateOption) {
-        <div class="pdx-select-option pdx-select-create" role="option" @click="createOption()">
+        <div class="pdx-select-option pdx-select-create" role="option" data-part="option" @click="createOption()">
           <span class="pdx-select-create-icon">+</span>
           {{ (createLabel || uiString('select', 'create')).replace('{query}', query) }}
         </div>
@@ -157,10 +163,20 @@ import type { Option, Row, SourceElement } from './select-types';
 @model value: string | string[] | null = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md; }
-@part root;
+@part root, search, tag, clear, spinner, popup, list, option;
+// The visual states, on the host as custom states (#132, #287): a theme styles `pdx-select:state(open)`,
+// and the design CSS draws the trigger and the popup from them. Neither carries a state class.
+@state open = isOpen;
+@state invalid = !!error;
+@state success = !!success;
+@state warning = !!warning;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state loading = isLoading;
+@state multiple = !!multiple;
 // Its events: kebab-case names, declared quoted (#749), each dispatched by its camelCase function.
-@event 'pdx-open';
-@event 'pdx-close';
+/** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
+@event 'open-change': { value: boolean };
 @event 'pdx-clear';
 @event 'pdx-search': { query: string };
 @event 'pdx-create': { value: string, label: string };
@@ -208,7 +224,8 @@ import type { Option, Row, SourceElement } from './select-types';
 // The host is the one submitter; an inner field carrying the name too would send the value twice.
 @host self { :name="name || null" }
 
-@expose focus, blur, clear, openSelect, closeSelect, toggleSelect, selectedItem;
+// The popup is driven with the overlay verbs (#287), which replace the alpha openSelect/closeSelect/toggleSelect.
+@expose focus, blur, clear, show, close, toggle, selectedItem;
 
 const uid = generatedId('pdx-sel');
 const listboxId = uid + '-lb';
@@ -425,7 +442,7 @@ function open() {
   activeIndex = -1;
   const ds = dataSource;
   if (ds && externalSource && ds.data().length === 0 && !ds.isLoading()) ds.refresh();
-  pdxOpen();
+  openChange({ value: true });
 }
 
 function close() {
@@ -433,14 +450,13 @@ function close() {
   isOpen = false;
   query = '';
   if (externalSource && dataSource && query.peek()) dataSource!.setFilter([]);
-  pdxClose();
+  openChange({ value: false });
 }
 
 function toggle() { if (isOpen) close(); else open(); }
 
-const openSelect = open;
-const closeSelect = close;
-const toggleSelect = toggle;
+/** Open the popup: the overlay verb (#287). */
+function show() { open(); }
 
 // ── Selection actions ──
 function selectItem(item: Option) {
@@ -474,8 +490,9 @@ let searchTimer: ReturnType<typeof setTimeout> | null = null;
 
 function onSearchInput(e: Event) {
   const val = (e.target as HTMLInputElement).value;
-  // Open first: open() clears the query, and a :value binding does not write the input back when
-  // its value has not changed, so the text typed would stay with the query cleared (finding 9).
+  // Open first: open() clears the query, and the write below puts the typed text back. The search
+  // fields bind it two-way, `::value="query"`: a one-way `:value` does not write the input back when its
+  // value has not changed, so the text typed stayed with the query cleared (finding 9).
   if (!isOpen) open();
   userTyped = true;
   query = val;
@@ -687,10 +704,6 @@ const rows = $derived(() => {
   items.forEach((item, idx) => out.push({ key: 'o' + idx, header: false, name: '', item, index: idx, style: '' }));
   return out;
 });
-
-const triggerClass = $derived('pdx-select-trigger pdx-input-wrap'
-  + (disabled ? ' disabled' : '') + (readonly ? ' readonly' : '') + (error ? ' error' : '')
-  + (success ? ' success' : '') + (warning ? ' warning' : '') + (multiple ? ' multiple' : ''));
 
 const isLoading = $derived(loading || (dataSource ? dataSource.isLoading() : false));
 
