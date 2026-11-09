@@ -356,7 +356,8 @@ alpha
 
 ```ebnf
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                     /* in the script */
-VariantAxis    ::= Word S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"?
+VariantAxis    ::= Word S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? Word )? S? ";"?
+VariantValue   ::= Word ( S? ":" S? StringLiteral )?                           /* the value's native selector, #986 */
 VariantRule    ::= "@variant" S VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in a <style scoped> */
 VariantTest    ::= Word S? "(" S? Word ( S? "," S? Word )* S? ")"
 LibraryRule    ::= "@variant" S ( Hosts S )? VariantTest ( S "and" S VariantTest )* S? "{" CssText "}"   /* in @pdxui/design */
@@ -370,8 +371,15 @@ TagName        ::= "pdx-" Word
 `@variants { variant: { primary, ghost } = primary; }` — or one axis per line. Each axis becomes a prop
 typed with its values — `variant: { primary, ghost } = primary;` is
 `@prop variant: 'primary' | 'ghost' = 'primary';` — and is reflected on the host as an attribute,
-`variant="ghost"`, as `@host { :variant="variant" }` would write it. An axis without `= default`
-defaults to its first value. The generated `.d.ts` carries the union.
+`variant="ghost"`. An axis without `= default` defaults to its first value. The generated `.d.ts`
+carries the union. The descriptor declares the axes under `variants`, as a TypeScript component
+does, and core makes the props and the reflection (#986): a value outside the axis is reflected as the
+default, and the default is written first in the descriptor, the value core reads as the default.
+
+A value may name the selector that draws the same look on native HTML, as the descriptor's record
+form does: `@variants { size: { md: '.pdx-input-md', sm: '.pdx-input-sm' } = md; }`. Every value of an
+axis names one, or none does (`PDX_VARIANTS_MALFORMED`). The descriptor then declares the axis as that
+record, which is what a library component needs (below).
 
 `@variant` in a `<style scoped>` keys rules by those attributes. Before the block is scoped, each
 selector of its body is put under the host's attribute test: `@variant variant(ghost) { .label { … } }`
@@ -462,6 +470,14 @@ so every selector it yields takes the theme root and the nested-theme guard like
   `PDX_VARIANT_UNKNOWN` (error) — any `@variant` in a component that declares no `@variants` is one.
 - A declared value other than the default that no `@variant` rule names: `PDX_VARIANT_UNSTYLED`
   (warning). The default is the base rules' look and is never reported.
+- A library component in a `.pdx` (a `pdx-` tag, reserved to the library) is drawn by `@pdxui/design`
+  (#986): a value counts as styled when a rule of its `<style scoped>` or of the design package's
+  variant and theme sources names it, read as the design build reads them. As there, a value styles
+  every value that shares its native selector, and one that shares the default's is never reported.
+  The variant sources are not published, so outside the monorepo the design package's rules are not
+  read and nothing is reported for them.
+- Every value of an axis names its native selector, or none does: one named and one not is
+  `PDX_VARIANTS_MALFORMED`.
 - The values are CSS: a colour in them is a token, like any colour in a component (CD-C3).
 - An `@variant` in a plain `<style>` block is copied as written: the browser drops it.
 - In the library, the design build checks the rules against `custom-elements.json`, so it runs after

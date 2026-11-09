@@ -185,7 +185,9 @@ component's variants once: each axis is a prop typed with its values (`variant: 
 reflected on the host (`variant="ghost"`). The `<style scoped>` keys rules by it —
 `@variant variant(ghost) { [data-part="root"] { … } }`, `@variant variant(ghost) and size(sm) { … }`,
 `@variant size(sm) { :scope { … } }` for the host itself, `@variant variant(ghost, danger) { … }` for
-any of several values — instead of a class assembled from the prop.
+any of several values — instead of a class assembled from the prop. A value outside the axis is
+reflected as the default. A value may name its native selector, `size: { md: '.pdx-input-md', sm:
+'.pdx-input-sm' } = md;` (every value or none), as the library's components do.
 A rule for a value that does not exist is `PDX_VARIANT_UNKNOWN`; a value (other than the default) no
 rule styles, `PDX_VARIANT_UNSTYLED`.
 

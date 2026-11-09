@@ -249,6 +249,8 @@ export function assembleModule(
     ssr = false,
     /** `@hydrate trigger;` (#160, part 4d): the triggers a generated host waits for; '' for none. */
     hydrate = '',
+    /** The descriptor's `variants` from `@variants` (#986), already built; '' for none. */
+    variantsCode = '',
 ): string {
     // The setup body of a `<template shadow>` component adopts its CSS into the root, and the helper
     // that does it has to be imported or the module throws on its first mount. Read from
@@ -338,6 +340,9 @@ export function assembleModule(
     if (hostCode) code += `  host: ${hostCode},\n`;
     // The descriptor's `parts` (#134): the component's public, named elements, as the manifest lists them.
     if (parts.length > 0) code += `  parts: [${parts.map(p => jsQuote(p)).join(', ')}],\n`;
+    // The descriptor's `variants` (#986): the axes, as a TypeScript component declares them; core makes
+    // each a prop reflected on the host.
+    if (variantsCode) code += `  variants: ${variantsCode},\n`;
     // The descriptor's `slots` (#489): each typed snippet is a property of the element, a function
     // the parent's `@snippet` (or a script) assigns and the component's `@render` calls.
     if (slots.length > 0) code += `  slots: { ${slots.map(s => `${s}: slot()`).join(', ')} },\n`;
