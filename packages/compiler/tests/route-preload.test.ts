@@ -126,10 +126,12 @@ describe('the tags', () => {
 describe('the tags of a generated page', () => {
     const asset = (fileName: string, source: string | Uint8Array): BundleChunk => ({ type: 'asset', fileName, source });
 
-    it('preload the scripts as the client page does, and write each stylesheet inline, named by its file', () => {
+    it('preload what the client page preloads, and write each stylesheet inline as well, named by its file', () => {
+        // The preload is for Vite's loader, which waits for the stylesheet before it mounts the route.
         const bundle = { 'assets/a.css': asset('assets/a.css', 'h1{margin:0}') };
         expect(pageTags(bundle, ['assets/a.js', 'assets/a.css'], '/')).toBe(
-            '<link rel="modulepreload" crossorigin href="/assets/a.js">\n<style data-pdx-route-css="assets/a.css">h1{margin:0}</style>');
+            '<link rel="modulepreload" crossorigin href="/assets/a.js">\n<link rel="preload" as="style" crossorigin href="/assets/a.css">'
+            + '\n<style data-pdx-route-css="assets/a.css">h1{margin:0}</style>');
     });
 
     it('read a stylesheet the bundle holds as bytes', () => {
@@ -143,8 +145,8 @@ describe('the tags of a generated page', () => {
         expect(tags.match(/<\/style/gi), 'the stylesheet closed its element early').toHaveLength(1);
     });
 
-    it('control — a stylesheet the bundle does not hold is left out, not written empty', () => {
-        expect(pageTags({}, ['assets/a.js', 'assets/missing.css'], '/')).toBe('<link rel="modulepreload" crossorigin href="/assets/a.js">');
+    it('control — a stylesheet the bundle does not hold is not written empty', () => {
+        expect(pageTags({}, ['assets/a.js', 'assets/missing.css'], '/')).not.toContain('<style');
     });
 });
 

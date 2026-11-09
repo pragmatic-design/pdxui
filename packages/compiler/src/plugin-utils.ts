@@ -424,15 +424,17 @@ export function preloadTags(files: string[], base: string): string {
 }
 
 /**
- * The tags of a page generated with its route's content in it (#966): the scripts as
- * {@link preloadTags} writes them, and each stylesheet INLINE, in a `<style>` that names its file.
- * The content paints at once, so its styles have to be there: a `preload` lets it paint unstyled and
- * shift, and a `<link rel="stylesheet">` holds the first paint for a round trip (~170 ms on slow 4G,
- * measured on `showcase/scenarios/ssg-virtual`). Vite's loader still fetches the file when the route's
- * chunk imports it, after the page is taken over; the rules are the same, so nothing on screen changes.
+ * The tags of a page generated with its route's content in it (#966): what {@link preloadTags}
+ * writes — the scripts, and each stylesheet preloaded — and each stylesheet INLINE as well, in a
+ * `<style>` that names its file. The content paints at once, so its styles have to be there: a
+ * preload alone lets it paint unstyled and shift, and a `<link rel="stylesheet">` holds the first
+ * paint for a round trip (~170 ms on slow 4G, measured on `showcase/scenarios/ssg-virtual`). The
+ * preload stays for Vite's loader, which waits for the route chunk's stylesheet before it mounts the
+ * route: started with the entry, the file is in the cache by then. Without it the take-over of the
+ * showcase's generated `/` came 130 ms later (1201 ms against 1069).
  */
 export function pageTags(bundle: Record<string, BundleChunk>, files: string[], base: string): string {
-    const scripts = preloadTags(files.filter((f) => !f.endsWith('.css')), base);
+    const scripts = preloadTags(files, base);
     const styles = files.filter((f) => f.endsWith('.css')).map((f) => {
         const asset = Object.values(bundle).find((c) => c.fileName === f);
         const source = asset?.source;

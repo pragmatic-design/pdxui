@@ -164,7 +164,8 @@ describe('a generated page carries its route\'s stylesheet', () => {
         expect(css, 'the about page does not carry its route\'s stylesheet').toBeDefined();
         expect(css, 'the stylesheet in the page is not the route\'s').toMatch(/margin:\s*0/);
         expect(about.indexOf('data-pdx-route-css'), 'the styles are not in the head').toBeLessThan(about.indexOf('</head>'));
-        expect(linked(about, 'preload', 'css'), 'the route\'s stylesheet is only preloaded: the page paints before it').not.toContain('about');
+        // Preloaded as well, for Vite's loader, which waits for it before it mounts the route.
+        expect(linked(about, 'preload', 'css'), 'the route\'s stylesheet is not preloaded for the loader').toContain('about');
         expect(linked(about, 'stylesheet', 'css'), 'a render-blocking link holds the first paint for a round trip').not.toContain('about');
     }, 180_000);
 
