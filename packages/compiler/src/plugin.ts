@@ -2,7 +2,7 @@
 // Transforms .pdx files into JavaScript modules with source maps.
 
 import type { Plugin, UserConfig } from 'vite';
-import { readFileSync, realpathSync } from 'fs';
+import { readFileSync, realpathSync, existsSync } from 'fs';
 import { dirname, resolve, normalize, relative, isAbsolute, basename } from 'path';
 import { parseSFC } from './parser/sfc';
 import { parseTemplate, templateStartInFile } from './parser/template';
@@ -37,7 +37,7 @@ import { collectOrigins, mapFromOrigins, insertMapLines } from './compiler/sourc
 import type { SourceMapJSON } from './compiler/sourcemap';
 import { PluginRunner } from './plugin-system';
 import type { CompilerPlugin } from './plugin-system';
-import { discoverPragmaticAliases, scanForStores, scanForRoutes, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
+import { discoverPragmaticAliases, scanForStores, scanForRoutes, scanRouteFile, isScannedFile, injectStoreImports, injectComponentImports, routePreloadFiles, preloadTags, isRouterSeam, injectAfterHeadOpen, shortPath, type BundleChunk } from './plugin-utils';
 import { generateRouteTable, routerSeamModule, devRouteTableModule, buildSpecifier, devSpecifier, ROUTE_TABLE_ID } from './route-table';
 import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { writeRouteTypes } from './route-types';
@@ -218,13 +218,33 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
      * answer to a page saved, added or stripped of its `@page`. The route table itself is left to
      * the reload that follows a structural change; only the types are refreshed here.
      */
-    function refreshRouteTypes(): void {
+    /**
+     * The routes `.pdx/routes.d.ts` is written from while the server runs: the whole tree scanned once,
+     * then kept by file. A saved page re-reads that page only (#961): the whole scan took ~80 ms of the
+     * showcase's ~95 ms between a save and the update the page receives, on every save of a page.
+     */
+    let typedRoutes: ScannedRoute[] | null = null;
+    const ROUTE_DIRS = ['src', 'pages'];
+
+    function refreshRouteTypes(changed?: string): void {
         const root = viteRoot ?? process.cwd();
-        const routes: ScannedRoute[] = [];
-        for (const sub of ['src', 'pages']) {
-            scanForRoutes(resolve(root, sub), routes, (tag) => componentResolver.has(tag), defaultLayout, prefix);
+        const knowsTag = (tag: string) => componentResolver.has(tag);
+        if (changed === undefined || typedRoutes === null) {
+            typedRoutes = [];
+            for (const sub of ROUTE_DIRS) scanForRoutes(resolve(root, sub), typedRoutes, knowsTag, defaultLayout, prefix);
+        } else {
+            typedRoutes = typedRoutes.filter((r) => r.file !== changed);
+            if (ROUTE_DIRS.some((sub) => isScannedFile(resolve(root, sub), changed)) && existsSync(changed)) {
+                // A file the analyser cannot read declares no route, as in the whole scan; said, since a
+                // save in the middle of an edit is where it happens, and its compile reports the rest.
+                try {
+                    scanRouteFile(changed, typedRoutes, knowsTag, defaultLayout, prefix);
+                } catch (err) {
+                    console.warn(`[pdx] route types: ${shortPath(changed)} was not read (${err instanceof Error ? err.message : String(err)}); its routes are left out until it is saved again`);
+                }
+            }
         }
-        if (routes.length > 0) writeRouteTypes(root, routes.map((r) => r.path));
+        if (typedRoutes.length > 0) writeRouteTypes(root, typedRoutes.map((r) => r.path));
     }
 
     const main: Plugin = {
@@ -326,6 +346,8 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
             }
             // The routes as types (#150), for navigate() and <pdx-link>: an app with no route has none.
             if (scannedRoutes.length > 0) writeRouteTypes(root, scannedRoutes.map((r) => r.path));
+            // What a saved page updates by its file, from here on (#961).
+            typedRoutes = [...scannedRoutes];
 
             // Tag collisions found by the SCAN are reported here, through Rollup's warning channel,
             // so they carry a code and reach whatever is consuming the build — not only a terminal.
@@ -631,8 +653,9 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // A route changed (#150): `.pdx/routes.d.ts` follows, while the server runs. Read the
                 // saved text, not the module: a page that has just lost its `@page` changes the routes too.
                 const file = ctx.file.replace(/\\/g, '/');
-                if (/^[ \t]*@page[ \t]/m.test(await ctx.read()) || scannedRoutes.some((r) => r.file === file)) {
-                    refreshRouteTypes();
+                if (/^[ \t]*@page[ \t]/m.test(await ctx.read()) || scannedRoutes.some((r) => r.file === file)
+                    || typedRoutes?.some((r) => r.file === file)) {
+                    refreshRouteTypes(file);
                 }
                 const mod = ctx.server.moduleGraph.getModuleById(ctx.file);
                 if (mod) {
