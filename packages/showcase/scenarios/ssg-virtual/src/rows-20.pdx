@@ -1,0 +1,16 @@
+<!-- The long list with its first 20 rows written by the server (#930). -->
+<template>
+  <h1 data-test="title">The long list</h1>
+  <ul class="list" data-test="list">
+    @for (rows as row; track row.id) @virtual(32, serverRows: 20) {
+      <li class="row">{{ row.label }}</li>
+    }
+  </ul>
+</template>
+
+<script>
+import { ROWS } from './rows';
+@page '/rows-20';
+const rows = ROWS;
+</script>
+

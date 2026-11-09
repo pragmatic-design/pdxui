@@ -12,10 +12,15 @@ import type { VirtualCall } from '../renderer/virtual-list';
 import { serverBlock, serverElement, writtenElements, type ServerBlock } from './mode';
 
 /**
- * The rows the server writes when `@virtual` does not say. ASSUMPTION (#930): a first screen of rows of a
- * typical estimate; the default is to be chosen by measuring CLS and first paint on a long list.
+ * The rows the server writes when `@virtual` does not say (#930). Measured on a list of 32 px rows as tall
+ * as the screen (`showcase/tests/scenario-ssg-virtual.spec.ts`, slow 4G, CPU 4×): a page whose rows fill
+ * its first screen has it full at the first paint, ~0.24 s, and one with fewer at ~1.2 s, once the client
+ * has rendered them; the first and largest paints, the take-over and the layout shift (0) do not change
+ * with the count, and a row costs ~125 bytes of HTML. A 390 × 844 screen shows 25 such rows and a
+ * 1280 × 800 one 23: 40, the smallest count measured that fills both, also fills a screen up to ~1350 px
+ * tall. 80 adds 5 KB for nothing at those sizes.
  */
-export const DEFAULT_SERVER_ROWS = 20;
+export const DEFAULT_SERVER_ROWS = 40;
 
 /** The role of the element the list is written in, as the client reads it from the DOM (`roleOf`). */
 function containerRole(): string | null {
