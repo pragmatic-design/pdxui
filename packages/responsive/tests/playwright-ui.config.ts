@@ -6,8 +6,6 @@ const excluded = CERTIFY_EXCLUSIONS.map((e) => `**/${e.file}`);
 const named = CERTIFY_PROJECTS.flatMap((p) => (p.files === 'rest' ? [] : p.files));
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration/ui-components',
     // Everything in the folder runs, except what is listed — with a reason and an issue — in
     // certify-exclusions.ts. Naming the runners instead would leave every other spec here in no
@@ -42,7 +40,7 @@ export default defineConfig({
     // failure it saw is not reporting. Measured on Playwright 1.58.2 with a test that fails on the
     // first attempt and passes on the second: exit 0 without this, exit 1 with it.
     failOnFlakyTests: true,
-    reporter: 'line',
+    reporter: [['line'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     use: {
         baseURL: 'http://localhost:5220',
         viewport: { width: 1280, height: 800 },

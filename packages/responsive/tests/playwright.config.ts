@@ -1,8 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
@@ -15,7 +13,7 @@ export default defineConfig({
     // first attempt and passes on the second: exit 0 without this, exit 1 with it.
     failOnFlakyTests: true,
     workers: process.env.CI ? 1 : undefined,
-    reporter: 'html',
+    reporter: [['html'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     use: {
         trace: 'on-first-retry',
     },

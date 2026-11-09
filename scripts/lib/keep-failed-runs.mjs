@@ -1,53 +1,38 @@
 // What a failed Playwright run left in its output folder, copied where the next run cannot empty it
-// (#845 for the site, #975 for every config).
+// (#845 for the site, #975 for every config, #990 for reading the run's status).
 //
 // Playwright empties a config's output folder when a run starts. A failed test's trace, its error
 // context and anything a fixture wrote for it (the showcase's stall probe) are in that folder, and the
 // first re-run of a red that does not reproduce, the obvious next step, deleted them unread: #611,
 // #587 and an earlier issue lost their evidence that way.
 //
-// Every Playwright config names this module as a global teardown. After each run it copies each
-// project's output folder, when the run left a failure's files in it, to `<output folder>-kept/<stamp>/`, keeps
-// the last ten, and prints where. `packages/core/tests/keep-failures.test.ts` holds both: the copy, and
-// that no config is without it.
+// Every Playwright config lists this module among its reporters. When a run ends and did not pass, it
+// copies each project's output folder to `<output folder>-kept/<stamp>/`, keeps the last ten, and
+// prints where. A reporter, not a global teardown: the teardown runs before the reporters' `onEnd`,
+// so it cannot know the run's status, and guessing it from the files kept a green run whose tests
+// wrote a measurement on success (#990). `packages/core/tests/keep-failures.test.ts` holds both: the
+// copy, and that no config is without it.
+//
+// A `--reporter` on the command line replaces the config's reporters, this one with them: a run
+// started that way keeps nothing. No script of the repository passes one.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, statSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 
 /** How many kept runs stay per output folder: enough for a few re-runs, not a growing folder. */
 const KEEP = 10;
 
-/** Whether `path` is a file, or a folder with a file somewhere in it. @param {string} path */
-function holdsAFile(path) {
-    if (!statSync(path).isDirectory()) return true;
-    return readdirSync(path).some((name) => holdsAFile(join(path, name)));
-}
-
 /**
- * Whether a run left evidence in `results`: a file in an entry that is not dot-named.
- *
- * Not the run's status: a global teardown runs before the reporters' `onEnd`, so `.last-run.json` is
- * still the previous run's when it does. Not a folder alone: a passing test whose spec asks for an
- * output path leaves an empty folder named after it (the showcase's retention and SSG specs do).
- * What a failure leaves is files: its trace, its error context, a fixture's record. And what every
- * run writes, failed or not, is dot-named: Playwright's `.last-run.json`, the setups' `.auth/`,
- * `.ssg/`, `.h2-cert/`. A failure that leaves no file has nothing for a rerun to lose.
- * @param {string} results
- */
-function leftEvidence(results) {
-    return existsSync(results) && readdirSync(results).some((name) => !name.startsWith('.') && holdsAFile(join(results, name)));
-}
-
-/**
- * Copy `results` to `<keptRoot>/<stamp>` when the run left evidence in it, drop the oldest beyond the
- * last ten, and return where it went; null when there was nothing to keep.
+ * Copy `results` to `<keptRoot>/<stamp>` when the run did not pass and left the folder, drop the
+ * oldest beyond the last ten, and return where it went; null when there was nothing to keep.
  * @param {string} results
  * @param {string} keptRoot
  * @param {string} stamp
+ * @param {'passed' | 'failed' | 'timedout' | 'interrupted'} status the run's, from `onEnd`
  * @returns {string | null}
  */
-export function keepFailures(results, keptRoot, stamp) {
-    if (!leftEvidence(results)) return null;
+export function keepFailures(results, keptRoot, stamp, status) {
+    if (status === 'passed' || !existsSync(results)) return null;
     const target = join(keptRoot, stamp);
     mkdirSync(keptRoot, { recursive: true });
     cpSync(results, target, { recursive: true });
@@ -56,14 +41,27 @@ export function keepFailures(results, keptRoot, stamp) {
     return target;
 }
 
-/**
- * The global teardown: each project's output folder, once, kept beside it as `<folder>-kept`.
- * @param {{ projects: { outputDir: string }[] }} config Playwright's FullConfig.
- */
-export default function keepFailedRuns(config) {
-    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    for (const outputDir of new Set(config.projects.map((p) => p.outputDir))) {
-        const kept = keepFailures(outputDir, `${outputDir}-kept`, stamp);
-        if (kept) console.log(`[playwright] a failed run's traces are kept in ${kept}`);
+/** The reporter: each project's output folder, once, kept beside it as `<folder>-kept`. */
+export default class KeepFailedRuns {
+    /** @type {string[]} */
+    #outputDirs = [];
+
+    /** @param {{ projects: { outputDir: string }[] }} config Playwright's FullConfig. */
+    onBegin(config) {
+        this.#outputDirs = [...new Set(config.projects.map((p) => p.outputDir))];
+    }
+
+    /** @param {{ status: 'passed' | 'failed' | 'timedout' | 'interrupted' }} result Playwright's FullResult. */
+    onEnd(result) {
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        for (const outputDir of this.#outputDirs) {
+            const kept = keepFailures(outputDir, `${outputDir}-kept`, stamp, result.status);
+            if (kept) console.log(`[playwright] a failed run's traces are kept in ${kept}`);
+        }
+    }
+
+    /** It prints one line on a failed run, beside the config's own reporters, and takes nothing from them. */
+    printsToStdio() {
+        return false;
     }
 }

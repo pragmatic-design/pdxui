@@ -19,8 +19,6 @@ import { defineConfig } from '@playwright/test';
 import { PIXEL_THRESHOLD, pixelTolerance } from './integration/visual-regression/pixel-threshold';
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: './integration',
     // Only the manifest-driven runners (theme-regression checks the showcase pages' structure, with
     // no screenshots, and runs with playwright-visual.config.ts)
@@ -59,7 +57,7 @@ export default defineConfig({
     // that should not vary.
     fullyParallel: true,
     workers: 4,
-    reporter: [['line'], ['html', { open: 'never' }]],
+    reporter: [['line'], ['html', { open: 'never' }], ['../../../scripts/lib/keep-failed-runs.mjs']],
     // One shared set of baselines: ALWAYS -docker-linux, never -darwin/-win32.
     // An explicit path under testDir (.../tests/integration) → predictable for the commit/cp.
     snapshotPathTemplate: '{testDir}/visual-regression/__screenshots__/{testFileName}/{arg}-docker-linux{ext}',
