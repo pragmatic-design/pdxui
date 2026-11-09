@@ -226,9 +226,10 @@ is reported as `PDX_LOADER_NOT_FOUND` rather than silently registering nothing.
 
 The data does not wait for the page's code. The compiler gives the loader a small module of its
 own, and a navigation starts it together with the page's chunk: on a real network that is one round
-trip for both, not one for the code and then one for the data. The page appears when both are in. A
-loader that reads something the script declares beside it — a constant, a helper — has to stay with
-its page, and then the page's chunk comes first; keep what a loader needs in an import, and it moves.
+trip for both, not one for the code and then one for the data. The page appears when both are in.
+What the loader needs comes from an import, as it already must: lifted out of the component, it cannot
+read the constants and helpers of the script either. The one exception is the page's `label`
+function: a loader that calls it stays with its page, and then the page's chunk comes first.
 
 A link that prefetches its route on hover or in view starts the loader too, so the data is often in
 before the click. The result waits ten seconds for the navigation, under the route, its params and

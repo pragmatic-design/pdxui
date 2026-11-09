@@ -7,10 +7,14 @@
 // holds its declaration, the script imports it reads, and a default export. The table imports it
 // beside the page chunk, and the router starts both at once.
 //
-// A loader that reads a name its script declares beside it — a constant, a helper, a rune — cannot
-// be moved without that name. Its module exports null, and the bridge imports the page as before.
-// The check is by name and errs towards declining: a name that only appears in a string or a comment
-// keeps the loader with its page, which is the old behaviour, never a broken module.
+// What the hoisted loader can reach in its page is what this module has to hold: the page module's own
+// scope, which is the script's imports and the other function `hoistLoader` lifts there, `@page`'s
+// `label`. Everything else the script declares — a constant, a helper, a rune — lives in the
+// component's setup, out of the hoisted loader's reach in the page as much as here (#974). So the one
+// name that keeps a loader with its page is the label function: read, it is in the page and not here,
+// and this module exports null for the bridge to import the page as before. The check is by name on
+// the loader's code with its types erased, and errs towards declining: the label's name in a string
+// or a comment keeps the loader with its page, which is the old behaviour, never a broken module.
 
 import { dirname, posix } from 'path';
 import { parseSFC } from './parser/sfc';
@@ -28,25 +32,9 @@ export function loaderModuleId(tag: string): string {
     return LOADER_MODULE_PREFIX + tag;
 }
 
-// Match: `function name(` / `const name =` / `class Name` / `@prop name:` and the other runes that
-// declare a name. Groups: [1]=the declared name
-const DECLARED = /(?:\bfunction\s*\*?\s*|\b(?:const|let|var|class|interface|type|enum)\s+|@(?:prop|fetch|form|store|event|state|part|provide|inject)\s+)([A-Za-z_$][\w$]*)/g;
-// Match: `const { a, b: c } =` / `let [x, y] =` — a destructuring declaration. Groups: [1]=its pattern
-const DESTRUCTURED = /\b(?:const|let|var)\s*([{[][^=]*[}\]])\s*=/g;
-
 /** Whether `code` mentions `name` as a whole identifier, not as a property after a dot. */
 function mentions(code: string, name: string): boolean {
     return new RegExp(`(?<![\\w$.])${escapeForRegExp(name)}(?![\\w$])`).test(code);
-}
-
-/** The names the rest of the script declares: what the loader would lose if it moved alone. */
-function declaredBeside(rest: string): Set<string> {
-    const names = new Set<string>();
-    for (const m of rest.matchAll(DECLARED)) names.add(m[1]);
-    for (const m of rest.matchAll(DESTRUCTURED)) {
-        for (const id of m[1].matchAll(/[A-Za-z_$][\w$]*/g)) names.add(id[0]);
-    }
-    return names;
 }
 
 /**
@@ -55,18 +43,19 @@ function declaredBeside(rest: string): Set<string> {
  * loader cannot stand alone, or the script declares no such function.
  */
 export function generateLoaderModule(source: string, filename: string, name: string): string {
-    const none = `// @loader ${name} stays with its page: it is not declared, or it reads a name declared beside it.\nexport default null;\n`;
+    const none = `// @loader ${name} stays with its page: it is not declared, or it reads @page's label function.\nexport default null;\n`;
     const script = parseSFC(source).script;
     if (!script) return none;
     const hoisted = hoistLoader(script.content, name);
     if (!hoisted) return none;
     const declaration = hoisted.declaration;
-    for (const other of declaredBeside(hoisted.body)) {
-        if (mentions(declaration, other)) return none;
-    }
+    // What the loader READS is its code without its types: a name in an annotation is not a read (#974).
+    const runtime = script.lang === 'js' ? declaration : eraseTypes(declaration, filename);
+    const reads = (local: string) => mentions(runtime, local);
 
     const analysis = analyzeScript(script.content, filename);
-    const reads = (local: string) => mentions(declaration, local);
+    const label = analysis.route.labelFn;
+    if (label && label !== name && reads(label)) return none;
     const imports = analysis.userImports.filter(stmt => importedLocalNames(stmt).some(reads));
     const core = analysis.coreImportNames.filter(reads);
 

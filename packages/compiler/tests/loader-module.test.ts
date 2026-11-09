@@ -3,9 +3,9 @@
 //
 // The loader is already hoisted to module level in the page module (it runs before the component
 // exists and cannot read its setup), so it can live apart: the module holds its declaration, the
-// script imports it reads, and nothing else. A loader that reads a name its script declares beside
-// it cannot be moved without that name: its module exports null, and the route table's bridge
-// imports the page as before.
+// script imports it reads, and nothing else. A loader that reads @page's label function, the one other
+// name the page keeps at module scope, cannot be moved without it: its module exports null, and the
+// route table's bridge imports the page as before.
 
 import { describe, it, expect } from 'vitest';
 import { generateLoaderModule, loaderModuleId } from '../src/loader-module';
@@ -54,8 +54,23 @@ describe('the module of a @loader', () => {
         expect(() => new Function(code.replace(/^export default .*$/m, ''))).not.toThrow();
     });
 
-    it('exports null when the loader reads a name its script declares beside it', () => {
-        // Moved alone, `base` would be a ReferenceError the first time the route is visited.
+    it('exports null when the loader reads @page\'s label function, which only the page has at module scope', () => {
+        // The page module lifts the label beside the loader; moved alone, `crumb` would be a
+        // ReferenceError the first time the route is visited.
+        const code = generateLoaderModule(page([
+            "@page '/t/:id' { label: crumb };",
+            '@loader loaded: load;',
+            'function crumb(params) { return `T ${params.id}`; }',
+            'async function load({ params }) { document.title = crumb(params); return fetch("/t"); }',
+        ].join('\n')), 't.pdx', 'load');
+
+        expect(code).toMatch(/export default null;/);
+        expect(code).not.toContain('function load');
+    });
+
+    it('a name the setup declares does not keep it with its page: the page\'s hoisted loader cannot see it either (#974)', () => {
+        // In the page module the loader is lifted to module scope and `base` stays in setup(): the
+        // page throws the same ReferenceError, so declining bought nothing and cost a round trip.
         const code = generateLoaderModule(page([
             "@page '/t';",
             '@loader loaded: load;',
@@ -63,8 +78,39 @@ describe('the module of a @loader', () => {
             'async function load() { return fetch(base + "/t"); }',
         ].join('\n')), 't.pdx', 'load');
 
-        expect(code).toMatch(/export default null;/);
-        expect(code).not.toContain('function load');
+        expect(code).toContain('export default load;');
+    });
+
+    it('another function\'s local of the same name is not a read: it moves (#974)', () => {
+        // The showcase's ticket: `reload()` has its own `const res`, and so does the loader.
+        const code = generateLoaderModule(page([
+            "@page '/t';",
+            '@loader loaded: load;',
+            'async function load() { const res = await fetch("/t"); return res.json(); }',
+            'async function reload() { const res = await fetch("/u"); return res.json(); }',
+        ].join('\n')), 't.pdx', 'load');
+
+        expect(code).toContain('export default load;');
+        expect(code).not.toContain('reload');
+    });
+
+    it('a name the loader only writes in a type is not a read: it moves (#974)', () => {
+        // The showcase's ticket: `{ id: number }` types the params, and the page declares `@prop id`.
+        // Read as a name, the type kept the loader with its page, and a navigation paid a round trip
+        // for an empty module before it could import the page that held the loader.
+        const code = generateLoaderModule(page([
+            "@page '/tickets/:id(number)';",
+            '@loader ticket: loadTicket;',
+            "import type { LoaderContext } from '@pdxui/router';",
+            "@prop id: string = '';",
+            'async function loadTicket({ params, signal }: LoaderContext<{ id: number }>): Promise<unknown> {',
+            '  const res = await fetch(`/api/tickets/${params.id}`, { signal });',
+            '  return res.json();',
+            '}',
+        ].join('\n'), ' lang="ts"'), 'ticket.pdx', 'loadTicket');
+
+        expect(code).toContain('export default loadTicket;');
+        expect(code).not.toMatch(/LoaderContext|: number/);
     });
 
     it('exports null when the script has no function by that name', () => {
