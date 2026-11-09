@@ -15,7 +15,14 @@ function tmpRoot(name: string): string {
     return join(tmpdir(), `pdx-check-${name}-${Date.now()}-${Math.floor(Math.random() * 1e6)}`);
 }
 
-describe('pdx check — exit code on error-severity findings', () => {
+// Every suite here runs a whole `pdx check` over a project, so it is held to the time a command takes, as
+// the other tests of this package that run one are (#953, #972). Measured 2026-11-09, 10 runs each: 16–85 ms
+// alone and 22–88 ms with core's suite beside it; the case that reports a tag nothing declares, which reads
+// every sibling package's sources once, 0.48–0.84 s alone and 0.64–1.54 s beside core. That case timed out
+// at vitest's default 5 s in the pre-push gate, which runs every package at once.
+const COMMAND = { timeout: 60_000 };
+
+describe('pdx check — exit code on error-severity findings', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
@@ -63,7 +70,7 @@ describe('pdx check — exit code on error-severity findings', () => {
 
 // The mistakes the compiler finds while GENERATING code — a bound name the component does not
 // declare — reach `pdx check` too, not only `vite dev`'s console: validate() alone does not see them.
-describe('pdx check — diagnostics found while generating code', () => {
+describe('pdx check — diagnostics found while generating code', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
@@ -136,7 +143,7 @@ describe('pdx check — diagnostics found while generating code', () => {
 
 // CD-L1, the one cross-file rule — the same function, in the same shape, written in two
 // pages is a composable nobody extracted. Only `pdx check` sees every file at once.
-describe('pdx check — logic repeated across pages (CD-L1)', () => {
+describe('pdx check — logic repeated across pages (CD-L1)', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
@@ -237,7 +244,7 @@ describe('pdx check — logic repeated across pages (CD-L1)', () => {
 
 // The heuristic rules. CD-D1 is cross-file — a route and a route inside it loading the
 // same endpoint; the per-file ones (compiler's design-heuristics.test.ts) reach the report too.
-describe('pdx check — the heuristic component-design rules', () => {
+describe('pdx check — the heuristic component-design rules', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
@@ -297,7 +304,7 @@ describe('pdx check — the heuristic component-design rules', () => {
     });
 });
 
-describe('pdx check — i18n translations path', () => {
+describe('pdx check — i18n translations path', COMMAND, () => {
     let root: string;
 
     beforeEach(() => { root = tmpRoot('i18n'); });
@@ -350,7 +357,7 @@ describe('pdx check — i18n translations path', () => {
 // custom element will not be registered", on an app whose components register and run.
 //
 // The i18n dictionaries avoid the same doubled path (above). This is the other caller.
-describe('pdx check — the project’s own components resolve', () => {
+describe('pdx check — the project’s own components resolve', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;

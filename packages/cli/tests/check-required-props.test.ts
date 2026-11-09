@@ -10,7 +10,9 @@ import checkCmd from '../src/commands/check';
 
 interface JsonReport { files: { file: string; warnings: { code: string; message: string; line?: number }[] }[] }
 
-describe('pdx check — PDX_PROP_REQUIRED', () => {
+// Each case runs a whole `pdx check` over a project: held to the time a command takes (#972). Measured
+// 2026-11-09, 10 runs each: 22–82 ms alone, 35–96 ms with core's suite beside it.
+describe('pdx check — PDX_PROP_REQUIRED', { timeout: 60_000 }, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;

@@ -15,7 +15,9 @@ interface Report {
     summary: { ignored: number };
 }
 
-describe('pdx check reports defects; --design adds the review', () => {
+// Each case runs a whole `pdx check` over a project: held to the time a command takes (#972). Measured
+// 2026-11-09, 10 runs each: 17–78 ms alone, 28–99 ms with core's suite beside it.
+describe('pdx check reports defects; --design adds the review', { timeout: 60_000 }, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
