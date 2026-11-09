@@ -13,6 +13,7 @@ import type { AwaitTiming } from './await';
 import type { ErrorBoundaryOptions } from './error-boundary';
 import type { DynamicOptions } from './dynamic';
 import type { HydrateOnOptions } from './hydrate-on';
+import type { VirtualCall } from './virtual-list';
 
 type Content = Node | DocumentFragment;
 
@@ -23,6 +24,7 @@ export interface BlockVisitor<R> {
     match<T extends string | number>(value: () => T, cases: Record<string, () => Content>): R;
     show(condition: () => boolean, content: Content): R;
     list<T>(items: () => T[], keyFn: (item: T, index: number) => unknown, renderer: RowRenderer<T>, options: RepeatOptions | undefined): R;
+    virtual<T>(call: VirtualCall<T>): R;
     defer(options: DeferOptions, loadFn: (() => Promise<unknown>) | null, renderFn: (module?: unknown) => Content): R;
     await<T>(source: () => unknown, thenFn: (value: () => T) => Content, loadingFn: (() => Content | null) | null,
         errorFn: ((error: unknown, retry: () => void) => Content) | null, options: AwaitTiming): R;

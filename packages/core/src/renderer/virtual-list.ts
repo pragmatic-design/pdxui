@@ -18,23 +18,8 @@ import { signal, effect, collectDisposers, onDispose, untracked } from '../react
 import type { Signal } from '../utils/types';
 import { createVirtualizer } from './virtualizer';
 import { DEV } from '../utils/env';
-
-/** What a `@for … @virtual` accepts besides an array: a source that pages (`DataSource`). */
-interface PagedSource<T> {
-    data: () => T[];
-    hasMore: () => boolean;
-    loadMore: () => Promise<unknown>;
-    isLoading?: () => boolean;
-    /** The source's total, when the transport reports one. */
-    total?: () => number;
-}
-
-function isPaged<T>(value: unknown): value is PagedSource<T> {
-    return !!value && typeof value === 'object'
-        && typeof (value as PagedSource<T>).data === 'function'
-        && typeof (value as PagedSource<T>).loadMore === 'function'
-        && typeof (value as PagedSource<T>).hasMore === 'function';
-}
+import { isDeferring, deferredBlock } from './deferred-block';
+import { isPaged, listOf, setSize, implicitRole, rowAttributes, DEFAULT_ESTIMATE, ROW_ROLES, KEY_ROLES, type PagedSource } from './virtual-set';
 
 export interface VirtualListOptions {
     /** The estimated row size in px (`@virtual(48)`). Without it, the first rendered row is measured. */
@@ -47,6 +32,19 @@ export interface VirtualListOptions {
     empty?: () => Node;
     /** The renderer receives getters, `item()` and `index()`, as `eachRow`'s does. */
     getters?: boolean;
+    /**
+     * Rendered to a string (#930): how many rows the server writes, from the first, before the spacer
+     * that stands for the rest. The server has no layout, so the window it writes is a count.
+     */
+    serverRows?: number;
+}
+
+/** A `eachVirtual` call, as a block visitor reads it while the list is not built (#930). */
+export interface VirtualCall<T> {
+    readonly items: () => T[] | PagedSource<T> | null | undefined;
+    readonly keyFn: (item: T, index: number) => unknown;
+    readonly render: ((item: T, index: number) => Node) | ((item: () => T, index: () => number) => Node);
+    readonly options: VirtualListOptions;
 }
 
 interface Row<T> {
@@ -57,15 +55,6 @@ interface Row<T> {
     index?: Signal<number>;
 }
 
-/** Until a row has been measured, and with no `@virtual(n)`: a guess that renders a few rows. */
-const DEFAULT_ESTIMATE = 40;
-
-/** Roles whose items carry `aria-setsize` and `aria-posinset`. */
-const SET_ROLES = new Set(['list', 'listbox', 'tree']);
-/** Roles whose rows carry `aria-rowindex`, the role's element `aria-rowcount`. */
-const ROW_ROLES = new Set(['grid', 'treegrid', 'table']);
-/** The composite roles: the list owns a roving tabindex and the arrow keys. */
-const KEY_ROLES = new Set(['listbox', 'tree', 'grid', 'treegrid']);
 /** What Tab can reach in a row. */
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
 
@@ -74,16 +63,10 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), selec
  * `role`, else the implicit role of a `ul`/`ol` (list) or a table (table, from a `tbody` too).
  */
 function roleOf(container: HTMLElement): { role: string | null; roleEl: HTMLElement | null } {
-    const explicit = container.getAttribute('role');
-    if (explicit) return { role: explicit, roleEl: container };
-    const tag = container.localName;
-    if (tag === 'ul' || tag === 'ol') return { role: 'list', roleEl: container };
-    if (tag === 'table') return { role: 'table', roleEl: container };
-    if (tag === 'tbody' || tag === 'thead' || tag === 'tfoot') {
-        const table = container.closest('table');
-        if (table) return { role: table.getAttribute('role') ?? 'table', roleEl: table };
-    }
-    return { role: null, roleEl: null };
+    const table = container.closest('table');
+    const role = implicitRole(container.localName, container.getAttribute('role'), () => (table ? table.getAttribute('role') : undefined));
+    const inTable = !container.getAttribute('role') && ['tbody', 'thead', 'tfoot'].includes(container.localName);
+    return { role, roleEl: role === null ? null : (inTable ? table : container) };
 }
 
 /**
@@ -97,6 +80,8 @@ export function eachVirtual<T>(
     options: VirtualListOptions = {},
 ): DocumentFragment {
     const keyFn = typeof key === 'string' ? (item: T) => (item as Record<string, unknown>)[key] : key;
+    // Rendered to a string or hydrating (#930): the call, for the block visitor that writes or adopts it.
+    if (isDeferring()) return deferredBlock((v) => v.virtual<T>({ items, keyFn, render, options }));
     const tag = options.tag ?? 'div';
     const frag = document.createDocumentFragment();
     const start = document.createComment('virtual');
@@ -137,18 +122,7 @@ export function eachVirtual<T>(
         const value = items();
         return isPaged<T>(value) ? value : null;
     };
-    const list = (): T[] => {
-        const value = items();
-        if (isPaged<T>(value)) return value.data() ?? [];
-        return Array.isArray(value) ? value : [];
-    };
-    /** The size of the set: the array's length; a source's total, or -1 (unknown) while it has more. */
-    const setSize = (data: T[], paged: PagedSource<T> | null): number => {
-        if (!paged) return data.length;
-        const total = paged.total?.() ?? 0;
-        if (total > 0) return total;
-        return paged.hasMore() ? -1 : data.length;
-    };
+    const list = (): T[] => listOf(items());
 
     let estimate = options.estimate;
     const virt = createVirtualizer({
@@ -196,13 +170,7 @@ export function eachVirtual<T>(
 
     /** What a rendered row says about itself, by the container's role (#284). */
     function describe(node: HTMLElement, index: number, size: number, rowsBefore: number, tabStop: number): void {
-        if (role && SET_ROLES.has(role)) {
-            node.setAttribute('aria-setsize', String(size));
-            node.setAttribute('aria-posinset', String(index + 1));
-        } else if (role && ROW_ROLES.has(role)) {
-            node.setAttribute('aria-rowindex', String(index + 1 + rowsBefore));
-        }
-        if (role && KEY_ROLES.has(role)) node.tabIndex = index === tabStop ? 0 : -1;
+        for (const [name, value] of Object.entries(rowAttributes(role, index, size, rowsBefore, tabStop))) node.setAttribute(name, value);
     }
 
     /**

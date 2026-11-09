@@ -10,6 +10,7 @@ import { errorBoundary } from '../renderer/error-boundary';
 import { snippetContent } from '../renderer/snippet';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { serverBlock, serverElement, type ServerBlock } from './mode';
+import { serverVirtual } from './virtual';
 
 /** The triggers that fire later: the others — `immediate`, and a trigger unknown — fire at once. */
 const LATER_TRIGGER = /^(viewport|interaction|idle(\(\d+\))?|timer\(\d+\))$/;
@@ -40,6 +41,9 @@ export const serverBlocks: BlockVisitor<ServerBlock> = {
     list: (items, _keyFn, renderer) => serverBlock('repeat-start', 'repeat-end', () => items().map((item, i) => renderer.mode === 'getters'
         ? renderer.render(() => item, () => i)
         : renderer.render(item, i)), DEV ? { item: true, hidden: false } : null),
+
+    /** A virtual list: the first window of rows and the spacers around it (server/virtual.ts). */
+    virtual: (call) => serverVirtual(call),
 
     /** The content as the client mounts it: its trigger says when the client takes it over, not what it is. */
     hydrateOn: (_options, renderFn) => serverBlock('hydrate', '/hydrate', () => [renderFn()]),
