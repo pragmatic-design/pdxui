@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PDX ssg virtual</title>
+    <!--
+      The pages' styles are here, not in a <style scoped> of each page: a generated page does not carry
+      its route's stylesheet yet, and paints without it (#966). Here the first paint has them, so what
+      is measured is the list (#930), not the missing stylesheet.
+    -->
+    <style>
+      html, body { margin: 0; font: 16px/1.25 system-ui, sans-serif; }
+      h1 { height: 72px; margin: 0; box-sizing: border-box; padding: 16px; font-size: 24px; }
+      .list { height: calc(100vh - 72px); overflow: auto; margin: 0; padding: 0; list-style: none; }
+      .row { height: 32px; box-sizing: border-box; padding: 6px 16px; border-bottom: 1px solid #ddd; }
+    </style>
+  </head>
+  <body>
+    <pdx-router-outlet></pdx-router-outlet>
+    <script type="module" src="./src/main.js"></script>
+  </body>
+</html>

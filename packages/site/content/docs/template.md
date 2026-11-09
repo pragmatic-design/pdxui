@@ -306,9 +306,9 @@ The collection can also be a `DataSource`: the list renders its `data()`, and wh
 scrolls into view, it calls `loadMore()` once while `hasMore()` is true. `@empty` shows for an empty
 list, and for a source that has no data and is not loading.
 
-**On a page generated at build time**, the server has no screen to measure, so it writes the first 20
-rows and a spacer for the rest; the page hydrates keeping them. `@virtual(64, serverRows: 40)` writes
-40 instead, `serverRows: 0` none.
+**On a page generated at build time**, the server has no screen to measure, so it writes the first 40
+rows, enough to fill a phone's or a laptop's first screen, and a spacer for the rest; the page hydrates
+keeping them. `@virtual(64, serverRows: 60)` writes 60 instead, `serverRows: 0` none.
 
 The shape is checked. The `@for` must be the only content of a native element (a component's
 children are projected elsewhere), and each row must be one element. Anything else is

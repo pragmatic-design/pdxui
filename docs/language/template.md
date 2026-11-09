@@ -1042,8 +1042,9 @@ when its size changes. The collection may be an array or a `DataSource`: of a so
 rendered, and when its last row is in view, `hasMore()` is true and no load runs, `loadMore()` is
 called once. `@empty` is the list's own: it renders for an empty array, or a source with no data that
 is not loading. `serverRows: n` (#930) is how many rows a page rendered on the server writes, from the
-first: the server has no layout to measure, so its window is a count, 20 without the option
-([server.md](server.md)). It does not change what the client renders.
+first: the server has no layout to measure, so its window is a count, 40 without the option — measured
+to fill a phone's and a laptop's first screen of 32 px rows ([server.md](server.md)). It does not change
+what the client renders.
 
 What a virtual list says to assistive technology follows the container's role (#284): its `role`, or
 the implicit role of a `ul`/`ol` (`list`) or a table (`table`, read from a `tbody` too).
