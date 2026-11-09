@@ -236,9 +236,12 @@ page the name is then the source, and the route still registers the function.
 The loader also gets a module of its own, `virtual:pdx-loader/<tag>`: its declaration, the script
 imports it reads, its types erased. The route table imports that module, and a navigation starts it
 together with the chunk of every level of the match; a level is shown when its loader and its chunk
-have both settled (#119). A loader that reads a name the script declares beside it — a constant, a
-helper, a rune — is not moved: its module exports `null`, and the route table imports the page to
-reach it, as before. A link that prefetches its route under the `hover` or `viewport` policy starts
+have both settled (#119). The module holds what the lifted loader can reach in its page: the page
+module's scope, which is the script's imports and `@page`'s `label` function. A loader that reads that
+label function is not moved: its module exports `null`, and the route table imports the page to reach
+it, as before. Nothing else keeps it there. A name in a type annotation is not a read, and the rest of
+the script lives in the component's setup, which the lifted loader cannot read in its page either
+(#974). A link that prefetches its route under the `hover` or `viewport` policy starts
 the loader too, once every guard of the route has allowed it; the result is kept for ten seconds
 under the route's pattern, its own params and its query in a canonical order, and a navigation with
 the same key takes it instead of calling the loader. The prefetched call gets the same context, with

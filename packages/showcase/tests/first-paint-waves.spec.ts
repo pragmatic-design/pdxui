@@ -221,6 +221,36 @@ test('a navigation to a route with a loader fetches its chunk and its data in tw
         .toBeLessThanOrEqual(2);
 });
 
+test('the record\'s request does not wait for the page\'s chunk: the loader has a module of its own (#119, #974)', async ({ page }) => {
+    // The count above depends on the runner: on a busy one the page chunk, queued as a prefetch, starts
+    // late, and a navigation whose loader needs that chunk reads three waves (#974). What it rests on
+    // does not: the loader's module, `app-ticket-*` after the page's tag, is all the record needs. Every
+    // other script is held SLOW ms; the record has to be asked for long before they are in. With the
+    // loader kept in the page — its module exporting null — it is asked for after them.
+    const SLOW = 2000;
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.route(/\.js(\?|$)/, async (route) => {
+        if (!/\/app-ticket-[^/]*\.js/.test(route.request().url())) await new Promise((r) => setTimeout(r, SLOW));
+        await route.fallback();
+    });
+    const record = page.waitForRequest(/\/api\/tickets\/1$/, { timeout: SLOW * 4 });
+    const t0 = await page.evaluate(() => {
+        performance.clearResourceTimings();
+        const now = performance.now();
+        history.pushState(null, '', '/tickets/1');
+        dispatchEvent(new PopStateEvent('popstate'));
+        return now;
+    });
+    await record;
+    const entries = await page.evaluate(() => (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+        .map((e) => ({ file: e.name.split('/').pop()!, start: e.startTime })));
+    const loaderModule = entries.find((e) => /^app-ticket-/.test(e.file));
+    const data = entries.find((e) => e.file === '1');
+    expect(loaderModule, `the loader's module was not fetched: ${entries.map((e) => e.file).join(', ')}`).toBeDefined();
+    expect(data!.start - t0, `the record was asked for ${Math.round(data!.start - t0)} ms into the navigation, behind the page's chunk held ${SLOW} ms`)
+        .toBeLessThan(SLOW / 2);
+});
+
 test('the built page names the landing route chunk before the browser asks for it', () => {
     const links = preloads();
     expect(links.length, 'dist/index.html has no modulepreload: the first screen is found one '
