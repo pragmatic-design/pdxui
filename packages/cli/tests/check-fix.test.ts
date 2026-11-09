@@ -39,7 +39,12 @@ const TWO_COUNTS = [
     '',
 ].join('\n');
 
-describe('pdx check --fix and --json', () => {
+// Each case below runs a whole `pdx check` over a project: held to the time a command takes, as the agent
+// loop's last case is (#953, #972). Measured 2026-11-09, 10 runs each: 16–95 ms alone, 21–113 ms with core's
+// suite beside it, against vitest's default 5 s that a case of check-command.test.ts ran out of in the gate.
+const COMMAND = { timeout: 60_000 };
+
+describe('pdx check --fix and --json', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
@@ -135,7 +140,7 @@ describe('pdx check --fix and --json', () => {
 });
 
 // The loop an agent runs — check, fix, check — on one instance of each common mistake.
-describe('the agent loop: check --json --fix, then check --json', () => {
+describe('the agent loop: check --json --fix, then check --json', COMMAND, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;

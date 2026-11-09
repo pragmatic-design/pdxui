@@ -69,7 +69,9 @@ describe('pdx check --types', () => {
         const { findings } = await check(false);
         expect(findings.filter(f => f.code === 'PDX_TS')).toEqual([]);
         expect(exitSpy).not.toHaveBeenCalledWith(1);
-    });
+        // A whole `pdx check`, like the cases around it (#972). Measured 2026-11-09, 10 runs: 22–37 ms
+        // alone, 29–50 ms with core's suite beside it.
+    }, 60_000);
 
     // The editor opens every showcase .pdx and finds no type error (packages/lsp/tests/
     // showcase-sweep). The check and the editor must not disagree: same projection, same

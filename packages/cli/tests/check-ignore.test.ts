@@ -13,7 +13,9 @@ interface Report {
     summary: { ignored: number; warnings: number };
 }
 
-describe('pdx check honours pdx-ignore', () => {
+// Each case runs a whole `pdx check` over a project: held to the time a command takes (#972). Measured
+// 2026-11-09, 10 runs each: 18–76 ms alone, 26–94 ms with core's suite beside it.
+describe('pdx check honours pdx-ignore', { timeout: 60_000 }, () => {
     let root: string;
     let prevCwd: string;
     let exitSpy: ReturnType<typeof vi.spyOn>;
