@@ -109,12 +109,16 @@ Declares a prop: an attribute-synced signal on the element, with TypeScript's ru
 
 It becomes an entry of the component's `props` object, `name: { type: T, default: d }`, where `T`
 is `String`, `Number` or `Boolean` for `string`, `number`, `boolean`, `Array` for a type ending in
-`[]`, and `Object` for every other type (unions included); the default is emitted as written, except
+`[]`, and `Object` for every other type. A union, `null` and `undefined` aside, takes the kind its
+members share (#960): `'top' | 'bottom'` is a `String`, `1 | number` a `Number`, `true | false` a
+`Boolean`; a union of kinds, or with a member that is none of these (`Favourites | null`), is an
+`Object`. A `String`, `Number` or `Boolean` prop reads its attribute, kebab-case or not; an `Object`
+prop is a property only. The default is emitted as written, except
 an array or object literal for an `Array` or `Object` prop, which is emitted as a factory,
 `default: () => ([])`, so that each instance gets its own (#677); and a
 required prop carries `required: true`, which core reports in development when the host does not
 set it. A prop with no default that is absent holds the empty value of `T`: `''`, `0`, `false`,
-`[]`, or `null` for `Object`. Where the setup reads the name, it declares `const name = ctx.name;`
+`[]`, or `null` for `Object` — and `null` when its type says `null` (`'top' | 'bottom' | null`). Where the setup reads the name, it declares `const name = ctx.name;`
 and the rewrite turns each read into `name()`; in a `$signal` or `$store` initialiser the read is
 `ctx.name.peek()`, the value at setup time. The `.d.ts` gets `name: Type` for a required prop and
 `name?: Type` for the others. The descriptor's builders are `prop.required<T>()`, `prop<T>(d)` and
@@ -203,8 +207,8 @@ component's `models`.
 - `{ attribute: string }` (#753) says how the attribute is read — `string`, `number`, `boolean` or
   `json` — apart from the type: it is the descriptor entry's `type`, `String`, `Number`, `Boolean` or
   `Object`, and the `.d.ts` keeps the type as written. Without it the reading is derived from the type,
-  as for a `@prop`: `string` is a string, `number` a number, `boolean` a boolean, an array or anything
-  else JSON. The options are comma-separated, in any order, beside `form`. Another word is
+  as for a `@prop`: `string` is a string, `number` a number, `boolean` a boolean, a union of one kind
+  that kind (`'view' | 'edit'` a string, #960), an array or anything else JSON. The options are comma-separated, in any order, beside `form`. Another word is
   `PDX_MODEL_ATTRIBUTE_UNKNOWN` (error).
 - A model whose type unites values whose attribute is read differently — two or more of a string, a
   number, a boolean and an array of them, `null` and `undefined` aside, as `string | string[] | null` —

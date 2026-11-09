@@ -87,7 +87,7 @@ function splitTopLevel(body: string): string[] {
 }
 
 /** How the attribute of a value of this member type is read: String, Number, Boolean, Array, or null for another. */
-function readingOf(member: string): string | null {
+export function readingOf(member: string): string | null {
     const m = member.trim();
     if (m === 'string' || /^(['"`]).*\1$/.test(m)) return 'String';
     if (m === 'number' || /^-?\d+(\.\d+)?$/.test(m)) return 'Number';
@@ -112,7 +112,7 @@ export function attributeReadingIsAmbiguous(tsType: string): boolean {
 }
 
 /** `tsType` split at its top-level `|`. */
-function splitUnion(tsType: string): string[] {
+export function splitUnion(tsType: string): string[] {
     const out: string[] = [];
     let depth = 0;
     let from = 0;

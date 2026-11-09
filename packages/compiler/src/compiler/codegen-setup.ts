@@ -15,6 +15,7 @@ import { originMark } from './sourcemap';
 import { maskNonCode } from './tokenizer';
 import { jsQuote, jsString } from './js-literal';
 import { formRuleNames, CORE_FORM_RULES } from './form-rules';
+import { splitUnion } from './model-options';
 
 // ─── Public API ────────────────────────────────────────────────────
 
@@ -30,14 +31,18 @@ export const PROP_BUILDER = 'prop';
  * runtime type always written, so the coercion is the one the analyser chose and never an inference.
  * The caller imports `prop` (see codegen-new) when there is any.
  */
-export function buildPropsObject(props: { name: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
+export function buildPropsObject(props: { name: string; tsType?: string; runtimeType: string; default?: string; required?: true; form?: true }[]): string {
     if (props.length === 0) return '{}';
     const entries = props.map(p => {
         const type = `{ type: ${p.runtimeType} }`;
         // Core reports a required prop the host did not set, in development (#123, #130).
         const spec = p.required ? `${PROP_BUILDER}.required(${type})`
             : p.default !== undefined ? `${PROP_BUILDER}(${defaultEntry(p.runtimeType, p.default)}, ${type})`
-            : `${PROP_BUILDER}.optional(${type})`;
+            // Absent, a prop whose type says `null` holds null, not its kind's empty value (#960):
+            // `'top' | 'bottom' | null` is a String now, and '' is not a value its type allows.
+            : p.runtimeType !== 'Object' && p.tsType !== undefined && splitUnion(p.tsType).includes('null')
+                ? `${PROP_BUILDER}(null, ${type})`
+                : `${PROP_BUILDER}.optional(${type})`;
         // A model `{ form }` (#135) carries core's form wiring, as `model(d, { form: true })` does: the
         // caller imports `wireFormModel` (see codegen-new), and an app without one does not carry it.
         return `    ${p.name}: ${p.form ? `{ ...${spec}, form: wireFormModel }` : spec}`;
