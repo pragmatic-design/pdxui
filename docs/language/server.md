@@ -40,7 +40,8 @@ with no second render and no external dependency.
   container at once and keeps the server's rows its first window holds, by key — all of them in a window
   that starts at 0, as a page that has not scrolled — builds the ones it holds that the server did not
   write, and lets the others go; an adopted `@empty` stays until rows come. The number of rows the server writes is
-  `VirtualListOptions.serverRows`, 20 when it is not set.
+  `@virtual(…, serverRows: n)` in a template, `VirtualListOptions.serverRows` by hand, 20 when it is
+  not set.
 - `pdx build --ssg` renders every `@page` route without dynamic parameters, plus the paths listed in
   `pdx.config`'s `ssg.routes`, to `dist/<route>/index.html`. Each page is the built `index.html` with
   the route's content in its body, and its `@title` and `@meta` in its head.

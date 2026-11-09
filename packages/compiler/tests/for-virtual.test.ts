@@ -32,6 +32,21 @@ describe('the grammar', () => {
         expect(() => parseTemplate('@for (xs as x; track x) @virtual(0) { <li></li> }')).toThrow(/estimated row size in px/);
         expect(() => parseTemplate('@for (xs as x; track x) @virtual(big) { <li></li> }')).toThrow(/estimated row size in px/);
     });
+
+    // #930: how many rows the server writes, a named option after the estimate (owner, 2026-11-09).
+    it('reads serverRows, after the estimate or alone', () => {
+        const [both] = parseTemplate('@for (xs as x; track x) @virtual(48, serverRows: 30) { <li>{{ x }}</li> }');
+        const [alone] = parseTemplate('@for (xs as x; track x) @virtual(serverRows: 0) { <li>{{ x }}</li> }');
+        expect((both as { virtual?: unknown }).virtual).toEqual({ estimate: 48, serverRows: 30 });
+        expect((alone as { virtual?: unknown }).virtual).toEqual({ serverRows: 0 });
+    });
+
+    it('serverRows takes a whole number of rows from 0; another name is not an option of @virtual', () => {
+        expect(() => parseTemplate('@for (xs as x; track x) @virtual(48, serverRows: 2.5) { <li></li> }')).toThrow(/serverRows is a whole number of rows/);
+        expect(() => parseTemplate('@for (xs as x; track x) @virtual(48, serverRows: -1) { <li></li> }')).toThrow(/serverRows is a whole number of rows/);
+        expect(() => parseTemplate('@for (xs as x; track x) @virtual(48, rows: 3) { <li></li> }')).toThrow(/'rows' is not an option of @virtual/);
+        expect(() => parseTemplate('@for (xs as x; track x) @virtual(serverRows: 3, 48) { <li></li> }')).toThrow(/estimated row size in px/);
+    });
 });
 
 describe('it compiles to eachVirtual', () => {
@@ -44,6 +59,12 @@ describe('it compiles to eachVirtual', () => {
         expect(code).toMatch(/estimate:\s*64/);
         expect(code).toMatch(/tag:\s*"li"/);
         expect(code, 'a virtual @for still renders every row through eachRow').not.toMatch(/eachRow\(/);
+    });
+
+    it('serverRows goes to eachVirtual\'s options; without it, none is written', () => {
+        const { code } = compile(sfc('<ul>@for (posts as p; track p.id) @virtual(64, serverRows: 30) { <li>{{ p.title }}</li> }</ul>'), 'feed.pdx');
+        expect(code).toMatch(/serverRows:\s*30/);
+        expect(compile(sfc(feed), 'feed.pdx').code).not.toMatch(/serverRows/);
     });
 
     it('@empty is the list\'s, through eachVirtual — not a when() around it', () => {

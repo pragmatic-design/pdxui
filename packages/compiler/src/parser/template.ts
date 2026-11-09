@@ -115,8 +115,9 @@ export interface ForNode {
     /**
      * `@virtual` / `@virtual(48)` (#283): only the rows in view are rendered. `estimate` is the
      * number written, the estimated row size in px; without one the first rendered row is measured.
+     * `serverRows` is how many rows the server writes (`@virtual(48, serverRows: 30)`, #930).
      */
-    virtual?: { estimate?: number };
+    virtual?: { estimate?: number; serverRows?: number };
     loc?: SourceLoc;
 }
 
@@ -814,18 +815,40 @@ function parseFor(ctx: ParseContext, loc: SourceLoc): ForNode {
     return { type: 'for', items: items.trim(), exprOffset, item, index: indexVar, track: track.trim(), body, emptyBody, transition, ...(virtual ? { virtual } : {}), loc };
 }
 
-/** `@virtual` or `@virtual(48)`, after a `@for` header and its transition modifiers (#283). */
-function tryParseVirtual(ctx: ParseContext): { estimate?: number } | undefined {
+/**
+ * `@virtual`, `@virtual(48)`, `@virtual(48, serverRows: 30)` or `@virtual(serverRows: 30)`, after a
+ * `@for` header and its transition modifiers (#283). The number is the estimated row size in px; the
+ * named options follow it (#930).
+ */
+function tryParseVirtual(ctx: ParseContext): { estimate?: number; serverRows?: number } | undefined {
     if (!lookAhead(ctx, '@virtual')) return undefined;
     advance(ctx, 8); // skip @virtual
     skipWhitespace(ctx);
     if (ctx.source[ctx.pos] !== '(') return {};
     const raw = parseParenthesized(ctx).trim();
-    const n = Number(raw);
-    if (raw === '' || !Number.isFinite(n) || n <= 0) {
-        throw new Error(`Invalid @virtual(${raw}) at line ${ctx.line}: the number is the estimated row size in px, e.g. @virtual(48). Write @virtual alone to measure the first row.`);
-    }
-    return { estimate: n };
+    const out: { estimate?: number; serverRows?: number } = {};
+    raw.split(',').map((p) => p.trim()).forEach((part, i) => {
+        // Match: `name: value`, a named option. Groups: [1]=name [2]=value
+        const named = /^([A-Za-z_$][\w$]*)\s*:\s*(.*)$/.exec(part);
+        if (!named) {
+            const n = Number(part);
+            if (i > 0 || part === '' || !Number.isFinite(n) || n <= 0) {
+                throw new Error(`Invalid @virtual(${raw}) at line ${ctx.line}: the number is the estimated row size in px, first, e.g. @virtual(48). Write @virtual alone to measure the first row.`);
+            }
+            out.estimate = n;
+            return;
+        }
+        const [, name, value] = named;
+        if (name !== 'serverRows') {
+            throw new Error(`Invalid @virtual(${raw}) at line ${ctx.line}: '${name}' is not an option of @virtual. Its option is serverRows, the rows the server writes: @virtual(48, serverRows: 30).`);
+        }
+        const rows = Number(value);
+        if (value.trim() === '' || !Number.isInteger(rows) || rows < 0) {
+            throw new Error(`Invalid @virtual(${raw}) at line ${ctx.line}: serverRows is a whole number of rows from 0, the rows the server writes, e.g. @virtual(48, serverRows: 30).`);
+        }
+        out.serverRows = rows;
+    });
+    return out;
 }
 
 // ─── @switch ───────────────────────────────────────────────────────
