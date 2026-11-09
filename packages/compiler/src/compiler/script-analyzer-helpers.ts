@@ -4,6 +4,7 @@
 import type { FormFieldDecl, HeadInfo, RouteInfo, RouteParamDecl, SearchParamDecl } from './script-analyzer-types';
 import { skipNonCode, findClosing, endsWithExpressionKeyword, splitAtDepthZero } from './tokenizer';
 import { routeParams } from '../text-scan';
+import { readingOf, splitUnion } from './model-options';
 
 // ─── Tokenizer-Based Type Extraction ─────────────────────────────
 
@@ -228,15 +229,25 @@ export function extractSearchBlock(trimmed: string): string | null {
 // ─── Helpers ───────────────────────────────────────────────────────
 
 /** Map a TypeScript type annotation to its runtime constructor name.
- *  'string' → 'String', 'number' → 'Number', 'Item[]' → 'Array', 'Foo' → 'Object' */
+ *  'string' → 'String', 'number' → 'Number', 'Item[]' → 'Array', 'Foo' → 'Object'.
+ *  A union, `null` and `undefined` aside, takes the kind its members share (#960, the owner's rule):
+ *  `'top' | 'bottom'` → 'String', `1 | number` → 'Number'; members of different kinds, or one that is
+ *  no string, number, boolean or array of them, → 'Object'. */
 export function tsToRuntimeType(tsType: string): string {
-    const base = tsType.replace(/\[\]$/, '');
+    const members = splitUnion(tsType).filter((m) => m !== 'null' && m !== 'undefined');
+    if (members.length === 1) return singleRuntimeType(members[0]);
+    const readings = members.map((m) => readingOf(m));
+    return readings.length > 0 && readings.every((r) => r !== null && r === readings[0]) ? readings[0]! : 'Object';
+}
+
+/** One type, not a union: its runtime type, a string, number or boolean literal read as its kind. */
+function singleRuntimeType(tsType: string): string {
     if (tsType.endsWith('[]')) return 'Array';
-    switch (base.toLowerCase()) {
+    switch (tsType.toLowerCase()) {
         case 'string': return 'String';
         case 'number': return 'Number';
         case 'boolean': return 'Boolean';
-        default: return 'Object';
+        default: return readingOf(tsType) ?? 'Object';
     }
 }
 
