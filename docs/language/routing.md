@@ -287,6 +287,10 @@ its loaders' results.
 
 - A name no function of the script declares raises `PDX_LOADER_NOT_FOUND` (a warning); the route is
   registered without a loader.
+- A loader, or `@page`'s label function, that reads a name the component's setup declares — a prop,
+  a signal, a constant, a function of the script — raises `PDX_LOADER_READS_SETUP` (an error): both
+  run at module scope, where that name is not defined (#977). What it reads is measured with its types
+  erased and its scopes followed, so a name in an annotation, or another function's local, is not one.
 - An option other than `staleTime`, or a `staleTime` that is not a number of milliseconds the compiler
   reads, raises `PDX_LOADER_UNKNOWN_OPTION` (an error). The value goes into the route table, read
   before any page runs, so a name of the script cannot stand for it.

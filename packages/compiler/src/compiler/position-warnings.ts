@@ -264,6 +264,11 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             const loader = /^`@loader ([\w$]+)`/.exec(w.message)?.[1];
             return loader ? find(source, script, new RegExp(`@loader\\s+${escape(loader)}\\b`)) : undefined;
         }
+        case 'PDX_LOADER_READS_SETUP': {
+            // Match: "The loader `loadUser` reads …" — the function the message names, at its declaration.
+            const fn = /^The (?:loader|label function) `([\w$]+)`/.exec(w.message)?.[1];
+            return fn ? find(source, script, declarationOf(fn)) : undefined;
+        }
         case 'PDX_ACTION_UNKNOWN_OPTION':
         case 'PDX_AGENT_ACTION_UNBOUND': {
             // Match: "`@action save`: …" — the declaration the message names.
