@@ -65,6 +65,38 @@ export function isDeferredTemplate(value: unknown): value is DeferredTemplate {
 export interface BlockMark {
     readonly item: boolean;
     readonly hidden: boolean;
+    /**
+     * Attributes set on each top-level element, after its own, as the client sets them on a row it has
+     * built: a virtual list's row index and its place in the set (#930).
+     */
+    readonly attributes?: Readonly<Record<string, string>>;
+}
+
+/** An element whose children are being written, as a block inside it needs to know it. */
+export interface WrittenElement {
+    readonly tag: string;
+    /** Its `role` attribute, as written; null for none. */
+    readonly role: string | null;
+}
+
+const written: WrittenElement[] = [];
+
+/** Write `fn` as the children of `el`: `writtenElements()` has it last while it runs. */
+export function writingInside<T>(el: WrittenElement, fn: () => T): T {
+    written.push(el);
+    try {
+        return fn();
+    } finally {
+        written.pop();
+    }
+}
+
+/**
+ * The elements whose children are being written, outermost first: what a virtual list reads for the role
+ * of the element it is placed in, which on the client it reads from the DOM (#930).
+ */
+export function writtenElements(): readonly WrittenElement[] {
+    return written;
 }
 
 /**

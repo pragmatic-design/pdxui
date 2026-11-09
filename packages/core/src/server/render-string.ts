@@ -19,7 +19,7 @@ import { sanitizeUrlForTag } from '../security/sanitize-url';
 import { twoWayAccessor } from '../renderer/two-way-value';
 import { PH_EXTRACT, PH_REGEX } from '../renderer/template-plan';
 import { templateTree, VOID_ELEMENTS, type TreeNode, type TreeAttribute } from './template-tree';
-import { withServerRender, isDeferredTemplate, isServerBlock, isServerElement, type DeferredTemplate, type ServerBlock, type ServerElement, type BlockMark } from './mode';
+import { withServerRender, isDeferredTemplate, isServerBlock, isServerElement, writingInside, type DeferredTemplate, type ServerBlock, type ServerElement, type BlockMark } from './mode';
 import { renderHost, type SkippedComponent } from './render-component';
 import { serverBlocks } from './blocks';
 import { isDeferredBlock } from '../renderer/deferred-block';
@@ -126,7 +126,9 @@ function renderTemplate(t: DeferredTemplate, slots: Projection | null, mark: Blo
  * both items and hidden, as on the client.
  */
 function renderBlock(b: ServerBlock, slots: Projection | null, outer: BlockMark | null): string {
-    const mark = b.mark && outer ? { item: b.mark.item || outer.item, hidden: b.mark.hidden || outer.hidden } : (b.mark ?? outer);
+    const mark = b.mark && outer
+        ? { item: b.mark.item || outer.item, hidden: b.mark.hidden || outer.hidden, attributes: { ...outer.attributes, ...b.mark.attributes } }
+        : (b.mark ?? outer);
     const render = (parts: () => readonly unknown[]): string => {
         const [inner, dispose] = collectDisposers(() => untracked(() => parts().map((part) => content(part, slots, mark)).join('')));
         dispose();
@@ -157,6 +159,7 @@ const NO_CHILDREN: Projected = { default: '', named: new Map() };
  */
 function createdElement(e: ServerElement, mark: BlockMark | null): string {
     const attrs = new Map<string, string | null>(Object.entries(e.attributes));
+    for (const [name, value] of Object.entries(mark?.attributes ?? {})) attrs.set(name, value);
     if (mark?.item) attrs.set('data-pdx-item', '');
     if (mark?.hidden && e.tag !== 'svg' && e.tag !== 'math') attrs.set('style', joinStyle([attrs.get('style'), 'display: none;']));
     if (e.tag.includes('-')) {
@@ -272,6 +275,7 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     for (const a of n.attributes) attribute(s, a, values);
     // What the enclosing helper sets on a top-level element (list.ts `createRow`, helpers.ts `show`):
     // after the element's own bindings, as the client sets it after the template built the element.
+    for (const [name, value] of Object.entries(mark?.attributes ?? {})) s.attributes.set(name, value);
     if (mark?.item) s.attributes.set('data-pdx-item', '');
     if (mark?.hidden && n.name !== 'svg' && n.name !== 'math') s.style.push('display: none;');
     const attrs = new Map(s.attributes);
@@ -295,12 +299,16 @@ function element(n: ElementNode, values: readonly unknown[], slots: Projection |
     if (n.void) return open;
     let inner: string;
     if (s.text !== null) inner = escapeText(s.text);
-    else if (n.name === 'select' && s.selectValue !== null) {
-        // Its options — written by this template, through an <optgroup>, by a list — know the value.
-        const outer = selectValue;
-        selectValue = s.selectValue;
-        try { inner = nodes(n.children, values, slots); } finally { selectValue = outer; }
-    } else inner = nodes(n.children, values, slots);
+    else {
+        // A block among its children knows the element it is in: a virtual list reads its role.
+        inner = writingInside({ tag: n.name, role: attrs.get('role') ?? null }, () => {
+            if (n.name !== 'select' || s.selectValue === null) return nodes(n.children, values, slots);
+            // Its options — written by this template, through an <optgroup>, by a list — know the value.
+            const outer = selectValue;
+            selectValue = s.selectValue;
+            try { return nodes(n.children, values, slots); } finally { selectValue = outer; }
+        });
+    }
     return `${open}${inner}</${n.name}>`;
 }
 

@@ -31,6 +31,14 @@ with no second render and no external dependency.
   `@if` or `@for` is evaluated once; a `@defer` renders its `@placeholder` unless its trigger fires at
   once; an `@await` renders its `@loading` branch, except over a route's `@loader`, whose data the
   build has fetched (below).
+- A `@for … @virtual` has no layout to measure on the server, so it writes the window it starts at: its
+  first rows, between the two spacers the client places, the one after them sized for the rows not
+  written by the row estimate, so the page has the list's height (#930). With nothing to show it writes
+  `@empty`. Each row carries what the client's row says of itself (`aria-setsize` and `aria-posinset`
+  in a list, the roving `tabindex` under a composite role), except `aria-rowindex`: the header rows
+  around a table's list are not known while it is written. When it hydrates, the client builds the
+  list again in place of the server's window. The number of rows the server writes is
+  `VirtualListOptions.serverRows`, 20 when it is not set.
 - `pdx build --ssg` renders every `@page` route without dynamic parameters, plus the paths listed in
   `pdx.config`'s `ssg.routes`, to `dist/<route>/index.html`. Each page is the built `index.html` with
   the route's content in its body, and its `@title` and `@meta` in its head.

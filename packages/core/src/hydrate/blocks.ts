@@ -19,6 +19,7 @@ import { renderSnippet, followSnippet, snippetContent } from '../renderer/snippe
 import { dynamic, followDynamic } from '../renderer/dynamic';
 import type { BlockVisitor } from '../renderer/deferred-block';
 import { hydrateOn } from '../renderer/hydrate-on';
+import { eachVirtual } from '../renderer/virtual-list';
 import { withoutHydration, type Adopter } from './mode';
 import { takeOverLater } from './later';
 import { offerRange } from './compiled';
@@ -87,6 +88,10 @@ export const hydrationBlocks: BlockVisitor<BlockAdopt> = {
         followList(start, end, items, keyFn, renderer, options, { mapped, keys });
         return end.nextSibling;
     },
+
+    // A virtual list is built as the client builds it, in place of the server's window (#930): the window
+    // the client renders depends on its measured container.
+    virtual: (call) => built('virtual', '/virtual', () => eachVirtual(call.items, call.keyFn, call.render, call.options)),
 
     defer: (options, loadFn, renderFn) => (a, parent, at) => {
         const start = a.expect(at, 'defer');
@@ -167,6 +172,7 @@ export function builders(build: (node: Node) => Node): BlockVisitor<DocumentFrag
         match: (value, cases) => match(value, cases),
         show: (condition, content) => show(condition, build(content)),
         list: (items, keyFn, renderer, options) => mountList(items, keyFn, renderer, options),
+        virtual: (call) => eachVirtual(call.items, call.keyFn, call.render, call.options),
         defer: (options, loadFn, renderFn) => defer(options, loadFn, renderFn),
         await: (source, thenFn, loadingFn, errorFn, options) => awaitBlock(source, thenFn, loadingFn, errorFn, options),
         boundary: (contentFn, fallbackFn, options) => errorBoundary(contentFn, fallbackFn, options),
