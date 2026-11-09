@@ -156,7 +156,7 @@ import type { Option, Row, SourceElement } from './select-types';
 // The attribute is one value, a string (#753): the type says the rest.
 @model value: string | string[] | null = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
-@variants { size: { md, xs, sm, lg, xl } = md; }
+@variants { size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md; }
 @part root;
 // Its events: kebab-case names, declared quoted (#749), each dispatched by its camelCase function.
 @event 'pdx-open';

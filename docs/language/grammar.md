@@ -83,7 +83,8 @@ ExposeDecl     ::= "@expose" S Identifier ( S? "," S? Identifier )* End
 ProvideDecl    ::= "@provide" S Identifier S? "=" S? Expression End                                  (β #139: Identifier is a token — landed #496)
 InjectDecl     ::= "@inject" S Identifier S "from" S Identifier ( S? "=" S? Expression )? End         (β #139 — landed #496)
 VariantsDecl   ::= "@variants" S? "{" ( S? VariantAxis )+ S? "}"                                    (β #153)
-VariantAxis    ::= Identifier S? ":" S? "{" S? Word ( S? "," S? Word )* S? "}" ( S? "=" S? Word )? S? ";"
+VariantAxis    ::= Identifier S? ":" S? "{" S? VariantValue ( S? "," S? VariantValue )* S? "}" ( S? "=" S? Word )? S? ";"
+VariantValue   ::= Word ( S? ":" S? StringLiteral )?                                                (β #986: every value of an axis names its native selector, or none does)
 TagDecl        ::= "@tag" S StringLiteral End
 ```
 

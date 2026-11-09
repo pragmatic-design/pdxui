@@ -963,7 +963,8 @@ export function compile(
     // What the styles say that the browser will not read.
     allWarnings.push(...validateStyles(descriptor.styles ?? [], source));
     // The variants the script declares against the @variant rules the styles write (#153).
-    allWarnings.push(...validateVariants(cachedAnalysis?.variants, descriptor.styles ?? [], source));
+    // A library component's values are styled by @pdxui/design's rules too (#986).
+    allWarnings.push(...validateVariants(cachedAnalysis?.variants, descriptor.styles ?? [], source, cachedAnalysis?.customTag ?? tag));
     // The component-design rules one file can decide: CD-A1, A2, D3, C2.
     allWarnings.push(...validateDesign(descriptor, cachedAnalysis, source));
     // A name declared twice by runes or @prop: the output would keep one of them in silence.

@@ -204,7 +204,10 @@ with `@variant` (CD-C1, below).
 ```
 
 An axis of two words, `connectorStyle`, is reflected as `connector-style="dashed"` and named so in a
-rule: `@variant connector-style(dashed)`.
+rule: `@variant connector-style(dashed)`. A value outside the axis is reflected as the default, as on
+the library's components. A value may also name the selector that draws the same look on native
+markup, `size: { md: '.pdx-input-md', sm: '.pdx-input-sm' } = md;`: every value names one, or none
+does. The library's components write it so; an application rarely needs it.
 
 ### CD-A2 — A component does not write its own props, except as the user's input
 

@@ -11,7 +11,7 @@ import type {
     ScriptSnippet, ActionInfo,
 } from './script-analyzer-types';
 import { parseHostBlock } from './host-block';
-import { parseVariantsBlock, variantProps, variantHostAttrs, type VariantAxis } from './variants';
+import { parseVariantsBlock, variantProps, type VariantAxis } from './variants';
 import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './tag-prefix';
 import {
     tsToRuntimeType, extractCallBody, splitWatchArgs, extractBlock,
@@ -749,14 +749,15 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         }
 
         // ─── @variants { axis: { a, b } = a; … } — the component's variants (#153) ───
-        // Each axis is a prop typed with its values, reflected on the host as an attribute.
+        // Each axis is a prop typed with its values, reflected on the host as an attribute: the
+        // descriptor declares the axes under `variants` and core does both (#986). The props stay in the
+        // analysis for the types, marked `variant`.
         // Match: `@variants {` or `@variants{`, the block possibly spread over several lines.
         if (/^@variants\s*\{/.test(trimmed)) {
             const block = extractBlock(lines, i);
             const read = parseVariantsBlock(block.content);
             variants.push(...read.axes);
             props.push(...variantProps(read.axes));
-            host = [...(host ?? []), ...variantHostAttrs(read.axes)];
             for (const error of read.errors) {
                 warnings.push({
                     code: 'PDX_VARIANTS_MALFORMED',

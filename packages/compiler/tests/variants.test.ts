@@ -36,19 +36,20 @@ describe('@variants in the script', () => {
         expect(parseVariantsBlock('@variants { size = big; }').errors).toEqual(["'size = big;' is not an axis"]);
     });
 
-    it('generates a prop per axis, typed with its values and defaulting to its default', () => {
+    it('types a prop per axis with its values and its default, marked as an axis (#986)', () => {
         const analysis = analyzeScript(VARIANTS, 'btn.pdx');
         expect(analysis.props).toEqual([
-            { name: 'variant', tsType: "'primary' | 'ghost' | 'danger'", runtimeType: 'String', default: "'primary'" },
-            { name: 'size', tsType: "'sm' | 'md' | 'lg'", runtimeType: 'String', default: "'md'" },
+            { name: 'variant', tsType: "'primary' | 'ghost' | 'danger'", runtimeType: 'String', default: "'primary'", variant: true },
+            { name: 'size', tsType: "'sm' | 'md' | 'lg'", runtimeType: 'String', default: "'md'", variant: true },
         ]);
         expect(generateDts({ tag: 'app-btn', props: analysis.props, events: [], slots: [] })).toContain("variant?: 'primary' | 'ghost' | 'danger';");
     });
 
-    it('reflects each axis on the host as an attribute', () => {
+    it('declares the axes under the descriptor\'s variants, which core reflects on the host (#986)', () => {
+        // The reflection itself is core's, measured on a compiled component in core/tests/pdx-variants.test.ts.
         const { code } = compile(file(VARIANTS, STYLED), 'btn.pdx');
-        expect(code).toContain(`':variant': (ctx) => ctx.variant()`);
-        expect(code).toContain(`':size': (ctx) => ctx.size()`);
+        expect(code).toContain('variants: { variant: ["primary", "ghost", "danger"], size: ["md", "sm", "lg"] },');
+        expect(code).not.toContain("':variant'");
     });
 
     it('a malformed block is PDX_VARIANTS_MALFORMED, naming what it could not read', () => {
@@ -102,9 +103,10 @@ describe('an axis of two words', () => {
     const TWO = '@variants {\n  connectorStyle: { solid, dashed } = solid;\n}';
     const RULE = '@variant connector-style(dashed) { [data-part="root"] { border-style: dashed; } }';
 
-    it('is reflected under its kebab attribute', () => {
+    it('is declared under its camelCase name, which core reflects under its kebab attribute (#986)', () => {
+        // core/tests/pdx-variants.test.ts measures `connector-style="dashed"` on a compiled host.
         const { code } = compile(file(TWO, RULE), 'btn.pdx');
-        expect(code).toContain(`':connector-style': (ctx) => ctx.connectorStyle()`);
+        expect(code).toContain('variants: { connectorStyle: ["solid", "dashed"] },');
     });
 
     it('a rule naming it in kebab-case compiles to that attribute and reports nothing', () => {

@@ -19,6 +19,7 @@ import { delegatedEventTypes } from './inline-event-delegation';
 import { assembleModule, detectDeadSignals, extractTag, renderReturnIndex } from './codegen-shared';
 import { jsQuote } from './js-literal';
 import { coreRuleImports } from './form-rules';
+import { variantsDescriptor } from './variants';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -165,8 +166,10 @@ export function compileNewMode(
 
     const tag = analysis.customTag ?? extractTag(filename, ctx.tagPrefix);
 
-    // A `@model` is a prop the component writes (#124): the descriptor declares it under `models`.
-    const propsCode = buildPropsObject(analysis.props.filter(p => !p.model));
+    // A `@model` is a prop the component writes (#124): the descriptor declares it under `models`. An
+    // `@variants` axis is declared under `variants`, which core makes a prop reflected on the host (#986).
+    const propsCode = buildPropsObject(analysis.props.filter(p => !p.model && !p.variant));
+    const variantsCode = analysis.variants && analysis.variants.length > 0 ? variantsDescriptor(analysis.variants) : '';
     const models = analysis.props.filter(p => p.model);
     const modelsCode = models.length > 0 ? buildPropsObject(models) : '';
     // A model `{ form }` (#135) names core's form wiring in its entry.
@@ -248,7 +251,8 @@ export function compileNewMode(
         ctx.target,
         typedSlots,
         ctx.ssr,
-        analysis.hydrate ?? '');
+        analysis.hydrate ?? '',
+        variantsCode);
 }
 
 /** Compile a @store .pdx file into a global store module (no component). */
