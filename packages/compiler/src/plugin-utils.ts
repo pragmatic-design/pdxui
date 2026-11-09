@@ -129,6 +129,96 @@ export function scanForStores(rootDir: string, registry: Map<string, string>): v
     scan(rootDir);
 }
 
+/**
+ * Whether scanForRoutes(`rootDir`) reads `file`: a `.pdx` under it, no deeper than its scan goes, and in
+ * no directory it skips (`node_modules`, `dist`, a dot directory). What a re-read of one saved file
+ * checks first, so that it adds only what the whole scan would (#961).
+ */
+export function isScannedFile(rootDir: string, file: string): boolean {
+    const rel = relative(rootDir, file).replace(/\\/g, '/');
+    if (rel === '' || rel.startsWith('../') || rel.includes(':') || !rel.endsWith('.pdx')) return false;
+    const dirs = rel.split('/').slice(0, -1);
+    // scanForRoutes stops below depth 5: a file five directories down is read, one six down is not.
+    if (dirs.length > 5) return false;
+    return !dirs.some((d) => d === 'node_modules' || d === 'dist' || d.startsWith('.'));
+}
+
+/**
+ * The routes one `.pdx` declares, pushed onto `routes`: what scanForRoutes reads of each file, and what
+ * the dev server re-reads of a page that was saved, rather than the whole tree (#961).
+ */
+export function scanRouteFile(fullPath: string, routes: ScannedRoute[],
+    knowsTag?: (tag: string) => boolean, defaultLayout?: string, prefix: string = DEFAULT_TAG_PREFIX): void {
+    const content = readFileSync(fullPath, 'utf-8');
+    if (!/^[ \t]*@page[ \t]/m.test(content)) return;
+
+    // THE REAL ANALYSER, not a second set of regexes.
+    //
+    // A scan that re-reads each declaration itself — `@page` with one pattern,
+    // `@guard` with another, `@loader` with a third — drifts: every field the
+    // codegen emits and the scan does not is a route that behaves differently in
+    // a production build than in dev, silently. The scan needs EVERY field the
+    // outlet reads, so it does not guess and calls what the compiler calls.
+    const descriptor = parseSFC(content);
+    // A file with no `<script>` block is read WHOLE: a `.pdx` that is nothing but
+    // directives is what several of this scanner's own tests write.
+    const script = descriptor.script;
+    const analysis = analyzeScript(script?.content ?? content, normalizePath(fullPath));
+    const route = analysis.route;
+    if (!route.page) return;
+
+    const tag = analysis.customTag ?? deriveTag(normalizePath(fullPath), prefix);
+    // Every path this component answers to, in declaration order — the analyser
+    // puts the first in `page` and the rest in `aliases`, and the codegen registers
+    // one route per alias. A scan that produced fewer is a production build with
+    // fewer routes than the dev server.
+    const paths = [route.page, ...(route.aliases ?? [])];
+
+    for (const path of paths) {
+        routes.push({
+            path,
+            file: normalizePath(fullPath),
+            tag,
+            guard: route.guard,
+            redirect: route.redirectTo,
+            redirects: route.redirects,
+            meta: route.meta,
+            loader: route.loader,
+            loaderStaleTime: route.loaderStaleTime,
+            // The outlet reads these to activate a page. Taken only from
+            // `globalThis.__pdx_routes`, which a page module fills WHEN IT IS
+            // IMPORTED, every page would have to be imported for the router to know
+            // it exists, and nothing could be split.
+            keepAlive: route.keepAlive,
+            preload: route.preload,
+            prefetch: route.prefetch,
+            transition: route.transition,
+            scroll: route.scroll as 'preserve' | 'top' | undefined,
+            // The STRING form only. `@page { label: ticketLabel }` names a
+            // function that lives in the page's module, which this table — built
+            // by scanning the sources, in a file of its own — cannot reference.
+            // The page's own registration carries it and replaces this entry when
+            // the module loads, which is before its crumb is ever drawn: the
+            // breadcrumb's last level IS the page on screen.
+            label: route.label,
+            labelKey: route.labelKey,
+            title: route.title,
+            titleKey: route.titleKey,
+            outlets: route.outlets,
+            // `@layout 'admin'` → ['pdx-admin-layout']. The same call the page's own
+            // registration makes, so the two modes resolve a name identically.
+            // The app's default when the page declares none, none for `@layout 'none'`
+            // — `routeLayout`, the same call the page's registration makes.
+            layouts: layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix).length > 0
+                ? layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix) : undefined,
+            // `@page` implies lazy loading unless the page opts out with preload.
+            // The file is the import specifier the outlet hands to `import()`.
+            lazy: !route.preload,
+            hasOutlet: /<pdx-router-outlet[\s/>]/.test(descriptor.template?.content ?? '') || undefined,
+        });
+    }
+}
+
 /** Route entry from pre-scan — what the route table (`route-table.ts`) is written from. */
 export interface ScannedRoute {
     path: string;
@@ -224,74 +314,7 @@ export function scanForRoutes(rootDir: string, routes: ScannedRoute[],
                     }
                     if (!entry.endsWith('.pdx')) continue;
 
-                    const content = readFileSync(fullPath, 'utf-8');
-                    if (!/^[ \t]*@page[ \t]/m.test(content)) continue;
-
-                    // THE REAL ANALYSER, not a second set of regexes.
-                    //
-                    // A scan that re-reads each declaration itself — `@page` with one pattern,
-                    // `@guard` with another, `@loader` with a third — drifts: every field the
-                    // codegen emits and the scan does not is a route that behaves differently in
-                    // a production build than in dev, silently. The scan needs EVERY field the
-                    // outlet reads, so it does not guess and calls what the compiler calls.
-                    const descriptor = parseSFC(content);
-                    // A file with no `<script>` block is read WHOLE: a `.pdx` that is nothing but
-                    // directives is what several of this scanner's own tests write.
-                    const script = descriptor.script;
-                    const analysis = analyzeScript(script?.content ?? content, normalizePath(fullPath));
-                    const route = analysis.route;
-                    if (!route.page) continue;
-
-                    const tag = analysis.customTag ?? deriveTag(normalizePath(fullPath), prefix);
-                    // Every path this component answers to, in declaration order — the analyser
-                    // puts the first in `page` and the rest in `aliases`, and the codegen registers
-                    // one route per alias. A scan that produced fewer is a production build with
-                    // fewer routes than the dev server.
-                    const paths = [route.page, ...(route.aliases ?? [])];
-
-                    for (const path of paths) {
-                        routes.push({
-                            path,
-                            file: normalizePath(fullPath),
-                            tag,
-                            guard: route.guard,
-                            redirect: route.redirectTo,
-                            redirects: route.redirects,
-                            meta: route.meta,
-                            loader: route.loader,
-                            loaderStaleTime: route.loaderStaleTime,
-                            // The outlet reads these to activate a page. Taken only from
-                            // `globalThis.__pdx_routes`, which a page module fills WHEN IT IS
-                            // IMPORTED, every page would have to be imported for the router to know
-                            // it exists, and nothing could be split.
-                            keepAlive: route.keepAlive,
-                            preload: route.preload,
-                            prefetch: route.prefetch,
-                            transition: route.transition,
-                            scroll: route.scroll as 'preserve' | 'top' | undefined,
-                            // The STRING form only. `@page { label: ticketLabel }` names a
-                            // function that lives in the page's module, which this table — built
-                            // by scanning the sources, in a file of its own — cannot reference.
-                            // The page's own registration carries it and replaces this entry when
-                            // the module loads, which is before its crumb is ever drawn: the
-                            // breadcrumb's last level IS the page on screen.
-                            label: route.label,
-                            labelKey: route.labelKey,
-                            title: route.title,
-                            titleKey: route.titleKey,
-                            outlets: route.outlets,
-                            // `@layout 'admin'` → ['pdx-admin-layout']. The same call the page's own
-                            // registration makes, so the two modes resolve a name identically.
-                            // The app's default when the page declares none, none for `@layout 'none'`
-                            // — `routeLayout`, the same call the page's registration makes.
-                            layouts: layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix).length > 0
-                                ? layoutChain(routeLayout(route.layout, defaultLayout), knowsTag, prefix) : undefined,
-                            // `@page` implies lazy loading unless the page opts out with preload.
-                            // The file is the import specifier the outlet hands to `import()`.
-                            lazy: !route.preload,
-                            hasOutlet: /<pdx-router-outlet[\s/>]/.test(descriptor.template?.content ?? '') || undefined,
-                        });
-                    }
+                    scanRouteFile(fullPath, routes, knowsTag, defaultLayout, prefix);
                 } catch { /* skip */ }
             }
         } catch { /* skip unreadable dir */ }

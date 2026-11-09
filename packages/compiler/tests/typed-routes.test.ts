@@ -68,6 +68,76 @@ describe('the plugin writes it', () => {
         expect(projectRoutePatterns(root).sort()).toEqual(['/', '/users/:id']);
     });
 
+    // #961: a saved page re-reads that page, not the tree. The whole scan was ~80 ms of the ~95 ms
+    // between a save and the page's update, on every save of a page of the showcase.
+    describe('while the server runs, a saved page updates its own routes', () => {
+        type Hot = { file: string; read(): Promise<string>; server: { moduleGraph: { getModuleById(): null } } };
+        type Plugin = {
+            configResolved(c: { root: string; command: string }): void;
+            buildStart(this: { warn(): void }): void;
+            handleHotUpdate(ctx: Hot): Promise<unknown>;
+        };
+        function served(root: string): { save(file: string, text: string): Promise<void>; dts(): string } {
+            const plugin = pdx()[0] as unknown as Plugin;
+            plugin.configResolved({ root, command: 'serve' });
+            plugin.buildStart.call({ warn() {} });
+            return {
+                async save(file, text) {
+                    writeFileSync(file, text);
+                    await plugin.handleHotUpdate({ file: file.replace(/\\/g, '/'), read: async () => text, server: { moduleGraph: { getModuleById: () => null } } });
+                },
+                dts: () => readFileSync(join(root, ROUTE_TYPES_FILE), 'utf-8'),
+            };
+        }
+        function app(): { root: string; user: string; home: string } {
+            const root = tmp();
+            mkdirSync(join(root, 'src', 'pages'), { recursive: true });
+            const user = join(root, 'src', 'pages', 'user.pdx');
+            const home = join(root, 'src', 'pages', 'home.pdx');
+            writeFileSync(user, page('/users/:id(number)'));
+            writeFileSync(home, page('/'));
+            return { root, user, home };
+        }
+
+        it('a changed pattern replaces the old one; the other pages stay', async () => {
+            const { root, user } = app();
+            const s = served(root);
+            await s.save(user, page('/people/:id(number)'));
+            expect(s.dts()).toContain('"/people/:id": { id: number };');
+            expect(s.dts()).not.toContain('/users/:id');
+            expect(s.dts()).toContain('"/": {};');
+        });
+
+        it('only the saved file is read again: another page changed on disk, unsaved, keeps its old pattern', async () => {
+            const { root, user, home } = app();
+            const s = served(root);
+            // Not through the server: the whole scan would read it, a re-read of the saved file does not.
+            writeFileSync(home, page('/start'));
+            await s.save(user, page('/people/:id(number)'));
+            expect(s.dts()).toContain('"/": {};');
+            expect(s.dts()).not.toContain('/start');
+        });
+
+        it('a page that loses its @page loses its route', async () => {
+            const { root, user } = app();
+            const s = served(root);
+            await s.save(user, '<template><p>x</p></template>\n<script>\n</script>\n');
+            expect(s.dts()).not.toContain('/users/:id');
+            expect(s.dts()).toContain('"/": {};');
+        });
+
+        it('a page outside the scanned directories adds nothing, as the whole scan would not', async () => {
+            const { root } = app();
+            const s = served(root);
+            mkdirSync(join(root, 'tools'), { recursive: true });
+            await s.save(join(root, 'tools', 'stray.pdx'), page('/stray'));
+            mkdirSync(join(root, 'src', 'dist'), { recursive: true });
+            await s.save(join(root, 'src', 'dist', 'built.pdx'), page('/built'));
+            expect(s.dts()).not.toContain('/stray');
+            expect(s.dts()).not.toContain('/built');
+        });
+    });
+
     it('control — an app with no route gets no file', () => {
         const root = tmp();
         mkdirSync(join(root, 'src'), { recursive: true });
