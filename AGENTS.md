@@ -36,7 +36,9 @@ which is worth it for a component change.
 1. **A component that is not exported is not registered, and nothing says so.** A `<pdx-*>` tag is
    auto-imported through the `exports` of `packages/ui/package.json`, which are generated: after
    adding a component run `pnpm --dir packages/ui run manifest` and then `run exports`, add its
-   import to `packages/ui/src/index.ts` by hand, and restart Vite with `--force`.
+   import to `packages/ui/src/index.ts` by hand, and restart Vite with `--force`. A component written
+   in `.pdx` is `src/{name}/pdx-{name}.pdx`, imported with its extension (`import './x/pdx-x.pdx'`);
+   the build compiles it and writes its `.d.ts` (#1004).
 2. **A `ctx.track()` that returns before it reads a signal never runs again.** Read the signals
    first, then touch the DOM in a frame.
 3. **Bind attributes with `:attr=`, never `${}`.** The compiler warns with `PDX_RAW_INTERPOLATION`.
@@ -55,7 +57,7 @@ which is worth it for a component change.
 | The language's formal reference: every rune and directive, its grammar, its diagnostics | [docs/language](docs/language), held to the compiler by `packages/compiler/tests/language-reference.test.ts` |
 | Component design rules (the compiler's design checks cite them) | [docs/PDX-COMPONENT-DESIGN.md](docs/PDX-COMPONENT-DESIGN.md) |
 | User documentation, published as the site | `packages/site/content/docs/` |
-| A component | `packages/ui/src/{name}/pdx-{name}.ts` |
+| A component | `packages/ui/src/{name}/pdx-{name}.ts`, or `.pdx` (#1004) |
 | Its demo page, and one component per demo section | `packages/compiler/demo/showcase-new/pages/comp-{name}.pdx`, `pages/sections/comp-{name}/` |
 | Its certification manifest | `packages/responsive/tests/manifests/{name}.manifest.ts` |
 | Themes and tokens, for designers | [packages/design/THEMING.md](packages/design/THEMING.md) |

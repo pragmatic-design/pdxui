@@ -84,6 +84,39 @@ describe('gen-exports adds what the manifest has and the exports map does not', 
         expect(Object.keys(exports).at(-1)).toBe('./package.json');
     });
 
+    // A component written in .pdx (#1004): the workspace imports its source, which `pdx()` compiles;
+    // a consumer imports the compiled module and its declaration, which the library build writes.
+    it('adds an entry for a .pdx component: its source in development, its compiled module in dist', () => {
+        const { exports, added } = computeExports({}, [mod('src/probe/pdx-probe.pdx', 'pdx-probe')]);
+        expect(added).toEqual(['./probe ← src/probe/pdx-probe.pdx']);
+        expect(exports['./probe']).toEqual({
+            development: './src/probe/pdx-probe.pdx',
+            types: './dist/probe/pdx-probe.d.ts',
+            import: './dist/probe/pdx-probe.js',
+        });
+    });
+
+    it('rewrites a .pdx entry it already has, and sees that it covers its component', () => {
+        const { exports, added } = computeExports(
+            { './probe': { development: './src/probe/pdx-probe.pdx' } },
+            [mod('src/probe/pdx-probe.pdx', 'pdx-probe')],
+        );
+        expect(added).toEqual([]);
+        expect(exports['./probe']).toEqual({
+            development: './src/probe/pdx-probe.pdx',
+            types: './dist/probe/pdx-probe.d.ts',
+            import: './dist/probe/pdx-probe.js',
+        });
+    });
+
+    it('drops a .pdx entry whose source is gone', () => {
+        const { exports, removed } = computeExports(
+            { './probe': { development: './src/probe/pdx-probe.pdx' } }, [], () => false,
+        );
+        expect(exports['./probe']).toBeUndefined();
+        expect(removed).toEqual(['./probe ← ./src/probe/pdx-probe.pdx']);
+    });
+
     it('exports the icon modules as one pattern, @pdxui/ui/icons/<name> (#47)', () => {
         const { exports } = computeExports({}, []);
         expect(exports['./icons/*']).toEqual({

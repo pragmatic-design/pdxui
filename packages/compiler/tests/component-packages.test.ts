@@ -88,6 +88,23 @@ describe('the resolver over component packages', () => {
         expect(r.enumValues('acme-chip', 'tone')).toEqual(['info', 'warn']);
     });
 
+    it('maps a component written in .pdx to the export of its compiled module (#1004)', () => {
+        // The manifest names the source, `src/badge/pdx-badge.pdx`; an installed package's exports
+        // point at what the library build made of it, `dist/badge/pdx-badge.js`.
+        write('node_modules/@acme/widgets/package.json', {
+            name: '@acme/widgets', version: '1.0.0', customElements: 'custom-elements.json',
+            exports: { './badge': { types: './dist/badge/pdx-badge.d.ts', import: './dist/badge/pdx-badge.js' } },
+        });
+        write('node_modules/@acme/widgets/custom-elements.json', {
+            schemaVersion: '1.0.0',
+            modules: [{ kind: 'javascript-module', path: 'src/badge/pdx-badge.pdx', declarations: [{ kind: 'class', customElement: true, name: 'PdxBadge', tagName: 'pdx-badge' }] }],
+        });
+        const r = new ComponentResolver();
+        r.registerComponentPackages(root);
+
+        expect(r.resolve('pdx-badge')?.importPath).toBe('@acme/widgets/badge');
+    });
+
     it('auto-imports it in a compiled module', () => {
         const r = new ComponentResolver();
         r.registerComponentPackages(root);
