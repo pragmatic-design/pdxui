@@ -25,7 +25,8 @@ The file name determines the tag, behind the application prefix: `user-card.pdx`
 The prefix is `app` unless the project names its own, `pdx({ prefix: 'shop' })` (or `prefix` in
 `pdx.config.ts`). To force a different tag use `@tag 'app-other-name'`. The `pdx-` prefix belongs to the
 `@pdxui/*` packages: `@tag 'pdx-…'` is an error, `PDX_TAG_RESERVED`, and `pdx migrate` renames an
-alpha project's `pdx-` tags.
+alpha project's `pdx-` tags. A library component written in `.pdx` keeps its `pdx-` tag when your app
+compiles it from source: `@pdxui/ui`'s switch is `<pdx-switch>` under any prefix.
 
 Each block is optional — a `.pdx` with just a `<template>` is a valid component — and one
 `<template>` and one `<script>` is the limit. **`<style>` you may write more than once**, which is how

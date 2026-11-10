@@ -6,6 +6,7 @@ import { dirname, join, relative } from 'path';
 import { deriveTag } from './compiler/codegen';
 import { layoutChain, routeLayout } from './compiler/codegen-shared';
 import { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './compiler/tag-prefix';
+import { tagPrefixFor } from './library-prefix';
 import { analyzeScript } from './compiler/script-analyzer';
 import { parseSFC } from './parser/sfc';
 import { moduleDir } from './module-dir';
@@ -686,7 +687,7 @@ export function injectComponentImports(
     // almost always means a missing export in packages/ui/package.json, or a component
     // file that does not exist — otherwise a silent failure (the CE is never registered,
     // zero console errors). We exclude the current file's own tag (self-reference).
-    const ownTag = deriveTag(currentFile, resolver.prefix);
+    const ownTag = deriveTag(currentFile, tagPrefixFor(currentFile, resolver.prefix, resolver.root));
     for (const tag of usedTags) {
         if (tag === ownTag) continue;
         // The library's prefix and the app's own (#136) are claims this warning can check: another

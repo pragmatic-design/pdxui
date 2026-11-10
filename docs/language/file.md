@@ -88,6 +88,13 @@ explicitly. The prefix `pdx-` is reserved for the `@pdxui/*` packages.
   name starts with `pdx-` does not derive one: the reserved prefix is dropped, `pdx-code.pdx` →
   `<app-code>` (landed so, rather than as an error, so an alpha file named that way keeps compiling
   and only its tag changes).
+- A file of a published `@pdxui/*` package (the nearest `package.json` above it is named `@pdxui/…`
+  and is not `private`) derives its tag with `pdx-`, whatever the application's prefix (#1009): an
+  app that compiles the library's source, through its `development` condition, registers
+  `@pdxui/ui`'s `pdx-switch.pdx` as `<pdx-switch>`, not `<app-switch>`. A private `@pdxui/*` package
+  (the showcase, the site) is an application, and its files take its prefix; so is an app that sits
+  inside the package, with no `package.json` of its own (a demo, the package's own test harness),
+  which names `prefix: 'pdx'` itself when it compiles the package's components.
 - Two files that derive one tag are `PDX_TAG_COLLISION`, as in alpha.
 - `pdx migrate` renames an existing application's `pdx-` tags in its templates, its CSS selectors and
   its `@tag` lines, and reports a tag it finds inside a string.

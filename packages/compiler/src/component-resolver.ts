@@ -9,6 +9,7 @@ import { join, dirname, relative, resolve } from 'path';
 import { createRequire } from 'module';
 import { deriveTag } from './compiler/codegen';
 import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
+import { tagPrefixFor } from './library-prefix';
 import { moduleDir } from './module-dir';
 import { scanNoImportTags } from './no-import-tags';
 import { componentPackages, type ComponentPackage } from './component-packages';
@@ -76,6 +77,8 @@ export class ComponentResolver {
     private _projectDirs: string[] = [];
     /** The app's component tag prefix the project was registered with (#136). */
     private _prefix: string = DEFAULT_TAG_PREFIX;
+    /** The project root the last scan was given; undefined before any scan. */
+    private _root: string | undefined;
 
     /** Each project file's `@tag`, null when it declares none — what `projectComponents` reports. */
     private declaredTags = new Map<string, string | null>();
@@ -83,6 +86,11 @@ export class ComponentResolver {
     /** The app's component tag prefix, `pdx({ prefix })`: what a project file's tag starts with. */
     get prefix(): string {
         return this._prefix;
+    }
+
+    /** The project root the components were registered from: what tells a library file from the app's (#1009). */
+    get root(): string | undefined {
+        return this._root;
     }
 
     /** The project's components: each one's tag, its file, and the `@tag` it declares (null for none). */
@@ -545,7 +553,8 @@ export class ComponentResolver {
      */
     registerProjectComponents(rootDir: string, scanDirs: string[] = [], prefix: string = DEFAULT_TAG_PREFIX): void {
         this._prefix = prefix;
-        const dirs = [...new Set([join(rootDir, 'src'), join(rootDir, 'pages'), ...scanDirs.map(d => resolve(rootDir, d))])];
+        this._root = rootDir;
+        const dirs =[...new Set([join(rootDir, 'src'), join(rootDir, 'pages'), ...scanDirs.map(d => resolve(rootDir, d))])];
         this._projectDirs = dirs.map(d => normalizePath(relative(rootDir, d)) || '.');
 
         // A rescan REPLACES this scan's findings. The dev server calls this again whenever a `.pdx`
@@ -637,7 +646,7 @@ export class ComponentResolver {
                         if (baseName.startsWith('_')) continue;
                         // Check for @tag override in script
                         const declaredTag = this._detectTag(fullPath);
-                        const tag = declaredTag ?? deriveTag(normalizePath(fullPath), this._prefix);
+                        const tag = declaredTag ?? deriveTag(normalizePath(fullPath), tagPrefixFor(fullPath, this._prefix, rootDir));
                         this.declaredTags.set(normalizePath(fullPath), declaredTag);
                         // Don't overwrite @pdxui/ui entries — library takes precedence
                         if (this.map.has(tag)) {

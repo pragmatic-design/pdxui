@@ -7,6 +7,7 @@ import { analyzeScript } from './compiler/script-analyzer';
 import type { ScriptAnalysis } from './compiler/script-analyzer-types';
 import { deriveTag } from './compiler/codegen-shared';
 import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
+import { tagPrefixFor } from './library-prefix';
 import { scriptDocComments, type ScriptDocs } from './compiler/component-docs';
 
 export interface ComponentDescription {
@@ -22,14 +23,14 @@ export interface ComponentDescription {
 
 /**
  * Describe the .pdx `source` at `filename`, as `pdx({ prefix })` would register it. `prefix` is the
- * tag prefix, `app` by default; the library's is `pdx`.
+ * tag prefix; without one, a file of a `@pdxui/*` package takes `pdx` and any other `app` (#1009).
  */
 export function describeComponent(source: string, filename: string, options: { prefix?: string } = {}): ComponentDescription {
     const descriptor = parseSFC(source);
     const script = descriptor.script?.content ?? '';
     const analysis = analyzeScript(script, filename);
     return {
-        tag: analysis.customTag ?? deriveTag(filename, options.prefix ?? DEFAULT_TAG_PREFIX),
+        tag: analysis.customTag ?? deriveTag(filename, options.prefix ?? tagPrefixFor(filename, DEFAULT_TAG_PREFIX)),
         analysis,
         template: descriptor.template?.content ?? '',
         script,
