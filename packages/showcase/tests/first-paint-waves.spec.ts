@@ -233,7 +233,6 @@ test('the record\'s request does not wait for the page\'s chunk: the loader has 
         if (!/\/app-ticket-[^/]*\.js/.test(route.request().url())) await new Promise((r) => setTimeout(r, SLOW));
         await route.fallback();
     });
-    const record = page.waitForRequest(/\/api\/tickets\/1$/, { timeout: SLOW * 4 });
     const t0 = await page.evaluate(() => {
         performance.clearResourceTimings();
         const now = performance.now();
@@ -241,12 +240,15 @@ test('the record\'s request does not wait for the page\'s chunk: the loader has 
         dispatchEvent(new PopStateEvent('popstate'));
         return now;
     });
-    await record;
+    // The record's Resource Timing entry is what is read, and it is added when its response ends, not
+    // when its request starts: waiting for the request read the entries before it was there (#994).
+    await page.waitForFunction(() => performance.getEntriesByType('resource').some((e) => /\/api\/tickets\/1$/.test(e.name)), undefined, { timeout: SLOW * 4 });
     const entries = await page.evaluate(() => (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
         .map((e) => ({ file: e.name.split('/').pop()!, start: e.startTime })));
     const loaderModule = entries.find((e) => /^app-ticket-/.test(e.file));
     const data = entries.find((e) => e.file === '1');
     expect(loaderModule, `the loader's module was not fetched: ${entries.map((e) => e.file).join(', ')}`).toBeDefined();
+    expect(data, `the record has no timing entry: ${entries.map((e) => e.file).join(', ')}`).toBeDefined();
     expect(data!.start - t0, `the record was asked for ${Math.round(data!.start - t0)} ms into the navigation, behind the page's chunk held ${SLOW} ms`)
         .toBeLessThan(SLOW / 2);
 });
