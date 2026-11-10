@@ -78,6 +78,7 @@ describe('the browser jobs run in the Playwright image of the locked version (#9
     }
 
     it('the visual job\'s Dockerfile starts from the same image', () => {
-        expect(read('packages/responsive/tests/docker/Dockerfile')).toMatch(new RegExp(`^FROM ${image.replace(/[.:/]/g, '\\$&')}$`, 'm'));
+        const from = read('packages/responsive/tests/docker/Dockerfile').split(/\r?\n/).filter((line) => line.startsWith('FROM '));
+        expect(from).toEqual([`FROM ${image}`]);
     });
 });

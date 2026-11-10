@@ -15,7 +15,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { FullConfig, Page } from '@playwright/test';
+import { request, type FullConfig, type Page } from '@playwright/test';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -32,15 +32,20 @@ export default async function globalSetup(config: FullConfig): Promise<void> {
     await signIn(String(config.projects[0].use.baseURL));
 }
 
-/** Sign in as the admin against the server at `baseURL`, and write its state to `sessionFile(port)`. */
+/**
+ * Sign in as the admin against the server at `baseURL`, and write its state to `sessionFile(port)`.
+ *
+ * Through Playwright's request context, not Node's `fetch` (#998): the preview listens on the first
+ * address `localhost` resolves to, which is `::1` in the Playwright image, and `fetch` connected to
+ * `127.0.0.1` only — ECONNREFUSED before any spec ran. Playwright tries every address, as the browser
+ * and the webServer's readiness check do.
+ */
 export async function signIn(baseURL: string): Promise<void> {
-    const res = await fetch(`${baseURL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: 'admin', password: 'pdx' }),
-    });
-    if (!res.ok) throw new Error(`the suite could not sign in: ${res.status} ${await res.text()}`);
+    const api = await request.newContext({ baseURL });
+    const res = await api.post('/api/auth/login', { data: { username: 'admin', password: 'pdx' } });
+    if (!res.ok()) throw new Error(`the suite could not sign in: ${res.status()} ${await res.text()}`);
     const { access, refresh } = await res.json() as { access: string; refresh: string | null };
+    await api.dispose();
 
     const file = sessionFile(Number(new URL(baseURL).port));
     mkdirSync(dirname(file), { recursive: true });
