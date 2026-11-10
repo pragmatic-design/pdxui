@@ -6,6 +6,9 @@
 // the step whose duration varies most: over 189 successful jobs (15 runs of quality.yml and
 // certify.yml, 2026-10-23), median 0.3 minutes, p90 10, max 16 — apt falling back from the Azure
 // mirror. So it gets its own timeout above that, and each job one above its own longest run.
+//
+// Since #998 no job runs that install: the browser jobs run in the Playwright image, which
+// ci-playwright-image.test.ts holds. The install check stays for a workflow that brings one back.
 
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
