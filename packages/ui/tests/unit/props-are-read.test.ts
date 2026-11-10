@@ -59,12 +59,26 @@ function declaredPdxProps(src: string, file: string): Declared[] {
     const { tag, analysis } = describeComponent(src, file, { prefix: 'pdx' });
     const names = analysis.props.filter((p) => !p.model && !p.variant).map((p) => p.name);
     if (names.length === 0) return [];
-    const rest = src
-        // Match: a block comment, JSDoc included, and an HTML comment. Groups: none
-        .replace(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g, '')
+    const rest = withoutComments(src)
         // Match: a `//` comment line, and a `@prop` declaration line. Groups: none
         .replace(/^[ \t]*(?:\/\/|@prop\b)[^\n]*$/gm, '');
     return [{ tag, names, rest, formModel: analysis.props.some((p) => p.form === true) }];
+}
+
+/**
+ * `src` without its block and HTML comments. Removed until none is left: one pass over `<!<!---->--`
+ * leaves a comment behind, which would count the name inside it as a read.
+ */
+function withoutComments(src: string): string {
+    // Match: a block comment, JSDoc included, and an HTML comment. Groups: none
+    const COMMENT = /\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g;
+    let out = src;
+    let before: string;
+    do {
+        before = out;
+        out = out.replace(COMMENT, '');
+    } while (out !== before);
+    return out;
 }
 
 /** A prop read in `rest`: through `ctx`, called, quoted — or, in a .pdx, by its bare name. */
