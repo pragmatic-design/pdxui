@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-478 value exports.
+479 value exports.
 
 ### `__adoptStyles`
 
@@ -590,6 +590,24 @@ read `a,b` in a production build and `ab` in dev (#100).
 `constant`: the compiler knows the value cannot change — a literal, or a `@for` row's track key
 (#110). It is written once, by the same rule, outside any tracking: no effect is created, and what
 it reads does not subscribe the render it sits in.
+
+### `bindParts`
+
+```ts
+import { bindParts } from '@pdxui/core';
+
+function bindParts(el: Element, value: unknown): void
+```
+
+Add `el` to the array the signal `value` holds, and take it out when the scope that rendered it is
+disposed. A value that is not a signal is ignored, as by `bindRef`.
+
+A row is bound while it is being built, before it is in the document, and an `@for` binds a
+thousand in one turn. So an added element is in the array at once, at its end — what `onMount`
+reads, which runs in the same turn — and one microtask later the array is settled: document
+order, and the elements whose scope was disposed taken out. One copy and one sort per turn, not
+one per row. A row that only moves, as a keyed `@for` moves one, keeps its place in the array
+until an element comes or goes.
 
 ### `bindRef`
 

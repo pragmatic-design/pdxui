@@ -161,10 +161,13 @@ triggers, a `:ref` for what neither expresses (`focus()`). A `:ref` declared `$s
 component is typed in the editor by what it exposes: `dlg.nope()` is an error.
 
 **`@part trigger, popup;`** names a component's public inner elements: write `data-part="popup"` on
-exactly one element each. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,
+the elements it names. A page or theme styles a part as `my-menu [data-part="popup"]` — parts,
 `:state()` and the component's tokens are the public styling surface, its internal classes are not. In
-the script `popup` is the element (`null` while not rendered), so it needs no `:ref`. A part on no
-element, on two, or a `data-part` with no `@part` are `PDX_PART_MISSING` / `_DUPLICATE` / `_UNDECLARED`.
+the script `popup` is the element (`null` while not rendered), so it needs no `:ref`. A part the
+template renders more than once — every `@for` row, two siblings, an element beside the rows — is the
+array of the rendered elements, in document order (`option[0]?.focus()`); on alternative branches of
+one `@if` chain it stays one element. A part on no element, or a `data-part` with no `@part`, are
+`PDX_PART_MISSING` / `PDX_PART_UNDECLARED`.
 
 **`@host { role="combobox" :aria-expanded="open" @keydown.enter="onKey" }`** puts attributes, bindings
 and listeners on the component's own element — the template's attribute syntax, one line or several.

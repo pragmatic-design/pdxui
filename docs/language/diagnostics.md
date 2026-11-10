@@ -55,7 +55,6 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_SLOT_REQUIRED` | error | A component used without a snippet it requires (#489). | `@slot`, [script.md](script.md); `@snippet`, [template.md](template.md) |
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not one of its models (#124). | `::name`, [template.md](template.md); `@model`, [script.md](script.md) |
 | `PDX_PART_MISSING` | error | A declared `@part` that no element of the template carries. | `@part`, [script.md](script.md) |
-| `PDX_PART_DUPLICATE` | error | A `@part` written on more than one element. | `@part`, [script.md](script.md) |
 | `PDX_PART_UNDECLARED` | error | A `data-part` that names no `@part`. | `@part`, [script.md](script.md) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host`, [script.md](script.md) |
 | `PDX_MALFORMED_STATE` | error | `@state` written in a shape the compiler does not recognise. | `@state`, [script.md](script.md) |

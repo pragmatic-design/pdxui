@@ -1317,10 +1317,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
 
     // Each @part is the ref of its element (#134): a signal holding it, null until the element is
     // rendered, which the script reads by the part's name — as a `:ref` written to a `$signal(null)`.
+    // A part the template renders more than once starts as `[]` instead (#988): the compiler knows it
+    // once the template is read (codegen-new).
     // A name the script already declares is left to that declaration.
     for (const name of parts) {
         if (signals.some(s => s.name === name) || exports.some(e => e.name === name)) continue;
-        signals.push({ name, initialExpr: 'null' });
+        signals.push({ name, initialExpr: 'null', part: true });
         exports.push({ name, kind: 'signal' });
         // As a `$signal` does: a component whose only declaration is a part would call it unimported.
         usedFeatures.add('signal');

@@ -539,9 +539,11 @@ class InlineGen {
             // mark: HTML attribute names are written in lower case.
             else if (kind.custom && /^[A-Z][\w$]*$/.test(n)) continue;
             else if (val && n === 'data-part' && this.ctx.parts.has(val)) {
-                // A declared part (#134): the attribute is written, and the element is the part's ref.
+                // A declared part (#134): the attribute is written, and the element is the part's ref,
+                // or one of its elements when the template renders the part more than once (#988).
                 this.tree.attribute(el, n, val);
-                this.refBind(el, val);
+                if (this.ctx.repeatedParts.has(val)) this.partsBind(el, val);
+                else this.refBind(el, val);
             }
             else if (val)                     this.tree.attribute(el, n, decodeEntities(val));
             else                              this.tree.attribute(el, n, '');
@@ -813,6 +815,13 @@ class InlineGen {
         // rendering scope is disposed (#262).
         this.imports.add('bindRef');
         this.out(`bindRef(${el},${prefixCtx(expr, this.ctx)});`);
+    }
+
+    /** A part the template renders more than once (#988): core's bindParts adds the element to its array. */
+    private partsBind(el: string, name: string): void {
+        if (this.ctx.ssr) return;
+        this.imports.add('bindParts');
+        this.out(`bindParts(${el},${prefixCtx(name, this.ctx)});`);
     }
 
     /**

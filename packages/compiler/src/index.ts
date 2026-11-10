@@ -66,6 +66,8 @@ export type { ComponentEntry } from './component-resolver';
 
 // Validation
 export { validate, collectTemplateIdentifiers } from './compiler/validate';
+// How many elements of each part the template can render at once (#988): the editor types a part by it.
+export { dataPartCounts } from './compiler/validate-parts';
 export type { ValidationWarning, DiagnosticSeverity, FixProposal, FixEdit } from './compiler/validate';
 export { proposeFixes } from './compiler/fix-proposals';
 export { applyIgnores, parseIgnores, exemptionFor } from './compiler/ignores';

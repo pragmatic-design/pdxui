@@ -55,6 +55,62 @@ describe('@part compiles into a ref and the descriptor', () => {
     });
 });
 
+// A part is every element that carries it (#988). When the template can render at most one at a
+// time, the name is that element; otherwise it is the array of the rendered elements.
+describe('a part on several elements', () => {
+    const SCRIPT = '@part x;\nlet a = $signal(true);\nlet b = $signal(true);\nlet items = $signal([1, 2]);';
+    const many = (template: string) => {
+        const { code } = compile(pdx(template, SCRIPT), 'test.pdx');
+        return code;
+    };
+
+    it('on an @for row: the name is an array, each row\'s element bound into it', () => {
+        const code = many('@for (items as it; track it) { <b data-part="x">{{ it }}</b> }');
+        expect(code).toContain('const __x = signal([]');
+        expect(code).toMatch(/bindParts\(__el\d+,ctx\.x\)/);
+        expect(code).not.toMatch(/bindRef\(__el\d+,ctx\.x\)/);
+    });
+
+    it('on two siblings: an array', () => {
+        const code = many('<b data-part="x">1</b><i data-part="x">2</i>');
+        expect(code).toContain('const __x = signal([]');
+        expect(code.match(/bindParts\(__el\d+,ctx\.x\)/g)).toHaveLength(2);
+    });
+
+    it('beside an @for: an array', () => {
+        const code = many('@for (items as it; track it) { <b data-part="x">{{ it }}</b> }<i data-part="x">+</i>');
+        expect(code.match(/bindParts\(__el\d+,ctx\.x\)/g)).toHaveLength(2);
+    });
+
+    it('in two separate @if blocks: an array', () => {
+        const code = many('@if (a) { <b data-part="x">1</b> } @if (b) { <i data-part="x">2</i> }');
+        expect(code).toContain('const __x = signal([]');
+    });
+
+    it('in a @snippet body, which the child may render any number of times: an array', () => {
+        const code = many('<app-list>@snippet row(it) { <b data-part="x">{{ it }}</b> }</app-list>');
+        expect(code).toContain('const __x = signal([]');
+    });
+
+    it('the control: on alternative branches of one chain, the element or null', () => {
+        const chains = [
+            '@if (a) { <b data-part="x">1</b> } @else if (b) { <i data-part="x">2</i> } @else { <u data-part="x">3</u> }',
+            '@switch (a) { @case (true) { <b data-part="x">1</b> } @default { <i data-part="x">2</i> } }',
+            '@if (a) { <b data-part="x">1</b> } @else { @if (b) { <i data-part="x">2</i> } }',
+        ];
+        for (const template of chains) {
+            const code = many(template);
+            expect(code, template).toContain('const __x = signal(null');
+            expect(code, template).not.toContain('bindParts');
+        }
+    });
+
+    it('the control: the same chain, one branch carrying it twice, is an array', () => {
+        const code = many('@if (a) { <b data-part="x">1</b><b data-part="x">2</b> } @else { <i data-part="x">3</i> }');
+        expect(code).toContain('const __x = signal([]');
+    });
+});
+
 describe('the part diagnostics', () => {
     it('PDX_PART_MISSING: a declared part on no element', () => {
         const found = codes('<button>x</button>', '@part trigger;', 'PDX_PART_MISSING');
@@ -62,10 +118,16 @@ describe('the part diagnostics', () => {
         expect(found[0].message).toContain(`'trigger'`);
     });
 
-    it('PDX_PART_DUPLICATE: a part on two elements', () => {
-        const found = codes('<b data-part="x">1</b><i data-part="x">2</i>', '@part x;', 'PDX_PART_DUPLICATE');
-        expect(found).toHaveLength(1);
-        expect(found[0].message).toContain('2 elements');
+    it('a part on several elements is no error: a part is every element that carries it (#988)', () => {
+        const templates = [
+            '<b data-part="x">1</b><i data-part="x">2</i>',
+            '@for (items as it; track it) { <b data-part="x">{{ it }}</b> }',
+            '@if (a) { <b data-part="x">1</b> } @else { <i data-part="x">2</i> }',
+        ];
+        for (const template of templates) {
+            const found = codes(template, '@part x;\nlet a = $signal(true);\nlet items = $signal([1]);', 'PDX_PART_DUPLICATE');
+            expect(found, template).toHaveLength(0);
+        }
     });
 
     it('PDX_PART_UNDECLARED: a data-part the script does not declare', () => {
@@ -76,7 +138,7 @@ describe('the part diagnostics', () => {
 
     it('the control: one element per declared part raises none', () => {
         const template = '<button data-part="trigger">x</button><div data-part="popup">y</div>';
-        for (const code of ['PDX_PART_MISSING', 'PDX_PART_DUPLICATE', 'PDX_PART_UNDECLARED']) {
+        for (const code of ['PDX_PART_MISSING', 'PDX_PART_UNDECLARED']) {
             expect(codes(template, '@part trigger, popup;', code), code).toHaveLength(0);
         }
     });

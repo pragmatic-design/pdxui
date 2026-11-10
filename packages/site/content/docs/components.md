@@ -515,7 +515,7 @@ parent read `dialogRef.isOpen`, and write `dialogRef.isOpen = true`. A `$derived
 ## @part — named, public parts
 
 A component's inner elements are its own business, except the ones it names. `@part` declares them,
-and `data-part="…"` marks each, on exactly one element:
+and `data-part="…"` marks the elements each one names:
 
 ```pdx
 <template>
@@ -532,9 +532,34 @@ function close() { open = false; trigger?.focus(); }
 
 The page or a theme styles a part by its name, `my-menu [data-part="popup"] { … }`, instead of an
 internal class that may be renamed; parts, `:state()` and the component's tokens are what is public.
-In the script the name is the element (`null` while it is not rendered), so it needs no `:ref`. A
-declared part on no element is `PDX_PART_MISSING`, on two `PDX_PART_DUPLICATE`, and a `data-part` with
-no `@part` is `PDX_PART_UNDECLARED`. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
+In the script the name is the element (`null` while it is not rendered), so it needs no `:ref`.
+
+A part is every element that carries it, as the platform's `part` attribute is. When the template can
+render more than one at once — every row of an `@for`, two siblings, an element beside the rows — the
+name is the array of the rendered elements, in document order:
+
+```pdx
+<template>
+  <ul>
+    @for (items as item; track item.id) { <li data-part="option">{{ item.label }}</li> }
+    @if (creating) { <li data-part="option">Create “{{ query }}”</li> }
+  </ul>
+</template>
+
+<script>
+@part option;
+let items = $signal([]);
+let creating = $signal(false);
+let query = $signal('');
+function focusFirst() { option[0]?.focus(); }
+</script>
+```
+
+The compiled template adds each element through core's `bindParts`: it is in the array as soon as it
+renders, `onMount` included, and the array is put back in document order in a microtask. A row that
+only moves keeps its place in the array until an element comes or goes. On alternative branches of one
+`@if` / `@else` chain at most one renders, and the name stays that element or `null`. A declared part on no element is `PDX_PART_MISSING`, and a `data-part` with no
+`@part` is `PDX_PART_UNDECLARED`. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
 and the manifest lists a component's parts.
 
 ## @host — the component's own element

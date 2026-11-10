@@ -54,6 +54,12 @@ export interface CompileContext {
     parts: Set<string>;
 
     /**
+     * The parts the template can render more than once at a time (#988): their name is the array of
+     * the rendered elements, and a `data-part` naming one binds it with core's `bindParts`.
+     */
+    repeatedParts: Set<string>;
+
+    /**
      * What a `@render name(…)` calls (#489): the typed snippets the script declares with `@slot`, read
      * from the element's property, and the script's own template `@snippet`s, functions of the render.
      */
@@ -196,6 +202,7 @@ export function createCompileContext(options?: {
         delegatedEvents: new Set(),
         rowHandlers: null,
         parts: new Set(),
+        repeatedParts: new Set(),
         slotNames: new Set(),
         scriptSnippets: new Set(),
         selectors: new Set(),

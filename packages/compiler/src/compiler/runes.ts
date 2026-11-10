@@ -31,7 +31,7 @@ export const RUNES: readonly RuneInfo[] = [
     d('slot', 'Declare a typed snippet the parent provides: its signature; `?` makes it optional.', '@slot row: (item: T, index: number);', '@slot ${1:row}: (${2:item: T});'),
     d('generic', 'Declare a type parameter, inferred from the props that use it (`T="User"` on the tag sets it).', '@generic T extends { id: string };', '@generic ${1:T};'),
     d('expose', 'Expose methods on the host element.', '@expose methodA, methodB;', '@expose ${1:method};'),
-    d('part', 'Declare named, public parts: `data-part="name"` on one element each, and `name` is its ref.', '@part trigger, popup;', '@part ${1:name};'),
+    d('part', 'Declare named, public parts: `data-part="name"` on the elements it names, and `name` is the element, or the array of them when the template renders more than one.', '@part trigger, popup;', '@part ${1:name};'),
     d('host',"Attributes, bindings and listeners on the component's own element, with the template's attribute grammar. A name, `@host el`, binds the element itself for the script and the template.", '@host { role="combobox" :aria-expanded="open" @keydown="onKey" }   // @host el; names the element', '@host { ${1:role}="${2:value}" }'),
     d('variants', 'Declare the component\'s variants: each axis is a prop typed with its values, reflected on the host, and styled with `@variant axis(value) { … }`.', '@variants { variant: { primary, ghost } = primary; }', '@variants {\n  ${1:variant}: { ${2:primary}, ${3:ghost} } = ${2:primary};\n}'),
     d('state','A visual state of the host, kept in sync with a boolean; CSS matches it with `:state(name)`.', '@state name = booleanExpression;', '@state ${1:name} = ${2:condition};'),
