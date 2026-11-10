@@ -52,7 +52,8 @@ test('page creation has its own timeout, and a failure records the fixtures over
 
         expect(tooSlow.status).toBe('timedOut');
         expect(tooSlow.message, 'a page slower than its own timeout fails as a fixture timeout naming it').toMatch(/Fixture "page" timeout of 6000ms exceeded during setup/);
-        const kept = keepFailures(tooSlow.out, join(root, 'kept'), 'too-slow');
+        // The run failed, its test having timed out: what the reporter passes the copy at its end.
+        const kept = keepFailures(tooSlow.out, join(root, 'kept'), 'too-slow', 'failed');
         expect(kept).not.toBeNull();
         expect(readFileSync(join(kept!, 'slow-fixtures.txt'), 'utf8')).toMatch(/probe\tFixture "page"\t\d+ ms/);
 

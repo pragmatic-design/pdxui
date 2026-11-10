@@ -5,19 +5,20 @@
 // is flaky, and that first re-run deleted the one trace that could say why: #611, #587 and an earlier
 // issue lost theirs that way.
 //
-// Every config's global teardown, `scripts/lib/keep-failed-runs.mjs`, copies what a run left in its
-// output folder to `<output folder>-kept/<stamp>/`, which no run empties. A clean run leaves nothing,
-// so nothing is copied. It was the site's alone (#845); it now covers every config, so a gate's red
-// in any browser suite brings its trace whatever is run after it.
+// Every config's reporter `scripts/lib/keep-failed-runs.mjs` copies what a failed run left in its
+// output folder to `<output folder>-kept/<stamp>/`, which no run empties. It reads the run's status
+// in `onEnd`: a passed run is not kept, whatever its tests wrote (#990 — the touch-target specs write a
+// measurement on success, and a green run said it had failed). It was the site's alone (#845); it now
+// covers every config, so a gate's red in any browser suite brings its trace whatever is run after it.
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, existsSync, rmSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
-import { keepFailures } from '../../../scripts/lib/keep-failed-runs.mjs';
+import KeepFailedRuns, { keepFailures } from '../../../scripts/lib/keep-failed-runs.mjs';
 
 const REPO = join(__dirname, '..', '..', '..');
-const TEARDOWN = join(REPO, 'scripts', 'lib', 'keep-failed-runs.mjs');
+const KEEPER = join(REPO, 'scripts', 'lib', 'keep-failed-runs.mjs');
 
 let root: string;
 beforeEach(() => { root = mkdtempSync(join(tmpdir(), 'pdx-keep-')); });
@@ -28,34 +29,31 @@ describe('keepFailures', () => {
         const results = join(root, 'test-results');
         mkdirSync(join(results, 'inline-edit-focus-Tab-out'), { recursive: true });
         writeFileSync(join(results, 'inline-edit-focus-Tab-out', 'trace.zip'), 'trace');
-        const kept = keepFailures(results, join(root, 'test-results-kept'), '2026-10-04T15-00-00');
+        const kept = keepFailures(results, join(root, 'test-results-kept'), '2026-10-04T15-00-00', 'failed');
         expect(kept).toBe(join(root, 'test-results-kept', '2026-10-04T15-00-00'));
         expect(readFileSync(join(kept!, 'inline-edit-focus-Tab-out', 'trace.zip'), 'utf8')).toBe('trace');
     });
 
-    it('the control: a clean run leaves an empty folder, and nothing is kept', () => {
+    it('a passed run is not kept, whatever its tests wrote (#990)', () => {
+        // touch-targets.spec.ts writes measured.json on success: a green certification run said it had
+        // failed and took a kept slot.
         const results = join(root, 'test-results');
-        mkdirSync(results);
-        expect(keepFailures(results, join(root, 'test-results-kept'), 'x')).toBeNull();
+        mkdirSync(join(results, 'touch-targets-select-corporate'), { recursive: true });
+        writeFileSync(join(results, 'touch-targets-select-corporate', 'measured.json'), '[]');
+        expect(keepFailures(results, join(root, 'test-results-kept'), 'x', 'passed')).toBeNull();
         expect(existsSync(join(root, 'test-results-kept'))).toBe(false);
     });
 
-    it('a run that leaves only Playwright\'s own bookkeeping keeps nothing', () => {
-        // `.last-run.json` is written by every run, passing or not: it is not a failure.
+    it('a run that timed out or was interrupted is kept: it did not pass', () => {
         const results = join(root, 'test-results');
-        mkdirSync(results);
-        writeFileSync(join(results, '.last-run.json'), '{"status":"passed","failedTests":[]}');
-        expect(keepFailures(results, join(root, 'test-results-kept'), 'x')).toBeNull();
+        mkdirSync(join(results, 'a'), { recursive: true });
+        writeFileSync(join(results, 'a', 'trace.zip'), 't');
+        expect(keepFailures(results, join(root, 'kept-t'), 'x', 'timedout')).not.toBeNull();
+        expect(keepFailures(results, join(root, 'kept-i'), 'x', 'interrupted')).not.toBeNull();
     });
 
-    it('a green run\'s empty test folders keep nothing', () => {
-        // A passing spec that asks for an output path leaves an empty folder named after its test: the
-        // showcase's retention and SSG specs did, and a gate that passed kept a run (#975).
-        const results = join(root, 'test-results');
-        mkdirSync(join(results, 'scenario-component-retention-names-what-keeps-it', 'nested'), { recursive: true });
-        mkdirSync(join(results, '.auth'), { recursive: true });
-        writeFileSync(join(results, '.auth', 'admin.json'), '{}');
-        expect(keepFailures(results, join(root, 'test-results-kept'), 'x')).toBeNull();
+    it('a failed run that left no output folder keeps nothing, and does not throw', () => {
+        expect(keepFailures(join(root, 'never-made'), join(root, 'test-results-kept'), 'x', 'failed')).toBeNull();
     });
 
     it('keeps the last ten runs, not every run since the machine was set up', () => {
@@ -63,8 +61,30 @@ describe('keepFailures', () => {
         const keptRoot = join(root, 'test-results-kept');
         mkdirSync(join(results, 'a'), { recursive: true });
         writeFileSync(join(results, 'a', 'trace.zip'), 't');
-        for (let i = 0; i < 12; i++) keepFailures(results, keptRoot, `run-${String(i).padStart(2, '0')}`);
+        for (let i = 0; i < 12; i++) keepFailures(results, keptRoot, `run-${String(i).padStart(2, '0')}`, 'failed');
         expect(readdirSync(keptRoot).sort()).toEqual(Array.from({ length: 10 }, (_, i) => `run-${String(i + 2).padStart(2, '0')}`));
+    });
+});
+
+describe('the reporter', () => {
+    it('copies each project\'s output folder once, on a failed run, and nothing on a passed one', async () => {
+        const out = join(root, 'test-results');
+        mkdirSync(join(out, 'a'), { recursive: true });
+        writeFileSync(join(out, 'a', 'measured.json'), '[]');
+        const config = { projects: [{ outputDir: out }, { outputDir: out }] };
+        const passed = new KeepFailedRuns();
+        passed.onBegin(config);
+        passed.onEnd({ status: 'passed' });
+        expect(existsSync(`${out}-kept`), 'a passed run was kept').toBe(false);
+        const failed = new KeepFailedRuns();
+        failed.onBegin(config);
+        failed.onEnd({ status: 'failed' });
+        expect(readdirSync(`${out}-kept`), 'two projects sharing a folder copied it twice').toHaveLength(1);
+    });
+
+    it('does not take the terminal from the config\'s own reporters', () => {
+        // A reporter that prints nothing says so, or Playwright adds a line reporter beside the config's.
+        expect(new KeepFailedRuns().printsToStdio()).toBe(false);
     });
 });
 
@@ -92,14 +112,21 @@ describe('every Playwright config keeps its failed runs', () => {
         expect(found.length).toBeGreaterThan(10);
     });
 
-    it('each names scripts/lib/keep-failed-runs.mjs as a global teardown', () => {
+    it('each names scripts/lib/keep-failed-runs.mjs as a reporter, not as a global teardown', () => {
+        // A global teardown runs before the reporters' onEnd, so it cannot know whether the run passed (#990).
         const missing = found.filter(({ file, rel }) => {
             if (NOT_A_SUITE.has(rel)) return false;
             const src = readFileSync(file, 'utf8');
-            // The path as the config writes it, resolved against the config's own folder.
-            const named = [...src.matchAll(/['"]([^'"]*keep-failed-runs\.mjs)['"]/g)].map((m) => resolve(dirname(file), m[1]));
-            return !/globalTeardown/.test(src) || !named.includes(TEARDOWN);
+            // The path as the config writes it, resolved against the config's own folder, inside `reporter`.
+            const reporter = /reporter:\s*\[([\s\S]*?)\]\s*,\s*\n/.exec(src)?.[1] ?? '';
+            const named = [...reporter.matchAll(/['"]([^'"]*keep-failed-runs\.mjs)['"]/g)].map((m) => resolve(dirname(file), m[1]));
+            return !named.includes(KEEPER);
         }).map(({ rel }) => rel);
         expect(missing, 'these configs lose a failed run\'s traces to the next run').toEqual([]);
+    });
+
+    it('none names it as a global teardown any more', () => {
+        const stale = found.filter(({ file }) => /globalTeardown[^\n]*keep-failed-runs/.test(readFileSync(file, 'utf8'))).map(({ rel }) => rel);
+        expect(stale).toEqual([]);
     });
 });

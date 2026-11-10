@@ -52,11 +52,9 @@ export default defineConfig({
     fullyParallel: true,
     workers: WORKERS,
     // A failed test's fixtures over 5 s go to slow-fixtures.txt, kept with its trace (#758).
-    reporter: [['list'], ['./slow-fixtures-reporter.ts']],
+    reporter: [['list'], ['./slow-fixtures-reporter.ts'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     // The test's own: page creation has a timeout of its own, in fixture.ts (#758).
     timeout: 30_000,
-    // The next run empties test-results/: a failed test's trace is copied out first (#845, #975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     use: {
         baseURL: `http://localhost:${PORT}`,
         // Kept for a FAILED test only, as the showcase does: a failure in the gate that does not

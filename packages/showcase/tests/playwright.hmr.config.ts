@@ -18,14 +18,12 @@ const PORT = 5313;
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     testMatch: ['hmr.spec.ts'],
     fullyParallel: false,
     // Derived, as `playwright-worker-budget.test.ts` asks; the serial spec uses one of them.
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
-    reporter: [['list']],
+    reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     timeout: 60_000,
     globalSetup: './session.ts',
     use: { baseURL: `http://localhost:${PORT}`, trace: 'off', locale: 'en-US', storageState: sessionFile(PORT) },

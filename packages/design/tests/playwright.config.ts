@@ -24,8 +24,6 @@ import { defineConfig } from '@playwright/test';
 const WORKERS = process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8));
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
@@ -39,7 +37,7 @@ export default defineConfig({
     // with it.
     failOnFlakyTests: true,
     workers: WORKERS,
-    reporter: 'html',
+    reporter: [['html'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     use: {
         baseURL: 'http://localhost:3333',
         trace: 'on-first-retry',

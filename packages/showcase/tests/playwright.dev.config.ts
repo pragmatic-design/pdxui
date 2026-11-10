@@ -20,8 +20,6 @@ const PORT = 5312;
 const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 export default defineConfig({
-    // A failed run's traces are copied where the next run cannot empty them (#975).
-    globalTeardown: '../../../scripts/lib/keep-failed-runs.mjs',
     testDir: '.',
     // `permissions-edit.spec.ts` edits the mock server's roles: here, on a server of its
     // own, so a revoked grant cannot race the build's specs that read it.
@@ -37,7 +35,7 @@ export default defineConfig({
     // that is a quarter of a 32-core machine is four times an 8-core laptop's budget. Five tests
     // against one dev server do not need much of it.
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
-    reporter: [['list']],
+    reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     timeout: 30_000,
     // Signed in, as the build's suite is: the dev server's routes are behind the login too.
     globalSetup: './session.ts',
