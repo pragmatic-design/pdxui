@@ -11,9 +11,22 @@ TypeScript `component()` descriptors. The pilot rewrites three components in `.p
 | 3 | the data grid's filter popover | a piece of a large component, heavy and imperative | done |
 
 **The outcome.** The rule was set by the owner: if `pdx-select` passes with no escape hatch, the
-library moves to `.pdx`. It passed every unchanged test, but only by reaching `ctx` in nine places of
-five kinds. **The rule fell on no: the library stays TypeScript.** What a yes would take is #686, for
-the owner to decide; the `.pdx` versions stay here, unexported, as the bench to run the pilot again.
+library moves to `.pdx`.
+
+- **First run, 2026-10-25.** It passed every unchanged test, but only by reaching `ctx` in nine
+  places of five kinds. **The rule fell on no: the library stayed TypeScript.** The owner decided each
+  gap in #686, and each became a declaration: #749–#753, then #986, #987, #988 and #999.
+- **Second run, 2026-11-10.** The three components are on the beta contract (#287, #293). The
+  select reaches `ctx` nowhere and has no `ESCAPE HATCH` left, and neither do the switch and the
+  popover. Results:
+  - `test:pilot`: 3096 passed and 29 skipped, the TypeScript suite's numbers;
+  - `PDX_PILOT=1` certification of the three and of the components that hold them: 684 passed, with
+    1 flaky in an axe spec of `pdx-filter-builder`, a TypeScript component (below).
+
+  **The rule falls on yes.** The move itself changes how every component is written and published,
+  so it is the owner's to start. What it needs first is under «Before the library moves».
+
+The `.pdx` versions stay here, unexported, until then.
 
 ## How a pilot component is held to the same bar
 
@@ -51,9 +64,48 @@ measuring the TypeScript one.
   the grid's filter-menu guard goes red. Before its placement observed its size, the anchor guard was
   red too, 44 px off the funnel: certification was measuring the `.pdx` content.
 
+## The second run
+
+On 2026-11-10, against `main` with every declaration above merged.
+
+- **The switch was behind.** `pilot/switch.pdx` had never followed #293. Unchanged, its
+  certification failed `switch-disabled` in 13 themes and four beta-contract guards. It now has:
+  - the custom states and the `label` and `description` parts;
+  - `aria-invalid` and `aria-busy`;
+  - `::checked`, two-way, where a one-way `:checked` had a handler writing the model back
+    (`PDX_ONE_WAY_EDITED_FIELD`).
+- **One defect came out of it, #999.** A `@part` named like a prop replaced the prop, with no
+  diagnostic, and the switch's label was not rendered: 16 certification tests. Now the script's name
+  wins.
+- **What the compiler says, with `prefix: 'pdx'`:**
+  - the switch's `label` and `description` and the select's `clear` are parts only a theme needs.
+    `PDX_PART_NAME_TAKEN` says the script does not reach them by name, and each file silences it with
+    a `pdx-ignore` that gives the reason;
+  - the select keeps three `PDX_EFFECT_STATE`, a design heuristic the build does not print.
+    `selectedValues` is written by the user's actions too, so it is no `$derived`. `virtualItems` and
+    `virtualTotalSize` copy the signals of a virtualizer the effect creates and disposes.
+- **The flaky test.** `a11y: filter-builder-empty [pragmatic]` failed once and passed on its retry.
+  The page it scanned showed every scenario, not the one asked for. It was the second test of the
+  first wave, on the scenario server's first compile. `pdx-filter-builder` is not piloted.
+- **Not measured again:** the lines, weights and mount times below are the first run's.
+
+## Before the library moves
+
+The rule is met. These stand between it and a library written in `.pdx`:
+
+- **The generators read TypeScript (finding 3).** `gen-manifest.mjs` parses `component()` calls, and
+  the catalogue, the variants and the certification registry follow from it. A `.pdx` component is
+  invisible to them. The compiler already produces the descriptor, so the generators can read it from
+  the compiled module.
+- **A cold `.pdx` in the dev transform (finding 11).** The first select compiles in 301 ms against
+  69 ms for the TypeScript one.
+- **Weight and the value list's mount.** On a production build the switch and the select mount at
+  or under their TypeScript versions. The filter popover's value list is 1.82–1.84×, and every `.pdx`
+  module is heavier, because it carries its compiled render inline.
+
 ## Measurements
 
-Measured on 2026-10-25.
+Measured on 2026-10-25, the first run.
 
 - **Lines** are the source file. For the filter popover, the part the `.pdx` replaces: lines 145–383
   and 428–582 of `src/shared/filter-popover.ts`.
@@ -131,8 +183,9 @@ What the numbers mean:
 
 ## Where the select reaches `ctx`
 
-The rule asks for no escape hatch. The select needs five kinds, each marked `ESCAPE HATCH` in
-[`pilot/select.pdx`](pilot/select.pdx). The switch and the filter popover need none.
+The rule asks for no escape hatch. In the first run the select needed five kinds, each marked
+`ESCAPE HATCH` in [`pilot/select.pdx`](pilot/select.pdx). Each is a declaration now, and the select
+has none left. The switch and the filter popover never needed one.
 
 | What the component does | Why no declaration covers it | Places |
 |---|---|---|
@@ -147,21 +200,24 @@ What the pilot found that the language or the toolchain does not do yet.
 
 | # | Finding | Where it went |
 |---|---|---|
-| 1 | `PDX_VARIANT_UNSTYLED` warns a library `.pdx` that its variants are unstyled. They are drawn by `@pdxui/design`, not its own `<style scoped>` | moot while the library is TypeScript |
-| 2 | `@variants` cannot name a value's native class (`sm: '.pdx-toggle-sm'`), which `gen-variants.mjs` draws native markup from | moot, as 1 |
-| 3 | The library's generators read TypeScript. `gen-manifest.mjs` parses `component()` calls, and the catalogue, the variants and the certification registry follow from it. A `.pdx` component is invisible to them | moot, as 1 |
+| 1 | `PDX_VARIANT_UNSTYLED` warns a library `.pdx` that its variants are unstyled. They are drawn by `@pdxui/design`, not its own `<style scoped>` | fixed, #986: a library component's variants are checked against the design package's rules |
+| 2 | `@variants` cannot name a value's native class (`sm: '.pdx-toggle-sm'`), which `gen-variants.mjs` draws native markup from | fixed, #986: a value carries its native selector |
+| 3 | The library's generators read TypeScript. `gen-manifest.mjs` parses `component()` calls, and the catalogue, the variants and the certification registry follow from it. A `.pdx` component is invisible to them | open: the first thing a move needs |
 | 4 | The compiled render runs a generic property-or-attribute branch where the element's tag decides it | fixed, #685: a property the native element certainly has is assigned with no branch |
 | 5 | Certification does not check a switch's role: with `role="checkbox"` every spec stayed green, axe included | #684 |
 | 6 | The signal rewrite renames a type member that shares a prop's name (`{ source?: … }` → `{ source()?: … }`), and the type erasure then gives up without a word | #675 |
 | 7 | `.peek()` on a `$derived` or a prop is rewritten to a call that throws | #676 |
 | 8 | `@prop xs: T[] = []` is one array shared by every instance | #677 |
 | 9 | A `:value` binding does not write back a value the user changed | #678 |
-| 10 | A model cannot say its attribute is a string and its value is not (`@model value: string = null`) | #686, item 5 |
+| 10 | A model cannot say its attribute is a string and its value is not (`@model value: string = null`) | fixed, #753: `@model value: … { attribute: string }` |
 | 11 | A cold `.pdx` compiles slowly in the dev transform: 301 ms for the first select against 69 ms | open: #685 measured the mount on a production build, not the dev transform |
 | 12 | A script function named `valueOf` is taken for a core function: the lookup reads `Object.prototype` | #681 |
 | 13 | A `$signal` initialiser that reads another `$signal` is left as written, and throws | #682 |
 | 14 | `@defer` renders after its load resolves even when the code is there, so a box measured right after the append is empty | fixed after the first block, #685: a `@defer`'s code is one loader per module, and a block whose code has arrived renders in its trigger's task. The first block of a `@defer` still waits for its load, so the popover keeps observing its size |
 | 15 | `PDX_UNUSED_REACTIVE` misses the reads inside a script `@snippet` | #683 |
+| 16 | A `<label for>` needed the host's `id` and a document query | fixed, #987: a form-associated host has `labels` |
+| 17 | A part could sit on one element only: the select's options and tags are rows | fixed, #988: a part is every element that carries it, an array when there can be more than one |
+| 18 | A `@part` named like a prop replaced the prop with no diagnostic; named like a function, it bound nothing | fixed, #999: the script's name wins, `PDX_PART_NAME_TAKEN` (info) |
 
 Two things in the pilot's own wiring are worth knowing for the next run:
 
