@@ -7,24 +7,25 @@
   <label :class="wrapClass">
     <input
       type="checkbox"
-      :class="toggleClass"
+      class="pdx-toggle"
       data-part="root"
       role="switch"
       :ref="inputEl"
-      :checked="checked"
+      ::checked="checked"
       :disabled="disabled || loading"
       :aria-checked="String(!!checked)"
-      :aria-label="ariaLabel || (label ? null : uiString('switch', 'label'))"
-      @change="onChange" />
+      :aria-invalid="error ? 'true' : null"
+      :aria-busy="loading ? 'true' : null"
+      :aria-label="ariaLabel || (label ? null : uiString('switch', 'label'))" />
     @if (label || description) {
       <span class="pdx-switch-content">
         @if (label) {
-          <span class="pdx-switch-label">{{ label }}</span>
+          <span class="pdx-switch-label" data-part="label">{{ label }}</span>
         } @else {
           <slot></slot>
         }
         @if (description) {
-          <span class="pdx-switch-desc">{{ description }}</span>
+          <span class="pdx-switch-desc" data-part="description">{{ description }}</span>
         }
       </span>
     } @else {
@@ -40,7 +41,12 @@ import { uiString } from '../src/shared/i18n';
 @model checked: boolean = false { form };
 /** sm, md (the default) or lg: the track's size. */
 @variants { size: { md: '.pdx-toggle-md', sm: '.pdx-toggle-sm', lg: '.pdx-toggle-lg' } = md; }
-@part root;
+@part root, label, description;
+// On the host as custom states (#132, #293): the track and its label carry no state class.
+@state checked = !!checked;
+@state invalid = !!error;
+@state disabled = !!disabled;
+@state loading = !!loading;
 @prop disabled: boolean = false;
 @prop loading: boolean = false;
 @prop label: string = '';
@@ -60,18 +66,11 @@ import { uiString } from '../src/shared/i18n';
 
 let inputEl = $signal<HTMLInputElement | null>(null);
 
-const toggleClass = $derived('pdx-toggle' + (error ? ' pdx-toggle-error' : '') + (loading ? ' pdx-toggle-loading' : ''));
-const wrapClass = $derived('pdx-switch-wrap' + (labelPosition === 'left' ? ' pdx-switch-label-left' : '') + (disabled || loading ? ' disabled' : ''));
+const wrapClass = $derived('pdx-switch-wrap' + (labelPosition === 'left' ? ' pdx-switch-label-left' : ''));
 
-function onChange(e: Event) {
-  if (disabled || loading) return;
-  checked = (e.target as HTMLInputElement).checked;
-}
-
+// The field writes `checked` itself, two-way: a disabled or loading switch is a disabled input, which
+// the user cannot change.
 function focus() { inputEl?.focus(); }
 function blur() { inputEl?.blur(); }
-function clear() {
-  if (inputEl) inputEl.checked = false;
-  checked = false;
-}
+function clear() { checked = false; }
 </script>
