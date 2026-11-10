@@ -357,6 +357,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it, `@part x;`, or remove the attribute.',
         example: { bad: pdx('<div data-part="popup">x</div>', 'let open = $signal(false);'), good: pdx('<div data-part="popup">x</div>', '@part popup;') },
     },
+    PDX_PART_NAME_TAKEN: {
+        severity: 'info', category: 'defect',
+        summary: 'A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, a function, a constant), with no `:ref` on its element.',
+        explanation: 'A part\'s name is chosen by the styling contract, and the script\'s name keeps its meaning (#999): `@prop label` stays the label text where a part `label` would have replaced it with the element. The part is still the template\'s and the theme\'s — its `data-part`, the manifest — but the script does not read its element by that name, and with no `:ref` it does not reach it at all.',
+        fix: 'To reach the element, bind it with `:ref` to a `$signal` of another name. A `$signal` of the part\'s own name receives the element, as a part does. A part only a theme needs can stay as it is: the finding is information.',
+        example: { bad: pdx('<span data-part="label">{{ label }}</span>', "@prop label: string = '';\n@part label;"), good: pdx('<span data-part="label" :ref="labelEl">{{ label }}</span>', "@prop label: string = '';\n@part label;\nlet labelEl = $signal<HTMLElement | null>(null);") },
+    },
     PDX_HOST_INVALID_ATTRIBUTE: {
         severity: 'error', category: 'defect',
         summary: 'On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument.',

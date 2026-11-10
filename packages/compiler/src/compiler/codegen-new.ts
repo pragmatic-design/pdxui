@@ -125,8 +125,10 @@ export function compileNewMode(
     ctx.literalConsts = literalConstNames(descriptor.script?.content ?? '');
     // Bubbling events inside a @for are delegated to one listener per type (#113).
     ctx.delegatedEvents = delegatedEventTypes(ast);
-    // A literal `data-part` naming a declared part is also that part's ref (#134).
-    ctx.parts = new Set(analysis.parts);
+    // A literal `data-part` naming a declared part is also that part's ref (#134), when the part's
+    // name is a signal: its own, or a `$signal` the script declares. A name the script declares as
+    // anything else keeps its meaning (#999), and the element is not handed to it.
+    ctx.parts = new Set(analysis.parts.filter(name => analysis.signals.some(s => s.name === name)));
     // One the template can render more than once is the array of its elements (#988): its signal,
     // declared by the part, starts empty. The setup is written below, after this.
     ctx.repeatedParts = repeatedParts(analysis.parts, ast);

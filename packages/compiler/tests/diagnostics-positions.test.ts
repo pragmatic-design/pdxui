@@ -63,6 +63,7 @@ const ROWS: Record<string, Row> = {
     PDX_NAME_RESERVED: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@prop label: string;\n@prop track: string;'), at: '@prop track' },
     PDX_SLOT_REQUIRED: { src: pdx('<p>{{ a }}</p>\n<app-list>@snippet row(u) { <b>{{ u }}</b> }</app-list>\n  <app-list></app-list>', 'let a = $signal(1);'), at: '<app-list></app-list>' },
     PDX_PART_MISSING: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@part trigger;'), at: '@part trigger;' },
+    PDX_PART_NAME_TAKEN: { src: pdx('<p data-part="label">{{ label }}</p>', "@prop label: string = '';\n@part label;"), at: '@part label;' },
     PDX_PART_UNDECLARED: { src: pdx('<p data-part="popup">{{ a }}</p>', 'let a = $signal(1);'), at: 'data-part="popup"' },
     PDX_HOST_INVALID_ATTRIBUTE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@host {\n  role="button"\n  data-part="x"\n}'), at: 'data-part="x"' },
     PDX_MALFORMED_STATE: { src: pdx('<p>{{ a }}</p>', 'let a = $signal(1);\n@state open;'), at: '@state open;' },

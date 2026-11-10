@@ -82,6 +82,21 @@ describe('the rune declarations', () => {
         expect(hover?.contents.value).toMatch(/var trigger: HTMLElement\b/);
     });
 
+    it('a @part named like another script declaration leaves it its type (#999)', () => {
+        const scripts = [
+            "@prop label: string = '';\n@part label;\nfunction f() { label.toUpperCase(); }\nf;\n",
+            '@model checked: boolean = false;\n@part checked;\nfunction f() { checked = !checked; }\nf;\n',
+            '@part clear;\nfunction clear() { return 1; }\nclear();\n',
+            '@part label;\nconst label = 1;\nlabel.toFixed();\n',
+            '@part label;\nlet label = $signal<HTMLElement | null>(null);\nfunction f() { label?.focus(); }\nf;\n',
+        ];
+        for (const script of scripts) expect(diagnose(script), script).toEqual([]);
+        const script = scripts[0];
+        const vf = buildVirtualFile(script, 0, [], '', -1);
+        const hover = tsHover(svc, URI, vf, script.indexOf('label.toUpperCase')) as { contents: { value: string } } | null;
+        expect(hover?.contents.value).toMatch(/label: string/);
+    });
+
     it('a @part the template renders more than once is the array of its elements (#988)', () => {
         const script = '@part option, search;\nlet items = $signal([1]);\nlet a = $signal(true);\nfunction f() { option.forEach((o) => o.focus()); search?.focus(); }\nf;\n';
         const template = '@for (items as it; track it) { <li data-part="option">{{ it }}</li> }<li data-part="option">+</li>'

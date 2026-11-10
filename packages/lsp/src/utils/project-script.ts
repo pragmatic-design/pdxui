@@ -2,7 +2,7 @@
 // they declare typed at the end, the $… runes left to their ambient declarations. Split from
 // ts-service.ts, which hosts the language service that reads it.
 
-import { DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
+import { analyzeScript, DECORATOR_RUNES, eventEmitterName, parseActionDecl, parseFetchDecl, parseVariantsBlock, readModelOptions, routeParamsType, withoutStatementEnd } from '@pdxui/compiler';
 import { routeNameTypes } from './route-name-types';
 import { formTypeOf } from './form-types';
 
@@ -157,6 +157,8 @@ export function projectScriptMapped(
     const names = new Map<string, string>();
     // `@event name: T` → the script's `name(detail)`, declared typed by its payload.
     const emitters: string[] = [];
+    // The `@part` names that are the part's own signal, read once on the first `@part`.
+    let partSignals: Set<string> | undefined;
     RUNE_KW.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = RUNE_KW.exec(s))) {
@@ -222,8 +224,12 @@ export function projectScriptMapped(
             // Match: @part trigger, popup; — each name is its element, null while not rendered (#134),
             // or the array of its elements when the template renders it more than once (#988).
             // Typed by the tag it sits on would need the template; HTMLElement is what it always is.
+            // A name the script declares itself is that declaration (#999), typed where it is written:
+            // the compiler's analyzer says which names are the part's own.
+            partSignals ??= new Set(analyzeScript(s, 'projection.pdx').signals.filter((sig) => sig.part).map((sig) => sig.name));
             const list = /^\s+([\w\s,]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             for (const name of list ? list[1].split(',').map((n) => n.trim()).filter(Boolean) : []) {
+                if (!partSignals.has(name)) continue;
                 emitters.push((partCounts?.get(name) ?? 0) > 1 ? `var ${name}: HTMLElement[];` : `var ${name}: HTMLElement | null;`);
             }
         }

@@ -429,6 +429,12 @@ the template can render at the same time:
 - The array follows every element that comes or goes, at once, and is put back in document order in a
   microtask. A row that only moves, as a keyed `@for` moves one, keeps its place in the array until an
   element comes or goes.
+- A part's name the script already declares (#999): a `$signal` of that name receives the element; a
+  `@prop`, a `@model`, a function or a constant keeps its meaning, and the element is not bound to it.
+  The part is still the template's and the theme's (its `data-part`, the manifest). The script
+  reaches the element through a `:ref` on it; without one, `PDX_PART_NAME_TAKEN` (info) says so. A part's
+  name is chosen by the styling contract, so it never turns a public prop into an element:
+  `pdx-switch` has a `label` prop and a `label` part.
 - `:part=` and the HTML `part` attribute are not this: `part` is the shadow-parts attribute.
 
 ### Examples
