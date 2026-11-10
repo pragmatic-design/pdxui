@@ -408,15 +408,27 @@ PartAttribute ::= 'data-part="' Identifier '"'
 ### Semantics
 
 A named, public element of the component (#134). `@part popup;` in the script and
-`data-part="popup"` written literally on exactly one element. The part is a typed private reference in
+`data-part="popup"` written literally on the elements it names. The part is a typed private reference in
 the script (`popup: HTMLDivElement`) and an entry in the manifest. Parts, states and component tokens
 are the **public styling surface** of a component; its internal classes are not. Descriptor:
 `parts: ['popup']`.
 
+A part is every element that carries it (#988), as the platform's `part` attribute is: a theme's
+`[data-part="option"]` styles every option. What the script's name holds depends on how many of them
+the template can render at the same time:
+
+| The `data-part` sits on | The name is |
+|---|---|
+| one element, or alternative branches of one chain (`@if` / `@else if` / `@else`, the cases of a `@switch`, the states of a `@defer`, an `@await` or a `@try`) | that element, or `null` while none is rendered |
+| an `@for` row, two siblings, two separate blocks, an element beside an `@for`, a `@snippet` body | the array of the rendered elements, in document order; `[]` while none is |
+
 ### Rules
 
-- A declared part with no element: `PDX_PART_MISSING`; on two elements: `PDX_PART_DUPLICATE`; a
-  `data-part` with no declaration: `PDX_PART_UNDECLARED`.
+- A declared part with no element: `PDX_PART_MISSING`; a `data-part` with no declaration:
+  `PDX_PART_UNDECLARED`.
+- The array follows every element that comes or goes, at once, and is put back in document order in a
+  microtask. A row that only moves, as a keyed `@for` moves one, keeps its place in the array until an
+  element comes or goes.
 - `:part=` and the HTML `part` attribute are not this: `part` is the shadow-parts attribute.
 
 ### Examples
@@ -435,8 +447,9 @@ let open = $signal(false);
 
 **Landed** (#134). The part's ref is a signal holding the element (`null` while it is not rendered),
 as a `:ref` to a `$signal(null)`. The editor types it `HTMLElement | null`; the tag's own type
-(`HTMLDivElement`) needs the template, which is the editor's template projection (#122). The count is of the attribute as written, so a `data-part` inside an
-`@for` counts once: whether it may sit there is still one of the open questions (decisions.md). A
+(`HTMLDivElement`) needs the template, which is the editor's template projection (#122). A part the
+template renders more than once is a signal holding the array, bound by core's `bindParts`, and the
+editor types it `HTMLElement[]` (#988). A
 name the script declares itself keeps its declaration, and the element is bound to it. The manifest
 lists a TypeScript component's `parts` as `cssParts`.
 

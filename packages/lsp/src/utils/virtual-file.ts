@@ -3,7 +3,7 @@
 // and provides the two-way mapping between .pdx offsets and virtual offsets. The projected script is
 // 1:1 with the script but for the text it inserts (`insertions`, #564), which the mapping steps over.
 
-import type { TemplateNode } from '@pdxui/compiler';
+import { dataPartCounts, type TemplateNode } from '@pdxui/compiler';
 import { projectScriptMapped, type ScriptInsertion } from './project-script';
 import { projectTemplate } from './template-projection';
 import type { ResolveType, ResolveSnippet } from './template-projection';
@@ -33,7 +33,7 @@ export function buildVirtualFile(
     /** What types a `@snippet`'s parameters (#490). */
     resolveSnippet?: ResolveSnippet,
 ): VirtualFile {
-    const projected = projectScriptMapped(scriptContent);
+    const projected = projectScriptMapped(scriptContent, { partCounts: ast ? dataPartCounts(ast) : undefined });
     const { script, declarations } = typeRefs(projected.text, refTargets(ast, resolveExposed));
     let content = script + EPILOGUE + (declarations ? declarations + '\n' : '');
     let templateMap: SegmentMap | null = null;

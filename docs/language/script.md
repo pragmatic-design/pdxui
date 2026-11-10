@@ -498,18 +498,26 @@ The analyzer's form: `@part trigger, popup;`, and `data-part="popup"` on the ele
 #### Semantics
 
 A named, public element of the component. `@part popup;` in the script, and `data-part="popup"`
-written literally on one element of the template. The attribute stays in the page, so a theme or a
-test reaches the element as `pdx-menu [data-part="popup"]` — with the component's `:state()` and its
-tokens, the public styling surface; its internal classes are not. In the script the name is the
-element: a signal that holds it while it is rendered and `null` otherwise, as a `:ref` written to a
-`$signal(null)`, so `popup?.focus()` needs no `:ref`. The descriptor declares `parts: ['popup']`, and the
-manifest lists them.
+written literally on the elements of the template it names. The attribute stays in the page, so a
+theme or a test reaches the element as `pdx-menu [data-part="popup"]` — with the component's
+`:state()` and its tokens, the public styling surface; its internal classes are not. In the script the
+name is the element: a signal that holds it while it is rendered and `null` otherwise, as a `:ref`
+written to a `$signal(null)`, so `popup?.focus()` needs no `:ref`. The descriptor declares
+`parts: ['popup']`, and the manifest lists them.
+
+A part is every element that carries it (#988). When the template can render more than one of them at
+the same time — on an `@for` row, on two siblings, in two separate blocks, beside an `@for`, in a
+`@snippet` body — the name is the **array** of the rendered elements, in document order, and `[]`
+while none is. On alternative branches of one chain (`@if` / `@else if` / `@else`, a `@switch`'s
+cases, the states of a `@defer`, an `@await` or a `@try`) at most one renders, and the name is that
+element or `null`.
 
 #### Rules
 
-- A declared part on no element raises `PDX_PART_MISSING`; on more than one, `PDX_PART_DUPLICATE`; a
-  `data-part` with no declaration, `PDX_PART_UNDECLARED`. The count is of the attribute as written: a
-  `data-part` inside an `@for` counts once (whether it may sit there is an open question of the beta).
+- A declared part on no element raises `PDX_PART_MISSING`; a `data-part` with no declaration,
+  `PDX_PART_UNDECLARED`.
+- An array part follows every element that comes or goes at once, and is put back in document order
+  in a microtask; a row that only moves keeps its place until an element comes or goes.
 - A name the script declares itself is that declaration: the part's element is bound to it.
 
 #### Examples

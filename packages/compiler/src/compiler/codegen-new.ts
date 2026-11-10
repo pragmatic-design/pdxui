@@ -20,6 +20,7 @@ import { assembleModule, detectDeadSignals, extractTag, renderReturnIndex } from
 import { jsQuote } from './js-literal';
 import { coreRuleImports } from './form-rules';
 import { variantsDescriptor } from './variants';
+import { repeatedParts } from './validate-parts';
 
 /** Compile using decorator+rune syntax. Auto-return, auto-import, signal mutation rewriting. */
 export function compileNewMode(
@@ -126,6 +127,10 @@ export function compileNewMode(
     ctx.delegatedEvents = delegatedEventTypes(ast);
     // A literal `data-part` naming a declared part is also that part's ref (#134).
     ctx.parts = new Set(analysis.parts);
+    // One the template can render more than once is the array of its elements (#988): its signal,
+    // declared by the part, starts empty. The setup is written below, after this.
+    ctx.repeatedParts = repeatedParts(analysis.parts, ast);
+    for (const s of analysis.signals) if (s.part && ctx.repeatedParts.has(s.name)) s.initialExpr = '[]';
     // What a `@render` calls (#489): a typed snippet the script declares, or one of its template
     // `@snippet`s, which are compiled here as functions of the render, beside the hoisted slots.
     const typedSlots = analysis.slots.filter(s => s.signature !== undefined).map(s => s.name);

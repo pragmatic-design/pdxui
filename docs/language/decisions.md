@@ -91,10 +91,12 @@ issue implements it. Each line names where the rule lives.
   as a signal; deferred.
 - **The WebMCP adapter**: revisited at the end of Chrome's origin trial — and with it `@form { agent }`
   (decision 54).
-- **Four questions the examples raised**, for the next revision: whether a `data-part` may sit inside
-  a `@for`; how `@part` and `@state` names relate to the script's other names; whether the callee rule
-  (decision 17) covers `onSave?.()`; whether `execute()` rejects when the action fails, or only on
-  cancellation.
+- **Three questions the examples raised**, for the next revision: how `@part` and `@state` names
+  relate to the script's other names; whether the callee rule (decision 17) covers `onSave?.()`;
+  whether `execute()` rejects when the action fails, or only on cancellation. A fourth, whether a
+  `data-part` may sit inside an `@for`, was decided by the owner on 2026-11-10 (#988): a part is every
+  element that carries it, and its name is an array when the template renders more than one
+  ([components.md](components.md), `@part`).
 
 ## Names this specification chose
 

@@ -138,7 +138,14 @@ export function projectScript(scriptContent: string): string {
  * declaration's parameters take no contextual type, and a `.ts` file reads no JSDoc type — so the
  * text is inserted, and the virtual file maps every offset around it (./virtual-file.ts).
  */
-export function projectScriptMapped(scriptContent: string, { typeLoader = true } = {}): { text: string; insertions: ScriptInsertion[] } {
+export function projectScriptMapped(
+    scriptContent: string,
+    { typeLoader = true, partCounts }: {
+        typeLoader?: boolean;
+        /** How many elements of each part the template can render at once (#988): more than one is an array. */
+        partCounts?: ReadonlyMap<string, number>;
+    } = {},
+): { text: string; insertions: ScriptInsertion[] } {
     const s = scriptContent;
     // The page's pattern (its first path) and the function its named loader calls, when there are both.
     let pattern: string | null = null;
@@ -212,11 +219,12 @@ export function projectScriptMapped(scriptContent: string, { typeLoader = true }
             if (named) emitters.push(`var ${named[1]}: import('@pdxui/core').PdxElement;`);
         }
         if (kw === 'part') {
-            // Match: @part trigger, popup; — each name is its element, null while not rendered (#134).
+            // Match: @part trigger, popup; — each name is its element, null while not rendered (#134),
+            // or the array of its elements when the template renders it more than once (#988).
             // Typed by the tag it sits on would need the template; HTMLElement is what it always is.
             const list = /^\s+([\w\s,]+?)\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
             for (const name of list ? list[1].split(',').map((n) => n.trim()).filter(Boolean) : []) {
-                emitters.push(`var ${name}: HTMLElement | null;`);
+                emitters.push((partCounts?.get(name) ?? 0) > 1 ? `var ${name}: HTMLElement[];` : `var ${name}: HTMLElement | null;`);
             }
         }
         if (kw === 'snippet') {

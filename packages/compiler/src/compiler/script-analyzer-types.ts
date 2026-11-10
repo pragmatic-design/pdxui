@@ -87,6 +87,8 @@ export interface SignalDecl {
     type?: string;
     /** Where the declaration was written in the .pdx, when a source map was asked for. */
     origin?: number;
+    /** Declared by `@part` (#134), not by the script: its element, or the array of them (#988). */
+    part?: true;
 }
 
 export interface DerivedDecl {

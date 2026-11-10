@@ -346,16 +346,9 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
     PDX_PART_MISSING: {
         severity: 'error', category: 'defect',
         summary: 'A declared `@part` that no element of the template carries.',
-        explanation: 'A part is a public name for one element: a theme styles `[data-part="x"]` and the script reads `x` as the element. With no element, both reach nothing, and the manifest lists a part that is not there.',
+        explanation: 'A part is a public name for the elements that carry it: a theme styles `[data-part="x"]` and the script reads `x` as the element, or as the array of them when the template renders more than one. With no element, both reach nothing, and the manifest lists a part that is not there.',
         fix: 'Write `data-part="x"` on the element it names, or remove `x` from `@part`.',
         example: { bad: pdx('<button>Menu</button>', '@part trigger;'), good: pdx('<button data-part="trigger">Menu</button>', '@part trigger;') },
-    },
-    PDX_PART_DUPLICATE: {
-        severity: 'error', category: 'defect',
-        summary: 'A `@part` written on more than one element.',
-        explanation: 'A part names one element. On two, a theme styles both under one name and the script\'s ref holds whichever rendered last.',
-        fix: 'Keep `data-part="x"` on one element, and give the others parts of their own.',
-        example: { bad: pdx('<button data-part="action">A</button><button data-part="action">B</button>', '@part action;'), good: pdx('<button data-part="ok">A</button><button data-part="cancel">B</button>', '@part ok, cancel;') },
     },
     PDX_PART_UNDECLARED: {
         severity: 'error', category: 'defect',

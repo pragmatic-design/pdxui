@@ -82,6 +82,17 @@ describe('the rune declarations', () => {
         expect(hover?.contents.value).toMatch(/var trigger: HTMLElement\b/);
     });
 
+    it('a @part the template renders more than once is the array of its elements (#988)', () => {
+        const script = '@part option, search;\nlet items = $signal([1]);\nlet a = $signal(true);\nfunction f() { option.forEach((o) => o.focus()); search?.focus(); }\nf;\n';
+        const template = '@for (items as it; track it) { <li data-part="option">{{ it }}</li> }<li data-part="option">+</li>'
+            + '@if (a) { <input data-part="search"> } @else { <input data-part="search"> }';
+        expect(diagnose(script, template)).toEqual([]);
+        const vf = buildVirtualFile(script, 0, parseTemplate(template, 1), template, 0);
+        const at = (name: string) => (tsHover(svc, URI, vf, script.indexOf(name, script.indexOf('function'))) as { contents: { value: string } } | null)?.contents.value;
+        expect(at('option')).toMatch(/var option: HTMLElement\[\]/);
+        expect(at('search')).toMatch(/var search: HTMLElement\b(?!\[)/);
+    });
+
     it('$event.target.value is accepted in a handler', () => {
         expect(diagnose("let name = $signal('');", '<input @input="name = $event.target.value">')).toEqual([]);
     });
