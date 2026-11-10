@@ -20,14 +20,22 @@ env:
   FC_FONTATIONS: '1'
   DBUS_SESSION_BUS_ADDRESS: 'disabled:'
 
-# Every job and every Chromium install has a timeout (#642): without one a stalled apt ran for six
-# hours. Each value sits above the longest successful run of 15 (2026-10-23): the install took up to
-# 16 minutes (median 0.3), a contracts job up to 21, visual up to 6. core's ci-timeouts test holds it.
+# Every job has a timeout (#642): without one a stalled apt ran for six hours. Each value sits above
+# the longest successful run of 15 (2026-10-23): a contracts job up to 21 minutes, visual up to 6.
+# core's ci-timeouts test holds it.
+#
+# The contracts jobs run in the official Playwright image, of the version the lockfile pins (#998):
+# it carries Chromium and its system libraries, so no job runs apt. Installing them on the runner
+# stalled in apt after the Azure mirror fell back. core's ci-playwright-image test holds the tag to
+# the lockfile and to the visual job's Dockerfile.
 jobs:
-  # Dimensions 1-4: deterministic, fast, no screenshots → no Docker needed.
+  # Dimensions 1-4: deterministic, fast, no screenshots → the base Playwright image, not the visual
+  # job's pinned fonts.
   contracts:
     name: contracts (dim 1-4) (${{ matrix.project }} ${{ matrix.shard }}/${{ matrix.of }})
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -50,8 +58,6 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
-        timeout-minutes: 25
       - name: Generate scenarios + registry
         run: pnpm --filter @pdxui/responsive test:gen
       # The whole certification folder, as `test:certify` runs it: no file filter. A list of named
@@ -83,6 +89,8 @@ jobs:
   contracts-2024:
     name: contracts (dim 1, baseline-2024)
     runs-on: ubuntu-24.04
+    container:
+      image: mcr.microsoft.com/playwright:v1.58.2-noble
     timeout-minutes: 45
     env:
       PDX_TARGET: baseline-2024
@@ -93,8 +101,6 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: pnpm }
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @pdxui/responsive exec playwright install --with-deps chromium
-        timeout-minutes: 25
       - name: Generate scenarios + registry
         run: pnpm --filter @pdxui/responsive test:gen
       - name: Dim 1, contract math, on baseline-2024
