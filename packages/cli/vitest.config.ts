@@ -7,6 +7,6 @@ import { unitTestWorkers } from '../../build/unit-test-workers';
 export default defineConfig({
     test: {
         maxWorkers: unitTestWorkers(),
-        setupFiles: ['./tests/setup-esbuild.ts'],
+        setupFiles: ['./tests/setup-esbuild.ts', '../core/tests/setup/slow-test-record.ts'],
     },
 });

@@ -16,6 +16,8 @@ export default defineConfig({
     test: {
         environment: 'node',
         include: ['tests/**/*.test.ts'],
+        // A failed test over 2 s says what its process was doing (#991).
+        setupFiles: ['../core/tests/setup/slow-test-record.ts'],
         // Its share of the machine, not all of it: `test:unit` runs four packages at once.
         maxWorkers: unitTestWorkers(),
         coverage: {

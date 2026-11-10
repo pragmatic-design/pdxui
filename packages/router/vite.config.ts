@@ -30,7 +30,7 @@ export default defineConfig({
         // Its share of the machine, not all of it: `test:unit` runs four packages at once.
         maxWorkers: unitTestWorkers(),
         // The MutationObserver GC detector, shared with core and ui; needs --expose-gc below.
-        setupFiles: ['../core/tests/setup/gc-observer.ts'],
+        setupFiles: ['../core/tests/setup/gc-observer.ts', '../core/tests/setup/slow-test-record.ts'],
         execArgv: ['--expose-gc'],
         coverage: {
             provider: 'v8',

@@ -68,7 +68,7 @@ export default defineConfig({
         // The MutationObserver GC detector, one file for the three happy-dom packages that have one
         // (core owns it, next to its own setup). It needs --expose-gc below.
         // settle-prefetch keeps a file's environment up until its idle prefetches have loaded.
-        setupFiles: ['../core/tests/setup/gc-observer.ts', 'tests/setup/settle-prefetch.ts'],
+        setupFiles: ['../core/tests/setup/gc-observer.ts', 'tests/setup/settle-prefetch.ts', '../core/tests/setup/slow-test-record.ts'],
         execArgv: ['--expose-gc'],
     },
 });

@@ -48,7 +48,7 @@ export default defineConfig({
         exclude: ['**/node_modules/**', '**/dist/**', 'tests/perf/**'],
         // Refuses an unstubbed fetch by name instead of opening a socket to happy-dom's default
         // origin (http://localhost:3000). See the file for what that costs.
-        setupFiles: ['tests/setup/no-network.ts', 'tests/setup/gc-observer.ts'],
+        setupFiles: ['tests/setup/no-network.ts', 'tests/setup/gc-observer.ts', 'tests/setup/slow-test-record.ts'],
         // --expose-gc for the detector in gc-observer.ts: happy-dom drops a MutationObserver's
         // records after a collection, so a test that rests on one passes alone and fails at random
         // in the gate. Forcing the collection makes it fail always.
