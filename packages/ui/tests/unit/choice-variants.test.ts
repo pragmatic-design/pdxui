@@ -5,7 +5,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { cleanup, mount, tick } from './helpers';
 import '../../src/checkbox/pdx-checkbox';
 import '../../src/radio/pdx-radio';
-import '../../src/switch-toggle/pdx-switch';
+import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/segmented/pdx-segmented';
 import '../../src/slider/pdx-slider';
 import '../../src/rating/pdx-rating';

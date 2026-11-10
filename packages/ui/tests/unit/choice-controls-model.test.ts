@@ -13,7 +13,7 @@ import { compile } from '../../../compiler/src/plugin';
 import { alphaChangeEvent, type AlphaLookup } from '../../../compiler/src/language/alpha-events';
 import { tick, cleanup } from './helpers';
 import '../../src/checkbox/pdx-checkbox';
-import '../../src/switch-toggle/pdx-switch';
+import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/radio/pdx-radio';
 import '../../src/toggle/pdx-toggle';
 import '../../src/radio-group/pdx-radio-group';

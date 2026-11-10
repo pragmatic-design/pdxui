@@ -16,7 +16,8 @@ function componentFiles(dir: string, acc: string[] = []): string[] {
     for (const entry of readdirSync(dir)) {
         const p = join(dir, entry);
         if (statSync(p).isDirectory()) componentFiles(p, acc);
-        else if (/^pdx-.*\.ts$/.test(entry)) acc.push(p);
+        // A component written in .pdx too (#1008): moving one must not change what it observes.
+        else if (/^pdx-.*\.(ts|pdx)$/.test(entry)) acc.push(p);
     }
     return acc;
 }
@@ -37,7 +38,7 @@ describe('observed attributes', () => {
     it('are the ones each component has always observed', () => {
         const record: Record<string, string[]> = {};
         for (const name of files) {
-            const tag = (name.match(/(pdx-[\w-]+)\.ts$/) ?? [])[1];
+            const tag = (name.match(/(pdx-[\w-]+)\.(?:ts|pdx)$/) ?? [])[1];
             const ctor = tag ? customElements.get(tag) : undefined;
             if (!ctor) continue;
             const observed = (ctor as unknown as { observedAttributes?: string[] }).observedAttributes ?? [];

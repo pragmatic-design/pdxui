@@ -25,9 +25,10 @@ function declarationOf(relPath: string): Declaration[] {
     return mods.map((m) => m.declarations[0]);
 }
 
+// The switch's pair left when the switch moved to src/ (#1008): switch-is-pdx.test.ts holds its
+// declaration to the one recorded from its TypeScript version.
 const PAIRS = [
     { pdx: 'pilot/select.pdx', ts: 'src/select/pdx-select.ts' },
-    { pdx: 'pilot/switch.pdx', ts: 'src/switch-toggle/pdx-switch.ts' },
 ];
 
 describe('a .pdx component in the manifest, against its TypeScript version', () => {
@@ -52,6 +53,6 @@ describe('a .pdx component in the manifest, against its TypeScript version', () 
     }
 
     it('the control: a TypeScript component is read as before', () => {
-        expect(declarationOf('src/switch-toggle/pdx-switch.ts').map((d) => d.tagName)).toEqual(['pdx-switch']);
+        expect(declarationOf('src/select/pdx-select.ts').map((d) => d.tagName)).toEqual(['pdx-select']);
     });
 });

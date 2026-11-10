@@ -1,0 +1,318 @@
+{
+  "kind": "class",
+  "customElement": true,
+  "name": "PdxSwitch",
+  "tagName": "pdx-switch",
+  "category": "Atoms",
+  "order": 15,
+  "description": "A toggle switch (role=\"switch\") the user turns on and off, with a label, a description and a\nloading state.",
+  "members": [
+    {
+      "kind": "field",
+      "name": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "disabled"
+    },
+    {
+      "kind": "field",
+      "name": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "loading"
+    },
+    {
+      "kind": "field",
+      "name": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "label"
+    },
+    {
+      "kind": "field",
+      "name": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "description"
+    },
+    {
+      "kind": "field",
+      "name": "ariaLabel",
+      "description": "Accessible name when there is no visible label (forwarded to the inner input)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "arialabel"
+    },
+    {
+      "kind": "field",
+      "name": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'right'",
+      "attribute": "labelposition"
+    },
+    {
+      "kind": "field",
+      "name": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "error"
+    },
+    {
+      "kind": "field",
+      "name": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "name"
+    },
+    {
+      "kind": "field",
+      "name": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''",
+      "attribute": "value"
+    },
+    {
+      "kind": "field",
+      "name": "size",
+      "description": "sm, md (the default) or lg: the track's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'",
+      "attribute": "size"
+    },
+    {
+      "kind": "field",
+      "name": "checked",
+      "description": "Whether it is checked / on.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false",
+      "attribute": "checked"
+    },
+    {
+      "kind": "method",
+      "name": "focus",
+      "parameters": [],
+      "description": "Moves focus to it."
+    },
+    {
+      "kind": "method",
+      "name": "blur",
+      "parameters": [],
+      "description": "Removes focus from it."
+    },
+    {
+      "kind": "method",
+      "name": "clear",
+      "parameters": [],
+      "description": "Clears the value."
+    }
+  ],
+  "models": [
+    "checked"
+  ],
+  "formAssociated": true,
+  "variants": [
+    {
+      "name": "size",
+      "values": [
+        "md",
+        "sm",
+        "lg"
+      ],
+      "default": "md",
+      "native": {
+        "md": ".pdx-toggle-md",
+        "sm": ".pdx-toggle-sm",
+        "lg": ".pdx-toggle-lg"
+      }
+    }
+  ],
+  "alphaEvents": [
+    "pdx-change"
+  ],
+  "alphaDetail": {
+    "checked": "$event.detail.value",
+    "value": "$event.currentTarget.value"
+  },
+  "events": [
+    {
+      "name": "checked-change",
+      "type": {
+        "text": "CustomEvent"
+      },
+      "description": "Fired when the component writes `checked`. Does not bubble.",
+      "detail": "{ value: boolean }"
+    }
+  ],
+  "roles": [
+    "switch"
+  ],
+  "attributes": [
+    {
+      "name": "disabled",
+      "fieldName": "disabled",
+      "description": "Disables interaction and dims the control.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "loading",
+      "fieldName": "loading",
+      "description": "Shows a loading / busy state.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "label",
+      "fieldName": "label",
+      "description": "Visible label text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "description",
+      "fieldName": "description",
+      "description": "Secondary descriptive text.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "arialabel",
+      "fieldName": "ariaLabel",
+      "description": "Accessible name when there is no visible label (forwarded to the inner input)",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "labelposition",
+      "fieldName": "labelPosition",
+      "description": "Where the label sits relative to the control.",
+      "type": {
+        "text": "string"
+      },
+      "default": "'right'"
+    },
+    {
+      "name": "error",
+      "fieldName": "error",
+      "description": "Marks the control as invalid.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    },
+    {
+      "name": "name",
+      "fieldName": "name",
+      "description": "Form field name, submitted with the form.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "value",
+      "fieldName": "value",
+      "description": "The current value.",
+      "type": {
+        "text": "string"
+      },
+      "default": "''"
+    },
+    {
+      "name": "size",
+      "fieldName": "size",
+      "description": "sm, md (the default) or lg: the track's size.",
+      "type": {
+        "text": "'md' | 'sm' | 'lg'"
+      },
+      "default": "'md'"
+    },
+    {
+      "name": "checked",
+      "fieldName": "checked",
+      "description": "Whether it is checked / on.",
+      "type": {
+        "text": "boolean"
+      },
+      "default": "false"
+    }
+  ],
+  "slots": [
+    {
+      "name": "",
+      "description": "The content placed inside the element."
+    }
+  ],
+  "cssParts": [
+    {
+      "name": "root",
+      "description": "The native checkbox with role=\"switch\", the track drawn; the size variants key by it."
+    },
+    {
+      "name": "label",
+      "description": "The `label` text, when set."
+    },
+    {
+      "name": "description",
+      "description": "The `description` text, when set."
+    }
+  ],
+  "cssStates": [
+    {
+      "name": "checked",
+      "description": "It is on."
+    },
+    {
+      "name": "invalid",
+      "description": "`error` is set; the switch is aria-invalid."
+    },
+    {
+      "name": "disabled",
+      "description": "`disabled` is set."
+    },
+    {
+      "name": "loading",
+      "description": "`loading` is set; the switch is aria-busy and takes no toggle."
+    }
+  ]
+}

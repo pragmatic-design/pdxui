@@ -11,15 +11,16 @@
 // load is timed; and so is `pdx-button`, which the TypeScript popover creates without importing — the
 // grid that holds it defines it — while the `.pdx` one imports it: without it here, the TypeScript
 // side's buttons would stay unknown elements that draw nothing.
+// The switch was measured here until it moved to .pdx (#1008): with no TypeScript side left, both
+// builds would measure the same component. PILOT.md keeps its numbers.
 import '../../../../ui/src/button/pdx-button';
-import '../../../../ui/src/switch-toggle/pdx-switch';
 import '../../../../ui/src/select/pdx-select';
 import '../../../../ui/src/input/pdx-input';
 import '../../../../ui/src/number-input/pdx-number-input';
 import '../../../../ui/src/date-picker/pdx-date-picker';
 import { buildFilterPopoverContent, type FilterConditionState, type FilterFieldInfo } from '../../../../ui/src/shared/filter-popover';
 
-type Kind = 'switch' | 'select' | 'values' | 'conditions';
+type Kind = 'select' | 'values' | 'conditions';
 
 const OPTIONS = Array.from({ length: 10 }, (_, i) => ({ label: `Option ${i + 1}`, value: `o${i + 1}` }));
 const STATUS: FilterFieldInfo = {
@@ -32,11 +33,7 @@ const NONE = { onApply() {}, onClear() {}, onClose() {} };
 
 /** Append one of `kind` to `host`. */
 function add(kind: Kind, host: HTMLElement): void {
-    if (kind === 'switch') {
-        const el = document.createElement('pdx-switch');
-        el.setAttribute('label', 'Notifications');
-        host.appendChild(el);
-    } else if (kind === 'select') {
+    if (kind === 'select') {
         const el = document.createElement('pdx-select') as HTMLElement & { options: unknown; value: unknown };
         el.options = OPTIONS;
         el.value = 'o3';
@@ -61,7 +58,6 @@ const buttons = (h: HTMLElement, n: number) => h.querySelectorAll('.pdx-dg-fp-ac
  * for two conditions; a popover when its two buttons are too.
  */
 const READY: Record<Kind, (host: HTMLElement, n: number) => boolean> = {
-    switch: (h, n) => h.querySelectorAll('pdx-switch input[role="switch"]').length === n,
     select: (h, n) => h.querySelectorAll('pdx-select [role="combobox"]').length === n,
     values: (h, n) => h.querySelectorAll('.pdx-dg-filter-popover input[type="checkbox"]').length === n * (STATUS.options!.length + 1)
         && buttons(h, n),

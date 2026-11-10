@@ -3,13 +3,15 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { offlineEndpoint } from './offline-endpoint';
-import { designTargetPlugin } from '../../../compiler/src/design-target';
+import { pdx } from '../../../compiler/src/index';
 import { certifyTarget } from '../../../responsive/tests/certify-target';
 import { pilotPlugins } from '../../pilot/plugin';
 
-// Scenarios don't use .pdx files — just HTML + ES modules importing @pdxui/*
-// The pdx() plugin is not needed here, only aliases for workspace packages — and its design-target
-// plugin, which gives the design CSS the form of the target.
+// The scenario pages are HTML + ES modules importing @pdxui/*, through the aliases below. pdx() is
+// here for the library's components written in .pdx (#1008), compiled as the library build compiles
+// them (ui/library-config.ts): with the library's prefix, which this server names itself because it
+// sits inside @pdxui/ui (#1009), and no devtools. Its design-target plugin gives the design CSS the
+// form of the target; its own aliases are off, the ones below are the point of this file.
 //
 // IMPORTANT: the alias targets must be ABSOLUTE. @rollup/plugin-alias resolves a relative
 // target against the IMPORTING FILE, so a page in generated/ (one level deeper) would break
@@ -43,7 +45,9 @@ function uiSubpathAliases(): { find: string; replacement: string }[] {
     for (const [key, target] of Object.entries(pkg.exports)) {
         if (key === '.' || !key.startsWith('./')) continue;
         const dev = typeof target === 'string' ? target : target.development;
-        if (!dev?.endsWith('.ts')) continue;   // ./manifest is JSON, and nothing imports it here
+        // A component's source is .ts or, written in .pdx, .pdx (#1008); ./manifest is JSON, and
+        // nothing imports it here.
+        if (!dev?.endsWith('.ts') && !dev?.endsWith('.pdx')) continue;
         aliases.push({
             find: `@pdxui/ui${key.slice(1)}`,
             replacement: resolve(here, '../..', dev.replace(/^\.\//, '')),
@@ -60,15 +64,17 @@ function uiSubpathAliases(): { find: string; replacement: string }[] {
 const target = certifyTarget();
 
 // The pilot (#137): with PDX_PILOT=1 the piloted components are their .pdx rewrites, so the same
-// manifests certify them. Off by default: certify measures the shipped library.
-const pilot = process.env.PDX_PILOT === '1' ? pilotPlugins() : [];
+// manifests certify them. Off by default: certify measures the shipped library. The pilot's plugins
+// carry their own pdx(), with the library's prefix; one compiler either way.
+const compilerOptions = { devtools: false, autoAlias: false, target } as const;
+const compiler = process.env.PDX_PILOT === '1' ? pilotPlugins(compilerOptions) : pdx({ ...compilerOptions, prefix: 'pdx' });
 
 export default defineConfig({
     server: { port: 5220 },
     define: { __PDX_TARGET__: JSON.stringify(target) },
     // A real endpoint for `offline-queue.html`, so that going offline is a network fact and not a
     // redefined `navigator.onLine`. It answers `/__offline/*` and nothing else.
-    plugins: [offlineEndpoint(), designTargetPlugin(target), ...pilot],
+    plugins: [offlineEndpoint(), ...compiler],
     resolve: {
         // An ARRAY, not an object: the design sub-paths need a regex, because each one resolves to
         // a FILE named after the component and a prefix alias would produce `<dir>/button` with no

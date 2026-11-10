@@ -21,6 +21,9 @@
  *
  * The value list is not within 1.2×, and why is in its row.
  *
+ * The switch's row left when the switch moved to `.pdx` (#1008): with no TypeScript switch, both
+ * builds mount the same component, and the ratio would measure nothing.
+ *
  * A ratio also rises when the TypeScript side gets faster: #910 made the library's mount faster on
  * both sides, the TypeScript popover more, and the conditions read 1.3–1.4× though the `.pdx` side
  * had got faster too. So a row over its bound passes when the `.pdx` side itself is no slower than
@@ -89,7 +92,6 @@ const MAIN_SLACK = 1.25;
  * that the gate fails on a regression and not on a busy machine.
  */
 const ROWS = [
-    { kind: 'switch', name: 'pdx-switch', max: COMPONENT_RATIO },
     { kind: 'select', name: 'pdx-select', max: COMPONENT_RATIO },
     { kind: 'values', name: 'filter popover, value list', max: 2.0 },
     { kind: 'conditions', name: 'filter popover, conditions', max: 1.3 },

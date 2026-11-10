@@ -2,7 +2,7 @@
  * MANIFEST — pdx-switch (Custom Element, Tier 1)
  *
  * NEW contracts, derived by inspecting:
- *  - source: packages/ui/src/switch-toggle/pdx-switch.ts
+ *  - source: packages/ui/src/switch-toggle/pdx-switch.pdx (TypeScript until #1008; the same DOM)
  *      the HOST <pdx-switch> (light DOM, formAssociated) renders an INNER
  *      <label class="pdx-switch-wrap">:
  *        - <input type="checkbox" role="switch" class="pdx-toggle" data-part="root">

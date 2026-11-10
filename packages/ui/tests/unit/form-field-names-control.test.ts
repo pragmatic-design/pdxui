@@ -10,7 +10,7 @@ import { cleanup, tick } from './helpers';
 import '../../src/form-field/pdx-form-field';
 import '../../src/input/pdx-input';
 import '../../src/date-picker/pdx-date-picker';
-import '../../src/switch-toggle/pdx-switch';
+import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/time-picker/pdx-time-picker';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/radio-group/pdx-radio-group';

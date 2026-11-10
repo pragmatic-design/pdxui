@@ -36,11 +36,26 @@ function code(path: string): string {
 
 interface Owner { subpath: string; file: string }
 
+/**
+ * A module the manifest says declares each tag. A component written in .pdx (#1008) has no
+ * `component('pdx-…')` to read: its tag comes from its file name or its `@tag`, resolved there.
+ */
+const cem = JSON.parse(readFileSync(join(UI, 'custom-elements.json'), 'utf-8')) as {
+    modules: { path: string; declarations?: { tagName?: string }[] }[];
+};
+
 /** tag → the module that registers it, read from the package's own export map. */
 const owner = new Map<string, Owner>();
 for (const [key, target] of Object.entries(pkg.exports)) {
     if (!key.startsWith('./') || key === './all') continue;
     const dev = typeof target === 'string' ? target : target.development;
+    if (dev?.endsWith('.pdx')) {
+        const path = dev.replace(/^\.\//, '');
+        for (const d of cem.modules.find((m) => m.path === path)?.declarations ?? []) {
+            if (d.tagName && !owner.has(d.tagName)) owner.set(d.tagName, { subpath: key, file: join(UI, path) });
+        }
+        continue;
+    }
     if (!dev?.endsWith('.ts')) continue;
     const file = join(UI, dev.replace(/^\.\//, ''));
     if (!existsSync(file)) continue;
@@ -72,6 +87,9 @@ describe('a component registers the tags it renders', () => {
     it('leaves no tag it renders to somebody else to register', () => {
         const missing: string[] = [];
         for (const { file, owns } of modules) {
+            // A .pdx imports the tags its template renders through the compiler (AGENTS.md, item 1):
+            // there is no hand-written import to check. A .ts that renders a .pdx's tag still is.
+            if (file.endsWith('.pdx')) continue;
             const src = code(file);
             for (const tag of rendered(src)) {
                 if (owns.has(tag)) continue;
