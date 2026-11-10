@@ -163,6 +163,7 @@ import type { Option, Row, SourceElement } from './select-types';
 @model value: string | string[] | null = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md; }
+// pdx-ignore PDX_PART_NAME_TAKEN: clear is the theme's part; the script's clear is the exposed method
 @part root, search, tag, clear, spinner, popup, list, option;
 // The visual states, on the host as custom states (#132, #287): a theme styles `pdx-select:state(open)`,
 // and the design CSS draws the trigger and the popup from them. Neither carries a state class.

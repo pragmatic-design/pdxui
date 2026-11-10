@@ -41,6 +41,7 @@ import { uiString } from '../src/shared/i18n';
 @model checked: boolean = false { form };
 /** sm, md (the default) or lg: the track's size. */
 @variants { size: { md: '.pdx-toggle-md', sm: '.pdx-toggle-sm', lg: '.pdx-toggle-lg' } = md; }
+// pdx-ignore PDX_PART_NAME_TAKEN: label and description are the theme's parts; the script reads the props of those names
 @part root, label, description;
 // On the host as custom states (#132, #293): the track and its label carry no state class.
 @state checked = !!checked;
