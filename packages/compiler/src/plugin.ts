@@ -9,6 +9,7 @@ import { parseTemplate, templateStartInFile } from './parser/template';
 import type { SourceLoc } from './parser/template';
 import { compileSFC, deriveTag } from './compiler/codegen';
 import { DEFAULT_TAG_PREFIX } from './compiler/tag-prefix';
+import { tagPrefixFor } from './library-prefix';
 import { analyzeScript } from './compiler/script-analyzer';
 import { validate } from './compiler/validate';
 import { diagnosticUrl, DIAGNOSTICS } from './diagnostics/catalog';
@@ -543,7 +544,9 @@ export function pdx(options?: PdxPluginOptions): Plugin[] {
                 // Determine minify: explicit option wins, otherwise auto-detect from build mode
                 const minify = shouldMinify !== undefined ? shouldMinify : !isDevMode;
                 const result = compile(code, id, compilerPlugins, resolver, {
-                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, prefix, ssr,
+                    minify, componentDirs, production: !isDevMode, logWarnings: true, logDesign: design, target, ssr,
+                    // A @pdxui package's .pdx keeps its pdx- tag; the app's own take the app's (#1009).
+                    prefix: tagPrefixFor(id, prefix, projectRoot),
                     // The client's copy takes over the markup; the server's writes it.
                     hydrate: hydrate && !ssr,
                     // The file a runtime error names, as the app knows it.
