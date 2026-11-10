@@ -1,0 +1,18 @@
+<template>
+  <button data-part="trigger" @click="ping({ n: count })">{{ label }}</button>
+</template>
+
+<script>
+/** A component written in .pdx, built as the library builds one (#1004). */
+@prop label: string = 'probe';
+@model count: number = 0;
+@event ping: { n: number };
+@part trigger;
+@expose trigger, bump;
+
+/** Adds `by`, one by default, to the count. */
+function bump(by: number = 1): number {
+  count = count + by;
+  return count;
+}
+</script>

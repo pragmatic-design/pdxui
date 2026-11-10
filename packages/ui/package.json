@@ -648,7 +648,7 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly",
+    "build": "node scripts/gen-icons.mjs && node scripts/gen-manifest.mjs && node scripts/gen-exports.mjs && vite build && tsc --emitDeclarationOnly && node scripts/gen-pdx-dts.mjs",
     "manifest": "node scripts/gen-manifest.mjs",
     "icons": "node scripts/gen-icons.mjs",
     "exports": "node scripts/gen-exports.mjs",

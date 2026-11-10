@@ -708,12 +708,15 @@ function exportTargets(def: unknown): string[] {
     return [];
 }
 
-/** Normalise an export target / manifest module path → `dir/file` (drop ./, leading src|dist, ext). */
+/**
+ * Normalise an export target / manifest module path → `dir/file` (drop ./, leading src|dist, ext).
+ * A `.pdx` source and the `.js` the library build makes of it are one module (#1004).
+ */
 function normalizeModulePath(p: string): string {
     return p
         .replace(/^\.?\//, '')
         .replace(/^(src|dist)\//, '')
-        .replace(/\.(d\.ts|ts|js|mjs|cjs)$/, '');
+        .replace(/\.(d\.ts|ts|pdx|js|mjs|cjs)$/, '');
 }
 
 /**

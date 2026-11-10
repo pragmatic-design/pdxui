@@ -1,0 +1,18 @@
+{
+  "name": "pdx-lib-fixture",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./probe": {
+      "development": "./src/probe/pdx-probe.pdx",
+      "types": "./dist/probe/pdx-probe.d.ts",
+      "import": "./dist/probe/pdx-probe.js"
+    },
+    "./plain": {
+      "development": "./src/plain/pdx-plain.ts",
+      "types": "./dist/plain/pdx-plain.d.ts",
+      "import": "./dist/plain/pdx-plain.js"
+    }
+  }
+}

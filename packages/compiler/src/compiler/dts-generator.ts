@@ -1,31 +1,80 @@
 // DTS Generator — produces .pdx.d.ts files for IntelliSense.
 // Generates: Props, Events, Slots, Fetches, Forms, Stores, SearchParams, Exposed, HTMLElementTagNameMap.
 
+import ts from 'typescript';
 import type { PropInfo, EventInfo, SlotInfo, FetchDecl, StoreDecl } from './script-analyzer';
 import type { SearchParamDecl, ScriptAnalysis } from './script-analyzer-types';
 
-/** A reactive name an `@expose` puts on the element as an accessor (#752). */
+/** A name an `@expose` puts on the element: an accessor (#752), or a method (#1004). */
 export interface ExposedMember {
     name: string;
-    /** The type written for it, or `unknown`: the compiler has no type checker to infer one. */
+    /**
+     * The type written for it, or `unknown`: the compiler has no type checker to infer one. For a
+     * method, its return type.
+     */
     type: string;
-    /** A $derived: a getter alone. A $signal is written through its setter. */
+    /** A $derived or a part: a getter alone. A $signal is written through its setter. */
     readonly: boolean;
+    /** A function: its parameters as the declaration lists them, `index: number, smooth?: boolean`. */
+    params?: string;
 }
 
 /**
- * The `@expose`d names that are a $signal or a $derived, with the type each was declared with.
- * Functions and constants are exposed as they are, and the .d.ts says nothing of them.
+ * What each `@expose`d name is on the element, with the types written for it:
+ *
+ * - a $signal, a writable accessor; a $derived, a read-only one (#752);
+ * - a part (#134), its element or, when `partCounts` says the template renders more than one, the
+ *   array of them (#988) — read-only, the template sets it;
+ * - a function, a method with the parameters and the return type its declaration writes (#1004).
+ *
+ * A constant is exposed as it is, and the .d.ts says nothing of it.
  */
-export function exposedMembers(analysis: Pick<ScriptAnalysis, 'exposes' | 'signals' | 'deriveds'>): ExposedMember[] {
+export function exposedMembers(
+    analysis: Pick<ScriptAnalysis, 'exposes' | 'signals' | 'deriveds'> & Partial<Pick<ScriptAnalysis, 'body'>>,
+    partCounts: ReadonlyMap<string, number> = new Map(),
+): ExposedMember[] {
     const out: ExposedMember[] = [];
+    let body: ts.SourceFile | undefined;
     for (const name of analysis.exposes) {
         const signal = analysis.signals.find(s => s.name === name);
+        if (signal?.part) {
+            out.push({ name, type: (partCounts.get(name) ?? 0) > 1 ? 'HTMLElement[]' : 'HTMLElement | null', readonly: true });
+            continue;
+        }
         const derived = signal ? undefined : analysis.deriveds.find(d => d.name === name);
         const decl = signal ?? derived;
-        if (decl) out.push({ name, type: decl.type ?? 'unknown', readonly: derived !== undefined });
+        if (decl) { out.push({ name, type: decl.type ?? 'unknown', readonly: derived !== undefined }); continue; }
+        body ??= ts.createSourceFile('script.ts', analysis.body ?? '', ts.ScriptTarget.Latest, true);
+        const method = declaredMethod(name, body);
+        if (method) out.push({ name, ...method, readonly: true });
     }
     return out;
+}
+
+/**
+ * The function `name` declares in the script — `function name(…)`, or `const name = (…) => …` — as a
+ * method: its parameters, a default making one optional, and its return type as written (`unknown`
+ * when none is, a `Promise` of it for an async one). Null when `name` is not a function.
+ */
+function declaredMethod(name: string, body: ts.SourceFile): { params: string; type: string } | null {
+    let fn: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression | null = null;
+    for (const st of body.statements) {
+        if (ts.isFunctionDeclaration(st) && st.name?.text === name) fn = st;
+        if (ts.isVariableStatement(st)) {
+            for (const d of st.declarationList.declarations) {
+                if (ts.isIdentifier(d.name) && d.name.text === name && d.initializer
+                    && (ts.isArrowFunction(d.initializer) || ts.isFunctionExpression(d.initializer))) fn = d.initializer;
+            }
+        }
+    }
+    if (!fn) return null;
+    const params = fn.parameters.map((p) => {
+        const optional = p.questionToken || p.initializer ? '?' : '';
+        return `${p.name.getText(body)}${optional}: ${p.type ? p.type.getText(body) : 'unknown'}`;
+    }).join(', ');
+    const async = fn.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+    const type = fn.type ? fn.type.getText(body) : async ? 'Promise<unknown>' : 'unknown';
+    return { params, type };
 }
 
 export interface DtsInput {
@@ -132,7 +181,9 @@ export function generateDts(input: DtsInput): string {
     const exposed = input.exposed ?? [];
     if (exposed.length > 0) {
         lines.push(`export interface ${pascalTag}Exposed {`);
-        for (const m of exposed) lines.push(`  ${m.readonly ? 'readonly ' : ''}${m.name}: ${m.type};`);
+        for (const m of exposed) {
+            lines.push(m.params !== undefined ? `  ${m.name}(${m.params}): ${m.type};` : `  ${m.readonly ? 'readonly ' : ''}${m.name}: ${m.type};`);
+        }
         lines.push('}');
         lines.push('');
     }

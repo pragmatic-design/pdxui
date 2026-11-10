@@ -25,9 +25,13 @@ import { pathToFileURL } from 'url';
 const PKG = new URL('../package.json', import.meta.url);
 const MANIFEST = new URL('../custom-elements.json', import.meta.url);
 
-/** ./src/a/b.ts → { development, types, import } pointing at the mirrored dist file. */
+/**
+ * ./src/a/b.ts or ./src/a/b.pdx → { development, types, import } pointing at the mirrored dist file.
+ * A .pdx (#1004) is its source in development, which the workspace's `pdx()` compiles; the library
+ * build compiles it to b.js and writes its b.d.ts.
+ */
 function distConditions(srcPath) {
-    const rel = srcPath.replace(/^\.\/src\//, '').replace(/\.ts$/, ''); // a/b
+    const rel = srcPath.replace(/^\.\/src\//, '').replace(/\.(ts|pdx)$/, ''); // a/b
     return {
         development: srcPath,
         types: `./dist/${rel}.d.ts`,
@@ -60,7 +64,7 @@ function normalizeModulePath(p) {
     return p
         .replace(/^\.?\//, '')
         .replace(/^(src|dist)\//, '')
-        .replace(/\.(d\.ts|ts|js|mjs|cjs)$/, '');
+        .replace(/\.(d\.ts|ts|pdx|js|mjs|cjs)$/, '');
 }
 
 /**
@@ -78,9 +82,9 @@ export function computeExports(currentExports, manifestModules, exists = () => t
     for (const [key, value] of Object.entries(currentExports)) {
         if (key === './package.json') continue; // re-added last, so it stays at the end
         if (key === '.' || key === './all') { out[key] = BARREL; rewritten++; continue; }
-        // Find a ./src/*.ts target in the current entry (string or any condition value).
+        // Find a ./src/*.ts or ./src/*.pdx target in the current entry (string or any condition value).
         const targets = typeof value === 'string' ? [value] : Object.values(value);
-        const src = targets.find((t) => typeof t === 'string' && /^\.\/src\/.*\.ts$/.test(t));
+        const src = targets.find((t) => typeof t === 'string' && /^\.\/src\/.*\.(ts|pdx)$/.test(t));
         // A source that is gone was removed with its component: the export would resolve to nothing.
         // The icon pattern is a pattern, not a file, and is re-added below.
         if (src && !src.includes('*') && !exists(src)) { removed.push(`${key} ← ${src}`); continue; }

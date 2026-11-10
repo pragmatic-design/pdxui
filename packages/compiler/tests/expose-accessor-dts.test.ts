@@ -41,9 +41,40 @@ describe('the .d.ts of an exposed reactive name', () => {
         expect(dts).toContain('  map: Record<string, number>;\n  readonly pick: () => void;\n');
     });
 
-    it('control: functions, and a component that exposes nothing reactive, add no interface', () => {
-        const dts = dtsOf('function reset() {}\n@expose reset;');
+    it('control: a component that exposes nothing adds no interface', () => {
+        const dts = dtsOf('function reset() {}');
         expect(dts).not.toContain('Exposed');
         expect(dts).toContain("'app-counter': HTMLElement & AppCounterProps;");
+    });
+});
+
+// A published component's declaration is its public API (#1004): the methods it exposes and the parts a
+// caller reaches through it are typed, not left out.
+describe('the .d.ts of an exposed function and an exposed part', () => {
+    it('a function is a method of the element, with the parameters and the return type written', () => {
+        const dts = dtsOf([
+            'function reset() {}',
+            'function goTo(index: number, smooth?: boolean): void {}',
+            'async function load(id: string, force = false) {}',
+            'const pick = (value: string): string => value;',
+            '@expose reset, goTo, load, pick;',
+        ].join('\n'));
+        expect(dts).toContain([
+            'export interface AppCounterExposed {',
+            '  reset(): unknown;',
+            '  goTo(index: number, smooth?: boolean): void;',
+            '  load(id: string, force?: unknown): Promise<unknown>;',
+            '  pick(value: string): string;',
+            '}',
+        ].join('\n'));
+    });
+
+    it('an exposed part is its element, or the array of them when the template renders more than one', () => {
+        const analysis = analyzeScript('@part trigger, option;\n@expose trigger, option;', 'counter.pdx');
+        const exposed = exposedMembers(analysis, new Map([['trigger', 1], ['option', Infinity]]));
+        expect(exposed).toEqual([
+            { name: 'trigger', type: 'HTMLElement | null', readonly: true },
+            { name: 'option', type: 'HTMLElement[]', readonly: true },
+        ]);
     });
 });
