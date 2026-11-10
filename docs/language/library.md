@@ -20,7 +20,7 @@ their issues are #286–#293.
 
 | Area | The component | Source |
 |---|---|---|
-| Contract | declares its API with the typed descriptor, or is a `.pdx` file — one declaration model for both | #123, #137 |
+| Contract | declares its API with the typed descriptor, or is a `.pdx` file — one declaration model for both, and one manifest declaration: a `.pdx` documents itself in the first `/** … */` of its script ([components.md](components.md)) | #123, #137, #1003 |
 | Value | a value component declares a `@model` and emits exactly one change event per model, `{ value }` | #124, #125 — landed |
 | Forms | a value component is form-associated: it takes part in `<form>`, `FormData`, reset and validity | #135 — landed |
 | States | visual states are custom states (`:state(name)`), not classes on the host | #132 |

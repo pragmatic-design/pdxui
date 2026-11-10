@@ -148,19 +148,65 @@
 </template>
 
 <script>
+/**
+ * One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple
+ * props, fed by an array or a DataSource.
+ *
+ * @slot item - Renders one option in the list: a snippet `item(option, index)`; `option.raw` is the original entry.
+ * @slot selected - Renders the selected value in the trigger: a snippet `selected(option)`.
+ *
+ * @csspart root - The trigger: the frame, its border, background and the states' colours.
+ * @csspart search - The search field, while `searchable`: in the trigger, or atop the list with `search-position="dropdown"`.
+ * @csspart tag - A chosen option in the trigger, while `multiple`.
+ * @csspart clear - The clear button, while `clearable`, something is chosen and neither `disabled` nor `readonly`.
+ * @csspart spinner - The loading spinner, a `role="status"`, while loading.
+ * @csspart popup - The floating panel that holds the list.
+ * @csspart list - The `role="listbox"`.
+ * @csspart option - An option of the list.
+ *
+ * @cssstate open - The popup is open.
+ * @cssstate invalid - `error` is set.
+ * @cssstate success - `success` is set.
+ * @cssstate warning - `warning` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate loading - `loading` is set, or the DataSource is loading.
+ * @cssstate multiple - `multiple` is set: the trigger holds tags.
+ *
+ * @cssprop --pdx-input-border-color - The trigger is the text input's frame, `.pdx-input-wrap`, and reads pdx-input's tokens (#761): its border at rest (the outlined input style).
+ * @cssprop --pdx-input-border-color-focus - The frame's border while focused (the outlined input style).
+ * @cssprop --pdx-input-border-color-invalid - The frame's border in the invalid state.
+ * @cssprop --pdx-input-border-color-success - The frame's border in the success state.
+ * @cssprop --pdx-input-border-color-warning - The frame's border in the warning state.
+ * @cssprop --pdx-input-border-width - The frame's bottom border, in the filled input style.
+ * @cssprop --pdx-input-focus-ring - The ring around the frame while focused.
+ * @cssprop --pdx-input-min-height - The frame's height, at the md size.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail value $event.detail.value
+ * @alphadetail values $event.detail.value
+ * @alphadetail item $event.currentTarget.selectedItem
+ * @alphadetail items $event.currentTarget.selectedItem
+ */
 import { createDataSource, isDataSource, usePopover, overlayStack, createVirtualizer, effect, generatedId } from '@pdxui/core';
 import type { DataSource, PopoverPlacement } from '@pdxui/core';
 import { DataSourceContext } from '../src/data-source/data-source-context';
 import { uiString, format } from '../src/shared/i18n';
 import '@pdxui/design/components/select';
 import '@pdxui/design/components/chip';
-import type { Option, Row, SourceElement } from './select-types';
 
-/** The selection (#481): the option's value, or null; in multiple mode the array of values. */
+/** A `<pdx-data-source>` element given as the select's source. */
+interface SourceElement { source(): DataSource<Record<string, unknown>> }
+/** An option as the select holds it, whatever shape the caller's options had. */
+interface Option { label: string; value: unknown; _raw: unknown }
+/** A row of the list: a group header, or an option at its keyboard index. */
+interface Row { key: string; header: boolean; name: string; item: Option; index: number; style: string }
+
+// The selection (#481): the option's value, or null; in multiple mode the array of values.
 // What the form submits (#751): with nothing chosen a native select with an empty placeholder submits
 // an empty entry, where the model (null) would submit none; in multiple mode, every selected value.
-// The attribute is one value, a string (#753): the type says the rest.
-@model value: string | string[] | null = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
+// The attribute is one value, a string (#753).
+@model value: unknown = null { attribute: string, form: () => { const sel = Array.from(selectedValues); return multiple ? sel : (sel.length > 0 ? sel[0] : ''); } };
 /** xs, sm, md (the default), lg or xl — the same scale as pdx-input. */
 @variants { size: { md: '.pdx-input-md', xs: '.pdx-input-xs', sm: '.pdx-input-sm', lg: '.pdx-input-lg', xl: '.pdx-input-xl' } = md; }
 // pdx-ignore PDX_PART_NAME_TAKEN: clear is the theme's part; the script's clear is the exposed method
@@ -178,14 +224,19 @@ import type { Option, Row, SourceElement } from './select-types';
 // Its events: kebab-case names, declared quoted (#749), each dispatched by its camelCase function.
 /** The popup opened (`true`) or closed (`false`): its open state, read-only, as an overlay's (#287). */
 @event 'open-change': { value: boolean };
+/** Fired when the clear button empties the selection, after its `value-change`. */
 @event 'pdx-clear';
+/** Fired as the user types in the search input. */
 @event 'pdx-search': { query: string };
-@event 'pdx-create': { value: string, label: string };
-// No `= []`: that default is one array literal in the descriptor, shared by every instance; with
-// none, core gives each instance its own (packages/ui/PILOT.md, finding 8).
-@prop options?: unknown[];
+/** Fired when the user creates an option from the search text. */
+@event 'pdx-create': { value: string; label: string };
+// An option's `raw` is the app's entry, an element of `options` or of `source` (#853): the editor
+// infers `T`.
+@generic T;
+// Each instance gets its own array: the compiler makes the literal a factory (#677).
+@prop options: T[] = [];
 /** DataSource instance — dedicated prop for data-driven select. Takes priority over options. */
-@prop source: DataSource<unknown> | null = null;
+@prop source: DataSource<T> | null = null;
 @prop labelField: string = 'label';
 @prop valueField: string = 'value';
 @prop placeholder: string = '';
@@ -197,28 +248,31 @@ import type { Option, Row, SourceElement } from './select-types';
 @prop clearable: boolean = false;
 @prop searchable: boolean = false;
 @prop multiple: boolean = false;
-/** Multi mode: -1 shows every chip, 0 a summary only, N>0 N chips and a "+K" chip. */
+/** Multi mode: collapse selected tags in the trigger to keep it compact.
+ *  -1 = unlimited (default, show all chips); 0 = summary only ("N selected");
+ *  N>0 = show N chips + a "+K" overflow chip. The dropdown is unaffected. */
 @prop maxTagCount: number = -1;
 @prop name: string = '';
 @prop loading: boolean = false;
 @prop groupField: string = '';
-/** The combobox's accessible name, and its listbox's. */
+/** The combobox's accessible name, and its listbox's. Not needed inside a pdx-form-field with a
+ *  label, after a pdx-label, or with a <label for> the select's id: those name it. */
 @prop label: string = '';
-/** Where the search input sits: 'trigger' (default) or 'dropdown'. */
+/** Where to show search input: 'trigger' (default) or 'dropdown' */
 @prop searchPosition: 'trigger' | 'dropdown' = 'trigger';
-/** Allow creating new options when the search has no match. Emits pdx-create. */
+/** Allow creating new options when search has no match. Emits pdx-create. */
 @prop creatable: boolean = false;
-/** Label template for the create option; {query} is the search text. */
+/** Label template for the create option. Use {query} as placeholder. Empty: the select.create
+ *  component string, «Create "{query}"» in English. */
 @prop createLabel: string = '';
-/** Debounced server-side filtering for a remote DataSource. */
+/** Enable debounced server-side filtering for remote DataSource. */
 @prop remote: boolean = false;
 /** Debounce delay in ms for remote search. */
 @prop debounce: number = 200;
 
-/** Renders one option in the list. */
-@slot item?: (option: { label: string; value: unknown; raw: unknown }, index: number);
-/** Renders the selected value in the trigger. */
-@slot selected?: (option: { label: string; value: unknown; raw: unknown });
+// A parent's `@snippet` sets these, positional arguments (#492); the component's JSDoc describes them.
+@slot item?: (option: { label: string; value: unknown; raw: T }, index: number);
+@slot selected?: (option: { label: string; value: unknown; raw: T });
 
 @inject injectedSource from DataSourceContext = null;
 
@@ -226,7 +280,7 @@ import type { Option, Row, SourceElement } from './select-types';
 @host self { :name="name || null" }
 
 // The popup is driven with the overlay verbs (#287), which replace the alpha openSelect/closeSelect/toggleSelect.
-@expose focus, blur, clear, show, close, toggle, selectedItem;
+@expose selectedItem, focus, blur, clear, show, close, toggle;
 
 const uid = generatedId('pdx-sel');
 const listboxId = uid + '-lb';
@@ -446,6 +500,7 @@ function open() {
   openChange({ value: true });
 }
 
+/** Close the popup. */
 function close() {
   if (!isOpen) return;
   isOpen = false;
@@ -454,9 +509,10 @@ function close() {
   openChange({ value: false });
 }
 
+/** Open the popup when closed, close it when open. */
 function toggle() { if (isOpen) close(); else open(); }
 
-/** Open the popup: the overlay verb (#287). */
+/** Open the popup. */
 function show() { open(); }
 
 // ── Selection actions ──

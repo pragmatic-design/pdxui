@@ -34,6 +34,9 @@ export { compileSFC } from './compiler/codegen';
 export { deriveTag } from './compiler/codegen-shared';
 export { DEFAULT_TAG_PREFIX, RESERVED_TAG_PREFIX } from './compiler/tag-prefix';
 export { analyzeScript, inlineFormFields } from './compiler/script-analyzer';
+// A .pdx component with its doc comments (#1003): what the library's manifest generator reads.
+export { describeComponent, type ComponentDescription } from './describe-component';
+export { scriptDocComments, type ScriptDocs, type DeclarationDoc, type DocTarget } from './compiler/component-docs';
 export type {
     ScriptAnalysis, PropInfo, EventInfo, SlotInfo, FormFieldDecl,
     SignalDecl, DerivedDecl, StoreDecl, WatchDecl, ExportDecl,

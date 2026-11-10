@@ -18,7 +18,7 @@ Type to add removable tags.
 | `warning` | `warning` | boolean | `false` | Applies the warning state styling. |
 | `loading` | `loading` | boolean | `false` | Show loading state |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | — | string[] | `() => []` | The current value. |
+| `value` | — | string[] | `[]` | The current value. |
 
 **API (via `:ref`)**
 

@@ -87,6 +87,13 @@ declaration per direction, each visible in the file.
 The untyped `createBus`, `createChannel` and `createCommands`, and `createCompoundParent`, are not
 exported: an import of one is `PDX_REMOVED_FORM`, naming the declaration to write instead (#144).
 
+A component documents itself in JSDoc, as a TypeScript `component()` does (#1003). The first
+`/** … */` of the script, before any declaration or import, is the component's own: its prose and
+its tags (`@summary`, `@csspart`, `@cssstate`, `@cssprop`, `@slot`, `@capability`, `@fires`). A
+`/** … */` directly above a declaration — `@prop`, `@model`, `@event`, `@slot`, `@state`, an
+`@variants` axis, a function or a `const` — describes that declaration; a line comment between the
+two does not detach it. The library's manifest reads both (`describeComponent` in the compiler).
+
 ### @prop
 
 #### Syntax

@@ -8,7 +8,7 @@ Build complex filters visually.
 |---|---|---|---|---|
 | `fields` | — | unknown[] | `[]` | Field definitions (FieldDefinition[] or FilterField[]). |
 | `source` | — | Record<string, unknown> \| null | `null` | DataSource to auto-bind filters. |
-| `value` | — | (FilterDescriptor \| CompositeFilter)[] | `() => []` | The current value. |
+| `value` | — | (FilterDescriptor \| CompositeFilter)[] | `[]` | The current value. |
 | `logic` | `logic` | 'and' \| 'or' | `'and'` |  |
 
 **Events:** `logic-change` → `detail: { value: 'and' | 'or' }` — Fired when the component writes `logic`. Does not bubble.; `value-change` → `detail: { value: (FilterDescriptor | CompositeFilter)[] }` — Fired when the component writes `value`. Does not bubble.
