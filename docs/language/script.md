@@ -518,7 +518,9 @@ element or `null`.
   `PDX_PART_UNDECLARED`.
 - An array part follows every element that comes or goes at once, and is put back in document order
   in a microtask; a row that only moves keeps its place until an element comes or goes.
-- A name the script declares itself is that declaration: the part's element is bound to it.
+- A name the script declares itself is that declaration (#999). A `$signal` receives the part's
+  element; a `@prop`, a `@model`, a function or a constant keeps its meaning, the element is not bound
+  to it, and a `:ref` on the element reaches it; without one, `PDX_PART_NAME_TAKEN` (info) says so.
 
 #### Examples
 

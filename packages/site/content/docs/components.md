@@ -559,7 +559,11 @@ The compiled template adds each element through core's `bindParts`: it is in the
 renders, `onMount` included, and the array is put back in document order in a microtask. A row that
 only moves keeps its place in the array until an element comes or goes. On alternative branches of one
 `@if` / `@else` chain at most one renders, and the name stays that element or `null`. A declared part on no element is `PDX_PART_MISSING`, and a `data-part` with no
-`@part` is `PDX_PART_UNDECLARED`. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
+`@part` is `PDX_PART_UNDECLARED`. When the part's name is already a prop, a model, a function or a
+constant of the script, that declaration keeps its meaning: a `label` part beside a `label` prop
+leaves `label` the text, and the element is reached with a `:ref` on it (without one,
+`PDX_PART_NAME_TAKEN`, info). A
+`$signal` of the part's name receives the element. A TypeScript component lists them as `parts: ['trigger', 'popup']`,
 and the manifest lists a component's parts.
 
 ## @host — the component's own element

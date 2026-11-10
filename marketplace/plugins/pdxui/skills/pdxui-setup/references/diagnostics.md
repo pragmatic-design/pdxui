@@ -4,7 +4,7 @@
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 110 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 111 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1154,6 +1154,39 @@ write:
 </template>
 <script>
 @part trigger;
+</script>
+```
+
+### PDX_PART_NAME_TAKEN
+
+*info* — A `@part` whose name the script declares as something other than a `$signal` (a prop, a model, a function, a constant), with no `:ref` on its element.
+
+A part's name is chosen by the styling contract, and the script's name keeps its meaning (#999): `@prop label` stays the label text where a part `label` would have replaced it with the element. The part is still the template's and the theme's — its `data-part`, the manifest — but the script does not read its element by that name, and with no `:ref` it does not reach it at all.
+
+**Fix.** To reach the element, bind it with `:ref` to a `$signal` of another name. A `$signal` of the part's own name receives the element, as a part does. A part only a theme needs can stay as it is: the finding is information.
+
+Instead of:
+
+```html
+<template>
+  <span data-part="label">{{ label }}</span>
+</template>
+<script>
+@prop label: string = '';
+@part label;
+</script>
+```
+
+write:
+
+```html
+<template>
+  <span data-part="label" :ref="labelEl">{{ label }}</span>
+</template>
+<script>
+@prop label: string = '';
+@part label;
+let labelEl = $signal<HTMLElement | null>(null);
 </script>
 ```
 

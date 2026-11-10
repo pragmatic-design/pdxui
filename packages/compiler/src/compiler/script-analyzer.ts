@@ -1319,9 +1319,11 @@ export function analyzeScript(script: string, _filename: string, options: { orig
     // rendered, which the script reads by the part's name — as a `:ref` written to a `$signal(null)`.
     // A part the template renders more than once starts as `[]` instead (#988): the compiler knows it
     // once the template is read (codegen-new).
-    // A name the script already declares is left to that declaration.
+    // A name the script already declares is left to that declaration (#999): a `$signal` receives the
+    // element; any other name keeps its meaning, and the part is the template's and the theme's only
+    // (PDX_PART_NAME_TAKEN, validate-parts.ts).
     for (const name of parts) {
-        if (signals.some(s => s.name === name) || exports.some(e => e.name === name)) continue;
+        if (signals.some(s => s.name === name) || props.some(p => p.name === name) || exports.some(e => e.name === name)) continue;
         signals.push({ name, initialExpr: 'null', part: true });
         exports.push({ name, kind: 'signal' });
         // As a `$signal` does: a component whose only declaration is a part would call it unimported.

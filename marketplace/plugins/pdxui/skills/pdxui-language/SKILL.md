@@ -167,7 +167,9 @@ the script `popup` is the element (`null` while not rendered), so it needs no `:
 template renders more than once — every `@for` row, two siblings, an element beside the rows — is the
 array of the rendered elements, in document order (`option[0]?.focus()`); on alternative branches of
 one `@if` chain it stays one element. A part on no element, or a `data-part` with no `@part`, are
-`PDX_PART_MISSING` / `PDX_PART_UNDECLARED`.
+`PDX_PART_MISSING` / `PDX_PART_UNDECLARED`. A part named like a prop, a model, a function or a
+constant leaves that name its meaning (a `label` prop stays the text): reach the element with a
+`:ref` to another `$signal` (`PDX_PART_NAME_TAKEN`, info).
 
 **`@host { role="combobox" :aria-expanded="open" @keydown.enter="onKey" }`** puts attributes, bindings
 and listeners on the component's own element — the template's attribute syntax, one line or several.

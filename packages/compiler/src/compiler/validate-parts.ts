@@ -104,11 +104,27 @@ export function repeatedParts(parts: readonly string[], ast: readonly TemplateNo
     return new Set(parts.filter((name) => (counts.get(name) ?? 0) > 1));
 }
 
+// Match: a `:ref=` binding in an opening tag.
+const REF_BINDING = /(?<=\s):ref=/;
+
+/** Does an element carrying the literal `data-part="name"` also bind a `:ref`? */
+function partHasRef(name: string, ast: readonly TemplateNode[]): boolean {
+    for (const markup of markupOf(ast)) {
+        for (const tag of openingTagTexts(markup)) {
+            if (!REF_BINDING.test(tag)) continue;
+            for (const m of tag.matchAll(DATA_PART)) if ((m[1] ?? m[2]) === name) return true;
+        }
+    }
+    return false;
+}
+
 /**
- * The part diagnostics: a declared part on no element (`PDX_PART_MISSING`), and a `data-part` the
- * script does not declare (`PDX_PART_UNDECLARED`).
+ * The part diagnostics: a declared part on no element (`PDX_PART_MISSING`), a `data-part` the
+ * script does not declare (`PDX_PART_UNDECLARED`), and a part whose name the script declares as
+ * something other than a signal, with no `:ref` on its element to reach it (`PDX_PART_NAME_TAKEN`).
+ * `signalNames` are the script's signals: a part's own, or a `$signal` that receives its element.
  */
-export function checkParts(parts: readonly string[], ast: TemplateNode[]): ValidationWarning[] {
+export function checkParts(parts: readonly string[], ast: TemplateNode[], signalNames: ReadonlySet<string>): ValidationWarning[] {
     const counts = dataPartCounts(ast);
     const declared = new Set(parts);
     const warnings: ValidationWarning[] = [];
@@ -118,6 +134,12 @@ export function checkParts(parts: readonly string[], ast: TemplateNode[]): Valid
                 code: 'PDX_PART_MISSING', severity: 'error',
                 message: `@part '${name}' is on no element of the template.`,
                 hint: `Write data-part="${name}" on the element it names, or remove it from @part.`,
+            });
+        } else if (!signalNames.has(name) && !partHasRef(name, ast)) {
+            warnings.push({
+                code: 'PDX_PART_NAME_TAKEN', severity: 'info',
+                message: `@part '${name}' has the name of a script declaration, which keeps its meaning: the script does not read the part's element by that name.`,
+                hint: `To reach the element, give it a :ref to a $signal of another name: data-part="${name}" :ref="${name}El".`,
             });
         }
     }

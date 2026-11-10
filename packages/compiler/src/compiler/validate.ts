@@ -574,9 +574,9 @@ export function validate(
         });
     }
 
-    // ─── Check 10d: each @part on exactly one element (#134) ────
+    // ─── Check 10d: the @part declarations and the data-part attributes (#134, #988, #999) ────
 
-    warnings.push(...checkParts(analysis.parts, ast));
+    warnings.push(...checkParts(analysis.parts, ast, new Set(analysis.signals.map(s => s.name))));
 
     // ─── Check 10e: invoker commands reach a target that answers them (#140) ──
 

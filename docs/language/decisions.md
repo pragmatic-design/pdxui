@@ -91,11 +91,13 @@ issue implements it. Each line names where the rule lives.
   as a signal; deferred.
 - **The WebMCP adapter**: revisited at the end of Chrome's origin trial — and with it `@form { agent }`
   (decision 54).
-- **Three questions the examples raised**, for the next revision: how `@part` and `@state` names
-  relate to the script's other names; whether the callee rule (decision 17) covers `onSave?.()`;
-  whether `execute()` rejects when the action fails, or only on cancellation. A fourth, whether a
-  `data-part` may sit inside an `@for`, was decided by the owner on 2026-11-10 (#988): a part is every
-  element that carries it, and its name is an array when the template renders more than one
+- **Three questions the examples raised**, for the next revision: how `@state` names relate to the
+  script's other names; whether the callee rule (decision 17) covers `onSave?.()`; whether
+  `execute()` rejects when the action fails, or only on cancellation. Two more were decided by the
+  owner on 2026-11-10. Whether a `data-part` may sit inside an `@for` (#988): a part is every element
+  that carries it, and its name is an array when the template renders more than one. How a `@part`
+  name relates to the script's other names (#999): the script's name wins, a `$signal` of that name
+  receives the element, and any other declaration keeps its meaning, with `PDX_PART_NAME_TAKEN`
   ([components.md](components.md), `@part`).
 
 ## Names this specification chose

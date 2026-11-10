@@ -111,6 +111,61 @@ describe('a part on several elements', () => {
     });
 });
 
+// A part's name taken by the script (#999): the script's name wins, and the part stays the
+// template's and the theme's. Only a `$signal` the script declares receives the element.
+describe('a part named like another script name', () => {
+    it('a @prop keeps its meaning: the template reads the prop, not the element', () => {
+        const { code } = compile(pdx('@if (label) { <span data-part="label">{{ label }}</span> }', "@prop label: string = '';\n@part label;"), 'test.pdx');
+        expect(code).not.toContain('const __label = signal(null');
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.label\)/);
+        expect(markup(code).join('')).toContain('data-part="label"');
+        expect(code).toContain(`parts: ['label'],`);
+    });
+
+    it('a @model keeps its meaning', () => {
+        const { code } = compile(pdx('<input data-part="checked" :checked="checked" />', '@model checked: boolean = false;\n@part checked;'), 'test.pdx');
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.checked\)/);
+    });
+
+    it('a function keeps its meaning, and the element is not handed to it', () => {
+        const { code } = compile(pdx('<button data-part="clear" @click="clear">x</button>', '@part clear;\nfunction clear() {}'), 'test.pdx');
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.clear\)/);
+    });
+
+    it('PDX_PART_NAME_TAKEN (info): a part the script cannot read by its name', () => {
+        const scripts = [
+            "@prop label: string = '';\n@part label;",
+            '@model label: boolean = false;\n@part label;',
+            '@part label;\nfunction label() {}',
+            '@part label;\nconst label = 1;',
+            '@part label;\nlet n = $signal(1);\nconst label = $derived(n * 2);',
+        ];
+        for (const script of scripts) {
+            const found = codes('<span data-part="label">x</span>', script, 'PDX_PART_NAME_TAKEN');
+            expect(found, script).toHaveLength(1);
+            expect(found[0].severity, script).toBe('info');
+            expect(found[0].message, script).toContain(`'label'`);
+            expect(found[0].hint, script).toContain(':ref');
+        }
+    });
+
+    it('the control: a :ref on the element reaches it, and PDX_PART_NAME_TAKEN is not raised', () => {
+        const template = '<span data-part="label" :ref="labelEl">{{ label }}</span>';
+        const script = "@prop label: string = '';\n@part label;\nlet labelEl = $signal<HTMLElement | null>(null);";
+        expect(codes(template, script, 'PDX_PART_NAME_TAKEN')).toHaveLength(0);
+        const { code } = compile(pdx(template, script), 'test.pdx');
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.labelEl\)/);
+        expect(code).not.toMatch(/bind(Ref|Parts)\(__el\d+,ctx\.label\)/);
+    });
+
+    it('the control: a $signal the script declares receives the element, with no diagnostic', () => {
+        const script = '@part label;\nlet label = $signal<HTMLElement | null>(null);';
+        const { code } = compile(pdx('<span data-part="label">x</span>', script), 'test.pdx');
+        expect(code).toMatch(/bindRef\(__el\d+,ctx\.label\)/);
+        expect(codes('<span data-part="label">x</span>', script, 'PDX_PART_NAME_TAKEN')).toHaveLength(0);
+    });
+});
+
 describe('the part diagnostics', () => {
     it('PDX_PART_MISSING: a declared part on no element', () => {
         const found = codes('<button>x</button>', '@part trigger;', 'PDX_PART_MISSING');
