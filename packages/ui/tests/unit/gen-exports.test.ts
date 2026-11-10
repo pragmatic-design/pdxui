@@ -29,11 +29,11 @@ describe('gen-exports adds what the manifest has and the exports map does not', 
     });
 
     it('leaves a component alone when an export already reaches it under another name', () => {
-        // ./switch ← src/switch-toggle/pdx-switch.ts, ./sparkline ← src/chart/pdx-sparkline.ts:
-        // the subpath is not the directory, so coverage is decided by the target file, not the name.
+        // ./sparkline ← src/chart/pdx-sparkline.ts: the subpath is not the directory, so coverage is
+        // decided by the target file, not the name.
         const { added } = computeExports(
-            { './switch': { development: './src/switch-toggle/pdx-switch.ts' } },
-            [mod('src/switch-toggle/pdx-switch.ts', 'pdx-switch')],
+            { './sparkline': { development: './src/chart/pdx-sparkline.ts' } },
+            [mod('src/chart/pdx-sparkline.ts', 'pdx-sparkline')],
         );
         expect(added).toEqual([]);
     });

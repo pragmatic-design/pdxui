@@ -16,7 +16,7 @@ import '../color-picker/pdx-color-picker'; // rendered by this component, and re
 import '../number-input/pdx-number-input'; // rendered by this component, and registered by nobody else
 import '../rating/pdx-rating'; // rendered by this component, and registered by nobody else
 import '../select/pdx-select'; // rendered by this component, and registered by nobody else
-import '../switch-toggle/pdx-switch'; // rendered by this component, and registered by nobody else
+import '../switch-toggle/pdx-switch.pdx'; // rendered by this component, and registered by nobody else
 
 registerComponentStrings('inline-edit', {
     empty: 'Click to edit',

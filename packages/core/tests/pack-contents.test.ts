@@ -21,6 +21,9 @@ const PACKAGES = join(__dirname, '..', '..');
 const ALLOWED_EXT = new Set([
     '.ts', '.tsx', '.mts', '.cts', '.js', '.mjs', '.cjs', '.json', '.css', '.map',
     '.md', '.html', '.svg', '.woff', '.woff2', '.d',
+    // A component written in .pdx (#1008): @pdxui/ui's `development` condition points at the source,
+    // which an app resolving that condition compiles under the library's prefix (#1009).
+    '.pdx',
 ]);
 // `.d.mts` and `.d.cts` are what unbuild emits for @pdxui/cli — declarations, not strays.
 /** Named files with no extension, or whose extension is misleading. */

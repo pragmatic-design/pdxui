@@ -10,7 +10,7 @@ import { cleanup, tick } from './helpers';
 
 import '../../src/json-editor/pdx-json-editor';
 import '../../src/input/pdx-input';
-import '../../src/switch-toggle/pdx-switch';
+import '../../src/switch-toggle/pdx-switch.pdx';
 import '../../src/tag-input/pdx-tag-input';
 import '../../src/select/pdx-select';
 import '../../src/button/pdx-button';

@@ -122,11 +122,6 @@
       "types": "./dist/radio/pdx-radio.d.ts",
       "import": "./dist/radio/pdx-radio.js"
     },
-    "./switch": {
-      "development": "./src/switch-toggle/pdx-switch.ts",
-      "types": "./dist/switch-toggle/pdx-switch.d.ts",
-      "import": "./dist/switch-toggle/pdx-switch.js"
-    },
     "./radio-group": {
       "development": "./src/radio-group/pdx-radio-group.ts",
       "types": "./dist/radio-group/pdx-radio-group.d.ts",
@@ -626,6 +621,11 @@
       "development": "./src/icon/pragmatic/*.ts",
       "types": "./dist/icon/pragmatic/*.d.ts",
       "import": "./dist/icon/pragmatic/*.js"
+    },
+    "./switch": {
+      "development": "./src/switch-toggle/pdx-switch.pdx",
+      "types": "./dist/switch-toggle/pdx-switch.d.ts",
+      "import": "./dist/switch-toggle/pdx-switch.js"
     },
     "./package.json": "./package.json"
   },

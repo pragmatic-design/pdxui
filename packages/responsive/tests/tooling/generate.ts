@@ -71,10 +71,22 @@ function uiTagMap(): Map<string, string> {
     const pkg = JSON.parse(readFileSync(join(uiDir, 'package.json'), 'utf-8')) as {
         exports: Record<string, { development?: string } | string>;
     };
+    // A component written in .pdx (#1008) has no `component('pdx-…')` to read: its tag comes from its
+    // file name or its `@tag`, which the manifest has already resolved, so the manifest credits it.
+    const cem = JSON.parse(readFileSync(join(uiDir, 'custom-elements.json'), 'utf-8')) as {
+        modules: { path: string; declarations?: { tagName?: string }[] }[];
+    };
     const map = new Map<string, string>();
     for (const [key, target] of Object.entries(pkg.exports)) {
         if (key === '.' || !key.startsWith('./') || key === './all') continue;
         const dev = typeof target === 'string' ? target : target.development;
+        if (dev?.endsWith('.pdx')) {
+            const path = dev.replace(/^\.\//, '');
+            for (const d of cem.modules.find((m) => m.path === path)?.declarations ?? []) {
+                if (d.tagName && !map.has(d.tagName)) map.set(d.tagName, key.slice(2));
+            }
+            continue;
+        }
         if (!dev?.endsWith('.ts')) continue;
         const file = join(uiDir, dev.replace(/^\.\//, ''));
         if (!existsSync(file)) continue;

@@ -24,7 +24,7 @@ import '../number-input/pdx-number-input';
 import '../textarea/pdx-textarea';
 import '../select/pdx-select';
 import '../checkbox/pdx-checkbox';
-import '../switch-toggle/pdx-switch';
+import '../switch-toggle/pdx-switch.pdx';
 // This component's styles live in form.css — written where the
 // container is rather than where the component is. Imported explicitly so they travel anyway.
 import '@pdxui/design/components/form';

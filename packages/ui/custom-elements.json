@@ -27209,7 +27209,7 @@
     },
     {
       "kind": "javascript-module",
-      "path": "src/switch-toggle/pdx-switch.ts",
+      "path": "src/switch-toggle/pdx-switch.pdx",
       "declarations": [
         {
           "kind": "class",
@@ -27536,7 +27536,7 @@
           "name": "pdx-switch",
           "declaration": {
             "name": "PdxSwitch",
-            "module": "src/switch-toggle/pdx-switch.ts"
+            "module": "src/switch-toggle/pdx-switch.pdx"
           }
         }
       ]

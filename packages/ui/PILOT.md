@@ -26,7 +26,10 @@ library moves to `.pdx`.
   **The rule falls on yes.** The move itself changes how every component is written and published,
   so it is the owner's to start. What it needs first is under «Before the library moves».
 
-The `.pdx` versions stay here, unexported, until then.
+The `.pdx` versions stay here, unexported, until each moves. **The move has started:** `pdx-switch` is
+`src/switch-toggle/pdx-switch.pdx` since #1008, and its TypeScript version is gone. The pilot now
+substitutes the select and the popover only, and the mount measurement below has no switch row any more;
+its numbers here are the record of when it had one.
 
 ## How a pilot component is held to the same bar
 

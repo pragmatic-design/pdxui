@@ -34,7 +34,9 @@ function documented(): { tag: string; module: string }[] {
  */
 function importedModules(): Set<string> {
     const src = readFileSync(join(UI, 'src', 'index.ts'), 'utf8');
-    return new Set([...src.matchAll(/^import\s+'\.\/([^']+)';/gm)].map(m => `src/${m[1]}.ts`));
+    // A TypeScript module is imported without its extension; a .pdx one with it (#1008).
+    return new Set([...src.matchAll(/^import\s+'\.\/([^']+)';/gm)]
+        .map(m => m[1].endsWith('.pdx') ? `src/${m[1]}` : `src/${m[1]}.ts`));
 }
 
 describe('the barrel registers every documented component', () => {

@@ -11,6 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
+import { describeComponent } from '@pdxui/compiler';
 
 const SRC = join(__dirname, '..', '..', 'src');
 const FORM_MODEL = join(__dirname, '..', '..', '..', 'core', 'src', 'form', 'form-model.ts');
@@ -37,14 +38,38 @@ const NOT_READ: Record<string, string> = {
     'pdx-form-section.name': 'identifies the section to the page',
 };
 
-function tsFiles(dir: string): string[] {
+function sourceFiles(dir: string): string[] {
     const out: string[] = [];
     for (const name of readdirSync(dir)) {
         const full = join(dir, name);
-        if (statSync(full).isDirectory()) out.push(...tsFiles(full));
-        else if (name.endsWith('.ts')) out.push(full);
+        if (statSync(full).isDirectory()) out.push(...sourceFiles(full));
+        else if (name.endsWith('.ts') || name.endsWith('.pdx')) out.push(full);
     }
     return out;
+}
+
+/**
+ * A component written in .pdx (#1008): its `@prop`s as the compiler reads them — the models and the
+ * variants aside, as a TypeScript descriptor keeps them out of its props block — and the file without
+ * their declaration lines and their comments. A .pdx reads a prop by its bare name, in the template or
+ * the script, so the name standing anywhere else in the file is the read; a comment that names it is
+ * not.
+ */
+function declaredPdxProps(src: string, file: string): Declared[] {
+    const { tag, analysis } = describeComponent(src, file, { prefix: 'pdx' });
+    const names = analysis.props.filter((p) => !p.model && !p.variant).map((p) => p.name);
+    if (names.length === 0) return [];
+    const rest = src
+        // Match: a block comment, JSDoc included, and an HTML comment. Groups: none
+        .replace(/\/\*[\s\S]*?\*\/|<!--[\s\S]*?-->/g, '')
+        // Match: a `//` comment line, and a `@prop` declaration line. Groups: none
+        .replace(/^[ \t]*(?:\/\/|@prop\b)[^\n]*$/gm, '');
+    return [{ tag, names, rest, formModel: analysis.props.some((p) => p.form === true) }];
+}
+
+/** A prop read in `rest`: through `ctx`, called, quoted — or, in a .pdx, by its bare name. */
+function isRead(name: string, rest: string, pdx: boolean): boolean {
+    return new RegExp(pdx ? `\\b${name}\\b` : `ctx\\.${name}\\b|\\b${name}\\s*\\(\\)|['"]${name}['"]`).test(rest);
 }
 
 /** Past whitespace and `//` comment lines, from `i`. */
@@ -131,8 +156,12 @@ function declaredProps(src: string): Declared[] {
 }
 
 describe('the props a component declares', () => {
-    const components = tsFiles(SRC).flatMap((f) =>
-        declaredProps(readFileSync(f, 'utf8')).map((found) => ({ file: relative(SRC, f).replace(/\\/g, '/'), found })));
+    const components = sourceFiles(SRC).flatMap((f) => {
+        const src = readFileSync(f, 'utf8');
+        const pdx = f.endsWith('.pdx');
+        return (pdx ? declaredPdxProps(src, f) : declaredProps(src))
+            .map((found) => ({ file: relative(SRC, f).replace(/\\/g, '/'), found, pdx }));
+    });
 
     it('were found, so the assertion below is not vacuous', () => {
         // Every registration with a props block: 114 on 2026-10-24 (#658), 82 when models-first
@@ -142,9 +171,9 @@ describe('the props a component declares', () => {
 
     it('are each read by the component, or listed with a reason', () => {
         const unread: string[] = [];
-        for (const { file, found } of components) {
+        for (const { file, found, pdx } of components) {
             for (const name of found.names) {
-                const read = new RegExp(`ctx\\.${name}\\b|\\b${name}\\s*\\(\\)|['"]${name}['"]`).test(found.rest)
+                const read = isRead(name, found.rest, pdx)
                     || (found.formModel && name in READ_BY_FORM_MODEL);
                 if (!read && !(`${found.tag}.${name}` in NOT_READ)) unread.push(`${found.tag}.${name} (${file})`);
             }
@@ -170,7 +199,7 @@ describe('the props a component declares', () => {
         for (const key of Object.keys(NOT_READ)) {
             const [tag, name] = [key.slice(0, key.lastIndexOf('.')), key.slice(key.lastIndexOf('.') + 1)];
             const c = components.find((x) => x.found.tag === tag);
-            const read = c && new RegExp(`ctx\\.${name}\\b|\\b${name}\\s*\\(\\)|['"]${name}['"]`).test(c.found.rest);
+            const read = c && isRead(name, c.found.rest, c.pdx);
             if (!c || !c.found.names.includes(name) || read) stale.push(key);
         }
         expect(stale, 'these exceptions no longer apply: remove them').toEqual([]);

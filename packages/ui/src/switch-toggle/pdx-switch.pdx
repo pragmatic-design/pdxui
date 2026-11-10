@@ -1,8 +1,3 @@
-<!--
-  pdx-switch, written in .pdx for the pilot (#137): the same component as
-  src/switch-toggle/pdx-switch.ts, held to the same unit tests and certification manifest.
-  Not exported: the follow-up the pilot opens decides.
--->
 <template>
   <label :class="wrapClass">
     <input
@@ -52,7 +47,7 @@
  * @alphadetail checked $event.detail.value
  * @alphadetail value $event.currentTarget.value
  */
-import { uiString } from '../src/shared/i18n';
+import { uiString } from '../shared/i18n';
 
 // A toggle writes it (#480), and the write dispatches `checked-change`.
 @model checked: boolean = false { form };
@@ -88,7 +83,8 @@ const wrapClass = $derived('pdx-switch-wrap' + (labelPosition === 'left' ? ' pdx
 
 // The field writes `checked` itself, two-way: a disabled or loading switch is a disabled input, which
 // the user cannot change.
-function focus() { inputEl?.focus(); }
-function blur() { inputEl?.blur(); }
-function clear() { checked = false; }
+// Typed: the published declaration is written from these signatures (#1004).
+function focus(): void { inputEl?.focus(); }
+function blur(): void { inputEl?.blur(); }
+function clear(): void { checked = false; }
 </script>

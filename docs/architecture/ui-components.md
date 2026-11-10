@@ -8,10 +8,12 @@ Every component is a standard Custom Element: `<pdx-button>`, `<pdx-dialog>`, `<
 
 ## How a component works
 
-Every component is a single TypeScript file that calls `component()` from core:
+Every component is a single file: a TypeScript one that calls `component()` from core, or a `.pdx` one
+that the compiler turns into that call (#1004; `pdx-switch` is the first, `src/switch-toggle/pdx-switch.pdx`,
+#1008). The TypeScript form, simplified from what the switch was before it moved:
 
 ```typescript
-// packages/ui/src/switch-toggle/pdx-switch.ts
+// packages/ui/src/switch-toggle/pdx-switch.ts, before #1008
 import { component, html, prop } from '@pdxui/core';
 
 component('pdx-switch', {

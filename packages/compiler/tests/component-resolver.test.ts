@@ -36,7 +36,7 @@ describe('ComponentResolver — manifest-driven resolution', () => {
     });
 
     it('resolves RENAMED exports via the source file, not the dir name', () => {
-        // src/switch-toggle/pdx-switch.ts is exported as "./switch"
+        // src/switch-toggle/pdx-switch.pdx is exported as "./switch" (a .pdx since #1008)
         expect(r.resolve('pdx-switch')?.importPath).toBe('@pdxui/ui/switch');
         // src/overlay/pdx-overlay-outlet.ts is exported as "./overlay-outlet"
         expect(r.resolve('pdx-overlay-outlet')?.importPath).toBe('@pdxui/ui/overlay-outlet');
