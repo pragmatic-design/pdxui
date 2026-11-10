@@ -15,7 +15,7 @@ Drill through nested options.
 | `loadChildren` | — | ((...args: unknown[]) => unknown) \| null | `null` | Lazy load function: (node) => Promise<CascaderNode[]> |
 | `name` | `name` | string | `''` | Form field name |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs, sm, md (the default), lg or xl — the same scale as pdx-input. |
-| `value` | — | string[] | `() => []` | The current value. |
+| `value` | — | string[] | `[]` | The current value. |
 
 **API (via `:ref`)**
 

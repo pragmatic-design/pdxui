@@ -686,9 +686,22 @@ compiles into the same descriptor, so the behaviour exists once, in core. `ctx` 
 (`ctx.size()` is the union; `ctx.emit('nope')` is a type error), and the manifest reads props, events,
 slots, states, parts and variants from its types, not from JSDoc. The constructor form of alpha
 (`props: { x: { type: String } }`) is removed: a prop is a builder's, `prop<T>()`, `prop.required<T>()` or
-`prop.optional<T>()`, and a model `model<T>()`. Whether the library moves to `.pdx` is decided
+`prop.optional<T>()`, and a model `model<T>()`. Whether the library moves to `.pdx` was decided
 by a measured pilot on three components (#137): if the medium one (`pdx-select`) needs no escape
-hatch, `.pdx` becomes the default for the library.
+hatch, `.pdx` becomes the default for the library. Its second run met the rule, and the owner decided
+on 2026-11-10 that the library moves (#686, `packages/ui/PILOT.md`).
+
+A library component written in `.pdx`, `src/<name>/pdx-<name>.pdx`, is in the manifest as a
+TypeScript one is (#1003): the generator reads it from the compiler's description of the file, and
+the two produce the same declaration. Its documentation is where the TypeScript component's JSDoc is:
+
+- the first `/** … */` of the script, before any declaration or import, is the component's JSDoc,
+  with the same tags (`@summary`, `@slot`, `@csspart`, `@cssstate`, `@cssprop`, `@capability`,
+  `@fires`, `@alphaevent`, `@alphadetail`, `@alphacommit`, `@alpharename`);
+- a `/** … */` directly above a `@prop`, `@model`, `@event`, `@slot`, `@state`, `@variants` axis or
+  an `@expose`d function describes it; a line comment between the two does not detach it;
+- a type the script imports from a package is written in the manifest as `import('pkg').Name`, so
+  it resolves where the manifest is read.
 
 **Landed** (#123): the builders `prop`, `prop.required`, `event`, `model` and `slot` (`@pdxui/core`),
 every field above in the descriptor's type, and the behaviour of two of them. `props` types `ctx`

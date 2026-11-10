@@ -14,7 +14,7 @@ Drag-and-drop or browse to upload.
 | `auto` | `auto` | boolean | `false` | Upload immediately on selection. |
 | `action` | `action` | string | `''` | URL to upload files to. |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the dropzone's size. |
-| `value` | — | File[] | `() => []` | The current value. |
+| `value` | — | File[] | `[]` | The current value. |
 
 **API (via `:ref`)**
 

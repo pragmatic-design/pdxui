@@ -16,34 +16,31 @@
 //   - css states            ← the descriptor's `states: [...]`, described by JSDoc `@cssstate name - desc`
 //   - summary/description   ← JSDoc on the component() statement
 //
+// A component written in .pdx, pdx-*.pdx, is read from the compiler's description of it
+// (manifest-pdx.mjs, #1003): the same fields, from its declarations and the JSDoc of its script.
+// Both readers hand what they extract to one assembly, manifest-shared.mjs.
+//
 // Usage: node scripts/gen-manifest.mjs   (writes packages/ui/custom-elements.json)
 
 import ts from 'typescript';
 import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from 'fs';
 import { join, relative, dirname } from 'path';
-import { fileURLToPath, pathToFileURL } from 'url';
+import { pathToFileURL } from 'url';
 import { componentTokens } from '../../design/scripts/component-tokens.mjs';
+import {
+    UI_ROOT, normalizeEol, PROP_DESC, jsdocDescription, jsdocTags, splitNameDesc, scanRoles, withoutComments,
+    scanSlots, scanExportedShapes, declaredFunction, functionParameters, describeProp, assembleModule,
+} from './manifest-shared.mjs';
+import { analyzePdxFile } from './manifest-pdx.mjs';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const UI_ROOT = join(__dirname, '..');
 const SRC = join(UI_ROOT, 'src');
 
-/** CRLF (and lone CR) → LF. Every piece of prose that reaches the manifest goes through this. */
-export function normalizeEol(text) {
-    return text.replace(/\r\n?/g, '\n');
-}
-
-// Curated descriptions for component-specific props (keyed 'tag:prop'). JSDoc still wins; this fills
-// props whose meaning is too component-specific to auto-derive from the name.
-// Normalised on read for the same reason as the component sources: this file is edited by hand and
-// carries multi-line descriptions, so a Windows checkout would feed CRLF straight into the JSON.
-let PROP_DESC = {};
-try { PROP_DESC = JSON.parse(normalizeEol(readFileSync(join(UI_ROOT, 'prop-descriptions.json'), 'utf8'))); } catch { /* optional */ }
+export { normalizeEol };
 
 // ─── Categories + order (from the section comments of src/index.ts) ──────
 
 /** Parse src/index.ts: maps tag → { category, order } from the barrel's sections. */
-function parseCategories() {
+export function parseCategories() {
     const map = {};
     let category = 'Other';
     let order = 0;
@@ -53,7 +50,9 @@ function parseCategories() {
         const tier = /^\/\/\s*Tier\s*[^:]*:\s*(.+?)\s*$/.exec(line);
         if (tier) { category = tier[1]; continue; }
         if (/^\/\/\s*Infrastructure/.test(line)) { category = 'Infrastructure'; continue; }
-        const imp = /^import\s+'\.\/[^/]+\/(pdx-[\w-]+)'/.exec(line);
+        // Match: import './select/pdx-select';  or a .pdx component's  import './select/pdx-select.pdx';
+        // Groups: [1]=the tag
+        const imp = /^import\s+'\.\/[^/]+\/(pdx-[\w-]+)(?:\.pdx)?'/.exec(line);
         if (imp) map[imp[1]] = { category, order: order++ };
     }
     return map;
@@ -61,7 +60,7 @@ function parseCategories() {
 
 // ─── File discovery ─────────────────────────────────────────────────
 
-/** Recursively collect every pdx-*.ts under src/. */
+/** Recursively collect every pdx-*.ts and pdx-*.pdx under src/ (#1003). */
 const SKIP_DIRS = new Set();
 
 function collectComponentFiles(dir) {
@@ -70,7 +69,7 @@ function collectComponentFiles(dir) {
         if (SKIP_DIRS.has(item)) continue;
         const full = join(dir, item);
         if (statSync(full).isDirectory()) out.push(...collectComponentFiles(full));
-        else if (/^pdx-.*\.ts$/.test(item)) out.push(full);
+        else if (/^pdx-.*\.(ts|pdx)$/.test(item)) out.push(full);
     }
     return out;
 }
@@ -78,36 +77,6 @@ function collectComponentFiles(dir) {
 // ─── AST helpers ────────────────────────────────────────────────────
 
 const TYPE_MAP = { String: 'string', Number: 'number', Boolean: 'boolean', Array: 'array', Object: 'object' };
-
-/** tag `pdx-badge` → class-ish name `PdxBadge`. */
-function tagToName(tag) {
-    return tag.split('-').map(p => p.charAt(0).toUpperCase() + p.slice(1)).join('');
-}
-
-/** First JSDoc description text on a node (the prose before any @tag), or ''. */
-function jsdocDescription(node) {
-    const docs = ts.getJSDocCommentsAndTags(node).filter(ts.isJSDoc);
-    for (const d of docs) {
-        if (typeof d.comment === 'string' && d.comment.trim()) return d.comment.trim();
-    }
-    return '';
-}
-
-/** All JSDoc @tags on a node as { tag, text }. */
-function jsdocTags(node) {
-    const out = [];
-    for (const t of ts.getJSDocCommentsAndTags(node)) {
-        if (ts.isJSDoc(t) && t.tags) {
-            for (const tag of t.tags) {
-                const text = typeof tag.comment === 'string'
-                    ? tag.comment
-                    : (tag.comment?.map(c => c.text).join('') ?? '');
-                out.push({ tag: tag.tagName.text, text: text.trim() });
-            }
-        }
-    }
-    return out;
-}
 
 /**
  * The type a prop DECLARES for itself: `@type number | 'auto'` above it, or '' when it says nothing.
@@ -125,13 +94,6 @@ function jsdocDeclaredType(node, sourceFile) {
         }
     }
     return '';
-}
-
-/** Split a JSDoc tag body "name - description" (or "name description") into {name, description}. */
-function splitNameDesc(text) {
-    const m = text.match(/^(\S+)\s*-\s*(.*)$/s) || text.match(/^(\S+)\s+(.*)$/s);
-    if (m) return { name: m[1], description: m[2].trim() };
-    return { name: text.trim(), description: '' };
 }
 
 /** Find the `component('tag', {...})` ExpressionStatement; returns { statement, tag, optionsObj } or null. */
@@ -231,11 +193,6 @@ function extractSlotSignatures(optionsObj, sourceFile) {
     return signatures;
 }
 
-/** The event a model dispatches, as core names it: `selectedId` → `selected-id-change`. */
-function modelEventName(name) {
-    return `${name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`)}-change`;
-}
-
 /**
  * `prop(…)`, `prop.required(…)`, `prop.optional(…)` or `model(…)`: the builders a typed descriptor
  * declares a prop with (#123, #124, #130). `noDefault`: the call takes its options first.
@@ -290,9 +247,23 @@ function builtProp(initializer, sourceFile) {
     const runtime = noDefault
         ? (optionsRuntime(first, sourceFile) ?? 'object')
         : (optionsRuntime(second, sourceFile) ?? inferredRuntime(first));
-    const def = noDefault || !first ? undefined : first.getText(sourceFile);
+    const def = noDefault || !first ? undefined : defaultText(first, runtime, sourceFile);
     const iconName = optionsFlag(noDefault ? first : second, sourceFile, 'iconName');
     return { type: typeArg || runtime, runtime, default: def, iconName, ...(required ? { required: true } : {}) };
+}
+
+/**
+ * A prop's default as the manifest shows it: the value it starts with. An Array or Object prop's
+ * factory, `() => []`, is called by core once per instance (resolveDefault), so the value is `[]`; a
+ * .pdx's `= []` compiles to that factory (#677) and reads `[]` too (#1003). A factory with a block
+ * body, and any other default, is shown as written.
+ */
+function defaultText(arg, runtime, sourceFile) {
+    if ((runtime === 'array' || runtime === 'object') && ts.isArrowFunction(arg) && arg.parameters.length === 0 && !ts.isBlock(arg.body)) {
+        const value = ts.isParenthesizedExpression(arg.body) ? arg.body.expression : arg.body;
+        return value.getText(sourceFile);
+    }
+    return arg.getText(sourceFile);
 }
 
 /** A boolean field of a builder's options argument (`{ iconName: true }`): true only when written `true`. */
@@ -366,23 +337,6 @@ function extractGenerics(optionsObj, sourceFile) {
         out.push({ name: decl.name.getText(sourceFile), extends: field('extends'), from: field('from'), source: field('source') });
     }
     return out;
-}
-
-/**
- * The states a descriptor declares, `states: ['open', 'invalid']` (#132) → { name, description }, the
- * description from a `@cssstate name - text` tag on the component, as for `@csspart`.
- */
-function extractDescriptorStates(optionsObj, sourceFile, tags) {
-    const statesProp = optionsObj.properties.find(
-        p => ts.isPropertyAssignment(p) && p.name.getText(sourceFile) === 'states');
-    if (!statesProp || !ts.isArrayLiteralExpression(statesProp.initializer)) return [];
-    const described = new Map(tags.filter(t => t.tag === 'cssstate').map(t => {
-        const s = splitNameDesc(t.text);
-        return [s.name, s.description];
-    }));
-    return statesProp.initializer.elements.filter(e => ts.isStringLiteralLike(e)).map(e => ({
-        name: e.text, description: described.get(e.text) || `Matched with \`:state(${e.text})\`.`,
-    }));
 }
 
 /**
@@ -482,105 +436,6 @@ function scanEmitDetails(node, sourceFile, into = new Map()) {
 }
 
 /**
- * `@fires name {Type} - description` → { name, type, description }. The type is optional and may
- * itself contain braces (`{{ value, hex }}`), so it is read by matching them, not by a regex.
- */
-function parseFires(text) {
-    const m = text.match(/^(\S+)\s*/);
-    if (!m) return { name: text.trim(), type: '', description: '' };
-    const name = m[1];
-    let rest = text.slice(m[0].length);
-    let type = '';
-    if (rest.startsWith('{')) {
-        let depth = 0, i = 0;
-        for (; i < rest.length; i++) {
-            if (rest[i] === '{') depth++;
-            else if (rest[i] === '}' && --depth === 0) break;
-        }
-        type = rest.slice(1, i).trim();
-        rest = rest.slice(i + 1).trim();
-    }
-    return { name, type, description: rest.replace(/^-\s*/, '').trim() };
-}
-
-/**
- * The ARIA roles a component renders — what a test or a measuring script targets. Read from
- * `role="x"`, `setAttribute('role', 'x')`, and every quoted role inside a bound
- * `role="${() => cond ? 'a' : 'b'}"`: pdx-select's trigger is a combobox only when searchable, a
- * button otherwise, and measuring code that does not know that fails on half the selects.
- *
- * A role the component only LOOKS FOR is not one it renders: `role="x"` inside an attribute selector
- * (`querySelector('[role="heading"]')`) is skipped, and `text` comes with its comments blanked out
- * (`withoutComments`). Otherwise pdx-popover would publish a heading it only queries, and pdx-label
- * and pdx-form-field a combobox, a radiogroup and a group.
- */
-function scanRoles(text) {
-    const roles = new Set();
-    for (const m of text.matchAll(/(?<!\[)\brole=(["'])([\w-]+)\1/g)) roles.add(m[2]);
-    // A literal, or the values of an expression up to the `);` that ends the statement:
-    // `setAttribute('role', ctx.mode() === 'single' ? 'radiogroup' : 'group');`.
-    for (const m of text.matchAll(/setAttribute\(\s*['"]role['"]\s*,\s*['"]([\w-]+)['"]\s*\)/g)) roles.add(m[1]);
-    for (const m of text.matchAll(/setAttribute\(\s*['"]role['"]\s*,\s*(.*?)\)\s*;/g)) {
-        for (const r of valueLiterals(m[1])) roles.add(r);
-    }
-    for (const m of text.matchAll(/(?<!\[)\brole="\$\{([^}]*)\}"/g)) {
-        for (const r of valueLiterals(m[1])) roles.add(r);
-    }
-    return [...roles].sort();
-}
-
-/** The quoted words of an expression that are values it yields, not operands of a comparison
- *  (`mode === 'single' ? 'radiogroup' : 'group'` yields radiogroup and group, not single). */
-function valueLiterals(expr) {
-    const out = [];
-    for (const q of expr.matchAll(/(['"])([\w-]+)\1/g)) {
-        const before = expr.slice(0, q.index).trimEnd();
-        const after = expr.slice(q.index + q[0].length).trimStart();
-        // Parentheses between the word and the operator do not make it a value: `(x || 'both') === 'none'`.
-        if (/[=!]=\s*\(*$/.test(before) || /^[\s)]*[=!]==?/.test(after)) continue;
-        out.push(q[2]);
-    }
-    return out;
-}
-
-/**
- * The file's text with every comment replaced by spaces (newlines kept). The comment ranges come from
- * the parsed tree, so `//` inside a string or a template — a URL in markup — is text, not a comment:
- * a regex cannot tell them apart. A comment quoting `role="button"` would give pdx-select a false
- * button role.
- */
-function withoutComments(sourceFile) {
-    const text = sourceFile.getFullText();
-    const chars = text.split('');
-    const blank = ({ pos, end }) => { for (let i = pos; i < end; i++) if (chars[i] !== '\n') chars[i] = ' '; };
-    const visit = (node) => {
-        for (const r of ts.getLeadingCommentRanges(text, node.getFullStart()) ?? []) blank(r);
-        for (const r of ts.getTrailingCommentRanges(text, node.getEnd()) ?? []) blank(r);
-        ts.forEachChild(node, visit);
-    };
-    visit(sourceFile);
-    return chars.join('');
-}
-
-/**
- * The slots a component renders: `<slot>` is the default one (name ''), `<slot name="x">` a named
- * one. A tool that shows a component needs to know whether its children are content or ignored —
- * `<pdx-badge value="5">badge</pdx-badge>` looks right, while the badge renders its value and drops
- * the text. A name bound at runtime is not a name this can read, and
- * is left out rather than guessed.
- */
-function scanSlots(text) {
-    const names = new Set();
-    for (const m of text.matchAll(/<slot\b([^>]*)>/g)) {
-        const attrs = m[1];
-        const named = attrs.match(/\bname=(["'])([\w-]+)\1/);
-        if (named) names.add(named[2]);
-        else if (!/\bname=/.test(attrs)) names.add('');
-    }
-    return [...names].sort();
-}
-
-/**
  * The non-component `.ts` files beside a component: where a component that grew split its logic
  * (pdx-data-grid emits `pdx-selection-change` from grid-selection.ts, not from pdx-data-grid.ts).
  */
@@ -592,140 +447,6 @@ function helperFiles(file) {
     return readdirSync(dir)
         .filter(f => f.endsWith('.ts') && !f.endsWith('.d.ts') && !/^pdx-/.test(f))
         .map(f => join(dir, f));
-}
-
-// Universal prop names with a constant meaning across components — safe to auto-describe when the
-// component supplies no JSDoc. Component-specific props are left blank (semantics vary too much).
-const UNIVERSAL_PROPS = {
-    size: 'Size of the control (e.g. sm, md, lg).',
-    disabled: 'Disables interaction and dims the control.',
-    readonly: 'Makes the value read-only — visible but not editable.',
-    loading: 'Shows a loading / busy state.',
-    error: 'Marks the control as invalid.',
-    value: 'The current value.',
-    placeholder: 'Placeholder text shown while empty.',
-    name: 'Form field name, submitted with the form.',
-    label: 'Visible label text.',
-    required: 'Marks the field as required.',
-    checked: 'Whether it is checked / on.',
-    open: 'Whether it is open.',
-    variant: 'Visual variant.',
-    clearable: 'Shows a clear button to reset the value.',
-    ariaLabel: 'Accessible name when there is no visible label.',
-    min: 'Minimum allowed value.',
-    max: 'Maximum allowed value.',
-    step: 'Increment step.',
-    orientation: 'Layout orientation — horizontal or vertical.',
-    placement: 'Position relative to the anchor element.',
-    bordered: 'Adds a border.',
-    rounded: 'Rounds the corners.',
-    separator: 'The separator between items.',
-    description: 'Secondary descriptive text.',
-    clickable: 'Whether items are clickable.',
-    closeOnEscape: 'Close when the Escape key is pressed.',
-    labelPosition: 'Where the label sits relative to the control.',
-    success: 'Applies the success state styling.',
-    warning: 'Applies the warning state styling.',
-    icon: 'Icon to display.',
-    color: 'Colour of the component.',
-    items: 'The data items to render.',
-    source: 'The data source to render from.',
-    selected: 'The currently selected item(s).',
-    multiple: 'Allow selecting more than one.',
-    closable: 'Shows a close affordance.',
-    fullWidth: 'Stretches to the full width of its container.',
-    locale: 'BCP-47 locale used for formatting.',
-};
-function describeProp(name) { return UNIVERSAL_PROPS[name] || ''; }
-
-/** A conventional description for a pdx-* event when no @fires JSDoc supplies one. Event names follow
- *  a tight convention, so this is safe (unlike prop descriptions, which we never auto-generate). */
-function describeEvent(name) {
-    const n = name.replace(/^pdx-/, '');
-    const map = {
-        change: 'Fired when the value changes.',
-        input: 'Fired on each input as the user types.',
-        open: 'Fired when it opens.',
-        close: 'Fired when it closes.',
-        toggle: 'Fired when toggled open or closed.',
-        select: 'Fired when an item is selected.',
-        clear: 'Fired when the value is cleared.',
-        focus: 'Fired when it receives focus.',
-        blur: 'Fired when it loses focus.',
-        submit: 'Fired when the form is submitted.',
-        reset: 'Fired when the form is reset.',
-        dismiss: 'Fired when dismissed.',
-        confirm: 'Fired when confirmed.',
-        cancel: 'Fired when cancelled.',
-        navigate: 'Fired on navigation.',
-        search: 'Fired when a search is performed.',
-        create: 'Fired when a new item is created.',
-        remove: 'Fired when an item is removed.',
-        sort: 'Fired when the sort order changes.',
-        expand: 'Fired when expanded.',
-        collapse: 'Fired when collapsed.',
-        load: 'Fired when content has loaded.',
-        error: 'Fired when an error occurs.',
-    };
-    if (map[n]) return map[n];
-    if (n.endsWith('-change')) return `Fired when the ${n.replace(/-change$/, '').replace(/-/g, ' ')} changes.`;
-    if (n.endsWith('-click')) return `Fired when the ${n.replace(/-click$/, '').replace(/-/g, ' ')} is clicked.`;
-    return `Fired on \`${name}\`.`;
-}
-
-/**
- * The interfaces a component's own module exports, with their fields.
- *
- * A prop of type `array` or `object` tells a reader nothing: an array of WHAT? "items · array · The
- * data items to render" on `pdx-breadcrumb` leads a reader to pass `[{ label }]` without learning
- * that `BreadcrumbItem` also has `href` — and to ship a breadcrumb that renders and does not
- * navigate. No error, nothing to notice.
- *
- * The shapes are read from the source rather than declared a second time on the prop: every
- * array/object prop would be one more place to keep in sync, and a shape that drifts from its interface is worse than
- * one that is merely absent.
- */
-function interfacesIn(sourceFile) {
-    const out = [];
-    for (const st of sourceFile.statements) {
-        if (!ts.isInterfaceDeclaration(st)) continue;
-        if (!st.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword)) continue;
-        const fields = st.members
-            .filter(m => ts.isPropertySignature(m) && m.name)
-            .map(m => {
-                const name = m.name.getText(sourceFile);
-                const optional = m.questionToken ? '?' : '';
-                const type = m.type ? m.type.getText(sourceFile).replace(/\s+/g, ' ') : 'unknown';
-                return `${name}${optional}: ${type}`;
-            });
-        if (fields.length) out.push({ name: st.name.getText(sourceFile), fields });
-    }
-    return out;
-}
-
-function scanExportedShapes(sourceFile, componentFile) {
-    const shapes = interfacesIn(sourceFile);
-    const seen = new Set(shapes.map(s => s.name));
-
-    // A component split across a folder keeps its types next door: `pdx-data-grid` declares no
-    // interfaces of its own, and `ColumnDef` lives in `data-grid/grid-context.ts`. Take the
-    // siblings' exported interfaces too, but only the ones this component actually NAMES — a folder
-    // like data-grid/ exports dozens, and a wall of unrelated types is as unreadable as none.
-    const text = sourceFile.getFullText();
-    let siblings = [];
-    try { siblings = readdirSync(dirname(componentFile)).filter(f => f.endsWith('.ts') && !f.startsWith('pdx-')); }
-    catch { /* no folder, no siblings */ }
-    for (const sib of siblings) {
-        const full = join(dirname(componentFile), sib);
-        const sf = ts.createSourceFile(full, normalizeEol(readFileSync(full, 'utf8')), ts.ScriptTarget.Latest, true);
-        for (const shape of interfacesIn(sf)) {
-            if (seen.has(shape.name)) continue;
-            if (!new RegExp(`\\b${shape.name}\\b`).test(text)) continue;
-            seen.add(shape.name);
-            shapes.push(shape);
-        }
-    }
-    return shapes;
 }
 
 /**
@@ -783,26 +504,6 @@ function scanExposedMethods(sourceFile) {
 }
 
 /**
- * The function a name refers to, declared in the same file: `ctx.expose({ goTo })` is the common
- * form, and its parameters live on `function goTo(targetIndex)` in the setup. Only a declaration
- * or a `const x = (…) => …` is followed — resolving further is a type checker's job, and this is
- * a generator.
- */
-function declaredFunction(name, sourceFile) {
-    let found = null;
-    const visit = (node) => {
-        if (found) return;
-        if (ts.isFunctionDeclaration(node) && node.name?.text === name) { found = node; return; }
-        if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name
-            && node.initializer && (ts.isArrowFunction(node.initializer) || ts.isFunctionExpression(node.initializer))) {
-            found = node.initializer; return;
-        }
-        ts.forEachChild(node, visit);
-    };
-    visit(sourceFile);
-    return found;
-}
-/**
  * The parameters of an exposed property, where it carries a function: a method, an arrow or a
  * function expression. Null when the property is something else — a shorthand naming a function
  * declared elsewhere, an object, a call — so the caller can fall back rather than print `()` on a
@@ -816,11 +517,7 @@ function parametersOf(prop, sourceFile) {
             ? prop.initializer
             : named ? declaredFunction(named, sourceFile) : null;
     if (!fn) return null;
-    return fn.parameters.map(p => ({
-        name: p.name.getText(sourceFile),
-        ...(p.type ? { type: { text: p.type.getText(sourceFile) } } : {}),
-        ...(p.questionToken || p.initializer ? { optional: true } : {}),
-    }));
+    return functionParameters(fn, sourceFile);
 }
 /**
  * The shape of an exposed object, as a reader would call it: `{ scrollTo(opts), getViewport() }`.
@@ -840,23 +537,11 @@ function objectShape(object, sourceFile) {
     return `{ ${parts.join(', ')} }`;
 }
 
-function describeMethod(name) {
-    const map = {
-        open: 'Opens it.', close: 'Closes it.', toggle: 'Toggles it open/closed.',
-        show: 'Shows it.', hide: 'Hides it.', clear: 'Clears the value.', reset: 'Resets to the initial state.',
-        focus: 'Moves focus to it.', blur: 'Removes focus from it.', submit: 'Submits it.',
-        refresh: 'Reloads its data.', reload: 'Reloads its data.', validate: 'Runs validation and returns the result.',
-        scrollTo: 'Scrolls to the given target.', next: 'Advances to the next item.', prev: 'Goes to the previous item.',
-    };
-    // No sentence for a method nobody described: "Imperative `expand()` method (call via a ref)." says
-    // nothing the name does not. An empty description is honest, and the
-    // count printed at the end of the run is the list to write.
-    return map[name] || '';
-}
-
 // ─── Per-file extraction ────────────────────────────────────────────
 
 export function analyzeFile(file, text, categories) {
+    // A component written in .pdx (#1003): read from the compiler's description of it.
+    if (file.endsWith('.pdx')) return analyzePdxFile(file, text, categories);
     // LF before anything is read out of the source. TypeScript hands back JSDoc prose with the
     // file's own terminators, so on a Windows checkout every multi-line description would reach the
     // JSON as a literal `\r\n` INSIDE the string value — content as far as git is concerned, which
@@ -921,175 +606,38 @@ function analyzeComponent(found, { file, text, sourceFile, categories, shared })
     });
     const emitted = scanEmitDetails(scanNode, sourceFile);
     for (const h of helpers) scanEmitDetails(h.sourceFile, h.sourceFile, emitted);
-    const detailOf = (name, declared) => {
-        if (declared) return declared;
-        const e = emitted.get(name);
-        return e && !e.opaque && e.shapes.size ? [...e.shapes].join(' | ') : undefined;
-    };
-    const events = [];
-    const seenEvents = new Set();
-    const declaredEvents = extractDescriptorEvents(optionsObj, sourceFile);
-    const addEvent = (name, description, declared) => {
-        if (seenEvents.has(name)) return;
-        const detail = detailOf(name, declared);
-        // An event kept on the component says so: an app listening on an ancestor does not get it.
-        const said = description || describeEvent(name);
-        const noBubble = emitted.get(name)?.noBubble || declaredEvents.get(name)?.noBubble;
-        const text = noBubble ? `${said.replace(/\.?\s*$/, '.')} Does not bubble.` : said;
-        events.push({ name, type: { text: 'CustomEvent' }, description: text, ...(detail ? { detail } : {}) });
-        seenEvents.add(name);
-    };
-    // The descriptor's `events` first: its type argument is the detail's declared type (#123).
-    for (const [name, d] of declaredEvents) addEvent(name, d.description, d.detail);
-    // Each model's event (#124): dispatched when the component writes it, never bubbling.
-    for (const m of models) addEvent(modelEventName(m.name), `Fired when the component writes \`${m.name}\`. Does not bubble.`, `{ value: ${m.type} }`);
-    for (const t of tags.filter(t => t.tag === 'fires' || t.tag === 'event')) {
-        const { name, type, description } = parseFires(t.text);
-        addEvent(name, description, type);
-    }
-    for (const name of scanEmittedEvents(scanText)) addEvent(name, '', '');
-    for (const name of emitted.keys()) addEvent(name, '', '');
     // Roles are read with the comments blanked out, in the component's own statement when the file
     // declares more than one.
     const cleanText = withoutComments(sourceFile);
     const roleText = shared ? cleanText.slice(statement.getStart(sourceFile), statement.getEnd()) : cleanText;
-    const roles = scanRoles([roleText, ...helpers.map(h => withoutComments(h.sourceFile))].join('\n'));
+    // What ctx.expose({...}) puts on the element: methods, getters, and objects with their keys.
+    const methods = scanExposedMethods(scanNode).map(({ name, getter, description, object, params }) => (
+        object ? { name, kind: 'object', objectType: objectShape(object, sourceFile), description }
+            : getter ? { name, kind: 'getter', description }
+                : { name, kind: 'method', params, description }));
 
-    // `@slot - desc` (leading dash, no name) is the default slot → empty name per CEM.
-    const slots = tags.filter(t => t.tag === 'slot').map(t => {
-        const s = splitNameDesc(t.text);
-        return s.name === '-' ? { name: '', description: s.description } : s;
+    return assembleModule({
+        file, tag, category: cat, tags, description: jsdocDescription(statement), props,
+        models: models.map(m => m.name),
+        generics: generics.map(g => (g.extends ? `${g.name} extends ${g.extends}` : g.name)),
+        formAssociated: hasFormModel(optionsObj, sourceFile),
+        variants,
+        declaredEvents: extractDescriptorEvents(optionsObj, sourceFile),
+        emitted,
+        emittedNames: [...scanEmittedEvents(scanText), ...emitted.keys()],
+        roles: scanRoles([roleText, ...helpers.map(h => withoutComments(h.sourceFile))].join('\n')),
+        renderedSlots: scanSlots(scanText),
+        slotSignatures: extractSlotSignatures(optionsObj, sourceFile),
+        parts: stringArrayField(optionsObj, sourceFile, 'parts'),
+        states: stringArrayField(optionsObj, sourceFile, 'states'),
+        methods,
+        // The interfaces this module exports, so a reader of `items: array` can see what an item is.
+        // sourceFile, not scanNode: interfaces are module-level, and a file declaring two components
+        // shares them. scanNode narrows to one component() statement for those files.
+        shapes: scanExportedShapes(sourceFile, file),
+        // The contexts it provides and reads (#498), in its own statement or file and its helpers.
+        contexts: scanContexts([scanNode, ...helpers.map(h => h.sourceFile)], new Set(props.map(p => p.name))),
     });
-    // …and every slot the component renders, documented or not.
-    for (const name of scanSlots(scanText)) {
-        if (!slots.some(s => s.name === name)) slots.push({ name, description: name ? '' : 'The content placed inside the element.' });
-    }
-    // …and the descriptor's declared slots with their signatures (#491).
-    for (const [name, signature] of extractSlotSignatures(optionsObj, sourceFile)) {
-        const known = slots.find(s => s.name === name);
-        if (known) known.signature = signature;
-        else slots.push({ name, description: '', signature });
-    }
-    const cssParts = tags.filter(t => t.tag === 'csspart').map(t => splitNameDesc(t.text));
-    // The descriptor's `parts` (#134), each reached as `[data-part="name"]`; a `@csspart` describes it.
-    for (const name of stringArrayField(optionsObj, sourceFile, 'parts')) {
-        if (!cssParts.some(p => p.name === name)) cssParts.push({ name, description: `The element reached as \`[data-part="${name}"]\`.` });
-    }
-    const cssProperties = tags.filter(t => t.tag === 'cssprop' || t.tag === 'cssproperty').map(t => splitNameDesc(t.text));
-    const cssStates = extractDescriptorStates(optionsObj, sourceFile, tags);
-    // The capabilities (#292): `@capability <name> - <what it does>`, what an agent's page card says the
-    // component can do — sortable, filterable, selectable, editable (library.md, «Accessibility»).
-    const capabilities = tags.filter(t => t.tag === 'capability').map(t => splitNameDesc(t.text));
-    // The alpha events the component no longer emits (#478): `@alphaevent <name>`, and how each alpha
-    // `detail.<field>` reads in the beta, `@alphadetail <field> <expression>`. The compiler reports a
-    // listener on one as a removed form; `pdx migrate` rewrites it with the detail map.
-    const alphaEvents = tags.filter(t => t.tag === 'alphaevent').map(t => t.text.trim()).filter(Boolean);
-    const alphaDetail = {};
-    for (const t of tags.filter(t => t.tag === 'alphadetail')) {
-        // Match: `<field> <expression>`. Groups: [1]=the field [2]=the expression
-        const m = /^(\S+)\s+(\S[\s\S]*)$/.exec(t.text.trim());
-        if (m) alphaDetail[m[1]] = m[2].trim();
-    }
-    // The alpha event that was the commit, apart from the live one (#479): `pdx migrate` moves a
-    // listener on it to the inner input's native `change`, not to the model's event.
-    const alphaCommit = tags.find(t => t.tag === 'alphacommit')?.text.trim() || '';
-    // An alpha event that is now a declared event of another name (#481), `@alpharename <alpha> <new>`:
-    // a picker's query, which is not its model.
-    const alphaRename = {};
-    for (const t of tags.filter(t => t.tag === 'alpharename')) {
-        // Match: `<alpha event> <new event>`. Groups: [1]=the alpha event [2]=the new one
-        const m = /^(\S+)\s+(\S+)$/.exec(t.text.trim());
-        if (m) alphaRename[m[1]] = m[2];
-    }
-    const summary = tags.find(t => t.tag === 'summary')?.text || '';
-    const description = jsdocDescription(statement);
-
-    const className = tagToName(tag);
-    // Object/Array/Function props are PROP-ONLY in core (PROP_ONLY_TYPES) — set via JS
-    // property, never reflected as an HTML attribute. They are fields, not attributes.
-    const PROP_ONLY = new Set(['object', 'array', 'function']);
-    const members = props.map(p => ({
-        kind: 'field', name: p.name, ...(p.description ? { description: p.description } : {}),
-        type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),
-        ...(PROP_ONLY.has(p.runtime) ? {} : { attribute: p.name.toLowerCase() }),
-        ...(p.iconName ? { iconName: true } : {}),
-        // A prop the host must set (`prop.required<T>()`): a use without it is PDX_PROP_REQUIRED (#130).
-        ...(p.required ? { required: true } : {}),
-    }));
-    // What ctx.expose({...}) puts on the element: methods to call through a ref, and getters to read
-    // (a read-only field in the Custom Elements Manifest schema, with no attribute).
-    const methods = scanExposedMethods(scanNode).map(({ name, getter, description, object, params }) => {
-        // An object is not callable: publishing it as a method tells a reader to write
-        // `el.scrollArea()`, which throws. It is a readonly field, like a getter, and its TYPE
-        // carries the keys — they are the API, and they would appear nowhere else.
-        if (object) {
-            return {
-                kind: 'field', name, readonly: true, type: { text: objectShape(object, sourceFile) },
-                description: description || `Read-only, via a ref: \`el.${name}\`.`,
-            };
-        }
-        if (getter) {
-            return { kind: 'field', name, readonly: true, description: description || `Read-only, via a ref: \`el.${name}\`.` };
-        }
-        return { kind: 'method', name, ...(params ? { parameters: params } : {}), description: description || describeMethod(name) };
-    });
-    // The interfaces this module exports, so a reader of `items: array` can see what an item is.
-    // sourceFile, not scanNode: interfaces are module-level, and a file declaring two components
-    // shares them. scanNode narrows to one component() statement for those files.
-    const shapes = scanExportedShapes(sourceFile, file);
-    // The contexts it provides and reads (#498), in its own statement or file and its helpers.
-    const contexts = scanContexts([scanNode, ...helpers.map(h => h.sourceFile)], new Set(props.map(p => p.name)));
-    for (const mm of methods) members.push(mm);
-    const attributes = props.filter(p => !PROP_ONLY.has(p.runtime)).map(p => ({
-        name: p.name.toLowerCase(), fieldName: p.name,
-        ...(p.description ? { description: p.description } : {}),
-        type: { text: p.type }, ...(p.default !== undefined ? { default: p.default } : {}),
-    }));
-
-    return {
-        kind: 'javascript-module',
-        path: relative(UI_ROOT, file).replace(/\\/g, '/'),
-        declarations: [{
-            kind: 'class', customElement: true, name: className, tagName: tag,
-            category: cat.category, order: cat.order,
-            ...(summary ? { summary } : {}), ...(description ? { description } : {}),
-            // Its type parameters (#651), as a .pdx's `@generic` records them: the editor types a
-            // parent's snippet with them, inferred from the props that use them.
-            ...(generics.length ? { generics: generics.map(g => (g.extends ? `${g.name} extends ${g.extends}` : g.name)) } : {}),
-            members,
-            // The props `::x` may bind (#124): the compiler's resolver reads them from here.
-            ...(models.length ? { models: models.map(m => m.name) } : {}),
-            // Takes part in a form through a model declared `{ form: true }` (#135).
-            ...(hasFormModel(optionsObj, sourceFile) ? { formAssociated: true } : {}),
-            // The variant axes (#512): the design build checks its `@variant` rules against them, and
-            // certification generates one scenario per value.
-            ...(variants.length ? { variants } : {}),
-            ...(alphaEvents.length ? { alphaEvents } : {}),
-            ...(Object.keys(alphaDetail).length ? { alphaDetail } : {}),
-            ...(alphaCommit ? { alphaCommit } : {}),
-            ...(Object.keys(alphaRename).length ? { alphaRename } : {}),
-            ...(events.length ? { events } : {}),
-            ...(roles.length ? { roles } : {}),
-            attributes,
-            ...(shapes.length ? { shapes } : {}),
-            ...(slots.length ? { slots } : {}),
-            ...(cssParts.length ? { cssParts } : {}),
-            ...(cssProperties.length ? { cssProperties } : {}),
-            ...(cssStates.length ? { cssStates } : {}),
-            // What the component offers to do, which an agent's page card reads (#292).
-            ...(capabilities.length ? { capabilities } : {}),
-            ...(contexts.provides.length || contexts.injects.length ? {
-                'x-pdx-context': {
-                    ...(contexts.provides.length ? { provides: contexts.provides } : {}),
-                    ...(contexts.injects.length ? { injects: contexts.injects } : {}),
-                },
-            } : {}),
-        }],
-        exports: [{
-            kind: 'custom-element-definition', name: tag,
-            declaration: { name: className, module: relative(UI_ROOT, file).replace(/\\/g, '/') },
-        }],
-    };
 }
 
 // ─── Main ───────────────────────────────────────────────────────────

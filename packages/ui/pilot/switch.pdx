@@ -35,9 +35,26 @@
 </template>
 
 <script>
+/**
+ * A toggle switch (role="switch") the user turns on and off, with a label, a description and a
+ * loading state.
+ *
+ * @csspart root - The native checkbox with role="switch", the track drawn; the size variants key by it.
+ * @csspart label - The `label` text, when set.
+ * @csspart description - The `description` text, when set.
+ *
+ * @cssstate checked - It is on.
+ * @cssstate invalid - `error` is set; the switch is aria-invalid.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate loading - `loading` is set; the switch is aria-busy and takes no toggle.
+ *
+ * @alphaevent pdx-change
+ * @alphadetail checked $event.detail.value
+ * @alphadetail value $event.currentTarget.value
+ */
 import { uiString } from '../src/shared/i18n';
 
-/** A toggle writes it (#480), and the write dispatches `checked-change`. */
+// A toggle writes it (#480), and the write dispatches `checked-change`.
 @model checked: boolean = false { form };
 /** sm, md (the default) or lg: the track's size. */
 @variants { size: { md: '.pdx-toggle-md', sm: '.pdx-toggle-sm', lg: '.pdx-toggle-lg' } = md; }

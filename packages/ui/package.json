@@ -661,6 +661,7 @@
     "@pdxui/design": "workspace:*"
   },
   "devDependencies": {
+    "@pdxui/compiler": "workspace:*",
     "@pdxui/core": "workspace:*",
     "typescript": "^5.8.0",
     "vite": "^6.4.4",

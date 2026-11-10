@@ -22,17 +22,28 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { deriveTag } from '@pdxui/compiler';
 
 const UI = join(__dirname, '..', '..');
 const SRC = join(UI, 'src');
 
-/** Every `component('pdx-…')` call in the source tree, with the file that holds it. */
+/**
+ * Every `component('pdx-…')` call in the source tree, and every `pdx-*.pdx` component (#1003), with
+ * the file that holds it. A .pdx registers the tag its `@tag` names, else the one its file name
+ * gives under the library's prefix — the compiler's rule, `deriveTag`.
+ */
 function declaredTags(): { tag: string; file: string }[] {
     const out: { tag: string; file: string }[] = [];
     const walk = (dir: string): void => {
         for (const name of readdirSync(dir)) {
             const full = join(dir, name);
             if (statSync(full).isDirectory()) { walk(full); continue; }
+            if (/^pdx-.*\.pdx$/.test(name)) {
+                // Match: @tag 'pdx-x';   Groups: [1]=the tag
+                const tagged = /^\s*@tag\s+['"]([\w-]+)['"]/m.exec(readFileSync(full, 'utf8'));
+                out.push({ tag: tagged?.[1] ?? deriveTag(name, 'pdx'), file: full.slice(UI.length + 1).replace(/\\/g, '/') });
+                continue;
+            }
             if (!name.endsWith('.ts')) continue;
             const text = readFileSync(full, 'utf8');
             for (const m of text.matchAll(/\bcomponent\(\s*['"`](pdx-[a-z0-9-]+)['"`]/g)) {

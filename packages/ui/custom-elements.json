@@ -1271,7 +1271,7 @@
               "type": {
                 "text": "T[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -3077,7 +3077,7 @@
               "type": {
                 "text": "unknown[]"
               },
-              "default": "() => [0.4, 0.85]"
+              "default": "[0.4, 0.85]"
             },
             {
               "kind": "field",
@@ -5483,7 +5483,7 @@
               "type": {
                 "text": "string[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "method",
@@ -7528,7 +7528,7 @@
               "type": {
                 "text": "unknown[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -13795,7 +13795,7 @@
               "type": {
                 "text": "File[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "method",
@@ -14115,7 +14115,7 @@
               "type": {
                 "text": "(FilterDescriptor | CompositeFilter)[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -20725,7 +20725,7 @@
               "type": {
                 "text": "unknown[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -22861,7 +22861,7 @@
               "type": {
                 "text": "unknown[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -24689,7 +24689,7 @@
               "type": {
                 "text": "T[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",
@@ -27994,7 +27994,7 @@
               "type": {
                 "text": "string[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "method",
@@ -30569,7 +30569,7 @@
               "type": {
                 "text": "string[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "method",
@@ -31261,7 +31261,7 @@
               "type": {
                 "text": "T[]"
               },
-              "default": "() => []"
+              "default": "[]"
             },
             {
               "kind": "field",

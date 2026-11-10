@@ -27,7 +27,7 @@ option breaks WAI-ARIA. Select by clicking the row, and read the state from `ari
 | `draggable` | `draggable` | boolean | `false` | Enable drag and drop |
 | `name` | `name` | string | `''` | Form field name |
 | `size` | `size` | 'md' \| 'sm' \| 'lg' | `'md'` | sm, md (the default) or lg: the rows, the search fields and the move buttons. |
-| `value` | — | string[] | `() => []` | The current value. |
+| `value` | — | string[] | `[]` | The current value. |
 
 **API (via `:ref`)**
 

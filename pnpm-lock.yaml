@@ -310,6 +310,9 @@ importers:
 
   packages/ui:
     devDependencies:
+      '@pdxui/compiler':
+        specifier: workspace:*
+        version: link:../compiler
       '@pdxui/core':
         specifier: workspace:*
         version: link:../core
