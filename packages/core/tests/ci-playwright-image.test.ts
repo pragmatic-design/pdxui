@@ -44,6 +44,13 @@ function containerImage(block: string): string | null {
     return /^ {4}container:\s*\n {6}image:\s*(\S+)/m.exec(block)?.[1] ?? null;
 }
 
+/** The `options` of a job's `container:` block. */
+function containerOptions(block: string): string | null {
+    // Match: `      options: x` inside the block that starts at `    container:`. Groups: [1]=the options
+    const container = /^ {4}container:\s*\n((?: {6}.*\n?)*)/m.exec(block)?.[1] ?? '';
+    return /^ {6}options:\s*(.+?)\s*$/m.exec(container)?.[1] ?? null;
+}
+
 /** The `NODE_OPTIONS` of a job's `container.env`, written right after its image. */
 function containerNodeOptions(block: string): string | null {
     // Match: the image line, `      env:`, then `        NODE_OPTIONS: x`. Groups: [1]=the value
@@ -70,6 +77,8 @@ describe('the browser jobs run in the Playwright image of the locked version (#9
         const withEnv = yaml.replace('      image: img:1\n', '      image: img:1\n      env:\n        A: 1\n        NODE_OPTIONS: --x\n');
         expect(containerNodeOptions(jobBlock(withEnv, 'a')!)).toBe('--x');
         expect(containerNodeOptions(jobBlock(yaml, 'a')!)).toBeNull();
+        expect(containerOptions(jobBlock(withEnv.replace('NODE_OPTIONS: --x\n', 'NODE_OPTIONS: --x\n      options: --user 7\n'), 'a')!)).toBe('--user 7');
+        expect(containerOptions(jobBlock(withEnv, 'a')!)).toBeNull();
     });
 
     it('the lockfile resolves one Playwright version', () => {
@@ -85,6 +94,9 @@ describe('the browser jobs run in the Playwright image of the locked version (#9
                 // In the image `localhost` is ::1 first; on the runner it is 127.0.0.1. A server bound
                 // to localhost listened on ::1 alone, and Node's fetch to it was refused at 127.0.0.1.
                 expect(containerNodeOptions(block!), 'the container resolves IPv4 first, as the runner').toBe('--dns-result-order=ipv4first');
+                // The checkout belongs to the runner's user: as root, git refused it as of dubious
+                // ownership, and the showcase's scenario apps read origin/main through git.
+                expect(containerOptions(block!), 'the container runs as the user who owns the checkout').toBe('--user 1001');
             });
         }
 

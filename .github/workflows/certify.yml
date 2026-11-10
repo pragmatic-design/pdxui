@@ -29,8 +29,9 @@ env:
 # stalled in apt after the Azure mirror fell back. In the image `localhost` resolves to ::1 first,
 # where the runner gives 127.0.0.1: a test server bound to localhost listened on ::1 alone, and
 # Node's fetch to it connected to 127.0.0.1 and was refused. The container resolves IPv4 first, as
-# the runner does. core's ci-playwright-image test holds the tag to the lockfile and to the visual
-# job's Dockerfile, and the resolution order.
+# the runner does. And it runs as the runner's user, 1001, who owns the checkout: as root, git
+# refused the workspace as of dubious ownership. core's ci-playwright-image test holds the tag to the
+# lockfile and to the visual job's Dockerfile, the resolution order and the user.
 jobs:
   # Dimensions 1-4: deterministic, fast, no screenshots → the base Playwright image, not the visual
   # job's pinned fonts.
@@ -41,6 +42,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
       env:
         NODE_OPTIONS: --dns-result-order=ipv4first
+      options: --user 1001
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -98,6 +100,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
       env:
         NODE_OPTIONS: --dns-result-order=ipv4first
+      options: --user 1001
     timeout-minutes: 45
     env:
       PDX_TARGET: baseline-2024

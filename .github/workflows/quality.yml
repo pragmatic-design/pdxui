@@ -47,7 +47,9 @@ env:
 # runner stalled in apt after the Azure mirror fell back. The container resolves `localhost` IPv4
 # first, as the runner does: the image gives ::1 first, so a preview bound to localhost listened on
 # ::1 alone and Node's fetch to it (the showcase's sign-in, a generated page's loader) was refused at
-# 127.0.0.1. core's ci-playwright-image test holds the tag to the lockfile, and the resolution order.
+# 127.0.0.1. It runs as the runner's user, 1001, who owns the checkout: as root, git refused the
+# workspace as of dubious ownership (the scenario apps read origin/main). core's ci-playwright-image
+# test holds the tag to the lockfile, the resolution order and the user.
 jobs:
   # Build first, because the typecheck needs it: packages/framework checks against what core, ui
   # and router publish (dist/*.d.ts), not their sources, and a fresh runner has no dist.
@@ -125,6 +127,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
       env:
         NODE_OPTIONS: --dns-result-order=ipv4first
+      options: --user 1001
     timeout-minutes: 45
     strategy:
       fail-fast: false
@@ -175,6 +178,7 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-noble
       env:
         NODE_OPTIONS: --dns-result-order=ipv4first
+      options: --user 1001
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v7
