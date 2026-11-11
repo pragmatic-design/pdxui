@@ -109,8 +109,9 @@ export const emitRemoved: LanguageChange = {
         // The declarations the script is missing, written at the top of the script.
         const script = parseSFC(out).script;
         if (!script || script.src) return out;
-        // Match: an `@event` declaration's name, bare or quoted. Groups: [1]=the name as written
-        const declared = new Set([...script.content.matchAll(/^[ \t]*@event(?:\(\s*bubbles\s*\))?\s+([A-Za-z_$][\w$]*|'[^'\n]*'|"[^"\n]*")/gm)]
+        // Match: an `@event` declaration's name, bare or quoted, with or without its options (#1035).
+        // Groups: [1]=the name as written
+        const declared = new Set([...script.content.matchAll(/^[ \t]*@event(?:\([^)]*\))?\s+([A-Za-z_$][\w$]*|'[^'\n]*'|"[^"\n]*")/gm)]
             .map((m) => m[1].replace(/^"(.*)"$/, "'$1'")));
         const missing = [...used].filter((name) => !declared.has(name));
         if (missing.length === 0) return out;

@@ -33,7 +33,7 @@ import { DEFER_TRIGGERS, parseDeferTriggers, unknownHydrateTriggers } from './de
 import { liftStoreExports } from './store-exports';
 import { readActionDecl, actionOptionProblems, actionAgentOptions, compileAction, compileDevAction, ACTION_OPTIONS, ACTION_CONCURRENCY } from './action-decl';
 import { readDeclarationsOntoOneLine } from './declaration-reading';
-import { isEventName, eventEmitterName } from './event-names';
+import { isEventName, eventEmitterName, eventOptions } from './event-names';
 
 // Re-export all types so existing imports from './script-analyzer' continue to work.
 export * from './script-analyzer-types';
@@ -467,10 +467,12 @@ export function analyzeScript(script: string, _filename: string, options: { orig
         // ─── @event 'open-change': PayloadType — a quoted name (#749) ───
         // The library's events are kebab-case (`open-change`, `value-change`), which no identifier can
         // spell. The quoted name is the event; its emitter is the camelCase of it.
-        // Match: `@event` or `@event(bubbles)`, then a name in single or double quotes, then `:`, `;` or
-        // the end. Groups: [1]=`(bubbles)` when written [2]=the quote [3]=the name as written
-        const quotedEvent = trimmed.match(/^@event(\(\s*bubbles\s*\))?\s+(['"])([^'"]*)\2\s*(?=:|;|$)/);
-        if (quotedEvent) {
+        // Match: `@event`, its options in parentheses when written (`(bubbles)`, `(cancelable)`, both,
+        // #1035), then a name in single or double quotes, then `:`, `;` or the end.
+        // Groups: [1]=the options' parentheses when written [2]=the quote [3]=the name as written
+        const quotedEvent = trimmed.match(/^@event(\([^)]*\))?\s+(['"])([^'"]*)\2\s*(?=:|;|$)/);
+        const quotedOptions = quotedEvent ? eventOptions(quotedEvent[1]) : null;
+        if (quotedEvent && quotedOptions) {
             const name = quotedEvent[3];
             if (!isEventName(name)) {
                 warnings.push({
@@ -484,34 +486,36 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             const colonPos = trimmed.indexOf(':', quotedEvent[0].length);
             const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
             const emitter = eventEmitterName(name);
-            events.push(quotedEvent[1] ? { name, emitter, payloadType, bubbles: true } : { name, emitter, payloadType });
+            events.push({ name, emitter, payloadType, ...quotedOptions });
             continue;
         }
 
-        // ─── @event name: PayloadType  /  @event(bubbles) name: PayloadType ───
+        // ─── @event name: PayloadType  /  @event(bubbles, cancelable) name: PayloadType ───
         // Tokenizer-based for complex types like { old: T, new: T }
-        // Match: `@event` or `@event(bubbles)`, then the name, then `:`, `;` or the end — the whole
-        // name, an identifier. Without the lookahead `@event pdx-change: number;` declared an event
-        // named `pdx` (#202). Groups: [1]=`(bubbles)` when written [2]=name
-        const eventPrefix = trimmed.match(/^@event(\(\s*bubbles\s*\))?\s+(\w+)\s*(?=:|;|$)(?::\s*)?/);
-        if (eventPrefix) {
+        // Match: `@event`, its options in parentheses when written, then the name, then `:`, `;` or the
+        // end — the whole name, an identifier. Without the lookahead `@event pdx-change: number;`
+        // declared an event named `pdx` (#202). Groups: [1]=the options' parentheses when written [2]=name
+        const eventPrefix = trimmed.match(/^@event(\([^)]*\))?\s+(\w+)\s*(?=:|;|$)(?::\s*)?/);
+        const prefixOptions = eventPrefix ? eventOptions(eventPrefix[1]) : null;
+        if (eventPrefix && prefixOptions) {
             const name = eventPrefix[2];
             const nameEnd = trimmed.indexOf(name, '@event'.length + (eventPrefix[1]?.length ?? 0)) + name.length;
             const colonPos = trimmed.indexOf(':', nameEnd);
             const payloadType = colonPos >= 0 ? (extractTypeAnnotation(trimmed, colonPos).type || 'void') : 'void';
-            events.push(eventPrefix[1] ? { name, payloadType, bubbles: true } : { name, payloadType });
+            events.push({ name, payloadType, ...prefixOptions });
             continue;
         }
 
-        // `@event(…)` with an option that is not `bubbles` (#138): a known keyword in an unknown shape.
+        // `@event(…)` with an option that is neither `bubbles` (#138) nor `cancelable` (#1035), or one
+        // written twice: a known keyword in an unknown shape.
         if (trimmed.startsWith('@event(')) {
             // Match: the name after the parenthesis, to say the form with it. Groups: [1]=name
             const named = /\)\s*(\w+)/.exec(trimmed)?.[1] ?? 'name';
             warnings.push({
                 code: 'PDX_UNKNOWN_DECLARATION',
                 severity: 'error' as const,
-                message: `\`${trimmed}\` is not a form of @event: the only option is \`(bubbles)\`.`,
-                hint: `Use: @event(bubbles) ${named}: PayloadType; — or @event ${named}: PayloadType; for an event that stays on the component.`,
+                message: `\`${trimmed}\` is not a form of @event: the options are \`(bubbles)\` and \`(cancelable)\`, each at most once.`,
+                hint: `Use: @event(bubbles) ${named}: PayloadType; — @event(cancelable) ${named}: PayloadType; for one a listener can refuse, @event(bubbles, cancelable) for both, or @event ${named}: PayloadType; for an event that stays on the component.`,
             });
             continue;
         }

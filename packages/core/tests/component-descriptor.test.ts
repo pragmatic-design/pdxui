@@ -175,4 +175,21 @@ describe('the descriptor at runtime', () => {
         expect(onEl).toEqual([1]);
         expect(seenAbove).toEqual(['up']);
     });
+
+    it('an event declared cancelable: true can be refused, and emit answers false then (#1035)', () => {
+        const name = tag();
+        let fire: () => boolean[] = () => [];
+        component(name, {
+            events: { 'before-move': event<number>({ cancelable: true }), moved: event<number>() },
+            // As a .pdx's emitter calls it: no options at the call, the declaration decides.
+            setup(ctx) { fire = () => [ctx.emit('before-move', 1), ctx.emit('moved', 1)]; },
+            render: () => html`<p>x</p>`,
+        });
+        const el = mount(name);
+        expect(fire(), 'nobody refused: both dispatched').toEqual([true, true]);
+        el.addEventListener('before-move', (e) => e.preventDefault());
+        el.addEventListener('moved', (e) => e.preventDefault());
+        // The declared one is refused; the other was never cancelable, so preventDefault() is a no-op.
+        expect(fire()).toEqual([false, true]);
+    });
 });

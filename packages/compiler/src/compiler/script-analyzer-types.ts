@@ -29,6 +29,8 @@ export interface EventInfo {
     payloadType: string;  // '{ value: number }', 'void', etc.
     /** `@event(bubbles) name`: the event bubbles and is composed; absent, it stays on the host (#138). */
     bubbles?: true;
+    /** `@event(cancelable) name`: a listener can refuse it, and the emitter returns false then (#1035). */
+    cancelable?: true;
 }
 
 /** `@state name = expression;` — a visual state of the host, a custom state (#132). */

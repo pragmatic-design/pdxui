@@ -426,12 +426,10 @@ export function component<P extends PropMap, E extends EventMap, M extends Model
                         if (DEV) console.warn(`[pdx] <${tag}> emitted '${event}', which its descriptor does not declare in \`events\` (declared: ${[...declaredEvents].join(', ') || 'none'}).`);
                         return this.emit(event, detail, emitOptions);
                     }
-                    // An event declared `event({ bubbles: true })` bubbles unless the call says otherwise (#138).
-                    const declared = options.events?.[event];
-                    const resolved = declared?.bubbles === true && emitOptions?.bubbles === undefined
-                        ? { ...emitOptions, bubbles: true }
-                        : emitOptions;
-                    return this.emit(event, detail, resolved);
+                    // The declaration is the default and the call's options win: an event declared
+                    // `event({ bubbles: true })` bubbles, one declared `event({ cancelable: true })` can be
+                    // refused, unless the call says otherwise (#138, #1035).
+                    return this.emit(event, detail, { ...options.events?.[event], ...emitOptions });
                 },
                 track: (fn: () => void | (() => void), options?: EffectOptions) => this.track(fn, options),
                 frame: (fn: () => void) => this.frame(fn),

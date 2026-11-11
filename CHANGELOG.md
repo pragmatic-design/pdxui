@@ -16,6 +16,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- `@event(cancelable)` (#1035): a `.pdx` dispatches an event its parent can refuse, as a TypeScript
+  component does with `ctx.emit(name, detail, { cancelable: true })`. The emitter returns false when a
+  listener called `preventDefault()`, so the component writes `if (!beforeMove(d)) return;`. It goes with
+  `(bubbles)` in either order, `@event(bubbles, cancelable)`. In TypeScript, `event({ cancelable: true })`
+  declares it once in the descriptor, and every `ctx.emit` of that event is cancelable.
+
 - `pdx-signature-pad` (#1019): a signature drawn with a pointer, or typed as a name, that the form
   receives as a PNG data URL. It is form-associated (`name`, `required`, `error`, reset); `min-stroke`
   asks for a stroke of some length before a tap counts; Ctrl+Z takes the last stroke off and Delete
