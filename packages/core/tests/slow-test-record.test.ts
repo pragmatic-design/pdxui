@@ -13,7 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { takeSample, describeSample, recordLine, recordLines, SLOW_TEST_MS } from './setup/slow-test-sample';
+import { takeSample, describeSample, recordLine, recordLines, failureLines, SLOW_TEST_MS } from './setup/slow-test-sample';
 
 /** Keeps the event loop busy, on the CPU, for `ms`. */
 function spin(ms: number): void {
@@ -80,6 +80,28 @@ describe('the sample', () => {
     it('the control: a slow test that asserts wrong is not #991, which is a timeout', () => {
         const lines = recordLines('a scan', 'tests/public-tree.test.ts', describeSample(takeSample(), takeSample()), 'AssertionError: expected 1 to be 2');
         expect(lines).toHaveLength(1);
+    });
+
+    it('a fast failure gets no record, and is still named when it is a known one (#1027)', () => {
+        // remove-tree's grandchild case failed in milliseconds: a registry read only for slow failures
+        // would never have named it.
+        const fast = describeSample(takeSample(), takeSample());
+        const lines = failureLines('on Windows, names a process outside the children that sits in the tree', 'tests/remove-tree.test.ts', fast,
+            'AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion');
+        expect(lines).toHaveLength(1);
+        expect(lines[0]).toMatch(/^\[known-failure\] #1027 /);
+    });
+
+    it('the control: a fast failure that is nothing known prints nothing', () => {
+        const fast = describeSample(takeSample(), takeSample());
+        expect(failureLines('sorts', 'tests/sort.test.ts', fast, 'AssertionError: expected 1 to be 2')).toEqual([]);
+    });
+
+    it('a slow failure still gets its record first', () => {
+        const slow = { ...describeSample(takeSample(), takeSample()), wallMs: SLOW_TEST_MS + 1 };
+        const lines = failureLines('a scan', 'tests/public-tree.test.ts', slow, 'Error: Test timed out in 5000ms.');
+        expect(lines[0].startsWith('[slow-test] ')).toBe(true);
+        expect(lines[1]).toMatch(/^\[known-failure\] #991 /);
     });
 
     it('the threshold is two seconds, under vitest\'s five', () => {

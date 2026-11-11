@@ -75,6 +75,13 @@ const OCCURRENCES = [
             slowTest: { wallMs: 5605, loopBusy: 0, cpuShare: 0, reading: 'waiting, its event loop idle' },
         },
     },
+    {
+        issue: 1027, why: 'remove-tree\'s grandchild case found dist/ free in the gate (2026-11-11)',
+        failure: {
+            file: 'packages/cli/tests/remove-tree.test.ts', title: 'on Windows, names a process outside the children that sits in the tree',
+            error: 'AssertionError: the given combination of arguments (undefined and string) is invalid for this assertion',
+        },
+    },
 ];
 
 describe('the registry of known intermittent failures', () => {
