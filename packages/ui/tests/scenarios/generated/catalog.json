@@ -2825,6 +2825,25 @@
       ]
     },
     {
+      "name": "signature-pad",
+      "tags": [
+        "pdx-signature-pad"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "signature-pad-basic",
+          "title": "Signature pad — Basic"
+        },
+        {
+          "id": "signature-pad-disabled",
+          "title": "Signature pad — Disabled"
+        }
+      ]
+    },
+    {
       "name": "slider",
       "tags": [
         "pdx-slider"

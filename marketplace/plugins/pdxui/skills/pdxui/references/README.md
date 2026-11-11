@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 116 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 117 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -107,6 +107,7 @@ Every input and selection control.
 - `<pdx-search-input>` — Search box with clear and shortcuts.
 - `<pdx-segmented>` — A compact set of exclusive options.
 - `<pdx-select>` — A searchable dropdown select.
+- `<pdx-signature-pad>` — Draw or type a signature; the form gets a PNG.
 - `<pdx-slider>` — Pick a number by dragging.
 - `<pdx-switch>` — Toggle a setting on or off.
 - `<pdx-tag-input>` — Type to add removable tags.

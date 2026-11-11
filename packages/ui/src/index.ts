@@ -37,6 +37,7 @@ import './color-picker/pdx-color-picker';
 import './file-upload/pdx-file-upload';
 import './slider/pdx-slider';
 import './rating/pdx-rating';
+import './signature-pad/pdx-signature-pad.pdx';
 import './segmented/pdx-segmented';
 import './toggle/pdx-toggle';
 import './calendar/pdx-calendar';

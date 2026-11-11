@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 426 keys in 77 components.
+> Generated from the sources. 436 keys in 78 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -380,6 +380,16 @@ placeholders, filled at render: keep them in the translation.
 | `shared` | `to` | `To…` | `@pdxui/ui/src/shared/i18n.ts` |
 | `shared` | `value` | `Value...` | `@pdxui/ui/src/shared/i18n.ts` |
 | `sidebar` | `label` | `Sidebar` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `clear` | `Clear` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `cleared` | `Signature cleared` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `draw` | `Draw` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `empty` | `{label}, empty` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `label` | `Signature` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `placeholder` | `Sign here` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `signed` | `{label}, signed` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `type` | `Type` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `typeLabel` | `Type your name` | `@pdxui/ui/src/shared/i18n.ts` |
+| `signature-pad` | `undo` | `Undo` | `@pdxui/ui/src/shared/i18n.ts` |
 | `slider` | `maximum` | `Maximum` | `@pdxui/ui/src/shared/i18n.ts` |
 | `slider` | `maximumOf` | `{label}, maximum` | `@pdxui/ui/src/shared/i18n.ts` |
 | `slider` | `minimum` | `Minimum` | `@pdxui/ui/src/shared/i18n.ts` |

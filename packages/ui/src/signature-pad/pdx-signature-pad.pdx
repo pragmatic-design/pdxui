@@ -1,0 +1,165 @@
+<template>
+  <div class="pdx-signature-pad" data-part="root" role="group" :aria-label="fieldName">
+    <div class="pdx-signature-toolbar" data-part="toolbar">
+      <button type="button" class="pdx-ghost pdx-btn-sm pdx-signature-mode" data-part="modeButton"
+        :aria-pressed="String(mode === 'draw')" :disabled="!interactive" @click="setMode('draw')">{{ uiString('signature-pad', 'draw') }}</button>
+      <button type="button" class="pdx-ghost pdx-btn-sm pdx-signature-mode" data-part="modeButton"
+        :aria-pressed="String(mode === 'type')" :disabled="!interactive" @click="setMode('type')">{{ uiString('signature-pad', 'type') }}</button>
+    </div>
+    @if (mode === 'type') {
+      <input type="text" class="pdx-input pdx-signature-type" data-part="nameInput" autocomplete="name"
+        ::value="typed" :disabled="disabled" :readonly="readonly"
+        :aria-label="uiString('signature-pad', 'typeLabel')" @input="retyped()" />
+    }
+    <div class="pdx-signature-surface" data-part="surface">
+      <canvas class="pdx-signature-canvas" data-part="pad" role="img" :aria-label="surfaceName"
+        :aria-invalid="error ? 'true' : null"
+        :tabindex="mode === 'draw' && interactive ? 0 : -1" attach:drawOn @keydown="onKey($event)"></canvas>
+      <span class="pdx-signature-guide" data-part="guide" aria-hidden="true"></span>
+      @if (!signed) {
+        <span class="pdx-signature-placeholder" data-part="prompt" aria-hidden="true">{{ placeholder || uiString('signature-pad', 'placeholder') }}</span>
+      }
+    </div>
+    @if (!readonly) {
+      <div class="pdx-signature-actions">
+        @if (mode === 'draw') {
+          <button type="button" class="pdx-ghost pdx-btn-sm" data-part="undoButton"
+            :disabled="!interactive || strokeCount === 0" @click="undo()">{{ uiString('signature-pad', 'undo') }}</button>
+        }
+        <button type="button" class="pdx-ghost pdx-btn-sm" data-part="clearButton"
+          :disabled="!interactive || !signed" @click="clear()">{{ uiString('signature-pad', 'clear') }}</button>
+      </div>
+    }
+    <span class="pdx-sr-only" aria-live="polite">{{ announcement }}</span>
+  </div>
+</template>
+
+<script>
+/**
+ * A signature the user draws with a pointer, or types as a name drawn in a script face, and the form
+ * receives as a PNG data URL. Ctrl+Z takes the last stroke off, Delete clears it.
+ *
+ * @csspart root - The field, `role="group"` named by the label.
+ * @csspart toolbar - The two ways to sign.
+ * @csspart modeButton - The Draw and the Type button, `aria-pressed` on the one in use.
+ * @csspart nameInput - The text field of the Type mode.
+ * @csspart surface - The paper the signature is drawn on.
+ * @csspart pad - The canvas, `role="img"` named by the label and whether it is signed.
+ * @csspart guide - The signing line.
+ * @csspart prompt - The placeholder shown while nothing is signed.
+ * @csspart undoButton - The button that takes the last stroke off.
+ * @csspart clearButton - The button that clears the signature.
+ *
+ * @cssstate empty - Nothing counts as signed.
+ * @cssstate typing - The Type mode is in use.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ * @cssstate invalid - `error` is set.
+ */
+import { uiString, format } from '../shared/i18n';
+import { SignatureSurface } from './surface';
+import '@pdxui/design/components/signature-pad';
+
+/** The signature as a PNG data URL; '' when nothing counts as signed. Setting it shows that image. */
+@model value: string = '' { form };
+/** draw (the default) or type: how the user signs. */
+@model mode: 'draw' | 'type' = 'draw';
+@part root, toolbar, modeButton, nameInput, surface, pad, guide, prompt, undoButton, clearButton;
+@state empty = !signed;
+@state typing = mode === 'type';
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@state invalid = !!error;
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+/** The form judges it: an empty signature is valueMissing. */
+@prop required: boolean = false;
+/** A custom validity message: the field is invalid while it is set. */
+@prop error: string = '';
+@prop name: string = '';
+/** The field's name, for the group and the surface. Empty: «Signature». */
+@prop label: string = '';
+/** Accessible name when there is no visible label; wins over `label`. */
+@prop ariaLabel: string = '';
+/** The prompt on the empty surface. Empty: «Sign here». */
+@prop placeholder: string = '';
+/** The pen's width, in CSS pixels. */
+@prop penWidth: number = 2;
+/** The path length, in CSS pixels, a drawing needs before it counts as signed. 0: any stroke. */
+@prop minStroke: number = 0;
+
+@host { :name="name || null" }
+
+@expose clear, undo, focus, isEmpty;
+
+let typed = $signal('');
+let signed = $signal(false);
+let strokeCount = $signal(0);
+let announcement = $signal('');
+/** The value this field last wrote: a value that differs came from outside and is shown. */
+let written = '';
+
+const interactive = $derived(!disabled && !readonly);
+const fieldName = $derived(ariaLabel || label || uiString('signature-pad', 'label'));
+const surfaceName = $derived(format(uiString('signature-pad', signed ? 'signed' : 'empty'), { label: fieldName }));
+
+/** The canvas, the pointer on it and the export (surface.ts). */
+const board = new SignatureSurface(
+  () => ({ penWidth, minStroke, mode, typed, drawing: interactive && mode === 'draw' }),
+  (v) => { written = v; value = v; },
+  () => { signed = board.signed(); strokeCount = board.strokes.length; },
+);
+
+function drawOn(el: Element): () => void { return board.attach(el as HTMLCanvasElement); }
+
+// A value set from outside — the attribute, the property, a form reset — is shown as it is.
+$watch(value, (v) => {
+  if (v === written) return;
+  written = v;
+  typed = '';
+  if (v) mode = 'draw';
+  board.show(v);
+});
+
+// What the drawing reads: a change redraws it, and a typed name waits for its face.
+$effect(() => {
+  void penWidth; void minStroke; void mode; void typed;
+  void board.retype();
+});
+
+/** Redraw for what is shown now, and give the form its image. */
+function recommit(): void {
+  void board.retype().then(() => { written = board.exported(); value = written; });
+}
+
+function setMode(next: 'draw' | 'type'): void {
+  if (mode === next) return;
+  mode = next;
+  announcement = '';
+  recommit();
+}
+
+function retyped(): void { recommit(); }
+
+function onKey(e: KeyboardEvent): void {
+  if (!interactive) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+  if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); clear(); }
+}
+
+// Typed: the published declaration is written from these signatures (#1004).
+/** Clear the signature, drawn or typed; the value becomes ''. */
+function clear(): void {
+  typed = '';
+  board.clear();
+  written = '';
+  value = '';
+  announcement = uiString('signature-pad', 'cleared');
+}
+/** Take the last stroke off; the value follows. */
+function undo(): void { board.undo(); }
+/** Focus the surface, or the name field in the Type mode. */
+function focus(): void { (mode === 'type' ? nameInput : pad)?.focus(); }
+/** Whether nothing counts as signed. */
+function isEmpty(): boolean { return !signed; }
+</script>

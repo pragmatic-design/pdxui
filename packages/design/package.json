@@ -201,6 +201,10 @@
       "development": "./src/components/layered/rating.css",
       "default": "./dist/components/rating.css"
     },
+    "./components/signature-pad": {
+      "development": "./src/components/layered/signature-pad.css",
+      "default": "./dist/components/signature-pad.css"
+    },
     "./components/relation-picker": {
       "development": "./src/components/layered/relation-picker.css",
       "default": "./dist/components/relation-picker.css"

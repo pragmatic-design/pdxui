@@ -16,6 +16,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- `pdx-signature-pad` (#1019): a signature drawn with a pointer, or typed as a name, that the form
+  receives as a PNG data URL. It is form-associated (`name`, `required`, `error`, reset); `min-stroke`
+  asks for a stroke of some length before a tap counts; Ctrl+Z takes the last stroke off and Delete
+  clears it. The strokes are kept as points, so a resize or a pixel ratio of 2 redraws them sharp. The
+  Type mode is the keyboard way to sign: the name is drawn in Alex Brush (SIL OFL 1.1, shipped with the
+  component and loaded only by that mode), so the image is the same on every system. The surface is
+  paper in both schemes and the exported ink is on a transparent background: `--pdx-signature-paper`,
+  `--pdx-signature-ink`, `--pdx-signature-height`, `--pdx-font-signature`.
+
 - Every library component declares its props with the descriptor, `prop<T>()` (#872), where 108 of
   them still used the constructor form `{ type: String, default: '' }`. No prop changed its runtime
   type, default or attribute: the components observe the same attributes, which a test now records.

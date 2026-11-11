@@ -3724,6 +3724,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/otp', label: 'OTP' },
           { key: '/components/slider', label: 'Slider' },
           { key: '/components/rating', label: 'Rating' },
+          { key: '/components/signature-pad', label: 'Signature Pad' },
         ]},
         { key: 'selection-inputs', label: 'Selection', icon: 'check-square', children: [
           { key: '/components/checkbox', label: 'Checkbox' },
@@ -3948,7 +3949,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:307" });
+}, { name: "app.pdx:308" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -7423,6 +7424,39 @@ component('app-comp-sidebar', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/sidebar",tag:"app-comp-sidebar",title:"Sidebar — PDX Components",lazy:true,file:'./comp-sidebar.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-signature-pad.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-q5694g");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-q5694g"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-q5694g]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Signature Pad</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-signature-pad&gt;</code> — a signature drawn with a pointer, or typed as a name, that the form\\n      receives as a PNG. Strokes stay sharp at any pixel ratio and survive a resize.</p>  <app-demo-comp-signature-pad-basic class="demo-section"></app-demo-comp-signature-pad-basic>  <app-demo-comp-signature-pad-type class="demo-section"></app-demo-comp-signature-pad-type>  <app-demo-comp-signature-pad-form class="demo-section"></app-demo-comp-signature-pad-form>  <app-demo-comp-signature-pad-states class="demo-section"></app-demo-comp-signature-pad-states>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>string</span><span>The PNG data URL; \\'\\' when nothing counts as signed. Setting it shows that image</span></div> <div class="opt-row"><code>mode</code><span>\\'draw\\' | \\'type\\'</span><span>How the user signs</span></div> <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div> <div class="opt-row"><code>required</code><span>boolean</span><span>An empty signature is <code>valueMissing</code></span></div> <div class="opt-row"><code>error</code><span>string</span><span>A custom validity message</span></div> <div class="opt-row"><code>min-stroke</code><span>number</span><span>Path length (CSS px) before the strokes count; 0 = any</span></div> <div class="opt-row"><code>pen-width</code><span>number</span><span>The pen\\'s width in CSS px (default 2)</span></div> <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field\\'s accessible name</span></div> <div class="opt-row"><code>placeholder</code><span>string</span><span>The prompt on the empty surface</span></div> <div class="opt-row"><code>disabled</code> / <code>readonly</code><span>boolean</span><span>No drawing; readonly hides Undo and Clear</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and methods</h3> <div class="options-table"><div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>value-change</code><span>{ value: string }</span><span>A stroke, an undo, a clear or a typed name wrote <code>value</code></span></div> <div class="opt-row"><code>mode-change</code><span>{ value: \\'draw\\' | \\'type\\' }</span><span>The user switched how to sign</span></div> <div class="opt-row"><code>clear() · undo() · focus() · isEmpty()</code><span></span><span>Through a <code>:ref</code></span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Styling</h3> <div class="options-table"><div class="opt-header"><span>Token / selector</span><span>—</span><span>What</span></div> <div class="opt-row"><code>--pdx-signature-paper</code> / <code>--pdx-signature-ink</code><span></span><span>The surface and the ink; paper stays light in a dark scheme, as the image is pasted on documents</span></div> <div class="opt-row"><code>--pdx-signature-height</code><span></span><span>The surface\\'s height (10rem)</span></div> <div class="opt-row"><code>--pdx-font-signature</code><span></span><span>The face of a typed name</span></div> <div class="opt-row"><code>:state(empty | typing | disabled | readonly | invalid)</code><span></span><span>On the host</span></div></div></section></div>'));
+component('app-comp-signature-pad', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Signature Pad Component" });
+    ctx.el.setAttribute('data-pdx-q5694g', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/signature-pad'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/signature-pad",tag:"app-comp-signature-pad",title:"Signature Pad Component",lazy:true,file:'./comp-signature-pad.pdx'});
 "
 `;
 
@@ -28448,6 +28482,129 @@ const shortItems = [
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-signature-pad/demo-comp-signature-pad-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { bindInterpolation, bindTwoWay, component, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-r8d4ft");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-r8d4ft"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-r8d4ft]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Draw with the mouse, a pen or a finger. <kbd>Ctrl</kbd>+<kbd>Z</kbd> takes the last stroke off, <kbd>Delete</kbd> clears it; the value is a PNG data URL.</p> <div class="demo-stack"><pdx-signature-pad label="Customer signature"></pdx-signature-pad> <p class="pdx-txt-small pdx-ink-muted"><!----></p></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el7=__el6.firstChild;const __el8=__el7.nextSibling.nextSibling;const __t9=__el8.firstChild;return [__el7,__t9];};
+component('app-demo-comp-signature-pad-basic', {
+  props: {},
+  setup(ctx) {
+    const __signature = signal('', { name: 'demo-comp-signature-pad-basic:signature' });
+    ctx.el.setAttribute('data-pdx-r8d4ft', '');
+    return { signature: __signature };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el7,__t9]=__walk0(__frag);
+    bindTwoWay(__el7, 'value', ctx.signature);
+    bindInterpolation(__t9,()=>ctx.signature() ? 'Signed — ' + Math.round(ctx.signature().length / 1024) + ' KB PNG' : 'Not signed');
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-signature-pad/demo-comp-signature-pad-form.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { batchHandler, bindInterpolation, component, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-1ut5bv");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-1ut5bv"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-1ut5bv], [data-pdx-1ut5bv-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack, :where(:not([data-pdx-1ut5bv])):scope:is(.demo-stack) { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n  :scope .actions, :where(:not([data-pdx-1ut5bv])):scope:is(.actions) { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Form Integration</h2> <p class="pdx-txt-small pdx-ink-muted">Form-associated: the PNG is submitted under its <code>name</code>; <code>required</code> makes an empty signature <code>valueMissing</code>, and a reset clears it. <code>min-stroke</code> asks for a stroke of some length before a tap counts.</p> <div class="demo-stack"><form><pdx-form-field label="Signature" required><pdx-signature-pad name="signature" required min-stroke="40" data-pdx-1ut5bv-in></pdx-signature-pad></pdx-form-field> <div class="actions"><button class="pdx-primary" type="submit">Submit</button> <button class="pdx-ghost" type="reset">Reset</button></div></form> <p class="pdx-txt-small pdx-ink-muted"><!----></p></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild;const __el14=__el8.nextSibling.nextSibling;const __t15=__el14.firstChild;return [__el8,__t15];};
+component('app-demo-comp-signature-pad-form', {
+  props: {},
+  setup(ctx) {
+    const __submitted = signal('', { name: 'demo-comp-signature-pad-form:submitted' });
+function onSubmit(e) {
+      e.preventDefault();
+      const value = new FormData(e.target).get('signature');
+      __submitted.setRaw(typeof value === 'string' && value ? 'Submitted a ' + Math.round(value.length / 1024) + ' KB PNG' : 'Nothing submitted');
+    }
+    ctx.el.setAttribute('data-pdx-1ut5bv', '');
+    return { submitted: __submitted, onSubmit };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el8,__t15]=__walk0(__frag);
+    __el8.addEventListener('submit', safeHandler(batchHandler(ctx.onSubmit), ctx.el?.tagName?.toLowerCase(), 'submit'));
+    bindInterpolation(__t15,()=>ctx.submitted());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-signature-pad/demo-comp-signature-pad-states.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-7oetkz");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-7oetkz"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-7oetkz]) to ([data-pdx-root] \\u003E *) {:scope .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--pdx-space-lg); }\\n  :scope .demo-grid \\u003E div { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">States</h2> <div class="demo-grid"><div><span class="pdx-txt-small pdx-ink-muted">Disabled</span> <pdx-signature-pad label="Disabled signature" disabled></pdx-signature-pad></div> <div><span class="pdx-txt-small pdx-ink-muted">Readonly</span> <pdx-signature-pad label="Readonly signature" readonly></pdx-signature-pad></div> <div><span class="pdx-txt-small pdx-ink-muted">Error</span> <pdx-signature-pad label="Signature in error" error="Sign to accept the terms"></pdx-signature-pad></div> <div><span class="pdx-txt-small pdx-ink-muted">Thick pen</span> <pdx-signature-pad label="Thick pen" pen-width="5"></pdx-signature-pad></div></div></section>'));
+component('app-demo-comp-signature-pad-states', {
+  props: {},
+  setup(ctx) {
+    ctx.el.setAttribute('data-pdx-7oetkz', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-signature-pad/demo-comp-signature-pad-type.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-kvhpl1");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-kvhpl1"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-kvhpl1]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Type your name</h2> <p class="pdx-txt-small pdx-ink-muted">The keyboard way to sign: the name is drawn in a script face the package ships, so the image is the same on every system. The face loads only when this mode is used.</p> <div class="demo-stack"><pdx-signature-pad label="Signature" mode="type"></pdx-signature-pad></div></section>'));
+component('app-demo-comp-signature-pad-type', {
+  props: {},
+  setup(ctx) {
+    ctx.el.setAttribute('data-pdx-kvhpl1', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-skeleton/demo-comp-skeleton-accessibility.pdx 1`] = `
 "// 0 warning(s)
 
@@ -29838,7 +29995,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 114 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 115 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

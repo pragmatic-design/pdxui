@@ -93,6 +93,7 @@ import { searchInput } from '../../../../manifests/search-input.manifest';
 import { segmented } from '../../../../manifests/segmented.manifest';
 import { select } from '../../../../manifests/select.manifest';
 import { sidebar } from '../../../../manifests/sidebar.manifest';
+import { signaturePad } from '../../../../manifests/signature-pad.manifest';
 import { slider } from '../../../../manifests/slider.manifest';
 import { sortableList } from '../../../../manifests/sortable-list.manifest';
 import { sparkline } from '../../../../manifests/sparkline.manifest';
@@ -179,7 +180,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, signaturePad, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -635,6 +636,8 @@ export const scenarioPage: Record<string, string> = {
     "sidebar-mini": "tier-6",
     "sidebar-position-left": "tier-6",
     "sidebar-position-right": "tier-6",
+    "signature-pad-basic": "tier-3c",
+    "signature-pad-disabled": "tier-3c",
     "slider-basic": "tier-1c",
     "slider-sizes": "tier-1c",
     "slider-disabled": "tier-1c",

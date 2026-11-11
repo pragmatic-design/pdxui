@@ -5,7 +5,7 @@ description: "PDX (@pdxui/ui) input controls — text, number, masked, password,
 
 # UI · Inputs (form controls)
 
-> Every input and selection control.  (29 components)  ·  catalogue generated from the library's custom-elements manifest.
+> Every input and selection control.  (30 components)  ·  catalogue generated from the library's custom-elements manifest.
 > Cross-cutting playbook, recipes and gotchas: the **`pdxui`** skill.
 > **Names.** Bind a prop by its kebab-case name, `:max-height="620"`, `:empty-title="t"`: the component
 > receives the camelCase prop (`maxHeight`). In a `.pdx` template the camelCase form, `:maxHeight`, compiles
@@ -35,6 +35,7 @@ Each page has the props, events, slots and API, the notes, and the examples of t
 - [`<pdx-search-input>`](references/pdx-search-input.md) — Search box with clear and shortcuts.
 - [`<pdx-segmented>`](references/pdx-segmented.md) — A compact set of exclusive options.
 - [`<pdx-select>`](references/pdx-select.md) — A searchable dropdown select.
+- [`<pdx-signature-pad>`](references/pdx-signature-pad.md) — Draw or type a signature; the form gets a PNG.
 - [`<pdx-slider>`](references/pdx-slider.md) — Pick a number by dragging.
 - [`<pdx-switch>`](references/pdx-switch.md) — Toggle a setting on or off.
 - [`<pdx-tag-input>`](references/pdx-tag-input.md) — Type to add removable tags.

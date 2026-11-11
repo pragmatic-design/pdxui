@@ -1,0 +1,33 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Form Integration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Form-associated: the PNG is submitted under its <code>name</code>; <code>required</code> makes an empty signature <code>valueMissing</code>, and a reset clears it. <code>min-stroke</code> asks for a stroke of some length before a tap counts.</p>
+    <div class="demo-stack">
+      <form @submit="onSubmit">
+        <pdx-form-field label="Signature" required>
+          <pdx-signature-pad name="signature" required min-stroke="40"></pdx-signature-pad>
+        </pdx-form-field>
+        <div class="actions">
+          <button type="submit" class="pdx-primary">Submit</button>
+          <button type="reset" class="pdx-ghost">Reset</button>
+        </div>
+      </form>
+      <p class="pdx-txt-small pdx-ink-muted">{{ submitted }}</p>
+    </div>
+  </section>
+</template>
+
+<script>
+let submitted = $signal('');
+
+function onSubmit(e) {
+  e.preventDefault();
+  const value = new FormData(e.target).get('signature');
+  submitted = typeof value === 'string' && value ? 'Submitted a ' + Math.round(value.length / 1024) + ' KB PNG' : 'Nothing submitted';
+}
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }
+</style>
