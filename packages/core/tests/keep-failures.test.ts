@@ -11,7 +11,7 @@
 // measurement on success, and a green run said it had failed). It was the site's alone (#845); it now
 // covers every config, so a gate's red in any browser suite brings its trace whatever is run after it.
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { mkdtempSync, mkdirSync, writeFileSync, readdirSync, existsSync, rmSync, readFileSync, statSync } from 'node:fs';
 import { join, relative, dirname, resolve } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -85,6 +85,56 @@ describe('the reporter', () => {
     it('does not take the terminal from the config\'s own reporters', () => {
         // A reporter that prints nothing says so, or Playwright adds a line reporter beside the config's.
         expect(new KeepFailedRuns().printsToStdio()).toBe(false);
+    });
+});
+
+describe('the reporter names a known intermittent failure (#1013)', () => {
+    const failed = (file: string, title: string, message: string, probe?: object) => ({
+        test: { location: { file }, title, expectedStatus: 'passed' },
+        result: {
+            status: 'timedOut',
+            errors: [{ message }],
+            attachments: probe ? [{ name: 'stall-probe.json', contentType: 'application/json', body: Buffer.from(JSON.stringify(probe)) }] : [],
+        },
+    });
+
+    function run(...tests: ReturnType<typeof failed>[]): { lines: string[]; kept: string } {
+        const out = join(root, 'test-results');
+        mkdirSync(join(out, 'a'), { recursive: true });
+        const lines: string[] = [];
+        const log = vi.spyOn(console, 'log').mockImplementation((line: string) => { lines.push(line); });
+        try {
+            const reporter = new KeepFailedRuns();
+            reporter.onBegin({ projects: [{ outputDir: out }] });
+            for (const t of tests) reporter.onTestEnd(t.test, t.result);
+            reporter.onEnd({ status: 'failed' });
+        } finally {
+            log.mockRestore();
+        }
+        return { lines, kept: join(`${out}-kept`, readdirSync(`${out}-kept`)[0]) };
+    }
+
+    it('prints the issue to reopen and writes known-failures.json into the kept folder', () => {
+        const { lines, kept } = run(failed(join(root, 'tests', 'component-pages.spec.ts'), 'relation-picker',
+            'TypeError: Failed to fetch dynamically imported module: http://localhost:5251/assets/index-CYnFLpTt.js'));
+        const known = lines.filter((l) => l.startsWith('[known-failure]'));
+        expect(known).toHaveLength(1);
+        expect(known[0]).toMatch(/^\[known-failure\] #617 .*component-pages\.spec\.ts › relation-picker/);
+        expect(known[0]).toContain(kept);
+        const record = JSON.parse(readFileSync(join(kept, 'known-failures.json'), 'utf8'));
+        expect(record).toEqual([{ issue: 617, test: 'component-pages.spec.ts › relation-picker' }]);
+    });
+
+    it('reads the stall probe a test attached: a frozen page is #611', () => {
+        const probe = { gapMs: 300, page: { heartbeat: [{ at: 1, gap: 9790 }], longTasks: [{ at: 1, duration: 9683, name: 'self' }], longFrames: [] }, runner: { heartbeat: [] } };
+        const { lines } = run(failed(join(root, 'tests', 'assets.spec.ts'), 'details', 'Error: expect(locator).toBeVisible() failed\nTimeout: 5000ms', probe));
+        expect(lines.filter((l) => l.startsWith('[known-failure]')).map((l) => l.slice(0, 20))).toEqual(['[known-failure] #611']);
+    });
+
+    it('an unrelated failure is kept, and named as nothing known', () => {
+        const { lines, kept } = run(failed(join(root, 'tests', 'customers.spec.ts'), 'sorts', 'Error: expect(received).toBe(expected)'));
+        expect(lines.filter((l) => l.startsWith('[known-failure]'))).toEqual([]);
+        expect(existsSync(join(kept, 'known-failures.json'))).toBe(false);
     });
 });
 

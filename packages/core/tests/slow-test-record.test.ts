@@ -13,7 +13,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { setTimeout as sleep } from 'node:timers/promises';
-import { takeSample, describeSample, recordLine, SLOW_TEST_MS } from './setup/slow-test-sample';
+import { takeSample, describeSample, recordLine, recordLines, SLOW_TEST_MS } from './setup/slow-test-sample';
 
 /** Keeps the event loop busy, on the CPU, for `ms`. */
 function spin(ms: number): void {
@@ -68,6 +68,18 @@ describe('the sample', () => {
         const data = JSON.parse(line.slice('[slow-test] '.length));
         expect(data).toMatchObject({ test: 'a scan', file: 'tests/public-tree.test.ts' });
         for (const key of ['wallMs', 'loopBusy', 'cpuShare', 'gcMs', 'heapUsedMB', 'heapLimitMB', 'freeMemMB', 'reading']) expect(data).toHaveProperty(key);
+    });
+
+    it('the record is followed by the known failure it is (#1013): this is #991 coming back', () => {
+        const lines = recordLines('a scan', 'tests/public-tree.test.ts', describeSample(takeSample(), takeSample()), 'Error: Test timed out in 5000ms.');
+        expect(lines[0].startsWith('[slow-test] ')).toBe(true);
+        expect(lines.slice(1)).toHaveLength(1);
+        expect(lines[1]).toMatch(/^\[known-failure\] #991 .*public-tree\.test\.ts › a scan/);
+    });
+
+    it('the control: a slow test that asserts wrong is not #991, which is a timeout', () => {
+        const lines = recordLines('a scan', 'tests/public-tree.test.ts', describeSample(takeSample(), takeSample()), 'AssertionError: expected 1 to be 2');
+        expect(lines).toHaveLength(1);
     });
 
     it('the threshold is two seconds, under vitest\'s five', () => {
