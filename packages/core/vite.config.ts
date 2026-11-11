@@ -20,6 +20,11 @@ export default defineConfig({
                 // Its own entry, importing nothing of core: installed before core is evaluated.
                 'server-dom': 'src/server/dom-entry.ts',
                 hydrate: 'src/hydrate/index.ts',
+                // A sub-path whose barrel exports what the root does not runs its own barrel (#1015):
+                // pointed at the root bundle, its extra names typechecked and were undefined once built.
+                // Their state is the root's: the modules they share are one shared chunk.
+                i18n: 'src/i18n/index.ts',
+                testing: 'src/testing/index.ts',
             },
             // The IIFE is built separately, by vite.config.iife.ts, because it is the one
             // artefact with no bundler after it: it needs `process.env.NODE_ENV` replaced, and

@@ -1539,6 +1539,14 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `@pdxui/core/i18n` and `@pdxui/core/testing` run what they type (#1015). Both took their types
+  from their own module and, in a build, their code from the root bundle, which has neither
+  `setFallbackLocale`, `resetI18n`, `getTranslation`, `clearTranslations`, `isLocaleLoaded`,
+  `clearLoadedLocales`, `clearFormatCache` nor any of `testing`'s helpers (`mount`, `fireEvent`,
+  `tick`, `waitFor`…): they typechecked, worked in dev and were `undefined` once built. Each is now
+  an entry of its own, sharing its modules with the root, so a locale set through one is the
+  locale read through the other.
+
 - A component's mount no longer makes an attribute signal and an effect for every prop (#910): an
   attribute change reaches its prop by a call from `attributeChangedCallback`, as a property set
   reaches it by the setter, and `attr()` makes its signal on first use. 500 `pdx-input`s mount in
