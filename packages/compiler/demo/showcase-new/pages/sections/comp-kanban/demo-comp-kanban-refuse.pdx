@@ -1,0 +1,31 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Refusing a move</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>before-move</code> is asked first, whichever way the card moves. Here a card reaches Done only from Review: <code>preventDefault()</code> refuses the rest, the board stays as it was, and the refusal is announced.</p>
+    <pdx-kanban label="Workflow" :columns="columns" ::items="tasks" @before-move="onBeforeMove"></pdx-kanban>
+    <p class="pdx-txt-small pdx-ink-muted">{{ refused }}</p>
+  </section>
+</template>
+
+<script>
+const columns = [
+  { key: 'todo', label: 'To do' },
+  { key: 'review', label: 'Review' },
+  { key: 'done', label: 'Done' },
+];
+let tasks = $signal([
+  { id: 'w1', title: 'Draft the contract', status: 'todo' },
+  { id: 'w2', title: 'Approve the budget', status: 'review' },
+]);
+let refused = $signal('');
+
+function onBeforeMove(e) {
+  const { item, from, to } = e.detail;
+  if (to.column === 'done' && from.column !== 'review') {
+    e.preventDefault();
+    refused = item.title + ' cannot skip Review.';
+  } else {
+    refused = '';
+  }
+}
+</script>

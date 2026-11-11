@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Drag a card by its body, or focus the board and press <kbd>Space</kbd> to pick a card up, the arrows to carry it, <kbd>Space</kbd> to drop it. The <kbd>⋯</kbd> menu moves a card with single clicks. <code>::items</code> holds the result; Doing has a limit of 2.</p>
+    <pdx-kanban label="Sprint board" :columns="columns" ::items="tasks" @move="onMove"></pdx-kanban>
+    <p class="pdx-txt-small pdx-ink-muted">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+const columns = [
+  { key: 'todo', label: 'To do' },
+  { key: 'doing', label: 'Doing', limit: 2 },
+  { key: 'done', label: 'Done' },
+];
+let tasks = $signal([
+  { id: 't1', title: 'Write the release notes', status: 'todo' },
+  { id: 't2', title: 'Fix the login redirect', status: 'todo' },
+  { id: 't3', title: 'Review the pricing page', status: 'doing' },
+  { id: 't4', title: 'Ship the theme picker', status: 'done' },
+]);
+let last = $signal('No move yet.');
+
+function onMove(e) {
+  const { item, from, to } = e.detail;
+  last = item.title + ': ' + from.column + ' → ' + to.column + ', position ' + (to.index + 1);
+}
+</script>

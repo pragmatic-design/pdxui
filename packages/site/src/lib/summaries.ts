@@ -25,6 +25,7 @@ export const summaries: Record<string, string> = {
     'pdx-slider': 'Pick a number by dragging.',
     'pdx-rating': 'Star rating with halves and tooltips.',
     'pdx-signature-pad': 'Draw or type a signature; the form gets a PNG.',
+    'pdx-kanban': 'Columns of cards, moved by pointer, keyboard or menu.',
     'pdx-segmented': 'A compact set of exclusive options.',
     'pdx-toggle': 'A pressable on/off button.',
     'pdx-toggle-group': 'Exclusive or multi-select set of toggles.',

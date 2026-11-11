@@ -1,0 +1,32 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Custom cards</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A <code>cardContent</code> snippet draws each card; the board keeps the moving, the menu and the announcements. <code>key-field</code>, <code>column-field</code> and <code>title-field</code> name the item's fields.</p>
+    <pdx-kanban label="Support tickets" :columns="columns" ::items="tickets" key-field="ref" column-field="stage" title-field="subject">
+      @snippet cardContent(ticket) {
+        <div class="ticket">
+          <span class="pdx-txt-small pdx-ink-muted">{{ ticket.ref }}</span>
+          <span class="pdx-txt-body">{{ ticket.subject }}</span>
+          <pdx-badge :variant="ticket.priority === 'high' ? 'danger' : 'muted'">{{ ticket.priority }}</pdx-badge>
+        </div>
+      }
+    </pdx-kanban>
+  </section>
+</template>
+
+<script>
+const columns = [
+  { key: 'new', label: 'New' },
+  { key: 'open', label: 'Open' },
+  { key: 'solved', label: 'Solved' },
+];
+let tickets = $signal([
+  { ref: 'SUP-101', subject: 'Cannot export to PDF', stage: 'new', priority: 'high' },
+  { ref: 'SUP-102', subject: 'Invoice shows the wrong VAT', stage: 'open', priority: 'high' },
+  { ref: 'SUP-103', subject: 'Dark mode on the login page', stage: 'open', priority: 'low' },
+]);
+</script>
+
+<style scoped>
+  .ticket { display: flex; flex-direction: column; gap: var(--pdx-space-3xs); align-items: flex-start; }
+</style>

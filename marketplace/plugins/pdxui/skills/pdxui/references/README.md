@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 117 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 118 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -54,6 +54,7 @@ Grids, charts, lists and data sources.
 - `<pdx-entity-grid>` — A CRUD grid: create, edit, delete, bulk.
 - `<pdx-filter-builder>` — Build complex filters visually.
 - `<pdx-infinite-scroll>` — Load more as you scroll.
+- `<pdx-kanban>` — Columns of cards, moved by pointer, keyboard or menu.
 - `<pdx-list>` — Data-driven list with custom rows.
 - `<pdx-relative-time>` — Auto-updating “3 days ago”.
 - `<pdx-sortable-list>` — A list the user can put in another order, by dragging a row's handle or from the keyboard alone.

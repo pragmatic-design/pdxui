@@ -1,0 +1,321 @@
+<template>
+  <div class="pdx-kanban" data-part="root" role="group" :aria-label="label || uiString('kanban', 'label')">
+    <span class="pdx-sr-only" :id="instructionsId">{{ uiString('kanban', 'instructions') }}</span>
+    @for (view as col; track col.key) {
+      <section class="pdx-kanban-column" data-part="column" :data-column="col.key" :data-over="col.over ? '' : null">
+        <div class="pdx-kanban-header" data-part="header">
+          <h3 class="pdx-kanban-title" :id="instructionsId + '-' + col.key">{{ col.label }}</h3>
+          <span class="pdx-kanban-count" data-part="count">{{ col.count }}</span>
+        </div>
+        <ul class="pdx-kanban-list" data-part="list" :aria-labelledby="instructionsId + '-' + col.key" attach:sortableColumn="col.key">
+          @for (col.items as item; track keyOf(item)) {
+            <li class="pdx-kanban-card" data-part="card" :data-key="keyOf(item)"
+              :tabindex="keyOf(item) === tabKey ? 0 : -1"
+              :aria-roledescription="uiString('kanban', 'roleDescription')" :aria-describedby="instructionsId"
+              :data-lifted="lift && keyOf(lift.item) === keyOf(item) ? '' : null"
+              @keydown="onKey($event, item)" @focus="focusKey = keyOf(item)">
+              <div class="pdx-kanban-body">
+                @render cardContent?.(item) @else { <span class="pdx-kanban-card-title">{{ titleOf(item) }}</span> }
+              </div>
+              <pdx-dropdown-menu :items="menuOf(item)" :disabled="!interactive" placement="bottom-end" @pdx-select="onMenu(item, $event)">
+                <button slot="trigger" type="button" class="pdx-ghost" size="sm" data-part="moveButton"
+                  :aria-label="format(uiString('kanban', 'move'), { title: titleOf(item) })" :disabled="!interactive">⋯</button>
+              </pdx-dropdown-menu>
+            </li>
+          }
+        </ul>
+        @if (col.items.length === 0) {
+          <p class="pdx-kanban-empty" data-part="empty">{{ uiString('kanban', 'empty') }}</p>
+        }
+      </section>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * A board of columns of cards. The column an item is in is its `column-field`, and the order inside a
+ * column is the order of `items`. A card moves by the pointer, by the keyboard — Space or Enter picks it
+ * up, the arrows carry it, Space or Enter drops it, Escape cancels, each step announced — or by its Move
+ * menu; each way asks `before-move` first, which the app can refuse with `preventDefault()`.
+ *
+ * @csspart root - The board, `role="group"` named by `label`.
+ * @csspart column - A column; `[data-column]` is its key, `[data-over]` marks one over its limit.
+ * @csspart header - A column's title and count.
+ * @csspart count - The number of cards, with the limit when the column has one.
+ * @csspart list - A column's list of cards, named by its title.
+ * @csspart card - A card, the list item the keyboard moves; `[data-key]` is its key.
+ * @csspart moveButton - A card's Move menu button.
+ * @csspart empty - What an empty column says.
+ *
+ * @cssstate lifted - A card is picked up from the keyboard.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ */
+import { announce, generatedId, useSortable } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { arrange, moveItem } from './board';
+import '@pdxui/design/components/kanban';
+
+@generic T extends { [field: string]: unknown };
+/** The cards. The component writes a new array on a move: the item a copy with its column field set. */
+@model items: T[] = [];
+/** The columns, in order: a `key` its items' column field holds, a `label`, and an optional `limit`. */
+@prop columns: { key: string; label: string; limit?: number }[] = [];
+/** The item field that names its column. */
+@prop columnField: string = 'status';
+/** The item field that identifies it. */
+@prop keyField: string = 'id';
+/** The item field a card shows, and the announcements name it by. */
+@prop titleField: string = 'title';
+/** The board's accessible name. Empty: «Board». */
+@prop label: string = '';
+@prop disabled: boolean = false;
+/** The cards are shown and not moved. */
+@prop readonly: boolean = false;
+/** What a card draws; without it, its title. */
+@slot cardContent?: (item: T);
+/** Asked before every move; `preventDefault()` refuses it and the board stays as it was. */
+@event(cancelable) 'before-move': { item: T; from: { column: string; index: number }; to: { column: string; index: number } };
+/** A move was made: `items` holds it, and `item` is the moved copy. */
+@event move: { item: T; from: { column: string; index: number }; to: { column: string; index: number } };
+@part root, column, header, count, list, card, moveButton, empty;
+@state lifted = lift !== null;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@host el;
+
+/** A place on the board: a column's key and an index in it. */
+type Place = { column: string; index: number };
+
+/** The card picked up from the keyboard, where it started, and where it is carried. */
+let lift = $signal<{ item: T; from: Place; to: Place } | null>(null);
+/** The card the board's one tab stop is on. */
+let focusKey = $signal('');
+
+const instructionsId = generatedId('pdx-kanban');
+/** One sortable group per board: its columns are one destination, another board's are not. */
+const group = generatedId('pdx-kanban-group');
+
+const interactive = $derived(!disabled && !readonly);
+const columnKeys = $derived(columns.map((c) => c.key));
+/** What is shown: the items, or with the lifted card where the arrows carried it. */
+const shown = $derived(lift ? moveItem(items, lift.item, lift.to.column, lift.to.index, columnField) : items);
+const arranged = $derived(arrange(shown, columnKeys, columnField));
+const view = $derived(columns.map((c) => {
+  const cards = arranged.get(c.key) ?? [];
+  const limited = typeof c.limit === 'number';
+  return {
+    key: c.key,
+    label: c.label,
+    items: cards,
+    over: limited && cards.length > (c.limit as number),
+    count: limited
+      ? format(uiString('kanban', 'countLimit'), { count: cards.length, limit: c.limit as number })
+      : format(uiString('kanban', 'count'), { count: cards.length }),
+  };
+}));
+/** The tab stop: the focused card while it is there, else the first card. */
+const tabKey = $derived(shown.some((i) => keyOf(i) === focusKey) ? focusKey : firstKey());
+
+function keyOf(item: T): string { return String(item[keyField]); }
+function titleOf(item: T): string { return String(item[titleField] ?? keyOf(item)); }
+function labelOf(lane: string): string { return columns.find((c) => c.key === lane)?.label ?? lane; }
+function firstKey(): string {
+  for (const lane of columnKeys) { const first = arranged.get(lane)?.[0]; if (first) return keyOf(first); }
+  return '';
+}
+/** The item of `items` with this key: the original, not a preview's copy. */
+function original(key: string): T | undefined { return items.find((i) => keyOf(i) === key); }
+/** Where a card is in what is shown. */
+function placeOf(key: string): Place | null {
+  for (const [lane, cards] of arranged) {
+    const index = cards.findIndex((i) => keyOf(i) === key);
+    if (index >= 0) return { column: lane, index };
+  }
+  return null;
+}
+/** Where a card is in `items` itself, before any preview. */
+function homeOf(item: T): Place {
+  const lane = String(item[columnField]);
+  return { column: lane, index: (arrange(items, [lane], columnField).get(lane) ?? []).indexOf(item) };
+}
+/** How many cards `lane` holds without `key`: the last index a card carried there can take. */
+function roomIn(lane: string, key: string): number {
+  return (arrange(items, [lane], columnField).get(lane) ?? []).filter((i) => keyOf(i) !== key).length;
+}
+function say(message: string, item: T, at: Place): void {
+  announce(format(uiString('kanban', message), {
+    title: titleOf(item), column: labelOf(at.column), position: at.index + 1, total: roomIn(at.column, keyOf(item)) + 1,
+  }));
+}
+/** Put the focus back on a card once the board has drawn it where it now is. */
+function refocus(key: string): void {
+  focusKey = key;
+  queueMicrotask(() => {
+    const target = el.querySelector(`[data-part="card"][data-key="${CSS.escape(key)}"]`) as HTMLElement | null;
+    if (target && document.activeElement !== target) target.focus();
+  });
+}
+
+/**
+ * The one way a move is made: ask `before-move`, then write `items` and say so. False when it was
+ * refused or went nowhere.
+ */
+function commit(item: T, to: Place): boolean {
+  const from = homeOf(item);
+  if (from.column === to.column && from.index === to.index) return false;
+  if (!beforeMove({ item, from, to })) {
+    say('refused', item, from);
+    return false;
+  }
+  const next = moveItem(items, item, to.column, to.index, columnField);
+  const moved = next.find((i) => keyOf(i) === keyOf(item)) as T;
+  items = next;
+  move({ item: moved, from, to });
+  say('dropped', moved, to);
+  return true;
+}
+
+// ─── The keyboard ──────────────────────────────────────────────────────────────
+
+function onKey(e: KeyboardEvent, shownItem: T): void {
+  if (lift) { carry(e); return; }
+  const key = keyOf(shownItem);
+  if (e.key === ' ' || e.key === 'Enter') {
+    // A key on the Move button inside the card is the button's.
+    if (!interactive || e.target !== e.currentTarget) return;
+    e.preventDefault();
+    const item = original(key);
+    if (!item) return;
+    const from = homeOf(item);
+    lift = { item, from, to: from };
+    say('lifted', item, from);
+    return;
+  }
+  if (e.target !== e.currentTarget) return;
+  const at = placeOf(key);
+  if (!at) return;
+  const cards = arranged.get(at.column) ?? [];
+  let target: T | undefined;
+  if (e.key === 'ArrowDown') target = cards[at.index + 1];
+  else if (e.key === 'ArrowUp') target = cards[at.index - 1];
+  else if (e.key === 'Home') target = cards[0];
+  else if (e.key === 'End') target = cards[cards.length - 1];
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    const step = e.key === 'ArrowRight' ? 1 : -1;
+    // The nearest column with a card, at the same height or the last one there.
+    for (let c = columnKeys.indexOf(at.column) + step; c >= 0 && c < columnKeys.length; c += step) {
+      const there = arranged.get(columnKeys[c]) ?? [];
+      if (there.length > 0) { target = there[Math.min(at.index, there.length - 1)]; break; }
+    }
+  } else return;
+  e.preventDefault();
+  if (target) refocus(keyOf(target));
+}
+
+/** A key while a card is lifted: the arrows carry it, Space or Enter drops it, Escape puts it back. */
+function carry(e: KeyboardEvent): void {
+  const current = lift;
+  if (!current) return;
+  const key = keyOf(current.item);
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    e.stopPropagation();
+    lift = null;
+    say('cancelled', current.item, current.from);
+    refocus(key);
+    return;
+  }
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    lift = null;
+    // Dropped where it was picked up: nothing to ask, and it is said all the same.
+    if (current.to.column === current.from.column && current.to.index === current.from.index) say('dropped', current.item, current.to);
+    else commit(current.item, current.to);
+    refocus(key);
+    return;
+  }
+  // The card keeps the focus while it is carried: Tab would leave it lifted somewhere else.
+  if (e.key === 'Tab') { e.preventDefault(); return; }
+  let lane = current.to.column;
+  let index = current.to.index;
+  if (e.key === 'ArrowDown') index = Math.min(index + 1, roomIn(lane, key));
+  else if (e.key === 'ArrowUp') index = Math.max(index - 1, 0);
+  else if (e.key === 'Home') index = 0;
+  else if (e.key === 'End') index = roomIn(lane, key);
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    const next = columnKeys[columnKeys.indexOf(lane) + (e.key === 'ArrowRight' ? 1 : -1)];
+    if (!next) { e.preventDefault(); return; }
+    lane = next;
+    index = Math.min(index, roomIn(lane, key));
+  } else return;
+  e.preventDefault();
+  if (lane === current.to.column && index === current.to.index) return;
+  const to = { column: lane, index };
+  lift = { ...current, to };
+  say('moved', current.item, to);
+  refocus(key);
+}
+
+// ─── The Move menu: the single-pointer way (WCAG 2.2 2.5.7) ────────────────────
+
+/** The moves there are for a card: up and down only where it can go, every column but its own. */
+function menuOf(shownItem: T): { key: string; label: string; type?: 'separator' }[] {
+  const item = original(keyOf(shownItem));
+  if (!item) return [];
+  const home = homeOf(item);
+  const last = roomIn(home.column, keyOf(item));
+  const within: { key: string; label: string; type?: 'separator' }[] = [];
+  if (home.index > 0) within.push({ key: 'top', label: uiString('kanban', 'top') }, { key: 'up', label: uiString('kanban', 'up') });
+  if (home.index < last) within.push({ key: 'down', label: uiString('kanban', 'down') }, { key: 'bottom', label: uiString('kanban', 'bottom') });
+  const across = columns.filter((c) => c.key !== home.column)
+    .map((c) => ({ key: 'to:' + c.key, label: format(uiString('kanban', 'moveTo'), { column: c.label }) }));
+  return within.length > 0 && across.length > 0 ? [...within, { key: 'sep', label: '', type: 'separator' }, ...across] : [...within, ...across];
+}
+
+function onMenu(shownItem: T, e: CustomEvent<{ key: string }>): void {
+  const item = original(keyOf(shownItem));
+  if (!item || !interactive) return;
+  const home = homeOf(item);
+  const choice = e.detail.key;
+  let to: Place | null = null;
+  if (choice === 'top') to = { column: home.column, index: 0 };
+  else if (choice === 'up') to = { column: home.column, index: home.index - 1 };
+  else if (choice === 'down') to = { column: home.column, index: home.index + 1 };
+  else if (choice === 'bottom') to = { column: home.column, index: roomIn(home.column, keyOf(item)) };
+  else if (choice.startsWith('to:')) {
+    const lane = choice.slice('to:'.length);
+    to = { column: lane, index: roomIn(lane, keyOf(item)) };
+  }
+  if (to) commit(item, to);
+}
+
+// ─── The pointer ───────────────────────────────────────────────────────────────
+
+/**
+ * Each column's list is a sortable list of one group: a card dragged by its body moves inside the
+ * column or to another, and the drop goes through `commit` like the keyboard's. The body, not the
+ * whole card, is the handle, so the Move button stays a button.
+ */
+function sortableColumn(listEl: Element, laneOf: () => string): () => void {
+  const sortable = useSortable<T>(() => listEl as HTMLElement, {
+    group,
+    itemSelector: '[data-part="card"]',
+    handle: '.pdx-kanban-body',
+    a11y: false,
+    items: () => arranged.get(laneOf()) ?? [],
+    disabled: () => !interactive || lift !== null,
+    onReorder: (from, to) => {
+      const shownItem = (arranged.get(laneOf()) ?? [])[from];
+      const item = shownItem && original(keyOf(shownItem));
+      if (item) commit(item, { column: laneOf(), index: to });
+    },
+    onReceive: (shownItem, _from, to) => {
+      const item = original(keyOf(shownItem));
+      if (item) commit(item, { column: laneOf(), index: to });
+    },
+  });
+  return sortable.dispose;
+}
+</script>

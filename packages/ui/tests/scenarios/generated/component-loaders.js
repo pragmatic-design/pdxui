@@ -62,6 +62,7 @@ export const LOADERS = new Map([
     ['pdx-input', () => import('@pdxui/ui/input')],
     ['pdx-input-group', () => import('@pdxui/ui/input-group')],
     ['pdx-json-editor', () => import('@pdxui/ui/json-editor')],
+    ['pdx-kanban', () => import('@pdxui/ui/kanban')],
     ['pdx-kbd', () => import('@pdxui/ui/kbd')],
     ['pdx-label', () => import('@pdxui/ui/label')],
     ['pdx-list', () => import('@pdxui/ui/list')],

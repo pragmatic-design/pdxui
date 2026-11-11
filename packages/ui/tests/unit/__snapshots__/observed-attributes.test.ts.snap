@@ -775,6 +775,17 @@ exports[`observed attributes > are the ones each component has always observed 1
     "size",
   ],
   "pdx-json-editor": [],
+  "pdx-kanban": [
+    "column-field",
+    "columnfield",
+    "disabled",
+    "key-field",
+    "keyfield",
+    "label",
+    "readonly",
+    "title-field",
+    "titlefield",
+  ],
   "pdx-kbd": [
     "keys",
     "size",

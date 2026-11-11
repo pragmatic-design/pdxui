@@ -1,0 +1,108 @@
+/* Kanban — columns of cards moved by the pointer, the keyboard or a Move menu.
+   States on pdx-kanban's host: lifted (a card is picked up from the keyboard), disabled, readonly.
+   A column over its limit carries [data-over]; the lifted card carries [data-lifted]. */
+
+.pdx-kanban {
+    --pdx-kanban-column-width: 17rem;
+    display: flex;
+    gap: var(--pdx-space-md);
+    align-items: flex-start;
+    overflow-x: auto;
+    padding-bottom: var(--pdx-space-2xs);
+}
+
+.pdx-kanban-column {
+    flex: 0 0 var(--pdx-kanban-column-width);
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    min-height: 10rem;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-inset);
+    border-radius: var(--pdx-radius-md);
+}
+
+.pdx-kanban-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--pdx-space-sm);
+    padding: 0 var(--pdx-space-2xs);
+}
+
+.pdx-kanban-title {
+    margin: 0;
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+    color: var(--pdx-color-text);
+}
+
+.pdx-kanban-count {
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+/* Over its limit: the count turns to the danger ink. */
+.pdx-kanban-column[data-over] .pdx-kanban-count {
+    color: var(--pdx-color-danger-ink);
+    font-weight: 600;
+}
+
+.pdx-kanban-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    min-height: 2.5rem;
+}
+
+.pdx-kanban-card {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    /* A pointer drag selects no text, so the browser starts no drag of its own. */
+    -webkit-user-select: none;
+    user-select: none;
+    outline: none;
+}
+
+.pdx-kanban-card:focus-visible {
+    box-shadow: var(--pdx-focus-ring);
+}
+
+.pdx-kanban-card[data-lifted] {
+    border-color: var(--pdx-color-primary);
+    box-shadow: var(--pdx-shadow-md), var(--pdx-focus-ring);
+}
+
+.pdx-kanban-body {
+    flex: 1;
+    min-width: 0;
+    cursor: grab;
+    color: var(--pdx-color-text);
+}
+
+.pdx-kanban-empty {
+    margin: 0;
+    padding: var(--pdx-space-sm);
+    text-align: center;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}
+
+/* ===== States ===== */
+
+:state(disabled) > .pdx-kanban {
+    opacity: var(--pdx-opacity-disabled);
+}
+
+:is(:state(disabled), :state(readonly)) > .pdx-kanban .pdx-kanban-body {
+    cursor: default;
+}

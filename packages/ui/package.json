@@ -632,6 +632,11 @@
       "types": "./dist/signature-pad/pdx-signature-pad.d.ts",
       "import": "./dist/signature-pad/pdx-signature-pad.js"
     },
+    "./kanban": {
+      "development": "./src/kanban/pdx-kanban.pdx",
+      "types": "./dist/kanban/pdx-kanban.d.ts",
+      "import": "./dist/kanban/pdx-kanban.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

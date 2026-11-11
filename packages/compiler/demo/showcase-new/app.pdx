@@ -188,6 +188,7 @@ const componentItems = [
   { key: 'data', label: 'Data', icon: 'database', expanded: true, children: [
     { key: 'data-display', label: 'Display', icon: 'list', children: [
       { key: '/components/list', label: 'List' },
+      { key: '/components/kanban', label: 'Kanban' },
       { key: '/components/tree', label: 'Tree' },
       { key: '/components/description-list', label: 'DescriptionList' },
       { key: '/components/statistic', label: 'Statistic' },
