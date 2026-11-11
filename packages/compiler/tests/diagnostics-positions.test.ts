@@ -115,6 +115,7 @@ const ROWS: Record<string, Row> = {
     PDX_PROP_NAME_CASE: { src: pdx('<pdx-button :maxitems="v">b</pdx-button>', 'let v = $signal(1);'), at: ':maxitems' },
     PDX_IGNORE_WITHOUT_REASON: { src: pdx('<p>x</p>\n  <!-- pdx-ignore PDX_RAW_INTERPOLATION -->', 'let a = $signal(1);'), at: 'pdx-ignore PDX_RAW' },
     PDX_UNDECLARED_REF: { src: pdx('<p>missing as text</p>\n  <p>{{ missing }}</p>', 'let a = $signal(1);'), at: '{{ missing }}' },
+    PDX_PRIVATE_REF: { src: pdx('<p>_kept as text</p>\n  <p>{{ _kept }}</p>', 'let _kept = $signal(1);'), at: '{{ _kept }}' },
     PDX_INVALID_ENUM_VALUE: { src: pdx('<pdx-button size="huge">b</pdx-button>', 'let a = $signal(1);'), at: 'size="huge"' },
     PDX_UNRESOLVED_COMPONENT: { src: pdx('<pdx-nope></pdx-nope>', 'let a = $signal(1);'), at: '<pdx-nope>', via: 'validate-unknown-tags' },
     PDX_STORE_EXPORT: { src: pdx('<div></div>', "@store menu;\nlet s = $signal('a');\nexport const label = () => s;"), at: 'export const label' },

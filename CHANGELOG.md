@@ -1539,6 +1539,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- A template that reads a `<script>` name starting with `_` is an error, `PDX_PRIVATE_REF` (#1016).
+  Such a name is private to the script and the setup does not return it, but it counted as declared,
+  so nothing said so and the read failed at runtime (`ctx._x is not a function`). Props, events,
+  snippets and imports reach the template whatever they are called.
+
 - `@pdxui/core/i18n` and `@pdxui/core/testing` run what they type (#1015). Both took their types
   from their own module and, in a build, their code from the root bundle, which has neither
   `setFallbackLocale`, `resetI18n`, `getTranslation`, `clearTranslations`, `isLocaleLoaded`,

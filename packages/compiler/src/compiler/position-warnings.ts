@@ -247,6 +247,7 @@ function locate(w: ValidationWarning, source: string, script?: Region, template?
             // Match: the `@keepAlive(…)` the message quotes, in the template.
             return text ? find(source, template, new RegExp(escape(text))) : undefined;
         case 'PDX_UNDECLARED_REF':
+        case 'PDX_PRIVATE_REF':
             return name ? findTemplateRead(source, template, name) : undefined;
         case 'PDX_INVALID_ENUM_VALUE': {
             // Match: `<pdx-button> size="huge"` — the tag, the attribute and the value.

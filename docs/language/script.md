@@ -34,7 +34,9 @@ Statement            ::= /* a TypeScript statement, the $ runes included */
 - **One grammar.** Every script is read this way, with or without `setup`, whatever it contains
   ([file.md](file.md#the-file)); the legacy markers and `@mixin` are removed forms.
 - **What the template sees.** Every top-level `const`, `let`, `function`, rune and declared name is
-  returned from `setup` to the template, except a name that starts with `_`.
+  returned from `setup` to the template, except a name that starts with `_`: a template that reads
+  one raises `PDX_PRIVATE_REF` (error). A prop, an event, a snippet and an import reach the template
+  whatever they are called.
 - **The rest is TypeScript**, type-erased (file.md). A syntax error raises
   `PDX_SCRIPT_SYNTAX_ERROR`; two top-level declarations of one name (runes, `@prop`, functions,
   classes, variables) raise `PDX_DUP_DECLARATION`.
