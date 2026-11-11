@@ -37,7 +37,13 @@ export default defineConfig({
     // with it.
     failOnFlakyTests: true,
     workers: WORKERS,
-    reporter: [['html'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of waiting forever (#1025): the pre-push once sat 38
+    // minutes after the start of test 327/327, and the keeper never ran. The suite alone takes ~40 s;
+    // five minutes is several times that, under the gate's load.
+    globalTimeout: 5 * 60_000,
+    // `open: 'never'`: the default serves the report on a failure and waits for Ctrl+C, a hang in the
+    // pre-push (#1025).
+    reporter: [['html', { open: 'never' }], ['../../../scripts/lib/keep-failed-runs.mjs']],
     use: {
         baseURL: 'http://localhost:3333',
         trace: 'on-first-retry',

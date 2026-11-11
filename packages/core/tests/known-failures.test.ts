@@ -68,6 +68,13 @@ const OCCURRENCES = [
         },
     },
     {
+        issue: 1025, why: 'the design suite stopped moving after the start of its last test (2026-11-11)',
+        failure: {
+            file: 'packages/design/tests/playwright.config.ts', title: 'still running: variant-bound.spec.ts › a bound variant',
+            error: 'Timed out waiting 300s for the test suite to run',
+        },
+    },
+    {
         issue: 991, why: 'a millisecond scan that timed out in the gate (2026-11-10)',
         failure: {
             file: 'packages/core/tests/public-tree.test.ts', title: 'NO published file names the old scope',
