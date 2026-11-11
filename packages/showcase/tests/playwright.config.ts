@@ -43,7 +43,8 @@ export default defineConfig({
         'first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'],
     fullyParallel: true,
     workers: WORKERS,
-    reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // The preview's sockets around a failed test, in sockets.jsonl, before the keeper copies it (#617).
+    reporter: [['list'], ['../../../scripts/lib/socket-sampler.mjs'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     timeout: 30_000,
     // Every route is behind the login: the suite signs in once, and every context starts
     // signed in. A guest's spec says so with `test.use({ storageState: GUEST })`.
