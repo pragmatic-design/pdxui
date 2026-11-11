@@ -1,0 +1,101 @@
+/* Signature pad — a drawing surface the form receives as an image, a "type your name" alternative, and
+   Clear / Undo. States on pdx-signature-pad's host: empty, typing, disabled, readonly, invalid.
+
+   The surface is PAPER in both schemes, and the ink is dark on it: the image the form saves is pasted on
+   documents, so its ink cannot follow a dark scheme into white. `--pdx-signature-paper` and
+   `--pdx-signature-ink` change both; the ink is the colour the canvas draws with (its `color`). */
+
+.pdx-signature-pad {
+    --pdx-signature-paper: oklch(0.99 0.003 260);
+    --pdx-signature-ink: oklch(0.25 0.06 260);
+    --pdx-signature-height: 10rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    min-width: 0;
+}
+
+.pdx-signature-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+}
+
+/* The two ways to sign, a pressed pair. */
+.pdx-signature-mode[aria-pressed="true"] {
+    background: var(--pdx-color-primary-soft);
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-signature-surface {
+    position: relative;
+    height: var(--pdx-signature-height);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    background: var(--pdx-signature-paper);
+    overflow: hidden;
+}
+
+.pdx-signature-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: var(--pdx-signature-ink);
+    font-family: var(--pdx-font-signature, 'pdx-signature', cursive);
+    /* The pointer draws; the page does not scroll or zoom under it. */
+    touch-action: none;
+    cursor: crosshair;
+    outline: none;
+}
+
+.pdx-signature-surface:has(.pdx-signature-canvas:focus-visible) {
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* The signing line, at the height the typed name sits on (surface.ts BASELINE). */
+.pdx-signature-guide {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 72%;
+    border-top: 1px solid oklch(0.25 0.02 260 / 0.35);
+    pointer-events: none;
+}
+
+.pdx-signature-placeholder {
+    position: absolute;
+    left: 6%;
+    top: 72%;
+    transform: translateY(calc(-100% - 0.25rem));
+    color: oklch(0.45 0.02 260);
+    font-size: var(--pdx-text-sm);
+    pointer-events: none;
+}
+
+.pdx-signature-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--pdx-space-xs);
+}
+
+/* ===== States ===== */
+
+:state(typing) > .pdx-signature-pad .pdx-signature-canvas {
+    cursor: default;
+}
+
+:state(readonly) > .pdx-signature-pad .pdx-signature-canvas {
+    cursor: default;
+}
+
+:state(disabled) > .pdx-signature-pad {
+    opacity: var(--pdx-opacity-disabled);
+}
+
+:state(disabled) > .pdx-signature-pad .pdx-signature-canvas {
+    cursor: not-allowed;
+}
+
+:state(invalid) > .pdx-signature-pad .pdx-signature-surface {
+    border-color: var(--pdx-color-danger);
+}

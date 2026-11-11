@@ -12,6 +12,7 @@ export const examples: Record<string, string> = {
     'pdx-switch': '<pdx-switch label="Enable notifications"></pdx-switch>',
     'pdx-slider': '<pdx-slider value="40" style="width:280px"></pdx-slider>',
     'pdx-rating': '<pdx-rating value="3"></pdx-rating>',
+    'pdx-signature-pad': '<pdx-signature-pad label="Signature" style="width:320px"></pdx-signature-pad>',
     'pdx-input': '<pdx-input placeholder="Type here…" style="width:280px"></pdx-input>',
     'pdx-textarea': '<pdx-textarea placeholder="Your message…" style="width:280px"></pdx-textarea>',
     'pdx-checkbox': '<pdx-checkbox label="I agree"></pdx-checkbox>',

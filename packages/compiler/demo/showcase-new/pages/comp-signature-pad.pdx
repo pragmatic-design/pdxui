@@ -1,0 +1,65 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Signature Pad</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-signature-pad&gt;</code> — a signature drawn with a pointer, or typed as a name, that the form
+      receives as a PNG. Strokes stay sharp at any pixel ratio and survive a resize.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <app-demo-comp-signature-pad-basic class="demo-section"></app-demo-comp-signature-pad-basic>
+
+    <!-- ═══ Type your name ═══ -->
+    <app-demo-comp-signature-pad-type class="demo-section"></app-demo-comp-signature-pad-type>
+
+    <!-- ═══ Form ═══ -->
+    <app-demo-comp-signature-pad-form class="demo-section"></app-demo-comp-signature-pad-form>
+
+    <!-- ═══ States ═══ -->
+    <app-demo-comp-signature-pad-states class="demo-section"></app-demo-comp-signature-pad-states>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>string</span><span>The PNG data URL; '' when nothing counts as signed. Setting it shows that image</span></div>
+        <div class="opt-row"><code>mode</code><span>'draw' | 'type'</span><span>How the user signs</span></div>
+        <div class="opt-row"><code>name</code><span>string</span><span>Form field name</span></div>
+        <div class="opt-row"><code>required</code><span>boolean</span><span>An empty signature is <code>valueMissing</code></span></div>
+        <div class="opt-row"><code>error</code><span>string</span><span>A custom validity message</span></div>
+        <div class="opt-row"><code>min-stroke</code><span>number</span><span>Path length (CSS px) before the strokes count; 0 = any</span></div>
+        <div class="opt-row"><code>pen-width</code><span>number</span><span>The pen's width in CSS px (default 2)</span></div>
+        <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field's accessible name</span></div>
+        <div class="opt-row"><code>placeholder</code><span>string</span><span>The prompt on the empty surface</span></div>
+        <div class="opt-row"><code>disabled</code> / <code>readonly</code><span>boolean</span><span>No drawing; readonly hides Undo and Clear</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>value-change</code><span>{ value: string }</span><span>A stroke, an undo, a clear or a typed name wrote <code>value</code></span></div>
+        <div class="opt-row"><code>mode-change</code><span>{ value: 'draw' | 'type' }</span><span>The user switched how to sign</span></div>
+        <div class="opt-row"><code>clear() · undo() · focus() · isEmpty()</code><span></span><span>Through a <code>:ref</code></span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Styling</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Token / selector</span><span>—</span><span>What</span></div>
+        <div class="opt-row"><code>--pdx-signature-paper</code> / <code>--pdx-signature-ink</code><span></span><span>The surface and the ink; paper stays light in a dark scheme, as the image is pasted on documents</span></div>
+        <div class="opt-row"><code>--pdx-signature-height</code><span></span><span>The surface's height (10rem)</span></div>
+        <div class="opt-row"><code>--pdx-font-signature</code><span></span><span>The face of a typed name</span></div>
+        <div class="opt-row"><code>:state(empty | typing | disabled | readonly | invalid)</code><span></span><span>On the host</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/signature-pad';
+@title 'Signature Pad Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

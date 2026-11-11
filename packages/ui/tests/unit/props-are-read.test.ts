@@ -18,15 +18,18 @@ const FORM_MODEL = join(__dirname, '..', '..', '..', 'core', 'src', 'form', 'for
 
 /**
  * The props core's `wireFormModel` reads for a component that declares a model `{ form: true }`
- * (#135): the host's `name`, which the form submits the value under, and the declared `value`, a
- * boolean model's checked value. Read there, not in the component's module, so the scan below would
- * not see them. Each is held to the line of form-model.ts that reads it.
+ * (#135): the host's `name`, which the form submits the value under, the declared `value`, a
+ * boolean model's checked value, and the declared `required`, which makes an empty model valueMissing.
+ * Read there, not in the component's module, so the scan below would not see them. Each is held to the
+ * line of form-model.ts that reads it.
  */
 const READ_BY_FORM_MODEL: Record<string, RegExp> = {
     // Match: wireFormModel reading the host's `name` attribute. Groups: none
     name: /el\.attr\('name'\)/,
     // Match: wireFormModel reading the declared `value` prop. Groups: none
     value: /declared\('value'\)/,
+    // Match: wireFormModel reading the declared `required` prop. Groups: none
+    required: /declared\('required'\)/,
 };
 
 /** Whether a module declares a model `{ form: true }`, which core wires to its form. */

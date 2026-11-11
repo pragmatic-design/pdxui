@@ -24,10 +24,14 @@ const LAYERED = join(DESIGN, 'src', 'components', 'layered');
 /** The stylesheets that belong to a component, by name. */
 const owned = readdirSync(LAYERED).filter(f => f.endsWith('.css')).map(f => f.replace(/\.css$/, '')).sort();
 
-/** Component directories under ui/src that hold a `pdx-<dir>.ts`. */
-const uiDirs = readdirSync(UI_SRC).filter(d => existsSync(join(UI_SRC, d, `pdx-${d}.ts`))).sort();
+/** The component file of a ui/src directory: `pdx-<dir>.ts`, or `pdx-<dir>.pdx` for one written in .pdx (#1004). */
+const componentFile = (dir: string): string | undefined =>
+    [`pdx-${dir}.ts`, `pdx-${dir}.pdx`].map(f => join(UI_SRC, dir, f)).find(existsSync);
 
-const sourceOf = (dir: string): string => readFileSync(join(UI_SRC, dir, `pdx-${dir}.ts`), 'utf-8');
+/** Component directories under ui/src that hold a `pdx-<dir>.ts` or `.pdx`. */
+const uiDirs = readdirSync(UI_SRC).filter(d => componentFile(d) !== undefined).sort();
+
+const sourceOf = (dir: string): string => readFileSync(componentFile(dir) as string, 'utf-8');
 
 describe('the scan has something to scan', () => {
     it('found the component stylesheets and the components', () => {
@@ -38,9 +42,9 @@ describe('the scan has something to scan', () => {
 
 describe('every component that owns a stylesheet imports it', () => {
     for (const name of owned) {
-        if (!existsSync(join(UI_SRC, name, `pdx-${name}.ts`))) continue;
+        if (componentFile(name) === undefined) continue;
         it(`pdx-${name}`, () => {
-            expect(sourceOf(name), `pdx-${name}.ts does not import its own stylesheet — it renders unstyled in an app that takes @pdxui/design/base`)
+            expect(sourceOf(name), `pdx-${name} does not import its own stylesheet — it renders unstyled in an app that takes @pdxui/design/base`)
                 .toContain(`@pdxui/design/components/${name}'`);
         });
     }

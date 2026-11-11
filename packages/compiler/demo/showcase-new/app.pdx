@@ -151,6 +151,7 @@ const componentItems = [
       { key: '/components/otp', label: 'OTP' },
       { key: '/components/slider', label: 'Slider' },
       { key: '/components/rating', label: 'Rating' },
+      { key: '/components/signature-pad', label: 'Signature Pad' },
     ]},
     { key: 'selection-inputs', label: 'Selection', icon: 'check-square', children: [
       { key: '/components/checkbox', label: 'Checkbox' },

@@ -29,6 +29,13 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // `toggle` names a panel's toggle when the group has no label to name it.
     'field-group': { edit: 'Edit', toggle: 'Show or hide section' },
     list: { empty: 'No items' },
+    // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
+    // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.
+    'signature-pad': {
+        label: 'Signature', placeholder: 'Sign here', empty: '{label}, empty', signed: '{label}, signed',
+        draw: 'Draw', type: 'Type', typeLabel: 'Type your name', clear: 'Clear', undo: 'Undo',
+        cleared: 'Signature cleared',
+    },
     // The reorder said out loud. `position` is the one a screen-reader user hears most, and it
     // speaks the POSITION rather than the index — "2 of 5", not "index 1" — which is dnd-kit's rule
     // and the difference between a usable announcement and a debugging one. `instructions` is the

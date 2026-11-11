@@ -94,6 +94,7 @@ export const LOADERS = new Map([
     ['pdx-segmented', () => import('@pdxui/ui/segmented')],
     ['pdx-select', () => import('@pdxui/ui/select')],
     ['pdx-sidebar', () => import('@pdxui/ui/sidebar')],
+    ['pdx-signature-pad', () => import('@pdxui/ui/signature-pad')],
     ['pdx-slider', () => import('@pdxui/ui/slider')],
     ['pdx-sortable-list', () => import('@pdxui/ui/sortable-list')],
     ['pdx-sparkline', () => import('@pdxui/ui/sparkline')],

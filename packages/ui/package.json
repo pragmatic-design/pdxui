@@ -627,6 +627,11 @@
       "types": "./dist/switch-toggle/pdx-switch.d.ts",
       "import": "./dist/switch-toggle/pdx-switch.js"
     },
+    "./signature-pad": {
+      "development": "./src/signature-pad/pdx-signature-pad.pdx",
+      "types": "./dist/signature-pad/pdx-signature-pad.d.ts",
+      "import": "./dist/signature-pad/pdx-signature-pad.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

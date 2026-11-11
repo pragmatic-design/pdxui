@@ -1,0 +1,28 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-grid">
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Disabled</span>
+        <pdx-signature-pad label="Disabled signature" disabled></pdx-signature-pad>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Readonly</span>
+        <pdx-signature-pad label="Readonly signature" readonly></pdx-signature-pad>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Error</span>
+        <pdx-signature-pad label="Signature in error" error="Sign to accept the terms"></pdx-signature-pad>
+      </div>
+      <div>
+        <span class="pdx-txt-small pdx-ink-muted">Thick pen</span>
+        <pdx-signature-pad label="Thick pen" pen-width="5"></pdx-signature-pad>
+      </div>
+    </div>
+  </section>
+</template>
+
+<style scoped>
+  .demo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--pdx-space-lg); }
+  .demo-grid > div { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+</style>
