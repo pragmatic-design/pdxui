@@ -7,7 +7,7 @@
 // on, so the cases below hand removeTree a file system that refuses where they say.
 
 import { describe, it, expect } from 'vitest';
-import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, existsSync, rmSync, renameSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
@@ -35,6 +35,27 @@ function fakeFs(held: string[], removable = held.length === 0, children: string[
         warn: (message) => { warnings.push(message); },
     };
     return { fs, calls, warnings };
+}
+
+/**
+ * Null when `pid` is alive and `dir` refuses a rename, as a directory a process sits in does on
+ * Windows; otherwise what is not so.
+ */
+function heldBy(pid: number, dir: string): string | null {
+    try {
+        process.kill(pid, 0);
+    } catch (e) {
+        return `the grandchild ${pid} is not alive (${(e as { code?: string }).code})`;
+    }
+    const probe = `${dir}.precondition`;
+    try {
+        renameSync(dir, probe);
+    } catch (e) {
+        const code = (e as { code?: string }).code;
+        return code === 'EBUSY' ? null : `${dir} could not be probed (${code})`;
+    }
+    renameSync(probe, dir);
+    return `${dir} is not held: it renamed while the grandchild ${pid} was alive`;
 }
 
 describe('removeTree', () => {
@@ -179,16 +200,31 @@ describe('removeTree', () => {
     it.runIf(process.platform === 'win32')('on Windows, names a process outside the children that sits in the tree', async () => {
         const root = mkdtempSync(join(tmpdir(), 'pdx-remove-grandchild-'));
         mkdirSync(join(root, 'dist'), { recursive: true });
-        // On Windows `kill()` ends a process without running its handlers, so the parent is asked to stop
-        // through its stdin: it kills the grandchild, waits for it to exit, and exits.
-        const grandchild = `require('child_process').spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], ` +
-            `{ cwd: ${JSON.stringify(join(root, 'dist'))}, stdio: 'ignore' })`;
-        const parent = spawn(process.execPath, ['-e',
-            `const c = ${grandchild}; c.on('spawn', () => process.stdout.write(String(c.pid))); ` +
-            "process.stdin.once('data', () => { c.once('exit', () => process.exit()); c.kill(); })"],
-        { cwd: tmpdir(), stdio: ['pipe', 'pipe', 'ignore'] });
-        const pid = await new Promise<string>((resolve) => parent.stdout!.once('data', (d: Buffer) => resolve(String(d))));
+        const dist = join(root, 'dist');
+        // The grandchild says it is ready from inside, once it runs in its directory: the parent's
+        // `spawn` event fires before the process has started (#1027). If it exits first, the parent
+        // says so, with what it wrote to stderr.
+        const parentCode = [
+            "const { spawn } = require('child_process');",
+            `const c = spawn(process.execPath, ['-e', ${JSON.stringify("process.stdout.write('ready'); setInterval(() => {}, 1000)")}], ` +
+                `{ cwd: ${JSON.stringify(dist)}, stdio: ['ignore', 'pipe', 'pipe'] });`,
+            "let err = ''; c.stderr.on('data', (d) => { err += d; });",
+            "c.stdout.once('data', () => process.stdout.write(JSON.stringify({ pid: c.pid })));",
+            "c.once('exit', (code) => process.stdout.write(JSON.stringify({ exited: code, stderr: err })));",
+            // On Windows `kill()` ends a process without running its handlers, so the parent is asked to
+            // stop through its stdin: it kills the grandchild, waits for it to exit, and exits — at once
+            // when the grandchild is gone already, or the wait would never end.
+            "process.stdin.once('data', () => { if (c.exitCode !== null || c.signalCode !== null) process.exit(); c.once('exit', () => process.exit()); c.kill(); });",
+        ].join('\n');
+        const parent = spawn(process.execPath, ['-e', parentCode], { cwd: tmpdir(), stdio: ['pipe', 'pipe', 'ignore'] });
+        const first = await new Promise<{ pid?: number; exited?: number; stderr?: string }>((resolve) =>
+            parent.stdout!.once('data', (d: Buffer) => resolve(JSON.parse(String(d)))));
         try {
+            expect(first.exited, `the grandchild exited before it was ready: ${first.stderr}`).toBeUndefined();
+            const pid = String(first.pid);
+            // The test's premise, asserted: the grandchild is alive and dist/ is held. Without it, a free
+            // dist/ read as removeTree's fault, an `undefined` error (#1027).
+            expect(heldBy(first.pid!, dist), 'the precondition').toBeNull();
             let error: Error | undefined;
             try { removeTree(root); } catch (e) { error = e as Error; }
             expect(error?.message).toContain('held: dist/ (EBUSY)');

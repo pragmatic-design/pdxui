@@ -89,6 +89,12 @@ export const KNOWN = [
         // A timeout, not any slow failure: a slow test that asserts wrong is a test failing.
         matches: (f) => Boolean(f.slowTest) && TIMED_OUT.test(f.error),
     },
+    {
+        issue: 1027,
+        says: 'remove-tree\'s grandchild case found dist/ not held',
+        evidence: 'the precondition\'s message: whether the grandchild was alive, and whether dist/ was held',
+        matches: (f) => fileIs(f, 'remove-tree.test.ts') && f.title.includes('names a process outside the children'),
+    },
 ];
 
 /**

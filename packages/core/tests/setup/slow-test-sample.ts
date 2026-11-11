@@ -96,3 +96,12 @@ export function recordLine(test: string, file: string, report: SampleReport): st
 export function recordLines(test: string, file: string, report: SampleReport, error: string): string[] {
     return [recordLine(test, file, report), ...knownFailureLines({ file, title: test, error, slowTest: report }, 'this log')];
 }
+
+/**
+ * What a failed test prints: a slow one its record and the known failure it is; a fast one only the
+ * known failure, if it is one (#1027 — remove-tree's grandchild case fails in milliseconds).
+ */
+export function failureLines(test: string, file: string, report: SampleReport, error: string): string[] {
+    if (report.wallMs >= SLOW_TEST_MS) return recordLines(test, file, report, error);
+    return knownFailureLines({ file, title: test, error }, 'this log');
+}

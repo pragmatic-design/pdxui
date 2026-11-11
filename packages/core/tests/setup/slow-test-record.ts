@@ -7,15 +7,15 @@
 // slow test that passes is not what this is for, and the log stays as it was for a green run.
 
 import { beforeEach } from 'vitest';
-import { takeSample, describeSample, recordLines, SLOW_TEST_MS } from './slow-test-sample';
+import { takeSample, describeSample, failureLines } from './slow-test-sample';
 
 beforeEach((ctx) => {
     const start = takeSample();
     ctx.onTestFailed(() => {
         const report = describeSample(start, takeSample());
-        if (report.wallMs < SLOW_TEST_MS) return;
-        // The record, then `[known-failure] #991 …` when it is a timeout (#1013).
+        // A slow failure: the record, then `[known-failure] #991 …` when it is a timeout (#1013). A fast
+        // one: only `[known-failure] #n …`, when it is a known one (#1027).
         const error = (ctx.task.result?.errors ?? []).map((e) => e.message ?? '').join('\n');
-        for (const line of recordLines(ctx.task.name, ctx.task.file?.name ?? '', report, error)) console.warn(line);
+        for (const line of failureLines(ctx.task.name, ctx.task.file?.name ?? '', report, error)) console.warn(line);
     });
 });
