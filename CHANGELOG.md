@@ -1539,6 +1539,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `hidden` hides every component (#1018). The browser's `[hidden] { display: none }` is a user-agent
+  rule, and a component stylesheet that sets `display` outranks it: 416 component tags and classes —
+  `pdx-empty-state`, `pdx-tabs`, `.pdx-badge` among them — drew an element carrying `hidden`. The reset
+  now says `[hidden]:not([hidden="until-found"]) { display: none !important; }` in its first layer,
+  and the four component rules that guarded their own `[hidden]` are gone.
+
 - `<pdx-icon>` warns in development when a name is not in its set, for any set, once per name and
   set (#1017). The «pragmatic» resolver warned on every draw — a list of 100 rows with one wrong icon
   warned 100 times — and a set registered with `registerIconSet` drew nothing in silence.

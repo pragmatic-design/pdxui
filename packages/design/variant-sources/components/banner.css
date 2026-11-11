@@ -122,12 +122,6 @@
     z-index: var(--pdx-z-sticky, 10);
 }
 
-/* ===== Dismissable — hidden after close ===== */
-
-.pdx-banner[hidden] {
-    display: none;
-}
-
 /* pdx-banner closed: the host's state (#291), which takes its alert out of the tree with it (A4). */
 pdx-banner:state(dismissed) {
     display: none;
