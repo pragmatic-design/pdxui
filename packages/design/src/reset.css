@@ -11,6 +11,14 @@
     padding: 0;
 }
 
+/* `hidden` hides, whatever display a component gives itself (#1018). The browser's own rule is a
+   user-agent one, and any author `display` outranks it: 416 component tags and classes drew their
+   `hidden` elements. Important in the first layer, so no later layer's rule, important or not, undoes
+   it. `until-found` keeps the browser's behaviour: hidden, and found by find-in-page. */
+[hidden]:not([hidden="until-found"]) {
+    display: none !important;
+}
+
 html {
     color-scheme: light dark;
     -webkit-text-size-adjust: 100%;

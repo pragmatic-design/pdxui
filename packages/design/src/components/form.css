@@ -44,10 +44,6 @@
     gap: var(--pdx-space-md);
 }
 
-.pdx-form-section-content[hidden] {
-    display: none;
-}
-
 /* A section that is not active is not shown (#293): `active` is a state of the host. */
 :where(pdx-form-section):not(:state(active)) > [data-part="root"] {
     display: none;
@@ -117,10 +113,6 @@
     display: flex;
     flex-direction: column;
     gap: var(--pdx-space-md);
-}
-
-.pdx-field-group-content[hidden] {
-    display: none;
 }
 
 /* Panel mode — the legend holds a disclosure button, drawn as plain legend text: a keyboard
