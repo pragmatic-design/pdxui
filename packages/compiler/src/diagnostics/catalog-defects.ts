@@ -799,4 +799,11 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'Declare it, or fix the spelling — when one declared name is within 2 edits the message names it, and the fix renames the read.',
         example: { bad: pdx('<p>{{ coutn }}</p>', 'let count = $signal(0);'), good: pdx('<p>{{ count }}</p>', 'let count = $signal(0);') },
     },
+    PDX_PRIVATE_REF: {
+        severity: 'error', category: 'defect',
+        summary: 'The template reads a name of `<script>` that starts with `_`, which the script keeps to itself.',
+        explanation: 'A name that starts with `_` is not returned to the template, so the read is `undefined` at runtime: a binding shows nothing, a call throws `ctx._x is not a function`. Props, events, snippets and imports are not affected (#1016).',
+        fix: 'Rename it without the underscore, in the script and in the template; keep the underscore only for what the template never reads.',
+        example: { bad: pdx('<p>{{ _count }}</p>', 'let _count = $signal(0);'), good: pdx('<p>{{ count }}</p>', 'let count = $signal(0);') },
+    },
 };

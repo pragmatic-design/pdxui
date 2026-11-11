@@ -72,7 +72,8 @@ text, anything else as `String(value)` — `interpolationText` in core, used by 
 
 #### Rules
 
-- A name the script does not declare is `PDX_UNDECLARED_REF` (error). Loop, slot and `@catch`/`@await`
+- A name the script does not declare is `PDX_UNDECLARED_REF` (error); one it declares with a leading
+  `_`, and so keeps to itself, is `PDX_PRIVATE_REF` (error). Loop, slot and `@catch`/`@await`
   names, arrow parameters and `$event` are the template's own.
 - `${…}` in text is `PDX_RAW_INTERPOLATION` (warning): it is written as the text the author typed,
   never evaluated.

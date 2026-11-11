@@ -8,7 +8,7 @@ order: 25
 
 > **Formal reference:** [docs/language/diagnostics.md](https://github.com/pragmatic-design/pdxui/blob/main/docs/language/diagnostics.md) indexes the same codes by the construct that raises them.
 
-Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 111 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
+Every finding the compiler, `pdx check` and the editor report carries a `PDX_*` code — 112 of them. Each is listed here with what it means and what to write instead, generated from the catalog in `packages/compiler/src/diagnostics/`. From a terminal, `pdx explain <CODE>` prints the same entry; `--json` prints it for an agent. A finding in `pdx check --json` links its entry with `url`.
 
 ## Defects
 
@@ -1263,6 +1263,36 @@ function upper(v) { return String(v).toUpperCase(); }
 The router treats a policy it does not know as `hover`: the route would prefetch on a hover whatever was written, and nothing would say so.
 
 **Fix.** One of `'hover'` (the default), `'eager'`, `'viewport'`, `'never'`.
+
+### PDX_PRIVATE_REF
+
+*error* — The template reads a name of `<script>` that starts with `_`, which the script keeps to itself.
+
+A name that starts with `_` is not returned to the template, so the read is `undefined` at runtime: a binding shows nothing, a call throws `ctx._x is not a function`. Props, events, snippets and imports are not affected (#1016).
+
+**Fix.** Rename it without the underscore, in the script and in the template; keep the underscore only for what the template never reads.
+
+Instead of:
+
+```html
+<template>
+  <p>{{ _count }}</p>
+</template>
+<script>
+let _count = $signal(0);
+</script>
+```
+
+write:
+
+```html
+<template>
+  <p>{{ count }}</p>
+</template>
+<script>
+let count = $signal(0);
+</script>
+```
 
 ### PDX_PROP_INVALID_TYPE
 

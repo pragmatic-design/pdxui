@@ -80,6 +80,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_RAW_INTERPOLATION` | warn | A `${…}` in the template markup. | interpolation, [template.md](template.md) |
 | `PDX_RAW_INTERPOLATION_IN_BINDING` | error | A `${…}` inside the value of a bound attribute (`:x`, `::x`, `@x`). | bindings, [template.md](template.md) |
 | `PDX_UNDECLARED_REF` | error | A name the template reads that `<script>` does not declare. | expressions, [template.md](template.md) |
+| `PDX_PRIVATE_REF` | error | A name the template reads that `<script>` declares with a leading `_`, which it keeps to itself. | expressions, [script.md](script.md) |
 | `PDX_UNRESOLVED_COMPONENT` | warn | A custom-element tag that no component package and no project component defines. | component tags, [template.md](template.md) |
 | `PDX_UNKNOWN_PROP` | warn | A bound name the component does not declare as a prop. | `:prop` bindings, [template.md](template.md) |
 | `PDX_PROP_NAME_CASE` | warn | A bound prop written in lowercase that matches a camelCase prop. | `:prop` bindings, [template.md](template.md) |

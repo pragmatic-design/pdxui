@@ -45,6 +45,22 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
 }
 
 /**
+ * The names the template reaches whatever they are called: props and event emitters are on the host,
+ * imports are the module's, snippets the render's, and `exports` is what the setup returns. A name of
+ * the script outside these, starting with `_`, is private to it (docs/language/script.md).
+ */
+function publicNames(analysis: ScriptAnalysis): Set<string> {
+    const s = new Set<string>();
+    for (const p of analysis.props) s.add(p.name);
+    for (const e of analysis.events) s.add(e.emitter ?? e.name);
+    for (const sn of analysis.snippets) s.add(sn.name);
+    for (const e of analysis.exports) s.add(e.name);
+    for (const n of analysis.importedNames ?? []) s.add(n);
+    for (const n of analysis.coreImportNames) s.add(n);
+    return s;
+}
+
+/**
  * The template reads of names the component does not declare, each once, with the one declared
  * name within 2 edits as its suggestion when there is exactly one. A name that appears as a word
  * anywhere in the script's code is taken as declared there — a destructured const, a local
@@ -52,11 +68,26 @@ export function declaredNames(analysis: ScriptAnalysis): Set<string> {
  */
 export function checkUndeclaredRefs(analysis: ScriptAnalysis, templateIds: ReadonlySet<string>, warnings: ValidationWarning[]): void {
     const declared = declaredNames(analysis);
+    const reachable = publicNames(analysis);
     const script = [analysis.body, ...analysis.userImports,
         ...analysis.lifecycle.onMount, ...analysis.lifecycle.onDestroy, ...analysis.effects].join('\n');
     for (const id of templateIds) {
+        const inScript = declared.has(id) || new RegExp(`(?<![\\w$])${escapeForRegExp(id)}(?![\\w$])`).test(script);
+        // PDX_PRIVATE_REF (#1016): the script has it, and keeps it — the setup does not return it, so the
+        // template's read is `ctx._x`, undefined at runtime.
+        if (id.startsWith('_') && inScript && !reachable.has(id)) {
+            const bare = id.replace(/^_+/, '');
+            warnings.push({
+                code: 'PDX_PRIVATE_REF',
+                severity: 'error',
+                message: `'${id}' starts with _, so it is private to <script> and the template cannot read it.`,
+                hint: bare ? `Rename it ${bare}, in the script and here, to give it to the template.` : `Give it a name that does not start with _.`,
+                ...(bare ? { suggestion: bare } : {}),
+            });
+            continue;
+        }
         if (declared.has(id) || AMBIENT.has(id) || ROUTER_READS.has(id) || id.startsWith('$')) continue;
-        if (new RegExp(`(?<![\\w$])${escapeForRegExp(id)}(?![\\w$])`).test(script)) continue;
+        if (inScript) continue;
         const meant = onlyNear(id, declared, 2);
         warnings.push({
             code: 'PDX_UNDECLARED_REF',
