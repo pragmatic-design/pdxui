@@ -29,7 +29,8 @@ export default defineConfig({
     testMatch: ['first-paint.spec.ts', 'first-paint-http2.spec.ts', 'first-paint-waves.spec.ts', 'ssg-pages.spec.ts'],
     fullyParallel: true,
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
-    reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // The preview's sockets around a failed test, in sockets.jsonl, before the keeper copies it (#617).
+    reporter: [['list'], ['../../../scripts/lib/socket-sampler.mjs'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     timeout: 30_000,
     globalSetup: ['./session.ts', './ssg-site.ts'],
     use: {

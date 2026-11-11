@@ -51,8 +51,9 @@ export default defineConfig({
     // 112 component pages: the failure of one must not hide the other 111.
     fullyParallel: true,
     workers: WORKERS,
-    // A failed test's fixtures over 5 s go to slow-fixtures.txt, kept with its trace (#758).
-    reporter: [['list'], ['./slow-fixtures-reporter.ts'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A failed test's fixtures over 5 s go to slow-fixtures.txt, kept with its trace (#758), and the
+    // preview's sockets around it to sockets.jsonl (#617).
+    reporter: [['list'], ['./slow-fixtures-reporter.ts'], ['../../../scripts/lib/socket-sampler.mjs'], ['../../../scripts/lib/keep-failed-runs.mjs']],
     // The test's own: page creation has a timeout of its own, in fixture.ts (#758).
     timeout: 30_000,
     use: {
