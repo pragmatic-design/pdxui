@@ -64,14 +64,14 @@
     "./testing": {
 "development": "./src/testing/index.ts",
       "types": "./dist/testing/index.d.ts",
-      "import": "./dist/pragmatic-core.es.js",
-      "require": "./dist/pragmatic-core.cjs"
+      "import": "./dist/testing.es.js",
+      "require": "./dist/testing.cjs"
     },
     "./i18n": {
 "development": "./src/i18n/index.ts",
       "types": "./dist/i18n/index.d.ts",
-      "import": "./dist/pragmatic-core.es.js",
-      "require": "./dist/pragmatic-core.cjs"
+      "import": "./dist/i18n.es.js",
+      "require": "./dist/i18n.cjs"
     }
   },
   "files": [
