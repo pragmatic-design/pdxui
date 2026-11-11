@@ -260,11 +260,13 @@ beta (#124); `{ attribute }` beta (#753)
 #### Syntax
 
 ```ebnf
-EventDecl ::= "@event" ( "(" S? "bubbles" S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? S? ";"?
+EventDecl   ::= "@event" ( "(" S? EventOption ( S? "," S? EventOption )? S? ")" )? S ( Identifier | StringLiteral ) ( S? ":" S? Type )? S? ";"?
+EventOption ::= "bubbles" | "cancelable"
 ```
 
-The analyzer's form: `@event name: PayloadType;`, or `@event(bubbles) name: PayloadType;`; a kebab-case
-name is quoted, `@event 'open-change': PayloadType;` (#749).
+The analyzer's form: `@event name: PayloadType;`, `@event(bubbles) name: PayloadType;`,
+`@event(cancelable) name: PayloadType;` or both, `@event(bubbles, cancelable)`; a kebab-case name is
+quoted, `@event 'open-change': PayloadType;` (#749).
 
 #### Semantics
 
@@ -275,7 +277,12 @@ host with `detail`, and **the event does not bubble** (#138): `bubbles: false, c
 Angular's `output()`, so an event named `change` or `close` is never confused, on an ancestor, with
 the native events of the same name rising from the inputs inside. `@event(bubbles) name` opts in:
 the emitter passes `{ bubbles: true }`, and the event bubbles and crosses shadow roots. The descriptor
-declares the same (`events: { name: event({ bubbles: true }) }`). Without a type the payload is
+declares the same (`events: { name: event({ bubbles: true }) }`). `@event(cancelable) name` (#1035)
+makes it an event a listener can refuse: the emitter passes `{ cancelable: true }` and **returns** what
+the dispatch returns, false when a listener called `preventDefault()`, so the component writes
+`if (!beforeMove(d)) return;`, as a TypeScript component reads `ctx.emit`. The descriptor declares it
+`event({ cancelable: true })`, and core makes every dispatch of that event cancelable. The two options go
+together in either order, each once. Without a type the payload is
 `void`. The `.d.ts` gets an `Events` interface; a parent listens with `@name="…"` on the component
 ([template.md](template.md)).
 
@@ -290,7 +297,8 @@ name.
 - A line `@event …` that is not this form raises `PDX_MALFORMED_EVENT`. That includes an unquoted
   name that is not an `Identifier`: `@event pdx-change: T` is an error; `@event 'pdx-change': T` is
   the form.
-- `@event(…)` with an option other than `bubbles` raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
+- `@event(…)` with an option other than `bubbles` or `cancelable`, or one written twice, raises
+  `PDX_UNKNOWN_DECLARATION`, its hint the forms.
 - A quoted name is lowercase words of letters and digits, starting with a letter, joined by single
   hyphens; anything else raises `PDX_UNKNOWN_DECLARATION`, its hint the form.
 - The function is the only way to dispatch from a `.pdx`. `$emit('name', x)` is removed (#138):
@@ -324,9 +332,27 @@ function save() {
 </script>
 ```
 
+An event the parent can refuse:
+
+```pdx
+<template>
+  <button @click="archive()">Archive</button>
+</template>
+
+<script>
+@event(cancelable) 'before-archive': { id: string };
+@event archived: { id: string };
+
+function archive() {
+  if (!beforeArchive({ id: 'a1' })) return;
+  archived({ id: 'a1' });
+}
+</script>
+```
+
 #### Since
 
-alpha
+alpha; `(cancelable)`, beta (#1035)
 
 ### @slot
 

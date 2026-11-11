@@ -32,9 +32,9 @@ const DECLARATIONS: [DocTarget, RegExp][] = [
     // Match: @prop label: …  /  @model value: …   Groups: [1]=the name
     ['prop', new RegExp(`^@prop\\s+(${NAME})`)],
     ['model', new RegExp(`^@model\\s+(${NAME})`)],
-    // Match: @event picked: …  /  @event(bubbles) picked  /  @event 'open-change': …
-    // Groups: [1]=a bare name [2]=a quoted name
-    ['event', new RegExp(`^@event(?:\\(\\s*bubbles\\s*\\))?\\s+(?:(${NAME})|['"]([^'"\\n]+)['"])`)],
+    // Match: @event picked: …  /  @event(bubbles) picked  /  @event(cancelable) 'before-move'  /
+    // @event 'open-change': … — any options in parentheses (#1035). Groups: [1]=a bare name [2]=a quoted name
+    ['event', new RegExp(`^@event(?:\\([^)]*\\))?\\s+(?:(${NAME})|['"]([^'"\\n]+)['"])`)],
     // Match: @slot row?: …   Groups: [1]=the name
     ['slot', new RegExp(`^@slot\\s+(${NAME})`)],
     // Match: @state busy = …   Groups: [1]=the name

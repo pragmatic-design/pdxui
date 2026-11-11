@@ -206,12 +206,14 @@ export function projectScriptMapped(
             }
         }
         if (kw === 'event') {
-            // Match: @event name: PayloadType;  or  @event(bubbles) name: PayloadType; (#138), the name bare
-            // or quoted (#749), whose emitter is then its camelCase.
-            // Groups: [1]=bare name [2]=quoted name [3]=payload type (optional)
-            const ev = /^(?:\(\s*bubbles\s*\))?\s+(?:([A-Za-z_$][\w$]*)|['"]([^'"\n]+)['"])\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
-            const emitter = ev && (ev[1] ?? eventEmitterName(ev[2]));
-            if (ev && emitter) emitters.push(ev[3] ? `var ${emitter}: (detail: ${ev[3]}) => void;` : `var ${emitter}: (detail?: unknown) => void;`);
+            // Match: @event name: PayloadType;  or with its options, `@event(bubbles)` (#138),
+            // `@event(cancelable)` (#1035) or both; the name bare or quoted (#749), whose emitter is then
+            // its camelCase. A cancelable event's emitter answers whether nobody refused it.
+            // Groups: [1]=the options' parentheses (optional) [2]=bare name [3]=quoted name [4]=payload type (optional)
+            const ev = /^(\([^)]*\))?\s+(?:([A-Za-z_$][\w$]*)|['"]([^'"\n]+)['"])\s*(?::\s*([^;\n]+?))?\s*;?\s*(?:\n|$)/.exec(s.slice(m.index + 1 + kw.length));
+            const emitter = ev && (ev[2] ?? eventEmitterName(ev[3]));
+            const returns = ev?.[1] && /\bcancelable\b/.test(ev[1]) ? 'boolean' : 'void';
+            if (ev && emitter) emitters.push(ev[4] ? `var ${emitter}: (detail: ${ev[4]}) => ${returns};` : `var ${emitter}: (detail?: unknown) => ${returns};`);
         }
         if (kw === 'host') {
             // Match: @host el;  or  @host el { … } — the component's own element, named (#750), a

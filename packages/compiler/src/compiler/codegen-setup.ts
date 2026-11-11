@@ -140,8 +140,11 @@ export function buildSetupBody(
     const emitters = analysis.events
         .map(e => ({ ...e, fn: e.emitter ?? e.name }))
         .filter(e => !bodyLocalNames.has(e.fn));
+    // `@event(cancelable)` (#1035) passes `cancelable: true`, and the emitter returns what the dispatch
+    // returns: false when a listener refused it, as `ctx.emit` answers in a TypeScript component.
     for (const e of emitters) {
-        parts.push(`    const ${e.fn} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${e.bubbles ? ', { bubbles: true }' : ''});`);
+        const opts = [e.bubbles ? 'bubbles: true' : '', e.cancelable ? 'cancelable: true' : ''].filter(Boolean);
+        parts.push(`    const ${e.fn} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${opts.length > 0 ? `, { ${opts.join(', ')} }` : ''});`);
     }
 
     // Late signals: those reading a body-local, and those reading a late signal. They are

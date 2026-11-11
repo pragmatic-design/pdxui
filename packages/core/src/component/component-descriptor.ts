@@ -92,11 +92,19 @@ export interface EventSpec<D> {
     readonly __detail?: D;
     /** Whether it bubbles (and is composed): false unless declared, as `ctx.emit` does (#138). */
     readonly bubbles?: boolean;
+    /** Whether a listener can refuse it with `preventDefault()`; `ctx.emit` then answers false (#1035). */
+    readonly cancelable?: boolean;
 }
 
-/** Declare an event: `event<number>()`, `event<void>({ bubbles: true })` for one ancestors hear. */
-export function event<D = void>(options?: { bubbles?: boolean }): EventSpec<D> {
-    return options?.bubbles === true ? { bubbles: true } : {};
+/**
+ * Declare an event: `event<number>()`; `event<void>({ bubbles: true })` for one ancestors hear;
+ * `event<Move>({ cancelable: true })` for one a listener can refuse, which `ctx.emit` answers false.
+ */
+export function event<D = void>(options?: { bubbles?: boolean; cancelable?: boolean }): EventSpec<D> {
+    const spec: { bubbles?: boolean; cancelable?: boolean } = {};
+    if (options?.bubbles === true) spec.bubbles = true;
+    if (options?.cancelable === true) spec.cancelable = true;
+    return spec;
 }
 
 /**

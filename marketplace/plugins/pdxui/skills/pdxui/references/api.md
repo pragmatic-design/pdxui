@@ -2006,10 +2006,11 @@ Evaluate a visibility condition against current form values.
 ```ts
 import { event } from '@pdxui/core';
 
-function event(options?: { bubbles?: boolean }): EventSpec<D>
+function event(options?: { bubbles?: boolean; cancelable?: boolean }): EventSpec<D>
 ```
 
-Declare an event: `event<number>()`, `event<void>({ bubbles: true })` for one ancestors hear.
+Declare an event: `event<number>()`; `event<void>({ bubbles: true })` for one ancestors hear;
+`event<Move>({ cancelable: true })` for one a listener can refuse, which `ctx.emit` answers false.
 
 ### `exhaustSignal`
 

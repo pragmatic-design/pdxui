@@ -59,11 +59,26 @@ let opened = $signal(false);
 let counted = $signal(0);
 </script>`;
 
+// A refusable event (#1035): the handler goes on only when nobody refused it.
+const CANCELABLE_CHILD = `<template>
+<button class="move" @click="tryMove()">move</button>
+<p class="moved">{{ moved }}</p>
+</template>
+<script>
+@event(cancelable) 'before-move': { to: string };
+let moved = $signal('no');
+function tryMove() {
+  if (!beforeMove({ to: 'done' })) return;
+  moved = 'yes';
+}
+</script>`;
+
 beforeAll(() => {
     load('ev-child.pdx', CHILD);
     load('ev-parent.pdx', PARENT);
     load('ev-quoted.pdx', QUOTED_CHILD);
     load('ev-quoted-parent.pdx', QUOTED_PARENT);
+    load('ev-cancelable.pdx', CANCELABLE_CHILD);
 });
 afterEach(() => cleanup());
 
@@ -147,5 +162,31 @@ describe('@event with a quoted name, compiled and mounted (#749)', () => {
         expect(parent.querySelector('.counted')?.textContent).toBe('3');
         expect(seen, 'value-change did not reach the document body').not.toBeNull();
         expect(seen!.detail).toBe(3);
+    });
+});
+
+describe('@event(cancelable), compiled and mounted (#1035)', () => {
+    async function mountCancelable(): Promise<HTMLElement> {
+        const el = document.createElement('app-ev-cancelable');
+        document.body.appendChild(el);
+        await tick();
+        return el;
+    }
+
+    it('a listener that calls preventDefault() refuses it: the emitter answers false', async () => {
+        const el = await mountCancelable();
+        let detail: unknown = null;
+        el.addEventListener('before-move', (e) => { detail = (e as CustomEvent).detail; e.preventDefault(); });
+        el.querySelector<HTMLButtonElement>('.move')!.click();
+        await tick();
+        expect(detail).toEqual({ to: 'done' });
+        expect(el.querySelector('.moved')?.textContent, 'the refused move went on').toBe('no');
+    });
+
+    it('control — with nobody refusing, the handler goes on', async () => {
+        const el = await mountCancelable();
+        el.querySelector<HTMLButtonElement>('.move')!.click();
+        await tick();
+        expect(el.querySelector('.moved')?.textContent).toBe('yes');
     });
 });
