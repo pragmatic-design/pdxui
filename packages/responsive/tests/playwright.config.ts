@@ -13,7 +13,8 @@ export default defineConfig({
     // first attempt and passes on the second: exit 0 without this, exit 1 with it.
     failOnFlakyTests: true,
     workers: process.env.CI ? 1 : undefined,
-    reporter: [['html'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // `open: 'never'`: the default serves the report on a failure and waits for Ctrl+C (#1025).
+    reporter: [['html', { open: 'never' }], ['../../../scripts/lib/keep-failed-runs.mjs']],
     use: {
         trace: 'on-first-retry',
     },

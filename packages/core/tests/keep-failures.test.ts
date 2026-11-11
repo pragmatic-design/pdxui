@@ -131,6 +131,33 @@ describe('the reporter names a known intermittent failure (#1013)', () => {
         expect(lines.filter((l) => l.startsWith('[known-failure]')).map((l) => l.slice(0, 20))).toEqual(['[known-failure] #611']);
     });
 
+    it('a run ended by its global timeout is #1025, naming the tests still running', () => {
+        // Measured on Playwright 1.58.2: a global timeout reaches a reporter as onError, coloured,
+        // and the test it cut off never gets an onTestEnd.
+        const out = join(root, 'test-results');
+        mkdirSync(join(out, 'a'), { recursive: true });
+        const lines: string[] = [];
+        const log = vi.spyOn(console, 'log').mockImplementation((line: string) => { lines.push(line); });
+        try {
+            const reporter = new KeepFailedRuns();
+            reporter.onBegin({ configFile: join(root, 'tests', 'playwright.config.ts'), projects: [{ outputDir: out }] });
+            const done = { id: 'd', location: { file: join(root, 'tests', 'a.spec.ts') }, title: 'ends', expectedStatus: 'passed' };
+            const stuck = { id: 's', location: { file: join(root, 'tests', 'variant-bound.spec.ts') }, title: 'never ends', expectedStatus: 'passed' };
+            reporter.onTestBegin(done);
+            reporter.onTestBegin(stuck);
+            reporter.onTestEnd(done, { status: 'passed' });
+            reporter.onError({ message: '\u001b[31mTimed out waiting 300s for the test suite to run\u001b[39m' });
+            reporter.onError({ message: '\u001b[31mTimed out waiting 300s for the teardown for test suite to run\u001b[39m' });
+            reporter.onEnd({ status: 'timedout' });
+        } finally {
+            log.mockRestore();
+        }
+        const known = lines.filter((l) => l.startsWith('[known-failure]'));
+        expect(known).toHaveLength(1);
+        expect(known[0]).toMatch(/^\[known-failure\] #1025 .*playwright\.config\.ts › still running: variant-bound\.spec\.ts › never ends/);
+        expect(known[0]).not.toContain('a.spec.ts › ends');
+    });
+
     it('an unrelated failure is kept, and named as nothing known', () => {
         const { lines, kept } = run(failed(join(root, 'tests', 'customers.spec.ts'), 'sorts', 'Error: expect(received).toBe(expected)'));
         expect(lines.filter((l) => l.startsWith('[known-failure]'))).toEqual([]);
@@ -178,5 +205,16 @@ describe('every Playwright config keeps its failed runs', () => {
     it('none names it as a global teardown any more', () => {
         const stale = found.filter(({ file }) => /globalTeardown[^\n]*keep-failed-runs/.test(readFileSync(file, 'utf8'))).map(({ rel }) => rel);
         expect(stale).toEqual([]);
+    });
+
+    it('no html reporter opens itself on a failure (#1025)', () => {
+        // The html reporter's default, `open: 'on-failure'`, serves the report outside CI and waits for
+        // Ctrl+C: in the pre-push, a failed run is a hang with the failure behind it.
+        const bare = found.filter(({ file }) => {
+            const src = readFileSync(file, 'utf8');
+            const htmls = [...src.matchAll(/\[\s*['"]html['"]\s*(?:,\s*\{([^}]*)\})?\s*\]/g)];
+            return htmls.some((m) => !/open:\s*['"]never['"]/.test(m[1] ?? ''));
+        }).map(({ rel }) => rel);
+        expect(bare, 'these configs serve their report and wait when a run fails').toEqual([]);
     });
 });

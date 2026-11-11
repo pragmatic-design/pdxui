@@ -83,6 +83,14 @@ export const KNOWN = [
         matches: (f) => /removed instances are still alive after a GC/.test(f.error),
     },
     {
+        issue: 1025,
+        says: 'a browser suite that stopped moving until its global timeout ended it',
+        evidence: 'the tests still running, named here, and their traces in the kept folder',
+        // Playwright's own wording for the run's timeout; its teardown's ("…for the teardown for test
+        // suite to run") follows it and is not a second occurrence.
+        matches: (f) => /Timed out waiting \d+s for the test suite to run/.test(f.error),
+    },
+    {
         issue: 991,
         says: 'a fast vitest test timed out under the gate\'s load',
         evidence: 'the [slow-test] line just above: its reading names what held the process',

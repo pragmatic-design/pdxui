@@ -19,7 +19,9 @@
 //
 // It also names a known intermittent failure (#1013): each failed test is matched against
 // `known-failures.mjs`, and a match prints `[known-failure] #n …` with the kept folder and writes
-// `known-failures.json` into it. That line means: reopen #n with what the folder holds.
+// `known-failures.json` into it. That line means: reopen #n with what the folder holds. An error
+// outside any test, the run's global timeout among them, is matched too, titled with the tests it
+// cut off (#1025).
 
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
@@ -69,23 +71,52 @@ function failureOf(test, result) {
     };
 }
 
+/** Playwright colours the errors it reports outside a test. */
+const ANSI = /\u001b\[[0-9;]*m/g;
+
 /** The reporter: each project's output folder, once, kept beside it as `<folder>-kept`. */
 export default class KeepFailedRuns {
     /** @type {string[]} */
     #outputDirs = [];
     /** @type {ReturnType<typeof failureOf>[]} */
     #failures = [];
+    /** @type {string} */
+    #configFile = 'the Playwright config';
+    /** The tests begun and not ended, by id: what a run's timeout cut off gets no onTestEnd. @type {Map<string, string>} */
+    #running = new Map();
 
-    /** @param {{ projects: { outputDir: string }[] }} config Playwright's FullConfig. */
+    /** @param {{ configFile?: string, projects: { outputDir: string }[] }} config Playwright's FullConfig. */
     onBegin(config) {
         this.#outputDirs = [...new Set(config.projects.map((p) => p.outputDir))];
+        if (config.configFile) this.#configFile = config.configFile;
+    }
+
+    /** @param {{ id: string, location: { file: string }, title: string }} test Playwright's TestCase. */
+    onTestBegin(test) {
+        this.#running.set(test.id, `${basename(test.location.file)} › ${test.title}`);
     }
 
     /**
-     * @param {{ location: { file: string }, title: string, expectedStatus: string }} test Playwright's TestCase.
+     * An error outside any test: the run's global timeout arrives here, and only here (#1025). It is
+     * matched as a failure of the config, titled with the tests it cut off.
+     * @param {{ message?: string, value?: string }} error Playwright's TestError.
+     */
+    onError(error) {
+        const running = [...this.#running.values()];
+        this.#failures.push({
+            file: this.#configFile,
+            title: running.length > 0 ? `still running: ${running.join(', ')}` : 'no test running',
+            error: (error.message ?? error.value ?? '').replace(ANSI, ''),
+            probe: null,
+        });
+    }
+
+    /**
+     * @param {{ id?: string, location: { file: string }, title: string, expectedStatus: string }} test Playwright's TestCase.
      * @param {{ status: string, errors?: { message?: string }[], attachments?: { name: string, body?: Buffer }[] }} result
      */
     onTestEnd(test, result) {
+        this.#running.delete(test.id);
         if (result.status === test.expectedStatus || result.status === 'skipped') return;
         this.#failures.push(failureOf(test, result));
     }
