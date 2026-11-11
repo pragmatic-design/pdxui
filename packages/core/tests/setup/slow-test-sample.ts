@@ -11,6 +11,7 @@
 import { performance, PerformanceObserver, type EventLoopUtilization } from 'node:perf_hooks';
 import { freemem } from 'node:os';
 import { getHeapStatistics } from 'node:v8';
+import { knownFailureLines } from '../../../../scripts/lib/known-failures.mjs';
 
 /** A failed test over this long gets a record: under vitest's 5 s timeout, over every scan alone. */
 export const SLOW_TEST_MS = 2000;
@@ -86,4 +87,12 @@ export function describeSample(start: Sample, end: Sample): SampleReport {
 /** The line the gate log carries, searchable by its prefix. */
 export function recordLine(test: string, file: string, report: SampleReport): string {
     return `[slow-test] ${JSON.stringify({ test, file, ...report })}`;
+}
+
+/**
+ * The record, and after it the known failure it is (`scripts/lib/known-failures.mjs`, #1013): a fast
+ * test timing out in the gate is #991 coming back, and the gate says so instead of someone recognising it.
+ */
+export function recordLines(test: string, file: string, report: SampleReport, error: string): string[] {
+    return [recordLine(test, file, report), ...knownFailureLines({ file, title: test, error, slowTest: report }, 'this log')];
 }

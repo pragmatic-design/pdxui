@@ -13,6 +13,11 @@ export function keepFailures(results: string, keptRoot: string, stamp: string, s
 /** The reporter: each project's output folder, once, kept beside it as `<folder>-kept`. */
 export default class KeepFailedRuns {
     onBegin(config: { projects: { outputDir: string }[] }): void;
+    /** A failed test, matched against the known intermittent failures when the run ends (#1013). */
+    onTestEnd(
+        test: { location: { file: string }; title: string; expectedStatus: string },
+        result: { status: string; errors?: { message?: string; value?: string }[]; attachments?: { name: string; body?: Buffer }[] },
+    ): void;
     onEnd(result: { status: RunStatus }): void;
     printsToStdio(): boolean;
 }
