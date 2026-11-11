@@ -2,7 +2,7 @@
 // optical size compensation, RTL mirroring, and accessibility.
 // Renders SVG from registered icon sets, inline SVG, or URL.
 
-import { signal, effect, component, html, prop } from '@pdxui/core';
+import { signal, effect, component, html, prop, DEV, getDefaultIconSet } from '@pdxui/core';
 import { resolveIcon } from '@pdxui/core';
 import { sanitizeSVG } from '../shared/sanitize';
 import { registerPragmaticResolver } from './pragmatic-resolver';
@@ -22,6 +22,21 @@ export { defineIcons } from './icon-map';
 registerPragmaticResolver();
 
 const SIZES: Record<string, number> = { xs: 12, sm: 16, md: 20, lg: 24, xl: 32 };
+
+/** The `set/name` pairs already warned about: a list of 100 rows with one wrong icon says it once. */
+const warnedUnknown = new Set<string>();
+
+/** In development, a name its set does not have, once per name and set (#1017): otherwise it draws nothing, in silence. */
+function warnUnknown(name: string, set: string): void {
+    // First, so a production build folds the whole body away.
+    if (!DEV) return;
+    const setName = set || getDefaultIconSet() || '';
+    const key = `${setName}/${name}`;
+    if (warnedUnknown.has(key)) return;
+    warnedUnknown.add(key);
+    console.warn(`[pdx-icon] "${name}" is not an icon of the "${setName}" set, so nothing is drawn.`
+        + (setName === 'pragmatic' ? ` The set's names: getPragmaticIconNames() from '@pdxui/ui/icon/pragmatic-icons'.` : ''));
+}
 
 /**
  * An icon drawn as SVG from a registered set, inline markup or a URL, with accessibility built in.
@@ -112,7 +127,11 @@ component('pdx-icon', {
             if (nameProp) {
                 resolveIcon(nameProp, setProp || undefined).then(result => {
                     if (run !== drawRun) return;
-                    if (!result) { el.innerHTML = ''; return; }
+                    if (!result) {
+                        el.innerHTML = '';
+                        warnUnknown(nameProp, setProp);
+                        return;
+                    }
                     if (typeof result === 'string') {
                         el.innerHTML = sanitizeSVG(result);
                     } else {

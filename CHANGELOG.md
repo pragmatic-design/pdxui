@@ -1539,6 +1539,10 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `<pdx-icon>` warns in development when a name is not in its set, for any set, once per name and
+  set (#1017). The «pragmatic» resolver warned on every draw — a list of 100 rows with one wrong icon
+  warned 100 times — and a set registered with `registerIconSet` drew nothing in silence.
+
 - A template that reads a `<script>` name starting with `_` is an error, `PDX_PRIVATE_REF` (#1016).
   Such a name is private to the script and the setup does not return it, but it counted as declared,
   so nothing said so and the read failed at runtime (`ctx._x is not a function`). Props, events,
