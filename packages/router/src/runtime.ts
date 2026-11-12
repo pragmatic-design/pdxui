@@ -8,7 +8,7 @@
 // holds the build's table.
 
 import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource, setDevtoolsLoaderSource } from '@pdxui/core';
-import { saveScrollPosition as saveScroll } from '@pdxui/core';
+import { saveScrollPosition as saveScroll, setLocationSource } from '@pdxui/core';
 import { compileMatcher } from './matcher';
 import { clearLoaders } from './loaders';
 import { forgetKeptResults } from './loader-cache';
@@ -62,6 +62,10 @@ export function createRouter(routes: RouteConfig[], options?: string | RouterOpt
     // Backward compat: createRouter(routes, '/base') still works
     configureRouter(typeof options === 'string' ? { basePath: options } : options);
     config.matcher = compileMatcher(routes);
+    // Core's current location is this router's path from now on (#1023): `<pdx-app-shell>` reads it
+    // through core, because `@pdxui/ui` does not depend on this package. A navigation is a
+    // `history.pushState`, which no listener of the address bar would see.
+    setLocationSource(() => _path());
 
     if (!isBrowser) return;
     _routerCleanup = listen();
@@ -105,6 +109,8 @@ export function configureRouter(options?: RouterOptions): void {
 export function destroyRouter(): void {
     _routerCleanup?.();
     _routerCleanup = null;
+    // No router, no router path: core's current location is the address bar's again.
+    setLocationSource(null);
     // A destroyed router holds no page, so it holds no page's data. Without this the loader map
     // outlives the router that filled it and the next one starts with somebody else's records.
     clearLoaders();

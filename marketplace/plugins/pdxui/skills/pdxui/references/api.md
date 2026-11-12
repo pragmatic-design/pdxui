@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-479 value exports.
+481 value exports.
 
 ### `__adoptStyles`
 
@@ -3358,6 +3358,17 @@ function loadTranslations(loc: string, messages: Record<string, unknown>): void
 Load translations for a locale. Flattens nested objects to dot notation.
 Can be called multiple times to merge translations.
 
+### `locationPath`
+
+```ts
+import { locationPath } from '@pdxui/core';
+
+function locationPath(): string
+```
+
+The current path: the router's when it runs, else the address bar's. Reactive: a reader re-runs on
+every navigation, and when a source is named after it first read.
+
 ### `logMiddleware`
 
 ```ts
@@ -4984,6 +4995,17 @@ setLocaleStrings({
     datepicker: { today: 'Oggi', clear: 'Cancella' },
     dialog: { close: 'Chiudi' },
 });
+
+### `setLocationSource`
+
+```ts
+import { setLocationSource } from '@pdxui/core';
+
+function setLocationSource(source: (() => string) | null): void
+```
+
+Name where the current path comes from: `@pdxui/router` does, when it loads. An application with a
+router of its own passes its path signal; `null` goes back to the address bar.
 
 ### `setNestedValue`
 

@@ -7,7 +7,7 @@ parent: api
 
 # Browser and device API
 
-Storage, online and idle state, the title and head, media queries, scroll, the splash screen, bottom sheets, pull-to-refresh, safe areas and the route trail. 20 exports, from `@pdxui/core`.
+Storage, online and idle state, the title and head, media queries, scroll, the splash screen, bottom sheets, pull-to-refresh, safe areas and the route trail. 22 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -41,6 +41,17 @@ function isSplashUp(): boolean
 ```
 
 Whether the start-up splash is on screen and not yet leaving: the app's first frames are its.
+
+## `locationPath`
+
+```ts
+import { locationPath } from '@pdxui/core';
+
+function locationPath(): string
+```
+
+The current path: the router's when it runs, else the address bar's. Reactive: a reader re-runs on
+every navigation, and when a source is named after it first read.
 
 ## `restoreScrollPosition`
 
@@ -84,6 +95,17 @@ function scrollTo(target: string | number | Element, options?: { behavior?: Scro
 ```
 
 Scroll to a target: CSS selector, element, or Y position.
+
+## `setLocationSource`
+
+```ts
+import { setLocationSource } from '@pdxui/core';
+
+function setLocationSource(source: (() => string) | null): void
+```
+
+Name where the current path comes from: `@pdxui/router` does, when it loads. An application with a
+router of its own passes its path signal; `null` goes back to the address bar.
 
 ## `setRouteTrail`
 

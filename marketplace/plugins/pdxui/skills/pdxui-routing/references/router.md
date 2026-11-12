@@ -420,6 +420,20 @@ routeTrail();        // RouteCrumb[] — a signal: read it in a template or an e
 empties it. An application calls neither — they are there for a screen that drives its own
 navigation without this router, and for a test that wants a trail without one.
 
+The current path is published the same way, for a component that lights the entry of the page in
+front of you:
+
+```ts
+import { locationPath, setLocationSource } from '@pdxui/core';
+
+locationPath();      // string — the router's path while it runs, a signal like currentPath()
+```
+
+`createRouter` names its path as the source and `destroyRouter` takes it back. With no router,
+`locationPath()` is the address bar's path and follows the back and forward buttons. An app with a
+router of its own calls `setLocationSource(() => itsPath())` once, because a `history.pushState`
+fires no event anybody could listen to.
+
 ## One chunk per page
 
 A route is a **split point**. `@page` makes the page its own JavaScript chunk, and the browser
