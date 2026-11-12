@@ -15,17 +15,27 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
-const PAGES = join(__dirname, '..', 'demo', 'showcase-new', 'pages');
+const REPO = join(__dirname, '..', '..', '..');
+const PAGES = join(REPO, 'packages', 'compiler', 'demo', 'showcase-new', 'pages');
 
-/** Every `.pdx` under the showcase's pages, sections included. */
-function pdxFiles(dir: string, out: string[] = []): string[] {
+/** Every file under `dir` whose name `match` accepts, subfolders included unless `deep` is false. */
+function filesIn(dir: string, match: (name: string) => boolean, deep = true, out: string[] = []): string[] {
     for (const name of readdirSync(dir)) {
         const full = join(dir, name);
-        if (statSync(full).isDirectory()) pdxFiles(full, out);
-        else if (name.endsWith('.pdx')) out.push(full);
+        if (statSync(full).isDirectory()) { if (deep) filesIn(full, match, deep, out); }
+        else if (match(name)) out.push(full);
     }
     return out;
 }
+
+// The markup the same vocabulary reaches beyond the demos (#1047): the certification manifests'
+// scenarios, the hand-written scenario pages (the generated ones are the manifests'), and the
+// builder's preview.
+const FIXTURES = [
+    ...filesIn(join(REPO, 'packages', 'responsive', 'tests', 'manifests'), (n) => n.endsWith('.manifest.ts'), false),
+    ...filesIn(join(REPO, 'packages', 'ui', 'tests', 'scenarios'), (n) => n.endsWith('.html'), false),
+    ...filesIn(join(REPO, 'packages', 'builder', 'preview'), (n) => n.endsWith('.html'), false),
+];
 
 /** Class names no stylesheet defines anywhere, and what to write instead. */
 const UNDEFINED: Record<string, string> = {
@@ -42,7 +52,7 @@ const TOOLBAR_ONLY = new Set(['pdx-btn-sm', 'pdx-btn-xs']);
 function offences(file: string): string[] {
     const source = readFileSync(file, 'utf8');
     const hasToolbar = /pdx-toolbar/.test(source);
-    const rel = relative(PAGES, file).replace(/\\/g, '/');
+    const rel = relative(REPO, file).replace(/\\/g, '/');
     const found: string[] = [];
     // Match: a static `class="…"` attribute (a bound `:class` is not a literal list). Groups: [1]=the classes
     for (const m of source.matchAll(/(?<![:\w-])class="([^"]*)"/g)) {
@@ -55,7 +65,7 @@ function offences(file: string): string[] {
 }
 
 describe('showcase demos give buttons only classes a stylesheet defines (#1045)', () => {
-    const files = pdxFiles(PAGES);
+    const files = filesIn(PAGES, (n) => n.endsWith('.pdx'));
 
     it('found the demos, so the assertion below is not vacuous', () => {
         expect(files.length).toBeGreaterThan(100);
@@ -63,5 +73,16 @@ describe('showcase demos give buttons only classes a stylesheet defines (#1045)'
 
     it('no class attribute names a class that styles nothing where it is used', () => {
         expect(files.flatMap(offences)).toEqual([]);
+    });
+});
+
+describe('certification fixtures and the builder preview do too (#1047)', () => {
+    it('found them, so the assertion below is not vacuous', () => {
+        expect(FIXTURES.length).toBeGreaterThan(100);
+        expect(FIXTURES.some((f) => f.endsWith('composition.html'))).toBe(true);
+    });
+
+    it('no class attribute names a class that styles nothing where it is used', () => {
+        expect(FIXTURES.flatMap(offences)).toEqual([]);
     });
 });

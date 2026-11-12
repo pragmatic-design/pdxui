@@ -85,7 +85,7 @@ export const navbar: ComponentManifest = {
             // edge: 655 at 390px.
             id: 'navbar-phone',
             title: 'Navbar — collapsed, actions wider than what is left of the bar',
-            html: `<div data-test="nav-box" style="width: 320px"><pdx-navbar data-test="navbar-phone" brand="Enterprise" brand-icon="box" label="App" items='[{"key":"home","label":"Home","href":"#","active":true},{"key":"docs","label":"Documentation","href":"#"}]'><div class="pdx-input-wrap" style="max-width: 220px"><input class="pdx-input" type="text" placeholder="Search..." aria-label="Search"></div><button class="pdx-navbar-icon-btn" type="button" aria-label="Notifications">N</button><button class="pdx-navbar-icon-btn" type="button" aria-label="Settings">S</button><button class="pdx-ghost pdx-btn-sm" type="button" data-test="nav-user">John Doe</button></pdx-navbar></div>`,
+            html: `<div data-test="nav-box" style="width: 320px"><pdx-navbar data-test="navbar-phone" brand="Enterprise" brand-icon="box" label="App" items='[{"key":"home","label":"Home","href":"#","active":true},{"key":"docs","label":"Documentation","href":"#"}]'><div class="pdx-input-wrap" style="max-width: 220px"><input class="pdx-input" type="text" placeholder="Search..." aria-label="Search"></div><button class="pdx-navbar-icon-btn" type="button" aria-label="Notifications">N</button><button class="pdx-navbar-icon-btn" type="button" aria-label="Settings">S</button><button class="pdx-ghost" size="sm" type="button" data-test="nav-user">John Doe</button></pdx-navbar></div>`,
         },
     ],
 

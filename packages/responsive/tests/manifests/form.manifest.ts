@@ -70,7 +70,7 @@ export const form: ComponentManifest = {
                             <input class="pdx-input" type="email" name="email" data-test="control-2" value="ada@example.com" />
                         </pdx-form-field>
                         <pdx-form-actions data-test="actions">
-                            <button type="button" class="pdx-btn pdx-primary" data-test="submit">Save</button>
+                            <button type="button" class="pdx-primary" data-test="submit">Save</button>
                         </pdx-form-actions>
                     </pdx-form>
                 </div>`,
