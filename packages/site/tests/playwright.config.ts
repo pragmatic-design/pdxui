@@ -16,6 +16,7 @@
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -54,6 +55,9 @@ export default defineConfig({
     // A failed test's fixtures over 5 s go to slow-fixtures.txt, kept with its trace (#758), and the
     // preview's sockets around it to sockets.jsonl (#617).
     reporter: [['list'], ['./slow-fixtures-reporter.ts'], ['../../../scripts/lib/socket-sampler.mjs'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040). Slowest run measured:
+    // the whole suite, 3.7 min, locally under the gate, 2026-11-12 (CI runs a third of it, 3.0 min).
+    globalTimeout: suiteTimeout(222),
     // The test's own: page creation has a timeout of its own, in fixture.ts (#758).
     timeout: 30_000,
     use: {

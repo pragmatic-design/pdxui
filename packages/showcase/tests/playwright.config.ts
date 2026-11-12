@@ -10,6 +10,7 @@
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { sessionFile } from './session';
@@ -45,6 +46,9 @@ export default defineConfig({
     workers: WORKERS,
     // The preview's sockets around a failed test, in sockets.jsonl, before the keeper copies it (#617).
     reporter: [['list'], ['../../../scripts/lib/socket-sampler.mjs'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040). Slowest run measured:
+    // the whole suite, 3.2 min, locally under the gate, 2026-11-12 (CI runs half of it, 3.0 min).
+    globalTimeout: suiteTimeout(192),
     timeout: 30_000,
     // Every route is behind the login: the suite signs in once, and every context starts
     // signed in. A guest's spec says so with `test.use({ storageState: GUEST })`.

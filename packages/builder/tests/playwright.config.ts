@@ -1,5 +1,6 @@
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { CUSTOM_THEMES_DIR, CUSTOM_THEMES_ENV } from './custom-themes-dir';
@@ -39,6 +40,9 @@ export default defineConfig({
     fullyParallel: true,
     workers: WORKERS,
     reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040). Slowest run measured:
+    // 1.9 min, on CI, 2026-11-12 (1.2 min locally under the gate).
+    globalTimeout: suiteTimeout(114),
     timeout: 30_000,
     // The first navigation pays for Vite transforming the app; under the parallel gate that cost
     // exceeds a test's budget. Paid once, on the app's readiness condition — see warm-up.ts.

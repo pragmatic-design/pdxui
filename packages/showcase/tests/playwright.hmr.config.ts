@@ -10,6 +10,7 @@
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { sessionFile } from './session';
@@ -24,6 +25,9 @@ export default defineConfig({
     // Derived, as `playwright-worker-budget.test.ts` asks; the serial spec uses one of them.
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
     reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040). Slowest run measured:
+    // 17 s, locally under the gate, 2026-11-12 (6 s on CI).
+    globalTimeout: suiteTimeout(17),
     timeout: 60_000,
     globalSetup: './session.ts',
     use: { baseURL: `http://localhost:${PORT}`, trace: 'off', locale: 'en-US', storageState: sessionFile(PORT) },
