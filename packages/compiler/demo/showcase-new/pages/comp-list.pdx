@@ -22,6 +22,8 @@
 
     <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper>
 
+    <app-demo-comp-list-comment-thread class="demo-section"></app-demo-comp-list-comment-thread>
+
     <section>
       <h2 class="pdx-txt-heading section-heading">Props</h2>
       <div class="options-table">
