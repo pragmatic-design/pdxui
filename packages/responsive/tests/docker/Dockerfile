@@ -13,25 +13,21 @@ ENV FC_FONTATIONS=1 DBUS_SESSION_BUS_ADDRESS=disabled:
 # Deterministic fonts for the themes + fontconfig with fixed hinting/antialiasing.
 #
 # MANROPE IS REQUIRED, not decorative: --pdx-font-heading is
-# `'Manrope', system-ui, sans-serif`, and without the package fontconfig resolves the whole chain to
+# `'Manrope', system-ui, sans-serif`, and without its file fontconfig resolves the whole chain to
 # WenQuanYi Zen Hei — a CJK font present in the base image. Every heading of every baseline would be
 # rendered in a Chinese font: heavier, with taller line boxes, and a glyph coverage that draws arrows
 # where a Latin font would draw nothing. See the test
 # tests/integration/visual-regression/fonts.spec.ts, which fails if a family the tokens declare
 # does not resolve to itself.
 #
-# Pinned versions: noble is a frozen release, so today they match the candidate — but written out,
-# the image stops depending on that, and an archive that moves breaks the build instead of changing
-# the screenshots silently.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        fontconfig=2.15.0-1.1ubuntu2 \
-        fonts-inter=4.0+ds-1 \
-        fonts-jetbrains-mono=2.304+ds-4 \
-        fonts-manrope=4.504+git20201211-3 \
-        fonts-roboto=2:0~20170802-3 \
-    && rm -rf /var/lib/apt/lists/* \
-    && mkdir -p /etc/fonts/conf.d
+# The fonts are files in the repository, not packages: an apt mirror that is slow or down no longer
+# fails the build, and nothing outside the repository can change a screenshot (#1032). They are the
+# files of the noble packages fonts-inter 4.0+ds-1, fonts-jetbrains-mono 2.304+ds-4,
+# fonts-manrope 4.504+git20201211-3 and fonts-roboto-unhinted 2:0~20170802-3, and only the weights
+# the visual suite and the font guard open: measured by tracing the files Chromium opens over the
+# whole run. A weight a theme starts to use is added from the same package; each folder keeps the
+# package's copyright and licence. fontconfig is already in the base image.
+COPY packages/responsive/tests/docker/fonts /usr/share/fonts/pdx
 COPY packages/responsive/tests/docker/fonts.conf /etc/fonts/local.conf
 RUN fc-cache -f
 

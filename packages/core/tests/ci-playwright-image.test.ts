@@ -17,7 +17,7 @@
 // bound to ::1 and refused, then with the option bound to 127.0.0.1 and answered.
 
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = join(__dirname, '../../..');
@@ -110,5 +110,34 @@ describe('the browser jobs run in the Playwright image of the locked version (#9
     it('the visual job\'s Dockerfile starts from the same image', () => {
         const from = read('packages/responsive/tests/docker/Dockerfile').split(/\r?\n/).filter((line) => line.startsWith('FROM '));
         expect(from).toEqual([`FROM ${image}`]);
+    });
+});
+
+// The visual image installed its fonts with apt while it built (#1032). A slow or unreachable apt
+// mirror failed the build before any screenshot was taken, and a package that moved could change
+// every baseline. The fonts are files in the repository, copied into the image, so building it
+// downloads nothing beyond the base image and the workspace's own dependencies.
+describe('the visual image installs nothing from apt (#1032)', () => {
+    const dockerfile = read('packages/responsive/tests/docker/Dockerfile');
+    const fontsDir = 'packages/responsive/tests/docker/fonts';
+
+    it('no instruction of the Dockerfile runs apt', () => {
+        const instructions = dockerfile.split(/\r?\n/).filter((line) => !line.trimStart().startsWith('#'));
+        expect(instructions.join('\n')).not.toMatch(/\bapt(-get)?\b/);
+    });
+
+    it('the vendored fonts are copied into the image', () => {
+        expect(dockerfile).toMatch(new RegExp(`^COPY ${fontsDir} /usr/share/fonts/pdx$`, 'm'));
+    });
+
+    it('every vendored family carries its licence', () => {
+        const families = readdirSync(join(root, fontsDir), { withFileTypes: true }).filter((d) => d.isDirectory());
+        expect(families.map((d) => d.name).sort()).toEqual(['inter', 'jetbrains-mono', 'manrope', 'roboto']);
+        for (const family of families) {
+            const files = readdirSync(join(root, fontsDir, family.name));
+            expect(files.filter((f) => /\.(otf|ttf)$/.test(f)).length, `${family.name}: no font file`).toBeGreaterThan(0);
+            const licence = files.filter((f) => /^(COPYRIGHT|LICENSE)/.test(f)).map((f) => read(`${fontsDir}/${family.name}/${f}`)).join('\n');
+            expect(licence, `${family.name}: no licence text`).toMatch(/SIL OPEN FONT LICENSE|Apache License/i);
+        }
     });
 });
