@@ -3830,6 +3830,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/nav-menu', label: 'NavMenu' },
         ]},
         { key: 'nav-app', label: 'App Navigation', icon: 'compass', children: [
+          { key: '/components/app-shell', label: 'AppShell' },
           { key: '/components/navbar', label: 'Navbar' },
           { key: '/components/sidebar', label: 'Sidebar' },
           { key: '/components/breadcrumb', label: 'Breadcrumb' },
@@ -3951,7 +3952,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:310" });
+}, { name: "app.pdx:311" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -4109,6 +4110,39 @@ component('app-comp-app-layout', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/app-layout",tag:"app-comp-app-layout",title:"AppLayout — PDX Components",lazy:true,file:'./comp-app-layout.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-app-shell.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-2c9liu");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-2c9liu"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-2c9liu]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">App Shell</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-app-shell&gt;</code> — an application\\'s chrome drawn from a navigation model: a rail of the reader\\'s own entries\\n      (home, favourites, recents), a searchable catalogue of every entry the reader may see, a bar and the page. A choice goes\\n      through the router when one runs.</p>  <app-demo-comp-app-shell-basic class="demo-section"></app-demo-comp-app-shell-basic>  <app-demo-comp-app-shell-collapsed class="demo-section"></app-demo-comp-app-shell-collapsed>  <app-demo-comp-app-shell-profile class="demo-section"></app-demo-comp-app-shell-profile>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>items</code><span>{ key, label, items: Entry[] }[]</span><span>The catalogue\\'s groups. An entry is <code>{ key, label, href, icon?, badge?, permission?, exact? }</code></span></div> <div class="opt-row"><code>home</code><span>Entry</span><span>The rail\\'s first entry, never a favourite</span></div> <div class="opt-row"><code>default-favourites</code><span>string[]</span><span>The favourites of a first visit, by key</span></div> <div class="opt-row"><code>recents</code><span>number</span><span>How many recents the rail shows (default 5; 0: none)</span></div> <div class="opt-row"><code>user</code><span>string</span><span>Whose recents: each person keeps their own</span></div> <div class="opt-row"><code>storage-key</code><span>string</span><span>The localStorage prefix for the rail, favourites and recents</span></div> <div class="opt-row"><code>collapsed</code><span>boolean</span><span>Icons only; a model (<code>::collapsed</code>), kept across visits</span></div> <div class="opt-row"><code>label</code><span>string</span><span>The navigation\\'s accessible name (default «Main navigation»)</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, slots and methods</h3> <div class="options-table"><div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>before-navigate</code><span>{ key, href }</span><span>Cancelable: <code>preventDefault()</code> keeps the shell from following the entry</span></div> <div class="opt-row"><code>slot="brand"</code><span></span><span>The rail\\'s head</span></div> <div class="opt-row"><code>slot="bar"</code><span></span><span>The top bar: title, search, profile menu</span></div> <div class="opt-row"><code>slot="foot"</code><span></span><span>The rail\\'s foot: environment, version</span></div> <div class="opt-row"><code>openCatalog() · closeCatalog()</code><span></span><span>The catalogue</span></div> <div class="opt-row"><code>openMenu() · closeMenu()</code><span></span><span>The drawer, below 600px</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"><div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div> <div class="opt-row"><code>Tab</code><span></span><span>The rail\\'s entries are one tab stop; the arrows walk them</span></div> <div class="opt-row"><code>ArrowDown</code><span></span><span>From the catalogue\\'s search into its list</span></div> <div class="opt-row"><code>Escape</code><span></span><span>Closes the catalogue, then the drawer; focus returns to what opened it</span></div></div></section></div>'));
+component('app-comp-app-shell', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "App Shell Component" });
+    ctx.el.setAttribute('data-pdx-2c9liu', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/app-shell'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/app-shell",tag:"app-comp-app-shell",title:"App Shell Component",lazy:true,file:'./comp-app-shell.pdx'});
 "
 `;
 
@@ -9838,6 +9872,138 @@ component('app-demo-comp-app-layout-without-border', {
     __el7.addEventListener('click', safeHandler(batchHandler(() => ctx.page3.setRaw('Home')), ctx.el?.tagName?.toLowerCase(), 'click'));
     let __el8w_aria_current = {}; effect(() => { const __b = ctx.page3() === 'About' ? 'page' : null; if (Object.is(__b, __el8w_aria_current)) return; __el8w_aria_current = __b; const __v = __b; if (__v == null || __v === false) __el8.removeAttribute("aria-current"); else { __el8.setAttribute("aria-current", __v === true ? '' : String(__v)); } });
     __el8.addEventListener('click', safeHandler(batchHandler(() => ctx.page3.setRaw('About')), ctx.el?.tagName?.toLowerCase(), 'click'));
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-shell/demo-comp-app-shell-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { shellItems, shellHome } from './data.pdx';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-bgdoe3");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-bgdoe3"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  \\n  @scope ([data-pdx-bgdoe3], [data-pdx-bgdoe3-in]) to ([data-pdx-root] \\u003E *) {:scope .shell-frame, :where(:not([data-pdx-bgdoe3])):scope:is(.shell-frame) {\\n    --pdx-app-shell-height: 520px;\\n    height: 520px;\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-md);\\n    overflow: hidden;\\n    transform: translateZ(0);\\n  }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">A navigation model, drawn: the rail holds Dashboard, the favourites (Tickets on a first visit) and the\\n      lists opened lately; <strong>All</strong> opens every entry, searchable, with a pin beside each. Billing needs a permission\\n      this page does not grant, so it is not drawn. Here <code>before-navigate</code> is refused, so a choice stays on this page.</p> <div class="shell-frame"><pdx-app-shell storage-key="demo-shell-basic"><strong slot="brand" data-pdx-bgdoe3-in>PDX</strong> <span class="pdx-txt-heading" slot="bar" data-pdx-bgdoe3-in>Service desk</span> <span class="pdx-badge pdx-warning" slot="foot" data-pdx-bgdoe3-in>STAGING</span> <p class="pdx-txt-body" data-pdx-bgdoe3-in>Chosen: <strong data-pdx-bgdoe3-in><!----></strong></p></pdx-app-shell></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>const items = [\\n  { key: \\'work\\', label: \\'Work\\', items: [\\n    { key: \\'tickets\\', label: \\'Tickets\\', href: \\'/tickets\\', icon: \\'list\\', badge: 12 },\\n    { key: \\'billing\\', label: \\'Billing\\', href: \\'/billing\\', icon: \\'credit-card\\', permission: \\'billing.read\\' },\\n  ] },\\n];\\n\\n&lt;pdx-app-shell :items="items" :home="home" :default-favourites="[\\'tickets\\']"&gt;\\n  &lt;strong slot="brand"&gt;PDX&lt;/strong&gt;\\n  &lt;span slot="bar"&gt;Service desk&lt;/span&gt;\\n  &lt;pdx-router-outlet&gt;&lt;/pdx-router-outlet&gt;\\n&lt;/pdx-app-shell&gt;</code></pre></details></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild;const __el10=__el6.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling;const __el11=__el10.firstChild.nextSibling;const __t12=__el11.firstChild;return [__el6,__t12];};
+component('app-demo-comp-app-shell-basic', {
+  props: {},
+  setup(ctx) {
+    const __chosen = signal('nothing yet', { name: 'demo-comp-app-shell-basic:chosen' });
+/** The demo stays on its page: the choice is shown, not followed. */
+    function onBeforeNavigate(e) {
+      e.preventDefault();
+      __chosen.setRaw(e.detail.key + ' → ' + e.detail.href);
+    }
+    ctx.el.setAttribute('data-pdx-bgdoe3', '');
+    return { chosen: __chosen, onBeforeNavigate };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el6,__t12]=__walk0(__frag);
+    let __el6w_items = {}; effect(() => { const __b = shellItems; if (Object.is(__b, __el6w_items)) return; __el6w_items = __b; assignBoundProperty(__el6, "items", __b); });
+    let __el6w_home = {}; effect(() => { const __b = shellHome; if (Object.is(__b, __el6w_home)) return; __el6w_home = __b; assignBoundProperty(__el6, "home", __b); });
+    let __el6w_default_favourites = {}; effect(() => { const __b = ['tickets']; if (Object.is(__b, __el6w_default_favourites)) return; __el6w_default_favourites = __b; assignBoundProperty(__el6, "defaultFavourites", __b); });
+    __el6.addEventListener('before-navigate', safeHandler(batchHandler(($event) => ctx.onBeforeNavigate($event)), ctx.el?.tagName?.toLowerCase(), 'before-navigate'));
+    bindInterpolation(__t12,()=>ctx.chosen());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-shell/demo-comp-app-shell-collapsed.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { shellItems, shellHome } from './data.pdx';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-deu0ku");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-deu0ku"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-deu0ku], [data-pdx-deu0ku-in]) to ([data-pdx-root] \\u003E *) {:scope .shell-frame, :where(:not([data-pdx-deu0ku])):scope:is(.shell-frame) {\\n    --pdx-app-shell-height: 420px;\\n    height: 420px;\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-md);\\n    overflow: hidden;\\n    transform: translateZ(0);\\n  }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Collapsed rail</h2> <p class="pdx-txt-small pdx-ink-muted">80px of icons; a group opens as a flyout. The handle on the rail\\'s edge toggles it, and the shell\\n      keeps the choice for the next visit. <code>::collapsed</code> binds it. Below 600px the rail becomes a drawer opened from the bar.</p> <div class="shell-frame"><pdx-app-shell storage-key="demo-shell-collapsed"><strong slot="brand" data-pdx-deu0ku-in>P</strong> <span class="pdx-txt-heading" slot="bar" data-pdx-deu0ku-in>Collapsed: <!----></span> <p class="pdx-txt-body pdx-ink-muted" data-pdx-deu0ku-in>The page.</p></pdx-app-shell></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-app-shell :items="items" ::collapsed="collapsed"&gt;…&lt;/pdx-app-shell&gt;</code></pre></details></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild;const __el7=__el5.firstChild.nextSibling.nextSibling;const __t8=__el7.firstChild.nextSibling;return [__el5,__t8];};
+component('app-demo-comp-app-shell-collapsed', {
+  props: {},
+  setup(ctx) {
+    const __collapsed = signal(true, { name: 'demo-comp-app-shell-collapsed:collapsed' });
+function onBeforeNavigate(e) { e.preventDefault(); }
+    ctx.el.setAttribute('data-pdx-deu0ku', '');
+    return { collapsed: __collapsed, onBeforeNavigate };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el5,__t8]=__walk0(__frag);
+    let __el5w_items = {}; effect(() => { const __b = shellItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
+    let __el5w_home = {}; effect(() => { const __b = shellHome; if (Object.is(__b, __el5w_home)) return; __el5w_home = __b; assignBoundProperty(__el5, "home", __b); });
+    let __el5w_default_favourites = {}; effect(() => { const __b = ['tickets', 'board']; if (Object.is(__b, __el5w_default_favourites)) return; __el5w_default_favourites = __b; assignBoundProperty(__el5, "defaultFavourites", __b); });
+    bindTwoWay(__el5, 'collapsed', ctx.collapsed);
+    __el5.addEventListener('before-navigate', safeHandler(batchHandler(($event) => ctx.onBeforeNavigate($event)), ctx.el?.tagName?.toLowerCase(), 'before-navigate'));
+    bindInterpolation(__t8,()=>ctx.collapsed() ? 'yes' : 'no');
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-app-shell/demo-comp-app-shell-profile.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, getScheme, safeHandler, setScheme, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { shellItems, shellHome } from './data.pdx';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-zbguf4");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-zbguf4"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-zbguf4], [data-pdx-zbguf4-in]) to ([data-pdx-root] \\u003E *) {:scope .shell-frame, :where(:not([data-pdx-zbguf4])):scope:is(.shell-frame) {\\n    --pdx-app-shell-height: 360px;\\n    height: 360px;\\n    border: 1px solid var(--pdx-color-border);\\n    border-radius: var(--pdx-radius-md);\\n    overflow: hidden;\\n    transform: translateZ(0);\\n  }\\n  :scope .bar, :where(:not([data-pdx-zbguf4])):scope:is(.bar) { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-sm); flex: 1; min-width: 0; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">The bar: title and profile menu</h2> <p class="pdx-txt-small pdx-ink-muted">The bar is the app\\'s: a title, a search, and the profile menu with the scheme, the density or the\\n      sign-out. The shell draws none of them; it places what the <code>bar</code> slot holds.</p> <div class="shell-frame"><pdx-app-shell storage-key="demo-shell-profile" collapsed><strong slot="brand" data-pdx-zbguf4-in>P</strong> <div class="bar" slot="bar" data-pdx-zbguf4-in><span class="pdx-txt-heading" data-pdx-zbguf4-in>Tickets</span> <pdx-dropdown-menu label="Ada Lovelace" icon="user" variant="ghost" size="sm" placement="bottom-end" data-pdx-zbguf4-in></pdx-dropdown-menu></div> <p class="pdx-txt-body pdx-ink-muted" data-pdx-zbguf4-in>Scheme: <strong data-pdx-zbguf4-in><!----></strong></p></pdx-app-shell></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-app-shell :items="items"&gt;\\n  &lt;div slot="bar"&gt;\\n    &lt;span&gt;Tickets&lt;/span&gt;\\n    &lt;pdx-dropdown-menu label="Ada Lovelace" icon="user" :items="profileItems" @pdx-select="onProfile"&gt;&lt;/pdx-dropdown-menu&gt;\\n  &lt;/div&gt;\\n  …\\n&lt;/pdx-app-shell&gt;</code></pre></details></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el5=__el4.firstChild;const __el7=__el5.firstChild.nextSibling.nextSibling;const __el9=__el7.firstChild.nextSibling.nextSibling;const __el10=__el7.nextSibling.nextSibling;const __el11=__el10.firstChild.nextSibling;const __t12=__el11.firstChild;return [__el5,__el9,__t12];};
+component('app-demo-comp-app-shell-profile', {
+  props: {},
+  setup(ctx) {
+    const __scheme = signal(getScheme(), { name: 'demo-comp-app-shell-profile:scheme' });
+const profileItems = [
+      { key: 'light', label: 'Light scheme', icon: 'sun' },
+      { key: 'dark', label: 'Dark scheme', icon: 'moon' },
+      { key: 'sep', label: '', type: 'separator' },
+      { key: 'out', label: 'Sign out', icon: 'log-out' },
+    ];
+    
+    
+    
+    
+    function onProfile(e) {
+      const key = e.detail.key;
+      if (key === 'light' || key === 'dark') { setScheme(key); __scheme.setRaw(key); }
+    }
+    
+    function onBeforeNavigate(e) { e.preventDefault(); }
+    ctx.el.setAttribute('data-pdx-zbguf4', '');
+    return { profileItems, scheme: __scheme, onProfile, onBeforeNavigate };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el5,__el9,__t12]=__walk0(__frag);
+    let __el5w_items = {}; effect(() => { const __b = shellItems; if (Object.is(__b, __el5w_items)) return; __el5w_items = __b; assignBoundProperty(__el5, "items", __b); });
+    let __el5w_home = {}; effect(() => { const __b = shellHome; if (Object.is(__b, __el5w_home)) return; __el5w_home = __b; assignBoundProperty(__el5, "home", __b); });
+    __el5.addEventListener('before-navigate', safeHandler(batchHandler(($event) => ctx.onBeforeNavigate($event)), ctx.el?.tagName?.toLowerCase(), 'before-navigate'));
+    let __el9w_items = {}; effect(() => { const __b = ctx.profileItems; if (Object.is(__b, __el9w_items)) return; __el9w_items = __b; assignBoundProperty(__el9, "items", __b); });
+    __el9.addEventListener('pdx-select', safeHandler(batchHandler(($event) => ctx.onProfile($event)), ctx.el?.tagName?.toLowerCase(), 'pdx-select'));
+    bindInterpolation(__t12,()=>ctx.scheme());
     return __frag;
   })(),
 });
@@ -30495,7 +30661,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 117 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 118 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

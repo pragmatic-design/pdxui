@@ -6,6 +6,7 @@ export const LOADERS = new Map([
     ['pdx-affix', () => import('@pdxui/ui/affix')],
     ['pdx-alert-dialog', () => import('@pdxui/ui/alert-dialog')],
     ['pdx-app-layout', () => import('@pdxui/ui/app-layout')],
+    ['pdx-app-shell', () => import('@pdxui/ui/app-shell')],
     ['pdx-aspect-ratio', () => import('@pdxui/ui/aspect-ratio')],
     ['pdx-auto-form', () => import('@pdxui/ui/auto-form')],
     ['pdx-autocomplete', () => import('@pdxui/ui/autocomplete')],

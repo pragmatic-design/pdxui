@@ -213,6 +213,10 @@
       "development": "./src/components/layered/signature-pad.css",
       "default": "./dist/components/signature-pad.css"
     },
+    "./components/app-shell": {
+      "development": "./src/components/layered/app-shell.css",
+      "default": "./dist/components/app-shell.css"
+    },
     "./components/relation-picker": {
       "development": "./src/components/layered/relation-picker.css",
       "default": "./dist/components/relation-picker.css"

@@ -38,6 +38,24 @@ export function locationPath(): string {
     return source ? source() : addressPath();
 }
 
+let _navigator: ((href: string) => void) | null = null;
+
+/**
+ * Follow `href` with the router, when one has named itself; `false` when none has, and the caller lets
+ * its link do the browser's work. A component that draws links (`<pdx-app-shell>`) calls it on a
+ * click: where the Navigation API does not hand the click to the router, the link would reload the page.
+ */
+export function navigateTo(href: string): boolean {
+    if (!_navigator) return false;
+    _navigator(href);
+    return true;
+}
+
+/** Name what follows a link: `@pdxui/router` does, in `createRouter`; `null` takes it back. */
+export function setNavigator(navigator: ((href: string) => void) | null): void {
+    _navigator = navigator;
+}
+
 /**
  * Name where the current path comes from: `@pdxui/router` does, when it loads. An application with a
  * router of its own passes its path signal; `null` goes back to the address bar.

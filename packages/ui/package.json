@@ -642,6 +642,11 @@
       "types": "./dist/localized-input/pdx-localized-input.d.ts",
       "import": "./dist/localized-input/pdx-localized-input.js"
     },
+    "./app-shell": {
+      "development": "./src/app-shell/pdx-app-shell.pdx",
+      "types": "./dist/app-shell/pdx-app-shell.d.ts",
+      "import": "./dist/app-shell/pdx-app-shell.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

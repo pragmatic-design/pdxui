@@ -8,14 +8,14 @@
 // holds the build's table.
 
 import { DEV, setDevtoolsRouteSource, recordDevtoolsNavigation, setDevtoolsMapSource, setDevtoolsLoaderSource } from '@pdxui/core';
-import { saveScrollPosition as saveScroll, setLocationSource } from '@pdxui/core';
+import { saveScrollPosition as saveScroll, setLocationSource, setNavigator } from '@pdxui/core';
 import { compileMatcher } from './matcher';
 import { clearLoaders } from './loaders';
 import { forgetKeptResults } from './loader-cache';
 import { installRouteTable, toRouteConfig } from './route-table';
 import { isBrowser, _path, _params, _query, _route, _navError, _state, _loaderState, _loaderError, _loaderStale, _loaderData } from './state';
 import { isWritingUrl, writeUrl, primaryOutlet } from './address';
-import { config, handleNavigation, stripBase, onAfterNavigate, guardAnswer } from './navigation';
+import { config, handleNavigation, stripBase, onAfterNavigate, guardAnswer, navigate } from './navigation';
 import { routeMap } from './devtools-map';
 import type { RouteConfig, RouterOptions, RouteTable } from './types';
 
@@ -66,6 +66,9 @@ export function createRouter(routes: RouteConfig[], options?: string | RouterOpt
     // through core, because `@pdxui/ui` does not depend on this package. A navigation is a
     // `history.pushState`, which no listener of the address bar would see.
     setLocationSource(() => _path());
+    // And it follows the links a component draws (`navigateTo`): where the Navigation API does not
+    // hand a click to this router, the link would reload the page.
+    setNavigator((href) => navigate.url(href));
 
     if (!isBrowser) return;
     _routerCleanup = listen();
@@ -109,8 +112,10 @@ export function configureRouter(options?: RouterOptions): void {
 export function destroyRouter(): void {
     _routerCleanup?.();
     _routerCleanup = null;
-    // No router, no router path: core's current location is the address bar's again.
+    // No router, no router path: core's current location is the address bar's again, and a link
+    // is the browser's.
     setLocationSource(null);
+    setNavigator(null);
     // A destroyed router holds no page, so it holds no page's data. Without this the loader map
     // outlives the router that filled it and the next one starts with somebody else's records.
     clearLoaders();

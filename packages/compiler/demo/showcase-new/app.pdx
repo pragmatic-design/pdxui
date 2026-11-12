@@ -257,6 +257,7 @@ const componentItems = [
       { key: '/components/nav-menu', label: 'NavMenu' },
     ]},
     { key: 'nav-app', label: 'App Navigation', icon: 'compass', children: [
+      { key: '/components/app-shell', label: 'AppShell' },
       { key: '/components/navbar', label: 'Navbar' },
       { key: '/components/sidebar', label: 'Sidebar' },
       { key: '/components/breadcrumb', label: 'Breadcrumb' },

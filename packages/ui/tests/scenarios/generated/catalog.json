@@ -77,6 +77,25 @@
       ]
     },
     {
+      "name": "app-shell",
+      "tags": [
+        "pdx-app-shell"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "app-shell-basic",
+          "title": "App shell — Basic"
+        },
+        {
+          "id": "app-shell-collapsed",
+          "title": "App shell — Collapsed"
+        }
+      ]
+    },
+    {
       "name": "aspect-ratio",
       "tags": [
         "pdx-aspect-ratio"

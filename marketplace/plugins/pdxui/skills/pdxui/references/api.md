@@ -16,7 +16,7 @@ to make visible.
 
 ## @pdxui/core
 
-481 value exports.
+483 value exports.
 
 ### `__adoptStyles`
 
@@ -3598,6 +3598,18 @@ clicks while `pending()`, under the policies that wait.
 `invalidate` names the cache tags to drop on success, which is how a list refreshes itself after
 an item is created without the caller wiring the two together.
 
+### `navigateTo`
+
+```ts
+import { navigateTo } from '@pdxui/core';
+
+function navigateTo(href: string): boolean
+```
+
+Follow `href` with the router, when one has named itself; `false` when none has, and the caller lets
+its link do the browser's work. A component that draws links (`<pdx-app-shell>`) calls it on a
+click: where the Navigation API does not hand the click to the router, the link would reload the page.
+
 ### `offerPart`
 
 ```ts
@@ -5006,6 +5018,16 @@ function setLocationSource(source: (() => string) | null): void
 
 Name where the current path comes from: `@pdxui/router` does, when it loads. An application with a
 router of its own passes its path signal; `null` goes back to the address bar.
+
+### `setNavigator`
+
+```ts
+import { setNavigator } from '@pdxui/core';
+
+function setNavigator(navigator: ((href: string) => void) | null): void
+```
+
+Name what follows a link: `@pdxui/router` does, in `createRouter`; `null` takes it back.
 
 ### `setNestedValue`
 

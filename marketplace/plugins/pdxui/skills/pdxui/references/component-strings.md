@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 457 keys in 80 components.
+> Generated from the sources. 468 keys in 81 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -23,6 +23,17 @@ placeholders, filled at render: keep them in the translation.
 | `alert-dialog` | `typeToConfirm` | `Type {text} to confirm:` | `@pdxui/ui/src/shared/i18n.ts` |
 | `app-layout` | `aside` | `Secondary` | `@pdxui/ui/src/shared/i18n.ts` |
 | `app-layout` | `mainNav` | `Main navigation` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `all` | `All` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `close` | `Close` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `collapse` | `Collapse navigation` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `expand` | `Expand navigation` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `favourites` | `Favourites` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `menu` | `Menu` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `nav` | `Main navigation` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `noMatch` | `Nothing matches “{query}”` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `pin` | `Pin {name}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `recent` | `Recent` | `@pdxui/ui/src/shared/i18n.ts` |
+| `app-shell` | `search` | `Search` | `@pdxui/ui/src/shared/i18n.ts` |
 | `auto-form` | `reset` | `Reset` | `@pdxui/ui/src/shared/i18n.ts` |
 | `auto-form` | `submit` | `Save` | `@pdxui/ui/src/shared/i18n.ts` |
 | `autocomplete` | `clear` | `Clear` | `@pdxui/ui/src/shared/i18n.ts` |

@@ -434,6 +434,12 @@ locationPath();      // string — the router's path while it runs, a signal lik
 router of its own calls `setLocationSource(() => itsPath())` once, because a `history.pushState`
 fires no event anybody could listen to.
 
+The other half is following a link. `navigateTo(href)` hands the href to the router and answers
+`true`, or answers `false` when there is none, and the caller lets its link do the browser's work.
+`<pdx-app-shell>` calls it on a choice: where the Navigation API does not give a link's click to the
+router, the link would reload the page. `createRouter` names the router with `setNavigator`, and an
+app with its own router does the same.
+
 ## One chunk per page
 
 A route is a **split point**. `@page` makes the page its own JavaScript chunk, and the browser

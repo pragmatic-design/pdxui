@@ -9,6 +9,7 @@ A multi-level navigation menu.
 | `collapsed` | `collapsed` | boolean | `false` | Collapsed mode (show only icons, hide labels) |
 | `indent` | `indent` | number | `36` | Indent per nesting level (px) |
 | `iconSet` | `iconset` | string | `''` | Icon set name (for pdx-icon set attribute) |
+| `label` | `label` | string | `''` | The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need two names, or a screen-reader user cannot tell the landmarks apart (#1023). |
 | `size` | `size` | 'md' \| 'sm' | `'md'` | `sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar. |
 | `indicator` | `indicator` | 'fill' \| 'border' | `'fill'` | How the current entry is marked: `fill` tints it; `border` also draws a bar on its start edge. |
 | `chevron` | `chevron` | 'start' \| 'end' | `'start'` | Where a group's chevron sits: before its icon, or at the end of its row. |

@@ -27,7 +27,7 @@
         // Not the barrel: a load of this page builds ONE case, and registers that case's components
         // (the barrel is 414 requests a load, ~400 loads a certify run).
         import { loadTags, tagsIn } from './generated/component-loaders.js';
-        import { createDataSource, createForm, required, email, component, html, signal, computed, context, inject, saveScrollPosition, restoreScrollPosition, useScroll } from '@pdxui/core';
+        import { createDataSource, createForm, required, email, component, html, signal, computed, context, inject, saveScrollPosition, restoreScrollPosition, useScroll, setPermissions, setLocationSource, setNavigator } from '@pdxui/core';
 
         const p = new URLSearchParams(location.search);
         const theme = p.get('theme'); if (theme) document.documentElement.setAttribute('pdx-theme', theme);
@@ -38,6 +38,17 @@
         // For a spec that builds its own markup (form-value-once): register its tags BEFORE inserting
         // it, as the page does for a case.
         api.load = (markup) => loadTags(tagsIn(markup));
+        // pdx-app-shell (#1023) reads permissions and the current path through core: a spec grants the
+        // first, and drives the second as a router would, with a navigator that records the clicks.
+        api.setPermissions = setPermissions;
+        const path = signal('/');
+        api.navigated = [];
+        api.goTo = (p) => path.set(p);
+        api.routerless = () => { setLocationSource(null); setNavigator(null); };
+        api.router = () => {
+            setLocationSource(() => path());
+            setNavigator((href) => { api.navigated.push(href); path.set(href); });
+        };
 
         const ROWS = [
             { id: 1, name: 'Ada', role: 'engineer' },

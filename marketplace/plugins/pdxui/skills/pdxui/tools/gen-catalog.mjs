@@ -53,8 +53,8 @@ const UISRC = join(UI, 'packages/ui/src');
 //    the generator should make for us. ──
 const AREAS = [
   { id: 'layout', title: 'Layout & shell', blurb: 'Page structure and application shell.',
-    desc: 'PDX (@pdxui/ui) layout and shell components — pdx-app-layout, pdx-page-header, navbar, sidebar, splitter, scroll-area, row/col grid, aspect-ratio, masonry, toolbar, affix, scroll-spy — with props and events. Use when building the page structure or app shell of a .pdx app.',
-    tags: ['pdx-app-layout','pdx-page-header','pdx-navbar','pdx-sidebar','pdx-splitter','pdx-scroll-area','pdx-affix','pdx-row','pdx-col','pdx-aspect-ratio','pdx-masonry','pdx-toolbar','pdx-scroll-spy'] },
+    desc: 'PDX (@pdxui/ui) layout and shell components — pdx-app-layout, pdx-app-shell, pdx-page-header, navbar, sidebar, splitter, scroll-area, row/col grid, aspect-ratio, masonry, toolbar, affix, scroll-spy — with props and events. Use when building the page structure or app shell of a .pdx app.',
+    tags: ['pdx-app-layout','pdx-app-shell','pdx-page-header','pdx-navbar','pdx-sidebar','pdx-splitter','pdx-scroll-area','pdx-affix','pdx-row','pdx-col','pdx-aspect-ratio','pdx-masonry','pdx-toolbar','pdx-scroll-spy'] },
   { id: 'navigation', title: 'Navigation & menus', blurb: 'Navigation, menus, entries, pagination.',
     desc: 'PDX navigation components — router-outlet, link, nav-menu, bottom-nav, breadcrumb, menu, menubar, dropdown and context menus, command palette, tabs, pagination, fab, split-button — with props and events. Use when adding links, navigation, menus, tabs or a command palette to a .pdx app.',
     tags: ['pdx-router-outlet','pdx-link','pdx-nav-menu','pdx-bottom-nav','pdx-breadcrumb','pdx-menu','pdx-menubar','pdx-dropdown-menu','pdx-context-menu','pdx-command','pdx-tabs','pdx-pagination','pdx-fab','pdx-split-button'] },

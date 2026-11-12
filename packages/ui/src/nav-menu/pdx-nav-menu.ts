@@ -112,6 +112,11 @@ component('pdx-nav-menu', {
         indent: prop(36),
         /** Icon set name (for pdx-icon set attribute) */
         iconSet: prop(''),
+        /**
+         * The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need
+         * two names, or a screen-reader user cannot tell the landmarks apart (#1023).
+         */
+        label: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slots are not read
     // (#492). The controls' snippet is `itemActions`, named apart from the `actions` prop above.
@@ -478,6 +483,13 @@ component('pdx-nav-menu', {
             _expandedKeys.set(expanded);
         }
 
+        // The landmark's name follows `label` without a rebuild of the entries; `uiAttr` re-reads it
+        // when the language changes.
+        ctx.track(() => {
+            const name = (ctx.label() as string) || uiString('nav-menu', 'label');
+            _navEl?.setAttribute('aria-label', name);
+        });
+
         // ─── Build ───────────────────────────────────────────
         let _prevItemsRef: NavMenuItem[] | null = null;
         ctx.track(() => {
@@ -505,7 +517,7 @@ component('pdx-nav-menu', {
                     _navEl.className = 'pdx-nav';
                     _navEl.setAttribute('data-part', 'nav');
                     _navEl.setAttribute('role', 'navigation');
-                    uiAttr(_navEl, 'aria-label', () => uiString('nav-menu', 'label'));
+                    uiAttr(_navEl, 'aria-label', () => (ctx.label() as string) || uiString('nav-menu', 'label'));
 
                     buildItems(items, _navEl, 0);
                     keys.applyRoving();

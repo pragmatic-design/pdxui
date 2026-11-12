@@ -1,0 +1,38 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Collapsed rail</h2>
+    <p class="pdx-txt-small pdx-ink-muted">80px of icons; a group opens as a flyout. The handle on the rail's edge toggles it, and the shell
+      keeps the choice for the next visit. <code>::collapsed</code> binds it. Below 600px the rail becomes a drawer opened from the bar.</p>
+    <div class="shell-frame">
+      <pdx-app-shell :items="shellItems" :home="shellHome" :default-favourites="['tickets', 'board']" storage-key="demo-shell-collapsed"
+        ::collapsed="collapsed" @before-navigate="onBeforeNavigate($event)">
+        <strong slot="brand">P</strong>
+        <span slot="bar" class="pdx-txt-heading">Collapsed: {{ collapsed ? 'yes' : 'no' }}</span>
+        <p class="pdx-txt-body pdx-ink-muted">The page.</p>
+      </pdx-app-shell>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-app-shell :items="items" ::collapsed="collapsed"&gt;…&lt;/pdx-app-shell&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+import { shellItems, shellHome } from './data.pdx';
+
+let collapsed = $signal(true);
+
+function onBeforeNavigate(e) { e.preventDefault(); }
+</script>
+
+<style scoped>
+  .shell-frame {
+    --pdx-app-shell-height: 420px;
+    height: 420px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+</style>
