@@ -201,6 +201,10 @@
       "development": "./src/components/layered/kanban.css",
       "default": "./dist/components/kanban.css"
     },
+    "./components/localized-input": {
+      "development": "./src/components/layered/localized-input.css",
+      "default": "./dist/components/localized-input.css"
+    },
     "./components/rating": {
       "development": "./src/components/layered/rating.css",
       "default": "./dist/components/rating.css"

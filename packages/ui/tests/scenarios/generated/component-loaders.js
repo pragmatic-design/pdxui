@@ -66,6 +66,7 @@ export const LOADERS = new Map([
     ['pdx-kbd', () => import('@pdxui/ui/kbd')],
     ['pdx-label', () => import('@pdxui/ui/label')],
     ['pdx-list', () => import('@pdxui/ui/list')],
+    ['pdx-localized-input', () => import('@pdxui/ui/localized-input')],
     ['pdx-masked-input', () => import('@pdxui/ui/masked-input')],
     ['pdx-masonry', () => import('@pdxui/ui/masonry')],
     ['pdx-mention', () => import('@pdxui/ui/mention')],

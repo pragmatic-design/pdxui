@@ -16,6 +16,15 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- `pdx-localized-input` (#1024): one text in several cultures, `{ [culture]: string }`, the shape of a
+  LocalizedString. The cultures are tabs, each named in its own language (`Intl.DisplayNames`), with the
+  current locale's first. A culture with no text is marked, in its tab's accessible name too, and an empty
+  culture shows the default one's text as its placeholder. With `layout="stacked"` every culture is a
+  field. Each field carries its culture's `lang` and `dir` (right to left for Arabic, Hebrew, Persian…).
+  It is form-associated: the form submits the JSON, and `required` asks every culture, or with
+  `required-scope="default"` the default one, through the form model's `missing` (#1039). `multiline`
+  gives a textarea per culture.
+
 - A form model says when its value is missing (#1039): `@model value: T { form, missing: () => expr }`
   makes `required` `valueMissing` while the expression is true, in place of core's own rule (`null`,
   `''`, `false`, an empty array), which never calls an object missing. In TypeScript, `ctx.formMissing(() =>

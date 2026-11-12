@@ -65,6 +65,7 @@ import { kanban } from '../../../../manifests/kanban.manifest';
 import { kbd } from '../../../../manifests/kbd.manifest';
 import { label } from '../../../../manifests/label.manifest';
 import { list } from '../../../../manifests/list.manifest';
+import { localizedInput } from '../../../../manifests/localized-input.manifest';
 import { maskedInput } from '../../../../manifests/masked-input.manifest';
 import { masonry } from '../../../../manifests/masonry.manifest';
 import { mention } from '../../../../manifests/mention.manifest';
@@ -181,7 +182,7 @@ const variantAxes: Record<string, ManifestVariantAxis[]> = {
 };
 
 /** Every component manifest, with the scenarios its variants generate. */
-export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kanban, kbd, label, list, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, signaturePad, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
+export const manifests: ComponentManifest[] = [accordion, affix, alertDialog, appLayout, aspectRatio, autoForm, autocomplete, avatarGroup, avatar, badge, banner, blockUi, bottomNav, bottomSheet, breadcrumb, bulkActions, buttonGroup, button, calendar, card, carousel, cascader, chart, checkboxGroup, checkbox, chip, col, colorPicker, command, contextMenu, dataGrid, dataSource, datePicker, descriptionList, dialog, divider, drawer, dropdownMenu, editDrawer, emptyState, entityGrid, errorBoundary, fab, fieldGroup, fieldList, fieldset, fileUpload, filterBuilder, formActions, formField, formSection, formTemplate, form, icon, image, infiniteScroll, inlineEdit, inputGroup, input, jsonEditor, kanban, kbd, label, list, localizedInput, maskedInput, masonry, mention, menu, menubar, navMenu, navbar, numberInput, otpInput, overlayOutlet, pageHeader, pagination, passwordInput, popover, progress, provide, radioGroup, radio, rating, relationPicker, relativeTime, richText, row, scrollArea, scrollSpy, searchInput, segmented, select, sidebar, signaturePad, slider, sortableList, sparkline, spinner, splitButton, splitter, statistic, switchToggle, tab, table, tabs, tagInput, textarea, timePicker, timeline, toast, toggleButton, toggleGroup, toggle, toolbar, tooltip, transfer, treeSelect, tree, wizard].map((m) => withVariantScenarios(m, variantAxes[m.name]));
 
 /** The map from scenario id to the HTML page (slug) that holds it. */
 export const scenarioPage: Record<string, string> = {
@@ -506,6 +507,9 @@ export const scenarioPage: Record<string, string> = {
     "label-size-xl": "tier-1b",
     "list-basic": "tier-5b",
     "list-clickable": "tier-5b",
+    "localized-input-tabs": "tier-3c",
+    "localized-input-stacked": "tier-3c",
+    "localized-input-disabled": "tier-3c",
     "masked-input-basic": "tier-1c",
     "masked-input-disabled": "tier-1c",
     "masked-input-sizes": "tier-1c",

@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 453 keys in 79 components.
+> Generated from the sources. 457 keys in 80 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -289,6 +289,10 @@ placeholders, filled at render: keep them in the translation.
 | `kanban` | `top` | `Move to top` | `@pdxui/ui/src/shared/i18n.ts` |
 | `kanban` | `up` | `Move up` | `@pdxui/ui/src/shared/i18n.ts` |
 | `list` | `empty` | `No items` | `@pdxui/ui/src/shared/i18n.ts` |
+| `localized-input` | `field` | `{label} ({language})` | `@pdxui/ui/src/shared/i18n.ts` |
+| `localized-input` | `label` | `Text` | `@pdxui/ui/src/shared/i18n.ts` |
+| `localized-input` | `languages` | `Languages` | `@pdxui/ui/src/shared/i18n.ts` |
+| `localized-input` | `missing` | `missing` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `label` | `Mentions` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `loading` | `Loading...` | `@pdxui/ui/src/mention/pdx-mention.ts` |
 | `mention` | `noResults` | `No results` | `@pdxui/ui/src/mention/pdx-mention.ts` |

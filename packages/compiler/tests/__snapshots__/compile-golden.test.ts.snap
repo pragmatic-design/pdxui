@@ -3742,6 +3742,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
           { key: '/components/time-picker', label: 'TimePicker' },
           { key: '/components/color-picker', label: 'ColorPicker' },
           { key: '/components/tag-input', label: 'TagInput' },
+          { key: '/components/localized-input', label: 'LocalizedInput' },
           { key: '/components/cascader', label: 'Cascader' },
           { key: '/components/tree-select', label: 'TreeSelect' },
           { key: '/components/file-upload', label: 'FileUpload' },
@@ -3950,7 +3951,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:309" });
+}, { name: "app.pdx:310" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -6402,6 +6403,39 @@ component('app-comp-list', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/list",tag:"app-comp-list",title:"List — PDX Components",lazy:true,file:'./comp-list.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-localized-input.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-lziom");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-lziom"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-lziom]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Localized Input</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-localized-input&gt;</code> — one text in several cultures, <code>{ [culture]: string }</code>, the shape\\n      of a LocalizedString: tabs named in each language, missing cultures marked, each field with its own\\n      <code>lang</code> and <code>dir</code>.</p>  <app-demo-comp-localized-input-basic class="demo-section"></app-demo-comp-localized-input-basic>  <app-demo-comp-localized-input-stacked class="demo-section"></app-demo-comp-localized-input-stacked>  <app-demo-comp-localized-input-form class="demo-section"></app-demo-comp-localized-input-form>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>value</code><span>{ [culture]: string } | null</span><span>The text by culture; the form submits its JSON</span></div> <div class="opt-row"><code>cultures</code><span>string[]</span><span>The culture codes; the current locale\\'s comes first</span></div> <div class="opt-row"><code>default-culture</code><span>string</span><span>The culture <code>required-scope="default"</code> asks, and the placeholder of an empty one</span></div> <div class="opt-row"><code>required</code> / <code>required-scope</code><span>boolean / \\'all\\' | \\'default\\'</span><span>Every culture, or the default one</span></div> <div class="opt-row"><code>layout</code><span>\\'tabs\\' | \\'stacked\\'</span><span>One culture at a time, or all</span></div> <div class="opt-row"><code>multiline</code> / <code>rows</code><span>boolean / number</span><span>A textarea per culture</span></div> <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field\\'s name; each culture\\'s field is "label (language)"</span></div> <div class="opt-row"><code>disabled</code> / <code>readonly</code> / <code>error</code><span></span><span>As every field</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3> <div class="options-table"><div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div> <div class="opt-row"><code>:state(incomplete)</code><span></span><span>Some culture has no text</span></div> <div class="opt-row"><code>:state(invalid | disabled | readonly)</code><span></span><span>As every field</span></div> <div class="opt-row"><code>[data-part="tab"] / [data-part="marker"] / [data-part="field"]</code><span></span><span>A culture\\'s tab, its missing dot, its field</span></div></div></section></div>'));
+component('app-comp-localized-input', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Localized Input Component" });
+    ctx.el.setAttribute('data-pdx-lziom', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/localized-input'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/localized-input",tag:"app-comp-localized-input",title:"Localized Input Component",lazy:true,file:'./comp-localized-input.pdx'});
 "
 `;
 
@@ -23576,6 +23610,117 @@ const slotItems = [
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-localized-input/demo-comp-localized-input-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, bindInterpolation, bindTwoWay, component, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-ek2lub");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-ek2lub"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-ek2lub]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">One text in several cultures. Each culture is a tab named in its own language, the current one first; a dot marks a culture still missing, and an empty culture shows the default one\\'s text as a hint. <code>::value</code> holds <code>{ [culture]: string }</code>.</p> <div class="demo-stack"><pdx-localized-input label="Product name"></pdx-localized-input> <pre class="pdx-txt-mono pdx-txt-small"><!----></pre></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.firstChild;const __el7=__el6.nextSibling.nextSibling;const __t8=__el7.firstChild;return [__el6,__t8];};
+component('app-demo-comp-localized-input-basic', {
+  props: {},
+  setup(ctx) {
+    const __name = signal({ en: 'Desk lamp', it: 'Lampada da scrivania' }, { name: 'demo-comp-localized-input-basic:name' });
+const cultures = ['en', 'it', 'de', 'fr'];
+    ctx.el.setAttribute('data-pdx-ek2lub', '');
+    return { cultures, name: __name };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el6,__t8]=__walk0(__frag);
+    let __el6w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el6w_cultures)) return; __el6w_cultures = __b; assignBoundProperty(__el6, "cultures", __b); });
+    bindTwoWay(__el6, 'value', ctx.name);
+    bindInterpolation(__t8,()=>JSON.stringify(ctx.name()));
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-localized-input/demo-comp-localized-input-form.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-ajl2c1");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-ajl2c1"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-ajl2c1], [data-pdx-ajl2c1-in]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack, :where(:not([data-pdx-ajl2c1])):scope:is(.demo-stack) { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n  :scope .actions, :where(:not([data-pdx-ajl2c1])):scope:is(.actions) { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Form Integration</h2> <p class="pdx-txt-small pdx-ink-muted">Form-associated: the form submits the value\\'s JSON under its <code>name</code>. <code>required</code> asks every culture; with <code>required-scope="default"</code> only the default culture.</p> <div class="demo-stack"><form><pdx-form-field label="Title (every culture)" required><pdx-localized-input name="title" required data-pdx-ajl2c1-in></pdx-localized-input></pdx-form-field> <pdx-form-field label="Subtitle (English required)" required><pdx-localized-input name="subtitle" required required-scope="default" default-culture="en" data-pdx-ajl2c1-in></pdx-localized-input></pdx-form-field> <div class="actions"><button class="pdx-primary" type="submit">Submit</button> <button class="pdx-ghost" type="reset">Reset</button></div></form> <pre class="pdx-txt-mono pdx-txt-small"><!----></pre></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el7=__el6.firstChild;const __el8=__el7.firstChild;const __el9=__el8.firstChild;const __el10=__el8.nextSibling.nextSibling;const __el11=__el10.firstChild;const __el15=__el7.nextSibling.nextSibling;const __t16=__el15.firstChild;return [__el7,__el9,__el11,__t16];};
+component('app-demo-comp-localized-input-form', {
+  props: {},
+  setup(ctx) {
+    const __submitted = signal('', { name: 'demo-comp-localized-input-form:submitted' });
+const cultures = ['en', 'it'];
+    
+    
+    
+    function onSubmit(e) {
+      e.preventDefault();
+      const data = new FormData(e.target);
+      __submitted.setRaw('title: ' + data.get('title') + '\\nsubtitle: ' + data.get('subtitle'));
+    }
+    ctx.el.setAttribute('data-pdx-ajl2c1', '');
+    return { cultures, submitted: __submitted, onSubmit };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el7,__el9,__el11,__t16]=__walk0(__frag);
+    __el7.addEventListener('submit', safeHandler(batchHandler(ctx.onSubmit), ctx.el?.tagName?.toLowerCase(), 'submit'));
+    let __el9w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el9w_cultures)) return; __el9w_cultures = __b; assignBoundProperty(__el9, "cultures", __b); });
+    let __el11w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el11w_cultures)) return; __el11w_cultures = __b; assignBoundProperty(__el11, "cultures", __b); });
+    bindInterpolation(__t16,()=>ctx.submitted());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-localized-input/demo-comp-localized-input-stacked.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-fpi0bq");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-fpi0bq"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-fpi0bq]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Stacked and multi-line</h2> <p class="pdx-txt-small pdx-ink-muted"><code>layout="stacked"</code> shows every culture at once, for side-by-side translation; <code>multiline</code> makes each a textarea. Each field carries its culture\\'s <code>lang</code> and <code>dir</code>: Arabic is written right to left.</p> <div class="demo-stack"><pdx-localized-input label="Description" layout="stacked" multiline></pdx-localized-input></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.firstChild;return [__el8];};
+component('app-demo-comp-localized-input-stacked', {
+  props: {},
+  setup(ctx) {
+const cultures = ['en', 'it', 'ar'];
+    
+    const description = { en: 'A lamp for the desk, with a dimmer.', ar: 'مصباح للمكتب مع مخفت.' };
+    ctx.el.setAttribute('data-pdx-fpi0bq', '');
+    return { cultures, description };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el8]=__walk0(__frag);
+    let __el8w_cultures = {}; effect(() => { const __b = ctx.cultures; if (Object.is(__b, __el8w_cultures)) return; __el8w_cultures = __b; assignBoundProperty(__el8, "cultures", __b); });
+    let __el8w_value = {}; effect(() => { const __b = ctx.description; if (Object.is(__b, __el8w_value)) return; __el8w_value = __b; assignBoundProperty(__el8, "value", __b); });
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-masked-input/demo-comp-masked-input-custom-pattern.pdx 1`] = `
 "// 0 warning(s)
 
@@ -30210,7 +30355,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 116 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 117 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

@@ -5,7 +5,7 @@ description: "PDX (@pdxui/ui) input controls — text, number, masked, password,
 
 # UI · Inputs (form controls)
 
-> Every input and selection control.  (30 components)  ·  catalogue generated from the library's custom-elements manifest.
+> Every input and selection control.  (31 components)  ·  catalogue generated from the library's custom-elements manifest.
 > Cross-cutting playbook, recipes and gotchas: the **`pdxui`** skill.
 > **Names.** Bind a prop by its kebab-case name, `:max-height="620"`, `:empty-title="t"`: the component
 > receives the camelCase prop (`maxHeight`). In a `.pdx` template the camelCase form, `:maxHeight`, compiles
@@ -23,6 +23,7 @@ Each page has the props, events, slots and API, the notes, and the examples of t
 - [`<pdx-date-picker>`](references/pdx-date-picker.md) — Pick a date from a calendar.
 - [`<pdx-file-upload>`](references/pdx-file-upload.md) — Drag-and-drop or browse to upload.
 - [`<pdx-input>`](references/pdx-input.md) — Text field with sizes, states and addons.
+- [`<pdx-localized-input>`](references/pdx-localized-input.md) — One text in several languages, a tab each.
 - [`<pdx-masked-input>`](references/pdx-masked-input.md) — Input that enforces a fixed format.
 - [`<pdx-mention>`](references/pdx-mention.md) — Type @ to mention people.
 - [`<pdx-number-input>`](references/pdx-number-input.md) — Numeric field with steppers and formatting.

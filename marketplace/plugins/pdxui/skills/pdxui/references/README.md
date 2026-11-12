@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 118 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 119 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -96,6 +96,7 @@ Every input and selection control.
 - `<pdx-date-picker>` — Pick a date from a calendar.
 - `<pdx-file-upload>` — Drag-and-drop or browse to upload.
 - `<pdx-input>` — Text field with sizes, states and addons.
+- `<pdx-localized-input>` — One text in several languages, a tab each.
 - `<pdx-masked-input>` — Input that enforces a fixed format.
 - `<pdx-mention>` — Type @ to mention people.
 - `<pdx-number-input>` — Numeric field with steppers and formatting.

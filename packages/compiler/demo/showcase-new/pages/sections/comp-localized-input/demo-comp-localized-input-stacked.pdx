@@ -1,0 +1,18 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Stacked and multi-line</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>layout="stacked"</code> shows every culture at once, for side-by-side translation; <code>multiline</code> makes each a textarea. Each field carries its culture's <code>lang</code> and <code>dir</code>: Arabic is written right to left.</p>
+    <div class="demo-stack">
+      <pdx-localized-input label="Description" layout="stacked" multiline :cultures="cultures" :value="description"></pdx-localized-input>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it', 'ar'];
+const description = { en: 'A lamp for the desk, with a dimmer.', ar: 'مصباح للمكتب مع مخفت.' };
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }
+</style>

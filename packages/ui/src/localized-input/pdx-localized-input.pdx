@@ -1,0 +1,142 @@
+<template>
+  <div class="pdx-localized-input" data-part="root" role="group" :aria-label="fieldName">
+    @if (!stacked) {
+      <div class="pdx-localized-tabs" data-part="tabs" role="tablist" :aria-label="uiString('localized-input', 'languages')">
+        @for (shown as culture; track culture) {
+          <button type="button" class="pdx-localized-tab" data-part="tab" role="tab" :id="idOf('tab', culture)" :lang="culture"
+            :aria-selected="String(culture === active)" :aria-controls="idOf('panel', culture)"
+            :tabindex="culture === active ? 0 : -1" :disabled="disabled" :aria-label="tabNameOf(culture)"
+            @click="select(culture)" @keydown="onTabKey($event, culture)">{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker" data-part="marker" aria-hidden="true"></span>}</button>
+        }
+      </div>
+    }
+    @for (shown as culture; track culture) {
+      <div :class="stacked ? 'pdx-localized-row' : 'pdx-localized-panel'" data-part="panel" :id="idOf('panel', culture)"
+        :role="stacked ? null : 'tabpanel'" :aria-labelledby="stacked ? null : idOf('tab', culture)"
+        :hidden="!stacked && culture !== active">
+        @if (stacked) {
+          <span class="pdx-localized-row-label" aria-hidden="true" :lang="culture">{{ cultureName(culture) }}@if (missingOf(culture)) {<span class="pdx-localized-marker"></span>}</span>
+        }
+        @if (multiline) {
+          <textarea class="pdx-input" data-part="field" :lang="culture" :dir="directionOf(culture)" :rows="rows"
+            :defaultValue="mountedTextOf(culture)" :value="textOf(culture)" :placeholder="placeholderOf(culture)" :disabled="disabled" :readonly="readonly"
+            :aria-label="nameOf(culture)" :aria-invalid="error ? 'true' : null" @input="write(culture, $event)"></textarea>
+        } @else {
+          <input type="text" class="pdx-input" data-part="field" :lang="culture" :dir="directionOf(culture)"
+            :defaultValue="mountedTextOf(culture)" :value="textOf(culture)" :placeholder="placeholderOf(culture)" :disabled="disabled" :readonly="readonly"
+            :aria-label="nameOf(culture)" :aria-invalid="error ? 'true' : null" @input="write(culture, $event)" />
+        }
+      </div>
+    }
+  </div>
+</template>
+
+<script>
+/**
+ * One text in several cultures, `{ [culture]: string }` — the shape of Pragmatic's LocalizedString. The
+ * cultures are tabs named in their own language, the current one first, a culture with no text marked
+ * in its tab's name; or, `layout="stacked"`, every culture a labelled field. Each field carries its
+ * culture's `lang` and `dir`. `required` asks every culture, or with `required-scope="default"` the
+ * default one; the form submits the value's JSON.
+ *
+ * @csspart root - The field, `role="group"` named by the label.
+ * @csspart tabs - The tablist of the cultures.
+ * @csspart tab - A culture's tab, named in its own language.
+ * @csspart marker - The dot of a culture with no text.
+ * @csspart panel - A culture's panel (a tabpanel), or its row when stacked.
+ * @csspart field - A culture's input or textarea.
+ *
+ * @cssstate incomplete - Some culture has no text.
+ * @cssstate invalid - `error` is set.
+ * @cssstate disabled - `disabled` is set.
+ * @cssstate readonly - `readonly` is set.
+ */
+import { generatedId, getLocale } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { missing, isComplete, withText, orderCultures, cultureName, directionOf, type LocalizedText, type RequiredScope } from './localized-text';
+import '@pdxui/design/components/localized-input';
+
+/** The text, by culture code. A culture with no entry, or an empty one, is missing; the form submits the JSON. */
+@model value: LocalizedText | null = null { form: () => value ? JSON.stringify(value) : null, missing: () => !isComplete(value, cultures, requiredScope, defaultOf()) };
+/** The cultures to edit, as codes (`en`, `it`, `fr-CA`). The current locale's comes first when it is one of them. */
+@prop cultures: string[] = [];
+/** The culture `required-scope="default"` asks for, and whose text an empty culture shows as its placeholder. Empty: the first culture. */
+@prop defaultCulture: string = '';
+/** all (the default): `required` asks every culture; default: only the default culture. */
+@prop requiredScope: 'all' | 'default' = 'all';
+/** tabs (the default): one culture at a time; stacked: every culture a field. */
+@prop layout: 'tabs' | 'stacked' = 'tabs';
+/** A textarea per culture instead of an input. */
+@prop multiline: boolean = false;
+/** The textarea's rows, when `multiline`. */
+@prop rows: number = 3;
+/** The field's name: the group's, and in each culture's field name. Empty: «Text». */
+@prop label: string = '';
+/** Accessible name when there is no visible label; wins over `label`. */
+@prop ariaLabel: string = '';
+@prop disabled: boolean = false;
+@prop readonly: boolean = false;
+/** The form judges it with `required-scope`: every culture, or the default one. */
+@prop required: boolean = false;
+/** A custom validity message: the field is invalid while it is set. */
+@prop error: string = '';
+@prop name: string = '';
+@part root, tabs, tab, marker, panel, field;
+@state incomplete = missing(value, cultures).length > 0;
+@state invalid = !!error;
+@state disabled = !!disabled;
+@state readonly = !!readonly;
+@host { :name="name || null" }
+
+const locale = getLocale();
+const id = generatedId('pdx-localized-input');
+/** The culture whose tab is selected, when the user chose one; else the first. */
+let chosen = $signal('');
+
+const stacked = $derived(layout === 'stacked');
+const shown = $derived(orderCultures(cultures, locale()));
+const active = $derived(shown.includes(chosen) ? chosen : (shown[0] ?? ''));
+const fieldName = $derived(ariaLabel || label || uiString('localized-input', 'label'));
+
+function defaultOf(): string { return defaultCulture || cultures[0] || ''; }
+function idOf(kind: string, culture: string): string { return `${id}-${kind}-${culture}`; }
+function textOf(culture: string): string { return value?.[culture] ?? ''; }
+/**
+ * The value the field mounted with. A form reset puts the model back to it (core), and resets each inner
+ * field to its default value (the browser): the fields' default is this text, so the two agree. A field
+ * whose text did not change across the reset would otherwise keep the browser's empty default, since its
+ * binding has nothing new to write.
+ */
+const mounted: LocalizedText | null = value;
+function mountedTextOf(culture: string): string { return mounted?.[culture] ?? ''; }
+function missingOf(culture: string): boolean { return !textOf(culture).trim(); }
+/** A tab's name: the culture in its own language, and «missing» after it while it has no text. */
+function tabNameOf(culture: string): string {
+  return missingOf(culture) ? `${cultureName(culture)}, ${uiString('localized-input', 'missing')}` : cultureName(culture);
+}
+function nameOf(culture: string): string { return format(uiString('localized-input', 'field'), { label: fieldName, language: cultureName(culture) }); }
+/** An empty culture shows the default culture's text, so the translator sees what to translate. */
+function placeholderOf(culture: string): string { return culture === defaultOf() ? '' : textOf(defaultOf()); }
+
+function write(culture: string, e: Event): void {
+  const next = withText(value, culture, (e.target as HTMLInputElement | HTMLTextAreaElement).value);
+  value = Object.keys(next).length > 0 ? next : null;
+}
+
+function select(culture: string): void { chosen = culture; }
+
+/** The tablist's keys: the arrows, Home and End move the focus and the selection with it. */
+function onTabKey(e: KeyboardEvent, culture: string): void {
+  const i = shown.indexOf(culture);
+  let next = -1;
+  if (e.key === 'ArrowRight') next = (i + 1) % shown.length;
+  else if (e.key === 'ArrowLeft') next = (i - 1 + shown.length) % shown.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = shown.length - 1;
+  if (next < 0) return;
+  e.preventDefault();
+  chosen = shown[next];
+  // The part `tab` is the rendered tabs (#988): the one of that culture takes the focus.
+  queueMicrotask(() => tab.find((t) => t.getAttribute('lang') === shown[next])?.focus());
+}
+</script>
