@@ -184,7 +184,7 @@ alpha; required props and `?` since beta (#130)
 ```ebnf
 ModelDecl     ::= "@model" S Identifier S? ":" S? Type ( S? "=" S? Expression )? ( S? ModelOptions )? S? ";"?
 ModelOptions  ::= "{" S? ModelOption ( S? "," S? ModelOption )* S? "}"
-ModelOption   ::= "form" ( S? ":" S? Expression )? | "attribute" S? ":" S? ( "string" | "number" | "boolean" | "json" )
+ModelOption   ::= "form" ( S? ":" S? Expression )? | "missing" S? ":" S? Expression | "attribute" S? ":" S? ( "string" | "number" | "boolean" | "json" )
 ```
 
 The analyzer's form: `@model name: Type = default;`
@@ -213,6 +213,11 @@ component's `models`.
   the default are read, with or without a default. `{ form: () => expr }` (#751) also says what the
   form submits: it compiles to `ctx.formValue?.(() => expr);` at the end of the setup, rewritten as the
   script is.
+- `{ form, missing: () => expr }` (#1039) says when the value counts as missing for `required`, in
+  place of core's own rule (`null`, `''`, `false`, an empty array), which never calls an object missing.
+  It compiles to `ctx.formMissing?.(() => expr);` at the end of the setup, rewritten as the script is.
+  `required` still decides whether missing is an error, and `error` still wins. `missing` without `form`
+  is `PDX_UNKNOWN_DECLARATION` (error): only a form model is judged by `required`.
 - `{ attribute: string }` (#753) says how the attribute is read — `string`, `number`, `boolean` or
   `json` — apart from the type: it is the descriptor entry's `type`, `String`, `Number`, `Boolean` or
   `Object`, and the `.d.ts` keeps the type as written. Without it the reading is derived from the type,

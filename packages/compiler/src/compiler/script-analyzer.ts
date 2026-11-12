@@ -403,6 +403,18 @@ export function analyzeScript(script: string, _filename: string, options: { orig
             // Optional: core installs `formValue` with the form wiring, which a runtime with no
             // ElementInternals (happy-dom) does not run, and the component must still set up there.
             if (options?.formExpr) formValueCalls.push({ text: `ctx.formValue?.(${options.formExpr});`, line: i });
+            // `{ missing: () => expr }` (#1039): when the value counts as missing for `required`, the same
+            // way: a statement at the end of the body, read by core's validity. Only a form model has a
+            // `required` core judges, so without `form` it means nothing and is said.
+            if (options?.missingExpr && options.form) formValueCalls.push({ text: `ctx.formMissing?.(${options.missingExpr});`, line: i });
+            if (options?.missingExpr && !options.form) {
+                warnings.push({
+                    code: 'PDX_UNKNOWN_DECLARATION',
+                    severity: 'error' as const,
+                    message: `@model '${name}' declares { missing } without { form }: only a form model's value is judged by required.`,
+                    hint: `Use: @model ${name}: T = d { form, missing: () => … };`,
+                });
+            }
             const declaration = modelOptions ? trimmed.slice(0, modelOptions.start).trimEnd() + ';' : trimmed;
             const { type: tsType, rest } = extractTypeAnnotation(declaration, colonPos);
             if (tsType) {

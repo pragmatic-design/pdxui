@@ -93,6 +93,12 @@ export interface ComponentContextBase {
      * the model. Present only on a component with a form model, in a DOM with form association.
      */
     formValue?(get: () => unknown): void;
+    /**
+     * When the value counts as missing for `required`, said by the component (#1039): `get` answers it,
+     * in place of core's own rule (`null`, `''`, `false`, an empty array), which never calls an object
+     * missing. Present only on a component with a form model, in a DOM with form association.
+     */
+    formMissing?(get: () => boolean): void;
     /** Track an effect for auto-disposal on disconnect. `options.name` names it for the inspector. */
     track(fn: () => void | (() => void), options?: EffectOptions): Dispose;
     /**

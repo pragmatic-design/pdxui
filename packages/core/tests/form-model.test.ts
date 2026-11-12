@@ -6,6 +6,7 @@ import { describe, it, expect } from 'vitest';
 import { toFormValue, isUnsupportedFormValue, wireFormModel } from '../src/form/form-model';
 import { model } from '../src/component/component-descriptor';
 import { PROP_SPEC } from '../src/component/prop-spec';
+import { signal, effect } from '../src/reactivity/signal';
 
 const entries = (v: unknown): [string, string][] =>
     [...(v as FormData).entries()].map(([k, x]) => [k, typeof x === 'string' ? x : (x as File).name]);
@@ -48,6 +49,42 @@ describe('toFormValue — the model\'s value as the form submits it', () => {
     it('a value with no rule — a plain object — is unsupported, not stringified', () => {
         expect(isUnsupportedFormValue(toFormValue({ a: 1 }, 'n', 'on'))).toBe(true);
         expect(isUnsupportedFormValue(toFormValue('x', 'n', 'on'))).toBe(false);
+    });
+});
+
+describe('ctx.formMissing — the component says when its value is missing (#1039)', () => {
+    /** A form model wired to a fake element that records its validity: no ElementInternals needed. */
+    function wire(initial: unknown, required = true) {
+        const flags: Array<Record<string, boolean>> = [];
+        const el = {
+            parentElement: null,
+            attr: () => signal<string | null>('field'),
+            setFormValue: () => {},
+            setValidity: (f: Record<string, boolean> = {}) => { flags.push(f); },
+        };
+        const ctx: Record<string, unknown> = { value: signal(initial), required: signal(required) };
+        wireFormModel(el, (fn) => { effect(fn); }, ctx, 'value', ['value', 'required'], 'x-field');
+        return { ctx, last: () => flags[flags.length - 1] };
+    }
+
+    it('without it, an object is never missing: the old rule', () => {
+        const { last } = wire({ en: '' });
+        expect(last()).toEqual({});
+    });
+
+    it('with it, required is valueMissing while the function says so, and valid when it does not', () => {
+        const { ctx, last } = wire({ en: 'Hi' });
+        const value = ctx.value as ReturnType<typeof signal<Record<string, string>>>;
+        (ctx.formMissing as (get: () => boolean) => void)(() => !value().it);
+        expect(last()).toEqual({ valueMissing: true });
+        value.set({ en: 'Hi', it: 'Ciao' });
+        expect(last()).toEqual({});
+    });
+
+    it('a component that is not required is valid whatever the function says', () => {
+        const { ctx, last } = wire({ en: 'Hi' }, false);
+        (ctx.formMissing as (get: () => boolean) => void)(() => true);
+        expect(last()).toEqual({});
     });
 });
 

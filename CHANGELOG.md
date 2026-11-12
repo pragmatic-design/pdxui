@@ -16,6 +16,11 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- A form model says when its value is missing (#1039): `@model value: T { form, missing: () => expr }`
+  makes `required` `valueMissing` while the expression is true, in place of core's own rule (`null`,
+  `''`, `false`, an empty array), which never calls an object missing. In TypeScript, `ctx.formMissing(() =>
+  …)` in the setup. `required` still decides whether missing is an error, and `error` still wins.
+
 - `pdx-kanban` (#1021): columns of cards. The column an item is in is a field of it (`column-field`), and
   the order inside a column is the order of `items`, which the board writes on a move (`::items`). A card
   moves three ways:

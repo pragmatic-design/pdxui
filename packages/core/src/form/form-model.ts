@@ -141,6 +141,10 @@ export function wireFormModel(
     // What the component's setup says the form submits instead of the model, if it says so.
     const submitted = createSignal<(() => unknown) | null>(null);
     ctx.formValue = (get: () => unknown) => submitted.setRaw(get);
+    // When the value counts as missing for `required`, if the component says (#1039): an object model is
+    // never missing by `isMissing`, and only the component knows what it has to hold.
+    const missingWhen = createSignal<(() => boolean) | null>(null);
+    ctx.formMissing = (get: () => boolean) => missingWhen.setRaw(get);
     wired.add(el);
 
     track(() => {
@@ -163,8 +167,9 @@ export function wireFormModel(
         const value = signal();
         const error = errorProp?.();
         const required = requiredProp?.() === true;
+        const judge = missingWhen();
         if (typeof error === 'string' && error !== '') { el.setValidity({ customError: true }, error); return; }
-        if (required && isMissing(value)) el.setValidity({ valueMissing: true }, missingMessage(value));
+        if (required && (judge ? judge() === true : isMissing(value))) el.setValidity({ valueMissing: true }, missingMessage(value));
         else el.setValidity({});
     });
 
