@@ -179,3 +179,25 @@ const ds = createDataSource({
 // Page change → DataSource.setPage() → List auto-reloads.
 ```
 
+**A comment thread** — A composition, not a component (#1022): `pdx-list` draws the comments, `pdx-avatar` and `pdx-relative-time` fill each one, and a form with `pdx-textarea` and `pdx-button` adds to it. Replies go one level deep. Ctrl+Enter (⌘+Enter) sends, Escape closes a reply.
+
+```html
+<pdx-list :items="thread.comments" dividers>
+  &#64;snippet item(c) {
+    <article :aria-label="c.author + ', ' + c.text">
+      <span aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+      <strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time>
+      <p>{{ c.text }}</p>
+      <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>
+    </article>
+  }
+  &#64;snippet empty() { <p>No comments yet.</p> }
+</pdx-list>
+
+<form @submit.prevent="send()">
+  <pdx-textarea ::value="draft" arialabel="Add a comment" @keydown="onComposerKey($event)"></pdx-textarea>
+  <pdx-button type="submit" size="sm" :disabled="!draft.trim()">Comment</pdx-button>
+</form>
+<p class="pdx-sr-only" role="status">{{ announcement }}</p>
+```
+

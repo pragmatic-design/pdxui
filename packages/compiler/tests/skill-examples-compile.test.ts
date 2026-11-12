@@ -44,7 +44,8 @@ describe('the .pdx examples in the skills', () => {
         // + the component pages' examples from the demos that use a block directive:
         // pdx-checkbox and pdx-chip (@for/@if), pdx-error-boundary's two @try blocks, and pdx-transfer's
         // sizes (@for, #748).
-        expect(COMPILED.map(e => e.where)).toHaveLength(24);
+        // + the comment thread composed from pdx-list, pdx-textarea and pdx-button (#1022).
+        expect(COMPILED.map(e => e.where)).toHaveLength(25);
     });
 
     it('skips only what says it is partial — and nothing does today', () => {

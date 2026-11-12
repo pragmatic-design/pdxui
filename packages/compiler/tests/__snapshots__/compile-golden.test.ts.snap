@@ -6385,7 +6385,7 @@ import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
   __pdx_style.textContent = "\\n@scope ([data-pdx-suprvs]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
 }
 
-const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">List</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-list&gt;</code> — data-bound list. Supports static arrays, DataSource,\\n      custom item templates, loading overlay, empty state, clickable items, dividers.</p> <app-demo-comp-list-basic class="demo-section"></app-demo-comp-list-basic> <app-demo-comp-list-data-source class="demo-section"></app-demo-comp-list-data-source> <app-demo-comp-list-empty class="demo-section"></app-demo-comp-list-empty> <app-demo-comp-list-slot-template class="demo-section"></app-demo-comp-list-slot-template> <app-demo-comp-list-custom-empty class="demo-section"></app-demo-comp-list-custom-empty> <app-demo-comp-list-rich-item class="demo-section"></app-demo-comp-list-rich-item> <app-demo-comp-list-pagination class="demo-section"></app-demo-comp-list-pagination> <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper> <section><h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr><tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field name</td></tr><tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr><tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr><tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>Border around list</td></tr><tr><td><code>empty-title</code></td><td>String</td><td>\\'No items\\'</td><td>Empty state title</td></tr><tr><td><code>empty-description</code></td><td>String</td><td>\\'\\'</td><td>Empty state description</td></tr><tr><td><code>empty-icon</code></td><td>String</td><td>\\'inbox\\'</td><td>Empty state icon</td></tr></tbody></table></div></section> <section><h2 class="pdx-txt-heading section-heading">Snippets</h2> <div class="options-table"><table><thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead><tbody><tr><td><code>item</code></td><td><code>(item, index)</code></td><td>Custom item template; without it, the item\\'s first text field.</td></tr><tr><td><code>empty</code></td><td><code>()</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr></tbody></table></div></section></div>'));
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">List</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-list&gt;</code> — data-bound list. Supports static arrays, DataSource,\\n      custom item templates, loading overlay, empty state, clickable items, dividers.</p> <app-demo-comp-list-basic class="demo-section"></app-demo-comp-list-basic> <app-demo-comp-list-data-source class="demo-section"></app-demo-comp-list-data-source> <app-demo-comp-list-empty class="demo-section"></app-demo-comp-list-empty> <app-demo-comp-list-slot-template class="demo-section"></app-demo-comp-list-slot-template> <app-demo-comp-list-custom-empty class="demo-section"></app-demo-comp-list-custom-empty> <app-demo-comp-list-rich-item class="demo-section"></app-demo-comp-list-rich-item> <app-demo-comp-list-pagination class="demo-section"></app-demo-comp-list-pagination> <app-demo-comp-list-data-source-wrapper class="demo-section"></app-demo-comp-list-data-source-wrapper> <app-demo-comp-list-comment-thread class="demo-section"></app-demo-comp-list-comment-thread> <section><h2 class="pdx-txt-heading section-heading">Props</h2> <div class="options-table"><table><thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>items</code></td><td>T[]</td><td>null</td><td>Static data array</td></tr><tr><td><code>source</code></td><td>DataSource</td><td>null</td><td>DataSource instance (priority over items)</td></tr><tr><td><code>id-field</code></td><td>String</td><td>\\'id\\'</td><td>Unique ID field name</td></tr><tr><td><code>dividers</code></td><td>Boolean</td><td>false</td><td>Show dividers between items</td></tr><tr><td><code>clickable</code></td><td>Boolean</td><td>false</td><td>Items are clickable (hover + cursor)</td></tr><tr><td><code>bordered</code></td><td>Boolean</td><td>true</td><td>Border around list</td></tr><tr><td><code>empty-title</code></td><td>String</td><td>\\'No items\\'</td><td>Empty state title</td></tr><tr><td><code>empty-description</code></td><td>String</td><td>\\'\\'</td><td>Empty state description</td></tr><tr><td><code>empty-icon</code></td><td>String</td><td>\\'inbox\\'</td><td>Empty state icon</td></tr></tbody></table></div></section> <section><h2 class="pdx-txt-heading section-heading">Snippets</h2> <div class="options-table"><table><thead><tr><th>Snippet</th><th>Arguments</th><th>Description</th></tr></thead><tbody><tr><td><code>item</code></td><td><code>(item, index)</code></td><td>Custom item template; without it, the item\\'s first text field.</td></tr><tr><td><code>empty</code></td><td><code>()</code></td><td>Custom empty state (overrides empty-title/description/icon props).</td></tr></tbody></table></div></section></div>'));
 component('app-comp-list', {
   props: {},
   setup(ctx) {
@@ -23287,6 +23287,146 @@ const basicItems = [
     __el5.addEventListener('pdx-click', safeHandler(batchHandler(ctx.onItemClick), ctx.el?.tagName?.toLowerCase(), 'pdx-click'));
     __el5['item']=(item)=>{const __frag=__blk0();const [__t8,__t10]=__walk0(__frag);bindInterpolation(__t8,()=>item.name);bindInterpolation(__t10,()=>item.role);return __frag;};
     bindInterpolation(__t12,()=>ctx.listLog());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-list/demo-comp-list-comment-thread.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, bindRef, bindTwoWay, component, eachRow, effect, safeHandler, signal, staticBlock, staticMarkup, store, when } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-1izf8x");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-1izf8x"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-1izf8x], [data-pdx-1izf8x-in]) to ([data-pdx-root] \\u003E *) {:scope .thread, :where(:not([data-pdx-1izf8x])):scope:is(.thread) { max-width: 640px; display: flex; flex-direction: column; gap: var(--pdx-space-md); }\\n  :scope .comment, :where(:not([data-pdx-1izf8x])):scope:is(.comment) { display: flex; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }\\n  :scope .reply, :where(:not([data-pdx-1izf8x])):scope:is(.reply) { padding: var(--pdx-space-xs) 0; }\\n  :scope .who, :where(:not([data-pdx-1izf8x])):scope:is(.who) { flex-shrink: 0; }\\n  :scope .body, :where(:not([data-pdx-1izf8x])):scope:is(.body) { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }\\n  :scope .meta, :where(:not([data-pdx-1izf8x])):scope:is(.meta), :scope .text, :where(:not([data-pdx-1izf8x])):scope:is(.text) { margin: 0; }\\n  :scope .meta, :where(:not([data-pdx-1izf8x])):scope:is(.meta) { font-size: var(--pdx-text-sm); display: flex; gap: var(--pdx-space-xs); align-items: baseline; flex-wrap: wrap; }\\n  :scope .text, :where(:not([data-pdx-1izf8x])):scope:is(.text) { overflow-wrap: anywhere; }\\n  :scope .actions, :where(:not([data-pdx-1izf8x])):scope:is(.actions) { display: flex; gap: var(--pdx-space-2xs); }\\n  :scope .replies, :where(:not([data-pdx-1izf8x])):scope:is(.replies) { list-style: none; margin: 0; padding: 0 0 0 var(--pdx-space-md); border-inline-start: 2px solid var(--pdx-color-border); }\\n  :scope .composer, :where(:not([data-pdx-1izf8x])):scope:is(.composer) { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }\\n  :scope .reply-composer, :where(:not([data-pdx-1izf8x])):scope:is(.reply-composer) { margin-top: var(--pdx-space-xs); }\\n  :scope .composer-actions, :where(:not([data-pdx-1izf8x])):scope:is(.composer-actions) { display: flex; justify-content: flex-end; align-items: center; gap: var(--pdx-space-xs); }\\n  :scope .hint, :where(:not([data-pdx-1izf8x])):scope:is(.hint) { margin-inline-end: auto; }\\n  :scope .none, :where(:not([data-pdx-1izf8x])):scope:is(.none) { margin: 0; padding: var(--pdx-space-md); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<pdx-button variant="ghost" size="sm" data-test="delete" data-pdx-1izf8x-in>Delete</pdx-button>'));
+const __walk0=(r)=>{const __el27=r.firstChild;return [__el27];};
+const __blk1=staticBlock(staticMarkup('<li data-pdx-1izf8x-in><article class="comment reply" data-test="reply-item" data-pdx-1izf8x-in><span class="who" aria-hidden="true" data-pdx-1izf8x-in><pdx-avatar size="xs" data-pdx-1izf8x-in></pdx-avatar></span> <div class="body" data-pdx-1izf8x-in><p class="meta" data-pdx-1izf8x-in><strong data-pdx-1izf8x-in><!----></strong> <pdx-relative-time class="pdx-ink-muted" data-pdx-1izf8x-in></pdx-relative-time></p> <p class="text" data-pdx-1izf8x-in><!----></p></div></article></li>'));
+const __walk1=(r)=>{const __el31=r.firstChild;const __el32=__el31.firstChild;const __el33=__el32.firstChild;const __el34=__el33.firstChild;const __el35=__el33.nextSibling.nextSibling;const __el36=__el35.firstChild;const __el37=__el36.firstChild;const __t38=__el37.firstChild;const __el39=__el37.nextSibling.nextSibling;const __el40=__el36.nextSibling.nextSibling;const __t41=__el40.firstChild;return [__el32,__el34,__t38,__el39,__t41];};
+const __blk2=staticBlock(staticMarkup('<ul class="replies" aria-label="Replies" data-pdx-1izf8x-in><!----></ul>'));
+const __walk2=(r)=>{const __el30=r.firstChild;const __m43=__el30.firstChild;return [__m43];};
+const __blk3=staticBlock(staticMarkup('<form class="composer reply-composer" data-test="reply-form" data-pdx-1izf8x-in><pdx-textarea rows="2" minRows="2" maxRows="6" data-pdx-1izf8x-in></pdx-textarea> <div class="composer-actions" data-pdx-1izf8x-in><pdx-button variant="ghost" size="sm" data-pdx-1izf8x-in>Cancel</pdx-button> <pdx-button type="submit" size="sm" data-test="send-reply" data-pdx-1izf8x-in>Reply</pdx-button></div></form>'));
+const __walk3=(r)=>{const __el46=r.firstChild;const __el47=__el46.firstChild;const __el48=__el47.nextSibling.nextSibling;const __el49=__el48.firstChild;const __el50=__el49.nextSibling.nextSibling;return [__el46,__el47,__el49,__el50];};
+const __blk4=staticBlock(staticMarkup('<article class="comment" data-test="comment" data-pdx-1izf8x-in><span class="who" aria-hidden="true" data-pdx-1izf8x-in><pdx-avatar size="sm" data-pdx-1izf8x-in></pdx-avatar></span> <div class="body" data-pdx-1izf8x-in><p class="meta" data-pdx-1izf8x-in><strong data-pdx-1izf8x-in><!----></strong> <pdx-relative-time class="pdx-ink-muted" data-pdx-1izf8x-in></pdx-relative-time></p> <p class="text" data-pdx-1izf8x-in><!----></p> <div class="actions" data-pdx-1izf8x-in><pdx-button variant="ghost" size="sm" data-test="reply" data-pdx-1izf8x-in>Reply</pdx-button> <!----></div> <!----><!----></div></article>'));
+const __walk4=(r)=>{const __el15=r.firstChild;const __el16=__el15.firstChild;const __el17=__el16.firstChild;const __el18=__el16.nextSibling.nextSibling;const __el19=__el18.firstChild;const __el20=__el19.firstChild;const __t21=__el20.firstChild;const __el22=__el20.nextSibling.nextSibling;const __el23=__el19.nextSibling.nextSibling;const __t24=__el23.firstChild;const __el25=__el23.nextSibling.nextSibling;const __el26=__el25.firstChild;const __m29=__el26.nextSibling.nextSibling;const __m45=__el25.nextSibling.nextSibling;const __m52=__m45.nextSibling;return [__el15,__el17,__t21,__el22,__t24,__el26,__m29,__m45,__m52];};
+const __blk5=staticBlock(staticMarkup('<p class="pdx-ink-muted none" data-pdx-1izf8x-in>No comments yet. Start the conversation below.</p>'));
+const __blk6=staticBlock(staticMarkup('<section data-test="comment-thread"><h2 class="pdx-txt-heading section-heading">A comment thread</h2> <p class="pdx-txt-small pdx-ink-muted">A composition, not a component (#1022): <code>pdx-list</code> draws the comments,\\n      <code>pdx-avatar</code> and <code>pdx-relative-time</code> fill each one, and a form with <code>pdx-textarea</code> and\\n      <code>pdx-button</code> adds to it. Replies go one level deep. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (<kbd>⌘</kbd>+<kbd>Enter</kbd>)\\n      sends, <kbd>Escape</kbd> closes a reply.</p> <div class="demo-container thread"><pdx-list dividers data-test="comments"></pdx-list> <form class="composer" data-test="composer"><pdx-textarea arialabel="Add a comment" placeholder="Add a comment…" rows="2" minRows="2" maxRows="8" data-test="composer-text"></pdx-textarea> <div class="composer-actions"><span class="pdx-txt-small pdx-ink-muted hint">Ctrl+Enter to send</span> <pdx-button type="submit" size="sm" data-test="send">Comment</pdx-button></div></form> <p class="pdx-sr-only" role="status" data-test="announce"><!----></p></div> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="thread.comments" dividers&gt;\\n  @snippet item(c) {\\n    &lt;article :aria-label="c.author + \\', \\' + c.text"&gt;\\n      &lt;span aria-hidden="true"&gt;&lt;pdx-avatar :alt="c.author" size="sm"&gt;&lt;/pdx-avatar&gt;&lt;/span&gt;\\n      &lt;strong&gt;{{ c.author }}&lt;/strong&gt; &lt;pdx-relative-time :datetime="c.at"&gt;&lt;/pdx-relative-time&gt;\\n      &lt;p&gt;{{ c.text }}&lt;/p&gt;\\n      &lt;pdx-button variant="ghost" size="sm" @click="openReply(c, $event)"&gt;Reply&lt;/pdx-button&gt;\\n    &lt;/article&gt;\\n  }\\n  @snippet empty() { &lt;p&gt;No comments yet.&lt;/p&gt; }\\n&lt;/pdx-list&gt;\\n\\n&lt;form @submit.prevent="send()"&gt;\\n  &lt;pdx-textarea ::value="draft" arialabel="Add a comment" @keydown="onComposerKey($event)"&gt;&lt;/pdx-textarea&gt;\\n  &lt;pdx-button type="submit" size="sm" :disabled="!draft.trim()"&gt;Comment&lt;/pdx-button&gt;\\n&lt;/form&gt;\\n&lt;p class="pdx-sr-only" role="status"&gt;{{ announcement }}&lt;/p&gt;</code></pre></details></section>'));
+const __walk6=(r)=>{const __el0=r.firstChild;const __el13=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el14=__el13.firstChild;const __el54=__el14.nextSibling.nextSibling;const __el55=__el54.firstChild;const __el56=__el55.nextSibling.nextSibling;const __el58=__el56.firstChild.nextSibling.nextSibling;const __el59=__el54.nextSibling.nextSibling;const __t60=__el59.firstChild;return [__el0,__el14,__el54,__el55,__el58,__t60];};
+component('app-demo-comp-list-comment-thread', {
+  props: {},
+  setup(ctx) {
+    const __draft = signal('', { name: 'demo-comp-list-comment-thread:draft' });
+    const __replyDraft = signal('', { name: 'demo-comp-list-comment-thread:replyDraft' });
+    const __replyTo = signal(null, { name: 'demo-comp-list-comment-thread:replyTo' });
+    const __announcement = signal('', { name: 'demo-comp-list-comment-thread:announcement' });
+    const __root = signal(null, { name: 'demo-comp-list-comment-thread:root' });
+    const __composer = signal(null, { name: 'demo-comp-list-comment-thread:composer' });
+/** The person signed in: their comments can be deleted. */
+    const ME = 'You';
+    
+    
+    /** An ISO time \`minutes\` ago, so the relative times read as a live thread. */
+    function ago(minutes) { return new Date(Date.now() - minutes * 60_000).toISOString(); }
+    const thread = store({ comments: [
+  { id: 1, author: 'Alice Johnson', at: ago(180), text: 'The export times out on accounts with more than ten thousand rows.', replies: [
+    { id: 2, author: 'Bob Smith', at: ago(150), text: 'Reproduced on staging. It is the CSV writer, not the query.' },
+  ] },
+  { id: 3, author: ME, at: ago(25), text: 'I will page the writer and keep the request open while it streams.', replies: [] },
+] });
+    
+    let nextId = 100;
+    
+    
+    // A store, not a signal holding an array: a reply is pushed INTO its comment, which keeps its key. A
+    // list row reused for an unchanged key does not re-render for a replaced object; a store notifies
+    // the row's own reads instead (core \`repeat()\`: mutate the item reactively, or give it a new key).
+    
+    
+    
+    
+    /** The comment a reply is being written to, or null. One reply form at a time. */
+    
+    
+    
+    
+    /** The Reply button that opened the form: Escape and Cancel give it focus back. */
+    let replyOpener = null;
+    
+    
+    function send() {
+      const text = __draft().trim();
+      if (!text) return;
+      thread.comments.push({ id: nextId++, author: ME, at: new Date().toISOString(), text, replies: [] });
+      __draft.setRaw('');
+      __announcement.setRaw('Comment added.');
+    }
+    
+    function onComposerKey(e) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+    }
+    
+    function openReply(c, e) {
+      // The native button inside pdx-button, which is what takes focus — not the host.
+      replyOpener = e.target.closest('button');
+      __replyDraft.setRaw('');
+      __replyTo.setRaw(c.id);
+      // The form renders on this change: its field takes focus once it is in the page.
+      requestAnimationFrame(() => {
+        const field = __root() && __root().querySelector('[data-test="reply-form"] pdx-textarea');
+        if (field) field.focus();
+      });
+    }
+    
+    function closeReply() {
+      __replyTo.setRaw(null);
+      if (replyOpener) replyOpener.focus();
+    }
+    
+    function sendReply(id) {
+      const text = __replyDraft().trim();
+      if (!text) return;
+      const parent = thread.comments.find((c) => c.id === id);
+      if (parent) parent.replies.push({ id: nextId++, author: ME, at: new Date().toISOString(), text });
+      __replyDraft.setRaw('');
+      __announcement.setRaw('Reply added.');
+      closeReply();
+    }
+    
+    function onReplyKey(e, id) {
+      if (e.key === 'Escape') { e.preventDefault(); closeReply(); }
+      else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendReply(id); }
+    }
+    
+    function remove(id) {
+      const at = thread.comments.findIndex((c) => c.id === id);
+      if (at >= 0) thread.comments.splice(at, 1);
+      if (__replyTo() === id) __replyTo.setRaw(null);
+      __announcement.setRaw('Comment deleted.');
+      // The deleted comment held the focus: it goes to the composer, not to the top of the page.
+      if (__composer()) __composer().focus();
+    }
+    ctx.el.setAttribute('data-pdx-1izf8x', '');
+    return { ME, ago, nextId, thread, draft: __draft, replyDraft: __replyDraft, replyTo: __replyTo, announcement: __announcement, root: __root, composer: __composer, replyOpener, send, onComposerKey, openReply, closeReply, sendReply, onReplyKey, remove };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk6();
+    const [__el0,__el14,__el54,__el55,__el58,__t60]=__walk6(__frag);
+    bindRef(__el0,ctx.root);
+    let __el14w_items = {}; effect(() => { const __b = ctx.thread.comments; if (Object.is(__b, __el14w_items)) return; __el14w_items = __b; assignBoundProperty(__el14, "items", __b); });
+    __el14['item']=(c)=>{const __frag=__blk4();const [__el15,__el17,__t21,__el22,__t24,__el26,__m29,__m45,__m52]=__walk4(__frag);let __el15w_aria_label = {}; effect(() => { const __b = c.author + ', ' + c.text; if (Object.is(__b, __el15w_aria_label)) return; __el15w_aria_label = __b; const __v = __b; if (__v == null || __v === false) __el15.removeAttribute("aria-label"); else { __el15.setAttribute("aria-label", __v === true ? '' : String(__v)); } });let __el17w_alt = {}; effect(() => { const __b = c.author; if (Object.is(__b, __el17w_alt)) return; __el17w_alt = __b; assignBoundProperty(__el17, "alt", __b); });bindInterpolation(__t21,()=>c.author);let __el22w_datetime = {}; effect(() => { const __b = c.at; if (Object.is(__b, __el22w_datetime)) return; __el22w_datetime = __b; assignBoundProperty(__el22, "datetime", __b); });bindInterpolation(__t24,()=>c.text);__el26.addEventListener('click', safeHandler(batchHandler(($event) => ctx.openReply(c, $event)), ctx.el?.tagName?.toLowerCase(), 'click'));const __cf28=when(()=>c.author === ctx.ME,()=>{const __frag=__blk0();const [__el27]=__walk0(__frag);__el27.addEventListener('click', safeHandler(batchHandler(() => ctx.remove(c.id)), ctx.el?.tagName?.toLowerCase(), 'click'));return __frag;},null);__m29.replaceWith(__cf28);const __cf44=when(()=>c.replies.length > 0,()=>{const __frag=__blk2();const [__m43]=__walk2(__frag);const __cf42=eachRow(()=>c.replies,'id',(r)=>{const __frag=__blk1();const [__el32,__el34,__t38,__el39,__t41]=__walk1(__frag);let __el32w_aria_label = {}; effect(() => { const __b = r().author + ', ' + r().text; if (Object.is(__b, __el32w_aria_label)) return; __el32w_aria_label = __b; const __v = __b; if (__v == null || __v === false) __el32.removeAttribute("aria-label"); else { __el32.setAttribute("aria-label", __v === true ? '' : String(__v)); } });let __el34w_alt = {}; effect(() => { const __b = r().author; if (Object.is(__b, __el34w_alt)) return; __el34w_alt = __b; assignBoundProperty(__el34, "alt", __b); });bindInterpolation(__t38,()=>r().author);let __el39w_datetime = {}; effect(() => { const __b = r().at; if (Object.is(__b, __el39w_datetime)) return; __el39w_datetime = __b; assignBoundProperty(__el39, "datetime", __b); });bindInterpolation(__t41,()=>r().text);return __frag;});__m43.replaceWith(__cf42);return __frag;},null);__m45.replaceWith(__cf44);const __cf51=when(()=>ctx.replyTo() === c.id,()=>{const __frag=__blk3();const [__el46,__el47,__el49,__el50]=__walk3(__frag);__el46.addEventListener('submit',(e)=>{e.preventDefault();(safeHandler(batchHandler(() => ctx.sendReply(c.id)), ctx.el?.tagName?.toLowerCase(), 'submit'))(e);});bindTwoWay(__el47, 'value', ctx.replyDraft);let __el47w_ariaLabel = {}; effect(() => { const __b = 'Reply to ' + c.author; if (Object.is(__b, __el47w_ariaLabel)) return; __el47w_ariaLabel = __b; assignBoundProperty(__el47, "ariaLabel", __b); });__el47.addEventListener('keydown', safeHandler(batchHandler(($event) => ctx.onReplyKey($event, c.id)), ctx.el?.tagName?.toLowerCase(), 'keydown'));__el49.addEventListener('click', safeHandler(batchHandler(() => ctx.closeReply()), ctx.el?.tagName?.toLowerCase(), 'click'));let __el50w_disabled = {}; effect(() => { const __b = !ctx.replyDraft().trim(); if (Object.is(__b, __el50w_disabled)) return; __el50w_disabled = __b; assignBoundProperty(__el50, "disabled", __b); });return __frag;},null);__m52.replaceWith(__cf51);return __frag;};
+    __el14['empty']=()=>{const __frag=__blk5();return __frag;};
+    __el54.addEventListener('submit',(e)=>{e.preventDefault();(safeHandler(batchHandler(() => ctx.send()), ctx.el?.tagName?.toLowerCase(), 'submit'))(e);});
+    bindRef(__el55,ctx.composer);
+    bindTwoWay(__el55, 'value', ctx.draft);
+    __el55.addEventListener('keydown', safeHandler(batchHandler(($event) => ctx.onComposerKey($event)), ctx.el?.tagName?.toLowerCase(), 'keydown'));
+    let __el58w_disabled = {}; effect(() => { const __b = !ctx.draft().trim(); if (Object.is(__b, __el58w_disabled)) return; __el58w_disabled = __b; assignBoundProperty(__el58, "disabled", __b); });
+    bindInterpolation(__t60,()=>ctx.announcement());
     return __frag;
   })(),
 });

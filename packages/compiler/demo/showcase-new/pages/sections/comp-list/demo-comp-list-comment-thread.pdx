@@ -1,0 +1,187 @@
+<template>
+  <section :ref="root" data-test="comment-thread">
+    <h2 class="pdx-txt-heading section-heading">A comment thread</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A composition, not a component (#1022): <code>pdx-list</code> draws the comments,
+      <code>pdx-avatar</code> and <code>pdx-relative-time</code> fill each one, and a form with <code>pdx-textarea</code> and
+      <code>pdx-button</code> adds to it. Replies go one level deep. <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (<kbd>⌘</kbd>+<kbd>Enter</kbd>)
+      sends, <kbd>Escape</kbd> closes a reply.</p>
+    <div class="demo-container thread">
+      <pdx-list :items="thread.comments" dividers data-test="comments">
+        @snippet item(c) {
+          <article class="comment" :aria-label="c.author + ', ' + c.text" data-test="comment">
+            <span class="who" aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+            <div class="body">
+              <p class="meta"><strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at" class="pdx-ink-muted"></pdx-relative-time></p>
+              <p class="text">{{ c.text }}</p>
+              <div class="actions">
+                <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)" data-test="reply">Reply</pdx-button>
+                @if (c.author === ME) {
+                  <pdx-button variant="ghost" size="sm" @click="remove(c.id)" data-test="delete">Delete</pdx-button>
+                }
+              </div>
+              @if (c.replies.length > 0) {
+                <ul class="replies" aria-label="Replies">
+                  @for (c.replies as r; track r.id) {
+                    <li>
+                      <article class="comment reply" :aria-label="r.author + ', ' + r.text" data-test="reply-item">
+                        <span class="who" aria-hidden="true"><pdx-avatar :alt="r.author" size="xs"></pdx-avatar></span>
+                        <div class="body">
+                          <p class="meta"><strong>{{ r.author }}</strong> <pdx-relative-time :datetime="r.at" class="pdx-ink-muted"></pdx-relative-time></p>
+                          <p class="text">{{ r.text }}</p>
+                        </div>
+                      </article>
+                    </li>
+                  }
+                </ul>
+              }
+              @if (replyTo === c.id) {
+                <form class="composer reply-composer" @submit.prevent="sendReply(c.id)" data-test="reply-form">
+                  <pdx-textarea ::value="replyDraft" :ariaLabel="'Reply to ' + c.author" rows="2" minRows="2" maxRows="6"
+                    @keydown="onReplyKey($event, c.id)"></pdx-textarea>
+                  <div class="composer-actions">
+                    <pdx-button variant="ghost" size="sm" @click="closeReply()">Cancel</pdx-button>
+                    <pdx-button type="submit" size="sm" :disabled="!replyDraft.trim()" data-test="send-reply">Reply</pdx-button>
+                  </div>
+                </form>
+              }
+            </div>
+          </article>
+        }
+        @snippet empty() {
+          <p class="pdx-ink-muted none">No comments yet. Start the conversation below.</p>
+        }
+      </pdx-list>
+
+      <form class="composer" @submit.prevent="send()" data-test="composer">
+        <pdx-textarea :ref="composer" ::value="draft" arialabel="Add a comment" placeholder="Add a comment…" rows="2" minRows="2" maxRows="8"
+          @keydown="onComposerKey($event)" data-test="composer-text"></pdx-textarea>
+        <div class="composer-actions">
+          <span class="pdx-txt-small pdx-ink-muted hint">Ctrl+Enter to send</span>
+          <pdx-button type="submit" size="sm" :disabled="!draft.trim()" data-test="send">Comment</pdx-button>
+        </div>
+      </form>
+      <p class="pdx-sr-only" role="status" data-test="announce">{{ announcement }}</p>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="thread.comments" dividers&gt;
+  &#64;snippet item(c) &#123;
+    &lt;article :aria-label="c.author + ', ' + c.text"&gt;
+      &lt;span aria-hidden="true"&gt;&lt;pdx-avatar :alt="c.author" size="sm"&gt;&lt;/pdx-avatar&gt;&lt;/span&gt;
+      &lt;strong&gt;&#123;&#123; c.author &#125;&#125;&lt;/strong&gt; &lt;pdx-relative-time :datetime="c.at"&gt;&lt;/pdx-relative-time&gt;
+      &lt;p&gt;&#123;&#123; c.text &#125;&#125;&lt;/p&gt;
+      &lt;pdx-button variant="ghost" size="sm" @click="openReply(c, $event)"&gt;Reply&lt;/pdx-button&gt;
+    &lt;/article&gt;
+  &#125;
+  &#64;snippet empty() &#123; &lt;p&gt;No comments yet.&lt;/p&gt; &#125;
+&lt;/pdx-list&gt;
+
+&lt;form @submit.prevent="send()"&gt;
+  &lt;pdx-textarea ::value="draft" arialabel="Add a comment" @keydown="onComposerKey($event)"&gt;&lt;/pdx-textarea&gt;
+  &lt;pdx-button type="submit" size="sm" :disabled="!draft.trim()"&gt;Comment&lt;/pdx-button&gt;
+&lt;/form&gt;
+&lt;p class="pdx-sr-only" role="status"&gt;&#123;&#123; announcement &#125;&#125;&lt;/p&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+/** The person signed in: their comments can be deleted. */
+const ME = 'You';
+
+/** An ISO time `minutes` ago, so the relative times read as a live thread. */
+function ago(minutes) { return new Date(Date.now() - minutes * 60_000).toISOString(); }
+
+let nextId = 100;
+
+// A store, not a signal holding an array: a reply is pushed INTO its comment, which keeps its key. A
+// list row reused for an unchanged key does not re-render for a replaced object; a store notifies
+// the row's own reads instead (core `repeat()`: mutate the item reactively, or give it a new key).
+const thread = $store({ comments: [
+  { id: 1, author: 'Alice Johnson', at: ago(180), text: 'The export times out on accounts with more than ten thousand rows.', replies: [
+    { id: 2, author: 'Bob Smith', at: ago(150), text: 'Reproduced on staging. It is the CSV writer, not the query.' },
+  ] },
+  { id: 3, author: ME, at: ago(25), text: 'I will page the writer and keep the request open while it streams.', replies: [] },
+] });
+
+let draft = $signal('');
+let replyDraft = $signal('');
+/** The comment a reply is being written to, or null. One reply form at a time. */
+let replyTo = $signal(null);
+let announcement = $signal('');
+let root = $signal(null);
+let composer = $signal(null);
+/** The Reply button that opened the form: Escape and Cancel give it focus back. */
+let replyOpener = null;
+
+function send() {
+  const text = draft.trim();
+  if (!text) return;
+  thread.comments.push({ id: nextId++, author: ME, at: new Date().toISOString(), text, replies: [] });
+  draft = '';
+  announcement = 'Comment added.';
+}
+
+function onComposerKey(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+}
+
+function openReply(c, e) {
+  // The native button inside pdx-button, which is what takes focus — not the host.
+  replyOpener = e.target.closest('button');
+  replyDraft = '';
+  replyTo = c.id;
+  // The form renders on this change: its field takes focus once it is in the page.
+  requestAnimationFrame(() => {
+    const field = root && root.querySelector('[data-test="reply-form"] pdx-textarea');
+    if (field) field.focus();
+  });
+}
+
+function closeReply() {
+  replyTo = null;
+  if (replyOpener) replyOpener.focus();
+}
+
+function sendReply(id) {
+  const text = replyDraft.trim();
+  if (!text) return;
+  const parent = thread.comments.find((c) => c.id === id);
+  if (parent) parent.replies.push({ id: nextId++, author: ME, at: new Date().toISOString(), text });
+  replyDraft = '';
+  announcement = 'Reply added.';
+  closeReply();
+}
+
+function onReplyKey(e, id) {
+  if (e.key === 'Escape') { e.preventDefault(); closeReply(); }
+  else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendReply(id); }
+}
+
+function remove(id) {
+  const at = thread.comments.findIndex((c) => c.id === id);
+  if (at >= 0) thread.comments.splice(at, 1);
+  if (replyTo === id) replyTo = null;
+  announcement = 'Comment deleted.';
+  // The deleted comment held the focus: it goes to the composer, not to the top of the page.
+  if (composer) composer.focus();
+}
+</script>
+
+<style scoped>
+  .thread { max-width: 640px; display: flex; flex-direction: column; gap: var(--pdx-space-md); }
+  .comment { display: flex; gap: var(--pdx-space-sm); padding: var(--pdx-space-sm) var(--pdx-space-md); width: 100%; }
+  .reply { padding: var(--pdx-space-xs) 0; }
+  .who { flex-shrink: 0; }
+  .body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--pdx-space-2xs); }
+  .meta, .text { margin: 0; }
+  .meta { font-size: var(--pdx-text-sm); display: flex; gap: var(--pdx-space-xs); align-items: baseline; flex-wrap: wrap; }
+  .text { overflow-wrap: anywhere; }
+  .actions { display: flex; gap: var(--pdx-space-2xs); }
+  .replies { list-style: none; margin: 0; padding: 0 0 0 var(--pdx-space-md); border-inline-start: 2px solid var(--pdx-color-border); }
+  .composer { display: flex; flex-direction: column; gap: var(--pdx-space-xs); }
+  .reply-composer { margin-top: var(--pdx-space-xs); }
+  .composer-actions { display: flex; justify-content: flex-end; align-items: center; gap: var(--pdx-space-xs); }
+  .hint { margin-inline-end: auto; }
+  .none { margin: 0; padding: var(--pdx-space-md); }
+</style>
