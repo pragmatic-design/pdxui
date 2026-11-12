@@ -447,6 +447,12 @@ what follows in Chromium.
         <p><strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time></p>
         <p>{{ c.text }}</p>
         <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>
+        @if (replyTo === c.id) {
+          <form @submit.prevent="sendReply(c.id)">
+            <pdx-textarea ::value="replyDraft" :ariaLabel="'Reply to ' + c.author" @keydown="onReplyKey($event, c.id)"></pdx-textarea>
+            <pdx-button type="submit" size="sm" :disabled="!replyDraft.trim()">Reply</pdx-button>
+          </form>
+        }
         @if (c.replies.length > 0) {
           <ul aria-label="Replies">
             @for (c.replies as r; track r.id) { <li><article :aria-label="r.author + ', ' + r.text">…</article></li> }
@@ -480,6 +486,33 @@ function send() {
 }
 function onComposerKey(e) {
   if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+}
+
+let replyTo = $signal(null);          // one reply form at a time
+let replyDraft = $signal('');
+let replyOpener = null;               // the Reply button that opened it
+
+function openReply(c, e) {
+  replyOpener = e.target.closest('button');          // the native button inside pdx-button
+  const article = e.target.closest('article');
+  replyDraft = '';
+  replyTo = c.id;
+  requestAnimationFrame(() => article.querySelector('pdx-textarea')?.focus());
+}
+function closeReply() {
+  replyTo = null;
+  replyOpener?.focus();
+}
+function sendReply(id) {
+  const text = replyDraft.trim();
+  if (!text) return;
+  thread.comments.find((c) => c.id === id)?.replies.push({ id: crypto.randomUUID(), author: ME, at: new Date().toISOString(), text });
+  announcement = 'Reply added.';
+  closeReply();
+}
+function onReplyKey(e, id) {
+  if (e.key === 'Escape') { e.preventDefault(); closeReply(); }
+  else if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendReply(id); }
 }
 </script>
 ```
