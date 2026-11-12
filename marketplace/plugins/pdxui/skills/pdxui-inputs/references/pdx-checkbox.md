@@ -54,7 +54,7 @@ are checked against the manifest above._
 <pdx-checkbox label="Select all items"
   :checked="allOn(items)" :indeterminate="someOn(items)"
   @checked-change="e => items = setAll(items, e.detail.value)"></pdx-checkbox>
-&#64;for (items as item; track item.label) {
+@for (items as item; track item.label) {
   <pdx-checkbox :label="item.label" :value="item.label" :checked="item.on"
     @checked-change="e => items = setOne(items, item.label, e.detail.value)"></pdx-checkbox>
 }

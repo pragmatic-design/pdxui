@@ -126,7 +126,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-mention :items="users">
-  &#64;snippet suggestion(item) {
+  @snippet suggestion(item) {
     <div class="mention-custom">
       <span class="avatar">{{ item.label.charAt(0) }}</span>
       <span>{{ item.label }}</span>
