@@ -54,6 +54,25 @@ export function lateSignals<S extends LateSignal>(signals: S[], bodyLocals: Set<
     return late;
 }
 
+/**
+ * `decls` in an order where each comes after the ones of `decls` it reads, otherwise as given: a late
+ * signal reading a late store, or a store reading a signal, is placed from the offsets of those
+ * before it (#1051). A cycle, which no initializer can satisfy, keeps the given order for its members.
+ */
+export function dependencyOrder<S extends LateSignal>(decls: S[]): S[] {
+    const names = new Set(decls.map((d) => d.name));
+    const placed = new Set<string>();
+    const out: S[] = [];
+    let rest = decls;
+    while (rest.length > 0) {
+        const ready = rest.filter((d) => namesRead(d.initialExpr, names).every((n) => n === d.name || placed.has(n)));
+        const next = ready.length > 0 ? ready : rest;
+        for (const d of next) { out.push(d); placed.add(d.name); }
+        rest = rest.filter((d) => !placed.has(d.name));
+    }
+    return out;
+}
+
 /** The names a top-level statement declares: variables (destructuring included), functions, classes. */
 function declaredNames(stmt: ts.Statement): string[] {
     const out: string[] = [];

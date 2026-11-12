@@ -10,7 +10,7 @@ import { escapeForReactiveTemplate } from './codegen-shared';
 import { generateSignalDeclarations, generateDerivedDeclarations, generateAutoReturn, rewriteInitialiser } from './signal-rewrite';
 import { rewriteAst, parsesCleanly, type WarningSink } from './signal-rewrite-ast';
 import { emitWatchSource } from './watch-source';
-import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSignalMarkers } from './setup-signal-placement';
+import { lateSignals, lateSignalOffsets, insertLateSignalMarkers, replaceLateSignalMarkers, dependencyOrder } from './setup-signal-placement';
 import { originMark } from './sourcemap';
 import { maskNonCode } from './tokenizer';
 import { jsQuote, jsString } from './js-literal';
@@ -147,11 +147,13 @@ export function buildSetupBody(
         parts.push(`    const ${e.fn} = (detail) => ctx.emit(${jsQuote(e.name)}, detail${opts.length > 0 ? `, { ${opts.join(', ')} }` : ''});`);
     }
 
-    // Late signals: those reading a body-local, and those reading a late signal. They are
-    // declared inside the body, after the statement that declares what they read.
-    const late = lateSignals(analysis.signals, bodyLocalNames);
+    // Late signals and stores: those reading a body-local, and those reading a late one, signal or
+    // store alike (#1051: a store was always declared before the body, in the TDZ of a `const` above
+    // it). They are declared inside the body, after the statement that declares what they read.
+    const late = lateSignals([...analysis.signals, ...analysis.stores], bodyLocalNames);
     const signalsBeforeBody = analysis.signals.filter(s => !late.has(s.name));
     const signalsAfterBody = analysis.signals.filter(s => late.has(s.name));
+    const storesAfterBody = analysis.stores.filter(s => late.has(s.name));
     // Where each line of the body was written: marked before anything moves or rewrites
     // it, so the mark travels with the line.
     const originBody = analysis.bodyOrigins && analysis.bodyOrigins.length === analysis.body.split('\n').length
@@ -169,11 +171,12 @@ export function buildSetupBody(
 
     // Store declarations ($store → store()) — rewrite prop references with .peek()
     // (string/object-key-aware so keys and string contents aren't touched).
-    for (const s of analysis.stores) {
+    const declareStore = (s: (typeof analysis.stores)[number]): string => {
         const storeExpr = rewriteInitialiser(s.initialExpr, propNames, initSignalNames, filename);
         // The keyword as written: `let state = $store(…)` emitted as `const` threw on `state = …` (#202).
-        parts.push(markFirst(`    ${s.keyword ?? 'const'} ${s.name} = store(${storeExpr});`, s.origin));
-    }
+        return markFirst(`    ${s.keyword ?? 'const'} ${s.name} = store(${storeExpr});`, s.origin);
+    };
+    for (const s of analysis.stores) if (!late.has(s.name)) parts.push(declareStore(s));
 
     // @params — typed route params with coercion: the outlet's routeParams signal, and one computed
     // per param under the param's own name, like a $derived, so the script reads `id` (as `id()`)
@@ -445,7 +448,8 @@ export function buildSetupBody(
     //
     // One signal reading a body-local (`params`) can pull many signals after the body, and without
     // the clamp any derived reading one of them breaks the app.
-    const afterBodySignalNames = signalsAfterBody.map(s => s.name);
+    // A late store is waited for the same way (#1051).
+    const afterBodySignalNames = [...signalsAfterBody, ...storesAfterBody].map(s => s.name);
     const refsAfterBodySignal = (expr: string): boolean =>
         afterBodySignalNames.some(n => new RegExp(`\\b${n}\\b`).test(expr));
     let firstAfterSignalDerivedIdx = -1;
@@ -464,7 +468,12 @@ export function buildSetupBody(
     // because an earlier one waits. One the body does not read stays at its end, where it was.
     const bodyReads = (name: string): boolean => new RegExp(`\\b${name}\\b`).test(bodyForDerived);
     const lateDecls = [
-        ...signalsAfterBody.map(s => ({ name: s.name, initialExpr: s.initialExpr, declare: () => declareSignal(s) })),
+        // Signals and stores in an order where each follows the late ones it reads: placement reads the
+        // offsets of the declarations before it in this list.
+        ...dependencyOrder([
+            ...signalsAfterBody.map(s => ({ name: s.name, initialExpr: s.initialExpr, declare: () => declareSignal(s) })),
+            ...storesAfterBody.map(s => ({ name: s.name, initialExpr: s.initialExpr, declare: () => declareStore(s) })),
+        ]),
         ...lateForms,
         ...derivedsAfterBody.map(d => ({
             name: d.name, initialExpr: d.expr, unplaced: bodyReads(d.name) ? 'start' as const : 'end' as const,
@@ -520,7 +529,7 @@ export function buildSetupBody(
     // What the body could not place (it does not parse, or there is no body) — AFTER it: the late
     // signals, then the remaining deriveds.
     if (!lateOffsets) {
-        if (signalsAfterBody.length > 0) parts.push(signalsAfterBody.map(declareSignal).join('\n'));
+        for (const decl of lateDecls.slice(0, signalsAfterBody.length + storesAfterBody.length)) parts.push(decl.declare());
         for (const form of lateForms) parts.push(form.declare());
         if (derivedsAfterBody.length > 0) parts.push(derivedsAfterBody.map(declareDerived).join('\n'));
     }
