@@ -40,9 +40,9 @@
       </pdx-form>
 
       <div class="wizard-nav">
-        <button class="pdx-btn pdx-ghost pdx-sm" :disabled="isFirstStep()" @click="prevStep">← Previous</button>
+        <button class="pdx-ghost" size="sm" :disabled="isFirstStep()" @click="prevStep">← Previous</button>
         <span class="pdx-txt-small pdx-ink-muted" :textContent="stepLabel()"></span>
-        <button :class="nextBtnClass()" @click="nextStep" :textContent="nextBtnText()"></button>
+        <button size="sm" :class="nextBtnClass()" @click="nextStep" :textContent="nextBtnText()"></button>
       </div>
     </div>
 
@@ -93,7 +93,7 @@ function step1Style() { return wizardStep === 1 ? '' : 'display:none'; }
 function step2Style() { return wizardStep === 2 ? '' : 'display:none'; }
 function isFirstStep() { return wizardStep === 0; }
 function stepLabel() { return 'Step ' + (wizardStep + 1) + ' of 3'; }
-function nextBtnClass() { return wizardStep < 2 ? 'pdx-btn pdx-primary pdx-sm' : 'pdx-btn pdx-success pdx-sm'; }
+function nextBtnClass() { return wizardStep < 2 ? 'pdx-primary' : 'pdx-success'; }
 function nextBtnText() { return wizardStep < 2 ? 'Next →' : 'Submit ✓'; }
 </script>
 

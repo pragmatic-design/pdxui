@@ -10,7 +10,7 @@
           Child sees greeting: <strong>{{ greetingMsg }}</strong>
         </div>
         <div class="demo-controls">
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="changeGreeting">Change Greeting</button>
+          <button class="pdx-outline" size="sm" @click="changeGreeting">Change Greeting</button>
         </div>
       </pdx-provide>
     </div>

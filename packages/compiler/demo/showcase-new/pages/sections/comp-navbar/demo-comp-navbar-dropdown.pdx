@@ -18,7 +18,7 @@
           <div class="pdx-navbar-spacer"></div>
           <div class="pdx-navbar-actions">
             <a class="pdx-navbar-link" href="#">Sign In</a>
-            <button class="pdx-btn pdx-primary pdx-btn-sm">Get Started</button>
+            <button class="pdx-primary" size="sm">Get Started</button>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@
     &lt;/nav&gt;
     &lt;div class="pdx-navbar-spacer"&gt;&lt;/div&gt;
     &lt;div class="pdx-navbar-actions"&gt;
-      &lt;button class="pdx-btn pdx-primary pdx-btn-sm"&gt;Get Started&lt;/button&gt;
+      &lt;button class="pdx-primary" size="sm"&gt;Get Started&lt;/button&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;</code></pre>

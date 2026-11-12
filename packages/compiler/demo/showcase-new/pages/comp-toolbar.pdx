@@ -62,12 +62,12 @@
 // Toggle active state on toolbar buttons (for demo interactivity). One delegated listener on the
 // page's root: it hears every toolbar button this page renders, with no wait for them to exist.
 function onToolbarClick(e) {
-  const btnEl = e.target.closest && e.target.closest('pdx-toolbar .pdx-btn');
+  const btnEl = e.target.closest && e.target.closest('pdx-toolbar button');
   if (!btnEl) return;
   const parentGroup = btnEl.closest('.pdx-toolbar-group');
   if (parentGroup && parentGroup.hasAttribute('data-radio')) {
     // Radio group (alignment): one active at a time
-    parentGroup.querySelectorAll('.pdx-btn').forEach(function(siblingEl) { siblingEl.classList.remove('active'); });
+    parentGroup.querySelectorAll('button').forEach(function(siblingEl) { siblingEl.classList.remove('active'); });
     btnEl.classList.add('active');
   } else {
     // Independent toggle (bold, italic, etc.)

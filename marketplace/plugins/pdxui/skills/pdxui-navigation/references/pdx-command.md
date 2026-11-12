@@ -57,7 +57,7 @@ const items = [
 
 ```html
 <div class="demo-container">
-  <button class="pdx-btn pdx-outline" @click="filesOpen = true">Find a file</button>
+  <button class="pdx-outline" @click="filesOpen = true">Find a file</button>
   <span class="run-note pdx-txt-small pdx-ink-muted">Opened: <strong>{{ lastFile }}</strong></span>
   <pdx-command
     ::open="filesOpen"

@@ -21,8 +21,8 @@
               <span class="tc-sw" style="background: var(--pdx-color-warning)"></span>
               <span class="tc-sw" style="background: var(--pdx-color-danger)"></span>
             </div>
-            <button class="pdx-btn pdx-primary tc-btn">Primary</button>
-            <button class="pdx-btn pdx-outline tc-btn">Outline</button>
+            <button class="pdx-primary tc-btn">Primary</button>
+            <button class="pdx-outline tc-btn">Outline</button>
             <div class="tc-input-wrap pdx-input-wrap">
               <input class="pdx-input" placeholder="Input" readonly />
             </div>

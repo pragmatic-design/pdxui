@@ -8,7 +8,7 @@
       skipped by the arrows, never run. A <code>shortcut</code> is shown and announced as a key shortcut.
     </p>
     <div class="demo-container">
-      <button class="pdx-btn pdx-primary" @click="open = true">
+      <button class="pdx-primary" @click="open = true">
         <pdx-icon name="search" size="14"></pdx-icon> Open command palette
       </button>
       <span class="run-note pdx-txt-small pdx-ink-muted">Last run: <strong>{{ lastRun }}</strong></span>

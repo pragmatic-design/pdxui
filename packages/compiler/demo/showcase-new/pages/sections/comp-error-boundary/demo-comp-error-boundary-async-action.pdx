@@ -9,7 +9,7 @@
       @if (formState === 'idle') {
         <div class="demo-widget">
           <div class="pdx-txt-small"><strong>Email:</strong> not-an-email</div>
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="submitForm">Submit Form</button>
+          <button class="pdx-outline" size="sm" @click="submitForm">Submit Form</button>
         </div>
       }
       @if (formState === 'submitting') {
@@ -23,13 +23,13 @@
           <div class="pdx-error-icon">&#9888;</div>
           <div class="pdx-error-msg">Form submission failed</div>
           <div class="pdx-error-detail">{{ formError }}</div>
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline retry-btn" @click="resetForm">Fix and Retry</button>
+          <button class="pdx-outline retry-btn" size="sm" @click="resetForm">Fix and Retry</button>
         </div>
       }
       @if (formState === 'success') {
         <div class="demo-widget success-widget">
           <div class="pdx-txt-small" style="color: var(--pdx-color-success); font-weight: 600">&#10003; Form submitted</div>
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" style="margin-top: var(--pdx-space-xs)" @click="resetForm">Reset</button>
+          <button class="pdx-outline" size="sm" style="margin-top: var(--pdx-space-xs)" @click="resetForm">Reset</button>
         </div>
       }
     </div>

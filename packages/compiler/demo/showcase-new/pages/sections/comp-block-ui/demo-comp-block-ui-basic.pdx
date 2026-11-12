@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading section-heading">Basic</h2>
     <p class="pdx-txt-small pdx-ink-muted">Toggle the blocked state. Content underneath is non-interactive while blocked.</p>
     <div class="demo-actions">
-      <button class="pdx-btn pdx-primary pdx-btn-xs" @click="toggleBlock">Toggle Block</button>
+      <button class="pdx-primary" size="sm" @click="toggleBlock">Toggle Block</button>
     </div>
     <div class="demo-wrap">
       <pdx-block-ui :blocked="blocked" id="demo-block">
@@ -11,9 +11,9 @@
           <h3>Panel Content</h3>
           <p class="pdx-txt-small pdx-ink-muted">This content is blocked during loading. Buttons are non-clickable.</p>
           <div style="display:flex;gap:8px;margin-top:var(--pdx-space-sm)">
-            <button class="pdx-btn pdx-outline pdx-btn-xs">Action A</button>
-            <button class="pdx-btn pdx-outline pdx-btn-xs">Action B</button>
-            <button class="pdx-btn pdx-primary pdx-btn-xs">Save</button>
+            <button class="pdx-outline" size="sm">Action A</button>
+            <button class="pdx-outline" size="sm">Action B</button>
+            <button class="pdx-primary" size="sm">Save</button>
           </div>
         </div>
       </pdx-block-ui>
