@@ -11,6 +11,7 @@
  *            <canvas data-part="pad" role="img" aria-label="Signature, empty" tabindex="0">
  *            <span data-part="guide"> · <span data-part="prompt"> while empty
  *          <div class="pdx-signature-actions"> Undo, Clear (disabled while there is nothing to take off)
+ *      every button is size="sm" (buttons.css): a ghost button, smaller than the default one.
  *  - CSS: packages/design/src/components/signature-pad.css
  *      .pdx-signature-surface → height var(--pdx-signature-height) (10rem), paper background, border.
  *      .pdx-signature-canvas → width/height 100% of the surface; touch-action: none.
@@ -37,6 +38,13 @@ export const signaturePad: ComponentManifest = {
             id: 'signature-pad-disabled',
             title: 'Signature pad — Disabled',
             html: `<div style="max-width: 420px;"><pdx-signature-pad data-test="sig" label="Customer signature" disabled></pdx-signature-pad></div>`,
+        },
+        {
+            // A default-size ghost button beside the pad: the yardstick the pad's small buttons are
+            // measured against (#1037).
+            id: 'signature-pad-button-size',
+            title: 'Signature pad — Button size',
+            html: `<div style="max-width: 420px;"><button type="button" class="pdx-ghost" data-test="ref">Reference</button><pdx-signature-pad data-test="sig" label="Customer signature"></pdx-signature-pad></div>`,
         },
     ],
 
@@ -75,6 +83,25 @@ export const signaturePad: ComponentManifest = {
                             { description: 'pad width ≈ surface width', left: 'pad.width', op: '<=', right: 'surface.width', tolerance: 0 },
                             { description: 'pad height ≈ surface height', left: 'pad.height', op: '<=', right: 'surface.height', tolerance: 0 },
                             { description: 'pad fills the width (within the border)', left: 'pad.width', op: '>=', right: 'surface.width', tolerance: 2 },
+                        ],
+                    },
+                ],
+            },
+            'signature-pad-button-size': {
+                composition: [
+                    {
+                        // The toolbar's and the actions' buttons are small (size="sm"): the class
+                        // pdx-btn-sm sizes a button only inside .pdx-toolbar, and drew them at full height.
+                        description: 'the pad\'s buttons are smaller than a default button',
+                        parent: 'body',
+                        children: {
+                            ref: 'section:not([hidden]) [data-test="ref"]',
+                            mode: 'section:not([hidden]) [data-test="sig"] [data-part="modeButton"]',
+                            clear: 'section:not([hidden]) [data-test="sig"] [data-part="clearButton"]',
+                        },
+                        relations: [
+                            { description: 'mode button height < default button height', left: 'mode.height', op: '<', right: 'ref.height' },
+                            { description: 'clear button height < default button height', left: 'clear.height', op: '<', right: 'ref.height' },
                         ],
                     },
                 ],
