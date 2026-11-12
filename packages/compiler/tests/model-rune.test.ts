@@ -215,3 +215,31 @@ describe('@model … { form: () => expr }', () => {
         expect(code).not.toContain('formValue');
     });
 });
+
+// `{ missing: () => expr }` (#1039): when the value counts as missing for `required`, said by the
+// component — an object model is never missing by core's own rule. The runtime half is
+// packages/core/tests/form-model.test.ts.
+describe('@model … { form, missing: () => expr }', () => {
+    it('is read beside form, and the model is still a form model', () => {
+        const analysis = analyzeScript("@model value: Record<string, string> | null = null { form: () => JSON.stringify(value), missing: () => !value?.en };", 'field.pdx');
+        expect(analysis.props).toEqual([expect.objectContaining({ name: 'value', model: true, form: true })]);
+        expect(analysis.warnings).toEqual([]);
+    });
+
+    it('compiles to ctx.formMissing with the expression, its signals rewritten as the script\'s are', () => {
+        const { code } = compile(sfc("@model value: Record<string, string> | null = null { form, missing: () => !value?.en || strict };\nlet strict = $signal(false);"), 'field.pdx', [], undefined, {});
+        expect(code).toContain('ctx.formMissing?.(() => !__value()?.en || __strict());');
+    });
+
+    it('missing without form is PDX_UNKNOWN_DECLARATION: only a form model is judged by required', () => {
+        const analysis = analyzeScript("@model value: string = '' { missing: () => !value };", 'field.pdx');
+        const w = analysis.warnings.find((x) => x.code === 'PDX_UNKNOWN_DECLARATION');
+        expect(w, '{ missing } without { form } was accepted').toBeDefined();
+        expect(w!.hint).toContain('form');
+    });
+
+    it('control: a model with no missing calls no formMissing', () => {
+        const { code } = compile(sfc("@model value: string = '' { form };"), 'field.pdx', [], undefined, {});
+        expect(code).not.toContain('formMissing');
+    });
+});

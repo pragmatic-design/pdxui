@@ -1,0 +1,10 @@
+<template>
+  <span class="missing">{{ JSON.stringify(value) }}</span>
+</template>
+
+<script>
+// A value core's own rule never calls missing, an object, with the component saying when it is
+// (#1039): both keys have to be there. It submits its JSON. tests/form-model.spec.ts.
+@model value: Record<string, string> = {} { form: () => JSON.stringify(value), missing: () => !value.en || !value.it };
+@prop required: boolean = false;
+</script>

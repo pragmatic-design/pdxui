@@ -1,5 +1,5 @@
-// A `@model` declaration's trailing options, `{ form }`, `{ form: () => expr }` and `{ attribute: … }`
-// (#135, #751, #753), and how its attribute is read.
+// A `@model` declaration's trailing options, `{ form }`, `{ form: () => expr }`, `{ missing: () => expr }`
+// and `{ attribute: … }` (#135, #751, #1039, #753), and how its attribute is read.
 //
 // The options are the declaration's last top-level `{ … }`, its entries split at top-level commas.
 // Braces, brackets, parentheses and string literals inside them are skipped whole, so a `form`
@@ -19,6 +19,8 @@ export interface ModelOptions {
     form: boolean;
     /** `form: expr`: what the form submits instead of the model. */
     formExpr?: string;
+    /** `missing: expr`: when the value counts as missing for `required` (#1039); a form model's only. */
+    missingExpr?: string;
     /** `attribute: x`, as written: one of ATTRIBUTE_READINGS's keys, or a word that is not. */
     attribute?: string;
 }
@@ -55,12 +57,16 @@ export function readModelOptions(declaration: string): { options: ModelOptions; 
     if (depth !== 0 || lastOpen <= 0) return null;
     const options: ModelOptions = { form: false };
     for (const entry of splitTopLevel(text.slice(lastOpen + 1, -1))) {
-        // Match: `form`, `form: <expression>` or `attribute: <word>`. Groups: [1]=name [2]=its value
-        const m = /^(form|attribute)\s*(?::\s*([\s\S]+))?$/.exec(entry);
+        // Match: `form`, `form: <expression>`, `missing: <expression>` or `attribute: <word>`.
+        // Groups: [1]=name [2]=its value
+        const m = /^(form|missing|attribute)\s*(?::\s*([\s\S]+))?$/.exec(entry);
         if (!m) return null;
         if (m[1] === 'form') {
             options.form = true;
             if (m[2]) options.formExpr = m[2];
+        } else if (m[1] === 'missing') {
+            if (!m[2]) return null;
+            options.missingExpr = m[2];
         } else {
             if (!m[2] || !/^\w+$/.test(m[2])) return null;
             options.attribute = m[2];

@@ -107,3 +107,17 @@ test('a model\'s { form: () => expr } is what the form submits; a null model wit
     await setProp(page, 'app-fm-null', 'value', 'z1');
     expect(await second(), 'the expression follows the model').toEqual([['e', 'b'], ['z', 'z1']]);
 });
+
+// `{ missing: () => expr }` (#1039): an object model, which core's own rule never calls missing.
+test('a model\'s { missing: () => expr } decides valueMissing for required: invalid with one key, valid with both', async ({ page }) => {
+    const state = () => page.evaluate(() => ({
+        valid: (document.getElementById('f3') as HTMLFormElement).checkValidity(),
+        missing: (document.querySelector('app-fm-missing') as unknown as { validity: ValidityState }).validity.valueMissing,
+    }));
+    expect(await state(), 'an empty object, required').toEqual({ valid: false, missing: true });
+    await setProp(page, 'app-fm-missing', 'value', { en: 'Hi' });
+    expect(await state(), 'one key: still missing, though an object').toEqual({ valid: false, missing: true });
+    await setProp(page, 'app-fm-missing', 'value', { en: 'Hi', it: 'Ciao' });
+    expect(await state(), 'both keys').toEqual({ valid: true, missing: false });
+    expect(await page.evaluate(() => new FormData(document.getElementById('f3') as HTMLFormElement).get('m'))).toBe('{"en":"Hi","it":"Ciao"}');
+});

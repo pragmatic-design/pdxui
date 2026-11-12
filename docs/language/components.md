@@ -112,7 +112,10 @@ rules; reset, restore and `required` stay on the model. The expression is a func
 read again whenever what it reads changes, its signals rewritten as the script's are; it compiles to
 `ctx.formValue(…)` at the end of the setup, so it may read what the script declares after the model.
 `@model value: string | null = null { form: () => value ?? '' };` submits an empty entry where a null
-model would submit none, as a native select with an empty placeholder does.
+model would submit none, as a native select with an empty placeholder does. A component whose value
+is missing by a rule of its own — an object, which the rule above never calls missing — says when, with
+`{ form, missing: () => expr }` (#1039 — landed): `required` is `valueMissing` while the expression is
+true. It compiles to `ctx.formMissing(…)`, the TypeScript form, read again whenever what it reads changes.
 
 `{ attribute: string }` (#753 — landed; or `number`, `boolean`, `json`) says how the attribute is read,
 apart from the model's type: a select's value is one string from the attribute and an array in
