@@ -428,6 +428,82 @@ function open(a) { console.log('open appointment', a.id); }
   the text's box, not the block's: when a slot is too short the block keeps its height and the
   `overflow: hidden` line shrinks and cuts its own text. CSS that stacks three lines in a short block fails the measure.
 
+## A comment thread (notes on a ticket, a review, a task)
+
+There is no thread component, by decision (#1022): mentions, reactions and how deep replies go differ
+from app to app more than a component could fix. A thread is a composition: **`pdx-list`** draws the
+comments, **`pdx-avatar`** and **`pdx-relative-time`** fill each one, and a form with
+**`pdx-textarea`** and **`pdx-button`** adds to it. The working example is the "A comment thread"
+section of pdx-list's page (`compiler/demo/showcase-new/pages/sections/comp-list/demo-comp-list-comment-thread.pdx`,
+on the site at `/components/pdx-list`), and `packages/site/tests/comment-thread-recipe.spec.ts` holds
+what follows in Chromium.
+
+```html
+<template>
+  <pdx-list :items="thread.comments" dividers>
+    @snippet item(c) {
+      <article :aria-label="c.author + ', ' + c.text">
+        <span aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+        <p><strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time></p>
+        <p>{{ c.text }}</p>
+        <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>
+        @if (c.replies.length > 0) {
+          <ul aria-label="Replies">
+            @for (c.replies as r; track r.id) { <li><article :aria-label="r.author + ', ' + r.text">…</article></li> }
+          </ul>
+        }
+      </article>
+    }
+    @snippet empty() { <p>No comments yet.</p> }
+  </pdx-list>
+
+  <form @submit.prevent="send()">
+    <pdx-textarea :ref="composer" ::value="draft" arialabel="Add a comment" @keydown="onComposerKey($event)"></pdx-textarea>
+    <pdx-button type="submit" size="sm" :disabled="!draft.trim()">Comment</pdx-button>
+  </form>
+  <p class="pdx-sr-only" role="status">{{ announcement }}</p>
+</template>
+
+<script>
+const ME = 'You';
+const thread = $store({ comments: [/* { id, author, at: ISO, text, replies: [] } */] });
+let draft = $signal('');
+let announcement = $signal('');
+let composer = $signal(null);
+
+function send() {
+  const text = draft.trim();
+  if (!text) return;
+  thread.comments.push({ id: crypto.randomUUID(), author: ME, at: new Date().toISOString(), text, replies: [] });
+  draft = '';
+  announcement = 'Comment added.';
+}
+function onComposerKey(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); }
+}
+</script>
+```
+
+- **The thread is a `$store`, not a `$signal` holding an array.** A reply is `parent.replies.push(…)`
+  into a comment whose `id` does not change. A list row reused for an unchanged key is not drawn again
+  for a replaced object (`{ ...c, replies: [...] }` shows nothing, and core warns in development); a
+  store notifies the row's own reads.
+- **Ctrl+Enter (⌘+Enter) sends** and the field keeps focus; Enter alone is a new line. An empty or
+  blank comment cannot be sent: the button is disabled on `!draft.trim()`.
+- **A reply opens in place, one at a time**, and its field takes focus once it is rendered (a
+  `requestAnimationFrame` after setting the state). Escape and Cancel close it and give focus back to
+  the Reply button that opened it: the native `<button>` inside `pdx-button` (`e.target.closest('button')`),
+  not the host, which is not focusable.
+- **Deleting a comment moves focus to the composer.** The focused button went away with its comment;
+  left alone, focus falls to `<body>`.
+- **Every change is announced** through one `role="status"` line: added, replied, deleted.
+- **Each comment is an `article` named by its author and text**, so a screen reader moving by article
+  hears who said what. The avatar is wrapped in `aria-hidden`: `pdx-avatar` needs `alt` to draw the
+  initials, and that also names it, so beside the written name it would be read twice.
+- **Replies go one level deep**, in a `ul` inside their comment. Deeper threads, editing, mentions
+  (`pdx-mention` in place of `pdx-textarea`) and saving through your API are the app's: the store is
+  where an optimistic write goes, and a failed save takes the comment back out and says so.
+
 ## A generic LOB admin: a descriptor → `createCrud` and `createDetail` (canonically `Pragmatic.Design.Builder/profiler/app`)
 An app with dozens of entities: **no hand-written per-entity `.pdx` at all**. Two runtimes and two generators.
 - **The runtimes** (`src/lib/`): `createCrud(d)` (the list: grid, filter builder and CRUD drawer), and `createDetail(d)` (master-detail:
