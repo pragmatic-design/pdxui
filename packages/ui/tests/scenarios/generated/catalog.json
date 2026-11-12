@@ -2882,6 +2882,10 @@
         {
           "id": "signature-pad-disabled",
           "title": "Signature pad — Disabled"
+        },
+        {
+          "id": "signature-pad-button-size",
+          "title": "Signature pad — Button size"
         }
       ]
     },

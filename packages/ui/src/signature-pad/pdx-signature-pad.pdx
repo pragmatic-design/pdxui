@@ -1,9 +1,9 @@
 <template>
   <div class="pdx-signature-pad" data-part="root" role="group" :aria-label="fieldName">
     <div class="pdx-signature-toolbar" data-part="toolbar">
-      <button type="button" class="pdx-ghost pdx-btn-sm pdx-signature-mode" data-part="modeButton"
+      <button type="button" class="pdx-ghost pdx-signature-mode" size="sm" data-part="modeButton"
         :aria-pressed="String(mode === 'draw')" :disabled="!interactive" @click="setMode('draw')">{{ uiString('signature-pad', 'draw') }}</button>
-      <button type="button" class="pdx-ghost pdx-btn-sm pdx-signature-mode" data-part="modeButton"
+      <button type="button" class="pdx-ghost pdx-signature-mode" size="sm" data-part="modeButton"
         :aria-pressed="String(mode === 'type')" :disabled="!interactive" @click="setMode('type')">{{ uiString('signature-pad', 'type') }}</button>
     </div>
     @if (mode === 'type') {
@@ -23,10 +23,10 @@
     @if (!readonly) {
       <div class="pdx-signature-actions">
         @if (mode === 'draw') {
-          <button type="button" class="pdx-ghost pdx-btn-sm" data-part="undoButton"
+          <button type="button" class="pdx-ghost" size="sm" data-part="undoButton"
             :disabled="!interactive || strokeCount === 0" @click="undo()">{{ uiString('signature-pad', 'undo') }}</button>
         }
-        <button type="button" class="pdx-ghost pdx-btn-sm" data-part="clearButton"
+        <button type="button" class="pdx-ghost" size="sm" data-part="clearButton"
           :disabled="!interactive || !signed" @click="clear()">{{ uiString('signature-pad', 'clear') }}</button>
       </div>
     }

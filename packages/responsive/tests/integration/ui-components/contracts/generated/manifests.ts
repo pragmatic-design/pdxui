@@ -645,6 +645,7 @@ export const scenarioPage: Record<string, string> = {
     "sidebar-position-right": "tier-6",
     "signature-pad-basic": "tier-3c",
     "signature-pad-disabled": "tier-3c",
+    "signature-pad-button-size": "tier-3c",
     "slider-basic": "tier-1c",
     "slider-sizes": "tier-1c",
     "slider-disabled": "tier-1c",
