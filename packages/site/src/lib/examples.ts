@@ -13,6 +13,7 @@ export const examples: Record<string, string> = {
     'pdx-slider': '<pdx-slider value="40" style="width:280px"></pdx-slider>',
     'pdx-rating': '<pdx-rating value="3"></pdx-rating>',
     'pdx-signature-pad': '<pdx-signature-pad label="Signature" style="width:320px"></pdx-signature-pad>',
+    'pdx-localized-input': `<pdx-localized-input label="Product name" cultures='["en","it","fr"]' value='{"en":"Desk lamp"}' style="width:320px"></pdx-localized-input>`,
     'pdx-kanban': `<pdx-kanban label="Sprint" columns='[{"key":"todo","label":"To do"},{"key":"done","label":"Done"}]' items='[{"id":"a","title":"Write the spec","status":"todo"},{"id":"b","title":"Ship it","status":"done"}]'></pdx-kanban>`,
     'pdx-input': '<pdx-input placeholder="Type here…" style="width:280px"></pdx-input>',
     'pdx-textarea': '<pdx-textarea placeholder="Your message…" style="width:280px"></pdx-textarea>',

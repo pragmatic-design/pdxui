@@ -1,0 +1,83 @@
+/* Localized input — one text in several cultures: a tab per culture with a missing marker, one field per
+   culture. States on pdx-localized-input's host: incomplete, invalid, disabled, readonly. The fields are
+   `.pdx-input` / `.pdx-textarea`: they look like the library's other fields. */
+
+.pdx-localized-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-xs);
+    min-width: 0;
+}
+
+.pdx-localized-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-localized-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    border: 1px solid transparent;
+    border-radius: var(--pdx-radius-sm);
+    background: none;
+    color: var(--pdx-color-muted);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    cursor: pointer;
+}
+
+.pdx-localized-tab:hover {
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-inset);
+}
+
+.pdx-localized-tab[aria-selected="true"] {
+    color: var(--pdx-color-primary-ink);
+    background: var(--pdx-color-primary-soft);
+}
+
+.pdx-localized-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* A culture with no text: a dot in the warning ink beside its name. */
+.pdx-localized-marker {
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--pdx-color-warning-ink);
+}
+
+.pdx-localized-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+}
+
+.pdx-localized-row {
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-localized-row-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-muted);
+}
+
+/* ===== States ===== */
+
+:state(disabled) > .pdx-localized-input {
+    opacity: var(--pdx-opacity-disabled);
+}
+
+:state(disabled) > .pdx-localized-input .pdx-localized-tab {
+    cursor: not-allowed;
+}

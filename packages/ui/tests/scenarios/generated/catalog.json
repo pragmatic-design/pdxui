@@ -1991,6 +1991,29 @@
       ]
     },
     {
+      "name": "localized-input",
+      "tags": [
+        "pdx-localized-input"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "localized-input-tabs",
+          "title": "Localized input — Tabs"
+        },
+        {
+          "id": "localized-input-stacked",
+          "title": "Localized input — Stacked"
+        },
+        {
+          "id": "localized-input-disabled",
+          "title": "Localized input — Disabled"
+        }
+      ]
+    },
+    {
       "name": "masked-input",
       "tags": [
         "pdx-masked-input"

@@ -169,6 +169,7 @@ const componentItems = [
       { key: '/components/time-picker', label: 'TimePicker' },
       { key: '/components/color-picker', label: 'ColorPicker' },
       { key: '/components/tag-input', label: 'TagInput' },
+      { key: '/components/localized-input', label: 'LocalizedInput' },
       { key: '/components/cascader', label: 'Cascader' },
       { key: '/components/tree-select', label: 'TreeSelect' },
       { key: '/components/file-upload', label: 'FileUpload' },

@@ -1,0 +1,52 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Localized Input</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-localized-input&gt;</code> — one text in several cultures, <code>{ [culture]: string }</code>, the shape
+      of a LocalizedString: tabs named in each language, missing cultures marked, each field with its own
+      <code>lang</code> and <code>dir</code>.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <app-demo-comp-localized-input-basic class="demo-section"></app-demo-comp-localized-input-basic>
+
+    <!-- ═══ Stacked ═══ -->
+    <app-demo-comp-localized-input-stacked class="demo-section"></app-demo-comp-localized-input-stacked>
+
+    <!-- ═══ Form ═══ -->
+    <app-demo-comp-localized-input-form class="demo-section"></app-demo-comp-localized-input-form>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>value</code><span>{ [culture]: string } | null</span><span>The text by culture; the form submits its JSON</span></div>
+        <div class="opt-row"><code>cultures</code><span>string[]</span><span>The culture codes; the current locale's comes first</span></div>
+        <div class="opt-row"><code>default-culture</code><span>string</span><span>The culture <code>required-scope="default"</code> asks, and the placeholder of an empty one</span></div>
+        <div class="opt-row"><code>required</code> / <code>required-scope</code><span>boolean / 'all' | 'default'</span><span>Every culture, or the default one</span></div>
+        <div class="opt-row"><code>layout</code><span>'tabs' | 'stacked'</span><span>One culture at a time, or all</span></div>
+        <div class="opt-row"><code>multiline</code> / <code>rows</code><span>boolean / number</span><span>A textarea per culture</span></div>
+        <div class="opt-row"><code>label</code> / <code>aria-label</code><span>string</span><span>The field's name; each culture's field is "label (language)"</span></div>
+        <div class="opt-row"><code>disabled</code> / <code>readonly</code> / <code>error</code><span></span><span>As every field</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">States and parts</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Selector</span><span>—</span><span>When</span></div>
+        <div class="opt-row"><code>:state(incomplete)</code><span></span><span>Some culture has no text</span></div>
+        <div class="opt-row"><code>:state(invalid | disabled | readonly)</code><span></span><span>As every field</span></div>
+        <div class="opt-row"><code>[data-part="tab"] / [data-part="marker"] / [data-part="field"]</code><span></span><span>A culture's tab, its missing dot, its field</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/localized-input';
+@title 'Localized Input Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

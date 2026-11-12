@@ -33,6 +33,7 @@ import './otp-input/pdx-otp-input';
 import './radio-group/pdx-radio-group';
 import './checkbox-group/pdx-checkbox-group';
 import './tag-input/pdx-tag-input';
+import './localized-input/pdx-localized-input.pdx';
 import './color-picker/pdx-color-picker';
 import './file-upload/pdx-file-upload';
 import './slider/pdx-slider';

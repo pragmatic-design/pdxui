@@ -637,6 +637,11 @@
       "types": "./dist/kanban/pdx-kanban.d.ts",
       "import": "./dist/kanban/pdx-kanban.js"
     },
+    "./localized-input": {
+      "development": "./src/localized-input/pdx-localized-input.pdx",
+      "types": "./dist/localized-input/pdx-localized-input.d.ts",
+      "import": "./dist/localized-input/pdx-localized-input.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

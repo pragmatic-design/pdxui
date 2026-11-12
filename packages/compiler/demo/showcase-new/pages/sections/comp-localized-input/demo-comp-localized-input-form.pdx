@@ -1,0 +1,37 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Form Integration</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Form-associated: the form submits the value's JSON under its <code>name</code>. <code>required</code> asks every culture; with <code>required-scope="default"</code> only the default culture.</p>
+    <div class="demo-stack">
+      <form @submit="onSubmit">
+        <pdx-form-field label="Title (every culture)" required>
+          <pdx-localized-input name="title" required :cultures="cultures"></pdx-localized-input>
+        </pdx-form-field>
+        <pdx-form-field label="Subtitle (English required)" required>
+          <pdx-localized-input name="subtitle" required required-scope="default" default-culture="en" :cultures="cultures"></pdx-localized-input>
+        </pdx-form-field>
+        <div class="actions">
+          <button type="submit" class="pdx-primary">Submit</button>
+          <button type="reset" class="pdx-ghost">Reset</button>
+        </div>
+      </form>
+      <pre class="pdx-txt-mono pdx-txt-small">{{ submitted }}</pre>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it'];
+let submitted = $signal('');
+
+function onSubmit(e) {
+  e.preventDefault();
+  const data = new FormData(e.target);
+  submitted = 'title: ' + data.get('title') + '\nsubtitle: ' + data.get('subtitle');
+}
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }
+  .actions { display: flex; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }
+</style>

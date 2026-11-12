@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">One text in several cultures. Each culture is a tab named in its own language, the current one first; a dot marks a culture still missing, and an empty culture shows the default one's text as a hint. <code>::value</code> holds <code>{ [culture]: string }</code>.</p>
+    <div class="demo-stack">
+      <pdx-localized-input label="Product name" :cultures="cultures" ::value="name"></pdx-localized-input>
+      <pre class="pdx-txt-mono pdx-txt-small">{{ JSON.stringify(name) }}</pre>
+    </div>
+  </section>
+</template>
+
+<script>
+const cultures = ['en', 'it', 'de', 'fr'];
+let name = $signal({ en: 'Desk lamp', it: 'Lampada da scrivania' });
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); max-width: 440px; }
+</style>

@@ -26,6 +26,7 @@
 @import "./autocomplete.css";
 @import "./color-picker.css";
 @import "./tag-input.css";
+@import "./localized-input.css";
 @import "./file-upload.css";
 @import "./rating.css";
 @import "./signature-pad.css";
