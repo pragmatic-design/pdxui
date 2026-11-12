@@ -29,6 +29,7 @@
         // Each component carries its own CSS, so that an app ships the styles of what it renders.
         // A barrel import here would register every component and load every stylesheet, and a
         // scenario could then rely on a neighbour's import without anything noticing.
+        import '@pdxui/ui/kanban';
         import '@pdxui/ui/rating';
         import '@pdxui/ui/signature-pad';
 
@@ -56,7 +57,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-rating","pdx-signature-pad"];
+        const __tags = ["pdx-kanban","pdx-rating","pdx-signature-pad"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -70,6 +71,16 @@
     </script>
 </head>
 <body>
+
+    <section data-scenario="kanban-basic">
+        <h3>Kanban — Basic</h3>
+        <pdx-kanban data-test="board" label="Sprint" columns='[{"key":"todo","label":"To do"},{"key":"doing","label":"Doing","limit":1},{"key":"done","label":"Done"}]' items='[{"id":"a","title":"Write the spec","status":"todo"},{"id":"b","title":"Fix the bug","status":"todo"},{"id":"c","title":"Review","status":"doing"}]'></pdx-kanban>
+    </section>
+
+    <section data-scenario="kanban-disabled">
+        <h3>Kanban — Disabled</h3>
+        <pdx-kanban data-test="board" label="Sprint" disabled columns='[{"key":"todo","label":"To do"},{"key":"doing","label":"Doing","limit":1},{"key":"done","label":"Done"}]' items='[{"id":"a","title":"Write the spec","status":"todo"},{"id":"b","title":"Fix the bug","status":"todo"},{"id":"c","title":"Review","status":"doing"}]'></pdx-kanban>
+    </section>
 
     <section data-scenario="rating-basic">
         <h3>Rating — Basic</h3>

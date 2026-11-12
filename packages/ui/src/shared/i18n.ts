@@ -29,6 +29,21 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // `toggle` names a panel's toggle when the group has no label to name it.
     'field-group': { edit: 'Edit', toggle: 'Show or hide section' },
     list: { empty: 'No items' },
+    // A move said out loud: `{title}` is the card, `{column}` the column's label, `{position}` and
+    // `{total}` its place in it, counted from 1. `count` / `countLimit` are the column's header count.
+    // `move` names a card's Move menu button; the menu's entries are `up`…`moveTo`.
+    kanban: {
+        label: 'Board', roleDescription: 'movable card', empty: 'No cards',
+        instructions: 'Press Space or Enter to pick the card up, the arrow keys to move it, Space or Enter to drop it, and Escape to cancel. The Move menu does the same.',
+        lifted: '{title} lifted. {column}, position {position} of {total}.',
+        moved: '{column}, position {position} of {total}.',
+        dropped: '{title} dropped. {column}, position {position} of {total}.',
+        refused: 'Move refused. {title} is back in {column}.',
+        cancelled: 'Move cancelled. {title} is back in {column}.',
+        count: '{count}', countLimit: '{count} of {limit}',
+        move: 'Move {title}', up: 'Move up', down: 'Move down', top: 'Move to top', bottom: 'Move to bottom',
+        moveTo: 'Move to {column}',
+    },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.
     'signature-pad': {

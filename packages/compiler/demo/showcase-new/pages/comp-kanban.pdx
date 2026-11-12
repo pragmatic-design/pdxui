@@ -1,0 +1,62 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Kanban</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-kanban&gt;</code> — columns of cards moved by the pointer, the keyboard or a Move menu, each move
+      asked of the app first with a cancellable <code>before-move</code> and announced to a screen reader.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <app-demo-comp-kanban-basic class="demo-section"></app-demo-comp-kanban-basic>
+
+    <!-- ═══ Refusing a move ═══ -->
+    <app-demo-comp-kanban-refuse class="demo-section"></app-demo-comp-kanban-refuse>
+
+    <!-- ═══ Custom cards ═══ -->
+    <app-demo-comp-kanban-card class="demo-section"></app-demo-comp-kanban-card>
+
+    <!-- ═══ States ═══ -->
+    <app-demo-comp-kanban-states class="demo-section"></app-demo-comp-kanban-states>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>T[]</span><span>The cards; written on a move (<code>::items</code>)</span></div>
+        <div class="opt-row"><code>columns</code><span>{ key, label, limit? }[]</span><span>The columns in order; <code>limit</code> shows in the count and marks the column over it</span></div>
+        <div class="opt-row"><code>column-field</code><span>string</span><span>The item field naming its column (default <code>status</code>)</span></div>
+        <div class="opt-row"><code>key-field</code> / <code>title-field</code><span>string</span><span>The item's key and its title (default <code>id</code> / <code>title</code>)</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>The board's accessible name</span></div>
+        <div class="opt-row"><code>disabled</code> / <code>readonly</code><span>boolean</span><span>No move by any way</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippet</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>before-move</code><span>{ item, from, to }</span><span>Cancellable: <code>preventDefault()</code> refuses the move</span></div>
+        <div class="opt-row"><code>move</code><span>{ item, from, to }</span><span>The move was made; <code>items</code> holds it</span></div>
+        <div class="opt-row"><code>items-change</code><span>{ value }</span><span>The model was written</span></div>
+        <div class="opt-row"><code>&#64;snippet cardContent(item)</code><span></span><span>What a card draws</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div>
+        <div class="opt-row"><code>Tab</code><span></span><span>The board is one tab stop</span></div>
+        <div class="opt-row"><code>Arrows · Home · End</code><span></span><span>Walk the cards; with a card lifted, carry it</span></div>
+        <div class="opt-row"><code>Space · Enter</code><span></span><span>Pick a card up; drop it</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>Put a lifted card back</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/kanban';
+@title 'Kanban Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

@@ -1883,6 +1883,25 @@
       ]
     },
     {
+      "name": "kanban",
+      "tags": [
+        "pdx-kanban"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "kanban-basic",
+          "title": "Kanban — Basic"
+        },
+        {
+          "id": "kanban-disabled",
+          "title": "Kanban — Disabled"
+        }
+      ]
+    },
+    {
       "name": "kbd",
       "tags": [
         "pdx-kbd"

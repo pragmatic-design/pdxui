@@ -51,6 +51,7 @@
 @import "./description-list.css";
 @import "./list.css";
 @import "./sortable-list.css";
+@import "./kanban.css";
 @import "./splitter.css";
 @import "./scroll-area.css";
 @import "./app-layout.css";

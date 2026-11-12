@@ -3761,6 +3761,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
       { key: 'data', label: 'Data', icon: 'database', expanded: true, children: [
         { key: 'data-display', label: 'Display', icon: 'list', children: [
           { key: '/components/list', label: 'List' },
+          { key: '/components/kanban', label: 'Kanban' },
           { key: '/components/tree', label: 'Tree' },
           { key: '/components/description-list', label: 'DescriptionList' },
           { key: '/components/statistic', label: 'Statistic' },
@@ -3949,7 +3950,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:308" });
+}, { name: "app.pdx:309" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -6268,6 +6269,39 @@ component('app-comp-json-editor', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/json-editor",tag:"app-comp-json-editor",title:"JSON Editor",lazy:true,file:'./comp-json-editor.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-kanban.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-po0kzz");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-po0kzz"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-po0kzz]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Kanban</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-kanban&gt;</code> — columns of cards moved by the pointer, the keyboard or a Move menu, each move\\n      asked of the app first with a cancellable <code>before-move</code> and announced to a screen reader.</p>  <app-demo-comp-kanban-basic class="demo-section"></app-demo-comp-kanban-basic>  <app-demo-comp-kanban-refuse class="demo-section"></app-demo-comp-kanban-refuse>  <app-demo-comp-kanban-card class="demo-section"></app-demo-comp-kanban-card>  <app-demo-comp-kanban-states class="demo-section"></app-demo-comp-kanban-states>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>items</code><span>T[]</span><span>The cards; written on a move (<code>::items</code>)</span></div> <div class="opt-row"><code>columns</code><span>{ key, label, limit? }[]</span><span>The columns in order; <code>limit</code> shows in the count and marks the column over it</span></div> <div class="opt-row"><code>column-field</code><span>string</span><span>The item field naming its column (default <code>status</code>)</span></div> <div class="opt-row"><code>key-field</code> / <code>title-field</code><span>string</span><span>The item\\'s key and its title (default <code>id</code> / <code>title</code>)</span></div> <div class="opt-row"><code>label</code><span>string</span><span>The board\\'s accessible name</span></div> <div class="opt-row"><code>disabled</code> / <code>readonly</code><span>boolean</span><span>No move by any way</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippet</h3> <div class="options-table"><div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>before-move</code><span>{ item, from, to }</span><span>Cancellable: <code>preventDefault()</code> refuses the move</span></div> <div class="opt-row"><code>move</code><span>{ item, from, to }</span><span>The move was made; <code>items</code> holds it</span></div> <div class="opt-row"><code>items-change</code><span>{ value }</span><span>The model was written</span></div> <div class="opt-row"><code>@snippet cardContent(item)</code><span></span><span>What a card draws</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"><div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div> <div class="opt-row"><code>Tab</code><span></span><span>The board is one tab stop</span></div> <div class="opt-row"><code>Arrows · Home · End</code><span></span><span>Walk the cards; with a card lifted, carry it</span></div> <div class="opt-row"><code>Space · Enter</code><span></span><span>Pick a card up; drop it</span></div> <div class="opt-row"><code>Escape</code><span></span><span>Put a lifted card back</span></div></div></section></div>'));
+component('app-comp-kanban', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Kanban Component" });
+    ctx.el.setAttribute('data-pdx-po0kzz', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/kanban'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/kanban",tag:"app-comp-kanban",title:"Kanban Component",lazy:true,file:'./comp-kanban.pdx'});
 "
 `;
 
@@ -22681,6 +22715,187 @@ const schema = {
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-kanban/demo-comp-kanban-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Drag a card by its body, or focus the board and press <kbd>Space</kbd> to pick a card up, the arrows to carry it, <kbd>Space</kbd> to drop it. The <kbd>⋯</kbd> menu moves a card with single clicks. <code>::items</code> holds the result; Doing has a limit of 2.</p> <pdx-kanban label="Sprint board"></pdx-kanban> <p class="pdx-txt-small pdx-ink-muted"><!----></p></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el8=__el7.nextSibling.nextSibling;const __t9=__el8.firstChild;return [__el7,__t9];};
+component('app-demo-comp-kanban-basic', {
+  props: {},
+  setup(ctx) {
+    const __tasks = signal([
+  { id: 't1', title: 'Write the release notes', status: 'todo' },
+  { id: 't2', title: 'Fix the login redirect', status: 'todo' },
+  { id: 't3', title: 'Review the pricing page', status: 'doing' },
+  { id: 't4', title: 'Ship the theme picker', status: 'done' },
+], { name: 'demo-comp-kanban-basic:tasks' });
+    const __last = signal('No move yet.', { name: 'demo-comp-kanban-basic:last' });
+const columns = [
+      { key: 'todo', label: 'To do' },
+      { key: 'doing', label: 'Doing', limit: 2 },
+      { key: 'done', label: 'Done' },
+    ];
+    
+    
+    
+    
+    function onMove(e) {
+      const { item, from, to } = e.detail;
+      __last.setRaw(item.title + ': ' + from.column + ' → ' + to.column + ', position ' + (to.index + 1));
+    }
+    return { columns, tasks: __tasks, last: __last, onMove };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el7,__t9]=__walk0(__frag);
+    let __el7w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el7w_columns)) return; __el7w_columns = __b; assignBoundProperty(__el7, "columns", __b); });
+    bindTwoWay(__el7, 'items', ctx.tasks);
+    __el7.addEventListener('move', safeHandler(batchHandler(ctx.onMove), ctx.el?.tagName?.toLowerCase(), 'move'));
+    bindInterpolation(__t9,()=>ctx.last());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-kanban/demo-comp-kanban-card.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, bindInterpolation, bindTwoWay, component, effect, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-rxeqex");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-rxeqex"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-rxeqex], [data-pdx-rxeqex-in]) to ([data-pdx-root] \\u003E *) {:scope .ticket, :where(:not([data-pdx-rxeqex])):scope:is(.ticket) { display: flex; flex-direction: column; gap: var(--pdx-space-3xs); align-items: flex-start; }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="ticket" data-pdx-rxeqex-in><span class="pdx-txt-small pdx-ink-muted" data-pdx-rxeqex-in><!----></span> <span class="pdx-txt-body" data-pdx-rxeqex-in><!----></span> <pdx-badge data-pdx-rxeqex-in><!----></pdx-badge></div>'));
+const __walk0=(r)=>{const __el8=r.firstChild;const __el9=__el8.firstChild;const __t10=__el9.firstChild;const __el11=__el9.nextSibling.nextSibling;const __t12=__el11.firstChild;const __el13=__el11.nextSibling.nextSibling;const __t14=__el13.firstChild;return [__t10,__t12,__el13,__t14];};
+const __blk1=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Custom cards</h2> <p class="pdx-txt-small pdx-ink-muted">A <code>cardContent</code> snippet draws each card; the board keeps the moving, the menu and the announcements. <code>key-field</code>, <code>column-field</code> and <code>title-field</code> name the item\\'s fields.</p> <pdx-kanban label="Support tickets" key-field="ref" column-field="stage" title-field="subject"></pdx-kanban></section>'));
+const __walk1=(r)=>{const __el0=r.firstChild;const __el7=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;return [__el7];};
+component('app-demo-comp-kanban-card', {
+  props: {},
+  setup(ctx) {
+    const __tickets = signal([
+  { ref: 'SUP-101', subject: 'Cannot export to PDF', stage: 'new', priority: 'high' },
+  { ref: 'SUP-102', subject: 'Invoice shows the wrong VAT', stage: 'open', priority: 'high' },
+  { ref: 'SUP-103', subject: 'Dark mode on the login page', stage: 'open', priority: 'low' },
+], { name: 'demo-comp-kanban-card:tickets' });
+const columns = [
+      { key: 'new', label: 'New' },
+      { key: 'open', label: 'Open' },
+      { key: 'solved', label: 'Solved' },
+    ];
+    ctx.el.setAttribute('data-pdx-rxeqex', '');
+    return { columns, tickets: __tickets };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk1();
+    const [__el7]=__walk1(__frag);
+    let __el7w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el7w_columns)) return; __el7w_columns = __b; assignBoundProperty(__el7, "columns", __b); });
+    bindTwoWay(__el7, 'items', ctx.tickets);
+    __el7['cardContent']=(ticket)=>{const __frag=__blk0();const [__t10,__t12,__el13,__t14]=__walk0(__frag);bindInterpolation(__t10,()=>ticket.ref);bindInterpolation(__t12,()=>ticket.subject);let __el13w_variant = {}; effect(() => { const __b = ticket.priority === 'high' ? 'danger' : 'muted'; if (Object.is(__b, __el13w_variant)) return; __el13w_variant = __b; assignBoundProperty(__el13, "variant", __b); });bindInterpolation(__t14,()=>ticket.priority);return __frag;};
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-kanban/demo-comp-kanban-refuse.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, bindTwoWay, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Refusing a move</h2> <p class="pdx-txt-small pdx-ink-muted"><code>before-move</code> is asked first, whichever way the card moves. Here a card reaches Done only from Review: <code>preventDefault()</code> refuses the rest, the board stays as it was, and the refusal is announced.</p> <pdx-kanban label="Workflow"></pdx-kanban> <p class="pdx-txt-small pdx-ink-muted"><!----></p></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el5=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el6=__el5.nextSibling.nextSibling;const __t7=__el6.firstChild;return [__el5,__t7];};
+component('app-demo-comp-kanban-refuse', {
+  props: {},
+  setup(ctx) {
+    const __tasks = signal([
+  { id: 'w1', title: 'Draft the contract', status: 'todo' },
+  { id: 'w2', title: 'Approve the budget', status: 'review' },
+], { name: 'demo-comp-kanban-refuse:tasks' });
+    const __refused = signal('', { name: 'demo-comp-kanban-refuse:refused' });
+const columns = [
+      { key: 'todo', label: 'To do' },
+      { key: 'review', label: 'Review' },
+      { key: 'done', label: 'Done' },
+    ];
+    
+    
+    
+    
+    function onBeforeMove(e) {
+      const { item, from, to } = e.detail;
+      if (to.column === 'done' && from.column !== 'review') {
+        e.preventDefault();
+        __refused.setRaw(item.title + ' cannot skip Review.');
+      } else {
+        __refused.setRaw('');
+      }
+    }
+    return { columns, tasks: __tasks, refused: __refused, onBeforeMove };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el5,__t7]=__walk0(__frag);
+    let __el5w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el5w_columns)) return; __el5w_columns = __b; assignBoundProperty(__el5, "columns", __b); });
+    bindTwoWay(__el5, 'items', ctx.tasks);
+    __el5.addEventListener('before-move', safeHandler(batchHandler(ctx.onBeforeMove), ctx.el?.tagName?.toLowerCase(), 'before-move'));
+    bindInterpolation(__t7,()=>ctx.refused());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-kanban/demo-comp-kanban-states.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-e6ews9");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-e6ews9"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-e6ews9]) to ([data-pdx-root] \\u003E *) {:scope .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">States</h2> <div class="demo-stack"><span class="pdx-txt-small pdx-ink-muted">Readonly — shown, not moved</span> <pdx-kanban label="Readonly board" readonly></pdx-kanban> <span class="pdx-txt-small pdx-ink-muted">Disabled</span> <pdx-kanban label="Disabled board" disabled></pdx-kanban></div></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el2=__el0.firstChild.nextSibling.nextSibling;const __el4=__el2.firstChild.nextSibling.nextSibling;const __el6=__el4.nextSibling.nextSibling.nextSibling.nextSibling;return [__el4,__el6];};
+component('app-demo-comp-kanban-states', {
+  props: {},
+  setup(ctx) {
+const columns = [
+      { key: 'todo', label: 'To do' },
+      { key: 'done', label: 'Done' },
+    ];
+    
+    const tasks = [
+      { id: 's1', title: 'Plan the sprint', status: 'todo' },
+      { id: 's2', title: 'Close the retro', status: 'done' },
+    ];
+    ctx.el.setAttribute('data-pdx-e6ews9', '');
+    return { columns, tasks };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el4,__el6]=__walk0(__frag);
+    let __el4w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el4w_columns)) return; __el4w_columns = __b; assignBoundProperty(__el4, "columns", __b); });
+    let __el4w_items = {}; effect(() => { const __b = ctx.tasks; if (Object.is(__b, __el4w_items)) return; __el4w_items = __b; assignBoundProperty(__el4, "items", __b); });
+    let __el6w_columns = {}; effect(() => { const __b = ctx.columns; if (Object.is(__b, __el6w_columns)) return; __el6w_columns = __b; assignBoundProperty(__el6, "columns", __b); });
+    let __el6w_items = {}; effect(() => { const __b = ctx.tasks; if (Object.is(__b, __el6w_items)) return; __el6w_items = __b; assignBoundProperty(__el6, "items", __b); });
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-kbd/demo-comp-kbd-combinations.pdx 1`] = `
 "// 0 warning(s)
 
@@ -29995,7 +30210,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 115 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 116 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

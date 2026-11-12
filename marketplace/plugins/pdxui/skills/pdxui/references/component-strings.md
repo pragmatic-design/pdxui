@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 436 keys in 78 components.
+> Generated from the sources. 453 keys in 79 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -271,6 +271,23 @@ placeholders, filled at render: keep them in the translation.
 | `json-editor` | `edit` | `Edit…` | `@pdxui/ui/src/shared/i18n.ts` |
 | `json-editor` | `empty` | `No items — use "＋ Add item" below.` | `@pdxui/ui/src/shared/i18n.ts` |
 | `json-editor` | `removeItem` | `Remove item {n}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `bottom` | `Move to bottom` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `cancelled` | `Move cancelled. {title} is back in {column}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `count` | `{count}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `countLimit` | `{count} of {limit}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `down` | `Move down` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `dropped` | `{title} dropped. {column}, position {position} of {total}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `empty` | `No cards` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `instructions` | `Press Space or Enter to pick the card up, the arrow keys to move it, Space or Enter to drop it, and Escape to cancel. The Move menu does the same.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `label` | `Board` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `lifted` | `{title} lifted. {column}, position {position} of {total}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `move` | `Move {title}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `moved` | `{column}, position {position} of {total}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `moveTo` | `Move to {column}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `refused` | `Move refused. {title} is back in {column}.` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `roleDescription` | `movable card` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `top` | `Move to top` | `@pdxui/ui/src/shared/i18n.ts` |
+| `kanban` | `up` | `Move up` | `@pdxui/ui/src/shared/i18n.ts` |
 | `list` | `empty` | `No items` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `label` | `Mentions` | `@pdxui/ui/src/shared/i18n.ts` |
 | `mention` | `loading` | `Loading...` | `@pdxui/ui/src/mention/pdx-mention.ts` |

@@ -12,7 +12,7 @@
           "name": "PdxAccordion",
           "tagName": "pdx-accordion",
           "category": "Overlay + Containers",
-          "order": 92,
+          "order": 93,
           "description": "Expandable sections with animated height, opened one at a time or several together, and navigated\nwith the arrow keys, Home and End.",
           "members": [
             {
@@ -329,7 +329,7 @@
           "name": "PdxAlertDialog",
           "tagName": "pdx-alert-dialog",
           "category": "Overlay + Containers",
-          "order": 88,
+          "order": 89,
           "description": "A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and\nCancel takes the focus first.",
           "members": [
             {
@@ -1028,7 +1028,7 @@
           "name": "PdxAutoForm",
           "tagName": "pdx-auto-form",
           "category": "Data-bound",
-          "order": 102,
+          "order": 103,
           "description": "A form generated from field definitions or a form schema, so the same JSON that drives a data grid\nalso produces its edit form.",
           "members": [
             {
@@ -1258,7 +1258,7 @@
           "name": "PdxAutocomplete",
           "tagName": "pdx-autocomplete",
           "category": "Data-bound",
-          "order": 98,
+          "order": 99,
           "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
           "generics": [
             "T"
@@ -2560,7 +2560,7 @@
           "name": "PdxBanner",
           "tagName": "pdx-banner",
           "category": "Overlay + Containers",
-          "order": 94,
+          "order": 95,
           "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
           "members": [
             {
@@ -3067,7 +3067,7 @@
           "name": "PdxBottomSheet",
           "tagName": "pdx-bottom-sheet",
           "category": "Overlay + Containers",
-          "order": 95,
+          "order": 96,
           "description": "A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to\nresize it and swipes down to dismiss it.",
           "members": [
             {
@@ -3545,7 +3545,7 @@
           "name": "PdxBulkActions",
           "tagName": "pdx-bulk-actions",
           "category": "Data-bound",
-          "order": 103,
+          "order": 104,
           "description": "A contextual action bar for a multi-selection: while items are selected it shows how many, a\nbutton per action and a clear button.",
           "members": [
             {
@@ -4648,7 +4648,7 @@
           "name": "PdxCard",
           "tagName": "pdx-card",
           "category": "Overlay + Containers",
-          "order": 93,
+          "order": 94,
           "description": "A structured card with header, body, footer and media slots, which can show a loading skeleton\nand be clickable or selectable.",
           "members": [
             {
@@ -4958,7 +4958,7 @@
           "name": "PdxCarousel",
           "tagName": "pdx-carousel",
           "category": "Data Display",
-          "order": 82,
+          "order": 83,
           "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
           "generics": [
             "T"
@@ -5777,7 +5777,7 @@
           "name": "PdxChart",
           "tagName": "pdx-chart",
           "category": "Data-bound",
-          "order": 108,
+          "order": 109,
           "description": "A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.",
           "members": [
             {
@@ -6320,7 +6320,7 @@
           "name": "PdxSparkline",
           "tagName": "pdx-sparkline",
           "category": "Data-bound",
-          "order": 109,
+          "order": 110,
           "description": "A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip\nor legend.",
           "members": [
             {
@@ -7887,7 +7887,7 @@
           "name": "PdxCommand",
           "tagName": "pdx-command",
           "category": "Overlay + Containers",
-          "order": 96,
+          "order": 97,
           "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
           "generics": [
             "T extends { label: string }"
@@ -8313,7 +8313,7 @@
           "name": "PdxDataGrid",
           "tagName": "pdx-data-grid",
           "category": "Data-bound",
-          "order": 100,
+          "order": 101,
           "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
           "generics": [
             "T"
@@ -9435,7 +9435,7 @@
           "name": "PdxDataSource",
           "tagName": "pdx-data-source",
           "category": "Data-bound",
-          "order": 99,
+          "order": 100,
           "description": "A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,\ntables and selects.",
           "members": [
             {
@@ -10421,7 +10421,7 @@
           "name": "PdxDescriptionList",
           "tagName": "pdx-description-list",
           "category": "Data Display",
-          "order": 77,
+          "order": 78,
           "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
           "generics": [
             "T extends { label: string }"
@@ -10644,7 +10644,7 @@
           "name": "PdxDialog",
           "tagName": "pdx-dialog",
           "category": "Overlay + Containers",
-          "order": 87,
+          "order": 88,
           "summary": "Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.",
           "description": "Modal dialog with backdrop, focus trap and Escape-to-close.",
           "members": [
@@ -11146,7 +11146,7 @@
           "name": "PdxDrawer",
           "tagName": "pdx-drawer",
           "category": "Overlay + Containers",
-          "order": 89,
+          "order": 90,
           "description": "A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus\ntrap.",
           "members": [
             {
@@ -11726,7 +11726,7 @@
           "name": "PdxEditDrawer",
           "tagName": "pdx-edit-drawer",
           "category": "Data-bound",
-          "order": 104,
+          "order": 105,
           "description": "A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits\n`pdx-save` with the values.",
           "members": [
             {
@@ -11967,7 +11967,7 @@
           "name": "PdxEmptyState",
           "tagName": "pdx-empty-state",
           "category": "Data Display",
-          "order": 80,
+          "order": 81,
           "description": "A placeholder for an empty data view: an icon, a title and a description, with an optional action\nbutton.",
           "members": [
             {
@@ -12147,7 +12147,7 @@
           "name": "PdxEntityGrid",
           "tagName": "pdx-entity-grid",
           "category": "Data-bound",
-          "order": 105,
+          "order": 106,
           "description": "A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,\nand `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.",
           "members": [
             {
@@ -12431,7 +12431,7 @@
           "name": "PdxErrorBoundary",
           "tagName": "pdx-error-boundary",
           "category": "Infrastructure",
-          "order": 112,
+          "order": 113,
           "description": "Catches render errors and effect failures from its children and shows a fallback UI with retry.",
           "members": [
             {
@@ -14087,7 +14087,7 @@
           "name": "PdxFilterBuilder",
           "tagName": "pdx-filter-builder",
           "category": "Data-bound",
-          "order": 101,
+          "order": 102,
           "description": "A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.",
           "members": [
             {
@@ -15534,7 +15534,7 @@
           "name": "PdxImage",
           "tagName": "pdx-image",
           "category": "Data Display",
-          "order": 81,
+          "order": 82,
           "description": "An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source\nbehind authentication.",
           "members": [
             {
@@ -15952,7 +15952,7 @@
           "name": "PdxInfiniteScroll",
           "tagName": "pdx-infinite-scroll",
           "category": "Data Display",
-          "order": 83,
+          "order": 84,
           "description": "Loads more data as the user scrolls to the bottom, paging a DataSource or firing\n`pdx-load-more` for manual control.",
           "members": [
             {
@@ -17248,7 +17248,7 @@
           "name": "PdxJsonEditor",
           "tagName": "pdx-json-editor",
           "category": "Data-bound",
-          "order": 106,
+          "order": 107,
           "description": "A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each\nobject or list of objects in a sub-modal of its own.",
           "members": [
             {
@@ -17316,6 +17316,262 @@
           "declaration": {
             "name": "PdxJsonEditor",
             "module": "src/json-editor/pdx-json-editor.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/kanban/pdx-kanban.pdx",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxKanban",
+          "tagName": "pdx-kanban",
+          "category": "Data Display",
+          "order": 77,
+          "description": "A board of columns of cards. The column an item is in is its `column-field`, and the order inside a\ncolumn is the order of `items`. A card moves by the pointer, by the keyboard — Space or Enter picks it\nup, the arrows carry it, Space or Enter drops it, Escape cancels, each step announced — or by its Move\nmenu; each way asks `before-move` first, which the app can refuse with `preventDefault()`.",
+          "generics": [
+            "T extends { [field: string]: unknown }"
+          ],
+          "members": [
+            {
+              "kind": "field",
+              "name": "columns",
+              "description": "The columns, in order: a `key` its items' column field holds, a `label`, and an optional `limit`.",
+              "type": {
+                "text": "{ key: string; label: string; limit?: number }[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "columnField",
+              "description": "The item field that names its column.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'status'",
+              "attribute": "columnfield"
+            },
+            {
+              "kind": "field",
+              "name": "keyField",
+              "description": "The item field that identifies it.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'id'",
+              "attribute": "keyfield"
+            },
+            {
+              "kind": "field",
+              "name": "titleField",
+              "description": "The item field a card shows, and the announcements name it by.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'title'",
+              "attribute": "titlefield"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "description": "The board's accessible name. Empty: «Board».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "description": "Disables interaction and dims the control.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "readonly",
+              "description": "The cards are shown and not moved.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "items",
+              "description": "The cards. The component writes a new array on a move: the item a copy with its column field set.",
+              "type": {
+                "text": "T[]"
+              },
+              "default": "[]"
+            }
+          ],
+          "models": [
+            "items"
+          ],
+          "events": [
+            {
+              "name": "before-move",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Asked before every move; `preventDefault()` refuses it and the board stays as it was.",
+              "detail": "{ item: T; from: { column: string; index: number }; to: { column: string; index: number } }"
+            },
+            {
+              "name": "move",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A move was made: `items` holds it, and `item` is the moved copy.",
+              "detail": "{ item: T; from: { column: string; index: number }; to: { column: string; index: number } }"
+            },
+            {
+              "name": "items-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `items`. Does not bubble.",
+              "detail": "{ value: T[] }"
+            }
+          ],
+          "roles": [
+            "group"
+          ],
+          "attributes": [
+            {
+              "name": "columnfield",
+              "fieldName": "columnField",
+              "description": "The item field that names its column.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'status'"
+            },
+            {
+              "name": "keyfield",
+              "fieldName": "keyField",
+              "description": "The item field that identifies it.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'id'"
+            },
+            {
+              "name": "titlefield",
+              "fieldName": "titleField",
+              "description": "The item field a card shows, and the announcements name it by.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'title'"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "The board's accessible name. Empty: «Board».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "disabled",
+              "fieldName": "disabled",
+              "description": "Disables interaction and dims the control.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "name": "readonly",
+              "fieldName": "readonly",
+              "description": "The cards are shown and not moved.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            }
+          ],
+          "slots": [
+            {
+              "name": "cardContent",
+              "description": "What a card draws; without it, its title.",
+              "signature": "(item: T)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The board, `role=\"group\"` named by `label`."
+            },
+            {
+              "name": "column",
+              "description": "A column; `[data-column]` is its key, `[data-over]` marks one over its limit."
+            },
+            {
+              "name": "header",
+              "description": "A column's title and count."
+            },
+            {
+              "name": "count",
+              "description": "The number of cards, with the limit when the column has one."
+            },
+            {
+              "name": "list",
+              "description": "A column's list of cards, named by its title."
+            },
+            {
+              "name": "card",
+              "description": "A card, the list item the keyboard moves; `[data-key]` is its key."
+            },
+            {
+              "name": "moveButton",
+              "description": "A card's Move menu button."
+            },
+            {
+              "name": "empty",
+              "description": "What an empty column says."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "lifted",
+              "description": "A card is picked up from the keyboard."
+            },
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            },
+            {
+              "name": "readonly",
+              "description": "`readonly` is set."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-kanban-column-width"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "pdx-kanban",
+          "declaration": {
+            "name": "PdxKanban",
+            "module": "src/kanban/pdx-kanban.pdx"
           }
         }
       ]
@@ -20613,7 +20869,7 @@
           "name": "PdxOverlayOutlet",
           "tagName": "pdx-overlay-outlet",
           "category": "Infrastructure",
-          "order": 113,
+          "order": 114,
           "description": "Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog\nabove the last, trapping focus inside and closing the top one on Escape.",
           "members": [],
           "roles": [
@@ -21495,7 +21751,7 @@
           "name": "PdxPopover",
           "tagName": "pdx-popover",
           "category": "Overlay + Containers",
-          "order": 86,
+          "order": 87,
           "description": "A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click\noutside or Escape.",
           "members": [
             {
@@ -21952,7 +22208,7 @@
           "name": "PdxProvide",
           "tagName": "pdx-provide",
           "category": "Infrastructure",
-          "order": 111,
+          "order": 112,
           "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
           "members": [
             {
@@ -22843,7 +23099,7 @@
           "name": "PdxRelationPicker",
           "tagName": "pdx-relation-picker",
           "category": "Data-bound",
-          "order": 107,
+          "order": 108,
           "description": "Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new\none to be created.",
           "members": [
             {
@@ -23000,7 +23256,7 @@
           "name": "PdxRelativeTime",
           "tagName": "pdx-relative-time",
           "category": "Data Display",
-          "order": 84,
+          "order": 85,
           "description": "Shows a time relative to now (\"3 hours ago\", \"in 2 days\"), locale-aware and kept up to date.",
           "members": [
             {
@@ -23149,7 +23405,7 @@
           "name": "PdxRichText",
           "tagName": "pdx-rich-text",
           "category": "Data-bound",
-          "order": 110,
+          "order": 111,
           "description": "A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.",
           "members": [
             {
@@ -24676,7 +24932,7 @@
           "name": "PdxSelect",
           "tagName": "pdx-select",
           "category": "Data-bound",
-          "order": 97,
+          "order": 98,
           "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
           "generics": [
             "T"
@@ -27231,7 +27487,7 @@
           "name": "PdxStatistic",
           "tagName": "pdx-statistic",
           "category": "Data Display",
-          "order": 79,
+          "order": 80,
           "description": "Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.",
           "members": [
             {
@@ -27923,7 +28179,7 @@
           "name": "PdxTabs",
           "tagName": "pdx-tabs",
           "category": "Overlay + Containers",
-          "order": 91,
+          "order": 92,
           "description": "Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy\nmounting and closable tabs.",
           "members": [
             {
@@ -29552,7 +29808,7 @@
           "name": "PdxTimeline",
           "tagName": "pdx-timeline",
           "category": "Data Display",
-          "order": 78,
+          "order": 79,
           "description": "A vertical or horizontal sequence of events, with status colors, icons and clickable items.",
           "generics": [
             "T extends { title: string }"
@@ -29839,7 +30095,7 @@
           "name": "PdxToast",
           "tagName": "pdx-toast",
           "category": "Overlay + Containers",
-          "order": 90,
+          "order": 91,
           "description": "A container that shows notification toasts from a global queue, in one of six screen positions,\npausing on hover and offering action buttons.",
           "members": [
             {
@@ -30546,7 +30802,7 @@
           "name": "PdxTooltip",
           "tagName": "pdx-tooltip",
           "category": "Overlay + Containers",
-          "order": 85,
+          "order": 86,
           "description": "A tooltip that describes its trigger on hover or focus, in one of 12 placements, with show and\nhide delays.",
           "members": [
             {

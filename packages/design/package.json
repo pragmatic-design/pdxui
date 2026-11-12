@@ -197,6 +197,10 @@
       "development": "./src/components/layered/progress.css",
       "default": "./dist/components/progress.css"
     },
+    "./components/kanban": {
+      "development": "./src/components/layered/kanban.css",
+      "default": "./dist/components/kanban.css"
+    },
     "./components/rating": {
       "development": "./src/components/layered/rating.css",
       "default": "./dist/components/rating.css"

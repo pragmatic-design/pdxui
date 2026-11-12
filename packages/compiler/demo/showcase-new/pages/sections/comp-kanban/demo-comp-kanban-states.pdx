@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">States</h2>
+    <div class="demo-stack">
+      <span class="pdx-txt-small pdx-ink-muted">Readonly — shown, not moved</span>
+      <pdx-kanban label="Readonly board" readonly :columns="columns" :items="tasks"></pdx-kanban>
+      <span class="pdx-txt-small pdx-ink-muted">Disabled</span>
+      <pdx-kanban label="Disabled board" disabled :columns="columns" :items="tasks"></pdx-kanban>
+    </div>
+  </section>
+</template>
+
+<script>
+const columns = [
+  { key: 'todo', label: 'To do' },
+  { key: 'done', label: 'Done' },
+];
+const tasks = [
+  { id: 's1', title: 'Plan the sprint', status: 'todo' },
+  { id: 's2', title: 'Close the retro', status: 'done' },
+];
+</script>
+
+<style scoped>
+  .demo-stack { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+</style>

@@ -16,6 +16,18 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- `pdx-kanban` (#1021): columns of cards. The column an item is in is a field of it (`column-field`), and
+  the order inside a column is the order of `items`, which the board writes on a move (`::items`). A card
+  moves three ways:
+  - by the pointer, dragged by its body;
+  - by the keyboard: the board is one tab stop, Space or Enter picks a card up, the arrows carry it,
+    Space or Enter drops it, Escape puts it back, and each step is announced;
+  - by its Move menu, the single-pointer way that WCAG 2.2 2.5.7 asks for.
+
+  Each way asks a cancellable `before-move` first, and a refused move leaves the board as it was and is
+  announced. A column's `limit` shows in its count and marks the column over it. A `cardContent`
+  snippet draws a card.
+
 - `@event(cancelable)` (#1035): a `.pdx` dispatches an event its parent can refuse, as a TypeScript
   component does with `ctx.emit(name, detail, { cancelable: true })`. The emitter returns false when a
   listener called `preventDefault()`, so the component writes `if (!beforeMove(d)) return;`. It goes with
