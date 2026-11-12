@@ -111,7 +111,7 @@ _From the component's demo, one per section. They illustrate the markup and the 
 code left out, and a script is the part that matters, not a whole file. The props and events they use
 are checked against the manifest above._
 
-**Standard Editor** — Full toolbar with formatting, headings, lists, links. Try Markdown shortcuts: `# ` for headings, `**bold**`, `*italic*`, `&#96;code&#96;`, `- ` for lists. _(from the live demo)_
+**Standard Editor** — Full toolbar with formatting, headings, lists, links. Try Markdown shortcuts: `# ` for headings, `**bold**`, `*italic*`, `` `code` ``, `- ` for lists. _(from the live demo)_
 
 ```html
 <div class="demo-area">

@@ -96,7 +96,7 @@ const orderForm = createForm({
 
 ```html
 <pdx-field-list name="tasks" :itemFields="taskFields" :itemDefault="taskDefault">
-  &#64;snippet row(item, index) {
+  @snippet row(item, index) {
     <pdx-input :value="item.title" @value-change="e => setTask(index, 'title', e.currentTarget.value)"></pdx-input>
     <pdx-select :options="people" :value="item.assignee"
       @value-change="e => setTask(index, 'assignee', e.detail.value)"></pdx-select>

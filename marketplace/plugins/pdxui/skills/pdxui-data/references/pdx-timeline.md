@@ -102,7 +102,7 @@ are checked against the manifest above._
 ```html
 <!-- PDX components inside a snippet -->
 <pdx-timeline :items="events">
-  &#64;snippet content(item) {
+  @snippet content(item) {
     <pdx-card variant="outline" compact>
       <div class="header">
         <strong>{{ item.title }}</strong>

@@ -145,7 +145,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-tag-input :value="tags">
-  &#64;snippet tag(tag) {
+  @snippet tag(tag) {
     <span class="tag-colored">{{ tag }}</span>
   }
 </pdx-tag-input>

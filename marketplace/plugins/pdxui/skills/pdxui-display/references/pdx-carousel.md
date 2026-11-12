@@ -113,7 +113,7 @@ are checked against the manifest above._
 ```html
 <!-- Compose PDX components inside carousel slides -->
 <pdx-carousel :items="slides">
-  &#64;snippet slide(slide, index) {
+  @snippet slide(slide, index) {
     <div class="slide">
       <pdx-badge variant="outline">Step {{ index + 1 }}</pdx-badge>
       <h3>{{ slide.title }}</h3>

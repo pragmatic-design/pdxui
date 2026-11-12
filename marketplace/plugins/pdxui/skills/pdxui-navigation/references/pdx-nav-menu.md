@@ -126,7 +126,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-nav-menu :items="items" actions="overlay">
-  &#64;snippet itemActions(item) {
+  @snippet itemActions(item) {
     <button type="button" :aria-label="'Pin ' + item.label">☆</button>
   }
 </pdx-nav-menu>

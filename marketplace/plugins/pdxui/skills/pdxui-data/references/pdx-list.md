@@ -45,7 +45,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-list :items="users" clickable dividers @pdx-click="onUserClick">
-  &#64;snippet item(item) {
+  @snippet item(item) {
     <strong>{{ item.name }}</strong> {{ item.role }}
   }
 </pdx-list>
@@ -64,7 +64,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :source="ds" clickable dividers>
-  &#64;snippet item(item) {
+  @snippet item(item) {
     <span>{{ item.name }}</span> <span class="role">{{ item.role }}</span>
   }
 </pdx-list>
@@ -85,7 +85,7 @@ const ds = createDataSource({
 ```html
 <!-- Template: the snippet receives item + index from the list -->
 <pdx-list :items="users" clickable dividers>
-  &#64;snippet item(item, index) {
+  @snippet item(item, index) {
     <div class="user-row">
       <span class="idx">{{ index + 1 }}.</span>
       <div class="info">
@@ -114,7 +114,7 @@ const ds = createDataSource({
 ```html
 <!-- The empty snippet overrides the default empty state -->
 <pdx-list :items="[]">
-  &#64;snippet empty() {
+  @snippet empty() {
     <div class="custom-empty">
       <pdx-icon name="search" size="32"></pdx-icon>
       <p>Nothing here yet — try adding some items!</p>
@@ -134,7 +134,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :items="richItems" dividers>
-  &#64;snippet item(item) {
+  @snippet item(item) {
     <div class="avatar">{{ item.initials }}</div>
     <div><strong>{{ item.name }}</strong>
       <div class="role">{{ item.role }}</div></div>
@@ -155,7 +155,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :source="ds">
-  &#64;snippet item(item) { <strong>{{ item.name }}</strong> }
+  @snippet item(item) { <strong>{{ item.name }}</strong> }
 </pdx-list>
 <pdx-pagination :total="ds.total()" :pageSize="5"
   :page="ds.page()" @page-change="onPage">
@@ -167,7 +167,7 @@ const ds = createDataSource({
 ```html
 <pdx-data-source url="/api/users" :page-size="5">
   <pdx-list clickable dividers>
-    &#64;snippet item(item) { {{ item.name }} }
+    @snippet item(item) { {{ item.name }} }
   </pdx-list>
   <pdx-pagination></pdx-pagination>
 </pdx-data-source>
@@ -183,7 +183,7 @@ const ds = createDataSource({
 
 ```html
 <pdx-list :items="thread.comments" dividers>
-  &#64;snippet item(c) {
+  @snippet item(c) {
     <article :aria-label="c.author + ', ' + c.text">
       <span aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
       <strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time>
@@ -191,7 +191,7 @@ const ds = createDataSource({
       <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>
     </article>
   }
-  &#64;snippet empty() { <p>No comments yet.</p> }
+  @snippet empty() { <p>No comments yet.</p> }
 </pdx-list>
 
 <form @submit.prevent="send()">

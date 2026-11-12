@@ -45,7 +45,9 @@ describe('the .pdx examples in the skills', () => {
         // pdx-checkbox and pdx-chip (@for/@if), pdx-error-boundary's two @try blocks, and pdx-transfer's
         // sizes (@for, #748).
         // + the comment thread composed from pdx-list, pdx-textarea and pdx-button (#1022).
-        expect(COMPILED.map(e => e.where)).toHaveLength(25);
+        // + three blocks whose directives were written `&#64;if` / `&#64;for` until the catalogue decoded
+        // them (#1055): pdx-data-grid's custom cells, its cell and header snippets, and a pdx-checkbox list.
+        expect(COMPILED.map(e => e.where)).toHaveLength(28);
     });
 
     it('skips only what says it is partial — and nothing does today', () => {

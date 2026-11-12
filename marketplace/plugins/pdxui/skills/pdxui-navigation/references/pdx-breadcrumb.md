@@ -85,7 +85,7 @@ are checked against the manifest above._
 
 ```html
 <pdx-breadcrumb :items="items">
-  &#64;snippet item(item, _index, isLast) {
+  @snippet item(item, _index, isLast) {
     <span class="crumb-custom">
       {{ isLast ? item.label : item.label + ' →' }}
     </span>

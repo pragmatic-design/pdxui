@@ -456,7 +456,7 @@ const ds = createDataSource({ data: bigData, pageSize: 0 });
 <pdx-data-grid :source="ds" :columns="columns"
   expandable hover>
 
-  &#64;snippet detail(row) {
+  @snippet detail(row) {
     <div style="padding: 16px">
       <strong>Details for {{ row.name }}</strong>
       <p>Role: {{ row.role }}</p>
@@ -478,8 +478,8 @@ const columns = [
 
 ```html
 <pdx-data-grid :source="ds" :columns="columns" hover>
-  &#64;snippet cell(row, column) {
-    &#64;if (column.field === '_actions') {
+  @snippet cell(row, column) {
+    @if (column.field === '_actions') {
       <pdx-button size="xs" @click="edit(row.id)">Edit</pdx-button>
       <pdx-button size="xs" variant="danger" @click="remove(row.id)">
         Delete
@@ -544,7 +544,7 @@ const ds = createDataSource({
 </pdx-data-grid>
 ```
 
-**Snippets** — A custom cell with `&#64;snippet cell(row, column, value)`, one for every column: it switches on `column.field`, and the columns it draws nothing for are the grid's. A custom header with `&#64;snippet header(column)`, the empty state with `&#64;snippet empty()`.
+**Snippets** — A custom cell with `@snippet cell(row, column, value)`, one for every column: it switches on `column.field`, and the columns it draws nothing for are the grid's. A custom header with `@snippet header(column)`, the empty state with `@snippet empty()`.
 
 ```js
 import { status } from '@pdxui/core';
@@ -563,8 +563,8 @@ const columns = [
 <pdx-data-grid :data="users" :columns="columns" hover>
 
   <!-- A custom cell for the 'name' column; the others are the grid's -->
-  &#64;snippet cell(row, column, value) {
-    &#64;if (column.field === 'name') {
+  @snippet cell(row, column, value) {
+    @if (column.field === 'name') {
       <div class="user-cell">
         <pdx-avatar size="xs" :alt="row.name"></pdx-avatar>
         <strong>{{ value }}</strong>
@@ -573,14 +573,14 @@ const columns = [
   }
 
   <!-- A custom header -->
-  &#64;snippet header(column) {
-    &#64;if (column.field === 'name') {
+  @snippet header(column) {
+    @if (column.field === 'name') {
       <pdx-icon name="user" size="14"></pdx-icon> {{ column.header }}
     }
   }
 
   <!-- A custom empty state -->
-  &#64;snippet empty() {
+  @snippet empty() {
     <pdx-empty-state title="No results" icon="search"></pdx-empty-state>
   }
 

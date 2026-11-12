@@ -175,7 +175,7 @@ function renderValue(item) {
 
 ```html
 <pdx-description-list :items="items" :columns="2" :bordered="true" label-width="100px">
-  &#64;snippet value(item, index) {
+  @snippet value(item, index) {
     <span class="dl-custom-value">{{ item.value }}</span>
   }
 </pdx-description-list>

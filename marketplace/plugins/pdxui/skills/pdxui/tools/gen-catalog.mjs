@@ -296,11 +296,19 @@ if (existsSync(NOTES) && !PROJECT) {
 // relation-picker: packages/site/scripts/port-demos.mjs reads both folders the same way).
 const DEMO_DIRS = [join(UI, 'packages/compiler/demo/showcase-new/pages'), join(UI, 'packages/site/src/demos-authored')];
 // `@@` is how a .pdx template writes a literal `@` (parser/template.ts): the demo's `@@try` is `@try`.
+// Every numeric reference is decoded, not a list of them: a demo writes `@` as `&#64;` and a backtick
+// as `&#96;`, and one left out reached the references as `&#64;snippet` (#1055). `&amp;` goes last, so
+// a written `&amp;#64;` stays `&#64;`.
 const unescapeHtml = (s) => s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"')
-  .replace(/&#39;/g, "'").replace(/&#123;/g, '{').replace(/&#125;/g, '}').replace(/&amp;/g, '&').replace(/@@/g, '@');
+  // Match: a decimal or hexadecimal numeric character reference. Groups: [1]=decimal [2]=hexadecimal
+  .replace(/&#(?:(\d+)|x([0-9a-f]+));/gi, (_, dec, hex) => String.fromCodePoint(dec ? Number(dec) : parseInt(hex, 16)))
+  .replace(/&amp;/g, '&').replace(/@@/g, '@');
 // A tag named in a heading becomes code, `<code>` or not: `<pdx-error-boundary>` bare is read as a tag
 // by Markdown. The escaped `&lt;x&gt;` outside a code span is what the demos write for it.
-const plainText = (s) => unescapeHtml(removeAll(s.replace(/<code>([\s\S]*?)<\/code>/g, '`$1`'), /<[^>]+>/g)
+// A code span holding a backtick takes a double one, padded: `` `x` `` (CommonMark). A single fence
+// around a decoded `&#96;` closed at the first backtick inside it.
+const codeSpan = (c) => (/`|&#96;|&#x60;/i.test(c) ? '`` ' + c + ' ``' : '`' + c + '`');
+const plainText = (s) => unescapeHtml(removeAll(s.replace(/<code>([\s\S]*?)<\/code>/g, (_, c) => codeSpan(c)), /<[^>]+>/g)
   .replace(/(`[^`]*`)|&lt;(\/?[a-z][\w-]*)&gt;/g, (m, code, tag) => code ?? `\`<${tag}>\``)).replace(/\s+/g, ' ').trim();
 /** A line that starts script rather than markup: where a Source block's JS part begins. */
 const SCRIPT_START = /^(import |export |const |let |var |function |async |await |class |\/\/|\/\*|[A-Za-z_$][\w$.]*\s*(=|\())/;
