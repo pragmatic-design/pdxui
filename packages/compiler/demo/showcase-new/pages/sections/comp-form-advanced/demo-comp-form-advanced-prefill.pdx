@@ -8,7 +8,7 @@
 
     <div class="demo-block">
       <div class="demo-toolbar">
-        <button class="pdx-btn pdx-secondary pdx-sm" @click="loadUser">Load User #42</button>
+        <button class="pdx-secondary" size="sm" @click="loadUser">Load User #42</button>
         <span :class="prefillStatusClass()" :textContent="prefillStatusText()"></span>
       </div>
 

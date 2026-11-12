@@ -52,10 +52,10 @@ are checked against the manifest above._
 ```html
 <div class="demo-container">
   <pdx-form-actions align="between">
-    <button class="pdx-btn pdx-ghost pdx-danger">Delete</button>
+    <button class="pdx-ghost pdx-danger">Delete</button>
     <span class="spacer"></span>
-    <button class="pdx-btn pdx-outline">Save draft</button>
-    <button class="pdx-btn pdx-primary">Publish</button>
+    <button class="pdx-outline">Save draft</button>
+    <button class="pdx-primary">Publish</button>
   </pdx-form-actions>
 </div>
 ```

@@ -3,7 +3,7 @@
     <h2 class="pdx-txt-heading section-heading">Simulated Fetch</h2>
     <p class="pdx-txt-small pdx-ink-muted">Click "Load Data" to block for 2 seconds, then unblock.</p>
     <div class="demo-actions">
-      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="simulateFetch">Load Data</button>
+      <button class="pdx-outline" size="sm" @click="simulateFetch">Load Data</button>
     </div>
     <div class="demo-wrap">
       <pdx-block-ui :blocked="fetchLoading" id="fetch-block">

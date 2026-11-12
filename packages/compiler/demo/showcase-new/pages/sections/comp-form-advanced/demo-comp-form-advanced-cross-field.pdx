@@ -21,7 +21,7 @@
             <pdx-date-picker name="endDate" ::value="crossForm.endDate"></pdx-date-picker>
           </pdx-form-field>
         </div>
-        <button type="submit" class="pdx-btn pdx-primary pdx-sm">Validate All</button>
+        <button type="submit" class="pdx-primary" size="sm">Validate All</button>
       </pdx-form>
     </div>
 

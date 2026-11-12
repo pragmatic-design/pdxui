@@ -8,7 +8,7 @@
     <div class="demo-box">
       @if (netState === 'idle') {
         <div class="demo-widget">
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="startNetworkDemo">Load Users</button>
+          <button class="pdx-outline" size="sm" @click="startNetworkDemo">Load Users</button>
         </div>
       }
       @if (netState === 'loading') {
@@ -24,10 +24,10 @@
           <div class="pdx-error-detail">{{ netError }}</div>
           @if (netRetry < 3) {
             <div class="pdx-error-meta">Retry {{ netRetry }} of 3 — next attempt in {{ netCountdown }}s</div>
-            <button class="pdx-btn pdx-btn-sm pdx-btn-error retry-btn" disabled>Retrying...</button>
+            <button class="pdx-danger retry-btn" size="sm" disabled>Retrying...</button>
           } @else {
             <div class="pdx-error-meta">Failed after 3 attempts.</div>
-            <button class="pdx-btn pdx-btn-sm pdx-btn-outline retry-btn" @click="resetNetworkDemo">Start Over</button>
+            <button class="pdx-outline retry-btn" size="sm" @click="resetNetworkDemo">Start Over</button>
           }
         </div>
       }
@@ -35,7 +35,7 @@
         <div class="demo-widget success-widget" role="status">
           <div class="pdx-txt-small" style="color: var(--pdx-color-success); font-weight: 600">&#10003; Data loaded successfully</div>
           <div class="pdx-txt-small pdx-ink-muted">Loaded 3 users after {{ netRetry }} failed attempts.</div>
-          <button class="pdx-btn pdx-btn-sm pdx-btn-outline" style="margin-top: var(--pdx-space-xs)" @click="resetNetworkDemo">Reset</button>
+          <button class="pdx-outline" size="sm" style="margin-top: var(--pdx-space-xs)" @click="resetNetworkDemo">Reset</button>
         </div>
       }
     </div>
@@ -124,15 +124,6 @@ function resetNetworkDemo() {
   color: var(--pdx-color-muted);
   margin-bottom: var(--pdx-space-sm);
 }
-
-.pdx-btn-error {
-  background: var(--pdx-color-danger);
-  color: var(--pdx-color-danger-text);
-  border: none;
-  cursor: pointer;
-}
-.pdx-btn-error:hover { opacity: 0.85; }
-.pdx-btn-error:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .pdx-spinner-inline {
   width: 18px;

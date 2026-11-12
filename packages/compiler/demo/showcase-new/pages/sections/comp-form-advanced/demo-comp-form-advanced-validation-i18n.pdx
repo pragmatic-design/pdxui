@@ -8,9 +8,9 @@
 
     <div class="demo-block">
       <div class="demo-toolbar">
-        <button :class="langBtnEn()" @click="setLang('en')">English</button>
-        <button :class="langBtnIt()" @click="setLang('it')">Italiano</button>
-        <button :class="langBtnDe()" @click="setLang('de')">Deutsch</button>
+        <button size="sm" :class="langBtnEn()" @click="setLang('en')">English</button>
+        <button size="sm" :class="langBtnIt()" @click="setLang('it')">Italiano</button>
+        <button size="sm" :class="langBtnDe()" @click="setLang('de')">Deutsch</button>
       </div>
 
       <pdx-form :form="i18nForm">
@@ -25,7 +25,7 @@
         <pdx-form-field :field="i18nForm.age" label="Age" required>
           <pdx-number-input name="age" ::value="i18nForm.age" :min="0" :max="150"></pdx-number-input>
         </pdx-form-field>
-        <button type="submit" class="pdx-btn pdx-primary pdx-sm">Validate</button>
+        <button type="submit" class="pdx-primary" size="sm">Validate</button>
       </pdx-form>
     </div>
 
@@ -58,9 +58,9 @@ const translations = { en: { 'validation.required': '{field} is required', 'vali
 let currentLang = $signal('en');
 
 function setLang(lang) { currentLang = lang; const dict = translations[lang] || translations.en; setValidationLocale((key, params) => { const tmpl = dict[key]; if (!tmpl) return undefined; const merged = Object.assign({ field: 'This field', min: '?', max: '?' }, params || {}); return tmpl.replace(/\{(\w+)\}/g, (_, k) => String(merged[k] ?? k)); }); i18nForm.validate(); }
-function langBtnEn() { return 'pdx-btn pdx-sm ' + (currentLang === 'en' ? 'pdx-primary' : 'pdx-outline'); }
-function langBtnIt() { return 'pdx-btn pdx-sm ' + (currentLang === 'it' ? 'pdx-primary' : 'pdx-outline'); }
-function langBtnDe() { return 'pdx-btn pdx-sm ' + (currentLang === 'de' ? 'pdx-primary' : 'pdx-outline'); }
+function langBtnEn() { return currentLang === 'en' ? 'pdx-primary' : 'pdx-outline'; }
+function langBtnIt() { return currentLang === 'it' ? 'pdx-primary' : 'pdx-outline'; }
+function langBtnDe() { return currentLang === 'de' ? 'pdx-primary' : 'pdx-outline'; }
 
 const i18nForm = createForm({ initialValues: { username: '', email: '', age: 0 }, validators: { username: [required('validation.required'), minLength(3, 'validation.minLength')], email: [required('validation.required'), email('validation.email')], age: [min(1, 'validation.min')] }, validateOn: 'onChange' });
 

@@ -20,7 +20,7 @@ compiles. This page is the working summary; the reference is the definition.
 
 ```html
 <template>
-  <button class="pdx-btn pdx-primary" @click="count++">clicked {{ count }} times</button>
+  <button class="pdx-primary" @click="count++">clicked {{ count }} times</button>
 </template>
 
 <script>

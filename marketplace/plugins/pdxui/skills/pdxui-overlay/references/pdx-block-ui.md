@@ -53,7 +53,7 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-actions">
-  <button class="pdx-btn pdx-outline pdx-btn-xs" @click="simulateFetch">Load Data</button>
+  <button class="pdx-outline" size="sm" @click="simulateFetch">Load Data</button>
 </div>
 <div class="demo-wrap">
   <pdx-block-ui :blocked="fetchLoading" id="fetch-block">
@@ -68,8 +68,8 @@ are checked against the manifest above._
 
 ```html
 <div class="demo-actions">
-  <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(120)">Save in 120 ms</button>
-  <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(350)">Save in 350 ms</button>
+  <button class="pdx-outline" size="sm" @click="save(120)">Save in 120 ms</button>
+  <button class="pdx-outline" size="sm" @click="save(350)">Save in 350 ms</button>
 </div>
 <div class="demo-wrap">
   <pdx-block-ui :blocked="saving" message="Saving…">

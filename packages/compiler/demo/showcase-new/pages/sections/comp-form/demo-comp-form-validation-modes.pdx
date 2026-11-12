@@ -30,7 +30,7 @@
           <pdx-form-field :field="submitForm.email" label="Email" required>
             <pdx-input name="email" ::value="submitForm.email" placeholder="Validate on submit"></pdx-input>
           </pdx-form-field>
-          <button type="submit" class="pdx-btn pdx-primary pdx-sm">Submit</button>
+          <button type="submit" class="pdx-primary" size="sm">Submit</button>
         </pdx-form>
       </div>
     </div>

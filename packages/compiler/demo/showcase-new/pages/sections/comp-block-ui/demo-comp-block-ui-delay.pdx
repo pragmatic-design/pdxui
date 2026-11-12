@@ -3,8 +3,8 @@
     <h2 class="pdx-txt-heading section-heading">Delay and minimum duration</h2>
     <p class="pdx-txt-small pdx-ink-muted">The input is blocked at once; the overlay is drawn only after <code>delay</code> (300 ms), then kept for at least <code>min-duration</code> (200 ms). A quick save never flashes a spinner, and a slow one does not blink.</p>
     <div class="demo-actions">
-      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(120)">Save in 120 ms</button>
-      <button class="pdx-btn pdx-outline pdx-btn-xs" @click="save(350)">Save in 350 ms</button>
+      <button class="pdx-outline" size="sm" @click="save(120)">Save in 120 ms</button>
+      <button class="pdx-outline" size="sm" @click="save(350)">Save in 350 ms</button>
     </div>
     <div class="demo-wrap">
       <pdx-block-ui :blocked="saving" message="Saving…">

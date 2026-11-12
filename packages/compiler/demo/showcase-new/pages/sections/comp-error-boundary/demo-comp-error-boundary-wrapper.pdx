@@ -6,8 +6,8 @@
       <code>pdx-error</code> event for logging. Provides <code>ErrorContext</code> to descendants.
     </p>
     <div class="demo-controls demo-row">
-      <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="breakWidget">Make it throw</button>
-      <button class="pdx-btn pdx-btn-sm pdx-btn-outline" @click="fixWidget">Fix the data source</button>
+      <button class="pdx-outline" size="sm" @click="breakWidget">Make it throw</button>
+      <button class="pdx-outline" size="sm" @click="fixWidget">Fix the data source</button>
     </div>
     <div class="demo-box">
       <pdx-error-boundary fallback-message="Dashboard widget crashed." :max-retries="3" @pdx-error="onBoundaryError">

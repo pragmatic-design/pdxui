@@ -177,7 +177,7 @@ A shipment form whose draft survives closing the tab:
     </pdx-form-field>
     <pdx-form-actions submitLabel="Send"></pdx-form-actions>
   </pdx-form>
-  <button class="pdx-btn pdx-outline save-draft" type="button" @click="saveDraft()">Save draft</button>
+  <button class="pdx-outline save-draft" type="button" @click="saveDraft()">Save draft</button>
   <span class="draft-state pdx-txt-small pdx-ink-muted">{{ savedAt }}</span>
 </template>
 

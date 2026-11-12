@@ -74,7 +74,7 @@ are checked against the manifest above._
     </nav>
     <div class="pdx-navbar-spacer"></div>
     <div class="pdx-navbar-actions">
-      <button class="pdx-btn pdx-primary pdx-btn-sm">Get Started</button>
+      <button class="pdx-primary" size="sm">Get Started</button>
     </div>
   </div>
 </div>

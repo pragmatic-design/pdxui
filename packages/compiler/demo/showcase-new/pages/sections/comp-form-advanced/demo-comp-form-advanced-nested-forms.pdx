@@ -9,7 +9,7 @@
       <div class="nested-header">
         <h4 class="pdx-txt-small pdx-weight-semibold">Order Form</h4>
         <div class="demo-toolbar">
-          <button class="pdx-btn pdx-primary pdx-sm" @click="submitAllNested">Submit Order</button>
+          <button class="pdx-primary" size="sm" @click="submitAllNested">Submit Order</button>
           <span :class="nestedStatusClass()" :textContent="nestedStatusText()"></span>
         </div>
       </div>
