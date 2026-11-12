@@ -12,6 +12,7 @@
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { sessionFile } from './session';
@@ -36,6 +37,9 @@ export default defineConfig({
     // against one dev server do not need much of it.
     workers: process.env.CI ? 1 : Math.max(1, Math.floor(cpus().length / 8)),
     reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040): this suite once sat 31
+    // minutes after its last test. Slowest run measured: 46 s, on CI, 2026-11-12 (33 s locally).
+    globalTimeout: suiteTimeout(46),
     timeout: 30_000,
     // Signed in, as the build's suite is: the dev server's routes are behind the login too.
     globalSetup: './session.ts',

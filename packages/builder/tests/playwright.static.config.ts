@@ -10,6 +10,7 @@
  */
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 
@@ -44,6 +45,9 @@ export default defineConfig({
     fullyParallel: true,
     workers: WORKERS,
     reporter: [['list'], ['../../../scripts/lib/keep-failed-runs.mjs']],
+    // A run that stops moving fails instead of holding the pre-push (#1040). Slowest run measured:
+    // 13 s, locally under the gate, 2026-11-12 (10 s on CI).
+    globalTimeout: suiteTimeout(13),
     timeout: 30_000,
     use: {
         baseURL: `http://localhost:${PORT}`,

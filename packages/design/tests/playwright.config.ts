@@ -1,5 +1,6 @@
 import { cpus } from 'node:os';
 import { defineConfig } from '@playwright/test';
+import { suiteTimeout } from '../../../scripts/lib/suite-timeout.mjs';
 
 // Workers, capped and stated.
 //
@@ -38,9 +39,9 @@ export default defineConfig({
     failOnFlakyTests: true,
     workers: WORKERS,
     // A run that stops moving fails instead of waiting forever (#1025): the pre-push once sat 38
-    // minutes after the start of test 327/327, and the keeper never ran. The suite alone takes ~40 s;
-    // five minutes is several times that, under the gate's load.
-    globalTimeout: 5 * 60_000,
+    // minutes after the start of test 327/327, and the keeper never ran. The bound is the gate's
+    // shared rule (#1040); the slowest run measured is 2.0 min, on CI, 2026-11-12 (36 s locally).
+    globalTimeout: suiteTimeout(120),
     // `open: 'never'`: the default serves the report on a failure and waits for Ctrl+C, a hang in the
     // pre-push (#1025).
     reporter: [['html', { open: 'never' }], ['../../../scripts/lib/keep-failed-runs.mjs']],
