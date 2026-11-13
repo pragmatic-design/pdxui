@@ -5,8 +5,9 @@ User image or initials, any size.
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `src` | `src` | string | `''` | Image URL; falls back to initials if it fails. |
-| `alt` | `alt` | string | `''` | The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden). |
+| `alt` | `alt` | string | `''` | The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden. |
 | `color` | `color` | string | `'auto'` | 'auto' generates color from name. Or pass a CSS color. Default: 'auto'. |
+| `decorative` | `decorative` | boolean | `false` | Beside the person's name written out: the initials and the colour still come from `alt`, but the avatar is aria-hidden, with no role or label, so the name is not read twice (#1054). |
 | `size` | `size` | 'md' \| 'xs' \| 'sm' \| 'lg' \| 'xl' | `'md'` | xs (24px), sm (32px), md (40px, the default), lg (48px) or xl (64px). |
 | `shape` | `shape` | 'circle' \| 'square' | `'circle'` | circle (the default) or square (the theme's medium radius). |
 

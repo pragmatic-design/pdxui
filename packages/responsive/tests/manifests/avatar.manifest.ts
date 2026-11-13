@@ -63,6 +63,19 @@ export const avatar: ComponentManifest = {
                 </div>`,
         },
         {
+            // Beside a name written out (#1054): `decorative` keeps the initials and the colour of the
+            // name, and leaves the accessibility tree, so the name is not read twice. Beside it the
+            // same name without `decorative`, the control: a named img.
+            id: 'avatar-decorative',
+            title: 'Avatar — decorative, beside a written name',
+            html: `
+                <div class="row" style="display:flex;align-items:center;gap:12px">
+                    <pdx-avatar data-test="av-decorative" size="md" alt="Alice Johnson" decorative></pdx-avatar>
+                    <strong>Alice Johnson</strong>
+                    <pdx-avatar data-test="av-named" size="md" alt="Alice Johnson"></pdx-avatar>
+                </div>`,
+        },
+        {
             // A picture that fails: an empty PNG data URI, refused by the decoder without a request.
             // The host is :state(broken) and the initials show in the picture's place.
             id: 'avatar-broken',
@@ -179,7 +192,7 @@ export const avatar: ComponentManifest = {
     // ── Dim. 2: axe-core ──
     a11y: {
         // role="img" plus aria-label (from alt) must pass WCAG cleanly.
-        scenarios: ['avatar-sizes', 'avatar-no-alt'],
+        scenarios: ['avatar-sizes', 'avatar-no-alt', 'avatar-decorative'],
     },
 
     // ── Dim. 3: style isolation ──

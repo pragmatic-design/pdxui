@@ -49,10 +49,15 @@ component('pdx-avatar', {
     parts: ['root', 'image', 'fallback'],
     props: {
         src: prop(''),
-        /** The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden). */
+        /** The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden. */
         alt: prop(''),
         /** 'auto' generates color from name. Or pass a CSS color. Default: 'auto'. */
         color: prop('auto'),
+        /**
+         * Beside the person's name written out: the initials and the colour still come from `alt`, but
+         * the avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).
+         */
+        decorative: prop(false),
     },
     setup(ctx) {
         const imgError = signal(false);
@@ -81,17 +86,22 @@ component('pdx-avatar', {
             return c ? `--pdx-avatar-bg:${c}` : '';
         }
 
-        return { initials, onImgError, showImage, colorStyle };
+        /** The name it is announced by: `alt`, unless it is decorative. */
+        function spokenName(): string {
+            return ctx.decorative() ? '' : ctx.alt() as string;
+        }
+
+        return { initials, onImgError, showImage, colorStyle, spokenName };
     },
-    // With a name, an image named by it; without one, decorative — hidden, no role. An unnamed
+    // With a name, an image named by it; without one, or decorative, hidden with no role. An unnamed
     // role="img" showing "?" fails axe's role-img-alt.
     // `pdx-avatar-box` is how pdx.reset sees the element, and keeps a page's bare `span { border }` off
     // it (#413); avatar.css draws it by its part. `.pdx-avatar` is the CSS-only avatar.
     render: (ctx) => html`
         <span class="pdx-avatar-box" data-part="root" :style="${ctx.colorStyle}"
-            :role="${() => ctx.alt() ? 'img' : null}"
-            :aria-label="${() => ctx.alt() || null}"
-            :aria-hidden="${() => ctx.alt() ? null : 'true'}">
+            :role="${() => ctx.spokenName() ? 'img' : null}"
+            :aria-label="${() => ctx.spokenName() || null}"
+            :aria-hidden="${() => ctx.spokenName() ? null : 'true'}">
             ${() => ctx.showImage()
                 ? html`<img data-part="image" src="${ctx.src}" alt="${ctx.alt}" @error="${ctx.onImgError}" />`
                 : html`<span data-part="fallback">${ctx.initials}</span>`

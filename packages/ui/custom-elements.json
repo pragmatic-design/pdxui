@@ -2471,7 +2471,7 @@
             {
               "kind": "field",
               "name": "alt",
-              "description": "The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden).",
+              "description": "The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden.",
               "type": {
                 "text": "string"
               },
@@ -2487,6 +2487,16 @@
               },
               "default": "'auto'",
               "attribute": "color"
+            },
+            {
+              "kind": "field",
+              "name": "decorative",
+              "description": "Beside the person's name written out: the initials and the colour still come from `alt`, but\nthe avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "decorative"
             },
             {
               "kind": "field",
@@ -2546,7 +2556,7 @@
             {
               "name": "alt",
               "fieldName": "alt",
-              "description": "The person's name: initials, accessible name and auto color. Without it the avatar is decorative (aria-hidden).",
+              "description": "The person's name: initials, accessible name and auto color. Without it, or with `decorative`, the avatar is aria-hidden.",
               "type": {
                 "text": "string"
               },
@@ -2560,6 +2570,15 @@
                 "text": "string"
               },
               "default": "'auto'"
+            },
+            {
+              "name": "decorative",
+              "fieldName": "decorative",
+              "description": "Beside the person's name written out: the initials and the colour still come from `alt`, but\nthe avatar is aria-hidden, with no role or label, so the name is not read twice (#1054).",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
             },
             {
               "name": "size",

@@ -218,6 +218,7 @@ export const scenarioPage: Record<string, string> = {
     "avatar-sizes": "tier-1a",
     "avatar-shapes": "tier-1a",
     "avatar-no-alt": "tier-1a",
+    "avatar-decorative": "tier-1a",
     "avatar-broken": "tier-1a",
     "avatar-size-md": "tier-1a",
     "avatar-size-xs": "tier-1a",

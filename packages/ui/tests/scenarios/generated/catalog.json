@@ -194,6 +194,10 @@
           "title": "Avatar — without a name (decorative)"
         },
         {
+          "id": "avatar-decorative",
+          "title": "Avatar — decorative, beside a written name"
+        },
+        {
           "id": "avatar-broken",
           "title": "Avatar — a picture that fails to load"
         },
