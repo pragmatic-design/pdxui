@@ -18378,23 +18378,23 @@
             },
             {
               "kind": "field",
-              "name": "label",
-              "description": "The list's accessible name, written on the `role=\"list\"` element (#1053): two lists on a\npage are told apart by it. An `aria-label` written on the host is moved there too.",
+              "name": "ariaLabel",
+              "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "attribute": "label"
+              "attribute": "arialabel"
             },
             {
               "kind": "field",
-              "name": "labelledby",
-              "description": "The id of an element on the page that names the list, as `aria-labelledby` on the\n`role=\"list\"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too.",
+              "name": "ariaLabelledby",
+              "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
               "type": {
                 "text": "string"
               },
               "default": "''",
-              "attribute": "labelledby"
+              "attribute": "arialabelledby"
             },
             {
               "kind": "method",
@@ -18482,18 +18482,18 @@
               "default": "'inbox'"
             },
             {
-              "name": "label",
-              "fieldName": "label",
-              "description": "The list's accessible name, written on the `role=\"list\"` element (#1053): two lists on a\npage are told apart by it. An `aria-label` written on the host is moved there too.",
+              "name": "arialabel",
+              "fieldName": "ariaLabel",
+              "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
               "type": {
                 "text": "string"
               },
               "default": "''"
             },
             {
-              "name": "labelledby",
-              "fieldName": "labelledby",
-              "description": "The id of an element on the page that names the list, as `aria-labelledby` on the\n`role=\"list\"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too.",
+              "name": "arialabelledby",
+              "fieldName": "ariaLabelledby",
+              "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
               "type": {
                 "text": "string"
               },

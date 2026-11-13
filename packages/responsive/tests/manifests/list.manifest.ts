@@ -74,18 +74,16 @@ export const list: ComponentManifest = {
                 </div>`,
         },
         {
-            // Two lists on a page are told apart by name (#1053): by the label prop, by an aria-label
-            // written on the host (moved to the role="list" element), and by labelledby.
+            // Two lists on a page are told apart by name (#1053): an aria-label or an aria-labelledby
+            // written on the host, which the list writes on its role="list" element.
             id: 'list-named',
             title: 'List — Named lists',
             html: `
                 <div style="max-width: 480px;">
-                    <pdx-list data-test="by-label" label="Comments"
+                    <pdx-list data-test="by-label" aria-label="Comments"
                         items='[{"id":1,"name":"Looks good"}]'></pdx-list>
-                    <pdx-list data-test="by-host" aria-label="Attachments"
-                        items='[{"id":1,"name":"report.pdf"}]'></pdx-list>
                     <h3 id="tasks-heading">Tasks</h3>
-                    <pdx-list data-test="by-labelledby" labelledby="tasks-heading"
+                    <pdx-list data-test="by-labelledby" aria-labelledby="tasks-heading"
                         items='[{"id":1,"name":"Call the client"}]'></pdx-list>
                 </div>`,
         },

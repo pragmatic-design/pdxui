@@ -9,7 +9,7 @@
 //     @snippet empty() { <div>No users found</div> }
 //   </pdx-list>
 
-import { component, html, inject, repeatWithSlot, slot, declaredSnippet, prop, signal } from '@pdxui/core';
+import { component, html, inject, repeatWithSlot, slot, declaredSnippet, prop } from '@pdxui/core';
 import { DataSourceContext } from '../data-source/data-source-context';
 import type { DataSource, SlotFunction } from '@pdxui/core';
 import { uiString } from '../shared/i18n';
@@ -64,15 +64,12 @@ component('pdx-list', {
         emptyDescription: prop(''),
         emptyIcon: prop('inbox', { iconName: true }),
         /**
-         * The list's accessible name, written on the `role="list"` element (#1053): two lists on a
-         * page are told apart by it. An `aria-label` written on the host is moved there too.
+         * The list's accessible name, `aria-label` on the host, written on the `role="list"` element
+         * (#1053): the host has no role, so a name left on it alone names nothing.
          */
-        label: prop(''),
-        /**
-         * The id of an element on the page that names the list, as `aria-labelledby` on the
-         * `role="list"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too.
-         */
-        labelledby: prop(''),
+        ariaLabel: prop(''),
+        /** The id of the element that names the list, `aria-labelledby` on the host, written the same way. */
+        ariaLabelledby: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651) or of `source` (#853):
@@ -114,39 +111,17 @@ component('pdx-list', {
         }
         let repeatFragment: DocumentFragment | null = null;
 
-        // A name written on the host names nothing: the host has no role, the inner element has
-        // `role="list"`. So the host's `aria-label` and `aria-labelledby` are taken off it and
-        // written on the list, now and whenever they are written again (#1053).
-        const hostLabel = signal('');
-        const hostLabelledby = signal('');
-        function takeHostName(): void {
-            for (const [attr, target] of [['aria-label', hostLabel], ['aria-labelledby', hostLabelledby]] as const) {
-                const value = ctx.el.getAttribute(attr);
-                if (value === null) continue;
-                target.set(value);
-                ctx.el.removeAttribute(attr);
-            }
-        }
-        takeHostName();
-        ctx.track(() => {
-            const observer = new MutationObserver(takeHostName);
-            observer.observe(ctx.el, { attributes: true, attributeFilter: ['aria-label', 'aria-labelledby'] });
-            return () => observer.disconnect();
-        });
-
-        /** Name the list: `labelledby` outranks `label`, and the props outrank what the host carried. */
+        /** Name the list from the host's `aria-label` and `aria-labelledby` (#1053). */
         function applyName(): void {
             if (!listEl) return;
-            const labelledby = (ctx.labelledby() as string) || hostLabelledby();
-            const label = (ctx.label() as string) || hostLabel();
-            if (labelledby) listEl.setAttribute('aria-labelledby', labelledby);
-            else listEl.removeAttribute('aria-labelledby');
-            if (label) listEl.setAttribute('aria-label', label);
-            else listEl.removeAttribute('aria-label');
+            for (const [attr, value] of [['aria-label', ctx.ariaLabel()], ['aria-labelledby', ctx.ariaLabelledby()]] as const) {
+                if (value) listEl.setAttribute(attr, value as string);
+                else listEl.removeAttribute(attr);
+            }
         }
-        // The signals are read before the list exists, so the name follows them once it does.
+        // The props are read before the list exists, so the name follows them once it does.
         ctx.track(() => {
-            void ctx.label(); void ctx.labelledby(); void hostLabel(); void hostLabelledby();
+            void ctx.ariaLabel(); void ctx.ariaLabelledby();
             applyName();
         });
 
