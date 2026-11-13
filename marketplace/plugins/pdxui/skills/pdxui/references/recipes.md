@@ -468,7 +468,7 @@ what follows in Chromium.
   <pdx-list :items="thread.comments" dividers>
     @snippet item(c) {
       <article :aria-label="c.author + ', ' + c.text">
-        <span aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+        <pdx-avatar :alt="c.author" size="sm" decorative></pdx-avatar>
         <p><strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time></p>
         <p>{{ c.text }}</p>
         <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>
@@ -556,8 +556,8 @@ function onReplyKey(e, id) {
   left alone, focus falls to `<body>`.
 - **Every change is announced** through one `role="status"` line: added, replied, deleted.
 - **Each comment is an `article` named by its author and text**, so a screen reader moving by article
-  hears who said what. The avatar is wrapped in `aria-hidden`: `pdx-avatar` needs `alt` to draw the
-  initials, and that also names it, so beside the written name it would be read twice.
+  hears who said what. The avatar is `decorative`: its `alt` still draws the initials and the colour,
+  but it leaves the accessibility tree, so beside the written name it is not read twice.
 - **Replies go one level deep**, in a `ul` inside their comment. Deeper threads, editing, mentions
   (`pdx-mention` in place of `pdx-textarea`) and saving through your API are the app's: the store is
   where an optimistic write goes, and a failed save takes the comment back out and says so.

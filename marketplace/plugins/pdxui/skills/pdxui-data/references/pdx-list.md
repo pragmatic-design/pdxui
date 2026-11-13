@@ -187,7 +187,7 @@ const ds = createDataSource({
 <pdx-list :items="thread.comments" dividers>
   @snippet item(c) {
     <article :aria-label="c.author + ', ' + c.text">
-      <span aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+      <pdx-avatar :alt="c.author" size="sm" decorative></pdx-avatar>
       <strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at"></pdx-relative-time>
       <p>{{ c.text }}</p>
       <pdx-button variant="ghost" size="sm" @click="openReply(c, $event)">Reply</pdx-button>

@@ -106,6 +106,7 @@ exports[`observed attributes > are the ones each component has always observed 1
   "pdx-avatar": [
     "alt",
     "color",
+    "decorative",
     "shape",
     "size",
     "src",

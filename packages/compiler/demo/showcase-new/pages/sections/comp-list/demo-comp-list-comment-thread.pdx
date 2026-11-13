@@ -9,7 +9,7 @@
       <pdx-list :items="thread.comments" dividers data-test="comments">
         @snippet item(c) {
           <article class="comment" :aria-label="c.author + ', ' + c.text" data-test="comment">
-            <span class="who" aria-hidden="true"><pdx-avatar :alt="c.author" size="sm"></pdx-avatar></span>
+            <pdx-avatar class="who" :alt="c.author" size="sm" decorative></pdx-avatar>
             <div class="body">
               <p class="meta"><strong>{{ c.author }}</strong> <pdx-relative-time :datetime="c.at" class="pdx-ink-muted"></pdx-relative-time></p>
               <p class="text">{{ c.text }}</p>
@@ -24,7 +24,7 @@
                   @for (c.replies as r; track r.id) {
                     <li>
                       <article class="comment reply" :aria-label="r.author + ', ' + r.text" data-test="reply-item">
-                        <span class="who" aria-hidden="true"><pdx-avatar :alt="r.author" size="xs"></pdx-avatar></span>
+                        <pdx-avatar class="who" :alt="r.author" size="xs" decorative></pdx-avatar>
                         <div class="body">
                           <p class="meta"><strong>{{ r.author }}</strong> <pdx-relative-time :datetime="r.at" class="pdx-ink-muted"></pdx-relative-time></p>
                           <p class="text">{{ r.text }}</p>
@@ -67,7 +67,7 @@
       <pre class="pdx-txt-mono"><code>&lt;pdx-list :items="thread.comments" dividers&gt;
   &#64;snippet item(c) &#123;
     &lt;article :aria-label="c.author + ', ' + c.text"&gt;
-      &lt;span aria-hidden="true"&gt;&lt;pdx-avatar :alt="c.author" size="sm"&gt;&lt;/pdx-avatar&gt;&lt;/span&gt;
+      &lt;pdx-avatar :alt="c.author" size="sm" decorative&gt;&lt;/pdx-avatar&gt;
       &lt;strong&gt;&#123;&#123; c.author &#125;&#125;&lt;/strong&gt; &lt;pdx-relative-time :datetime="c.at"&gt;&lt;/pdx-relative-time&gt;
       &lt;p&gt;&#123;&#123; c.text &#125;&#125;&lt;/p&gt;
       &lt;pdx-button variant="ghost" size="sm" @click="openReply(c, $event)"&gt;Reply&lt;/pdx-button&gt;

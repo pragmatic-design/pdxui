@@ -39,6 +39,7 @@
         <div class="opt-row"><code>size</code><span>string</span><span>xs (24px), sm (32px), md (40px), lg (48px), xl (64px)</span></div>
         <div class="opt-row"><code>shape</code><span>string</span><span>circle (default), square</span></div>
         <div class="opt-row"><code>color</code><span>string</span><span>auto (default, from name hash), or CSS color value</span></div>
+        <div class="opt-row"><code>decorative</code><span>boolean</span><span>Beside the name written out: initials and colour still come from <code>alt</code>, but the avatar is aria-hidden, no role or label, so the name is not read twice</span></div>
       </div>
     </section>
   </div>
