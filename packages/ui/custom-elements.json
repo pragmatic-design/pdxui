@@ -18377,6 +18377,26 @@
               "iconName": true
             },
             {
+              "kind": "field",
+              "name": "ariaLabel",
+              "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "arialabel"
+            },
+            {
+              "kind": "field",
+              "name": "ariaLabelledby",
+              "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "arialabelledby"
+            },
+            {
               "kind": "method",
               "name": "refresh",
               "parameters": [],
@@ -18460,6 +18480,24 @@
                 "text": "string"
               },
               "default": "'inbox'"
+            },
+            {
+              "name": "arialabel",
+              "fieldName": "ariaLabel",
+              "description": "The list's accessible name, `aria-label` on the host, written on the `role=\"list\"` element\n(#1053): the host has no role, so a name left on it alone names nothing.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "arialabelledby",
+              "fieldName": "ariaLabelledby",
+              "description": "The id of the element that names the list, `aria-labelledby` on the host, written the same way.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ],
           "slots": [

@@ -15,6 +15,8 @@ Data-driven list with custom rows.
 | `emptyTitle` | `emptytitle` | string | `''` | The empty state's title. Empty: the list.empty component string, «No items». |
 | `emptyDescription` | `emptydescription` | string | `''` | Description shown when the list is empty. |
 | `emptyIcon` | `emptyicon` | string | `'inbox'` | Icon shown in the empty state. |
+| `ariaLabel` | `arialabel` | string | `''` | The list's accessible name, `aria-label` on the host, written on the `role="list"` element (#1053): the host has no role, so a name left on it alone names nothing. |
+| `ariaLabelledby` | `arialabelledby` | string | `''` | The id of the element that names the list, `aria-labelledby` on the host, written the same way. |
 
 **API (via `:ref`)**
 

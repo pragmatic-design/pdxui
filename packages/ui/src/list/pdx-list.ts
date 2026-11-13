@@ -63,6 +63,13 @@ component('pdx-list', {
         emptyTitle: prop(''),
         emptyDescription: prop(''),
         emptyIcon: prop('inbox', { iconName: true }),
+        /**
+         * The list's accessible name, `aria-label` on the host, written on the `role="list"` element
+         * (#1053): the host has no role, so a name left on it alone names nothing.
+         */
+        ariaLabel: prop(''),
+        /** The id of the element that names the list, `aria-labelledby` on the host, written the same way. */
+        ariaLabelledby: prop(''),
     },
     // A parent's `@snippet` sets these, positional arguments; the alpha scoped slot is not read (#492).
     // The item a snippet receives is the app's, an element of `items` (#651) or of `source` (#853):
@@ -103,6 +110,20 @@ component('pdx-list', {
             else ctx.el.removeAttribute('aria-busy');
         }
         let repeatFragment: DocumentFragment | null = null;
+
+        /** Name the list from the host's `aria-label` and `aria-labelledby` (#1053). */
+        function applyName(): void {
+            if (!listEl) return;
+            for (const [attr, value] of [['aria-label', ctx.ariaLabel()], ['aria-labelledby', ctx.ariaLabelledby()]] as const) {
+                if (value) listEl.setAttribute(attr, value as string);
+                else listEl.removeAttribute(attr);
+            }
+        }
+        // The props are read before the list exists, so the name follows them once it does.
+        ctx.track(() => {
+            void ctx.ariaLabel(); void ctx.ariaLabelledby();
+            applyName();
+        });
 
         let injectedDS: DataSource<unknown> | null = null;
 
@@ -351,6 +372,7 @@ component('pdx-list', {
                     listEl.setAttribute('role', 'list');
                     listEl.addEventListener('click', onListClick);
                     listEl.addEventListener('keydown', onListKeydown);
+                    applyName();
                     ctx.el.appendChild(listEl);
 
                     buildList();

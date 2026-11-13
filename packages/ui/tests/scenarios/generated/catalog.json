@@ -2006,6 +2006,10 @@
         {
           "id": "list-clickable",
           "title": "List — Clickable items"
+        },
+        {
+          "id": "list-named",
+          "title": "List — Named lists"
         }
       ]
     },

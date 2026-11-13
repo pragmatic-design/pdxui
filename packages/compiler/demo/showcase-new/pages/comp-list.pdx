@@ -39,6 +39,8 @@
             <tr><td><code>empty-title</code></td><td>String</td><td>'No items'</td><td>Empty state title</td></tr>
             <tr><td><code>empty-description</code></td><td>String</td><td>''</td><td>Empty state description</td></tr>
             <tr><td><code>empty-icon</code></td><td>String</td><td>'inbox'</td><td>Empty state icon</td></tr>
+            <tr><td><code>aria-label</code></td><td>String</td><td>''</td><td>The list's accessible name, written on its <code>role="list"</code> element</td></tr>
+            <tr><td><code>aria-labelledby</code></td><td>String</td><td>''</td><td>The id of the element that names the list, written the same way</td></tr>
           </tbody>
         </table>
       </div>

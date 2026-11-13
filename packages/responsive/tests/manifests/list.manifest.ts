@@ -73,6 +73,20 @@ export const list: ComponentManifest = {
                     </pdx-list>
                 </div>`,
         },
+        {
+            // Two lists on a page are told apart by name (#1053): an aria-label or an aria-labelledby
+            // written on the host, which the list writes on its role="list" element.
+            id: 'list-named',
+            title: 'List — Named lists',
+            html: `
+                <div style="max-width: 480px;">
+                    <pdx-list data-test="by-label" aria-label="Comments"
+                        items='[{"id":1,"name":"Looks good"}]'></pdx-list>
+                    <h3 id="tasks-heading">Tasks</h3>
+                    <pdx-list data-test="by-labelledby" aria-labelledby="tasks-heading"
+                        items='[{"id":1,"name":"Call the client"}]'></pdx-list>
+                </div>`,
+        },
     ],
 
     // ── Dim. 1: the mathematical contract ──
@@ -165,7 +179,7 @@ export const list: ComponentManifest = {
     // no disableRules. Note: the non-keyboard clickability is a functional bug (see the header),
     // not necessarily caught by axe — reported separately.
     a11y: {
-        scenarios: ['list-basic'],
+        scenarios: ['list-basic', 'list-named'],
     },
 
     // ── Dim. 3: style isolation ──
