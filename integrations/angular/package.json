@@ -11,9 +11,9 @@
     "@angular/compiler": "^22.2.1",
     "@angular/core": "^22.2.1",
     "@angular/platform-browser": "^22.2.1",
-    "@pdxui/core": "1.0.0-alpha.1",
-    "@pdxui/design": "1.0.0-alpha.1",
-    "@pdxui/ui": "1.0.0-alpha.1",
+    "@pdxui/core": "1.0.0-beta.0",
+    "@pdxui/design": "1.0.0-beta.0",
+    "@pdxui/ui": "1.0.0-beta.0",
     "rxjs": "^7.8.0",
     "zone.js": "~0.16.3"
   },

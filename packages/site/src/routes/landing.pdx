@@ -13,7 +13,7 @@
           Components. No boilerplate, dual-mode dev/prod — and this page is built with PDX.
         </p>
         <p class="hero-status">
-          <strong>Alpha</strong> — the APIs still change between releases.
+          <strong>Beta</strong> — the APIs may still change before 1.0.
           <a href="/docs/licensing" @click="followLink">MIT, every package</a>.
         </p>
         <div class="hero-actions">

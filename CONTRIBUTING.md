@@ -1,6 +1,6 @@
 # Contributing to PDX UI
 
-Thank you for looking. This is an **alpha**: APIs still change between releases, and the
+Thank you for looking. This is a **beta**: APIs may still change before 1.0, and the
 [CHANGELOG](CHANGELOG.md) records every change an application can notice. Please read this page
 before opening a pull request. It is short, and each rule on it exists because something broke
 without it.

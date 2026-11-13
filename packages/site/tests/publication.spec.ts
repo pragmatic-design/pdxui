@@ -42,7 +42,9 @@ test('the licensing page names the license each published package declares', asy
 test('the footer states the status and links to licensing and npm', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
     const footer = page.locator('footer.site-footer');
-    await expect(footer).toContainText(/alpha/i);
+    await expect(footer).toContainText(/beta/i);
+    await expect(footer).not.toContainText(/alpha/i);
+    await expect(page.locator('.preview-ribbon'), 'the corner ribbon says the same').toHaveText('Beta');
     await expect(footer.locator('a[href="/docs/licensing"]')).toHaveCount(1);
     await expect(footer.locator('a[href="https://www.npmjs.com/org/pdxui"]')).toHaveCount(1);
 });
@@ -61,9 +63,10 @@ test('the footer licensing link reaches the page by a click', async ({ page }) =
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Licensing');
 });
 
-test('the landing page states the alpha status in text a screen reader reaches', async ({ page }) => {
+test('the landing page states the beta status in text a screen reader reaches', async ({ page }) => {
     await page.goto('/', { waitUntil: 'networkidle' });
-    await expect(page.locator('.landing').getByText(/alpha/i).first()).toBeVisible();
+    await expect(page.locator('.landing .hero-status')).toContainText(/beta/i);
+    await expect(page.locator('.landing .hero-status')).toBeVisible();
 });
 
 test('the landing install matches the quick start: runtime, compiler and the CLI', async ({ page }) => {

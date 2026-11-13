@@ -250,7 +250,7 @@ a:not([class*="pdx-"]) { color: var(--gold); }
 .design-gallery .demo-section:last-child > section { margin-bottom: 0; }
 .design-gallery .section-heading { margin: 0 0 0.6rem; }
 
-/* ── Diagonal "Alpha" corner ribbon (top-right) — PDX is an alpha release ────────────────────── */
+/* ── Diagonal "Beta" corner ribbon (top-right) — PDX is a beta release ──────────────────────── */
 .preview-ribbon {
   position: fixed;
   top: 0;
