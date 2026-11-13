@@ -1,6 +1,6 @@
 {
   "name": "@pdxui/design",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.0",
   "description": "Context-driven CSS framework. Agent-first, human-friendly.",
   "license": "MIT",
   "publishConfig": { "access": "public" },

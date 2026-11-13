@@ -1,8 +1,8 @@
 <template>
   <div class="site">
-    <!-- Diagonal corner banner — PDX is an alpha release. Decorative: the footer and the landing
+    <!-- Diagonal corner banner — PDX is a beta release. Decorative: the footer and the landing
          page say it in text. -->
-    <div class="preview-ribbon" aria-hidden="true"><span>Alpha</span></div>
+    <div class="preview-ribbon" aria-hidden="true"><span>Beta</span></div>
     <header class="site-header" @keydown="onHeaderKey">
       <div class="site-header-inner shell-wrap">
         <a class="site-brand" href="/">
@@ -46,7 +46,7 @@
     <footer class="site-footer">
       <div class="shell-wrap site-footer-inner">
         <span class="metal-gradient brand-name">PDX</span>
-        <span class="footer-note">Built with PDX UI. Alpha: the APIs still change between releases.</span>
+        <span class="footer-note">Built with PDX UI. Beta: the APIs may still change before 1.0.</span>
         <nav class="footer-links" aria-label="Project">
           <a class="footer-link" href="/docs/licensing" @click="goFromMenu">Licensing — MIT</a>
           <a class="footer-link" href="https://github.com/pragmatic-design/pdxui">GitHub ↗</a>

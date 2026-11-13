@@ -250,7 +250,7 @@ describe('the packages carry a scope the project owns', () => {
         // sources and tests included.
         const pkgs = npmPackages.filter(d => !NOT_ON_NPM.has(d)).map(d => ({ d, m: packageJson(d) as {
             version?: string; files?: string[]; publishConfig?: { access?: string } } }));
-        expect(pkgs.map(p => `${p.d}: ${p.m.version}`).filter(s => !s.endsWith(': 1.0.0-alpha.1')),
+        expect(pkgs.map(p => `${p.d}: ${p.m.version}`).filter(s => !s.endsWith(': 1.0.0-beta.0')),
             'these packages are not at the release version').toEqual([]);
         expect(pkgs.filter(p => p.m.publishConfig?.access !== 'public').map(p => p.d),
             'these packages would publish as restricted').toEqual([]);

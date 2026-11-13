@@ -7,7 +7,7 @@ body:
     attributes:
       label: Packages and version
       description: The @pdxui packages involved, with the version you use.
-      placeholder: "@pdxui/core 1.0.0-alpha.1, @pdxui/compiler 1.0.0-alpha.1"
+      placeholder: "@pdxui/core 1.0.0-beta.0, @pdxui/compiler 1.0.0-beta.0"
     validations:
       required: true
 
