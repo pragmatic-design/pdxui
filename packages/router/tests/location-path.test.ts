@@ -15,7 +15,7 @@ customElements.define('pdx-lp-tickets', class extends HTMLElement {});
 
 import { navigate } from '../src/runtime';
 import { currentPath } from '../src/state';
-import { locationPath, effect } from '@pdxui/core';
+import { locationPath, navigateTo, effect } from '@pdxui/core';
 import '../src/outlet';
 
 const tick = () => new Promise((r) => setTimeout(r, 0));
@@ -43,5 +43,12 @@ describe('core\'s location path, under the router', () => {
         await tick();
         expect(seen).toEqual(['/tickets/42', '/', '/tickets/7']);
         stop();
+    });
+
+    it('navigateTo goes through the router: no page load, the path follows', async () => {
+        expect(navigateTo('/tickets/9')).toBe(true);
+        await tick();
+        expect(currentPath()).toBe('/tickets/9');
+        expect(locationPath()).toBe('/tickets/9');
     });
 });

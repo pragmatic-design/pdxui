@@ -1,0 +1,62 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">The bar: title and profile menu</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The bar is the app's: a title, a search, and the profile menu with the scheme, the density or the
+      sign-out. The shell draws none of them; it places what the <code>bar</code> slot holds.</p>
+    <div class="shell-frame">
+      <pdx-app-shell :items="shellItems" :home="shellHome" storage-key="demo-shell-profile" collapsed
+        @before-navigate="onBeforeNavigate($event)">
+        <strong slot="brand">P</strong>
+        <div slot="bar" class="bar">
+          <span class="pdx-txt-heading">Tickets</span>
+          <pdx-dropdown-menu label="Ada Lovelace" icon="user" variant="ghost" size="sm" placement="bottom-end"
+            :items="profileItems" @pdx-select="onProfile($event)"></pdx-dropdown-menu>
+        </div>
+        <p class="pdx-txt-body pdx-ink-muted">Scheme: <strong>{{ scheme }}</strong></p>
+      </pdx-app-shell>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>&lt;pdx-app-shell :items="items"&gt;
+  &lt;div slot="bar"&gt;
+    &lt;span&gt;Tickets&lt;/span&gt;
+    &lt;pdx-dropdown-menu label="Ada Lovelace" icon="user" :items="profileItems" @pdx-select="onProfile"&gt;&lt;/pdx-dropdown-menu&gt;
+  &lt;/div&gt;
+  …
+&lt;/pdx-app-shell&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+import { setScheme, getScheme } from '@pdxui/core';
+import { shellItems, shellHome } from './data.pdx';
+
+const profileItems = [
+  { key: 'light', label: 'Light scheme', icon: 'sun' },
+  { key: 'dark', label: 'Dark scheme', icon: 'moon' },
+  { key: 'sep', label: '', type: 'separator' },
+  { key: 'out', label: 'Sign out', icon: 'log-out' },
+];
+
+let scheme = $signal(getScheme());
+
+function onProfile(e) {
+  const key = e.detail.key;
+  if (key === 'light' || key === 'dark') { setScheme(key); scheme = key; }
+}
+
+function onBeforeNavigate(e) { e.preventDefault(); }
+</script>
+
+<style scoped>
+  .shell-frame {
+    --pdx-app-shell-height: 360px;
+    height: 360px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+  .bar { display: flex; align-items: center; justify-content: space-between; gap: var(--pdx-space-sm); flex: 1; min-width: 0; }
+</style>

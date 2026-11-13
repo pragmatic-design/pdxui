@@ -1,0 +1,63 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">App Shell</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-app-shell&gt;</code> — an application's chrome drawn from a navigation model: a rail of the reader's own entries
+      (home, favourites, recents), a searchable catalogue of every entry the reader may see, a bar and the page. A choice goes
+      through the router when one runs.
+    </p>
+
+    <!-- ═══ Basic ═══ -->
+    <app-demo-comp-app-shell-basic class="demo-section"></app-demo-comp-app-shell-basic>
+
+    <!-- ═══ Collapsed rail ═══ -->
+    <app-demo-comp-app-shell-collapsed class="demo-section"></app-demo-comp-app-shell-collapsed>
+
+    <!-- ═══ The bar ═══ -->
+    <app-demo-comp-app-shell-profile class="demo-section"></app-demo-comp-app-shell-profile>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>items</code><span>{ key, label, items: Entry[] }[]</span><span>The catalogue's groups. An entry is <code>{ key, label, href, icon?, badge?, permission?, exact? }</code></span></div>
+        <div class="opt-row"><code>home</code><span>Entry</span><span>The rail's first entry, never a favourite</span></div>
+        <div class="opt-row"><code>default-favourites</code><span>string[]</span><span>The favourites of a first visit, by key</span></div>
+        <div class="opt-row"><code>recents</code><span>number</span><span>How many recents the rail shows (default 5; 0: none)</span></div>
+        <div class="opt-row"><code>user</code><span>string</span><span>Whose recents: each person keeps their own</span></div>
+        <div class="opt-row"><code>storage-key</code><span>string</span><span>The localStorage prefix for the rail, favourites and recents</span></div>
+        <div class="opt-row"><code>collapsed</code><span>boolean</span><span>Icons only; a model (<code>::collapsed</code>), kept across visits</span></div>
+        <div class="opt-row"><code>label</code><span>string</span><span>The navigation's accessible name (default «Main navigation»)</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events, slots and methods</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>before-navigate</code><span>{ key, href }</span><span>Cancelable: <code>preventDefault()</code> keeps the shell from following the entry</span></div>
+        <div class="opt-row"><code>slot="brand"</code><span></span><span>The rail's head</span></div>
+        <div class="opt-row"><code>slot="bar"</code><span></span><span>The top bar: title, search, profile menu</span></div>
+        <div class="opt-row"><code>slot="foot"</code><span></span><span>The rail's foot: environment, version</span></div>
+        <div class="opt-row"><code>openCatalog() · closeCatalog()</code><span></span><span>The catalogue</span></div>
+        <div class="opt-row"><code>openMenu() · closeMenu()</code><span></span><span>The drawer, below 600px</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div>
+        <div class="opt-row"><code>Tab</code><span></span><span>The rail's entries are one tab stop; the arrows walk them</span></div>
+        <div class="opt-row"><code>ArrowDown</code><span></span><span>From the catalogue's search into its list</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>Closes the catalogue, then the drawer; focus returns to what opened it</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/app-shell';
+@title 'App Shell Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>

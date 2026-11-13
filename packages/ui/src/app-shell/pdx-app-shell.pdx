@@ -1,0 +1,282 @@
+<template>
+  <div class="pdx-app-shell" data-part="root" :data-side="effectiveCollapsed ? 'collapsed' : 'expanded'" :data-open="menuOpen ? '' : null"
+    @keydown="onShellKey($event)" @click="onShellClick($event)">
+    <pdx-sidebar class="pdx-app-shell-rail" data-part="rail" mini :open="!effectiveCollapsed" :width="300" :collapsed-width="80" :ref="railEl">
+      <div class="pdx-app-shell-brand" data-part="brand"><slot name="brand"></slot></div>
+      <pdx-nav-menu class="pdx-app-shell-nav" data-part="railNav" :label="navName" :items="railItems" :active-key="railActive"
+        :collapsed="effectiveCollapsed" chevron="end" actions="overlay" @pdx-select="onSelect($event)" @pdx-toggle="onGroupToggle($event)">
+        @snippet itemActions(item) {
+          @if (item.pin) {
+            <button class="pdx-app-shell-pin" data-part="pin" type="button" :aria-pressed="isPinned(item.pin) ? 'true' : 'false'"
+              :aria-label="format(uiString('app-shell', 'pin'), { name: item.label })" @click.prevent.stop="togglePin(item.pin)"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pdx-app-shell-pin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+          }
+        }
+      </pdx-nav-menu>
+      <button class="pdx-app-shell-all" data-part="allButton" type="button" aria-haspopup="dialog" :aria-controls="catalogId"
+        :aria-expanded="catalogOpen ? 'true' : 'false'" :ref="allEl" @click="toggleCatalog()">
+        <span class="pdx-app-shell-all-icon" aria-hidden="true">≡</span>
+        <span class="pdx-app-shell-all-label">{{ uiString('app-shell', 'all') }}</span>
+      </button>
+      <div class="pdx-app-shell-foot" data-part="foot"><slot name="foot"></slot></div>
+    </pdx-sidebar>
+
+    <div class="pdx-app-shell-catalog" data-part="catalog" :id="catalogId" role="dialog" aria-modal="false"
+      :aria-label="uiString('app-shell', 'all')" :hidden="!catalogOpen" :ref="catalogEl">
+      <div class="pdx-app-shell-catalog-head">
+        <input class="pdx-input pdx-app-shell-search" data-part="search" type="search" ::value="query"
+          :placeholder="uiString('app-shell', 'search')" :aria-label="uiString('app-shell', 'search')" :ref="searchEl"
+          @keydown="onSearchKey($event)" />
+        <button class="pdx-app-shell-close" data-part="closeButton" type="button" :aria-label="uiString('app-shell', 'close')" @click="closeCatalog()">×</button>
+      </div>
+      @if (catalogItems.length === 0) {
+        <p class="pdx-app-shell-empty" data-part="empty">{{ format(uiString('app-shell', 'noMatch'), { query }) }}</p>
+      }
+      <pdx-nav-menu class="pdx-app-shell-nav" data-part="catalogNav" :label="uiString('app-shell', 'all')" :items="catalogItems"
+        :active-key="'all-' + activeKey" chevron="end" actions="overlay" @pdx-select="onSelect($event)">
+        @snippet itemActions(item) {
+          <button class="pdx-app-shell-pin" data-part="pin" type="button" :aria-pressed="isPinned(item.pin) ? 'true' : 'false'"
+            :aria-label="format(uiString('app-shell', 'pin'), { name: item.label })" @click.prevent.stop="togglePin(item.pin)"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path class="pdx-app-shell-pin-head" d="M9 3h6l-1 6 4 4H6l4-4z"/><path d="M12 13v8"/></svg></button>
+        }
+      </pdx-nav-menu>
+    </div>
+
+    <div class="pdx-app-shell-frame" data-part="frame" :inert="menuOpen">
+      <button class="pdx-app-shell-toggle" data-part="railToggle" type="button" :aria-expanded="effectiveCollapsed ? 'false' : 'true'"
+        :aria-label="uiString('app-shell', effectiveCollapsed ? 'expand' : 'collapse')" @click="toggleRail()">{{ effectiveCollapsed ? '›' : '‹' }}</button>
+      <header class="pdx-app-shell-bar" data-part="bar">
+        <button class="pdx-app-shell-menu" data-part="menuButton" type="button" :aria-label="uiString('app-shell', 'menu')"
+          :aria-expanded="menuOpen ? 'true' : 'false'" @click="openMenu()">☰</button>
+        <slot name="bar"></slot>
+      </header>
+      <main class="pdx-app-shell-main" data-part="main"><slot></slot></main>
+    </div>
+  </div>
+</template>
+
+<script>
+/**
+ * An application's chrome, drawn from a navigation model: a rail of the reader's own entries — home,
+ * favourites, recents — and a catalogue of every entry the app has, grouped and searchable, beside
+ * it. Entries the reader has no permission for are not drawn. A choice goes through the router when
+ * one runs. Below 600px the rail is a modal drawer opened from the bar.
+ *
+ * The app fills three slots: `brand` (the rail's head), `bar` (the top bar: title, search, the
+ * profile menu) and `foot` (the rail's foot: environment, version); the page goes in the default slot.
+ *
+ * @csspart root - The shell: the rail, the catalogue and the frame, `data-side` collapsed or expanded.
+ * @csspart rail - The navigation rail, a `pdx-sidebar`: 80px collapsed, 300px expanded.
+ * @csspart brand - The rail's head, holding the `brand` slot.
+ * @csspart railNav - The rail's `pdx-nav-menu`: home, favourites, recents.
+ * @csspart pin - The pin beside an entry, `aria-pressed` when it is a favourite.
+ * @csspart allButton - Opens the catalogue.
+ * @csspart foot - The rail's foot, holding the `foot` slot.
+ * @csspart catalog - The catalogue, a non-modal `role="dialog"` beside the rail.
+ * @csspart search - The catalogue's search field.
+ * @csspart closeButton - Closes the catalogue.
+ * @csspart empty - Said when the search matches no entry.
+ * @csspart catalogNav - The catalogue's `pdx-nav-menu`.
+ * @csspart frame - The bar and the page; inert while the drawer is open.
+ * @csspart railToggle - Collapses and expands the rail.
+ * @csspart bar - The top bar, holding the `bar` slot.
+ * @csspart menuButton - Opens the drawer below 600px.
+ * @csspart main - The page, the default slot.
+ *
+ * @cssstate collapsed - The rail shows icons only.
+ * @cssstate catalog - The catalogue is open.
+ * @cssstate drawer - The drawer is open (below 600px).
+ */
+import { hasPermission, locationPath, navigateTo, device } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { allowedGroups, entries, activeEntry, searchGroups, noteRecent, keptKeys } from './model';
+import type { AppShellGroup, AppShellEntry } from './model';
+import '@pdxui/design/components/app-shell';
+
+/** The catalogue: every entry of the app, in groups. Entries with a `permission` the reader lacks are not drawn. */
+@prop items: AppShellGroup[] = [];
+/** The first entry of the rail, always there and never a favourite: the app's home, usually. */
+@prop home: AppShellEntry | null = null;
+/** The favourites of a first visit, by entry key: a rail is not empty the first time. */
+@prop defaultFavourites: string[] = [];
+/** How many recents the rail shows; 0 shows none. */
+@prop recents: number = 5;
+/** Whose recents: each person keeps their own. Empty is a guest. */
+@prop user: string = '';
+/** The prefix of what the shell keeps in localStorage: the rail's state, the favourites, the recents. */
+@prop storageKey: string = 'pdx-app-shell';
+/** The navigation's accessible name. Empty: «Main navigation». */
+@prop label: string = '';
+/** Whether the rail shows icons only. Kept across visits when the reader toggles it. */
+@model collapsed: boolean = false;
+/**
+ * An entry was chosen, before the shell follows it. Cancelable: `preventDefault()` keeps the shell
+ * from navigating — for an entry the app opens its own way, or a demo that stays on its page.
+ */
+@event(cancelable) 'before-navigate': { key: string; href: string };
+@slot brand;
+@slot bar;
+@slot foot;
+@part root, rail, brand, railNav, pin, allButton, foot, catalog, search, closeButton, empty, catalogNav, frame, railToggle, bar, menuButton, main;
+
+@expose openCatalog, closeCatalog, openMenu, closeMenu;
+
+const catalogId = 'pdx-app-shell-catalog-' + Math.random().toString(36).slice(2, 8);
+let railEl = $signal(null);
+let allEl = $signal(null);
+let catalogEl = $signal(null);
+let searchEl = $signal(null);
+
+/** localStorage as the shell uses it: absent on the server (#160), and a stored value that is not JSON is none. */
+function stored(name, fallback) {
+  if (typeof localStorage === 'undefined') return fallback;
+  const raw = localStorage.getItem(storageKey + '.' + name);
+  if (raw === null) return fallback;
+  try { return JSON.parse(raw); } catch { return fallback; }
+}
+function store(name, value) {
+  if (typeof localStorage !== 'undefined') localStorage.setItem(storageKey + '.' + name, JSON.stringify(value));
+}
+
+const navName = $derived(label || uiString('app-shell', 'nav'));
+
+// ── What the reader may see ──────────────────────────────────────────────────────────────
+const allowed = $derived(allowedGroups(items, (p) => hasPermission(p)()));
+const allEntries = $derived([...(home ? [home] : []), ...entries(allowed)]);
+const activeKey = $derived(activeEntry(locationPath(), allEntries));
+
+// ── The rail's state ─────────────────────────────────────────────────────────────────────
+// Kept when the reader toggles it; on a phone the rail is icons whatever they last chose.
+if (stored('collapsed', null) !== null) collapsed = stored('collapsed', false) === true;
+let menuOpen = $signal(false);
+const effectiveCollapsed = $derived(menuOpen ? false : device.isMobile() ? true : collapsed);
+
+@state collapsed = effectiveCollapsed;
+@state drawer = menuOpen;
+
+function toggleRail() {
+  collapsed = !collapsed;
+  store('collapsed', collapsed);
+}
+
+/** Open the drawer (below 600px) and put the focus in it. */
+function openMenu() {
+  menuOpen = true;
+  requestAnimationFrame(() => railEl?.querySelector('a')?.focus());
+}
+/** Close the drawer. */
+function closeMenu() { menuOpen = false; }
+
+// ── Favourites and recents ───────────────────────────────────────────────────────────────
+let pins = $signal(stored('pins', null) ?? defaultFavourites);
+let recentList = $signal([]);
+// Whose recents: read again when the person changes. Before the watch that notes a visit, so the
+// first visit is added to this person's list, not to an empty one.
+$watch(user, (who) => { recentList = stored('recents.' + (who || 'guest'), []); }, { immediate: true });
+
+function isPinned(key) { return pins.includes(key); }
+function togglePin(key) {
+  pins = pins.includes(key) ? pins.filter((k) => k !== key) : [...pins, key];
+  store('pins', pins);
+}
+
+// A visit to an entry's page notes it, home aside: the rail lists what the reader opens lately. A
+// history, not a value that follows from the path: a watch writes it, and storage keeps it.
+$watch(activeKey, (key) => {
+  if (!key || (home && key === home.key) || recents <= 0) return;
+  // Kept longer than shown, so unpinning a favourite brings it back among the recents.
+  const next = noteRecent(recentList, key, recents + pins.length + 3);
+  if (next.join() === recentList.join()) return;
+  recentList = next;
+  store('recents.' + (user || 'guest'), next);
+}, { immediate: true });
+
+const shownPins = $derived(keptKeys(pins, allEntries).filter((k) => !home || k !== home.key));
+const shownRecents = $derived(keptKeys(recentList, allEntries).filter((k) => !pins.includes(k) && (!home || k !== home.key)).slice(0, recents));
+
+// ── Which groups are open, kept across visits ────────────────────────────────────────────
+const groupsOpen = stored('groups', {});
+function onGroupToggle(e) {
+  groupsOpen[e.detail.key] = e.detail.expanded;
+  store('groups', groupsOpen);
+}
+
+function byKey(key) { return allEntries.find((e) => e.key === key); }
+function entry(e, key = e.key) {
+  return { key, label: e.label, href: e.href, icon: e.icon, badge: e.badge != null ? String(e.badge) : undefined, pin: e.key };
+}
+function header(key, label, children) {
+  return { type: 'header', key, label, collapsed: groupsOpen[key] === false, children };
+}
+
+const railItems = $derived([
+  ...(home ? [{ ...entry(home), pin: undefined }] : []),
+  ...(shownPins.length ? [header('favourites', uiString('app-shell', 'favourites'), shownPins.map(byKey).filter(Boolean).map((e) => entry(e)))] : []),
+  ...(shownRecents.length ? [header('recent', uiString('app-shell', 'recent'), shownRecents.map(byKey).filter(Boolean).map((e) => entry(e, 'recent-' + e.key)))] : []),
+]);
+
+/** The rail entry of the current page: itself when it is in the rail, its recent row, or nothing. */
+const railActive = $derived(
+  !activeKey ? ''
+    : (home && activeKey === home.key) || shownPins.includes(activeKey) ? activeKey
+    : shownRecents.includes(activeKey) ? 'recent-' + activeKey
+    : '');
+
+// ── The catalogue ────────────────────────────────────────────────────────────────────────
+let catalogOpen = $signal(false);
+let query = $signal('');
+@state catalog = catalogOpen;
+
+const catalogItems = $derived(searchGroups(allowed, query).map((g) =>
+  header('all-' + g.key, g.label, g.items.map((e) => entry(e, 'all-' + e.key)))));
+
+/** Open the catalogue on an empty search, and put the focus in the search. */
+function openCatalog() {
+  query = '';
+  catalogOpen = true;
+  requestAnimationFrame(() => searchEl?.focus());
+}
+function toggleCatalog() {
+  if (catalogOpen) closeCatalog();
+  else openCatalog();
+}
+/** Close it and give the focus back to «All», which opened it. */
+function closeCatalog() {
+  if (!catalogOpen) return;
+  catalogOpen = false;
+  allEl?.focus();
+}
+
+/** ArrowDown from the search goes into the list, as from a combobox's field. */
+function onSearchKey(e) {
+  if (e.key !== 'ArrowDown') return;
+  const first = catalogEl?.querySelector('.pdx-nav-item');
+  if (!first) return;
+  e.preventDefault();
+  first.focus();
+}
+
+// ── Choosing, closing ────────────────────────────────────────────────────────────────────
+/** A choice is the router's when one runs (no page load); the catalogue and the drawer close. */
+function onSelect(e) {
+  const href = e.detail.href;
+  if (!href) return;
+  catalogOpen = false;
+  menuOpen = false;
+  // The entry's own key: a recent row and a catalogue row carry it as `pin`.
+  const key = e.detail.item?.pin ?? e.detail.key;
+  if (!beforeNavigate({ key, href })) { e.preventDefault(); return; }
+  if (navigateTo(href)) e.preventDefault();
+}
+
+/** Escape from anywhere in the shell: the catalogue first, then the drawer. */
+function onShellKey(e) {
+  if (e.key !== 'Escape') return;
+  if (catalogOpen) { closeCatalog(); return; }
+  if (menuOpen) closeMenu();
+}
+
+/** A tap on the drawer's scrim (the root's own ::after) closes it; a click outside the catalogue and its opener closes that. */
+function onShellClick(e) {
+  if (menuOpen && e.target === e.currentTarget) closeMenu();
+  if (catalogOpen && !e.composedPath().some((n) => n === catalogEl || n === allEl)) closeCatalog();
+}
+</script>

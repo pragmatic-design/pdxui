@@ -4,7 +4,32 @@ Patterns proved on the screens of a LOB app. The service-desk showcase in `packa
 Always read [gotchas.md](gotchas.md) and the [catalogue](README.md) too.
 
 ## App shell (header + sidebar + content + footer)
-The component: **`pdx-app-layout`** (its regions come from `data-region="header|navbar|aside|footer"`, and everything else is main).
+**An app with a navigation model — groups of screens, favourites, recents, permissions — takes
+`pdx-app-shell`.** It draws the model:
+- a rail of the reader's own entries: `home`, the favourites, which are pinned from the catalogue
+  and start from `default-favourites`, and the lists opened lately, per `user`;
+- «All», a searchable catalogue of every entry the reader may see. An entry with a `permission` the
+  reader lacks is not drawn (`setPermissions`);
+- a bar and the page.
+
+A choice goes through the router when one runs (core's `navigateTo`), and the active entry follows
+the router's path (`locationPath()`): no wiring. The rail is 300px, or 80px when `collapsed`, a model
+the shell keeps across visits; below 600px it is a drawer opened from the bar. The **profile menu is
+the app's**, in `slot="bar"` beside the title: a `pdx-dropdown-menu` with the scheme (`setScheme`),
+the density and the sign-out. The shell draws no menu of its own, because no two apps put the same
+things in it. `before-navigate` is cancelable, for an entry the app opens its own way. The example is
+the App Shell page of the showcase.
+
+```html
+<pdx-app-shell :items="nav" :home="{ key: 'home', label: 'Dashboard', href: '/', icon: 'home' }"
+  :default-favourites="['tickets']" :user="auth.user()?.id ?? ''">
+  <strong slot="brand">ACME</strong>
+  <div slot="bar"><span>{{ title }}</span><pdx-dropdown-menu label="Ada" icon="user" :items="profile"></pdx-dropdown-menu></div>
+  <pdx-router-outlet></pdx-router-outlet>
+</pdx-app-shell>
+```
+
+The lower-level component, for a layout with no navigation model: **`pdx-app-layout`** (its regions come from `data-region="header|navbar|aside|footer"`, and everything else is main).
 - Collapsing to a mini rail: `navbar-collapsed` plus `navbar-collapsed-width`. It is a model: `::navbarCollapsed="collapsed"`
   follows `toggleNavbar()`/`openNavbar()`/`closeNavbar()`, announced by `navbar-collapsed-change`. Responsively: `navbar-breakpoint`
   (below it → a drawer overlay). The variants: `navbar-full-height` (a sidebar that swallows the header) against a full-width header.

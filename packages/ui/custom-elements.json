@@ -12,7 +12,7 @@
           "name": "PdxAccordion",
           "tagName": "pdx-accordion",
           "category": "Overlay + Containers",
-          "order": 94,
+          "order": 95,
           "description": "Expandable sections with animated height, opened one at a time or several together, and navigated\nwith the arrow keys, Home and End.",
           "members": [
             {
@@ -212,7 +212,7 @@
           "name": "PdxAffix",
           "tagName": "pdx-affix",
           "category": "Layout",
-          "order": 73,
+          "order": 74,
           "description": "Makes an element sticky once the user scrolls past a threshold, and reports when it is.",
           "members": [
             {
@@ -329,7 +329,7 @@
           "name": "PdxAlertDialog",
           "tagName": "pdx-alert-dialog",
           "category": "Overlay + Containers",
-          "order": 90,
+          "order": 91,
           "description": "A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and\nCancel takes the focus first.",
           "members": [
             {
@@ -966,6 +966,352 @@
     },
     {
       "kind": "javascript-module",
+      "path": "src/app-shell/pdx-app-shell.pdx",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxAppShell",
+          "tagName": "pdx-app-shell",
+          "category": "Layout",
+          "order": 67,
+          "description": "An application's chrome, drawn from a navigation model: a rail of the reader's own entries — home,\nfavourites, recents — and a catalogue of every entry the app has, grouped and searchable, beside\nit. Entries the reader has no permission for are not drawn. A choice goes through the router when\none runs. Below 600px the rail is a modal drawer opened from the bar.\n\nThe app fills three slots: `brand` (the rail's head), `bar` (the top bar: title, search, the\nprofile menu) and `foot` (the rail's foot: environment, version); the page goes in the default slot.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "items",
+              "description": "The catalogue: every entry of the app, in groups. Entries with a `permission` the reader lacks are not drawn.",
+              "type": {
+                "text": "AppShellGroup[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "home",
+              "description": "The first entry of the rail, always there and never a favourite: the app's home, usually.",
+              "type": {
+                "text": "AppShellEntry | null"
+              },
+              "default": "null"
+            },
+            {
+              "kind": "field",
+              "name": "defaultFavourites",
+              "description": "The favourites of a first visit, by entry key: a rail is not empty the first time.",
+              "type": {
+                "text": "string[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "recents",
+              "description": "How many recents the rail shows; 0 shows none.",
+              "type": {
+                "text": "number"
+              },
+              "default": "5",
+              "attribute": "recents"
+            },
+            {
+              "kind": "field",
+              "name": "user",
+              "description": "Whose recents: each person keeps their own. Empty is a guest.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "user"
+            },
+            {
+              "kind": "field",
+              "name": "storageKey",
+              "description": "The prefix of what the shell keeps in localStorage: the rail's state, the favourites, the recents.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'pdx-app-shell'",
+              "attribute": "storagekey"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "description": "The navigation's accessible name. Empty: «Main navigation».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "collapsed",
+              "description": "Whether the rail shows icons only. Kept across visits when the reader toggles it.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "collapsed"
+            },
+            {
+              "kind": "method",
+              "name": "openCatalog",
+              "parameters": [],
+              "description": "Open the catalogue on an empty search, and put the focus in the search."
+            },
+            {
+              "kind": "method",
+              "name": "closeCatalog",
+              "parameters": [],
+              "description": "Close it and give the focus back to «All», which opened it."
+            },
+            {
+              "kind": "method",
+              "name": "openMenu",
+              "parameters": [],
+              "description": "Open the drawer (below 600px) and put the focus in it."
+            },
+            {
+              "kind": "method",
+              "name": "closeMenu",
+              "parameters": [],
+              "description": "Close the drawer."
+            }
+          ],
+          "models": [
+            "collapsed"
+          ],
+          "events": [
+            {
+              "name": "before-navigate",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An entry was chosen, before the shell follows it. Cancelable: `preventDefault()` keeps the shell\nfrom navigating — for an entry the app opens its own way, or a demo that stays on its page.",
+              "detail": "{ key: string; href: string }"
+            },
+            {
+              "name": "collapsed-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `collapsed`. Does not bubble.",
+              "detail": "{ value: boolean }"
+            }
+          ],
+          "roles": [
+            "dialog"
+          ],
+          "attributes": [
+            {
+              "name": "recents",
+              "fieldName": "recents",
+              "description": "How many recents the rail shows; 0 shows none.",
+              "type": {
+                "text": "number"
+              },
+              "default": "5"
+            },
+            {
+              "name": "user",
+              "fieldName": "user",
+              "description": "Whose recents: each person keeps their own. Empty is a guest.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "storagekey",
+              "fieldName": "storageKey",
+              "description": "The prefix of what the shell keeps in localStorage: the rail's state, the favourites, the recents.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'pdx-app-shell'"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "The navigation's accessible name. Empty: «Main navigation».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "collapsed",
+              "fieldName": "collapsed",
+              "description": "Whether the rail shows icons only. Kept across visits when the reader toggles it.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            }
+          ],
+          "shapes": [
+            {
+              "name": "AppShellEntry",
+              "fields": [
+                "key: string",
+                "label: string",
+                "href: string",
+                "icon?: string",
+                "badge?: string | number",
+                "permission?: string",
+                "exact?: boolean"
+              ]
+            },
+            {
+              "name": "AppShellGroup",
+              "fields": [
+                "key: string",
+                "label: string",
+                "items: AppShellEntry[]"
+              ]
+            }
+          ],
+          "slots": [
+            {
+              "name": "",
+              "description": "The content placed inside the element."
+            },
+            {
+              "name": "bar",
+              "description": ""
+            },
+            {
+              "name": "brand",
+              "description": ""
+            },
+            {
+              "name": "foot",
+              "description": ""
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The shell: the rail, the catalogue and the frame, `data-side` collapsed or expanded."
+            },
+            {
+              "name": "rail",
+              "description": "The navigation rail, a `pdx-sidebar`: 80px collapsed, 300px expanded."
+            },
+            {
+              "name": "brand",
+              "description": "The rail's head, holding the `brand` slot."
+            },
+            {
+              "name": "railNav",
+              "description": "The rail's `pdx-nav-menu`: home, favourites, recents."
+            },
+            {
+              "name": "pin",
+              "description": "The pin beside an entry, `aria-pressed` when it is a favourite."
+            },
+            {
+              "name": "allButton",
+              "description": "Opens the catalogue."
+            },
+            {
+              "name": "foot",
+              "description": "The rail's foot, holding the `foot` slot."
+            },
+            {
+              "name": "catalog",
+              "description": "The catalogue, a non-modal `role=\"dialog\"` beside the rail."
+            },
+            {
+              "name": "search",
+              "description": "The catalogue's search field."
+            },
+            {
+              "name": "closeButton",
+              "description": "Closes the catalogue."
+            },
+            {
+              "name": "empty",
+              "description": "Said when the search matches no entry."
+            },
+            {
+              "name": "catalogNav",
+              "description": "The catalogue's `pdx-nav-menu`."
+            },
+            {
+              "name": "frame",
+              "description": "The bar and the page; inert while the drawer is open."
+            },
+            {
+              "name": "railToggle",
+              "description": "Collapses and expands the rail."
+            },
+            {
+              "name": "bar",
+              "description": "The top bar, holding the `bar` slot."
+            },
+            {
+              "name": "menuButton",
+              "description": "Opens the drawer below 600px."
+            },
+            {
+              "name": "main",
+              "description": "The page, the default slot."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "collapsed",
+              "description": "The rail shows icons only."
+            },
+            {
+              "name": "drawer",
+              "description": "The drawer is open (below 600px)."
+            },
+            {
+              "name": "catalog",
+              "description": "The catalogue is open."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-app-shell-bar-height"
+            },
+            {
+              "name": "--pdx-app-shell-catalog-width"
+            },
+            {
+              "name": "--pdx-app-shell-edge"
+            },
+            {
+              "name": "--pdx-app-shell-height"
+            },
+            {
+              "name": "--pdx-app-shell-pad"
+            },
+            {
+              "name": "--pdx-app-shell-rail-collapsed-width"
+            },
+            {
+              "name": "--pdx-app-shell-rail-width"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "pdx-app-shell",
+          "declaration": {
+            "name": "PdxAppShell",
+            "module": "src/app-shell/pdx-app-shell.pdx"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
       "path": "src/aspect-ratio/pdx-aspect-ratio.ts",
       "declarations": [
         {
@@ -974,7 +1320,7 @@
           "name": "PdxAspectRatio",
           "tagName": "pdx-aspect-ratio",
           "category": "Layout",
-          "order": 74,
+          "order": 75,
           "description": "Keeps its content at a fixed aspect ratio, using the native CSS aspect-ratio.",
           "members": [
             {
@@ -1028,7 +1374,7 @@
           "name": "PdxAutoForm",
           "tagName": "pdx-auto-form",
           "category": "Data-bound",
-          "order": 104,
+          "order": 105,
           "description": "A form generated from field definitions or a form schema, so the same JSON that drives a data grid\nalso produces its edit form.",
           "members": [
             {
@@ -1258,7 +1604,7 @@
           "name": "PdxAutocomplete",
           "tagName": "pdx-autocomplete",
           "category": "Data-bound",
-          "order": 100,
+          "order": 101,
           "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
           "generics": [
             "T"
@@ -2560,7 +2906,7 @@
           "name": "PdxBanner",
           "tagName": "pdx-banner",
           "category": "Overlay + Containers",
-          "order": 96,
+          "order": 97,
           "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
           "members": [
             {
@@ -2765,7 +3111,7 @@
           "name": "PdxBlockUi",
           "tagName": "pdx-block-ui",
           "category": "Layout",
-          "order": 75,
+          "order": 76,
           "description": "A loading overlay that wraps content and, while blocked, stops interaction with it and covers it\nwith a semi-transparent overlay and a spinner.",
           "members": [
             {
@@ -3067,7 +3413,7 @@
           "name": "PdxBottomSheet",
           "tagName": "pdx-bottom-sheet",
           "category": "Overlay + Containers",
-          "order": 97,
+          "order": 98,
           "description": "A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to\nresize it and swipes down to dismiss it.",
           "members": [
             {
@@ -3545,7 +3891,7 @@
           "name": "PdxBulkActions",
           "tagName": "pdx-bulk-actions",
           "category": "Data-bound",
-          "order": 105,
+          "order": 106,
           "description": "A contextual action bar for a multi-selection: while items are selected it shows how many, a\nbutton per action and a clear button.",
           "members": [
             {
@@ -4648,7 +4994,7 @@
           "name": "PdxCard",
           "tagName": "pdx-card",
           "category": "Overlay + Containers",
-          "order": 95,
+          "order": 96,
           "description": "A structured card with header, body, footer and media slots, which can show a loading skeleton\nand be clickable or selectable.",
           "members": [
             {
@@ -4958,7 +5304,7 @@
           "name": "PdxCarousel",
           "tagName": "pdx-carousel",
           "category": "Data Display",
-          "order": 84,
+          "order": 85,
           "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
           "generics": [
             "T"
@@ -5777,7 +6123,7 @@
           "name": "PdxChart",
           "tagName": "pdx-chart",
           "category": "Data-bound",
-          "order": 110,
+          "order": 111,
           "description": "A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.",
           "members": [
             {
@@ -6320,7 +6666,7 @@
           "name": "PdxSparkline",
           "tagName": "pdx-sparkline",
           "category": "Data-bound",
-          "order": 111,
+          "order": 112,
           "description": "A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip\nor legend.",
           "members": [
             {
@@ -7330,7 +7676,7 @@
           "name": "PdxCol",
           "tagName": "pdx-col",
           "category": "Layout",
-          "order": 68,
+          "order": 69,
           "description": "A column of a 12-column grid, inside `pdx-row` or any flex container, whose span can change at\neach breakpoint.",
           "members": [
             {
@@ -7887,7 +8233,7 @@
           "name": "PdxCommand",
           "tagName": "pdx-command",
           "category": "Overlay + Containers",
-          "order": 98,
+          "order": 99,
           "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
           "generics": [
             "T extends { label: string }"
@@ -8313,7 +8659,7 @@
           "name": "PdxDataGrid",
           "tagName": "pdx-data-grid",
           "category": "Data-bound",
-          "order": 102,
+          "order": 103,
           "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
           "generics": [
             "T"
@@ -9435,7 +9781,7 @@
           "name": "PdxDataSource",
           "tagName": "pdx-data-source",
           "category": "Data-bound",
-          "order": 101,
+          "order": 102,
           "description": "A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,\ntables and selects.",
           "members": [
             {
@@ -10421,7 +10767,7 @@
           "name": "PdxDescriptionList",
           "tagName": "pdx-description-list",
           "category": "Data Display",
-          "order": 79,
+          "order": 80,
           "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
           "generics": [
             "T extends { label: string }"
@@ -10644,7 +10990,7 @@
           "name": "PdxDialog",
           "tagName": "pdx-dialog",
           "category": "Overlay + Containers",
-          "order": 89,
+          "order": 90,
           "summary": "Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.",
           "description": "Modal dialog with backdrop, focus trap and Escape-to-close.",
           "members": [
@@ -11146,7 +11492,7 @@
           "name": "PdxDrawer",
           "tagName": "pdx-drawer",
           "category": "Overlay + Containers",
-          "order": 91,
+          "order": 92,
           "description": "A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus\ntrap.",
           "members": [
             {
@@ -11726,7 +12072,7 @@
           "name": "PdxEditDrawer",
           "tagName": "pdx-edit-drawer",
           "category": "Data-bound",
-          "order": 106,
+          "order": 107,
           "description": "A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits\n`pdx-save` with the values.",
           "members": [
             {
@@ -11967,7 +12313,7 @@
           "name": "PdxEmptyState",
           "tagName": "pdx-empty-state",
           "category": "Data Display",
-          "order": 82,
+          "order": 83,
           "description": "A placeholder for an empty data view: an icon, a title and a description, with an optional action\nbutton.",
           "members": [
             {
@@ -12147,7 +12493,7 @@
           "name": "PdxEntityGrid",
           "tagName": "pdx-entity-grid",
           "category": "Data-bound",
-          "order": 107,
+          "order": 108,
           "description": "A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,\nand `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.",
           "members": [
             {
@@ -12431,7 +12777,7 @@
           "name": "PdxErrorBoundary",
           "tagName": "pdx-error-boundary",
           "category": "Infrastructure",
-          "order": 114,
+          "order": 115,
           "description": "Catches render errors and effect failures from its children and shows a fallback UI with retry.",
           "members": [
             {
@@ -14087,7 +14433,7 @@
           "name": "PdxFilterBuilder",
           "tagName": "pdx-filter-builder",
           "category": "Data-bound",
-          "order": 103,
+          "order": 104,
           "description": "A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.",
           "members": [
             {
@@ -15534,7 +15880,7 @@
           "name": "PdxImage",
           "tagName": "pdx-image",
           "category": "Data Display",
-          "order": 83,
+          "order": 84,
           "description": "An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source\nbehind authentication.",
           "members": [
             {
@@ -15952,7 +16298,7 @@
           "name": "PdxInfiniteScroll",
           "tagName": "pdx-infinite-scroll",
           "category": "Data Display",
-          "order": 85,
+          "order": 86,
           "description": "Loads more data as the user scrolls to the bottom, paging a DataSource or firing\n`pdx-load-more` for manual control.",
           "members": [
             {
@@ -17248,7 +17594,7 @@
           "name": "PdxJsonEditor",
           "tagName": "pdx-json-editor",
           "category": "Data-bound",
-          "order": 108,
+          "order": 109,
           "description": "A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each\nobject or list of objects in a sub-modal of its own.",
           "members": [
             {
@@ -17330,7 +17676,7 @@
           "name": "PdxKanban",
           "tagName": "pdx-kanban",
           "category": "Data Display",
-          "order": 78,
+          "order": 79,
           "description": "A board of columns of cards. The column an item is in is its `column-field`, and the order inside a\ncolumn is the order of `items`. A card moves by the pointer, by the keyboard — Space or Enter picks it\nup, the arrows carry it, Space or Enter drops it, Escape cancels, each step announced — or by its Move\nmenu; each way asks `before-move` first, which the app can refuse with `preventDefault()`.",
           "generics": [
             "T extends { [field: string]: unknown }"
@@ -17935,7 +18281,7 @@
           "name": "PdxList",
           "tagName": "pdx-list",
           "category": "Data Display",
-          "order": 76,
+          "order": 77,
           "description": "A list bound to data, an array or a DataSource, with custom item templates, a loading overlay\nand an empty state.",
           "generics": [
             "T"
@@ -18848,7 +19194,7 @@
           "name": "PdxMasonry",
           "tagName": "pdx-masonry",
           "category": "Layout",
-          "order": 69,
+          "order": 70,
           "description": "A masonry grid: items of different heights flow top to bottom down each column.",
           "members": [
             {
@@ -19833,6 +20179,16 @@
             },
             {
               "kind": "field",
+              "name": "label",
+              "description": "The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need\ntwo names, or a screen-reader user cannot tell the landmarks apart (#1023).",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
               "name": "size",
               "description": "`sm`: a compact menu — smaller type, icons, chevrons and row padding, for a dense sidebar.",
               "type": {
@@ -19985,6 +20341,15 @@
               "name": "iconset",
               "fieldName": "iconSet",
               "description": "Icon set name (for pdx-icon set attribute)",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "The navigation landmark's accessible name. Empty: «Navigation». Two menus on a page need\ntwo names, or a screen-reader user cannot tell the landmarks apart (#1023).",
               "type": {
                 "text": "string"
               },
@@ -21208,7 +21573,7 @@
           "name": "PdxOverlayOutlet",
           "tagName": "pdx-overlay-outlet",
           "category": "Infrastructure",
-          "order": 115,
+          "order": 116,
           "description": "Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog\nabove the last, trapping focus inside and closing the top one on Escape.",
           "members": [],
           "roles": [
@@ -22090,7 +22455,7 @@
           "name": "PdxPopover",
           "tagName": "pdx-popover",
           "category": "Overlay + Containers",
-          "order": 88,
+          "order": 89,
           "description": "A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click\noutside or Escape.",
           "members": [
             {
@@ -22547,7 +22912,7 @@
           "name": "PdxProvide",
           "tagName": "pdx-provide",
           "category": "Infrastructure",
-          "order": 113,
+          "order": 114,
           "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
           "members": [
             {
@@ -23438,7 +23803,7 @@
           "name": "PdxRelationPicker",
           "tagName": "pdx-relation-picker",
           "category": "Data-bound",
-          "order": 109,
+          "order": 110,
           "description": "Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new\none to be created.",
           "members": [
             {
@@ -23595,7 +23960,7 @@
           "name": "PdxRelativeTime",
           "tagName": "pdx-relative-time",
           "category": "Data Display",
-          "order": 86,
+          "order": 87,
           "description": "Shows a time relative to now (\"3 hours ago\", \"in 2 days\"), locale-aware and kept up to date.",
           "members": [
             {
@@ -23744,7 +24109,7 @@
           "name": "PdxRichText",
           "tagName": "pdx-rich-text",
           "category": "Data-bound",
-          "order": 112,
+          "order": 113,
           "description": "A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.",
           "members": [
             {
@@ -24211,7 +24576,7 @@
           "name": "PdxRow",
           "tagName": "pdx-row",
           "category": "Layout",
-          "order": 67,
+          "order": 68,
           "description": "A responsive row that lays out pdx-col columns on a 12-column grid, with gutter, column count and\nalignment.",
           "members": [
             {
@@ -24341,7 +24706,7 @@
           "name": "PdxScrollArea",
           "tagName": "pdx-scroll-area",
           "category": "Layout",
-          "order": 71,
+          "order": 72,
           "description": "A scrollable container that replaces the native scrollbars with styled, auto-hiding overlay\nscrollbars, vertical, horizontal or on both axes.",
           "members": [
             {
@@ -24544,7 +24909,7 @@
           "name": "PdxScrollSpy",
           "tagName": "pdx-scroll-spy",
           "category": "Layout",
-          "order": 72,
+          "order": 73,
           "description": "Highlights the navigation link of the section currently visible, as the user scrolls.",
           "members": [
             {
@@ -25271,7 +25636,7 @@
           "name": "PdxSelect",
           "tagName": "pdx-select",
           "category": "Data-bound",
-          "order": 99,
+          "order": 100,
           "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
           "generics": [
             "T"
@@ -27015,7 +27380,7 @@
           "name": "PdxSortableList",
           "tagName": "pdx-sortable-list",
           "category": "Data Display",
-          "order": 77,
+          "order": 78,
           "description": "A list the user can put in another order, by dragging a row's handle or from the keyboard alone.\n\nIt emits `pdx-reorder` with the indices and never writes to `items`: the application applies the\nmove, so the array it owns stays the one source of truth.",
           "generics": [
             "T"
@@ -27610,7 +27975,7 @@
           "name": "PdxSplitter",
           "tagName": "pdx-splitter",
           "category": "Layout",
-          "order": 70,
+          "order": 71,
           "description": "A layout of resizable panes the user resizes by dragging the handles between them or from the\nkeyboard, with collapsible and nested panes.",
           "members": [
             {
@@ -27826,7 +28191,7 @@
           "name": "PdxStatistic",
           "tagName": "pdx-statistic",
           "category": "Data Display",
-          "order": 81,
+          "order": 82,
           "description": "Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.",
           "members": [
             {
@@ -28518,7 +28883,7 @@
           "name": "PdxTabs",
           "tagName": "pdx-tabs",
           "category": "Overlay + Containers",
-          "order": 93,
+          "order": 94,
           "description": "Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy\nmounting and closable tabs.",
           "members": [
             {
@@ -30147,7 +30512,7 @@
           "name": "PdxTimeline",
           "tagName": "pdx-timeline",
           "category": "Data Display",
-          "order": 80,
+          "order": 81,
           "description": "A vertical or horizontal sequence of events, with status colors, icons and clickable items.",
           "generics": [
             "T extends { title: string }"
@@ -30434,7 +30799,7 @@
           "name": "PdxToast",
           "tagName": "pdx-toast",
           "category": "Overlay + Containers",
-          "order": 92,
+          "order": 93,
           "description": "A container that shows notification toasts from a global queue, in one of six screen positions,\npausing on hover and offering action buttons.",
           "members": [
             {
@@ -31141,7 +31506,7 @@
           "name": "PdxTooltip",
           "tagName": "pdx-tooltip",
           "category": "Overlay + Containers",
-          "order": 87,
+          "order": 88,
           "description": "A tooltip that describes its trigger on hover or focus, in one of 12 placements, with show and\nhide delays.",
           "members": [
             {

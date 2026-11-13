@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 119 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 120 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -9,6 +9,13 @@ Page structure and application shell.
 
 - `<pdx-affix>` — Pin an element while scrolling.
 - `<pdx-app-layout>` — App shell: header, left/right sidebars, footer, and everything else as the main area.
+- `<pdx-app-shell>` — An application's chrome, drawn from a navigation model: a rail of the reader's own entries — home,
+favourites, recents — and a catalogue of every entry the app has, grouped and searchable, beside
+it. Entries the reader has no permission for are not drawn. A choice goes through the router when
+one runs. Below 600px the rail is a modal drawer opened from the bar.
+
+The app fills three slots: `brand` (the rail's head), `bar` (the top bar: title, search, the
+profile menu) and `foot` (the rail's foot: environment, version); the page goes in the default slot.
 - `<pdx-aspect-ratio>` — Lock content to a fixed ratio.
 - `<pdx-col>` — A responsive grid column.
 - `<pdx-masonry>` — A staggered, Pinterest-style grid.

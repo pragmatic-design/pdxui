@@ -1,0 +1,266 @@
+/* App shell — an application's chrome from a navigation model (#1023): a rail (80px of icons, or
+   300px), a catalogue panel beside it, a top bar and the page. States on pdx-app-shell's host:
+   collapsed, catalog, drawer. Below 600px — Material 3's compact window — the rail is a modal drawer
+   opened from the bar.
+
+   `--pdx-app-shell-rail-width` / `-collapsed-width` are the rail's two widths; the catalogue starts
+   where the rail ends. `--pdx-app-shell-bar-height` is the bar's height, which the rail's head and the
+   catalogue's head match so the three read as one strip. `--pdx-app-shell-height` is the window's
+   height, the rail's: a shell shown inside a page (a demo, a preview) sets its own. */
+
+/* `--pdx-app-shell-height` is read with a fallback, not declared here: declared on the shell it would
+   cover the value a page sets on an ancestor. */
+.pdx-app-shell {
+    --pdx-app-shell-rail-width: 300px;
+    --pdx-app-shell-rail-collapsed-width: 80px;
+    --pdx-app-shell-catalog-width: 320px;
+    /* A bar holding a control: its two insets, the control's height (global, density included) and
+       its 1px rule. */
+    --pdx-app-shell-bar-height: calc(2 * var(--pdx-space-md) + var(--pdx-control-height) + 1px);
+    --pdx-app-shell-edge: var(--pdx-app-shell-rail-width);
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    min-height: var(--pdx-app-shell-height, 100dvh);
+}
+.pdx-app-shell[data-side="collapsed"] { --pdx-app-shell-edge: var(--pdx-app-shell-rail-collapsed-width); }
+
+/* ── The rail ──────────────────────────────────────────────────────────────────────────────
+   As tall as the window and held there while the page scrolls: its foot stays on screen. Weighed
+   over `.pdx-sidebar`'s own `height: 100%`, which against a parent with only a min-height resolves to
+   auto and stops the rail at its content. */
+.pdx-app-shell .pdx-app-shell-rail {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: var(--pdx-app-shell-height, 100dvh);
+    display: flex;
+    flex-direction: column;
+    background: var(--pdx-color-surface);
+    border-inline-end: 1px solid var(--pdx-color-border);
+    --pdx-app-shell-pad: var(--pdx-space-xs);
+}
+.pdx-app-shell[data-side="collapsed"] .pdx-app-shell-rail { --pdx-app-shell-pad: var(--pdx-space-2xs); }
+
+.pdx-app-shell-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-xs);
+    flex: 0 0 auto;
+    height: var(--pdx-app-shell-bar-height);
+    padding: 0 var(--pdx-space-sm);
+    box-sizing: border-box;
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+    overflow: hidden;
+}
+
+/* The menu's host is the rail's scrolling column; entries and headings are the menu's own (nav.css). */
+.pdx-app-shell-nav {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: var(--pdx-app-shell-pad);
+}
+
+/* «All»: drawn as an entry, because that is what it is — it opens a list. */
+.pdx-app-shell-all {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    min-height: var(--pdx-nav-item-height, 40px);
+    margin: 0 var(--pdx-app-shell-pad) var(--pdx-space-xs);
+    padding: 0 var(--pdx-space-xs);
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font: inherit;
+    text-align: start;
+    cursor: pointer;
+}
+.pdx-app-shell-all:hover { background: var(--pdx-color-inset); color: var(--pdx-color-text); }
+.pdx-app-shell-all[aria-expanded="true"] { background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); }
+.pdx-app-shell-all-icon { width: 24px; text-align: center; flex: 0 0 auto; }
+.pdx-app-shell-all-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.pdx-app-shell-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--pdx-space-xs);
+    flex: 0 0 auto;
+    padding: var(--pdx-space-xs);
+    border-top: 1px solid var(--pdx-color-border);
+}
+/* Nothing projected: the slot stays as an empty <slot>, and the foot takes no room and draws no rule. */
+.pdx-app-shell-foot:has(> slot:only-child:empty) { display: none; }
+
+/* Collapsed: icons only. «All» keeps its label for a screen reader — hidden from sight, not from the
+   accessibility tree, or the button has no name. */
+.pdx-app-shell[data-side="collapsed"] .pdx-app-shell-rail .pdx-app-shell-all-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+.pdx-app-shell[data-side="collapsed"] .pdx-app-shell-all { justify-content: center; }
+
+/* ── The pin beside an entry: a pushpin, outlined, filled when the entry is a favourite ──── */
+.pdx-app-shell-pin {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: var(--pdx-color-inset);
+    color: inherit;
+    cursor: pointer;
+}
+.pdx-app-shell-pin svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.pdx-app-shell-pin[aria-pressed="true"] { color: var(--pdx-color-primary-ink); }
+.pdx-app-shell-pin[aria-pressed="true"] .pdx-app-shell-pin-head { fill: currentColor; }
+
+/* ── The catalogue: a second column beside the rail, over the page, not modal ─────────────── */
+.pdx-app-shell-catalog {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: var(--pdx-app-shell-edge);
+    z-index: 30;
+    width: var(--pdx-app-shell-catalog-width);
+    max-width: calc(100vw - var(--pdx-app-shell-edge));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--pdx-color-surface);
+    border-inline-end: 1px solid var(--pdx-color-border);
+    --pdx-app-shell-pad: var(--pdx-space-xs);
+}
+.pdx-app-shell-catalog[hidden] { display: none; }
+.pdx-app-shell-catalog-head {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+    flex: 0 0 auto;
+    height: var(--pdx-app-shell-bar-height);
+    padding: 0 var(--pdx-space-sm);
+    box-sizing: border-box;
+    background: var(--pdx-color-inset);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+.pdx-app-shell-search { flex: 1; min-width: 0; }
+.pdx-app-shell-close {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-muted);
+    font-size: 20px;
+    cursor: pointer;
+}
+.pdx-app-shell-close:hover { background: var(--pdx-color-surface); color: var(--pdx-color-text); }
+.pdx-app-shell-empty { margin: 0; padding: var(--pdx-space-md); color: var(--pdx-color-muted); font-size: var(--pdx-text-sm); }
+
+/* ── The frame: the bar and the page ──────────────────────────────────────────────────────── */
+.pdx-app-shell-frame {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* The rail's handle, at the crossing of the rail's edge and the bar's baseline. In the frame, not in
+   the rail: the sidebar clips its content while it collapses, and a handle on its border would lose
+   half of itself. Above the catalogue, which opens right at this edge. */
+.pdx-app-shell-toggle {
+    position: absolute;
+    top: calc(var(--pdx-app-shell-bar-height) - 11px);
+    inset-inline-start: -11px;
+    z-index: 31;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: 50%;
+    background: var(--pdx-color-bg);
+    color: var(--pdx-color-muted);
+    line-height: 1;
+    cursor: pointer;
+}
+.pdx-app-shell-toggle:hover { color: var(--pdx-color-text); }
+
+.pdx-app-shell-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-sm);
+    min-height: var(--pdx-app-shell-bar-height);
+    padding: 0 var(--pdx-space-md);
+    box-sizing: border-box;
+    border-bottom: 1px solid var(--pdx-color-border);
+    background: var(--pdx-color-surface);
+}
+.pdx-app-shell-menu {
+    display: none;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    background: transparent;
+    color: var(--pdx-color-text);
+    font-size: 20px;
+    cursor: pointer;
+}
+.pdx-app-shell-main { flex: 1; min-width: 0; padding: var(--pdx-space-lg); }
+
+/* ── Compact window, below 600px: the rail is a modal drawer opened from the bar ──────────────
+   Last in the file: a media query adds no specificity, and the rules it overrides are above. */
+@media (max-width: 599px) {
+    .pdx-app-shell-rail {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        inset-inline-start: 0;
+        z-index: 30;
+        box-shadow: var(--pdx-shadow-lg);
+    }
+    .pdx-app-shell:not([data-open]) .pdx-app-shell-rail,
+    .pdx-app-shell-toggle { display: none; }
+    .pdx-app-shell-menu { display: inline-flex; align-items: center; justify-content: center; }
+    .pdx-app-shell-catalog { inset-inline-start: 0; width: 100vw; max-width: 100vw; z-index: 32; }
+    /* The drawer's scrim: the root's own ::after, so a tap on it is a click on the root. */
+    .pdx-app-shell[data-open]::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: 29;
+        background: color-mix(in oklch, var(--pdx-color-text) 32%, transparent);
+    }
+}
+
+/* A printed page is the record, not the application around it. */
+@media print {
+    .pdx-app-shell-rail,
+    .pdx-app-shell-catalog,
+    .pdx-app-shell-toggle,
+    .pdx-app-shell-menu { display: none !important; }
+}

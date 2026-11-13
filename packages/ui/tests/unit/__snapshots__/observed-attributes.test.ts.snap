@@ -53,6 +53,14 @@ exports[`observed attributes > are the ones each component has always observed 1
     "with-border",
     "withborder",
   ],
+  "pdx-app-shell": [
+    "collapsed",
+    "label",
+    "recents",
+    "storage-key",
+    "storagekey",
+    "user",
+  ],
   "pdx-aspect-ratio": [
     "ratio",
   ],
@@ -893,6 +901,7 @@ exports[`observed attributes > are the ones each component has always observed 1
     "iconset",
     "indent",
     "indicator",
+    "label",
     "size",
   ],
   "pdx-navbar": [

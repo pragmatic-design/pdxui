@@ -332,7 +332,11 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // conditions from their host's custom states, and each rule keeps the native class beside the
 // `:where(pdx-form-field):state(…)` form, for markup written without the component. Main sat on the
 // ceiling: 66 KB on the CI's line; the built dist of this branch weighs 66.1 KB locally.
-const BUDGET_KB = { entry: 43.5, js: 472, css: 67, blocking: 103 };
+// entry 43.5 → 43.6 (owner's OK): pdx-app-shell (#1023) changes no byte of the entry's code — the
+// two builds are the same length, 130799 characters — only the content hashes of the chunks named in
+// Vite's preload map (pdx-nav-menu, the shell), which gzip packs 14 bytes worse. The built dist:
+// main 44577 → this branch 44591 bytes gzipped. Main sat on the rounding edge, 43.5 on the CI's line.
+const BUDGET_KB = { entry: 43.6, js: 472, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 

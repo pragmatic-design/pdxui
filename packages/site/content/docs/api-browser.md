@@ -7,7 +7,7 @@ parent: api
 
 # Browser and device API
 
-Storage, online and idle state, the title and head, media queries, scroll, the splash screen, bottom sheets, pull-to-refresh, safe areas and the route trail. 22 exports, from `@pdxui/core`.
+Storage, online and idle state, the title and head, media queries, scroll, the splash screen, bottom sheets, pull-to-refresh, safe areas and the route trail. 24 exports, from `@pdxui/core`.
 
 Part of the [API reference](/docs/api), generated from the source by `packages/site/scripts/gen-api.mjs`.
 
@@ -52,6 +52,18 @@ function locationPath(): string
 
 The current path: the router's when it runs, else the address bar's. Reactive: a reader re-runs on
 every navigation, and when a source is named after it first read.
+
+## `navigateTo`
+
+```ts
+import { navigateTo } from '@pdxui/core';
+
+function navigateTo(href: string): boolean
+```
+
+Follow `href` with the router, when one has named itself; `false` when none has, and the caller lets
+its link do the browser's work. A component that draws links (`<pdx-app-shell>`) calls it on a
+click: where the Navigation API does not hand the click to the router, the link would reload the page.
 
 ## `restoreScrollPosition`
 
@@ -106,6 +118,16 @@ function setLocationSource(source: (() => string) | null): void
 
 Name where the current path comes from: `@pdxui/router` does, when it loads. An application with a
 router of its own passes its path signal; `null` goes back to the address bar.
+
+## `setNavigator`
+
+```ts
+import { setNavigator } from '@pdxui/core';
+
+function setNavigator(navigator: ((href: string) => void) | null): void
+```
+
+Name what follows a link: `@pdxui/router` does, in `createRouter`; `null` takes it back.
 
 ## `setRouteTrail`
 

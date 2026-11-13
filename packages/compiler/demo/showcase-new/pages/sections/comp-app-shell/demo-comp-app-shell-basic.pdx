@@ -1,0 +1,57 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Basic</h2>
+    <p class="pdx-txt-small pdx-ink-muted">A navigation model, drawn: the rail holds Dashboard, the favourites (Tickets on a first visit) and the
+      lists opened lately; <strong>All</strong> opens every entry, searchable, with a pin beside each. Billing needs a permission
+      this page does not grant, so it is not drawn. Here <code>before-navigate</code> is refused, so a choice stays on this page.</p>
+    <div class="shell-frame">
+      <pdx-app-shell :items="shellItems" :home="shellHome" :default-favourites="['tickets']" storage-key="demo-shell-basic"
+        @before-navigate="onBeforeNavigate($event)">
+        <strong slot="brand">PDX</strong>
+        <span slot="bar" class="pdx-txt-heading">Service desk</span>
+        <span slot="foot" class="pdx-badge pdx-warning">STAGING</span>
+        <p class="pdx-txt-body">Chosen: <strong>{{ chosen }}</strong></p>
+      </pdx-app-shell>
+    </div>
+    <details class="source-block">
+      <summary>Source</summary>
+      <pre class="pdx-txt-mono"><code>const items = [
+  { key: 'work', label: 'Work', items: [
+    { key: 'tickets', label: 'Tickets', href: '/tickets', icon: 'list', badge: 12 },
+    { key: 'billing', label: 'Billing', href: '/billing', icon: 'credit-card', permission: 'billing.read' },
+  ] },
+];
+
+&lt;pdx-app-shell :items="items" :home="home" :default-favourites="['tickets']"&gt;
+  &lt;strong slot="brand"&gt;PDX&lt;/strong&gt;
+  &lt;span slot="bar"&gt;Service desk&lt;/span&gt;
+  &lt;pdx-router-outlet&gt;&lt;/pdx-router-outlet&gt;
+&lt;/pdx-app-shell&gt;</code></pre>
+    </details>
+  </section>
+</template>
+
+<script>
+import { shellItems, shellHome } from './data.pdx';
+
+let chosen = $signal('nothing yet');
+
+/** The demo stays on its page: the choice is shown, not followed. */
+function onBeforeNavigate(e) {
+  e.preventDefault();
+  chosen = e.detail.key + ' → ' + e.detail.href;
+}
+</script>
+
+<style scoped>
+  /* A shell is a window's chrome; shown in a page it gets a window of its own. The transform makes the
+     catalogue's and the drawer's fixed position relative to this frame. */
+  .shell-frame {
+    --pdx-app-shell-height: 520px;
+    height: 520px;
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+    overflow: hidden;
+    transform: translateZ(0);
+  }
+</style>

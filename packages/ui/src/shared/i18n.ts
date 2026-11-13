@@ -14,6 +14,13 @@ import { registerComponentStrings, getComponentString, formatMessage, componentS
 /** component → key → English default. */
 const DEFAULTS: Record<string, Record<string, string>> = {
     'app-layout': { mainNav: 'Main navigation', aside: 'Secondary' },
+    // `pin` and `unpin` name the pin beside an entry, `{name}` the entry's label; `noMatch` holds the
+    // search as `{query}`.
+    'app-shell': {
+        nav: 'Main navigation', all: 'All', favourites: 'Favourites', recent: 'Recent',
+        search: 'Search', close: 'Close', noMatch: 'Nothing matches “{query}”',
+        pin: 'Pin {name}', collapse: 'Collapse navigation', expand: 'Expand navigation', menu: 'Menu',
+    },
     // Names and button texts here rather than as prop defaults, which no locale could reach. The
     // prop still wins when it is set; these are what the component says when it is not.
     // `typeToConfirm` holds the text to type as `{text}`: the component renders it in <strong>, so the

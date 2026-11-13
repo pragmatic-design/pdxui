@@ -352,7 +352,7 @@ export type { ComponentStrings } from './i18n/component-strings';
 // The breadcrumb's trail: core holds it, the router fills it, `<pdx-breadcrumb>` reads it, and
 // neither half has to depend on the other.
 export { routeTrail, setRouteTrail, clearRouteTrail } from './navigation/route-trail';
-export { locationPath, setLocationSource } from './navigation/location-path';
+export { locationPath, setLocationSource, navigateTo, setNavigator } from './navigation/location-path';
 export type { RouteCrumb } from './navigation/route-trail';
 export { direction, isRTL, setDirection, inlineStart, inlineEnd, flipPlacement, rtlTransformX } from './i18n/rtl';
 

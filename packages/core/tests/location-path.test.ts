@@ -10,10 +10,25 @@
 // `packages/router/tests/location-path.test.ts`.
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { locationPath, setLocationSource } from '../src/navigation/location-path';
+import { locationPath, setLocationSource, navigateTo, setNavigator } from '../src/navigation/location-path';
 import { signal, effect } from '../src/reactivity/signal';
 
-afterEach(() => setLocationSource(null));
+afterEach(() => { setLocationSource(null); setNavigator(null); });
+
+describe('navigateTo, the other half (#1023)', () => {
+    // A link the shell draws is followed by the router when there is one: a click that went to the
+    // browser would reload the page wherever the Navigation API does not hand it to the router.
+    it('with no navigator it answers false, and the caller lets the link do its own work', () => {
+        expect(navigateTo('/tickets')).toBe(false);
+    });
+
+    it('with a navigator it hands it the href and answers true', () => {
+        const went: string[] = [];
+        setNavigator((href) => { went.push(href); });
+        expect(navigateTo('/tickets/7')).toBe(true);
+        expect(went).toEqual(['/tickets/7']);
+    });
+});
 
 describe('the location path registry', () => {
     it('without a source, it is the address bar\'s path', () => {

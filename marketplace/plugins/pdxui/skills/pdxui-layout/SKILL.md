@@ -1,11 +1,11 @@
 ---
 name: pdxui-layout
-description: "PDX (@pdxui/ui) layout and shell components — pdx-app-layout, pdx-page-header, navbar, sidebar, splitter, scroll-area, row/col grid, aspect-ratio, masonry, toolbar, affix, scroll-spy — with props and events. Use when building the page structure or app shell of a .pdx app."
+description: "PDX (@pdxui/ui) layout and shell components — pdx-app-layout, pdx-app-shell, pdx-page-header, navbar, sidebar, splitter, scroll-area, row/col grid, aspect-ratio, masonry, toolbar, affix, scroll-spy — with props and events. Use when building the page structure or app shell of a .pdx app."
 ---
 
 # UI · Layout & shell
 
-> Page structure and application shell.  (13 components)  ·  catalogue generated from the library's custom-elements manifest.
+> Page structure and application shell.  (14 components)  ·  catalogue generated from the library's custom-elements manifest.
 > Cross-cutting playbook, recipes and gotchas: the **`pdxui`** skill.
 > **Names.** Bind a prop by its kebab-case name, `:max-height="620"`, `:empty-title="t"`: the component
 > receives the camelCase prop (`maxHeight`). In a `.pdx` template the camelCase form, `:maxHeight`, compiles
@@ -17,6 +17,13 @@ Each page has the props, events, slots and API, the notes, and the examples of t
 
 - [`<pdx-affix>`](references/pdx-affix.md) — Pin an element while scrolling.
 - [`<pdx-app-layout>`](references/pdx-app-layout.md) — App shell: header, left/right sidebars, footer, and everything else as the main area.
+- [`<pdx-app-shell>`](references/pdx-app-shell.md) — An application's chrome, drawn from a navigation model: a rail of the reader's own entries — home,
+favourites, recents — and a catalogue of every entry the app has, grouped and searchable, beside
+it. Entries the reader has no permission for are not drawn. A choice goes through the router when
+one runs. Below 600px the rail is a modal drawer opened from the bar.
+
+The app fills three slots: `brand` (the rail's head), `bar` (the top bar: title, search, the
+profile menu) and `foot` (the rail's foot: environment, version); the page goes in the default slot.
 - [`<pdx-aspect-ratio>`](references/pdx-aspect-ratio.md) — Lock content to a fixed ratio.
 - [`<pdx-col>`](references/pdx-col.md) — A responsive grid column.
 - [`<pdx-masonry>`](references/pdx-masonry.md) — A staggered, Pinterest-style grid.
