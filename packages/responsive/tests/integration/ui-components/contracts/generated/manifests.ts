@@ -510,6 +510,7 @@ export const scenarioPage: Record<string, string> = {
     "label-size-xl": "tier-1b",
     "list-basic": "tier-5b",
     "list-clickable": "tier-5b",
+    "list-named": "tier-5b",
     "localized-input-tabs": "tier-3c",
     "localized-input-stacked": "tier-3c",
     "localized-input-disabled": "tier-3c",

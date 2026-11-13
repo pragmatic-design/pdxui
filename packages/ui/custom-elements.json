@@ -18377,6 +18377,26 @@
               "iconName": true
             },
             {
+              "kind": "field",
+              "name": "label",
+              "description": "The list's accessible name, written on the `role=\"list\"` element (#1053): two lists on a\npage are told apart by it. An `aria-label` written on the host is moved there too.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "labelledby",
+              "description": "The id of an element on the page that names the list, as `aria-labelledby` on the\n`role=\"list\"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "labelledby"
+            },
+            {
               "kind": "method",
               "name": "refresh",
               "parameters": [],
@@ -18460,6 +18480,24 @@
                 "text": "string"
               },
               "default": "'inbox'"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "The list's accessible name, written on the `role=\"list\"` element (#1053): two lists on a\npage are told apart by it. An `aria-label` written on the host is moved there too.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "labelledby",
+              "fieldName": "labelledby",
+              "description": "The id of an element on the page that names the list, as `aria-labelledby` on the\n`role=\"list\"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
             }
           ],
           "slots": [

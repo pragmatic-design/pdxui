@@ -15,6 +15,8 @@ Data-driven list with custom rows.
 | `emptyTitle` | `emptytitle` | string | `''` | The empty state's title. Empty: the list.empty component string, «No items». |
 | `emptyDescription` | `emptydescription` | string | `''` | Description shown when the list is empty. |
 | `emptyIcon` | `emptyicon` | string | `'inbox'` | Icon shown in the empty state. |
+| `label` | `label` | string | `''` | The list's accessible name, written on the `role="list"` element (#1053): two lists on a page are told apart by it. An `aria-label` written on the host is moved there too. |
+| `labelledby` | `labelledby` | string | `''` | The id of an element on the page that names the list, as `aria-labelledby` on the `role="list"` element; it outranks `label`. An `aria-labelledby` on the host is moved there too. |
 
 **API (via `:ref`)**
 

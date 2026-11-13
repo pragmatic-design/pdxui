@@ -821,6 +821,8 @@ exports[`observed attributes > are the ones each component has always observed 1
     "emptytitle",
     "id-field",
     "idfield",
+    "label",
+    "labelledby",
   ],
   "pdx-localized-input": [
     "aria-label",
