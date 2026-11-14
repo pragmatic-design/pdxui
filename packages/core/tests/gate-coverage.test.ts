@@ -196,6 +196,15 @@ describe('the pre-push', () => {
             .toBeLessThan(prePush.indexOf('pnpm certify'));
     });
 
+    // The suites the push affects, the browser ones left to CI (#1074); the full run one variable away.
+    it('runs the affected suites by default, and every suite with PDX_TEST_ALL=1', () => {
+        const all = prePush.indexOf('"$PDX_TEST_ALL" = "1"');
+        expect(all, 'no way to run every suite before a push').toBeGreaterThan(-1);
+        expect(prePush.indexOf('pnpm test ||', all), 'PDX_TEST_ALL=1 does not run pnpm test').toBeGreaterThan(all);
+        expect(prePush.indexOf('pnpm test:affected ||', all), 'the default is not test:affected').toBeGreaterThan(prePush.indexOf('pnpm test ||', all));
+        expect(rootPkg.scripts['test:affected']).toBe('node scripts/test-affected.mjs');
+    });
+
     // packages/site/src/demos is generated and git-ignored. CI's `pnpm build` regenerates it (the
     // site's build runs port-demos.mjs); locally it was whatever the last port-demos wrote, maybe on
     // another branch, and cli's design-pass-trees failed the push on demos of another commit (#1073).
