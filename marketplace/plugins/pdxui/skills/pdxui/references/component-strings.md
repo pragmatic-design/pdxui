@@ -1,6 +1,6 @@
 # Component strings — every key, its English default, where it is declared
 
-> Generated from the sources. 468 keys in 81 components.
+> Generated from the sources. 481 keys in 82 components.
 
 Override any of them with **one** call, **before the app mounts** — see the recipe "An app that is not in
 English":
@@ -383,6 +383,19 @@ placeholders, filled at render: keep them in the translation.
 | `router` | `loading` | `Loading...` | `@pdxui/router/src/outlet.ts` |
 | `router` | `notFound` | `Page not found` | `@pdxui/router/src/outlet.ts` |
 | `router` | `retry` | `Try again` | `@pdxui/router/src/outlet.ts` |
+| `scheduler` | `allDay` | `All day` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `day` | `Day` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `daysView` | `{count} days` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `eventName` | `{title}, {when}` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `label` | `Scheduler` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `next` | `Next period` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `previous` | `Previous period` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `resource` | `Resource` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `time` | `Time` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `today` | `Today` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `toolbar` | `Calendar` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `views` | `View` | `@pdxui/ui/src/shared/i18n.ts` |
+| `scheduler` | `week` | `Week` | `@pdxui/ui/src/shared/i18n.ts` |
 | `search-input` | `clear` | `Clear search` | `@pdxui/ui/src/shared/i18n.ts` |
 | `search-input` | `placeholder` | `Search...` | `@pdxui/ui/src/shared/i18n.ts` |
 | `search-input` | `searching` | `Searching` | `@pdxui/ui/src/shared/i18n.ts` |

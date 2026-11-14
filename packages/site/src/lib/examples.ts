@@ -15,6 +15,7 @@ export const examples: Record<string, string> = {
     'pdx-signature-pad': '<pdx-signature-pad label="Signature" style="width:320px"></pdx-signature-pad>',
     'pdx-localized-input': `<pdx-localized-input label="Product name" cultures='["en","it","fr"]' value='{"en":"Desk lamp"}' style="width:320px"></pdx-localized-input>`,
     'pdx-kanban': `<pdx-kanban label="Sprint" columns='[{"key":"todo","label":"To do"},{"key":"done","label":"Done"}]' items='[{"id":"a","title":"Write the spec","status":"todo"},{"id":"b","title":"Ship it","status":"done"}]'></pdx-kanban>`,
+    'pdx-scheduler': `<pdx-scheduler label="Team" view="day" date="2026-11-17" time-zone="Europe/Rome" start-hour="08:00" end-hour="13:00" now-indicator="false" events='[{"id":"a","title":"Design review","start":"2026-11-17T09:00","end":"2026-11-17T10:30"},{"id":"b","title":"Call","start":"2026-11-17T10:00","end":"2026-11-17T11:00"}]' style="width:100%;--pdx-scheduler-height:16rem"></pdx-scheduler>`,
     'pdx-input': '<pdx-input placeholder="Type here…" style="width:280px"></pdx-input>',
     'pdx-textarea': '<pdx-textarea placeholder="Your message…" style="width:280px"></pdx-textarea>',
     'pdx-checkbox': '<pdx-checkbox label="I agree"></pdx-checkbox>',

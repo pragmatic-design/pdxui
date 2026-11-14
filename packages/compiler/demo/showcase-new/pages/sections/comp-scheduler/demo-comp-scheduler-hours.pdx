@@ -1,0 +1,19 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Working week and hours</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Without <code>weekends</code> the week is Monday to Friday. <code>start-hour</code> and <code>end-hour</code> bound the visible day, <code>slot-minutes</code> sets the grid's step, and <code>business-hours</code> shades the time outside work. <code>time-zone</code> shows the events in an IANA zone: a start with an offset is an instant, placed at its time there.</p>
+    <pdx-scheduler label="Support rota" :weekends="false" first-day="1" start-hour="07:00" end-hour="19:00" slot-minutes="15" time-zone="America/New_York" :business-hours="hours" :events="shifts"></pdx-scheduler>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const hours = { 1: { start: '08:00', end: '17:00' }, 2: { start: '08:00', end: '17:00' }, 3: { start: '08:00', end: '17:00' }, 4: { start: '08:00', end: '17:00' }, 5: { start: '08:00', end: '13:00' } };
+const shifts = [
+  { id: 's1', title: 'Early shift', start: at(0, '07:00'), end: at(0, '11:00') },
+  { id: 's2', title: 'Hand-over', start: at(2, '13:00'), end: at(2, '13:15') },
+  // 14:00 UTC is 09:00 in New York in winter, 10:00 in summer.
+  { id: 's3', title: 'Global sync', start: at(3, '14:00') + 'Z', end: at(3, '15:00') + 'Z' },
+];
+</script>

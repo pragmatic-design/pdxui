@@ -91,6 +91,7 @@ export const LOADERS = new Map([
     ['pdx-relative-time', () => import('@pdxui/ui/relative-time')],
     ['pdx-rich-text', () => import('@pdxui/ui/rich-text')],
     ['pdx-row', () => import('@pdxui/ui/row')],
+    ['pdx-scheduler', () => import('@pdxui/ui/scheduler')],
     ['pdx-scroll-area', () => import('@pdxui/ui/scroll-area')],
     ['pdx-scroll-spy', () => import('@pdxui/ui/scroll-spy')],
     ['pdx-search-input', () => import('@pdxui/ui/search-input')],

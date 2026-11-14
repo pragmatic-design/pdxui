@@ -12,7 +12,7 @@
           "name": "PdxAccordion",
           "tagName": "pdx-accordion",
           "category": "Overlay + Containers",
-          "order": 95,
+          "order": 96,
           "description": "Expandable sections with animated height, opened one at a time or several together, and navigated\nwith the arrow keys, Home and End.",
           "members": [
             {
@@ -329,7 +329,7 @@
           "name": "PdxAlertDialog",
           "tagName": "pdx-alert-dialog",
           "category": "Overlay + Containers",
-          "order": 91,
+          "order": 92,
           "description": "A confirmation dialog that requires the user to act: the backdrop and Escape do not close it, and\nCancel takes the focus first.",
           "members": [
             {
@@ -1374,7 +1374,7 @@
           "name": "PdxAutoForm",
           "tagName": "pdx-auto-form",
           "category": "Data-bound",
-          "order": 105,
+          "order": 106,
           "description": "A form generated from field definitions or a form schema, so the same JSON that drives a data grid\nalso produces its edit form.",
           "members": [
             {
@@ -1604,7 +1604,7 @@
           "name": "PdxAutocomplete",
           "tagName": "pdx-autocomplete",
           "category": "Data-bound",
-          "order": 101,
+          "order": 102,
           "description": "A text input with suggestions whose value is free text: the user can type anything, or pick a\nsuggestion from a local list or a remote data source.",
           "generics": [
             "T"
@@ -2925,7 +2925,7 @@
           "name": "PdxBanner",
           "tagName": "pdx-banner",
           "category": "Overlay + Containers",
-          "order": 97,
+          "order": 98,
           "description": "An inline alert banner with an icon matched to its variant and slots for actions, which the user\ncan close or which dismisses itself.",
           "members": [
             {
@@ -3432,7 +3432,7 @@
           "name": "PdxBottomSheet",
           "tagName": "pdx-bottom-sheet",
           "category": "Overlay + Containers",
-          "order": 98,
+          "order": 99,
           "description": "A sheet that rises from the bottom edge and snaps to set heights: the user drags its handle to\nresize it and swipes down to dismiss it.",
           "members": [
             {
@@ -3910,7 +3910,7 @@
           "name": "PdxBulkActions",
           "tagName": "pdx-bulk-actions",
           "category": "Data-bound",
-          "order": 106,
+          "order": 107,
           "description": "A contextual action bar for a multi-selection: while items are selected it shows how many, a\nbutton per action and a clear button.",
           "members": [
             {
@@ -5013,7 +5013,7 @@
           "name": "PdxCard",
           "tagName": "pdx-card",
           "category": "Overlay + Containers",
-          "order": 96,
+          "order": 97,
           "description": "A structured card with header, body, footer and media slots, which can show a loading skeleton\nand be clickable or selectable.",
           "members": [
             {
@@ -5323,7 +5323,7 @@
           "name": "PdxCarousel",
           "tagName": "pdx-carousel",
           "category": "Data Display",
-          "order": 85,
+          "order": 86,
           "description": "A carousel for images, cards or any content, with slide or fade animation, autoplay and touch swipe.",
           "generics": [
             "T"
@@ -6142,7 +6142,7 @@
           "name": "PdxChart",
           "tagName": "pdx-chart",
           "category": "Data-bound",
-          "order": 111,
+          "order": 112,
           "description": "A zero-dependency chart drawn on a canvas, styled by the design tokens, that resizes itself.",
           "members": [
             {
@@ -6685,7 +6685,7 @@
           "name": "PdxSparkline",
           "tagName": "pdx-sparkline",
           "category": "Data-bound",
-          "order": 112,
+          "order": 113,
           "description": "A tiny inline trend chart for tables, cards and KPIs: a line, area or bar with no axes, tooltip\nor legend.",
           "members": [
             {
@@ -8252,7 +8252,7 @@
           "name": "PdxCommand",
           "tagName": "pdx-command",
           "category": "Overlay + Containers",
-          "order": 99,
+          "order": 100,
           "description": "A command palette: a modal dialog with a search combobox over a listbox of commands. Open it with\n`show()`, close it with `close()` (or `toggle()`). Focus stays in the input, and the highlighted\ncommand is its `aria-activedescendant`; a disabled command is shown and skipped; a `shortcut` is\nannounced as `aria-keyshortcuts`.",
           "generics": [
             "T extends { label: string }"
@@ -8678,7 +8678,7 @@
           "name": "PdxDataGrid",
           "tagName": "pdx-data-grid",
           "category": "Data-bound",
-          "order": 103,
+          "order": 104,
           "description": "A data grid with sorting, pagination and type-aware cell rendering, whose cells and headers can be\nreplaced with slot templates.",
           "generics": [
             "T"
@@ -9800,7 +9800,7 @@
           "name": "PdxDataSource",
           "tagName": "pdx-data-source",
           "category": "Data-bound",
-          "order": 102,
+          "order": 103,
           "description": "A non-rendering element that creates a DataSource declaratively: the reactive data layer for lists,\ntables and selects.",
           "members": [
             {
@@ -10786,7 +10786,7 @@
           "name": "PdxDescriptionList",
           "tagName": "pdx-description-list",
           "category": "Data Display",
-          "order": 80,
+          "order": 81,
           "description": "Key-value pairs in a structured layout, horizontal or vertical and in one or more columns, with\nvalues as plain text or custom HTML.",
           "generics": [
             "T extends { label: string }"
@@ -11009,7 +11009,7 @@
           "name": "PdxDialog",
           "tagName": "pdx-dialog",
           "category": "Overlay + Containers",
-          "order": 90,
+          "order": 91,
           "summary": "Modal window: overlay with focus trap, z-index managed via overlayStack, Escape-to-close.",
           "description": "Modal dialog with backdrop, focus trap and Escape-to-close.",
           "members": [
@@ -11511,7 +11511,7 @@
           "name": "PdxDrawer",
           "tagName": "pdx-drawer",
           "category": "Overlay + Containers",
-          "order": 92,
+          "order": 93,
           "description": "A panel that slides in from any edge, over the page or pushing it, with swipe-to-close and a focus\ntrap.",
           "members": [
             {
@@ -12091,7 +12091,7 @@
           "name": "PdxEditDrawer",
           "tagName": "pdx-edit-drawer",
           "category": "Data-bound",
-          "order": 107,
+          "order": 108,
           "description": "A drawer hosting a schema-driven form to create or edit one entity: on Save it validates and emits\n`pdx-save` with the values.",
           "members": [
             {
@@ -12332,7 +12332,7 @@
           "name": "PdxEmptyState",
           "tagName": "pdx-empty-state",
           "category": "Data Display",
-          "order": 83,
+          "order": 84,
           "description": "A placeholder for an empty data view: an icon, a title and a description, with an optional action\nbutton.",
           "members": [
             {
@@ -12512,7 +12512,7 @@
           "name": "PdxEntityGrid",
           "tagName": "pdx-entity-grid",
           "category": "Data-bound",
-          "order": 108,
+          "order": 109,
           "description": "A CRUD surface over a data grid: the user creates, edits and deletes rows in a local optimistic copy,\nand `pdx-create`, `pdx-update` and `pdx-delete` let the app persist them.",
           "members": [
             {
@@ -12796,7 +12796,7 @@
           "name": "PdxErrorBoundary",
           "tagName": "pdx-error-boundary",
           "category": "Infrastructure",
-          "order": 115,
+          "order": 116,
           "description": "Catches render errors and effect failures from its children and shows a fallback UI with retry.",
           "members": [
             {
@@ -14452,7 +14452,7 @@
           "name": "PdxFilterBuilder",
           "tagName": "pdx-filter-builder",
           "category": "Data-bound",
-          "order": 104,
+          "order": 105,
           "description": "A chip-based filter bar driven by field definitions, for a DataSource, a data grid or any list.",
           "members": [
             {
@@ -15899,7 +15899,7 @@
           "name": "PdxImage",
           "tagName": "pdx-image",
           "category": "Data Display",
-          "order": 84,
+          "order": 85,
           "description": "An image with lazy loading, a fallback and zoom into a lightbox, that can also load from a source\nbehind authentication.",
           "members": [
             {
@@ -16317,7 +16317,7 @@
           "name": "PdxInfiniteScroll",
           "tagName": "pdx-infinite-scroll",
           "category": "Data Display",
-          "order": 86,
+          "order": 87,
           "description": "Loads more data as the user scrolls to the bottom, paging a DataSource or firing\n`pdx-load-more` for manual control.",
           "members": [
             {
@@ -17613,7 +17613,7 @@
           "name": "PdxJsonEditor",
           "tagName": "pdx-json-editor",
           "category": "Data-bound",
-          "order": 109,
+          "order": 110,
           "description": "A form, drawn from a schema, for editing a nested JSON value: scalars are edited inline, and each\nobject or list of objects in a sub-modal of its own.",
           "members": [
             {
@@ -21630,7 +21630,7 @@
           "name": "PdxOverlayOutlet",
           "tagName": "pdx-overlay-outlet",
           "category": "Infrastructure",
-          "order": 116,
+          "order": 117,
           "description": "Where the dialogs opened from code appear: it draws the page's dialog queue, stacking each dialog\nabove the last, trapping focus inside and closing the top one on Escape.",
           "members": [],
           "roles": [
@@ -22512,7 +22512,7 @@
           "name": "PdxPopover",
           "tagName": "pdx-popover",
           "category": "Overlay + Containers",
-          "order": 89,
+          "order": 90,
           "description": "A floating panel anchored to a trigger, opened by click, hover or manually, and closed by a click\noutside or Escape.",
           "members": [
             {
@@ -22969,7 +22969,7 @@
           "name": "PdxProvide",
           "tagName": "pdx-provide",
           "category": "Infrastructure",
-          "order": 114,
+          "order": 115,
           "description": "Makes a value available to everything it wraps, like Blazor's CascadingValue, under a context\ntoken; when two provide the same token, the nearest ancestor wins.",
           "members": [
             {
@@ -23860,7 +23860,7 @@
           "name": "PdxRelationPicker",
           "tagName": "pdx-relation-picker",
           "category": "Data-bound",
-          "order": 110,
+          "order": 111,
           "description": "Picks one or more existing rows for a many-to-many relation from a grid, and can ask for a new\none to be created.",
           "members": [
             {
@@ -24017,7 +24017,7 @@
           "name": "PdxRelativeTime",
           "tagName": "pdx-relative-time",
           "category": "Data Display",
-          "order": 87,
+          "order": 88,
           "description": "Shows a time relative to now (\"3 hours ago\", \"in 2 days\"), locale-aware and kept up to date.",
           "members": [
             {
@@ -24166,7 +24166,7 @@
           "name": "PdxRichText",
           "tagName": "pdx-rich-text",
           "category": "Data-bound",
-          "order": 113,
+          "order": 114,
           "description": "A rich text editor with no dependencies, with Markdown shortcuts, syntax highlighting and tables.",
           "members": [
             {
@@ -24749,6 +24749,527 @@
           "declaration": {
             "name": "PdxRow",
             "module": "src/row/pdx-row.ts"
+          }
+        }
+      ]
+    },
+    {
+      "kind": "javascript-module",
+      "path": "src/scheduler/pdx-scheduler.pdx",
+      "declarations": [
+        {
+          "kind": "class",
+          "customElement": true,
+          "name": "PdxScheduler",
+          "tagName": "pdx-scheduler",
+          "category": "Data Display",
+          "order": 80,
+          "description": "A calendar of events in time, by day and by resource: a day, a week or a run of days on a grid of\ntime slots, with an all-day row, the current time and the working hours marked. Each resource\n(a room, a technician) can have its own columns. The grid is a WAI-ARIA grid: one tab stop, the\narrows from slot to slot, Enter into a slot's events and Escape back out, PageUp and PageDown\nthrough periods. A click or Enter on an event emits `event-open`; on an empty slot, `slot-open`.",
+          "members": [
+            {
+              "kind": "field",
+              "name": "events",
+              "description": "The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day.",
+              "type": {
+                "text": "SchedulerEvent[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "resources",
+              "description": "The resources, each with its own columns; children are drawn as their leaves. Empty: one column per day.",
+              "type": {
+                "text": "SchedulerResource[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
+              "name": "views",
+              "description": "The views the bar offers, in order; one or none hides the switcher.",
+              "type": {
+                "text": "('day' | 'week' | 'days')[]"
+              },
+              "default": "['day', 'week', 'days']"
+            },
+            {
+              "kind": "field",
+              "name": "days",
+              "description": "How many days the `days` view shows.",
+              "type": {
+                "text": "number"
+              },
+              "default": "3",
+              "attribute": "days"
+            },
+            {
+              "kind": "field",
+              "name": "groupBy",
+              "description": "With resources: each resource's days together (`resource`) or each day's resources (`date`).",
+              "type": {
+                "text": "'resource' | 'date'"
+              },
+              "default": "'resource'",
+              "attribute": "groupby"
+            },
+            {
+              "kind": "field",
+              "name": "weekends",
+              "description": "Show Saturday and Sunday in the day columns.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "attribute": "weekends"
+            },
+            {
+              "kind": "field",
+              "name": "firstDay",
+              "description": "The first day of the week, 0 = Sunday … 6 = Saturday; -1: the locale's.",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1",
+              "attribute": "firstday"
+            },
+            {
+              "kind": "field",
+              "name": "startHour",
+              "description": "The first visible hour, `HH:mm`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'00:00'",
+              "attribute": "starthour"
+            },
+            {
+              "kind": "field",
+              "name": "endHour",
+              "description": "The end of the visible hours, `HH:mm`, up to `24:00`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'24:00'",
+              "attribute": "endhour"
+            },
+            {
+              "kind": "field",
+              "name": "scrollTo",
+              "description": "The hour the grid opens scrolled to.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'08:00'",
+              "attribute": "scrollto"
+            },
+            {
+              "kind": "field",
+              "name": "slotMinutes",
+              "description": "The length of a slot, in minutes.",
+              "type": {
+                "text": "number"
+              },
+              "default": "30",
+              "attribute": "slotminutes"
+            },
+            {
+              "kind": "field",
+              "name": "businessHours",
+              "description": "The working hours per weekday, shaded outside; a resource's own `businessHours` win in its columns.",
+              "type": {
+                "text": "BusinessHours"
+              },
+              "default": "{ 1: { start: '09:00', end: '18:00' }, 2: { start: '09:00', end: '18:00' }, 3: { start: '09:00', end: '18:00' }, 4: { start: '09:00', end: '18:00' }, 5: { start: '09:00', end: '18:00' } }"
+            },
+            {
+              "kind": "field",
+              "name": "nowIndicator",
+              "description": "Draw a line at the current time.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true",
+              "attribute": "nowindicator"
+            },
+            {
+              "kind": "field",
+              "name": "timeZone",
+              "description": "The IANA time zone events are shown in. Empty: the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "timezone"
+            },
+            {
+              "kind": "field",
+              "name": "locale",
+              "description": "Locale for dates and times. Empty: the page's language (`lang`), then the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "locale"
+            },
+            {
+              "kind": "field",
+              "name": "label",
+              "description": "The scheduler's accessible name. Empty: «Scheduler».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "label"
+            },
+            {
+              "kind": "field",
+              "name": "disabled",
+              "description": "Disables interaction and dims the control.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "disabled"
+            },
+            {
+              "kind": "field",
+              "name": "view",
+              "description": "The view on screen.",
+              "type": {
+                "text": "'day' | 'week' | 'days'"
+              },
+              "default": "'week'",
+              "attribute": "view"
+            },
+            {
+              "kind": "field",
+              "name": "date",
+              "description": "The reference date (ISO). Empty: today.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''",
+              "attribute": "date"
+            }
+          ],
+          "models": [
+            "view",
+            "date"
+          ],
+          "events": [
+            {
+              "name": "event-open",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event was clicked, or Enter pressed on it.",
+              "detail": "{ event: SchedulerEvent }"
+            },
+            {
+              "name": "slot-open",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An empty slot was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is the all-day cell.",
+              "detail": "{ start: string; end: string; resource: string | null; allDay: boolean }"
+            },
+            {
+              "name": "period-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "The period on screen changed, by the bar or the keyboard.",
+              "detail": "{ view: 'day' | 'week' | 'days'; start: string; end: string }"
+            },
+            {
+              "name": "view-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `view`. Does not bubble.",
+              "detail": "{ value: 'day' | 'week' | 'days' }"
+            },
+            {
+              "name": "date-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `date`. Does not bubble.",
+              "detail": "{ value: string }"
+            }
+          ],
+          "roles": [
+            "columnheader",
+            "grid",
+            "gridcell",
+            "group",
+            "row",
+            "rowheader",
+            "toolbar"
+          ],
+          "attributes": [
+            {
+              "name": "days",
+              "fieldName": "days",
+              "description": "How many days the `days` view shows.",
+              "type": {
+                "text": "number"
+              },
+              "default": "3"
+            },
+            {
+              "name": "groupby",
+              "fieldName": "groupBy",
+              "description": "With resources: each resource's days together (`resource`) or each day's resources (`date`).",
+              "type": {
+                "text": "'resource' | 'date'"
+              },
+              "default": "'resource'"
+            },
+            {
+              "name": "weekends",
+              "fieldName": "weekends",
+              "description": "Show Saturday and Sunday in the day columns.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true"
+            },
+            {
+              "name": "firstday",
+              "fieldName": "firstDay",
+              "description": "The first day of the week, 0 = Sunday … 6 = Saturday; -1: the locale's.",
+              "type": {
+                "text": "number"
+              },
+              "default": "-1"
+            },
+            {
+              "name": "starthour",
+              "fieldName": "startHour",
+              "description": "The first visible hour, `HH:mm`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'00:00'"
+            },
+            {
+              "name": "endhour",
+              "fieldName": "endHour",
+              "description": "The end of the visible hours, `HH:mm`, up to `24:00`.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'24:00'"
+            },
+            {
+              "name": "scrollto",
+              "fieldName": "scrollTo",
+              "description": "The hour the grid opens scrolled to.",
+              "type": {
+                "text": "string"
+              },
+              "default": "'08:00'"
+            },
+            {
+              "name": "slotminutes",
+              "fieldName": "slotMinutes",
+              "description": "The length of a slot, in minutes.",
+              "type": {
+                "text": "number"
+              },
+              "default": "30"
+            },
+            {
+              "name": "nowindicator",
+              "fieldName": "nowIndicator",
+              "description": "Draw a line at the current time.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "true"
+            },
+            {
+              "name": "timezone",
+              "fieldName": "timeZone",
+              "description": "The IANA time zone events are shown in. Empty: the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "locale",
+              "fieldName": "locale",
+              "description": "Locale for dates and times. Empty: the page's language (`lang`), then the browser's.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "label",
+              "fieldName": "label",
+              "description": "The scheduler's accessible name. Empty: «Scheduler».",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            },
+            {
+              "name": "disabled",
+              "fieldName": "disabled",
+              "description": "Disables interaction and dims the control.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "name": "view",
+              "fieldName": "view",
+              "description": "The view on screen.",
+              "type": {
+                "text": "'day' | 'week' | 'days'"
+              },
+              "default": "'week'"
+            },
+            {
+              "name": "date",
+              "fieldName": "date",
+              "description": "The reference date (ISO). Empty: today.",
+              "type": {
+                "text": "string"
+              },
+              "default": "''"
+            }
+          ],
+          "shapes": [
+            {
+              "name": "SchedulerEvent",
+              "fields": [
+                "id: string",
+                "title: string",
+                "start: string",
+                "end: string",
+                "allDay?: boolean",
+                "resource?: string | string[]",
+                "color?: string",
+                "readonly?: boolean"
+              ]
+            },
+            {
+              "name": "SchedulerResource",
+              "fields": [
+                "id: string",
+                "label: string",
+                "color?: string",
+                "children?: SchedulerResource[]",
+                "readonly?: boolean",
+                "businessHours?: BusinessHours"
+              ]
+            }
+          ],
+          "slots": [
+            {
+              "name": "event",
+              "description": "What an event draws; without it, its time and title.",
+              "signature": "(event: SchedulerEvent)"
+            }
+          ],
+          "cssParts": [
+            {
+              "name": "root",
+              "description": "The scheduler, a `role=\"group\"` named by `label`."
+            },
+            {
+              "name": "toolbar",
+              "description": "The bar above the grid: previous, today, next, the period and the views."
+            },
+            {
+              "name": "prev",
+              "description": "The button to the previous period."
+            },
+            {
+              "name": "todayButton",
+              "description": "The button back to today."
+            },
+            {
+              "name": "next",
+              "description": "The button to the next period."
+            },
+            {
+              "name": "period",
+              "description": "The period on screen, which names the grid."
+            },
+            {
+              "name": "viewSwitcher",
+              "description": "The view buttons, shown when `views` offers more than one."
+            },
+            {
+              "name": "grid",
+              "description": "The `role=\"grid\"` of slots."
+            },
+            {
+              "name": "columnHeader",
+              "description": "A day's or a resource's header."
+            },
+            {
+              "name": "allDayRow",
+              "description": "The row of all-day events."
+            },
+            {
+              "name": "slot",
+              "description": "A cell: a time slot of a day and resource, or its all-day cell."
+            },
+            {
+              "name": "event",
+              "description": "An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown."
+            },
+            {
+              "name": "nowLine",
+              "description": "The line at the current time."
+            }
+          ],
+          "cssStates": [
+            {
+              "name": "disabled",
+              "description": "`disabled` is set."
+            }
+          ],
+          "cssProperties": [
+            {
+              "name": "--pdx-scheduler-bar-height"
+            },
+            {
+              "name": "--pdx-scheduler-column-min"
+            },
+            {
+              "name": "--pdx-scheduler-event-color"
+            },
+            {
+              "name": "--pdx-scheduler-header-height"
+            },
+            {
+              "name": "--pdx-scheduler-height"
+            },
+            {
+              "name": "--pdx-scheduler-slot-height"
+            },
+            {
+              "name": "--pdx-scheduler-time-width"
+            }
+          ]
+        }
+      ],
+      "exports": [
+        {
+          "kind": "custom-element-definition",
+          "name": "pdx-scheduler",
+          "declaration": {
+            "name": "PdxScheduler",
+            "module": "src/scheduler/pdx-scheduler.pdx"
           }
         }
       ]
@@ -25693,7 +26214,7 @@
           "name": "PdxSelect",
           "tagName": "pdx-select",
           "category": "Data-bound",
-          "order": 100,
+          "order": 101,
           "description": "One control that is a select, a combobox or a multi-select, chosen by the searchable and multiple\nprops, fed by an array or a DataSource.",
           "generics": [
             "T"
@@ -28248,7 +28769,7 @@
           "name": "PdxStatistic",
           "tagName": "pdx-statistic",
           "category": "Data Display",
-          "order": 82,
+          "order": 83,
           "description": "Displays a numeric KPI value with its label, trend and icon, for dashboard cards and stat panels.",
           "members": [
             {
@@ -28940,7 +29461,7 @@
           "name": "PdxTabs",
           "tagName": "pdx-tabs",
           "category": "Overlay + Containers",
-          "order": 94,
+          "order": 95,
           "description": "Tabs the user switches between, each showing its own panel, with keyboard navigation, lazy\nmounting and closable tabs.",
           "members": [
             {
@@ -30569,7 +31090,7 @@
           "name": "PdxTimeline",
           "tagName": "pdx-timeline",
           "category": "Data Display",
-          "order": 81,
+          "order": 82,
           "description": "A vertical or horizontal sequence of events, with status colors, icons and clickable items.",
           "generics": [
             "T extends { title: string }"
@@ -30856,7 +31377,7 @@
           "name": "PdxToast",
           "tagName": "pdx-toast",
           "category": "Overlay + Containers",
-          "order": 93,
+          "order": 94,
           "description": "A container that shows notification toasts from a global queue, in one of six screen positions,\npausing on hover and offering action buttons.",
           "members": [
             {
@@ -31563,7 +32084,7 @@
           "name": "PdxTooltip",
           "tagName": "pdx-tooltip",
           "category": "Overlay + Containers",
-          "order": 88,
+          "order": 89,
           "description": "A tooltip that describes its trigger on hover or focus, in one of 12 placements, with show and\nhide delays.",
           "members": [
             {

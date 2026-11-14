@@ -1,0 +1,25 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">A week</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Events from an array: a start with a time is a timed event, a date alone is all day. Overlapping events share their day, and the line marks the current time. Click an event or an empty slot, or focus the grid and press <kbd>Enter</kbd>: the scheduler says which with <code>event-open</code> and <code>slot-open</code>.</p>
+    <pdx-scheduler label="Team calendar" :events="events" first-day="1" scroll-to="08:00" @event-open="onEvent" @slot-open="onSlot"></pdx-scheduler>
+    <p class="pdx-txt-small pdx-ink-muted">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const events = [
+  { id: 'e1', title: 'Stand-up', start: at(0, '09:00'), end: at(0, '09:30') },
+  { id: 'e2', title: 'Design review', start: at(1, '10:00'), end: at(1, '12:00') },
+  { id: 'e3', title: 'Customer call', start: at(1, '11:00'), end: at(1, '12:00') },
+  { id: 'e4', title: 'Lunch & learn', start: at(2, '12:30'), end: at(2, '13:30') },
+  { id: 'e5', title: 'Offsite', start: at(3), end: at(5) },
+  { id: 'e6', title: 'Release', start: at(4, '16:00'), end: at(4, '17:00') },
+];
+let last = $signal('Nothing opened yet.');
+
+function onEvent(e) { last = 'Opened ' + e.detail.event.title + '.'; }
+function onSlot(e) { last = 'Slot from ' + new Date(e.detail.start).toLocaleString() + (e.detail.allDay ? ', all day.' : '.'); }
+</script>

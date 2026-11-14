@@ -1,0 +1,24 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">By resource</h2>
+    <p class="pdx-txt-small pdx-ink-muted">Give it <code>resources</code> and each one gets its own columns: an event goes where its <code>resource</code> says, and one that names two shows in both. A resource's <code>color</code> tints its events, and its own <code>businessHours</code> shade its columns. <code>group-by="date"</code> puts each day's resources together instead.</p>
+    <pdx-scheduler label="Rooms" view="day" :date="today" :resources="rooms" :events="bookings" :views="['day', 'week']" scroll-to="08:00"></pdx-scheduler>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const today = at(1);
+const rooms = [
+  { id: 'atlas', label: 'Atlas', color: 'oklch(0.6 0.15 250)' },
+  { id: 'borealis', label: 'Borealis', color: 'oklch(0.6 0.15 150)', businessHours: { 2: { start: '10:00', end: '16:00' } } },
+  { id: 'cirrus', label: 'Cirrus', color: 'oklch(0.6 0.15 30)' },
+];
+const bookings = [
+  { id: 'b1', title: 'Interview', start: at(1, '09:00'), end: at(1, '10:00'), resource: 'atlas' },
+  { id: 'b2', title: 'Workshop', start: at(1, '10:00'), end: at(1, '12:30'), resource: 'borealis' },
+  { id: 'b3', title: 'All hands', start: at(1, '14:00'), end: at(1, '15:00'), resource: ['atlas', 'cirrus'] },
+  { id: 'b4', title: 'Maintenance', start: at(1), end: at(2), resource: 'cirrus' },
+];
+</script>

@@ -357,8 +357,10 @@ there.
 
 ## Day agenda per resource (vets, rooms, technicians)
 
-There is no scheduler component yet (`pdx-scheduler` is on the roadmap, not planned). A day agenda is a
-CSS grid: one column per resource with a sticky header, one row per five minutes with a sticky time
+`pdx-scheduler` draws this: `view="day"` with `resources`, one column per resource, events placed by
+their times, the keyboard and the accessible names included (`pdxui-data`, `pdx-scheduler.md`). Reach
+for the recipe below only for a read-only agenda that has to look different from it. A day agenda is
+a CSS grid: one column per resource with a sticky header, one row per five minutes with a sticky time
 column, and each appointment placed by `grid-row: start / span n`.
 
 **Short appointments stay readable.** A 15-minute slot is three rows, so it holds one line at the body

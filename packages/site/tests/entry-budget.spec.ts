@@ -22,8 +22,12 @@ import { join } from 'node:path';
  * routes imported eagerly it was 1008 kB, 240 kB gzip). The budget leaves ~25% for growth and is
  * still well below either regression it guards: the routes back in the entry are ~58 kB gzip more,
  * TypeScript ~900 kB.
+ *
+ * 228 → 232 with pdx-scheduler (#1020, owner's decision): main stood at ~227.7, and the entry grows
+ * with every component through the manifest alone — the scheduler's entry in it is 2.07 kB gzip, its
+ * code is not in the entry. Moving the manifest out of the entry is #1067.
  */
-const ENTRY_BUDGET_KB = 228;
+const ENTRY_BUDGET_KB = 232;
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 

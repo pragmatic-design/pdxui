@@ -16,7 +16,7 @@ PDX UI is a framework for the front end of line-of-business software: lists, rec
 dashboards. You write `.pdx` single-file components and declare what is specific to the screen:
 its route, its data, its state, its events. The compiler writes what is not: component
 registration, the route table, lazy loading, reactive bindings, scoped CSS, types. The output is
-standard Web Components, and it ships with **114 components** built for that kind of software and a
+standard Web Components, and it ships with **119 components** built for that kind of software and a
 design system with **13 themes**.
 
 It is the front-end half of the same idea as [Pragmatic.Design](https://github.com/pragmatic-design/Pragmatic.Design):
@@ -345,7 +345,7 @@ Then pick your way in:
 | [`@pdxui/core`](packages/core) | Signals, templates, components, forms, data, i18n, with no dependencies |
 | [`@pdxui/compiler`](packages/compiler) | The Vite plugin: `.pdx` → Web Components |
 | [`@pdxui/router`](packages/router) | `@page` routing, guards, lazy routes |
-| [`@pdxui/ui`](packages/ui) | 114 components for line-of-business applications |
+| [`@pdxui/ui`](packages/ui) | 119 components for line-of-business applications |
 | [`@pdxui/design`](packages/design) | The CSS design system: tokens, 13 themes, a WCAG-checked theme engine |
 | [`@pdxui/cli`](packages/cli) | `pdx dev · build · check · new · theme · mcp` |
 | [`@pdxui/lsp`](packages/lsp) | The `.pdx` language server; the [VS Code extension](packages/vscode-pdx) uses it |

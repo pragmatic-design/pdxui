@@ -1,0 +1,301 @@
+/* Scheduler — events on a grid of time slots, by day and by resource.
+   The grid is one CSS grid: its rows are `display: contents`, so every cell is a grid item and the
+   columns line up across rows. An event sits in the cell of the slot it starts in and is positioned
+   from there with the custom properties the component writes on it: --_scheduler-offset and
+   --_scheduler-length in slots, --_scheduler-column, -columns and -span among the events it
+   overlaps. An all-day bar spans --_scheduler-span cells in lane --_scheduler-lane.
+   Cells outside the working hours carry [data-off]; a slot on the hour, [data-hour].
+   State on pdx-scheduler's host: disabled. */
+
+pdx-scheduler {
+    display: block;
+    min-width: 0;
+}
+
+.pdx-scheduler {
+    --pdx-scheduler-slot-height: 2.25rem;
+    --pdx-scheduler-header-height: 2.5rem;
+    --pdx-scheduler-time-width: 4.5rem;
+    /* A week (7 columns and the time) fits about 580px: a page's content column, not a full screen. */
+    --pdx-scheduler-column-min: 4.5rem;
+    --pdx-scheduler-bar-height: 1.5rem;
+    --pdx-scheduler-height: 36rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--pdx-space-sm);
+    min-width: 0;
+    color: var(--pdx-color-text);
+}
+
+/* ===== The bar ===== */
+
+.pdx-scheduler-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--pdx-space-xs);
+}
+
+.pdx-scheduler-period {
+    flex: 1 1 10rem;
+    margin: 0;
+    font-size: var(--pdx-text-lg);
+    font-weight: 600;
+}
+
+.pdx-scheduler-views {
+    display: flex;
+    gap: var(--pdx-space-2xs);
+}
+
+.pdx-scheduler-button {
+    min-height: 2rem;
+    padding: var(--pdx-space-2xs) var(--pdx-space-sm);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.pdx-scheduler-button[aria-pressed="true"] {
+    color: var(--pdx-color-primary-ink);
+    background: var(--pdx-color-primary-soft);
+    border-color: var(--pdx-color-primary);
+}
+
+.pdx-scheduler-button:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+}
+
+.pdx-scheduler-button:disabled {
+    opacity: var(--pdx-opacity-disabled);
+    cursor: default;
+}
+
+/* ===== The grid ===== */
+
+.pdx-scheduler-grid {
+    display: grid;
+    grid-template-columns: var(--pdx-scheduler-time-width) repeat(var(--_scheduler-cols, 1), minmax(var(--pdx-scheduler-column-min), 1fr));
+    /* The header rows (--_scheduler-heads of them), the all-day row, then one track per slot. */
+    grid-template-rows: repeat(var(--_scheduler-heads, 1), var(--pdx-scheduler-header-height)) auto;
+    grid-auto-rows: var(--pdx-scheduler-slot-height);
+    max-height: var(--pdx-scheduler-height);
+    overflow: auto;
+    /* Its width is its container's, not its columns': a week of 7rem columns scrolls inside a phone
+       instead of pushing the page past the screen (measured: 856px of columns in a 390px viewport). */
+    contain: inline-size;
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+}
+
+.pdx-scheduler-row {
+    display: contents;
+}
+
+/* The header rows keep their height and stay on top while the slots scroll under them. */
+.pdx-scheduler-head > * {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-scheduler-head + .pdx-scheduler-head > * {
+    top: var(--pdx-scheduler-header-height);
+}
+
+.pdx-scheduler-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 var(--pdx-space-2xs);
+    overflow: hidden;
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-left: 1px solid var(--pdx-color-border);
+}
+
+.pdx-scheduler-header[data-today] {
+    color: var(--pdx-color-primary-ink);
+}
+
+/* The time column stays on the left while the columns scroll. */
+.pdx-scheduler-time,
+.pdx-scheduler-corner {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--pdx-color-surface);
+}
+
+.pdx-scheduler-head > .pdx-scheduler-corner {
+    z-index: 4;
+}
+
+.pdx-scheduler-time {
+    padding: 0 var(--pdx-space-xs);
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    text-align: end;
+    /* A slot's time is its accessible name; the column shows the hours only. */
+    line-height: 1;
+    translate: 0 -0.5em;
+}
+
+/* A slot's label shows on the hour only; the all-day row's always. */
+.pdx-scheduler-time[data-slot]:not([data-hour]) {
+    color: transparent;
+}
+
+.pdx-scheduler-allday-label {
+    align-self: center;
+    translate: none;
+}
+
+.pdx-scheduler-cell {
+    position: relative;
+    min-width: 0;
+    border-left: 1px solid var(--pdx-color-border);
+    border-top: 1px dashed color-mix(in oklch, var(--pdx-color-border) 60%, transparent);
+    outline: none;
+}
+
+.pdx-scheduler-cell[data-hour] {
+    border-top-style: solid;
+    border-top-color: var(--pdx-color-border);
+}
+
+.pdx-scheduler-cell[data-off] {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-scheduler-cell:focus-visible {
+    box-shadow: inset var(--pdx-focus-ring);
+}
+
+/* The all-day row stays under the headers while the slots scroll: a grid opened at 08:00 would
+   otherwise scroll it, and every all-day event, out of sight. */
+.pdx-scheduler-allday,
+.pdx-scheduler-allday-label {
+    position: sticky;
+    top: calc(var(--_scheduler-heads, 1) * var(--pdx-scheduler-header-height));
+    z-index: 2;
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+/* A sticky cell is a stacking context, and a bar runs from its first cell over the next ones: each
+   cell sits above the cells to its right (--_scheduler-col is its index), or the next cell's
+   background would cover the bar. */
+.pdx-scheduler-allday {
+    z-index: calc(3 + var(--_scheduler-cols, 1) - var(--_scheduler-col, 0));
+    min-height: calc(max(1, var(--_scheduler-lanes, 1)) * var(--pdx-scheduler-bar-height) + 4px);
+}
+
+/* Above every all-day cell: they scroll under it sideways. */
+.pdx-scheduler-allday-label {
+    z-index: calc(4 + var(--_scheduler-cols, 1));
+}
+
+/* ===== Events ===== */
+
+.pdx-scheduler-event {
+    --_scheduler-tint: var(--pdx-scheduler-event-color, var(--pdx-color-primary));
+    position: absolute;
+    z-index: 1;
+    top: calc(var(--_scheduler-offset, 0) * 100% + 1px);
+    left: calc(var(--_scheduler-column, 0) / var(--_scheduler-columns, 1) * 100% + 1px);
+    width: calc(var(--_scheduler-span, 1) / var(--_scheduler-columns, 1) * 100% - 3px);
+    height: calc(var(--_scheduler-length, 1) * var(--pdx-scheduler-slot-height) - 2px);
+    min-height: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 2px var(--pdx-space-2xs);
+    overflow: hidden;
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    line-height: 1.25;
+    text-align: start;
+    /* Text in the theme's text colour: the tint is the fill and the edge, never the text. */
+    color: var(--pdx-color-text);
+    background: color-mix(in oklch, var(--_scheduler-tint) 16%, var(--pdx-color-surface));
+    border: 0;
+    border-left: 3px solid var(--_scheduler-tint);
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.pdx-scheduler-event:focus-visible {
+    z-index: 2;
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+}
+
+.pdx-scheduler-event[data-before] {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.pdx-scheduler-event[data-after] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* The title first, the time after it, each on one line: a narrow event keeps a readable title. */
+.pdx-scheduler-event-time {
+    max-width: 100%;
+    overflow: hidden;
+    font-variant-numeric: tabular-nums;
+    color: var(--pdx-color-muted);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.pdx-scheduler-event-title {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+}
+
+.pdx-scheduler-bar {
+    top: calc(var(--_scheduler-lane, 0) * var(--pdx-scheduler-bar-height) + 2px);
+    left: 2px;
+    width: calc(var(--_scheduler-span, 1) * 100% - 4px);
+    height: calc(var(--pdx-scheduler-bar-height) - 2px);
+    min-height: 0;
+    justify-content: center;
+}
+
+.pdx-scheduler-now {
+    position: absolute;
+    z-index: 2;
+    left: 0;
+    right: 0;
+    top: calc(var(--_scheduler-offset, 0) * 100%);
+    height: 2px;
+    background: var(--pdx-color-danger);
+    pointer-events: none;
+}
+
+/* ===== States ===== */
+
+:state(disabled) > .pdx-scheduler {
+    opacity: var(--pdx-opacity-disabled);
+}
+
+:state(disabled) > .pdx-scheduler .pdx-scheduler-event {
+    cursor: default;
+}

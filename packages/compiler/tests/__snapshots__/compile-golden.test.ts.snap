@@ -3763,6 +3763,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
         { key: 'data-display', label: 'Display', icon: 'list', children: [
           { key: '/components/list', label: 'List' },
           { key: '/components/kanban', label: 'Kanban' },
+          { key: '/components/scheduler', label: 'Scheduler' },
           { key: '/components/tree', label: 'Tree' },
           { key: '/components/description-list', label: 'DescriptionList' },
           { key: '/components/statistic', label: 'Statistic' },
@@ -3952,7 +3953,7 @@ function toggleMenu() { __menuOpen.setRaw(!__menuOpen.peek()); }
     if (sidebar) requestAnimationFrame(() => { sidebar.scrollTop = sidebarScroll; });
     // Rebuild right TOC after route change (delay for page render)
     setTimeout(() => rebuildToc(), 150);
-}, { name: "app.pdx:311" });
+}, { name: "app.pdx:312" });
     ctx.el.setAttribute('data-pdx-luqdaw', '');
     return { menuOpen: __menuOpen, path, section, activeKey, currentItems, searchQuery: __searchQuery, filteredItems, toggleMenu, onSearch, onNavSelect, goDesign, goComponents, designItems, componentItems, sidebarEl: __sidebarEl, pageContent: __pageContent, pageToc: __pageToc, tocNavEl: __tocNavEl, tocObserverRef, rebuildToc };
   },
@@ -7327,6 +7328,39 @@ component('app-comp-row-col', {
 if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
 const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
 __pdx_pushRoute({path:"/components/row-col",tag:"app-comp-row-col",title:"Row & Col",lazy:true,file:'./comp-row-col.pdx'});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/comp-scheduler.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { component, staticBlock, staticMarkup, useHead } from '@pdxui/core';
+
+{
+  let __pdx_style = document.getElementById("pdx-s-d7zcvh");
+  if (!__pdx_style) { __pdx_style = document.createElement('style'); __pdx_style.id = "pdx-s-d7zcvh"; document.head.appendChild(__pdx_style); }
+  __pdx_style.textContent = "\\n  @scope ([data-pdx-d7zcvh]) to ([data-pdx-root] \\u003E *) {:scope .page { }\\n}";
+}
+
+const __blk0=staticBlock(staticMarkup('<div class="page"><h1 class="pdx-txt-title">Scheduler</h1> <p class="pdx-txt-body pdx-ink-muted intro"><code>&lt;pdx-scheduler&gt;</code> — events on a grid of time slots: a day, a week or a run of days, with an all-day\\n      row, the current time and the working hours marked, and a column per resource when it has them. The grid is a\\n      keyboard grid with one tab stop, and every event is announced with its time, day and resource.</p>  <app-demo-comp-scheduler-basic class="demo-section"></app-demo-comp-scheduler-basic>  <app-demo-comp-scheduler-resources class="demo-section"></app-demo-comp-scheduler-resources>  <app-demo-comp-scheduler-event class="demo-section"></app-demo-comp-scheduler-event>  <app-demo-comp-scheduler-hours class="demo-section"></app-demo-comp-scheduler-hours>  <section><h2 class="pdx-txt-heading section-heading">Reference</h2> <div class="options-table"><div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div> <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day</span></div> <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource; children are drawn as their leaves</span></div> <div class="opt-row"><code>view</code><span>\\'day\\' | \\'week\\' | \\'days\\'</span><span>The view on screen (<code>::view</code>)</span></div> <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers</span></div> <div class="opt-row"><code>date</code><span>string</span><span>The reference date, ISO (<code>::date</code>); empty is today</span></div> <div class="opt-row"><code>days</code><span>number</span><span>How many days the <code>days</code> view shows (3)</span></div> <div class="opt-row"><code>group-by</code><span>\\'resource\\' | \\'date\\'</span><span>Each resource\\'s days together, or each day\\'s resources</span></div> <div class="opt-row"><code>weekends</code><span>boolean</span><span>Show Saturday and Sunday (true)</span></div> <div class="opt-row"><code>first-day</code><span>number</span><span>The first day of the week, 0 = Sunday; -1 is the locale\\'s</span></div> <div class="opt-row"><code>start-hour</code> / <code>end-hour</code><span>HH:mm</span><span>The visible hours (00:00 / 24:00)</span></div> <div class="opt-row"><code>scroll-to</code><span>HH:mm</span><span>Where the grid opens (08:00)</span></div> <div class="opt-row"><code>slot-minutes</code><span>number</span><span>The length of a slot (30)</span></div> <div class="opt-row"><code>business-hours</code><span>object</span><span>Working hours per weekday, shaded outside; a resource\\'s own win</span></div> <div class="opt-row"><code>now-indicator</code><span>boolean</span><span>The line at the current time (true)</span></div> <div class="opt-row"><code>time-zone</code><span>string</span><span>The IANA zone events are shown in; empty is the browser\\'s</span></div> <div class="opt-row"><code>locale</code> / <code>label</code> / <code>disabled</code><span></span><span>Dates and times, the accessible name, no interaction</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippet</h3> <div class="options-table"><div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div> <div class="opt-row"><code>event-open</code><span>{ event }</span><span>An event was clicked, or Enter pressed on it</span></div> <div class="opt-row"><code>slot-open</code><span>{ start, end, resource, allDay }</span><span>An empty slot was clicked, or Enter pressed on it; times are ISO instants</span></div> <div class="opt-row"><code>period-change</code><span>{ view, start, end }</span><span>The period on screen changed: load its events</span></div> <div class="opt-row"><code>view-change</code> / <code>date-change</code><span>{ value }</span><span>A model was written</span></div> <div class="opt-row"><code>@snippet event(e)</code><span></span><span>What an event draws</span></div></div> <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3> <div class="options-table"><div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div> <div class="opt-row"><code>Tab</code><span></span><span>The grid is one tab stop</span></div> <div class="opt-row"><code>Arrows</code><span></span><span>One slot at a time; they stop at the edges</span></div> <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last slot</span></div> <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div> <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the slot\\'s events, or open an empty slot</span></div> <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its slot</span></div></div></section></div>'));
+component('app-comp-scheduler', {
+  props: {},
+  setup(ctx) {
+    useHead({ title: "Scheduler Component" });
+    ctx.el.setAttribute('data-pdx-d7zcvh', '');
+
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    return __frag;
+  })(),
+});
+
+// Auto-route: @page '/components/scheduler'
+if(!globalThis.__pdx_routes)globalThis.__pdx_routes=[];
+const __pdx_pushRoute=(r)=>{const i=globalThis.__pdx_routes.findIndex(x=>x.path===r.path);if(i>=0)globalThis.__pdx_routes[i]=r;else globalThis.__pdx_routes.push(r);globalThis.__pdx_routeRegistered&&globalThis.__pdx_routeRegistered(r.path);};
+__pdx_pushRoute({path:"/components/scheduler",tag:"app-comp-scheduler",title:"Scheduler Component",lazy:true,file:'./comp-scheduler.pdx'});
 "
 `;
 
@@ -28108,6 +28142,158 @@ component('app-demo-comp-row-col-responsive', {
 "
 `;
 
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-scheduler/demo-comp-scheduler-basic.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, batchHandler, bindInterpolation, component, effect, safeHandler, signal, staticBlock, staticMarkup } from '@pdxui/core';
+import { at } from './week.pdx';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">A week</h2> <p class="pdx-txt-small pdx-ink-muted">Events from an array: a start with a time is a timed event, a date alone is all day. Overlapping events share their day, and the line marks the current time. Click an event or an empty slot, or focus the grid and press <kbd>Enter</kbd>: the scheduler says which with <code>event-open</code> and <code>slot-open</code>.</p> <pdx-scheduler label="Team calendar" first-day="1" scroll-to="08:00"></pdx-scheduler> <p class="pdx-txt-small pdx-ink-muted"><!----></p></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el6=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;const __el7=__el6.nextSibling.nextSibling;const __t8=__el7.firstChild;return [__el6,__t8];};
+component('app-demo-comp-scheduler-basic', {
+  props: {},
+  setup(ctx) {
+    const __last = signal('Nothing opened yet.', { name: 'demo-comp-scheduler-basic:last' });
+const events = [
+      { id: 'e1', title: 'Stand-up', start: at(0, '09:00'), end: at(0, '09:30') },
+      { id: 'e2', title: 'Design review', start: at(1, '10:00'), end: at(1, '12:00') },
+      { id: 'e3', title: 'Customer call', start: at(1, '11:00'), end: at(1, '12:00') },
+      { id: 'e4', title: 'Lunch & learn', start: at(2, '12:30'), end: at(2, '13:30') },
+      { id: 'e5', title: 'Offsite', start: at(3), end: at(5) },
+      { id: 'e6', title: 'Release', start: at(4, '16:00'), end: at(4, '17:00') },
+    ];
+    
+    
+    
+    function onEvent(e) { __last.setRaw('Opened ' + e.detail.event.title + '.'); }
+    function onSlot(e) { __last.setRaw('Slot from ' + new Date(e.detail.start).toLocaleString() + (e.detail.allDay ? ', all day.' : '.')); }
+    return { events, last: __last, onEvent, onSlot };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el6,__t8]=__walk0(__frag);
+    let __el6w_events = {}; effect(() => { const __b = ctx.events; if (Object.is(__b, __el6w_events)) return; __el6w_events = __b; assignBoundProperty(__el6, "events", __b); });
+    __el6.addEventListener('event-open', safeHandler(batchHandler(ctx.onEvent), ctx.el?.tagName?.toLowerCase(), 'event-open'));
+    __el6.addEventListener('slot-open', safeHandler(batchHandler(ctx.onSlot), ctx.el?.tagName?.toLowerCase(), 'slot-open'));
+    bindInterpolation(__t8,()=>ctx.last());
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-scheduler/demo-comp-scheduler-event.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, bindInterpolation, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { at } from './week.pdx';
+
+const __blk0=staticBlock(staticMarkup('<strong><!----></strong> <span class="pdx-ink-muted"><!----> · <!----></span>'));
+const __walk0=(r)=>{const __el5=r.firstChild;const __t6=__el5.firstChild;const __el7=__el5.nextSibling.nextSibling;const __t8=__el7.firstChild;const __t9=__t8.nextSibling.nextSibling;return [__t6,__t8,__t9];};
+const __blk1=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">What an event draws</h2> <p class="pdx-txt-small pdx-ink-muted">The <code>event</code> snippet draws an event\\'s content; the scheduler keeps its place, its size and its accessible name. Without the snippet an event shows its time and title.</p> <pdx-scheduler label="Clinic" view="days" start-hour="08:00" end-hour="18:00" scroll-to="08:00"></pdx-scheduler></section>'));
+const __walk1=(r)=>{const __el0=r.firstChild;const __el4=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;return [__el4];};
+component('app-demo-comp-scheduler-event', {
+  props: {},
+  setup(ctx) {
+const start = at(1);
+    
+    const visits = [
+      { id: 'v1', title: 'Check-up', patient: 'Fido', reason: 'booster', start: at(1, '09:00'), end: at(1, '09:45') },
+      { id: 'v2', title: 'Surgery', patient: 'Birba', reason: 'spay', start: at(2, '10:00'), end: at(2, '12:00'), color: 'oklch(0.55 0.18 25)' },
+      { id: 'v3', title: 'Follow-up', patient: 'Argo', reason: 'limping', start: at(3, '15:00'), end: at(3, '15:30') },
+    ];
+    return { start, visits };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk1();
+    const [__el4]=__walk1(__frag);
+    { assignBoundProperty(__el4, "days", 3); }
+    let __el4w_date = {}; effect(() => { const __b = ctx.start; if (Object.is(__b, __el4w_date)) return; __el4w_date = __b; assignBoundProperty(__el4, "date", __b); });
+    let __el4w_events = {}; effect(() => { const __b = ctx.visits; if (Object.is(__b, __el4w_events)) return; __el4w_events = __b; assignBoundProperty(__el4, "events", __b); });
+    __el4['event']=(e)=>{const __frag=__blk0();const [__t6,__t8,__t9]=__walk0(__frag);bindInterpolation(__t6,()=>e.title);bindInterpolation(__t8,()=>e.patient);bindInterpolation(__t9,()=>e.reason);return __frag;};
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-scheduler/demo-comp-scheduler-hours.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { at } from './week.pdx';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">Working week and hours</h2> <p class="pdx-txt-small pdx-ink-muted">Without <code>weekends</code> the week is Monday to Friday. <code>start-hour</code> and <code>end-hour</code> bound the visible day, <code>slot-minutes</code> sets the grid\\'s step, and <code>business-hours</code> shades the time outside work. <code>time-zone</code> shows the events in an IANA zone: a start with an offset is an instant, placed at its time there.</p> <pdx-scheduler label="Support rota" first-day="1" start-hour="07:00" end-hour="19:00" slot-minutes="15" time-zone="America/New_York"></pdx-scheduler></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el9=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;return [__el9];};
+component('app-demo-comp-scheduler-hours', {
+  props: {},
+  setup(ctx) {
+const hours = { 1: { start: '08:00', end: '17:00' }, 2: { start: '08:00', end: '17:00' }, 3: { start: '08:00', end: '17:00' }, 4: { start: '08:00', end: '17:00' }, 5: { start: '08:00', end: '13:00' } };
+    
+    const shifts = [
+      { id: 's1', title: 'Early shift', start: at(0, '07:00'), end: at(0, '11:00') },
+      { id: 's2', title: 'Hand-over', start: at(2, '13:00'), end: at(2, '13:15') },
+      // 14:00 UTC is 09:00 in New York in winter, 10:00 in summer.
+      { id: 's3', title: 'Global sync', start: at(3, '14:00') + 'Z', end: at(3, '15:00') + 'Z' },
+    ];
+    return { hours, shifts };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el9]=__walk0(__frag);
+    { assignBoundProperty(__el9, "weekends", false); }
+    let __el9w_business_hours = {}; effect(() => { const __b = ctx.hours; if (Object.is(__b, __el9w_business_hours)) return; __el9w_business_hours = __b; assignBoundProperty(__el9, "businessHours", __b); });
+    let __el9w_events = {}; effect(() => { const __b = ctx.shifts; if (Object.is(__b, __el9w_events)) return; __el9w_events = __b; assignBoundProperty(__el9, "events", __b); });
+    return __frag;
+  })(),
+});
+"
+`;
+
+exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-scheduler/demo-comp-scheduler-resources.pdx 1`] = `
+"// 0 warning(s)
+
+============================================================
+import { assignBoundProperty, component, effect, staticBlock, staticMarkup } from '@pdxui/core';
+import { at } from './week.pdx';
+
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading section-heading">By resource</h2> <p class="pdx-txt-small pdx-ink-muted">Give it <code>resources</code> and each one gets its own columns: an event goes where its <code>resource</code> says, and one that names two shows in both. A resource\\'s <code>color</code> tints its events, and its own <code>businessHours</code> shade its columns. <code>group-by="date"</code> puts each day\\'s resources together instead.</p> <pdx-scheduler label="Rooms" view="day" scroll-to="08:00"></pdx-scheduler></section>'));
+const __walk0=(r)=>{const __el0=r.firstChild;const __el8=__el0.firstChild.nextSibling.nextSibling.nextSibling.nextSibling;return [__el8];};
+component('app-demo-comp-scheduler-resources', {
+  props: {},
+  setup(ctx) {
+const today = at(1);
+    
+    const rooms = [
+      { id: 'atlas', label: 'Atlas', color: 'oklch(0.6 0.15 250)' },
+      { id: 'borealis', label: 'Borealis', color: 'oklch(0.6 0.15 150)', businessHours: { 2: { start: '10:00', end: '16:00' } } },
+      { id: 'cirrus', label: 'Cirrus', color: 'oklch(0.6 0.15 30)' },
+    ];
+    
+    const bookings = [
+      { id: 'b1', title: 'Interview', start: at(1, '09:00'), end: at(1, '10:00'), resource: 'atlas' },
+      { id: 'b2', title: 'Workshop', start: at(1, '10:00'), end: at(1, '12:30'), resource: 'borealis' },
+      { id: 'b3', title: 'All hands', start: at(1, '14:00'), end: at(1, '15:00'), resource: ['atlas', 'cirrus'] },
+      { id: 'b4', title: 'Maintenance', start: at(1), end: at(2), resource: 'cirrus' },
+    ];
+    return { today, rooms, bookings };
+  },
+  render: (ctx) => (() => {
+    const __frag=__blk0();
+    const [__el8]=__walk0(__frag);
+    let __el8w_date = {}; effect(() => { const __b = ctx.today; if (Object.is(__b, __el8w_date)) return; __el8w_date = __b; assignBoundProperty(__el8, "date", __b); });
+    let __el8w_resources = {}; effect(() => { const __b = ctx.rooms; if (Object.is(__b, __el8w_resources)) return; __el8w_resources = __b; assignBoundProperty(__el8, "resources", __b); });
+    let __el8w_events = {}; effect(() => { const __b = ctx.bookings; if (Object.is(__b, __el8w_events)) return; __el8w_events = __b; assignBoundProperty(__el8, "events", __b); });
+    let __el8w_views = {}; effect(() => { const __b = ['day', 'week']; if (Object.is(__b, __el8w_views)) return; __el8w_views = __b; assignBoundProperty(__el8, "views", __b); });
+    return __frag;
+  })(),
+});
+"
+`;
+
 exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-scroll-area/demo-comp-scroll-area-always-visible.pdx 1`] = `
 "// 0 warning(s)
 
@@ -30661,7 +30847,7 @@ exports[`compile golden — demo corpus > showcase-new/pages/sections/comp-tabs/
 ============================================================
 import { component, staticBlock, staticMarkup } from '@pdxui/core';
 
-const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 118 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
+const __blk0=staticBlock(staticMarkup('<section><h2 class="pdx-txt-heading">Basic</h2> <p class="pdx-txt-small pdx-ink-muted">Click or use arrow keys to navigate. Animated indicator slides between tabs.</p> <pdx-tabs value="overview" label="Product"><div class="pdx-tabs" role="tablist"><button class="pdx-tab" data-tab="overview">Overview</button> <button class="pdx-tab" data-tab="features">Features</button> <button class="pdx-tab" data-tab="pricing">Pricing</button> <button class="pdx-tab" data-tab="reviews">Reviews</button></div> <div data-tab-panel="overview" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Overview</h3> <p class="pdx-txt-small pdx-ink-muted">Pragmatic Design is a full-stack framework ecosystem. This panel is eager-mounted (always in DOM).</p></div> <div data-tab-panel="features" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Features</h3> <p class="pdx-txt-small pdx-ink-muted">Signal-based reactivity, .pdx compiler, 13 themes, auto-imports, 119 components.</p></div> <div data-tab-panel="pricing" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Pricing</h3> <p class="pdx-txt-small pdx-ink-muted">Open source. Free forever. Enterprise support available.</p></div> <div data-tab-panel="reviews" style="padding:var(--pdx-space-lg)"><h3 class="pdx-txt-subheading">Reviews</h3> <p class="pdx-txt-small pdx-ink-muted">"Best DX I\\'ve ever experienced." — A happy developer</p></div></pdx-tabs> <details class="source-block"><summary>Source</summary> <pre class="pdx-txt-mono"><code>&lt;pdx-tabs value="overview"&gt;\\n  &lt;div class="pdx-tabs" role="tablist"&gt;\\n    &lt;button class="pdx-tab" data-tab="overview"&gt;Overview&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="features"&gt;Features&lt;/button&gt;\\n    &lt;button class="pdx-tab" data-tab="pricing"&gt;Pricing&lt;/button&gt;\\n  &lt;/div&gt;\\n  &lt;div data-tab-panel="overview"&gt;Overview content&lt;/div&gt;\\n  &lt;div data-tab-panel="features"&gt;Features content&lt;/div&gt;\\n  &lt;div data-tab-panel="pricing"&gt;Pricing content&lt;/div&gt;\\n&lt;/pdx-tabs&gt;</code></pre></details></section>'));
 component('app-demo-comp-tabs-basic', {
   props: {},
   setup(ctx) {

@@ -33,6 +33,7 @@
         import '@pdxui/ui/kanban';
         import '@pdxui/ui/localized-input';
         import '@pdxui/ui/rating';
+        import '@pdxui/ui/scheduler';
         import '@pdxui/ui/signature-pad';
 
         const params = new URLSearchParams(location.search);
@@ -59,7 +60,7 @@
         // Signals that the mount is complete, for deterministic waits (no waitForTimeout).
         // The tags THIS page imports, not a fixed one: a page that renders no button would wait
         // on pdx-button for a promise nothing resolves, and data-pdx-ready would never arrive.
-        const __tags = ["pdx-app-shell","pdx-kanban","pdx-localized-input","pdx-rating","pdx-signature-pad"];
+        const __tags = ["pdx-app-shell","pdx-kanban","pdx-localized-input","pdx-rating","pdx-scheduler","pdx-signature-pad"];
         Promise.allSettled(__tags.map((t) => customElements.whenDefined(t))).finally(() => {
             // 1st rAF: lets the initial render of the active CEs finish.
             requestAnimationFrame(async () => {
@@ -141,6 +142,21 @@
     <section data-scenario="rating-size-lg">
         <h3>pdx-rating — size="lg"</h3>
         <pdx-rating data-test="variant" size="lg"></pdx-rating>
+    </section>
+
+    <section data-scenario="scheduler-week">
+        <h3>Scheduler — A week</h3>
+        <pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" date="2026-11-16" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-11-16T09:00","end":"2026-11-16T09:30"},{"id":"review","title":"Review","start":"2026-11-17T10:00","end":"2026-11-17T12:00"},{"id":"call","title":"Call","start":"2026-11-17T11:00","end":"2026-11-17T12:00"},{"id":"offsite","title":"Offsite","start":"2026-11-18","end":"2026-11-20"}]'></pdx-scheduler>
+    </section>
+
+    <section data-scenario="scheduler-resources">
+        <h3>Scheduler — A day by room</h3>
+        <pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-11-17" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" resources='[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]' events='[{"id":"a1","title":"Interview","start":"2026-11-17T09:00","end":"2026-11-17T10:00","resource":"a"},{"id":"b1","title":"Workshop","start":"2026-11-17T09:00","end":"2026-11-17T11:00","resource":"b"}]'></pdx-scheduler>
+    </section>
+
+    <section data-scenario="scheduler-disabled">
+        <h3>Scheduler — Disabled</h3>
+        <pdx-scheduler data-test="scheduler" label="Team" view="week" disabled date="2026-11-16" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-11-16T09:00","end":"2026-11-16T09:30"},{"id":"review","title":"Review","start":"2026-11-17T10:00","end":"2026-11-17T12:00"},{"id":"call","title":"Call","start":"2026-11-17T11:00","end":"2026-11-17T12:00"},{"id":"offsite","title":"Offsite","start":"2026-11-18","end":"2026-11-20"}]'></pdx-scheduler>
     </section>
 
     <section data-scenario="signature-pad-basic">

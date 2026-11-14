@@ -16,6 +16,18 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Features
 
+- `pdx-scheduler` (#1020): events on a grid of time slots. This first part has the day, week and N-days
+  views, an all-day row with bars across days, the current time and the working hours marked, and a
+  column per resource (`resources`, grouped by resource or by date). An event's start is an instant
+  when it has an offset, a wall time in `time-zone` when it has none, and all day when it is a date
+  alone; the zone's DST rules come from `Intl`. Overlapping events share their day side by side. The
+  grid is a WAI-ARIA grid with one tab stop: the arrows go from slot to slot, Enter into a slot's events
+  and Escape back out, PageUp and PageDown change the period, and the new period is announced. Clicking
+  an event, or pressing Enter on it, emits `event-open`; doing the same on an empty slot emits
+  `slot-open`. An `event` snippet draws an event. The month, year, agenda and timeline views, moving,
+  resizing and creating events, recurrence, the built-in editor, and print and export come in the
+  following parts.
+
 - `pdx-localized-input` (#1024): one text in several cultures, `{ [culture]: string }`, the shape of a
   LocalizedString. The cultures are tabs, each named in its own language (`Intl.DisplayNames`), with the
   current locale's first. A culture with no text is marked, in its tab's accessible name too, and an empty
