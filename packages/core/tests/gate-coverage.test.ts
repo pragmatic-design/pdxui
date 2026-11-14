@@ -166,6 +166,23 @@ describe('CI runs every suite `pnpm test` runs', () => {
         }
     });
 
+    // The showcase's `test` script is five runs. Each runs in CI exactly once, and the two that measure
+    // time or memory (test:timing, test:scenarios) on a runner of their own (#1076): queued after a
+    // shard they made it the longest job of a pull request, 12–15 minutes.
+    it('every part of the showcase suite runs once, timing and scenarios on runners of their own', () => {
+        const showcase = JSON.parse(readFileSync(join(PACKAGES, 'showcase', 'package.json'), 'utf-8')) as { scripts: Record<string, string> };
+        const parts = showcase.scripts.test.split('&&').map((s) => s.trim().replace(/^npm run /, ''));
+        expect(parts).toEqual(expect.arrayContaining(['test:build', 'test:timing', 'test:dev', 'test:hmr', 'test:scenarios']));
+        const entries = [...jobBody(quality, 'browser').matchAll(/^\s*- \{ (suite: [^\n]*) \}\s*$/gm)].map((m) => m[1]);
+        for (const part of ['test:timing', 'test:dev', 'test:hmr', 'test:scenarios']) {
+            const runs = entries.filter((e) => e.includes(`run ${part}`));
+            expect(runs.length, `${part} runs in ${runs.length} browser entries`).toBe(1);
+            if (part === 'test:timing' || part === 'test:scenarios') {
+                expect(runs[0], `${part} shares its runner`).toMatch(new RegExp(`run: 'pnpm --filter @pdxui/showcase run ${part}'`));
+            }
+        }
+    });
+
     it('the builder job runs both its suites', () => {
         const builder = jobBody(quality, 'builder');
         expect(builder).toContain('test:e2e');
