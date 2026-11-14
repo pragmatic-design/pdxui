@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" pdx-theme="neutral" pdx-scheme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Scheduler external drop harness</title>
+    <style>
+        html, body { margin: 0; }
+        body { background: #fff; color: #111; font-family: system-ui; }
+        .stage { display: flex; gap: 24px; align-items: flex-start; padding: 24px; }
+        .stage pdx-scheduler { flex: 1; }
+        .puck { width: 120px; height: 48px; line-height: 48px; text-align: center; background: #48c; color: #fff;
+                border-radius: 6px; user-select: none; touch-action: none; }
+    </style>
+</head>
+<body>
+<div class="stage">
+    <div class="puck" data-test="puck">Site visit</div>
+    <pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" date="2026-09-21" time-zone="Europe/Rome" locale="en-US"
+        start-hour="08:00" end-hour="18:00" now-indicator="false"
+        events='[{"id":"review","title":"Review","start":"2026-09-22T10:00","end":"2026-09-22T12:00"}]'></pdx-scheduler>
+</div>
+
+<script type="module">
+    // pdx-scheduler receiving something the app made draggable with useDrag (#1020, part 6): the
+    // puck carries `{ title, duration }` and is dropped on a slot of the week, driven by real pointer
+    // events from scheduler-pointer.spec.ts. Nothing here asserts.
+    import { useDrag } from '@pdxui/core';
+    import '@pdxui/ui/scheduler';
+    import '@pdxui/design/base';
+
+    const puck = document.querySelector('[data-test="puck"]');
+    useDrag(() => puck, { data: () => ({ title: 'Site visit', duration: 60 }), a11y: false });
+    requestAnimationFrame(() => requestAnimationFrame(() =>
+        document.documentElement.setAttribute('data-pdx-ready', '1')));
+</script>
+</body>
+</html>

@@ -17,6 +17,9 @@
     <!-- ═══ By resource ═══ -->
     <app-demo-comp-scheduler-resources class="demo-section"></app-demo-comp-scheduler-resources>
 
+    <!-- ═══ Drag, resize, create ═══ -->
+    <app-demo-comp-scheduler-drag class="demo-section"></app-demo-comp-scheduler-drag>
+
     <!-- ═══ Timeline ═══ -->
     <app-demo-comp-scheduler-timeline class="demo-section"></app-demo-comp-scheduler-timeline>
 
@@ -31,8 +34,11 @@
       <h2 class="pdx-txt-heading section-heading">Reference</h2>
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
-        <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day</span></div>
-        <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource, children drawn as their leaves; in the timeline, a row per resource, children under their parent</span></div>
+        <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color?, readonly?, draggable?, resizable?, background? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day. Written after a move, resize or create the app allowed (<code>::events</code>)</span></div>
+        <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours?, readonly?, draggable?, resizable? }[]</span><span>A column per resource, children drawn as their leaves; in the timeline, a row per resource, children under their parent</span></div>
+        <div class="opt-row"><code>readonly</code><span>boolean</span><span>Nothing is moved, resized or created; an event or a resource can still allow it for itself</span></div>
+        <div class="opt-row"><code>prevent-overlap</code><span>boolean</span><span>Refuse a place over another event of the same resource (false)</span></div>
+        <div class="opt-row"><code>create-id</code><span>() =&gt; string</span><span>The id of an event the scheduler creates (<code>crypto.randomUUID()</code>)</span></div>
         <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'</span><span>The view on screen (<code>::view</code>)</span></div>
         <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all seven by default</span></div>
         <div class="opt-row"><code>timeline-scale</code><span>'day' | 'week' | 'month' | 'year'</span><span>The timeline's period and columns: a day of slots, a week or month of days, a year of months ('week')</span></div>
@@ -58,7 +64,13 @@
         <div class="opt-row"><code>event-open</code><span>{ event }</span><span>An event was clicked, or Enter pressed on it</span></div>
         <div class="opt-row"><code>slot-open</code><span>{ start, end, resource, allDay }</span><span>An empty slot or day of the month was clicked, or Enter pressed on it; times are ISO instants</span></div>
         <div class="opt-row"><code>period-change</code><span>{ view, start, end }</span><span>The period on screen changed: load its events</span></div>
-        <div class="opt-row"><code>view-change</code> / <code>date-change</code><span>{ value }</span><span>A model was written</span></div>
+        <div class="opt-row"><code>before-move</code> / <code>move</code><span>{ event, from, to, conflicts }</span><span>An event dragged to another time, day or resource: asked first (<code>preventDefault()</code> refuses), then done</span></div>
+        <div class="opt-row"><code>before-resize</code> / <code>resize</code><span>{ event, edge, from, to, conflicts }</span><span>An edge dragged: asked first, then done</span></div>
+        <div class="opt-row"><code>before-create</code><span>{ start, end, resource, allDay, conflicts }</span><span>A drag over empty slots is about to create an event; refusable</span></div>
+        <div class="opt-row"><code>external-drop</code><span>{ data, start, end, resource, allDay, conflicts }</span><span>A <code>useDrag</code> source of the app dropped on the grid; refusable, else an event from <code>data.title</code> and <code>data.duration</code> (minutes)</span></div>
+        <div class="opt-row"><code>create</code><span>{ event }</span><span>An event was created and added to <code>events</code></span></div>
+        <div class="opt-row"><code>rejected</code><span>{ action, event, to, reason, conflicts }</span><span>A change was refused: <code>overlap</code> by <code>prevent-overlap</code>, <code>prevented</code> by the app</span></div>
+        <div class="opt-row"><code>view-change</code> / <code>date-change</code> / <code>events-change</code><span>{ value }</span><span>A model was written</span></div>
         <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
       </div>
 
@@ -70,7 +82,7 @@
         <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last cell. In the year, the week's first and last day</span></div>
         <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
         <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day; in the year, open the day</span></div>
-        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell; during a pointer drag, drop the event back where it was</span></div>
         <div class="opt-row"><code>Enter · Space</code><span></span><span>On a timeline resource with children: open or close it</span></div>
         <div class="opt-row"><code>→ · ←</code><span></span><span>On a timeline resource: open a closed parent, close an open one, or from a child go to its parent</span></div>
       </div>

@@ -65,6 +65,8 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         allDay: 'All day', time: 'Time', resource: 'Resource', eventName: '{title}, {when}',
         more: '+{count} more', moreName: '{count, plural, one {# more event} other {# more events}}, {date}',
         dayName: '{date}, {count, plural, =0 {no events} one {# event} other {# events}}', noEvents: 'No events in this period',
+        newEvent: 'New event', moved: '{title} moved', resized: '{title} resized', created: '{title} created',
+        refused: '{title} not changed', overlapRefused: '{title} not changed: it would overlap {count, plural, one {# event} other {# events}}',
     },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.
