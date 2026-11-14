@@ -40,3 +40,30 @@ function pickAction(name) {
     closeAction();
 }
 </script>
+
+<style scoped>
+.action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.action-item {
+  display: flex;
+  align-items: center;
+  gap: var(--pdx-space-md);
+  padding: var(--pdx-space-md) var(--pdx-space-lg);
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--pdx-color-text);
+  cursor: pointer;
+  border-radius: var(--pdx-radius-sm);
+  transition: background var(--pdx-duration-fast);
+}
+.action-item:hover {
+  background: var(--pdx-color-inset);
+}
+.action-item.danger {
+  color: var(--pdx-color-danger-ink);
+}
+</style>

@@ -42,6 +42,5 @@ onMount(() => {
 </script>
 
 <style scoped>
-.page { max-width: 960px; }
 .intro { margin-bottom: var(--pdx-space-xl); }
 </style>

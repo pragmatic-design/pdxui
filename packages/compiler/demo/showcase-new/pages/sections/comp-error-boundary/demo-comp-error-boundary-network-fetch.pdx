@@ -13,20 +13,20 @@
       }
       @if (netState === 'loading') {
         <div class="demo-widget state-loading" role="status">
-          <div class="pdx-spinner-inline"></div>
+          <div class="demo-spinner"></div>
           <span class="pdx-txt-small pdx-ink-muted">Fetching /api/users...</span>
         </div>
       }
       @if (netState === 'error') {
-        <div class="pdx-error-fallback" role="alert">
-          <div class="pdx-error-icon">&#128268;</div>
-          <div class="pdx-error-msg">Failed to load user data</div>
-          <div class="pdx-error-detail">{{ netError }}</div>
+        <div class="demo-error" role="alert">
+          <div class="demo-error-icon">&#128268;</div>
+          <div class="demo-error-msg">Failed to load user data</div>
+          <div class="demo-error-detail">{{ netError }}</div>
           @if (netRetry < 3) {
-            <div class="pdx-error-meta">Retry {{ netRetry }} of 3 — next attempt in {{ netCountdown }}s</div>
+            <div class="demo-error-meta">Retry {{ netRetry }} of 3 — next attempt in {{ netCountdown }}s</div>
             <button class="pdx-danger retry-btn" size="sm" disabled>Retrying...</button>
           } @else {
-            <div class="pdx-error-meta">Failed after 3 attempts.</div>
+            <div class="demo-error-meta">Failed after 3 attempts.</div>
             <button class="pdx-outline retry-btn" size="sm" @click="resetNetworkDemo">Start Over</button>
           }
         </div>
@@ -116,22 +116,3 @@ function resetNetworkDemo() {
   netCountdown = 0;
 }
 </script>
-
-<style>
-/* Global: the spinner is async-action's too. */
-.pdx-error-meta {
-  font-size: var(--pdx-text-xs);
-  color: var(--pdx-color-muted);
-  margin-bottom: var(--pdx-space-sm);
-}
-
-.pdx-spinner-inline {
-  width: 18px;
-  height: 18px;
-  border: 2px solid var(--pdx-color-border);
-  border-top-color: var(--pdx-color-primary);
-  border-radius: 50%;
-  animation: pdx-spin 0.6s linear infinite;
-}
-@keyframes pdx-spin { to { transform: rotate(360deg); } }
-</style>

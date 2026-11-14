@@ -23,3 +23,21 @@
     </div>
   </section>
 </template>
+
+<style scoped>
+.comparison {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  flex-wrap: wrap;
+}
+.comparison-col {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--pdx-space-md);
+  border: 1px solid var(--pdx-color-border);
+  border-radius: var(--pdx-radius-md);
+  background: var(--pdx-color-inset);
+}
+.comparison-col ul { padding-left: 1.2rem; margin: var(--pdx-space-xs) 0 0; }
+.comparison-col li { margin-bottom: var(--pdx-space-2xs); }
+</style>

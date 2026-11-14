@@ -38,3 +38,12 @@ const countries = ['Argentina', 'Australia', 'Brazil', 'Canada', 'China', 'Denma
 const languages = ['English', 'Spanish', 'French', 'German', 'Italian', 'Portuguese', 'Chinese', 'Japanese', 'Korean', 'Arabic', 'Hindi', 'Russian'];
 const roles = ['Admin', 'Editor', 'Viewer', 'Moderator', 'Developer'];
 </script>
+
+<style scoped>
+.demo-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-md);
+  max-width: 400px;
+}
+</style>

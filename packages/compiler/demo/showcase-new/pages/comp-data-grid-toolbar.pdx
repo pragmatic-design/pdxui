@@ -36,11 +36,5 @@
 </script>
 
 <style scoped>
-.page {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding: var(--pdx-space-xl) var(--pdx-space-md);
-}
 .intro { margin-bottom: var(--pdx-space-2xl); }
 </style>
