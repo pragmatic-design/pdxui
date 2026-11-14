@@ -58,3 +58,36 @@ function triggerGlobalError() {
   throw new Error('Unhandled click: fetchUserProfile() returned 403 Forbidden');
 }
 </script>
+
+<style scoped>
+.error-log {
+  margin-top: var(--pdx-space-sm);
+  padding: var(--pdx-space-sm);
+  background: var(--pdx-color-inset);
+  border-radius: var(--pdx-radius-sm);
+  max-height: 160px;
+  overflow-y: auto;
+}
+.log-entry {
+  display: flex;
+  gap: var(--pdx-space-sm);
+  font-size: var(--pdx-text-xs);
+  padding: 2px 0;
+  border-bottom: 1px solid var(--pdx-color-border);
+  font-family: monospace;
+}
+.log-entry:last-child { border-bottom: none; }
+.log-source {
+  color: var(--pdx-color-danger-ink);
+  font-weight: 600;
+  min-width: 50px;
+}
+.log-msg {
+  flex: 1;
+  color: var(--pdx-color-text);
+}
+.log-time {
+  color: var(--pdx-color-muted);
+  white-space: nowrap;
+}
+</style>

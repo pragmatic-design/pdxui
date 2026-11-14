@@ -11,9 +11,9 @@
           <p class="pdx-txt-small pdx-ink-muted">No error here — the catch block is invisible.</p>
         </div>
       } @catch (err) {
-        <div class="pdx-error-fallback" role="alert">
-          <div class="pdx-error-icon">&#9888;</div>
-          <div class="pdx-error-msg">{{ err instanceof Error ? err.message : String(err) }}</div>
+        <div class="demo-error" role="alert">
+          <div class="demo-error-icon">&#9888;</div>
+          <div class="demo-error-msg">{{ err instanceof Error ? err.message : String(err) }}</div>
         </div>
       }
     </div>

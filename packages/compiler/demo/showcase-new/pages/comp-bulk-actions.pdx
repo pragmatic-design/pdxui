@@ -38,7 +38,6 @@
 </script>
 
 <style scoped>
-.page { max-width: 1280px; }
 .intro { margin-bottom: var(--pdx-space-2xl); }
 section { margin-bottom: var(--pdx-space-3xl); }
 .section-heading { margin-bottom: var(--pdx-space-xs); }

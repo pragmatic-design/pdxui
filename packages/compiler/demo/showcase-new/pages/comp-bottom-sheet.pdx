@@ -80,36 +80,3 @@ import '@pdxui/ui/input';
 @page '/components/bottom-sheet'
 @title 'Bottom Sheet'
 </script>
-
-<style>
-.page { max-width: 800px; margin: 0 auto; padding: var(--pdx-space-lg); }
-.intro { margin-bottom: var(--pdx-space-xl); }
-section { margin-bottom: var(--pdx-space-2xl); }
-h2 { margin-bottom: var(--pdx-space-sm); }
-.btn-row { display: flex; flex-wrap: wrap; gap: var(--pdx-space-sm); margin-top: var(--pdx-space-sm); }
-
-.action-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-.action-item {
-    display: flex;
-    align-items: center;
-    gap: var(--pdx-space-md);
-    padding: var(--pdx-space-md) var(--pdx-space-lg);
-    background: none;
-    border: none;
-    font: inherit;
-    color: var(--pdx-color-text);
-    cursor: pointer;
-    border-radius: var(--pdx-radius-sm);
-    transition: background var(--pdx-duration-fast);
-}
-.action-item:hover {
-    background: var(--pdx-color-inset);
-}
-.action-item.danger {
-    color: var(--pdx-color-danger-ink);
-}
-</style>

@@ -85,7 +85,6 @@
 </script>
 
 <style scoped>
-  .page { max-width: 800px; }
 
   .opt-header, .opt-row { grid-template-columns: 180px 180px 1fr; }
 </style>

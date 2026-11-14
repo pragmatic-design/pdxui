@@ -19,10 +19,3 @@
   h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
   .desc { color: var(--pdx-color-muted); font-size: 0.85rem; margin: 0; }
 </style>
-
-<style>
-  .v-item { position: absolute; left: 0; right: 0; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--pdx-color-border); font-size: 0.85rem; }
-  .v-item:hover { background: var(--pdx-color-inset); }
-  .v-item.even { background: var(--pdx-color-inset); }
-  .v-item .muted { color: var(--pdx-color-muted); font-size: 0.8rem; }
-</style>

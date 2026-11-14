@@ -14,15 +14,15 @@
       }
       @if (formState === 'submitting') {
         <div class="demo-widget state-loading">
-          <div class="pdx-spinner-inline"></div>
+          <div class="demo-spinner"></div>
           <span class="pdx-txt-small pdx-ink-muted">Submitting...</span>
         </div>
       }
       @if (formState === 'error') {
-        <div class="pdx-error-fallback pdx-error-warning" role="alert">
-          <div class="pdx-error-icon">&#9888;</div>
-          <div class="pdx-error-msg">Form submission failed</div>
-          <div class="pdx-error-detail">{{ formError }}</div>
+        <div class="demo-error demo-error-warning" role="alert">
+          <div class="demo-error-icon">&#9888;</div>
+          <div class="demo-error-msg">Form submission failed</div>
+          <div class="demo-error-detail">{{ formError }}</div>
           <button class="pdx-outline retry-btn" size="sm" @click="resetForm">Fix and Retry</button>
         </div>
       }
@@ -61,29 +61,3 @@ function resetForm() {
   formError = '';
 }
 </script>
-
-<style>
-/* The error card the render-error, healthy, network-fetch and async-action sections draw. Global,
-   in one place, and in this order — .pdx-error-warning overrides
-   .pdx-error-fallback by coming after it. */
-.pdx-error-fallback {
-  padding: var(--pdx-space-md);
-  background: var(--pdx-color-danger-soft);
-  border: 1px solid var(--pdx-color-danger);
-  border-radius: var(--pdx-radius-md);
-  text-align: center;
-}
-.pdx-error-warning {
-  background: color-mix(in oklch, var(--pdx-color-warning) 10%, transparent);
-  border-color: var(--pdx-color-warning);
-}
-.pdx-error-icon { font-size: 2rem; margin-bottom: var(--pdx-space-xs); }
-.pdx-error-msg { font-weight: 600; margin-bottom: var(--pdx-space-2xs); }
-.pdx-error-detail {
-  font-size: var(--pdx-text-sm);
-  color: var(--pdx-color-muted);
-  margin-bottom: var(--pdx-space-xs);
-  font-family: monospace;
-  word-break: break-word;
-}
-</style>

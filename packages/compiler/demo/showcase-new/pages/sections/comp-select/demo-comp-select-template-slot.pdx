@@ -56,3 +56,53 @@ const teamMembers = [
   { id: 4, name: 'Diana Prince', role: 'PM', initials: 'DP' },
 ];
 </script>
+
+<style scoped>
+.team-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.team-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--pdx-color-primary);
+  color: var(--pdx-color-primary-text);
+  font-size: 0.65rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.team-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+.team-name {
+  font-weight: 500;
+}
+.team-role {
+  font-size: 0.7rem;
+  color: var(--pdx-color-muted);
+}
+.team-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.team-avatar-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--pdx-color-primary);
+  color: var(--pdx-color-primary-text);
+  font-size: 0.55rem;
+  font-weight: 600;
+}
+</style>

@@ -8,10 +8,10 @@
       @try {
         <div class="demo-widget">{{ throwRenderError() }}</div>
       } @catch (err) {
-        <div class="pdx-error-fallback" role="alert">
-          <div class="pdx-error-icon">&#9888;</div>
-          <div class="pdx-error-msg">Widget failed to render</div>
-          <div class="pdx-error-detail">{{ err instanceof Error ? err.message : String(err) }}</div>
+        <div class="demo-error" role="alert">
+          <div class="demo-error-icon">&#9888;</div>
+          <div class="demo-error-msg">Widget failed to render</div>
+          <div class="demo-error-detail">{{ err instanceof Error ? err.message : String(err) }}</div>
         </div>
       }
     </div>

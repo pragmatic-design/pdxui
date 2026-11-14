@@ -16,3 +16,12 @@
 <script>
 const colors = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Cyan', 'Teal'];
 </script>
+
+<style scoped>
+.demo-sizing {
+  display: flex;
+  flex-direction: column;
+  gap: var(--pdx-space-md);
+  max-width: 500px;
+}
+</style>

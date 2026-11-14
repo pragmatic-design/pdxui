@@ -38,3 +38,16 @@ function onHexChange(e) { hexOutput = e.currentTarget.value; }
 function onRgbChange(e) { rgbOutput = e.currentTarget.value; }
 function onHslChange(e) { hslOutput = e.currentTarget.value; }
 </script>
+
+<style scoped>
+.formats-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  flex-wrap: wrap;
+  max-width: 600px;
+}
+.format-col {
+  flex: 1;
+  min-width: 140px;
+}
+</style>

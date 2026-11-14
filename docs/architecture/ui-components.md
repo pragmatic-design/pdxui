@@ -155,12 +155,11 @@ The base structure:
 </script>
 
 <style scoped>
-  .page { max-width: 760px; }
-  .intro { margin-bottom: var(--pdx-space-xl); }
-  section { margin-bottom: var(--pdx-space-3xl); }
-  /* ... copy the remaining styles from comp-switch.pdx */
+  /* Only what this page draws and no other does. */
 </style>
 ```
+
+The page's width, its sections' spacing and the shared helpers (`demo-row`, `demo-stack`, `demo-box`, `source-block`, `options-table`…) come from `showcase-shared.css`: a page does not set them again. The demos take the content area's whole width; the intro and a section's description stop at a reading measure. A page's `<style>` is always `scoped`: an unscoped one is global and restyles every page (#1070, held by `packages/compiler/tests/showcase-scoped-styles.test.ts`).
 
 Each demo section is its own component, and the page composes them. A section of `pages/comp-{name}.pdx` lives in `pages/sections/comp-{name}/demo-comp-{name}-{slug}.pdx`, holds the whole `<section>` (heading, demo, source block) and the styles only it uses, and the page places it with a class:
 

@@ -113,38 +113,3 @@ import '@pdxui/ui/autocomplete';
 import '@pdxui/ui/select';
 import '@pdxui/ui/data-source';
 </script>
-
-<style>
-.demo-box {
-  padding: var(--pdx-space-md);
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  max-width: 400px;
-}
-.result {
-  margin-top: var(--pdx-space-sm);
-}
-.comparison {
-  display: flex;
-  gap: var(--pdx-space-lg);
-  flex-wrap: wrap;
-}
-.comparison-col {
-  flex: 1;
-  min-width: 200px;
-  padding: var(--pdx-space-md);
-  border: 1px solid var(--pdx-color-border);
-  border-radius: var(--pdx-radius-md);
-  background: var(--pdx-color-inset);
-}
-.comparison-col ul { padding-left: 1.2rem; margin: var(--pdx-space-xs) 0 0; }
-.comparison-col li { margin-bottom: var(--pdx-space-2xs); }
-
-.props-table table { width: 100%; border-collapse: collapse; font-size: var(--pdx-text-sm); }
-.props-table th { text-align: left; padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 2px solid var(--pdx-color-border); }
-.props-table td { padding: var(--pdx-space-xs) var(--pdx-space-sm); border-bottom: 1px solid var(--pdx-color-border); }
-
-details.source { margin-top: var(--pdx-space-sm); }
-details.source summary { cursor: pointer; font-size: var(--pdx-text-sm); color: var(--pdx-color-muted); user-select: none; }
-details.source pre { margin-top: var(--pdx-space-xs); padding: var(--pdx-space-sm); background: var(--pdx-color-inset); border-radius: var(--pdx-radius-md); font-size: var(--pdx-text-xs); overflow-x: auto; line-height: 1.5; }
-</style>

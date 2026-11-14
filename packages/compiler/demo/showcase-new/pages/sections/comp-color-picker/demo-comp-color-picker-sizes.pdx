@@ -23,3 +23,14 @@
 &lt;pdx-color-picker value="#ef4444" size="lg" /&gt;</code></pre></details>}
   </section>
 </template>
+
+<style scoped>
+.sizes-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  align-items: flex-end;
+}
+.size-col {
+  text-align: center;
+}
+</style>

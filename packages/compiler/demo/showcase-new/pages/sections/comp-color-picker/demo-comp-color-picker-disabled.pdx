@@ -18,3 +18,14 @@
 &lt;pdx-color-picker value="#8b5cf6" readonly /&gt;</code></pre></details>}
   </section>
 </template>
+
+<style scoped>
+.states-row {
+  display: flex;
+  gap: var(--pdx-space-lg);
+  align-items: flex-end;
+}
+.state-col {
+  text-align: center;
+}
+</style>
