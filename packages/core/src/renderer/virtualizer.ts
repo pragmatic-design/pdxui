@@ -23,7 +23,10 @@ export interface VirtualItem {
 export interface VirtualizerOptions {
     /** Reactive getter for the total number of items. */
     count: () => number;
-    /** Estimate the size (height or width) of an item by index. */
+    /**
+     * Estimate the size (height or width) of an item by index. It may read signals: when they change,
+     * the sizes and the offsets after them are computed again.
+     */
     estimateSize: (index: number) => number;
     /** Number of extra items to render above/below the visible area. Default: 3. */
     overscan?: number;
@@ -188,13 +191,40 @@ export function createVirtualizer(options: VirtualizerOptions): VirtualizerRetur
     // `set(v => v)` would be a no-op (the Object.is guard), and the invalidation would not propagate.
     const _measureVersion = signal(0);
 
+    // ── Estimates that change ──
+    // `estimateSize` may read signals: a row whose height follows its content, known without
+    // measuring it (the lanes of a scheduler's resource). Summing the estimates inside a computed
+    // tracks them; when one changes, the sum is taken again and every offset after the first row is
+    // dropped, since any row may have changed. A constant estimate reads nothing, and this runs once
+    // per count, as the sum always has.
+    const _estimates = computed(() => {
+        const n = count();
+        let sum = 0;
+        for (let i = 0; i < n; i++) sum += estimateSize(i);
+        return { n, sum };
+    });
+    let adopted: { n: number; sum: number } | null = null;
+
+    function adoptEstimates(): void {
+        const est = _estimates();
+        if (est === adopted) return;
+        adopted = est;
+        syncCount();
+        totalsFor = est.n;
+        estimatedSum = est.sum;
+        measuredDelta = 0;
+        for (const [i, size] of measuredSizes) if (i < est.n) measuredDelta += size - estimateSize(i);
+        validTo = 0;
+    }
+
     const _totalSize = computed(() => {
-        count(); // track count changes
+        adoptEstimates(); // track count and estimate changes
         _measureVersion(); // track re-measure (dynamic row heights)
         return getTotalSize();
     });
 
     const _items = computed((): VirtualItem[] => {
+        adoptEstimates();
         const n = count();
         _measureVersion(); // track re-measure (dynamic row heights)
         if (n === 0) return [];

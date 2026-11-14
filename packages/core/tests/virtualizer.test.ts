@@ -80,6 +80,28 @@ describe('createVirtualizer', () => {
         scrollEl.remove();
     });
 
+    it('an estimate that reads a signal: the sizes and offsets follow it, the count unchanged', () => {
+        const scrollEl = createScrollContainer();
+        // Row 2 grows from one lane to three, as a scheduler's resource does when its events overlap.
+        const lanes = signal(1);
+        const v = createVirtualizer({
+            count: () => 10,
+            estimateSize: (i) => (i === 2 ? lanes() * 40 : 40),
+            getScrollElement: () => scrollEl,
+        });
+
+        expect(v.totalSize()).toBe(400);
+        expect(v.items()[3].start).toBe(120);
+        lanes.set(3);
+        expect(v.totalSize()).toBe(480);
+        expect(v.items()[2].size).toBe(120);
+        expect(v.items()[3].start).toBe(200);
+        expect(v.itemRect(9).start).toBe(440);
+
+        v.dispose();
+        scrollEl.remove();
+    });
+
     it('supports gap between items', () => {
         const scrollEl = createScrollContainer();
         const v = createVirtualizer({
