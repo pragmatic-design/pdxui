@@ -1,5 +1,5 @@
 /**
- * MANIFEST — pdx-scheduler (#1020, part 3: the time grid; part 4: month, year, agenda)
+ * MANIFEST — pdx-scheduler (#1020, part 3: the time grid; part 4: month, year, agenda; part 5: timeline)
  *
  * Derived from:
  *  - source: packages/ui/src/scheduler/pdx-scheduler.pdx
@@ -17,6 +17,10 @@
  *              <button data-part="event" [data-line]> in lanes · <button data-part="more" data-date> «+N»
  *          year: twelve <div data-part="yearMonth" role="grid"> of <div role="gridcell" data-date [data-events]>
  *          agenda: <div data-part="agendaList"> → a date and a <ul> of <button data-part="event"> per day
+ *          timeline: <div data-part="grid" role="grid|treegrid"> the scroll container; only the rows and columns in view
+ *            a sticky header row of <div role="columnheader" data-part="columnHeader">, then a <div role="rowgroup"> of
+ *            <div role="row" [aria-expanded]> placed at its top → <div role="rowheader" data-part="rowHeader" data-row data-col="0">
+ *              and <div role="gridcell" data-part="slot" data-row data-col> → <button data-part="event" data-id>, in lanes
  *  - CSS: packages/design/src/components/scheduler.css
  *
  * The date, the zone and the locale are fixed and the now line is off, so the grid is the same every day.
@@ -35,6 +39,13 @@ const FIXED = `date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-ho
 // «+2»), a call on Tuesday.
 const MONTH_EVENTS = `[{"id":"trip","title":"Trip","start":"2026-09-25","end":"2026-09-30"},{"id":"call","title":"Call","start":"2026-09-22T10:30","end":"2026-09-22T11:00"},{"id":"t1","title":"One","start":"2026-09-24T09:00","end":"2026-09-24T10:00"},{"id":"t2","title":"Two","start":"2026-09-24T11:00","end":"2026-09-24T12:00"},{"id":"t3","title":"Three","start":"2026-09-24T14:00","end":"2026-09-24T15:00"},{"id":"t4","title":"Four","start":"2026-09-24T16:00","end":"2026-09-24T17:00"}]`;
 const CALENDAR = `date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false"`;
+// The timeline: two rooms under a site, and a van. The audit runs Tuesday noon to Wednesday noon in Room
+// A; the van has two trips that overlap on Wednesday, so its row takes two lanes.
+const SITES = `[{"id":"north","label":"North site","children":[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]},{"id":"van","label":"Van"}]`;
+const SITE_EVENTS = `[{"id":"audit","title":"Audit","start":"2026-09-22T12:00","end":"2026-09-23T12:00","resource":"a"},{"id":"move","title":"Move","start":"2026-09-21","end":"2026-09-24","resource":"van"},{"id":"pickup","title":"Pickup","start":"2026-09-23T09:00","end":"2026-09-23T13:00","resource":"van"},{"id":"talk","title":"Talk","start":"2026-09-24T09:00","end":"2026-09-24T10:00","resource":"b"}]`;
+// Five hundred resources over a day of half-hour slots: 24 000 cells if every one were drawn.
+const MANY = JSON.stringify(Array.from({ length: 500 }, (_, i) => ({ id: `r${i}`, label: `Resource ${i + 1}` })));
+const MANY_EVENTS = JSON.stringify([{ id: 'first', title: 'First', start: '2026-09-22T09:00', end: '2026-09-22T11:00', resource: 'r0' }, { id: 'last', title: 'Last', start: '2026-09-22T09:00', end: '2026-09-22T10:00', resource: 'r499' }]);
 
 export const scheduler: ComponentManifest = {
     name: 'scheduler',
@@ -73,6 +84,16 @@ export const scheduler: ComponentManifest = {
             id: 'scheduler-agenda',
             title: 'Scheduler — An agenda',
             html: `<pdx-scheduler data-test="scheduler" label="Team" view="agenda" ${CALENDAR} events='${MONTH_EVENTS}'></pdx-scheduler>`,
+        },
+        {
+            id: 'scheduler-timeline',
+            title: 'Scheduler — A week by resource',
+            html: `<pdx-scheduler data-test="scheduler" label="Sites" view="timeline" ${CALENDAR} resources='${SITES}' events='${SITE_EVENTS}'></pdx-scheduler>`,
+        },
+        {
+            id: 'scheduler-timeline-many',
+            title: 'Scheduler — A day of 500 resources',
+            html: `<pdx-scheduler data-test="scheduler" label="Fleet" view="timeline" timeline-scale="day" ${CALENDAR} resources='${MANY}' events='${MANY_EVENTS}'></pdx-scheduler>`,
         },
     ],
 
@@ -188,6 +209,32 @@ export const scheduler: ComponentManifest = {
                     },
                 ],
             },
+            'scheduler-timeline': {
+                composition: [
+                    {
+                        // Rows: North site 0, Room A 1, Room B 2, Van 3. Columns: Monday 21 is data-col 1, Tuesday 2, Wednesday 3.
+                        description: 'an event lies along its row from its start to its end; overlapping ones stack',
+                        parent: 'body',
+                        children: {
+                            audit: 'section:not([hidden]) [data-test="scheduler"] [data-id="audit"]',
+                            tuesday: 'section:not([hidden]) [data-test="scheduler"] [data-row="1"][data-col="2"]',
+                            wednesday: 'section:not([hidden]) [data-test="scheduler"] [data-row="1"][data-col="3"]',
+                            roomA: 'section:not([hidden]) [data-test="scheduler"] [data-row="1"][data-col="0"]',
+                            van: 'section:not([hidden]) [data-test="scheduler"] [data-row="3"][data-col="0"]',
+                            move: 'section:not([hidden]) [data-test="scheduler"] [data-id="move"]',
+                            pickup: 'section:not([hidden]) [data-test="scheduler"] [data-id="pickup"]',
+                        },
+                        relations: [
+                            { description: 'the audit starts inside Tuesday', left: 'audit.left', op: '>', right: 'tuesday.left' },
+                            { description: 'and ends inside Wednesday', left: 'audit.right', op: '<', right: 'wednesday.right' },
+                            { description: 'past Tuesday\'s end', left: 'audit.right', op: '>', right: 'wednesday.left' },
+                            { description: 'the audit is in Room A\'s row', left: 'audit.bottom', op: '<=', right: 'roomA.bottom', tolerance: 1 },
+                            { description: 'the van\'s overlapping trips stack: the pickup under the move', left: 'pickup.top', op: '>=', right: 'move.bottom', tolerance: 1 },
+                            { description: 'the van\'s row holds both lanes', left: 'van.height', op: '>', right: 'roomA.height' },
+                        ],
+                    },
+                ],
+            },
             'scheduler-disabled': {
                 standalone: [
                     {
@@ -202,7 +249,7 @@ export const scheduler: ComponentManifest = {
 
     // ── Dim. 2: axe-core ── the grid pattern: columnheaders, rowheaders, gridcells, named events.
     a11y: {
-        scenarios: ['scheduler-week', 'scheduler-resources', 'scheduler-month', 'scheduler-year', 'scheduler-agenda'],
+        scenarios: ['scheduler-week', 'scheduler-resources', 'scheduler-month', 'scheduler-year', 'scheduler-agenda', 'scheduler-timeline'],
     },
 
     // ── Dim. 3: style isolation ──
@@ -226,6 +273,7 @@ export const scheduler: ComponentManifest = {
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(4)' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(5)' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(6)' },
+            { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-part="viewSwitcher"] button:nth-child(7)' },
             { key: 'Tab', expectFocus: '[data-test="scheduler"] [data-row="1"][data-col="0"]' },
             { key: 'ArrowRight', expectFocus: '[data-test="scheduler"] [data-row="1"][data-col="1"]' },
             { key: 'ArrowDown', expectFocus: '[data-test="scheduler"] [data-row="2"][data-col="1"]' },
@@ -236,7 +284,7 @@ export const scheduler: ComponentManifest = {
 
     // ── Dim. 5: visual regression (Docker) ──
     visual: {
-        scenarios: ['scheduler-week', 'scheduler-month'],
+        scenarios: ['scheduler-week', 'scheduler-month', 'scheduler-timeline'],
     },
 };
 

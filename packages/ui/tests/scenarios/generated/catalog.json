@@ -2727,6 +2727,14 @@
         {
           "id": "scheduler-agenda",
           "title": "Scheduler — An agenda"
+        },
+        {
+          "id": "scheduler-timeline",
+          "title": "Scheduler — A week by resource"
+        },
+        {
+          "id": "scheduler-timeline-many",
+          "title": "Scheduler — A day of 500 resources"
         }
       ]
     },

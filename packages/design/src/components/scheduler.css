@@ -558,6 +558,183 @@ pdx-scheduler {
     color: var(--pdx-color-muted);
 }
 
+/* ===== Timeline ===== */
+/* A row per resource along the period's columns. Only the rows and columns in view are in the DOM:
+   the body is as tall as every row (--_scheduler-height, from the component), each row is placed at
+   its --_scheduler-top and is --_scheduler-lanes lanes tall, and each cell at its column index
+   (--_scheduler-col) times the column width. The header row and the resources' column stay on screen
+   while the rest scrolls under them. An event starts --_scheduler-from columns into the cell it is
+   drawn in, is --_scheduler-length columns long, in lane --_scheduler-lane. The probe has a lane's
+   height and a column's width (--_scheduler-column, stretched to fill), which the component measures
+   to know what is in view. */
+
+.pdx-scheduler-timeline {
+    --pdx-scheduler-lane-height: 2rem;
+    --pdx-scheduler-timeline-column: 5rem;
+    --_scheduler-resource-width: min(11rem, 40cqi);
+    /* A column is the token's width, or wider when the period fits: a week fills a wide screen instead
+       of leaving it empty on the right. Resolved in the children, where 100cqi is the timeline's width. */
+    --_scheduler-column: max(var(--pdx-scheduler-timeline-column), (100cqi - var(--_scheduler-resource-width)) / var(--_scheduler-cols, 1));
+    position: relative;
+    max-height: var(--pdx-scheduler-height);
+    overflow: auto;
+    container-type: inline-size;
+    /* A cell focused by the keyboard is scrolled clear of the header row and the resources' column. */
+    scroll-padding-top: var(--pdx-scheduler-header-height);
+    scroll-padding-left: var(--_scheduler-resource-width);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+}
+
+.pdx-scheduler-timeline-probe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--_scheduler-column);
+    height: var(--pdx-scheduler-lane-height);
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.pdx-scheduler-timeline-head,
+.pdx-scheduler-timeline-body {
+    position: relative;
+    width: calc(var(--_scheduler-resource-width) + var(--_scheduler-cols, 1) * var(--_scheduler-column));
+}
+
+.pdx-scheduler-timeline-head {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    height: var(--pdx-scheduler-header-height);
+    background: var(--pdx-color-surface);
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-scheduler-timeline-head > .pdx-scheduler-corner {
+    display: flex;
+    align-items: center;
+    width: var(--_scheduler-resource-width);
+    height: 100%;
+    padding: 0 var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+    color: var(--pdx-color-muted);
+}
+
+.pdx-scheduler-timeline-head > .pdx-scheduler-header,
+.pdx-scheduler-timeline-row > .pdx-scheduler-cell {
+    position: absolute;
+    top: 0;
+    left: calc(var(--_scheduler-resource-width) + var(--_scheduler-col, 0) * var(--_scheduler-column));
+    width: var(--_scheduler-column);
+    height: 100%;
+}
+
+.pdx-scheduler-timeline-body {
+    height: var(--_scheduler-height, 0);
+}
+
+.pdx-scheduler-timeline-row {
+    position: absolute;
+    top: var(--_scheduler-top, 0);
+    left: 0;
+    width: 100%;
+    height: calc(var(--_scheduler-lanes, 1) * var(--pdx-scheduler-lane-height));
+    border-bottom: 1px solid var(--pdx-color-border);
+}
+
+.pdx-scheduler-timeline-row > .pdx-scheduler-cell {
+    border-top: 0;
+}
+
+.pdx-scheduler-timeline-resource {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--pdx-space-2xs);
+    width: var(--_scheduler-resource-width);
+    height: 100%;
+    padding: 0 var(--pdx-space-sm) 0 calc(var(--pdx-space-sm) + (var(--_scheduler-level, 1) - 1) * var(--pdx-space-md));
+    overflow: hidden;
+    font-size: var(--pdx-text-sm);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    background: var(--pdx-color-surface);
+    border-right: 1px solid var(--pdx-color-border);
+    outline: none;
+}
+
+.pdx-scheduler-timeline-resource:focus-visible {
+    box-shadow: inset var(--pdx-focus-ring);
+}
+
+/* A parent: its name is bold and a chevron says whether its children show. */
+[aria-expanded] > .pdx-scheduler-timeline-resource {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+[aria-expanded] > .pdx-scheduler-timeline-resource::before {
+    content: "";
+    flex: none;
+    width: 0.4em;
+    height: 0.4em;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    rotate: -45deg;
+    transition: rotate 0.15s;
+}
+
+[aria-expanded="true"] > .pdx-scheduler-timeline-resource::before {
+    rotate: 45deg;
+}
+
+.pdx-scheduler-span {
+    top: calc(var(--_scheduler-lane, 0) * var(--pdx-scheduler-lane-height) + 2px);
+    left: calc(var(--_scheduler-from, 0) * var(--_scheduler-column) + 1px);
+    width: calc(var(--_scheduler-length, 1) * var(--_scheduler-column) - 3px);
+    height: calc(var(--pdx-scheduler-lane-height) - 4px);
+    min-width: 0.5rem;
+    min-height: 0;
+    justify-content: center;
+    /* Clipped, not hidden: `hidden` would make it the scroll box its sticky title holds on to. */
+    overflow: clip;
+}
+
+/* An event that started left of the view keeps its title in sight, just right of the resources. */
+.pdx-scheduler-span .pdx-scheduler-event-title {
+    position: sticky;
+    left: calc(var(--_scheduler-resource-width) + var(--pdx-space-2xs));
+}
+
+/* Cut on the side that goes on past the period: left for [data-before], right for [data-after]. */
+.pdx-scheduler-span[data-before] {
+    border-radius: 0 var(--pdx-radius-sm) var(--pdx-radius-sm) 0;
+}
+
+.pdx-scheduler-span[data-after] {
+    border-radius: var(--pdx-radius-sm) 0 0 var(--pdx-radius-sm);
+}
+
+.pdx-scheduler-span[data-before][data-after] {
+    border-radius: 0;
+}
+
+.pdx-scheduler-timeline-now {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+    left: calc(var(--_scheduler-resource-width) + var(--_scheduler-at, 0) * var(--_scheduler-column));
+    width: 2px;
+    background: var(--pdx-color-danger);
+    pointer-events: none;
+}
+
 /* ===== States ===== */
 
 :state(disabled) > .pdx-scheduler {

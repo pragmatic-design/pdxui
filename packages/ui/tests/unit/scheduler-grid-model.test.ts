@@ -4,7 +4,7 @@
 // once per day and resource it covers, and side by side with the events it overlaps there. An all-day
 // event is a bar in the all-day row, over the adjacent columns it covers, in a lane.
 import { describe, it, expect } from 'vitest';
-import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime, buildHeaderRows, eventResources } from '../../src/scheduler/grid-model';
+import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime, isWorkingDay, buildHeaderRows, eventResources } from '../../src/scheduler/grid-model';
 
 const ROME = 'Europe/Rome';
 const days = ['2026-11-16', '2026-11-17', '2026-11-18'];
@@ -143,6 +143,15 @@ describe('isBusinessTime', () => {
     it('a day set to null, or absent, has no business hours', () => {
         expect(isBusinessTime('2026-11-21', 10 * 60, hours)).toBe(false); // a Saturday
         expect(isBusinessTime('2026-11-17', 10 * 60, hours)).toBe(false); // a Tuesday, absent
+    });
+});
+
+describe('isWorkingDay', () => {
+    it('a weekday with hours is a working day; one set to null or absent is not', () => {
+        const hours = { 1: { start: '09:00', end: '18:00' }, 6: null };
+        expect(isWorkingDay('2026-11-16', hours)).toBe(true); // a Monday
+        expect(isWorkingDay('2026-11-21', hours)).toBe(false); // a Saturday
+        expect(isWorkingDay('2026-11-17', hours)).toBe(false); // a Tuesday, absent
     });
 });
 

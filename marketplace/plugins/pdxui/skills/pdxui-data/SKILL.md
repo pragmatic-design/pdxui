@@ -28,7 +28,7 @@ Each page has the props, events, slots and API, the notes, and the examples of t
 - [`<pdx-kanban>`](references/pdx-kanban.md) — Columns of cards, moved by pointer, keyboard or menu.
 - [`<pdx-list>`](references/pdx-list.md) — Data-driven list with custom rows.
 - [`<pdx-relative-time>`](references/pdx-relative-time.md) — Auto-updating “3 days ago”.
-- [`<pdx-scheduler>`](references/pdx-scheduler.md) — Events in time: day, week, month, year and agenda views, by resource.
+- [`<pdx-scheduler>`](references/pdx-scheduler.md) — Events in time: day, week, month, year, agenda and timeline views, by resource.
 - [`<pdx-sortable-list>`](references/pdx-sortable-list.md) — A list the user can put in another order, by dragging a row's handle or from the keyboard alone.
 
 It emits `pdx-reorder` with the indices and never writes to `items`: the application applies the

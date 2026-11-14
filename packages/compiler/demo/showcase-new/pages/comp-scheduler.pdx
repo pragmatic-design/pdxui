@@ -4,7 +4,7 @@
     <p class="pdx-txt-body pdx-ink-muted intro">
       <code>&lt;pdx-scheduler&gt;</code> — events in time: a day, a week or a run of days on a grid of time slots, with an
       all-day row, the current time and the working hours marked and a column per resource when it has them; a month,
-      a year, or an agenda of the period. Every grid is a keyboard grid with one tab stop, and every event is announced
+      a year, an agenda of the period, or a timeline of resources in rows. Every grid is a keyboard grid with one tab stop, and every event is announced
       with its time, day and resource.
     </p>
 
@@ -16,6 +16,9 @@
 
     <!-- ═══ By resource ═══ -->
     <app-demo-comp-scheduler-resources class="demo-section"></app-demo-comp-scheduler-resources>
+
+    <!-- ═══ Timeline ═══ -->
+    <app-demo-comp-scheduler-timeline class="demo-section"></app-demo-comp-scheduler-timeline>
 
     <!-- ═══ What an event draws ═══ -->
     <app-demo-comp-scheduler-event class="demo-section"></app-demo-comp-scheduler-event>
@@ -29,9 +32,10 @@
       <div class="options-table">
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
         <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day</span></div>
-        <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource; children are drawn as their leaves</span></div>
-        <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'</span><span>The view on screen (<code>::view</code>)</span></div>
-        <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all six by default</span></div>
+        <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource, children drawn as their leaves; in the timeline, a row per resource, children under their parent</span></div>
+        <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'</span><span>The view on screen (<code>::view</code>)</span></div>
+        <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all seven by default</span></div>
+        <div class="opt-row"><code>timeline-scale</code><span>'day' | 'week' | 'month' | 'year'</span><span>The timeline's period and columns: a day of slots, a week or month of days, a year of months ('week')</span></div>
         <div class="opt-row"><code>date</code><span>string</span><span>The reference date, ISO (<code>::date</code>); empty is today</span></div>
         <div class="opt-row"><code>days</code><span>number</span><span>How many days the <code>days</code> view shows (3)</span></div>
         <div class="opt-row"><code>agenda-days</code><span>number</span><span>How many days the agenda lists (7)</span></div>
@@ -67,6 +71,8 @@
         <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
         <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day; in the year, open the day</span></div>
         <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell</span></div>
+        <div class="opt-row"><code>Enter · Space</code><span></span><span>On a timeline resource with children: open or close it</span></div>
+        <div class="opt-row"><code>→ · ←</code><span></span><span>On a timeline resource: open a closed parent, close an open one, or from a child go to its parent</span></div>
       </div>
     </section>
   </div>

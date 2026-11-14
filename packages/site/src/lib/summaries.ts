@@ -26,7 +26,7 @@ export const summaries: Record<string, string> = {
     'pdx-rating': 'Star rating with halves and tooltips.',
     'pdx-signature-pad': 'Draw or type a signature; the form gets a PNG.',
     'pdx-kanban': 'Columns of cards, moved by pointer, keyboard or menu.',
-    'pdx-scheduler': 'Events in time: day, week, month, year and agenda views, by resource.',
+    'pdx-scheduler': 'Events in time: day, week, month, year, agenda and timeline views, by resource.',
     'pdx-localized-input': 'One text in several languages, a tab each.',
     'pdx-segmented': 'A compact set of exclusive options.',
     'pdx-toggle': 'A pressable on/off button.',

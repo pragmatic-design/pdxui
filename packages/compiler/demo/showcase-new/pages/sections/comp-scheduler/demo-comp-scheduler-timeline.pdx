@@ -1,0 +1,29 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Timeline</h2>
+    <p class="pdx-txt-small pdx-ink-muted"><code>view="timeline"</code> puts each resource on a row along the period: <code>timeline-scale</code> is a day of slots, a week or a month of days, or a year of months. A resource's <code>children</code> sit under it, and the parent opens and closes with a click, <kbd>Enter</kbd> or the arrows. Events that overlap stack in their row. Only the rows and columns in view are drawn, so this fleet of 200 vans costs what a screenful does.</p>
+    <pdx-segmented label="Timeline scale" :value="scale" options='["day","week","month","year"]' @value-change="e => scale = e.detail.value"></pdx-segmented>
+    <pdx-scheduler label="Fleet" view="timeline" :timeline-scale="scale" :date="today" :resources="fleet" :events="jobs" :views="['timeline']" scroll-to="08:00"></pdx-scheduler>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const today = at(1);
+let scale = $signal('week');
+// Two depots of vans, then the long tail of the fleet.
+const fleet = [
+  { id: 'north', label: 'North depot', children: [{ id: 'n1', label: 'Van N1', color: 'oklch(0.6 0.15 250)' }, { id: 'n2', label: 'Van N2', color: 'oklch(0.6 0.15 250)' }] },
+  { id: 'south', label: 'South depot', children: [{ id: 's1', label: 'Van S1', color: 'oklch(0.6 0.15 150)' }, { id: 's2', label: 'Van S2', color: 'oklch(0.6 0.15 150)' }] },
+  ...Array.from({ length: 196 }, (_, i) => ({ id: 'v' + i, label: 'Van ' + (i + 1) })),
+];
+const jobs = [
+  { id: 'j1', title: 'Delivery', start: at(1, '08:30'), end: at(1, '12:00'), resource: 'n1' },
+  { id: 'j2', title: 'Pickup', start: at(1, '10:00'), end: at(1, '11:30'), resource: 'n1' },
+  { id: 'j3', title: 'Service', start: at(0), end: at(3), resource: 'n2', color: 'var(--pdx-color-warning)' },
+  { id: 'j4', title: 'Long haul', start: at(1, '14:00'), end: at(3, '18:00'), resource: 's1' },
+  { id: 'j5', title: 'Inspection', start: at(2, '09:00'), end: at(2, '10:00'), resource: 'south' },
+  ...Array.from({ length: 196 }, (_, i) => ({ id: 'f' + i, title: 'Route ' + (i + 1), start: at(1 + (i % 3), '09:00'), end: at(1 + (i % 3), '15:00'), resource: 'v' + i })),
+];
+</script>

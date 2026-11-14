@@ -97,6 +97,45 @@
           </div>
         }
       </div>
+    } @else if (view === 'timeline') {
+      <div class="pdx-scheduler-timeline" data-part="grid" :role="isTree ? 'treegrid' : 'grid'" :aria-labelledby="periodId" aria-readonly="true"
+        :aria-rowcount="tlRows.length + 1" :aria-colcount="tlColumns.length + 1" :ref="gridEl"
+        :style="'--_scheduler-cols:' + tlColumns.length + ';--_scheduler-height:' + tlWindow.height() + 'px'"
+        @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)">
+        <div class="pdx-scheduler-timeline-probe" aria-hidden="true" :ref="probeEl"></div>
+        <div role="row" class="pdx-scheduler-timeline-head" aria-rowindex="1">
+          <div role="columnheader" class="pdx-scheduler-corner" aria-colindex="1">{{ uiString('scheduler', 'resource') }}</div>
+          @for (tlCols as vc; track vc.index) {
+            <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-colindex="vc.index + 2" :aria-label="vc.full"
+              :data-today="vc.today ? '' : null" :style="'--_scheduler-col:' + vc.index">{{ vc.text }}</div>
+          }
+        </div>
+        <div role="rowgroup" class="pdx-scheduler-timeline-body">
+          @for (tlShown as s; track s.row.key) {
+            <div role="row" class="pdx-scheduler-timeline-row" :aria-rowindex="s.index + 2" :aria-level="isTree ? s.row.level : null"
+              :aria-posinset="isTree ? s.row.posinset : null" :aria-setsize="isTree ? s.row.setsize : null" :aria-expanded="s.row.parent ? (s.row.expanded ? 'true' : 'false') : null"
+              :style="'--_scheduler-top:' + s.top + 'px;--_scheduler-lanes:' + s.row.lanes + ';--_scheduler-level:' + s.row.level">
+              <div role="rowheader" class="pdx-scheduler-timeline-resource" data-part="rowHeader" aria-colindex="1" :data-row="s.index" data-col="0"
+                :tabindex="tabCell.row === s.index && tabCell.col === 0 ? 0 : -1">{{ s.row.resource?.label ?? uiString('scheduler', 'timeline') }}</div>
+              @for (tlCols as vc; track vc.index) {
+                <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.index" :data-col="vc.index + 1" :aria-colindex="vc.index + 2"
+                  :data-off="tlOff(s.row, vc.col) ? '' : null" :tabindex="tabCell.row === s.index && tabCell.col === vc.index + 1 ? 0 : -1" :style="'--_scheduler-col:' + vc.index">
+                  @for (itemsInColumn(s.row, vc.index, tlWindow.firstColumn()) as it; track it.id) {
+                    <button type="button" class="pdx-scheduler-event pdx-scheduler-span" data-part="event" tabindex="-1" :data-id="it.event.id"
+                      :style="'--_scheduler-from:' + (it.start - vc.index) + ';--_scheduler-length:' + (it.end - it.start) + ';--_scheduler-lane:' + it.lane + colorStyle(it.event, s.row.resource)"
+                      :data-before="it.before ? '' : null" :data-after="it.after ? '' : null" :aria-label="spanName(it.event, s.row.resource)">
+                      @render event?.(it.event) @else { <span class="pdx-scheduler-event-title">{{ it.event.title }}</span> }
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+          @if (tlNow !== null) {
+            <div class="pdx-scheduler-timeline-now" data-part="nowLine" aria-hidden="true" :style="'--_scheduler-at:' + tlNow"></div>
+          }
+        </div>
+      </div>
     } @else {
       <div class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
         :style="'--_scheduler-cols:' + columns.length + ';--_scheduler-heads:' + headerRows.length + ';--_scheduler-lanes:' + allDay.lanes" :ref="gridEl"
@@ -116,7 +155,7 @@
             <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-allday" data-part="slot" data-row="0" :data-col="ci" :tabindex="tabCell.row === 0 && tabCell.col === ci ? 0 : -1" :style="'--_scheduler-col:' + ci">
               @for (barsAt(ci) as b; track b.id) {
                 <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" tabindex="-1" :data-id="b.id"
-                  :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + colorStyle(b.event, c)"
+                  :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + colorStyle(b.event, c.resource)"
                   :data-before="b.before ? '' : null" :data-after="b.after ? '' : null" :aria-label="allDayName(b.event, c)">
                   @render event?.(b.event) @else { <span class="pdx-scheduler-event-title">{{ b.event.title }}</span> }
                 </button>
@@ -133,7 +172,7 @@
                 :tabindex="tabCell.row === ri + 1 && tabCell.col === ci ? 0 : -1">
                 @for (eventsAt(ci, ri) as p; track p.id) {
                   <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
-                    :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + colorStyle(p.event, c)"
+                    :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + colorStyle(p.event, c.resource)"
                     :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)">
                     @render event?.(p.event) @else {
                       <span class="pdx-scheduler-event-title">{{ p.event.title }}</span>
@@ -159,7 +198,10 @@
  * time slots, with an all-day row, the current time and the working hours marked, and each resource
  * (a room, a technician) can have its own columns. The month view is a grid of days with the events
  * stacked in each and a «+N» where they do not fit; the year view, twelve months with the days that
- * have events marked; the agenda, a list of the period's events by day. The grids are WAI-ARIA grids:
+ * have events marked; the agenda, a list of the period's events by day. The timeline puts each
+ * resource on a row, its children under it and collapsible, along the period's slots, days or months,
+ * and draws only the rows and columns in view: a thousand resources cost what a screenful does. The
+ * grids are WAI-ARIA grids (a treegrid when resources nest):
  * one tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and
  * PageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,
  * `slot-open`; on the «+N» or a day of the year, it opens that day.
@@ -171,10 +213,11 @@
  * @csspart next - The button to the next period.
  * @csspart period - The period on screen, which names the grid.
  * @csspart viewSwitcher - The view buttons, shown when `views` offers more than one.
- * @csspart grid - The `role="grid"` of the time slots or of the month's days.
- * @csspart columnHeader - A day's or a resource's header, or a weekday's in the month.
+ * @csspart grid - The `role="grid"` of the time slots, of the month's days, or of the timeline's rows (a `treegrid` when resources nest), which scrolls.
+ * @csspart columnHeader - A day's or a resource's header, a weekday's in the month, a slot's, day's or month's in the timeline.
+ * @csspart rowHeader - A resource's name at the start of its timeline row; a parent's carries the row's `aria-expanded`.
  * @csspart allDayRow - The row of all-day events.
- * @csspart slot - A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year.
+ * @csspart slot - A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year, a resource's slot, day or month in the timeline.
  * @csspart event - An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.
  * @csspart more - A month day's «+N», the events that did not fit; it opens the day.
  * @csspart yearMonth - A month of the year view, a `role="grid"` of its own.
@@ -183,29 +226,33 @@
  *
  * @cssstate disabled - `disabled` is set.
  */
-import { announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, today } from '@pdxui/core';
+import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, today } from '@pdxui/core';
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
-import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts } from './time';
-import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, placeTimed, placeAllDay, isBusinessTime, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
+import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, eventInstant } from './time';
+import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
 import { buildMonthWeeks, buildYearMonths, buildAgendaDays, type MonthWeek, type YearMonth } from './calendar-model';
-import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, monthName, weekdayName } from './labels';
+import { timelineRows, timelineColumns, placeTimeline, axisPosition, itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
+import { timelineWindow } from './timeline-window';
+import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, monthName, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import '@pdxui/design/components/scheduler';
 
-type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda';
-const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda'];
+type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
+const VIEWS: CalendarView[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
 /** What a cell's Enter goes into: its events, and a month day's «+N». */
 const INNER = '[data-part="event"], [data-part="more"]';
 
 /** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. */
 @prop events: SchedulerEvent[] = [];
-/** The resources, each with its own columns in the time grid; children are drawn as their leaves. Empty: one column per day. */
+/** The resources: each with its own columns in the time grid, where children are drawn as their leaves; each a row of the timeline, children under their parent. Empty: one column per day, one timeline row. */
 @prop resources: SchedulerResource[] = [];
 /** The view on screen. */
-@model view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' = 'week';
+@model view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline' = 'week';
 /** The views the bar offers, in order; one or none hides the switcher. */
-@prop views: ('day' | 'week' | 'days' | 'month' | 'year' | 'agenda')[] = ['day', 'week', 'days', 'month', 'year', 'agenda'];
+@prop views: ('day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline')[] = ['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline'];
+/** The timeline's period and its columns: a day of slots, a week or a month of days, a year of months. */
+@prop timelineScale: 'day' | 'week' | 'month' | 'year' = 'week';
 /** The reference date (ISO). Empty: today. */
 @model date: string = '';
 /** How many days the `days` view shows. */
@@ -246,8 +293,8 @@ const INNER = '[data-part="event"], [data-part="more"]';
 /** An empty slot or day was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is a whole day. */
 @event 'slot-open': { start: string; end: string; resource: string | null; allDay: boolean };
 /** The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year. */
-@event 'period-change': { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'; start: string; end: string };
-@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, allDayRow, slot, event, more, yearMonth, agendaList, nowLine;
+@event 'period-change': { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string };
+@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, rowHeader, allDayRow, slot, event, more, yearMonth, agendaList, nowLine;
 @state disabled = !!disabled;
 @host el;
 
@@ -260,15 +307,22 @@ let active = $signal<{ row: number; col: number } | null>(null);
 /** The day the year view's one tab stop is on; empty: the reference date. */
 let yearDay = $signal('');
 let now = $signal(Date.now());
+/** The timeline's parents the reader collapsed. */
+let collapsed = $signal<ReadonlySet<string>>(new Set());
+/** The timeline's hidden probe, and the lane height and column width it measures from the theme, in px. */
+let probeEl = $signal<HTMLElement | null>(null);
+let metrics = $signal({ lane: 32, column: 80 });
 
 const periodId = generatedId('pdx-scheduler-period');
 const loc = $derived(resolveLocale(el, locale));
 const zone = $derived(timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone);
 const refDate = $derived(date || today());
 const weekStart = $derived(firstDay >= 0 ? firstDay : getFirstDayOfWeek(loc));
-const rangeOptions = $derived({ firstDay: weekStart, days, agendaDays, hiddenDays: weekends ? [] : [0, 6] });
+const rangeOptions = $derived({ firstDay: weekStart, days, agendaDays, timelineScale, hiddenDays: weekends ? [] : [0, 6] });
 const range = $derived(viewRange(view, refDate, rangeOptions));
-const periodText = $derived(periodLabel(view, range.days, loc, refDate));
+/** The view whose period the bar names: the timeline's scale for the timeline. */
+const periodView = $derived(view === 'timeline' ? timelineScale : view);
+const periodText = $derived(periodLabel(periodView, range.days, loc, refDate));
 const shownViews = $derived(views.filter((v) => VIEWS.includes(v)));
 const isTimeGrid = $derived(view === 'day' || view === 'week' || view === 'days');
 const columns = $derived(buildColumns(isTimeGrid ? range.days : [], resources, groupBy));
@@ -291,13 +345,37 @@ const monthHeads = $derived(monthWeeks.length ? monthWeeks[0].days.map((d) => ({
 const yearMonths = $derived(view === 'year' ? buildYearMonths(range.start, weekStart, events, zone) : []);
 const yearCursor = $derived(yearDay >= range.start && yearDay < range.end ? yearDay : refDate);
 const agendaGroups = $derived(view === 'agenda' ? buildAgendaDays(range.days, events, zone) : []);
-const gridSize = $derived(view === 'month' ? { rows: monthWeeks.length, cols: perWeek } : { rows: slots.length + 1, cols: columns.length });
-/** The reference date's cell: its week and day in the month; in the time grid, its column at `scrollTo`, where the grid opens. */
+const tlColumns = $derived(view === 'timeline' ? timelineColumns(timelineScale, range.days, { timeZone: zone, startMinutes, endMinutes, slotMinutes }) : []);
+const tlRows = $derived(view === 'timeline' ? placeTimeline(events, timelineRows(resources, collapsed), tlColumns, zone) : []);
+const isTree = $derived(resources.some((r) => (r.children?.length ?? 0) > 0));
+/** Where the current time is along the timeline, in columns; null off the period or between columns. */
+const tlNow = $derived(nowIndicator && tlColumns.some((c) => now >= c.start && now < c.end) ? axisPosition(tlColumns, now) : null);
+const gridSize = $derived(view === 'month' ? { rows: monthWeeks.length, cols: perWeek }
+  : view === 'timeline' ? { rows: tlRows.length, cols: tlColumns.length + 1 }
+  : { rows: slots.length + 1, cols: columns.length });
+/** The column `scrollTo` or the reference date is in: a day's slot at that hour, a day, the month of a year. */
+const tlHomeColumn = $derived(Math.max(0, tlColumns.findIndex((c) => timelineScale === 'day' ? (c.minutes ?? 0) >= parseClock(scrollTo)
+  : timelineScale === 'year' ? c.date === refDate.slice(0, 8) + '01' : c.date === refDate)));
+/** The reference date's cell: its week and day in the month; in the time grid, its column at `scrollTo`, where the grid opens; the timeline's first row at that column. */
 const homeCell = $derived(view === 'month'
   ? { row: Math.max(0, monthWeeks.findIndex((w) => w.days.includes(refDate))), col: Math.max(0, monthWeeks.find((w) => w.days.includes(refDate))?.days.indexOf(refDate) ?? 0) }
+  : view === 'timeline' ? { row: 0, col: tlHomeColumn + 1 }
   : { row: Math.max(0, slots.findIndex((m) => m >= parseClock(scrollTo))) + 1, col: Math.max(0, columns.findIndex((c) => c.date === refDate)) });
 /** The tab stop, inside the grid on screen: a view with fewer rows or columns keeps one cell reachable. */
 const tabCell = $derived({ row: Math.min((active ?? homeCell).row, gridSize.rows - 1), col: Math.min((active ?? homeCell).col, gridSize.cols - 1) });
+// The rows and columns of the timeline in view, and the tab stop's wherever it is.
+const tlWindow = timelineWindow({
+  grid: () => (view === 'timeline' ? gridEl : null),
+  rows: () => tlRows,
+  columns: () => tlColumns.length,
+  metrics: () => metrics,
+  pinned: () => ({ row: tabCell.row, col: tabCell.col - 1 }),
+});
+const tlShown = $derived(tlWindow.rows().filter((vr) => vr.index < tlRows.length).map((vr) => ({ index: vr.index, top: vr.start, row: tlRows[vr.index] })));
+const tlCols = $derived(tlWindow.columns().filter((vc) => vc.index < tlColumns.length).map((vc) => {
+  const col = tlColumns[vc.index];
+  return { index: vc.index, col, today: col.minutes === null && timelineScale !== 'year' && col.date === todayDate, ...timelineHeader(col, timelineScale, loc) };
+}));
 
 function eventsAt(ci: number, ri: number): PlacedEvent[] { return byCell.get(ci + '|' + ri) ?? []; }
 function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
@@ -323,10 +401,23 @@ function dayEventName(e: SchedulerEvent, minutes: number | null, w: MonthWeek, f
   const names = resourceNames(e);
   return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (names ? ', ' + names : '');
 }
-/** An event's colour: its own, else its column's resource's, else its first resource's. */
-function colorStyle(e: SchedulerEvent, c?: Column): string {
-  const color = e.color ?? c?.resource?.color ?? eventResources(e, resources)[0]?.color;
+/** An event's colour: its own, else the colour of the resource it is drawn for, else its first resource's. */
+function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string {
+  const color = e.color ?? resource?.color ?? eventResources(e, resources)[0]?.color;
   return color ? ';--pdx-scheduler-event-color:' + color : '';
+}
+/** A timeline cell outside the working hours of its row's resource: a slot off the hours, a day off. */
+function tlOff(row: TimelineRow, c: TimelineColumn): boolean {
+  if (timelineScale === 'year') return false;
+  const hours = row.resource?.businessHours ?? businessHours;
+  return c.minutes === null ? !isWorkingDay(c.date, hours) : !isBusinessTime(c.date, c.minutes, hours);
+}
+/** A timeline event's name: its title, its start time (or «All day») and its days, the row's resource. */
+function spanName(e: SchedulerEvent, resource: SchedulerResource | null): string {
+  const d = eventDates(e, zone);
+  const days = dayRange(d.from, addDays(d.to, -1), loc);
+  const when = (isAllDay(e) ? uiString('scheduler', 'allDay') : clockLabel(zonedParts(eventInstant(e.start, zone), zone).minutes, loc)) + ', ' + days;
+  return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (resource ? ', ' + resource.label : '');
 }
 /** Where the current-time line is in this cell, 0 to 1, or null when it is not here. */
 function nowAt(ci: number, ri: number): number | null {
@@ -345,7 +436,7 @@ function moved(): void {
   active = null;
   const r = viewRange(view, refDate, rangeOptions);
   periodChange({ view, start: r.start, end: r.end });
-  announce(periodLabel(view, r.days, loc, refDate));
+  announce(periodLabel(periodView, r.days, loc, refDate));
 }
 function step(direction: 1 | -1): void { date = stepPeriod(view, refDate, direction, rangeOptions); moved(); }
 function goToday(): void { date = today(); moved(); }
@@ -361,8 +452,36 @@ function openDay(d: string): void {
 
 // ─── The grids: one tab stop, the arrows between cells ─────────────────────────
 
+/** The cell of the grid a target is in: a grid cell, or a timeline row's resource, which the arrows reach too. */
 function cellOf(target: EventTarget | null): HTMLElement | null {
-  return target instanceof Element ? target.closest('[role="gridcell"]') as HTMLElement | null : null;
+  return target instanceof Element ? target.closest('[role="gridcell"], [data-part="rowHeader"]') as HTMLElement | null : null;
+}
+/** Open or close a timeline parent, keeping the focus on it. */
+function toggleRow(row: number, open: boolean): void {
+  const r = tlRows[row];
+  if (!r?.parent || r.expanded === open) return;
+  const next = new Set(collapsed);
+  if (open) next.delete(r.key); else next.add(r.key);
+  collapsed = next;
+  focusCell(row, 0);
+}
+/**
+ * The keys of a timeline row's resource, a treegrid's: Enter or Space opens or closes a parent, Right
+ * opens a closed one, Left closes an open one or goes to a child's parent. True when the key was taken.
+ */
+function onRowHeaderKey(e: KeyboardEvent, row: number): boolean {
+  const r = tlRows[row];
+  if (!r) return false;
+  if (e.key === 'Enter' || e.key === ' ') { if (r.parent) toggleRow(row, !r.expanded); return true; }
+  if (e.key === 'ArrowRight' && r.parent && !r.expanded) { toggleRow(row, true); return true; }
+  if (e.key === 'ArrowLeft') {
+    if (r.parent && r.expanded) toggleRow(row, false);
+    else if (r.level > 1) {
+      for (let i = row - 1; i >= 0; i--) if (tlRows[i].level < r.level) { focusCell(i, 0); break; }
+    }
+    return true;
+  }
+  return false;
 }
 function focusCell(row: number, col: number): void {
   active = { row, col };
@@ -377,6 +496,10 @@ function slotOf(row: number, col: number) {
     start: new Date(zonedInstant(d, 0, zone)).toISOString(), end: new Date(zonedInstant(d, 1440, zone)).toISOString(), resource, allDay: true,
   });
   if (view === 'month') return whole(monthWeeks[row].days[col], null);
+  if (view === 'timeline') {
+    const t = tlColumns[col - 1];
+    return { start: new Date(t.start).toISOString(), end: new Date(t.end).toISOString(), resource: tlRows[row].resource?.id ?? null, allDay: t.minutes === null };
+  }
   const c = columns[col];
   if (row === 0) return whole(c.date, c.resource?.id ?? null);
   const from = slots[row - 1];
@@ -396,6 +519,7 @@ function onKey(e: KeyboardEvent): void {
     if (e.key === 'Escape') { e.preventDefault(); focusCell(row, col); }
     return;
   }
+  if (view === 'timeline' && col === 0 && onRowHeaderKey(e, row)) { e.preventDefault(); return; }
   if (e.key === 'Enter' || e.key === 'F2') {
     e.preventDefault();
     const inner = cell.querySelectorAll<HTMLElement>(INNER);
@@ -426,6 +550,7 @@ function onClick(e: MouseEvent): void {
   const row = Number(cell.dataset.row);
   const col = Number(cell.dataset.col);
   active = { row, col };
+  if (cell.dataset.part === 'rowHeader') { if (tlRows[row]?.parent) toggleRow(row, !tlRows[row].expanded); return; }
   slotOpen(slotOf(row, col));
 }
 
@@ -462,8 +587,22 @@ function onYearClick(e: MouseEvent): void {
 
 // ─── Mount: the clock; the time grid opens at `scrollTo` ───────────────────────
 
+/**
+ * The timeline at its home column, right of the resources: a day's slot at `scrollTo`, the reference
+ * date, its month. Not while the focus is in the grid: PageDown keeps the focused cell where it is.
+ */
+function timelineHome(): void {
+  requestAnimationFrame(() => {
+    if (view !== 'timeline' || !gridEl || gridEl.contains(document.activeElement)) return;
+    gridEl.scrollLeft = tlWindow.columnRect(tlHomeColumn).start;
+  });
+}
+// It opens there, and goes back there for another period or scale: the columns are not the same ones.
+$watch(tlColumns, () => timelineHome());
 $watch(gridEl, (grid) => {
-  if (!grid || !isTimeGrid) return;
+  if (!grid) return;
+  if (view === 'timeline') { timelineHome(); return; }
+  if (!isTimeGrid) return;
   requestAnimationFrame(() => {
     const first = slots.findIndex((m) => m >= parseClock(scrollTo));
     const row = grid.querySelector(`[data-row="${first + 1}"]`) as HTMLElement | null;
@@ -473,7 +612,14 @@ $watch(gridEl, (grid) => {
     if (row && head && first > 0) grid.scrollTop += row.getBoundingClientRect().top - head.getBoundingClientRect().bottom;
   });
 });
+// A lane's height and a column's width are the theme's (`--pdx-scheduler-lane-height`,
+// `--pdx-scheduler-timeline-column`): the probe is sized by them, and measured again when they change.
+const probeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
+  const r = entry.target.getBoundingClientRect();
+  if (r.height > 0 && r.width > 0 && (r.height !== metrics.lane || r.width !== metrics.column)) metrics = { lane: r.height, column: r.width };
+});
+$watch(probeEl, (probe) => { probeObserver?.disconnect(); if (probe) probeObserver?.observe(probe); });
 let clock: ReturnType<typeof setInterval> | undefined;
 onMount(() => { clock = setInterval(() => { now = Date.now(); }, 60_000); });
-onDestroy(() => { if (clock !== undefined) clearInterval(clock); });
+onDestroy(() => { if (clock !== undefined) clearInterval(clock); probeObserver?.disconnect(); tlWindow.dispose(); });
 </script>

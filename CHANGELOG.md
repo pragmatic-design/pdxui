@@ -28,8 +28,17 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   and multi-day ones as bars across the week, and counts what does not fit (`day-max-events`) in a
   «+N» that opens the day. The year view is twelve months with the days that have events marked; the
   arrows move by day and week, and Enter opens a day. The agenda lists the events of `agenda-days` days,
-  by day. `views` offers all six by default. The timeline view, moving, resizing and creating events,
-  recurrence, the built-in editor, and print and export come in the following parts.
+  by day. The timeline view puts each resource on a row along the period, a day of slots, a week or a
+  month of days or a year of months (`timeline-scale`); a resource's children sit under it, and the
+  parent opens and closes with a click, Enter or the arrows (a WAI-ARIA treegrid). Overlapping events
+  stack in their row, and only the rows and columns in view are drawn: 500 resources over a day of
+  half-hour slots keep fewer than 40 rows in the DOM. `views` offers all seven by default. Moving,
+  resizing and creating events, recurrence, the built-in editor, and print and export come in the
+  following parts.
+
+- `createVirtualizer`'s `estimateSize` may read signals: a size known without measuring it, such as a
+  row as tall as its content, changes when they change, and the offsets of the items after it follow.
+  It used to be summed once per count, so an item that grew kept its old size until the count changed.
 
 - `pdx-localized-input` (#1024): one text in several cultures, `{ [culture]: string }`, the shape of a
   LocalizedString. The cultures are tabs, each named in its own language (`Intl.DisplayNames`), with the
