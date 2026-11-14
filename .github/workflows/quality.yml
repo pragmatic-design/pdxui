@@ -140,10 +140,13 @@ jobs:
           # The dev-server config is five tests against its own server: once, with the first shard.
           # So is the HMR config (#246), which saves a .pdx while its own dev server runs.
           - { suite: showcase, shard: 1/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=1/2 --workers=2 && pnpm --filter @pdxui/showcase run test:dev && pnpm --filter @pdxui/showcase run test:hmr' }
-          # The scenario apps (#244, #243) build three small apps, weigh two and measure the heap of the
-          # third over 100 mounts: once, with the second. So do the timed specs (#606), after the shard,
-          # with nothing else running on the runner.
-          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2 && pnpm --filter @pdxui/showcase run test:timing && pnpm --filter @pdxui/showcase run test:scenarios' }
+          - { suite: showcase, shard: 2/2, run: 'pnpm --filter @pdxui/showcase exec playwright test --config tests/playwright.config.ts --shard=2/2 --workers=2' }
+          # The timed specs (#606) and the scenario apps (#244, #243: three small apps built, two
+          # weighed, the heap of the third measured over 100 mounts) each on a runner of their own
+          # (#1076). Queued after the second shard they made it the longest job of a pull request,
+          # 12m11s–14m50s on 2026-11-14; alone on a runner, nothing else runs while they measure.
+          - { suite: showcase-timing, dir: showcase, run: 'pnpm --filter @pdxui/showcase run test:timing' }
+          - { suite: showcase-scenarios, dir: showcase, run: 'pnpm --filter @pdxui/showcase run test:scenarios' }
     steps:
       - uses: actions/checkout@v7
       - uses: pnpm/action-setup@v6
@@ -159,7 +162,8 @@ jobs:
         if: failure()
         with:
           name: ${{ matrix.suite }}-report-${{ strategy.job-index }}
-          path: packages/${{ matrix.suite }}/test-results
+          # `dir` where the suite's package folder is not its name (showcase-timing, showcase-scenarios).
+          path: packages/${{ matrix.dir || matrix.suite }}/test-results
 
   # The builder has a `test` script, so `pnpm test` reaches these suites too. This job is where CI
   # runs them: in the image that carries a browser for them, uploading the report on failure; naming the
