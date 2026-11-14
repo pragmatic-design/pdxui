@@ -1,13 +1,18 @@
 #!/bin/sh
 # Pre-push gate. Fastest to slowest (fail-fast):
 #   1) Quality outside the UI: typecheck + lint (core·compiler·router·ui·lsp·cli·design engine)  (seconds)
-#   2) The site demos regenerated, then the suites: pnpm test, every package   (minutes)
+#   2) The site demos regenerated, then the suites the push affects: `pnpm test:affected`   (minutes)
 #   2b) The compiler benchmarks, alone                               (seconds)
 #   3) Only with PDX_CERTIFY=1: component certification (Dim 1-4) and, when Docker answers, the
 #      visual regression (Dim 5)
 #
-# Phase 2 is the only local gate that runs every package's suite: `pnpm coverage` filters on four
-# packages, so without it ui, cli and design would be covered by no gate at all.
+# Phase 2 runs the vitest suites of the packages the push changes and of those built on them, plus
+# core and cli, whose suites read the whole repository; a change outside packages/ runs every vitest
+# suite (scripts/test-affected.mjs). The browser suites — design, builder, site, showcase — are CI's,
+# which shards them and runs every suite on every pull request: here they cost ~12 of the ~17
+# minutes the full `pnpm test` took (2026-11-14), and CI then spent them again (#1074). Measured the
+# same day: every vitest suite (a change outside packages/) 252 s; a change to ui alone (ui, core,
+# cli) 194 s. PDX_TEST_ALL=1 runs the full `pnpm test` here, as before.
 #
 # Certification is CI's, by default. It ran here too, and with it a push took about 25 minutes
 # that CI then spent again (#60). certify.yml runs Dim 1-5 on every pull request, with no path
@@ -19,6 +24,7 @@
 #   - Skip everything once:          git push --no-verify
 #   - Skip quality only (env):       PDX_SKIP_QUALITY=1
 #   - Skip the suites only (env):    PDX_SKIP_TESTS=1
+#   - Every suite, browser too (env): PDX_TEST_ALL=1
 #   - Skip the benchmarks (env):     PDX_SKIP_PERF=1
 # Adding:
 #   - Certify before the push (env): PDX_CERTIFY=1   (and PDX_SKIP_VISUAL=1 to leave out Dim 5)
@@ -41,7 +47,7 @@ else
     echo "[pre-push] OK: quality."
 fi
 
-# ── Phase 2: the suites (every package) ──
+# ── Phase 2: the suites the push affects (every suite with PDX_TEST_ALL=1) ──
 if [ "$PDX_SKIP_TESTS" = "1" ]; then
     echo "[pre-push] PDX_SKIP_TESTS=1 -> suites skipped"
 else
@@ -50,8 +56,13 @@ else
     # the site's design check failed the push on demos of another commit (#1073).
     echo "[pre-push] Site demos: port-demos.mjs"
     node packages/site/scripts/port-demos.mjs || { echo "[pre-push] FAILED: port-demos. (override: git push --no-verify)"; exit 1; }
-    echo "[pre-push] Suites: pnpm test  (skip with: PDX_SKIP_TESTS=1)"
-    pnpm test || { echo "[pre-push] FAILED: suites. Push blocked. (override: git push --no-verify)"; exit 1; }
+    if [ "$PDX_TEST_ALL" = "1" ]; then
+        echo "[pre-push] Suites: pnpm test, every package  (PDX_TEST_ALL=1)"
+        pnpm test || { echo "[pre-push] FAILED: suites. Push blocked. (override: git push --no-verify)"; exit 1; }
+    else
+        echo "[pre-push] Suites: pnpm test:affected  (every suite: PDX_TEST_ALL=1; none: PDX_SKIP_TESTS=1)"
+        pnpm test:affected || { echo "[pre-push] FAILED: suites. Push blocked. (override: git push --no-verify)"; exit 1; }
+    fi
     echo "[pre-push] OK: suites."
 fi
 

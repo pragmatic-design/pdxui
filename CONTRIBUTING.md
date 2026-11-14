@@ -166,7 +166,12 @@ pnpm certify          # Playwright: contract geometry, axe, hostile-CSS isolatio
 pnpm certify:visual   # Docker: visual regression against the committed baselines
 ```
 
-The `pre-push` hook runs `pnpm typecheck`, `pnpm lint`, `pnpm test` and the compiler benchmarks.
+The `pre-push` hook runs `pnpm typecheck`, `pnpm lint`, `pnpm test:affected` and the compiler
+benchmarks. `test:affected` runs the vitest suites of the packages your change touches and of those
+built on them, plus core and cli, whose suites read the whole repository; a change outside
+`packages/` runs every vitest suite. The browser suites (design, builder, site, showcase) run in CI,
+with every other suite, on every pull request: a red in a package your change did not touch is found
+there. Push with `PDX_TEST_ALL=1` to run the full `pnpm test` first.
 Certification runs in CI on every pull request, all five dimensions. To run it before the push as
 well, push with `PDX_CERTIFY=1`: for a change to a component's look or geometry, a red seen before
 the push saves a round trip. CI also runs Dim 1 a second time with the pages built for the frozen
