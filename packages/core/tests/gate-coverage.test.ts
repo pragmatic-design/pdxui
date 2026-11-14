@@ -145,7 +145,13 @@ describe('CI runs every suite `pnpm test` runs', () => {
         expect(uncovered.include, 'the uncovered half names packages to INCLUDE, so a new one joins no gate').toEqual([]);
         // Exactly what test:unit excludes, plus exactly what coverage runs: nothing in neither.
         expect([...uncovered.exclude].sort()).toEqual([...unit.exclude, ...covered].sort());
-        expect(executed, 'no job runs the coverage packages').toMatch(/run:\s*pnpm coverage\b/);
+        // CI runs them as a matrix, a runner each (#1082): the script stays the source of the list,
+        // and the matrix must name exactly its packages, each run with coverage.
+        const job = jobBody(quality, 'coverage');
+        const matrix = /package:\s*\[([^\]]*)\]/.exec(job)?.[1].split(',').map((s) => `@pdxui/${s.trim()}`).sort() ?? [];
+        expect(matrix, 'the coverage matrix and the coverage script name different packages').toEqual([...covered].sort());
+        expect(job, 'the coverage job does not run its package with coverage')
+            .toMatch(/run:\s*pnpm --filter @pdxui\/\$\{\{ matrix\.package \}\} exec vitest run --coverage/);
         expect(executed, 'no job runs the rest of the unit half').toMatch(/run:\s*pnpm test:unit:uncovered\b/);
     });
 
