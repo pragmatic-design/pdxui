@@ -1595,6 +1595,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
 
 ### Fixes
 
+- `watch()`, and so `$watch`, created inside a running effect no longer makes that effect depend on
+  it. It read a getter source, and ran an `immediate` callback, tracked by whatever effect was
+  running: a component that watches a ref, mounted by another component's effect, re-ran that effect
+  each time its own render set the ref, which mounted it again. The site's props playground built
+  `pdx-scheduler` a hundred times before the runtime broke the loop. Both are read untracked now.
+
 - `hidden` hides every component (#1018). The browser's `[hidden] { display: none }` is a user-agent
   rule, and a component stylesheet that sets `display` outranks it: 416 component tags and classes —
   `pdx-empty-state`, `pdx-tabs`, `.pdx-badge` among them — drew an element carrying `hidden`. The reset

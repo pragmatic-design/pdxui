@@ -1,7 +1,7 @@
 // Explicit Watcher — observe signal changes with old/new value tracking.
 // Unlike effect (auto-track), watch explicitly declares what to observe.
 
-import { effect } from './signal';
+import { effect, untracked } from './signal';
 import type { Signal, ReadonlySignal, Dispose } from '../utils/types';
 
 // ─── Types ─────────────────────────────────────────────────────────
@@ -58,11 +58,12 @@ export function watch(
         return typeof s === 'function' && !('set' in s) ? s() : (s as Signal<unknown>)();
     }
 
-    // Read without tracking (for initial oldValue)
+    // Read without tracking (for initial oldValue). A plain getter is called untracked: a watch
+    // created inside a running effect (a component mounted by another component's effect) would
+    // otherwise make that effect depend on the source, and re-run it whenever the source changes.
     function peek(s: WatchSource<unknown>): unknown {
         if (typeof s === 'function' && 'peek' in s) return (s as Signal<unknown>).peek();
-        // For plain getters, just call — we'll track in the effect anyway
-        return typeof s === 'function' ? s() : s;
+        return typeof s === 'function' ? untracked(s as () => unknown) : s;
     }
 
     let oldValues = sources.map(peek);
@@ -70,11 +71,14 @@ export function watch(
 
     if (options?.immediate) {
         const currentValues = [...oldValues];
-        if (isMulti) {
-            callback(currentValues, currentValues);
-        } else {
-            callback(currentValues[0], currentValues[0]);
-        }
+        // Untracked for the same reason: what the callback reads is not the enclosing effect's.
+        untracked(() => {
+            if (isMulti) {
+                callback(currentValues, currentValues);
+            } else {
+                callback(currentValues[0], currentValues[0]);
+            }
+        });
     }
 
     const dispose = effect(() => {
