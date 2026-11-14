@@ -18,6 +18,11 @@ describe('periodLabel', () => {
     it('in the locale given', () => {
         expect(periodLabel('day', ['2026-11-17'], 'it-IT')).toBe('martedì 17 novembre 2026');
     });
+
+    it('a month or a year: the reference date\'s, not the grid\'s first day in the month before', () => {
+        expect(periodLabel('month', ['2026-10-26', '2026-12-06'], 'en-US', '2026-11-17')).toBe('November 2026');
+        expect(periodLabel('year', ['2026-01-01', '2026-12-31'], 'en-US', '2026-11-17')).toBe('2026');
+    });
 });
 
 describe('dayHeader', () => {

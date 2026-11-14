@@ -99,14 +99,15 @@ export interface RowLayout {
 /**
  * A row of the month view (a week) or of the timeline: intervals stacked in lanes, at most `maxLanes`
  * of them. What would go in a lane past the limit is not placed; `more[u]` counts, for unit `u` of the
- * row (`0 ≤ u < length`), the intervals over it that were left out.
+ * row (`0 ≤ u < length`), the intervals over it that were left out. An interval may start or end
+ * inside a unit (a timed event at its hour of a day): it counts in every unit it touches.
  */
 export function layoutRow(items: readonly Interval[], length: number, maxLanes = Infinity): RowLayout {
     const more = new Array<number>(length).fill(0);
     const placed: Lane[] = [];
     for (const { i, lane } of placeInLanes(normalised(items))) {
         if (lane < maxLanes) { placed.push({ id: i.id, lane }); continue; }
-        for (let u = Math.max(0, i.start); u < Math.min(length, i.end); u++) more[u]++;
+        for (let u = Math.max(0, Math.floor(i.start)); u < Math.min(length, Math.ceil(i.end)); u++) more[u]++;
     }
     return { placed, more };
 }

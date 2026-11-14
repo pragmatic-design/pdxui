@@ -24764,7 +24764,7 @@
           "tagName": "pdx-scheduler",
           "category": "Data Display",
           "order": 80,
-          "description": "A calendar of events in time, by day and by resource: a day, a week or a run of days on a grid of\ntime slots, with an all-day row, the current time and the working hours marked. Each resource\n(a room, a technician) can have its own columns. The grid is a WAI-ARIA grid: one tab stop, the\narrows from slot to slot, Enter into a slot's events and Escape back out, PageUp and PageDown\nthrough periods. A click or Enter on an event emits `event-open`; on an empty slot, `slot-open`.",
+          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The grids are WAI-ARIA grids:\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day.",
           "members": [
             {
               "kind": "field",
@@ -24778,7 +24778,7 @@
             {
               "kind": "field",
               "name": "resources",
-              "description": "The resources, each with its own columns; children are drawn as their leaves. Empty: one column per day.",
+              "description": "The resources, each with its own columns in the time grid; children are drawn as their leaves. Empty: one column per day.",
               "type": {
                 "text": "SchedulerResource[]"
               },
@@ -24789,9 +24789,9 @@
               "name": "views",
               "description": "The views the bar offers, in order; one or none hides the switcher.",
               "type": {
-                "text": "('day' | 'week' | 'days')[]"
+                "text": "('day' | 'week' | 'days' | 'month' | 'year' | 'agenda')[]"
               },
-              "default": "['day', 'week', 'days']"
+              "default": "['day', 'week', 'days', 'month', 'year', 'agenda']"
             },
             {
               "kind": "field",
@@ -24802,6 +24802,26 @@
               },
               "default": "3",
               "attribute": "days"
+            },
+            {
+              "kind": "field",
+              "name": "agendaDays",
+              "description": "How many days the `agenda` view lists, from the reference date.",
+              "type": {
+                "text": "number"
+              },
+              "default": "7",
+              "attribute": "agendadays"
+            },
+            {
+              "kind": "field",
+              "name": "dayMaxEvents",
+              "description": "How many events a day of the month shows before its «+N».",
+              "type": {
+                "text": "number"
+              },
+              "default": "3",
+              "attribute": "daymaxevents"
             },
             {
               "kind": "field",
@@ -24816,7 +24836,7 @@
             {
               "kind": "field",
               "name": "weekends",
-              "description": "Show Saturday and Sunday in the day columns.",
+              "description": "Show Saturday and Sunday in the day columns and the month.",
               "type": {
                 "text": "boolean"
               },
@@ -24856,7 +24876,7 @@
             {
               "kind": "field",
               "name": "scrollTo",
-              "description": "The hour the grid opens scrolled to.",
+              "description": "The hour the time grid opens scrolled to.",
               "type": {
                 "text": "string"
               },
@@ -24937,7 +24957,7 @@
               "name": "view",
               "description": "The view on screen.",
               "type": {
-                "text": "'day' | 'week' | 'days'"
+                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'"
               },
               "default": "'week'",
               "attribute": "view"
@@ -24971,7 +24991,7 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "An empty slot was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is the all-day cell.",
+              "description": "An empty slot or day was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is a whole day.",
               "detail": "{ start: string; end: string; resource: string | null; allDay: boolean }"
             },
             {
@@ -24979,8 +24999,8 @@
               "type": {
                 "text": "CustomEvent"
               },
-              "description": "The period on screen changed, by the bar or the keyboard.",
-              "detail": "{ view: 'day' | 'week' | 'days'; start: string; end: string }"
+              "description": "The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.",
+              "detail": "{ view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'; start: string; end: string }"
             },
             {
               "name": "view-change",
@@ -24988,7 +25008,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `view`. Does not bubble.",
-              "detail": "{ value: 'day' | 'week' | 'days' }"
+              "detail": "{ value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' }"
             },
             {
               "name": "date-change",
@@ -25019,6 +25039,24 @@
               "default": "3"
             },
             {
+              "name": "agendadays",
+              "fieldName": "agendaDays",
+              "description": "How many days the `agenda` view lists, from the reference date.",
+              "type": {
+                "text": "number"
+              },
+              "default": "7"
+            },
+            {
+              "name": "daymaxevents",
+              "fieldName": "dayMaxEvents",
+              "description": "How many events a day of the month shows before its «+N».",
+              "type": {
+                "text": "number"
+              },
+              "default": "3"
+            },
+            {
               "name": "groupby",
               "fieldName": "groupBy",
               "description": "With resources: each resource's days together (`resource`) or each day's resources (`date`).",
@@ -25030,7 +25068,7 @@
             {
               "name": "weekends",
               "fieldName": "weekends",
-              "description": "Show Saturday and Sunday in the day columns.",
+              "description": "Show Saturday and Sunday in the day columns and the month.",
               "type": {
                 "text": "boolean"
               },
@@ -25066,7 +25104,7 @@
             {
               "name": "scrollto",
               "fieldName": "scrollTo",
-              "description": "The hour the grid opens scrolled to.",
+              "description": "The hour the time grid opens scrolled to.",
               "type": {
                 "text": "string"
               },
@@ -25131,7 +25169,7 @@
               "fieldName": "view",
               "description": "The view on screen.",
               "type": {
-                "text": "'day' | 'week' | 'days'"
+                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'"
               },
               "default": "'week'"
             },
@@ -25209,11 +25247,11 @@
             },
             {
               "name": "grid",
-              "description": "The `role=\"grid\"` of slots."
+              "description": "The `role=\"grid\"` of the time slots or of the month's days."
             },
             {
               "name": "columnHeader",
-              "description": "A day's or a resource's header."
+              "description": "A day's or a resource's header, or a weekday's in the month."
             },
             {
               "name": "allDayRow",
@@ -25221,11 +25259,23 @@
             },
             {
               "name": "slot",
-              "description": "A cell: a time slot of a day and resource, or its all-day cell."
+              "description": "A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year."
             },
             {
               "name": "event",
               "description": "An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown."
+            },
+            {
+              "name": "more",
+              "description": "A month day's «+N», the events that did not fit; it opens the day."
+            },
+            {
+              "name": "yearMonth",
+              "description": "A month of the year view, a `role=\"grid\"` of its own."
+            },
+            {
+              "name": "agendaList",
+              "description": "The agenda's list of days."
             },
             {
               "name": "nowLine",

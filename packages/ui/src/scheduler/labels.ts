@@ -35,8 +35,14 @@ const RANGE: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day
 /** The locale's own short time: `hour: 'numeric'` writes 9:00 where en-GB writes 09:00. */
 const TIME: Intl.DateTimeFormatOptions = { timeStyle: 'short' };
 
-/** The period a view shows: a day's full date, or the first and last of its days as one range. */
-export function periodLabel(view: SchedulerView, days: readonly string[], locale: string): string {
+/**
+ * The period a view shows: a day's full date; the month or the year of `date`, the reference date, for
+ * those views (a month's grid starts and ends in the months beside it); else the first and last of its
+ * days as one range.
+ */
+export function periodLabel(view: SchedulerView, days: readonly string[], locale: string, date = days[0]): string {
+    if (view === 'month') return fmt(locale, { year: 'numeric', month: 'long' }).format(noon(date));
+    if (view === 'year') return fmt(locale, { year: 'numeric' }).format(noon(date));
     if (days.length === 0) return '';
     if (view === 'day' || days.length === 1) return fmt(locale, FULL).format(noon(days[0]));
     return fmt(locale, RANGE).formatRange(noon(days[0]), noon(days[days.length - 1]));
@@ -49,6 +55,26 @@ export function dayHeader(date: string, locale: string): { weekday: string; day:
         weekday: fmt(locale, { weekday: 'short' }).format(d),
         day: fmt(locale, { day: 'numeric' }).format(d),
         full: fmt(locale, FULL).format(d),
+    };
+}
+
+/** A run of days in full, «Friday, November 6 – Sunday, November 8, 2026»; one day is that day. */
+export function dayRange(first: string, last: string, locale: string): string {
+    return first === last ? fmt(locale, FULL).format(noon(first)) : fmt(locale, FULL).formatRange(noon(first), noon(last));
+}
+
+/** A month's name, for the year view's months and the month view's grid: «November». */
+export function monthName(date: string, locale: string): string {
+    return fmt(locale, { month: 'long' }).format(noon(date));
+}
+
+/** A weekday's short name, for a month's column headers: «Mon»; and its full name. */
+export function weekdayName(date: string, locale: string): { short: string; narrow: string; full: string } {
+    const d = noon(date);
+    return {
+        short: fmt(locale, { weekday: 'short' }).format(d),
+        narrow: fmt(locale, { weekday: 'narrow' }).format(d),
+        full: fmt(locale, { weekday: 'long' }).format(d),
     };
 }
 

@@ -146,17 +146,32 @@
 
     <section data-scenario="scheduler-week">
         <h3>Scheduler — A week</h3>
-        <pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" date="2026-11-16" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-11-16T09:00","end":"2026-11-16T09:30"},{"id":"review","title":"Review","start":"2026-11-17T10:00","end":"2026-11-17T12:00"},{"id":"call","title":"Call","start":"2026-11-17T11:00","end":"2026-11-17T12:00"},{"id":"offsite","title":"Offsite","start":"2026-11-18","end":"2026-11-20"}]'></pdx-scheduler>
+        <pdx-scheduler data-test="scheduler" label="Team" view="week" first-day="1" date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-09-21T09:00","end":"2026-09-21T09:30"},{"id":"review","title":"Review","start":"2026-09-22T10:00","end":"2026-09-22T12:00"},{"id":"call","title":"Call","start":"2026-09-22T11:00","end":"2026-09-22T12:00"},{"id":"offsite","title":"Offsite","start":"2026-09-23","end":"2026-09-25"}]'></pdx-scheduler>
     </section>
 
     <section data-scenario="scheduler-resources">
         <h3>Scheduler — A day by room</h3>
-        <pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-11-17" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" resources='[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]' events='[{"id":"a1","title":"Interview","start":"2026-11-17T09:00","end":"2026-11-17T10:00","resource":"a"},{"id":"b1","title":"Workshop","start":"2026-11-17T09:00","end":"2026-11-17T11:00","resource":"b"}]'></pdx-scheduler>
+        <pdx-scheduler data-test="scheduler" label="Rooms" view="day" date="2026-09-22" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" resources='[{"id":"a","label":"Room A"},{"id":"b","label":"Room B"}]' events='[{"id":"a1","title":"Interview","start":"2026-09-22T09:00","end":"2026-09-22T10:00","resource":"a"},{"id":"b1","title":"Workshop","start":"2026-09-22T09:00","end":"2026-09-22T11:00","resource":"b"}]'></pdx-scheduler>
     </section>
 
     <section data-scenario="scheduler-disabled">
         <h3>Scheduler — Disabled</h3>
-        <pdx-scheduler data-test="scheduler" label="Team" view="week" disabled date="2026-11-16" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-11-16T09:00","end":"2026-11-16T09:30"},{"id":"review","title":"Review","start":"2026-11-17T10:00","end":"2026-11-17T12:00"},{"id":"call","title":"Call","start":"2026-11-17T11:00","end":"2026-11-17T12:00"},{"id":"offsite","title":"Offsite","start":"2026-11-18","end":"2026-11-20"}]'></pdx-scheduler>
+        <pdx-scheduler data-test="scheduler" label="Team" view="week" disabled date="2026-09-21" time-zone="Europe/Rome" locale="en-US" start-hour="08:00" end-hour="18:00" now-indicator="false" events='[{"id":"standup","title":"Stand-up","start":"2026-09-21T09:00","end":"2026-09-21T09:30"},{"id":"review","title":"Review","start":"2026-09-22T10:00","end":"2026-09-22T12:00"},{"id":"call","title":"Call","start":"2026-09-22T11:00","end":"2026-09-22T12:00"},{"id":"offsite","title":"Offsite","start":"2026-09-23","end":"2026-09-25"}]'></pdx-scheduler>
+    </section>
+
+    <section data-scenario="scheduler-month">
+        <h3>Scheduler — A month</h3>
+        <pdx-scheduler data-test="scheduler" label="Team" view="month" day-max-events="2" date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false" events='[{"id":"trip","title":"Trip","start":"2026-09-25","end":"2026-09-30"},{"id":"call","title":"Call","start":"2026-09-22T10:30","end":"2026-09-22T11:00"},{"id":"t1","title":"One","start":"2026-09-24T09:00","end":"2026-09-24T10:00"},{"id":"t2","title":"Two","start":"2026-09-24T11:00","end":"2026-09-24T12:00"},{"id":"t3","title":"Three","start":"2026-09-24T14:00","end":"2026-09-24T15:00"},{"id":"t4","title":"Four","start":"2026-09-24T16:00","end":"2026-09-24T17:00"}]'></pdx-scheduler>
+    </section>
+
+    <section data-scenario="scheduler-year">
+        <h3>Scheduler — A year</h3>
+        <pdx-scheduler data-test="scheduler" label="Team" view="year" date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false" events='[{"id":"trip","title":"Trip","start":"2026-09-25","end":"2026-09-30"},{"id":"call","title":"Call","start":"2026-09-22T10:30","end":"2026-09-22T11:00"},{"id":"t1","title":"One","start":"2026-09-24T09:00","end":"2026-09-24T10:00"},{"id":"t2","title":"Two","start":"2026-09-24T11:00","end":"2026-09-24T12:00"},{"id":"t3","title":"Three","start":"2026-09-24T14:00","end":"2026-09-24T15:00"},{"id":"t4","title":"Four","start":"2026-09-24T16:00","end":"2026-09-24T17:00"}]'></pdx-scheduler>
+    </section>
+
+    <section data-scenario="scheduler-agenda">
+        <h3>Scheduler — An agenda</h3>
+        <pdx-scheduler data-test="scheduler" label="Team" view="agenda" date="2026-09-22" first-day="1" time-zone="Europe/Rome" locale="en-US" now-indicator="false" events='[{"id":"trip","title":"Trip","start":"2026-09-25","end":"2026-09-30"},{"id":"call","title":"Call","start":"2026-09-22T10:30","end":"2026-09-22T11:00"},{"id":"t1","title":"One","start":"2026-09-24T09:00","end":"2026-09-24T10:00"},{"id":"t2","title":"Two","start":"2026-09-24T11:00","end":"2026-09-24T12:00"},{"id":"t3","title":"Three","start":"2026-09-24T14:00","end":"2026-09-24T15:00"},{"id":"t4","title":"Four","start":"2026-09-24T16:00","end":"2026-09-24T17:00"}]'></pdx-scheduler>
     </section>
 
     <section data-scenario="signature-pad-basic">

@@ -38,6 +38,8 @@ pdx-scheduler {
 
 .pdx-scheduler-period {
     flex: 1 1 10rem;
+    /* On one line: when the views do not fit beside it, they go to the next line, not its words. */
+    white-space: nowrap;
     margin: 0;
     font-size: var(--pdx-text-lg);
     font-weight: 600;
@@ -45,6 +47,7 @@ pdx-scheduler {
 
 .pdx-scheduler-views {
     display: flex;
+    flex-wrap: wrap;
     gap: var(--pdx-space-2xs);
 }
 
@@ -57,6 +60,7 @@ pdx-scheduler {
     background: var(--pdx-color-surface);
     border: 1px solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-sm);
+    white-space: nowrap;
     cursor: pointer;
 }
 
@@ -151,8 +155,10 @@ pdx-scheduler {
     translate: 0 -0.5em;
 }
 
-/* A slot's label shows on the hour only; the all-day row's always. */
-.pdx-scheduler-time[data-slot]:not([data-hour]) {
+/* A slot's label shows on the hour only; the all-day row's always. The first slot's would sit, raised
+   half a line to its top edge, under the all-day label: it is hidden too, the grid starts there. */
+.pdx-scheduler-time[data-slot]:not([data-hour]),
+[data-part="allDayRow"] + .pdx-scheduler-row > .pdx-scheduler-time {
     color: transparent;
 }
 
@@ -288,6 +294,266 @@ pdx-scheduler {
     height: 2px;
     background: var(--pdx-color-danger);
     pointer-events: none;
+}
+
+/* ===== Month ===== */
+/* A column per day shown, a row per week. Each day's events sit in lanes under its number, positioned
+   from the day they start on: --_scheduler-lane down, --_scheduler-span days across. The day is tall
+   enough for --_scheduler-lanes of them and the «+N» under them. [data-line] is a timed event inside
+   one day, drawn as a line of text rather than a filled bar; [data-outside] a day of the month beside. */
+
+.pdx-scheduler-month {
+    --_scheduler-number-height: 1.75rem;
+    --_scheduler-more-height: 1.25rem;
+    /* Narrower than the time grid's: seven days fit a phone (2.5rem each, 280px), their titles cut. */
+    grid-template-columns: repeat(var(--_scheduler-cols, 7), minmax(2.5rem, 1fr));
+    grid-template-rows: var(--pdx-scheduler-header-height);
+    grid-auto-rows: minmax(calc(var(--_scheduler-number-height) + var(--_scheduler-lanes, 3) * var(--pdx-scheduler-bar-height) + var(--_scheduler-more-height)), 1fr);
+    /* A month is seen whole: its height is its weeks', not the time grid's window onto the hours. */
+    max-height: none;
+}
+
+.pdx-scheduler-month .pdx-scheduler-header:first-child,
+.pdx-scheduler-month .pdx-scheduler-day:first-child {
+    border-left: 0;
+}
+
+.pdx-scheduler-day {
+    border-top-style: solid;
+    border-top-color: var(--pdx-color-border);
+}
+
+.pdx-scheduler-day[data-outside] {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-scheduler-day-number {
+    display: block;
+    height: var(--_scheduler-number-height);
+    padding: var(--pdx-space-2xs) var(--pdx-space-xs) 0;
+    font-size: var(--pdx-text-sm);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.25;
+    text-align: end;
+}
+
+.pdx-scheduler-day[data-outside] .pdx-scheduler-day-number {
+    color: var(--pdx-color-muted);
+}
+
+.pdx-scheduler-day[data-today] .pdx-scheduler-day-number {
+    font-weight: 700;
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-scheduler-month .pdx-scheduler-bar {
+    top: calc(var(--_scheduler-number-height) + var(--_scheduler-lane, 0) * var(--pdx-scheduler-bar-height));
+}
+
+/* A timed event of one day: its time and title on a line, the tint on the edge only. */
+.pdx-scheduler-bar[data-line] {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--pdx-space-2xs);
+    background: transparent;
+}
+
+.pdx-scheduler-bar[data-line]:hover {
+    background: color-mix(in oklch, var(--_scheduler-tint) 10%, transparent);
+}
+
+.pdx-scheduler-bar[data-line] .pdx-scheduler-event-time {
+    flex: none;
+}
+
+.pdx-scheduler-more {
+    position: absolute;
+    left: 2px;
+    bottom: 2px;
+    height: calc(var(--_scheduler-more-height) - 2px);
+    max-width: calc(100% - 4px);
+    padding: 0 var(--pdx-space-2xs);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font: inherit;
+    font-size: var(--pdx-text-xs);
+    font-weight: 600;
+    color: var(--pdx-color-primary-ink);
+    background: transparent;
+    border: 0;
+    border-radius: var(--pdx-radius-sm);
+    cursor: pointer;
+}
+
+.pdx-scheduler-more:hover {
+    background: var(--pdx-color-primary-soft);
+}
+
+.pdx-scheduler-more:focus-visible {
+    outline: none;
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* ===== Year ===== */
+/* Twelve months, as many across as fit; a day with events is marked under its number. */
+
+.pdx-scheduler-year {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+    gap: var(--pdx-space-md) var(--pdx-space-lg);
+    contain: inline-size;
+    padding: var(--pdx-space-sm);
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+}
+
+.pdx-scheduler-mini {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    align-content: start;
+}
+
+.pdx-scheduler-mini-title {
+    grid-column: 1 / -1;
+    padding-bottom: var(--pdx-space-2xs);
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+}
+
+.pdx-scheduler-mini-head {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
+    text-align: center;
+}
+
+.pdx-scheduler-mini-day {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.75rem;
+    font-size: var(--pdx-text-xs);
+    font-variant-numeric: tabular-nums;
+    border-radius: var(--pdx-radius-sm);
+    outline: none;
+    cursor: pointer;
+}
+
+.pdx-scheduler-mini-day[data-outside] {
+    cursor: default;
+}
+
+.pdx-scheduler-mini-day:not([data-outside]):hover {
+    background: var(--pdx-color-inset);
+}
+
+.pdx-scheduler-mini-day[data-events]::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--pdx-color-primary);
+}
+
+.pdx-scheduler-mini-day[data-today] {
+    font-weight: 700;
+    color: var(--pdx-color-primary-ink);
+    background: var(--pdx-color-primary-soft);
+}
+
+.pdx-scheduler-mini-day:focus-visible {
+    box-shadow: var(--pdx-focus-ring);
+}
+
+/* ===== Agenda ===== */
+/* The days that have events, each a date over its list; an event is its time, its title, its resource. */
+
+.pdx-scheduler-agenda {
+    max-height: var(--pdx-scheduler-height);
+    overflow: auto;
+    background: var(--pdx-color-surface);
+    border: 1px solid var(--pdx-color-border);
+    border-radius: var(--pdx-radius-md);
+}
+
+.pdx-scheduler-empty {
+    margin: 0;
+    padding: var(--pdx-space-lg);
+    color: var(--pdx-color-muted);
+    text-align: center;
+}
+
+.pdx-scheduler-agenda-day + .pdx-scheduler-agenda-day {
+    border-top: 1px solid var(--pdx-color-border);
+}
+
+.pdx-scheduler-agenda-date {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font-size: var(--pdx-text-sm);
+    font-weight: 600;
+    background: var(--pdx-color-inset);
+}
+
+.pdx-scheduler-agenda-day[data-today] .pdx-scheduler-agenda-date {
+    color: var(--pdx-color-primary-ink);
+}
+
+.pdx-scheduler-agenda-items {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.pdx-scheduler-agenda-event {
+    --_scheduler-tint: var(--pdx-scheduler-event-color, var(--pdx-color-primary));
+    display: grid;
+    grid-template-columns: minmax(7rem, auto) 1fr auto;
+    align-items: baseline;
+    gap: var(--pdx-space-sm);
+    width: 100%;
+    padding: var(--pdx-space-xs) var(--pdx-space-sm);
+    font: inherit;
+    font-size: var(--pdx-text-sm);
+    color: var(--pdx-color-text);
+    text-align: start;
+    background: transparent;
+    border: 0;
+    border-left: 3px solid var(--_scheduler-tint);
+    cursor: pointer;
+}
+
+.pdx-scheduler-agenda-event:hover {
+    background: color-mix(in oklch, var(--_scheduler-tint) 10%, transparent);
+}
+
+.pdx-scheduler-agenda-event:focus-visible {
+    outline: none;
+    box-shadow: inset var(--pdx-focus-ring);
+}
+
+.pdx-scheduler-agenda-time {
+    font-variant-numeric: tabular-nums;
+    color: var(--pdx-color-muted);
+}
+
+.pdx-scheduler-agenda-title {
+    min-width: 0;
+    font-weight: 600;
+}
+
+.pdx-scheduler-agenda-resource {
+    font-size: var(--pdx-text-xs);
+    color: var(--pdx-color-muted);
 }
 
 /* ===== States ===== */

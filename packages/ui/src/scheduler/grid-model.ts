@@ -113,6 +113,54 @@ function resourcesOf(event: SchedulerEvent): string[] {
     return r === undefined ? [] : Array.isArray(r) ? r : [r];
 }
 
+/** The leaf resources an event names, in the order of `resources`. */
+export function eventResources(event: SchedulerEvent, resources: readonly SchedulerResource[]): SchedulerResource[] {
+    const ids = resourcesOf(event);
+    return leafResources(resources).filter((r) => ids.includes(r.id));
+}
+
+/** The timed events by cell, `column|slot`, so a cell reads its own in one lookup. */
+export function cellIndex(placed: Map<string, PlacedEvent[]>, columns: readonly Column[]): Map<string, PlacedEvent[]> {
+    const out = new Map<string, PlacedEvent[]>();
+    columns.forEach((c, ci) => {
+        for (const p of placed.get(c.key) ?? []) {
+            const key = `${ci}|${p.slot}`;
+            const list = out.get(key);
+            if (list) list.push(p); else out.set(key, [p]);
+        }
+    });
+    return out;
+}
+
+export type HeaderCell = { key: string; text: string; full: string | null; span: number; today: boolean };
+export type HeaderRow = { key: string; corner: string; cells: HeaderCell[] };
+
+/**
+ * The time grid's header rows: one of days, or two with resources, the group above and the columns
+ * below. `dayLabel` writes a day's header, `corners` name the corner cell of a row of days or of
+ * resources.
+ */
+export function buildHeaderRows(
+    columns: readonly Column[],
+    days: readonly string[],
+    resources: readonly SchedulerResource[],
+    groupBy: 'resource' | 'date',
+    o: { today: string; dayLabel: (date: string) => { text: string; full: string }; corners: { time: string; resource: string } },
+): HeaderRow[] {
+    const dayCell = (key: string, date: string, span: number): HeaderCell => ({ key, ...o.dayLabel(date), span, today: date === o.today });
+    const resourceCell = (key: string, r: SchedulerResource, span: number): HeaderCell => ({ key, text: r.label, full: null, span, today: false });
+    const leaves = leafResources(resources);
+    const dayRow = (key: string, cells: HeaderCell[]): HeaderRow => ({ key, corner: o.corners.time, cells });
+    const resourceRow = (key: string, cells: HeaderCell[]): HeaderRow => ({ key, corner: o.corners.resource, cells });
+    const columnDays = columns.map((c) => dayCell(c.key, c.date, 1));
+    if (leaves.length === 0) return [dayRow('days', columnDays)];
+    if (groupBy === 'resource') return [resourceRow('groups', leaves.map((r) => resourceCell(`r|${r.id}`, r, days.length))), dayRow('days', columnDays)];
+    return [
+        dayRow('groups', days.map((d) => dayCell(`d|${d}`, d, leaves.length))),
+        resourceRow('resources', columns.map((c) => resourceCell(c.key, c.resource as SchedulerResource, 1))),
+    ];
+}
+
 /** Whether an event belongs in a column: any event without resources, else one that names its resource. */
 function belongs(event: SchedulerEvent, column: Column): boolean {
     return column.resource === undefined || resourcesOf(event).includes(column.resource.id);
@@ -162,8 +210,11 @@ export function placeTimed(events: readonly SchedulerEvent[], columns: readonly 
     return out;
 }
 
-/** An all-day event's dates, `[first, last + 1)`. */
-function allDayDates(event: SchedulerEvent, timeZone: string): { from: string; to: string } {
+/**
+ * The dates an event is on in `timeZone`, `[first, last + 1)`: an end at midnight is the day before's
+ * end, and an event of no length is on the day it starts.
+ */
+export function eventDates(event: SchedulerEvent, timeZone: string): { from: string; to: string } {
     const from = DATE_ONLY.test(event.start) ? event.start : zonedParts(eventInstant(event.start, timeZone), timeZone).date;
     let to: string;
     if (DATE_ONLY.test(event.end)) to = event.end;
@@ -178,7 +229,7 @@ function allDayDates(event: SchedulerEvent, timeZone: string): { from: string; t
 export function placeAllDay(events: readonly SchedulerEvent[], columns: readonly Column[], timeZone: string): { bars: AllDayBar[]; lanes: number } {
     const runs: { key: string; event: SchedulerEvent; first: number; span: number; before: boolean; after: boolean }[] = [];
     for (const event of events.filter(isAllDay)) {
-        const { from, to } = allDayDates(event, timeZone);
+        const { from, to } = eventDates(event, timeZone);
         let run: (typeof runs)[number] | null = null;
         columns.forEach((c, i) => {
             const covered = c.date >= from && c.date < to && belongs(event, c);

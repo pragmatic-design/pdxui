@@ -2715,6 +2715,18 @@
         {
           "id": "scheduler-disabled",
           "title": "Scheduler — Disabled"
+        },
+        {
+          "id": "scheduler-month",
+          "title": "Scheduler — A month"
+        },
+        {
+          "id": "scheduler-year",
+          "title": "Scheduler — A year"
+        },
+        {
+          "id": "scheduler-agenda",
+          "title": "Scheduler — An agenda"
         }
       ]
     },

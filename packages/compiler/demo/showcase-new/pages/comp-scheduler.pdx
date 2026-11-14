@@ -2,13 +2,17 @@
   <div class="page">
     <h1 class="pdx-txt-title">Scheduler</h1>
     <p class="pdx-txt-body pdx-ink-muted intro">
-      <code>&lt;pdx-scheduler&gt;</code> — events on a grid of time slots: a day, a week or a run of days, with an all-day
-      row, the current time and the working hours marked, and a column per resource when it has them. The grid is a
-      keyboard grid with one tab stop, and every event is announced with its time, day and resource.
+      <code>&lt;pdx-scheduler&gt;</code> — events in time: a day, a week or a run of days on a grid of time slots, with an
+      all-day row, the current time and the working hours marked and a column per resource when it has them; a month,
+      a year, or an agenda of the period. Every grid is a keyboard grid with one tab stop, and every event is announced
+      with its time, day and resource.
     </p>
 
     <!-- ═══ A week ═══ -->
     <app-demo-comp-scheduler-basic class="demo-section"></app-demo-comp-scheduler-basic>
+
+    <!-- ═══ Month, year and agenda ═══ -->
+    <app-demo-comp-scheduler-views class="demo-section"></app-demo-comp-scheduler-views>
 
     <!-- ═══ By resource ═══ -->
     <app-demo-comp-scheduler-resources class="demo-section"></app-demo-comp-scheduler-resources>
@@ -26,10 +30,12 @@
         <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
         <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day</span></div>
         <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource; children are drawn as their leaves</span></div>
-        <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days'</span><span>The view on screen (<code>::view</code>)</span></div>
-        <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers</span></div>
+        <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'</span><span>The view on screen (<code>::view</code>)</span></div>
+        <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers; all six by default</span></div>
         <div class="opt-row"><code>date</code><span>string</span><span>The reference date, ISO (<code>::date</code>); empty is today</span></div>
         <div class="opt-row"><code>days</code><span>number</span><span>How many days the <code>days</code> view shows (3)</span></div>
+        <div class="opt-row"><code>agenda-days</code><span>number</span><span>How many days the agenda lists (7)</span></div>
+        <div class="opt-row"><code>day-max-events</code><span>number</span><span>How many events a day of the month shows before its <code>+N</code> (3)</span></div>
         <div class="opt-row"><code>group-by</code><span>'resource' | 'date'</span><span>Each resource's days together, or each day's resources</span></div>
         <div class="opt-row"><code>weekends</code><span>boolean</span><span>Show Saturday and Sunday (true)</span></div>
         <div class="opt-row"><code>first-day</code><span>number</span><span>The first day of the week, 0 = Sunday; -1 is the locale's</span></div>
@@ -46,7 +52,7 @@
       <div class="options-table">
         <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
         <div class="opt-row"><code>event-open</code><span>{ event }</span><span>An event was clicked, or Enter pressed on it</span></div>
-        <div class="opt-row"><code>slot-open</code><span>{ start, end, resource, allDay }</span><span>An empty slot was clicked, or Enter pressed on it; times are ISO instants</span></div>
+        <div class="opt-row"><code>slot-open</code><span>{ start, end, resource, allDay }</span><span>An empty slot or day of the month was clicked, or Enter pressed on it; times are ISO instants</span></div>
         <div class="opt-row"><code>period-change</code><span>{ view, start, end }</span><span>The period on screen changed: load its events</span></div>
         <div class="opt-row"><code>view-change</code> / <code>date-change</code><span>{ value }</span><span>A model was written</span></div>
         <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
@@ -56,11 +62,11 @@
       <div class="options-table">
         <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div>
         <div class="opt-row"><code>Tab</code><span></span><span>The grid is one tab stop</span></div>
-        <div class="opt-row"><code>Arrows</code><span></span><span>One slot at a time; they stop at the edges</span></div>
-        <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last slot</span></div>
+        <div class="opt-row"><code>Arrows</code><span></span><span>One slot, or day of the month, at a time; they stop at the edges. In the year, a day or a week, across months</span></div>
+        <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last cell. In the year, the week's first and last day</span></div>
         <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
-        <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the slot's events, or open an empty slot</span></div>
-        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its slot</span></div>
+        <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the cell's events and its <code>+N</code>, or open an empty slot or day; in the year, open the day</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its cell</span></div>
       </div>
     </section>
   </div>

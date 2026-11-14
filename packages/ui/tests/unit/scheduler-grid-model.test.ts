@@ -4,7 +4,7 @@
 // once per day and resource it covers, and side by side with the events it overlaps there. An all-day
 // event is a bar in the all-day row, over the adjacent columns it covers, in a lane.
 import { describe, it, expect } from 'vitest';
-import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime } from '../../src/scheduler/grid-model';
+import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime, buildHeaderRows, eventResources } from '../../src/scheduler/grid-model';
 
 const ROME = 'Europe/Rome';
 const days = ['2026-11-16', '2026-11-17', '2026-11-18'];
@@ -143,5 +143,32 @@ describe('isBusinessTime', () => {
     it('a day set to null, or absent, has no business hours', () => {
         expect(isBusinessTime('2026-11-21', 10 * 60, hours)).toBe(false); // a Saturday
         expect(isBusinessTime('2026-11-17', 10 * 60, hours)).toBe(false); // a Tuesday, absent
+    });
+});
+
+describe('buildHeaderRows', () => {
+    const o = { today: '2026-11-17', dayLabel: (d: string) => ({ text: d.slice(8), full: d }), corners: { time: 'Time', resource: 'Resource' } };
+    const two = days.slice(0, 2);
+
+    it('without resources: one row of days, today marked', () => {
+        const rows = buildHeaderRows(buildColumns(two, [], 'resource'), two, [], 'resource', o);
+        expect(rows.map((r) => [r.corner, r.cells.map((c) => [c.text, c.span, c.today])])).toEqual([['Time', [['16', 1, false], ['17', 1, true]]]]);
+    });
+
+    it('by resource: each resource over its days; by date: each day over its resources', () => {
+        const byResource = buildHeaderRows(buildColumns(two, rooms, 'resource'), two, rooms, 'resource', o);
+        expect(byResource.map((r) => r.cells.map((c) => [c.text, c.span]))).toEqual([[['Room A', 2], ['Room B', 2]], [['16', 1], ['17', 1], ['16', 1], ['17', 1]]]);
+        const byDate = buildHeaderRows(buildColumns(two, rooms, 'date'), two, rooms, 'date', o);
+        expect(byDate.map((r) => [r.corner, r.cells.map((c) => [c.text, c.span])])).toEqual([
+            ['Time', [['16', 2], ['17', 2]]],
+            ['Resource', [['Room A', 1], ['Room B', 1], ['Room A', 1], ['Room B', 1]]],
+        ]);
+    });
+});
+
+describe('eventResources', () => {
+    it('the leaves an event names, in the order of the resources', () => {
+        expect(eventResources({ id: 'e', title: '', start: '2026-11-17', end: '2026-11-18', resource: ['b', 'a'] }, rooms).map((r) => r.id)).toEqual(['a', 'b']);
+        expect(eventResources({ id: 'e', title: '', start: '2026-11-17', end: '2026-11-18' }, rooms)).toEqual([]);
     });
 });
