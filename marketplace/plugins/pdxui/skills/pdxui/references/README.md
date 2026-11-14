@@ -1,6 +1,6 @@
 # Component catalogue — index by area
 
-> 120 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
+> 121 components across 8 areas. Each area is a **skill of its own**, `pdxui-<area>`
 > (with its props/events catalogue). **Look here before building: the component almost always exists already.**
 
 ## Layout & shell — skill `pdxui-layout`
@@ -64,6 +64,11 @@ Grids, charts, lists and data sources.
 - `<pdx-kanban>` — Columns of cards, moved by pointer, keyboard or menu.
 - `<pdx-list>` — Data-driven list with custom rows.
 - `<pdx-relative-time>` — Auto-updating “3 days ago”.
+- `<pdx-scheduler>` — A calendar of events in time, by day and by resource: a day, a week or a run of days on a grid of
+time slots, with an all-day row, the current time and the working hours marked. Each resource
+(a room, a technician) can have its own columns. The grid is a WAI-ARIA grid: one tab stop, the
+arrows from slot to slot, Enter into a slot's events and Escape back out, PageUp and PageDown
+through periods. A click or Enter on an event emits `event-open`; on an empty slot, `slot-open`.
 - `<pdx-sortable-list>` — A list the user can put in another order, by dragging a row's handle or from the keyboard alone.
 
 It emits `pdx-reorder` with the indices and never writes to `items`: the application applies the

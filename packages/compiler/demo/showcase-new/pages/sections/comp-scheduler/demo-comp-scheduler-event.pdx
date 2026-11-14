@@ -1,0 +1,23 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">What an event draws</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The <code>event</code> snippet draws an event's content; the scheduler keeps its place, its size and its accessible name. Without the snippet an event shows its time and title.</p>
+    <pdx-scheduler label="Clinic" view="days" :days="3" :date="start" :events="visits" start-hour="08:00" end-hour="18:00" scroll-to="08:00">
+      @snippet event(e) {
+        <strong>{{ e.title }}</strong>
+        <span class="pdx-ink-muted">{{ e.patient }} · {{ e.reason }}</span>
+      }
+    </pdx-scheduler>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const start = at(1);
+const visits = [
+  { id: 'v1', title: 'Check-up', patient: 'Fido', reason: 'booster', start: at(1, '09:00'), end: at(1, '09:45') },
+  { id: 'v2', title: 'Surgery', patient: 'Birba', reason: 'spay', start: at(2, '10:00'), end: at(2, '12:00'), color: 'oklch(0.55 0.18 25)' },
+  { id: 'v3', title: 'Follow-up', patient: 'Argo', reason: 'limping', start: at(3, '15:00'), end: at(3, '15:30') },
+];
+</script>

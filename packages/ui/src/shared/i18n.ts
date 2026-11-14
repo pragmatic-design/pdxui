@@ -54,6 +54,14 @@ const DEFAULTS: Record<string, Record<string, string>> = {
         move: 'Move {title}', up: 'Move up', down: 'Move down', top: 'Move to top', bottom: 'Move to bottom',
         moveTo: 'Move to {column}',
     },
+    // `toolbar` names the bar above the grid, `views` its view buttons; `daysView` is the N-days view,
+    // `{count}` its days. `time` and `resource` name the grid's corner headers. `eventName` is an
+    // event's accessible name: `{title}`, then `{when}` (its time or «All day», and its date).
+    scheduler: {
+        label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
+        views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', allDay: 'All day',
+        time: 'Time', resource: 'Resource', eventName: '{title}, {when}',
+    },
     // `empty` / `signed` name the drawing surface with its state, `{label}` being the field's name;
     // `draw` / `type` are the two ways to sign, `type` the one a keyboard reaches; `cleared` is announced.
     'signature-pad': {

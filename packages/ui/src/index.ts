@@ -95,6 +95,7 @@ import './block-ui/pdx-block-ui';
 import './list/pdx-list';
 import './sortable-list/pdx-sortable-list';
 import './kanban/pdx-kanban.pdx';
+import './scheduler/pdx-scheduler.pdx';
 import './description-list/pdx-description-list';
 import './timeline/pdx-timeline';
 import './statistic/pdx-statistic';

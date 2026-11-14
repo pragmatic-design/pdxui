@@ -647,6 +647,11 @@
       "types": "./dist/app-shell/pdx-app-shell.d.ts",
       "import": "./dist/app-shell/pdx-app-shell.js"
     },
+    "./scheduler": {
+      "development": "./src/scheduler/pdx-scheduler.pdx",
+      "types": "./dist/scheduler/pdx-scheduler.d.ts",
+      "import": "./dist/scheduler/pdx-scheduler.js"
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": [

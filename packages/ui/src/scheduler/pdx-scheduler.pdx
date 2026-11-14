@@ -1,0 +1,352 @@
+<template>
+  <div class="pdx-scheduler" data-part="root" role="group" :aria-label="label || uiString('scheduler', 'label')">
+    <div class="pdx-scheduler-toolbar" data-part="toolbar" role="toolbar" :aria-label="uiString('scheduler', 'toolbar')">
+      <button type="button" class="pdx-scheduler-button" data-part="prev" :aria-label="uiString('scheduler', 'previous')" :disabled="disabled" @click="step(-1)">‹</button>
+      <button type="button" class="pdx-scheduler-button" data-part="todayButton" :disabled="disabled" @click="goToday()">{{ uiString('scheduler', 'today') }}</button>
+      <button type="button" class="pdx-scheduler-button" data-part="next" :aria-label="uiString('scheduler', 'next')" :disabled="disabled" @click="step(1)">›</button>
+      <div class="pdx-scheduler-period" data-part="period" :id="periodId">{{ periodText }}</div>
+      @if (shownViews.length > 1) {
+        <div class="pdx-scheduler-views" data-part="viewSwitcher" role="group" :aria-label="uiString('scheduler', 'views')">
+          @for (shownViews as v; track v) {
+            <button type="button" class="pdx-scheduler-button" :aria-pressed="v === view ? 'true' : 'false'" :disabled="disabled" @click="pick(v)">{{ viewName(v) }}</button>
+          }
+        </div>
+      }
+    </div>
+    <div class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
+      :style="'--_scheduler-cols:' + columns.length + ';--_scheduler-heads:' + headerRows.length + ';--_scheduler-lanes:' + allDay.lanes" :ref="gridEl"
+      @keydown="onKey($event)" @click="onClick($event)">
+      @for (headerRows as hr; track hr.key) {
+        <div role="row" class="pdx-scheduler-row pdx-scheduler-head">
+          <div role="columnheader" class="pdx-scheduler-corner"><span class="pdx-sr-only">{{ hr.corner }}</span></div>
+          @for (hr.cells as h; track h.key) {
+            <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-label="h.full"
+              :aria-colspan="h.span > 1 ? h.span : null" :style="'grid-column: span ' + h.span" :data-today="h.today ? '' : null">{{ h.text }}</div>
+          }
+        </div>
+      }
+      <div role="row" class="pdx-scheduler-row" data-part="allDayRow">
+        <div role="rowheader" class="pdx-scheduler-time pdx-scheduler-allday-label">{{ uiString('scheduler', 'allDay') }}</div>
+        @for (columns as c, ci; track c.key) {
+          <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-allday" data-part="slot" data-row="0" :data-col="ci" :tabindex="active.row === 0 && active.col === ci ? 0 : -1" :style="'--_scheduler-col:' + ci">
+            @for (barsAt(ci) as b; track b.id) {
+              <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" data-part="event" tabindex="-1" :data-id="b.id"
+                :style="'--_scheduler-span:' + b.span + ';--_scheduler-lane:' + b.lane + colorStyle(b.event, c)"
+                :data-before="b.before ? '' : null" :data-after="b.after ? '' : null" :aria-label="allDayName(b.event, c)">
+                @render event?.(b.event) @else { <span class="pdx-scheduler-event-title">{{ b.event.title }}</span> }
+              </button>
+            }
+          </div>
+        }
+      </div>
+      @for (slots as m, ri; track m) {
+        <div role="row" class="pdx-scheduler-row">
+          <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="m % 60 === 0 ? '' : null">{{ clockLabel(m, loc) }}</div>
+          @for (columns as c, ci; track c.key) {
+            <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="ri + 1" :data-col="ci"
+              :data-off="offHours(c, m) ? '' : null" :data-hour="m % 60 === 0 ? '' : null"
+              :tabindex="active.row === ri + 1 && active.col === ci ? 0 : -1">
+              @for (eventsAt(ci, ri) as p; track p.id) {
+                <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
+                  :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + colorStyle(p.event, c)"
+                  :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)">
+                  @render event?.(p.event) @else {
+                    <span class="pdx-scheduler-event-title">{{ p.event.title }}</span>
+                    <span class="pdx-scheduler-event-time">{{ timeOf(p) }}</span>
+                  }
+                </button>
+              }
+              @if (nowAt(ci, ri) !== null) {
+                <div class="pdx-scheduler-now" data-part="nowLine" aria-hidden="true" :style="'--_scheduler-offset:' + nowAt(ci, ri)"></div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</template>
+
+<script>
+/**
+ * A calendar of events in time, by day and by resource: a day, a week or a run of days on a grid of
+ * time slots, with an all-day row, the current time and the working hours marked. Each resource
+ * (a room, a technician) can have its own columns. The grid is a WAI-ARIA grid: one tab stop, the
+ * arrows from slot to slot, Enter into a slot's events and Escape back out, PageUp and PageDown
+ * through periods. A click or Enter on an event emits `event-open`; on an empty slot, `slot-open`.
+ *
+ * @csspart root - The scheduler, a `role="group"` named by `label`.
+ * @csspart toolbar - The bar above the grid: previous, today, next, the period and the views.
+ * @csspart prev - The button to the previous period.
+ * @csspart todayButton - The button back to today.
+ * @csspart next - The button to the next period.
+ * @csspart period - The period on screen, which names the grid.
+ * @csspart viewSwitcher - The view buttons, shown when `views` offers more than one.
+ * @csspart grid - The `role="grid"` of slots.
+ * @csspart columnHeader - A day's or a resource's header.
+ * @csspart allDayRow - The row of all-day events.
+ * @csspart slot - A cell: a time slot of a day and resource, or its all-day cell.
+ * @csspart event - An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.
+ * @csspart nowLine - The line at the current time.
+ *
+ * @cssstate disabled - `disabled` is set.
+ */
+import { announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, today } from '@pdxui/core';
+import { uiString, format } from '../shared/i18n';
+import { resolveLocale } from '../shared/locale';
+import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, type SchedulerView } from './time';
+import { buildColumns, buildSlots, placeTimed, placeAllDay, isBusinessTime, leafResources, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
+import { periodLabel, dayHeader, clockLabel, spanLabel } from './labels';
+import { gridKeyTarget } from './grid-keys';
+import '@pdxui/design/components/scheduler';
+
+type GridView = 'day' | 'week' | 'days';
+
+/** The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. */
+@prop events: SchedulerEvent[] = [];
+/** The resources, each with its own columns; children are drawn as their leaves. Empty: one column per day. */
+@prop resources: SchedulerResource[] = [];
+/** The view on screen. */
+@model view: 'day' | 'week' | 'days' = 'week';
+/** The views the bar offers, in order; one or none hides the switcher. */
+@prop views: ('day' | 'week' | 'days')[] = ['day', 'week', 'days'];
+/** The reference date (ISO). Empty: today. */
+@model date: string = '';
+/** How many days the `days` view shows. */
+@prop days: number = 3;
+/** With resources: each resource's days together (`resource`) or each day's resources (`date`). */
+@prop groupBy: 'resource' | 'date' = 'resource';
+/** Show Saturday and Sunday in the day columns. */
+@prop weekends: boolean = true;
+/** The first day of the week, 0 = Sunday … 6 = Saturday; -1: the locale's. */
+@prop firstDay: number = -1;
+/** The first visible hour, `HH:mm`. */
+@prop startHour: string = '00:00';
+/** The end of the visible hours, `HH:mm`, up to `24:00`. */
+@prop endHour: string = '24:00';
+/** The hour the grid opens scrolled to. */
+@prop scrollTo: string = '08:00';
+/** The length of a slot, in minutes. */
+@prop slotMinutes: number = 30;
+/** The working hours per weekday, shaded outside; a resource's own `businessHours` win in its columns. */
+@prop businessHours: BusinessHours = { 1: { start: '09:00', end: '18:00' }, 2: { start: '09:00', end: '18:00' }, 3: { start: '09:00', end: '18:00' }, 4: { start: '09:00', end: '18:00' }, 5: { start: '09:00', end: '18:00' } };
+/** Draw a line at the current time. */
+@prop nowIndicator: boolean = true;
+/** The IANA time zone events are shown in. Empty: the browser's. */
+@prop timeZone: string = '';
+/** Locale for dates and times. Empty: the page's language (`lang`), then the browser's. */
+@prop locale: string = '';
+/** The scheduler's accessible name. Empty: «Scheduler». */
+@prop label: string = '';
+@prop disabled: boolean = false;
+/** What an event draws; without it, its time and title. */
+@slot event?: (event: SchedulerEvent);
+/** An event was clicked, or Enter pressed on it. */
+@event 'event-open': { event: SchedulerEvent };
+/** An empty slot was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is the all-day cell. */
+@event 'slot-open': { start: string; end: string; resource: string | null; allDay: boolean };
+/** The period on screen changed, by the bar or the keyboard. */
+@event 'period-change': { view: 'day' | 'week' | 'days'; start: string; end: string };
+@part root, toolbar, prev, todayButton, next, period, viewSwitcher, grid, columnHeader, allDayRow, slot, event, nowLine;
+@state disabled = !!disabled;
+@host el;
+
+let gridEl = $signal<HTMLElement | null>(null);
+/** The cell the grid's one tab stop is on: row 0 is the all-day row, then one row per slot. */
+let active = $signal({ row: 1, col: 0 });
+let now = $signal(Date.now());
+
+const periodId = generatedId('pdx-scheduler-period');
+const loc = $derived(resolveLocale(el, locale));
+const zone = $derived(timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone);
+const refDate = $derived(date || today());
+const weekStart = $derived(firstDay >= 0 ? firstDay : getFirstDayOfWeek(loc));
+const rangeOptions = $derived({ firstDay: weekStart, days, hiddenDays: weekends ? [] : [0, 6] });
+const range = $derived(viewRange(view, refDate, rangeOptions));
+const periodText = $derived(periodLabel(view, range.days, loc));
+const shownViews = $derived(views.filter((v) => v === 'day' || v === 'week' || v === 'days'));
+const columns = $derived(buildColumns(range.days, resources, groupBy));
+const startMinutes = $derived(parseClock(startHour));
+const endMinutes = $derived(parseClock(endHour));
+const slots = $derived(buildSlots(startMinutes, endMinutes, slotMinutes));
+const timed = $derived(placeTimed(events, columns, { timeZone: zone, startMinutes, endMinutes, slotMinutes }));
+const allDay = $derived(placeAllDay(events, columns, zone));
+/** The timed events by cell, `column|slot`, so a cell reads its own in one lookup. */
+const byCell = $derived(cellIndex(timed, columns));
+const todayDate = $derived(zonedParts(now, zone).date);
+const headerRows = $derived(buildHeaderRows(columns, todayDate));
+
+function cellIndex(placed: Map<string, PlacedEvent[]>, cols: Column[]): Map<string, PlacedEvent[]> {
+  const out = new Map<string, PlacedEvent[]>();
+  cols.forEach((c, ci) => {
+    for (const p of placed.get(c.key) ?? []) {
+      const key = ci + '|' + p.slot;
+      const list = out.get(key);
+      if (list) list.push(p); else out.set(key, [p]);
+    }
+  });
+  return out;
+}
+
+/** One header row of days, or two with resources: the group above, the columns below. */
+function buildHeaderRows(cols: Column[], todayIso: string) {
+  const dayCell = (key: string, iso: string, span: number) => {
+    const h = dayHeader(iso, loc);
+    return { key, text: h.weekday + ' ' + h.day, full: h.full, span, today: iso === todayIso };
+  };
+  const resourceCell = (key: string, r: SchedulerResource, span: number) => ({ key, text: r.label, full: null, span, today: false });
+  const leaves = leafResources(resources);
+  const dayRow = { key: 'days', corner: uiString('scheduler', 'time'), cells: [] as ReturnType<typeof dayCell>[] };
+  if (leaves.length === 0) {
+    dayRow.cells = cols.map((c) => dayCell(c.key, c.date, 1));
+    return [dayRow];
+  }
+  const n = range.days.length;
+  if (groupBy === 'resource') {
+    return [
+      { key: 'groups', corner: uiString('scheduler', 'resource'), cells: leaves.map((r) => resourceCell('r|' + r.id, r, n)) },
+      { ...dayRow, cells: cols.map((c) => dayCell(c.key, c.date, 1)) },
+    ];
+  }
+  return [
+    { ...dayRow, key: 'groups', cells: range.days.map((d) => dayCell('d|' + d, d, leaves.length)) },
+    { key: 'resources', corner: uiString('scheduler', 'resource'), cells: cols.map((c) => resourceCell(c.key, c.resource as SchedulerResource, 1)) },
+  ];
+}
+
+function eventsAt(ci: number, ri: number): PlacedEvent[] { return byCell.get(ci + '|' + ri) ?? []; }
+function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
+function viewName(v: GridView): string { return v === 'days' ? format(uiString('scheduler', 'daysView'), { count: days }) : uiString('scheduler', v); }
+function offHours(c: Column, minutes: number): boolean { return !isBusinessTime(c.date, minutes, c.resource?.businessHours ?? businessHours); }
+function timeOf(p: PlacedEvent): string {
+  const start = startMinutes + (p.slot + p.offset) * slotMinutes;
+  return spanLabel(Math.round(start), Math.round(start + p.length * slotMinutes), loc);
+}
+function where(c: Column): string { return c.resource ? ', ' + c.resource.label : ''; }
+function timedName(p: PlacedEvent, c: Column): string {
+  return format(uiString('scheduler', 'eventName'), { title: p.event.title, when: timeOf(p) + ', ' + dayHeader(c.date, loc).full }) + where(c);
+}
+function allDayName(e: SchedulerEvent, c: Column): string {
+  return format(uiString('scheduler', 'eventName'), { title: e.title, when: uiString('scheduler', 'allDay') + ', ' + dayHeader(c.date, loc).full }) + where(c);
+}
+function colorStyle(e: SchedulerEvent, c: Column): string {
+  const color = e.color ?? c.resource?.color;
+  return color ? ';--pdx-scheduler-event-color:' + color : '';
+}
+/** Where the current-time line is in this cell, 0 to 1, or null when it is not here. */
+function nowAt(ci: number, ri: number): number | null {
+  if (!nowIndicator) return null;
+  const c = columns[ci];
+  const here = zonedParts(now, zone);
+  if (!c || c.date !== here.date) return null;
+  const from = slots[ri];
+  const to = Math.min(from + slotMinutes, endMinutes);
+  return here.minutes >= from && here.minutes < to ? (here.minutes - from) / slotMinutes : null;
+}
+
+// ─── The period ────────────────────────────────────────────────────────────────
+
+function moved(): void {
+  const r = viewRange(view, refDate, rangeOptions);
+  periodChange({ view, start: r.start, end: r.end });
+  announce(periodLabel(view, r.days, loc));
+}
+function step(direction: 1 | -1): void { date = stepPeriod(view, refDate, direction, rangeOptions); moved(); }
+function goToday(): void { date = today(); moved(); }
+function pick(v: GridView): void { if (v !== view) { view = v; moved(); } }
+
+// ─── The grid: one tab stop, the arrows between cells ──────────────────────────
+
+function cellOf(target: EventTarget | null): HTMLElement | null {
+  return target instanceof Element ? target.closest('[role="gridcell"]') as HTMLElement | null : null;
+}
+function focusCell(row: number, col: number): void {
+  active = { row, col };
+  queueMicrotask(() => {
+    const cell = gridEl?.querySelector(`[data-row="${row}"][data-col="${col}"]`) as HTMLElement | null;
+    cell?.focus();
+  });
+}
+/** The slot a cell is: start and end as instants in the zone, and its resource. */
+function slotOf(row: number, col: number) {
+  const c = columns[col];
+  if (row === 0) {
+    const start = zonedInstant(c.date, 0, zone);
+    return { start: new Date(start).toISOString(), end: new Date(zonedInstant(c.date, 1440, zone)).toISOString(), resource: c.resource?.id ?? null, allDay: true };
+  }
+  const from = slots[row - 1];
+  const to = Math.min(from + slotMinutes, endMinutes);
+  return { start: new Date(zonedInstant(c.date, from, zone)).toISOString(), end: new Date(zonedInstant(c.date, to, zone)).toISOString(), resource: c.resource?.id ?? null, allDay: false };
+}
+function eventById(id: string): SchedulerEvent | undefined { return events.find((e) => e.id === id); }
+
+function onKey(e: KeyboardEvent): void {
+  if (disabled) return;
+  const cell = cellOf(e.target);
+  if (!cell) return;
+  const row = Number(cell.dataset.row);
+  const col = Number(cell.dataset.col);
+  const onEvent = e.target !== cell;
+  if (onEvent) {
+    // Inside a cell: Escape gives the grid its keys back; Tab moves between the cell's events.
+    if (e.key === 'Escape') { e.preventDefault(); focusCell(row, col); }
+    return;
+  }
+  if (e.key === 'Enter' || e.key === 'F2') {
+    e.preventDefault();
+    const first = cell.querySelector('[data-part="event"]') as HTMLElement | null;
+    if (first) {
+      for (const button of cell.querySelectorAll<HTMLElement>('[data-part="event"]')) button.tabIndex = 0;
+      first.focus();
+    } else slotOpen(slotOf(row, col));
+    return;
+  }
+  const target = gridKeyTarget(e, { row, col }, { rows: slots.length + 1, cols: columns.length });
+  if (!target) return;
+  e.preventDefault();
+  if ('period' in target) { step(target.period); focusCell(row, Math.min(col, columns.length - 1)); return; }
+  focusCell(target.cell.row, target.cell.col);
+}
+
+function onClick(e: MouseEvent): void {
+  if (disabled) return;
+  const button = e.target instanceof Element ? e.target.closest('[data-part="event"]') as HTMLElement | null : null;
+  if (button) {
+    const ev = eventById(button.dataset.id ?? '');
+    if (ev) eventOpen({ event: ev });
+    return;
+  }
+  const cell = cellOf(e.target);
+  if (!cell) return;
+  const row = Number(cell.dataset.row);
+  const col = Number(cell.dataset.col);
+  active = { row, col };
+  slotOpen(slotOf(row, col));
+}
+
+// The events of a cell are tab stops while the focus is among them; once it leaves them — to their
+// cell with Escape, or anywhere else — they go back to tabindex -1, and the grid keeps one tab stop.
+function onFocusOut(e: FocusEvent): void {
+  const t = e.target as HTMLElement | null;
+  if (t?.dataset.part !== 'event') return;
+  const next = e.relatedTarget instanceof HTMLElement ? e.relatedTarget : null;
+  if (next?.dataset.part === 'event' && next.parentElement === t.parentElement) return;
+  for (const button of t.parentElement?.querySelectorAll<HTMLElement>('[data-part="event"]') ?? []) button.tabIndex = -1;
+}
+
+// ─── Mount: the clock, the first scroll ────────────────────────────────────────
+
+let clock: ReturnType<typeof setInterval> | undefined;
+onMount(() => {
+  clock = setInterval(() => { now = Date.now(); }, 60_000);
+  gridEl?.addEventListener('focusout', onFocusOut);
+  const first = slots.findIndex((m) => m >= parseClock(scrollTo));
+  const row = gridEl?.querySelector(`[data-row="${first + 1}"]`) as HTMLElement | null;
+  const head = gridEl?.querySelector('[data-part="allDayRow"] [role="rowheader"]') as HTMLElement | null;
+  if (gridEl && row && head && first > 0) gridEl.scrollTop = row.offsetTop - head.offsetTop - head.offsetHeight;
+});
+onDestroy(() => {
+  if (clock !== undefined) clearInterval(clock);
+  gridEl?.removeEventListener('focusout', onFocusOut);
+});
+</script>

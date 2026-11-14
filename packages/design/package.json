@@ -213,6 +213,10 @@
       "development": "./src/components/layered/signature-pad.css",
       "default": "./dist/components/signature-pad.css"
     },
+    "./components/scheduler": {
+      "development": "./src/components/layered/scheduler.css",
+      "default": "./dist/components/scheduler.css"
+    },
     "./components/app-shell": {
       "development": "./src/components/layered/app-shell.css",
       "default": "./dist/components/app-shell.css"

@@ -2696,6 +2696,29 @@
       ]
     },
     {
+      "name": "scheduler",
+      "tags": [
+        "pdx-scheduler"
+      ],
+      "tier": "3C",
+      "status": "wip",
+      "page": "tier-3c",
+      "scenarios": [
+        {
+          "id": "scheduler-week",
+          "title": "Scheduler — A week"
+        },
+        {
+          "id": "scheduler-resources",
+          "title": "Scheduler — A day by room"
+        },
+        {
+          "id": "scheduler-disabled",
+          "title": "Scheduler — Disabled"
+        }
+      ]
+    },
+    {
       "name": "scroll-area",
       "tags": [
         "pdx-scroll-area"

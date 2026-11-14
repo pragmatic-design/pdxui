@@ -1,0 +1,76 @@
+<template>
+  <div class="page">
+    <h1 class="pdx-txt-title">Scheduler</h1>
+    <p class="pdx-txt-body pdx-ink-muted intro">
+      <code>&lt;pdx-scheduler&gt;</code> — events on a grid of time slots: a day, a week or a run of days, with an all-day
+      row, the current time and the working hours marked, and a column per resource when it has them. The grid is a
+      keyboard grid with one tab stop, and every event is announced with its time, day and resource.
+    </p>
+
+    <!-- ═══ A week ═══ -->
+    <app-demo-comp-scheduler-basic class="demo-section"></app-demo-comp-scheduler-basic>
+
+    <!-- ═══ By resource ═══ -->
+    <app-demo-comp-scheduler-resources class="demo-section"></app-demo-comp-scheduler-resources>
+
+    <!-- ═══ What an event draws ═══ -->
+    <app-demo-comp-scheduler-event class="demo-section"></app-demo-comp-scheduler-event>
+
+    <!-- ═══ Working week and hours ═══ -->
+    <app-demo-comp-scheduler-hours class="demo-section"></app-demo-comp-scheduler-hours>
+
+    <!-- ═══ Reference ═══ -->
+    <section>
+      <h2 class="pdx-txt-heading section-heading">Reference</h2>
+      <div class="options-table">
+        <div class="opt-header"><span>Prop</span><span>Type</span><span>Description</span></div>
+        <div class="opt-row"><code>events</code><span>SchedulerEvent[]</span><span><code>{ id, title, start, end, allDay?, resource?, color? }</code>; a start with an offset is an instant, without one a wall time in <code>time-zone</code>, a date alone all day</span></div>
+        <div class="opt-row"><code>resources</code><span>{ id, label, color?, children?, businessHours? }[]</span><span>A column per resource; children are drawn as their leaves</span></div>
+        <div class="opt-row"><code>view</code><span>'day' | 'week' | 'days'</span><span>The view on screen (<code>::view</code>)</span></div>
+        <div class="opt-row"><code>views</code><span>array</span><span>The views the bar offers</span></div>
+        <div class="opt-row"><code>date</code><span>string</span><span>The reference date, ISO (<code>::date</code>); empty is today</span></div>
+        <div class="opt-row"><code>days</code><span>number</span><span>How many days the <code>days</code> view shows (3)</span></div>
+        <div class="opt-row"><code>group-by</code><span>'resource' | 'date'</span><span>Each resource's days together, or each day's resources</span></div>
+        <div class="opt-row"><code>weekends</code><span>boolean</span><span>Show Saturday and Sunday (true)</span></div>
+        <div class="opt-row"><code>first-day</code><span>number</span><span>The first day of the week, 0 = Sunday; -1 is the locale's</span></div>
+        <div class="opt-row"><code>start-hour</code> / <code>end-hour</code><span>HH:mm</span><span>The visible hours (00:00 / 24:00)</span></div>
+        <div class="opt-row"><code>scroll-to</code><span>HH:mm</span><span>Where the grid opens (08:00)</span></div>
+        <div class="opt-row"><code>slot-minutes</code><span>number</span><span>The length of a slot (30)</span></div>
+        <div class="opt-row"><code>business-hours</code><span>object</span><span>Working hours per weekday, shaded outside; a resource's own win</span></div>
+        <div class="opt-row"><code>now-indicator</code><span>boolean</span><span>The line at the current time (true)</span></div>
+        <div class="opt-row"><code>time-zone</code><span>string</span><span>The IANA zone events are shown in; empty is the browser's</span></div>
+        <div class="opt-row"><code>locale</code> / <code>label</code> / <code>disabled</code><span></span><span>Dates and times, the accessible name, no interaction</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Events and snippet</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Name</span><span>Detail</span><span>Description</span></div>
+        <div class="opt-row"><code>event-open</code><span>{ event }</span><span>An event was clicked, or Enter pressed on it</span></div>
+        <div class="opt-row"><code>slot-open</code><span>{ start, end, resource, allDay }</span><span>An empty slot was clicked, or Enter pressed on it; times are ISO instants</span></div>
+        <div class="opt-row"><code>period-change</code><span>{ view, start, end }</span><span>The period on screen changed: load its events</span></div>
+        <div class="opt-row"><code>view-change</code> / <code>date-change</code><span>{ value }</span><span>A model was written</span></div>
+        <div class="opt-row"><code>&#64;snippet event(e)</code><span></span><span>What an event draws</span></div>
+      </div>
+
+      <h3 class="pdx-txt-subheading" style="margin-top:var(--pdx-space-lg)">Keyboard</h3>
+      <div class="options-table">
+        <div class="opt-header"><span>Key</span><span>—</span><span>Action</span></div>
+        <div class="opt-row"><code>Tab</code><span></span><span>The grid is one tab stop</span></div>
+        <div class="opt-row"><code>Arrows</code><span></span><span>One slot at a time; they stop at the edges</span></div>
+        <div class="opt-row"><code>Home · End</code><span></span><span>The first and last column; with <kbd>Ctrl</kbd>, the first and last slot</span></div>
+        <div class="opt-row"><code>PageUp · PageDown</code><span></span><span>The previous and next period</span></div>
+        <div class="opt-row"><code>Enter · F2</code><span></span><span>Into the slot's events, or open an empty slot</span></div>
+        <div class="opt-row"><code>Escape</code><span></span><span>From an event back to its slot</span></div>
+      </div>
+    </section>
+  </div>
+</template>
+
+<script>
+@page '/components/scheduler';
+@title 'Scheduler Component';
+</script>
+
+<style scoped>
+  .page { }
+</style>
