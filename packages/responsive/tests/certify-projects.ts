@@ -21,6 +21,9 @@ export interface CertifyProject {
 
 export const CERTIFY_PROJECTS: CertifyProject[] = [
     { name: 'axe', files: ['axe-runner.spec.ts'], shards: 2 },
-    { name: 'contracts', files: ['manifest-contract.spec.ts'], shards: 1 },
+    // One shard took 12m53s–15m07s on 2026-11-14, the longest job of a pull request (#1075). Its
+    // tests share a page per scenario (beforeAll), and fullyParallel splits them within the file: a
+    // scenario cut by a shard opens its page once more, nothing else.
+    { name: 'contracts', files: ['manifest-contract.spec.ts'], shards: 3 },
     { name: 'guards', files: 'rest', shards: 2 },
 ];
