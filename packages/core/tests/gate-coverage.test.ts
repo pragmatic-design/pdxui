@@ -196,6 +196,17 @@ describe('the pre-push', () => {
             .toBeLessThan(prePush.indexOf('pnpm certify'));
     });
 
+    // packages/site/src/demos is generated and git-ignored. CI's `pnpm build` regenerates it (the
+    // site's build runs port-demos.mjs); locally it was whatever the last port-demos wrote, maybe on
+    // another branch, and cli's design-pass-trees failed the push on demos of another commit (#1073).
+    it('regenerates the site demos before the suites, as CI\'s build does', () => {
+        const at = prePush.indexOf('packages/site/scripts/port-demos.mjs');
+        expect(at, 'the suites check the site against demos of another commit').toBeGreaterThan(-1);
+        expect(at, 'the demos are regenerated after the suites have read them').toBeLessThan(prePush.search(/^\s*pnpm test\b/m));
+        expect(at, 'the demos are regenerated outside the suites phase, which PDX_SKIP_TESTS skips')
+            .toBeGreaterThan(prePush.indexOf('PDX_SKIP_TESTS" = "1"'));
+    });
+
     // Certification left the default pre-push (#60): 25 minutes a push that CI spent again. It is
     // still one variable away, and certify.yml must then run on every change — otherwise a change
     // to core, which every component is built on, would be certified nowhere.

@@ -1,7 +1,7 @@
 #!/bin/sh
 # Pre-push gate. Fastest to slowest (fail-fast):
 #   1) Quality outside the UI: typecheck + lint (core·compiler·router·ui·lsp·cli·design engine)  (seconds)
-#   2) The suites: pnpm test, every package                          (minutes)
+#   2) The site demos regenerated, then the suites: pnpm test, every package   (minutes)
 #   2b) The compiler benchmarks, alone                               (seconds)
 #   3) Only with PDX_CERTIFY=1: component certification (Dim 1-4) and, when Docker answers, the
 #      visual regression (Dim 5)
@@ -45,6 +45,11 @@ fi
 if [ "$PDX_SKIP_TESTS" = "1" ]; then
     echo "[pre-push] PDX_SKIP_TESTS=1 -> suites skipped"
 else
+    # The site's demo pages are generated from the showcase and git-ignored. CI regenerates them in
+    # `pnpm build`; here they were whatever the last port-demos wrote, maybe on another branch, and
+    # the site's design check failed the push on demos of another commit (#1073).
+    echo "[pre-push] Site demos: port-demos.mjs"
+    node packages/site/scripts/port-demos.mjs || { echo "[pre-push] FAILED: port-demos. (override: git push --no-verify)"; exit 1; }
     echo "[pre-push] Suites: pnpm test  (skip with: PDX_SKIP_TESTS=1)"
     pnpm test || { echo "[pre-push] FAILED: suites. Push blocked. (override: git push --no-verify)"; exit 1; }
     echo "[pre-push] OK: suites."
