@@ -5,7 +5,7 @@
 // - PageDown pages to the next period: the period's name changes and `period-change` says so.
 // - An event is named by its title, time and date: what a screen reader hears on it.
 //
-// On the `scheduler-week` scenario: the week of Monday 16 November 2026 in Rome, 08:00 to 18:00.
+// On the `scheduler-week` scenario: the week of Monday 21 September 2026 in Rome, 08:00 to 18:00.
 
 import { test, expect, type Page } from './contracts/fixture';
 import { goToScenario } from './contracts/measure';
@@ -34,10 +34,10 @@ test.describe('the scheduler grid', () => {
 
     test('an event is named by its title, time and date', async ({ page }) => {
         const scheduler = page.locator(`section:not([hidden]) ${root}`);
-        await expect(scheduler.getByRole('grid', { name: 'Nov 16 – 22, 2026' })).toHaveCount(1);
+        await expect(scheduler.getByRole('grid', { name: 'Sep 21 – 27, 2026' })).toHaveCount(1);
         // en-US writes the range with both halves' day periods, its spaces ICU's own (narrow or thin).
-        await expect(scheduler.getByRole('button', { name: /^Review, 10:00\sAM\s–\s12:00\sPM, Tuesday, November 17, 2026$/ })).toHaveCount(1);
-        await expect(scheduler.getByRole('button', { name: /^Offsite, All day, Wednesday, November 18, 2026$/ })).toHaveCount(1);
+        await expect(scheduler.getByRole('button', { name: /^Review, 10:00\sAM\s–\s12:00\sPM, Tuesday, September 22, 2026$/ })).toHaveCount(1);
+        await expect(scheduler.getByRole('button', { name: /^Offsite, All day, Wednesday, September 23, 2026$/ })).toHaveCount(1);
     });
 
     test('Enter on a slot goes into its events, Escape back to the slot', async ({ page }) => {
@@ -56,13 +56,13 @@ test.describe('the scheduler grid', () => {
     test('Enter on an empty slot, or a click on it, emits slot-open with its time', async ({ page }) => {
         await record(page, ['slot-open']);
         const scheduler = page.locator(`section:not([hidden]) ${root}`);
-        // Wednesday (column 2), 08:30: row 2. 08:30 in Rome is 07:30 UTC.
+        // Wednesday (column 2), 08:30: row 2. 08:30 in Rome is 06:30 UTC (summer time).
         await scheduler.locator('[data-row="2"][data-col="2"]').focus();
         await page.keyboard.press('Enter');
         await scheduler.locator('[data-row="3"][data-col="2"]').click();
         expect(await events(page)).toEqual([
-            { type: 'slot-open', detail: { start: '2026-11-18T07:30:00.000Z', end: '2026-11-18T08:00:00.000Z', resource: null, allDay: false } },
-            { type: 'slot-open', detail: { start: '2026-11-18T08:00:00.000Z', end: '2026-11-18T08:30:00.000Z', resource: null, allDay: false } },
+            { type: 'slot-open', detail: { start: '2026-09-23T06:30:00.000Z', end: '2026-09-23T07:00:00.000Z', resource: null, allDay: false } },
+            { type: 'slot-open', detail: { start: '2026-09-23T07:00:00.000Z', end: '2026-09-23T07:30:00.000Z', resource: null, allDay: false } },
         ]);
     });
 
@@ -79,8 +79,8 @@ test.describe('the scheduler grid', () => {
         const scheduler = page.locator(`section:not([hidden]) ${root}`);
         await scheduler.locator('[data-row="1"][data-col="0"]').focus();
         await page.keyboard.press('PageDown');
-        await expect(scheduler.locator('[data-part="period"]')).toHaveText('Nov 23 – 29, 2026');
-        expect(await events(page)).toEqual([{ type: 'period-change', detail: { view: 'week', start: '2026-11-23', end: '2026-11-30' } }]);
+        await expect(scheduler.locator('[data-part="period"]')).toHaveText('Sep 28 – Oct 4, 2026');
+        expect(await events(page)).toEqual([{ type: 'period-change', detail: { view: 'week', start: '2026-09-28', end: '2026-10-05' } }]);
         await expect(scheduler.locator('[data-row="1"][data-col="0"]'), 'the focus stays in the grid').toBeFocused();
     });
 });

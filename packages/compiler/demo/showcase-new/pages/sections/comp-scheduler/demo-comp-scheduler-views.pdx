@@ -1,0 +1,26 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Month, year and agenda</h2>
+    <p class="pdx-txt-small pdx-ink-muted">The same events in the other views. The month stacks a day's events under its number, all-day and multi-day events as bars, and counts what does not fit in a <code>+N</code> that opens the day; <code>day-max-events</code> sets how many fit. The year marks the days that have events, and a day opens on <kbd>Enter</kbd> or a click. The agenda lists the period's events by day, <code>agenda-days</code> of them.</p>
+    <pdx-scheduler label="Team calendar, month" view="month" first-day="1" :events="events" day-max-events="2" @event-open="onEvent"></pdx-scheduler>
+    <p class="pdx-txt-small pdx-ink-muted">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+import { at } from './week.pdx';
+
+const events = [
+  { id: 'v1', title: 'Planning', start: at(-7, '09:00'), end: at(-7, '10:00') },
+  { id: 'v2', title: 'Conference', start: at(-3), end: at(1) },
+  { id: 'v3', title: 'Stand-up', start: at(1, '09:00'), end: at(1, '09:30') },
+  { id: 'v4', title: 'Design review', start: at(1, '10:00'), end: at(1, '12:00') },
+  { id: 'v5', title: 'Customer call', start: at(1, '14:00'), end: at(1, '15:00') },
+  { id: 'v6', title: 'Retro', start: at(1, '16:00'), end: at(1, '17:00') },
+  { id: 'v7', title: 'Release', start: at(4, '16:00'), end: at(4, '17:00'), color: 'var(--pdx-color-success)' },
+  { id: 'v8', title: 'Holiday', start: at(10), end: at(12), color: 'var(--pdx-color-warning)' },
+];
+let last = $signal('Nothing opened yet.');
+
+function onEvent(e) { last = 'Opened ' + e.detail.event.title + '.'; }
+</script>

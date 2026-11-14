@@ -1102,7 +1102,11 @@ exports[`observed attributes > are the ones each component has always observed 1
     "wrap",
   ],
   "pdx-scheduler": [
+    "agenda-days",
+    "agendadays",
     "date",
+    "day-max-events",
+    "daymaxevents",
     "days",
     "disabled",
     "end-hour",

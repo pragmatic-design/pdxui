@@ -24,9 +24,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   grid is a WAI-ARIA grid with one tab stop: the arrows go from slot to slot, Enter into a slot's events
   and Escape back out, PageUp and PageDown change the period, and the new period is announced. Clicking
   an event, or pressing Enter on it, emits `event-open`; doing the same on an empty slot emits
-  `slot-open`. An `event` snippet draws an event. The month, year, agenda and timeline views, moving,
-  resizing and creating events, recurrence, the built-in editor, and print and export come in the
-  following parts.
+  `slot-open`. An `event` snippet draws an event. The month view stacks a day's events in lanes, all-day
+  and multi-day ones as bars across the week, and counts what does not fit (`day-max-events`) in a
+  «+N» that opens the day. The year view is twelve months with the days that have events marked; the
+  arrows move by day and week, and Enter opens a day. The agenda lists the events of `agenda-days` days,
+  by day. `views` offers all six by default. The timeline view, moving, resizing and creating events,
+  recurrence, the built-in editor, and print and export come in the following parts.
 
 - `pdx-localized-input` (#1024): one text in several cultures, `{ [culture]: string }`, the shape of a
   LocalizedString. The cultures are tabs, each named in its own language (`Intl.DisplayNames`), with the
@@ -1591,6 +1594,12 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   and `+=` are unchanged. (#187)
 
 ### Fixes
+
+- `watch()`, and so `$watch`, created inside a running effect no longer makes that effect depend on
+  it. It read a getter source, and ran an `immediate` callback, tracked by whatever effect was
+  running: a component that watches a ref, mounted by another component's effect, re-ran that effect
+  each time its own render set the ref, which mounted it again. The site's props playground built
+  `pdx-scheduler` a hundred times before the runtime broke the loop. Both are read untracked now.
 
 - `hidden` hides every component (#1018). The browser's `[hidden] { display: none }` is a user-agent
   rule, and a component stylesheet that sets `display` outranks it: 416 component tags and classes —

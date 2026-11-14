@@ -1,23 +1,21 @@
 ### `<pdx-scheduler>`
 
-A calendar of events in time, by day and by resource: a day, a week or a run of days on a grid of
-time slots, with an all-day row, the current time and the working hours marked. Each resource
-(a room, a technician) can have its own columns. The grid is a WAI-ARIA grid: one tab stop, the
-arrows from slot to slot, Enter into a slot's events and Escape back out, PageUp and PageDown
-through periods. A click or Enter on an event emits `event-open`; on an empty slot, `slot-open`.
+Events in time: day, week, month, year and agenda views, by resource.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `events` | — | SchedulerEvent[] | `[]` | The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. |
-| `resources` | — | SchedulerResource[] | `[]` | The resources, each with its own columns; children are drawn as their leaves. Empty: one column per day. |
-| `views` | — | ('day' \| 'week' \| 'days')[] | `['day', 'week', 'days']` | The views the bar offers, in order; one or none hides the switcher. |
+| `resources` | — | SchedulerResource[] | `[]` | The resources, each with its own columns in the time grid; children are drawn as their leaves. Empty: one column per day. |
+| `views` | — | ('day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda')[] | `['day', 'week', 'days', 'month', 'year', 'agenda']` | The views the bar offers, in order; one or none hides the switcher. |
 | `days` | `days` | number | `3` | How many days the `days` view shows. |
+| `agendaDays` | `agendadays` | number | `7` | How many days the `agenda` view lists, from the reference date. |
+| `dayMaxEvents` | `daymaxevents` | number | `3` | How many events a day of the month shows before its «+N». |
 | `groupBy` | `groupby` | 'resource' \| 'date' | `'resource'` | With resources: each resource's days together (`resource`) or each day's resources (`date`). |
-| `weekends` | `weekends` | boolean | `true` | Show Saturday and Sunday in the day columns. |
+| `weekends` | `weekends` | boolean | `true` | Show Saturday and Sunday in the day columns and the month. |
 | `firstDay` | `firstday` | number | `-1` | The first day of the week, 0 = Sunday … 6 = Saturday; -1: the locale's. |
 | `startHour` | `starthour` | string | `'00:00'` | The first visible hour, `HH:mm`. |
 | `endHour` | `endhour` | string | `'24:00'` | The end of the visible hours, `HH:mm`, up to `24:00`. |
-| `scrollTo` | `scrollto` | string | `'08:00'` | The hour the grid opens scrolled to. |
+| `scrollTo` | `scrollto` | string | `'08:00'` | The hour the time grid opens scrolled to. |
 | `slotMinutes` | `slotminutes` | number | `30` | The length of a slot, in minutes. |
 | `businessHours` | — | BusinessHours | `{ 1: { start: '09:00', end: '18:00' }, 2: { start: '09:00', end: '18:00' }, 3: { start: '09:00', end: '18:00' }, 4: { start: '09:00', end: '18:00' }, 5: { start: '09:00', end: '18:00' } }` | The working hours per weekday, shaded outside; a resource's own `businessHours` win in its columns. |
 | `nowIndicator` | `nowindicator` | boolean | `true` | Draw a line at the current time. |
@@ -25,10 +23,10 @@ through periods. A click or Enter on an event emits `event-open`; on an empty sl
 | `locale` | `locale` | string | `''` | Locale for dates and times. Empty: the page's language (`lang`), then the browser's. |
 | `label` | `label` | string | `''` | The scheduler's accessible name. Empty: «Scheduler». |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `view` | `view` | 'day' \| 'week' \| 'days' | `'week'` | The view on screen. |
+| `view` | `view` | 'day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda' | `'week'` | The view on screen. |
 | `date` | `date` | string | `''` | The reference date (ISO). Empty: today. |
 
-**Events:** `date-change` → `detail: { value: string }` — Fired when the component writes `date`. Does not bubble.; `event-open` → `detail: { event: SchedulerEvent }` — An event was clicked, or Enter pressed on it.; `period-change` → `detail: { view: 'day' | 'week' | 'days'; start: string; end: string }` — The period on screen changed, by the bar or the keyboard.; `slot-open` → `detail: { start: string; end: string; resource: string | null; allDay: boolean }` — An empty slot was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is the all-day cell.; `view-change` → `detail: { value: 'day' | 'week' | 'days' }` — Fired when the component writes `view`. Does not bubble.
+**Events:** `date-change` → `detail: { value: string }` — Fired when the component writes `date`. Does not bubble.; `event-open` → `detail: { event: SchedulerEvent }` — An event was clicked, or Enter pressed on it.; `period-change` → `detail: { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'; start: string; end: string }` — The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.; `slot-open` → `detail: { start: string; end: string; resource: string | null; allDay: boolean }` — An empty slot or day was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is a whole day.; `view-change` → `detail: { value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' }` — Fired when the component writes `view`. Does not bubble.
 
 **Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row` · `rowheader` · `toolbar`
 
@@ -36,7 +34,7 @@ through periods. A click or Enter on an event emits `event-open`; on an empty sl
 
 **States:** `:state(disabled)` — `disabled` is set.
 
-**Parts:** `[data-part="root"]` — The scheduler, a `role="group"` named by `label`.; `[data-part="toolbar"]` — The bar above the grid: previous, today, next, the period and the views.; `[data-part="prev"]` — The button to the previous period.; `[data-part="todayButton"]` — The button back to today.; `[data-part="next"]` — The button to the next period.; `[data-part="period"]` — The period on screen, which names the grid.; `[data-part="viewSwitcher"]` — The view buttons, shown when `views` offers more than one.; `[data-part="grid"]` — The `role="grid"` of slots.; `[data-part="columnHeader"]` — A day's or a resource's header.; `[data-part="allDayRow"]` — The row of all-day events.; `[data-part="slot"]` — A cell: a time slot of a day and resource, or its all-day cell.; `[data-part="event"]` — An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.; `[data-part="nowLine"]` — The line at the current time.
+**Parts:** `[data-part="root"]` — The scheduler, a `role="group"` named by `label`.; `[data-part="toolbar"]` — The bar above the grid: previous, today, next, the period and the views.; `[data-part="prev"]` — The button to the previous period.; `[data-part="todayButton"]` — The button back to today.; `[data-part="next"]` — The button to the next period.; `[data-part="period"]` — The period on screen, which names the grid.; `[data-part="viewSwitcher"]` — The view buttons, shown when `views` offers more than one.; `[data-part="grid"]` — The `role="grid"` of the time slots or of the month's days.; `[data-part="columnHeader"]` — A day's or a resource's header, or a weekday's in the month.; `[data-part="allDayRow"]` — The row of all-day events.; `[data-part="slot"]` — A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year.; `[data-part="event"]` — An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.; `[data-part="more"]` — A month day's «+N», the events that did not fit; it opens the day.; `[data-part="yearMonth"]` — A month of the year view, a `role="grid"` of its own.; `[data-part="agendaList"]` — The agenda's list of days.; `[data-part="nowLine"]` — The line at the current time.
 
 **Shapes:** `SchedulerEvent { id: string; title: string; start: string; end: string; allDay?: boolean; resource?: string | string[]; color?: string; readonly?: boolean }` · `SchedulerResource { id: string; label: string; color?: string; children?: SchedulerResource[]; readonly?: boolean; businessHours?: BusinessHours }`
 
@@ -51,6 +49,13 @@ are checked against the manifest above._
 
 ```html
 <pdx-scheduler label="Team calendar" :events="events" first-day="1" scroll-to="08:00" @event-open="onEvent" @slot-open="onSlot"></pdx-scheduler>
+<p class="pdx-txt-small pdx-ink-muted">{{ last }}</p>
+```
+
+**Month, year and agenda** — The same events in the other views. The month stacks a day's events under its number, all-day and multi-day events as bars, and counts what does not fit in a `+N` that opens the day; `day-max-events` sets how many fit. The year marks the days that have events, and a day opens on Enter or a click. The agenda lists the period's events by day, `agenda-days` of them. _(from the live demo)_
+
+```html
+<pdx-scheduler label="Team calendar, month" view="month" first-day="1" :events="events" day-max-events="2" @event-open="onEvent"></pdx-scheduler>
 <p class="pdx-txt-small pdx-ink-muted">{{ last }}</p>
 ```
 

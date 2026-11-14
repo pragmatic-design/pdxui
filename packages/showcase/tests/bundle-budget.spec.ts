@@ -336,7 +336,10 @@ const DIST = resolve(dirname(fileURLToPath(import.meta.url)), '..', 'dist', 'ass
 // two builds are the same length, 130799 characters — only the content hashes of the chunks named in
 // Vite's preload map (pdx-nav-menu, the shell), which gzip packs 14 bytes worse. The built dist:
 // main 44577 → this branch 44591 bytes gzipped. Main sat on the rounding edge, 43.5 on the CI's line.
-const BUDGET_KB = { entry: 43.6, js: 472, css: 67, blocking: 103 };
+// js 472 → 473 (owner's OK): pdx-scheduler's month, year and agenda views (#1020, part 4) — their
+// templates, the calendar model and the year's keys, in the scheduler's chunk, which the showcase's
+// scheduler page loads. Main sat on the ceiling; CI's Linux build measured the branch at 472.1 KB.
+const BUDGET_KB = { entry: 43.6, js: 473, css: 67, blocking: 103 };
 /** How much headroom a ceiling may keep before it stops measuring anything. */
 const SLACK_KB = 4;
 
