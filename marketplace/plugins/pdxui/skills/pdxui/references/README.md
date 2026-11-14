@@ -64,7 +64,7 @@ Grids, charts, lists and data sources.
 - `<pdx-kanban>` — Columns of cards, moved by pointer, keyboard or menu.
 - `<pdx-list>` — Data-driven list with custom rows.
 - `<pdx-relative-time>` — Auto-updating “3 days ago”.
-- `<pdx-scheduler>` — Events in time: day, week, month, year and agenda views, by resource.
+- `<pdx-scheduler>` — Events in time: day, week, month, year, agenda and timeline views, by resource.
 - `<pdx-sortable-list>` — A list the user can put in another order, by dragging a row's handle or from the keyboard alone.
 
 It emits `pdx-reorder` with the indices and never writes to `items`: the application applies the

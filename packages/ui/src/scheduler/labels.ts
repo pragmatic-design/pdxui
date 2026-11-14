@@ -78,6 +78,23 @@ export function weekdayName(date: string, locale: string): { short: string; narr
     };
 }
 
+/**
+ * A timeline column's header, and the words that name it: a slot's time («09:00», «09:00, Tuesday,
+ * September 22, 2026»), a day's weekday and number, a month's short name («Sep», «September 2026»).
+ */
+export function timelineHeader(column: { date: string; minutes: number | null }, scale: 'day' | 'week' | 'month' | 'year', locale: string): { text: string; full: string } {
+    if (column.minutes !== null) {
+        const time = clockLabel(column.minutes, locale);
+        return { text: time, full: time + ', ' + fmt(locale, FULL).format(noon(column.date)) };
+    }
+    if (scale === 'year') {
+        const d = noon(column.date);
+        return { text: fmt(locale, { month: 'short' }).format(d), full: fmt(locale, { year: 'numeric', month: 'long' }).format(d) };
+    }
+    const h = dayHeader(column.date, locale);
+    return { text: h.weekday + ' ' + h.day, full: h.full };
+}
+
 /** Minutes since midnight as the locale writes a time. 1440, the end of the day, is midnight. */
 export function clockLabel(minutes: number, locale: string): string {
     return fmt(locale, TIME).format(clock(minutes));

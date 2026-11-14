@@ -2,7 +2,7 @@
 // column and an event's time, through Intl in the scheduler's locale. A date alone is formatted as
 // that calendar date, whatever the zone of the machine running it.
 import { describe, it, expect } from 'vitest';
-import { periodLabel, dayHeader, clockLabel, spanLabel } from '../../src/scheduler/labels';
+import { periodLabel, dayHeader, clockLabel, spanLabel, timelineHeader } from '../../src/scheduler/labels';
 
 describe('periodLabel', () => {
     it('a day: its full date', () => {
@@ -28,6 +28,18 @@ describe('periodLabel', () => {
 describe('dayHeader', () => {
     it('the short weekday and the day of the month; the full date for its accessible name', () => {
         expect(dayHeader('2026-11-17', 'en-US')).toEqual({ weekday: 'Tue', day: '17', full: 'Tuesday, November 17, 2026' });
+    });
+});
+
+describe('timelineHeader', () => {
+    it('a slot: its time, named with its day', () => {
+        expect(timelineHeader({ date: '2026-09-22', minutes: 9 * 60 }, 'day', 'en-GB')).toEqual({ text: '09:00', full: '09:00, Tuesday, 22 September 2026' });
+    });
+    it('a day: its weekday and number, named in full', () => {
+        expect(timelineHeader({ date: '2026-09-22', minutes: null }, 'week', 'en-US')).toEqual({ text: 'Tue 22', full: 'Tuesday, September 22, 2026' });
+    });
+    it('a month of the year: its short name, named with the year', () => {
+        expect(timelineHeader({ date: '2026-09-01', minutes: null }, 'year', 'en-US')).toEqual({ text: 'Sep', full: 'September 2026' });
     });
 });
 

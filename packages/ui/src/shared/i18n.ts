@@ -61,7 +61,7 @@ const DEFAULTS: Record<string, Record<string, string>> = {
     // a day of the year view with `{count}` events; `noEvents` is the agenda with nothing in its period.
     scheduler: {
         label: 'Scheduler', toolbar: 'Calendar', previous: 'Previous period', next: 'Next period', today: 'Today',
-        views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda',
+        views: 'View', day: 'Day', week: 'Week', daysView: '{count} days', month: 'Month', year: 'Year', agenda: 'Agenda', timeline: 'Timeline',
         allDay: 'All day', time: 'Time', resource: 'Resource', eventName: '{title}, {when}',
         more: '+{count} more', moreName: '{count, plural, one {# more event} other {# more events}}, {date}',
         dayName: '{date}, {count, plural, =0 {no events} one {# event} other {# events}}', noEvents: 'No events in this period',

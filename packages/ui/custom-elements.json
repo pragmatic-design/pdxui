@@ -24764,7 +24764,7 @@
           "tagName": "pdx-scheduler",
           "category": "Data Display",
           "order": 80,
-          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The grids are WAI-ARIA grids:\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day.",
+          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day.",
           "members": [
             {
               "kind": "field",
@@ -24778,7 +24778,7 @@
             {
               "kind": "field",
               "name": "resources",
-              "description": "The resources, each with its own columns in the time grid; children are drawn as their leaves. Empty: one column per day.",
+              "description": "The resources: each with its own columns in the time grid, where children are drawn as their leaves; each a row of the timeline, children under their parent. Empty: one column per day, one timeline row.",
               "type": {
                 "text": "SchedulerResource[]"
               },
@@ -24789,9 +24789,19 @@
               "name": "views",
               "description": "The views the bar offers, in order; one or none hides the switcher.",
               "type": {
-                "text": "('day' | 'week' | 'days' | 'month' | 'year' | 'agenda')[]"
+                "text": "('day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline')[]"
               },
-              "default": "['day', 'week', 'days', 'month', 'year', 'agenda']"
+              "default": "['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline']"
+            },
+            {
+              "kind": "field",
+              "name": "timelineScale",
+              "description": "The timeline's period and its columns: a day of slots, a week or a month of days, a year of months.",
+              "type": {
+                "text": "'day' | 'week' | 'month' | 'year'"
+              },
+              "default": "'week'",
+              "attribute": "timelinescale"
             },
             {
               "kind": "field",
@@ -24957,7 +24967,7 @@
               "name": "view",
               "description": "The view on screen.",
               "type": {
-                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'"
+                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'"
               },
               "default": "'week'",
               "attribute": "view"
@@ -25000,7 +25010,7 @@
                 "text": "CustomEvent"
               },
               "description": "The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.",
-              "detail": "{ view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'; start: string; end: string }"
+              "detail": "{ view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string }"
             },
             {
               "name": "view-change",
@@ -25008,7 +25018,7 @@
                 "text": "CustomEvent"
               },
               "description": "Fired when the component writes `view`. Does not bubble.",
-              "detail": "{ value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' }"
+              "detail": "{ value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline' }"
             },
             {
               "name": "date-change",
@@ -25025,10 +25035,21 @@
             "gridcell",
             "group",
             "row",
+            "rowgroup",
             "rowheader",
-            "toolbar"
+            "toolbar",
+            "treegrid"
           ],
           "attributes": [
+            {
+              "name": "timelinescale",
+              "fieldName": "timelineScale",
+              "description": "The timeline's period and its columns: a day of slots, a week or a month of days, a year of months.",
+              "type": {
+                "text": "'day' | 'week' | 'month' | 'year'"
+              },
+              "default": "'week'"
+            },
             {
               "name": "days",
               "fieldName": "days",
@@ -25169,7 +25190,7 @@
               "fieldName": "view",
               "description": "The view on screen.",
               "type": {
-                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'"
+                "text": "'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'"
               },
               "default": "'week'"
             },
@@ -25247,11 +25268,15 @@
             },
             {
               "name": "grid",
-              "description": "The `role=\"grid\"` of the time slots or of the month's days."
+              "description": "The `role=\"grid\"` of the time slots, of the month's days, or of the timeline's rows (a `treegrid` when resources nest), which scrolls."
             },
             {
               "name": "columnHeader",
-              "description": "A day's or a resource's header, or a weekday's in the month."
+              "description": "A day's or a resource's header, a weekday's in the month, a slot's, day's or month's in the timeline."
+            },
+            {
+              "name": "rowHeader",
+              "description": "A resource's name at the start of its timeline row; a parent's carries the row's `aria-expanded`."
             },
             {
               "name": "allDayRow",
@@ -25259,7 +25284,7 @@
             },
             {
               "name": "slot",
-              "description": "A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year."
+              "description": "A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year, a resource's slot, day or month in the timeline."
             },
             {
               "name": "event",
@@ -25305,10 +25330,16 @@
               "name": "--pdx-scheduler-height"
             },
             {
+              "name": "--pdx-scheduler-lane-height"
+            },
+            {
               "name": "--pdx-scheduler-slot-height"
             },
             {
               "name": "--pdx-scheduler-time-width"
+            },
+            {
+              "name": "--pdx-scheduler-timeline-column"
             }
           ]
         }

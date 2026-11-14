@@ -1126,6 +1126,8 @@ exports[`observed attributes > are the ones each component has always observed 1
     "start-hour",
     "starthour",
     "time-zone",
+    "timeline-scale",
+    "timelinescale",
     "timezone",
     "view",
     "weekends",

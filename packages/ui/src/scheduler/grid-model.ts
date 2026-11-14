@@ -248,6 +248,12 @@ export function placeAllDay(events: readonly SchedulerEvent[], columns: readonly
     return { bars, lanes: bars.reduce((n, b) => Math.max(n, b.lane + 1), 0) };
 }
 
+/** Whether `date`'s weekday has business hours at all. */
+export function isWorkingDay(date: string, hours: BusinessHours): boolean {
+    const d = parseISO(date);
+    return !!hours[dayOfWeek(d.year, d.month, d.day) as 0 | 1 | 2 | 3 | 4 | 5 | 6];
+}
+
 /** Whether `minutes` past midnight of `date` falls in that weekday's business hours. */
 export function isBusinessTime(date: string, minutes: number, hours: BusinessHours): boolean {
     const d = parseISO(date);

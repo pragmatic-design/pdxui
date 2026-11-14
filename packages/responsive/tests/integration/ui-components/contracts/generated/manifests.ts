@@ -622,6 +622,8 @@ export const scenarioPage: Record<string, string> = {
     "scheduler-month": "tier-3c",
     "scheduler-year": "tier-3c",
     "scheduler-agenda": "tier-3c",
+    "scheduler-timeline": "tier-3c",
+    "scheduler-timeline-many": "tier-3c",
     "scroll-area-vertical": "tier-6",
     "scroll-spy-basic": "tier-6",
     "search-input-basic": "tier-1c",

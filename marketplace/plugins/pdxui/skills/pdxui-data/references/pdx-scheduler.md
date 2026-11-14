@@ -1,12 +1,13 @@
 ### `<pdx-scheduler>`
 
-Events in time: day, week, month, year and agenda views, by resource.
+Events in time: day, week, month, year, agenda and timeline views, by resource.
 
 | Prop | Attr | Type | Default | Notes |
 |---|---|---|---|---|
 | `events` | — | SchedulerEvent[] | `[]` | The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. |
-| `resources` | — | SchedulerResource[] | `[]` | The resources, each with its own columns in the time grid; children are drawn as their leaves. Empty: one column per day. |
-| `views` | — | ('day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda')[] | `['day', 'week', 'days', 'month', 'year', 'agenda']` | The views the bar offers, in order; one or none hides the switcher. |
+| `resources` | — | SchedulerResource[] | `[]` | The resources: each with its own columns in the time grid, where children are drawn as their leaves; each a row of the timeline, children under their parent. Empty: one column per day, one timeline row. |
+| `views` | — | ('day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda' \| 'timeline')[] | `['day', 'week', 'days', 'month', 'year', 'agenda', 'timeline']` | The views the bar offers, in order; one or none hides the switcher. |
+| `timelineScale` | `timelinescale` | 'day' \| 'week' \| 'month' \| 'year' | `'week'` | The timeline's period and its columns: a day of slots, a week or a month of days, a year of months. |
 | `days` | `days` | number | `3` | How many days the `days` view shows. |
 | `agendaDays` | `agendadays` | number | `7` | How many days the `agenda` view lists, from the reference date. |
 | `dayMaxEvents` | `daymaxevents` | number | `3` | How many events a day of the month shows before its «+N». |
@@ -23,18 +24,18 @@ Events in time: day, week, month, year and agenda views, by resource.
 | `locale` | `locale` | string | `''` | Locale for dates and times. Empty: the page's language (`lang`), then the browser's. |
 | `label` | `label` | string | `''` | The scheduler's accessible name. Empty: «Scheduler». |
 | `disabled` | `disabled` | boolean | `false` | Disables interaction and dims the control. |
-| `view` | `view` | 'day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda' | `'week'` | The view on screen. |
+| `view` | `view` | 'day' \| 'week' \| 'days' \| 'month' \| 'year' \| 'agenda' \| 'timeline' | `'week'` | The view on screen. |
 | `date` | `date` | string | `''` | The reference date (ISO). Empty: today. |
 
-**Events:** `date-change` → `detail: { value: string }` — Fired when the component writes `date`. Does not bubble.; `event-open` → `detail: { event: SchedulerEvent }` — An event was clicked, or Enter pressed on it.; `period-change` → `detail: { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda'; start: string; end: string }` — The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.; `slot-open` → `detail: { start: string; end: string; resource: string | null; allDay: boolean }` — An empty slot or day was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is a whole day.; `view-change` → `detail: { value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' }` — Fired when the component writes `view`. Does not bubble.
+**Events:** `date-change` → `detail: { value: string }` — Fired when the component writes `date`. Does not bubble.; `event-open` → `detail: { event: SchedulerEvent }` — An event was clicked, or Enter pressed on it.; `period-change` → `detail: { view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string }` — The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.; `slot-open` → `detail: { start: string; end: string; resource: string | null; allDay: boolean }` — An empty slot or day was clicked, or Enter pressed on it: its start and end (ISO, UTC), its resource, and whether it is a whole day.; `view-change` → `detail: { value: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline' }` — Fired when the component writes `view`. Does not bubble.
 
-**Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row` · `rowheader` · `toolbar`
+**Renders:** roles `columnheader` · `grid` · `gridcell` · `group` · `row` · `rowgroup` · `rowheader` · `toolbar` · `treegrid`
 
 **Slot:** `event` — What an event draws; without it, its time and title.
 
 **States:** `:state(disabled)` — `disabled` is set.
 
-**Parts:** `[data-part="root"]` — The scheduler, a `role="group"` named by `label`.; `[data-part="toolbar"]` — The bar above the grid: previous, today, next, the period and the views.; `[data-part="prev"]` — The button to the previous period.; `[data-part="todayButton"]` — The button back to today.; `[data-part="next"]` — The button to the next period.; `[data-part="period"]` — The period on screen, which names the grid.; `[data-part="viewSwitcher"]` — The view buttons, shown when `views` offers more than one.; `[data-part="grid"]` — The `role="grid"` of the time slots or of the month's days.; `[data-part="columnHeader"]` — A day's or a resource's header, or a weekday's in the month.; `[data-part="allDayRow"]` — The row of all-day events.; `[data-part="slot"]` — A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year.; `[data-part="event"]` — An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.; `[data-part="more"]` — A month day's «+N», the events that did not fit; it opens the day.; `[data-part="yearMonth"]` — A month of the year view, a `role="grid"` of its own.; `[data-part="agendaList"]` — The agenda's list of days.; `[data-part="nowLine"]` — The line at the current time.
+**Parts:** `[data-part="root"]` — The scheduler, a `role="group"` named by `label`.; `[data-part="toolbar"]` — The bar above the grid: previous, today, next, the period and the views.; `[data-part="prev"]` — The button to the previous period.; `[data-part="todayButton"]` — The button back to today.; `[data-part="next"]` — The button to the next period.; `[data-part="period"]` — The period on screen, which names the grid.; `[data-part="viewSwitcher"]` — The view buttons, shown when `views` offers more than one.; `[data-part="grid"]` — The `role="grid"` of the time slots, of the month's days, or of the timeline's rows (a `treegrid` when resources nest), which scrolls.; `[data-part="columnHeader"]` — A day's or a resource's header, a weekday's in the month, a slot's, day's or month's in the timeline.; `[data-part="rowHeader"]` — A resource's name at the start of its timeline row; a parent's carries the row's `aria-expanded`.; `[data-part="allDayRow"]` — The row of all-day events.; `[data-part="slot"]` — A cell: a time slot of a day and resource, its all-day cell, a day of the month or of the year, a resource's slot, day or month in the timeline.; `[data-part="event"]` — An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown.; `[data-part="more"]` — A month day's «+N», the events that did not fit; it opens the day.; `[data-part="yearMonth"]` — A month of the year view, a `role="grid"` of its own.; `[data-part="agendaList"]` — The agenda's list of days.; `[data-part="nowLine"]` — The line at the current time.
 
 **Shapes:** `SchedulerEvent { id: string; title: string; start: string; end: string; allDay?: boolean; resource?: string | string[]; color?: string; readonly?: boolean }` · `SchedulerResource { id: string; label: string; color?: string; children?: SchedulerResource[]; readonly?: boolean; businessHours?: BusinessHours }`
 
@@ -63,6 +64,13 @@ are checked against the manifest above._
 
 ```html
 <pdx-scheduler label="Rooms" view="day" :date="today" :resources="rooms" :events="bookings" :views="['day', 'week']" scroll-to="08:00"></pdx-scheduler>
+```
+
+**Timeline** — `view="timeline"` puts each resource on a row along the period: `timeline-scale` is a day of slots, a week or a month of days, or a year of months. A resource's `children` sit under it, and the parent opens and closes with a click, Enter or the arrows. Events that overlap stack in their row. Only the rows and columns in view are drawn, so this fleet of 200 vans costs what a screenful does. _(from the live demo)_
+
+```html
+<pdx-segmented label="Timeline scale" :value="scale" options='["day","week","month","year"]' @value-change="e => scale = e.detail.value"></pdx-segmented>
+<pdx-scheduler label="Fleet" view="timeline" :timeline-scale="scale" :date="today" :resources="fleet" :events="jobs" :views="['timeline']" scroll-to="08:00"></pdx-scheduler>
 ```
 
 **What an event draws** — The `event` snippet draws an event's content; the scheduler keeps its place, its size and its accessible name. Without the snippet an event shows its time and title. _(from the live demo)_
