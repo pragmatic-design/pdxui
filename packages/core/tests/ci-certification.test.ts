@@ -165,6 +165,31 @@ describe('the CI matrix runs every certification project, and every spec is in o
         const expected = CERTIFY_PROJECTS.flatMap((p) => Array.from({ length: p.shards }, (_, i) => `${p.name} ${i + 1}/${p.shards}`));
         expect(entries.sort()).toEqual(expected.sort());
     });
+
+    // The behavior suite rode on the one contracts job; with the project sharded it runs on its first
+    // shard alone (#1075), not once per shard.
+    it('the behavior suite runs once: with the first contracts shard', () => {
+        const flat = jobBody('contracts').replace(/\s+/g, ' ');
+        const step = flat.slice(flat.indexOf('name: Behavior suite'));
+        expect(step).toMatch(/^name: Behavior suite if: matrix\.project == 'contracts' && matrix\.shard == 1 run:/);
+    });
+});
+
+// One check for the whole certification, as Quality has one: the ruleset on `main` can require it by
+// name, and an auto-merge then waits for it. Without it a pull request was merged by auto-merge 42
+// seconds before its certification finished (#1075), on Quality alone.
+describe('certify.yml has one check that waits for every certification job', () => {
+    const jobs = [...workflow.slice(workflow.indexOf('\njobs:')).matchAll(/^ {2}([\w-]+):\s*$/gm)].map((m) => m[1]);
+
+    it('a job named `certification` waits for every other job and fails on any', () => {
+        expect(jobs).toContain('certification');
+        const body = jobBody('certification');
+        expect(body).toMatch(/name:\s*certification\s*\n/);
+        const needs = /needs:\s*\[([^\]]*)\]/.exec(body)?.[1].split(',').map((s) => s.trim()) ?? [];
+        expect([...needs].sort(), 'jobs the check does not wait for').toEqual(jobs.filter((j) => j !== 'certification').sort());
+        expect(body, 'a failed job would skip the check, and a skipped check reads as passed').toMatch(/if:\s*always\(\)/);
+        expect(body, 'the check does not read the results of the jobs it waits for').toContain('needs.*.result');
+    });
 });
 
 // The frozen baseline-2024 target keeps a reduced certification run (decision 16, #509): Dim 1 on the
@@ -176,6 +201,14 @@ describe('CI certifies the baseline-2024 target with a reduced Dim 1 run', () =>
 
     it('has the job, and it runs playwright — the control', () => {
         expect(playwrightInvocations(body()).length).toBeGreaterThan(0);
+    });
+
+    // The same project, so the same shards (#1075): one job took 10m57s–13m06s on 2026-11-14.
+    it('is sharded as the contracts project is', () => {
+        const shards = CERTIFY_PROJECTS.find((p) => p.name === 'contracts')!.shards;
+        const entries = [...body().matchAll(/-\s*\{\s*shard:\s*(\d+),\s*of:\s*(\d+)\s*\}/g)].map((m) => `${m[1]}/${m[2]}`);
+        expect(entries).toEqual(Array.from({ length: shards }, (_, i) => `${i + 1}/${shards}`));
+        expect(body().replace(/\s+/g, ' ')).toContain('--shard=${{ matrix.shard }}/${{ matrix.of }}');
     });
 
     it('builds the pages for baseline-2024', () => {
