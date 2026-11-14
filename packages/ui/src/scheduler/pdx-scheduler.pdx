@@ -126,7 +126,7 @@
         </div>
         @for (slots as m, ri; track m) {
           <div role="row" class="pdx-scheduler-row">
-            <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="m % 60 === 0 ? '' : null">{{ clockLabel(m, loc) }}</div>
+            <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="m % 60 === 0 ? '' : null" :data-first="ri === 0 ? '' : null">{{ clockLabel(m, loc) }}</div>
             @for (columns as c, ci; track c.key) {
               <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="ri + 1" :data-col="ci"
                 :data-off="offHours(c, m) ? '' : null" :data-hour="m % 60 === 0 ? '' : null"

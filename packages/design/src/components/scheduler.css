@@ -156,9 +156,11 @@ pdx-scheduler {
 }
 
 /* A slot's label shows on the hour only; the all-day row's always. The first slot's would sit, raised
-   half a line to its top edge, under the all-day label: it is hidden too, the grid starts there. */
+   half a line to its top edge, under the all-day label: it is hidden too ([data-first]), the grid
+   starts there. A mark, not `[data-part="allDayRow"] + …`: a sibling combinator beside an attribute
+   selector keeps removed elements alive in Chromium. */
 .pdx-scheduler-time[data-slot]:not([data-hour]),
-[data-part="allDayRow"] + .pdx-scheduler-row > .pdx-scheduler-time {
+.pdx-scheduler-time[data-first] {
     color: transparent;
 }
 
