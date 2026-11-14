@@ -24764,17 +24764,8 @@
           "tagName": "pdx-scheduler",
           "category": "Data Display",
           "order": 80,
-          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day.",
+          "description": "A calendar of events in time, by day and by resource. The day, week and N-days views are a grid of\ntime slots, with an all-day row, the current time and the working hours marked, and each resource\n(a room, a technician) can have its own columns. The month view is a grid of days with the events\nstacked in each and a «+N» where they do not fit; the year view, twelve months with the days that\nhave events marked; the agenda, a list of the period's events by day. The timeline puts each\nresource on a row, its children under it and collapsible, along the period's slots, days or months,\nand draws only the rows and columns in view: a thousand resources cost what a screenful does. The\ngrids are WAI-ARIA grids (a treegrid when resources nest):\none tab stop, the arrows from cell to cell, Enter into a cell's events and Escape back out, PageUp and\nPageDown through periods. A click or Enter on an event emits `event-open`; on an empty slot or day,\n`slot-open`; on the «+N» or a day of the year, it opens that day. With the mouse or a pen an event\nis dragged to another time, day or resource and resized by its edges, and a drag over empty slots\ncreates one; each asks `before-move`, `before-resize` or `before-create` first, which the app can\nrefuse, then writes `events`. `prevent-overlap` refuses a place that overlaps another event of the\nsame resource, and says why in `rejected`.",
           "members": [
-            {
-              "kind": "field",
-              "name": "events",
-              "description": "The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day.",
-              "type": {
-                "text": "SchedulerEvent[]"
-              },
-              "default": "[]"
-            },
             {
               "kind": "field",
               "name": "resources",
@@ -24964,6 +24955,44 @@
             },
             {
               "kind": "field",
+              "name": "readonly",
+              "description": "No event is moved, resized or created; an event or resource can still allow it for itself.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "readonly"
+            },
+            {
+              "kind": "field",
+              "name": "preventOverlap",
+              "description": "Refuse a move, resize or create that would overlap another event of the same resource.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false",
+              "attribute": "preventoverlap"
+            },
+            {
+              "kind": "field",
+              "name": "createId",
+              "description": "The id of an event the scheduler creates.",
+              "type": {
+                "text": "() => string"
+              },
+              "default": "() => crypto.randomUUID()"
+            },
+            {
+              "kind": "field",
+              "name": "events",
+              "description": "The events. A start or end with an offset or `Z` is an instant; without one, a wall time in `time-zone`; a date alone, all day. Written by the scheduler after a move, resize or create the app allowed.",
+              "type": {
+                "text": "SchedulerEvent[]"
+              },
+              "default": "[]"
+            },
+            {
+              "kind": "field",
               "name": "view",
               "description": "The view on screen.",
               "type": {
@@ -24984,10 +25013,75 @@
             }
           ],
           "models": [
+            "events",
             "view",
             "date"
           ],
           "events": [
+            {
+              "name": "before-move",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event is about to move, to another time, day or resource; `preventDefault()` refuses it.",
+              "detail": "{ event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "move",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event moved; `events` is already written.",
+              "detail": "{ event: SchedulerEvent; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "before-resize",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event is about to be resized by one edge; `preventDefault()` refuses it.",
+              "detail": "{ event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "resize",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event was resized; `events` is already written.",
+              "detail": "{ event: SchedulerEvent; edge: 'start' | 'end'; from: { start: string; end: string; resource?: string | string[] }; to: { start: string; end: string; resource?: string | string[] }; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "before-create",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A drag over empty slots is about to create an event there (ISO, UTC); `preventDefault()` refuses it.",
+              "detail": "{ start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "external-drop",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Something the app made draggable with `useDrag` was dropped on the grid: its data and where (ISO, UTC); `preventDefault()` refuses it, else an event is created there from `data.title` and `data.duration` (minutes).",
+              "detail": "{ data: unknown; start: string; end: string; resource: string | null; allDay: boolean; conflicts: SchedulerEvent[] }"
+            },
+            {
+              "name": "create",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "An event was created, by a drag over empty slots or a drop from outside, and added to `events`.",
+              "detail": "{ event: SchedulerEvent }"
+            },
+            {
+              "name": "rejected",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "A move, resize or create was refused: by `prevent-overlap` (`overlap`) or by the app (`prevented`).",
+              "detail": "{ action: 'move' | 'resize' | 'create'; event: SchedulerEvent | null; to: { start: string; end: string; resource?: string | string[] }; reason: 'overlap' | 'prevented'; conflicts: SchedulerEvent[] }"
+            },
             {
               "name": "event-open",
               "type": {
@@ -25011,6 +25105,14 @@
               },
               "description": "The period on screen changed, by the bar, the keyboard, or a day opened from the month or the year.",
               "detail": "{ view: 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline'; start: string; end: string }"
+            },
+            {
+              "name": "events-change",
+              "type": {
+                "text": "CustomEvent"
+              },
+              "description": "Fired when the component writes `events`. Does not bubble.",
+              "detail": "{ value: SchedulerEvent[] }"
             },
             {
               "name": "view-change",
@@ -25186,6 +25288,24 @@
               "default": "false"
             },
             {
+              "name": "readonly",
+              "fieldName": "readonly",
+              "description": "No event is moved, resized or created; an event or resource can still allow it for itself.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
+              "name": "preventoverlap",
+              "fieldName": "preventOverlap",
+              "description": "Refuse a move, resize or create that would overlap another event of the same resource.",
+              "type": {
+                "text": "boolean"
+              },
+              "default": "false"
+            },
+            {
               "name": "view",
               "fieldName": "view",
               "description": "The view on screen.",
@@ -25215,7 +25335,10 @@
                 "allDay?: boolean",
                 "resource?: string | string[]",
                 "color?: string",
-                "readonly?: boolean"
+                "readonly?: boolean",
+                "draggable?: boolean",
+                "resizable?: boolean",
+                "background?: boolean"
               ]
             },
             {
@@ -25226,6 +25349,8 @@
                 "color?: string",
                 "children?: SchedulerResource[]",
                 "readonly?: boolean",
+                "draggable?: boolean",
+                "resizable?: boolean",
                 "businessHours?: BusinessHours"
               ]
             }
@@ -25288,7 +25413,11 @@
             },
             {
               "name": "event",
-              "description": "An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown."
+              "description": "An event; `[data-before]` / `[data-after]` mark one that goes on past the piece shown, `[data-movable]` one that can be dragged, `[data-dragging]` the one being dragged."
+            },
+            {
+              "name": "resizeHandle",
+              "description": "An edge of an event that resizes it, `[data-edge=\"start\"]` or `[data-edge=\"end\"]`."
             },
             {
               "name": "more",
@@ -25311,6 +25440,10 @@
             {
               "name": "disabled",
               "description": "`disabled` is set."
+            },
+            {
+              "name": "dragging",
+              "description": "An event is being moved, resized or created with the pointer."
             }
           ],
           "cssProperties": [

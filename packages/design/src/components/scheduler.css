@@ -735,6 +735,66 @@ pdx-scheduler {
     pointer-events: none;
 }
 
+/* ===== Dragging ===== */
+/* An event that can be dragged says so to the pointer; the one being dragged is lifted. An edge of a
+   resizable event is a handle: the top and bottom of a time-grid event, the ends of a bar or a
+   timeline span. While a gesture runs nothing is selected and the cursor stays what it began as. */
+
+.pdx-scheduler-event[data-movable] {
+    cursor: grab;
+}
+
+.pdx-scheduler-event[data-dragging] {
+    z-index: 3;
+    box-shadow: var(--pdx-shadow-md);
+    opacity: 0.9;
+}
+
+.pdx-scheduler-resize {
+    position: absolute;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    height: 6px;
+    cursor: ns-resize;
+}
+
+.pdx-scheduler-resize[data-edge="start"] {
+    top: 0;
+}
+
+.pdx-scheduler-resize[data-edge="end"] {
+    bottom: 0;
+}
+
+/* Bars and spans run across: their handles are their ends. */
+:is(.pdx-scheduler-bar, .pdx-scheduler-span) > .pdx-scheduler-resize {
+    top: 0;
+    bottom: 0;
+    left: auto;
+    right: auto;
+    width: 6px;
+    height: auto;
+    cursor: ew-resize;
+}
+
+:is(.pdx-scheduler-bar, .pdx-scheduler-span) > .pdx-scheduler-resize[data-edge="start"] {
+    left: 0;
+}
+
+:is(.pdx-scheduler-bar, .pdx-scheduler-span) > .pdx-scheduler-resize[data-edge="end"] {
+    right: 0;
+}
+
+:state(dragging) > .pdx-scheduler {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+:state(dragging) > .pdx-scheduler .pdx-scheduler-event[data-movable] {
+    cursor: grabbing;
+}
+
 /* ===== States ===== */
 
 :state(disabled) > .pdx-scheduler {

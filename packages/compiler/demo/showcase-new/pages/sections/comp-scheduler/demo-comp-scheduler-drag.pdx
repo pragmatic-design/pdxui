@@ -1,0 +1,44 @@
+<template>
+  <section>
+    <h2 class="pdx-txt-heading section-heading">Drag, resize, create</h2>
+    <p class="pdx-txt-small pdx-ink-muted">With the mouse or a pen, drag an event to another time or room, pull its top or bottom edge to resize it, or drag over empty slots to create one. Drag the card below onto a room to book it. Each change asks first — <code>before-move</code>, <code>before-resize</code>, <code>before-create</code>, <code>external-drop</code> — and the app can refuse it with <code>preventDefault()</code>; then the scheduler writes <code>events</code>. Here <code>prevent-overlap</code> refuses a room that is already booked, and <code>rejected</code> says so. The workshop is <code>readonly</code>.</p>
+    <div class="drag-demo">
+      <div class="job" :ref="jobEl">Site visit · 1 h</div>
+      <pdx-scheduler label="Rooms, bookable" view="day" :date="today" :resources="rooms" ::events="bookings" :views="['day', 'week']" scroll-to="08:00" prevent-overlap
+        @move="onMove" @resize="onResize" @create="onCreate" @rejected="onRejected"></pdx-scheduler>
+    </div>
+    <p class="pdx-txt-small pdx-ink-muted" aria-live="polite">{{ last }}</p>
+  </section>
+</template>
+
+<script>
+import { useDrag, onDestroy } from '@pdxui/core';
+import { at } from './week.pdx';
+
+const today = at(1);
+const rooms = [
+  { id: 'atlas', label: 'Atlas', color: 'oklch(0.6 0.15 250)' },
+  { id: 'borealis', label: 'Borealis', color: 'oklch(0.6 0.15 150)' },
+];
+let bookings = $signal([
+  { id: 'd1', title: 'Interview', start: at(1, '09:00'), end: at(1, '10:00'), resource: 'atlas' },
+  { id: 'd2', title: 'Workshop', start: at(1, '10:00'), end: at(1, '12:00'), resource: 'borealis', readonly: true },
+  { id: 'd3', title: 'Planning', start: at(1, '13:00'), end: at(1, '14:00'), resource: 'atlas' },
+]);
+let last = $signal('Nothing changed yet.');
+let jobEl = $signal(null);
+
+// The card is the app's own element: useDrag makes it a source the scheduler's grid accepts.
+const job = useDrag(() => jobEl, { data: () => ({ title: 'Site visit', duration: 60 }) });
+onDestroy(() => job.dispose());
+
+function onMove(e) { last = e.detail.event.title + ' moved.'; }
+function onResize(e) { last = e.detail.event.title + ' now ends at ' + e.detail.to.end.slice(11, 16) + '.'; }
+function onCreate(e) { last = e.detail.event.title + ' created.'; }
+function onRejected(e) { last = e.detail.reason === 'overlap' ? 'Refused: that room is already booked.' : 'Refused by the app.'; }
+</script>
+
+<style scoped>
+  .drag-demo { display: flex; flex-direction: column; gap: var(--pdx-space-sm); }
+  .job { align-self: flex-start; padding: var(--pdx-space-xs) var(--pdx-space-sm); background: var(--pdx-color-primary-soft); color: var(--pdx-color-primary-ink); border: 1px dashed var(--pdx-color-primary); border-radius: var(--pdx-radius-md); cursor: grab; user-select: none; touch-action: none; font-size: var(--pdx-text-sm); }
+</style>

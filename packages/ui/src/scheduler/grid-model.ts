@@ -21,7 +21,14 @@ export interface SchedulerEvent {
     /** The resource, or resources, the event belongs to. */
     resource?: string | string[];
     color?: string;
+    /** Neither moved nor resized. */
     readonly?: boolean;
+    /** Whether it may be moved; wins over its resource's and the scheduler's. */
+    draggable?: boolean;
+    /** Whether it may be resized; wins over its resource's and the scheduler's. */
+    resizable?: boolean;
+    /** A blocked slot, drawn behind: never moved, and not counted as an overlap. */
+    background?: boolean;
     [field: string]: unknown;
 }
 
@@ -30,7 +37,12 @@ export interface SchedulerResource {
     label: string;
     color?: string;
     children?: SchedulerResource[];
+    /** Its events are neither moved nor resized, unless an event says otherwise. */
     readonly?: boolean;
+    /** Whether its events may be moved; an event's own wins, a nearer resource's wins over its parent's. */
+    draggable?: boolean;
+    /** Whether its events may be resized, in the same order. */
+    resizable?: boolean;
     businessHours?: BusinessHours;
 }
 
