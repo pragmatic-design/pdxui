@@ -80,27 +80,8 @@
         }
       </div>
     } @else if (view === 'agenda') {
-      <div class="pdx-scheduler-agenda" data-part="agendaList" @click="onClick($event)">
-        @if (agendaGroups.length === 0) {
-          <p class="pdx-scheduler-empty">{{ uiString('scheduler', 'noEvents') }}</p>
-        }
-        @for (agendaGroups as ad; track ad.date) {
-          <div class="pdx-scheduler-agenda-day" :data-today="ad.date === todayDate ? '' : null">
-            <div class="pdx-scheduler-agenda-date" :id="periodId + '-' + ad.date">{{ dayHeader(ad.date, loc).full }}</div>
-            <ul class="pdx-scheduler-agenda-items" :aria-labelledby="periodId + '-' + ad.date">
-              @for (ad.items as it; track it.event.id) {
-                <li>
-                  <button type="button" class="pdx-scheduler-agenda-event" data-part="event" :data-id="it.event.id" :style="colorStyle(it.event)">
-                    <span class="pdx-scheduler-agenda-time">{{ it.allDay ? uiString('scheduler', 'allDay') : spanLabel(it.start, it.end, loc) }}</span>
-                    <span class="pdx-scheduler-agenda-title">@render event?.(it.event) @else { {{ it.event.title }} }</span>
-                    @if (resourceNames(it.event)) { <span class="pdx-scheduler-agenda-resource">{{ resourceNames(it.event) }}</span> }
-                  </button>
-                </li>
-              }
-            </ul>
-          </div>
-        }
-      </div>
+      <pdx-scheduler-agenda :groups="agendaGroups" :today="todayDate" :label-id="periodId" :locale="loc" :resources="resources" :event="event"
+        @click="onClick($event)"></pdx-scheduler-agenda>
     } @else if (view === 'timeline') {
       <div class="pdx-scheduler-timeline" data-part="grid" :role="isTree ? 'treegrid' : 'grid'" :aria-labelledby="periodId" aria-readonly="true"
         :aria-rowcount="tlRows.length + 1" :aria-colcount="tlColumns.length + 1" :ref="gridEl"
@@ -268,6 +249,8 @@ import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { allowed, conflicts, type DropPoint, type Placement } from './drag-model';
 import { schedulerDrag, type Draft, type Gesture } from './scheduler-drag';
 import { cellAt, pointOfCell } from './drop-point';
+import { eventColorStyle, resourceLabels } from './event-style';
+import './scheduler-agenda.pdx';
 import '@pdxui/design/components/scheduler';
 
 type CalendarView = 'day' | 'week' | 'days' | 'month' | 'year' | 'agenda' | 'timeline';
@@ -469,7 +452,7 @@ function timeOf(p: PlacedEvent): string {
   const start = startMinutes + (p.slot + p.offset) * slotMinutes;
   return spanLabel(Math.round(start), Math.round(start + p.length * slotMinutes), loc);
 }
-function resourceNames(e: SchedulerEvent): string { return eventResources(e, resources).map((r) => r.label).join(', '); }
+function resourceNames(e: SchedulerEvent): string { return resourceLabels(e, resources); }
 function where(c: Column): string { return c.resource ? ', ' + c.resource.label : ''; }
 function timedName(p: PlacedEvent, c: Column): string {
   return format(uiString('scheduler', 'eventName'), { title: p.event.title, when: timeOf(p) + ', ' + dayHeader(c.date, loc).full }) + where(c);
@@ -484,10 +467,7 @@ function dayEventName(e: SchedulerEvent, minutes: number | null, w: MonthWeek, f
   return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (names ? ', ' + names : '');
 }
 /** An event's colour: its own, else the colour of the resource it is drawn for, else its first resource's. */
-function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string {
-  const color = e.color ?? resource?.color ?? eventResources(e, resources)[0]?.color;
-  return color ? ';--pdx-scheduler-event-color:' + color : '';
-}
+function colorStyle(e: SchedulerEvent, resource?: SchedulerResource | null): string { return eventColorStyle(e, resources, resource); }
 /** A timeline cell outside the working hours of its row's resource: a slot off the hours, a day off. */
 function tlOff(row: TimelineRow, c: TimelineColumn): boolean {
   if (timelineScale === 'year') return false;

@@ -501,6 +501,12 @@ pdx-scheduler {
 /* ===== Agenda ===== */
 /* The days that have events, each a date over its list; an event is its time, its title, its resource. */
 
+/* The view's own element, an @internal component of pdx-scheduler (#1020): no box of its own, so the
+   list inside it lays out in the scheduler as it did before the split. */
+:where(pdx-scheduler-agenda) {
+    display: contents;
+}
+
 .pdx-scheduler-agenda {
     max-height: var(--pdx-scheduler-height);
     overflow: auto;
