@@ -115,4 +115,19 @@ test.describe('the scheduler agenda', () => {
         const got = await events(page);
         expect(got.map((e) => (e.detail.event as { id: string }).id)).toEqual(['call']);
     });
+
+    test('an event snippet the app sets draws each event, and without one the title is drawn', async ({ page }) => {
+        const scheduler = await open(page, 'scheduler-agenda');
+        const list = scheduler.locator('[data-part="agendaList"]');
+        await expect(list.locator('.pdx-scheduler-agenda-title').first()).toHaveText('Call');
+        await scheduler.evaluate((host) => {
+            (host as unknown as { event: (e: { title: string }) => Node }).event = (e) => {
+                const b = document.createElement('b');
+                b.className = 'custom';
+                b.textContent = e.title.toUpperCase();
+                return b;
+            };
+        });
+        await expect(list.locator('.pdx-scheduler-agenda-title .custom').first()).toHaveText('CALL');
+    });
 });

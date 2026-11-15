@@ -58,7 +58,7 @@ Severity is the catalogue's (`error`, `warn`, `info`). Codes marked *(design)* a
 | `PDX_TWO_WAY_NOT_MODEL` | error | `::x` on a component prop that is not one of its models (#124). | `::name`, [template.md](template.md); `@model`, [script.md](script.md) |
 | `PDX_PART_MISSING` | error | A declared `@part` that no element of the template, nor of an `@internal` view it imports, carries. | `@part`, [script.md](script.md) |
 | `PDX_PART_IN_VIEW` | warn | The script reads a `@part` that only one of its `@internal` views draws (#1110). | `@part`, [script.md](script.md) |
-| `PDX_PART_NAME_TAKEN` | info | A `@part` whose name the script declares as a prop, a model, an import, a function or a constant, with no `:ref` on its element: that declaration keeps its meaning. | `@part`, [script.md](script.md) |
+| `PDX_PART_NAME_TAKEN` | info | A `@part` whose name the script declares as a prop, a model, a slot, an import, a function or a constant, with no `:ref` on its element: that declaration keeps its meaning. | `@part`, [script.md](script.md) |
 | `PDX_PART_UNDECLARED` | error | A `data-part` that names no `@part` — of this component, or of the component an `@internal` view belongs to. | `@part`, [script.md](script.md) |
 | `PDX_HOST_INVALID_ATTRIBUTE` | error | On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument. | `@host`, [script.md](script.md) |
 | `PDX_MALFORMED_STATE` | error | `@state` written in a shape the compiler does not recognise. | `@state`, [script.md](script.md) |
