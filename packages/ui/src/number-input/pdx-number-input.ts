@@ -2,7 +2,7 @@
 // Cursor-position-aware step, sign toggle, locale formatting.
 // Stepper buttons rendered OUTSIDE the input wrap (input-group style).
 
-import { component, event, html, signal, model, prop } from '@pdxui/core';
+import { component, event, html, signal, model, prop, onMount } from '@pdxui/core';
 import { uiString, uiAttr} from '../shared/i18n';
 import { resolveLocale, numberSeparators } from '../shared/locale';
 import { dispatchCommit } from '../shared/commit-change';
@@ -422,8 +422,6 @@ component('pdx-number-input', {
         let _bound = false;
 
         ctx.track(() => {
-            const el = ctx.el;
-
             // Subscribe to value/min/max so changes after mount re-sync the display.
             const propVal = ctx.value() as unknown;
             const fromProp = (): number | null => (isEmptyValue(propVal) ? null : Number(propVal));
@@ -441,44 +439,47 @@ component('pdx-number-input', {
                 next = normalize(next);
                 if (!Object.is(next, _value)) { _value = next; _committed = next; updateDisplay(); }
             }
+        });
 
-            requestAnimationFrame(() => {
-                if (!_bound) {
-                    _bound = true;
-                    inputEl = el.querySelector('input') as HTMLInputElement;
-                    if (inputEl) {
-                        inputEl.value = displayFormat(_value);
-                        inputEl.onkeydown = onKeydown;
-                        inputEl.oninput = onInput;
-                        inputEl.onblur = onBlur as any;
-                        inputEl.onfocus = onFocus as any;
-                        // Keep centered — sign button is part of the visual group
-                        if (ctx.allowWheel()) {
-                            inputEl.addEventListener('wheel', onWheel, { passive: false });
-                        }
-                    }
-                    // Create sign button imperatively
-                    if (isNegativeAllowed()) {
-                        const slot = el.querySelector('.pdx-number-sign-slot');
-                        if (slot) {
-                            const signBtn = document.createElement('button');
-                            signBtn.type = 'button';
-                            signBtn.dataset.part = 'sign';
-                            uiAttr(signBtn, 'aria-label', () => uiString('number-input', 'negative'));
-                            signBtn.onclick = () => {
-                                toggleSign();
-                                syncSign();
-                            };
-                            slot.replaceWith(signBtn);
-                            // Store ref for updates from keyboard
-                            (el as any).__signBtn = signBtn;
-                            syncSign();
-                            // Position sign adjacent to centered text
-                            requestAnimationFrame(() => positionSign());
-                        }
-                    }
+        // The one-time binding of the inner <input>, once the first render is in. It used to wait for
+        // the next frame, and until that frame came the field heard no key and its value was written
+        // over what had been typed (#1107): a filter or a cell editor created on a busy page.
+        onMount(() => {
+            if (_bound) return;
+            _bound = true;
+            const el = ctx.el;
+            inputEl = el.querySelector('input') as HTMLInputElement;
+            if (inputEl) {
+                inputEl.value = displayFormat(_value);
+                inputEl.onkeydown = onKeydown;
+                inputEl.oninput = onInput;
+                inputEl.onblur = onBlur as any;
+                inputEl.onfocus = onFocus as any;
+                // Keep centered — sign button is part of the visual group
+                if (ctx.allowWheel()) {
+                    inputEl.addEventListener('wheel', onWheel, { passive: false });
                 }
-            });
+            }
+            // Create sign button imperatively
+            if (isNegativeAllowed()) {
+                const slot = el.querySelector('.pdx-number-sign-slot');
+                if (slot) {
+                    const signBtn = document.createElement('button');
+                    signBtn.type = 'button';
+                    signBtn.dataset.part = 'sign';
+                    uiAttr(signBtn, 'aria-label', () => uiString('number-input', 'negative'));
+                    signBtn.onclick = () => {
+                        toggleSign();
+                        syncSign();
+                    };
+                    slot.replaceWith(signBtn);
+                    // Store ref for updates from keyboard
+                    (el as any).__signBtn = signBtn;
+                    syncSign();
+                    // Position sign adjacent to centered text: a measurement, so after layout.
+                    requestAnimationFrame(() => positionSign());
+                }
+            }
         });
 
         ctx.formValue?.(() => _liveValue());
