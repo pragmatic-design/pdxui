@@ -167,6 +167,12 @@ button.pdx-date-picker-icon:focus-visible {
     gap: var(--pdx-space-sm);
 }
 
+/* A calendar that opens the panel brings its own space above it, the padding of its navigation
+   row: the panel's top padding on top of it made the top inset twice the side one (#1088). */
+.pdx-date-picker-main:has(> pdx-calendar:first-child) {
+    padding-top: 0;
+}
+
 /* Calendar inside panel: remove its own border (panel provides the container) */
 .pdx-date-picker-panel .pdx-calendar-inline {
     border: none;
