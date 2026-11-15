@@ -112,6 +112,24 @@ export function buildSlots(startMinutes: number, endMinutes: number, slotMinutes
     return slots;
 }
 
+/** Where the current-time line is drawn: a slot, the fraction of it passed, in a column. */
+export interface NowLine { col: number; row: number; offset: number }
+
+/**
+ * The current-time lines: one in each column of `here.date` (a day, or that day of each resource), in
+ * the slot `here.minutes` falls in, `offset` of the way down it. None when the time is off the hours
+ * shown or the day is not in view. Worked out once per render, not asked by every cell (#1085).
+ */
+export function nowLines(columns: readonly Column[], slots: readonly number[], slotMinutes: number, endMinutes: number,
+    here: { date: string; minutes: number }): NowLine[] {
+    const row = slots.findIndex((from) => here.minutes >= from && here.minutes < Math.min(from + slotMinutes, endMinutes));
+    if (row < 0) return [];
+    const offset = (here.minutes - slots[row]) / slotMinutes;
+    const lines: NowLine[] = [];
+    columns.forEach((c, col) => { if (c.date === here.date) lines.push({ col, row, offset }); });
+    return lines;
+}
+
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
 /** An event the all-day row draws: `allDay`, or a start that is a date alone. */
@@ -141,6 +159,29 @@ export function cellIndex(placed: Map<string, PlacedEvent[]>, columns: readonly 
             if (list) list.push(p); else out.set(key, [p]);
         }
     });
+    return out;
+}
+
+/**
+ * The timed events a drawn time grid shows in its first drawn slot `first`, by column index, beside
+ * those that start there: the ones that start in a slot not drawn above it and reach into it (#1085).
+ * Each is moved to `first` with its offset made negative, so it is drawn from where it starts, above
+ * the window, and its start (`slot + offset`) is unchanged.
+ */
+export function eventsFromAbove(byCell: Map<string, PlacedEvent[]>, first: number, drawn: ReadonlySet<number>): Map<number, PlacedEvent[]> {
+    const out = new Map<number, PlacedEvent[]>();
+    for (const [key, list] of byCell) {
+        const bar = key.indexOf('|');
+        const slot = Number(key.slice(bar + 1));
+        if (slot >= first || drawn.has(slot)) continue;
+        const col = Number(key.slice(0, bar));
+        for (const p of list) {
+            if (p.slot + p.offset + p.length <= first) continue;
+            const moved = { ...p, slot: first, offset: p.slot + p.offset - first };
+            const at = out.get(col);
+            if (at) at.push(moved); else out.set(col, [moved]);
+        }
+    }
     return out;
 }
 

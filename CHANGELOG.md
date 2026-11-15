@@ -32,7 +32,9 @@ browser targets — and the language reference, [docs/language](docs/language/RE
   month of days or a year of months (`timeline-scale`); a resource's children sit under it, and the
   parent opens and closes with a click, Enter or the arrows (a WAI-ARIA treegrid). Overlapping events
   stack in their row, and only the rows and columns in view are drawn: 500 resources over a day of
-  half-hour slots keep fewer than 40 rows in the DOM. `views` offers all seven by default. With the
+  half-hour slots keep fewer than 40 rows in the DOM. The day, week and N-days grids draw only the slots
+  in view as well, so a week over a whole day mounts in a fifth of the time (#1085). `views` offers all
+  seven by default. With the
   mouse or a pen an event is dragged to another time, day or resource and resized by its edges, a
   drag over empty slots creates one, and something the app made draggable with `useDrag` can be
   dropped on the grid (`external-drop`). Each asks first — `before-move`, `before-resize`,

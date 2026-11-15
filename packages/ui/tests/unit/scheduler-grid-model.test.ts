@@ -4,7 +4,7 @@
 // once per day and resource it covers, and side by side with the events it overlaps there. An all-day
 // event is a bar in the all-day row, over the adjacent columns it covers, in a lane.
 import { describe, it, expect } from 'vitest';
-import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime, isWorkingDay, buildHeaderRows, eventResources } from '../../src/scheduler/grid-model';
+import { buildColumns, buildSlots, placeTimed, placeAllDay, isAllDay, isBusinessTime, isWorkingDay, buildHeaderRows, eventResources, nowLines, eventsFromAbove, type PlacedEvent } from '../../src/scheduler/grid-model';
 
 const ROME = 'Europe/Rome';
 const days = ['2026-11-16', '2026-11-17', '2026-11-18'];
@@ -33,6 +33,53 @@ describe('buildSlots', () => {
 
     it('a last slot cut by the end of the visible hours is kept, shorter', () => {
         expect(buildSlots(0, 50, 30)).toEqual([0, 30]);
+    });
+});
+
+describe('nowLines', () => {
+    const slots = buildSlots(8 * 60, 10 * 60, 30);
+    it('one line in the column of the day, in the slot of the minute, the fraction of it passed', () => {
+        expect(nowLines(buildColumns(days, [], 'resource'), slots, 30, 600, { date: '2026-11-17', minutes: 9 * 60 + 15 }))
+            .toEqual([{ col: 1, row: 2, offset: 0.5 }]);
+    });
+
+    it('a line in each of the day\'s columns, wherever the resources put them', () => {
+        const cols = buildColumns(days.slice(0, 2), rooms, 'resource');
+        expect(nowLines(cols, slots, 30, 600, { date: '2026-11-17', minutes: 480 }).map((l) => l.col)).toEqual([1, 3]);
+    });
+
+    it('none off the hours shown, or on a day not in view', () => {
+        const cols = buildColumns(days, [], 'resource');
+        expect(nowLines(cols, slots, 30, 600, { date: '2026-11-17', minutes: 600 })).toEqual([]);
+        expect(nowLines(cols, slots, 30, 600, { date: '2026-11-17', minutes: 7 * 60 })).toEqual([]);
+        expect(nowLines(cols, slots, 30, 600, { date: '2026-11-20', minutes: 480 })).toEqual([]);
+    });
+});
+
+describe('eventsFromAbove', () => {
+    const placed = (id: string, slot: number, offset: number, length: number): PlacedEvent => ({
+        id, event: { id, title: id, start: '', end: '' }, slot, offset, length, column: 0, columns: 1, span: 1, before: false, after: false,
+    });
+    const byCell = new Map<string, PlacedEvent[]>([
+        ['0|2', [placed('long', 2, 0.5, 20)]],
+        ['0|5', [placed('short', 5, 0, 2)]],
+        ['1|3', [placed('other', 3, 0, 10)]],
+        ['1|12', [placed('inside', 12, 0, 1)]],
+    ]);
+
+    it('the events that start above the first drawn slot and reach into it, moved there with their start unchanged', () => {
+        const got = eventsFromAbove(byCell, 10, new Set([10, 11, 12]));
+        expect(got.get(0)?.map((p) => [p.id, p.slot, p.offset])).toEqual([['long', 10, -7.5]]);
+        expect(got.get(1)?.map((p) => p.id)).toEqual(['other']);
+        const long = got.get(0)![0];
+        expect(long.slot + long.offset).toBe(2.5);
+        expect(long.length).toBe(20);
+    });
+
+    it('not one that ends before it, nor one whose own slot is drawn (the tab stop\'s)', () => {
+        const got = eventsFromAbove(byCell, 10, new Set([3, 10, 11, 12]));
+        expect(got.get(1)).toBeUndefined();
+        expect(got.get(0)?.map((p) => p.id)).toEqual(['long']);
     });
 });
 

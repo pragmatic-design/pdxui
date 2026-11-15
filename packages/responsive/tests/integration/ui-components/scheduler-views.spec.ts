@@ -78,9 +78,11 @@ test.describe('the scheduler month', () => {
         // The scenario's hours start at midnight; scroll-to is 08:00, the 17th slot of half an hour: row 17.
         const eight = scheduler.locator('[data-row="17"][data-col="0"]');
         await expect(eight).toBeFocused();
-        // The 08:00 slot is the first under the all-day row, not the last in the window.
+        // The 08:00 slot is the first under the all-day row, not the last in the window. Measured from
+        // the row's cell: its label is centred in it and shorter, and the slot under the label's bottom
+        // was 15 px under the sticky row (#1085).
         await expect.poll(async () => {
-            const [cell, head] = await Promise.all([eight.boundingBox(), scheduler.locator('[data-part="allDayRow"] [role="rowheader"]').boundingBox()]);
+            const [cell, head] = await Promise.all([eight.boundingBox(), scheduler.locator('[data-part="allDayRow"] [role="gridcell"]').first().boundingBox()]);
             return Math.abs(Math.round((cell?.y ?? 0) - ((head?.y ?? 0) + (head?.height ?? 0))));
         }).toBeLessThanOrEqual(2);
     });
