@@ -95,15 +95,41 @@ describe('cell editing by typing', () => {
         expect(cell(el, 1, 'city').classList.contains('pdx-dg-cell-editing')).toBe(true);
     });
 
-    it('a click outside saves the typed text', async () => {
-        const { el, source } = await mountGrid('cell');
+    /**
+     * Open the name editor, type, click outside, and wait until the source holds the save. The outside
+     * listener is installed in the frame after the editor opens: a frame asked for now runs after it,
+     * as frames run in order. A fixed 30 ms was a guess at when that frame comes (#1100).
+     */
+    async function clickAway(el: HTMLElement, source: { getById(id: unknown): unknown }, events: { type: string }[]): Promise<void> {
         const input = await openEditor(el, 1, 'name');
         type(input, 'Clicked away');
-        await tick(30); // the outside listener is installed a frame after the editor opens
+        await new Promise<void>((done) => requestAnimationFrame(() => done()));
         document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
-        await tick(30);
+        // The save writes the source, then syncs it: read once the source says so, not after a delay.
+        await vi.waitFor(() => {
+            expect((source.getById(1) as Row).name, `the edit was not saved: ${events.map((e) => e.type).join(', ')}`).toBe('Clicked away');
+        }, { timeout: 3000 }); // under the test's own 5 s, so a failure says why and the frames are restored
+    }
 
-        expect((source.getById(1) as Row).name).toBe('Clicked away');
+    it('a click outside saves the typed text', async () => {
+        const { el, source, events } = await mountGrid('cell');
+        await clickAway(el, source, events);
+        expect(events.map((e) => e.type)).toEqual(['pdx-cell-edit-end']);
+    });
+
+    it('the typed text survives a frame that comes late, as under the gate\'s load (#1100)', async () => {
+        // The editor got its starting value in a frame of its own: one that came after the first keys
+        // wrote the old value over them, and the click outside found nothing changed and cancelled.
+        const { el, source, events } = await mountGrid('cell');
+        const frame = window.requestAnimationFrame;
+        // Every frame from the double-click on comes 60 ms late.
+        window.requestAnimationFrame = (cb) => frame(() => setTimeout(() => cb(performance.now()), 60));
+        try {
+            await clickAway(el, source, events);
+        } finally {
+            window.requestAnimationFrame = frame;
+        }
+        expect(events.map((e) => e.type)).toEqual(['pdx-cell-edit-end']);
     });
 
     it('a number column saves the typed number, as a number', async () => {
