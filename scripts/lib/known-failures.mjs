@@ -98,6 +98,14 @@ export const KNOWN = [
         matches: (f) => Boolean(f.slowTest) && TIMED_OUT.test(f.error),
     },
     {
+        issue: 1099,
+        says: 'a child Playwright run of site-fixture.spec ended before its test, with no report',
+        evidence: 'the child\'s exit code, signal and the tail of its stderr and stdout, which the failure message carries',
+        // As it was recorded (an ENOENT on the child's JSON report), and as the spec words it since.
+        matches: (f) => fileIs(f, 'site-fixture.spec.ts')
+            && (/the child run wrote no report/.test(f.error) || /ENOENT: no such file or directory, open '[^']*\.json'/.test(f.error)),
+    },
+    {
         issue: 1027,
         says: 'remove-tree\'s grandchild case found dist/ not held',
         evidence: 'the precondition\'s message: whether the grandchild was alive, and whether dist/ was held',
