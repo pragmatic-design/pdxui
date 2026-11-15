@@ -147,10 +147,12 @@
       </div>
     } @else {
       <div class="pdx-scheduler-grid" data-part="grid" role="grid" :aria-labelledby="periodId" aria-readonly="true"
-        :style="'--_scheduler-cols:' + columns.length + ';--_scheduler-heads:' + headerRows.length + ';--_scheduler-lanes:' + allDay.lanes" :ref="gridEl"
+        :aria-rowcount="headerRows.length + 1 + slots.length" :aria-colcount="columns.length + 1"
+        :style="'--_scheduler-cols:' + columns.length + ';--_scheduler-heads:' + headerRows.length + ';--_scheduler-lanes:' + allDay.lanes + ';--_scheduler-slots:' + slots.length" :ref="gridEl"
         @keydown="onKey($event)" @click="onClick($event)" @focusout="onFocusOut($event)" @pointerdown="drag.down($event)">
-        @for (headerRows as hr; track hr.key) {
-          <div role="row" class="pdx-scheduler-row pdx-scheduler-head">
+        <div class="pdx-scheduler-slot-probe" aria-hidden="true" :ref="slotProbeEl"></div>
+        @for (headerRows as hr, hi; track hr.key) {
+          <div role="row" class="pdx-scheduler-row pdx-scheduler-head" :aria-rowindex="hi + 1">
             <div role="columnheader" class="pdx-scheduler-corner"><span class="pdx-sr-only">{{ hr.corner }}</span></div>
             @for (hr.cells as h; track h.key) {
               <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-label="h.full"
@@ -158,7 +160,7 @@
             }
           </div>
         }
-        <div role="row" class="pdx-scheduler-row" data-part="allDayRow">
+        <div role="row" class="pdx-scheduler-row" data-part="allDayRow" :aria-rowindex="headerRows.length + 1">
           <div role="rowheader" class="pdx-scheduler-time pdx-scheduler-allday-label">{{ uiString('scheduler', 'allDay') }}</div>
           @for (columns as c, ci; track c.key) {
             <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-allday" data-part="slot" data-row="0" :data-col="ci" :tabindex="tabCell.row === 0 && tabCell.col === ci ? 0 : -1" :style="'--_scheduler-col:' + ci">
@@ -177,14 +179,14 @@
             </div>
           }
         </div>
-        @for (slots as m, ri; track m) {
-          <div role="row" class="pdx-scheduler-row">
-            <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="m % 60 === 0 ? '' : null" :data-first="ri === 0 ? '' : null">{{ clockLabel(m, loc) }}</div>
+        @for (shownSlots as s; track s.m) {
+          <div role="row" class="pdx-scheduler-row" data-slot-row :aria-rowindex="headerRows.length + 2 + s.ri" :style="'--_scheduler-row:' + (headerRows.length + 2 + s.ri)">
+            <div role="rowheader" class="pdx-scheduler-time" data-slot :data-hour="s.m % 60 === 0 ? '' : null" :data-first="s.ri === 0 ? '' : null">{{ clockLabel(s.m, loc) }}</div>
             @for (columns as c, ci; track c.key) {
-              <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="ri + 1" :data-col="ci"
-                :data-off="offHours(c, m) ? '' : null" :data-hour="m % 60 === 0 ? '' : null"
-                :tabindex="tabCell.row === ri + 1 && tabCell.col === ci ? 0 : -1">
-                @for (eventsAt(ci, ri) as p; track p.id) {
+              <div role="gridcell" class="pdx-scheduler-cell" data-part="slot" :data-row="s.ri + 1" :data-col="ci"
+                :data-off="offHours(c, s.m) ? '' : null" :data-hour="s.m % 60 === 0 ? '' : null"
+                :tabindex="tabCell.row === s.ri + 1 && tabCell.col === ci ? 0 : -1">
+                @for (eventsAt(ci, s.ri) as p; track p.id) {
                   <button type="button" class="pdx-scheduler-event" data-part="event" tabindex="-1" :data-id="p.id"
                     :style="'--_scheduler-offset:' + p.offset + ';--_scheduler-length:' + p.length + ';--_scheduler-column:' + p.column + ';--_scheduler-columns:' + p.columns + ';--_scheduler-span:' + p.span + colorStyle(p.event, c.resource)"
                     :data-before="p.before ? '' : null" :data-after="p.after ? '' : null" :aria-label="timedName(p, c)"
@@ -199,12 +201,13 @@
                     }
                   </button>
                 }
-                @if (nowAt(ci, ri) !== null) {
-                  <div class="pdx-scheduler-now" data-part="nowLine" aria-hidden="true" :style="'--_scheduler-offset:' + nowAt(ci, ri)"></div>
-                }
               </div>
             }
           </div>
+        }
+        @for (nowLines as nl; track nl.col) {
+          <div class="pdx-scheduler-now" data-part="nowLine" aria-hidden="true"
+            :style="'grid-area:' + (headerRows.length + 2 + nl.row) + '/' + (nl.col + 2) + '/span 1/span 1;--_scheduler-offset:' + nl.offset"></div>
         }
       </div>
     }
@@ -255,10 +258,11 @@ import { addDays, announce, generatedId, getFirstDayOfWeek, onDestroy, onMount, 
 import { uiString, format } from '../shared/i18n';
 import { resolveLocale } from '../shared/locale';
 import { viewRange, stepPeriod, parseClock, zonedInstant, zonedParts, eventInstant } from './time';
-import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
+import { buildColumns, buildSlots, buildHeaderRows, cellIndex, eventResources, eventDates, isAllDay, placeTimed, placeAllDay, isBusinessTime, isWorkingDay, nowLines as nowLinesOf, eventsFromAbove, type SchedulerEvent, type SchedulerResource, type BusinessHours, type Column, type PlacedEvent } from './grid-model';
 import { buildMonthWeeks, buildYearMonths, buildAgendaDays, type MonthWeek, type YearMonth } from './calendar-model';
 import { timelineRows, timelineColumns, placeTimeline, axisPosition, itemsInColumn, type TimelineRow, type TimelineColumn } from './timeline-model';
 import { timelineWindow } from './timeline-window';
+import { slotWindow } from './time-window';
 import { periodLabel, dayHeader, dayRange, clockLabel, spanLabel, monthName, weekdayName, timelineHeader } from './labels';
 import { gridKeyTarget, dayKeyTarget } from './grid-keys';
 import { allowed, conflicts, type DropPoint, type Placement } from './drag-model';
@@ -366,6 +370,9 @@ let collapsed = $signal<ReadonlySet<string>>(new Set());
 /** The timeline's hidden probe, and the lane height and column width it measures from the theme, in px. */
 let probeEl = $signal<HTMLElement | null>(null);
 let metrics = $signal({ lane: 32, column: 80 });
+/** The time grid's hidden probe, and the slot height it measures from the theme, in px. */
+let slotProbeEl = $signal<HTMLElement | null>(null);
+let slotPx = $signal(36);
 /** What a pointer drag would make of an event, drawn in its place until it is dropped or dropped back. */
 let draft = $signal<Draft | null>(null);
 
@@ -391,7 +398,10 @@ const timed = $derived(placeTimed(shown, columns, { timeZone: zone, startMinutes
 const allDay = $derived(placeAllDay(shown, columns, zone));
 /** The timed events by cell, `column|slot`, so a cell reads its own in one lookup. */
 const byCell = $derived(cellIndex(timed, columns));
-const todayDate = $derived(zonedParts(now, zone).date);
+const nowParts = $derived(zonedParts(now, zone));
+const todayDate = $derived(nowParts.date);
+/** The current-time lines of the time grid, worked out once, not asked by each of its cells (#1085). */
+const nowLines = $derived(nowIndicator && isTimeGrid ? nowLinesOf(columns, slots, slotMinutes, endMinutes, nowParts) : []);
 const headerRows = $derived(buildHeaderRows(columns, range.days, resources, groupBy, {
   today: todayDate,
   dayLabel: (d) => { const h = dayHeader(d, loc); return { text: h.weekday + ' ' + h.day, full: h.full }; },
@@ -421,6 +431,16 @@ const homeCell = $derived(view === 'month'
   : { row: Math.max(0, slots.findIndex((m) => m >= parseClock(scrollTo))) + 1, col: Math.max(0, columns.findIndex((c) => c.date === refDate)) });
 /** The tab stop, inside the grid on screen: a view with fewer rows or columns keeps one cell reachable. */
 const tabCell = $derived({ row: Math.min((active ?? homeCell).row, gridSize.rows - 1), col: Math.min((active ?? homeCell).col, gridSize.cols - 1) });
+// The slots of the time grid in view, and the tab stop's wherever it is (#1085).
+const slotWin = slotWindow({
+  grid: () => (isTimeGrid ? gridEl : null),
+  count: () => slots.length,
+  slotHeight: () => slotPx,
+  pinned: () => tabCell.row - 1,
+});
+const shownSlots = $derived(slotWin.rows().filter((ri) => ri < slots.length).map((ri) => ({ ri, m: slots[ri] })));
+/** The events that start above the drawn slots and reach into them, drawn from the first one. */
+const fromAbove = $derived(eventsFromAbove(byCell, slotWin.first(), new Set(slotWin.rows())));
 // The rows and columns of the timeline in view, and the tab stop's wherever it is.
 const tlWindow = timelineWindow({
   grid: () => (view === 'timeline' ? gridEl : null),
@@ -435,7 +455,11 @@ const tlCols = $derived(tlWindow.columns().filter((vc) => vc.index < tlColumns.l
   return { index: vc.index, col, today: col.minutes === null && timelineScale !== 'year' && col.date === todayDate, ...timelineHeader(col, timelineScale, loc) };
 }));
 
-function eventsAt(ci: number, ri: number): PlacedEvent[] { return byCell.get(ci + '|' + ri) ?? []; }
+function eventsAt(ci: number, ri: number): PlacedEvent[] {
+  const own = byCell.get(ci + '|' + ri) ?? [];
+  const above = ri === slotWin.first() ? fromAbove.get(ci) : undefined;
+  return above ? [...above, ...own] : own;
+}
 function barsAt(ci: number) { return allDay.bars.filter((b) => b.first === ci); }
 function itemsAt(w: MonthWeek, di: number) { return w.items.filter((it) => it.first === di); }
 function monthHeadsOf(m: YearMonth) { return m.weeks[0].map((d) => ({ key: d.date, ...weekdayName(d.date, loc) })); }
@@ -476,16 +500,6 @@ function spanName(e: SchedulerEvent, resource: SchedulerResource | null): string
   const days = dayRange(d.from, addDays(d.to, -1), loc);
   const when = (isAllDay(e) ? uiString('scheduler', 'allDay') : clockLabel(zonedParts(eventInstant(e.start, zone), zone).minutes, loc)) + ', ' + days;
   return format(uiString('scheduler', 'eventName'), { title: e.title, when }) + (resource ? ', ' + resource.label : '');
-}
-/** Where the current-time line is in this cell, 0 to 1, or null when it is not here. */
-function nowAt(ci: number, ri: number): number | null {
-  if (!nowIndicator) return null;
-  const c = columns[ci];
-  const here = zonedParts(now, zone);
-  if (!c || c.date !== here.date) return null;
-  const from = slots[ri];
-  const to = Math.min(from + slotMinutes, endMinutes);
-  return here.minutes >= from && here.minutes < to ? (here.minutes - from) / slotMinutes : null;
 }
 
 // ─── The period ────────────────────────────────────────────────────────────────
@@ -769,13 +783,19 @@ $watch(gridEl, (grid) => {
   if (!isTimeGrid) return;
   requestAnimationFrame(() => {
     const first = slots.findIndex((m) => m >= parseClock(scrollTo));
-    const row = grid.querySelector(`[data-row="${first + 1}"]`) as HTMLElement | null;
-    const head = grid.querySelector('[data-part="allDayRow"] [role="rowheader"]') as HTMLElement | null;
-    // From the rectangles, not offsetTop: the all-day row is sticky, and a sticky element's offsetTop
-    // moves with the scroll, so a grid already scrolled (by the focus of a day opened) went elsewhere.
-    if (row && head && first > 0) grid.scrollTop += row.getBoundingClientRect().top - head.getBoundingClientRect().bottom;
+    // From the slot height, not from the row: the row may not be drawn yet (#1085). The header and
+    // all-day rows are sticky, so slot `first` sits right under them at `first` slots of scroll.
+    const slot = slotProbeEl?.getBoundingClientRect().height ?? 0;
+    if (first > 0 && slot > 0) grid.scrollTop = first * slot;
   });
 });
+// A slot's height is the theme's (`--pdx-scheduler-slot-height`): the probe is sized by it, and
+// measured again when it changes.
+const slotProbeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
+  const h = entry.target.getBoundingClientRect().height;
+  if (h > 0 && h !== slotPx) slotPx = h;
+});
+$watch(slotProbeEl, (probe) => { slotProbeObserver?.disconnect(); if (probe) slotProbeObserver?.observe(probe); });
 // A lane's height and a column's width are the theme's (`--pdx-scheduler-lane-height`,
 // `--pdx-scheduler-timeline-column`): the probe is sized by them, and measured again when they change.
 const probeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(([entry]) => {
@@ -785,5 +805,5 @@ const probeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeO
 $watch(probeEl, (probe) => { probeObserver?.disconnect(); if (probe) probeObserver?.observe(probe); });
 let clock: ReturnType<typeof setInterval> | undefined;
 onMount(() => { clock = setInterval(() => { now = Date.now(); }, 60_000); });
-onDestroy(() => { if (clock !== undefined) clearInterval(clock); probeObserver?.disconnect(); tlWindow.dispose(); drag.cancel(); dropZone.dispose(); });
+onDestroy(() => { if (clock !== undefined) clearInterval(clock); probeObserver?.disconnect(); slotProbeObserver?.disconnect(); tlWindow.dispose(); slotWin.dispose(); drag.cancel(); dropZone.dispose(); });
 </script>

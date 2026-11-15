@@ -85,14 +85,18 @@ pdx-scheduler {
 .pdx-scheduler-grid {
     display: grid;
     grid-template-columns: var(--pdx-scheduler-time-width) repeat(var(--_scheduler-cols, 1), minmax(var(--pdx-scheduler-column-min), 1fr));
-    /* The header rows (--_scheduler-heads of them), the all-day row, then one track per slot. */
-    grid-template-rows: repeat(var(--_scheduler-heads, 1), var(--pdx-scheduler-header-height)) auto;
+    /* The header rows (--_scheduler-heads of them), the all-day row, then one track per slot, every
+       one of them: only the slots in view are drawn (#1085), each in its own track, and the tracks of
+       the others keep their height. */
+    grid-template-rows: repeat(var(--_scheduler-heads, 1), var(--pdx-scheduler-header-height)) auto repeat(var(--_scheduler-slots, 1), var(--pdx-scheduler-slot-height));
     grid-auto-rows: var(--pdx-scheduler-slot-height);
     max-height: var(--pdx-scheduler-height);
     overflow: auto;
     /* Its width is its container's, not its columns': a week of 7rem columns scrolls inside a phone
        instead of pushing the page past the screen (measured: 856px of columns in a 390px viewport). */
     contain: inline-size;
+    /* The containing block of the current-time line, which is placed in its cell's grid area. */
+    position: relative;
     background: var(--pdx-color-surface);
     border: 1px solid var(--pdx-color-border);
     border-radius: var(--pdx-radius-md);
@@ -100,6 +104,23 @@ pdx-scheduler {
 
 .pdx-scheduler-row {
     display: contents;
+}
+
+/* A slot's row is in the track of its slot (--_scheduler-row), not in the next free one: the slots
+   above it may not be drawn. Its cells then fill the columns in order. */
+.pdx-scheduler-row[data-slot-row] > * {
+    grid-row: var(--_scheduler-row);
+}
+
+/* Sized by the slot height, which the time grid measures from it. */
+.pdx-scheduler-slot-probe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: var(--pdx-scheduler-slot-height);
+    visibility: hidden;
+    pointer-events: none;
 }
 
 /* The header rows keep their height and stay on top while the slots scroll under them. */
@@ -220,7 +241,10 @@ pdx-scheduler {
     --_scheduler-tint: var(--pdx-scheduler-event-color, var(--pdx-color-primary));
     position: absolute;
     z-index: 1;
-    top: calc(var(--_scheduler-offset, 0) * 100% + 1px);
+    /* In slots, as its height is, not in % of the cell: the cell's top border makes its box a pixel
+       shorter than a slot, and an event drawn from a slot above the window (#1085), many slots up,
+       was off by a pixel a slot. */
+    top: calc(var(--_scheduler-offset, 0) * var(--pdx-scheduler-slot-height) + 1px);
     left: calc(var(--_scheduler-column, 0) / var(--_scheduler-columns, 1) * 100% + 1px);
     width: calc(var(--_scheduler-span, 1) / var(--_scheduler-columns, 1) * 100% - 3px);
     height: calc(var(--_scheduler-length, 1) * var(--pdx-scheduler-slot-height) - 2px);

@@ -29,7 +29,9 @@
  */
 import { build } from 'vite';
 import { rmSync, writeFileSync } from 'node:fs';
-import { mainWorktree } from './pilot-main';
+// With its extension: `tools/perf/lib.mjs` imports this file under Node's own type stripping, which
+// does not guess one, as Playwright's loader does.
+import { mainWorktree } from './pilot-main.ts';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 

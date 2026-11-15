@@ -9,6 +9,9 @@
         // it: `vite.config.ts` reads `process.env`, and the two mock servers are `node:http`.
         "typeRoots": ["../compiler/node_modules/@types"],
         "types": ["node"],
+        // `tests/scenarios-build.ts` names `./pilot-main.ts` with its extension, because the perf
+        // tools import it under Node's type stripping, which resolves no extensionless path.
+        "allowImportingTsExtensions": true,
         // What the `pdx()` plugin resolves for the bundler, told to tsc as well.
         //
         // This app has no `@pdxui/*` in its package.json and needs none: the plugin
