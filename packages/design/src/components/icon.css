@@ -9,6 +9,15 @@
     to { transform: rotate(360deg); }
 }
 
+/* The host is as tall as its glyph. Left inline, a pdx-icon that a flex parent makes a block (an
+   input's prefix, a button) took the line of the text around it, 24px for a 16px icon, and the
+   glyph sat on that line's baseline, 2px above the centre the parent aligned the host to (#1087).
+   At zero weight: a component that places its icon otherwise still does. */
+:where(pdx-icon) {
+    display: inline-flex;
+    vertical-align: middle;
+}
+
 :where(pdx-icon) > [data-part="root"] {
     display: inline-flex;
     align-items: center;

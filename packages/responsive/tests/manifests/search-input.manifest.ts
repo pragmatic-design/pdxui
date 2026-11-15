@@ -141,6 +141,22 @@ export const searchInput: ComponentManifest = {
                             { description: 'md < lg', left: 'md.height', op: '<', right: 'lg.height' },
                         ],
                     },
+                    // The magnifier's glyph is centred on the text, at every size. It sat 2px high: its
+                    // pdx-icon, a flex item, took the 24px line of the text around it and the glyph sat
+                    // on that line's baseline (#1087). Measured against the input, not the field: an
+                    // underlined field (editorial, cyberpunk) has a bottom border only, and both the
+                    // text and the glyph are centred above it.
+                    ...(['sm', 'md', 'lg'] as const).map((size) => ({
+                        description: `${size}: the magnifier is centred on the text`,
+                        parent: 'body',
+                        children: {
+                            input: `[data-test="search-${size}"] [data-part="input"]`,
+                            glyph: `[data-test="search-${size}"] .pdx-input-prefix svg`,
+                        },
+                        relations: [
+                            { description: `${size}: glyph.centerY == input.centerY`, left: 'glyph.centerY', op: '==' as const, right: 'input.centerY', tolerance: 0.5 },
+                        ],
+                    })),
                 ],
             },
         },
