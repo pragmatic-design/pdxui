@@ -364,6 +364,13 @@ export const DEFECTS: Record<string, DiagnosticEntry> = {
         fix: 'To reach the element, bind it with `:ref` to a `$signal` of another name. A `$signal` of the part\'s own name receives the element, as a part does. A part only a theme needs can stay as it is: the finding is information.',
         example: { bad: pdx('<span data-part="label">{{ label }}</span>', "@prop label: string = '';\n@part label;"), good: pdx('<span data-part="label" :ref="labelEl">{{ label }}</span>', "@prop label: string = '';\n@part label;\nlet labelEl = $signal<HTMLElement | null>(null);") },
     },
+    PDX_PART_IN_VIEW: {
+        severity: 'warn', category: 'defect',
+        summary: 'The script reads a `@part` that only one of its `@internal` views draws (#1110).',
+        explanation: "The parts an `@internal` view draws are its owner's: the owner declares them, and its manifest lists them. The elements are in the view, though, and the owner's part signal of that name never receives one: what the script reads there is always empty.",
+        fix: 'Reach the element in the view, with a `:ref`, and pass what the owner needs as a prop or an event.',
+        reproducedIn: `${T}internal-component.test.ts`,
+    },
     PDX_HOST_INVALID_ATTRIBUTE: {
         severity: 'error', category: 'defect',
         summary: 'On `@host`, a form with no meaning on a host: `::x`, `data-part`, a generic argument.',

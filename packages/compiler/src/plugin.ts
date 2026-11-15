@@ -44,7 +44,7 @@ import { generateLoaderModule, LOADER_MODULE_PREFIX } from './loader-module';
 import { writeRouteTypes } from './route-types';
 import type { ScannedRoute } from './plugin-utils';
 import { ComponentResolver } from './component-resolver';
-import { importedInternals, checkInternalUses, type ReadComponent } from './internal-components';
+import { importedInternals, checkInternalUses, viewParts, type ReadComponent } from './internal-components';
 import { injectSplash, type SplashOptions } from './splash';
 import type { PropsLookup, BrowserTarget } from './compiler/compile-context';
 import type { EnumLookup } from './compiler/validate-enums';
@@ -955,6 +955,8 @@ export function compile(
         });
     }
     let cachedAnalysis: ReturnType<typeof analyzeScript> | null = null;
+    // The parts this component's @internal views draw, which are its own (#1110).
+    const partsOfViews = options?.readComponent ? viewParts(scriptContent, filename, options.readComponent) : undefined;
     if (scriptContent) {
         // Where the script starts in the .pdx, so the analysis can say where each line came from and
         // the source map follows it. Not for a script read from another file, nor one a
@@ -973,6 +975,7 @@ export function compile(
         allWarnings.push(...validate(cachedAnalysis, ast, filename, {
             enumValues: options?.enumValues, methodsOf: options?.methodsOf, modelsOf: options?.modelsOf, requiredPropsOf: options?.requiredPropsOf,
             requiredSlotsOf: options?.requiredSlotsOf,
+            viewParts: partsOfViews,
             eventHeardAbove: heard ? (event) => heard(event, ownTag) : undefined,
         }));
         // An @action offered to agents that no control of the template runs (#502, decision 31).

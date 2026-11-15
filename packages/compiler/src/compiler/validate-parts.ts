@@ -123,12 +123,29 @@ function partHasRef(name: string, ast: readonly TemplateNode[]): boolean {
  * script does not declare (`PDX_PART_UNDECLARED`), and a part whose name the script declares as
  * something other than a signal, with no `:ref` on its element to reach it (`PDX_PART_NAME_TAKEN`).
  * `signalNames` are the script's signals: a part's own, or a `$signal` that receives its element.
+ *
+ * The parts an `@internal` view draws are its owner's (#1110): `drawnBy` maps each part the owner's
+ * imported views draw to the view that draws it, and `internal` says this file is such a view, whose
+ * own `data-part`s its owner checks. `scriptReads` says whether the script reads a name.
  */
-export function checkParts(parts: readonly string[], ast: TemplateNode[], signalNames: ReadonlySet<string>): ValidationWarning[] {
+export function checkParts(parts: readonly string[], ast: TemplateNode[], signalNames: ReadonlySet<string>,
+    { internal = false, drawnBy = new Map(), scriptReads = () => false }: PartContext = {}): ValidationWarning[] {
     const counts = dataPartCounts(ast);
     const declared = new Set(parts);
     const warnings: ValidationWarning[] = [];
     for (const name of declared) {
+        const view = drawnBy.get(name);
+        if ((counts.get(name) ?? 0) === 0 && view) {
+            // The owner's part, on an element of its view: the owner's script never holds that element.
+            if (signalNames.has(name) && scriptReads(name)) {
+                warnings.push({
+                    code: 'PDX_PART_IN_VIEW', severity: 'warn',
+                    message: `@part '${name}' is drawn by ${view}, an @internal view: '${name}' in this script is never its element.`,
+                    hint: `Reach the element in ${view}, with a :ref there, and pass what the owner needs as a prop or an event.`,
+                });
+            }
+            continue;
+        }
         if ((counts.get(name) ?? 0) === 0) {
             warnings.push({
                 code: 'PDX_PART_MISSING', severity: 'error',
@@ -143,13 +160,31 @@ export function checkParts(parts: readonly string[], ast: TemplateNode[], signal
             });
         }
     }
-    for (const name of counts.keys()) {
+    // A view's parts are declared by its owner, which checks them against the views it imports.
+    if (!internal) {
+        for (const name of counts.keys()) {
+            if (declared.has(name)) continue;
+            warnings.push({
+                code: 'PDX_PART_UNDECLARED', severity: 'error',
+                message: `data-part '${name}' names no part the script declares.`,
+                hint: `Declare it: @part ${name};`,
+            });
+        }
+    }
+    for (const [name, view] of drawnBy) {
         if (declared.has(name)) continue;
         warnings.push({
             code: 'PDX_PART_UNDECLARED', severity: 'error',
-            message: `data-part '${name}' names no part the script declares.`,
-            hint: `Declare it: @part ${name};`,
+            message: `data-part '${name}', drawn by ${view}, an @internal view of this component, names no part the script declares.`,
+            hint: `Declare it here, in the component the view belongs to: @part ${name};`,
         });
     }
     return warnings;
+}
+
+/** What `checkParts` knows beyond the file: its @internal views, and whether it is one (#1110). */
+export interface PartContext {
+    internal?: boolean;
+    drawnBy?: ReadonlyMap<string, string>;
+    scriptReads?: (name: string) => boolean;
 }
