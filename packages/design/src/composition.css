@@ -14,6 +14,19 @@
     border-radius: var(--_r-tl, 0) var(--_r-tr, 0) var(--_r-br, 0) var(--_r-bl, 0);
 }
 
+/* A theme's hover lift and glow (--pdx-button-transform-hover, --pdx-button-shadow-hover) are a
+   standalone button's: in a joined group a hovered button would step out of the row and its glow
+   spill over its neighbours (#1086). The theme writes them on the button itself, so they are
+   turned off there, in this layer, after the themes. */
+:is(.pdx-btn-group, .pdx-btn-group-vertical) > pdx-button > button[data-part="root"],
+:is(.pdx-btn-group, .pdx-btn-group-vertical) > :is(button, a, [role="button"]),
+:is(.pdx-input-group, pdx-input-group) > pdx-button button,
+:is(.pdx-input-group, pdx-input-group) > button,
+:is(button, a, [role="button"]):is(.pdx-split-primary, .pdx-split-arrow) {
+    --pdx-button-transform-hover: none;
+    --pdx-button-shadow-hover: none;
+}
+
 /* Number-group: same enforcement */
 .pdx-number-group > .pdx-input-wrap,
 .pdx-number-group > .pdx-input-addon,

@@ -28,6 +28,7 @@
  *   - "first.topLeft >= middle.topLeft" catches the joined shape without assuming an absolute px.
  */
 import type { ComponentManifest } from './_types';
+import { GLOW_THEMES } from './_themes.ts';
 
 export const buttonGroup: ComponentManifest = {
     name: 'button-group',
@@ -134,8 +135,30 @@ export const buttonGroup: ComponentManifest = {
                         ],
                     },
                 ],
+                states: [
+                    {
+                        // A theme's premium hover (Pragmatic, Pragmatic Gold, Playful: a 1px lift) is a
+                        // standalone button's. In a joined group the button would step out of the row (#1086).
+                        description: 'a hovered button stays in the row: no lift',
+                        selector: 'pdx-button-group[data-test="bg"] [data-test="bg-mid"] button',
+                        trigger: 'hover',
+                        changes: { transform: { op: 'is', value: 'none' } },
+                    },
+                ],
             },
         },
+        // No glow either, in the themes whose hover adds one to a button with no shadow at rest.
+        // Neumorphic is not among them: its buttons are raised at rest, and keep that in a group.
+        themeOverrides: Object.fromEntries(GLOW_THEMES.map((theme) => [theme, {
+            'button-group-basic': {
+                states: [{
+                    description: `${theme}: a hovered button in a group has no glow (#1086)`,
+                    selector: 'pdx-button-group[data-test="bg"] [data-test="bg-mid"] button',
+                    trigger: 'hover' as const,
+                    changes: { boxShadow: { op: 'is' as const, value: 'none' } },
+                }],
+            },
+        }])),
     },
 
     // ── Dim. 2: axe-core ──
