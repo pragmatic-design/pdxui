@@ -1,0 +1,76 @@
+<template>
+  <div role="row" class="pdx-scheduler-row pdx-scheduler-head">
+    @for (heads as h; track h.key) {
+      <div role="columnheader" class="pdx-scheduler-header" data-part="columnHeader" :aria-label="h.full">{{ h.short }}</div>
+    }
+  </div>
+  @for (weeks as w, wi; track w.key) {
+    <div role="row" class="pdx-scheduler-row">
+      @for (w.days as d, di; track d) {
+        <div role="gridcell" class="pdx-scheduler-cell pdx-scheduler-day" data-part="slot" :data-row="wi" :data-col="di"
+          :data-outside="d.slice(0, 7) === refDate.slice(0, 7) ? null : ''" :data-today="d === today ? '' : null" :aria-current="d === today ? 'date' : null"
+          :tabindex="tabCell.row === wi && tabCell.col === di ? 0 : -1">
+          <span class="pdx-scheduler-day-number" aria-hidden="true">{{ dayHeader(d, locale).day }}</span>
+          <span class="pdx-sr-only">{{ dayHeader(d, locale).full }}</span>
+          @for (itemsAt(w, di) as it; track it.id) {
+            <button type="button" class="pdx-scheduler-event pdx-scheduler-bar" :data-line="it.bar ? null : ''" data-part="event" tabindex="-1" :data-id="it.event.id"
+              :style="'--_scheduler-span:' + it.span + ';--_scheduler-lane:' + it.lane + eventColorStyle(it.event, rules.resources)"
+              :data-movable="canDo(it.event, 'move', rules) ? '' : null" :data-dragging="isDraggedEvent(it.event, draft) ? '' : null"
+              :data-before="it.before ? '' : null" :data-after="it.after ? '' : null"
+              :aria-label="monthEventName(it.event, it.minutes, w.days, it.first, it.span, locale, rules.resources)">
+              @render event?.(it.event) @else {
+                @if (!it.bar) { <span class="pdx-scheduler-event-time">{{ clockLabel(it.minutes ?? 0, locale) }}</span> }
+                <span class="pdx-scheduler-event-title">{{ it.event.title }}</span>
+              }
+              @if (it.bar && canDo(it.event, 'resize', rules)) {
+                @if (!it.before) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="start" aria-hidden="true"></span> }
+                @if (!it.after) { <span class="pdx-scheduler-resize" data-part="resizeHandle" data-edge="end" aria-hidden="true"></span> }
+              }
+            </button>
+          }
+          @if (w.more[di] > 0) {
+            <button type="button" class="pdx-scheduler-more" data-part="more" tabindex="-1" :data-date="d"
+              :aria-label="format(uiString('scheduler', 'moreName'), { count: w.more[di], date: dayHeader(d, locale).full })">{{ format(uiString('scheduler', 'more'), { count: w.more[di] }) }}</button>
+          }
+        </div>
+      }
+    </div>
+  }
+</template>
+
+<script>
+// pdx-scheduler's month view (#1020): a grid of days, each with its events stacked and a «+N» where
+// they do not fit. Its element IS the grid: the owner gives the tag the grid's role, classes, part,
+// ref and handlers, so the pointer, the drop zone and the keys measure and hear a real box; this file
+// draws the rows. Its parts are pdx-scheduler's (#1110).
+@internal;
+import { uiString, format } from '../shared/i18n';
+import { dayHeader, clockLabel } from './labels';
+import { eventColorStyle } from './event-style';
+import { canDo, isDraggedEvent, monthEventName, type MoveRules } from './event-state';
+import type { MonthWeek } from './calendar-model';
+import type { Draft } from './scheduler-drag';
+import type { SchedulerEvent } from './grid-model';
+
+/** The month's weeks, each with its days and its events laid out in lanes. */
+@prop weeks: MonthWeek[] = [];
+/** The weekday heads, short and full. */
+@prop heads: { key: string; short: string; full: string }[] = [];
+/** The reference date (ISO): the days of other months are marked outside. */
+@prop refDate: string = '';
+/** Today's date (ISO), marked. */
+@prop today: string = '';
+/** The cell the grid's one tab stop is on. */
+@prop tabCell: { row: number; col: number } = { row: 0, col: 0 };
+/** The resolved locale dates and times are written in. */
+@prop locale: string = '';
+/** What the pointer may do with an event. */
+@prop rules: MoveRules = { disabled: false, readonly: false, resources: [] };
+/** What a pointer drag would make of an event, drawn in its place. */
+@prop draft: Draft | null = null;
+/** The owner's event snippet, passed on. */
+@slot event?: (event: SchedulerEvent);
+
+/** The events that start in day `di` of week `w`. */
+function itemsAt(w: MonthWeek, di: number) { return w.items.filter((it) => it.first === di); }
+</script>
